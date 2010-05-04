@@ -35,27 +35,27 @@ import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTSeparatedListNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineArgNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IAccessId;
 import org.eclipse.photran.internal.core.parser.IExpr;
-import org.eclipse.photran.internal.core.parser.Parser.ASTSeparatedListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.refactorings.UserInputBoolean;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
 
 
 /**
- * Refactoring to encapsulate a module variable.
+ * Refactoring to create getter and setter subprograms for a module variable and replace variable
+ * accesses with calls to those subprograms.
  * <p>
  * This refactoring accepts a module variable declaration, makes that declaration PRIVATE, adds
  * getter and setter procedures to the module, and then replaces accesses to the variable outside
@@ -64,7 +64,7 @@ import org.eclipse.rephraserengine.core.refactorings.UserInputString;
  * @author Tim Yuvashev
  * @author Jeff Overbey
  */
-public class EncapsulateVariableRefactoring extends SingleFileFortranRefactoring
+public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
 {
     private PhotranTokenRef selectedReference = null;
     private Definition selectedTokenDef = null;

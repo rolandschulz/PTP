@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring.interfaces;
 
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 
 /**
  * This is the interface implemented by all refactorings that subclass from
- * {@link SingleFileFortranRefactoring}.
+ * {@link FortranEditorRefactoring}.
  * 
  * @author Jeff Overbey
  */
-public interface ISingleFileFortranRefactoring extends IEditorRefactoring, ILTKRefactoring
+public interface IFortranEditorRefactoring extends IEditorRefactoring, ILTKRefactoring
 {
 
 }

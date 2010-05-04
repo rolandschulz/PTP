@@ -16,7 +16,7 @@ import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.tests.BaseTestCase;
 
 /**

@@ -27,20 +27,20 @@ import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericNameNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTObjectNameNode;
+import org.eclipse.photran.internal.core.parser.ASTSeparatedListNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTSeparatedListNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 
 /**
  *
  * @author Kurt Hendle
  */
-public class MakePrivateEntityPublicRefactoring extends SingleFileFortranRefactoring
+public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
 {
     //used by all forms
     private int numPrivateEnt = 0;

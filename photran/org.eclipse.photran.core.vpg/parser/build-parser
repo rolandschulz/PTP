@@ -8,11 +8,9 @@ echo Deleting old files...
 rm -f *.java
 
 echo Generating parser and AST classes...
-#	-prec "<LblDef>, <Label>, T_ICON > <SelectTypeBody>" \
-#	-reduce "<SectionSubscript>" "<SubroutineArg>" \
-#java -Xmx256M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-workspace/bz.over.templates/lib/js.jar \
-java -Xmx512M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-workspace/bz.over.templates/lib/js.jar \
+java -Xmx1024M -cp $SRCDIR/ludwig.jar \
 	Main_LALR1_Java_AST_Prototype \
+	-startSymbols "<ExecutableProgram>, <Body>, <Expr>, <ContainsStmt>" \
 	-shift T_COMMA "<IoControlSpecList>" \
 	-reduce "<SFVarName>" "<SFDummyArgName>" \
 	-package "org.eclipse.photran.internal.core.parser" \
@@ -36,6 +34,8 @@ java -Xmx512M -cp $SRCDIR/ludwig.jar:/Users/joverbey/Documents/eclipse/ludwig-wo
 	-genTerminalClass false \
 	-genLexerInterface false \
 	-genTokenClass false \
+	-separateSemanticActions true \
+	-separateParsingTables true \
 	-enablePreproc IPreprocessorReplacement \
 	$SRCDIR/fortran2008.bnf
 

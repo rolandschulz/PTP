@@ -23,8 +23,8 @@ import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
 
 /**
  * Unit tests for {@link Token#getOpenMPComments()}.

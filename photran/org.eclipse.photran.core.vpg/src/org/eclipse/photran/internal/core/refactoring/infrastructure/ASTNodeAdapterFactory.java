@@ -12,8 +12,8 @@ package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
 import org.eclipse.rephraserengine.core.preservation.ResetOffsetLength;
 import org.eclipse.rephraserengine.core.util.OffsetLength;

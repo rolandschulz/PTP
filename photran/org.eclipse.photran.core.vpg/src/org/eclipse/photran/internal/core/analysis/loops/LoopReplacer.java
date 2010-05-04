@@ -17,12 +17,12 @@ import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTDoConstructNode;
 import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IActionStmt;
 import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
 import org.eclipse.photran.internal.core.parser.IObsoleteActionStmt;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 
 /**
  * Identifies DO-loops in a Fortran AST and replaces them with {@link ASTProperLoopConstructNode}s.

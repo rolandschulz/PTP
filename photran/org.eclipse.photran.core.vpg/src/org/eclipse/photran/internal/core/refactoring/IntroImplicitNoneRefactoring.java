@@ -27,11 +27,11 @@ import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.util.Notification;
 
@@ -41,7 +41,7 @@ import org.eclipse.photran.internal.core.util.Notification;
  *
  * @author Jeff Overbey, Timofey Yuvashev
  */
-public class IntroImplicitNoneRefactoring extends MultipleFileFortranRefactoring
+public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
 {
     @Override
     public String getName()

@@ -8,8 +8,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorVPGTask;
 

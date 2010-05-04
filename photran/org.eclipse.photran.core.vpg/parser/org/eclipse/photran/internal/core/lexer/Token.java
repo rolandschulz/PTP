@@ -20,10 +20,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTMatcher;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNodeUtil;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.parser.ASTNodeUtil;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.IASTVisitor;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.util.OffsetLength;
@@ -385,25 +384,25 @@ public class Token implements IToken, IASTNode
         throw new UnsupportedOperationException();
     }
 
-    public boolean matches(IASTNode pattern)
-    {
-        return ASTNodeUtil.match(this, pattern).succeeded();
-    }
-
-    public <T extends IASTNode> ASTMatcher.Match<T> match(T pattern)
-    {
-        return ASTNodeUtil.match(this, pattern);
-    }
-
-    public <T extends IASTNode> List<ASTMatcher.Match<T>> matchAll(T pattern)
-    {
-        return ASTNodeUtil.matchAll(this, pattern);
-    }
-
-    public <T extends IASTNode> void replaceAll(T pattern, T replacement)
-    {
-        ASTNodeUtil.replaceAll(this, pattern, replacement);
-    }
+//    public boolean matches(IASTNode pattern)
+//    {
+//        return ASTNodeUtil.match(this, pattern).succeeded();
+//    }
+//
+//    public <T extends IASTNode> ASTMatcher.Match<T> match(T pattern)
+//    {
+//        return ASTNodeUtil.match(this, pattern);
+//    }
+//
+//    public <T extends IASTNode> List<ASTMatcher.Match<T>> matchAll(T pattern)
+//    {
+//        return ASTNodeUtil.matchAll(this, pattern);
+//    }
+//
+//    public <T extends IASTNode> void replaceAll(T pattern, T replacement)
+//    {
+//        ASTNodeUtil.replaceAll(this, pattern, replacement);
+//    }
     
     public void removeFromTree()
     {

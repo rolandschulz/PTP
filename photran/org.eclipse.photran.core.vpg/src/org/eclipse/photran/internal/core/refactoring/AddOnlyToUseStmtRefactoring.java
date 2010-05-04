@@ -32,13 +32,13 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
+import org.eclipse.photran.internal.core.parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTSeparatedListNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTSeparatedListNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
@@ -47,7 +47,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  *
  * @author Kurt Hendle
  */
-public class AddOnlyToUseStmtRefactoring extends SingleFileFortranRefactoring
+public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
 {
     private String moduleName = null;
     private IProject projectInEditor = null;

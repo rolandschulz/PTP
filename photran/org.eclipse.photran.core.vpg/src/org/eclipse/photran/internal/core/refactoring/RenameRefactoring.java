@@ -24,7 +24,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.interfaces.IRenameRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
@@ -34,7 +34,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  *
  * @author Jeff Overbey
  */
-public class RenameRefactoring extends SingleFileFortranRefactoring implements IRenameRefactoring
+public class RenameRefactoring extends FortranEditorRefactoring implements IRenameRefactoring
 {
     private Definition definitionToRename = null;
     private Collection<PhotranTokenRef> allReferences = null;

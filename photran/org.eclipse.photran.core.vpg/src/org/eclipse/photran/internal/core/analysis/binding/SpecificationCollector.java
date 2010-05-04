@@ -36,8 +36,8 @@ import org.eclipse.photran.internal.core.parser.ASTTargetStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTValueStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVariableNameNode;
 import org.eclipse.photran.internal.core.parser.ASTVolatileStmtNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IBindEntity;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 
 /**

@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.parser.ASTOperatorNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 
 /**
  * Refactoring to replace obsolete operators in Fortran files.
@@ -29,7 +29,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFile
  * @author Bruno B. Boniati
  * @author Jeff Overbey
  */
-public class RepObsOpersRefactoring extends MultipleFileFortranRefactoring
+public class RepObsOpersRefactoring extends FortranResourceRefactoring
 {
     @Override
     public String getName()

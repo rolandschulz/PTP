@@ -28,9 +28,9 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockNode;
 import org.eclipse.photran.internal.core.parser.ASTCommonBlockObjectNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
@@ -40,7 +40,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  *
  * @author Kurt Hendle
  */
-public class CommonVarNamesRefactoring extends SingleFileFortranRefactoring
+public class CommonVarNamesRefactoring extends FortranEditorRefactoring
 {
     private String commonBlockName = null;
     private HashMap<String, Integer> oldVarNames = new HashMap<String, Integer>();

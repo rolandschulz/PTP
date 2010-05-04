@@ -41,12 +41,12 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 
@@ -56,7 +56,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
  *
  * @author Stas Negara
  */
-public class MoveSavedToCommonBlockRefactoring extends SingleFileFortranRefactoring
+public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
 {
     /** The OS-dependent end-of-line sequence (\n or \r\n) */
     private static final String EOL = System.getProperty("line.separator");

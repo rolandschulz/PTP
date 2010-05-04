@@ -30,8 +30,8 @@ import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
@@ -138,10 +138,10 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends VPGResourceRefac
      */
     protected void initializeRefactoring(R refactoring, IFile file, TextSelection selection, String[] markerText)
     {
-        if (refactoring instanceof SingleFileFortranRefactoring)
-            ((SingleFileFortranRefactoring)refactoring).initialize(file, selection);
-        else if (refactoring instanceof MultipleFileFortranRefactoring)
-            ((MultipleFileFortranRefactoring)refactoring).initialize(Collections.singletonList(file));
+        if (refactoring instanceof FortranEditorRefactoring)
+            ((FortranEditorRefactoring)refactoring).initialize(file, selection);
+        else if (refactoring instanceof FortranResourceRefactoring)
+            ((FortranResourceRefactoring)refactoring).initialize(Collections.singletonList(file));
         else
             throw new IllegalStateException();
     }

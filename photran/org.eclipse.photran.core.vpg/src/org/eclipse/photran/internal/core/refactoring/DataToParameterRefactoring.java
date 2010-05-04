@@ -23,10 +23,10 @@ import org.eclipse.photran.internal.core.parser.ASTDataStmtValueNode;
 import org.eclipse.photran.internal.core.parser.ASTDatalistNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IDataStmtObject;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 
@@ -41,7 +41,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
  * @author Timofey Yuvashev
  * @author Jeff Overbey
  **/
-public class DataToParameterRefactoring extends MultipleFileFortranRefactoring
+public class DataToParameterRefactoring extends FortranResourceRefactoring
 {
     boolean changesWereMade = false;
     

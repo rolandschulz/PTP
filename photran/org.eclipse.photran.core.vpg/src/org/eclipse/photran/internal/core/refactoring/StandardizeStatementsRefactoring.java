@@ -24,9 +24,9 @@ import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 
@@ -39,7 +39,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
  * @author Timofey Yuvashev
  * @author Jeff Overbey
  **/
-public class StandardizeStatementsRefactoring extends MultipleFileFortranRefactoring{
+public class StandardizeStatementsRefactoring extends FortranResourceRefactoring{
 
     @Override
     public String getName()

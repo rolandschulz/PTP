@@ -15,17 +15,17 @@ import java.util.Iterator;
 
 import java.util.List;
 
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.parser.ASTListNode;
+import org.eclipse.photran.internal.core.parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.IASTVisitor;
 import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
-@SuppressWarnings({ "unchecked", "unused" })
+@SuppressWarnings("all")
 public class ASTForallStmtNode extends ASTNode implements IActionStmt, IBodyConstruct, ICaseBodyConstruct, IExecutableConstruct, IExecutionPartConstruct, IForallBodyConstruct
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTForallStmtNode
@@ -36,7 +36,6 @@ public class ASTForallStmtNode extends ASTNode implements IActionStmt, IBodyCons
     ASTScalarMaskExprNode scalarMaskExpr; // in ASTForallStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTForallStmtNode
     ASTAssignmentStmtNode assignment; // in ASTForallStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTForallStmtNode
 
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
@@ -100,7 +99,7 @@ public class ASTForallStmtNode extends ASTNode implements IActionStmt, IBodyCons
 
     @Override protected int getNumASTFields()
     {
-        return 9;
+        return 8;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -115,7 +114,6 @@ public class ASTForallStmtNode extends ASTNode implements IActionStmt, IBodyCons
         case 5:  return this.scalarMaskExpr;
         case 6:  return this.hiddenTRparen;
         case 7:  return this.assignment;
-        case 8:  return this.hiddenTEos;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -132,7 +130,6 @@ public class ASTForallStmtNode extends ASTNode implements IActionStmt, IBodyCons
         case 5:  this.scalarMaskExpr = (ASTScalarMaskExprNode)value; if (value != null) value.setParent(this); return;
         case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 7:  this.assignment = (ASTAssignmentStmtNode)value; if (value != null) value.setParent(this); return;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

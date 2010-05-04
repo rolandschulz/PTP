@@ -15,7 +15,7 @@ import java.io.PrintStream;
 
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 
 /**
  * Methods to reproduce source code from a (modified) AST.

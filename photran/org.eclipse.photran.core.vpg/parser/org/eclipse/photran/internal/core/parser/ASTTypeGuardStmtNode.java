@@ -15,29 +15,41 @@ import java.util.Iterator;
 
 import java.util.List;
 
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.parser.ASTListNode;
+import org.eclipse.photran.internal.core.parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.IASTVisitor;
 import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
-@SuppressWarnings({ "unchecked", "unused" })
+@SuppressWarnings("all")
 public class ASTTypeGuardStmtNode extends ASTNode
 {
+    org.eclipse.photran.internal.core.lexer.Token isDefault; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token isClass; // in ASTTypeGuardStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTDefault; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token isType; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIs; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeGuardStmtNode
-    org.eclipse.photran.internal.core.lexer.Token isDefault; // in ASTTypeGuardStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTDefault; // in ASTTypeGuardStmtNode
     ASTTypeSpecNode typeSpecNoPrefix; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token selectConstructName; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTTypeGuardStmtNode
+
+    public boolean isDefault()
+    {
+        return this.isDefault != null;
+    }
+
+    public void setIsDefault(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isDefault = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
 
     public boolean isClass()
     {
@@ -59,18 +71,6 @@ public class ASTTypeGuardStmtNode extends ASTNode
     public void setIsType(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isType = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public boolean isDefault()
-    {
-        return this.isDefault != null;
-    }
-
-    public void setIsDefault(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isDefault = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -114,12 +114,12 @@ public class ASTTypeGuardStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isClass;
-        case 1:  return this.isType;
-        case 2:  return this.hiddenTIs;
-        case 3:  return this.hiddenTLparen;
-        case 4:  return this.isDefault;
-        case 5:  return this.hiddenTDefault;
+        case 0:  return this.isDefault;
+        case 1:  return this.isClass;
+        case 2:  return this.hiddenTDefault;
+        case 3:  return this.isType;
+        case 4:  return this.hiddenTIs;
+        case 5:  return this.hiddenTLparen;
         case 6:  return this.typeSpecNoPrefix;
         case 7:  return this.hiddenTRparen;
         case 8:  return this.selectConstructName;
@@ -132,12 +132,12 @@ public class ASTTypeGuardStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isClass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isType = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.hiddenTIs = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 4:  this.isDefault = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.hiddenTDefault = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isDefault = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isClass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTDefault = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.isType = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTIs = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 6:  this.typeSpecNoPrefix = (ASTTypeSpecNode)value; if (value != null) value.setParent(this); return;
         case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 8:  this.selectConstructName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;

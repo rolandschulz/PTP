@@ -15,33 +15,21 @@ import java.util.Iterator;
 
 import java.util.List;
 
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.parser.ASTListNode;
+import org.eclipse.photran.internal.core.parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.IASTVisitor;
 import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
-@SuppressWarnings({ "unchecked", "unused" })
+@SuppressWarnings("all")
 public class ASTModuleNatureNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isIntrinsic; // in ASTModuleNatureNode
     org.eclipse.photran.internal.core.lexer.Token isNonIntrinsic; // in ASTModuleNatureNode
-
-    public boolean isIntrinsic()
-    {
-        return this.isIntrinsic != null;
-    }
-
-    public void setIsIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isIntrinsic = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isIntrinsic; // in ASTModuleNatureNode
 
     public boolean isNonIntrinsic()
     {
@@ -51,6 +39,18 @@ public class ASTModuleNatureNode extends ASTNode
     public void setIsNonIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isNonIntrinsic = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isIntrinsic()
+    {
+        return this.isIntrinsic != null;
+    }
+
+    public void setIsIntrinsic(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isIntrinsic = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -70,8 +70,8 @@ public class ASTModuleNatureNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isIntrinsic;
-        case 1:  return this.isNonIntrinsic;
+        case 0:  return this.isNonIntrinsic;
+        case 1:  return this.isIntrinsic;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -80,8 +80,8 @@ public class ASTModuleNatureNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isNonIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isNonIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isIntrinsic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

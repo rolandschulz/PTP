@@ -25,8 +25,8 @@ import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
  * and possibly require user input/selection
  * @author Jeff Overbey, Timofey Yuvashev
  */
-public abstract class SingleFileFortranRefactoring
-    extends MultipleFileFortranRefactoring
+public abstract class FortranEditorRefactoring
+    extends FortranResourceRefactoring
     implements IEditorRefactoring
 {
     /*

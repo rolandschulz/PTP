@@ -19,9 +19,9 @@ import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTObjectNameNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 
 /**
  * Remove Unused Variables: refactoring that removes unused variables in Fortran code,
@@ -36,7 +36,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFile
  * TODO - JO - Can we avoid running multiple times?
  * TODO - JO - What about specification stmts?
  */
-public class RemoveUnusedVariablesRefactoring extends MultipleFileFortranRefactoring{
+public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring{
 
     @Override
     public String getName()

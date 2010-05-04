@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.loops;
 
-import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTVisitor;
 
 /**
  * An extension of {@link IASTVisitorWithLoops} which contains an additional method so that it can visit

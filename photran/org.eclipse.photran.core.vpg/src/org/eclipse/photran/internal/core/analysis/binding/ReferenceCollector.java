@@ -84,7 +84,7 @@ import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.ASTVariableNode;
 import org.eclipse.photran.internal.core.parser.ASTWaitSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWaitStmtNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 

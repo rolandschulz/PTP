@@ -15,23 +15,35 @@ import java.util.Iterator;
 
 import java.util.List;
 
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNodeWithErrorRecoverySymbols;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTVisitor;
+import org.eclipse.photran.internal.core.parser.ASTListNode;
+import org.eclipse.photran.internal.core.parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.IASTVisitor;
 import org.eclipse.photran.internal.core.lexer.Token;
 
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
-@SuppressWarnings({ "unchecked", "unused" })
+@SuppressWarnings("all")
 public class ASTIntentSpecNode extends ASTNode
 {
+    org.eclipse.photran.internal.core.lexer.Token isIntentInOut; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token isIntentIn; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token isIntentOut; // in ASTIntentSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isIntentInOut; // in ASTIntentSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTOut; // in ASTIntentSpecNode
+
+    public boolean isIntentInOut()
+    {
+        return this.isIntentInOut != null;
+    }
+
+    public void setIsIntentInOut(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isIntentInOut = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
 
     public boolean isIntentIn()
     {
@@ -57,18 +69,6 @@ public class ASTIntentSpecNode extends ASTNode
     }
 
 
-    public boolean isIntentInOut()
-    {
-        return this.isIntentInOut != null;
-    }
-
-    public void setIsIntentInOut(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isIntentInOut = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTIntentSpecNode(this);
@@ -84,9 +84,9 @@ public class ASTIntentSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isIntentIn;
-        case 1:  return this.isIntentOut;
-        case 2:  return this.isIntentInOut;
+        case 0:  return this.isIntentInOut;
+        case 1:  return this.isIntentIn;
+        case 2:  return this.isIntentOut;
         case 3:  return this.hiddenTOut;
         default: throw new IllegalArgumentException("Invalid index");
         }
@@ -96,9 +96,9 @@ public class ASTIntentSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.isIntentInOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isIntentInOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isIntentIn = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.isIntentOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.hiddenTOut = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }

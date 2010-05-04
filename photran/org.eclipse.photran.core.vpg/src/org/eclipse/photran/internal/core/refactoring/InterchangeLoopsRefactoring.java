@@ -19,9 +19,9 @@ import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.ASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
 
 /**
@@ -29,7 +29,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.S
  *
  * @author Tim Yuvashev
  */
-public class InterchangeLoopsRefactoring extends SingleFileFortranRefactoring
+public class InterchangeLoopsRefactoring extends FortranEditorRefactoring
 {
     private ASTProperLoopConstructNode outerLoop = null;
     private ASTProperLoopConstructNode innerLoop = null;

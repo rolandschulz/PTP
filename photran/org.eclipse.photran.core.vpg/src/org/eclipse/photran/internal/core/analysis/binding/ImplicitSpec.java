@@ -19,9 +19,9 @@ import java.io.PrintStream;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTImplicitSpecNode;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 

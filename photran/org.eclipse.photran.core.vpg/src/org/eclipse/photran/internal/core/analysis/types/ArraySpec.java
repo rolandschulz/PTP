@@ -22,7 +22,7 @@ import org.eclipse.photran.internal.core.parser.ASTAssumedShapeSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTAssumedSizeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTDeferredShapeSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 

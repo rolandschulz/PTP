@@ -21,7 +21,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.RefactoringTestCase;
@@ -156,11 +156,11 @@ public class CheckCanAddDeclTests extends RefactoringTestCase
 
     /**
      * This is intended to be subclassed in order to gain access to the protected methods of
-     * {@link SingleFileFortranRefactoring} to test those methods.
+     * {@link FortranEditorRefactoring} to test those methods.
      *
      * @author Jeff Overbey
      */
-    private class FauxFortranRefactoring extends SingleFileFortranRefactoring
+    private class FauxFortranRefactoring extends FortranEditorRefactoring
     {
         public FauxFortranRefactoring()
         {

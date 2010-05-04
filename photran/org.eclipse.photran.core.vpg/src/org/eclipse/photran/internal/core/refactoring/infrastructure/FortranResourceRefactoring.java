@@ -46,18 +46,18 @@ import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
 import org.eclipse.photran.internal.core.parser.ISpecificationPartConstruct;
 import org.eclipse.photran.internal.core.parser.Parser;
-import org.eclipse.photran.internal.core.parser.Parser.ASTNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.util.IterableWrapper;
 import org.eclipse.photran.internal.core.util.Notification;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
@@ -70,7 +70,7 @@ import org.eclipse.rephraserengine.core.vpg.refactoring.VPGResourceRefactoring;
  * This is a base class for all Photran refactorings that apply to multiple files
  * @author Jeff Overbey, Timofey Yuvashev
  */
-public abstract class MultipleFileFortranRefactoring
+public abstract class FortranResourceRefactoring
     extends VPGResourceRefactoring<IFortranAST, Token, PhotranVPG>
     implements IResourceRefactoring
 {
@@ -473,7 +473,7 @@ public abstract class MultipleFileFortranRefactoring
         return (ASTProperLoopConstructNode)getNode(ast, selection, ASTProperLoopConstructNode.class);
     }
 
-    protected static ASTNode getNode(IFortranAST ast, ITextSelection selection, Class<? extends Parser.ASTNode> node)
+    protected static ASTNode getNode(IFortranAST ast, ITextSelection selection, Class<? extends ASTNode> node)
     {
         Token firstToken = findFirstTokenAfter(ast, selection.getOffset());
         Token lastToken = findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
@@ -482,7 +482,7 @@ public abstract class MultipleFileFortranRefactoring
         return getNode(firstToken, lastToken, node);
     }
 
-    protected static ASTNode getNode(Token firstToken, Token lastToken, Class<? extends Parser.ASTNode> node)
+    protected static ASTNode getNode(Token firstToken, Token lastToken, Class<? extends ASTNode> node)
     {
         assert(firstToken != null);
         assert(lastToken  != null);

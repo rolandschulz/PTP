@@ -8,8 +8,8 @@ import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.photran.internal.core.analysis.loops.GenericASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 
 /**
  * THIS IS AN INTERNAL CLASS.

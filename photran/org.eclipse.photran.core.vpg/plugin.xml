@@ -29,7 +29,7 @@
    <!-- Adapter factory for IASTNode objects -->
    <extension point="org.eclipse.core.runtime.adapters">
        <factory
-             adaptableType="org.eclipse.photran.internal.core.parser.Parser$IASTNode"
+             adaptableType="org.eclipse.photran.internal.core.parser.IASTNode"
              class="org.eclipse.photran.internal.core.refactoring.infrastructure.ASTNodeAdapterFactory">
           <adapter type="org.eclipse.rephraserengine.core.util.OffsetLength" />
           <adapter type="org.eclipse.rephraserengine.core.preservation.ResetOffsetLength" />

@@ -18,15 +18,15 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.MultipleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 
 /**
  * Refactoring to unify case of all keywords in Fortran files.
  *
  * @author Kurt Hendle
  */
-public class KeywordCaseRefactoring extends MultipleFileFortranRefactoring
+public class KeywordCaseRefactoring extends FortranResourceRefactoring
 {
     private boolean lowerCase = true;   //true for lower case, false for upper case
 

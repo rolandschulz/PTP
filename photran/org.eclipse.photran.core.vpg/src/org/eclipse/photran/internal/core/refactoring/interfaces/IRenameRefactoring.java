@@ -17,7 +17,7 @@ import org.eclipse.photran.internal.core.refactoring.RenameRefactoring;
  * 
  * @author Jeff Overbey
  */
-public interface IRenameRefactoring extends ISingleFileFortranRefactoring
+public interface IRenameRefactoring extends IFortranEditorRefactoring
 {
     void setNewNameForIdentifier(String newName);
 }

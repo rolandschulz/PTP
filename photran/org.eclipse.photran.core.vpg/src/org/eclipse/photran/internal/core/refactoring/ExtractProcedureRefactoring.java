@@ -34,19 +34,19 @@ import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
+import org.eclipse.photran.internal.core.parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTObjectNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
-import org.eclipse.photran.internal.core.parser.Parser.ASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
@@ -60,7 +60,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  * (Eventually, this should be generalized to extract either a subroutine or function,
  * hence the name "extract procedure.")
  */
-public class ExtractProcedureRefactoring extends SingleFileFortranRefactoring
+public class ExtractProcedureRefactoring extends FortranEditorRefactoring
 {
 	private StatementSequence selection = null;
 	private List<Definition> localVarsToPassInAsParams = new LinkedList<Definition>();

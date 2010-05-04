@@ -20,8 +20,8 @@ import org.eclipse.photran.internal.core.parser.ASTOperatorNode;
 import org.eclipse.photran.internal.core.parser.ASTRealConstNode;
 import org.eclipse.photran.internal.core.parser.ASTStringConstNode;
 import org.eclipse.photran.internal.core.parser.ASTUnaryExprNode;
+import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.IExpr;
-import org.eclipse.photran.internal.core.parser.Parser.ASTVisitor;
 
 /**
  * A type checker for Fortran programs.

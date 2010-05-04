@@ -17,8 +17,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import org.eclipse.photran.internal.core.parser.ASTExplicitShapeSpecNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IExpr;
-import org.eclipse.photran.internal.core.parser.Parser.IASTNode;
 import org.eclipse.photran.internal.core.vpg.IPhotranSerializable;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 

@@ -53,9 +53,9 @@ import org.eclipse.photran.internal.core.parser.ASTTypeParamDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeParamDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 

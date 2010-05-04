@@ -2048,7 +2048,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # R747
 <ForallConstruct> ::=
-  | <ForallConstructStmt>                <EndForallStmt>
+  | <ForallConstructStmt>              <EndForallStmt>
   | <ForallConstructStmt> <ForallBody> <EndForallStmt>
 
 (list):<ForallBody> ::=
@@ -2058,14 +2058,14 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 # R748
 # JO -- Added error productions
 <ForallConstructStmt> ::=
-  | (inline):<LblDef>                    -:T_FORALL (inline):<ForallHeader> -:T_EOS
+  | (inline):<LblDef>                           -:T_FORALL (inline):<ForallHeader> -:T_EOS
   | (inline):<LblDef> (inline):<Name> -:T_COLON -:T_FORALL (inline):<ForallHeader> -:T_EOS
-  | (inline):<LblDef>                    -:T_FORALL (error) T_EOS
+  | (inline):<LblDef>                           -:T_FORALL (error) T_EOS
   | (inline):<LblDef> (inline):<Name> -:T_COLON -:T_FORALL (error) T_EOS
 
 # R749
 <ForallHeader> ::=
-  | -:T_LPAREN <ForallTripletSpecList>                              -:T_RPAREN
+  | -:T_LPAREN <ForallTripletSpecList>                            -:T_RPAREN
   | -:T_LPAREN <ForallTripletSpecList> -:T_COMMA <ScalarMaskExpr> -:T_RPAREN
 
 <ScalarMaskExpr> ::= (inline):<MaskExpr>
@@ -2095,8 +2095,8 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # R754
 <ForallStmt> ::=
-    (inline):<LblDef> -:T_FORALL (inline):<ForallHeader> assignment:<AssignmentStmt>        -:T_EOS
-  | (inline):<LblDef> -:T_FORALL (inline):<ForallHeader> assignment:<PointerAssignmentStmt> -:T_EOS
+    (inline):<LblDef> -:T_FORALL (inline):<ForallHeader> assignment:<AssignmentStmt>
+  | (inline):<LblDef> -:T_FORALL (inline):<ForallHeader> assignment:<PointerAssignmentStmt>
 
 #######################################################################################################################
 # Section 8 Rules

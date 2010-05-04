@@ -17,8 +17,8 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTPrintStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStringConstNode;
-import org.eclipse.photran.internal.core.parser.Parser.IASTListNode;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.SingleFileFortranRefactoring;
+import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
@@ -47,7 +47,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  *
  * @author Jeff Overbey
  */
-public class EasterEgg extends SingleFileFortranRefactoring
+public class EasterEgg extends FortranEditorRefactoring
 {
     private ASTPrintStmtNode printStmt = null;
     private String string = null;
