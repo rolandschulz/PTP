@@ -13,7 +13,6 @@ package org.eclipse.ptp.rdt.server.dstore.core;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +52,7 @@ import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.dstore.core.model.DataStoreResources;
 import org.eclipse.dstore.core.model.DataStoreSchema;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
@@ -1131,7 +1131,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			info = ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", info); //$NON-NLS-1$
 
 		String infoMsg = Messages.getString("RSECIndexSubsystem.11"); //$NON-NLS-1$
-		String wholeMessage = MessageFormat.format(Messages.getString("RSECIndexSubsystem.12"), new Object[] { info }) + "  " + infoMsg; //$NON-NLS-1$ //$NON-NLS-2$
+		String wholeMessage = NLS.bind(Messages.getString("RSECIndexSubsystem.12"), new Object[] { info }) + "  " + infoMsg; //$NON-NLS-1$ //$NON-NLS-2$
 
 		IFile file = null;
 		String projectLocation = project.getLocationURI().getPath();
