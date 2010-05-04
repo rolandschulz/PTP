@@ -8,9 +8,9 @@
 
 package org.eclipse.ptp.remotetools.internal.ssh;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.ibm.icu.text.SimpleDateFormat;
 import com.jcraft.jsch.Buffer;
 import com.jcraft.jsch.SftpATTRS;
 
@@ -124,7 +124,7 @@ public class RemoteFileAttributes {
 	int atime;
 	int mtime;
 	String[] extended = null;
-	
+
 	public RemoteFileAttributes() {
 	}
 
@@ -142,10 +142,10 @@ public class RemoteFileAttributes {
 	public static RemoteFileAttributes getAttributes(SftpATTRS attrs) {
 		return new RemoteFileAttributes(attrs);
 	}
-	
+
 	public static RemoteFileAttributes getAttributes(String buf) {
 		RemoteFileAttributes attr = new RemoteFileAttributes();
-		
+
 		if (buf.endsWith("No such file or directory")) { //$NON-NLS-1$
 			return null;
 		}
@@ -153,12 +153,10 @@ public class RemoteFileAttributes {
 		if (args.length != 6) {
 			return null;
 		}
-		
-		attr.flags = SSH_FILEXFER_ATTR_PERMISSIONS
-			| SSH_FILEXFER_ATTR_SIZE
-			| SSH_FILEXFER_ATTR_UIDGID
-			| SSH_FILEXFER_ATTR_ACMODTIME;
-		
+
+		attr.flags = SSH_FILEXFER_ATTR_PERMISSIONS | SSH_FILEXFER_ATTR_SIZE | SSH_FILEXFER_ATTR_UIDGID
+				| SSH_FILEXFER_ATTR_ACMODTIME;
+
 		attr.permissions = Integer.decode(args[0]);
 		attr.size = Long.parseLong(args[1]);
 		attr.uid = Integer.parseInt(args[2]);
@@ -294,8 +292,8 @@ public class RemoteFileAttributes {
 		return extended;
 	}
 
+	@Override
 	public String toString() {
-		return (getPermissionsString() + " " + getUId() + " " + getGId() + " "
-				+ getSize() + " " + getMtimeString());
+		return getPermissionsString() + " " + getUId() + " " + getGId() + " " + getSize() + " " + getMtimeString(); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 	}
 }

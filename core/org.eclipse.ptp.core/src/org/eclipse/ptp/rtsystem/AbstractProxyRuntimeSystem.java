@@ -20,13 +20,11 @@ package org.eclipse.ptp.rtsystem;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -105,6 +103,9 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeStartupErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.utils.core.RangeSet;
+
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.util.ULocale;
 
 /*
  * ProxyAttributeDefEvents are formatted as follows:
@@ -192,36 +193,38 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 
 	private final static int ATTR_MIN_LEN = 5;
 	protected IProxyRuntimeClient proxy = null;
-	private AttributeDefinitionManager attrDefManager;
-	private Map<String, AttributeManager> jobSubs = Collections.synchronizedMap(new HashMap<String, AttributeManager>());
+	private final AttributeDefinitionManager attrDefManager;
+	private final Map<String, AttributeManager> jobSubs = Collections.synchronizedMap(new HashMap<String, AttributeManager>());
 
 	public AbstractProxyRuntimeSystem(IProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		this.proxy = proxy;
 		this.attrDefManager = manager;
 		proxy.addProxyRuntimeEventListener(this);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeAttributeDefEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeAttributeDefEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeAttributeDefEvent)
 	 */
 	public void handleEvent(IProxyRuntimeAttributeDefEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length >= ATTR_MIN_LEN + 2) {
 			try {
 				int numDefs = Integer.parseInt(attrs[0]);
-				
-				ArrayList<IAttributeDefinition<?,?,?>> attrDefs = 
-					new ArrayList<IAttributeDefinition<?,?,?>>(numDefs);
+
+				ArrayList<IAttributeDefinition<?, ?, ?>> attrDefs = new ArrayList<IAttributeDefinition<?, ?, ?>>(numDefs);
 
 				int pos = 1;
-				
+
 				for (int i = 0; i < numDefs; i++) {
 					int numArgs = Integer.parseInt(attrs[pos]);
-					
+
 					if (numArgs >= ATTR_MIN_LEN && pos + numArgs < attrs.length) {
-						IAttributeDefinition<?,?,?> attrDef = 
-							parseAttributeDefinition(attrs, pos + 1, pos + numArgs);	
+						IAttributeDefinition<?, ?, ?> attrDef = parseAttributeDefinition(attrs, pos + 1, pos + numArgs);
 						if (attrDef != null) {
 							attrDefs.add(attrDef);
 						}
@@ -231,8 +234,9 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 						return;
 					}
 				}
-				
-				fireRuntimeAttributeDefinitionEvent(new RuntimeAttributeDefinitionEvent(attrDefs.toArray(new IAttributeDefinition[attrDefs.size()])));
+
+				fireRuntimeAttributeDefinitionEvent(new RuntimeAttributeDefinitionEvent(attrDefs
+						.toArray(new IAttributeDefinition[attrDefs.size()])));
 			} catch (NumberFormatException ex) {
 				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_1));
 			}
@@ -241,79 +245,99 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeErrorStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeErrorStateEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeErrorStateEvent e) {
 		fireRuntimeErrorStateEvent(new RuntimeErrorStateEvent());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeErrorEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeErrorEvent)
 	 */
 	public void handleEvent(IProxyRuntimeMessageEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length > 0) {
 			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(mgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeJobChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeJobChangeEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeJobChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeJobChangeEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeJobChangeEvent(new RuntimeJobChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeMachineChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeMachineChangeEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeMachineChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeMachineChangeEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeMachineChangeEvent(new RuntimeMachineChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeNewJobEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewJobEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewJobEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 2) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
-		
-		if (eMgr != null) {			
+
+		if (eMgr != null) {
 			/*
 			 * Find any job submission attributes and add to the jobs
 			 */
@@ -328,340 +352,429 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 					jobSubs.remove(subId);
 				}
 			}
-			
+
 			fireRuntimeNewJobEvent(new RuntimeNewJobEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewMachineEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeNewMachineEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewMachineEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewMachineEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 2) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeNewMachineEvent(new RuntimeNewMachineEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewNodeEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeNewNodeEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewNodeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewNodeEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 2) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeNewNodeEvent(new RuntimeNewNodeEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewProcessEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeNewProcessEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewProcessEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewProcessEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 2) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeNewProcessEvent(new RuntimeNewProcessEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNewQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeNewQueueEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNewQueueEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNewQueueEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 2) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 1);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeNewQueueEvent(new RuntimeNewQueueEvent(attrs[0], eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeNodeChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeNodeChangeEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeNodeChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeNodeChangeEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeNodeChangeEvent(new RuntimeNodeChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeProcessChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeProcessChangeEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeProcessChangeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeProcessChangeEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeProcessChangeEvent(new RuntimeProcessChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeQueueChangeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent)
-	 */
-	public void handleEvent(IProxyRuntimeQueueChangeEvent e) {
-		String[] attrs = e.getAttributes();
-		
-		if (attrs.length < 1) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
-			return;
-		}
-		
-		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
-		if (eMgr != null) {			
-			fireRuntimeQueueChangeEvent(new RuntimeQueueChangeEvent(eMgr));
-		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeConnectedStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeQueueChangeEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeQueueChangeEvent)
+	 */
+	public void handleEvent(IProxyRuntimeQueueChangeEvent e) {
+		String[] attrs = e.getAttributes();
+
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
+			return;
+		}
+
+		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
+		if (eMgr != null) {
+			fireRuntimeQueueChangeEvent(new RuntimeQueueChangeEvent(eMgr));
+		} else {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeConnectedStateEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeConnectedStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeConnectedStateEvent e) {
 		fireRuntimeConnectedStateEvent(new RuntimeConnectedStateEvent());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#handleProxyRuntimeRemoveAllEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeRemoveAllEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveAllEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveAllEvent e) {
 		fireRuntimeRemoveAllEvent(new RuntimeRemoveAllEvent());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveJobEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeRemoveJobEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveJobEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveJobEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		fireRuntimeRemoveJobEvent(new RuntimeRemoveJobEvent(new RangeSet(attrs[0])));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveMachineEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeRemoveMachineEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveMachineEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveMachineEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		fireRuntimeRemoveMachineEvent(new RuntimeRemoveMachineEvent(new RangeSet(attrs[0])));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveNodeEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeRemoveNodeEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveNodeEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveNodeEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
 		fireRuntimeRemoveNodeEvent(new RuntimeRemoveNodeEvent(new RangeSet(attrs[0])));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveProcessEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeRemoveProcessEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveProcessEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRemoveProcessEvent e) {
-			String[] attrs = e.getAttributes();
-			
-			if (attrs.length < 1) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
-				return;
-			}
-			
-			fireRuntimeRemoveProcessEvent(new RuntimeRemoveProcessEvent(new RangeSet(attrs[0])));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRemoveQueueEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent)
-	 */
-	public void handleEvent(IProxyRuntimeRemoveQueueEvent e) {
-			String[] attrs = e.getAttributes();
-			
-			if (attrs.length < 1) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
-				return;
-			}
-			
-			fireRuntimeRemoveQueueEvent(new RuntimeRemoveQueueEvent(new RangeSet(attrs[0])));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeEventListener#handleEvent(org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent)
-	 */
-	public void handleEvent(IProxyRuntimeRMChangeEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length < 1) {
 			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
 			return;
 		}
-		
+
+		fireRuntimeRemoveProcessEvent(new RuntimeRemoveProcessEvent(new RangeSet(attrs[0])));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeRemoveQueueEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRemoveQueueEvent)
+	 */
+	public void handleEvent(IProxyRuntimeRemoveQueueEvent e) {
+		String[] attrs = e.getAttributes();
+
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
+			return;
+		}
+
+		fireRuntimeRemoveQueueEvent(new RuntimeRemoveQueueEvent(new RangeSet(attrs[0])));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.runtime.client.IProxyRuntimeEventListener#handleEvent
+	 * (org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent)
+	 */
+	public void handleEvent(IProxyRuntimeRMChangeEvent e) {
+		String[] attrs = e.getAttributes();
+
+		if (attrs.length < 1) {
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_4));
+			return;
+		}
+
 		ElementAttributeManager eMgr = getElementAttributeManager(attrs, 0);
-		if (eMgr != null) {			
+		if (eMgr != null) {
 			fireRuntimeRMChangeEvent(new RuntimeRMChangeEvent(eMgr));
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_3));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeRunningStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeRunningStateEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeRunningStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeRunningStateEvent e) {
 		fireRuntimeRunningStateEvent(new RuntimeRunningStateEvent());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeShutdownStateEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeShutdownStateEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeShutdownStateEvent)
 	 */
 	public void handleEvent(IProxyRuntimeShutdownStateEvent e) {
 		fireRuntimeShutdownStateEvent(new RuntimeShutdownStateEvent());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeStartupErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeStartupErrorEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeStartupErrorEvent)
 	 */
-	public void handleEvent(
-			IProxyRuntimeStartupErrorEvent e) {
+	public void handleEvent(IProxyRuntimeStartupErrorEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length > 0) {
 			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
 			IntegerAttribute codeAttr = mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
 			StringAttribute msgAttr = mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
 			if (codeAttr == null || msgAttr == null) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_5));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_5));
 			} else {
 				fireRuntimeStartupErrorEvent(new RuntimeStartupErrorEvent(codeAttr.getValue(), msgAttr.getValue()));
 			}
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_6));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_6));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeSubmitJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeSubmitJobErrorEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeSubmitJobErrorEvent)
 	 */
-	public void handleEvent(
-			IProxyRuntimeSubmitJobErrorEvent e) {
+	public void handleEvent(IProxyRuntimeSubmitJobErrorEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length > 0) {
 			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
-			IntegerAttribute codeAttr = (IntegerAttribute) mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
-			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
-			StringAttribute jobSubIdAttr = (StringAttribute) mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+			IntegerAttribute codeAttr = mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
+			StringAttribute msgAttr = mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
+			StringAttribute jobSubIdAttr = mgr.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 			if (codeAttr == null || msgAttr == null || jobSubIdAttr == null) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_7));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_7));
 			} else {
-				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobSubIdAttr.getValue()));
+				fireRuntimeSubmitJobErrorEvent(new RuntimeSubmitJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobSubIdAttr
+						.getValue()));
 			}
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_8));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_8));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#handleProxyRuntimeTerminateJobErrorEvent(org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeTerminateJobErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener#
+	 * handleProxyRuntimeTerminateJobErrorEvent
+	 * (org.eclipse.ptp.rtsystem.proxy.event
+	 * .IProxyRuntimeTerminateJobErrorEvent)
 	 */
-	public void handleEvent(
-			IProxyRuntimeTerminateJobErrorEvent e) {
+	public void handleEvent(IProxyRuntimeTerminateJobErrorEvent e) {
 		String[] attrs = e.getAttributes();
-		
+
 		if (attrs.length > 0) {
 			AttributeManager mgr = getAttributeManager(attrs, 0, attrs.length - 1);
-			IntegerAttribute codeAttr = (IntegerAttribute) mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
-			StringAttribute msgAttr = (StringAttribute) mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
-			StringAttribute jobIdAttr = (StringAttribute) mgr.getAttribute(JobAttributes.getJobIdAttributeDefinition());
+			IntegerAttribute codeAttr = mgr.getAttribute(ErrorAttributes.getCodeAttributeDefinition());
+			StringAttribute msgAttr = mgr.getAttribute(ErrorAttributes.getMsgAttributeDefinition());
+			StringAttribute jobIdAttr = mgr.getAttribute(JobAttributes.getJobIdAttributeDefinition());
 			if (codeAttr == null || msgAttr == null || jobIdAttr == null) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_9));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_9));
 			} else {
-				fireRuntimeTerminateJobErrorEvent(new RuntimeTerminateJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(), jobIdAttr.getValue()));
+				fireRuntimeTerminateJobErrorEvent(new RuntimeTerminateJobErrorEvent(codeAttr.getValue(), msgAttr.getValue(),
+						jobIdAttr.getValue()));
 			}
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_10));				
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_10));
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#shutdown()
 	 */
 	public abstract void shutdown() throws CoreException;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime.IProgressMonitor)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeSystem#startup(org.eclipse.core.runtime
+	 * .IProgressMonitor)
 	 */
 	public abstract void startup(IProgressMonitor monitor) throws CoreException;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.IControlSystem#submitJob(java.lang.String,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException {
 		try {
@@ -669,31 +782,40 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			attrMgr.addAttribute(jobSubAttr);
 			jobSubs.put(subId, attrMgr);
 			proxy.submitJob(attrMgr.toStringArray());
-		} catch(IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-				Messages.AbstractProxyRuntimeSystem_11, null));
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
+					Messages.AbstractProxyRuntimeSystem_11, null));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(org.eclipse.ptp.core.elements.IPJob)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IControlSystem#terminateJob(org.eclipse.ptp.
+	 * core.elements.IPJob)
 	 */
 	public void terminateJob(IPJob job) throws CoreException {
-		if(job == null) {
+		if (job == null) {
 			PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_12);
 			return;
 		}
-		
+
 		try {
 			proxy.terminateJob(job.getID());
-		} catch(IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-				Messages.AbstractProxyRuntimeSystem_11, null));
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
+					Messages.AbstractProxyRuntimeSystem_11, null));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp.core.elements.IPElement, boolean, org.eclipse.ptp.core.attributes.AttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IMonitoringSystem#filterEvents(org.eclipse.ptp
+	 * .core.elements.IPElement, boolean,
+	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public void filterEvents(IPElement element, boolean filterChildren, AttributeManager filterAttributes) throws CoreException {
 		try {
@@ -701,41 +823,47 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 			filterAttributes.addAttribute(FilterAttributes.getFilterChildrenAttributeDefinition().create(filterChildren));
 			proxy.filterEvents(filterAttributes.toStringArray());
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-					e.getMessage(), e));
-		}		
+			throw new CoreException(
+					new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
+		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#startEvents()
 	 */
 	public void startEvents() throws CoreException {
 		try {
 			proxy.startEvents();
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-					e.getMessage(), e));
+			throw new CoreException(
+					new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.IMonitoringSystem#stopEvents()
 	 */
 	public void stopEvents() throws CoreException {
 		try {
 			proxy.stopEvents();
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
-					e.getMessage(), e));
-		}	
+			throw new CoreException(
+					new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
+		}
 	}
 
 	/**
-	 * Create an attribute manager given an array of key/value strings. Each key/value string
-	 * must be in the form "key=value", where "key" is a string containing at least one character,
-	 * and "value" is a string containing zero or more characters. The "key" string cannot contain 
-	 * an '=' character. There is no white space allowed between the end of the "key" string, the '=', 
-	 * and the start of the "value" string, unless that white space is part of those strings.
+	 * Create an attribute manager given an array of key/value strings. Each
+	 * key/value string must be in the form "key=value", where "key" is a string
+	 * containing at least one character, and "value" is a string containing
+	 * zero or more characters. The "key" string cannot contain an '='
+	 * character. There is no white space allowed between the end of the "key"
+	 * string, the '=', and the start of the "value" string, unless that white
+	 * space is part of those strings.
 	 * 
 	 * @param kvs
 	 * @param start
@@ -744,33 +872,34 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 */
 	private AttributeManager getAttributeManager(String[] kvs, int start, int end) {
 		AttributeManager mgr = new AttributeManager();
-		
+
 		for (int i = start; i <= end; i++) {
 			String kv = kvs[i];
 			int sep = kv.indexOf('=');
 			if (sep > 0) {
 				try {
 					String id = kv.substring(0, sep);
-					IAttributeDefinition<?,?,?> attrDef = attrDefManager.getAttributeDefinition(id);
+					IAttributeDefinition<?, ?, ?> attrDef = attrDefManager.getAttributeDefinition(id);
 					if (attrDef == null) {
 						/*
-						 * Treat this as a string attribute. This allows the proxy to send unsolicited
-						 * attributes when their type is not important.
+						 * Treat this as a string attribute. This allows the
+						 * proxy to send unsolicited attributes when their type
+						 * is not important.
 						 */
 						attrDef = attrDefManager.createStringAttributeDefinition(id, id, id, true, ""); //$NON-NLS-1$
 					}
 					String value = ""; //$NON-NLS-1$
 					if (sep < kv.length() - 1) {
-						value = kv.substring(sep+1);
+						value = kv.substring(sep + 1);
 					}
-					IAttribute<?,?,?> attr = attrDef.create(value);
+					IAttribute<?, ?, ?> attr = attrDef.create(value);
 					mgr.addAttribute(attr);
 				} catch (IllegalValueException e1) {
-					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14+": "+e1.getMessage()); //$NON-NLS-1$
+					PTPCorePlugin.log(Messages.AbstractProxyRuntimeSystem_14 + ": " + e1.getMessage()); //$NON-NLS-1$
 				}
 			}
 		}
-		
+
 		return mgr;
 	}
 
@@ -781,116 +910,112 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 */
 	private ElementAttributeManager getElementAttributeManager(String[] attrs, int pos) {
 		ElementAttributeManager eMgr = new ElementAttributeManager();
-		
+
 		try {
 			int numRanges = Integer.parseInt(attrs[pos++]);
-			
+
 			for (int i = 0; i < numRanges; i++) {
 				if (pos >= attrs.length) {
-					return null;					
+					return null;
 				}
-				
+
 				RangeSet ids = new RangeSet(attrs[pos++]);
 				int numAttrs = Integer.parseInt(attrs[pos++]);
-				
+
 				int start = pos;
 				int end = pos + numAttrs - 1;
-				
+
 				if (end >= attrs.length) {
-					return null;					
+					return null;
 				}
-				
+
 				eMgr.setAttributeManager(ids, getAttributeManager(attrs, start, end));
-				
+
 				pos = end + 1;
 			}
 		} catch (NumberFormatException e1) {
 			return null;
 		}
-		
+
 		return eMgr;
 	}
-	
+
 	/**
 	 * Parse and extract an attribute definition.
 	 * 
 	 * On entry, we know that end < attrs.length and end - start >= ATTR_MIN_LEN
 	 * 
 	 */
-	private IAttributeDefinition<?,?,?> parseAttributeDefinition(String[] attrs, int start, int end) {
+	private IAttributeDefinition<?, ?, ?> parseAttributeDefinition(String[] attrs, int start, int end) {
 		int pos = start;
-		IAttributeDefinition<?,?,?> attrDef = null;
-		
+		IAttributeDefinition<?, ?, ?> attrDef = null;
+
 		String attrId = attrs[pos++];
 		String attrType = attrs[pos++];
 		String attrName = attrs[pos++];
 		String attrDesc = attrs[pos++];
 		boolean attrDisplay;
-			
+
 		try {
 			attrDisplay = Boolean.parseBoolean(attrs[pos++]);
 		} catch (NumberFormatException ex) {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-					Messages.AbstractProxyRuntimeSystem_15));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_15));
 			return null;
 		}
-		
+
 		String attrDefault = attrs[pos++];
-		
+
 		if (attrType.equals("BOOLEAN")) { //$NON-NLS-1$
 			try {
 				Boolean defVal = Boolean.parseBoolean(attrDefault);
 				attrDef = attrDefManager.createBooleanAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_16));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_16));
 			}
 		} else if (attrType.equals("DATE")) { //$NON-NLS-1$
 			if (end - pos > 2) {
 				try {
 					int dateStyle = toDateStyle(attrs[pos++]);
 					int timeStyle = toDateStyle(attrs[pos++]);
-					Locale locale = toLocale(attrs[pos++]);
-					
+					ULocale locale = toLocale(attrs[pos++]);
+
 					DateFormat fmt = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
 					Date defVal = fmt.parse(attrDefault);
-					
+
 					if (end - pos > 1) {
 						Date min = fmt.parse(attrs[pos++]);
 						Date max = fmt.parse(attrs[pos++]);
-						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, fmt, min, max);
+						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal,
+								fmt, min, max);
 					} else {
-						attrDef = attrDefManager.createDateAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, fmt);
+						attrDef = attrDefManager
+								.createDateAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, fmt);
 					}
 				} catch (ParseException ex) {
-					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-							Messages.AbstractProxyRuntimeSystem_17));
+					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_17));
 				} catch (IllegalValueException ex) {
-					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-							Messages.AbstractProxyRuntimeSystem_18
-							+ ex.getMessage()));					
+					fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_18
+							+ ex.getMessage()));
 				}
 			} else {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_19));				
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_19));
 			}
 		} else if (attrType.equals("DOUBLE")) { //$NON-NLS-1$
 			try {
 				Double defVal = Double.parseDouble(attrDefault);
 				if (end - pos > 0) {
-						Double min = Double.parseDouble(attrs[pos++]);
-						Double max = Double.parseDouble(attrs[pos++]);
-						attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min, max);
+					Double min = Double.parseDouble(attrs[pos++]);
+					Double max = Double.parseDouble(attrs[pos++]);
+					attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min,
+							max);
 				} else {
 					attrDef = attrDefManager.createDoubleAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 				}
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_20));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_20));
 			} catch (IllegalValueException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_18 
-						+ ex.getMessage()));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_18
+						+ ex.getMessage()));
 			}
 		} else if (attrType.equals("ENUMERATED")) { //$NON-NLS-1$
 			ArrayList<String> values = new ArrayList<String>();
@@ -898,58 +1023,52 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 				values.add(attrs[pos++]);
 			}
 			try {
-				attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName,
-						attrDesc, attrDisplay, attrDefault, values.toArray(new String[values.size()]));
+				attrDef = attrDefManager.createStringSetAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, attrDefault,
+						values.toArray(new String[values.size()]));
 			} catch (IllegalValueException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_18 
-						+ ex.getMessage()));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_18
+						+ ex.getMessage()));
 			}
 		} else if (attrType.equals("INTEGER")) { //$NON-NLS-1$
 			try {
 				Integer defVal = Integer.parseInt(attrDefault);
 				if (end - pos > 0) {
-						Integer min = Integer.parseInt(attrs[pos++]);
-						Integer max = Integer.parseInt(attrs[pos++]);
-						attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min, max);
+					Integer min = Integer.parseInt(attrs[pos++]);
+					Integer max = Integer.parseInt(attrs[pos++]);
+					attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal, min,
+							max);
 				} else {
 					attrDef = attrDefManager.createIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 				}
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, 
-						Messages.AbstractProxyRuntimeSystem_21));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_21));
 			} catch (IllegalValueException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_18 
-						+ ex.getMessage()));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_18
+						+ ex.getMessage()));
 			}
 		} else if (attrType.equals("BIGINTEGER")) { //$NON-NLS-1$
 			try {
 				BigInteger defVal = new BigInteger(attrDefault);
 				if (end - pos > 0) {
-						BigInteger min = new BigInteger(attrs[pos++]);
-						BigInteger max = new BigInteger(attrs[pos++]);
-						attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId,
-								attrName, attrDesc, attrDisplay, defVal, min, max);
+					BigInteger min = new BigInteger(attrs[pos++]);
+					BigInteger max = new BigInteger(attrs[pos++]);
+					attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal,
+							min, max);
 				} else {
-					attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId, attrName,
-							attrDesc, attrDisplay, defVal);
+					attrDef = attrDefManager.createBigIntegerAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, defVal);
 				}
 			} catch (NumberFormatException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_22));
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_22));
 			} catch (IllegalValueException ex) {
-				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-						Messages.AbstractProxyRuntimeSystem_18
-						+ ex.getMessage()));					
+				fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_18
+						+ ex.getMessage()));
 			}
 		} else if (attrType.equals("STRING")) { //$NON-NLS-1$
 			attrDef = attrDefManager.createStringAttributeDefinition(attrId, attrName, attrDesc, attrDisplay, attrDefault);
 		} else {
-			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR,
-					Messages.AbstractProxyRuntimeSystem_23));
+			fireRuntimeMessageEvent(new RuntimeMessageEvent(Level.ERROR, Messages.AbstractProxyRuntimeSystem_23));
 		}
-		
+
 		return attrDef;
 	}
 
@@ -975,27 +1094,27 @@ public abstract class AbstractProxyRuntimeSystem extends AbstractRuntimeSystem i
 	 * @param val
 	 * @return
 	 */
-	private Locale toLocale(String val) {
+	private ULocale toLocale(String val) {
 		if (val.equals("CANADA")) { //$NON-NLS-1$
-			return Locale.CANADA;
+			return ULocale.CANADA;
 		} else if (val.equals("CHINA")) { //$NON-NLS-1$
-			return Locale.CHINA;
+			return ULocale.CHINA;
 		} else if (val.equals("FRANCE")) { //$NON-NLS-1$
-			return Locale.FRANCE;
+			return ULocale.FRANCE;
 		} else if (val.equals("GERMANY")) { //$NON-NLS-1$
-			return Locale.GERMANY;
+			return ULocale.GERMANY;
 		} else if (val.equals("ITALY")) { //$NON-NLS-1$
-			return Locale.ITALY;
+			return ULocale.ITALY;
 		} else if (val.equals("JAPAN")) { //$NON-NLS-1$
-			return Locale.JAPAN;
+			return ULocale.JAPAN;
 		} else if (val.equals("TAIWAN")) { //$NON-NLS-1$
-			return Locale.TAIWAN;
+			return ULocale.TAIWAN;
 		} else if (val.equals("UK")) { //$NON-NLS-1$
-			return Locale.UK;
+			return ULocale.UK;
 		} else if (val.equals("US")) { //$NON-NLS-1$
-			return Locale.US;
+			return ULocale.US;
 		} else {
-			return Locale.US;
+			return ULocale.US;
 		}
 	}
 }

@@ -19,75 +19,74 @@
 package org.eclipse.ptp.core.attributes;
 
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ibm.icu.text.DateFormat;
+
 public class AttributeDefinitionManager {
-	private final Map<String, IAttributeDefinition<?,?,?>> attributeDefs =
-		Collections.synchronizedMap(new HashMap<String, IAttributeDefinition<?,?,?>>());
+	private final Map<String, IAttributeDefinition<?, ?, ?>> attributeDefs = Collections
+			.synchronizedMap(new HashMap<String, IAttributeDefinition<?, ?, ?>>());
 
 	public AttributeDefinitionManager() {
 	}
-	
+
 	/**
 	 * Create an attribute definition
 	 * 
 	 * @param attr
 	 */
-	public void setAttributeDefinition(IAttributeDefinition<?,?,?> attrDef) {
+	public void setAttributeDefinition(IAttributeDefinition<?, ?, ?> attrDef) {
 		synchronized (attributeDefs) {
 			if (!attributeDefs.containsKey(attrDef.getId())) {
 				attributeDefs.put(attrDef.getId(), attrDef);
 			}
 		}
 	}
-	
+
 	/**
 	 * @param attrDefs
 	 */
-	public void setAttributeDefinitions(IAttributeDefinition<?,?,?>[] attrDefs) {
-		for (IAttributeDefinition<?,?,?> attrDef : attrDefs) {
+	public void setAttributeDefinitions(IAttributeDefinition<?, ?, ?>[] attrDefs) {
+		for (IAttributeDefinition<?, ?, ?> attrDef : attrDefs) {
 			setAttributeDefinition(attrDef);
 		}
 	}
-	
+
 	/**
 	 * Lookup an attribute definition
 	 * 
 	 * @param attrId
 	 * @return attribute definition
 	 */
-	public IAttributeDefinition<?,?,?> getAttributeDefinition(String attrId) {
+	public IAttributeDefinition<?, ?, ?> getAttributeDefinition(String attrId) {
 		return attributeDefs.get(attrId);
 	}
-	
+
 	/**
 	 * Clear attribute definitions
 	 */
 	public void clear() {
 		attributeDefs.clear();
 	}
-	
+
 	/**
 	 * @param uniqueId
 	 * @param name
 	 * @param description
 	 * @param defaultValue
 	 * @return
-	 * @throws IllegalValueException 
+	 * @throws IllegalValueException
 	 */
-	public BigIntegerAttributeDefinition createBigIntegerAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, final BigInteger defaultValue) 
-			throws IllegalValueException {
-		BigIntegerAttributeDefinition def = new BigIntegerAttributeDefinition(uniqueId, name,
-				description, display, defaultValue);
+	public BigIntegerAttributeDefinition createBigIntegerAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, final BigInteger defaultValue) throws IllegalValueException {
+		BigIntegerAttributeDefinition def = new BigIntegerAttributeDefinition(uniqueId, name, description, display, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
-	
+
 	/**
 	 * @param uniqueId
 	 * @param name
@@ -98,11 +97,11 @@ public class AttributeDefinitionManager {
 	 * @return
 	 * @throws IllegalValueException
 	 */
-	public BigIntegerAttributeDefinition createBigIntegerAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, final BigInteger defaultValue,
-			final BigInteger min, final BigInteger max) throws IllegalValueException {
-		BigIntegerAttributeDefinition def = new BigIntegerAttributeDefinition(uniqueId, name,
-				description, display, defaultValue, min, max);
+	public BigIntegerAttributeDefinition createBigIntegerAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, final BigInteger defaultValue, final BigInteger min,
+			final BigInteger max) throws IllegalValueException {
+		BigIntegerAttributeDefinition def = new BigIntegerAttributeDefinition(uniqueId, name, description, display, defaultValue,
+				min, max);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -114,14 +113,13 @@ public class AttributeDefinitionManager {
 	 * @param defaultValue
 	 * @return
 	 */
-	public BooleanAttributeDefinition createBooleanAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, final Boolean defaultValue) {
-		BooleanAttributeDefinition def = new BooleanAttributeDefinition(uniqueId, name,
-				description, display, defaultValue);
+	public BooleanAttributeDefinition createBooleanAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, final Boolean defaultValue) {
+		BooleanAttributeDefinition def = new BooleanAttributeDefinition(uniqueId, name, description, display, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
-	
+
 	/**
 	 * @param uniqueId
 	 * @param name
@@ -130,14 +128,14 @@ public class AttributeDefinitionManager {
 	 * @param outputDateFormat
 	 * @return
 	 */
-	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name, 
+	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final Date defaultValue, final DateFormat outputDateFormat) {
-		DateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, 
-				description, display, defaultValue, outputDateFormat);
+		DateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, description, display, defaultValue,
+				outputDateFormat);
 		setAttributeDefinition(def);
 		return def;
 	}
-	
+
 	/**
 	 * @param uniqueId
 	 * @param name
@@ -149,10 +147,11 @@ public class AttributeDefinitionManager {
 	 * @return
 	 * @throws IllegalValueException
 	 */
-	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name, 
-			final String description, final boolean display, final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max) throws IllegalValueException {
-		DateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, 
-				description, display, defaultValue, outputDateFormat, min, max);
+	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, final Date defaultValue, final DateFormat outputDateFormat,
+			final Date min, final Date max) throws IllegalValueException {
+		DateAttributeDefinition def = new DateAttributeDefinition(uniqueId, name, description, display, defaultValue,
+				outputDateFormat, min, max);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -163,16 +162,15 @@ public class AttributeDefinitionManager {
 	 * @param description
 	 * @param defaultValue
 	 * @return
-	 * @throws IllegalValueException 
+	 * @throws IllegalValueException
 	 */
-	public DoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name, 
+	public DoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final Double defaultValue) throws IllegalValueException {
-		DoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, 
-				description, display, defaultValue);
+		DoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, description, display, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
-	
+
 	/**
 	 * @param uniqueId
 	 * @param name
@@ -183,10 +181,10 @@ public class AttributeDefinitionManager {
 	 * @return
 	 * @throws IllegalValueException
 	 */
-	public DoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name, 
-			final String description, final boolean display, final Double defaultValue, final Double min, final Double max) throws IllegalValueException {
-		DoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, 
-				description, display, defaultValue, min, max);
+	public DoubleAttributeDefinition createDoubleAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, final Double defaultValue, final Double min, final Double max)
+			throws IllegalValueException {
+		DoubleAttributeDefinition def = new DoubleAttributeDefinition(uniqueId, name, description, display, defaultValue, min, max);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -199,27 +197,25 @@ public class AttributeDefinitionManager {
 	 * @param defaultValue
 	 * @return
 	 */
-	public <E extends Enum<E>> EnumeratedAttributeDefinition<E> createEnumeratedAttributeDefinition(
-			final String uniqueId, final String name, final String description,
-			final boolean display, final E defaultValue) {
-		EnumeratedAttributeDefinition<E> def = 
-			new EnumeratedAttributeDefinition<E>(uniqueId, name, description, display, defaultValue);
+	public <E extends Enum<E>> EnumeratedAttributeDefinition<E> createEnumeratedAttributeDefinition(final String uniqueId,
+			final String name, final String description, final boolean display, final E defaultValue) {
+		EnumeratedAttributeDefinition<E> def = new EnumeratedAttributeDefinition<E>(uniqueId, name, description, display,
+				defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
-	
+
 	/**
 	 * @param uniqueId
 	 * @param name
 	 * @param description
 	 * @param defaultValue
 	 * @return
-	 * @throws IllegalValueException 
+	 * @throws IllegalValueException
 	 */
-	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, final Integer defaultValue) throws IllegalValueException {
-		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name,
-				description, display, defaultValue);
+	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, final Integer defaultValue) throws IllegalValueException {
+		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, display, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -234,11 +230,11 @@ public class AttributeDefinitionManager {
 	 * @return
 	 * @throws IllegalValueException
 	 */
-	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, 
-			final Integer defaultValue, final Integer min, final Integer max) throws IllegalValueException {
-		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name,
-				description, display, defaultValue, min, max);
+	public IntegerAttributeDefinition createIntegerAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, final Integer defaultValue, final Integer min, final Integer max)
+			throws IllegalValueException {
+		IntegerAttributeDefinition def = new IntegerAttributeDefinition(uniqueId, name, description, display, defaultValue, min,
+				max);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -250,14 +246,13 @@ public class AttributeDefinitionManager {
 	 * @param defaultValue
 	 * @return
 	 */
-	public StringAttributeDefinition createStringAttributeDefinition(final String uniqueId, final String name, 
+	public StringAttributeDefinition createStringAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final String defaultValue) {
-		StringAttributeDefinition def = new StringAttributeDefinition(uniqueId, name, 
-				description, display, defaultValue);
+		StringAttributeDefinition def = new StringAttributeDefinition(uniqueId, name, description, display, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
-	
+
 	/**
 	 * @param <T>
 	 * @param uniqueId
@@ -266,11 +261,9 @@ public class AttributeDefinitionManager {
 	 * @param defaultValue
 	 * @return
 	 */
-	public <T extends Comparable<T>> ArrayAttributeDefinition<T> createArrayAttributeDefinition(
-			final String uniqueId, final String name, final String description,
-			final boolean display, final T[] defaultValue) {
-		ArrayAttributeDefinition<T> def = new ArrayAttributeDefinition<T>(uniqueId, name,
-				description, display, defaultValue);
+	public <T extends Comparable<T>> ArrayAttributeDefinition<T> createArrayAttributeDefinition(final String uniqueId,
+			final String name, final String description, final boolean display, final T[] defaultValue) {
+		ArrayAttributeDefinition<T> def = new ArrayAttributeDefinition<T>(uniqueId, name, description, display, defaultValue);
 		setAttributeDefinition(def);
 		return def;
 	}
@@ -284,10 +277,8 @@ public class AttributeDefinitionManager {
 	 * @return
 	 * @throws IllegalValueException
 	 */
-	public StringSetAttributeDefinition createStringSetAttributeDefinition(
-			String uniqueId, String name, String description,
+	public StringSetAttributeDefinition createStringSetAttributeDefinition(String uniqueId, String name, String description,
 			final boolean display, String defaultValue, String[] values) throws IllegalValueException {
-		return new StringSetAttributeDefinition(uniqueId, name, description, display, defaultValue,
-				values);
+		return new StringSetAttributeDefinition(uniqueId, name, description, display, defaultValue, values);
 	}
 }
