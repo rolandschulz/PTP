@@ -22,11 +22,11 @@ import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import org.eclipse.ptp.core.messages.Messages;
 
 import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.util.ULocale;
 
 public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 
@@ -50,7 +50,7 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 		if (dateFormats != null) {
 			return dateFormats;
 		}
-		Locale[] locals = DateFormat.getAvailableLocales();
+		ULocale[] locals = DateFormat.getAvailableULocales();
 		final int styles[] = { DateFormat.SHORT, DateFormat.MEDIUM, DateFormat.LONG, DateFormat.FULL };
 		ArrayList<DateFormat> dfs = new ArrayList<DateFormat>(styles.length * styles.length * locals.length);
 		for (int i = 0; i < locals.length; ++i) {
