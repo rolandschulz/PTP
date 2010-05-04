@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,15 +26,17 @@ import java.util.Locale;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public class DateAttribute
-extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
+import com.ibm.icu.text.DateFormat;
+
+public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	private static DateFormat[] dateFormats = null;
 
 	public static void main(String[] args) throws IllegalValueException {
 		Calendar cal = Calendar.getInstance();
-		DateAttributeDefinition def = new DateAttributeDefinition("uniqId", "name", "desc", true, cal.getTime(), DateFormat.getDateTimeInstance()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		DateAttribute mda = (DateAttribute)def.create();
+		DateAttributeDefinition def = new DateAttributeDefinition(
+				"uniqId", "name", "desc", true, cal.getTime(), DateFormat.getDateTimeInstance()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		DateAttribute mda = def.create();
 		mda.setValue(cal);
 		System.out.println(mda.toString());
 		String str = mda.toString();
@@ -50,26 +51,23 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 			return dateFormats;
 		}
 		Locale[] locals = DateFormat.getAvailableLocales();
-		final int styles[] = { DateFormat.SHORT, DateFormat.MEDIUM,
-				DateFormat.LONG, DateFormat.FULL };
-		ArrayList<DateFormat> dfs = new ArrayList<DateFormat>(styles.length * styles.length
-				* locals.length);
+		final int styles[] = { DateFormat.SHORT, DateFormat.MEDIUM, DateFormat.LONG, DateFormat.FULL };
+		ArrayList<DateFormat> dfs = new ArrayList<DateFormat>(styles.length * styles.length * locals.length);
 		for (int i = 0; i < locals.length; ++i) {
 			for (int ds = 0; ds < styles.length; ++ds) {
 				final int dateStyle = styles[ds];
 				for (int ts = 0; ts < styles.length; ++ts) {
 					final int timeStyle = styles[ts];
-					dfs.add(DateFormat.getDateTimeInstance(dateStyle,
-							timeStyle, locals[i]));
+					dfs.add(DateFormat.getDateTimeInstance(dateStyle, timeStyle, locals[i]));
 				}
 			}
 		}
-		dateFormats = (DateFormat[]) dfs.toArray(new DateFormat[dfs.size()]);
+		dateFormats = dfs.toArray(new DateFormat[dfs.size()]);
 		return dateFormats;
 	}
 
 	protected final Calendar value = Calendar.getInstance();
-	
+
 	public DateAttribute(DateAttributeDefinition definition, Date initialValue) throws IllegalValueException {
 		super(definition);
 		setValue(initialValue);
@@ -83,20 +81,19 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 	public DateFormat getDateFormat() {
 		return getDefinition().getDateFormat();
 	}
-	
+
 	public Date getDateValue() {
 		return value.getTime();
 	}
 
-
 	public Calendar getValue() {
 		return (Calendar) value.clone();
 	}
-	
+
 	public String getValueAsString() {
 		return getDateFormat().format(value);
 	}
-	
+
 	public boolean isValid(String string) {
 		final Date date = parseString(string);
 		if (date == null) {
@@ -128,8 +125,7 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 	public void setValueAsString(String string) throws IllegalValueException {
 		final Date date = parseString(string);
 		if (date == null) {
-			throw new IllegalValueException(Messages.DateAttribute_2 + string
-					+ Messages.DateAttribute_3);
+			throw new IllegalValueException(Messages.DateAttribute_2 + string + Messages.DateAttribute_3);
 		}
 		if (date.compareTo(getMinDate()) < 0) {
 			throw new IllegalValueException(Messages.DateAttribute_4 + string + Messages.DateAttribute_5 + toString(getMinDate()));
@@ -139,10 +135,11 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 		}
 		value.setTime(date);
 	}
-	
+
+	@Override
 	public String toString() {
 		return getValueAsString();
-		
+
 	}
 
 	private Date getMaxDate() {
@@ -169,12 +166,14 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 		}
 		return date;
 	}
-	
+
 	private String toString(Date date) {
 		return getDateFormat().format(date);
 	}
 
-    /* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
@@ -188,18 +187,18 @@ extends AbstractAttribute<Calendar, DateAttribute, DateAttributeDefinition> {
 	}
 
 	@Override
-    protected int doCompareTo(DateAttribute other) {
-        return value.compareTo(other.value);
-    }
+	protected int doCompareTo(DateAttribute other) {
+		return value.compareTo(other.value);
+	}
 
-    @Override
-    protected boolean doEquals(DateAttribute other) {
-        return value.equals(other.value);
-    }
+	@Override
+	protected boolean doEquals(DateAttribute other) {
+		return value.equals(other.value);
+	}
 
-    @Override
-    protected int doHashCode() {
-        return value.hashCode();
-    }
+	@Override
+	protected int doHashCode() {
+		return value.hashCode();
+	}
 
 }

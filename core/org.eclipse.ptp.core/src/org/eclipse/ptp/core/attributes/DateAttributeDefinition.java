@@ -18,32 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public final class DateAttributeDefinition
-extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefinition> {
+import com.ibm.icu.text.DateFormat;
+
+public final class DateAttributeDefinition extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefinition> {
 
 	private Date minDate = new Date(Long.MIN_VALUE);
 	private Date maxDate = new Date(Long.MAX_VALUE);
-	
+
 	private final DateFormat outputDateFormat;
 	private final Date defaultValue;
 
-	public DateAttributeDefinition(final String uniqueId, final String name, 
-			final String description, final boolean display, 
+	public DateAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
 			final Date defaultValue, final DateFormat outputDateFormat) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 		this.outputDateFormat = outputDateFormat;
 	}
 
-	public DateAttributeDefinition(final String uniqueId, final String name, 
-			final String description, final boolean display, 
-			final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max) throws IllegalValueException {
+	public DateAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
+			final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max)
+			throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (defaultValue.compareTo(getMinDate()) < 0) {
 			throw new IllegalValueException(Messages.DateAttributeDefinition_0);
@@ -55,13 +54,15 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 		this.outputDateFormat = outputDateFormat;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public DateAttribute create() throws IllegalValueException {
 		return new DateAttribute(this, defaultValue);
 	}
-	
+
 	public DateAttribute create(String value) throws IllegalValueException {
 		return new DateAttribute(this, value);
 	}
@@ -73,7 +74,7 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 	public synchronized Date getMinDate() {
 		return minDate;
 	}
-	
+
 	public DateFormat getDateFormat() {
 		return outputDateFormat;
 	}
@@ -81,18 +82,16 @@ extends AbstractAttributeDefinition<Calendar, DateAttribute, DateAttributeDefini
 	public synchronized void setValidRange(Date minDate, Date maxDate) throws IllegalValueException {
 		if (minDate == null) {
 			this.minDate = new Date(Long.MIN_VALUE);
-		}
-		else {
+		} else {
 			this.minDate = minDate;
 		}
 		if (maxDate == null) {
 			this.maxDate = new Date(Long.MAX_VALUE);
-		}
-		else {
+		} else {
 			this.maxDate = maxDate;
 		}
 		if (this.minDate.compareTo(this.maxDate) > 0) {
-				throw new IllegalArgumentException(Messages.DateAttributeDefinition_2);
+			throw new IllegalArgumentException(Messages.DateAttributeDefinition_2);
 		}
 	}
 }

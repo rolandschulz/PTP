@@ -10,9 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ui.utils;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 
 public class DebugUtil {
@@ -26,17 +25,17 @@ public class DebugUtil {
 		if (PTPCorePlugin.getDefault().isDebugging()) {
 			String option = Platform.getDebugOption(DATASOURCE_OPTION);
 			if (option != null) {
-				DATASOURCE_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+				DATASOURCE_TRACING = option.equalsIgnoreCase("true"); //$NON-NLS-1$
 			}
 			option = Platform.getDebugOption(LISTENER_OPTION);
 			if (option != null) {
-				LISTENER_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+				LISTENER_TRACING = option.equalsIgnoreCase("true"); //$NON-NLS-1$
 			}
 		}
 	}
 
-	public static void trace(boolean option, String pattern, Object ... arguments) {
-		trace(option, MessageFormat.format(pattern, arguments));
+	public static void trace(boolean option, String pattern, Object... arguments) {
+		trace(option, NLS.bind(pattern, arguments));
 	}
 
 	public static void trace(boolean option, String message) {
@@ -46,8 +45,8 @@ public class DebugUtil {
 		}
 	}
 
-	public static void error(boolean option, String pattern, Object ... arguments) {
-		error(option, MessageFormat.format(pattern, arguments));
+	public static void error(boolean option, String pattern, Object... arguments) {
+		error(option, NLS.bind(pattern, arguments));
 	}
 
 	public static void error(boolean option, String message) {
