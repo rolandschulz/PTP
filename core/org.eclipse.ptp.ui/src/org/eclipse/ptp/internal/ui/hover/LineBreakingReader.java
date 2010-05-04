@@ -21,19 +21,23 @@ package org.eclipse.ptp.internal.ui.hover;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.text.BreakIterator;
+
 import org.eclipse.swt.graphics.GC;
+
+import com.ibm.icu.text.BreakIterator;
+
 /**
  * @author Clement chu
  */
 public class LineBreakingReader {
-	private BufferedReader fReader;
-	private GC fGC;
-	private int fMaxWidth;
+	private final BufferedReader fReader;
+	private final GC fGC;
+	private final int fMaxWidth;
 	private String fLine;
 	private int fOffset;
 	private int fLineLen;
-	private BreakIterator fLineBreakIterator;
+	private final BreakIterator fLineBreakIterator;
+
 	/**
 	 * Creates a reader that breaks an input text to fit in a given width.
 	 * 
@@ -52,6 +56,7 @@ public class LineBreakingReader {
 		fLine = null;
 		fLineBreakIterator = BreakIterator.getLineInstance();
 	}
+
 	/**
 	 * Is formatted line
 	 * 
@@ -60,8 +65,10 @@ public class LineBreakingReader {
 	public boolean isFormattedLine() {
 		return fLine != null;
 	}
+
 	/**
-	 * Reads the next line. The lengths of the line will not exceed the gived maximum width
+	 * Reads the next line. The lengths of the line will not exceed the gived
+	 * maximum width
 	 * 
 	 * @param indent
 	 * @return
@@ -88,7 +95,8 @@ public class LineBreakingReader {
 			if (fOffset == fLine.length()) {
 				fLine = null;
 			}
-			if (breakOffset == 1 && res.charAt(0) == '\t') {// added to prevent empty line
+			if (breakOffset == 1 && res.charAt(0) == '\t') {// added to prevent
+															// empty line
 				return "\t" + readLine(indent); //$NON-NLS-1$
 			}
 		} else {
@@ -97,6 +105,7 @@ public class LineBreakingReader {
 		}
 		return res;
 	}
+
 	public String readLine() throws IOException {
 		if (fLine == null) {
 			String line = fReader.readLine();
@@ -123,6 +132,7 @@ public class LineBreakingReader {
 		}
 		return res;
 	}
+
 	/**
 	 * Find next breaj offset
 	 * 
@@ -150,6 +160,7 @@ public class LineBreakingReader {
 		}
 		return nextOffset;
 	}
+
 	/**
 	 * Find word begin index
 	 * 

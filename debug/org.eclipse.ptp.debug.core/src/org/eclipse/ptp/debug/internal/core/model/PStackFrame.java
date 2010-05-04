@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,6 +57,8 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
 
+import com.ibm.icu.text.NumberFormat;
+
 /**
  * @author Clement chu
  * 
@@ -71,8 +72,8 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	protected static boolean equalFrame(IPDIStackFrame frameOne, IPDIStackFrame frameTwo) {
 		if (frameOne == null || frameTwo == null)
 			return false;
-		IPDILocator loc1 = (IPDILocator) frameOne.getLocator();
-		IPDILocator loc2 = (IPDILocator) frameTwo.getLocator();
+		IPDILocator loc1 = frameOne.getLocator();
+		IPDILocator loc2 = frameTwo.getLocator();
 		if (loc1 == null || loc2 == null)
 			return false;
 		if (loc1.getFile() != null && loc1.getFile().length() > 0 && loc2.getFile() != null && loc2.getFile().length() > 0
@@ -111,78 +112,114 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		getPDISession().getEventManager().addEventListener(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#canEvaluate()
 	 */
 	public boolean canEvaluate() {
 		return getDebugTarget().isSuspended();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IJumpToAddress#canJumpToAddress(java.math.BigInteger)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IJumpToAddress#canJumpToAddress(java
+	 * .math.BigInteger)
 	 */
 	public boolean canJumpToAddress(BigInteger address) {
 		return getThread().canResume();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IJumpToLine#canJumpToLine(org.eclipse.core.resources.IFile, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IJumpToLine#canJumpToLine(org.eclipse
+	 * .core.resources.IFile, int)
 	 */
 	public boolean canJumpToLine(IFile file, int lineNumber) {
 		return getThread().canResume();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IJumpToLine#canJumpToLine(java.lang.String, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IJumpToLine#canJumpToLine(java.lang.
+	 * String, int)
 	 */
 	public boolean canJumpToLine(String fileName, int lineNumber) {
 		return getThread().canResume();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IRestart#canRestart()
 	 */
 	public boolean canRestart() {
 		return getDebugTarget() instanceof IRestart && ((IRestart) getDebugTarget()).canRestart();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
 	public boolean canResume() {
 		return getThread().canResume();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal
+	 * ()
 	 */
 	public boolean canResumeWithoutSignal() {
 		return (getDebugTarget() instanceof IResumeWithoutSignal && ((IResumeWithoutSignal) getDebugTarget())
 				.canResumeWithoutSignal());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IRunToAddress#canRunToAddress(java.math.BigInteger)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IRunToAddress#canRunToAddress(java.math
+	 * .BigInteger)
 	 */
 	public boolean canRunToAddress(BigInteger address) {
 		return getThread().canResume();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IRunToLine#canRunToLine(org.eclipse.core.resources.IFile, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IRunToLine#canRunToLine(org.eclipse.
+	 * core.resources.IFile, int)
 	 */
 	public boolean canRunToLine(IFile file, int lineNumber) {
 		return getThread().canResume();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IRunToLine#canRunToLine(java.lang.String, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IRunToLine#canRunToLine(java.lang.String
+	 * , int)
 	 */
 	public boolean canRunToLine(String fileName, int lineNumber) {
 		return getThread().canResume();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
 	 */
 	public boolean canStepInto() {
@@ -194,7 +231,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
 	 */
 	public boolean canStepOver() {
@@ -206,7 +245,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
 	 */
 	public boolean canStepReturn() {
@@ -225,14 +266,18 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
 		return getThread().canSuspend();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
@@ -245,8 +290,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return exists && getThread().canTerminate() || getDebugTarget().canTerminate();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#evaluateExpression(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPStackFrame#evaluateExpression(java
+	 * .lang.String)
 	 */
 	public IValue evaluateExpression(String expressionText) throws DebugException {
 		if (!isDisposed()) {
@@ -258,8 +307,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#evaluateExpressionToString(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPStackFrame#evaluateExpressionToString
+	 * (java.lang.String)
 	 */
 	public String evaluateExpressionToString(String expression) throws DebugException {
 		try {
@@ -270,9 +323,14 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java
+	 * .lang.Class)
 	 */
+	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IRunToLine.class) {
 			return this;
@@ -301,63 +359,83 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return super.getAdapter(adapter);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#getAddress()
 	 */
 	public BigInteger getAddress() {
 		return getPDIStackFrame().getLocator().getAddress();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#getCharEnd()
 	 */
 	public int getCharEnd() throws DebugException {
 		return -1;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#getCharStart()
 	 */
 	public int getCharStart() throws DebugException {
 		return -1;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getDebugTarget()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getDebugTarget()
 	 */
+	@Override
 	public PDebugTarget getDebugTarget() {
 		return fThread.getDebugTarget();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#getFile()
 	 */
 	public String getFile() {
 		return getPDIStackFrame().getLocator().getFile();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#getFrameLineNumber()
 	 */
 	public int getFrameLineNumber() {
 		return getPDIStackFrame().getLocator().getLineNumber();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#getFunction()
 	 */
 	public String getFunction() {
 		return getPDIStackFrame().getLocator().getFunction();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#getLevel()
 	 */
 	public int getLevel() {
 		return getPDIStackFrame().getLevel();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#getLineNumber()
 	 */
 	public int getLineNumber() throws DebugException {
@@ -372,11 +450,13 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return -1;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#getName()
 	 */
 	public String getName() throws DebugException {
-		IPDILocator locator = (IPDILocator) getPDIStackFrame().getLocator();
+		IPDILocator locator = getPDIStackFrame().getLocator();
 		String func = ""; //$NON-NLS-1$
 		String file = ""; //$NON-NLS-1$
 		String line = ""; //$NON-NLS-1$
@@ -393,35 +473,45 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		return NLS.bind(Messages.PStackFrame_0, new Object[] { func, file, line });
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#getPDIStackFrame()
 	 */
 	public IPDIStackFrame getPDIStackFrame() {
 		return pdiStackFrame;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPStackFrame#getPDIThread()
 	 */
 	public IPDIThread getPDIThread() {
-		return (IPDIThread) ((PThread) getThread()).getPDIThread();
+		return ((PThread) getThread()).getPDIThread();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#getRegisterGroups()
 	 */
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
 		return (isDisposed()) ? new IRegisterGroup[0] : fSession.getRegisterManager().getRegisterGroups(getTasks(), this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#getThread()
 	 */
 	public IThread getThread() {
 		return fThread;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#getVariables()
 	 */
 	public IVariable[] getVariables() throws DebugException {
@@ -433,16 +523,22 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		List<IPVariable> all = new ArrayList<IPVariable>(globals.length + vars.size());
 		all.addAll(Arrays.asList(globals));
 		all.addAll(vars);
-		return (IVariable[]) all.toArray(new IVariable[all.size()]);
+		return all.toArray(new IVariable[all.size()]);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	public void handleDebugEvents(IPDIEvent[] events) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#hasRegisterGroups()
 	 */
 	public boolean hasRegisterGroups() throws DebugException {
@@ -450,36 +546,48 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 				: getDebugTarget().fSession.getRegisterManager().getRegisterGroups(getTasks(), this).length > 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStackFrame#hasVariables()
 	 */
 	public boolean hasVariables() throws DebugException {
 		return getVariables0().size() > 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
 		return getThread().isStepping();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
 		return getThread().isSuspended();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
 		return getThread().isTerminated();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IJumpToAddress#jumpToAddress(java.math.BigInteger)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IJumpToAddress#jumpToAddress(java.math
+	 * .BigInteger)
 	 */
 	public void jumpToAddress(BigInteger address) throws DebugException {
 		if (!canJumpToAddress(address))
@@ -493,8 +601,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IJumpToLine#jumpToLine(org.eclipse.core.resources.IFile, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IJumpToLine#jumpToLine(org.eclipse.core
+	 * .resources.IFile, int)
 	 */
 	public void jumpToLine(IFile file, int lineNumber) throws DebugException {
 		if (!canJumpToLine(file, lineNumber))
@@ -502,8 +614,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		jumpToLine(file.getFullPath().lastSegment(), lineNumber);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IJumpToLine#jumpToLine(java.lang.String, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IJumpToLine#jumpToLine(java.lang.String,
+	 * int)
 	 */
 	public void jumpToLine(String fileName, int lineNumber) throws DebugException {
 		if (!canJumpToLine(fileName, lineNumber))
@@ -516,7 +632,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IRestart#restart()
 	 */
 	public void restart() throws DebugException {
@@ -525,15 +643,21 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
 		getThread().resume();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#resumeWithoutSignal()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#resumeWithoutSignal
+	 * ()
 	 */
 	public void resumeWithoutSignal() throws DebugException {
 		if (canResumeWithoutSignal()) {
@@ -541,8 +665,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IRunToAddress#runToAddress(java.math.BigInteger, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IRunToAddress#runToAddress(java.math
+	 * .BigInteger, boolean)
 	 */
 	public void runToAddress(BigInteger address, boolean skipBreakpoints) throws DebugException {
 		if (!canRunToAddress(address))
@@ -561,8 +689,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IRunToLine#runToLine(org.eclipse.core.resources.IFile, int, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IRunToLine#runToLine(org.eclipse.core
+	 * .resources.IFile, int, boolean)
 	 */
 	public void runToLine(IFile file, int lineNumber, boolean skipBreakpoints) throws DebugException {
 		if (!canRunToLine(file, lineNumber))
@@ -570,8 +702,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		runToLine(file.getLocation().lastSegment(), lineNumber, skipBreakpoints);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IRunToLine#runToLine(java.lang.String, int, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IRunToLine#runToLine(java.lang.String,
+	 * int, boolean)
 	 */
 	public void runToLine(String fileName, int lineNumber, boolean skipBreakpoints) throws DebugException {
 		if (!canRunToLine(fileName, lineNumber))
@@ -590,7 +726,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#stepInto()
 	 */
 	public void stepInto() throws DebugException {
@@ -599,7 +737,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#stepOver()
 	 */
 	public void stepOver() throws DebugException {
@@ -608,7 +748,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
 	 */
 	public void stepReturn() throws DebugException {
@@ -617,14 +759,18 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
 		getThread().suspend();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
@@ -635,9 +781,12 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		try {
 			return getName();
@@ -661,7 +810,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		PExpression expression = null;
 		Iterator<PExpression> it = fExpressions.iterator();
 		while (it.hasNext()) {
-			expression = (PExpression) it.next();
+			expression = it.next();
 			if (expression.getExpressionText().compareTo(expressionText) == 0) {
 				return expression;
 			}
@@ -693,7 +842,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			return;
 		Iterator<PExpression> it = fExpressions.iterator();
 		while (it.hasNext()) {
-			PExpression exp = (PExpression) it.next();
+			PExpression exp = it.next();
 			exp.preserve();
 		}
 	}
@@ -764,7 +913,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		if (fExpressions != null) {
 			Iterator<PExpression> it = fExpressions.iterator();
 			while (it.hasNext()) {
-				((PExpression) it.next()).dispose();
+				(it.next()).dispose();
 			}
 			fExpressions.clear();
 		}
@@ -798,7 +947,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	protected IPDIVariableDescriptor findVariable(List<IPDIVariableDescriptor> list, PVariable var) {
 		Iterator<IPDIVariableDescriptor> it = list.iterator();
 		while (it.hasNext()) {
-			IPDIVariableDescriptor newVarObject = (IPDIVariableDescriptor) it.next();
+			IPDIVariableDescriptor newVarObject = it.next();
 			if (var.sameVariable(newVarObject))
 				return newVarObject;
 		}
@@ -866,7 +1015,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 				fVariables = new ArrayList<IPVariable>(vars.size());
 				Iterator<IPDIVariableDescriptor> it = vars.iterator();
 				while (it.hasNext()) {
-					fVariables.add(PVariableFactory.createLocalVariable(this, (IPDIVariableDescriptor) it.next()));
+					fVariables.add(PVariableFactory.createLocalVariable(this, it.next()));
 				}
 			} else {
 				if (refreshVariables()) {
@@ -941,7 +1090,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		// add any new locals
 		Iterator<IPDIVariableDescriptor> newOnes = locals.iterator();
 		while (newOnes.hasNext()) {
-			fVariables.add(PVariableFactory.createLocalVariable(this, (IPDIVariableDescriptor) newOnes.next()));
+			fVariables.add(PVariableFactory.createLocalVariable(this, newOnes.next()));
 		}
 	}
 }
