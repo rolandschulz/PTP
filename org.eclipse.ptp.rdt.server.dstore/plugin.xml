@@ -24,7 +24,7 @@
            point="org.eclipse.ptp.services.ui.providerContributors">
         <providerContributor
               class="org.eclipse.ptp.rdt.server.dstore.ui.RemoteToolsCIndexServiceProviderContributer"
-              id="org.eclipse.ptp.rdt.server.dstore.ui.RemoteToolsCIndexServiceProvider">
+              id="org.eclipse.ptp.rdt.server.dstore.RemoteToolsCIndexServiceProvider">
         </providerContributor>
      </extension>
 </plugin>
