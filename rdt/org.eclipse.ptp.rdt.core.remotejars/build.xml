@@ -475,7 +475,7 @@
 	<target name="jar.remote" depends="prepare.remote.jar, assemble.remote">
 		<jar destfile="${serverJar}.jar" basedir="${basedir}/rdt-server">
 			<manifest>
-				<attribute name="Rsrc-Class-Path" value="./ cdtminer.jar cdtmodel.jar cdtparser.jar ${coreRuntimeJar} ${equinoxJar} ${filesystemJar} ${icuBaseJar} stubs.jar lrparser.jar upcparser.jar xlcparser.jar ${lpgRuntimeJar}"/>
+				<attribute name="Rsrc-Class-Path" value="./ dstore_extra_server.jar dstore_core.jar dstore_miners.jar clientserver.jar cdtminer.jar cdtmodel.jar cdtparser.jar ${coreRuntimeJar} ${equinoxJar} ${filesystemJar} ${icuBaseJar} stubs.jar lrparser.jar upcparser.jar xlcparser.jar ${lpgRuntimeJar}"/>
 				<attribute name="Class-Path" value="."/>
 				<attribute name="Rsrc-Main-Class" value="org.eclipse.dstore.core.server.Server"/>
 				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
