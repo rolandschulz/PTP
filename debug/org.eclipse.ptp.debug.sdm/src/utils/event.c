@@ -292,7 +292,9 @@ DbgSerializeEvent(dbg_event *e, char **result, int *len)
 		break;
 	}
 
-	return proxy_serialize_msg(p, result, len);
+	res = proxy_serialize_msg(p, result, len);
+	free_proxy_msg(p);
+	return res;
 }
 
 static int
