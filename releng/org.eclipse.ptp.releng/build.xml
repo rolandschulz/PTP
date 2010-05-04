@@ -22,7 +22,8 @@
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
 		<property name="buildDirectory" value="${basedir}/results"/>
-		<property name="copyToDir" value="/home/www/tools/ptp/builds/${eclipseRelease}"/>
+		<property name="releaseDir" value="/home/www/tools/ptp/builds/${eclipseRelease}"/>
+		<property name="copyToDir" value="${releaseDir}/${buildType}.${buildId}"/>
 		<property name="testDirectory" value="${buildDirectory}/test"/>
 		<property name="baseLocation" value="${buildDirectory}/eclipse"/>
 		<property name="pde.build.scripts" value="${eclipse.pdebuild.scripts}"/>
@@ -119,23 +120,23 @@
 	</target>
 		
 	<target name="copy" depends="init" unless="hasErrors">
-		<mkdir dir="${copyToDir}/${buildType}.${buildId}"/>
-		<copy todir="${copyToDir}/${buildType}.${buildId}">
+		<mkdir dir="${copyToDir}"/>
+		<copy todir="${copyToDir}">
 			<fileset dir="${buildDirectory}/${buildType}.${buildId}"/>
 		</copy>
-		<chmod perm="g+w" dir="${copyToDir}/${buildType}.${buildId}">
-			<dirset dir="${copyToDir}/${buildType}.${buildId}"/>
+		<chmod perm="g+w" dir="${copyToDir}">
+			<dirset dir="${copyToDir}"/>
 		</chmod>
 		<!-- Create symlink to latest build -->
-		<delete file="${copyToDir}/latest" followsymlinks="false" failonerror="false"/>
+		<delete file="${releaseDir}/latest" followsymlinks="false" failonerror="false"/>
 		<!--symlink action="delete" link="${copyToDir}/latest" failonerror="false"/-->
-		<symlink link="${copyToDir}/latest" resource="${copyToDir}/${buildType}.${buildId}" overwrite="true"/>
-		<delete file="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" followsymlinks="false" failonerror="false"/>
+		<symlink link="${releaseDir}/latest" resource="${copyToDir}" overwrite="true"/>
+		<delete file="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" followsymlinks="false" failonerror="false"/>
 		<!--symlink action="delete" link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" failonerror="false"/-->
-		<symlink link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${buildType}.${buildId}/${ptpMasterFile}" overwrite="true"/>
-		<delete file="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" followsymlinks="false" failonerror="false"/>
+		<symlink link="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${ptpMasterFile}" overwrite="true"/>
+		<delete file="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" followsymlinks="false" failonerror="false"/>
 		<!--symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/-->
-		<symlink link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/${buildType}.${buildId}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
+		<symlink link="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
 	</target>
 	
 	<target name="p2" depends="init" unless="hasErrors">
