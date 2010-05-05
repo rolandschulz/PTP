@@ -440,15 +440,15 @@ ByteToHex(char *out_string, char *in_string, int in_size)
 static char * 
 GetDefaultAddress(int size)
 {
-	int i;
-	const char *pattern = "00";
-	char *addr = (char *)malloc(size*2 + 1);
+	int				i;
+	const char *	pattern = "00";
+	char *			addr = (char *)malloc(size*2 + 1);
 
-	for (i=0; i<size; i++) {
+	for (i=0; i < size; i++) {
 		memcpy(&addr[i*2], pattern, 2);
 	}
 	addr[size*2] = '\0';
-	return strdup(addr);
+	return addr;
 }
 
 /* Converts hexadecimal display to binary. String length is used
@@ -457,16 +457,19 @@ GetDefaultAddress(int size)
 static void 
 HexToByte(char *out_string, char *in_string, int in_size)
 {
-	int i;
-	int h_value, c_value;
-	int byte_val = 0;
-	int in_len, def_len = 0;
-	char *input;
-	char *def_input;
+	int		i;
+	int		h_value;
+	int		c_value;
+	int		byte_val = 0;
+	int		in_len;
+	int		def_len = 0;
+	char *	input;
+	char *	def_input;
 	
 	def_input = GetDefaultAddress(in_size);
-	if (in_size%2 != 0) {
-		out_string = strdup(def_input);
+	if (in_size % 2 != 0 || in_string == NULL) {
+		strcpy(out_string, def_input);
+		free(def_input);
 		return;
 	}
 
@@ -475,25 +478,25 @@ HexToByte(char *out_string, char *in_string, int in_size)
 
 	if (in_len == def_len) {
 		strcpy(def_input, in_string);
-	}
-	else {
-		for (i=def_len-in_len; i<def_len; i++) {
+	} else {
+		for (i = def_len - in_len; i < def_len; i++) {
 			def_input[i] = *in_string++;
 		}
 	}
 
-	input = strdup(def_input);
-	for (i=0; i<(in_size*2); i++) {
+	for (input = def_input, i = 0; i < in_size * 2; i++) {
 		if ((h_value = *input++) >= '0' && h_value <= '9')
 			c_value = h_value - '0';
 		else
-			(c_value = 10 + (h_value & 0xf) - ('a' & 0xf));
+			c_value = 10 + (h_value & 0xf) - ('a' & 0xf);
 
-		if (!(i%2))
+		if (!(i % 2))
 			byte_val = c_value * 16;
 		else
 			*out_string++ = byte_val + c_value;
 	}
+
+	free(def_input);
 }
 /*
  * Convert a null terminated array of hexadecimal characters to
@@ -507,18 +510,9 @@ AddressToAIF(char *addr, int len)
 	AIF * a;
 	char * buf;
 	
-	if (addr == NULL) {
-		addr = GetDefaultAddress(len);
-	}
-
 	a = NewAIF(0, len);
 	AIF_FORMAT(a) = strdup(AIF_ADDRESS_TYPE(len));
-
-	buf = _aif_alloc(len);
-	HexToByte(buf, addr, len);
-
-	memcpy(AIF_DATA(a), buf, len);
-	free(buf);
+	HexToByte(AIF_DATA(a), addr, len);
 	return a;
 }
 /*
