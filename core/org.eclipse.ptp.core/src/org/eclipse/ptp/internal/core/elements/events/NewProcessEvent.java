@@ -19,10 +19,10 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Collection;
+import java.util.BitSet;
 
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 
 /**
@@ -31,18 +31,27 @@ import org.eclipse.ptp.core.elements.events.INewProcessEvent;
  */
 public class NewProcessEvent implements INewProcessEvent {
 
+	private final IPJob job;
+	private final BitSet processes;
 	private final IPElement source;
-	private final Collection<IPProcess> processes;
 
-	public NewProcessEvent(IPElement source, Collection<IPProcess> processes) {
+	public NewProcessEvent(IPElement source, IPJob job, BitSet processes) {
 		this.source = source;
-		this.processes = processes;
+		this.job = job;
+		this.processes = (BitSet) processes.clone();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.events.INewProcessEvent#getJob()
+	 */
+	public IPJob getJob() {
+		return job;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.INewProcessEvent#getProcesses()
 	 */
-	public Collection<IPProcess> getProcesses() {
+	public BitSet getProcesses() {
 		return processes;
 	}
 

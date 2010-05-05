@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,7 +33,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -58,6 +58,7 @@ import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.messages.Messages;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -190,6 +191,7 @@ public class MachinesNodesView extends ViewPart {
 			halted = false;
 		}
 		
+		@SuppressWarnings("unused")
 		public MachineGraphicalRepresentation(String machineName, String machineID, Color color) {
 			this.machineName = machineName;
 			this.setMachineID(machineID);
@@ -199,6 +201,7 @@ public class MachinesNodesView extends ViewPart {
 			halted = false;
 		}
 		
+		@SuppressWarnings("unused")
 		public MachineGraphicalRepresentation(String machineName, Color color, int Ox, int Oy, int width, int height) {
 			this.machineName = machineName;
 			this.color = color;
@@ -206,6 +209,7 @@ public class MachinesNodesView extends ViewPart {
 			rectangle = new Rectangle(Ox, Oy, width, height);
 		}
 		
+		@SuppressWarnings("unused")
 		public MachineGraphicalRepresentation(String machineName, Color color, int Ox, int Oy) {
 			this.machineName = machineName;
 			this.color = color;
@@ -225,10 +229,12 @@ public class MachinesNodesView extends ViewPart {
 			return rectangle;
 		}
 		
+		@SuppressWarnings("unused")
 		public Color getColor() {
 			return color;
 		}
 		
+		@SuppressWarnings("unused")
 		public void setColor(Color color) {
 			this.color = color;
 		}
@@ -237,6 +243,7 @@ public class MachinesNodesView extends ViewPart {
 			return nodes.add(node);
 		}
 		
+		@SuppressWarnings("unused")
 		public boolean removeNode(NodeGraphicalRepresentation node) {
 			return nodes.remove(node);
 		}
@@ -303,10 +310,12 @@ public class MachinesNodesView extends ViewPart {
 			return rectangle;
 		}
 		
+		@SuppressWarnings("unused")
 		public void setGraphicalRepresentation(Rectangle ret) {
 			rectangle = ret;
 		}
 		
+		@SuppressWarnings("unused")
 		public void setNodeID(String nodeID) {
 			this.nodeID = nodeID;
 		}
@@ -726,11 +735,11 @@ public class MachinesNodesView extends ViewPart {
 					/*
 					 * Add job to the graphical representation of its node
 					 */
-					for (int i = 0; i < job.getProcesses().length; i ++) {
-						IPProcess process= job.getProcesses()[i];
-						if (process.getNode() != null) {
-							nodesHashMap.get(process.getNode().getID())
-							.addJob(job.getID());
+					final BitSet procJobRanks = job.getProcessJobRanks();
+					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+						final String nodeId = job.getProcessNodeId(procJobRank);
+						if (nodeId != null) {
+							nodesHashMap.get(nodeId).addJob(job.getID());
 							needRefresh = true;
 						}
 					}
@@ -739,11 +748,11 @@ public class MachinesNodesView extends ViewPart {
 					/*
 					 * remove job from the graphical representation of its node
 					 */
-					for (int i = 0; i < job.getProcesses().length; i ++) {
-						IPProcess process= job.getProcesses()[i];
-						if (process.getNode() != null) {
-							nodesHashMap.get(process.getNode().getID())
-							.removeJob(job.getID());
+					final BitSet procJobRanks = job.getProcessJobRanks();
+					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+						final String nodeId = job.getProcessNodeId(procJobRank);
+						if (nodeId != null) {
+							nodesHashMap.get(nodeId).removeJob(job.getID());
 							needRefresh = true;
 						}
 					}
@@ -760,11 +769,11 @@ public class MachinesNodesView extends ViewPart {
 				/*
 				 * Add job to the graphical representation of its node
 				 */
-				for (int i = 0; i < job.getProcesses().length; i ++) {
-					IPProcess process= job.getProcesses()[i];
-					if (process.getNode() != null) {
-						nodesHashMap.get(process.getNode().getID())
-								.addJob(job.getID());
+				final BitSet procJobRanks = job.getProcessJobRanks();
+				for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+					final String nodeId = job.getProcessNodeId(procJobRank);
+					if (nodeId != null) {
+						nodesHashMap.get(nodeId).addJob(job.getID());
 						needRefresh = true;
 					}
 				}
@@ -779,11 +788,11 @@ public class MachinesNodesView extends ViewPart {
 				/*
 				 * remove job from the graphical representation of its node
 				 */
-				for (int i = 0; i < job.getProcesses().length; i ++) {
-					IPProcess process= job.getProcesses()[i];
-					if (process.getNode() != null) {
-						nodesHashMap.get(process.getNode().getID())
-								.removeJob(job.getID());
+				final BitSet procJobRanks = job.getProcessJobRanks();
+				for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+					final String nodeId = job.getProcessNodeId(procJobRank);
+					if (nodeId != null) {
+						nodesHashMap.get(nodeId).removeJob(job.getID());
 						break;
 					}
 				}

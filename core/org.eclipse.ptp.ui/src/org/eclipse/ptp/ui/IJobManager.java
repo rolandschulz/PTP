@@ -12,7 +12,6 @@ package org.eclipse.ptp.ui;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -28,9 +27,10 @@ public interface IJobManager extends IElementManager {
 	/**
 	 * Add a process to the view.
 	 * 
-	 * @param proc process to add
+	 * @param job
+	 * @param procJobRank
 	 */
-	public void addProcess(IPProcess proc);
+	public void addProcess(IPJob job, int procJobRank);
 	
 	/**
 	 * Create an element handler for the job
@@ -47,14 +47,6 @@ public interface IJobManager extends IElementManager {
 	 * @return job with corresponding ID
 	 */
 	public IPJob findJobById(String jobId);
-	
-	/**
-	 * Find a process given its ID.
-	 * 
-	 * @param procId ID of the process to find
-	 * @return process with corresponding ID
-	 */
-	public IPProcess findProcess(String procId);
 	
 	/** 
 	 * Fire job event when job is changed
@@ -115,9 +107,10 @@ public interface IJobManager extends IElementManager {
 	/**
 	 * Remove a process from the view.
 	 * 
-	 * @param proc process to remove
+	 * @param job
+	 * @param procJobRank
 	 */
-	public void removeProcess(IPProcess proc);
+	public void removeProcess(IPJob job, int procJobRank);
 	
 	/** 
 	 * Set the current job

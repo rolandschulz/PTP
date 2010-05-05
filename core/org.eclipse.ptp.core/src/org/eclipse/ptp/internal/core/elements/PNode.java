@@ -18,24 +18,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
@@ -45,6 +45,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.INodeChildListener;
 import org.eclipse.ptp.core.elements.listeners.INodeListener;
+import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.events.ChangedProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.NodeChangeEvent;
@@ -52,8 +53,11 @@ import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 
 public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	
-	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
+	private final ListenerList elementListeners = new ListenerList();
+	// discover which job ranks for a given job are running on this node
+	private final Map<IPJobControl, BitSet> jobProcessRanksMap =
+		new HashMap<IPJobControl, BitSet>();
 
 	public PNode(String id, IPMachineControl mac, IAttribute<?,?,?>[] attrs) {
 		super(id, mac, P_NODE, attrs);
@@ -82,46 +86,42 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#addProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#addJobProcessRanks(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.BitSet)
 	 */
-	public void addProcesses(Collection<IPProcessControl> processControls) {
-		List<IPProcess> procs = new ArrayList<IPProcess>(processControls.size());
-		Set<IPJob> jobs = new HashSet<IPJob>();
-		
-		for (IPProcessControl process : processControls) {
-			/*
-			 * Add the process as a child of the node
-			 */
-			addChild(process);
-			
-			/*
-			 * Add this node to the process
-			 */
-			process.addNode(this);
-			
-			/*
-			 * Find the set of jobs that started these processes
-			 */
-			jobs.add(process.getJob());
-			
-			/*
-			 * Add the process to the event list
-			 */
-			procs.add(process);
+	public void addJobProcessRanks(IPJobControl job, BitSet processRanks) {
+		// add the incoming process indices to the
+		// existing process indices for this job
+		BitSet jobProcessRanks = jobProcessRanksMap.get(job);
+		if (jobProcessRanks == null) {
+			jobProcessRanks = new BitSet();
+			jobProcessRanksMap.put(job, jobProcessRanks);
 		}
-		
+		jobProcessRanks.or(processRanks);
+
 		/*
 		 * Add this node to the listeners for job child events. This is so
 		 * we can forward IChangedProcess events to the INodeChildListers.
 		 */
-		for (IPJob job : jobs) {
-			job.addChildListener(this);
-		}
-		
+		job.addChildListener(this);
+
 		/*
 		 * Fire the INewProcess event for these processes
 		 */
-		fireNewProcesses(procs);
+		fireNewProcesses(job, processRanks);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#getJobProcessRanks(org.eclipse.ptp.core.elements.IPJob)
+	 */
+	public BitSet getJobProcessRanks(IPJob job) {
+		return (BitSet) jobProcessRanksMap.get(job).clone();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPNode#getJobs()
+	 */
+	public Set<? extends IPJob> getJobs() {
+		return Collections.unmodifiableSet(jobProcessRanksMap.keySet());
 	}
 
 	/* (non-Javadoc)
@@ -154,26 +154,6 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 		}
 		return ""; //$NON-NLS-1$
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#getProcessControls()
-	 */
-	public Collection<IPProcessControl> getProcessControls() {
-		IPElementControl[] children = getChildren();
-		List<IPProcessControl> processes =
-			new ArrayList<IPProcessControl>(children.length);
-		for (IPElementControl element : children) {
-			processes.add((IPProcessControl)element);
-		}
-		return processes;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPNode#getProcesses()
-	 */
-	public IPProcess[] getProcesses() {
-		return getProcessControls().toArray(new IPProcess[getProcessControls().size()]);
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#getState()
@@ -186,18 +166,8 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
 	 */
 	public void handleEvent(IChangedProcessEvent e) {
-		fireChangedProcesses(e.getProcesses());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
-	 */
-	public void handleEvent(IRemoveProcessEvent e) {
-		for (IPProcess process : e.getProcesses()) {
-			removeChild((IPProcessControl)process);
-		}
-		
-		fireRemoveProcesses(e.getProcesses());
+		fireChangedProcesses((IPJob)e.getSource(), e.getProcesses(),
+				e.getAttributes());
 	}
 
 	/* (non-Javadoc)
@@ -205,6 +175,14 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 */
 	public void handleEvent(INewProcessEvent e) {
 		// Do nothing
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+	 */
+	public void handleEvent(IRemoveProcessEvent e) {
+		IPJobControl job = (IPJobControl) e.getJob();
+		removeJobProcessRanks(job, e.getProcesses());
 	}
 
 	/* (non-Javadoc)
@@ -222,18 +200,19 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#removeProcess(org.eclipse.ptp.core.elementcontrols.IPProcessControl)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#removeJobProcessRanks(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.BitSet)
 	 */
-	public void removeProcesses(Collection<IPProcessControl> processControls) {
-		List<IPProcess> processes = new ArrayList<IPProcess>(processControls.size());
+	public void removeJobProcessRanks(IPJobControl job, BitSet ranks) {
+		// remove the removed process indices from the jobProcesses's set of
+		// process indices for this job.
 		
-		for (IPProcessControl process : processControls) {
-			removeChild(process);
-			process.removeNode();
-			processes.add(process);
+		final BitSet jobProcessRanks = jobProcessRanksMap.get(job);
+		if (jobProcessRanks == null) {
+			PTPCorePlugin.log(Messages.PNode_1 + job.getName());
 		}
-		
-		fireRemoveProcesses(processes);
+		jobProcessRanks.andNot(ranks);
+
+		fireRemoveProcesses(job, ranks);
 	}
 
 	/**
@@ -250,13 +229,30 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	}
 	
 	/**
+	 * Send IChangedProcessEvent to registered listeners
+	 * @param job
+	 * @param processes
+	 * @param attrManager 
+	 */
+	private void fireChangedProcesses(IPJob job, BitSet processes,
+			AttributeManager attrManager) {
+		IChangedProcessEvent e = 
+			new ChangedProcessEvent(this, job, processes, attrManager);
+		
+		for (Object listener : childListeners.getListeners()) {
+			((INodeChildListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
 	 * Send INewProcessEvent to registered listeners
 	 * 
-	 * @param process
+	 * @param job the job that possesses these processes
+	 * @param processes indices of added processes
 	 */
-	private void fireNewProcesses(Collection<IPProcess> processes) {
+	private void fireNewProcesses(IPJob job, BitSet processes) {
 		INewProcessEvent e = 
-			new NewProcessEvent(this, processes);
+			new NewProcessEvent(this, job, processes);
 		
 		for (Object listener : childListeners.getListeners()) {
 			((INodeChildListener)listener).handleEvent(e);
@@ -264,31 +260,18 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	}
 
 	/**
-	 * @param process
+	 * @param job the job that used to posses these processes
+	 * @param processes indices of removed processes
 	 */
-	private void fireRemoveProcesses(Collection<IPProcess> processes) {
+	private void fireRemoveProcesses(IPJob job, BitSet processes) {
 		IRemoveProcessEvent e = 
-			new RemoveProcessEvent(this, processes);
+			new RemoveProcessEvent(this, job, processes);
 		
 		for (Object listener : childListeners.getListeners()) {
 			((INodeChildListener)listener).handleEvent(e);
 		}
 	}
 
-	/**
-	 * Send IChangedProcessEvent to registered listeners
-	 * 
-	 * @param nodes
-	 */
-	private void fireChangedProcesses(Collection<IPProcess> processes) {
-		IChangedProcessEvent e = 
-			new ChangedProcessEvent(this, processes);
-		
-		for (Object listener : childListeners.getListeners()) {
-			((INodeChildListener)listener).handleEvent(e);
-		}
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */

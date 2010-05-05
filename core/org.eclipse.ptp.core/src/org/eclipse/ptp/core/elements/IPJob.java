@@ -18,8 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import java.util.BitSet;
+import java.util.Set;
+
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
 
@@ -58,52 +64,107 @@ public interface IPJob extends IPElement {
 	public ILaunchConfiguration getLaunchConfiguration();
 
 	/**
-	 * Find a Process in this Job by its ID. Returns the Process
-	 * object if found, else returns <code>null</code>.
-	 * 
-	 * @param processNumber
-	 *            The Process number to search for
-	 * @return The Process object if found, else <code>null</code>
-	 * @see IPProcess
+	 * @param attributeDefinition
+	 * @param processJobRank the process in question
+	 * @return
 	 */
-	public IPProcess getProcessById(String id);
-	
-	/**
-	 * Finds a Process in by its integer index. A process index is a
-	 * zero-based index of all processes in the job. Returns the Process
-	 * object if found, else returns <code>null</code>.
-	 * 
-	 * @param number
-	 *            The Process number to search for
-	 * @return The Process object if found, else <code>null</code>
-	 */
-	public IPProcess getProcessByIndex(int number);
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	A getProcessAttribute(D attributeDefinition, int processJobRank);
 
 	/**
-	 * Finds a Process in by its String index. A process index is a
-	 * zero-based index of all processes in the job. Returns the Process
-	 * object if found, else returns <code>null</code>.
-	 * 
-	 * @param number
-	 *            The Process index to search for
-	 * @return The Process object if found, else <code>null</code>
+	 * @param attrDefId
+	 * @param processJobRank the process in question
+	 * @return
 	 */
-	public IPProcess getProcessByIndex(String number);
+	public IAttribute<?,?,?> getProcessAttribute(String attrDefId, int processJobRank);
 	
 	/**
-	 * Returns an array of the Processes comprised by this Job. 
-	 * Returns an empty array if there are no processes.
-	 * 
-	 * @return The Processes in this Job.
+	 * @param processJobRanks
+	 * @return
 	 */
-	public IPProcess[] getProcesses();
+	public Set<IAttributeDefinition<?, ?, ?>> getProcessAttributeKeys(
+			BitSet processJobRanks);
 	
+	/**
+	 * @param processJobRanks limit the returned attributes
+	 *  to this subset of process job ranks
+	 * @return
+	 */
+	public Set<IAttribute<?, ?, ?>> getProcessAttributes(BitSet processJobRanks);
+	
+	/**
+	 * @param attributeDefinition
+	 * @return
+	 */
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	Set<A> getProcessAttributes(D attributeDefinition);
+	
+	/**
+	 * @param attributeDefinition
+	 * @param processJobRanks limit the returned attributes
+	 *  to this subset of process job ranks
+	 * @return
+	 */
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	Set<A> getProcessAttributes(D attributeDefinition, BitSet processJobRanks);
+
+	
+	/**
+	 * @param attrDefId
+	 * @param processJobRanks limit the returned attributes
+	 *  to this subset of process job ranks
+	 * @return
+	 */
+	public Set<IAttribute<?,?,?>> getProcessAttributes(String attrDefId, BitSet processJobRanks);
+
+	
+	/**
+	 * Get the job ranks for all the processes known by this job
+	 * 
+	 * @return
+	 */
+	public BitSet getProcessJobRanks();
+	
+	/**
+	 * Get the jobRanks for all the processes known by this job with
+	 * attribute value equal to {@code attribute}
+	 *
+	 * @param attribute
+	 * @return
+	 */
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	BitSet getProcessJobRanks(A attribute);
+
+	/**
+	 * @param processJobRank
+	 * @return
+	 */
+	public String getProcessName(int processJobRank);
+	
+	/**
+	 * @param processJobRank
+	 * @return
+	 */
+	public String getProcessNodeId(int processJobRank);
+
+	/**
+	 * @param processJobRank
+	 * @return
+	 */
+	public ProcessAttributes.State getProcessState(int processJobRank);
+
 	/**
 	 * Returns parent queue for this job.
 	 * 
 	 * @return IPQueue
 	 */
 	public IPQueue getQueue();
+	
+	/**
+	 * @param processJobRank
+	 * @return the output saved for this processJobRank
+	 */
+	public String getSavedOutput(int processJobRank);
 
 	/**
 	 * Returns the state of the job
@@ -111,6 +172,18 @@ public interface IPJob extends IPElement {
 	 * @return job state
 	 */
 	public JobAttributes.State getState();
+	
+	/**
+	 * @param processJobRank
+	 * @return true if process is contained by this job
+	 */
+	public boolean hasProcessByJobRank(int processJobRank);
+
+	/**
+	 * @param processJobRanks
+	 * @return true if all of these processes are contained by this job
+	 */
+	public boolean hasProcessesByJobRanks(BitSet processJobRanks);
 
 	/**
 	 * Returns true/false regarding whether this Job is a debug job 
@@ -125,14 +198,14 @@ public interface IPJob extends IPElement {
 	 * @param listener
 	 */
 	public void removeChildListener(IJobChildListener listener);
-	
+
 	/**
 	 * Remove a listener for events relating to this job.
 	 * 
 	 * @param listener
 	 */
 	public void removeElementListener(IJobListener listener);
-	
+
 	/**
 	 * Sets this job to be a debug job
 	 */

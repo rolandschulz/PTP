@@ -45,6 +45,7 @@ public class Element extends PlatformObject implements IElement {
 		this.name = name;
 		this.pElement = pElement;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.model.IElement#cloneElement()
 	 */

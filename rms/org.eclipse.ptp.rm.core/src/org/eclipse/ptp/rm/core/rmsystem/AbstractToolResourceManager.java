@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core.rmsystem;
 
+import java.util.BitSet;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
@@ -17,7 +18,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
@@ -115,15 +115,6 @@ public abstract class AbstractToolResourceManager extends AbstractRuntimeResourc
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateProcess(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
-	 */
-	@Override
-	protected IPProcessControl doCreateProcess(IPJobControl job, String processId, AttributeManager attrs) {
-		return newProcess(job, processId, attrs);
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateQueue(java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
@@ -158,13 +149,12 @@ public abstract class AbstractToolResourceManager extends AbstractRuntimeResourc
 		return updateNodes(machine, nodes, attrs);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateProcesses(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateProcesses(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected boolean doUpdateProcesses(IPJobControl job, Collection<IPProcessControl> processes, AttributeManager attrs) {
-		return updateProcesses(job, processes, attrs);
+	protected boolean doUpdateProcesses(IPJobControl job, BitSet processJobRanks, AttributeManager attrs) {
+		return updateProcessesByJobRanks(job, processJobRanks, attrs);
 	}
 
 	/*

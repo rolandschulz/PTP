@@ -19,14 +19,16 @@
 package org.eclipse.ptp.ui.managers;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.ptp.core.elements.IPElement;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
@@ -41,6 +43,7 @@ import org.eclipse.ptp.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -176,16 +179,18 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 			NodeAttributes.State nodeState = node.getState();
 			
 			if (nodeState == NodeAttributes.State.UP) {
-				IPProcess[] procs = node.getProcesses();
-				if (procs.length > 0) {
-					for (IPProcess proc : procs) {
-						if (proc.getState() != ProcessAttributes.State.COMPLETED) {
-							return NodeAttributes.State.values().length;
+				Set<? extends IPJob> jobs = node.getJobs();
+				for (IPJob job : jobs) {
+					BitSet procs = node.getJobProcessRanks(job);
+					if (!procs.isEmpty()) {
+						for (Integer proc : new BitSetIterable(procs)) {
+							if (job.getProcessState(proc) != ProcessAttributes.State.COMPLETED) {
+								return NodeAttributes.State.values().length;
+							}
 						}
+						return NodeAttributes.State.values().length + 1;
 					}
-					return NodeAttributes.State.values().length + 1;
 				}
-				
 			}
 			
 			return nodeState.ordinal();

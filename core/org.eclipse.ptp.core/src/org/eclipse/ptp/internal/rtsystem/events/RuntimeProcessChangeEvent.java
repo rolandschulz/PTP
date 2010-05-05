@@ -25,7 +25,17 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent;
 
 public class RuntimeProcessChangeEvent extends AbstractRuntimeChangeEvent implements IRuntimeProcessChangeEvent {
 
-	public RuntimeProcessChangeEvent(ElementAttributeManager attrs) {
+	private final String jobId;
+
+	public RuntimeProcessChangeEvent(String jobId, ElementAttributeManager attrs) {
 		super(attrs);
+		this.jobId = jobId;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent#getJobId()
+	 */
+	public String getJobId() {
+		return jobId;
 	}
 }

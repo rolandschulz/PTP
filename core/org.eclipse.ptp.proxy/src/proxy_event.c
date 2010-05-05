@@ -358,10 +358,12 @@ proxy_node_change_event(int trans_id, char *id_range, int num_attrs)
  * PROCESS CHANGE EVENT. Used to change attributes on a process.
  */
 proxy_msg *
-proxy_process_change_event(int trans_id, char *id_range, int num_attrs)
+proxy_process_change_event(int trans_id, char *jobid, char *id_range,
+                           int num_attrs)
 {
 	proxy_msg *m = new_proxy_msg(PTP_PROXY_EV_RT_PROCESS_CHANGE, trans_id);
 
+	proxy_msg_add_string(m, jobid);
 	proxy_msg_add_int(m, 1); /* 1 id range */
 	proxy_msg_add_string(m, id_range);
 	proxy_msg_add_int(m, num_attrs);
@@ -451,10 +453,11 @@ proxy_remove_node_event(int trans_id, char *id_range)
  * REMOVE PROCESS EVENT. Used to remove process model elements.
  */
 proxy_msg *
-proxy_remove_process_event(int trans_id, char *id_range)
+proxy_remove_process_event(int trans_id, char *jobid, char *id_range)
 {
 	proxy_msg *m = new_proxy_msg(PTP_PROXY_EV_RT_REMOVE_PROCESS, trans_id);
 
+	proxy_msg_add_string(m, jobid);
 	proxy_msg_add_string(m, id_range);
 
 	return m;

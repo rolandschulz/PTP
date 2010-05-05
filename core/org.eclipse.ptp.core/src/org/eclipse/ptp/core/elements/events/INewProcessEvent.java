@@ -17,10 +17,10 @@
 package org.eclipse.ptp.core.elements.events;
 
 
-import java.util.Collection;
+import java.util.BitSet;
 
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPJob;
 
 /**
  * This event is generated when one or more new processes are created. It is
@@ -34,12 +34,20 @@ import org.eclipse.ptp.core.elements.IPProcess;
 public interface INewProcessEvent {
 	
 	/**
+	 * Get the job that contains these processes.
+	 * 
+	 * @return the job that contains these processes
+	 */
+	public IPJob getJob();
+
+	/**
 	 * Get the new processes
 	 * 
 	 * @return the new processes
 	 */
-	public Collection<IPProcess> getProcesses();
-
+	public BitSet getProcesses();
+	
+	
 	/**
 	 * Get the source of this event. Since a process normally has two parents,
 	 * a job and a node, his will return the source that generated the

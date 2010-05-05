@@ -29,13 +29,14 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -46,6 +47,7 @@ import org.eclipse.ptp.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -54,6 +56,11 @@ import org.eclipse.swt.graphics.Image;
  */
 
 public class JobManager extends AbstractElementManager implements IJobManager {
+	
+	private static String getProcessKey(IPJob job, int procJobRank) {
+		return job.getProcessName(procJobRank);
+	}
+
 	protected Map<String, IPJob> jobList = new HashMap<String, IPJob>();
 	protected IPJob cur_job = null;
 	protected IPQueue cur_queue = null;
@@ -69,23 +76,25 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		if (job != null) {
 			IElementSet set = createElementHandler(job).getSetRoot();
 			List<IElement> elements = new ArrayList<IElement>();
-			for (IPProcess proc : job.getProcesses()) {
-				if (proc == null || set.contains(proc.getID()))
+			for (Integer processJobRank : new BitSetIterable(job.getProcessJobRanks())) {
+				final String key = getProcessKey(job, processJobRank);
+				if (set.contains(key))
 					continue;
-				elements.add(createProcessElement(set, proc.getID(), proc.getProcessIndex(), proc));
+				elements.add(createProcessElement(set, key, job, processJobRank));
 			}
 			set.addElements(elements.toArray(new IElement[0]));
 		}
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IJobManager#addProcess(org.eclipse.ptp.core.elements.IPProcess)
+	 * @see org.eclipse.ptp.ui.IJobManager#addProcess(org.eclipse.ptp.core.elements.IPJob, int)
 	 */
-	public void addProcess(IPProcess proc) {
-		IPJob job = proc.getJob();
+	public void addProcess(IPJob job, int procJobRank) {
 		IElementSet set = createElementHandler(job).getSetRoot();
-		if (!set.contains(proc.getID())) {
-			set.addElements(new IElement[] { createProcessElement(set, proc.getID(), proc.getProcessIndex(), proc) });
+		final String key = getProcessKey(job, procJobRank);
+		if (!set.contains(key)) {
+			set.addElements(new IElement[] { createProcessElement(set, key,
+					job, procJobRank) });
 		}
 	}
 
@@ -116,30 +125,6 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 */
 	public IPJob findJobById(String job_id) {
 		return jobList.get(job_id);
-	}
-	
-	/** 
-	 * Find process
-	 * @param job job
-	 * @param id process ID
-	 * @return
-	 */
-	public IPProcess findProcess(IPJob job, String task_id) {
-		if (job == null)
-			return null;
-		return job.getProcessByIndex(task_id);
-		//return job.findProcess(id);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IJobManager#findProcess(java.lang.String)
-	 */
-	public IPProcess findProcess(String proc_id) {
-		IPJob job = getJob();
-		if (job != null) {
-			return job.getProcessById(proc_id);
-		}
-		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -188,10 +173,11 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	
 	/** 
 	 * Get process status text
-	 * @param proc process
+	 * @param proc process (PProcessUI goes away when we address UI scalability. See Bug 311057)
 	 * @return status
 	 */
-	public String getProcessStatusText(IPProcess proc) {
+	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+	public String getProcessStatusText(PProcessUI proc) {
 		if (proc != null) {
 			return proc.getState().toString();
 		}
@@ -259,9 +245,11 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 					return image;
 				}
 			}
-			IPProcess proc = job.getProcessById(element.getID());
-			if (proc != null) {
-				return ParallelImages.procImages[proc.getState().ordinal()][element.isSelected() ? 1 : 0];
+			IPElement pElement = element.getPElement();
+			// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+			if (pElement instanceof PProcessUI) {
+				State state = ((PProcessUI)pElement).getState();
+				return ParallelImages.procImages[state.ordinal()][element.isSelected() ? 1 : 0];
 			}
 		}
 		return null;
@@ -367,19 +355,20 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IJobManager#removeProcess(org.eclipse.ptp.core.elements.IPProcess)
+	 * @see org.eclipse.ptp.ui.IJobManager#removeProcess(org.eclipse.ptp.core.elements.IPJob, int)
 	 */
-	public void removeProcess(IPProcess proc) {
-		IElementHandler elementHandler = getElementHandler(proc.getJob().getID());
+	public void removeProcess(IPJob job, int procJobRank) {
+		IElementHandler elementHandler = getElementHandler(job.getID());
 		if (elementHandler != null) {
 			IElementSet set = elementHandler.getSetRoot();
-			IElement element = set.getElementByID(proc.getID());
+			final String key = getProcessKey(job, procJobRank);
+			IElement element = set.getElementByID(key);
 			if (element != null) {
-				set.removeElement(proc.getID());
+				set.removeElement(key);
 			}
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.ui.IElementManager#setCurrentSetId(java.lang.String)
 	 */
@@ -454,11 +443,15 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	/**
 	 * @param set
 	 * @param key
-	 * @param taskID
+	 * @param job
+	 * @param processJobRank
 	 * @return
 	 */
-	protected IElement createProcessElement(IElementSet set, String key, String taskID, IPProcess process) {
-		return new Element(set, key, taskID, process) {
+	protected IElement createProcessElement(IElementSet set, String key, IPJob job,
+			int processJobRank) {
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		final PProcessUI pelement = new PProcessUI(job, processJobRank);
+		return new Element(set, key, Integer.toString(processJobRank), pelement) {
 			public int compareTo(IElement e) {
 				return new Integer(getName()).compareTo(new Integer(e.getName()));
 			}

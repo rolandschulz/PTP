@@ -150,6 +150,7 @@ void delete_node_from_list(List * node_list, NodeObject * node_object);
 
 struct JobObject {              /* a LoadLeveler or ptp job in a cluster */
   int proxy_generated_job_id;
+  int task_counter;             /* Source for task ids for job */
   char *gui_assigned_job_id;
   int job_found;                /* job found indicator */
   int job_state;                /* 1=submitted, 2=in queue */
@@ -165,7 +166,7 @@ void add_job_to_list(List * job_list, JobObject * job_object);
 void delete_job_from_list(List * job_list, JobObject * job_object);
 
 struct TaskObject {             /* a LoadLeveler or ptp task for job */
-  int proxy_generated_task_id;
+  int task_id;
   int task_found;               /* job found indicator */
   int ll_task_id;
   int task_state;
@@ -1499,6 +1500,7 @@ void *monitor_LoadLeveler_jobs(void *job_ident)
                         malloc_check(job_object, __FUNCTION__, __LINE__);
                         memset(job_object, '\0', sizeof(job_object));   /* zero the malloc area */
                         job_object->proxy_generated_job_id = generate_id();     /* a unique identifier for this cluster */
+			job_object->task_counter = 0;
                         job_object->gui_assigned_job_id = "-1"; /* unsolicited job from proxy */
                         job_object->ll_step_id.from_host = strdup(ll_step_id.from_host);
                         job_object->ll_step_id.cluster = ll_step_id.cluster;
@@ -1572,7 +1574,8 @@ void *monitor_LoadLeveler_jobs(void *job_ident)
                                 task_object = (TaskObject *) malloc(sizeof(TaskObject));
                                 malloc_check(task_object, __FUNCTION__, __LINE__);
                                 memset(task_object, '\0', sizeof(task_object)); /* zero the malloc area */
-                                task_object->proxy_generated_task_id = generate_id();   /* a unique identifier for this cluster */
+                                task_object->task_id = job_object->task_counter;
+				job_object->task_counter = job_object->task_counter + 1;
                                 task_object->ll_task_id = task_instance_task_ID;
                                 task_object->node_name = strdup(task_instance_machine_name);
                                 task_object->node_address = strdup(task_instance_machine_address);
@@ -2296,18 +2299,15 @@ static int sendJobRemoveEvent(int gui_transmission_id, JobObject * job_object)
 static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_object, JobObject * job_object, TaskObject * task_object)
 {
   proxy_msg *msg;
-  char proxy_generated_job_id_string[256];
-  char proxy_generated_task_id_string[256];
-  char ll_task_id_string[256];
+  char proxy_generated_job_id_string[12];
+  char proxy_generated_task_id_string[12];
+  char ll_task_id_string[12];
   char *task_state_to_report = PTP_PROC_STATE_SUSPENDED;
   NodeObject *node_object = NULL;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d. job=%s.%d.%d. node=%s. task=%d.\n", __FUNCTION__, __LINE__, job_object->ll_step_id.from_host, job_object->ll_step_id.cluster, job_object->ll_step_id.proc, task_object->node_name, task_object->ll_task_id);
-  memset(proxy_generated_job_id_string, '\0', sizeof(proxy_generated_job_id_string));   /* zero the area */
-  memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string)); /* zero the area */
-  memset(ll_task_id_string, '\0', sizeof(ll_task_id_string));   /* zero the area */
   sprintf(proxy_generated_job_id_string, "%d", job_object->proxy_generated_job_id);
-  sprintf(proxy_generated_task_id_string, "%d", task_object->proxy_generated_task_id);
+  sprintf(proxy_generated_task_id_string, "%d", task_object->task_id);
   sprintf(ll_task_id_string, "%d", task_object->ll_task_id);
   msg = proxy_new_process_event(gui_transmission_id, proxy_generated_job_id_string, 1); /* 1 == num tasks */
 
@@ -2347,13 +2347,14 @@ static int sendTaskAddEvent(int gui_transmission_id, ClusterObject * cluster_obj
 static int sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, TaskObject * task_object)
 {
   proxy_msg *msg;
-  char proxy_generated_task_id_string[256];
+  char jobid[12];
+  char proxy_generated_task_id_string[12];
   char *task_state_to_report = PTP_PROC_STATE_STARTING;
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
-  memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string)); /* zero the area */
-  sprintf(proxy_generated_task_id_string, "%d", task_object->proxy_generated_task_id);
-  msg = proxy_process_change_event(gui_transmission_id, proxy_generated_task_id_string, 1);
+  sprintf(jobid, "%d", job_object->proxy_generated_job_id);
+  sprintf(proxy_generated_task_id_string, "%d", task_object->task_id);
+  msg = proxy_process_change_event(gui_transmission_id, jobid, proxy_generated_task_id_string, 1);
 
   switch (task_object->task_state) {
     case MY_STATE_IDLE:
@@ -2382,12 +2383,13 @@ static int sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, 
 static int sendTaskRemoveEvent(int gui_transmission_id, JobObject * job_object, TaskObject * task_object)
 {
   proxy_msg *msg;
-  char proxy_generated_task_id_string[256];
+  char proxy_generated_task_id_string[12];
+  char jobid[12];
 
   print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
-  memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string)); /* zero the area */
-  sprintf(proxy_generated_task_id_string, "%d", task_object->proxy_generated_task_id);
-  msg = proxy_remove_process_event(gui_transmission_id, proxy_generated_task_id_string);
+  sprintf(jobid, "%d", job_object->proxy_generated_job_id);
+  sprintf(proxy_generated_task_id_string, "%d", task_object->task_id);
+  msg = proxy_remove_process_event(gui_transmission_id, jobid, proxy_generated_task_id_string);
   enqueue_event_to_proxy_server(msg);
   print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
   return 0;
@@ -2831,7 +2833,7 @@ int server(char *name, char *host, int port, char *user_libpath)
   int connect_rc=0;
 #ifdef  __linux__
   char *libpath[] = {
-    NULL, "/opt/ibmll/LoadL/full/lib/", "/opt/ibmll/LoadL/so/lib/", (char *) -1
+    NULL, "/opt/ibmll/LoadL/full/lib/", "/opt/ibmll/LoadL/so/lib/", "/opt/ibmll/LoadL/scheduler/full/lib", (char *) -1
   };
   char *libname = "libllapi.so";
 #else
@@ -3249,6 +3251,7 @@ int my_ll_submit_job(int gui_transmission_id, char *job_sub_id, char *command_fi
       malloc_check(job_object, __FUNCTION__, __LINE__);
       memset(job_object, '\0', sizeof(job_object));     /* zero the malloc area */
       job_object->proxy_generated_job_id = generate_id();       /* a unique identifier for this cluster */
+      job_object->task_counter = 0;
       job_object->gui_assigned_job_id = "-1";   /* preset to async id (2 - n) */
       if (i == 0) {             /* if first */
         job_object->gui_assigned_job_id = job_sub_id;   /* pick up the parsed jobid for the first jobstep in job */

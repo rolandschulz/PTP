@@ -18,6 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.BitSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -45,9 +50,9 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
@@ -71,6 +76,7 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IMachineManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
@@ -81,6 +87,7 @@ import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlEvent;
@@ -733,6 +740,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			public Image getColumnImage(Object element, int columnIndex) {
 				return null;
 			}
+			@SuppressWarnings("rawtypes")
 			public String getColumnText(Object element, int columnIndex) {
 				if (element instanceof IAttribute) {
 					IAttribute<?,?,?> attr = (IAttribute<?,?,?>) element;
@@ -801,20 +809,23 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		processTableViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection sel = (IStructuredSelection)event.getSelection();
-				openProcessViewer((IPProcess)sel.getFirstElement());
+				// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+				openProcessViewer((PProcessUI)sel.getFirstElement());
 			}
 		});
 		processTableViewer.setLabelProvider(new LabelProvider() {
 			public Image getImage(Object element) {
-				if (element instanceof IPProcess) {
-					IPProcess process = (IPProcess) element;
+				if (element instanceof PProcessUI) {
+					// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+					PProcessUI process = (PProcessUI) element;
 					return ParallelImages.procImages[process.getState().ordinal()][0];
 				}
 				return null;
 			}
 			public String getText(Object element) {
-				if (element instanceof IPProcess) {
-					IPProcess process = (IPProcess) element;
+				if (element instanceof PProcessUI) {
+					// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+					PProcessUI process = (PProcessUI) element;
 					return process.getJob().getName() + ":" + process.getName(); //$NON-NLS-1$
 				}
 				return ""; //$NON-NLS-1$
@@ -826,7 +837,16 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 				if (inputElement instanceof IElementManager) {
 					IPNode node = getRegisteredNode();
 					if (node != null) {
-						return node.getProcesses();
+						// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+						final List<PProcessUI> procUIs = new LinkedList<PProcessUI>();
+						final Set<? extends IPJob> jobs = node.getJobs();
+						for (IPJob job : jobs) {
+							final BitSet procJobRanks = node.getJobProcessRanks(job);
+							for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+								procUIs.add(new PProcessUI(job, procJobRank));
+							}
+						}
+						return procUIs.toArray(new PProcessUI[0]);
 					}
 				}
 				return new Object[0];
@@ -835,8 +855,9 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		});
 		processTableViewer.setSorter(new ViewerSorter() {
 			public int compare(Viewer viewer, Object p1, Object p2) {
-				IPProcess proc1 = (IPProcess)p1;
-				IPProcess proc2 = (IPProcess)p2;
+				// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+				PProcessUI proc1 = (PProcessUI)p1;
+				PProcessUI proc2 = (PProcessUI)p2;
 				String name1 = proc1.getJob().getName() + ":" + proc1.getName(); //$NON-NLS-1$
 				String name2 = proc2.getJob().getName() + ":" + proc2.getName(); //$NON-NLS-1$
 				return name1.compareTo(name2);

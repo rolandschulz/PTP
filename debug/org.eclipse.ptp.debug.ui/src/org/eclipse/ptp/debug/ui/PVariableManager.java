@@ -18,7 +18,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -156,8 +155,8 @@ public class PVariableManager {
 			if (expressions == null || expressions.length == 0)
 				return ""; //$NON-NLS-1$
 
-			IPProcess p = job.getProcessByIndex(task);
-			if (p == null || p.getState() != ProcessAttributes.State.SUSPENDED)
+			final ProcessAttributes.State pState = job.getProcessState(task);
+			if (pState == null || pState != ProcessAttributes.State.SUSPENDED)
 				return ""; //$NON-NLS-1$
 			
 			StringBuffer display = new StringBuffer();

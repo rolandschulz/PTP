@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements;
 
+import java.util.BitSet;
+import java.util.Set;
+
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.listeners.INodeChildListener;
 import org.eclipse.ptp.core.elements.listeners.INodeListener;
@@ -56,13 +59,18 @@ public interface IPNode extends IPElement {
 	public String getNodeNumber();
 
 	/**
-	 * Return any processes that are linked to this node
-	 * Returns an empty array if there are no processes.
+	 * Get the job ranks for processes associated with this node and this job
+	 * @param job
 	 * 
-	 * @return array of processes
+	 * @return collection of process ranks
 	 */
-	public IPProcess[] getProcesses();
+	public BitSet getJobProcessRanks(IPJob job);
 	
+	/**
+	 * @return the jobs that have processes running on this node
+	 */
+	public Set<? extends IPJob> getJobs();
+
 	/**
 	 * Returns the state of the node
 	 * 

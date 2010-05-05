@@ -14,17 +14,17 @@
 
 package org.eclipse.ptp.ui.consoles;
 
-import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import java.util.BitSet;
+
 import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
-import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
-import org.eclipse.ptp.core.elements.listeners.IProcessListener;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -33,7 +33,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-public class JobConsole implements IJobChildListener, IProcessListener {
+public class JobConsole implements IJobChildListener {
 	/** 
 	 * search for console name first, if non-existed, 
 	 * create a new one
@@ -126,16 +126,13 @@ public class JobConsole implements IJobChildListener, IProcessListener {
 	 * @param index prefix added to each line of output
 	 * @param msg output from process
 	 */
-	public void cout(String index, String msg, MessageConsoleStream stream) {
+	synchronized public void cout(String index, String msg, MessageConsoleStream stream) {
 		String output = ""; //$NON-NLS-1$
 		
 		if (prefix) {
 			String[] lines = msg.split("\n"); //$NON-NLS-1$
 			for (int i = 0; i < lines.length; i++) {
-				if (i > 0) {
-					output += "\n"; //$NON-NLS-1$
-				}
-				output += "[" + index + "] " + lines[i]; //$NON-NLS-1$ //$NON-NLS-2$
+				output += "[" + index + "] " + lines[i] + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		} else {
 			output = msg;
@@ -145,37 +142,45 @@ public class JobConsole implements IJobChildListener, IProcessListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
-	 */
-	public void handleEvent(IChangedProcessEvent e) {
-		// Ignore event
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
 	 */
 	public void handleEvent(INewProcessEvent e) {
-		for (IPProcess process : e.getProcesses()) {
-			process.addElementListener(this);
-		}
+		// no-op
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedProcessEvent)
 	 */
-	public void handleEvent(IProcessChangeEvent e) {
-		IntegerAttribute index = e.getSource().getAttribute(
-				ProcessAttributes.getIndexAttributeDefinition());
-		if (index != null) {
-			StringAttribute stdout = e.getAttributes().getAttribute(
-					ProcessAttributes.getStdoutAttributeDefinition());
-			if (stdout != null) {
-				cout(index.getValueAsString(), stdout.getValueAsString(), outputStream);
+	public void handleEvent(IChangedProcessEvent e) {
+		final IPJob job = e.getJob();
+		
+		final StringAttributeDefinition stdoutAttributeDefinition = 
+			ProcessAttributes.getStdoutAttributeDefinition();
+		final boolean hasStdOut = e.getAttributes().getAttribute(stdoutAttributeDefinition) != null;
+		
+		final StringAttributeDefinition stderrAttributeDefinition = 
+			ProcessAttributes.getStderrAttributeDefinition();
+		final boolean hasStdErr = e.getAttributes().getAttribute(stderrAttributeDefinition) != null;
+
+		if (!hasStdErr && !hasStdOut) {
+			return;
+		}
+		
+		final BitSet indices = e.getProcesses();
+		for (Integer index : new BitSetIterable(indices)) {
+			if (hasStdOut) {
+				StringAttribute stdout = job.getProcessAttribute(stdoutAttributeDefinition,
+						index);
+				if (stdout != null) {
+					cout(index.toString(), stdout.getValueAsString(), outputStream);
+				}
 			}
-			StringAttribute stderr = e.getAttributes().getAttribute(
-					ProcessAttributes.getStderrAttributeDefinition());
-			if (stderr != null) {
-				cout(index.getValueAsString(), stderr.getValueAsString(), errorStream);
+			if (hasStdErr) {
+				StringAttribute stderr = job.getProcessAttribute(stderrAttributeDefinition,
+						index);
+				if (stderr != null) {
+					cout(index.toString(), stderr.getValueAsString(), errorStream);
+				}
 			}
 		}
 	}
@@ -184,9 +189,7 @@ public class JobConsole implements IJobChildListener, IProcessListener {
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
 	 */
 	public void handleEvent(IRemoveProcessEvent e) {
-		for (IPProcess process : e.getProcesses()) {
-			process.removeElementListener(this);
-		}
+		// no-op
 	}
 	
 	/**

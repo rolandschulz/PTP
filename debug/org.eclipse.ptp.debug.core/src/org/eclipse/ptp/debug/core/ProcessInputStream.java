@@ -19,30 +19,35 @@
 package org.eclipse.ptp.debug.core;
 
 import java.io.InputStream;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
-import org.eclipse.ptp.core.elements.listeners.IProcessListener;
+import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 
 /**
  * @author Clement chu
  */
-public class ProcessInputStream extends InputStream implements IProcessListener {
+public class ProcessInputStream extends InputStream implements IJobChildListener {
 	protected List<String> buffers;
 	protected int pos;
 	protected int count;
 	private String currentBuffer;
-	private IPProcess process;
+	private final IPJob job;
+	private final int processJobRank;
 
-	public ProcessInputStream(IPProcess process) {
-		this.process = process;
+	public ProcessInputStream(IPJob job, int processJobRank) {
+		this.job = job;
+		this.processJobRank = processJobRank;
 		buffers = Collections.synchronizedList(new LinkedList<String>());
-		process.addElementListener(this);
+		job.addChildListener(this);
 	}
 
 	public void addInput(String buffer) {
@@ -58,11 +63,7 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 	@Override
 	public void close() {
 		addInput(""); //$NON-NLS-1$
-		process.removeElementListener(this);
-	}
-
-	public IPProcess getProcess() {
-		return process;
+		job.removeChildListener(this);
 	}
 
 	/*
@@ -72,8 +73,14 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 	 * org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(
 	 * org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
 	 */
-	public void handleEvent(IProcessChangeEvent e) {
-		if (e.getSource().getState() == ProcessAttributes.State.COMPLETED) {
+	public void handleEvent(IChangedProcessEvent e) {
+		final BitSet processChangedSet = e.getProcesses();
+		// check to see if this event is concerned with
+		// the process that we care about
+		if (!processChangedSet.get(processJobRank)) {
+			return;
+		}
+		if (job.getProcessState(processJobRank) == ProcessAttributes.State.COMPLETED) {
 			close();
 		}
 
@@ -83,6 +90,20 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 			addInput(stdoutAttr.getValue() + "\n"); //$NON-NLS-1$
 		}
 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
+	 */
+	public void handleEvent(INewProcessEvent e) {
+		// not interested
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+	 */
+	public void handleEvent(IRemoveProcessEvent e) {
+		// not interested
 	}
 
 	/* (non-Javadoc)
@@ -136,7 +157,7 @@ public class ProcessInputStream extends InputStream implements IProcessListener 
 	}
 
 	public void restart() {
-		process.addElementListener(this);
+		job.addChildListener(this);
 	}
 
 	private String getBuffer() {

@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,9 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -70,9 +72,8 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		AttributeManager attrMrg = new AttributeManager();
 		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
-		for (IPProcess process : ipJob.getProcesses()) {
-			rtSystem.changeProcess(process.getID(), attrMrg);
-		}
+		BitSet processes = ipJob.getProcessJobRanks();
+		rtSystem.changeProcesses(ipJob.getID(), processes, attrMrg);
 	}
 	
 	/**
@@ -85,18 +86,9 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		/*
 		 * Mark all running and starting processes as finished.
 		 */
-		List<String> ids = new ArrayList<String>();
-		for (IPProcess ipProcess : ipJob.getProcesses()) {
-			if (ipProcess.getState() != ProcessAttributes.State.COMPLETED) {
-				ids.add(ipProcess.getID());
-			}
-		}
-
 		AttributeManager attrMrg = new AttributeManager();
 		attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.COMPLETED));
-		for (String processId : ids) {
-			rtSystem.changeProcess(processId, attrMrg);
-		}
+		rtSystem.changeProcesses(ipJob.getID(), ipJob.getProcessJobRanks(), attrMrg);
 	}
 
 	@Override
@@ -173,9 +165,14 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 							}
 						}
 						synchronized (lock1) {
-							IPProcess ipProc = ipJob.getProcessByIndex(index);
-							if (ipProc != null) {
-								ipProc.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+							boolean hasProc = ipJob.hasProcessByJobRank(index);
+							if (hasProc) {
+								final BitSet processIndices = new BitSet();
+								processIndices.set(index);
+								final StringAttribute attr = 
+									ProcessAttributes.getStdoutAttributeDefinition().create(line);
+								final IPJobControl ipJobControl = (IPJobControl)ipJob;
+								ipJobControl.addProcessAttributes(processIndices, new AttributeManager(attr));
 							}
 							DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
@@ -221,9 +218,13 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 							}
 						}
 						synchronized (lock1) {
-							IPProcess ipProc = ipJob.getProcessByIndex(index);
-							if (ipProc != null) {
-								ipProc.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
+							boolean hasProc = ipJob.hasProcessByJobRank(index);
+							if (hasProc) {
+								final BitSet processIndices = new BitSet();
+								processIndices.set(index);
+								AttributeManager attrManager = new AttributeManager(ProcessAttributes.getStderrAttributeDefinition().create(line));
+								final IPJobControl ipJobControl = (IPJobControl) ipJob;
+								ipJobControl.addProcessAttributes(processIndices, attrManager);
 							}
 							DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}:> {1}", getJobID(), line); //$NON-NLS-1$
 						}
@@ -343,5 +344,4 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: completely finished", getJobID()); //$NON-NLS-1$
 	}
-
 }

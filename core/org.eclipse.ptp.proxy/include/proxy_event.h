@@ -113,13 +113,13 @@ proxy_msg *	proxy_new_queue_event(int trans_id, char *rm_id, char *queue_id, cha
 proxy_msg *	proxy_job_change_event(int trans_id, char *id_range, int num_attrs);
 proxy_msg *	proxy_machine_change_event(int trans_id, char *id_range, int num_attrs);
 proxy_msg *	proxy_node_change_event(int trans_id, char *id_range, int num_attrs);
-proxy_msg *	proxy_process_change_event(int trans_id, char *id_range, int num_attrs);
+proxy_msg *	proxy_process_change_event(int trans_id, char *jobid, char *id_range, int num_attrs);
 proxy_msg *	proxy_queue_change_event(int trans_id, char *id_range, int num_attrs);
 proxy_msg *	proxy_rm_change_event(int trans_id, char *id, int num_attrs);
 proxy_msg *	proxy_remove_all_event(int trans_id);
 proxy_msg *	proxy_remove_job_event(int trans_id, char *id_range);
 proxy_msg *	proxy_remove_machine_event(int trans_id, char *id_range);
 proxy_msg *	proxy_remove_node_event(int trans_id, char *id_range);
-proxy_msg *	proxy_remove_process_event(int trans_id, char *id_range);
+proxy_msg *	proxy_remove_process_event(int trans_id, char *jobid, char *id_range);
 proxy_msg *	proxy_remove_queue_event(int trans_id, char *id_range);
 #endif /* !_PROXY_EVENT_H_ */

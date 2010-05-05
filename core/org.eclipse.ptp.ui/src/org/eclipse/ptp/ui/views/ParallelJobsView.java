@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -45,8 +46,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -73,6 +74,7 @@ import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.internal.ui.actions.JobFocusAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateJobAction;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IJobManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
@@ -83,6 +85,7 @@ import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.utils.DebugUtil;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.MouseAdapter;
@@ -122,11 +125,13 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		 */
 		public void handleEvent(INewProcessEvent e) {
 			if (e.getSource() instanceof IPJob) {
+				final IPJob job = (IPJob) e.getSource();
 				if (debug) {
 					System.err.println("----------------- IJobChildListener - INewProcessEvent: " + this); //$NON-NLS-1$
 				}
-				for (IPProcess proc : e.getProcesses()) {
-					getJobManager().addProcess(proc);
+				final BitSet procRanks = e.getProcesses();
+				for (Integer procRank : new BitSetIterable(procRanks)) {
+					getJobManager().addProcess(job, procRank);
 				}
 				boolean isCurrent = e.getSource().getID().equals(getCurrentID());
 				if (isCurrent) {
@@ -143,12 +148,14 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		 */
 		public void handleEvent(IRemoveProcessEvent e) {
 			if (e.getSource() instanceof IPJob) {
+				final IPJob job = (IPJob) e.getSource();
 				if (debug) {
 					System.err.println("----------------- IJobChildListener - IRemoveProcessEvent: " + this); //$NON-NLS-1$
 				}
 				boolean isCurrent = e.getSource().getID().equals(getCurrentID());
-				for (IPProcess proc : e.getProcesses()) {
-					getJobManager().removeProcess(proc);
+				final BitSet procRanks = e.getProcesses();
+				for (Integer procRank : new BitSetIterable(procRanks)) {
+					getJobManager().removeProcess(job, procRank);
 				}
 				if (isCurrent) {
 					updateJobSet();
@@ -504,7 +511,11 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#doubleClick(org.eclipse.ptp.ui.model.IElement)
 	 */
 	public void doubleClick(IElement element) {
-		openProcessViewer(getJobManager().findProcess(element.getID()));
+		IPElement pelement = element.getPElement();
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		if (pelement instanceof PProcessUI) {
+			openProcessViewer((PProcessUI) pelement);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -565,16 +576,16 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	public String[] getToolTipText(Object obj) {
 		IElementHandler setManager = getCurrentElementHandler();
-		if (obj == null || !(obj instanceof IPProcess) || setManager == null || cur_element_set == null)
+		if (obj == null || !(obj instanceof PProcessUI) || setManager == null || cur_element_set == null)
 			return IToolTipProvider.NO_TOOLTIP;
 
-		IPProcess proc = (IPProcess)obj;
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		PProcessUI proc = (PProcessUI)obj;
 		StringBuffer buffer = new StringBuffer();
-		String num = proc.getProcessIndex();
-		if (num != null) {
-			buffer.append(Messages.ParallelJobsView_1 + num);
-			buffer.append(Messages.ParallelJobsView_2);
-		}
+		int num = proc.getJobRank();
+		buffer.append(Messages.ParallelJobsView_1 + num);
+		buffer.append(Messages.ParallelJobsView_2);
+
 		if (proc.getPid() == 0) {
 		  buffer.append(Messages.ParallelJobsView_3 + "N/A"); //$NON-NLS-1$
 		} else {
@@ -689,7 +700,11 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		if (element == null)
 			return null;
 		
-		return getJobManager().findProcess(element.getID());
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		if (element.getPElement() instanceof PProcessUI) {
+			return element.getPElement();
+		}
+		return null;
 	}
 	
 	/** 

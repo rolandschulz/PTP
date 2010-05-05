@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIApplicationAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIJobAttributes;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPINodeAttributes;
@@ -190,6 +189,7 @@ public class OpenMPIProcessMapText12Parser {
 		Pattern p4 = Pattern.compile("\\s*Proc Rank:\\s*(\\d*)\\s*Proc PID:\\s*(\\d*)\\s*App_context index:\\s*(\\d*).*"); //$NON-NLS-1$
 
 		for (int i = 0; i < numProcesses; i ++) {
+			@SuppressWarnings("unused")
 			String processName = ""; //$NON-NLS-1$
 			int processIndex = 0;
 			int processPid = 0;
@@ -251,13 +251,7 @@ public class OpenMPIProcessMapText12Parser {
 				throw new IOException(Messages.OpenMPIProcessMapText12Parser_Exception_BrokenDisplayMapInformation);
 			}
 
-			OpenMPIProcessMap.Process proc = new OpenMPIProcessMap.Process(node, processIndex, processName, applicationIndex);
-			try {
-				proc.getAttributeManager().addAttribute(ProcessAttributes.getPIDAttributeDefinition().create(Integer.valueOf(processPid)));
-			} catch (IllegalValueException e) {
-				// This is not possible.
-				assert false;
-			}
+			OpenMPIProcessMap.Process proc = new OpenMPIProcessMap.Process(node, processIndex, applicationIndex);
 
 			map.addProcess(proc);
 			notifyNewProcess(proc);
