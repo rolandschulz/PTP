@@ -40,8 +40,7 @@ static List *			MISessionList = NULL;
 static struct timeval	MISessionDefaultSelectTimeout = {0, 1000};
 static int				MISessionDebug = 1;
 
-static void DoOOBAsyncCallbacks(MISession *sess, List *oobs);
-static void DoOOBStreamCallbacks(MISession *sess, List *oobs);
+static void DoOOBCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
@@ -358,9 +357,10 @@ ReadResponse(int fd)
  * for writing.
  */
 void
-MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds, MIOutput *output)
+MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds)
 {
 	char *		str;
+	MIOutput *	output;
 	
 	if (sess->pid == -1)
 		return;
@@ -401,6 +401,16 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			return;
 		}
 		
+		/*
+		 * If there's a command in progress, use the MIOutput saved with the command
+		 * to process any output. Otherwise create a new one.
+		 */
+		if (sess->command != NULL) {
+			output = sess->command->output;
+		} else {
+			output = MIOutputNew();
+		}
+
 		MIParse(str, output);
 			
 		/*
@@ -409,10 +419,7 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		 * 	stream oob records that always result from a command
 		 *	result records from a command
 		 * 
-		 * Async oob records are processed immediately and removed.
-		 * 
-		 * Stream oob records are processed immediately but a retained with the
-		 * command in case they are needed for later processing.
+		 * Async and stream oob records are processed immediately and removed.
 		 * 
 		 * If there are result records, then the output *should* have resulted
 		 * from the execution of a command. Mark the command as completed an
@@ -427,23 +434,29 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 				sess->command->completed = 1;
 			}
 #endif /* __gnu_linux__ */	
-			DoOOBAsyncCallbacks(sess, output->oobs);
-			DoOOBStreamCallbacks(sess, output->oobs);
+			DoOOBCallbacks(sess, output->oobs);
 		}
 
-		if (output->rr != NULL && sess->command != NULL) {
-			sess->command->completed = 1;
-			sess->command->output = output;
-			if (sess->command->callback != NULL)
-				sess->command->callback(output->rr, sess->command->cb_data);
-		} else {
-			if (sess->command == NULL) {
-				MIOutputFree(output);
+		/*
+		 * If there's a command in progress, process it.
+		 */
+		if (sess->command != NULL) {
+			if (output->rr != NULL) {
+				if (MISessionDebug) {
+					printf("MI: PROCESS COMMAND CALLBACK\n");
+					fflush(stdout);
+				}
+				if (sess->command->callback != NULL) {
+					sess->command->callback(output->rr, sess->command->cb_data);
+				}
+				sess->command->completed = 1;
 			}
+			if (sess->command->completed) {
+				sess->command = NULL;
+			}
+		} else {
+			MIOutputFree(output);
 		}
-
-		if (sess->command != NULL && sess->command->completed)
-			sess->command = NULL;
 	}
 	
     /* process application output */
@@ -500,21 +513,23 @@ ProcessCLIResultRecord(MIResultRecord *rr, void *data)
 }
 
 /*
- * Process async callbacks. Removes records from oobs list.
+ * Process OOB callbacks and remove records from oobs list.
  */
 static void
-DoOOBAsyncCallbacks(MISession *sess, List *oobs)
+DoOOBCallbacks(MISession *sess, List *oobs)
 {
 	MIOOBRecord *	oob;
 	MIResult *		res;
 	MIValue *		val;
 	
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
-		if (oob->type == MIOOBRecordTypeAsync) {
+		switch (oob->type) {
+		case MIOOBRecordTypeAsync:
 			switch (oob->sub_type) {
 			case MIOOBRecordExecAsync:
-				if (sess->exec_callback != NULL)
+				if (sess->exec_callback != NULL) {
 					sess->exec_callback(oob->class, oob->results);
+				}
 					
 				if (strcmp(oob->class, "stopped") == 0) {
 					int seen_reason = 0;
@@ -543,33 +558,20 @@ DoOOBAsyncCallbacks(MISession *sess, List *oobs)
 				break;
 				
 			case MIOOBRecordStatusAsync:
-				if (sess->status_callback != NULL)
+				if (sess->status_callback != NULL) {
 					sess->status_callback(oob->class, oob->results);
+				}
 				break;
 				
 			case MIOOBRecordNotifyAsync:
-				if (sess->notify_callback != NULL)
+				if (sess->notify_callback != NULL) {
 					sess->notify_callback(oob->class, oob->results);
+				}
 				break;
 			}
-			
-			RemoveFromList(oobs, (void *)oob);
-			MIOOBRecordFree(oob);
-		}
-	}
-}
+			break;
 
-/*
- * Process stream callbacks. We leave the records on the oobs list
- * because they may be needed by later command processing.
- */
-static void
-DoOOBStreamCallbacks(MISession *sess, List *oobs)
-{
-	MIOOBRecord *	oob;
-	
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
-		if (oob->type == MIOOBRecordTypeStream) {
+		case MIOOBRecordTypeStream:
 			switch (oob->sub_type) {
 			case MIOOBRecordConsoleStream:
 				if (sess->console_callback != NULL) {
@@ -578,16 +580,22 @@ DoOOBStreamCallbacks(MISession *sess, List *oobs)
 				break;
 				
 			case MIOOBRecordLogStream:
-				if (sess->log_callback != NULL)
+				if (sess->log_callback != NULL) {
 					sess->log_callback(oob->cstring);
+				}
 				break;
 				
 			case MIOOBRecordTargetStream:
-				if (sess->target_callback != NULL)
+				if (sess->target_callback != NULL) {
 					sess->target_callback(oob->cstring);
+				}
 				break;
 			}
+			break;
 		}
+
+		RemoveFromList(oobs, (void *)oob);
+		MIOOBRecordFree(oob);
 	}
 }
 
@@ -641,7 +649,7 @@ MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *
  * functions will modify it.
  */
 int
-MISessionProgress(MISession *sess, MIOutput *output)
+MISessionProgress(MISession *sess)
 {
 	int				n;
 	int				nfds;
@@ -671,7 +679,7 @@ MISessionProgress(MISession *sess, MIOutput *output)
 	}
 	
 
-	MISessionProcessCommandsAndResponses(sess, &rfds, NULL, output);
+	MISessionProcessCommandsAndResponses(sess, &rfds, NULL);
 	
 	return n;
 }

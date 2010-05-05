@@ -35,7 +35,7 @@ MIResultRecordNew(void)
 	MIResultRecord *	rr;
 	
 	rr = (MIResultRecord *)malloc(sizeof(MIResultRecord));
-	rr->results = NewList();
+	rr->results = NULL;
 	rr->resultClass = MIResultRecordINVALID;
 	rr->token = -1;
 	return rr;
@@ -74,9 +74,11 @@ MIResultRecordToString(MIResultRecord *rr)
 	else
 		str = MIStringNew("^%s", class);
 	
-	for (SetList(rr->results); (r = (MIResult *)GetListElement(rr->results)) != NULL;) {
+	if (rr->results != NULL) {
+		for (SetList(rr->results); (r = (MIResult *)GetListElement(rr->results)) != NULL;) {
 			MIStringAppend(str, MIStringNew(","));
 			MIStringAppend(str, MIResultToString(r));
+		}
 	}
 	
 	return str;

@@ -38,7 +38,7 @@ MICommandNew(char *command, int class)
 	cmd->num_options = 0;
 	cmd->completed = 0;
 	cmd->expected_class = class;
-	cmd->output = NULL;
+	cmd->output = MIOutputNew();
 	cmd->callback = NULL;
 	return cmd;
 }
@@ -53,10 +53,9 @@ MICommandFree(MICommand *cmd)
 	if (cmd->num_options > 0) {
 		for (i = 0; i < cmd->num_options; i++)
 			free(cmd->options[i]);
-		free(cmd->options);
 	}
-	if (cmd->output != NULL)
-		MIOutputFree(cmd->output);
+	free(cmd->options);
+	MIOutputFree(cmd->output);
 	free(cmd);
 }
 

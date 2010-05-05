@@ -731,9 +731,8 @@ static void
 SendCommandWait(MISession *sess, MICommand *cmd)
 {
 	MISessionSendCommand(sess, cmd);
-	MIOutput *output = MIOutputNew();
 	do {
-		MISessionProgress(sess, output);
+		MISessionProgress(sess);
 		if (sess->out_fd == -1) {
 			DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- SendCommandWait sess->out_fd = -1\n");
 			break;
@@ -868,7 +867,7 @@ GDBMIProgress(void)
 	}
 
 	if (DebugSession != NULL) {
-		if (MISessionProgress(DebugSession, MIOutputNew()) < 0) {
+		if (MISessionProgress(DebugSession) < 0) {
 			MISessionFree(DebugSession);
 			DebugSession = NULL;
 			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
