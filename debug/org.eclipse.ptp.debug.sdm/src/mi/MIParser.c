@@ -155,11 +155,12 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 			} else if (strncmp(token, primaryPrompt, strlen(primaryPrompt)) == 0) {
 				//break; // Do nothing.
 			} else {
-				MIOOBRecord *band = processMIOOBRecord(token, id);
-				if (band != NULL) {
-					if (mi->oobs == NULL)
+				MIOOBRecord *oob = processMIOOBRecord(token, id);
+				if (oob != NULL) {
+					if (mi->oobs == NULL) {
 						mi->oobs = NewList();
-					AddToList(mi->oobs, (void *)band);
+					}
+					AddToList(mi->oobs, (void *)oob);
 				}
 			}
 		}

@@ -65,9 +65,9 @@ extern void MISessionSetGDBPath(MISession *sess, char *path);
 extern int MISessionSendCommand(MISession *sess, MICommand *cmd);
 extern int MISessionCommandCompleted(MISession *sess);
 //extern void MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds);
-extern void MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds, MIOutput *output);
+extern void MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds);
 extern void MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds);
 //extern int MISessionProgress(MISession *sess);
-extern int MISessionProgress(MISession *sess, MIOutput *output);
+extern int MISessionProgress(MISession *sess);
 extern void ProcessCLIResultRecord(MIResultRecord *, void *);
 #endif /* _MISESSION_H_ */
