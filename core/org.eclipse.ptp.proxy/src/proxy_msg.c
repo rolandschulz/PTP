@@ -281,7 +281,7 @@ proxy_msg_add_data(proxy_msg *m, char *data, int len)
 
 	*p = '\0';
 
-	proxy_msg_add_string(m, arg);
+	proxy_msg_add_string_nocopy(m, arg);
 }
 
 void
