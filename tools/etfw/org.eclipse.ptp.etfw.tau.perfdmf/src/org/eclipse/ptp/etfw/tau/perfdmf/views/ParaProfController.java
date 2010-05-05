@@ -40,7 +40,9 @@ public class ParaProfController{
 	private PrintStream stdout=null;
 	//private String comBuf="";
 	private StreamRunner inRun;
+	private StreamRunner errRun;
 	private ProcessBuilder pb;
+	private Process proc;
 	private static final String DATABASES="databases";
 	private static final String APPLICATIONS="applications";
 	private static final String EXPERIMENTS="experiments";
@@ -49,6 +51,19 @@ public class ParaProfController{
 	public static TreeTuple EMPTY;
 
 	public ParaProfController(){
+		createProcess();
+
+	}
+	
+	private void killProcess(){
+		pushQueue=null;
+		pullQueue=null;
+		pb=null;
+		errRun=null;
+		inRun=null;
+	}
+	
+	private void createProcess(){
 		String paraprof=BuildLaunchUtils.getToolPath("tau")+File.separator+"paraprof";
 		EMPTY=new TreeTuple("None",-1,-1,Level.DATABASE);
 		File checkp = new File(paraprof);
@@ -63,18 +78,17 @@ public class ParaProfController{
 		command.add("--control");
 		pb = new ProcessBuilder(command);
 		
-		Process p=null;
+		proc=null;
 		try {
-			p = pb.start();
+			proc = pb.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		StreamRunner errRun=new StreamRunner(p.getErrorStream());
-		inRun=new StreamRunner(p.getInputStream(),pushQueue,pullQueue);
-		stdout = new PrintStream(new BufferedOutputStream(p.getOutputStream()));
+		errRun=new StreamRunner(proc.getErrorStream());
+		inRun=new StreamRunner(proc.getInputStream(),pushQueue,pullQueue);
+		stdout = new PrintStream(new BufferedOutputStream(proc.getOutputStream()));
 		errRun.start();
 		inRun.start();
-
 	}
 
 	public List<TreeTuple> getDatabases(){
@@ -113,8 +127,8 @@ public class ParaProfController{
 			if(hid >-1){
 				comBuf+=" "+hid;
 			}}
-		issueCommand(comBuf);
-
+		int res=issueCommand(comBuf);
+		if(res!=0)return out;
 		List<String> l = getResults();
 
 		for(String s : l)
@@ -134,7 +148,8 @@ public class ParaProfController{
 	
 	public TreeTuple uploadTrial(String profile,int dbid, String app, String exp, String tri){
 		String comBuf="control upload "+profile+" "+dbid+" "+app+" "+exp+" "+tri;
-		issueCommand(comBuf);
+		int res=issueCommand(comBuf);
+		if(res!=0)return null;
 		TreeTuple tt=null;
 		List<String> l = getResults();
 
@@ -171,11 +186,19 @@ public class ParaProfController{
 		return l;
 	}
 
-	private void issueCommand(String command){
+	private int issueCommand(String command){
 		if(stdout!=null){
 			stdout.println(command);
 			stdout.flush();
 		}
+		
+		if(errRun.exception){
+			System.out.println("Restarting Paraprof");
+			killProcess();
+			createProcess();
+			return -1;
+		}
+		return 0;
 	}
 
 	public void openTrial(int dbid, int tid){
@@ -197,6 +220,7 @@ public class ParaProfController{
 		private LinkedBlockingQueue<String> pushQueue;
 		private LinkedBlockingQueue<String> pullQueue;
 		InputStream is;
+		boolean exception = false;
 		StreamRunner(InputStream is, LinkedBlockingQueue<String> pushQueue, LinkedBlockingQueue<String> pullQueue){
 			this.is=is;
 			this.pushQueue=pushQueue;
@@ -217,6 +241,9 @@ public class ParaProfController{
 				while((line=br.readLine())!=null){
 					
 					if(pushQueue==null||pullQueue==null){
+						if(line.contains("Exception")){
+							exception=true;
+						}
 						System.out.println(line);
 					}
 					else{
