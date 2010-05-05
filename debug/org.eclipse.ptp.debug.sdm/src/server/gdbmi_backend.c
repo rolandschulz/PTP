@@ -2083,6 +2083,9 @@ GetAddressLength()
 	MICommandFree(cmd);
 
 	ADDRESS_LENGTH = (int)strtol(res, NULL, 10);
+
+	free(res);
+
 	return ADDRESS_LENGTH;
 }
 
@@ -2331,9 +2334,10 @@ GetCharPointerAIF(char *res)
 static AIF *
 GetSimpleAIF(MIVar *var, char *exp)
 {
-	AIF		*a = NULL;
-	AIF		*ac;
-	char	*pt;
+	AIF *	a = NULL;
+	AIF *	ac;
+	char *	pt;
+	char *	v;
 
 	int id = get_simple_type(var->type);
 	if (id == T_OTHER) {
@@ -2349,18 +2353,23 @@ GetSimpleAIF(MIVar *var, char *exp)
 		return MakeAIF("&/is4", exp);
 	case T_VOID_PTR:
 		ac = VoidToAIF(0, 0);
-		a = GetAIFPointer(GetVarValue(var->name), ac);
+		v = GetVarValue(var->name);
+		a = GetAIFPointer(v, ac);
+		free(v);
 		AIFFree(ac);
 		return a;
 	case T_ENUM:
 		return (var->type[4] == ' ') ? EmptyEnumToAIF(&var->type[5]) : EmptyEnumToAIF(NULL);
 	case T_OTHER:
-		if (exp == NULL)
+		if (exp == NULL) {
 			return NULL;
-
+		}
 		return GetSimpleAIF(var, NULL);
 	default:
-		return GetPrimitiveAIF(id, GetVarValue(var->name));
+		v = GetVarValue(var->name);
+		a = GetPrimitiveAIF(id, v);
+		free(v);
+		return a;
 	}
 }
 
@@ -2476,9 +2485,10 @@ GetArrayAIF(MIVar *var, int named)
 static AIF *
 GetPointerAIF(MIVar *var, int named)
 {
-	AIF *ac;
-	AIF *a;
-	int id;
+	AIF *	ac;
+	AIF *	a;
+	char *	v;
+	int		id;
 
 	find_pointer_base_type(var->type);
 
@@ -2488,7 +2498,10 @@ GetPointerAIF(MIVar *var, int named)
 			ac = GetAIF(var->children[0], var->children[0]->exp, named);
 			break;
 		case T_CHAR_PTR:
-			return GetCharPointerAIF(GetVarValue(var->children[0]->name));
+			v = GetVarValue(var->children[0]->name);
+			a = GetCharPointerAIF(v);
+			free(v);
+			return a;
 		case T_UNION:
 			ac = GetUnionAIF(var, named);
 			break;
@@ -2505,7 +2518,9 @@ GetPointerAIF(MIVar *var, int named)
 	if (ac == NULL) {
 		ac = VoidToAIF(0, 0);
 	}
-	a = GetAIFPointer(GetVarValue(var->name), ac);
+	v = GetVarValue(var->name);
+	a = GetAIFPointer(v, ac);
+	free(v);
 	AIFFree(ac);
 	return a;
 }
@@ -2513,19 +2528,29 @@ GetPointerAIF(MIVar *var, int named)
 static AIF *
 GetComplexAIF(MIVar *var, char *exp, int named)
 {
+	char *	v;
+	AIF *	a = NULL;
+
 	int id = get_complex_type(var->type);
 	switch (id) {
 	case T_ARRAY:
-		return GetArrayAIF(var, named);
+		a = GetArrayAIF(var, named);
+		break;
 	case T_CHAR_PTR:
-		return GetCharPointerAIF(GetVarValue(var->name));
+		v = GetVarValue(var->name);
+		a = GetCharPointerAIF(v);
+		free(v);
+		break;
 	case T_POINTER:
-		return GetPointerAIF(var, named);
+		a = GetPointerAIF(var, named);
+		break;
 	case T_UNION:
-		return GetUnionAIF(var, named);
+		a = GetUnionAIF(var, named);
+		break;
 	default://struct
-		return GetStructAIF(var, named);
+		a = GetStructAIF(var, named);
 	}
+	return a;
 }
 
 static AIF *
@@ -2666,9 +2691,10 @@ GetPartialUnionAIF(MIVar *var)
 static AIF *
 GetPartialPointerAIF(MIVar *var)
 {
-	AIF *ac;
-	AIF *a;
-	int id;
+	AIF *	ac;
+	AIF *	a;
+	char *	v;
+	int		id;
 
 	if (var->children != NULL) {
 		find_pointer_base_type(var->type);
@@ -2678,13 +2704,17 @@ GetPartialPointerAIF(MIVar *var)
 			case T_CHAR_PTR:
 				//replace miname
 				var->name = strdup(var->children[0]->exp);
-				a = GetCharPointerAIF(GetVarValue(var->children[0]->name));
+				v = GetVarValue(var->children[0]->name);
+				a = GetCharPointerAIF(v);
+				free(v);
 				break;
 			case T_POINTER:
 				//replace miname
 				var->name = strdup(var->children[0]->exp);
 				ac = VoidToAIF(0, 0);
-				a = GetAIFPointer(GetVarValue(var->children[0]->name), ac);
+				v = GetVarValue(var->children[0]->name);
+				a = GetAIFPointer(v, ac);
+				free(v);
 				AIFFree(ac);
 				break;
 			case T_UNION:
@@ -2706,11 +2736,15 @@ GetPartialPointerAIF(MIVar *var)
 		id = get_complex_type(var->type);
 		switch (id) {
 			case T_CHAR_PTR:
-				a = GetCharPointerAIF(GetVarValue(var->name));
+				v = GetVarValue(var->name);
+				a = GetCharPointerAIF(v);
+				free(v);
 				break;
 			default:
 				ac = VoidToAIF(0, 0);
-				a = GetAIFPointer(GetVarValue(var->name), ac);
+				v = GetVarValue(var->name);
+				a = GetAIFPointer(v, ac);
+				free(v);
 				AIFFree(ac);
 				break;
 		}
@@ -2721,27 +2755,36 @@ GetPartialPointerAIF(MIVar *var)
 static AIF *
 GetPartialComplexAIF(MIVar *var, char *exp)
 {
-	char *pt;
+	char *	v;
+	AIF *	a = NULL;
+
 	int id = get_complex_type(var->type);
 	if (id == T_OTHER) {
-		pt = GetPtypeValue(var->type);
-		if (pt != NULL) {
-			var->type = pt;
+		v = GetPtypeValue(var->type);
+		if (v != NULL) {
+			var->type = v;
 			id = get_complex_type(var->type);
 		}
 	}
 	switch (id) {
 	case T_ARRAY:
-		return GetPartialArrayAIF(var);
+		a = GetPartialArrayAIF(var);
+		break;
 	case T_CHAR_PTR:
-		return GetCharPointerAIF(GetVarValue(var->name));
+		v = GetVarValue(var->name);
+		a = GetCharPointerAIF(v);
+		free(v);
+		break;
 	case T_POINTER:
-		return GetPartialPointerAIF(var);
+		a = GetPartialPointerAIF(var);
+		break;
 	case T_UNION:
-		return GetPartialUnionAIF(var);
+		a = GetPartialUnionAIF(var);
+		break;
 	default://struct
-		return GetPartialStructAIF(var);
+		a = GetPartialStructAIF(var);
 	}
+	return a;
 }
 
 static AIF *
