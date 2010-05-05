@@ -200,5 +200,16 @@ sdm_set_deserialize(sdm_idset set, char *buf, char **end)
 char *
 _set_to_str(sdm_idset set)
 {
-	return bitset_to_set(set->set);
+	char *			p;
+	static int		str_count = 0;
+	static char *	str[5];
+
+	if (str_count >= 5) {
+		str_count = 0;
+	}
+	if (str[str_count] != NULL) {
+		free(str[str_count]);
+	}
+	p = str[str_count++] = bitset_to_set(set->set);
+	return p;
 }
