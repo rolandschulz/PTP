@@ -130,7 +130,6 @@ typedef struct
 
 typedef struct
 {
-    int proxy_taskid; /* Process id assigned by proxy         */
     pid_t parent_pid; /* PID for parent (poe) process         */
     pid_t task_pid; /* PID for this process                 */
     char *ipaddr; /* IP address of node where task is     */
@@ -285,7 +284,7 @@ static void send_local_default_attrs(int trans_id);
 static void send_new_node_list(int trans_id, int machine_id, List * new_nodes);
 static void send_job_state_change_event(int trans_id, int jobid, char *state);
 static void send_process_state_change_event(int trans_id, jobinfo * job, char *state);
-static void send_process_state_output_event(int trans_id, int procid, char *dest, char *output);
+static void send_process_state_output_event(int trans_id, int jobid, int procid, char *dest, char *output);
 static int generate_id(void);
 static void enqueue_event(proxy_msg * event);
 static void print_message(int type, const char *format, ...);
@@ -1363,7 +1362,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         return PTP_PROXY_RES_OK;
     }
     TRACE_DETAIL_V("stderr FD %d %d\n", stderr_pipe[0], stderr_pipe[1]);
-    job->poe_taskid = 0;
+    job->poe_taskid = -1;
     job->app_working_dir = cwd;
     job->submit_jobid = jobid;
     job->label_io = label_io;
@@ -1642,7 +1641,6 @@ startup_monitor(void *job_ident)
      * this application
      */
     char tasklist_path[_POSIX_PATH_MAX + 1];
-    int base_taskid;
     char *cfginfo;
     FILE *cfgfile;
     int numtasks;
@@ -1655,7 +1653,6 @@ startup_monitor(void *job_ident)
     time_t last_mtime;
     struct stat fileinfo;
     int i;
-    char *proxy_taskid;
     List *new_nodes;
     List *taskid_list;
     char jobid_str[30];
@@ -1663,9 +1660,11 @@ startup_monitor(void *job_ident)
     char procname[20];
     char task_range[15];
     struct timeval current_time;
+    char jobid[11];
 
     TRACE_ENTRY;
     job = (jobinfo *) job_ident;
+    sprintf(jobid, "%d", job->proxy_jobid);
     if (job->discovered_job) {
         new_nodes = NewList();
     }
@@ -1728,7 +1727,7 @@ startup_monitor(void *job_ident)
                 else {
                     TRACE_DETAIL("POE process terminated while proxy waiting for attach.cfg file\n");
                     TRACE_DETAIL("startup_monitor thread terminating.\n");
-                    return;
+                    return NULL;
                 } 
             }
             cfginfo = (char *) malloc(fileinfo.st_size);
@@ -1780,10 +1779,6 @@ startup_monitor(void *job_ident)
                     }
                     tasknum = atoi(p);
                     taskp = &tasks[tasknum];
-                    taskp->proxy_taskid = generate_id();
-                    if (tasknum == 0) {
-                    	base_taskid = taskp->proxy_taskid;
-                    }
 
                     /*
                      * There are two possible attach.cfg file formats now. In the old
@@ -2012,7 +2007,7 @@ startup_monitor(void *job_ident)
             }
             else {
                 node->task_count = node->task_count + 1;
-                sprintf(procid_str, "%d", taskp[i].proxy_taskid);
+                sprintf(procid_str, "%d", i);
                 AddToList(taskid_list, strdup(procid_str));
                 sprintf(procname, "task_%d", i);
                 proxy_add_process(msg, procid_str, procname, PTP_PROC_STATE_STARTING, 3);
@@ -2035,7 +2030,7 @@ startup_monitor(void *job_ident)
     while (proxy_taskid != NULL) {
         proxy_msg *start_msg;
 
-        start_msg = proxy_process_change_event(start_events_transid, proxy_taskid, 1);
+        start_msg = proxy_process_change_event(start_events_transid, jobid, proxy_taskid, 1);
         free(proxy_taskid);
         proxy_add_string_attribute(start_msg, PTP_PROC_STATE_ATTR, PTP_PROC_STATE_RUNNING);
         enqueue_event(start_msg);
@@ -2043,8 +2038,8 @@ startup_monitor(void *job_ident)
     }
     DestroyList(taskid_list, NULL);
 #endif
-    sprintf(task_range, "%d-%d", base_taskid, base_taskid + numtasks - 1);
-    msg = proxy_process_change_event(start_events_transid, task_range, 1);
+    sprintf(task_range, "0-%d", numtasks - 1);
+    msg = proxy_process_change_event(start_events_transid, jobid, task_range, 1);
     proxy_add_string_attribute(msg, PTP_PROC_STATE_ATTR, PTP_PROC_STATE_RUNNING);
     enqueue_event(msg);
     /*
@@ -4320,11 +4315,13 @@ sendTaskChangeEvent(int gui_transmission_id, JobObject * job_object, TaskObject 
     proxy_msg *msg;
     char proxy_generated_task_id_string[256];
     char *task_state_to_report = PTP_PROC_STATE_STARTING;
+    char jobid[11];
 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
     memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string));
     sprintf(proxy_generated_task_id_string, "%d", task_object->proxy_generated_task_id);
-    msg = proxy_process_change_event(gui_transmission_id, proxy_generated_task_id_string, 1);
+    sprintf(jobid, job_object->proxy_generated_job_id);
+    msg = proxy_process_change_event(gui_transmission_id, jobid, proxy_generated_task_id_string, 1);
 
     switch (task_object->task_state) {
         case MY_STATE_IDLE:
@@ -5297,14 +5294,15 @@ void send_stdout(jobinfo * job, char *buf)
         task = 0;
         outp = buf;
     }
-    send_process_state_output_event(start_events_transid, job->tasks[task].proxy_taskid, PTP_PROC_STDOUT_ATTR, outp);
+    send_process_state_output_event(start_events_transid, job->proxy_jobid, task, PTP_PROC_STDOUT_ATTR, outp);
 }
 
 void send_stderr(jobinfo * job, char *buf)
 {
     int match;
     proxy_msg *msg;
-    char jobid_str[30];
+    char jobid[11];
+
 
     /*
      * If the message written to stderr has the format 'ERROR: [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]'
@@ -5317,26 +5315,25 @@ void send_stderr(jobinfo * job, char *buf)
      * One way to handle informational messages is to save them in a list and then dump them
      * to stderr as soon as the attach.cfg file has been processed.
      */
+    sprintf(jobid, "%d", job->proxy_jobid);
     match = regexec(&errormsg_regex, buf, 0, NULL, 0);
     if ((match == 0) && (job->numtasks <= 0)) {
-        int proxy_taskid;
 
         /*
          * If job->numtasks is -1 this is first error, create phony process
          */
         if (job->numtasks == -1) {
-            sprintf(jobid_str, "%d", job->proxy_jobid);
-            msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
-            job->poe_taskid = generate_id();
-            sprintf(jobid_str, "%d", job->poe_taskid);
-            proxy_add_process(msg, jobid_str, "poe", PTP_PROC_STATE_RUNNING, 3);
+            job->poe_taskid = 0;
+            msg = proxy_new_process_event(start_events_transid, jobid, 1);
+            proxy_add_process(msg, "0", "poe", PTP_PROC_STATE_RUNNING, 3);
             proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, 0);
             proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, 0);
             proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, job->poe_pid);
             enqueue_event(msg);
             job->numtasks = 0;
         }
-        send_process_state_output_event(start_events_transid, job->poe_taskid, PTP_PROC_STDERR_ATTR, buf);
+        send_process_state_output_event(start_events_transid, job->proxy_jobid, job->poe_taskid,
+                                        PTP_PROC_STDERR_ATTR, buf);
     }
     else {
         /*
@@ -5345,15 +5342,13 @@ void send_stderr(jobinfo * job, char *buf)
          * error message id format [0-9][0-9][0-9][0-9]-[0-9][0-9][0-9] is always sent to
          * the front end.
          */
-        if (job->poe_taskid == 0) {
-            sprintf(jobid_str, "%d", job->proxy_jobid);
-            msg = proxy_new_process_event(start_events_transid, jobid_str, 1);
-            job->poe_taskid = generate_id();
-            sprintf(jobid_str, "%d", job->poe_taskid);
-            proxy_add_process(msg, jobid_str, "poe", PTP_PROC_STATE_RUNNING, 3);
+        if (job->poe_taskid == -1) {
+            msg = proxy_new_process_event(start_events_transid, jobid, 1);
+            proxy_add_process(msg, "0", "poe", PTP_PROC_STATE_RUNNING, 3);
             proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, 0);
             proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, 0);
             proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, job->poe_pid);
+            job->poe_taskid = 0;
             enqueue_event(msg);
         }
         if (job->stderr_redirect) {
@@ -5362,11 +5357,13 @@ void send_stderr(jobinfo * job, char *buf)
             fprintf(job->stderr_file, "%s", buf);
             match = regexec(&msgid_regex, buf, 0, NULL, 0);
             if (match == 0) {
-                send_process_state_output_event(start_events_transid, job->poe_taskid, PTP_PROC_STDERR_ATTR, buf);
+                send_process_state_output_event(start_events_transid, job->proxy_jobid, job->poe_taskid,
+                                                PTP_PROC_STDERR_ATTR, buf);
             }
         }
         else {
-            send_process_state_output_event(start_events_transid, job->poe_taskid, PTP_PROC_STDERR_ATTR, buf);
+            send_process_state_output_event(start_events_transid, job->proxy_jobid, job->poe_taskid,
+                                            PTP_PROC_STDERR_ATTR, buf);
         }
     }
 }
@@ -5524,17 +5521,12 @@ void send_process_state_change_event(int trans_id, jobinfo * job, char *state)
      * startup overlaps, then there is no guarantee of consecutive
      * ids for processes, then more than one message may be generated.
      */
-    taskinfo *tasks;
-    taskinfo *info;
-    int task_index;
-    int start_task;
-    int next_task;
     proxy_msg *msg;
-    char range[25];
-    int i;
+    char range[15];
+    char jobid[11];
 
-    tasks = job->tasks;
-    if (tasks == NULL) {
+    sprintf(jobid, "%d", job->proxy_jobid);
+    if (job->tasks == NULL) {
           /*
            * It's possible that the job terminated during startup, in which case
            * the only task present is the dummy task created to represent the
@@ -5542,56 +5534,27 @@ void send_process_state_change_event(int trans_id, jobinfo * job, char *state)
            * specified state for that task only.
            */
         if (job->numtasks == 0) {
-            snprintf(range, sizeof range, "%d", job->poe_taskid);
-            msg = proxy_process_change_event(trans_id, range, 1);
+            msg = proxy_process_change_event(trans_id, jobid, "0", 1);
             proxy_msg_add_keyval_string(msg, PTP_PROC_STATE_ATTR, state);
             enqueue_event(msg);
         }
         return;
     }
-    task_index = -1;
-    info = tasks;
-    i = 0;
-    while (i < job->numtasks) {
-        task_index = info->proxy_taskid;
-        start_task = task_index;
-        next_task = task_index;
-        /*
-         * Loop as long as the process object ids are consecutive and
-         * not end of list.
-         */
-        while (task_index == next_task) {
-            i = i + 1;
-            info = &tasks[i];
-            next_task = next_task + 1;
-            if (i >= job->numtasks) {
-                break;
-            }
-            task_index = info->proxy_taskid;
-        }
-        if (task_index != -1) {
-            /*
-             * Generate a process state change event for a consecutive
-             * range of process id objects. next_task will have a value
-             * 1 more than the last consecutive object id.
-             */
-            snprintf(range, sizeof range, "%d-%d", start_task, next_task - 1);
-            range[sizeof range - 1] = '\0';
-            msg = proxy_process_change_event(trans_id, range, 1);
-            proxy_msg_add_keyval_string(msg, PTP_PROC_STATE_ATTR, state);
-            enqueue_event(msg);
-            task_index = -1;
-        }
-    }
+    sprintf(range, "0-%d", job->numtasks - 1);
+    msg = proxy_process_change_event(trans_id, jobid, range, 1);
+    proxy_msg_add_keyval_string(msg, PTP_PROC_STATE_ATTR, state);
+    enqueue_event(msg);
 }
 
-void send_process_state_output_event(int trans_id, int procid, char *dest, char *output)
+void send_process_state_output_event(int trans_id, int jobid, int procid, char *dest, char *output)
 {
     proxy_msg *msg;
     char procid_str[12];
+    char jobid_str[11];
 
     sprintf(procid_str, "%d", procid);
-    msg = proxy_process_change_event(trans_id, procid_str, 1);
+    sprintf(jobid_str, "%d", jobid);
+    msg = proxy_process_change_event(trans_id, jobid_str, procid_str, 1);
     proxy_msg_add_keyval_string(msg, dest, output);
     print_message(TRACE_DETAIL_MESSAGE, "Sent stdout: %s\n", output);
     enqueue_event(msg);

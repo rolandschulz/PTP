@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rm.mpi.mpich2.core.rtsystem;
 
 import java.io.BufferedReader;
+import java.util.BitSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,7 +20,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -94,15 +94,20 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 						// Not one of our jobs
 						continue;
 					}
-					IPProcessControl process = (IPProcessControl)pJob.getProcessByIndex(job.getRank());
-					if (process != null && process.getNode() == null) {
+					final int jobRank = job.getRank();
+					boolean hasProcess = pJob.hasProcessByJobRank(jobRank);
+					final String processNodeId = hasProcess ? pJob.getProcessNodeId(jobRank) : null;
+					boolean processHasNode = processNodeId != null;
+					if (hasProcess && processHasNode) {
 						String nodeID = rts.getNodeIDforName(job.getHost());
 						if (nodeID == null) {
 							return new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), Messages.MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch, null);
 						}
 						AttributeManager attrMrg = new AttributeManager();
 						attrMrg.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
-						rts.changeProcess(process.getID(), attrMrg);
+						BitSet processJobRanks = new BitSet();
+						processJobRanks.set(jobRank);
+						rts.changeProcesses(pJob.getID(), processJobRanks, attrMrg);
 					}
 				}
 			}

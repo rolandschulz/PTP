@@ -22,11 +22,13 @@
 package org.eclipse.ptp.rmsystem;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,14 +50,12 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
@@ -72,22 +72,18 @@ import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
-import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 import org.eclipse.ptp.core.elements.events.INewNodeEvent;
-import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
-import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
@@ -96,7 +92,6 @@ import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.internal.core.elements.PJob;
 import org.eclipse.ptp.internal.core.elements.PMachine;
 import org.eclipse.ptp.internal.core.elements.PNode;
-import org.eclipse.ptp.internal.core.elements.PProcess;
 import org.eclipse.ptp.internal.core.elements.PQueue;
 import org.eclipse.ptp.internal.core.elements.Parent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedMachineEvent;
@@ -126,20 +121,17 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 		return attrs.toArray(new IAttribute<?, ?, ?>[0]);
 	}
 
-	private final ListenerList listeners = new ListenerList();
+	private AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
 	private final ListenerList childListeners = new ListenerList();
-	private final IQueueChildListener queueJobListener;
-	private final IJobChildListener jobProcessListener;
+	private IResourceManagerConfiguration config;
+	private final Map<String, IPJobControl> jobsById = Collections.synchronizedMap(new HashMap<String, IPJobControl>());
+
+	private final ListenerList listeners = new ListenerList();
 	private final IMachineChildListener machineNodeListener;
 
-	private IResourceManagerConfiguration config;
-	private AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
-
-	private final Map<String, IPJobControl> jobsById = Collections.synchronizedMap(new HashMap<String, IPJobControl>());
 	private final Map<String, IPMachineControl> machinesById = Collections.synchronizedMap(new HashMap<String, IPMachineControl>());
 	private final Map<String, IPNodeControl> nodesById = Collections.synchronizedMap(new HashMap<String, IPNodeControl>());
-	private final Map<String, IPProcessControl> processesById = Collections
-			.synchronizedMap(new HashMap<String, IPProcessControl>());
+	private final IQueueChildListener queueJobListener;
 	private final Map<String, IPQueueControl> queuesById = Collections.synchronizedMap(new HashMap<String, IPQueueControl>());
 	private final Map<String, IPQueueControl> queuesByName = Collections.synchronizedMap(new HashMap<String, IPQueueControl>());
 
@@ -158,23 +150,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 
 			public void handleEvent(IRemoveJobEvent e) {
 				for (IPJob job : e.getJobs()) {
-					job.removeChildListener(jobProcessListener);
 					jobsById.remove(job.getID());
-				}
-			}
-		};
-		jobProcessListener = new IJobChildListener() {
-			public void handleEvent(IChangedProcessEvent e) {
-				// OK to ignore
-			}
-
-			public void handleEvent(INewProcessEvent e) {
-				// OK to ignore
-			}
-
-			public void handleEvent(IRemoveProcessEvent e) {
-				for (IPProcess process : e.getProcesses()) {
-					processesById.remove(process.getID());
 				}
 			}
 		};
@@ -290,7 +266,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * 
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes" })
 	public Object getAdapter(Class adapter) {
 		if (adapter.isInstance(this)) {
 			return this;
@@ -394,6 +370,13 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	@Override
 	public String getName() {
 		return getConfiguration().getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IResourceManager#getNodeById(java.lang.String)
+	 */
+	public IPNode getNodeById(String id) {
+		return nodesById.get(id);
 	}
 
 	/*
@@ -592,7 +575,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 *      org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		return doSubmitJob(null, configuration, attrMgr, monitor);
 	}
 
@@ -603,7 +586,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * 		org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void submitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		doSubmitJob(subId, configuration, attrMgr, monitor);
 	}
 
@@ -669,7 +652,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	protected void addJobs(IPQueueControl queue, Collection<IPJobControl> jobs) {
 
 		for (IPJobControl job : jobs) {
-			job.addChildListener(jobProcessListener);
 			jobsById.put(job.getID(), job);
 		}
 
@@ -723,47 +705,32 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * 
 	 * @param job
 	 *            parent of the processes
-	 * @param processes
-	 *            collection of IPProcesControls
+	 * @param processJobRanks
+	 *            set of job ranks within job
+	 * @param attrs 
 	 */
-	protected void addProcesses(IPJobControl job, Collection<IPProcessControl> processes) {
-		/*
-		 * Map containing a list of processes that are linked to nodes
-		 */
-		Map<IPNodeControl, List<IPProcessControl>> nodeProcMap = new HashMap<IPNodeControl, List<IPProcessControl>>();
+	protected void addProcessesByJobRanks(IPJobControl job, BitSet processJobRanks,
+			AttributeManager attrs) {
+
+		// actually add the processes to the job
+		// with the given attributes
+		job.addProcessesByJobRanks(processJobRanks, attrs);
 		
-		for (IPProcessControl process : processes) {
+		// retrieve the set of nodes on which these processes are running
+		Set<StringAttribute> nodeIdAttrs = 
+			job.getProcessAttributes(ProcessAttributes.getNodeIdAttributeDefinition(),
+					processJobRanks);
+
+		for (StringAttribute nodeIdAttr : nodeIdAttrs) {
 			/*
-			 * Find the node ID attribute and add the process to the list for
-			 * each node. Remove the attribute from the attribute manager.
+			 * Add the jobs containing the node's processes to the nodes
 			 */
-			StringAttribute attr = process.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
-			if (attr != null) {
-				IPNodeControl node = getNodeControl(attr.getValue());
-				if (node != null) {
-					List<IPProcessControl> procs = nodeProcMap.get(node);
-					if (procs == null) {
-						procs = new ArrayList<IPProcessControl>();
-						nodeProcMap.put(node, procs);
-					}
-					procs.add(process);
-				}
+			final IPNodeControl node = getNodeControl(nodeIdAttr.getValue());
+			if (node != null) {
+				final BitSet nodesProcessJobRanks = job.getProcessJobRanks(nodeIdAttr);
+				node.addJobProcessRanks(job, nodesProcessJobRanks);
 			}
-			
-			processesById.put(process.getID(), process);
 		}
-		
-		/*
-		 * Bulk add the processes to the nodes
-		 */
-		for (Map.Entry<IPNodeControl, List<IPProcessControl>> entry : nodeProcMap.entrySet()) {
-			entry.getKey().addProcesses(entry.getValue());
-		}
-		
-		/*
-		 * Add processes to the job
-		 */
-		job.addProcesses(processes);
 	}
 
 	/**
@@ -875,7 +842,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @throws CoreException
 	 */
 	protected abstract IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException;
+	throws CoreException;
 
 	/**
 	 * Terminate a job.
@@ -926,7 +893,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 			((IResourceManagerListener) listener).handleEvent(e);
 		}
 	}
-	
+
 	/**
 	 * Propagate a IResourceManagerNewMachinesEvent to listeners.
 	 * 
@@ -1012,14 +979,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	}
 
 	/**
-	 * @param processId
-	 * @return
-	 */
-	protected IPProcessControl getProcessControl(String processId) {
-		return processesById.get(processId);
-	}
-
-	/**
 	 * @param machineId
 	 * @return
 	 */
@@ -1080,21 +1039,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	}
 
 	/**
-	 * Helper method to create a new process
-	 * 
-	 * @param job
-	 *            job that this process belongs to
-	 * @param processId
-	 *            ID for the process
-	 * @param attrs
-	 *            initial attributes for the process
-	 * @return newly created process model element
-	 */
-	protected IPProcessControl newProcess(IPJobControl job, String processId, AttributeManager attrs) {
-		return new PProcess(processId, job, attrs.getAttributes());
-	}
-
-	/**
 	 * Helper method to create a new queue
 	 * 
 	 * @param queueId
@@ -1140,20 +1084,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 */
 	protected void removeNodes(IPMachineControl machine, Collection<IPNodeControl> nodes) {
 		machine.removeNodes(nodes);
-	}
-
-	/**
-	 * Remove processes from the job. This will also result in the processes
-	 * being removed from the associated nodes, as the nodes were registered as
-	 * child listeners on the job.
-	 * 
-	 * @param job
-	 *            job containing the processes to remove
-	 * @param processes
-	 *            processes to remove from the model
-	 */
-	protected void removeProcesses(IPJobControl job, Collection<IPProcessControl> processes) {
-		job.removeProcesses(processes);
 	}
 
 	/**
@@ -1241,70 +1171,44 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * 
 	 * @param job
 	 *            parent of processes
-	 * @param processes
-	 *            collection of processes
+	 * @param processJobRanks
+	 *            set of job ranks for processes
 	 * @param attrs
 	 *            attributes to update
 	 * @return true if updated
 	 */
-	protected boolean updateProcesses(IPJobControl job, Collection<IPProcessControl> processes, AttributeManager attrs) {
-		StringAttribute nodeId = attrs.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
-		if (nodeId != null) {
-			Map<IPNodeControl, List<IPProcessControl>> nodeProcMap = new HashMap<IPNodeControl, List<IPProcessControl>>();
-			List<IPProcessControl> noNodeList = new ArrayList<IPProcessControl>();
+	protected boolean updateProcessesByJobRanks(IPJobControl job, BitSet processJobRanks, AttributeManager attrs) {
+		final StringAttributeDefinition nodeIdAttributeDefinition = ProcessAttributes.getNodeIdAttributeDefinition();
+		
+		StringAttribute newNodeId = attrs.getAttribute(nodeIdAttributeDefinition);
+		
+		// if we are update a node attribute we must move processes from one node
+		// to another
+		if (newNodeId != null) {
 			
-			/*
-			 * Generate two data structures. The first will contain a list of existing processes on each node except
-			 * the new node (nodeProcMap), the second will contain processes that are not currently assigned to 
-			 * nodes (noNodeList).
-			 */
-			for (IPProcessControl process : processes) {
-				StringAttribute attr = process.getAttribute(ProcessAttributes.getNodeIdAttributeDefinition());
-				if (attr == null) {
-					noNodeList.add(process);
-				} else if (!attr.getValue().equals(nodeId.getValue())) {
-					IPNodeControl node = getNodeControl(attr.getValue());
-					if (node != null) {
-						List<IPProcessControl> procs = nodeProcMap.get(node);
-						if (procs == null) {
-							procs = new ArrayList<IPProcessControl>();
-							nodeProcMap.put(node, procs);
-						}
-						procs.add(process);
-					}
-				}
-			}
-	
-			/*
-			 * Remove processes from their nodes
-			 */
-			/*
-			 * Bulk remove the processes to the nodes
-			 */
-			for (Map.Entry<IPNodeControl, List<IPProcessControl>> entry : nodeProcMap.entrySet()) {
-				entry.getKey().removeProcesses(entry.getValue());
-			}
+			IPNodeControl newNode = getNodeControl(newNodeId.getValue());
+			// add the job and the process job ranks to the new node
+			newNode.addJobProcessRanks(job, processJobRanks);
 			
-			/*
-			 * Now add processes that aren't already on the node to the new node
-			 */
-			IPNodeControl node = getNodeControl(nodeId.getValue());
-			if (node != null) {
-				for (List<IPProcessControl> procs : nodeProcMap.values()) {
-					node.addProcesses(procs);
+			// Remove the process job ranks from the nodes that no longer contain these processes
+			Set<StringAttribute> oldNodeIds = job.getProcessAttributes(nodeIdAttributeDefinition, processJobRanks);
+			oldNodeIds.remove(newNodeId);
+			for (StringAttribute oldNodeId : oldNodeIds) {
+				IPNodeControl oldNode = getNodeControl(oldNodeId.getValue());
+				if (oldNode != null) {
+					oldNode.removeJobProcessRanks(job, processJobRanks);
 				}
-				node.addProcesses(noNodeList);
 			}
 		}
-		
+	
 		/*
-		 * Update attributes
+		 * Update attributes on the job (where they live for the processes)
 		 */
-		job.addProcessAttributes(processes, attrs.getAttributes());
-		
+		job.addProcessAttributes(processJobRanks, attrs);
+	
 		return true;
 	}
-	
+
 	/**
 	 * Update attributes on a collection of queues.
 	 * 
@@ -1318,7 +1222,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 		addQueueAttributes(queues, attrs.getAttributes());
 		return true;
 	}
-	
+
 	/**
 	 * Update attributes for this RM
 	 * 

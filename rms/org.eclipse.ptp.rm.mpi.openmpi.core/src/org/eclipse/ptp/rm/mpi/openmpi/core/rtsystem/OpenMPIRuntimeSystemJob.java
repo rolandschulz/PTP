@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +29,11 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
+import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -87,26 +87,26 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	private InputStreamObserver stderrObserver;
 	private InputStreamObserver stdoutObserver;
 
-	/** Exception raised while parsing mpi map information. */
-	protected Exception parserException = null;
-	
 	/** Error detected in mpirun output */
 	protected boolean errorDetected = false;
+
 	protected String errorMessage = null;
-	
 	/** Used to signal map information completed */
 	protected boolean mapCompleted = false;
+
 	protected final ReentrantLock mapLock = new ReentrantLock();
 	protected final Condition mapCondition = mapLock.newCondition();
-	
+	/** Exception raised while parsing mpi map information. */
+	protected Exception parserException = null;
+
+	protected InputStreamListenerToOutputStream parserListener;
 	/** Main parser thread */
 	protected Thread parserThread;
-	protected InputStreamListenerToOutputStream parserListener;
 
 	public OpenMPIRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem, AttributeManager attrMgr) {
 		super(jobID, queueID, name, rtSystem, attrMgr);
 	}
-	
+
 	/**
 	 * Terminate all processes.
 	 */
@@ -122,23 +122,16 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					/*
 					 * Mark all running and starting processes as finished.
 					 */
-					List<String> ids = new ArrayList<String>();
-					for (IPProcess ipProcess : ipJob.getProcesses()) {
-						if (ipProcess.getState() != ProcessAttributes.State.COMPLETED) {
-							ids.add(ipProcess.getID());
-						}
-					}
-			
+
 					AttributeManager attrMrg = new AttributeManager();
 					attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.COMPLETED));
-					for (String processId : ids) {
-						rtSystem.changeProcess(processId, attrMrg);
-					}
+					final BitSet procJobRanks = ipJob.getProcessJobRanks();
+					rtSystem.changeProcesses(ipJob.getID(), procJobRanks, attrMrg);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Add a process to the job
 	 * 
@@ -151,22 +144,13 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		String nodeID = rts.getNodeIDforName(nodename);
 		if (nodeID != null) {
 			int processIndex = proc.getIndex();
-			/*
-			 * Use the index as the process name if the process name returned by the map is bogus
-			 */
-			String processName = proc.getName();
-			if (processName.equals("")) { //$NON-NLS-1$
-				processName = String.valueOf(processIndex);
-			}
-			IPProcessControl process = (IPProcessControl)job.getProcessByIndex(processIndex);
-			if (process != null) {
-				AttributeManager attrMgr = new AttributeManager();
-				attrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(processName));
-				attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
-				attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
-				attrMgr.addAttributes(proc.getAttributeManager().getAttributes());
-				getRtSystem().changeProcess(process.getID(), attrMgr);
-			}
+			final BitSet processIndices = new BitSet();
+			processIndices.set(processIndex);
+			AttributeManager attrMgr = new AttributeManager();
+			attrMgr.addAttribute(ProcessAttributes.getNodeIdAttributeDefinition().create(nodeID));
+			attrMgr.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.RUNNING));
+			attrMgr.addAttributes(proc.getAttributeManager().getAttributes());
+			getRtSystem().changeProcesses(job.getID(), processIndices, attrMgr);
 		}
 	}
 
@@ -185,9 +169,9 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		} catch (IOException e) {
 			assert false; // This exception is not possible
 		}
-		
+
 		setParserListener(new InputStreamListenerToOutputStream(parserOutputStream));
-	
+
 		parserThread = new Thread() {
 			@Override
 			public void run() {
@@ -228,7 +212,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 							}
 						});
 					} else if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)
-								|| configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
+							|| configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
 						InputStream is = new OpenMPI13xInputStream(parserInputStream);
 						OpenMPIProcessMapXml13Parser.parse(is, new IOpenMPIProcessMapParserListener() {
 							public void finish() {
@@ -239,7 +223,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								 */
 								getParserListener().disable();
 							}
-							
+
 							public void finishMap(AttributeManager manager) {
 								/*
 								 * Copy job attributes from map.
@@ -250,11 +234,11 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								}
 								setMapCompleted();
 							}
-							
+
 							public void newProcess(Process proc) {
 								addProcess(job, proc);
 							}
-							
+
 							public void start() {
 								// Empty
 							}
@@ -269,10 +253,8 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								if (proc != null) {
 									index = proc.getIndex();
 								}
-								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(index);
-								if (process != null) {
-									process.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(stderr));
-								}
+								final StringAttribute attr = ProcessAttributes.getStderrAttributeDefinition().create(stderr);
+								setProcessAttribute(job, index, attr);
 							}
 
 							public void stdout(Process proc, String output) {
@@ -285,12 +267,10 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 								if (proc != null) {
 									index = proc.getIndex();
 								}
-								IPProcessControl process = (IPProcessControl)job.getProcessByIndex(index);
-								if (process != null) {
-									process.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(stdout));
-								}
+								final StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(stdout);
+								setProcessAttribute(job, index, attr);
 							}
-							
+
 						});
 					} else {
 						assert false;
@@ -357,21 +337,21 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 				changeJobStatusMessage(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailedWithExitValue, new Integer(getProcess().exitValue())));
 				changeJobStatus(MPIJobAttributes.Status.ERROR);
 			}
-			
+
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: ignoring exit value {1} because job was forced to terminate by user", getJobID(), new Integer(getProcess().exitValue())); //$NON-NLS-1$
 		} else if (errorDetected) {
 			changeJobStatusMessage(NLS.bind(Messages.OpenMPIRuntimeSystemJob_Exception_ExecutionFailureDetected, errorMessage));
 			changeJobStatus(MPIJobAttributes.Status.ERROR);
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doExecutionStarted(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
 		mapCompleted = false;
-		
+
 		/*
 		 * Create processes for the job.
 		 */
@@ -380,20 +360,20 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		assert numProcsAttr != null;
 		getRtSystem().createProcesses(getJobID(), numProcsAttr.getValue().intValue());
-		
+
 		/*
 		 * We only require procZero if we're using OMPI 1.2.x or 1.3.[0-3]. Other versions use XML
 		 * for stdout and stderr.
 		 */
-		final IPProcess procZero;
+		final BitSet procZero = new BitSet();
 		if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)
 				|| (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13) 
 						&& configuration.getServiceVersion() < 4)) {
-			procZero = ipJob.getProcessByIndex(0);
-		} else {
-			procZero = null;
-		}
-		
+			if (ipJob.hasProcessByJobRank(0)) {
+				procZero.set(0);
+			}
+		} 
+
 		/*
 		 * 
 		 * Listener that saves stdout.
@@ -405,22 +385,23 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					errorDetected = true;
 					errorMessage = OpenMPIErrorParser.getErrorMessage();
 				}
-				if (procZero != null) {
-					procZero.addAttribute(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+				if (!procZero.isEmpty()) {
+					final AttributeManager attributes = new AttributeManager(ProcessAttributes.getStdoutAttributeDefinition().create(line));
+					((IPJobControl)ipJob).addProcessAttributes(procZero, attributes);
 				}
 				DebugUtil.trace(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}
-			
+
 			public void streamClosed() {
 				// No need to do anything
 			}
-			
+
 			public void streamError(Exception e) {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stdout stream: {0}", e); //$NON-NLS-1$
 				OpenMPIPlugin.log(e);
 			}
 		};
-		
+
 		/*
 		 * 
 		 * Listener that saves stderr.
@@ -432,22 +413,23 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 					errorDetected = true;
 					errorMessage = OpenMPIErrorParser.getErrorMessage();
 				}
-				if (procZero != null) {
-					procZero.addAttribute(ProcessAttributes.getStderrAttributeDefinition().create(line));
+				if (!procZero.isEmpty()) {
+					final AttributeManager attributes = new AttributeManager(ProcessAttributes.getStderrAttributeDefinition().create(line));
+					((IPJobControl)ipJob).addProcessAttributes(procZero, attributes);
 				}
 				DebugUtil.error(DebugUtil.RTS_JOB_OUTPUT_TRACING, "RTS job #{0}: {1}", getJobID(), line); //$NON-NLS-1$
 			}
-			
+
 			public void streamClosed() {
 				//
 			}
-			
+
 			public void streamError(Exception e) {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: stderr stream: {0}", e); //$NON-NLS-1$
 				OpenMPIPlugin.log(e);
 			}
 		};
-		
+
 		createParser(configuration, ipJob);
 
 		DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: starting all threads", getJobID()); //$NON-NLS-1$
@@ -464,16 +446,16 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		// Parse stdout or stderr, depending on mpi 1.2 or 1.3
 		if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
-			 /* 
-			  * Fix for bug #271810 
-			  */
+			/* 
+			 * Fix for bug #271810 
+			 */
 			if (!getRtSystem().getRemoteServices().getId().equals("org.eclipse.ptp.remote.RSERemoteServices")) { //$NON-NLS-1$
 				getStderrObserver().addListener(getParserListener());
 			} else {
 				getStdoutObserver().addListener(getParserListener());
 			}
 		} else if (configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)
-					|| configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
+				|| configuration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
 			getStdoutObserver().addListener(getParserListener());
 		} else {
 			assert false;
@@ -481,14 +463,14 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 		getStderrObserver().start();
 		getStdoutObserver().start();
-		
+
 		waitForMapCompleted();
-		
+
 		if (parserException != null) {
 			if (!getProcess().isCompleted()) {
 				getProcess().destroy();
 			}
-			
+
 			/*
 			 * Wait until both stdout and stderr stop because stream are closed.
 			 * Error messages may be still queued in the stream.
@@ -506,11 +488,11 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			} catch (InterruptedException e1) {
 				// Ignore
 			}
-				
+
 			throw OpenMPIPlugin.coreErrorException("Failed to parse output of Open MPI command. Check output for errors.", parserException); //$NON-NLS-1$
 		}	
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractToolRuntimeSystemJob#doPrepareExecution(org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -583,7 +565,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		} catch (InterruptedException e) {
 			// Do nothing.
 		}
-		
+
 		/*
 		 * Wait until both stdout and stderr stop because stream are closed.
 		 * This means that the process has finished.
@@ -601,7 +583,7 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		} catch (InterruptedException e1) {
 			// Ignore
 		}
-		
+
 		if (parserException != null) {
 			throw OpenMPIPlugin.coreErrorException("Failed to parse output of Open MPI command. Check output for errors.", parserException); //$NON-NLS-1$
 		}
@@ -639,14 +621,14 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	protected InputStreamObserver getStderrObserver() {
 		return stderrObserver;
 	}
-	
+
 	/**
 	 * @return the stdoutObserver
 	 */
 	protected InputStreamObserver getStdoutObserver() {
 		return stdoutObserver;
 	}
-	
+
 	/**
 	 * Signal that the map is complete.
 	 */
@@ -659,15 +641,15 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 			mapLock.unlock();
 		}		
 	}
-	
-	
+
+
 	/**
 	 * @return the parser listener
 	 */
 	protected void setParserListener(InputStreamListenerToOutputStream listener) {
 		parserListener = listener;
 	}
-	
+
 	/**
 	 * @param stderrObserver the stderrObserver to set
 	 */
@@ -699,6 +681,14 @@ public class OpenMPIRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		} finally {
 			mapLock.unlock();
 		}
+	}
+
+	void setProcessAttribute(final IPJob job, int index, final StringAttribute attr) {
+		final BitSet processIndices = new BitSet();
+		processIndices.set(index);
+		IPJobControl jobCtl = (IPJobControl) job;
+		final AttributeManager attrMgr = new AttributeManager(attr);
+		jobCtl.addProcessAttributes(processIndices, attrMgr);
 	}
 
 }

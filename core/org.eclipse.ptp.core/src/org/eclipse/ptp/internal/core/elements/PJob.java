@@ -19,46 +19,54 @@
 package org.eclipse.ptp.internal.core.elements;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.BitSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
+import org.eclipse.ptp.core.attributes.EnumeratedAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.core.attributes.IntegerAttribute;
+import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.attributes.AttributeIndexSet;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
-import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
-import org.eclipse.ptp.core.elements.listeners.IProcessListener;
+import org.eclipse.ptp.core.util.ProcessOutput;
 import org.eclipse.ptp.internal.core.elements.events.ChangedProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.JobChangeEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewProcessEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveProcessEvent;
 
-public class PJob extends Parent implements IPJobControl, IProcessListener {
-	private final ListenerList elementListeners = new ListenerList();
-	private final ListenerList childListeners = new ListenerList();
-	private final Map<String, IPProcessControl> indexMap = 
-		Collections.synchronizedMap(new HashMap<String, IPProcessControl>());
-	private ILaunchConfiguration configuration;
+public class PJob extends Parent implements IPJobControl {
 
+	private final ListenerList childListeners = new ListenerList();
+	private ILaunchConfiguration configuration;
+	private final BitSet currentProcessJobRanks = new BitSet();
+	private final ListenerList elementListeners = new ListenerList();
+	private final ProcessOutput processOutput;
+	private final Map<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> processAttributesMap =
+		new HashMap<IAttributeDefinition<?,?,?>, AttributeIndexSet<?>>();
 	public PJob(String id, IPQueueControl queue, IAttribute<?,?,?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
 		/*
@@ -74,15 +82,21 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 			debugFlag = JobAttributes.getDebugFlagAttributeDefinition().create();
 			addAttribute(debugFlag);
 		}
+
+		/*
+		 * handle output
+		*/
+		
+		processOutput = new ProcessOutput(this);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addChildListener(org.eclipse.ptp.core.elements.listeners.IJobProcessListener)
 	 */
 	public void addChildListener(IJobChildListener listener) {
 		childListeners.add(listener);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addElementListener(org.eclipse.ptp.core.elements.listeners.IJobListener)
 	 */
@@ -91,37 +105,60 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcessAttributes(java.util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcessAttributes(java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public void addProcessAttributes(Collection<IPProcessControl> processControls,
-			IAttribute<?, ?, ?>[] attrs) {
-		List<IPProcess> processes = new ArrayList<IPProcess>(processControls.size());
-		
-		for (IPProcessControl process : processControls) {
-			process.addAttributes(attrs);
-			processes.add(process);
-		}
-		
-		fireChangedProcesses(processes);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcesses(java.util.Collection)
-	 */
-	public void addProcesses(Collection<IPProcessControl> processControls) {
-		List<IPProcess> processes = new ArrayList<IPProcess>(processControls.size());
+	public void addProcessAttributes(BitSet processIds,
+			AttributeManager attributes) {
+		// limit the addition of attributes to the current set of
+		// child processes
+		processIds = (BitSet) processIds.clone();
+		processIds.and(currentProcessJobRanks);
 
-		for (IPProcessControl process : processControls) {
-			addChild(process);
-			String idx = process.getProcessIndex();
-			if (idx != null) {
-				indexMap.put(idx, process);
-			}
-			processes.add(process);
-			process.addElementListener(this);
+		addAttributesForJobRanks(processIds, attributes);
+
+		fireChangedProcesses(processIds, attributes);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcesses(java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
+	 */
+	public void addProcessesByJobRanks(BitSet newProcessJobRanks, AttributeManager attrs) {
+		// add the processes to the existing set of processes (via BitSets of ids)
+		currentProcessJobRanks.or(newProcessJobRanks);
+
+		// add the attributes from the AttributeManager to these processes.
+		addAttributesForJobRanks(newProcessJobRanks, attrs);
+
+		// add some that may have been overlooked, that will be needed
+		List<IAttribute<?, ?, ?>> requiredAttributes = new ArrayList<IAttribute<?,?,?>>(5);
+		/*
+		 * Create required attributes.
+		 */
+		EnumeratedAttribute<ProcessAttributes.State> procState = getAttribute(attrs, ProcessAttributes.getStateAttributeDefinition());
+		if (procState == null) {
+			procState = ProcessAttributes.getStateAttributeDefinition().create();
+			requiredAttributes.add(procState);
 		}
-		
-		fireNewProcesses(processes);
+		IntegerAttribute exitCode = getAttribute(attrs, ProcessAttributes.getExitCodeAttributeDefinition());
+		if (exitCode == null) {
+			try {
+				exitCode = ProcessAttributes.getExitCodeAttributeDefinition().create();
+				requiredAttributes.add(exitCode);
+			} catch (IllegalValueException e) {
+			}
+		}
+		StringAttribute signalName = getAttribute(attrs,
+				ProcessAttributes.getSignalNameAttributeDefinition());
+		if (signalName == null) {
+			signalName = ProcessAttributes.getSignalNameAttributeDefinition().create();
+			requiredAttributes.add(signalName);
+		}	
+
+		final IAttribute<?, ?, ?>[] requiredAttrs = 
+			requiredAttributes.toArray(new IAttribute<?, ?, ?>[0]);
+		addAttributesForJobRanks(newProcessJobRanks, new AttributeManager(requiredAttrs));
+
+		fireNewProcesses(newProcessJobRanks);
 	}
 
 	/* (non-Javadoc)
@@ -130,51 +167,150 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	public synchronized ILaunchConfiguration getLaunchConfiguration() {
 		return configuration;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessById(java.lang.String)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition, int)
 	 */
-	public IPProcess getProcessById(String id) {
-		IPElementControl element = findChild(id);
-		if (element != null) {
-			return (IPProcessControl) element;
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getProcessAttribute(
+			D attributeDefinition, int processJobRank) {
+		final BitSet processJobRanks = new BitSet();
+		processJobRanks.set(processJobRank);
+		final Set<A> attrs = getProcessAttributes(attributeDefinition, processJobRanks);
+		if (attrs.isEmpty()) {
+			return null;
+		}
+		return attrs.iterator().next();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttribute(java.lang.String, int)
+	 */
+	public IAttribute<?, ?, ?> getProcessAttribute(String attrDefId, int processJobRank) {
+		final BitSet processJobRanks = new BitSet();
+		processJobRanks.set(processJobRank);
+		final Set<IAttribute<?, ?, ?>> attrs = getProcessAttributes(attrDefId, processJobRanks);
+		if (attrs.isEmpty()) {
+			return null;
+		}
+		return attrs.iterator().next();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributeKeys(java.util.BitSet)
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<IAttributeDefinition<?, ?, ?>> getProcessAttributeKeys(BitSet processJobRanks) {
+		final Set<IAttributeDefinition<?, ?, ?>> results = new HashSet<IAttributeDefinition<?, ?, ?>>();
+		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
+			final Set<IAttribute<?, ?, ?>> attrs =
+				(Set<IAttribute<?, ?, ?>>) ais.getSubset(processJobRanks).getAttributes();
+			for (IAttribute<?, ?, ?> attr : attrs) {
+				results.add(attr.getDefinition());
+			}
+		}
+		return results;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(java.util.BitSet)
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<IAttribute<?, ?, ?>> getProcessAttributes(BitSet processJobRanks) {
+		final Set<IAttribute<?, ?, ?>> results = new HashSet<IAttribute<?, ?, ?>>();
+		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
+			final Set<IAttribute<?, ?, ?>> attrs =
+				(Set<IAttribute<?, ?, ?>>) ais.getSubset(processJobRanks).getAttributes();
+			results.addAll(attrs);
+		}
+		return results;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(org.eclipse.ptp.core.attributes.IAttributeDefinition)
+	 */
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+	Set<A> getProcessAttributes(D attributeDefinition) {
+		AttributeIndexSet<A> jobRanksForAttr = getAttributeIndexSet(attributeDefinition);
+		return jobRanksForAttr.getAttributes();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(org.eclipse.ptp.core.attributes.IAttributeDefinition, java.util.BitSet)
+	 */
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+	Set<A> getProcessAttributes(D attributeDefinition, BitSet processJobRanks) {
+		AttributeIndexSet<A> jobRanksForAttr = getAttributeIndexSet(attributeDefinition);
+		AttributeIndexSet<A> subSet = jobRanksForAttr.getSubset(processJobRanks);
+		return subSet.getAttributes();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(java.lang.String, java.util.BitSet)
+	 */
+	public Set<IAttribute<?,?,?>> getProcessAttributes(String attrDefId, BitSet processJobRanks) {
+		Set<IAttribute<?, ?, ?>> results = new HashSet<IAttribute<?,?,?>>();
+		for (Entry<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> entry : processAttributesMap.entrySet()) {
+			IAttributeDefinition<?, ?, ?> def = entry.getKey();
+			if (def.getId().equals(attrDefId)) {
+				AttributeIndexSet<?> jobRanksForAttr = entry.getValue();
+				AttributeIndexSet<?> subSet = jobRanksForAttr.getSubset(processJobRanks);
+				results.addAll(subSet.getAttributes());
+				return results;
+			}
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(int)
-	 */
-	public IPProcess getProcessByIndex(int index) {
-		return indexMap.get(String.valueOf(index));
-	}
 
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessByIndex(java.lang.String)
-	 */
-	public IPProcess getProcessByIndex(String index) {
-		return indexMap.get(index);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#getProcessControls()
-	 */
-	public Collection<IPProcessControl> getProcessControls() {
-		IPElementControl[] children = getChildren();
-		List<IPProcessControl> processes =
-			new ArrayList<IPProcessControl>(children.length);
-		for (IPElementControl element : children) {
-			processes.add((IPProcessControl)element);
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+	T getProcessAttributeValue(int processJobRank, final D def) {
+		AttributeIndexSet<A> attrIndexSet = getAttributeIndexSet(def);
+		final A attr = attrIndexSet.getAttribute(processJobRank);
+		if (attr == null) {
+			return null;
 		}
-		return processes;
+		return attr.getValue();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPJob#getProcesses()
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessIds()
 	 */
-	public IPProcess[] getProcesses() {
-		return getProcessControls().toArray(new IPProcess[getProcessControls().size()]);
+	public BitSet getProcessJobRanks() {
+		return (BitSet) currentProcessJobRanks.clone();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessIds(org.eclipse.ptp.core.attributes.IAttribute)
+	 */
+	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	BitSet getProcessJobRanks(A attribute) {
+		D def = attribute.getDefinition();
+		AttributeIndexSet<A> attrJobRanks = getAttributeIndexSet(def);
+		return attrJobRanks.getIndexSet(attribute);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessName(int)
+	 */
+	public String getProcessName(int processJobRank) {
+		return getName() + "." + processJobRank;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessNode(int)
+	 */
+	public String getProcessNodeId(int processJobRank) {
+		final StringAttributeDefinition def = ProcessAttributes.getNodeIdAttributeDefinition();
+		return getProcessAttributeValue(processJobRank, def);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessState(int)
+	 */
+	public ProcessAttributes.State getProcessState(int processJobRank) {
+		final EnumeratedAttributeDefinition<ProcessAttributes.State> def = ProcessAttributes.getStateAttributeDefinition();
+		return getProcessAttributeValue(processJobRank, def);
 	}
 
 	/* (non-Javadoc)
@@ -190,7 +326,14 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	public IPQueueControl getQueueControl() {
 		return (IPQueueControl) getParent();
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#getSavedOutput(int)
+	 */
+	public String getSavedOutput(int processJobRank) {
+		return processOutput.getSavedOutput(processJobRank);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getState()
 	 */
@@ -199,14 +342,20 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
+	 * @see org.eclipse.ptp.core.elements.IPJob#hasProcessById(int)
 	 */
-	public void handleEvent(IProcessChangeEvent e) {
-		if (!childListeners.isEmpty()) {
-			Collection<IPProcess> procs = new ArrayList<IPProcess>();
-			procs.add(e.getSource());
-			fireChangedProcesses(procs);
-		}
+	public boolean hasProcessByJobRank(int processJobRank) {
+		return currentProcessJobRanks.get(processJobRank);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPJob#hasProcessesByIds(java.util.BitSet)
+	 */
+	public boolean hasProcessesByJobRanks(BitSet processJobRanks) {
+		BitSet intersection = (BitSet) currentProcessJobRanks.clone();
+		intersection.and(processJobRanks);
+		boolean containsAll = intersection.equals(processJobRanks);
+		return containsAll;
 	}
 
 	/* (non-Javadoc)
@@ -231,22 +380,21 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#removeProcesses(java.util.Collection)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#removeProcesses(java.util.BitSet)
 	 */
-	public void removeProcesses(Collection<IPProcessControl> processControls) {
-		List<IPProcess> processes = new ArrayList<IPProcess>(processControls.size());
-		
-		for (IPProcessControl process : processControls) {
-			removeChild(process);
-			process.clearOutput();
-			String idx = process.getProcessIndex();
-			if (idx != null) {
-				indexMap.remove(idx);
-			}
-			processes.add(process);
+	public void removeProcessesByJobRanks(BitSet processJobRanks) {
+		// remove these processes from the master set
+		currentProcessJobRanks.andNot(processJobRanks);
+
+		// remove these processes from each AttributeIndexSet
+		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
+			ais.clearIndices(processJobRanks);
 		}
-		
-		fireRemoveProcesses(processes);
+
+		// clear the output file for the processes
+		clearOutput(processJobRanks);
+
+		fireRemoveProcesses(processJobRanks);
 	}
 
 	/* (non-Javadoc)
@@ -264,6 +412,45 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 		this.configuration = configuration;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void addAttributesForJobRanks(BitSet processJobRanks, AttributeManager attrs) {
+		StringAttribute stdOutAttr = attrs.getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
+		if (stdOutAttr != null) {
+			addOutput(stdOutAttr.getValue(), processJobRanks);
+		}
+		for (IAttribute<?, ?, ?> attr : attrs.getAttributes()) {
+			// get the process set for the attributes
+			// corresponding to attr's definition
+			AttributeIndexSet attrIds = getAttributeIndexSet(attr.getDefinition());
+			// add the procces' ranks to that attribute
+			attrIds.addIndicesToAttribute(attr, processJobRanks);
+		}
+	}
+
+	/**
+	 * @param output
+	 * @param processJobRanks
+	 */
+	private void addOutput(String output, BitSet processJobRanks) {
+		processOutput.addOutput(output, processJobRanks);
+	}
+
+	/**
+	 * @param processJobRanks 
+	 * 
+	 */
+	private void clearOutput(BitSet processJobRanks) {
+		final AttributeIndexSet<StringAttribute> outAttrs =
+			getAttributeIndexSet(ProcessAttributes.getStdoutAttributeDefinition());
+
+		// if all of the processes have had their output cleared
+		// then delete the output file
+		outAttrs.clearIndices(processJobRanks);
+		if (outAttrs.isEmpty()) {
+			processOutput.delete();
+		}
+	}
+
 	/**
 	 * Notify listeners when a job attribute has changed.
 	 * 
@@ -271,7 +458,7 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	 */
 	private void fireChangedJob(AttributeManager attrs) {
 		IJobChangeEvent e = new JobChangeEvent(this, attrs);
-		
+
 		for (Object listener : elementListeners.getListeners()) {
 			((IJobListener)listener).handleEvent(e);
 		}
@@ -280,44 +467,73 @@ public class PJob extends Parent implements IPJobControl, IProcessListener {
 	/**
 	 * Send IChangedProcessEvent to registered listeners
 	 * 
-	 * @param nodes
+	 * @param processes
+	 * @param attributes 
 	 */
-	private void fireChangedProcesses(Collection<IPProcess> processes) {
+	private void fireChangedProcesses(BitSet processes,
+			AttributeManager attributes) {
 		IChangedProcessEvent e = 
-			new ChangedProcessEvent(this, processes);
-		
+			new ChangedProcessEvent(this, this, processes,
+					attributes);
+
 		for (Object listener : childListeners.getListeners()) {
 			((IJobChildListener)listener).handleEvent(e);
 		}
 	}
-	
+
 	/**
-	 * Notify listeners when a new process is created.
+	 * Notify listeners when a new processes are created.
 	 * 
-	 * @param process
+	 * @param processes
 	 */
-	private void fireNewProcesses(Collection<IPProcess> processes) {
+	private void fireNewProcesses(BitSet processes) {
 		INewProcessEvent e = 
-			new NewProcessEvent(this, processes);
-		
+			new NewProcessEvent(this, this, processes);
+
 		for (Object listener : childListeners.getListeners()) {
 			((IJobChildListener)listener).handleEvent(e);
 		}
 	}
-	
+
 	/**
 	 * Notify listeners when the collection of processes are removed.
 	 * 
 	 * @param processes to remove
 	 */
-	private void fireRemoveProcesses(Collection<IPProcess> processes) {
+	private void fireRemoveProcesses(BitSet processes) {
 		IRemoveProcessEvent e = 
-			new RemoveProcessEvent(this, processes);
-		
+			new RemoveProcessEvent(this, this, processes);
+
 		for (Object listener : childListeners.getListeners()) {
 			((IJobChildListener)listener).handleEvent(e);
 		}
 	}
+
+	/**
+	 * @param attrs
+	 * @param def
+	 * @return
+	 */
+	private <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	A getAttribute(AttributeManager attrs, D def) {
+		return attrs.getAttribute(def);
+	}
+
+	/**
+	 * @param def
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	AttributeIndexSet<A> getAttributeIndexSet(D def) {
+		AttributeIndexSet<A> attributeIndexSet = (AttributeIndexSet<A>) processAttributesMap.get(def);
+		if (attributeIndexSet == null) {
+			attributeIndexSet = new AttributeIndexSet<A>();
+			processAttributesMap.put(def, attributeIndexSet);
+		}
+		return attributeIndexSet;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */

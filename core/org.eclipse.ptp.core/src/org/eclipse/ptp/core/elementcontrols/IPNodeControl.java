@@ -18,17 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import java.util.Collection;
+import java.util.BitSet;
 
 import org.eclipse.ptp.core.elements.IPNode;
 
 public interface IPNodeControl extends IPElementControl, IPNode {
 	/**
-	 * Add a collection of processes to the node
-	 * 
-	 * @param processes to add
+	 * @param job
+	 * @param processRanks
 	 */
-	public void addProcesses(Collection<IPProcessControl> processes);
+	public void addJobProcessRanks(IPJobControl job, BitSet processRanks);
 
 	/**
 	 * Get the parent machine for this node
@@ -36,18 +35,10 @@ public interface IPNodeControl extends IPElementControl, IPNode {
 	 * @return parent machine
 	 */
 	public IPMachineControl getMachineControl();
-
-	/**
-	 * Get the processes associated with this node
-	 * 
-	 * @return collection of processes
-	 */
-	public Collection<IPProcessControl> getProcessControls();
 	
 	/**
-	 * Remove processes from this node
-	 * 
-	 * @param processe to remove
+	 * @param job
+	 * @param processRanks
 	 */
-	public void removeProcesses(Collection<IPProcessControl> processes);
+	public void removeJobProcessRanks(IPJobControl job, BitSet processRanks);
 }

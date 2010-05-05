@@ -57,6 +57,9 @@ public class Messages extends NLS {
 	public static String AbstractRuntimeResourceManager_1;
 	public static String AbstractRuntimeResourceManager_10;
 	public static String AbstractRuntimeResourceManager_11;
+	public static String AbstractRuntimeResourceManager_12;
+	public static String AbstractRuntimeResourceManager_13;
+	public static String AbstractRuntimeResourceManager_14;
 	public static String AbstractRuntimeResourceManager_5;
 	public static String AbstractRuntimeResourceManager_2;
 	public static String AbstractRuntimeResourceManager_3;
@@ -127,6 +130,8 @@ public class Messages extends NLS {
 	public static String NodeAttributes_1;
 	public static String NodeAttributes_2;
 	public static String PMachine_0;
+	public static String PNode_0;
+	public static String PNode_1;
 	public static String ProcessAttributes_0;
 	public static String ProcessAttributes_1;
 	public static String ProcessAttributes_2;

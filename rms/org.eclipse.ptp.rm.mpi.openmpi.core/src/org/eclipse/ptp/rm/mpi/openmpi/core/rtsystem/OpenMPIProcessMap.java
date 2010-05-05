@@ -120,23 +120,17 @@ public class OpenMPIProcessMap {
 	 * A process spawned by mpirun for a certain application on a certain node.
 	 */
 	static public class Process {
-		private String name;
 		private int index;
 		private int applicationIndex;
 		private Node node;
 
 		final private AttributeManager attributeManager = new AttributeManager();
 
-		public Process(Node node, int index, String name, int applicationIndex) {
+		public Process(Node node, int index, int applicationIndex) {
 			super();
 			this.node = node;
-			this.name = name;
 			this.index = index;
 			this.applicationIndex = applicationIndex;
-		}
-
-		public String getName() {
-			return name;
 		}
 
 		public int getIndex() {

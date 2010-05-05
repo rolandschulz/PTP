@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.ui;
 
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.rm.ui.RMModelImages;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.model.IElement;
@@ -29,18 +32,21 @@ public class MPICH2RuntimeModelPresentation implements IRuntimeModelPresentation
 		if (object instanceof IElement) {
 			IElement element = (IElement)object;
 			IPElement pElement = element.getPElement();
-			if (pElement instanceof IPProcess) {
-				StringAttribute status = pElement.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+			// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+			if (pElement instanceof PProcessUI) {
+				EnumeratedAttribute<State> status = 
+					pElement.getAttribute(ProcessAttributes.getStateAttributeDefinition());
 				if (status != null) {
 					if (element.isSelected()) {
-						return RMModelImages.procSelImages.get(status.getValue());
+						return RMModelImages.procSelImages.get(status.getValueAsString());
 					}
-					return RMModelImages.procImages.get(status.getValue());
+					return RMModelImages.procImages.get(status.getValueAsString());
 				}
 			}
 		} else if (object instanceof IPJob) {
 			IPJob job = (IPJob)object;
-			StringAttribute status = job.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+			StringAttribute status = 
+				job.getAttribute(JobAttributes.getStatusAttributeDefinition());
 			if (status != null) {
 				if (job.isDebug()) {
 					return RMModelImages.jobDebugImages.get(status.getValue());
@@ -62,10 +68,16 @@ public class MPICH2RuntimeModelPresentation implements IRuntimeModelPresentation
 			element = (IPElement)object;
 		}
 		if (element != null) {
-			StringAttribute status = element.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
-			if (status != null) {
-				return status.getValue();
+			EnumeratedAttribute<State> state = 
+				element.getAttribute(ProcessAttributes.getStateAttributeDefinition());
+			if (state != null) {
+				return state.getValueAsString();
 			}
+//			StringAttribute status = 
+//				element.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+//			if (status != null) {
+//				return status.getValue();
+//			}
 		}
 		return null;
 	}

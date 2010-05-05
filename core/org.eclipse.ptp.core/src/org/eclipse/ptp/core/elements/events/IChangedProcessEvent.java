@@ -17,10 +17,11 @@
 package org.eclipse.ptp.core.elements.events;
 
 
-import java.util.Collection;
+import java.util.BitSet;
 
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPJob;
 
 /**
  * This event is generated when the attributes on one or more processes have changed. It is
@@ -29,12 +30,27 @@ import org.eclipse.ptp.core.elements.IPProcess;
  * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener
  */
 public interface IChangedProcessEvent {
+	
+	/**
+	 * Get the attributes that have changed
+	 * 
+	 * @return changed attributes
+	 */
+	public AttributeManager getAttributes();
+
+	/**
+	 * Get the job that owns these changed processes
+	 * 
+	 * @return the job that owns these changed processes
+	 */
+	public IPJob getJob();
+	
 	/**
 	 * Get the processes that have changed
 	 * 
 	 * @return processes that have changed
 	 */
-	public Collection<IPProcess> getProcesses();
+	public BitSet getProcesses();
 	
 	/**
 	 * Get the source of the event. This event can come from either a job

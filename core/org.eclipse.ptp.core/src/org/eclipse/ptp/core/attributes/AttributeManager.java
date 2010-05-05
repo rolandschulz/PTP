@@ -30,6 +30,10 @@ public class AttributeManager {
 	public AttributeManager() {
 	}
 	
+	public AttributeManager(IAttribute<?,?,?> attr) {
+		addAttribute(attr);
+	}
+	
 	public AttributeManager(IAttribute<?,?,?>[] attrs) {
 		for (IAttribute<?,?,?> attr : attrs) {
 			addAttribute(attr);
@@ -50,6 +54,7 @@ public class AttributeManager {
 	 * 
 	 * @param attrs
 	 */
+	@SuppressWarnings("rawtypes")
 	public void addAttributes(IAttribute<?,?,?>[] attrs) {
 		synchronized (map) {
 			for (IAttribute<?,?,?> attr : attrs) {
@@ -68,6 +73,7 @@ public class AttributeManager {
 	 * @param attr
 	 * @param def
 	 */
+	@SuppressWarnings("unchecked")
 	private <T extends Comparable<? super T>> void addAttributeToArrayAttribute(ArrayAttribute<T> attr) {
 		synchronized (map) {
 			ArrayAttributeDefinition<T> def = attr.getDefinition();
@@ -99,6 +105,7 @@ public class AttributeManager {
 	 * @param def
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getAttribute(D def) {
 		return (A) this.getAttribute(def.getId());
 	}
@@ -147,9 +154,15 @@ public class AttributeManager {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return map.toString();
+	}
+
 	/**
 	 * @return
 	 */
+	@SuppressWarnings("rawtypes")
 	public String[] toStringArray() {
 		ArrayList<String> res = new ArrayList<String>();
 		

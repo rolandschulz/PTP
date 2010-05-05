@@ -12,16 +12,15 @@
 
 package org.eclipse.ptp.internal.rtsystem.events;
 
-import org.eclipse.ptp.rtsystem.events.AbstractRuntimeRemoveEvent;
+import org.eclipse.ptp.rtsystem.events.AbstractRuntimeProcessesEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent;
 import org.eclipse.ptp.utils.core.RangeSet;
 
-public class RuntimeRemoveProcessEvent 
-	extends AbstractRuntimeRemoveEvent 
+public class RuntimeRemoveProcessEvent extends AbstractRuntimeProcessesEvent 
 		implements IRuntimeRemoveProcessEvent {
 
-	public RuntimeRemoveProcessEvent(RangeSet ids) {
-		super(ids);
+	public RuntimeRemoveProcessEvent(String jobId, RangeSet jobRanks) {
+		super(jobId, jobRanks);
 	}
 
 }

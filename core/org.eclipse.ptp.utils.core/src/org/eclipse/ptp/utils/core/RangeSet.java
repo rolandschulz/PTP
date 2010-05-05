@@ -12,6 +12,7 @@
 package org.eclipse.ptp.utils.core;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -29,6 +30,35 @@ public class RangeSet implements Iterable<String> {
 		
 	}
 	
+	/**
+	 * @param indices
+	 */
+	public RangeSet(BitSet indices) {
+		if (indices.isEmpty()) {
+			return;
+		}
+		
+		BitSetIterable iitb = new BitSetIterable(indices);
+		Iterator<Integer> iit = iitb.iterator();
+		int firstVal = iit.next();
+		
+		int low = firstVal;
+		int high = firstVal;
+		
+		while (iit.hasNext()) {
+			int val = iit.next();
+			if (val == (high + 1)) {
+				++high;
+			}
+			else {
+				add(low, high);
+				low = val;
+				high = val;
+			}
+		}
+		add(low, high);
+	}
+
 	public RangeSet(String str) {
 		if (str != null) {
 			String[] ranges = str.split(",");

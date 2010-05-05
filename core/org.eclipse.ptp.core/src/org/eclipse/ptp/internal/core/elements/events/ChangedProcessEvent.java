@@ -19,10 +19,11 @@
  */
 package org.eclipse.ptp.internal.core.elements.events;
 
-import java.util.Collection;
+import java.util.BitSet;
 
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 
 /**
@@ -31,18 +32,37 @@ import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
  */
 public class ChangedProcessEvent implements IChangedProcessEvent {
 
+	private final IPJob job;
+	private final BitSet processes;
 	private final IPElement source;
-	private final Collection<IPProcess> processes;
+	private final AttributeManager attrManager;
 	
-	public ChangedProcessEvent(IPElement source, Collection<IPProcess> processes) {
+	public ChangedProcessEvent(IPElement source, IPJob job, BitSet processes,
+			AttributeManager attrManager) {
 		this.source = source;
 		this.processes = processes;
+		this.job = job;
+		this.attrManager = attrManager;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getAttributes()
+	 */
+	public AttributeManager getAttributes() {
+		return attrManager;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getJob()
+	 */
+	public IPJob getJob() {
+		return job;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getProcesses()
 	 */
-	public Collection<IPProcess> getProcesses() {
+	public BitSet getProcesses() {
 		return processes;
 	}
 

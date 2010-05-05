@@ -146,8 +146,8 @@ public class RuntimeEventFactory implements IRuntimeEventFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeProcessChangeEvent(org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
-	public IRuntimeProcessChangeEvent newRuntimeProcessChangeEvent(ElementAttributeManager attrs) {
-		return new RuntimeProcessChangeEvent(attrs);
+	public IRuntimeProcessChangeEvent newRuntimeProcessChangeEvent(String jobId, ElementAttributeManager attrs) {
+		return new RuntimeProcessChangeEvent(jobId, attrs);
 	}
 	
 	/* (non-Javadoc)
@@ -181,8 +181,8 @@ public class RuntimeEventFactory implements IRuntimeEventFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveProcessEvent(org.eclipse.ptp.core.util.RangeSet)
 	 */
-	public IRuntimeRemoveProcessEvent newRuntimeRemoveProcessEvent(RangeSet ids) {
-		return new RuntimeRemoveProcessEvent(ids);
+	public IRuntimeRemoveProcessEvent newRuntimeRemoveProcessEvent(String jobId, RangeSet ids) {
+		return new RuntimeRemoveProcessEvent(jobId, ids);
 	}	
 	
 	/* (non-Javadoc)

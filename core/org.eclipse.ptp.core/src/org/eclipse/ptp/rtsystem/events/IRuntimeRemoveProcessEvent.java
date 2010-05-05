@@ -11,6 +11,6 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-public interface IRuntimeRemoveProcessEvent extends IRuntimeRemoveEvent {
+public interface IRuntimeRemoveProcessEvent extends IRuntimeProcessesEvent {
 
 }

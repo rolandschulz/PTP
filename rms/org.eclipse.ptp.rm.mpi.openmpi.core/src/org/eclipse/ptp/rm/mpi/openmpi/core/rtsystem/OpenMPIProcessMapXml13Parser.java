@@ -194,6 +194,7 @@ public class OpenMPIProcessMapXml13Parser {
 			throw new UnknownElementException(name);
 		}
 		/** Called when reading the beginning of the tag. */
+		@SuppressWarnings("unused")
 		public void start() throws SAXException {
 			// Ignore
 		}
@@ -202,14 +203,17 @@ public class OpenMPIProcessMapXml13Parser {
 			throw new UnknownAttributeException(name);
 		}
 		/** Called when all attributes have been read and tag content is going to be read. */
+		@SuppressWarnings("unused")
 		public void prepare() throws SAXException {
 			// Ignore
 		}
 		/** Called with characters from the element. */
+		@SuppressWarnings("unused")
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			// Ignore
 		}
 		/** Called when finished reading the end of the tag. */
+		@SuppressWarnings("unused")
 		public void finish() throws SAXException {
 			// Ignore
 		}
@@ -490,7 +494,7 @@ public class OpenMPIProcessMapXml13Parser {
 
 		@Override
 		public void finish() throws SAXException {
-			OpenMPIProcessMap.Process process = new OpenMPIProcessMap.Process(node, rank, Integer.toString(rank), 1);
+			OpenMPIProcessMap.Process process = new OpenMPIProcessMap.Process(node, rank, 1);
 			map.addProcess(process);
 			notifyNewProcess(process);
 			super.finish();

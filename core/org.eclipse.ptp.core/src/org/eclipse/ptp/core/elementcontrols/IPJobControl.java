@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import java.util.Collection;
+import java.util.BitSet;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 
 public interface IPJobControl extends IPElementControl, IPJob {
@@ -29,24 +29,19 @@ public interface IPJobControl extends IPElementControl, IPJob {
 	/**
 	 * Add attributes to a collection of processes.
 	 * 
-	 * @param processes collection of IPProcessControl
-	 * @param attrs array of attributes to add to each process
+	 * @param jobRanks job ranks of processes to be modified
+	 * @param attributes AttributeManager for the
+	 *        attributes to add to each process
 	 */
-	public void addProcessAttributes(Collection<IPProcessControl> processes, IAttribute<?,?,?>[] attrs);
+	public void addProcessAttributes(BitSet jobRanks,
+			AttributeManager attributes);
 
 	/**
-	 * Add the collection of processes to the job.
-	 * 
-	 * @param processes collection of IPProcessControls
+	 * @param jobRanks
+	 * @param attrs 
 	 */
-	public void addProcesses(Collection<IPProcessControl> processes);
-	
-	/**
-	 * Get all the processes known by this job
-	 * 
-	 * @return collection of processes
-	 */
-	public Collection<IPProcessControl> getProcessControls();
+	public void addProcessesByJobRanks(BitSet jobRanks,
+			AttributeManager attrs);
 
 	/**
 	 * Get the parent of this job
@@ -54,14 +49,14 @@ public interface IPJobControl extends IPElementControl, IPJob {
 	 * @return parent queue
 	 */
 	public IPQueueControl getQueueControl();
-	
+
 	/**
 	 * Remove processes from the job
 	 * 
-	 * @param processes to remove
+	 * @param jobRanks
 	 */
-	public void removeProcesses(Collection<IPProcessControl> processes);
-	
+	public void removeProcessesByJobRanks(BitSet jobRanks);
+
 	/**
 	 * Set the launch configuration that was used to launch this job.
 	 * 

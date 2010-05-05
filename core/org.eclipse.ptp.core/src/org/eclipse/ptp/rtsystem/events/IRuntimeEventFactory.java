@@ -108,10 +108,11 @@ public interface IRuntimeEventFactory {
 	public IRuntimeNodeChangeEvent newRuntimeNodeChangeEvent(ElementAttributeManager attrs);
 
 	/**
+	 * @param jobId TODO
 	 * @param attrs
 	 * @return
 	 */
-	public IRuntimeProcessChangeEvent newRuntimeProcessChangeEvent(ElementAttributeManager attrs);
+	public IRuntimeProcessChangeEvent newRuntimeProcessChangeEvent(String jobId, ElementAttributeManager attrs);
 
 	/**
 	 * @return
@@ -137,10 +138,11 @@ public interface IRuntimeEventFactory {
 	public IRuntimeRemoveNodeEvent newRuntimeRemoveNodeEvent(RangeSet ids);
 
 	/**
+	 * @param jobId TODO
 	 * @param ids
 	 * @return
 	 */
-	public IRuntimeRemoveProcessEvent newRuntimeRemoveProcessEvent(RangeSet ids);
+	public IRuntimeRemoveProcessEvent newRuntimeRemoveProcessEvent(String jobId, RangeSet ids);
 
 	/**
 	 * @param ids

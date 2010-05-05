@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
 
@@ -46,7 +47,6 @@ import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -71,6 +71,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
  * @author clement
@@ -317,7 +318,7 @@ public class SDMDebugger implements IPDebugger {
 	 * @return number of processes
 	 */
 	private int getJobSize(IPJob job) {
-		int nprocs = job.getProcesses().length;
+		int nprocs = job.getProcessJobRanks().cardinality();
 		if (nprocs == 0) {
 			nprocs = 1;
 		}
@@ -420,18 +421,19 @@ public class SDMDebugger implements IPDebugger {
 			throw newCoreException(e.getLocalizedMessage());
 		}
 		PrintWriter pw = new PrintWriter(os);
-		IPProcess processes[] = launch.getPJob().getProcesses();
-		pw.format("%d\n", processes.length); //$NON-NLS-1$
+		final IPJob pJob = launch.getPJob();
+		BitSet processJobRanks = pJob.getProcessJobRanks();
+		pw.format("%d\n", processJobRanks.cardinality()); //$NON-NLS-1$
 		int base = 50000;
 		int range = 10000;
 		Random random = new Random();
-		for (IPProcess process : processes) {
-			String index = process.getProcessIndex();
-			IPNode node = process.getNode();
+		for (Integer processIndex : new BitSetIterable(processJobRanks)) {
+			String nodeId = pJob.getProcessNodeId(processIndex);
+			IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
 			if (node != null) {
 				String nodeName = node.getName();
 				int portNumber = base + random.nextInt(range);
-				pw.format("%s %s %d\n", index, nodeName, portNumber); //$NON-NLS-1$
+				pw.format("%s %s %d\n", processIndex, nodeName, portNumber); //$NON-NLS-1$
 			} else {
 				throw newCoreException(Messages.SDMDebugger_15);
 			}

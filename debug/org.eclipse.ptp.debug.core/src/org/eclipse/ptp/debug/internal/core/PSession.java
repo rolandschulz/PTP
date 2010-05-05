@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.core;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -29,13 +30,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
@@ -604,22 +603,19 @@ public class PSession implements IPSession, IPDIEventListener {
 	}
 	
 	/**
-	 * Set the state of all processes in the bitlist
+	 * Set the state of all processes in the BitList
 	 * 
 	 * @param tasks
 	 * @param state
 	 */
 	private void changeProcessState(TaskSet tasks, State state) {
 		IPJob job = getJob();
-		List<IPProcessControl> processes = new ArrayList<IPProcessControl>();
+		BitSet processIndices = new BitSet();
 		for (int task : tasks.toArray()) {
-			IPProcess p = job.getProcessByIndex(task);
-			if (p instanceof IPProcessControl) {
-				processes.add((IPProcessControl)p);
-			}
+			processIndices.set(task);
 		}
 		EnumeratedAttribute<State> attr = ProcessAttributes.getStateAttributeDefinition().create(state);
-		((IPJobControl)job).addProcessAttributes(processes, new IAttribute<?,?,?>[] {attr});
+		((IPJobControl)job).addProcessAttributes(processIndices, new AttributeManager(attr));
 	}
 	
 	/**
@@ -651,14 +647,11 @@ public class PSession implements IPSession, IPDIEventListener {
 	 */
 	private void setProcessOutput(TaskSet tasks, String output) {
 		IPJob job = getJob();
-		List<IPProcessControl> processes = new ArrayList<IPProcessControl>();
+		BitSet processIndices = new BitSet();
 		for (int task : tasks.toArray()) {
-			IPProcess p = job.getProcessByIndex(task);
-			if (p instanceof IPProcessControl) {
-				processes.add((IPProcessControl)p);
-			}
+			processIndices.set(task);
 		}
 		StringAttribute attr = ProcessAttributes.getStdoutAttributeDefinition().create(output);
-		((IPJobControl)job).addProcessAttributes(processes, new IAttribute<?,?,?>[] {attr});
+		((IPJobControl)job).addProcessAttributes(processIndices, new AttributeManager(attr));
 	}
 }

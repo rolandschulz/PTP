@@ -43,7 +43,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.TaskSet;
@@ -62,6 +61,7 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.messages.Messages;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -327,7 +327,9 @@ public class ParallelDebugView extends ParallelJobsView {
 		if (obj == null)
 			return new String[] {"", ""}; //$NON-NLS-1$ //$NON-NLS-2$
 		String[] header = super.getToolTipText(obj);
-		String variableText = ((UIDebugManager) manager).getValueText(new Integer(((IPProcess)obj).getProcessIndex()).intValue(), this);
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		PProcessUI proc = (PProcessUI)obj;
+		String variableText = ((UIDebugManager) manager).getValueText(proc.getJobRank(), this);
 		if (variableText != null && variableText.length() > 0) {
 			return new String[] { header[0], variableText };
 		}

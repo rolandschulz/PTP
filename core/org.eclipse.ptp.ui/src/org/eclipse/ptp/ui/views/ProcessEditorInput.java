@@ -19,7 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.core.elements.IPProcess;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
@@ -28,12 +28,14 @@ import org.eclipse.ui.IPersistableElement;
  */
 
 public class ProcessEditorInput implements IEditorInput {
-    private IPProcess process = null;
+	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+    private PProcessUI process = null;
     
     /** Constructor
      * @param process
      */
-    public ProcessEditorInput(IPProcess process) {
+	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+    public ProcessEditorInput(PProcessUI process) {
 		if (process == null) {
 			throw new IllegalArgumentException();
 		}
@@ -72,7 +74,8 @@ public class ProcessEditorInput implements IEditorInput {
 	/** Get process
 	 * @return
 	 */
-	public IPProcess getProcess() {
+	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+	public PProcessUI getProcess() {
 		return process;
 	}
 	
@@ -107,8 +110,10 @@ public class ProcessEditorInput implements IEditorInput {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
-		if (adapter == IPProcess.class)
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		if (adapter == PProcessUI.class)
 			return process;
 		return null;
 	}	

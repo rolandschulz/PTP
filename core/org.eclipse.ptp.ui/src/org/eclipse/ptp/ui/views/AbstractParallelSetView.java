@@ -28,7 +28,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.internal.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.internal.ui.actions.CreateSetAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteSetAction;
@@ -36,6 +35,7 @@ import org.eclipse.ptp.internal.ui.actions.DisplayRulerAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveElementAction;
 import org.eclipse.ptp.internal.ui.actions.ZoomInAction;
 import org.eclipse.ptp.internal.ui.actions.ZoomOutAction;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.IElementManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -198,9 +198,10 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		zoomOutAction.setEnabled(cur_set_size > 0 && zoom_depth < Zoom.max_depth);
 	}
 	/** Open process viewer
-	 * @param element Target IPProcess
+	 * @param element Target PProcessUI (PProcessUI goes away when we address UI scalability. See Bug 311057)
 	 */
-	protected void openProcessViewer(final IPProcess element) {
+	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+	protected void openProcessViewer(final PProcessUI element) {
 		if (element == null)
 			return;
 		showWhile(new Runnable() {

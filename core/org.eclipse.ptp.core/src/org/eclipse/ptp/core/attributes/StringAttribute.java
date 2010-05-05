@@ -73,11 +73,11 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 
     @Override
     protected synchronized boolean doEquals(StringAttribute other) {
-        return value.equals(other.value);
+        return value.toString().equals(other.value.toString());
     }
 
 	@Override
     protected synchronized int doHashCode() {
-        return value.hashCode();
+        return value.toString().hashCode();
     }
 }

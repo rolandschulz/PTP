@@ -54,6 +54,8 @@ public class Messages extends NLS {
 	public static String MPICH2NodeAttributes_oversubscribedAttrDef_title;
 	public static String MPICH2NodeAttributes_statusMessageAttrDef_description;
 	public static String MPICH2NodeAttributes_statusMessageAttrDef_title;
+	public static String MPICH2PeriodicJob_0;
+	public static String MPICH2PeriodicJob_1;
 	public static String MPICH2Plugin_Exception_InternalError;
 
 	public static String MPICH2ResourceManagerConfiguration_defaultDescription;

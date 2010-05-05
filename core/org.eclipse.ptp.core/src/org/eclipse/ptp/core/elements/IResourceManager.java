@@ -87,6 +87,15 @@ public interface IResourceManager extends IPElement,
 	public String getName();
 
 	/**
+	 * Find a node object using its ID
+	 * Returns null if no node is found.
+	 * 
+	 * @param id ID of the node object
+	 * @return node object corresponding to the ID
+	 */
+	public IPNode getNodeById(String id);
+	
+	/**
 	 * Find a queue object using its ID.
 	 * Returns null if no queue is found.
 	 * 

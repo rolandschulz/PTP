@@ -24,13 +24,13 @@
   *******************************************************************************/
  package org.eclipse.ptp.rm.ibm.ll.core.rmsystem;
 
- import java.util.Collection;
+ import java.util.BitSet;
+import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
-import org.eclipse.ptp.core.elementcontrols.IPProcessControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rm.ibm.ll.core.rtsystem.IBMLLProxyRuntimeClient;
@@ -97,14 +97,6 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  	}
 
  	/* (non-Javadoc)
- 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateProcess(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
- 	 */
- 	@Override
- 	protected IPProcessControl doCreateProcess(IPJobControl job, String processId, AttributeManager attrs) {
- 		return newProcess(job, processId, attrs);
- 	}
-
- 	/* (non-Javadoc)
  	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateQueue(java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
  	 */
  	@Override
@@ -151,12 +143,12 @@ import org.eclipse.ptp.rtsystem.IRuntimeSystem;
  	}
 
  	/* (non-Javadoc)
- 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateProcesses(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
+ 	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateProcesses(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
  	 */
  	@Override
  	protected boolean doUpdateProcesses(IPJobControl job,
- 			Collection<IPProcessControl> processes, AttributeManager attrs) {
- 		return updateProcesses(job, processes, attrs);
+ 			BitSet processJobRanks, AttributeManager attrs) {
+ 		return updateProcessesByJobRanks(job, processJobRanks, attrs);
  	}
 
  	/* (non-Javadoc)

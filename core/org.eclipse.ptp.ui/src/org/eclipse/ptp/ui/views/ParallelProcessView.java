@@ -18,13 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.BitSet;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elements.IPProcess;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.events.IProcessChangeEvent;
-import org.eclipse.ptp.core.elements.listeners.IProcessListener;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
+import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
+import org.eclipse.ptp.core.elements.events.INewProcessEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
+import org.eclipse.ptp.core.elements.listeners.IJobChildListener;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -47,72 +53,18 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 /**
  * View for displaying details about an individual process
  */
-public class ParallelProcessView extends AbstractTextEditor implements IProcessListener {
+public class ParallelProcessView extends AbstractTextEditor implements IJobChildListener {
 	private Label pidLabel = null;
 	private Label statusLabel = null;
 	private Text outputText = null;
 	private FormToolkit toolkit = null;
 	private ScrolledForm myForm = null;
-	private IPProcess process = null;
+	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+	private PProcessUI process = null;
 
 	public ParallelProcessView() {
 		super();
 		setDocumentProvider(new StorageDocumentProvider());
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#dispose()
-	 */
-	public void dispose() {
-		process.removeElementListener(this);
-		myForm.dispose();
-		toolkit.dispose();
-		super.dispose();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus()
-	 */
-	public void setFocus() {
-		myForm.setFocus();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSave(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public void doSave(IProgressMonitor monitor) {}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSaveAs()
-	 */
-	public void doSaveAs() {}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isDirty()
-	 */
-	public boolean isDirty() {
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isSaveAsAllowed()
-	 */
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
-	 */
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		setSite(site);
-		setPartName(input.getName());
-		setInput(input);
-		Object obj = getEditorInput().getAdapter(IPProcess.class);
-		if (obj instanceof IPProcess) {
-			process = (IPProcess) obj;
-			process.addElementListener(this);
-		}
 	}
 	
 	/**
@@ -120,7 +72,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	 */
 	public void close() {
 		if (process != null) {
-			process.removeElementListener(this);
+			process.getJob().removeChildListener(this);
 		}
 		getSite().getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -130,7 +82,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			}
 		});
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
@@ -144,57 +96,68 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		initialText();
 	}
 	
-	/**
-	 * Add the process details to the view
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#dispose()
 	 */
-	protected void detailsSection() {
-		Section detailsSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR);
-		detailsSection.setText(Messages.ParallelProcessView_0);
-		detailsSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		Composite detailsContainer = createClientContainer(detailsSection, toolkit, 3, true, 2, 2);
-		pidLabel = toolkit.createLabel(detailsContainer, null);
-		pidLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		Composite statusContainer = createClientContainer(detailsContainer, toolkit, 3, true, 0, 0);
-		statusContainer.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 3));
-		statusLabel = toolkit.createLabel(statusContainer, null);
-		statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		detailsSection.setClient(detailsContainer);
+	public void dispose() {
+		process.getJob().removeChildListener(this);
+		myForm.dispose();
+		toolkit.dispose();
+		super.dispose();
 	}
 	
-	/**
-	 * Add the process output section to the view
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	protected void outputSection() {
-		Section outputSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR | Section.TWISTIE);
-		outputSection.setText(Messages.ParallelProcessView_1);
-		outputSection.setLayoutData(new GridData(GridData.FILL_BOTH));
-		outputSection.setExpanded(true);
-		Composite ouputContainer = createClientContainer(outputSection, toolkit, 1, true, 2, 2);
-		outputText = toolkit.createText(ouputContainer, null, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.heightHint = 200;
-		outputText.setLayoutData(gd);
-		outputSection.setClient(ouputContainer);
-		toolkit.paintBordersFor(ouputContainer);
+	public void doSave(IProgressMonitor monitor) {}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSaveAs()
+	 */
+	public void doSaveAs() {}
+	
+	public void handleEvent(final IChangedProcessEvent e) {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			public void run() {
+				final BitSet procRanks = e.getProcesses();
+				if (!procRanks.get(process.getJobRank())) {
+					return;
+				}
+				EnumeratedAttribute<State> statusAttr =
+					e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
+				if (statusAttr != null) {
+					statusLabel.setText(Messages.ParallelProcessView_6 + statusAttr.getValue());
+				} 
+				
+				StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
+				if (stdoutAttr != null) {
+					outputText.append(stdoutAttr.getValue());
+				}
+			}
+		});
 	}
 	
-	/**
-	 * Convenience method to create a container
-	 * 
-	 * @param parent
-	 * @param toolkit
-	 * @param columns
-	 * @param isEqual
-	 * @param mh
-	 * @param mw
-	 * @return
+	public void handleEvent(INewProcessEvent e) {
+		// no-op
+	}
+	
+	public void handleEvent(IRemoveProcessEvent e) {
+		// no-op
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
-	protected Composite createClientContainer(Composite parent, FormToolkit toolkit, int columns, 
-			boolean isEqual, int mh, int mw) {
-		Composite container = toolkit.createComposite(parent);
-		container.setLayout(createGridLayout(columns, isEqual, mh, mw));
-		return container;
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+		setSite(site);
+		setPartName(input.getName());
+		setInput(input);
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		Object obj = getEditorInput().getAdapter(PProcessUI.class);
+		if (obj instanceof PProcessUI) {
+			process = (PProcessUI) obj;
+			process.getJob().addChildListener(this);
+		}
 	}
 	
 	/**
@@ -217,27 +180,47 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			/*
 			 * Set initial output text
 			 */
-			outputText.setText(process.getSavedOutput(ProcessAttributes.getStdoutAttributeDefinition()));
+			outputText.setText(process.getSavedOutput());
 		}
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(org.eclipse.ptp.core.elements.events.IProcessChangedEvent)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isDirty()
 	 */
-	public void handleEvent(final IProcessChangeEvent e) {
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-			public void run() {
-				StringAttribute statusAttr = e.getAttributes().getAttribute(ProcessAttributes.getStatusAttributeDefinition());
-				if (statusAttr != null) {
-					statusLabel.setText(Messages.ParallelProcessView_6 + statusAttr.getValue());
-				} 
-				
-				StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
-				if (stdoutAttr != null) {
-					outputText.append(stdoutAttr.getValue());
-				}
-			}
-		});
+	public boolean isDirty() {
+		return false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isSaveAsAllowed()
+	 */
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus()
+	 */
+	public void setFocus() {
+		myForm.setFocus();
+	}
+	
+	/**
+	 * Convenience method to create a container
+	 * 
+	 * @param parent
+	 * @param toolkit
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
+	protected Composite createClientContainer(Composite parent, FormToolkit toolkit, int columns, 
+			boolean isEqual, int mh, int mw) {
+		Composite container = toolkit.createComposite(parent);
+		container.setLayout(createGridLayout(columns, isEqual, mh, mw));
+		return container;
 	}
 	
 	/**
@@ -259,6 +242,41 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	}
 	
 	/**
+	 * Add the process details to the view
+	 */
+	protected void detailsSection() {
+		Section detailsSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR);
+		detailsSection.setText(Messages.ParallelProcessView_0);
+		detailsSection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Composite detailsContainer = createClientContainer(detailsSection, toolkit, 3, true, 2, 2);
+		pidLabel = toolkit.createLabel(detailsContainer, null);
+		pidLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Composite statusContainer = createClientContainer(detailsContainer, toolkit, 3, true, 0, 0);
+		statusContainer.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 3));
+		statusLabel = toolkit.createLabel(statusContainer, null);
+		statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		detailsSection.setClient(detailsContainer);
+	}
+
+	/**
+	 * Add the process output section to the view
+	 */
+	protected void outputSection() {
+		Section outputSection = toolkit.createSection(myForm.getBody(), Section.TITLE_BAR | Section.TWISTIE);
+		outputSection.setText(Messages.ParallelProcessView_1);
+		outputSection.setLayoutData(new GridData(GridData.FILL_BOTH));
+		outputSection.setExpanded(true);
+		Composite ouputContainer = createClientContainer(outputSection, toolkit, 1, true, 2, 2);
+		outputText = toolkit.createText(ouputContainer, null, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.heightHint = 200;
+		outputText.setLayoutData(gd);
+		outputSection.setClient(ouputContainer);
+		toolkit.paintBordersFor(ouputContainer);
+	}
+
+	/**
 	 * Convenience method to create a GridData object
 	 * 
 	 * @param style
@@ -275,7 +293,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		gd.horizontalSpan = space;
 		return gd;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#updateStatusField(java.lang.String)
 	 */

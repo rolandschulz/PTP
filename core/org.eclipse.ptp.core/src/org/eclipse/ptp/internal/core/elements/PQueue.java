@@ -178,7 +178,7 @@ public class PQueue extends Parent implements IPQueueControl {
 		List<IPJob> jobs = new ArrayList<IPJob>(jobControls.size());
 		
 		for (IPJobControl job : jobControls) {
-			job.removeProcesses(job.getProcessControls());
+			job.removeProcessesByJobRanks(job.getProcessJobRanks());
 			removeChild(job);
 			jobs.add(job);
 		}
