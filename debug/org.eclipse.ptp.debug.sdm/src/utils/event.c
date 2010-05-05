@@ -783,8 +783,9 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_SUSPEND:
 		switch (e->dbg_event_u.suspend_event.reason) {
 		case DBGEV_SUSPEND_SIGNAL:
-			if (e->dbg_event_u.suspend_event.ev_u.sig != NULL)
+			if (e->dbg_event_u.suspend_event.ev_u.sig != NULL) {
 				FreeSignalInfo(e->dbg_event_u.suspend_event.ev_u.sig);
+			}
 			break;
 		case DBGEV_SUSPEND_INT:
 		case DBGEV_SUSPEND_STEP:
@@ -794,18 +795,20 @@ FreeDbgEvent(dbg_event *e) {
 			break;
 		}
 
-		if (e->dbg_event_u.suspend_event.frame != NULL)
+		if (e->dbg_event_u.suspend_event.frame != NULL) {
 			FreeStackframe(e->dbg_event_u.suspend_event.frame);
-		if (e->dbg_event_u.suspend_event.changed_vars != NULL)
+		}
+		if (e->dbg_event_u.suspend_event.changed_vars != NULL) {
 			DestroyList(e->dbg_event_u.suspend_event.changed_vars, free);
-
+		}
 		break;
 
 	case DBGEV_EXIT:
 		switch (e->dbg_event_u.suspend_event.reason) {
 			case DBGEV_EXIT_SIGNAL:
-				if (e->dbg_event_u.suspend_event.ev_u.sig != NULL)
+				if (e->dbg_event_u.suspend_event.ev_u.sig != NULL) {
 					FreeSignalInfo(e->dbg_event_u.suspend_event.ev_u.sig);
+				}
 				break;
 			case DBGEV_EXIT_NORMAL:
 				break;
@@ -813,58 +816,75 @@ FreeDbgEvent(dbg_event *e) {
 		break;
 
 	case DBGEV_FRAMES:
-		if (e->dbg_event_u.list != NULL)
+		if (e->dbg_event_u.list != NULL) {
 			DestroyList(e->dbg_event_u.list, FreeStackframe);
+		}
 		break;
 
 	case DBGEV_DATA:
-		if (e->dbg_event_u.data_event.data != NULL)
+		if (e->dbg_event_u.data_event.data != NULL) {
 			AIFFree(e->dbg_event_u.data_event.data);
-		if (e->dbg_event_u.data_event.type_desc != NULL)
+		}
+		if (e->dbg_event_u.data_event.type_desc != NULL) {
 			free(e->dbg_event_u.data_event.type_desc);
-		if (e->dbg_event_u.data_event.name != NULL)
+		}
+		if (e->dbg_event_u.data_event.name != NULL) {
 			free(e->dbg_event_u.data_event.name);
+		}
 		break;
 
 	case DBGEV_TYPE:
-		if (e->dbg_event_u.type_desc != NULL)
+		if (e->dbg_event_u.type_desc != NULL) {
 			free(e->dbg_event_u.type_desc);
+		}
 		break;
 
 	case DBGEV_THREAD_SELECT:
-		if (e->dbg_event_u.thread_select_event.frame != NULL)
+		if (e->dbg_event_u.thread_select_event.frame != NULL) {
 			FreeStackframe(e->dbg_event_u.thread_select_event.frame);
+		}
 		break;
 
 	case DBGEV_THREADS:
-		if (e->dbg_event_u.threads_event.list != NULL)
+		if (e->dbg_event_u.threads_event.list != NULL) {
 			DestroyList(e->dbg_event_u.threads_event.list, free);
+		}
 		break;
 
 	case DBGEV_DATAR_MEM:
-		if (e->dbg_event_u.meminfo != NULL)
+		if (e->dbg_event_u.meminfo != NULL) {
 			FreeMemoryInfo(e->dbg_event_u.meminfo);
+		}
 		break;
 
 	case DBGEV_ARGS:
 	case DBGEV_VARS:
-		if (e->dbg_event_u.list != NULL)
+		if (e->dbg_event_u.list != NULL) {
 			DestroyList(e->dbg_event_u.list, free);
+		}
 		break;
 
 	case DBGEV_SIGNALS:
-		if (e->dbg_event_u.list != NULL)
+		if (e->dbg_event_u.list != NULL) {
 			DestroyList(e->dbg_event_u.list, FreeSignalInfo);
+		}
 		break;
 
 	case DBGEV_BPSET:
-		if (e->dbg_event_u.bpset_event.bp != NULL)
+		if (e->dbg_event_u.bpset_event.bp != NULL) {
 			FreeBreakpoint(e->dbg_event_u.bpset_event.bp);
+		}
 		break;
+
+	case DBGEV_ERROR:
+		if (e->dbg_event_u.error_event.error_msg != NULL) {
+			free(e->dbg_event_u.error_event.error_msg);
+		}
 	}
 
-	if (e->procs != NULL)
+	if (e->procs != NULL) {
 		bitset_free(e->procs);
+	}
 
 	free(e);
 }
@@ -875,8 +895,9 @@ DbgErrorEvent(int err, char *msg)
 	dbg_event *	e = NewDbgEvent(DBGEV_ERROR);
 
 	e->dbg_event_u.error_event.error_code = err;
-	if (msg != NULL)
+	if (msg != NULL) {
 		e->dbg_event_u.error_event.error_msg = strdup(msg);
+	}
 
 	return e;
 }
