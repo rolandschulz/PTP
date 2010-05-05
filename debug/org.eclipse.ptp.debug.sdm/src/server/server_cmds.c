@@ -187,9 +187,7 @@ svr_progress(dbg_backend *db)
 	dbg_event *	e;
 
 	if (svr_res != DBGRES_OK) {
-		e = NewDbgEvent(DBGEV_ERROR);
-		e->dbg_event_u.error_event.error_code = DbgGetError();
-		e->dbg_event_u.error_event.error_msg = strdup(DbgGetErrorStr());
+		e = DbgErrorEvent(DbgGetError(), DbgGetErrorStr());
 		svr_event_callback(e);
 		FreeDbgEvent(e);
 		svr_res = DBGRES_OK;
