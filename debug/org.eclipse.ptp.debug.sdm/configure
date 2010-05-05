@@ -576,7 +576,7 @@ PACKAGE_VERSION='@buildVersion@'
 PACKAGE_STRING='org.eclipse.ptp.debug.sdm @buildVersion@'
 PACKAGE_BUGREPORT=''
 
-ac_unique_file="src/client/client.c"
+ac_unique_file="src/master/startup.c"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -698,8 +698,6 @@ CLNT_LIBS
 CPP
 GREP
 EGREP
-PTPDBGJNI_TRUE
-PTPDBGJNI_FALSE
 LIBOBJS
 subdirs
 LTLIBOBJS'
@@ -5161,14 +5159,6 @@ fi
 
 done
 
- if test "$ac_cv_header_jni_h" = yes; then
-  PTPDBGJNI_TRUE=
-  PTPDBGJNI_FALSE='#'
-else
-  PTPDBGJNI_TRUE='#'
-  PTPDBGJNI_FALSE=
-fi
-
 
 
 { echo "$as_me:$LINENO: checking whether time.h and sys/time.h may both be included" >&5
@@ -5845,13 +5835,6 @@ echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${PTPDBGJNI_TRUE}" && test -z "${PTPDBGJNI_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"PTPDBGJNI\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"PTPDBGJNI\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
@@ -6469,14 +6452,12 @@ CLNT_LIBS!$CLNT_LIBS$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
-PTPDBGJNI_TRUE!$PTPDBGJNI_TRUE$ac_delim
-PTPDBGJNI_FALSE!$PTPDBGJNI_FALSE$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 subdirs!$subdirs$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 90; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 88; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
