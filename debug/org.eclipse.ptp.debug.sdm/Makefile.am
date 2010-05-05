@@ -3,9 +3,9 @@ SUBDIRS =					libaif
 bin_PROGRAMS =				sdm
 noinst_PROGRAMS =			test_proxy test_proxy_rev test_mi
 
-sdm_SOURCES =				src/client/startup.c\
-							src/client/client.c \
-							src/client/client_cmds.c \
+sdm_SOURCES =				src/master/startup.c\
+							src/master/master.c \
+							src/master/master_cmds.c \
 							src/server/server.c \
 							src/server/server_cmds.c \
 							src/server/backend.c \
@@ -41,7 +41,7 @@ test_mi_LDADD =				libmi.a
 
 noinst_HEADERS =			include/backend.h \
 							include/breakpoint.h \
-							include/dbg_client.h \
+							include/dbg_master.h \
 							include/dbg_error.h \
 							include/dbg_event.h \
 							include/dbg_proxy.h \
