@@ -139,7 +139,7 @@ MISessionStartLocal(MISession *sess, char *prog)
 	signal(SIGPIPE, SIG_IGN);
 
 	if ((sess->pty_fd = get_master_pty(&name)) < 0 ) {
-		name = "/dev/null";
+		name = strdup("/dev/null");
 	}
 	
 	switch (sess->pid = fork())
@@ -151,7 +151,6 @@ MISessionStartLocal(MISession *sess, char *prog)
 		close(p1[1]);
 		close(p2[0]);
 		close(p2[1]);
-		
 		
 		if (prog == NULL)
 			execlp(sess->gdb_path, "gdb", "-q", "-tty", name, "-i", "mi", NULL);
@@ -167,6 +166,8 @@ MISessionStartLocal(MISession *sess, char *prog)
 	default:
 	    break;
 	}
+
+	free(name);
 
 	close(p1[1]);
 	close(p2[0]);
