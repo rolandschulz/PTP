@@ -123,7 +123,7 @@ MIGetVarCreateInfo(MICommand *cmd)
  * to check for different format.
  * See PR 81019
  */
-void
+static void
 parseChildren(MIValue *val, List **res)
 {
 	MIValue *	value;
@@ -147,7 +147,7 @@ parseChildren(MIValue *val, List **res)
 }
 
 void
-MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
+MIGetVarListChildrenInfo(MICommand *cmd, MIVar *var)
 {
 	int				num;
 	MIVar *			child;
@@ -174,11 +174,13 @@ MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
 
 	if (children != NULL) {
 		num = SizeOfList(children);
-		if (var->numchild != num)
+		if (var->numchild != num) {
 			var->numchild = num;
+		}
 		var->children = (MIVar **)malloc(sizeof(MIVar *) * var->numchild);
-		for (num = 0, SetList(children); (child = (MIVar *)GetListElement(children)) != NULL; )
+		for (num = 0, SetList(children); (child = (MIVar *)GetListElement(children)) != NULL; ) {
 			var->children[num++] = child;
+		}
 	}
 }
 
