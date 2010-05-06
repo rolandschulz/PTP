@@ -38,38 +38,38 @@ public interface SDMPreferenceConstants {
 	 * Extra arguments to pass to the sdm (e.g. debugging flags)
 	 */
 	public static final String SDM_DEBUGGER_ARGS = PLUGIN_ID + ".debugger_args"; //$NON-NLS-1$
-	
+
 	/**
 	 * SDM debugging
 	 */
 	public static final String SDM_DEBUG_ENABLED = PLUGIN_ID + ".debug_enabled"; //$NON-NLS-1$
 	public static final String SDM_DEBUG_LEVEL = PLUGIN_ID + ".debug_level"; //$NON-NLS-1$
-	
+
 	public static final int DEBUG_LEVEL_NONE = 0x00;
 	public static final int DEBUG_LEVEL_STARTUP = 0x01;
 	public static final int DEBUG_LEVEL_MESSAGES = 0x02;
 	public static final int DEBUG_LEVEL_ROUTING = 0x04;
-	public static final int DEBUG_LEVEL_SERVER = 0x08;
-	public static final int DEBUG_LEVEL_BACKEND = 0x10;
-	public static final int DEBUG_LEVEL_PROTOCOL = 0x20;
-	
-	public static final String SDM_DEBUG_MASTER_ENABLED = PLUGIN_ID + ".debug_master_enabled"; //$NON-NLS-1$
-	public static final String SDM_DEBUG_MASTER_LEVEL = PLUGIN_ID + ".debug_master_level"; //$NON-NLS-1$
+	public static final int DEBUG_LEVEL_MASTER = 0x08;
+	public static final int DEBUG_LEVEL_SERVER = 0x10;
+	public static final int DEBUG_LEVEL_BACKEND = 0x20;
+	public static final int DEBUG_LEVEL_PROTOCOL = 0x40;
 
-	public static final int DEBUG_MASTER_NONE = 0x00;
-	public static final int DEBUG_MASTER_TRACING = 0x01;
-	public static final int DEBUG_MASTER_TRACING_MORE = 0x02;
-	public static final int DEBUG_MASTER_OUTPUT = 0x03;
+	public static final String SDM_DEBUG_CLIENT_ENABLED = PLUGIN_ID + ".debug_client_enabled"; //$NON-NLS-1$
+	public static final String SDM_DEBUG_CLIENT_LEVEL = PLUGIN_ID + ".debug_client_level"; //$NON-NLS-1$
+
+	public static final int DEBUG_CLIENT_NONE = 0x00;
+	public static final int DEBUG_CLIENT_TRACING = 0x01;
+	public static final int DEBUG_CLIENT_TRACING_MORE = 0x02;
+	public static final int DEBUG_CLIENT_OUTPUT = 0x04;
 
 	/**
 	 * Debugger backend
 	 */
 	public static final String SDM_DEBUGGER_BACKEND_TYPE = PLUGIN_ID + ".debugger_backend"; //$NON-NLS-1$
 	public static final int SDM_DEFAULT_DEDUGGER_BACKEND_INDEX = 0;
-	public static final String[] SDM_DEBUGGER_BACKENDS = new String[] {
-		"gdb-mi" //$NON-NLS-1$
+	public static final String[] SDM_DEBUGGER_BACKENDS = new String[] { "gdb-mi" //$NON-NLS-1$
 	};
-	
+
 	/**
 	 * Path to backend debugger
 	 */

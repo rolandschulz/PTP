@@ -110,7 +110,7 @@ dbg_master_cmd_completed(sdm_message msg)
  		 * don't include the bitset, it is only added prior to sending back
  		 * to the client.
  		 */
- 		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] dbg_master_cmd_completed src=%s\n", sdm_route_get_id(),
+ 		DEBUG_PRINTF(DEBUG_LEVEL_MASTER, "dbg_master_cmd_completed src=%s\n",
  				_set_to_str(sdm_message_get_source(msg)));
 		proxy_msg_insert_bitset(m, idset_to_bitset(sdm_message_get_source(msg)), 0);
  		proxy_svr_queue_msg(dbg_proxy, m);
@@ -125,8 +125,6 @@ static int
 send_command(sdm_idset dest, int timeout, char *cmd, int len, void *cbdata)
 {
 	sdm_message 	msg;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] send_command dest=%s cmd=%s\n", sdm_route_get_id(), _set_to_str(dest), cmd);
 
 	msg = sdm_message_new(cmd, len);
 	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
@@ -145,7 +143,7 @@ DbgMasterInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs
 {
 	struct timeval	tv = { 0, CLIENT_TIMEOUT };
 
-	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] DbgMasterInit num_svrs=%d\n", sdm_route_get_id(), num_svrs);
+	DEBUG_PRINTF(DEBUG_LEVEL_MASTER, "DbgMasterInit num_svrs=%d\n", num_svrs);
 
 	tmp_idset = sdm_set_new();
 	tmp_bitset = bitset_new(num_svrs);
@@ -182,6 +180,10 @@ DbgMasterCreateSession(int num, char *host, int port)
 {
 	int			res;
 
+	DEBUG_PRINTF(DEBUG_LEVEL_MASTER, "DbgMasterCreateSession host=%s port=%d\n",
+			host != NULL ? host : "null",
+			port);
+
 	if (host != NULL)
 		res = proxy_svr_connect(dbg_proxy, host, port);
 	else
@@ -198,6 +200,7 @@ DbgMasterCreateSession(int num, char *host, int port)
 void
 DbgMasterFinish(void)
 {
+	DEBUG_PRINTS(DEBUG_LEVEL_MASTER, "DbgMasterFinish\n");
 	proxy_svr_finish(dbg_proxy);
 }
 
@@ -210,7 +213,7 @@ DbgMasterIsShutdown(void)
 	 * must be the server shutting down.
 	 */
 	if (dbg_state == SHUTDOWN_STARTED) {
-		printf("sdm: shutdown completed\n"); fflush(stdout);//TODO
+		DEBUG_PRINTS(DEBUG_LEVEL_MASTER, "shutdown completed\n");
 		dbg_state = SHUTDOWN_COMPLETED;
 		return 0;
 	}
@@ -225,6 +228,8 @@ DbgMasterStartSession(int tid, int nargs, char **args)
 	int			len;
 	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_STARTSESSION_CMD, tid);
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterStartSession", nargs, args);
 
 	proxy_msg_add_int(msg, SERVER_TIMEOUT);
 	proxy_msg_add_args(msg, nargs, args);
@@ -248,6 +253,8 @@ DbgMasterSetLineBreakpoint(int tid, int nargs, char **args)
 	bitset *	set;
 	char *		buf;
 	proxy_msg *	msg;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterSetLineBreakpoint", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -276,6 +283,8 @@ DbgMasterSetFuncBreakpoint(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterSetFuncBreakpoint", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -302,6 +311,8 @@ DbgMasterDeleteBreakpoint(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterDeleteBreakpoint", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -330,6 +341,8 @@ DbgMasterEnableBreakpoint(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterEnableBreakpoint", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -356,6 +369,8 @@ DbgMasterDisableBreakpoint(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterDisableBreakpoint", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -384,6 +399,8 @@ DbgMasterConditionBreakpoint(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterConditionBreakpoint", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -411,6 +428,8 @@ DbgMasterBreakpointAfter(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterBreakpointAfter", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -437,6 +456,8 @@ DbgMasterSetWatchpoint(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterSetWatchpoint", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -468,6 +489,8 @@ DbgMasterGo(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterGo", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -494,6 +517,8 @@ DbgMasterStep(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterStep", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -522,6 +547,8 @@ DbgMasterTerminate(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterTerminate", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -548,6 +575,8 @@ DbgMasterSuspend(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterSuspend", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -579,6 +608,8 @@ DbgMasterListStackframes(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterListStackframes", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -605,6 +636,8 @@ DbgMasterSetCurrentStackframe(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterSetCurrentStackframe", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -636,6 +669,8 @@ DbgMasterEvaluateExpression(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterEvaluateExpression", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -662,6 +697,8 @@ DbgMasterGetType(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterGetType", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -690,6 +727,8 @@ DbgMasterListLocalVariables(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterListLocalVariables", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -716,6 +755,8 @@ DbgMasterListArguments(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterListArguments", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -744,6 +785,8 @@ DbgMasterListGlobalVariables(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterListGlobalVariables", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -770,6 +813,8 @@ DbgMasterListInfoThreads(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterListInfoThreads", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -798,6 +843,8 @@ DbgMasterSetThreadSelect(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterSetThreadSelect", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -824,6 +871,8 @@ DbgMasterStackInfoDepth(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterStackInfoDepth", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -852,6 +901,8 @@ DbgMasterDataReadMemory(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterDataReadMemory", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -878,6 +929,8 @@ DbgMasterDataWriteMemory(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterDataWriteMemory", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -906,6 +959,8 @@ DbgMasterListSignals(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterListSignals", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -932,6 +987,8 @@ DbgMasterSignalInfo(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterSignalInfo", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
@@ -960,6 +1017,8 @@ DbgMasterCLIHandle(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterCLIHandle", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -985,6 +1044,8 @@ DbgMasterQuit(int tid, int nargs, char **args)
 	int			len;
 	char *		buf;
 	proxy_msg *	msg;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterQuit", nargs, args);
 
 	dbg_state = SHUTDOWN_STARTED;
 
@@ -1076,6 +1137,8 @@ DbgMasterDataEvaluateExpression(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterDataEvaluateExpression", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -1102,6 +1165,8 @@ DbgMasterEvaluatePartialExpression(int tid, int nargs, char **args)
 	proxy_msg *	msg;
 	bitset *	set;
 
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterEvaluatePartialExpression", nargs, args);
+
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
@@ -1127,6 +1192,8 @@ DbgMasterDeletePartialExpression(int tid, int nargs, char **args)
 	char *		buf;
 	proxy_msg *	msg;
 	bitset *	set;
+
+	DEBUG_PRINTA(DEBUG_LEVEL_MASTER, "DbgMasterDeletePartialExpression", nargs, args);
 
 	set = str_to_bitset(args[0], NULL);
 	if (set == NULL) {
