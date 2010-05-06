@@ -346,9 +346,12 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             {
                 // Line (possibly) starts with an integer label
                 pos = skipInteger(pos);
-                pos = Math.max(pos, 0);
                 pos = skipWhitespace(pos);
             }
+
+            pos = skipConstructLabel(pos);
+            pos = skipWhitespace(pos);
+
             return pos;
         }
 
@@ -358,7 +361,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 if (!Character.isWhitespace(line.charAt(pos)))
                     return pos;
 
-            return -1;
+            return 0;
         }
 
         private int skipInteger(int start)
@@ -367,7 +370,22 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 if (!Character.isDigit(line.charAt(pos)))
                     return pos;
 
-            return -1;
+            return 0;
+        }
+
+        private int skipConstructLabel(int start)
+        {
+            for (pos = start; pos < length; pos++)
+            {
+                if (Character.isLetterOrDigit(line.charAt(pos)))
+                    continue;
+                else if (line.charAt(pos) == ':')
+                    return pos+1;
+                else
+                    return start;
+            }
+
+            return start;
         }
 
         private void scan()
