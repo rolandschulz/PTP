@@ -13,7 +13,7 @@ package org.eclipse.ptp.pldt.openmp.core.analysis;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTNameNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
-import org.eclipse.photran.internal.core.parser.Parser.GenericASTVisitor;
+import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
