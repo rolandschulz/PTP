@@ -22,7 +22,7 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
-public class RemoteCopyTests extends TestCase {
+public class RemoteToolsTests extends TestCase {
 	private static final String USERNAME = "user"; //$NON-NLS-1$
 	private static final String PASSWORD = "password"; //$NON-NLS-1$
 	private static final String HOST = "localhost"; //$NON-NLS-1$
