@@ -306,7 +306,7 @@ void
 proxy_msg_add_string_nocopy(proxy_msg *m, char *val)
 {
 	if (val == NULL) {
-		val = "";
+		val = strdup("");
 	}
 	add_arg(m, val);
 }
