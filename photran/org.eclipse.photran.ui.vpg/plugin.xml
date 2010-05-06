@@ -188,10 +188,16 @@
             class="org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage"
             id="org.eclipse.photran.ui.SearchPathsPropertyPage"
             category="org.eclipse.photran.ui.newui.Page_head_general">
-         <!--filter
-               name="nature"
-               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
-         </filter-->
+         <filter
+               name="projectNature"
+               value="org.eclipse.photran.core.fnature">
+         </filter>            
+         <enabledWhen>
+            <or>
+              <instanceof value="org.eclipse.core.resources.IProject"/>
+              <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+            </or>          
+         </enabledWhen>
       </page>
    </extension>
 

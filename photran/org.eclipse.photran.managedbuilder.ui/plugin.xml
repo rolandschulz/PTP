@@ -36,6 +36,10 @@
                name="projectNature"
                value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
          </filter>            
+         <filter
+               name="projectNature"
+               value="org.eclipse.photran.core.fnature">
+         </filter>            
          <enabledWhen>
             <or>
 		     <instanceof value="org.eclipse.core.resources.IProject"/>

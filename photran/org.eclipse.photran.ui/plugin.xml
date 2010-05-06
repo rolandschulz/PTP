@@ -239,9 +239,13 @@
             id="org.eclipse.photran.ui.newui.Page_head_general"
             name="Fortran General"
             >
-         <filter
+         <!--filter
                name="projectNature"
                value="org.eclipse.cdt.core.cnature">
+         </filter-->
+         <filter
+               name="projectNature"
+               value="org.eclipse.photran.core.fnature">
          </filter>            
          <enabledWhen>
             <or>

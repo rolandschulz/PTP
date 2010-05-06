@@ -15,11 +15,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.photran.core.IFortranAST;
-import org.eclipse.photran.internal.cdtinterface.natures.ProjectNatures;
+import org.eclipse.photran.internal.core.FProjectNature;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
-import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
+import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -222,7 +222,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         try
         {
             if (!project.isAccessible()) return false;
-            if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID)) return false;
+            if (!project.hasNature(FProjectNature.F_NATURE_ID)) return false;
             return FortranCorePlugin.inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
         }
         catch (CoreException e)
@@ -238,9 +238,9 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
             if (!project.isAccessible())
                 return "The project " + project.getName() + " is not accessible.  "
                      + "Please make sure that it is open and that the permissions are set correctly.";
-            else if (!project.hasNature(ProjectNatures.C_NATURE_ID) && !project.hasNature(ProjectNatures.CC_NATURE_ID))
-                return "The project " + project.getName() + " is not a Fortran, C, or C++ project.  "
-                     + "Plase convert it to a Fortran, C, or C++ project and enable analysis and "
+            else if (!project.hasNature(FProjectNature.F_NATURE_ID))
+                return "The project " + project.getName() + " is not a Fortran project.  "
+                     + "Plase convert it to a Fortran project and enable analysis and "
                      + "refactoring in the project properties.";
             else if (!SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"))
                 return "Please enable analysis and refactoring in the project properties for "
