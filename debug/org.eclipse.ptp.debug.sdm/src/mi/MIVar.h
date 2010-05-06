@@ -51,21 +51,20 @@ struct MIVarChange {
 };
 typedef struct MIVarChange	MIVarChange;
 
-extern MIVar *MIVarNew(void);
-extern void MIVarFree(MIVar *var);
+extern MIVar *			MIVarNew(void);
+extern void				MIVarFree(MIVar *var);
 
-extern MIVarChange *MIVarChangeNew(void);
-extern void MIVarChangeFree(MIVarChange *var);
+extern MIVarChange *	MIVarChangeNew(void);
+extern void				MIVarChangeFree(MIVarChange *var);
 
-extern MIVar *MIVarParse(List *results);
-extern MIVar *MIGetVarCreateInfo(MICommand *cmd);
-extern void MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd);
-extern char *MIGetVarEvaluateExpressionInfo(MICommand *cmd);
-extern char *MIGetDataEvaluateExpressionInfo(MICommand *cmd);
-
-extern void MIGetVarUpdateInfo(MICommand *cmd, List **varchanges);
-extern MIVar *MIGetVarInfoType(MICommand *cmd);
-extern void MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var);
+extern MIVar *			MIVarParse(List *results);
+extern MIVar *			MIGetVarCreateInfo(MICommand *cmd);
+extern void				MIGetVarListChildrenInfo(MICommand *cmd, MIVar *var);
+extern char *			MIGetVarEvaluateExpressionInfo(MICommand *cmd);
+extern char *			MIGetDataEvaluateExpressionInfo(MICommand *cmd);
+extern void				MIGetVarUpdateInfo(MICommand *cmd, List **varchanges);
+extern MIVar *			MIGetVarInfoType(MICommand *cmd);
+extern void				MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var);
 #endif /* _MIVAR_H_ */
 
 
