@@ -39,11 +39,29 @@ debug_printf(int level, char *fmt, ...)
 	va_start(ap, fmt);
 
 	if ((level & debug_level) == level) {
-		fprintf(debug_out, "SDM[%d]: ", level);
+		fprintf(debug_out, "SDM: ");
 		vfprintf(debug_out, fmt, ap);
 		fflush(debug_out);
 	}
 
 	va_end(ap);
+}
+
+void
+debug_printargs(int level, char *msg, int nargs, char **args)
+{
+	int	i;
+
+	if ((level & debug_level) == level) {
+		fprintf(debug_out, "SDM: %s(", msg);
+		for (i = 0; i < nargs; i++) {
+			if (i > 0) {
+				fprintf(debug_out, ",");
+			}
+			fprintf(debug_out, "%s", args[i]);
+		}
+		fprintf(debug_out, ")\n");
+		fflush(debug_out);
+	}
 }
 #endif /* DEBUG */

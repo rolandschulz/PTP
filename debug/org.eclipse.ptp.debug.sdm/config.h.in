@@ -9,15 +9,18 @@ extern void debug_printf(int, char *, ...);
 #define DEBUG_LEVEL_STARTUP		0x01
 #define DEBUG_LEVEL_MESSAGES	0x02
 #define DEBUG_LEVEL_ROUTING		0x04
-#define DEBUG_LEVEL_SERVER		0x08
-#define DEBUG_LEVEL_BACKEND		0x10
-#define DEBUG_LEVEL_PROTOCOL	0x20
-#define TEST_DEBUG_LEVEL(level)			((debug_level&(level))==(level))
-#define DEBUG_PRINTF(level,format,...)	debug_printf((level),(format),__VA_ARGS__)
-#define DEBUG_PRINTS(level,str)			debug_printf((level),"%s",(str))
+#define DEBUG_LEVEL_MASTER		0x08
+#define DEBUG_LEVEL_SERVER		0x10
+#define DEBUG_LEVEL_BACKEND		0x20
+#define DEBUG_LEVEL_PROTOCOL	0x40
+#define TEST_DEBUG_LEVEL(level)						((debug_level&(level))==(level))
+#define DEBUG_PRINTF(level,format,...)				debug_printf((level),(format),__VA_ARGS__)
+#define DEBUG_PRINTS(level,str)						debug_printf((level),"%s",(str))
+#define DEBUG_PRINTA(level,str,nargs,args)			debug_printargs((level),(str),(nargs),(args))
 #else /* DEBUG */
 #define DEBUG_PRINTF(level,format,...)
 #define DEBUG_PRINTS(level,str)
+#define DEBUG_PRINTA(level,str,nargs,args)
 #endif /* DEBUG */
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
