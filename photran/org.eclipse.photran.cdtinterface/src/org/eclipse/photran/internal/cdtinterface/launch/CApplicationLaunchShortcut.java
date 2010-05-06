@@ -73,7 +73,10 @@ import org.eclipse.ui.dialogs.TwoPaneElementSelector;
 
 public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 
-	public void launch(IEditorPart editor, String mode) {
+	// JO
+    private static final String ID_LAUNCH_FORTRAN_APP = "org.eclipse.photran.launch.localCLaunch";
+
+    public void launch(IEditorPart editor, String mode) {
 		searchAndLaunch(new Object[] { editor.getEditorInput()}, mode);
 	}
 
@@ -198,7 +201,7 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 			wc.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, bin.getCProject().getElementName());
 			wc.setMappedResources(new IResource[] {bin.getResource().getProject()});
 			wc.setAttribute(ICDTLaunchConfigurationConstants.ATTR_WORKING_DIRECTORY, (String) null);
-			wc.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN, true);
+			wc.setAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN, false /*true*/); // JO modified
 			wc.setAttribute(
 				ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE,
 				ICDTLaunchConfigurationConstants.DEBUGGER_MODE_RUN);
@@ -207,10 +210,12 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 	        // Workaround for bug 262840: select the standard CDT launcher by default.
 	        HashSet<String> set = new HashSet<String>();
 	        set.add(mode);
+	        
 	        try {
 	            ILaunchDelegate preferredDelegate = wc.getPreferredDelegate(set);
 	            if (preferredDelegate == null) {
-                    wc.setPreferredLaunchDelegate(set, "org.eclipse.cdt.cdi.launch.localCLaunch");
+                    //wc.setPreferredLaunchDelegate(set, "org.eclipse.cdt.cdi.launch.localCLaunch"); // JO
+                    wc.setPreferredLaunchDelegate(set, ID_LAUNCH_FORTRAN_APP); // JO
 	            }
 	        } catch (CoreException e) {}
 			// End workaround for bug 262840
@@ -239,7 +244,8 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 	 * @return ILaunchConfigurationType
 	 */
 	protected ILaunchConfigurationType getCLaunchConfigType() {
-		return getLaunchManager().getLaunchConfigurationType(ICDTLaunchConfigurationConstants.ID_LAUNCH_C_APP);
+		//return getLaunchManager().getLaunchConfigurationType(ICDTLaunchConfigurationConstants.ID_LAUNCH_C_APP); // JO
+        return getLaunchManager().getLaunchConfigurationType(ID_LAUNCH_FORTRAN_APP); // JO
 	}
 
 	protected ILaunchManager getLaunchManager() {
