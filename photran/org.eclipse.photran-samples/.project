@@ -78,6 +78,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.photran.core.fnature</nature>
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.make.core.makeNature</nature>
 		<nature>org.eclipse.cdt.make.core.ScannerConfigNature</nature>
