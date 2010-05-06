@@ -7,9 +7,9 @@ import org.eclipse.ptp.core.tests.FileStoreTests;
 import org.eclipse.ptp.core.tests.RemoteConnectionTests;
 import org.eclipse.ptp.core.tests.SFTPTests;
 
-public class FileManagerTestSuite {
+public class RemoteCoreTestSuite {
 	public static Test suite() {
-		TestSuite suite = new TestSuite(FileManagerTestSuite.class.getName());
+		TestSuite suite = new TestSuite(RemoteCoreTestSuite.class.getName());
 		
 		suite.addTestSuite(FileStoreTests.class);
 		suite.addTestSuite(RemoteConnectionTests.class);
