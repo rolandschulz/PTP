@@ -172,7 +172,7 @@
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.RefactoringActionSet">
          <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <!--part id="org.eclipse.photran.ui.FixedFormFortranEditor"/-->
+         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
       </actionSetPartAssociation>
    </extension>
 
@@ -587,8 +587,20 @@
      />
    </extension>
    <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
+         <!-- Omitting this since most of the actions are only meaningful when an editor is open:
+         <actionSet id="org.eclipse.photran.ui.DebugActionSet"/-->
+         <actionSet id="org.eclipse.rephraserengine.ui.DebugActionSet"/>
+      </perspectiveExtension>
+   </extension>
+   <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.DebugActionSet">
+         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+      </actionSetPartAssociation>
+      <actionSetPartAssociation targetID="org.eclipse.rephraserengine.ui.DebugActionSet">
          <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
          <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
       </actionSetPartAssociation>
