@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.photran.internal.core.FProjectNature;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
@@ -65,6 +66,7 @@ abstract public class BaseTestFramework extends TestCase {
 	            PhotranVPG.getDatabase().clearDatabase();
 	            
 	            cproject = CProjectHelper.createCCProject("PhotranTestProject" + (++n), "bin", IPDOMManager.ID_NO_INDEXER); //$NON-NLS-1$ //$NON-NLS-2$
+	            CProjectHelper.addNatureToProject(cproject.getProject(), FProjectNature.F_NATURE_ID, null);
 	        
 	            project = cproject.getProject();
 	            
