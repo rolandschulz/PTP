@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.resources.IResourceFilter;
 
@@ -39,8 +40,8 @@ public class PhotranResourceFilter implements IResourceFilter
                 && PhotranVPG.getInstance().shouldProcessProject(((IFile)resource).getProject())
                 && PhotranVPG.getInstance().shouldProcessFile((IFile)resource)
                 && ((IFile)resource).isAccessible()
-                /*&& !FortranCorePlugin.hasFixedFormContentType((IFile)resource)*/
-                /*&& !FortranCorePlugin.hasCppContentType((IFile)resource)*/;
+                && (!FortranCorePlugin.hasFixedFormContentType((IFile)resource) || FortranResourceRefactoring.FIXED_FORM_REFACTORING_ENABLED)
+                && !FortranCorePlugin.hasCppContentType((IFile)resource);
         else
             return true;
     }

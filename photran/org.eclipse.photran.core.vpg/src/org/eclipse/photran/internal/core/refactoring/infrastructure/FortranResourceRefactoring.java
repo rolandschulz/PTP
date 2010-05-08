@@ -74,6 +74,9 @@ public abstract class FortranResourceRefactoring
     extends VPGResourceRefactoring<IFortranAST, Token, PhotranVPG>
     implements IResourceRefactoring
 {
+    // TEMPORARY -- So we can continue working on fixed form refactoring while effectively disabling it in the public 6.0 release
+    public static final boolean FIXED_FORM_REFACTORING_ENABLED = System.getenv("ENABLE_FIXED_FORM_REFACTORING") != null;
+    
     @Override
     protected final PhotranVPG getVPG()
     {
@@ -83,18 +86,20 @@ public abstract class FortranResourceRefactoring
     @Override
     protected final void preCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        boolean fixForm = false;
         status.addWarning("C preprocessor directives are IGNORED by the refactoring engine.  Use at your own risk.");
      
-        for(IFile file : this.selectedFiles)
+        if (FIXED_FORM_REFACTORING_ENABLED)
         {
-            if(FortranCorePlugin.hasFixedFormContentType(file))
-                fixForm = true;
+            for (IFile file : this.selectedFiles)
+            {
+                if (FortranCorePlugin.hasFixedFormContentType(file))
+                {
+                    status.addWarning("Indentation and line length is NOT checked when refactoring FIXED form files. " +
+                        "Use at your own risk.");
+                    return;
+                }
+            }
         }
-        
-        if(fixForm)
-            status.addWarning("Indentation and line length is NOT checked when refactoring FIXED form files. " +
-                   "Use at your own risk.");
     }
 
     @Override
@@ -133,6 +138,8 @@ public abstract class FortranResourceRefactoring
 
     protected void removeFixedFormFilesFrom(Collection<IFile> files, RefactoringStatus status)
     {
+        if (FIXED_FORM_REFACTORING_ENABLED) return;
+        
         Set<IFile> filesToRemove = new HashSet<IFile>();
 
         for (IFile file : files)

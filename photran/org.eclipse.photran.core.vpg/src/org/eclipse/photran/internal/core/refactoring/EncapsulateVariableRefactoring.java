@@ -45,9 +45,9 @@ import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IAccessId;
 import org.eclipse.photran.internal.core.parser.IExpr;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.rephraserengine.core.refactorings.UserInputBoolean;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
@@ -166,7 +166,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         checkCanBeEncapsulated(selectedTokenDef);
 
         allRefs = selectedTokenDef.findAllReferences(true);
-        //processTokenRefs(allRefs);
+        checkForFixedFormReferences(allRefs);
     }
 
     protected void checkCanBeEncapsulated(Definition def) throws PreconditionFailure
@@ -194,15 +194,15 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         return modNode != null;
     }
 
-    protected void processTokenRefs(Set<PhotranTokenRef> refs) throws PreconditionFailure
+    protected void checkForFixedFormReferences(Set<PhotranTokenRef> refs) throws PreconditionFailure
     {
-        for(PhotranTokenRef ref : refs)
+        for (PhotranTokenRef ref : refs)
             checkForFixedForm(ref.getFile());
     }
 
     protected void checkForFixedForm(IFile file) throws PreconditionFailure
     {
-        if(FortranCorePlugin.hasFixedFormContentType(file))
+        if (FortranCorePlugin.hasFixedFormContentType(file) && !FIXED_FORM_REFACTORING_ENABLED)
         {
             fail("Fixed form files cannot currently be refactored. " +
                     "File " + file.getName() + " is in fixed form and "+

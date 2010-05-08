@@ -11,7 +11,6 @@
 package org.eclipse.photran.internal.core.refactoring;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -64,7 +63,7 @@ public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
         throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        //removeFixedFormFilesFrom(this.selectedFiles, status);
+        removeFixedFormFilesFrom(this.selectedFiles, status);
         removeCpreprocessedFilesFrom(this.selectedFiles, status);        
     }
 

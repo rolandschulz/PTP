@@ -27,7 +27,6 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.interfaces.IRenameRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
-import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Refactoring to rename identifiers in Fortran programs.
@@ -156,7 +155,8 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
 
         allReferences = definitionToRename.findAllReferences(shouldBindInterfacesAndExternals);
-        //removeFixedFormReferences(status);
+        removeFixedFormReferences(status);
+        removeCPreprocessedReferences(status);
         checkIfReferencesCanBeRenamed(pm);
 
         checkForConflictingBindings(
@@ -203,6 +203,8 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
 
     private void removeFixedFormReferences(RefactoringStatus status)
     {
+        if (FIXED_FORM_REFACTORING_ENABLED) return;
+        
         HashSet<IFile> fixedFormFiles = new HashSet<IFile>();
         HashSet<IFile> freeFormFiles = new HashSet<IFile>();
         HashSet<PhotranTokenRef> referencesToRemove = new HashSet<PhotranTokenRef>();
@@ -234,9 +236,9 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         allReferences.removeAll(referencesToRemove);
     }
     
-    private void removeCPreprocessedFormReferences(RefactoringStatus status)
+    private void removeCPreprocessedReferences(RefactoringStatus status)
     {
-        HashSet<IFile> cppFormFiles = new HashSet<IFile>();
+        HashSet<IFile> cppFiles = new HashSet<IFile>();
         HashSet<IFile> freeFormFiles = new HashSet<IFile>();
         HashSet<PhotranTokenRef> referencesToRemove = new HashSet<PhotranTokenRef>();
 
@@ -244,7 +246,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         {
             IFile file = reference.getFile();
 
-            if (cppFormFiles.contains(file))
+            if (cppFiles.contains(file))
             {
                 referencesToRemove.add(reference);
             }
@@ -254,8 +256,8 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
             }
             else if (FortranCorePlugin.hasCppContentType(file))
             {
-                cppFormFiles.add(file);
-                status.addError("The C-Preprocessed form file " + file.getName() + " will not be refactored.");
+                cppFiles.add(file);
+                status.addError("The C-preprocessed file " + file.getName() + " will not be refactored.");
                 referencesToRemove.add(reference);
             }
             else

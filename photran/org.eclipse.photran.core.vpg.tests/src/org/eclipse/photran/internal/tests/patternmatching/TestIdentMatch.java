@@ -18,6 +18,7 @@ import junit.framework.TestCase;
  */
 public class TestIdentMatch extends TestCase
 {
+    public void test() {}
 //    public void setUp()
 //    {
 //        ASTMatcher.patternVariableSuffix = "";

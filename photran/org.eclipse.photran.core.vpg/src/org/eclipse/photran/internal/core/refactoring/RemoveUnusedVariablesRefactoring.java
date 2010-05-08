@@ -48,7 +48,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
-        //removeFixedFormFilesFrom(this.selectedFiles, status);
+        removeFixedFormFilesFrom(this.selectedFiles, status);
         removeCpreprocessedFilesFrom(this.selectedFiles, status);
         
         ensureAllScopesAreImplicitNone(status);
