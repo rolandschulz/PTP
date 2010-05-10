@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009 IBM Corporation.
+ * Copyright (c) 2009,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -238,9 +238,12 @@ public class MarkerManager {
 		// What if some markers were from other things? need to use only our specific plugin's marker id.
 		String f1=itemlist.get(0).getFile();
 		IResource res1 = getResource(f1);
-		
-		removeMarkers(res1,markerID);
-		
+		try {
+			removeMarkers(res1, markerID);
+		} catch (Exception e) {
+			System.out.println("Error deleting markers on file: "+res1);
+			e.printStackTrace();
+		}
 		// for root nodes, may have no parent ID
 		String parentID="";
 		IFeedbackItem temp=itemlist.get(0);
