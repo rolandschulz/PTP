@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,12 +33,18 @@ public class THGraphNode implements Serializable {
 	private List<THGraphEdge> fOutgoing= Collections.emptyList();
 	private List<THGraphEdge> fIncoming= Collections.emptyList();
 	private ICElement fElement;
+	private String fPath;
 	private ICElement[] fMembers= null;
 	
-	public THGraphNode(ICElement element) {
+	public THGraphNode(ICElement element, String path) {
 		fElement= element;
+		fPath = path;
 	}
 	
+	public String getPath() {
+		return fPath;
+	}
+
 	public void startEdge(THGraphEdge outgoing) {
 		fOutgoing= addElement(fOutgoing, outgoing);
 	}

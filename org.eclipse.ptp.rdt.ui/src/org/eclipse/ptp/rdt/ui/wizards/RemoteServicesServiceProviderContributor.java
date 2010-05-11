@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
 	private IRemoteServices fSelectedProvider;
 	private Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 	private IRemoteConnection fSelectedConnection;
+ 	private RemoteBuildServiceFileLocationWidget fBuildConfigLocationWidget;
 
 	
 	public void configureServiceProvider(IServiceProvider provider, final Composite container) {
@@ -101,7 +102,22 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
         
         // populate the combo with a list of providers
         populateConnectionCombo(connectionCombo);
-           
+       
+        
+        String configPath = fProvider.getConfigLocation();
+        if(configPath == null)
+        	configPath = RemoteBuildServiceFileLocationWidget.getDefaultPath(fSelectedProvider, fSelectedConnection);
+
+        fBuildConfigLocationWidget = new RemoteBuildServiceFileLocationWidget(container, SWT.NONE, fSelectedProvider, fSelectedConnection, configPath);
+        GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
+        data.horizontalSpan = 3;
+        fBuildConfigLocationWidget.setLayoutData(data); // set layout to grab horizontal space
+        fBuildConfigLocationWidget.addPathListener(new IIndexFilePathChangeListener() {
+			public void pathChanged(String newPath) {
+				updateProvider();
+			}
+		});
+        
         // new connection button
         final Button newConnectionButton = new Button(container, SWT.PUSH);
         newConnectionButton.setText(Messages.getString("RemoteServicesProviderSelectionDialog.1")); //$NON-NLS-1$
@@ -116,6 +132,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
 				}
 				// refresh list of connections
 				populateConnectionCombo(connectionCombo);
+				updateProvider();
 			}
         });
         
@@ -125,6 +142,8 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
 				fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
 				populateConnectionCombo(connectionCombo);
 				updateNewConnectionButtonEnabled(newConnectionButton);
+				updateProvider();
+				fBuildConfigLocationWidget.update(fSelectedProvider, fSelectedConnection);
 			}
         });
         
@@ -134,6 +153,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
 				fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 				updateNewConnectionButtonEnabled(newConnectionButton);
 				updateProvider();
+				fBuildConfigLocationWidget.update(fSelectedProvider, fSelectedConnection);
 			}
         });
         
@@ -173,14 +193,13 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
         // set selected connection to be the first one if we're not restoring from settings
         connectionCombo.select(toSelect);
         fSelectedConnection = fComboIndexToRemoteConnectionMap.get(toSelect);
-        updateProvider();
 	}
     
 	protected void updateProvider() {
 		// set the provider
 		fProvider.setRemoteToolsProviderID(fSelectedProvider.getId());
 		fProvider.setRemoteToolsConnection(fSelectedConnection);
-
+		fProvider.setConfigLocation(fBuildConfigLocationWidget.getConfigLocationPath());		
 	}
 	
 

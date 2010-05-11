@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,32 +19,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.internal.filesystem.local.LocalFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
+import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.core.RDTLog;
+import org.eclipse.ptp.rdt.core.remotemake.RemoteMakeBuilder;
+import org.eclipse.ptp.rdt.core.resources.RemoteMakeNature;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceModelManager;
-import org.eclipse.ptp.services.core.IServiceProvider;
-import org.eclipse.ptp.services.core.ServiceModelManager;
-import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
-
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
+import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
+import org.eclipse.rse.core.model.IHost;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Converts existing CDT projects to RDT projects.
@@ -58,12 +64,12 @@ import org.eclipse.swt.widgets.Listener;
  */
 public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
     
-    private static final String WZ_TITLE = "WizardProjectConversion.title"; //$NON-NLS-1$
-    private static final String WZ_DESC = "WizardProjectConversion.description"; //$NON-NLS-1$
-    ServiceProviderConfigurationWidget fServiceModelWidget;
-	Group remoteServices;
+	protected static final String WZ_TITLE = "WizardProjectConversion.title"; //$NON-NLS-1$
+	protected static final String WZ_DESC = "WizardProjectConversion.description"; //$NON-NLS-1$
+    protected ServiceProviderConfigurationWidget fServiceModelWidget;
+    protected Group remoteServices;
 	
-	Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
+    protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
 	
 	/**
 	 * Constructor for ConvertToRemoteWizardPage.
@@ -94,36 +100,49 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
      * - non-hidden projects
      * - non-RDT projects 
      * - projects that does not have remote systems temporary nature
+     * - projects that are located remotely
      */
     public boolean isCandidate(IProject project) {
     	boolean a = false;
     	boolean b = false;
     	boolean c = false;
-    	a = !project.isHidden();    	
+    	boolean d = false;
+    	a = !project.isHidden();
 		try {
-			b = !project.hasNature(RemoteNature.REMOTE_NATURE_ID);
+			//b = !project.hasNature(RemoteNature.REMOTE_NATURE_ID);
+			try {
+				ServiceModelManager.getInstance().getConfigurations(project);
+			}
+			catch(ProjectNotConfiguredException e) {
+				b = true;
+			}
 			c = !project.hasNature("org.eclipse.rse.ui.remoteSystemsTempNature"); //$NON-NLS-1$
+			
+			IHost host = RSEUtils.getConnection(project.getLocationURI());
+	    	if (host != null) {
+	    		d = !host.getSystemType().isLocal(); 
+	    	} else {
+	    		IFileStore fileStore = EFS.getStore(project.getLocationURI());
+				if (fileStore != null) {
+					if (!(fileStore instanceof LocalFile)) {
+						d = true;
+					}
+				}
+	    	}
+			
 		} catch (CoreException e) {
 			RDTLog.logError(e);
 		}
-		return a && b && c; 
+		
+
+		return a && b && c && d; 
     }
     
     /**
      * Add remote nature and configure remote services for the project
      */
     public void convertProject(IProject project, String bsId, IProgressMonitor monitor) throws CoreException{
-		monitor.beginTask(Messages.getString("WizardProjectConversion.monitor.convertingToRemoteProject"), 3); //$NON-NLS-1$
-		try {
-			RemoteNature.addRemoteNature(project, monitor);
-			configureServicesForRemoteProject(project);
-		} catch (InvocationTargetException e) {
-			RDTLog.logError(e);
-		} catch (InterruptedException e) {
-			RDTLog.logError(e);
-		} finally {
-			monitor.done();
-		}
+		convertProject(project, monitor);
     }
     
     /* (non-Javadoc)
@@ -131,14 +150,15 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	 */
 	@Override
 	public void convertProject(IProject project, IProgressMonitor monitor, String projectID) throws CoreException {
+		convertProject(project, monitor);
+	}
+	
+	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.getString("WizardProjectConversion.monitor.convertingToRemoteProject"), 3); //$NON-NLS-1$
 		try {
-			RemoteNature.addRemoteNature(project, monitor);
+			RemoteNature.addRemoteNature(project, new SubProgressMonitor(monitor,1));
+			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.BUILDER_ID, monitor);
 			configureServicesForRemoteProject(project);
-		} catch (InvocationTargetException e) {
-			RDTLog.logError(e);
-		} catch (InterruptedException e) {
-			RDTLog.logError(e);
 		} finally {
 			monitor.done();
 		}
@@ -150,7 +170,7 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 		remoteServices.setText(Messages.getString("WizardProjectConversion.servicesTableLabel")); //$NON-NLS-1$
 		remoteServices.setLayout(new FillLayout());
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		data.heightHint = 300;
+		data.heightHint = 350;
 		remoteServices.setLayoutData(data);
 		
 		
@@ -171,26 +191,30 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 				}							
 			}			
 		});
-		
-		
+		Shell shell = getContainer().getShell();
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,RDTHelpContextIds.CONVERTING_TO_REMOTE_PROJECT);
 	}
 
 	
 	@Override
 	public void doRun(IProgressMonitor monitor, String projectID, String bsId)throws CoreException {
+		monitor.beginTask(Messages.getString("ConvertToRemoteWizardPage.0"), 2); //$NON-NLS-1$
 		fServiceModelWidget.applyChangesToConfiguration();
-		super.doRun(monitor, projectID, bsId);
+		super.doRun(new SubProgressMonitor(monitor, 1), projectID, bsId);
 		try {
 			ServiceModelManager.getInstance().saveModelConfiguration();
 		} catch (IOException e) {
 			UIPlugin.log(e);
+		} finally {
+			monitor.done();
 		}
 	}
 
 	
-	private IServiceConfiguration getConfig(IProject project) {
+	protected IServiceConfiguration getConfig(IProject project) {
 		IServiceConfiguration config = projectConfigs.get(project);
-		if(config == null) {
+		IHost host = RSEUtils.getConnection(project.getLocationURI());
+		if(config == null && host != null) {
 			config = ServiceModelManager.getInstance().newServiceConfiguration(project.getName());
 			projectConfigs.put(project, config);
 		}
@@ -198,21 +222,15 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	}
 	
 	
-	private void changeProject(IProject project) {
+	protected void changeProject(IProject project) {
 		IServiceConfiguration config = getConfig(project);
     	fServiceModelWidget.applyChangesToConfiguration();
     	fServiceModelWidget.setServiceConfiguration(config);
     	remoteServices.setText(MessageFormat.format(Messages.getString("WizardProjectConversion.servicesTableForProjectLabel"), new Object[] {project.getName()}));  //$NON-NLS-1$
-    	setPageComplete(true);
 	}
 	
-	
-	
-
-	private void configureServicesForRemoteProject(IProject project) throws InvocationTargetException, InterruptedException {
+	protected void configureServicesForRemoteProject(IProject project) {
 		ServiceModelManager.getInstance().addConfiguration(project, getConfig(project));
 	}
 	
-
-
 }
