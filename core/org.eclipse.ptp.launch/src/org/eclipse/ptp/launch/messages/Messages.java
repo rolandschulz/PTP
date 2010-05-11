@@ -75,6 +75,15 @@ public class Messages extends NLS {
 	public static String DebuggerTab_Mode_not_supported;
 	public static String DebuggerTab_No_debugger_available;
 
+	public static String WorkingDirectoryBlock_0;
+	public static String WorkingDirectoryBlock_1;
+	public static String WorkingDirectoryBlock_2;
+	public static String WorkingDirectoryBlock_3;
+	public static String WorkingDirectoryBlock_4;
+	public static String WorkingDirectoryBlock_5;
+	public static String WorkingDirectoryBlock_6;
+
+	public static String WorkingDirectoryBlock_7;
 	public static String WorkingDirectoryBlock_Working_directory;
 	public static String WorkingDirectoryBlock_Working_directory_colon;
 	public static String WorkingDirectoryBlock_Use_default_working_directory;
@@ -118,7 +127,7 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_Error_converting_rules;
 	public static String AbstractParallelLaunchConfigurationDelegate_Parallel_launcher_does_not_support;
 	public static String AbstractParallelLaunchConfigurationDelegate_Unsupported_resource_manager_type;
-	
+
 	public static String PTPLaunchPlugin_0;
 	public static String PTPLaunchPlugin_1;
 	public static String PTPLaunchPlugin_2;
@@ -126,7 +135,7 @@ public class Messages extends NLS {
 	public static String PTPLaunchPlugin_4;
 	public static String PTPLaunchPlugin_5;
 	public static String PTPLaunchPlugin_6;
-	
+
 	public static String LauncherExecutionTab_ArgumentsFrame_CommandLineLabel;
 	public static String LauncherExecutionTab_ArgumentsFrame_Title;
 	public static String LauncherExecutionTab_ObserverFrame_BashCommandsAfterLabel;

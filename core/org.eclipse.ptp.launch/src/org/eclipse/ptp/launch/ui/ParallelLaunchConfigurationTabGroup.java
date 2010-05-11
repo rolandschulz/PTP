@@ -19,28 +19,18 @@
 package org.eclipse.ptp.launch.ui;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
-import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 
 /**
  * Main parallel launch configuration tab group.
  * 
- * This defines the order and type of tabs that will be displayed when a new parallel
- * launch configuration is created.
+ * This is a placeholder for the tabs that will be displayed when a new parallel
+ * launch configuration is created. Tabs are contributed using the
+ * launchConfigurationTabs extension point.
  */
 public class ParallelLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-    		ILaunchConfigurationTab tabs[] = {
-        		new ResourcesTab(),
-        		new ApplicationTab(), 
-        		new EnhancedSynchronizeTab(),
-        		new DebuggerTab(false),
-        		new ArgumentsTab(),
-        		new SourceLookupTab(),
-        		new EnvironmentTab(), 
-        		new CommonTab() };
-    		setTabs(tabs);
-	}    
+		setTabs(new ILaunchConfigurationTab[0]);
+	}
 }

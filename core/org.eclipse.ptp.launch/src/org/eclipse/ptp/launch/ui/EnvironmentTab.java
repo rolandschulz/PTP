@@ -17,42 +17,82 @@ import org.eclipse.debug.core.ILaunchManager;
 
 /**
  * A modified version of {@link org.eclipse.debug.ui.EnvironmentTab}, where the
- * "append" and "replace" options are always disabled, and set to "append". 
+ * "append" and "replace" options are always disabled, and set to "append".
+ * 
  * @author Daniel Felix Ferber
  */
 public class EnvironmentTab extends org.eclipse.debug.ui.EnvironmentTab {
+	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.environmentTab"; //$NON-NLS-1$
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
+	 */
+	@Override
+	public String getId() {
+		return TAB_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.EnvironmentTab#updateAppendReplace()
+	 */
 	@Override
 	protected void updateAppendReplace() {
 		appendEnvironment.setEnabled(false);
-		replaceEnvironment.setEnabled(false);	
+		replaceEnvironment.setEnabled(false);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.EnvironmentTab#setDefaults(org.eclipse.debug.core
+	 * .ILaunchConfigurationWorkingCopy)
+	 */
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		/*
-		 * Ensure that the "append"/"replace" attribute is always set to "append", 
-		 * ignoring whatever was set as default by the original implementation.
+		 * Ensure that the "append"/"replace" attribute is always set to
+		 * "append", ignoring whatever was set as default by the original
+		 * implementation.
 		 */
 		super.setDefaults(configuration);
 		configuration.setAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.EnvironmentTab#initializeFrom(org.eclipse.debug.
+	 * core.ILaunchConfiguration)
+	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
 		/*
-		 * Ensure that the "append"/"replace" controls are always shown as "append", 
-		 * ignoring whatever was shown by the original implementation.
+		 * Ensure that the "append"/"replace" controls are always shown as
+		 * "append", ignoring whatever was shown by the original implementation.
 		 */
 		appendEnvironment.setSelection(true);
-        replaceEnvironment.setSelection(false);
+		replaceEnvironment.setSelection(false);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.EnvironmentTab#performApply(org.eclipse.debug.core
+	 * .ILaunchConfigurationWorkingCopy)
+	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		/*
-		 * Ensure that the "append"/"replace" attribute is always set to "append", 
-		 * ignoring whatever was set by the original implementation.
+		 * Ensure that the "append"/"replace" attribute is always set to
+		 * "append", ignoring whatever was set by the original implementation.
 		 */
 		super.performApply(configuration);
 		configuration.setAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);

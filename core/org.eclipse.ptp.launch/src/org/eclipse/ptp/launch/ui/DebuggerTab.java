@@ -35,18 +35,24 @@ import org.eclipse.swt.widgets.Composite;
  * TODO: NEEDS TO BE DOCUMENTED
  */
 public class DebuggerTab extends AbstractDebuggerTab {
-	final protected boolean fAttachMode;
+	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.debuggerTab"; //$NON-NLS-1$
 
+	protected final boolean fAttachMode;
 	protected Button fStopInMain;
 	protected Button fAttachButton;
 
 	public DebuggerTab(boolean attachMode) {
 		fAttachMode = attachMode;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#createControl(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#createControl(
+	 * org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
@@ -60,15 +66,31 @@ public class DebuggerTab extends AbstractDebuggerTab {
 		createDebuggerGroup(comp, 2);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
 	 */
+	@Override
+	public String getId() {
+		return TAB_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#initializeFrom
+	 * (org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
 	public void initializeFrom(ILaunchConfiguration config) {
 		setInitializing(true);
 		super.initializeFrom(config);
 		try {
 			/*
-			 * Only set default debugger if there is a resource manager selected.
+			 * Only set default debugger if there is a resource manager
+			 * selected.
 			 */
 			String id = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, EMPTY_STRING);
 			loadDebuggerComboBox(config, id, getResourceManager(config) == null);
@@ -78,17 +100,23 @@ public class DebuggerTab extends AbstractDebuggerTab {
 		setInitializing(false);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#isValid(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public boolean isValid(ILaunchConfiguration config) {
 		if (!validateDebuggerConfig(config)) {
 			return false;
 		}
 		IPDebugConfiguration debugConfig = getDebugConfig();
-		String mode = fAttachMode ? IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH : IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN;
+		String mode = fAttachMode ? IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH
+				: IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN;
 		if (!debugConfig.supportsMode(mode)) {
-			setErrorMessage(NLS.bind(Messages.DebuggerTab_Mode_not_supported, new Object[]{mode}));
+			setErrorMessage(NLS.bind(Messages.DebuggerTab_Mode_not_supported, new Object[] { mode }));
 			return false;
 		}
 		if (super.isValid(config) == false) {
@@ -97,29 +125,44 @@ public class DebuggerTab extends AbstractDebuggerTab {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#performApply(org
+	 * .eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
+	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy config) {
 		super.performApply(config);
 		if (fAttachMode) {
-			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH);
+			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE,
+					IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH);
 		} else {
 			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, fStopInMain.getSelection());
-			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN);
+			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE,
+					IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#setDefaults(org
+	 * .eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
+	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy config) {
 		super.setDefaults(config);
 		if (fAttachMode) {
-			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH);
+			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE,
+					IPTPLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH);
 		} else {
-			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE, IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN);
-			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, IPTPLaunchConfigurationConstants.DEBUGGER_STOP_AT_MAIN_DEFAULT);
+			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_START_MODE,
+					IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN);
+			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN,
+					IPTPLaunchConfigurationConstants.DEBUGGER_STOP_AT_MAIN_DEFAULT);
 		}
 	}
 
@@ -144,6 +187,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			data.horizontalAlignment = GridData.BEGINNING;
 			fStopInMain.setLayoutData(data);
 			fStopInMain.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (!isInitializing()) {
 						updateLaunchConfigurationDialog();
@@ -161,7 +205,8 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	protected void initializeCommonControls(ILaunchConfiguration config) {
 		try {
 			if (!fAttachMode) {
-				fStopInMain.setSelection(config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, IPTPLaunchConfigurationConstants.DEBUGGER_STOP_AT_MAIN_DEFAULT));
+				fStopInMain.setSelection(config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN,
+						IPTPLaunchConfigurationConstants.DEBUGGER_STOP_AT_MAIN_DEFAULT));
 			}
 		} catch (CoreException e) {
 		}
@@ -198,14 +243,19 @@ public class DebuggerTab extends AbstractDebuggerTab {
 				}
 			}
 		}
-		// if no selection meaning nothing in config the force initdefault on tab
+		// if no selection meaning nothing in config the force initdefault on
+		// tab
 		setInitializeDefault(selection.equals("") ? true : false); //$NON-NLS-1$
-		loadDebuggerCombo((IPDebugConfiguration[])list.toArray(new IPDebugConfiguration[list.size()]), defaultSelection);
+		loadDebuggerCombo(list.toArray(new IPDebugConfiguration[list.size()]), defaultSelection);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#updateComboFromSelection()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.internal.ui.AbstractDebuggerTab#
+	 * updateComboFromSelection()
 	 */
+	@Override
 	protected void updateComboFromSelection() {
 		super.updateComboFromSelection();
 		initializeCommonControls(getLaunchConfiguration());
@@ -229,8 +279,9 @@ public class DebuggerTab extends AbstractDebuggerTab {
 	/**
 	 * Check that the selected debugger can be used for this launch
 	 * 
-	 * FIXME: This needs to check the debugger supports the platform being managed by the
-	 * resource manager. The RM will need to provide an interface to get this information.
+	 * FIXME: This needs to check the debugger supports the platform being
+	 * managed by the resource manager. The RM will need to provide an interface
+	 * to get this information.
 	 * 
 	 * @param config
 	 * @param debugConfig
