@@ -41,14 +41,8 @@ public final class ShowReleaseNotes implements IStartup
 
     private boolean shouldShowReleaseNotes()
     {
-        if (runningJUnitTests())
+        if (runningJUnitTests() || releaseNotesHaveAlreadyBeenDisplayed())
         {
-            // Don't show the release notes during JUnit test runs (which clear the workspace)
-            return false;
-        }
-        else if (photranVersion().toString().equals(getPreference()))
-        {
-            // The release notes were already displayed once; don't show them again
             return false;
         }
         else
@@ -63,7 +57,14 @@ public final class ShowReleaseNotes implements IStartup
     }
 
     /**
-     * @return
+     * The JUnit runner changes the eclipse.application property to
+     * <tt>org.eclipse.pde.junit.runtime.uitestapplication</tt>, so
+     * we can test for this to determine whether or not we are running
+     * a JUnit Plug-in Test.  (Since the workspace is generally cleared
+     * on every run, this would cause the Release Notes to be shown
+     * every test run, which should not happen.)
+     * 
+     * @return true if we are running a JUnit Plug-in Test
      */
     private boolean runningJUnitTests()
     {
@@ -73,6 +74,19 @@ public final class ShowReleaseNotes implements IStartup
         if (app != null && app.toLowerCase().contains("junit")) return true;
         
         return false;
+    }
+
+    /**
+     * A hidden workspace preference is used to track whether or not
+     * the release notes have been shown for this workspace.
+     * 
+     * @return true iff the Release Notes Shown workspace preference
+     * indicates that the release notes have already been shown for
+     * this workspace with this version of Photran
+     */
+    private boolean releaseNotesHaveAlreadyBeenDisplayed()
+    {
+        return photranVersion().toString().equals(getPreference());
     }
 
     /** @return the current value of the Release Notes Shown workspace preference */
