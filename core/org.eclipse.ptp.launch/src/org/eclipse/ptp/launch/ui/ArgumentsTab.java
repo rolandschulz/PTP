@@ -39,33 +39,36 @@ import org.eclipse.swt.widgets.Text;
  * TODO: NEEDS TO BE DOCUMENTED
  */
 public class ArgumentsTab extends LaunchConfigurationTab {
-    protected Text argumentText = null;
-    
-    protected WorkingDirectoryBlock workingDirectoryBlock = new WorkingDirectoryBlock(); 
-    
-    protected class WidgetListener implements ModifyListener {
+	protected class WidgetListener implements ModifyListener {
 		public void modifyText(ModifyEvent evt) {
 			updateLaunchConfigurationDialog();
-		}        
-    }
-    
-    protected WidgetListener listener = new WidgetListener();
+		}
+	}
 
-    /**
-     * @see ILaunchConfigurationTab#createControl(Composite)
-     */
-    public void createControl(Composite parent) {
-        Composite comp = new Composite(parent, SWT.NONE);
-        setControl(comp);
-        //WorkbenchHelp.setHelp(getControl(), ICDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ARGUMNETS_TAB);
-        
+	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.argumentsTab"; //$NON-NLS-1$
+
+	protected Text argumentText = null;
+
+	protected WorkingDirectoryBlock workingDirectoryBlock = new WorkingDirectoryBlock();
+
+	protected WidgetListener listener = new WidgetListener();
+
+	/**
+	 * @see ILaunchConfigurationTab#createControl(Composite)
+	 */
+	public void createControl(Composite parent) {
+		Composite comp = new Composite(parent, SWT.NONE);
+		setControl(comp);
+		// WorkbenchHelp.setHelp(getControl(),
+		// ICDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ARGUMNETS_TAB);
+
 		GridLayout topLayout = new GridLayout();
 		comp.setLayout(topLayout);
 
-		Composite parallelComp = new Composite(comp, SWT.NONE);		
+		Composite parallelComp = new Composite(comp, SWT.NONE);
 		parallelComp.setLayout(createGridLayout(2, false, 0, 0));
-		parallelComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));        
-                
+		parallelComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+
 		Label programArgumentLabel = new Label(parallelComp, SWT.NONE);
 		programArgumentLabel.setLayoutData(spanGridData(-1, 2));
 		programArgumentLabel.setText(Messages.ArgumentsTab_Parallel_Program_Arguments);
@@ -74,93 +77,113 @@ public class ArgumentsTab extends LaunchConfigurationTab {
 		gd.heightHint = 40;
 		argumentText.setLayoutData(gd);
 		argumentText.addModifyListener(listener);
-		
-        createVerticalSpacer(parallelComp, 2);
-		
-        workingDirectoryBlock.createControl(parallelComp);
-    }
-    
-    /**
-     * Defaults are empty.
-     * 
-     * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
-     */
-    public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, (String) null);
-        workingDirectoryBlock.setDefaults(configuration);
-    }
 
-    /**
-     * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
-     */
-    public void initializeFrom(ILaunchConfiguration configuration) {
-        try {
-            argumentText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, EMPTY_STRING));            
-            workingDirectoryBlock.initializeFrom(configuration);
-        } catch (CoreException e) {
-            setErrorMessage(Messages.CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION);
-        }
-    }
+		createVerticalSpacer(parallelComp, 2);
 
-    /**
-     * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
-     */
-    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, argumentText.getText());
-        workingDirectoryBlock.performApply(configuration);
-    }    
-    
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
-	 */
-	public boolean isValid(ILaunchConfiguration configuration) {
-		setErrorMessage(null);
-		setMessage(null);
-		
-		return workingDirectoryBlock.isValid(configuration);
+		workingDirectoryBlock.createControl(parallelComp);
 	}
-	
-    /**
-     * @see ILaunchConfigurationTab#getName()
-     */
-    public String getName() {
-        return Messages.ArgumentsTab_Arguments;
-    }
 
-    /**
-     * @see ILaunchConfigurationTab#setLaunchConfigurationDialog(ILaunchConfigurationDialog)
-     */
-    public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
-        super.setLaunchConfigurationDialog(dialog);
-		workingDirectoryBlock.setLaunchConfigurationDialog(dialog);
-    }
-    
-    /**
-     * @see ILaunchConfigurationTab#getImage()
-     */
-    public Image getImage() {
-        return LaunchImages.getImage(LaunchImages.IMG_ARGUMENTS_TAB);
-    }    
-    
-    /**
+	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getErrorMessage()
 	 */
+	@Override
 	public String getErrorMessage() {
 		String msg = super.getErrorMessage();
 		if (msg == null)
 			return workingDirectoryBlock.getErrorMessage();
 
 		return msg;
-	}	
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
+	 */
+	@Override
+	public String getId() {
+		return TAB_ID;
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#getImage()
+	 */
+	@Override
+	public Image getImage() {
+		return LaunchImages.getImage(LaunchImages.IMG_ARGUMENTS_TAB);
+	}
 
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getMessage()
 	 */
+	@Override
 	public String getMessage() {
 		String msg = super.getMessage();
 		if (msg == null)
 			return workingDirectoryBlock.getMessage();
 
 		return msg;
-	}		
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#getName()
+	 */
+	public String getName() {
+		return Messages.ArgumentsTab_Arguments;
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
+	 */
+	@Override
+	public void initializeFrom(ILaunchConfiguration configuration) {
+		try {
+			argumentText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, EMPTY_STRING));
+			workingDirectoryBlock.initializeFrom(configuration);
+		} catch (CoreException e) {
+			setErrorMessage(Messages.CommonTab_common_Exception_occurred_reading_configuration_EXCEPTION);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug
+	 * .core.ILaunchConfiguration)
+	 */
+	@Override
+	public boolean isValid(ILaunchConfiguration configuration) {
+		setErrorMessage(null);
+		setMessage(null);
+
+		return workingDirectoryBlock.isValid(configuration);
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
+	 */
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, argumentText.getText());
+		workingDirectoryBlock.performApply(configuration);
+	}
+
+	/**
+	 * Defaults are empty.
+	 * 
+	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
+	 */
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, (String) null);
+		workingDirectoryBlock.setDefaults(configuration);
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#setLaunchConfigurationDialog(ILaunchConfigurationDialog)
+	 */
+	@Override
+	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
+		super.setLaunchConfigurationDialog(dialog);
+		workingDirectoryBlock.setLaunchConfigurationDialog(dialog);
+	}
 }
