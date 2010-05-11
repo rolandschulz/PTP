@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -116,6 +116,7 @@ public class RemoteMakeNature implements IProjectNature {
 	 * @param builderID
 	 * @param mon
 	 * @throws CoreException
+	 * @deprecated
 	 */
 	public static void addToBuildSpec(IProject project, String builderID, IProgressMonitor mon) throws CoreException {
 		IProjectDescription description = project.getDescription();
@@ -139,6 +140,44 @@ public class RemoteMakeNature implements IProjectNature {
 		}
 	}
 
+	/**
+	 * Adds a builder to the build spec for the project.
+	 * 
+	 * @param project
+	 * @param builderID
+	 * @param mon
+	 * @throws CoreException
+	 */
+	public static void updateProjectDescription(IProject project, String builderID, IProgressMonitor mon) throws CoreException {
+		// setup builder
+		IProjectDescription description = project.getDescription();
+		ICommand[] commands = new ICommand[1];
+		
+		// setup remote makefile builder
+		commands[0] = description.newCommand();
+		commands[0].setBuilderName(builderID);
+		
+		// Scanner config builder does not need to be explicitly added,
+		// it will get implicitly called by the scanner discovery nature.
+		// If we explicitly add it here, it will get called twice, so
+		// the code that added it has been removed.
+		
+		description.setBuildSpec(commands);
+		
+		// add nature
+		String[] prevNatures= description.getNatureIds();
+		for (int i= 0; i < prevNatures.length; i++) {
+			if (NATURE_ID.equals(prevNatures[i]))
+				return;
+		}
+		String[] newNatures= new String[prevNatures.length + 1];
+		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
+		newNatures[prevNatures.length]= NATURE_ID;
+		description.setNatureIds(newNatures);
+		
+		project.setDescription(description, mon);
+	}
+	
 	/**
 	 * Removes a builder from the project's build spec.
 	 * 

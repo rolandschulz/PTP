@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,6 +34,7 @@ import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.cdt.utils.PathUtil;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -268,7 +269,8 @@ public class OpenIncludeAction extends
 			public String getText(Object element) {
 				if (element instanceof URI) {
 					URI uri= (URI)element;
-					IPath path = new Path(uri.getPath());
+					String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(uri);
+					IPath path = new Path(pathString);
 					return path.lastSegment() + " - "  + path.toString(); //$NON-NLS-1$
 				}
 				return super.getText(element);

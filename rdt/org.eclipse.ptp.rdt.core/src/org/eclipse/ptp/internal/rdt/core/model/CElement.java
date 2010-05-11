@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.rdt.core.RDTLog;
 
-public abstract class CElement implements ICElement, Serializable {
+public abstract class CElement implements ICElement, Serializable, IHasManagedLocation, IHasRemotePath {
 	private static final long serialVersionUID = 1L;
 
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
@@ -55,7 +55,9 @@ public abstract class CElement implements ICElement, Serializable {
 	protected int fType;
 
 	protected URI fLocation;
-	protected IPath fPath;
+	protected URI fManagedLocation;
+	protected String fRemotePath;
+	protected IPath fWorkspacePath;
 
 	protected ICProject fCProject;
 	
@@ -108,7 +110,7 @@ public abstract class CElement implements ICElement, Serializable {
 	}
 
 	public IPath getPath() {
-		return fPath;
+		return fWorkspacePath;
 	}
 
 	/**
@@ -122,8 +124,8 @@ public abstract class CElement implements ICElement, Serializable {
 				return files[0];
 			}
 		}
-		if (fPath != null) {
-			IFile[] files = root.findFilesForLocation(fPath);
+		if (fWorkspacePath != null) {
+			IFile[] files = root.findFilesForLocation(fWorkspacePath);
 			if (files.length > 0) {
 				return files[0];
 			}
@@ -210,11 +212,27 @@ public abstract class CElement implements ICElement, Serializable {
 		fLocation = location;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.model.IHasManagedLocation#setManagedLocation(java.net.URI)
+	 */
+	public void setManagedLocation(URI managedLocation) {
+		fManagedLocation = managedLocation;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.model.IHasManagedLocation#getManagedLocation()
+	 */
+	public URI getManagedLocation() {
+		return fManagedLocation;
+	}
+	
+	
+	
 	public void setPath(IPath path) {
 		if (path == null || path instanceof Path) {
-			fPath = path;
+			fWorkspacePath = path;
 		} else {
-			fPath = new Path(path.toPortableString());
+			fWorkspacePath = new Path(path.toPortableString());
 		}
 	}
 	
@@ -263,5 +281,20 @@ public abstract class CElement implements ICElement, Serializable {
 			hash += 47 * fLocation.hashCode();
 		}
 		return hash;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.model.IHasMappedLocation#getMappedLocation()
+	 */
+	public String getRemotePath() {
+		return fRemotePath;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.model.IHasMappedLocation#setMappedLocation(java.lang.String)
+	 */
+	public void setRemotePath(String location) {
+		fRemotePath = location;
+		
 	}
 }

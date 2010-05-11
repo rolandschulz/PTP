@@ -27,6 +27,10 @@
             file="context_RDT.xml"
             plugin="org.eclipse.ptp.rdt.ui">
       </contexts>
+      <contexts
+            file="context_RDT.xml"
+            plugin="org.eclipse.ptp.rdt.services">
+      </contexts>
    </extension>
 
 </plugin>

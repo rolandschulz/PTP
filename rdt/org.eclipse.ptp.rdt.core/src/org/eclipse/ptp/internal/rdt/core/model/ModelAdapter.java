@@ -161,6 +161,17 @@ public class ModelAdapter {
 			result.setCProject(new CProject(project.getElementName()));
 		
 		result.setLocationURI(element.getLocationURI());
+		
+		if(element instanceof IHasManagedLocation) {
+			IHasManagedLocation hml = (IHasManagedLocation) element;
+			result.setManagedLocation(hml.getManagedLocation());
+		}
+		
+		if(element instanceof IHasRemotePath) {
+			IHasRemotePath hasRemotePath = (IHasRemotePath) element;
+			result.setRemotePath(hasRemotePath.getRemotePath());
+		}
+		
 		result.setPath(element.getPath());
 		
 		if (depth != 0) {

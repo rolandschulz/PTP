@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,11 +72,11 @@ public class THGraph implements Serializable {
 		fConverter = converter;
 	}
 	
-	private THGraphNode addNode(ICElement input) {
+	private THGraphNode addNode(ICElement input, String path) {
 		THGraphNode node= fNodes.get(input); 
 
 		if (node == null) {
-			node= new THGraphNode(input);
+			node= new THGraphNode(input, path);
 			fNodes.put(input, node);
 			fRootNodes.add(node);
 			fLeaveNodes.add(node);
@@ -141,34 +141,67 @@ public class THGraph implements Serializable {
 		return fLeaveNodes;
 	}
 
-	public void defineInputNode(IIndex index, ICElement input, ICProjectFactory projectFactory) {
+	public void defineInputNode(IIndex index, ICElement input, ICProjectFactory projectFactory, String path) {
 		if (input != null) {
 			try {
 				fFileIsIndexed= true;
 				input= IndexQueries.attemptConvertionToHandle(index, input, fConverter, projectFactory);
-				fInputNode= addNode(input);
+				fInputNode= addNode(input, path);
 			} catch (CoreException e) {
 				RDTLog.logError(e);
 			}
 		}
 	}
 
+	private class StackElement {
+		@Override
+		public int hashCode() {
+			return fElement.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if(obj instanceof StackElement) {
+				StackElement se = (StackElement)obj;
+				return fElement.equals(se.fElement);
+			}
+			return false;
+		}
+
+		public ICElement fElement;
+		public String fPath;
+		
+		public StackElement(ICElement element, String path) {
+			fElement = element;
+			fPath = path;
+		}
+
+		private THGraph getOuterType() {
+			return THGraph.this;
+		}
+	}
+	
 	public void addSuperClasses(IIndex index, IProgressMonitor monitor, ICProjectFactory projectFactory) {
 		if (fInputNode == null) {
 			return;
 		}
-		HashSet<ICElement> handled= new HashSet<ICElement>();
-		ArrayList<ICElement> stack= new ArrayList<ICElement>();
-		stack.add(fInputNode.getElement());
-		handled.add(fInputNode.getElement());
+		HashSet<StackElement> handled= new HashSet<StackElement>();
+		ArrayList<StackElement> stack= new ArrayList<StackElement>();
+		
+		StackElement stackElement = new StackElement(fInputNode.getElement(), fInputNode.getPath());
+		
+		stack.add(stackElement);
+		handled.add(stackElement);
+		
 		while (!stack.isEmpty()) {
 			if (monitor.isCanceled()) {
 				return;
 			}
-			ICElement elem= stack.remove(stack.size()-1);
-			THGraphNode graphNode= addNode(elem);
+			
+			StackElement se = stack.remove(stack.size()-1);
+			THGraphNode graphNode= addNode(se.fElement, se.fPath);
 			try {
-				IIndexBinding binding = IndexQueries.elementToBinding(index, elem);
+				IIndexBinding binding = IndexQueries.elementToBinding(index, se.fElement, se.fPath);
 				if (binding != null) {
 					addMembers(index, graphNode, binding, projectFactory);
 				}
@@ -183,13 +216,18 @@ public class THGraph implements Serializable {
 						IName name= base.getBaseClassSpecifierName();
 						IBinding basecl= name != null ? index.findBinding(name) : base.getBaseClass();
 						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null, projectFactory);
+						String[] paths = IndexQueries.findRepresentitivePaths(index, basecl, fConverter, null, projectFactory);
+
 						for (int j = 0; j < baseElems.length; j++) {
 							ICElement baseElem = baseElems[j];
-							THGraphNode baseGraphNode= addNode(baseElem);
+							String path = paths[j];
+							THGraphNode baseGraphNode= addNode(baseElem, path);
 							addMembers(index, baseGraphNode, basecl, projectFactory);							
 							addEdge(graphNode, baseGraphNode);
-							if (handled.add(baseElem)) {
-								stack.add(baseElem);
+							StackElement se1 = new StackElement(baseElem, path);
+							
+							if (handled.add(se1)) {
+								stack.add(se1);
 							}
 						}
 					}
@@ -200,13 +238,17 @@ public class THGraph implements Serializable {
 					if (type instanceof IBinding) {
 						IBinding basecl= (IBinding) type;
 						ICElement[] baseElems= IndexQueries.findRepresentative(index, basecl, fConverter, null, projectFactory);
+						String[] paths = IndexQueries.findRepresentitivePaths(index, basecl, fConverter, null, projectFactory);
 						if (baseElems.length > 0) {
 							ICElement baseElem= baseElems[0];
-							THGraphNode baseGraphNode= addNode(baseElem);
+							String path = paths[0];
+							THGraphNode baseGraphNode= addNode(baseElem, path);
 							addMembers(index, baseGraphNode, basecl, projectFactory);							
 							addEdge(graphNode, baseGraphNode);
-							if (handled.add(baseElem)) {
-								stack.add(baseElem);
+							StackElement se1 = new StackElement(baseElem, path);
+							
+							if (handled.add(se1)) {
+								stack.add(se1);
 							}
 						}
 					}
@@ -224,19 +266,22 @@ public class THGraph implements Serializable {
 		if (fInputNode == null) {
 			return;
 		}
-		HashSet<ICElement> handled= new HashSet<ICElement>();
-		ArrayList<ICElement> stack= new ArrayList<ICElement>();
+		HashSet<StackElement> handled= new HashSet<StackElement>();
+		ArrayList<StackElement> stack= new ArrayList<StackElement>();
 		ICElement element = fInputNode.getElement();
-		stack.add(element);
-		handled.add(element);
+		String path = fInputNode.getPath();
+		StackElement stackElement = new StackElement(element, path);
+		stack.add(stackElement);
+		handled.add(stackElement);
 		while (!stack.isEmpty()) {
 			if (monitor.isCanceled()) {
 				return;
 			}
-			ICElement elem= stack.remove(stack.size()-1);
-			THGraphNode graphNode= addNode(elem);
+			StackElement se = stack.remove(stack.size()-1);
+			ICElement elem= se.fElement;
+			THGraphNode graphNode= addNode(elem, se.fPath);
 			try {
-				IBinding binding = IndexQueries.elementToBinding(index, elem);
+				IBinding binding = IndexQueries.elementToBinding(index, elem, se.fPath);
 				if (binding != null) {
 					IIndexName[] names= index.findNames(binding, IIndex.FIND_REFERENCES | IIndex.FIND_DEFINITIONS);
 					for (int i = 0; i < names.length; i++) {
@@ -249,13 +294,18 @@ public class THGraph implements Serializable {
 							if (subClassDef != null) {
 								IBinding subClass= index.findBinding(subClassDef);
 								ICElement[] subClassElems= IndexQueries.findRepresentative(index, subClass, fConverter, null, projectFactory);
+								String[] paths = IndexQueries.findRepresentitivePaths(index, subClass, fConverter, null, projectFactory);
 								if (subClassElems.length > 0) {
 									ICElement subClassElem= subClassElems[0];
-									THGraphNode subGraphNode= addNode(subClassElem);
+									String path1 = paths[0];
+									THGraphNode subGraphNode= addNode(subClassElem, path1);
 									addMembers(index, subGraphNode, subClass, projectFactory);							
 									addEdge(subGraphNode, graphNode);
-									if (handled.add(subClassElem)) {
-										stack.add(subClassElem);
+									
+									StackElement se1 = new StackElement(subClassElem, path1);
+									
+									if (handled.add(se1)) {
+										stack.add(se1);
 									}
 								}
 							}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,13 +11,21 @@
 package org.eclipse.ptp.remote.rse.core;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -50,15 +58,15 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
 	 */
-	@Override
-	public IFileStore directory() {
-		IFileStore dir = super.directory();
-		if (dir == null) {
-			dir = fFileMgr.getResource(connection().getWorkingDirectory());
-			directory(dir);
-		}
-		return dir;
-	}
+//	@Override
+//	public IFileStore directory() {
+//		IFileStore dir = super.directory();
+//		if (dir == null) {
+//			dir = fFileMgr.getResource(connection().getWorkingDirectory());
+//			directory(dir);
+//		}
+//		return dir;
+//	}
 	
 	/**
 	 * Convert environment map back to environment strings.
@@ -131,6 +139,78 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		if(inputString == null)
 			return null;
 		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
+	 */
+	@Override
+	public IFileStore directory() {
+		if(super.directory() == null) {
+			// get CWD
+			Map<String, String> envMap = environment();
+			
+			// check PWD first for UNIX systems
+			String cwd = envMap.get("PWD");
+			
+			// if that didn't work, try %CD% for Windows systems
+			if(cwd == null) {
+				cwd = envMap.get("CD");
+			}
+			
+			if(cwd != null) {
+				URI uri=null;
+				try {
+					uri = new URI("rse", fConnection.getHost().getHostName(), cwd, null);
+				} catch (URISyntaxException e) {
+					RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
+				}
+				try {
+					return EFS.getStore(uri);
+				} catch (CoreException e) {
+					RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
+				}
+			}
+				
+		}
+		return super.directory();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getHomeDirectory()
+	 */
+	public IFileStore getHomeDirectory() {
+		// determine the home directory using environment variables
+		Map<String, String> envMap = environment();
+		
+		// check HOME first for UNIX systems
+		String homeDir = envMap.get("HOME");
+		if(homeDir == null) {
+			homeDir = ""; //$NON-NLS-1$
+		}
+		
+		// if that didn't work, try %USERPROFILE% for Windows systems
+		if(homeDir == null) {
+			homeDir = envMap.get("USERPROFILE");
+			IPath homePath = new Path(homeDir);
+			homeDir = "/" + homePath.toString();
+		}
+		
+		if(homeDir != null) {
+			URI uri=null;
+			try {
+				uri = new URI("rse", fConnection.getHost().getHostName(), homeDir, null);
+			} catch (URISyntaxException e) {
+				RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
+			}
+			try {
+				return EFS.getStore(uri);
+			} catch (CoreException e) {
+				RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
+			}
+		}
+		
+		return null;
 	}
 
 }

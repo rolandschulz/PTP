@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,4 +41,11 @@ public interface IRemoteExecutionServiceProvider extends IServiceProvider {
 	 * @return IRemoteConnection
 	 */
 	public IRemoteConnection getConnection();
+	
+	/**
+	 * Gets the path to the configuration area on the the server.
+	 * 
+	 * @return String
+	 */
+	public String getConfigLocation();
 }
