@@ -41,7 +41,7 @@ public final class ShowReleaseNotes implements IStartup
 
     private boolean shouldShowReleaseNotes()
     {
-        if (System.getenv("TESTING") != null)
+        if (runningJUnitTests())
         {
             // Don't show the release notes during JUnit test runs (which clear the workspace)
             return false;
@@ -60,6 +60,19 @@ public final class ShowReleaseNotes implements IStartup
 
             return true;
         }
+    }
+
+    /**
+     * @return
+     */
+    private boolean runningJUnitTests()
+    {
+        if (System.getenv("TESTING") != null) return true;
+        
+        String app = System.getProperty("eclipse.application");
+        if (app != null && app.toLowerCase().contains("junit")) return true;
+        
+        return false;
     }
 
     /** @return the current value of the Release Notes Shown workspace preference */
