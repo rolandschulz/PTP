@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,12 +72,12 @@ import org.eclipse.ptp.rdt.core.activator.Activator;
 public class IndexQueries {
 	private static final ICElement[] EMPTY_ELEMENTS = new ICElement[0];
 
-	public static IIndexBinding elementToBinding(IIndex index, ICElement element) throws CoreException {
+	public static IIndexBinding elementToBinding(IIndex index, ICElement element, String path) throws CoreException {
 		if (element instanceof ISourceReference) {
 			ISourceReference sf = ((ISourceReference)element);
 			ISourceRange range= sf.getSourceRange();
 			if (range.getIdLength() != 0) {
-				IIndexName name= remoteElementToName(index, element);
+				IIndexName name= remoteElementToName(index, element, path);
 				if (name != null) {
 					return index.findBinding(name);
 				}
@@ -183,7 +183,7 @@ public class IndexQueries {
 		return null;
 	}
 	
-	public static IIndexName remoteElementToName(IIndex index, ICElement element) throws CoreException {
+	public static IIndexName remoteElementToName(IIndex index, ICElement element, String path) throws CoreException {
 		if (element instanceof ISourceReference) {
 			ISourceReference sf = ((ISourceReference)element);
 			ITranslationUnit tu= sf.getTranslationUnit();
@@ -191,7 +191,7 @@ public class IndexQueries {
 				
 				URI uri = null;
 				try {
-					uri = convertRemoteURIToLocal(tu.getLocationURI());
+					uri = convertPathToLocalURI(path);
 				} catch (URISyntaxException e) {
 					RDTLog.logError(e);
 				}
@@ -225,8 +225,8 @@ public class IndexQueries {
 		return null;
 	}
 
-	private static URI convertRemoteURIToLocal(URI locationURI) throws URISyntaxException {
-		URI uri = new URI("file", null, locationURI.getPath(), null); //$NON-NLS-1$
+	private static URI convertPathToLocalURI(String path) throws URISyntaxException {
+		URI uri = new URI("file", null, path, null); //$NON-NLS-1$
 		return uri;
 	}
 
@@ -292,6 +292,17 @@ public class IndexQueries {
 			}
 		}
 		return defs;
+	}
+	
+	public static String[] findRepresentitivePaths(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject, ICProjectFactory projectFactory) throws CoreException {
+		IIndexName[] defs= index.findNames(binding, IIndex.FIND_DEFINITIONS | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
+		ArrayList<String> paths = new ArrayList<String>();
+		
+		for(IIndexName name : defs) {
+			String path = name.getFile().getLocation().getURI().getPath();
+			paths.add(path);
+		}
+		return paths.toArray(new String[0]);
 	}
 	
 	public static ICElement[] findAllDefinitions(IIndex index, IBinding binding, IIndexLocationConverter converter, ICProject preferProject, ICProjectFactory projectFactory) throws CoreException {

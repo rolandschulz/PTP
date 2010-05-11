@@ -21,6 +21,7 @@ import org.eclipse.cdt.managedbuilder.envvar.IConfigurationEnvironmentVariableSu
 import org.eclipse.cdt.managedbuilder.envvar.IEnvironmentVariableProvider;
 import org.eclipse.cdt.managedbuilder.internal.envvar.BuildEnvVar;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
@@ -53,9 +54,14 @@ public class RemoteConfigurationEnvironmentSupplier implements
 	public IBuildEnvironmentVariable getVariable(String variableName,
 			IConfiguration configuration, IEnvironmentVariableProvider provider) {
 		Map<String, String> envMap = getRemoteEnvironment(configuration.getManagedProject());
-		String value = envMap.get(variableName) == null ? new String() : envMap.get(variableName);
-		IBuildEnvironmentVariable envVar = new BuildEnvVar(variableName, value);
-		return envVar;
+		
+		if (envMap != null) {
+			String value = envMap.get(variableName) == null ? new String() : envMap.get(variableName);
+			IBuildEnvironmentVariable envVar = new BuildEnvVar(variableName, value);
+			return envVar;
+		}
+		
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -115,9 +121,13 @@ public class RemoteConfigurationEnvironmentSupplier implements
 				IRemoteConnection connection = executionProvider
 						.getConnection();
 
+				if(connection == null) {
+					return null;
+				}
+				
 				if (!connection.isOpen()) {
 					try {
-						connection.open(null);
+						connection.open(new NullProgressMonitor());
 					} catch (RemoteConnectionException e) {
 						RDTLog.logError(e);
 					}

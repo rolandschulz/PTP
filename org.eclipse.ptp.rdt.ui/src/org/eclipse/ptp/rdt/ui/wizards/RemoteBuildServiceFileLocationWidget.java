@@ -10,15 +10,22 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.wizards;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
-import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -31,9 +38,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-public class IndexFileLocationWidget extends Composite {
+public class RemoteBuildServiceFileLocationWidget extends Composite {
 
-	
+	private IRemoteConnection fRemoteConnection = null;
+	private IRemoteServices fRemoteServices = null;
 	
 	///private final Label label;
 	private final Text text;
@@ -41,16 +49,16 @@ public class IndexFileLocationWidget extends Composite {
 	//private final Button validateButton;
 	private final Button defaultButton;
 	
-	private IHost host;
 	private ListenerList pathListeners = new ListenerList();
 	
+	
 	private Map<String,String> previousSelections = new HashMap<String,String>();
-
-	
-	
-	
-	public IndexFileLocationWidget(Composite parent, int style, IHost initialHost, String defaultPath) {
+		
+	public RemoteBuildServiceFileLocationWidget(Composite parent, int style, final IRemoteServices remoteServices, IRemoteConnection initialConnection, String defaultPath) {
 		super(parent, style);
+		
+		fRemoteServices = remoteServices;
+		fRemoteConnection = initialConnection;
 		
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
@@ -59,7 +67,7 @@ public class IndexFileLocationWidget extends Composite {
 		this.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		Group group = new Group(this, SWT.NONE);
-		group.setText(Messages.getString("IndexFileLocationWidget.0")); //$NON-NLS-1$
+		group.setText(Messages.getString("RemoteBuildServiceFileLocationWidget.1")); //$NON-NLS-1$
 		group.setLayout(new GridLayout(2, false));
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
@@ -72,7 +80,7 @@ public class IndexFileLocationWidget extends Composite {
 			public void modifyText(ModifyEvent e) {
 				String path = text.getText();
 				
-				previousSelections.put(key(host), path);
+				previousSelections.put(key(remoteServices, fRemoteConnection), path);
 				
 				for(Object listener : pathListeners.getListeners()) {
 					((IIndexFilePathChangeListener)listener).pathChanged(path);
@@ -88,7 +96,7 @@ public class IndexFileLocationWidget extends Composite {
 				browse();
 			}
 		});
-		
+			
 		defaultButton = new Button(group, SWT.NONE);
 		defaultButton.setText(Messages.getString("IndexFileLocationWidget.2"));  //$NON-NLS-1$
 		defaultButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -98,34 +106,48 @@ public class IndexFileLocationWidget extends Composite {
 			}
 		});
 		
-		setHost(initialHost);
 		if(defaultPath != null)
 			text.setText(defaultPath);
 	}
 	
 	
-	public IHost getHost() {
-		return host;
+	public IRemoteConnection getConnection() {
+		return fRemoteConnection;
 	}
 
 	
-	public void setHost(IHost host) {
-		if(host == null)
-			throw new NullPointerException();
-		this.host = host;
+//	public void setRemoteConnection(IRemoteServices remoteServices, IRemoteConnection connection) {
+//		if(connection == null || remoteServices == null)
+//			throw new IllegalArgumentException();
+//		
+//		fRemoteConnection = connection;
+//		fRemoteServices = remoteServices;
+//
+//		String path = previousSelections.get(key(remoteServices, connection));
+//		if(path == null)
+//			path = getDefaultPath(remoteServices, connection);
+//		if(path == null)
+//			path = ""; //$NON-NLS-1$
+//		
+//		text.setText(path); // modify event listener updates map
+//	}
+	
+	
+	public static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
+		// get the user's home directory
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, ""); //$NON-NLS-1$
+		IFileStore homeStore = processBuilder.getHomeDirectory();
+		URI uri = homeStore.toURI();
+		String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(uri);
+		IPath path = new Path(pathString);
+		path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME); 
+		return path.toString();
 		
-		String path = previousSelections.get(key(host));
-		if(path == null)
-			path = RSEUtils.getDefaultConfigDirectory(host);
-		if(path == null)
-			path = ""; //$NON-NLS-1$
-		
-		text.setText(path); // modify event listener updates map
 	}
-	
-	
-	private static String key(IHost host) {
-		return host.getSystemProfileName() + "." + host.getAliasName(); //$NON-NLS-1$
+
+
+	private static String key(IRemoteServices remoteServices, IRemoteConnection connection) {
+		return remoteServices.getName() + ":" + connection.getName(); //$NON-NLS-1$
 	}
 	
 	public String getConfigLocationPath() {
@@ -140,23 +162,24 @@ public class IndexFileLocationWidget extends Composite {
 	public void removePathListener(IIndexFilePathChangeListener listener) {
 		pathListeners.remove(listener);
 	}
-	
-	private void browse() {
-		SystemRemoteFolderDialog folderDialog = new SystemRemoteFolderDialog(getShell(), host.getAliasName());
-		folderDialog.setDefaultSystemConnection(host, true);
-		folderDialog.open();
 		
-		Object remoteObject = folderDialog.getSelectedObject();
-		if(remoteObject instanceof IRemoteFile) {
-			IRemoteFile folder = (IRemoteFile)remoteObject;
-			text.setText(folder.getCanonicalPath());
-		}
+	private void browse() {
+		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices);
+		String remotePath = uiServices.getUIFileManager().browseDirectory(this.getShell(), Messages.getString("RemoteBuildServiceFileLocationWidget.0"), text.getText(),0); //$NON-NLS-1$
+		if(remotePath != null)
+			text.setText(remotePath);
 	}
 
-	
 	private void restoreDefault() {
-		text.setText(RSEUtils.getDefaultConfigDirectory(host));
+		String defaultPath = getDefaultPath(fRemoteServices, fRemoteConnection);
+		text.setText(defaultPath);
 	}
 	
+	public void update(IRemoteServices services, IRemoteConnection connection) {
+		fRemoteServices = services;
+		fRemoteConnection = connection;
+		String defaultPath = getDefaultPath(fRemoteServices, fRemoteConnection);
+		text.setText(defaultPath);
+	}	
 
 }

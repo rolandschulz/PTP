@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,17 +28,26 @@ import org.eclipse.cdt.internal.core.ConsoleOutputSniffer;
 import org.eclipse.cdt.make.core.IMakeBuilderInfo;
 import org.eclipse.cdt.make.core.MakeBuilder;
 import org.eclipse.cdt.make.core.MakeCorePlugin;
+import org.eclipse.cdt.make.core.scannerconfig.IScannerConfigBuilderInfo2;
+import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector;
+import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector2;
 import org.eclipse.cdt.make.internal.core.MakeMessages;
 import org.eclipse.cdt.make.internal.core.StreamMonitor;
-import org.eclipse.cdt.make.internal.core.scannerconfig.ScannerInfoConsoleParserFactory;
+import org.eclipse.cdt.make.internal.core.scannerconfig2.SCMarkerGenerator;
+import org.eclipse.cdt.make.internal.core.scannerconfig2.ScannerConfigProfileManager;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IInputType;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.ITool;
+import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.internal.core.InputType;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceRuleFactory;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -55,6 +64,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.core.RDTLog;
+import org.eclipse.ptp.rdt.core.activator.Activator;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -65,6 +75,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
@@ -87,8 +98,10 @@ public class RemoteMakeBuilder extends MakeBuilder {
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(getProject(), REMOTE_MAKE_BUILDER_ID);
 		if (shouldBuild(CLEAN_BUILD, info)) {
-			IResourceRuleFactory ruleFactory= ResourcesPlugin.getWorkspace().getRuleFactory();
-			final ISchedulingRule rule = ruleFactory.modifyRule(getProject());
+						 
+			// have to use the workspace as the rule as the scanner config update needs the workspace lock
+			final ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
+			
 			Job backgroundJob = new Job("Standard Make Builder"){  //$NON-NLS-1$
 				/* (non-Javadoc)
 				 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
@@ -148,9 +161,10 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				// remove all markers for this project
 				removeAllMarkers(currProject);
 
+				final IConfiguration configuration = mbsInfo.getDefaultConfiguration();
 				
-				
-				IPath workingDirectory = mbsInfo.getDefaultConfiguration().getBuildData().getBuilderCWD();
+				final IBuilder builder = configuration.getBuilder();
+				IPath workingDirectory = ManagedBuildManager.getBuildLocation(configuration, builder );
 				
 				String[] targets = getTargets(kind, info);
 				if (targets.length != 0 && targets[targets.length - 1].equals(info.getCleanBuildTarget()))
@@ -162,7 +176,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				HashMap<String, String> envMap = new HashMap<String, String>();
 				
 				// Add variables from build info
-				IEnvironmentVariable[] envVars = ManagedBuildManager.getEnvironmentVariableProvider().getVariables(mbsInfo.getDefaultConfiguration(), true);
+				IEnvironmentVariable[] envVars = ManagedBuildManager.getEnvironmentVariableProvider().getVariables(configuration, true);
 				
 				for (IEnvironmentVariable environmentVariable : envVars) {
 					envMap.put(environmentVariable.getName(), environmentVariable.getValue());
@@ -200,32 +214,86 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					last = new Integer(100);
 				}
 				StreamMonitor streamMon = new StreamMonitor(new SubProgressMonitor(monitor, 100), cos, last.intValue());
-				ErrorParserManager epm = new ErrorParserManager(getProject(), workingDirectory, this, mbsInfo.getDefaultConfiguration().getErrorParserList());
+				ErrorParserManager epm = new ErrorParserManager(getProject(), workingDirectory, this, configuration.getErrorParserList());
 				epm.setOutputStream(streamMon);
 				final OutputStream stdout = epm.getOutputStream();
 				final OutputStream stderr = epm.getOutputStream();
 				
-				ConsoleOutputSniffer sniffer = ScannerInfoConsoleParserFactory.getMakeBuilderOutputSniffer(
-						stdout, stderr, getProject(), workingDirectory, null, this, null);
-				OutputStream consoleOut = (sniffer == null ? stdout : sniffer.getOutputStream());
-				OutputStream consoleErr = (sniffer == null ? stderr : sniffer.getErrorStream());
+				OutputStream consoleOut = null;
+				OutputStream currentStdOut = stdout;
+				OutputStream currentStdErr = stderr;
+				OutputStream consoleErr = null;
+				
+				// add a scanner info sniffer for the inputs of each tool in the toolchain
+				IToolChain tc = configuration.getToolChain();
+				
+				ITool[] tools = tc.getTools();
+				
+				for (ITool tool : tools) {
+
+					IInputType[] inputTypes = tool.getInputTypes();
+
+					for (IInputType inputType : inputTypes) {
+						
+						InputType realInputType = (InputType) inputType;
+						
+						// get scanner disc IDs
+						String scannerIDString = realInputType.getDiscoveryProfileIdAttribute();
+						
+						if(scannerIDString == null)
+							continue;
+						
+						// IDs are delimited by the | character
+						String[] scannerIDs = scannerIDString.split("\\|"); //$NON-NLS-1$
+						
+						for (String id : scannerIDs) {
+
+							//IScannerConfigBuilderInfo2 scBuilderInfo = ScannerConfigProfileManager
+							//		.createScannerConfigBuildInfo2(ManagedBuilderCorePlugin.getDefault()
+							//				.getPluginPreferences(), id, false);
+							IScannerConfigBuilderInfo2 scBuilderInfo = ScannerConfigProfileManager.createScannerConfigBuildInfo2(currProject, id);
+							IScannerInfoCollector collector = (IScannerInfoCollector) ScannerConfigProfileManager
+									.getInstance().getSCProfileConfiguration(id)
+									.getScannerInfoCollectorElement().createScannerInfoCollector();
+
+							if (collector instanceof IScannerInfoCollector2) {
+								IScannerInfoCollector2 s2 = (IScannerInfoCollector2) collector;
+								s2.setProject(currProject);
+							}
+
+							SCMarkerGenerator markerGenerator = new SCMarkerGenerator();
+							ConsoleOutputSniffer sniffer = ScannerInfoUtility.createBuildOutputSniffer(currentStdOut,
+									currentStdErr, currProject, configuration, workingDirectory,
+									markerGenerator, collector);
+							currentStdOut = (sniffer == null ? currentStdOut : sniffer.getOutputStream());
+							currentStdErr = (sniffer == null ? currentStdErr : sniffer.getErrorStream());
+						}
+					}
+				}
+				
+				// hook the console up to the last sniffer created, or to the stdout/stderr of the process if none were created
+				consoleOut = (currentStdOut == null ? stdout : currentStdOut);
+				consoleErr = (currentStdErr == null ? stderr : currentStdErr);
 				
 				// Determine the service model for this configuration, and use the provider of the build
 				// service to execute the build command.
 				ServiceModelManager smm = ServiceModelManager.getInstance();
-				IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject());
-				IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
-				IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
-				IRemoteExecutionServiceProvider executionProvider = null;
-				if(provider instanceof IRemoteExecutionServiceProvider) {
-					executionProvider = (IRemoteExecutionServiceProvider) provider;
-				}
 				
-				if (executionProvider != null) {
+				try{
+					IServiceConfiguration serviceConfig = smm.getActiveConfiguration(getProject());
+					IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+					IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
+					IRemoteExecutionServiceProvider executionProvider = null;
+					if(provider instanceof IRemoteExecutionServiceProvider) {
+						executionProvider = (IRemoteExecutionServiceProvider) provider;
+					}
 					
 					IRemoteServices remoteServices = executionProvider.getRemoteServices();
 					
 					IRemoteConnection connection = executionProvider.getConnection();
+					
+					if(connection == null)
+						return false;
 					
 					if(!connection.isOpen())
 						connection.open(monitor);
@@ -326,9 +394,14 @@ public class RemoteMakeBuilder extends MakeBuilder {
 							// this should never happen because we should never be building from a
 							// state where ressource changes are disallowed
 						}
-					} 
-
+					}
 				}
+				catch (ProjectNotConfiguredException e){
+					//occurs when loading a project from RTC, this is forced to run before the project is configured, this is expected
+					//if not due to above reason, then legitimate error
+				}
+
+				
 				getProject().setSessionProperty(qName, !monitor.isCanceled() && !isClean ? new Integer(streamMon.getWorkDone()) : null);
 
 				if (errMsg != null) {
@@ -353,6 +426,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				consoleOut.close();
 				consoleErr.close();
 				epm.reportProblems();
+				
+//				if(collector instanceof IScannerInfoCollector2) {
+//					IScannerInfoCollector2 s2 = (IScannerInfoCollector2) collector;
+//					s2.updateScannerConfiguration(monitor);
+//				}
 				cos.close();
 			}
 		} catch (Exception e) {
@@ -422,4 +500,34 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		}
 		return makeArray(targets);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.make.core.MakeBuilder#shouldBuild(int, org.eclipse.cdt.make.core.IMakeBuilderInfo)
+	 */
+	@Override
+	protected boolean shouldBuild(int kind, IMakeBuilderInfo info) {
+		IProject project = getProject();
+		
+		IProjectDescription description = null;
+		try {
+			description = project.getDescription();
+		} catch (CoreException e) {
+			Activator.log(e);
+		}
+		
+		ICommand[] commands = description.getBuildSpec();
+		ICommand builderCommand = null;
+		
+		for(ICommand command : commands) {
+			if(command.getBuilderName().equals(REMOTE_MAKE_BUILDER_ID)) {
+				builderCommand = command;
+				break;
+			}
+		}
+		
+		return builderCommand.isBuilding(kind);
+	
+	}
+	
+
 }

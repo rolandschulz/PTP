@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.ptp.internal.rdt.ui.search;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteLocationConverter;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
@@ -33,7 +34,8 @@ public class LocalSearchService implements ISearchService {
 	}
 
 	public ISearchQuery createSearchElementQuery(Scope indexScope, ICElement[] searchScope, ISourceReference object, int limitTo) {
-		RemoteSearchElementQuery query = new RemoteSearchElementQuery(searchScope, object, limitTo);
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(object.getTranslationUnit().getLocationURI());		
+		RemoteSearchElementQuery query = new RemoteSearchElementQuery(searchScope, object, path, limitTo);
 		return new RemoteSearchElementQueryAdapter(null, indexScope, query);
 	}
 

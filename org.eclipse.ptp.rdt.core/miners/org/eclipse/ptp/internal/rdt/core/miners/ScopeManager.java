@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
@@ -24,42 +25,88 @@ import org.eclipse.core.runtime.Path;
  */
 public class ScopeManager {
 	
-	private Map<String, Set<String>> scopeNamesToFileSetMap = null;
-	static private ScopeManager instance = null;
+	// TODO this is a horrible hack
+	private static final String DEFAULT_SCHEME = "rse"; //$NON-NLS-1$ 
+	
+	
+	public class ScopeData {
+		public String scheme;
+		public String host;
+		public String mappedPath;
+		public String rootPath;
+		public Set<String> files;
+	}
+	
+	private Map<String, ScopeData> fScopeNamesToScopeDataMap = null;
+	private Map<String, String> fFilePathToScopeNameMap = null;
+	static private ScopeManager fInstance = null;
 	
 	private ScopeManager()
 	{
-		scopeNamesToFileSetMap = new TreeMap<String, Set<String>>();
+		fScopeNamesToScopeDataMap = new TreeMap<String, ScopeData>();
+		fFilePathToScopeNameMap = new TreeMap<String, String>();
+		
 	}
 	
 	static public synchronized ScopeManager getInstance() {
-		if(instance == null)
-			instance = new ScopeManager();
+		if(fInstance == null)
+			fInstance = new ScopeManager();
 		
-		return instance;
+		return fInstance;
 	}
 	
-	public void addScope(String name, Set<String> files)
+	public synchronized void addScope(String scopeName, String scheme, String host, Set<String> files, String rootPath, String mappedPath)
 	{
-		scopeNamesToFileSetMap.put(name, files);
-	}
-	
-	public void removeScope(String name) {
-		scopeNamesToFileSetMap.remove(name);
-	}
-	
-	public Set<String> getFilesForScope(String name) {
-		return scopeNamesToFileSetMap.get(name);
-	}
-	
-	public void addFileToScope(String scope, String filename) {
-		Set<String> scopeFiles = getFilesForScope(scope);
-		if(scopeFiles == null) {
-			scopeFiles = new TreeSet<String>();
-			scopeNamesToFileSetMap.put(scope, scopeFiles);
+		ScopeData data = new ScopeData();
+		data.scheme = scheme;
+		data.host = host;
+		data.rootPath = rootPath;
+		data.mappedPath = mappedPath;
+		data.files = files;
+		fScopeNamesToScopeDataMap.put(scopeName, data);
+		
+		for(String filename : files) {
+			fFilePathToScopeNameMap.put(filename, scopeName);
 		}
 		
-		scopeFiles.add(filename);
+	}
+	
+		public synchronized void removeScope(String name) {
+		fScopeNamesToScopeDataMap.remove(name);
+	}
+	
+	public synchronized Set<String> getFilesForScope(String name) {
+		return fScopeNamesToScopeDataMap.get(name).files;
+	}
+	
+	public void addFileToScope(String scope, String scheme, String host, String filename, String rootPath, String mappedPath) {
+		ScopeData data = fScopeNamesToScopeDataMap.get(scope);
+		
+		if(data == null) {
+			// empty scope... create it
+			data = new ScopeData();
+			data.files = new TreeSet<String>();
+			data.files.add(filename);
+			data.scheme = scheme;
+			data.host = host;
+			data.rootPath = rootPath;
+			data.mappedPath = mappedPath;
+			fScopeNamesToScopeDataMap.put(scope, data);
+			
+		}
+		
+		else {
+			Set<String> scopeFiles = data.files;
+			
+			if(scopeFiles == null) {
+				scopeFiles = new TreeSet<String>();
+				data.files = scopeFiles;
+			}
+			
+			scopeFiles.add(filename);
+		}
+		
+		fFilePathToScopeNameMap.put(filename, scope);
 	}
 	
 	public void removeFileFromScope(String scope, String filename) {
@@ -67,10 +114,12 @@ public class ScopeManager {
 		
 		if(scopeFiles != null)
 			scopeFiles.remove(filename);
+		
+		fFilePathToScopeNameMap.remove(filename);
 	}
 	
 	public Set<String> getAllScopes() {
-		return scopeNamesToFileSetMap.keySet();
+		return fScopeNamesToScopeDataMap.keySet();
 	}
 
 	/**
@@ -109,4 +158,87 @@ public class ScopeManager {
 		return resultSet;
 	}
 	
+	/**
+	 * Returns the name of the scope the file belongs to, or null if there is no such scope.
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public String getScopeForFile(String filename) {
+		return fFilePathToScopeNameMap.get(filename);
+	}
+	
+	/**
+	 * Returns the EFS URI scheme which is used to host a given scope (project).
+	 * 
+	 * @param scopeName
+	 * @return String
+	 */
+	public String getSchemeForScope(String scopeName) {
+		ScopeData data = fScopeNamesToScopeDataMap.get(scopeName);
+		if(data == null)
+			return DEFAULT_SCHEME;
+		else
+			return data.scheme;
+	}
+	
+	/**
+	 * Returns an EFS URI scheme which can be used to access the given file.
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public String getSchemeForFile(String filename) {
+		String scope = getScopeForFile(filename);
+		if(scope != null)
+			return getSchemeForScope(scope);
+		else
+			return DEFAULT_SCHEME;
+	}
+	
+	public String getMappedPathForFile(String filename) {
+				
+		String scope = getScopeForFile(filename);
+		
+		if(scope == null) {
+			// it's an external file, so it will never be mapped... just return itself
+			return filename;
+		}
+		
+		ScopeData sd = fScopeNamesToScopeDataMap.get(scope);
+		
+		String scopeMappedPath = sd.mappedPath;
+		String scopeRootPath = sd.rootPath;
+		
+		if(scopeMappedPath == null || scopeRootPath == null)
+			return null;
+		
+		// figure out if the file resides as a child of the scope's root,
+		// or if it's wholly external
+		IPath scopePath = new Path(scopeRootPath);
+		IPath mappedScopePath = new Path(scopeMappedPath);
+		
+		IPath filePath = new Path(filename);
+		
+		if(scopePath.isPrefixOf(filePath)) {
+			int numSegments = filePath.matchingFirstSegments(scopePath);
+			IPath fileMappedPath = mappedScopePath.append(filePath.removeFirstSegments(numSegments));
+			
+			return fileMappedPath.toString();
+		}
+		
+		return null;
+	}
+
+	public String getHostForFile(String path, String defaultHost) {
+		String scope = getScopeForFile(path);
+		
+		if(scope == null) {
+			// external file...  use the default
+			return defaultHost;
+		}
+		
+		ScopeData sd = fScopeNamesToScopeDataMap.get(scope);
+		return sd.host;
+	}
 }

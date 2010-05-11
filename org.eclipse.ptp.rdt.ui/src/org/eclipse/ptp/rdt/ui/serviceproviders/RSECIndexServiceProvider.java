@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,9 @@ import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.RemoteContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
 import org.eclipse.ptp.internal.rdt.ui.search.RemoteSearchService;
+import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
+import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.SystemStartHere;
 import org.eclipse.rse.core.subsystems.IConnectorService;
@@ -70,6 +72,12 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	}
 	
 	private void initializeHost() {
+		try {
+			RSECorePlugin.waitForInitCompletion();
+		} catch (InterruptedException e) {
+			UIPlugin.log(e);
+			return;
+		}
 		if (fHost == null && getHostName() != null) {
 			IHost[] hosts = SystemStartHere.getConnections();
 			for (IHost host : hosts) {

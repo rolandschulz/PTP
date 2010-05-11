@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
 import org.eclipse.cdt.core.settings.model.extension.CConfigurationData;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
+import org.eclipse.cdt.internal.core.envvar.UserDefinedEnvironmentSupplier;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
@@ -28,10 +29,9 @@ import org.eclipse.cdt.managedbuilder.internal.core.ToolChain;
 import org.eclipse.cdt.managedbuilder.ui.wizards.CfgHolder;
 import org.eclipse.cdt.managedbuilder.ui.wizards.STDWizardHandler;
 import org.eclipse.cdt.ui.newui.UIMessages;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.cdt.utils.envvar.StorableEnvironment;
-import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -56,6 +56,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class RemoteMakefileWizardHandler extends STDWizardHandler {
 
+	private static final UserDefinedEnvironmentSupplier fUserSupplier = EnvironmentVariableManager.fUserSupplier;
+	
 	public RemoteMakefileWizardHandler(Composite p, IWizard w) {
 		super(p, w);
 		// TODO Auto-generated constructor stub
@@ -100,12 +102,7 @@ public class RemoteMakefileWizardHandler extends STDWizardHandler {
 			}
 			mngr.setProjectDescription(project, des);
 			
-			// remove all builders from the project... I really wish there was a less hacky way to do this that wasn't so damn slow
-			IProjectDescription projectDescription = project.getDescription();
-			projectDescription.setBuildSpec(new ICommand[0]);
-			project.setDescription(projectDescription, IProject.FORCE, new NullProgressMonitor());
-			RemoteMakeNature.addToBuildSpec(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-			RemoteMakeNature.addNature(project, new NullProgressMonitor());
+			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
 			
 			// set the build directory by default to be that of the project... the usual workspace macro doesn't work as the workspace resides locally
 			// and the project resides remotely
@@ -114,7 +111,8 @@ public class RemoteMakefileWizardHandler extends STDWizardHandler {
 			// assume that the path portion of the URI corresponds to the path on the remote machine
 			// this may not work if the remote machine does not use UNIX paths but we have no real way of knowing the path
 			// format, so we hope for the best...
-			IPath buildPath = Path.fromPortableString(projectLocation.getPath());
+			String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(projectLocation);
+			IPath buildPath = Path.fromPortableString(pathString);
 			
 			IManagedBuildInfo mbsInfo = ManagedBuildManager.getBuildInfo(project);	
 			mbsInfo.getDefaultConfiguration().getBuildData().setBuilderCWD(buildPath);

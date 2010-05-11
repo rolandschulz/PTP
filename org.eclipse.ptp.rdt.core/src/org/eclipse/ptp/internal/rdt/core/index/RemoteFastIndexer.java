@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,11 @@
  * IBM - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core.index;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.cdt.core.dom.IPDOMIndexerTask;
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -27,8 +32,9 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  *
  */
 public class RemoteFastIndexer extends AbstractPDOMIndexer {
+	public static final String ID = "org.eclipse.ptp.rdt.core.RemoteFastIndexer"; //$NON-NLS-1$	
 	
-	public static final String ID = "org.eclipse.ptp.rdt.core.RemoteFastIndexer"; //$NON-NLS-1$
+	private static List<IRemoteFastIndexerListener> listeners = new LinkedList<IRemoteFastIndexerListener>();
 	
 	public IPDOMIndexerTask createTask(ITranslationUnit[] added, ITranslationUnit[] changed, ITranslationUnit[] removed) {
 		IServiceModelManager smm = ServiceModelManager.getInstance();
@@ -45,7 +51,7 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 	}
 
 	
-	private boolean isReindex() {
+	protected static boolean isReindex() {
 		// Uses reflection to determine if createTask() is being called from PDOMRebuildTask.
 		String pdomRebuildTask = PDOMRebuildTask.class.getName();
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -62,4 +68,20 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 		return ID;
 	}
 	
+	/**
+	 * Add an event listener to the list, duplicates will not be registered
+	 * @param listener The listener to register
+	 */
+	public static void addRemoteFastIndexerListener(IRemoteFastIndexerListener listener) {
+		if (!listeners.contains(listener)) 
+				listeners.add(listener);
+	}
+
+	/**
+	 * Get the collection of listeners wishing to receive notification events from the indexer
+	 * @return A List containing all the listeners for this indexer
+	 */
+	static Collection<IRemoteFastIndexerListener> getRemoteFastIndexerListeners() {
+		return Collections.unmodifiableCollection(listeners);
+	}
 }
