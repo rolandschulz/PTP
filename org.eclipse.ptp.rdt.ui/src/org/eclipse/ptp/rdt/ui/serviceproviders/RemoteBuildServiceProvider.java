@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
+import java.net.URI;
+
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
+import org.eclipse.ptp.rdt.core.activator.Activator;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 /**
@@ -32,6 +43,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID = "RemoteBuildServiceProvider.remoteToolsProviderID"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME = "RemoteBuildServiceProvider.remoteToolsConnectionName"; //$NON-NLS-1$
+	public static final String REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION = "RemoteBuildServiceProvider.configLocation"; //$NON-NLS-1$
 	
 	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider"; //$NON-NLS-1$
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.BuildService"; //$NON-NLS-1$
@@ -39,6 +51,33 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 
 	private IRemoteConnection fRemoteConnection = null;
 
+
+
+	private static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
+		if (remoteServices == null || connection == null) {
+			return null;
+		}
+		// get the user's home directory
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, ""); //$NON-NLS-1$
+		IFileStore homeStore = processBuilder.getHomeDirectory();
+		URI uri = homeStore.toURI();
+		String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(uri);
+		IPath path = new Path(pathString);
+		path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
+		return path.toString();
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConfigLocation()
+	 */
+	public String getConfigLocation() {
+		return getString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, getDefaultPath(getRemoteServices(), getConnection()));
+	}
+
+	public void setConfigLocation(String configLocation) {
+		putString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, configLocation);
+	}
 
 	public String getConfigurationString() {
 		if (isConfigured()) {
@@ -57,6 +96,15 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 				IRemoteConnectionManager manager = services.getConnectionManager();
 				if (manager != null) {
 					fRemoteConnection = manager.getConnection(getRemoteConnectionName());
+					
+					if(fRemoteConnection != null && !fRemoteConnection.isOpen()) {
+						try {
+							fRemoteConnection.open(new NullProgressMonitor());
+						} catch (RemoteConnectionException e) {
+							Activator.log(e);
+							return null;
+						}
+					}
 				}
 			}
 		}

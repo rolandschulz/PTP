@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -431,7 +431,7 @@ public class IndexerBlock extends AbstractCOptionPage {
                 	if (config.getName() != null && !WorkbenchActivityHelper.filterItem(config)) {
                 		IProject proj = getProject();
                 		if (proj != null && RemoteNature.hasRemoteNature(proj)) {
-                			if (id.equalsIgnoreCase("org.eclipse.ptp.rdt.core.RemoteFastIndexer") || id.equalsIgnoreCase("org.eclipse.cdt.core.nullindexer")) { //$NON-NLS-1$ //$NON-NLS-2$
+                			if (id.startsWith("org.eclipse.ptp.rdt.core.RemoteFastIndexer") || id.equalsIgnoreCase("org.eclipse.cdt.core.nullindexer")) { //$NON-NLS-1$ //$NON-NLS-2$
                 				fIndexerConfigMap.put(id, config);
                 			}
                 		} else {

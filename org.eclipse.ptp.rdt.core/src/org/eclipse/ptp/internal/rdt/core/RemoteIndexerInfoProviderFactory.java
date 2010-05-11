@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,6 +32,7 @@ import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.cdt.core.parser.IScannerInfoProvider;
 import org.eclipse.cdt.internal.core.indexer.FileEncodingRegistry;
 import org.eclipse.cdt.internal.core.pdom.indexer.IndexerPreferences;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -266,7 +267,7 @@ public class RemoteIndexerInfoProviderFactory {
 				// compute the scanner info, share identical scanner infos
 				IScannerInfo localScannerInfo = provider.getScannerInformation(tu.getResource());
 				RemoteScannerInfo remoteScannerInfo = cache.get(localScannerInfo);
-				String path = element.getLocationURI().getPath();
+				String path = FileSystemUtilityManager.getDefault().getPathFromURI(element.getLocationURI());
 				scannerInfoMap.put(path, remoteScannerInfo);
 		
 				// compute the language
@@ -331,7 +332,6 @@ public class RemoteIndexerInfoProviderFactory {
 			fileEncodingRegistry.registerFileEncoding(filePath, specificEncoding);
 		}
 	}
-	
 	
 	private static Set<String> computeIndexerPreferences(Properties props) {
 		Set<String> prefs = new HashSet<String>(props.size());

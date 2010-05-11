@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 QNX Software Systems and others.
+ * Copyright (c) 2006, 2010 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,18 +28,21 @@ import org.eclipse.ptp.internal.rdt.core.index.IndexQueries;
 public class RemoteSearchElementQuery extends RemoteSearchQuery {
 	private static final long serialVersionUID = 1L;
 
-	private ISourceReference element;
+	private ISourceReference fElement;
+
+	private String fPath;
 	
-	public RemoteSearchElementQuery(ICElement[] scope, ISourceReference element, int flags) {
+	public RemoteSearchElementQuery(ICElement[] scope, ISourceReference element, String path, int flags) {
 		super(scope, flags | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
-		this.element = element;
+		fElement = element;
+		fPath = path;
 	}
 
 	public IStatus runWithIndex(IIndex index, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException {
 		fConverter = converter;
 		try {
-			if (element instanceof ICElement) {
-				IBinding binding= IndexQueries.elementToBinding(index, (ICElement) element);
+			if (fElement instanceof ICElement) {
+				IBinding binding= IndexQueries.elementToBinding(index, (ICElement) fElement, fPath);
 				if (binding != null) {
 					createMatches(index, binding);
 				}
@@ -51,6 +54,6 @@ public class RemoteSearchElementQuery extends RemoteSearchQuery {
 	}
 	
 	public ISourceReference getSourceReference() {
-		return element;
+		return fElement;
 	}
 }

@@ -12,7 +12,6 @@ package org.eclipse.ptp.rdt.ui.subsystems;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +30,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IParent;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.parser.ParserMessages;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -70,6 +70,7 @@ import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
+import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider;
 import org.eclipse.ptp.services.core.IService;
@@ -79,10 +80,12 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
 import org.eclipse.rse.connectorservice.dstore.util.StatusMonitor;
 import org.eclipse.rse.connectorservice.dstore.util.StatusMonitorFactory;
+import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.SubSystem;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
+import org.eclipse.rse.services.dstore.util.DStoreStatusMonitor;
 
 import com.ibm.icu.text.MessageFormat;
 
@@ -103,6 +106,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	private ProjectChangeListener fProjectOpenListener;
 	private List<String> fErrorMessages = new ArrayList<String>();
 
+	private boolean fIsInitializing = false;
+	
 	protected RSECIndexSubsystem(IHost host,
 			IConnectorService connectorService) {
 		super(host, connectorService);
@@ -123,22 +128,43 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	 * @see org.eclipse.rse.core.subsystems.SubSystem#initializeSubSystem(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void initializeSubSystem(IProgressMonitor monitor) {
-		
+	public synchronized void initializeSubSystem(IProgressMonitor monitor) throws SystemMessageException {
+		boolean isFirstCall = false;
+		if(!fIsInitializing) {
+			fIsInitializing = true;
+			isFirstCall = true;
+		}
+
 		try {
 			super.initializeSubSystem(monitor);
-		} catch (SystemMessageException e) {
-			RDTLog.logError(e);	
+			fProjectOpenListener = new ProjectChangeListener(this);
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectOpenListener);
+
+			DataStore dataStore = getDataStore(monitor);
+			DataElement status = dataStore.activateMiner("org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"); //$NON-NLS-1$
+
+			if (status != null) {
+				DStoreStatusMonitor statusMonitor = new DStoreStatusMonitor(dataStore);
+
+				// wait for the miner to be fully initialized
+				try {
+					statusMonitor.waitForUpdate(status, monitor);
+				} catch (InterruptedException e) {
+					UIPlugin.log(e);
+				}
+			}
+
 		}
-		
-		fProjectOpenListener = new ProjectChangeListener(this);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectOpenListener);
-		
-		getDataStore().activateMiner("org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"); //$NON-NLS-1$
+
+		finally {
+			if(isFirstCall)
+				fIsInitializing = false;
+		}
+
 	}
 
 	@Override
-	public void uninitializeSubSystem(IProgressMonitor monitor) {
+	public synchronized void uninitializeSubSystem(IProgressMonitor monitor) {
 		super.uninitializeSubSystem(monitor);
 		
 		
@@ -154,11 +180,11 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	 */
 	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, String indexLocation, IProgressMonitor monitor, RemoteIndexerTask task) {
 		removeProblems(scope);
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 		if(dataStore == null)
 			return Status.OK_STATUS;
 		
-    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
+    	DataElement result = getDataStore(monitor).createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
      	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
      	monitor.beginTask("Rebuilding indexing...", 100); //$NON-NLS-1$
    
@@ -167,6 +193,10 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
         	ArrayList<Object> args = new ArrayList<Object>();
  
         	args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+           	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getScheme()));
+        	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getRootPath()));
+        	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getMappedPath()));
+        	args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, indexLocation));
         	
         	String serializedProvider = null;
         	try {
@@ -176,7 +206,6 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			}
 			
 			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider));
-			args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, indexLocation));
 			
             DataElement status = dataStore.command(queryCmd, args, result);   
 
@@ -328,11 +357,11 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 		
 		removeProblems(scope);
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 		if(dataStore == null)
 			return Status.OK_STATUS;
 
-    	DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
+    	DataElement result = getDataStore(monitor).createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
      	StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(_connectorService, dataStore);
      	int workCount = newElements.size() + changedElements.size();
     	monitor.beginTask("Incrementally Indexing...", workCount); //$NON-NLS-1$
@@ -342,6 +371,10 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
         	ArrayList<Object> args = new ArrayList<Object>();
         	
         	args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+           	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getScheme()));
+           	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getRootPath()));
+        	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getMappedPath()));
+        	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getHost()));
            	
            	String serializedProvider = null;
         	try {
@@ -395,7 +428,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 				for (int i = 0; i < status.getNestedSize(); i ++ ){
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
-			    		String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
+						String message = element.getAttribute(DE.A_NAME)+ ".  " ;  //$NON-NLS-1$
 			    		for (int j = 0; j < fErrorMessages.size(); j++) {
 			    			if (message.indexOf(fErrorMessages.get(j)) > 0) {					    		
 					    		String msg = reportProblem(scope, message);
@@ -452,9 +485,10 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#registerScope(org.eclipse.ptp.internal.rdt.core.model.Scope, java.lang.String[], org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus registerScope(Scope scope, List<ICElement> elements, String configLocation, IProgressMonitor monitor)
+	public synchronized IStatus registerScope(Scope scope, List<ICElement> elements, String configLocation, IProgressMonitor monitor)
 	{
-		DataStore dataStore = getDataStore();
+		
+		DataStore dataStore = getDataStore(monitor);
 		   
 	    if (dataStore != null)
 	    {
@@ -474,6 +508,23 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             	DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
             	args.add(scopeElement);
             	
+            	// scheme for scope
+            	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getScheme());
+            	args.add(dataElement);
+            	
+            	// host
+            	DataElement hostElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getHost());
+            	args.add(hostElement);
+ 
+               	// root path for scope on server
+            	DataElement rootPath = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getRootPath());
+            	args.add(rootPath);
+ 
+            	
+            	// mapped path for scope on local machine
+            	DataElement mappedPath = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getMappedPath());
+            	args.add(mappedPath);
+            	
             	// need to know where to find the pdom file for the scope
             	DataElement configElement = dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, configLocation);
             	args.add(configElement);
@@ -486,12 +537,10 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             	// execute the command
             	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
             	
-            	try
-                {
+            	try {
                 	smonitor.waitForUpdate(status, monitor);
                 }
-                catch (Exception e)
-                {                	
+                catch (Exception e) {
                 	RDTLog.logError(e);
                 }
             }	
@@ -540,31 +589,20 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		}
 	}
 	
-	protected URI convertRemotePathToURI(String path) throws URISyntaxException {
-		return new URI("rse", _host.getHostName(), path, null); //$NON-NLS-1$
-	}
-	
 	protected String convertURIToRemotePath(URI locationURI) {
-		// RSE URIs are of the form rse://host/path
-		
-		// it had better be an RSE URI
-		assert(locationURI.getScheme().equals("rse")); //$NON-NLS-1$
-		
-		// the URI had better correspond to a location on the host that this subsystem is connected to
-		assert(_host.getHostName().equals(locationURI.getHost()));
-		
-		return locationURI.getPath();
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(locationURI);
+		return path;
 	}
 
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#unregisterScope(org.eclipse.ptp.internal.rdt.core.model.Scope, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IStatus unregisterScope(Scope scope, IProgressMonitor monitor) {
+	public synchronized IStatus unregisterScope(Scope scope, IProgressMonitor monitor) {
 	    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(scope.getName());
 		fInitializedProjects.remove(project);
 		
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 		   
 	    if (dataStore != null)
 	    {
@@ -594,12 +632,10 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             	//DataElement status = dataStore.command(queryCmd, dataStore.getDescriptorRoot(), true); 
             	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
             	
-            	try
-                {
+            	try {
                 	smonitor.waitForUpdate(status, monitor);
                 }
-                catch (Exception e)
-                {            
+                catch (Exception e) {   
                 	RDTLog.logError(e);
                 }
             }
@@ -623,7 +659,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	
 	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.9"), 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] {scope, unit, selectedText, selectionStart, selectionLength}, monitor);
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] {scope, unit, path, selectedText, selectionStart, selectionLength}, monitor);
 		if(result == null)
 			return OpenDeclarationResult.failureUnexpectedError();
 		return (OpenDeclarationResult)result;
@@ -635,7 +672,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 
 	public CalledByResult getCallers(Scope scope, ICElement subject, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.5") + subject, 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLERS, new Object[] { scope, getHostName(), subject }, null);
+    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLERS, new Object[] { scope, getHostName(), subject, path }, null);
 		if (result == null) {
 			return new CalledByResult();
 		}
@@ -647,7 +685,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	 */
 	public CallsToResult getCallees(Scope scope, ICElement subject, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.6") + subject, 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLS, new Object[] { scope, getHostName(), subject }, null);
+    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLS, new Object[] { scope, getHostName(), subject, path }, null);
 		if (result == null) {
 			return new CallsToResult();
 		}
@@ -659,7 +698,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	 */
 	public ICElement[] getCHDefinitions(Scope scope, ICElement subject, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, new Object[] { scope, getHostName(), subject }, null);
+    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, new Object[] { scope, getHostName(), subject, path }, null);
 		if (result == null) {
 			return new ICElement[0];
 		}
@@ -668,7 +708,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	
 	public ICElement[] getCHDefinitions(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + unit, 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, new Object[] { scope, getHostName(), unit, selectionStart, selectionLength }, null);
+    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, new Object[] { scope, getHostName(), unit, path, selectionStart, selectionLength }, null);
 		if (result == null) {
 			return new ICElement[0];
 		}
@@ -685,8 +726,11 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		return (List<RemoteSearchMatch>) result;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Proposal> computeCompletionProposals(Scope scope, RemoteContentAssistInvocationContext context, ITranslationUnit unit) {
-		DataStore dataStore = getDataStore();
+		checkAllProjects(new NullProgressMonitor());
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+		DataStore dataStore = getDataStore(null);
 	    if (dataStore == null)
 	    {
 	    	return Collections.emptyList();
@@ -712,6 +756,11 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
     	
     	// translation unit
     	args.add(createSerializableElement(dataStore, unit));
+    	
+    	// path to translation unit
+    	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, path);
+    	args.add(dataElement);
+
     	
     	// execute the command
     	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
@@ -744,7 +793,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 	
 	public THGraph computeTypeGraph(Scope scope, ICElement input, IProgressMonitor monitor) {
-		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH, new Object[] { scope, getHostName(), input }, monitor);
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(input.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH, new Object[] { scope, getHostName(), input, path }, monitor);
 		if (result == null) {
 			return new THGraph();
 		}
@@ -752,7 +802,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 	
 	public ICElement[] findTypeHierarchyInput(Scope scope, ICElement memberInput) {
-		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT1, new Object[] { scope, getHostName(), memberInput }, null);
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(memberInput.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT1, new Object[] { scope, getHostName(), memberInput, path }, null);
 		if (result == null) {
 			return new ICElement[] { null, null };
 		}
@@ -760,7 +811,8 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 	
 	public ICElement[] findTypeHierarchyInput(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength) {
-		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getHostName(), unit, new Integer(selectionStart), new Integer(selectionLength)}, null);
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getHostName(), unit, path, new Integer(selectionStart), new Integer(selectionLength)}, null);
 		if (result == null) {
 			return new ICElement[] { null, null };
 		}
@@ -782,7 +834,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	 * @param deserializeResult If true the result will be deserialized, if false it will treat the result as a raw string.
 	 */
 	private Object sendRequest(String requestType, Object[] arguments, IProgressMonitor monitor, boolean deserializeResult) {
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 	    if (dataStore == null)
 	    	return null;
 	    
@@ -797,6 +849,18 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
     		if (argument instanceof Scope) {
     	    	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, ((Scope) argument).getName());
     	    	args.add(dataElement);
+    	    	
+    	    	dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, ((Scope) argument).getScheme());
+            	args.add(dataElement);
+            	
+            	// root path for scope on server
+            	DataElement rootPath = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, ((Scope) argument).getRootPath());
+            	args.add(rootPath);
+            	
+            	// path mappings for scope
+            	DataElement pathElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, ((Scope) argument).getMappedPath());
+            	args.add(pathElement);
+            	
     		} else if (argument instanceof String) {
             	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, (String) argument);
             	args.add(dataElement);
@@ -860,18 +924,37 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
     	}
 	}
 
-	protected DataStore getDataStore()
+	protected synchronized DataStore getDataStore(IProgressMonitor monitor)
 	{
+		if(monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+			
+		try {
+			RSECorePlugin.waitForInitCompletion();
+		} catch (InterruptedException e) {
+			UIPlugin.log(e);
+			return null;
+		}
+			
 		IConnectorService connectorService = getConnectorService();
 		
 		if(connectorService instanceof DStoreConnectorService) {
-			return ((DStoreConnectorService) connectorService).getDataStore();
+			DStoreConnectorService dstoreConnectorService = (DStoreConnectorService) connectorService;
+			if(!fIsInitializing && !dstoreConnectorService.isConnected()) {
+				try {
+					dstoreConnectorService.connect(monitor);
+				} catch (Exception e) {
+					UIPlugin.log(e);
+				}
+			}
+			return dstoreConnectorService.getDataStore();
 
 		}
 		return null;
 	}
 	
-	public void checkAllProjects(IProgressMonitor monitor) {
+	public synchronized void checkAllProjects(IProgressMonitor monitor) {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot workspaceRoot = workspace.getRoot();
 
@@ -897,7 +980,24 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		}
 	}
 		
-	public void checkProject(IProject project, IProgressMonitor monitor) {
+	public synchronized void checkProject(IProject project, IProgressMonitor monitor) {
+	
+		try {
+			RSECorePlugin.waitForInitCompletion();
+		} catch (InterruptedException e) {
+			UIPlugin.log(e);
+			return;
+		}
+		
+		IConnectorService connectorService = getConnectorService();
+		if(!connectorService.isConnected()) {
+			try {
+				connectorService.connect(monitor);
+			} catch (Exception e) {
+				UIPlugin.log(e);
+			}
+		}
+		
 		if (project == null){ 
 			return;
 		}
@@ -918,7 +1018,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		}
 	}
 
-	private void initializeScope(IProject project, IProgressMonitor monitor) throws CoreException {
+	private synchronized void initializeScope(IProject project, IProgressMonitor monitor) throws CoreException {
 		// get the service model configuration for this project
 		final ServiceModelManager serviceModelManager = ServiceModelManager.getInstance();
 		IServiceConfiguration config = serviceModelManager.getActiveConfiguration(project);
@@ -949,9 +1049,9 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 
 		// collect the translation units
 		project.accept(fileCollector);
-
+		
+		Scope scope = new Scope(project);
 		String configLocation = ((IIndexServiceProvider)provider).getIndexLocation();
-		Scope scope = new Scope(project.getName());
 
 		// unregister the scope if there already is one
 		unregisterScope(scope, monitor);
