@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.core.RemoteScannerInfo;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
@@ -75,7 +76,8 @@ public class RemoteSearchService extends AbstractRemoteService implements ISearc
 	}
 	
 	public ISearchQuery createSearchElementQuery(Scope indexScope, ICElement[] searchScope, ISourceReference object, int limitTo) {
-		RemoteSearchElementQuery query = new RemoteSearchElementQuery(convertScope(searchScope), adaptReference(object), limitTo);
+		String path = FileSystemUtilityManager.getDefault().getPathFromURI(object.getTranslationUnit().getLocationURI());
+		RemoteSearchElementQuery query = new RemoteSearchElementQuery(convertScope(searchScope), adaptReference(object), path, limitTo);
 		return new RemoteSearchElementQueryAdapter(getSubSystem(), indexScope, query);
 	}
 

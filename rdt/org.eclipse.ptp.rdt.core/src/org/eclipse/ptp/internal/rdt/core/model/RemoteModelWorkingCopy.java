@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/ 
 
 package org.eclipse.ptp.internal.rdt.core.model;
-
 import java.util.Map;
 
 import org.eclipse.cdt.core.model.CModelException;
@@ -56,24 +55,28 @@ public class RemoteModelWorkingCopy extends WorkingCopy {
 	 * @see org.eclipse.cdt.internal.core.model.TranslationUnit#buildStructure(org.eclipse.cdt.internal.core.model.OpenableInfo, org.eclipse.core.runtime.IProgressMonitor, java.util.Map, org.eclipse.core.resources.IResource)
 	 */
 	@Override
-	protected boolean buildStructure(OpenableInfo info, IProgressMonitor pm,
-			Map<ICElement, CElementInfo> newElements,
+	protected boolean buildStructure(OpenableInfo info, IProgressMonitor pm, Map<ICElement, CElementInfo> newElements,
 			IResource underlyingResource) throws CModelException {
-		
-		//remove previous info before we start creating new ones
+
+		// remove previous info before we start creating new ones
 		removeChildrenInfo(fOriginal);
-		
-		// generate structure - using remote model	
-		IModelBuilderService service = new RemoteModelBuilderServiceFactory().getModelBuilderService(getCProject().getProject());
-		ITranslationUnit tu = null;
-		try {
-			tu = service.getModel(fOriginal, new NullProgressMonitor());
-			ModelBuilder builder = new ModelBuilder(fOriginal, new NullProgressMonitor());
-			builder.buildLocalModel((TranslationUnit)tu);
-		} catch (CoreException e) {
-			e.printStackTrace();
+
+		// generate structure - using remote model
+		IModelBuilderService service = new RemoteModelBuilderServiceFactory().getModelBuilderService(getCProject()
+				.getProject());
+		if (service != null) {
+			ITranslationUnit tu = null;
+			try {
+				tu = service.getModel(fOriginal, new NullProgressMonitor());
+				ModelBuilder builder = new ModelBuilder(fOriginal, new NullProgressMonitor());
+				builder.buildLocalModel((TranslationUnit) tu);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+			return true;
 		}
-		return true;
+
+		return false;
 	}
 	
 	//remove any cached info from itself and its children

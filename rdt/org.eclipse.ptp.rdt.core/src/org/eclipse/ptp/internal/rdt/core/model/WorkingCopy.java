@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,9 @@
  *******************************************************************************/ 
 
 package org.eclipse.ptp.internal.rdt.core.model;
+
+import java.io.IOException;
+import java.net.URI;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
@@ -40,10 +43,21 @@ public class WorkingCopy extends TranslationUnit implements IRemoteWorkingCopy {
 	
 	@Override
 	public CodeReader getCodeReader() {
-		if (fLocation == null)
+		
+		URI uri = null;
+		
+		if(fManagedLocation != null)
+			uri = fManagedLocation;
+		else
+			uri = fLocation;
+		
+		if(uri == null)
 			return null;
 		
-		return new CodeReader(fLocation.getPath(), getContents());
+		String filePath = fRemotePath != null ? fRemotePath : uri.getPath();
+		
+		return new CodeReader(filePath, getContents());
+		
 	}
 	
 	@Override

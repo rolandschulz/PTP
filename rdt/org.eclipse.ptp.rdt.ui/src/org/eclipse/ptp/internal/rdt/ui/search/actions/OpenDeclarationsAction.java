@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.text.CWordFinder;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -130,7 +131,8 @@ public class OpenDeclarationsAction extends SelectionParseAction {
 			workingCopy = ModelAdapter.adaptElement(null, workingCopy, 0, true);
 		}
 		
-		Scope scope = new Scope(workingCopy.getCProject().getProject().getName());
+		
+		Scope scope = new Scope(workingCopy.getCProject().getProject());
 		int selectionStart  = fTextSelection.getOffset();
 		int selectionLength = fTextSelection.getLength();
 		
@@ -176,14 +178,7 @@ public class OpenDeclarationsAction extends SelectionParseAction {
 	 * Replaces the path portion of the given URI.
 	 */
 	private URI replacePath(URI u, String path) {
-		try {
-			return new URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(),
-			               path, // replaced! 
-			               u.getQuery(),u.getFragment());
-		} catch (URISyntaxException e) {
-			RDTLog.logError(e);
-			return null;
-		}
+		return FileSystemUtilityManager.getDefault().replacePath(u, path);
 	}
 	
 	

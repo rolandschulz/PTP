@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.core.activator;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.core.remotemake.PathEntryValidationListener;
 import org.osgi.framework.BundleContext;
 
@@ -56,5 +58,29 @@ public class Activator extends Plugin {
 		finally {
 			super.stop(context);
 		}
+	}
+	
+	public static void log(String e) {
+		log(createStatus(e));
+	}
+	
+	public static void log(Throwable e) {
+		log("Error", e); //$NON-NLS-1$
+	}
+	
+	public static void log(String message, Throwable e) {
+		log(createStatus(message, e));
+	}
+
+	public static IStatus createStatus(String msg) {
+		return createStatus(msg, null);
+	}
+
+	public static IStatus createStatus(String msg, Throwable e) {
+		return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, msg, e);
+	}
+	
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
 	}
 }

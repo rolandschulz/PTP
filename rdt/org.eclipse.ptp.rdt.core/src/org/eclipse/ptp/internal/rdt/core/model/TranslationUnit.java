@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ import org.eclipse.cdt.core.parser.IncludeFileContentProvider;
 import org.eclipse.cdt.internal.core.index.IndexBasedFileContentProvider;
 import org.eclipse.cdt.internal.core.model.IBufferFactory;
 import org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver;
+import org.eclipse.cdt.utils.FileSystemUtilityManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -93,6 +94,31 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			throw new IllegalArgumentException(e);
 		}
 		setLocationURI(element.getLocationURI());
+		
+		if(element instanceof IHasManagedLocation) {
+			IHasManagedLocation hml = (IHasManagedLocation) element;
+			setManagedLocation(hml.getManagedLocation());
+		}
+		
+		else {
+			// we are adapting a local TU to a remote TU
+			// we need to get a hold of the managed URI
+			URI managedURI = FileSystemUtilityManager.getDefault().getManagedURI(element.getLocationURI());
+			setManagedLocation(managedURI);
+		}
+		
+		if(element instanceof IHasRemotePath) {
+			IHasRemotePath hasRemotePath = (IHasRemotePath) element;
+			setRemotePath(hasRemotePath.getRemotePath());
+		}
+		
+		else {
+			// we are adapting a local TU to a remote TU
+			// we need to get a hold of the mapped path
+			String remotePath = FileSystemUtilityManager.getDefault().getPathFromURI(element.getLocationURI());
+			setRemotePath(remotePath);
+		}
+		
 		isHeaderUnit = element.isHeaderUnit();
 	}
 	
@@ -217,10 +243,19 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	}
 
 	public CodeReader getCodeReader() {
-		if(fLocation == null)
+	
+		
+		URI uri = null;
+		
+		if(fManagedLocation != null)
+			uri = fManagedLocation;
+		else
+			uri = fLocation;
+		
+		if(uri == null)
 			return null;
 		
-		String filePath = fLocation.getPath();
+		String filePath = fRemotePath != null ? fRemotePath : uri.getPath();
 		try {
 			return new CodeReader(filePath);
 		} catch (IOException e) {
@@ -547,7 +582,10 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	}
 
 	public boolean isActive() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
+	}
+
+	public String getPathForFileContent() {
+		return getRemotePath();
 	}
 }

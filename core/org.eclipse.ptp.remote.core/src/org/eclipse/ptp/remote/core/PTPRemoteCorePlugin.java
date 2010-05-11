@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -220,8 +220,12 @@ public class PTPRemoteCorePlugin extends Plugin {
 		RemoteServicesProxy proxy = allRemoteServicesById.get(id);
 		if (proxy != null) {
 			return proxy.getServices();
+		} else {
+			// initialization might have failed for that set of services previously... try to load it again
+			retrieveRemoteServices(id);
+			proxy = allRemoteServicesById.get(id);
+			return proxy.getServices();
 		}
-		return null;
 	}
 
 	/**
@@ -286,6 +290,34 @@ public class PTPRemoteCorePlugin extends Plugin {
 					RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
 					allRemoteServicesById.put(proxy.getId(), proxy);
 					allRemoteServicesByScheme.put(proxy.getScheme(), proxy);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Attempts to load the remote services with a given ID.  If no services are loaded, it
+	 * loads them all.
+	 * 
+	 * @param id
+	 */
+	private void retrieveRemoteServices(String id) {
+		if (allRemoteServicesById == null) {
+			retrieveRemoteServices();
+		} else {
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, REMOTE_SERVICES_EXTENSION_POINT_ID);
+			final IExtension[] extensions = extensionPoint.getExtensions();
+
+			for (IExtension ext : extensions) {
+				final IConfigurationElement[] elements = ext.getConfigurationElements();
+
+				for (IConfigurationElement ce : elements) {
+					RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
+					if (proxy.getId().equals(id)) {
+						allRemoteServicesById.put(proxy.getId(), proxy);
+						allRemoteServicesByScheme.put(proxy.getScheme(), proxy);					
+					}
 				}
 			}
 		}

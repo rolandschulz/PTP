@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,15 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getHomeDirectory()
+	 */
+	@Override
+	public IFileStore getHomeDirectory() {
+		String pathString = System.getProperty("user.home");
+		return EFS.getLocalFileSystem().getStore(new Path(pathString));
+	}
+
 	private ProcessFactory localProcessBuilder;
 	private Map<String, String> remoteEnv = new HashMap<String, String>();
 	
