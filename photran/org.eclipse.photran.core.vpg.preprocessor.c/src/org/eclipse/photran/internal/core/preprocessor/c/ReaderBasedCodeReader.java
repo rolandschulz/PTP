@@ -7,36 +7,25 @@
  *
  * Contributors:
  *    UIUC - Initial API and implementation
+ *           (Jeff Overbey) Modified to use Reader rather than InputStream
  *******************************************************************************/
 package org.eclipse.photran.internal.core.preprocessor.c;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.eclipse.cdt.core.parser.CodeReader;
 
-public class InputStreamCodeReader extends CodeReader 
+public class ReaderBasedCodeReader extends CodeReader 
 {
 
-	public InputStreamCodeReader(String filename, InputStream stream)
+	public ReaderBasedCodeReader(String filename, Reader stream)
 			throws IOException 
 	{
 		super(filename, convertToCharBuffer(stream));
-		
-		// TODO Auto-generated constructor stub
 	}
 	
-	public InputStreamCodeReader(String filename, String charSet, InputStream stream)
-			throws IOException 
-	{
-		//We are dropping out the charSet variable because it is used internally by 
-		// CodeReader to read from the FileStream. Since we want to read from the 
-		// InputStream, and we do it byte-wise, we don't really care for encoding
-		super(filename, convertToCharBuffer(stream));
-		// TODO Auto-generated constructor stub
-	}
-	
-	private static char[] convertToCharBuffer(InputStream stream)
+	private static char[] convertToCharBuffer(Reader stream)
 	{
 		int b = 0;
 		StringBuffer aggregate = new StringBuffer();
@@ -57,7 +46,14 @@ public class InputStreamCodeReader extends CodeReader
 				aggregate.append((char)b);
 			}
 		}
+		try
+        {
+            stream.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
 		return aggregate.toString().toCharArray();
 	}
-
 }

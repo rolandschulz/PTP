@@ -64,9 +64,9 @@ class FixedFormLexerPrepass {
 		this.in = new OffsetLineReader(in);
 	}
 	
-	public FixedFormLexerPrepass(InputStream in) {
-		this(new InputStreamReader(in));
-	}
+//	public FixedFormLexerPrepass(InputStream in) {
+//		this(new InputStreamReader(in));
+//	}
 	
 	public int getLine(int absCharPos) {
 		if (absCharPos<0) return 0;

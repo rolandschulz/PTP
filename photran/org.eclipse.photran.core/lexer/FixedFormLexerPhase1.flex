@@ -34,7 +34,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import java.util.regex.Pattern;
-import java.io.InputStream;
+import java.io.Reader;
 import org.eclipse.core.resources.IFile;
 
 @SuppressWarnings("unused")
@@ -58,8 +58,8 @@ import org.eclipse.core.resources.IFile;
 
     private TokenFactory tokenFactory;
 
-    public FixedFormLexerPhase1(InputStream in, FixedFormLexerPrepass _prepass, TokenFactory tokenFactory) {
-        this(new LineAppendingInputStream(in));
+    public FixedFormLexerPhase1(Reader in, FixedFormLexerPrepass _prepass, TokenFactory tokenFactory) {
+        this(new LineAppendingReader(in));
         this.prepass=_prepass;
         this.tokenFactory = tokenFactory;
     }
@@ -188,7 +188,7 @@ import org.eclipse.core.resources.IFile;
 
     private String filename = "<stdin>";
 
-    public FixedFormLexerPhase1(java.io.InputStream in, FixedFormLexerPrepass _prepass, IFile file, String filename, TokenFactory tokenFactory)
+    public FixedFormLexerPhase1(Reader in, FixedFormLexerPrepass _prepass, IFile file, String filename, TokenFactory tokenFactory)
     {
         this(in, _prepass, tokenFactory);
         this.lastTokenFile = new FileOrIFile(file);

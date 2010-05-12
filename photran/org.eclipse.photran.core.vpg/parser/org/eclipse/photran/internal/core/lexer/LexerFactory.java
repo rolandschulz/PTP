@@ -10,11 +10,12 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -29,19 +30,23 @@ public final class LexerFactory
 {
     private LexerFactory() {;}
     
-    public static IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, SourceForm sourceForm, boolean accumulateWhitetext) throws IOException
+    public static IAccumulatingLexer createLexer(Reader in, IFile file, String filename, SourceForm sourceForm, boolean accumulateWhitetext) throws IOException
     {
         return sourceForm.createLexer(in, file, filename, accumulateWhitetext);
     }
     
     public static IAccumulatingLexer createLexer(File file, SourceForm sourceForm, boolean accumulateWhitetext) throws IOException
     {
-        return createLexer(new BufferedInputStream(new FileInputStream(file)), null, file.getAbsolutePath(), sourceForm, accumulateWhitetext);
+        return createLexer(new BufferedReader(new FileReader(file)), null, file.getAbsolutePath(), sourceForm, accumulateWhitetext);
     }
     
     public static IAccumulatingLexer createLexer(IFile file, SourceForm sourceForm, boolean accumulateWhitetext) throws CoreException, IOException
     {
-        return createLexer(file.getContents(true), file, determineFilename(file), sourceForm, accumulateWhitetext);
+        return createLexer(new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset())),
+            file,
+            determineFilename(file),
+            sourceForm,
+            accumulateWhitetext);
     }
 
     private static String determineFilename(IFile file)

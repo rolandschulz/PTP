@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 /**
  * Java's <code>BufferedReader</code> can read a line of text from another
@@ -20,9 +20,9 @@ import java.io.InputStream;
  * 
  * @author Jeff Overbey
  */
-public final class LineInputStream extends InputStream implements CharSequence
+public final class LineReader extends SingleCharReader implements CharSequence
 {
-    protected InputStream in;
+    protected Reader in;
     
     protected String filename;
     protected int startOffset;
@@ -37,12 +37,12 @@ public final class LineInputStream extends InputStream implements CharSequence
     protected int lineNumInCurrentStream = 0;
     protected boolean atEOF = false;
 
-    public LineInputStream(InputStream readFrom, String filename) throws IOException
+    public LineReader(Reader readFrom, String filename) throws IOException
     {
         this(readFrom, filename, 0, 0);
     }
 
-    public LineInputStream(InputStream readFrom, String filename, int startOffset, int startLineNum) throws IOException
+    public LineReader(Reader readFrom, String filename, int startOffset, int startLineNum) throws IOException
     {
         this.in = readFrom;
         this.filename = filename;
@@ -256,5 +256,11 @@ public final class LineInputStream extends InputStream implements CharSequence
         {
             return String.valueOf(currentLine, start, end-start);
         }
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        in.close();
     }
 }

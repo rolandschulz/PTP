@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.internal.examples.text;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -127,7 +129,7 @@ public final class ConvertTabsToSpacesRefactoring extends Refactoring implements
         TextFileChange change = new TextFileChange("Replace tabs in " + file.getName(), file);
         change.setEdit(new MultiTextEdit());
 
-        BufferedInputStream in = new BufferedInputStream(file.getContents(true));
+        Reader in = new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset()));
         int offset = 0;
         int column = 0;
         int numberOfTabsReplaced = 0;

@@ -12,12 +12,13 @@ package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.ASTTokenFactory;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
 import org.eclipse.photran.internal.core.lexer.LexerException;
-import org.eclipse.photran.internal.core.lexer.LineAppendingInputStream;
+import org.eclipse.photran.internal.core.lexer.LineAppendingReader;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.TokenFactory;
 
@@ -39,9 +40,9 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
     private FortranPreprocessor preprocessor;
     private FortranIncludeDirective lastDirective;
 
-    public PreprocessingFreeFormLexerPhase1(InputStream in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
+    public PreprocessingFreeFormLexerPhase1(Reader in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
     {
-        this(new FortranPreprocessor(new LineAppendingInputStream(in), file, filename, callback), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
+        this(new FortranPreprocessor(new LineAppendingReader(in), file, filename, callback), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
     }
     
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)

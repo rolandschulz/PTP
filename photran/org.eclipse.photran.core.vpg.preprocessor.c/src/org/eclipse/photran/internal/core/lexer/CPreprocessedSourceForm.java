@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
@@ -30,7 +30,7 @@ public final class CPreprocessedSourceForm extends SourceForm
     	this.callback = callback;
     }
 
-    @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+    @Override public IAccumulatingLexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
     {
         return new LexerPhase3(new FreeFormLexerPhase2(new CPreprocessingFreeFormLexerPhase1(in, file, filename, callback, accumulateWhitetext)));
     }

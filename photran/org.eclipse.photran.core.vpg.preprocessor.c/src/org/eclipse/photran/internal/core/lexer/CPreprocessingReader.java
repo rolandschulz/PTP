@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.preprocessor.c.CppHelper;
@@ -25,7 +25,7 @@ import org.eclipse.photran.internal.core.preprocessor.c.OffsetLimitReachedExcept
  * 
  * @author Matthew Michelotti
  */
-public class CPreprocessingInputStream extends InputStream
+public class CPreprocessingReader extends SingleCharReader
 {
 	/**ProducerMap constructed from the CPP tokens*/
 	private ProducerMap producerMap;
@@ -45,14 +45,14 @@ public class CPreprocessingInputStream extends InputStream
 	 * from these tokens. The tokens are remembered, so that they
 	 * can be read as an input stream.
 	 * @param filename - name of file that inputStream corresponds to
-	 * @param inputStream - InputStream to read file data from
+	 * @param reader - Reader to read file data from
 	 * @throws IOException
 	 */
-	public CPreprocessingInputStream(IFile file, String filename, InputStream inputStream) throws IOException
+	public CPreprocessingReader(IFile file, String filename, Reader reader) throws IOException
 	{
 		try
 		{
-			CppHelper cpp = new CppHelper(file, filename, inputStream);
+			CppHelper cpp = new CppHelper(file, filename, reader);
 			curToken = cpp.getRemainingTokens();
 			curTokenImage = CppHelper.getFullImage(curToken);
 			producerMap = new ProducerMap(curToken);
@@ -83,4 +83,9 @@ public class CPreprocessingInputStream extends InputStream
 	public IncludeMap getIncludeMap() {
 		return includeMap;
 	}
+
+    @Override
+    public void close() throws IOException
+    {
+    }
 }

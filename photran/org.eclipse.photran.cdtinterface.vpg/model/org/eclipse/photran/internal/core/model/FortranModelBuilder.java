@@ -1,6 +1,6 @@
 package org.eclipse.photran.internal.core.model;
 
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +74,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
             SourceForm sourceForm = determineSourceForm(file);
             String filename = determineFilename(file);
             lexer = LexerFactory.createLexer(
-                new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes()),
+                new StringReader(translationUnit.getBuffer().getContents()),
                 file,
                 filename,
                 sourceForm,

@@ -27,8 +27,10 @@
  */
 
 package org.eclipse.photran.internal.core.lexer;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
 import org.eclipse.core.resources.IFile;
 
 @SuppressWarnings("unused")
@@ -120,9 +122,9 @@ import org.eclipse.core.resources.IFile;
     private String filename = "<stdin>";
     protected TokenFactory tokenFactory;
 
-    public FreeFormLexerPhase1(java.io.InputStream in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    public FreeFormLexerPhase1(Reader in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
-        this(new LineAppendingInputStream(in));
+        this(new LineAppendingReader(in));
         this.lastTokenFile = new FileOrIFile(file);
         this.filename = filename;
         this.tokenFactory = tokenFactory;

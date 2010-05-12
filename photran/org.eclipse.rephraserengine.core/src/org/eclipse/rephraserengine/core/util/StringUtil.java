@@ -67,7 +67,7 @@ public class StringUtil
     
     public static String read(IFile file) throws IOException, CoreException
     {
-        return read(file.getContents(true));
+        return read(new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset())));
     }
 
     public static String read(File file) throws IOException

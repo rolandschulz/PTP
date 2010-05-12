@@ -12,9 +12,9 @@ package org.eclipse.rephraserengine.internal.ui.actions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -42,7 +42,8 @@ public class DisplayModelAction extends VPGOutputWindowAction
                 if (filename != null)
                 {
                     ArrayList<Integer> lineMap = new ArrayList<Integer>();
-                    String fileContents = readStream(lineMap, info.getFileInEditor().getContents(true));
+                    String fileContents = readStream(lineMap,
+                        new BufferedReader(new InputStreamReader(info.getFileInEditor().getContents(true), info.getFileInEditor().getCharset())));
                     ps.println(filename);
                     ps.println();
                     Model model = new Model("edge model", new NullProgressMonitor(), 0, vpg, filename);
@@ -60,10 +61,9 @@ public class DisplayModelAction extends VPGOutputWindowAction
         }
     }
 
-    protected String readStream(ArrayList<Integer> lineMap, InputStream inputStream) throws IOException
+    protected String readStream(ArrayList<Integer> lineMap, Reader in) throws IOException
     {
         StringBuffer sb = new StringBuffer(4096);
-        BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
         for (int offset = 0, ch = in.read(); ch >= 0; ch = in.read())
         {
             sb.append((char)ch);

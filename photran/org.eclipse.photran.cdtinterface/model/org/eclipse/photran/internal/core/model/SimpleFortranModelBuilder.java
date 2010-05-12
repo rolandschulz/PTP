@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +73,7 @@ public class SimpleFortranModelBuilder implements IFortranModelBuilder
     {
         this.newElements = new HashMap();
         
-        InputStream in = new ByteArrayInputStream(translationUnit.getBuffer().getContents().getBytes());
+        Reader in = new StringReader(translationUnit.getBuffer().getContents());
         String filename = translationUnit.getElementName();
         boolean wasSuccessful = true;
 

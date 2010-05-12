@@ -10,8 +10,12 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
@@ -20,7 +24,7 @@ import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.Incl
 /**
  * Phase 1 lexer that handles C preprocessor directives.
  * <p>
- * This class feeds {@link FreeFormLexerPhase1} with a {@link CPreprocessingInputStream},
+ * This class feeds {@link FreeFormLexerPhase1} with a {@link CPreprocessingReader},
  * an {@link InputStream} that interprets C preprocessor directives.
  * {@link FreeFormLexerPhase1} tokenizes the preprocessed stream.  However, this
  * class subclasses {@link FreeFormLexerPhase1} and overrides its tokenization
@@ -49,13 +53,13 @@ public class CPreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
 	
 	private Token lastReadInFile = null;
 
-    public CPreprocessingFreeFormLexerPhase1(InputStream in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
+    public CPreprocessingFreeFormLexerPhase1(Reader in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
     {
-        this(new CPreprocessingInputStream(file, filename, new LineAppendingInputStream(in)), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
+        this(new CPreprocessingReader(file, filename, new LineAppendingReader(in)), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
     }
 
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)
-    private CPreprocessingFreeFormLexerPhase1(CPreprocessingInputStream cpp, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    private CPreprocessingFreeFormLexerPhase1(CPreprocessingReader cpp, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
         super(cpp, file, filename, tokenFactory, accumulateWhitetext);
         this.producerMap = cpp.getProducerMap();

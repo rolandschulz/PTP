@@ -1,6 +1,6 @@
 package org.eclipse.photran.internal.ui.editor_vpg;
 
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -179,7 +179,7 @@ public class FortranEditorTasks
                         String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
 
                         SourceForm sourceForm = determineSourceForm();
-                        IAccumulatingLexer lexer = LexerFactory.createLexer(new ByteArrayInputStream(editorContents.getBytes()),
+                        IAccumulatingLexer lexer = LexerFactory.createLexer(new StringReader(editorContents),
                                                                             editor.getIFile(),
                                                                             editor.getIFile().getName(),
                                                                             sourceForm,

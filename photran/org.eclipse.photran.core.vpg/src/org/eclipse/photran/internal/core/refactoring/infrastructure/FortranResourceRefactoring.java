@@ -11,6 +11,8 @@
 package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -271,8 +273,9 @@ public abstract class FortranResourceRefactoring
     {
         try
         {
+            final String charset = Charset.defaultCharset().name();
             IAccumulatingLexer lexer = LexerFactory.createLexer(
-                new ByteArrayInputStream(string.getBytes()), null, "(none)",
+                new InputStreamReader(new ByteArrayInputStream(string.getBytes(charset)), charset), null, "(none)",
                 SourceForm.UNPREPROCESSED_FREE_FORM, true);
             Parser parser = new Parser();
 

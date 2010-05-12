@@ -11,7 +11,7 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 
@@ -29,12 +29,13 @@ public class FixedFormLexerPhase2 implements ILexer
 
     private IToken nextToken = null;
 
-    public FixedFormLexerPhase2(InputStream in, IFile file, String filename, TokenFactory tokenFactory)
+    public FixedFormLexerPhase2(Reader in, IFile file, String filename, TokenFactory tokenFactory)
     {
-        in = new LineAppendingInputStream(in);
-        final FixedFormLexerPrepass prepass = new FixedFormLexerPrepass(in);
-        InputStream prepassReader = new InputStream()
+        final Reader input = new LineAppendingReader(in);
+        final FixedFormLexerPrepass prepass = new FixedFormLexerPrepass(input);
+        Reader prepassReader = new SingleCharReader()
         {
+            @Override
             public int read() throws IOException
             {
                 try
@@ -46,6 +47,12 @@ public class FixedFormLexerPhase2 implements ILexer
                     e.printStackTrace();
                     return -1;
                 }
+            }
+            
+            @Override
+            public void close() throws IOException
+            {
+                input.close();
             }
         };
 

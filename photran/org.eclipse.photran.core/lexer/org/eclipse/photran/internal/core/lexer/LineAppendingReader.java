@@ -11,40 +11,40 @@
 package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 /**
- * Wraps another <code>InputStream</code>, and, if the wrapped stream does not end
+ * Wraps another <code>Reader</code>, and, if the wrapped stream does not end
  * with an end-of-line character, appends the OS-dependent end-of-line sequence to
  * the end of the stream.
  * 
  * @author Jeff Overbey
  */
-public final class LineAppendingInputStream extends InputStream
+public final class LineAppendingReader extends SingleCharReader
 {
-    private InputStream originalInputStream;
-    private InputStream eolInputStream;
-    private InputStream currentInputStream;
+    private Reader originalReader;
+    private Reader eolReader;
+    private Reader currentReader;
     
     private int lastChar = -1;
     
-    public LineAppendingInputStream(InputStream streamToWrap)
+    public LineAppendingReader(Reader streamToWrap)
     {
-        this.originalInputStream = streamToWrap;
-        this.eolInputStream = new EOLInputStream();
+        this.originalReader = streamToWrap;
+        this.eolReader = new EOLReader();
         
-        this.currentInputStream = originalInputStream;
+        this.currentReader = originalReader;
     }
 
     @Override
     public int read() throws IOException
     {
-        int result = currentInputStream.read();
+        int result = currentReader.read();
         
-        if (result == -1 && currentInputStream == originalInputStream && !isEOL(lastChar))
+        if (result == -1 && currentReader == originalReader && !isEOL(lastChar))
         {
-            currentInputStream = eolInputStream;
-            result = currentInputStream.read();
+            currentReader = eolReader;
+            result = currentReader.read();
         }
         else
         {
@@ -59,7 +59,13 @@ public final class LineAppendingInputStream extends InputStream
         return c =='\n' || c == '\r';
     }
 
-    private static class EOLInputStream extends InputStream
+    @Override
+    public void close() throws IOException
+    {
+        originalReader.close();
+    }
+
+    private static class EOLReader extends SingleCharReader
     {
         private static final byte[] EOL = System.getProperty("line.separator").getBytes();
         private int eolByte = 0;
@@ -69,6 +75,10 @@ public final class LineAppendingInputStream extends InputStream
         {
             return eolByte < EOL.length ? EOL[eolByte++] : -1;
         }
-        
+
+        @Override
+        public void close() throws IOException
+        {
+        }
     }
 }

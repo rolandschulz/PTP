@@ -12,6 +12,7 @@ package org.eclipse.photran.internal.core.lexer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -21,7 +22,6 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.PreprocessingFreeFormLexerPhase1;
-import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Contains constants enumerating the various Fortran source forms (fixed form, free form, free
@@ -63,13 +63,13 @@ public abstract class SourceForm
      *     </ol>
      * </ol>
      */
-    public abstract IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException;
+    public abstract IAccumulatingLexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException;
     
     public abstract String getDescription(String filename);
     
     public static final SourceForm UNPREPROCESSED_FREE_FORM = new SourceForm()
     {
-        @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+        @Override public IAccumulatingLexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
         {
             return new LexerPhase3(new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext)));
         }
@@ -79,7 +79,7 @@ public abstract class SourceForm
     
     public static final SourceForm FIXED_FORM = new SourceForm()
     {
-        @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+        @Override public IAccumulatingLexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
         {
             return new LexerPhase3(new FixedFormLexerPhase2(in, file, filename, ASTTokenFactory.getInstance()));
         }
@@ -96,7 +96,7 @@ public abstract class SourceForm
     {
         return new SourceForm()
         {
-            @Override public IAccumulatingLexer createLexer(InputStream in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+            @Override public IAccumulatingLexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
             {
                 SourceForm sf = findPreferredSourceForm(filename);
                 if (sf != null)

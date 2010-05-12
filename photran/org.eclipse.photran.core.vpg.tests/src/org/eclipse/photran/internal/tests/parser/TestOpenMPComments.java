@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.tests.parser;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,8 +129,7 @@ public class TestOpenMPComments extends TestCase
     
     private ASTExecutableProgramNode parse(SourceForm sourceForm, String string) throws IOException, LexerException, SyntaxException
     {
-        ByteArrayInputStream in = new ByteArrayInputStream(string.getBytes());
-        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(in, null, "<stdin>", sourceForm, true));
+        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(new StringReader(string), null, "<stdin>", sourceForm, true));
         assertTrue(ast != null);
         return ast;
     }

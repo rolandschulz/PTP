@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -44,11 +47,19 @@ public class IncludeLoaderCallback
      * @return <code>InputStream</code>, not null
      * @throws FileNotFoundException if the file cannot be found
      */
-    public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
+    public Reader getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
     {
         try
         {
-        	return getIncludedFile(fileToInclude).getContents(true);
+        	IFile file = getIncludedFile(fileToInclude);
+            try
+            {
+                return new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset()));
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                return new BufferedReader(new InputStreamReader(file.getContents(true)));
+            }
         }
         catch (CoreException e)
         {

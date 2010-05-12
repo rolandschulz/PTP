@@ -10,9 +10,8 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.tests;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 
 import junit.framework.TestCase;
 
@@ -63,8 +62,7 @@ public abstract class BaseTestCase extends TestCase
     protected <T extends IBodyConstruct> T parseStmt(String stmt) throws IOException, LexerException, SyntaxException
     {
         String program = stmt + "\nend program\n";
-        InputStream in = new ByteArrayInputStream(program.getBytes());
-        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(in, null, null, SourceForm.UNPREPROCESSED_FREE_FORM, true));
+        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(new StringReader(program), null, null, SourceForm.UNPREPROCESSED_FREE_FORM, true));
         assertTrue(ast != null);
         LoopReplacer.replaceAllLoopsIn(ast);
         return (T)((ASTMainProgramNode)ast.getProgramUnitList().get(0)).getBody().get(0);

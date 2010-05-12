@@ -12,9 +12,8 @@ package org.eclipse.photran.internal.core.preprocessor.c;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.Arrays;
-import java.util.Map;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.dom.parser.c.GCCScannerExtensionConfiguration;
@@ -24,7 +23,6 @@ import org.eclipse.cdt.core.parser.IScannerInfoProvider;
 import org.eclipse.cdt.core.parser.NullLogService;
 import org.eclipse.cdt.core.parser.ParserLanguage;
 import org.eclipse.cdt.core.parser.ScannerInfo;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 
@@ -64,11 +62,11 @@ public class CppHelper {
      * @param includeSearchPaths - file paths to search in for included files
      * @throws IOException
      */
-    public CppHelper(String filename, InputStream in, String[] includeSearchPaths)
+    public CppHelper(String filename, Reader in, String[] includeSearchPaths)
     		throws IOException
     {
     	//NOTE: it is important that the CodeReader gets an ABSOLUTE file path
-        cpp = new CPreprocessor(new InputStreamCodeReader(filename, in),
+        cpp = new CPreprocessor(new ReaderBasedCodeReader(filename, in),
             new ScannerInfo(null, includeSearchPaths), ParserLanguage.C,
             new NullLogService(), new GCCScannerExtensionConfiguration(),
             FileCodeReaderFactory.getInstance());
@@ -85,7 +83,7 @@ public class CppHelper {
      *      Also, @param in could be different than @param file, if for example there
      *      are un-saved changes in the editor.
      */
-    public CppHelper(IResource infoProvider, String filename, InputStream in) throws IOException {
+    public CppHelper(IResource infoProvider, String filename, Reader in) throws IOException {
         //NOTE: it is important that the CodeReader gets an ABSOLUTE file path
         if (filename == null) 
             filename = "";
@@ -104,7 +102,7 @@ public class CppHelper {
         }
 
         //Map<String, String> temp = scanInfo.getDefinedSymbols();
-        cpp = new CPreprocessor(new InputStreamCodeReader(filename, in),
+        cpp = new CPreprocessor(new ReaderBasedCodeReader(filename, in),
             new ScannerInfo(scanInfo.getDefinedSymbols(), scanInfo.getIncludePaths()), ParserLanguage.C, new NullLogService(), 
             new GCCScannerExtensionConfiguration(), FileCodeReaderFactory.getInstance());
     }

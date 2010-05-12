@@ -13,15 +13,15 @@ package org.eclipse.photran.internal.ui.actions;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.StringBufferInputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.photran.internal.core.lexer.CPreprocessingInputStream;
+import org.eclipse.photran.internal.core.lexer.CPreprocessingReader;
 import org.eclipse.photran.internal.ui.editor.FixedFormFortranEditor;
 import org.eclipse.photran.internal.ui.editor.FreeFormFortranEditor;
 import org.eclipse.ui.ide.IDE;
@@ -32,7 +32,7 @@ import org.eclipse.ui.internal.Workbench;
  *
  * @author Jeff Overbey
  */
-@SuppressWarnings({ "deprecation", "restriction" })
+@SuppressWarnings({ "restriction" })
 public class DisplayPreprocessedSource extends FortranEditorActionDelegate
 {
     public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException
@@ -42,8 +42,8 @@ public class DisplayPreprocessedSource extends FortranEditorActionDelegate
         	boolean isFixedForm = getFortranEditor().isFixedForm();
         	
             IDocument doc = getFortranEditor().getIDocument();
-            InputStream in = new StringBufferInputStream(doc.get());
-            InputStream cppIn = new CPreprocessingInputStream(getFortranEditor().getIFile(), null, in);
+            Reader in = new StringReader(doc.get());
+            Reader cppIn = new CPreprocessingReader(getFortranEditor().getIFile(), null, in);
             
             File tempFile = File.createTempFile(
             	"tmp",

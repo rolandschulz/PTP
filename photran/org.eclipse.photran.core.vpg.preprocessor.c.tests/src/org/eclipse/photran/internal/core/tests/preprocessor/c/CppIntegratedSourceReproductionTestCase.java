@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.eclipse.photran.internal.core.lexer.CPreprocessedSourceForm;
 import org.eclipse.photran.internal.core.lexer.SourceForm;
@@ -35,7 +35,7 @@ public class CppIntegratedSourceReproductionTestCase extends AbstractParserTestC
     {
         return new CPreprocessedSourceForm(new IncludeLoaderCallback(null)
         {
-            @Override public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
+            @Override public Reader getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
             {
                 throw new FileNotFoundException("#include lines not supported in JUnit tests");
             }

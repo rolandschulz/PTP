@@ -10,11 +10,15 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.vpg;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -26,9 +30,9 @@ import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
+import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
-import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.LexerFactory;
@@ -213,7 +217,7 @@ public class PhotranVPGBuilder extends PhotranVPG
             sourceForm = SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject())
             {
                 @Override
-                public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
+                public Reader getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
                 {
                     // When we encounter an INCLUDE directive, set up a file dependency in the VPG
 
@@ -303,11 +307,19 @@ public class PhotranVPGBuilder extends PhotranVPG
         if (ast == null)
             throw new IllegalArgumentException(filename + " returned null AST");
         
-        ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
-        ast.getRoot().printOn(new PrintStream(out), null);
-        ast = parse(filename, new ByteArrayInputStream(out.toByteArray()));
+        try
+        {
+            final String charset = Charset.defaultCharset().name(); // Platform's default charset
+            ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
+            ast.getRoot().printOn(new PrintStream(out, false, charset), null);
+            ast = parse(filename, new InputStreamReader(new ByteArrayInputStream(out.toByteArray()), charset));
 
-        computeEdgesAndAnnotations(filename, ast);
+            computeEdgesAndAnnotations(filename, ast);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new Error(e);
+        }
     }
 
     @Override public String getSourceCodeFromAST(IFortranAST ast)
@@ -321,7 +333,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         return parse(filename, null);
     }
 
-    private IFortranAST parse(final String filename, InputStream stream)
+    private IFortranAST parse(final String filename, Reader stream)
     {
         if (filename == null || isVirtualFile(filename)) return null;
 
@@ -331,7 +343,7 @@ public class PhotranVPGBuilder extends PhotranVPG
             SourceForm sourceForm = determineSourceForm(filename);
             try
             {
-                if (stream == null) stream = file.getContents(true);
+                if (stream == null) stream = new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset()));
                 IAccumulatingLexer lexer = LexerFactory.createLexer(stream, file, filename, sourceForm, true);
                 long start = System.currentTimeMillis();
                 ASTExecutableProgramNode ast = parser.parse(lexer);

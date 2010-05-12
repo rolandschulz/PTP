@@ -12,7 +12,7 @@ package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -21,15 +21,16 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
-import org.eclipse.photran.internal.core.lexer.LineInputStream;
+import org.eclipse.photran.internal.core.lexer.LineReader;
+import org.eclipse.photran.internal.core.lexer.SingleCharReader;
 
 /**
- * An <code>InputStream</code> that recognizes and processes Fortran INCLUDE lines.
+ * An <code>Reader</code> that recognizes and processes Fortran INCLUDE lines.
  * <p> 
- * This class implements an {@link InputStream} the provides the contents of a
+ * This class implements an {@link Reader} the provides the contents of a
  * Fortran file <i>after</i> INCLUDE lines have been processed.  Photran's
  * machine-constructed, free-form lexer ({@link FreeFormLexerPhase1}) tokenizes
- * this InputStream, oblivious to the fact that it is actually tokenizing
+ * this Reader, oblivious to the fact that it is actually tokenizing
  * preprocessed text.  However, a special subclass
  * ({@link PreprocessingFreeFormLexerPhase1}) takes care of mapping the
  * preprocessed tokens back to their images and locations in the original files.
@@ -41,10 +42,10 @@ import org.eclipse.photran.internal.core.lexer.LineInputStream;
  * 
  * @author Jeff Overbey
  */
-public final class FortranPreprocessor extends InputStream
+public final class FortranPreprocessor extends SingleCharReader
 {
     /**
-     * Utility class.  Originally, we simply used a <pre>Stack<LineInputStream></pre>,
+     * Utility class.  Originally, we simply used a <pre>Stack<LineReader></pre>,
      * but a profile revealed that Stack#peek was consuming a large amount of time
      * due to repeated invocations.  Now, the #topStream field in this class is
      * accessed instead, resulting in a significant performance improvement
@@ -52,13 +53,13 @@ public final class FortranPreprocessor extends InputStream
      */
     private static final class StreamStack
     {
-        private Stack<LineInputStream> streamStack = new Stack<LineInputStream>();
-        private LineInputStream topStream = null;
+        private Stack<LineReader> streamStack = new Stack<LineReader>();
+        private LineReader topStream = null;
         
-        public void push(LineInputStream lineInputStream)
+        public void push(LineReader lineReader)
         {
-            streamStack.push(lineInputStream);
-            topStream = lineInputStream;
+            streamStack.push(lineReader);
+            topStream = lineReader;
         }
 
         public int size()
@@ -93,13 +94,13 @@ public final class FortranPreprocessor extends InputStream
     private ArrayList<Integer> fileStartLines;
     private ArrayList<Integer> fileStartLineAdjustments;
     
-    public FortranPreprocessor(InputStream readFrom, IFile file, String filename, IncludeLoaderCallback callback) throws IOException
+    public FortranPreprocessor(Reader readFrom, IFile file, String filename, IncludeLoaderCallback callback) throws IOException
     {
         this.topLevelFile = file;
         this.callback = callback;
         
         streamStack = new StreamStack();
-        streamStack.push(new LineInputStream(readFrom, filename));
+        streamStack.push(new LineReader(readFrom, filename));
         
         directivesInTopLevelFile = new LinkedList<FortranIncludeDirective>();
         directivesInTopLevelFile.add(null);
@@ -167,9 +168,10 @@ public final class FortranPreprocessor extends InputStream
         throw new IllegalArgumentException();
     }
     
+    @Override
     public int read() throws IOException
     {
-        LineInputStream currentStream = streamStack.topStream;
+        LineReader currentStream = streamStack.topStream;
         if (currentStream.atBOL()) checkForInclude();
         currentStream = streamStack.topStream;
         if (currentStream.atEOF()) finishInclude();
@@ -192,11 +194,11 @@ public final class FortranPreprocessor extends InputStream
         Matcher m = INCLUDE_LINE.matcher(streamStack.topStream);
         if (m.matches())
         {
-            LineInputStream origStream = streamStack.topStream;
+            LineReader origStream = streamStack.topStream;
             String includeLine = origStream.currentLine();
             String fileToInclude = m.group(INCLUDE_LINE_CAPTURING_GROUP_OF_FILENAME);
             
-            InputStream newStream = findIncludedFile(fileToInclude);
+            Reader newStream = findIncludedFile(fileToInclude);
             if (newStream != null)
             {
                 if (inTopLevelFile())
@@ -208,7 +210,7 @@ public final class FortranPreprocessor extends InputStream
                 origStream.setRestartOffset(offset + includeLine.length());
                 origStream.setRestartLine(line + 1);
                 
-                streamStack.push(new LineInputStream(newStream, fileToInclude, offset, line));
+                streamStack.push(new LineReader(newStream, fileToInclude, offset, line));
                 
                 fileNames.add(fileToInclude);
                 fileStartOffsets.add(new Integer(offset));
@@ -222,7 +224,7 @@ public final class FortranPreprocessor extends InputStream
         }
     }
 
-    protected InputStream findIncludedFile(String fileToInclude) throws IOException
+    protected Reader findIncludedFile(String fileToInclude) throws IOException
     {
         try
         {
@@ -281,5 +283,11 @@ public final class FortranPreprocessor extends InputStream
     public IFile getTopLevelFile()
     {
         return topLevelFile;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        streamStack.topStream.close();
     }
 }
