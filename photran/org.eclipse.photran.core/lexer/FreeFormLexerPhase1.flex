@@ -514,14 +514,14 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 {Xcon}                                          { wantEos = true;                     return token(Terminal.T_XCON); }
 {Xdop}                                          { wantEos = true;                     return token(Terminal.T_XDOP); }
 {Zcon}                                          { wantEos = true;                     return token(Terminal.T_ZCON); }
-"'"                                             { stringBuffer = new StringBuffer();
-                                                  stringBuffer.append('\'');
+{Ident}?"'"                                     { stringBuffer = new StringBuffer();
+                                                  stringBuffer.append(yytext());
                                                   sbOffset = yychar;
                                                   sbLine = yyline+1;
                                                   sbCol = yycolumn+1;
                                                   yybegin(QUOTED); }
-\"                                              { stringBuffer = new StringBuffer();
-                                                  stringBuffer.append('\"');
+{Ident}?\"                                      { stringBuffer = new StringBuffer();
+                                                  stringBuffer.append(yytext());
                                                   sbOffset = yychar;
                                                   sbLine = yyline+1;
                                                   sbCol = yycolumn+1;
