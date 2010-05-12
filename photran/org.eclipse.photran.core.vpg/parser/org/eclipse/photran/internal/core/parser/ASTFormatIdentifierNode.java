@@ -29,8 +29,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTFormatIdentifierNode extends ASTNode
 {
     ASTCExprNode formatExpr; // in ASTFormatIdentifierNode
-    ASTLblRefNode formatLbl; // in ASTFormatIdentifierNode
     org.eclipse.photran.internal.core.lexer.Token formatIsAsterisk; // in ASTFormatIdentifierNode
+    ASTLblRefNode formatLbl; // in ASTFormatIdentifierNode
 
     public ASTCExprNode getFormatExpr()
     {
@@ -44,18 +44,6 @@ public class ASTFormatIdentifierNode extends ASTNode
     }
 
 
-    public ASTLblRefNode getFormatLbl()
-    {
-        return this.formatLbl;
-    }
-
-    public void setFormatLbl(ASTLblRefNode newValue)
-    {
-        this.formatLbl = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public boolean formatIsAsterisk()
     {
         return this.formatIsAsterisk != null;
@@ -64,6 +52,18 @@ public class ASTFormatIdentifierNode extends ASTNode
     public void setFormatIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.formatIsAsterisk = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public ASTLblRefNode getFormatLbl()
+    {
+        return this.formatLbl;
+    }
+
+    public void setFormatLbl(ASTLblRefNode newValue)
+    {
+        this.formatLbl = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -84,8 +84,8 @@ public class ASTFormatIdentifierNode extends ASTNode
         switch (index)
         {
         case 0:  return this.formatExpr;
-        case 1:  return this.formatLbl;
-        case 2:  return this.formatIsAsterisk;
+        case 1:  return this.formatIsAsterisk;
+        case 2:  return this.formatLbl;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -95,8 +95,8 @@ public class ASTFormatIdentifierNode extends ASTNode
         switch (index)
         {
         case 0:  this.formatExpr = (ASTCExprNode)value; if (value != null) value.setParent(this); return;
-        case 1:  this.formatLbl = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
-        case 2:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.formatIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.formatLbl = (ASTLblRefNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

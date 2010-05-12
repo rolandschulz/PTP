@@ -32,6 +32,6 @@ public interface IActionStmt extends IASTNode, IExecutableConstruct
 
 /////////////////////////////////// User Code //////////////////////////////////
 
-    Token getLabel();
+    Token getLabel(); void setLabel(Token label);
 }
 

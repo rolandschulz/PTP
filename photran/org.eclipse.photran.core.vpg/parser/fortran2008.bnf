@@ -66,8 +66,19 @@
 * ASTBlockConstructNode(extends=ScopingNode)
 * ASTInterfaceBlockNode(extends=ScopingNode)
 
+* ASTIfThenStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTFormatStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTElseStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTSubroutineStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTSelectCaseStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTDataStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTElseIfStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTFunctionStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTCaseStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+* ASTForallConstructStmtNode(implements=IActionStmt,also-visit=IActionStmt)
+
 # Custom code
-* IActionStmt =>    Token getLabel();
+* IActionStmt =>    Token getLabel(); void setLabel(Token label);
 
 #######################################################################################################################
 # Section 2 Rules

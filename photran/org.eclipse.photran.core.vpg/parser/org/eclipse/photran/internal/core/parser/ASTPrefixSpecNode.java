@@ -28,21 +28,33 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTPrefixSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isRecursive; // in ASTPrefixSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isModule; // in ASTPrefixSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isElemental; // in ASTPrefixSpecNode
     org.eclipse.photran.internal.core.lexer.Token isImpure; // in ASTPrefixSpecNode
     ASTTypeSpecNode typeSpec; // in ASTPrefixSpecNode
     org.eclipse.photran.internal.core.lexer.Token isPure; // in ASTPrefixSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isElemental; // in ASTPrefixSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isModule; // in ASTPrefixSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isRecursive; // in ASTPrefixSpecNode
 
-    public boolean isRecursive()
+    public boolean isModule()
     {
-        return this.isRecursive != null;
+        return this.isModule != null;
     }
 
-    public void setIsRecursive(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsModule(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isRecursive = newValue;
+        this.isModule = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isElemental()
+    {
+        return this.isElemental != null;
+    }
+
+    public void setIsElemental(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isElemental = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -83,26 +95,14 @@ public class ASTPrefixSpecNode extends ASTNode
     }
 
 
-    public boolean isElemental()
+    public boolean isRecursive()
     {
-        return this.isElemental != null;
+        return this.isRecursive != null;
     }
 
-    public void setIsElemental(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsRecursive(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isElemental = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public boolean isModule()
-    {
-        return this.isModule != null;
-    }
-
-    public void setIsModule(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isModule = newValue;
+        this.isRecursive = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -122,12 +122,12 @@ public class ASTPrefixSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isRecursive;
-        case 1:  return this.isImpure;
-        case 2:  return this.typeSpec;
-        case 3:  return this.isPure;
-        case 4:  return this.isElemental;
-        case 5:  return this.isModule;
+        case 0:  return this.isModule;
+        case 1:  return this.isElemental;
+        case 2:  return this.isImpure;
+        case 3:  return this.typeSpec;
+        case 4:  return this.isPure;
+        case 5:  return this.isRecursive;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -136,12 +136,12 @@ public class ASTPrefixSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isRecursive = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isImpure = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.typeSpec = (ASTTypeSpecNode)value; if (value != null) value.setParent(this); return;
-        case 3:  this.isPure = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 4:  this.isElemental = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.isModule = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isModule = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isElemental = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.isImpure = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.typeSpec = (ASTTypeSpecNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.isPure = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.isRecursive = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

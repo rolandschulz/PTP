@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTElseIfStmtNode extends ASTNodeWithErrorRecoverySymbols
+public class ASTElseIfStmtNode extends ASTNodeWithErrorRecoverySymbols implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTElseIfStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTElse; // in ASTElseIfStmtNode
@@ -78,6 +78,8 @@ public class ASTElseIfStmtNode extends ASTNodeWithErrorRecoverySymbols
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTElseIfStmtNode(this);
+        visitor.visitIActionStmt(this);
+        visitor.visitIActionStmt(this);
         visitor.visitASTNode(this);
     }
 

@@ -28,30 +28,18 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTComponentAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token codimension; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token contiguous; // in ASTComponentAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token dimension; // in ASTComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token pointer; // in ASTComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token allocatable; // in ASTComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token codimension; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLbracket; // in ASTComponentAttrSpecNode
     ASTCoarraySpecNode coarraySpec; // in ASTComponentAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token allocatable; // in ASTComponentAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token pointer; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRbracket; // in ASTComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token dimension; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTComponentAttrSpecNode
     ASTComponentArraySpecNode componentArraySpec; // in ASTComponentAttrSpecNode
     ASTAccessSpecNode accessSpec; // in ASTComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTComponentAttrSpecNode
-
-    public boolean codimension()
-    {
-        return this.codimension != null;
-    }
-
-    public void setCodimension(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.codimension = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
 
     public boolean contiguous()
     {
@@ -65,26 +53,14 @@ public class ASTComponentAttrSpecNode extends ASTNode
     }
 
 
-    public boolean dimension()
+    public boolean pointer()
     {
-        return this.dimension != null;
+        return this.pointer != null;
     }
 
-    public void setDimension(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.dimension = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public ASTCoarraySpecNode getCoarraySpec()
-    {
-        return this.coarraySpec;
-    }
-
-    public void setCoarraySpec(ASTCoarraySpecNode newValue)
-    {
-        this.coarraySpec = newValue;
+        this.pointer = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -101,14 +77,38 @@ public class ASTComponentAttrSpecNode extends ASTNode
     }
 
 
-    public boolean pointer()
+    public boolean codimension()
     {
-        return this.pointer != null;
+        return this.codimension != null;
     }
 
-    public void setPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setCodimension(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.pointer = newValue;
+        this.codimension = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public ASTCoarraySpecNode getCoarraySpec()
+    {
+        return this.coarraySpec;
+    }
+
+    public void setCoarraySpec(ASTCoarraySpecNode newValue)
+    {
+        this.coarraySpec = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean dimension()
+    {
+        return this.dimension != null;
+    }
+
+    public void setDimension(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.dimension = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -152,14 +152,14 @@ public class ASTComponentAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.codimension;
-        case 1:  return this.contiguous;
-        case 2:  return this.dimension;
-        case 3:  return this.hiddenTLbracket;
-        case 4:  return this.coarraySpec;
-        case 5:  return this.allocatable;
-        case 6:  return this.pointer;
-        case 7:  return this.hiddenTRbracket;
+        case 0:  return this.contiguous;
+        case 1:  return this.pointer;
+        case 2:  return this.allocatable;
+        case 3:  return this.codimension;
+        case 4:  return this.hiddenTLbracket;
+        case 5:  return this.coarraySpec;
+        case 6:  return this.hiddenTRbracket;
+        case 7:  return this.dimension;
         case 8:  return this.hiddenTLparen;
         case 9:  return this.componentArraySpec;
         case 10: return this.accessSpec;
@@ -172,14 +172,14 @@ public class ASTComponentAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.codimension = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.contiguous = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.dimension = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 4:  this.coarraySpec = (ASTCoarraySpecNode)value; if (value != null) value.setParent(this); return;
-        case 5:  this.allocatable = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 6:  this.pointer = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 7:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.contiguous = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.pointer = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.allocatable = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.codimension = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.coarraySpec = (ASTCoarraySpecNode)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTRbracket = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.dimension = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 8:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 9:  this.componentArraySpec = (ASTComponentArraySpecNode)value; if (value != null) value.setParent(this); return;
         case 10: this.accessSpec = (ASTAccessSpecNode)value; if (value != null) value.setParent(this); return;

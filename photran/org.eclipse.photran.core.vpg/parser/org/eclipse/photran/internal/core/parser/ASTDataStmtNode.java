@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements IBlockDataBodyConstruct, IBodyConstruct, ICaseBodyConstruct, IDeclarationConstruct, IExecutionPartConstruct, IModuleBodyConstruct, IObsoleteExecutionPartConstruct, ISpecificationPartConstruct, ISpecificationStmt
+public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements IActionStmt, IBlockDataBodyConstruct, IBodyConstruct, ICaseBodyConstruct, IDeclarationConstruct, IExecutionPartConstruct, IModuleBodyConstruct, IObsoleteExecutionPartConstruct, ISpecificationPartConstruct, ISpecificationStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTDataStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTData; // in ASTDataStmtNode
@@ -60,6 +60,7 @@ public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDataStmtNode(this);
+        visitor.visitIActionStmt(this);
         visitor.visitIBlockDataBodyConstruct(this);
         visitor.visitIBodyConstruct(this);
         visitor.visitICaseBodyConstruct(this);
@@ -69,6 +70,7 @@ public class ASTDataStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         visitor.visitIObsoleteExecutionPartConstruct(this);
         visitor.visitISpecificationPartConstruct(this);
         visitor.visitISpecificationStmt(this);
+        visitor.visitIActionStmt(this);
         visitor.visitASTNode(this);
     }
 
