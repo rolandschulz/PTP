@@ -320,6 +320,28 @@ public abstract class FortranElement extends SourceManipulation // Parent
     }
 
     /**
+     * An element representing a subroutine or function when we're not sure
+     * which one it is (e.g., in an EXTERNAL or MODULE PROCEDURE statement)
+     */
+    public static class Subprogram extends FortranElement
+    {
+        public Subprogram(Parent parent, IToken nameToken)
+        {
+            super(parent, nameToken);
+        }
+
+        public ImageDescriptor getBaseImageDescriptor()
+        {
+            return imageDescriptor();
+        }
+
+        public static ImageDescriptor imageDescriptor()
+        {
+            return getImageDescriptorForIcon("subroutine.gif");
+        }
+    }
+
+    /**
      * An element representing an interface declaration (INTERFACE ... END INTERFACE).
      */
     public static class Interface extends FortranElement

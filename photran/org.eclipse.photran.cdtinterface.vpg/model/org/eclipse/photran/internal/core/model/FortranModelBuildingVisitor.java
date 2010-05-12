@@ -15,10 +15,13 @@ import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTInterfaceBlockNode;
+import org.eclipse.photran.internal.core.parser.ASTInterfaceBodyNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicListNode;
 import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
+import org.eclipse.photran.internal.core.parser.ASTModuleProcedureStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTSpecificBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubmoduleNode;
@@ -219,15 +222,36 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
     {
         IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
         for (int i = 0; i < list.size(); i++)
-            addToModel(node, setPos(new FortranElement.Variable(getCurrentParent(), list.get(i).getExternalName()), node));
+            addToModel(node, setPos(new FortranElement.Subprogram(getCurrentParent(), list.get(i).getExternalName()), node));
     }
 
     public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
     {
         Token token = node.getInterfaceStmt().getGenericName() == null
-            ? null
+            ? node.getInterfaceStmt().getInterfaceToken()
             : node.getInterfaceStmt().getGenericName().getGenericName();
-        addToModel(node, setPos(new FortranElement.Variable(getCurrentParent(), token), node));
+        addToModel(node, setPos(new FortranElement.Subprogram(getCurrentParent(), token), node));
+    }
+
+    public void visitASTInterfaceBodyNode(ASTInterfaceBodyNode node)
+    {
+        if (node.getFunctionStmt() != null)
+        {
+            Token token = node.getFunctionStmt().getFunctionName().getFunctionName();
+            addToModel(node, setPos(new FortranElement.Function(getCurrentParent(), token), node));
+        }
+        else if (node.getSubroutineStmt() != null)
+        {
+            Token token = node.getSubroutineStmt().getSubroutineName().getSubroutineName();
+            addToModel(node, setPos(new FortranElement.Subroutine(getCurrentParent(), token), node));
+        }
+    }
+
+    public void visitASTModuleProcedureStmtNode(ASTModuleProcedureStmtNode node)
+    {
+        IASTListNode<ASTProcedureNameListNode> list = node.getProcedureNameList();
+        for (int i = 0; i < list.size(); i++)
+            addToModel(node, setPos(new FortranElement.Subprogram(getCurrentParent(), list.get(i).getProcedureName()), node));
     }
 
     public void visitASTIntrinsicStmtNode(ASTIntrinsicStmtNode node)
