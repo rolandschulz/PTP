@@ -69,16 +69,34 @@ public final class RefactorMenu extends CompoundContributionItem
     protected IContributionItem[] getContributionItems()
     {
         selection = new WorkbenchSelectionInfo();
-        List<IContributionItem> result = loadRefactoringsFromExtensionPoint();
+        LinkedList<IContributionItem> result = loadRefactoringsFromExtensionPoint();
+        return fixMenu(result);
+    }
+
+    private IContributionItem[] fixMenu(LinkedList<IContributionItem> result)
+    {
+        // The last item in a menu should never be a separator, and there
+        // should never be two separators in a row (e.g., if this menu is
+        // followed by another group of commands).  Both of those look
+        // strange, and they can be avoided by never ending the list of
+        // contribution items with a separator.
+        if (!result.isEmpty() && result.getLast() instanceof SeparatorContributionItem)
+            result.removeLast();
+
+        // Adds an informative item ("No refactorings available") when
+        // necessary, since an empty menu looks like a bug.
+        if (result.isEmpty())
+            return new IContributionItem[] { new EmptyMenuContributionItem() };
+
         return result.toArray(new IContributionItem[result.size()]);
     }
 
-    private List<IContributionItem> loadRefactoringsFromExtensionPoint()
+    private LinkedList<IContributionItem> loadRefactoringsFromExtensionPoint()
     {
         return loadRefactoringsFrom(Platform.getExtensionRegistry().getConfigurationElementsFor(REFACTORING_EXTENSION_POINT_ID));
     }
 
-    private List<IContributionItem> loadRefactoringsFrom(IConfigurationElement[] configs)
+    private LinkedList<IContributionItem> loadRefactoringsFrom(IConfigurationElement[] configs)
     {
         LinkedList<IContributionItem> result = new LinkedList<IContributionItem>();
 
@@ -312,6 +330,16 @@ public final class RefactorMenu extends CompoundContributionItem
         public void fill(Menu parent, int index)
         {
             new MenuItem(parent, SWT.SEPARATOR, index);
+        }
+    };
+
+    private static class EmptyMenuContributionItem extends ContributionItem
+    {
+        public void fill(Menu parent, int index)
+        {
+            MenuItem item = new MenuItem(parent, SWT.NONE, index);
+            item.setText("(No refactorings available)");
+            item.setEnabled(false);
         }
     };
 }
