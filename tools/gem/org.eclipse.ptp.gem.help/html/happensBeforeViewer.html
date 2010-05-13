@@ -1,0 +1,148 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+    <title>Happens Before Viewer</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>Happens Before Viewer</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>Running the Happens Before Viewer</h2>
+<p>
+The Happens Before Viewer may be launched from within the Analyzer View or
+on a log file directly (via context menus):
+</p>
+
+<p>
+<i> Note: The generated log file will be in a directory named <b>"gem"</b> at the same level as the source code file
+in the project explorer.</i>
+</p>
+<ul>
+    <li>
+        From the Analyzer View, simply click the <b>HB Viewer</b> button after the analyzer has been run.
+    </li>
+    <li>
+        From the Project Explorer window, right click on source code or ISP generated log file
+        and select <img height="16" src="images/hpv-trident.gif" width="13" />
+        <b>Launch Happens Before Viewer</b> from the GEM context menu.
+    </li>
+    
+</ul>
+
+<br>
+<center>
+<img src="images/hpvPopUp.png">
+</center>
+<br><br>
+
+<h2>Understanding What You See</h2><br>
+<ul>
+    <li>
+        <b>Showing Interleaving:</b> indicates which interleaving is being shown and how many there are in total.
+    </li>
+    <li>
+        <b>Deadlock:</b>Is either followed by <font COLOR="#00ff00">no </font>or <font COLOR="#ff0000">yes</font>,
+        and indicates if any of the interleavings has a deadlock.
+    </li>
+    <li>
+        <b>Red Bordered DEADLOCK</b> at the bottom of the window indicates that at this point the currently selected
+        interleaving is deadlocked. Calls above this will be issued and calls that would come afterward are not shown.
+    </li>
+    <li>
+        <b>Process[Number]:</b> This specifies which Process the calls below it belong to (Where Number is the number
+        of the process in question). The color of the border around this text is arbitrary and serves only to help
+        the human eye distinguish the various columns and return to a column of interest more quickly.
+    </li>
+    <li>
+        <b>Blue Arrows:</b> show CB (Completes Before) edges that stay in the same process. A CB edge is a guarantee
+        that the source must complete before the destination. For example a Barrier will always have a CB edge
+        connecting it to the next call in the same process because the next call cannot complete before the barrier
+        is finished. It is important to note though that there is only a CB edge to each call blocked by the call in
+        question. As an example lets imagine that a Barrier is followed by a second Barrier and then a Send. There
+        is a CB edge between the first and second Barrier and between the second Barrier and the Send, but none
+        between the first Barrier and the Send because it the second Barriers that directly blocks the send. The
+        CB edges are by default not shown, but 4.3 will show you how to make them appear.
+    </li>
+    <li>
+        <b>Red Arrows</b> show CB edges that connect calls of different processes.
+    </li>
+    <li>
+        <b>Black Arrows</b> connect calls that match. For example a Send will have a Black Arrow pointing to the
+        Receive that picks up its message.
+    </li>
+    <li>
+        <b>Dotted Black Arrows</b> like solid Block Arrows these connect calls that match. The only difference
+        is that these connect a Red Bordered call.
+    </li>
+    <li>
+        <b>Red Borders</b> indicates that this call is the source of a different interleaving. Or in other words
+        that what is currently being displayed is one potential match for the Red Bordered call, but that another
+        possible match exists and can be viewed by changing which interleaving is being shown.
+    </li>
+</ul>
+
+<br>
+<img alt="" src="images/hpv.png">
+<br><br>
+
+<h2>Changing What You See</h2>
+<p>
+To change which log file you are viewing you can click File -&gt; Open Trace and navigate to the desired file.
+</p>
+
+<ul>
+    <li>
+        To change which Interleaving you are viewing you can click on the &lt; or &gt; buttons or click “Goto”
+        after providing the desired interleaving number in the text box next to it.
+    </li>
+    <li>
+        To toggle whether or not you want matches to shown use the check box next to “Show Matches”.
+    </li>
+    <li>
+        To reset the view back to how it was before you made changes click the “Clear” button.
+    </li>
+    <li>
+        To see the source file that generated the log click on “Show Source”.
+    </li>
+    <li>
+        To see only the Intra-process Completes-Before Edges (CBs for a given Processes right click that process and
+        select “ViewIntraCB”.<br><br>
+        <img src="images/process-intracb.png"><br><br>
+    </li>
+    <li>
+        To add Completes-Before Edges (CBs) for a given call to the current window, right click the call and select either View
+        IntraCB, View InterCB, or View Both as desired. Lastly you will need to indicate whether you want to view
+        the results in the current window or in a new popup window.
+    </li>
+</ul>
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+
+</html>
