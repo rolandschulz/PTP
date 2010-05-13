@@ -113,7 +113,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
                 {
                     if (defList.size() > 1)
                         def = openSelectionDialog(defList);
-                    else if (defList.size() == 1)
+                    else if (defList.size() == 1 && defList.get(0).getTokenRef().getOffset() >= 0)
                         def = defList.get(0);
                     else
                         def = null;

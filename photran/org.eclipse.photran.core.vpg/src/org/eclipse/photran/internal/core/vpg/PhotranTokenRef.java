@@ -37,7 +37,7 @@ public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializ
 	
 	public PhotranTokenRef(IFile file, int offset, int length)
 	{
-		this(PhotranVPG.getFilenameForIFile(file), offset, length);
+		this(file == null ? "" : PhotranVPG.getFilenameForIFile(file), offset, length);
 	}
 	
 	public PhotranTokenRef(PhotranTokenRef copyFrom)

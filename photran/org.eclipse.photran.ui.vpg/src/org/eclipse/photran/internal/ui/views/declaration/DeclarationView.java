@@ -22,6 +22,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.editor.FortranKeywordRuleBasedScanner;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
@@ -286,17 +287,26 @@ public class DeclarationView extends ViewPart
      * IFortranEditorVPGTask - Callback run when the VPG is more-or-less up-to-date.
      * This method is run <i>outside</i> the UI thread.
      */
-    public synchronized void handle(IFile file, IFortranAST ast, DefinitionMap<Definition> defMap)
+    public void handle(IFile file, IFortranAST ast, DefinitionMap<Definition> defMap)
     {
         if (defMap == null) return;
 
-        activeDefinitions.put(file.getFullPath().toPortableString(), new DefinitionMap<String>(defMap)
+        long start = System.currentTimeMillis();
+
+        DefinitionMap<String> newDefMap = new DefinitionMap<String>(defMap)
         {
             @Override protected String map(String qualifiedName, Definition def)
             {
                 return def.describe();
             }
-        });
+        };
+
+        synchronized (this)
+        {
+            activeDefinitions.put(file.getFullPath().toPortableString(), newDefMap);
+        }
+
+        PhotranVPG.getInstance().debug("        Decl view IEditorVPGTask handler:\t" + (System.currentTimeMillis()-start) + " ms", PhotranVPG.getFilenameForIFile(file));
     }
 
     /**
@@ -308,9 +318,13 @@ public class DeclarationView extends ViewPart
     {
         if (activeEditor != null)
         {
+            long start = System.currentTimeMillis();
+            
             String path = activeEditor.getIFile().getFullPath().toPortableString();
             activeAST.put(path, ast);
             activeTokenList.put(path, tokenList);
+            
+            PhotranVPG.getInstance().debug("        Decl view IEditorASTTask handler:\t" + (System.currentTimeMillis()-start) + " ms", null);
         }
         return true;
     }

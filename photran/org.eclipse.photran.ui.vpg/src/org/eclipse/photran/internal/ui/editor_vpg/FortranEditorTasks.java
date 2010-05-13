@@ -175,28 +175,45 @@ public class FortranEditorTasks
                 {
                     if (editor.getDocumentProvider() != null)
                     {
-                        String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
+                                                debug("DispatchASTTasksJob#parseThenRunASTTasks():");
 
+                        String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
+                        
+                                                long start = System.currentTimeMillis();
                         ISourceForm sourceForm = determineSourceForm();
                         IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(new StringReader(editorContents),
                                                                             editor.getIFile(),
                                                                             editor.getIFile().getName(),
                                                                             sourceForm);
+                                                debug("    createLexer:\t" + (System.currentTimeMillis()-start) + " ms");
+                                                start = System.currentTimeMillis();
                         ASTExecutableProgramNode astRootNode = parser.parse(lexer);
+                                                debug("    parse:\t" + (System.currentTimeMillis()-start) + " ms");
                         if (astRootNode == null) return;
 
                         HashSet<IFortranEditorASTTask> tasksToRemove = new HashSet<IFortranEditorASTTask>();
                         synchronized (FortranEditorTasks.instance(editor))
                         {
+                                                start = System.currentTimeMillis();
                             for (IFortranEditorASTTask task : FortranEditorTasks.instance(editor).astTasks)
+                            {
+                                                long start2 = System.currentTimeMillis();
                                 if (!task.handle(astRootNode, lexer.getTokenList(), defMap))
                                     tasksToRemove.add(task);
+                                                debug("        Task " + task.getClass().getSimpleName() + ":\t" + (System.currentTimeMillis()-start2) + " ms");
+                            }
+                                                debug("    Total Running Tasks:\t" + (System.currentTimeMillis()-start) + " ms");
                         }
                         FortranEditorTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                     }
                 }
                 catch (SyntaxException e) { /* Ignore syntax errors */ }
                 catch (Throwable e) { FortranUIPlugin.log("Error running AST tasks", e); }
+            }
+
+            private void debug(String string)
+            {
+                PhotranVPG.getInstance().debug(string, null);
             }
         }
 
