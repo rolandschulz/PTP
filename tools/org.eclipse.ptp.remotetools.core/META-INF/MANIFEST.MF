@@ -8,7 +8,7 @@ Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  com.jcraft.jsch,
- org.eclipse.jsch.core;bundle-version="1.1.100",
+ org.eclipse.jsch.core,
  org.eclipse.ptp.remotetools.utils,
  org.eclipse.ptp.utils.core;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
@@ -18,4 +18,4 @@ Export-Package: org.eclipse.ptp.remotetools,
 Bundle-ClassPath: 
  .
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: com.ibm.icu.text;version="4.2.1.1"
+Import-Package: com.ibm.icu.text
