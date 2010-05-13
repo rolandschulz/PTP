@@ -171,6 +171,17 @@ import org.eclipse.core.resources.IFile;
         return lastTokenLength;
     }
 
+    public void setTokenAsCurrent(IToken token)
+    {
+    	//lastTokenFile = token.getFile();
+        lastTokenLine = token.getLine();
+        lastTokenCol = token.getCol();
+        lastTokenFile = token.getPhysicalFile();
+        lastTokenFileOffset = token.getFileOffset();
+        lastTokenStreamOffset = token.getStreamOffset();
+        lastTokenLength = token.getLength();
+    }
+
     private void startInclude() throws FileNotFoundException
     {
 //      //GRRRRR, yypushStream is in the JFlex docs but is not actually implemented in v1.4.1!

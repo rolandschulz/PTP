@@ -75,6 +75,11 @@ public class LexerPhase3 implements IAccumulatingLexer
         return phase2Lexer.getLastTokenStreamOffset();
     }
 
+    public void setTokenAsCurrent(IToken token)
+    {
+        throw new UnsupportedOperationException();
+    }
+
     public Token yylex() throws IOException, LexerException
     {
         Token token = (Token)phase2Lexer.yylex();

@@ -26,4 +26,7 @@ public interface ILexer
     int getLastTokenStreamOffset();
     
     int getLastTokenLength();
+    
+    /** Only needed in Phase 1 lexers (called by <code>CPreprocessingLexer</code>) */
+    void setTokenAsCurrent(IToken token);
 }

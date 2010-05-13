@@ -10,19 +10,17 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
 
 /**
- * Phase 1 lexer that handles C preprocessor directives.
+ * Base class for a lexer that handles C preprocessor directives by preprocessing the
+ * input stream, using a Phase 1 lexer to tokenize it, and then calling back to the
+ * preprocessor to determine which tokens were preprocessed.
  * <p>
  * This class feeds {@link FreeFormLexerPhase1} with a {@link CPreprocessingReader},
  * an {@link InputStream} that interprets C preprocessor directives.
@@ -34,8 +32,10 @@ import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.Incl
  *
  * @author Matthew Michelotti, Jeff Overbey
  */
-public class CPreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
+public abstract class CPreprocessingLexer implements ILexer
 {
+    private ILexer phase1Lexer;
+    
 	/**ProducerMap obatined from CPreprocessingInputStream.
 	 * Used to find directives and macros.*/
 	private ProducerMap producerMap;
@@ -53,21 +53,25 @@ public class CPreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
 	
 	private Token lastReadInFile = null;
 
-    public CPreprocessingFreeFormLexerPhase1(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
+    public CPreprocessingLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
     {
         this(new CPreprocessingReader(file, filename, new LineAppendingReader(in)), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
     }
 
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)
-    private CPreprocessingFreeFormLexerPhase1(CPreprocessingReader cpp, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    private CPreprocessingLexer(CPreprocessingReader cpp, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
     {
-        super(cpp, file, filename, tokenFactory, accumulateWhitetext);
+        this.phase1Lexer = createDelegateLexer(cpp, file, filename, tokenFactory, accumulateWhitetext);
         this.producerMap = cpp.getProducerMap();
         this.includeMap = cpp.getIncludeMap();
 
         if (accumulateWhitetext == false)
             throw new IllegalArgumentException("C preprocessor can only be used if accumulateWhitetext is true");
     }
+
+    protected abstract ILexer createDelegateLexer(
+        CPreprocessingReader cpp, IFile file, String filename,
+        TokenFactory tokenFactory, boolean accumulateWhitetext);
 
     public Token yylex() throws IOException, LexerException
     {
@@ -215,28 +219,39 @@ public class CPreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
      * @throws LexerException
      */
     private Token rawYYLex() throws IOException, LexerException {
-    	Token token = (Token)super.yylex();
+    	Token token = (Token)phase1Lexer.yylex();
     	
-    	includeMap.setStreamOffset(lastTokenStreamOffset);
+    	includeMap.setStreamOffset(phase1Lexer.getLastTokenStreamOffset());
 
     	//token.setFile(includeMap.getFile());
     	token.setLine(includeMap.getLine());
     	token.setCol(includeMap.getCol());
     	token.setPhysicalFile(includeMap.getFileOrIFile());
     	token.setFileOffset(includeMap.getFileOffset());
-    	token.setStreamOffset(lastTokenStreamOffset);
-    	token.setLength(lastTokenLength);
+    	token.setStreamOffset(phase1Lexer.getLastTokenStreamOffset());
+    	token.setLength(phase1Lexer.getLastTokenLength());
 
     	return token;
     }
 
-    private void setTokenAsCurrent(Token token) {
-    	//lastTokenFile = token.getFile();
-    	lastTokenLine = token.getLine();
-		lastTokenCol = token.getCol();
-		lastTokenFile = token.getPhysicalFile();
-		lastTokenFileOffset = token.getFileOffset();
-		lastTokenStreamOffset = token.getStreamOffset();
-		lastTokenLength = token.getLength();
+    public void setTokenAsCurrent(IToken token)
+    {
+        phase1Lexer.setTokenAsCurrent(token);
     }
+
+    public TokenFactory getTokenFactory() { return phase1Lexer.getTokenFactory(); }
+    
+    public String getFilename() { return phase1Lexer.getFilename(); }
+
+    public int getLastTokenLine() { return phase1Lexer.getLastTokenLine(); }
+
+    public int getLastTokenCol() { return phase1Lexer.getLastTokenCol(); }
+    
+    public FileOrIFile getLastTokenFile() { return phase1Lexer.getLastTokenFile(); }
+    
+    public int getLastTokenFileOffset() { return phase1Lexer.getLastTokenFileOffset(); }
+    
+    public int getLastTokenStreamOffset() { return phase1Lexer.getLastTokenStreamOffset(); }
+    
+    public int getLastTokenLength() { return phase1Lexer.getLastTokenLength(); }
 }

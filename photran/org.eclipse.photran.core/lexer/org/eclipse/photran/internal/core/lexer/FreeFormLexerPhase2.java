@@ -1852,4 +1852,9 @@ public class FreeFormLexerPhase2 implements ILexer
     {
         return lastTokenLength;
     }
+
+    public void setTokenAsCurrent(IToken token)
+    {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -135,4 +135,9 @@ public class FixedFormLexerPhase2 implements ILexer
     {
         return freeLexer2.getLastTokenLength();
     }
+
+    public void setTokenAsCurrent(IToken token)
+    {
+        throw new UnsupportedOperationException();
+    }
 }

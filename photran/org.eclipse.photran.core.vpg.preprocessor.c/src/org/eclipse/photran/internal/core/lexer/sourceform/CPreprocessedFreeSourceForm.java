@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.photran.internal.core.lexer.CPreprocessingFreeFormLexerPhase1;
+import org.eclipse.photran.internal.core.lexer.CPreprocessingLexer;
+import org.eclipse.photran.internal.core.lexer.CPreprocessingReader;
+import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase2;
 import org.eclipse.photran.internal.core.lexer.ILexer;
 import org.eclipse.photran.internal.core.lexer.TokenFactory;
@@ -46,4 +48,21 @@ public class CPreprocessedFreeSourceForm implements ISourceForm
     
     public boolean isFixedForm()     { return false; }
     public boolean isCPreprocessed() { return true; }
+    
+    private static class CPreprocessingFreeFormLexerPhase1 extends CPreprocessingLexer
+    {
+        public CPreprocessingFreeFormLexerPhase1(
+            Reader in, IFile file, String filename,
+            boolean accumulateWhitetext) throws IOException
+        {
+            super(in, file, filename, accumulateWhitetext);
+        }
+
+        @Override protected ILexer createDelegateLexer(
+            CPreprocessingReader cpp, IFile file, String filename,
+            TokenFactory tokenFactory, boolean accumulateWhitetext)
+        {
+            return new FreeFormLexerPhase1(cpp, file, filename, tokenFactory, accumulateWhitetext);
+        }
+    }
 }
