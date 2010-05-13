@@ -22,7 +22,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.editor.FortranKeywordRuleBasedScanner;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
@@ -55,7 +55,7 @@ public class DeclarationView extends ViewPart
                IFortranEditorVPGTask,
                IFortranEditorASTTask
 {
-    private AbstractFortranEditor activeEditor = null;
+    private FortranEditor activeEditor = null;
     private HashMap<String, ASTExecutableProgramNode> activeAST = new HashMap<String, ASTExecutableProgramNode>();
     private HashMap<String, TokenList> activeTokenList = new HashMap<String, TokenList>();
     private HashMap<String, DefinitionMap<String>> activeDefinitions = new HashMap<String, DefinitionMap<String>>();
@@ -103,16 +103,16 @@ public class DeclarationView extends ViewPart
     private SourceViewer createFortranSourceViewer(Composite parent)
     {
         final SourceViewer viewer = new SourceViewer(parent, null, SWT.V_SCROLL); //TextViewer(parent, SWT.NONE);
-        viewer.configure(new AbstractFortranEditor.FortranSourceViewerConfiguration(null)
+        viewer.configure(new FortranEditor.FortranSourceViewerConfiguration(null)
         {
             @Override protected ITokenScanner getTokenScanner()
             {
-                // Copied from FreeFormFortranEditor#getTokenScanner
+                // Copied from FortranEditor#getTokenScanner
                 return new FortranKeywordRuleBasedScanner(false, viewer);
             }
         });
         viewer.setDocument(document);
-        IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(), AbstractFortranEditor.PARTITION_TYPES);
+        IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(), FortranEditor.PARTITION_TYPES);
         partitioner.connect(document);
         document.setDocumentPartitioner(partitioner);
 
@@ -159,13 +159,13 @@ public class DeclarationView extends ViewPart
      */
     public synchronized void selectionChanged(IWorkbenchPart part, ISelection selection)
     {
-        if (part instanceof AbstractFortranEditor)
+        if (part instanceof FortranEditor)
         {
             if (activeEditor != part)
             {
                 // Observe new editor
                 stopObserving(activeEditor);
-                activeEditor = startObserving((AbstractFortranEditor)part);
+                activeEditor = startObserving((FortranEditor)part);
             }
             else
             {
@@ -185,11 +185,11 @@ public class DeclarationView extends ViewPart
      *
      * See http://dev.eclipse.org/mhonarc/newsLists/news.eclipse.platform/msg44602.html
      */
-    private AbstractFortranEditor startObserving(final AbstractFortranEditor editor)
+    private FortranEditor startObserving(final FortranEditor editor)
     {
         if (editor != null)
         {
-            String declViewEnabledProperty = SearchPathProperties.getProperty(
+            String declViewEnabledProperty = new SearchPathProperties().getProperty(
                 editor.getIFile(),
                 SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME);
             if (declViewEnabledProperty != null && declViewEnabledProperty.equals("true"))
@@ -258,7 +258,7 @@ public class DeclarationView extends ViewPart
         return null;
     }
 
-    private void addCaretMovementListenerTo(AbstractFortranEditor editor)
+    private void addCaretMovementListenerTo(FortranEditor editor)
     {
         TextViewer sourceViewer = (TextViewer)editor.getSourceViewerx();
         if (sourceViewer != null)
@@ -268,14 +268,14 @@ public class DeclarationView extends ViewPart
     /**
      * Unregisters this view to receive notifications of caret movement in <code>editor</code>
      */
-    private void stopObserving(AbstractFortranEditor editor)
+    private void stopObserving(FortranEditor editor)
     {
         update("");
         if (editor != null)
             removeCaretMovementListenerFrom(editor);
     }
 
-    private void removeCaretMovementListenerFrom(AbstractFortranEditor editor)
+    private void removeCaretMovementListenerFrom(FortranEditor editor)
     {
         TextViewer sourceViewer = (TextViewer)editor.getSourceViewerx();
         if (sourceViewer != null)

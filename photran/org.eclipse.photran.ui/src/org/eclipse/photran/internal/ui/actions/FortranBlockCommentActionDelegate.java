@@ -27,7 +27,7 @@ import org.eclipse.jface.text.IRewriteTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate.Edit.EditFactory;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 /**
@@ -40,11 +40,11 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
 {
     public FortranBlockCommentActionDelegate() { super(); }
     
-    public FortranBlockCommentActionDelegate(AbstractFortranEditor ed) { super(ed); }
+    public FortranBlockCommentActionDelegate(FortranEditor ed) { super(ed); }
 
     public void run(IProgressMonitor progressMonitor)
     {
-        AbstractFortranEditor editor = getFortranEditor();
+        FortranEditor editor = getFortranEditor();
         ITextSelection selection = editor.getSelection();
         IDocument document = editor.getIDocument();
         if (document == null) return;

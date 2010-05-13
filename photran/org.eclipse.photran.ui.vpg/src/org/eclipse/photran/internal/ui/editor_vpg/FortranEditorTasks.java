@@ -12,18 +12,18 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
+import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.ui.FortranUIPlugin;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-import org.eclipse.photran.internal.ui.editor.FixedFormFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.rephraserengine.core.vpg.eclipse.VPGJob;
 
 public class FortranEditorTasks
@@ -32,7 +32,7 @@ public class FortranEditorTasks
      * @return the instance of FortranEditorTasks associated with the given
      * editor, creating the instance on-demand if necessary
      */
-    public static FortranEditorTasks instance(AbstractFortranEditor editor)
+    public static FortranEditorTasks instance(FortranEditor editor)
     {
         if (editor.reconcilerTasks == null)
             editor.reconcilerTasks = new FortranEditorTasks(editor);
@@ -40,7 +40,7 @@ public class FortranEditorTasks
         return (FortranEditorTasks)editor.reconcilerTasks;
     }
 
-    private FortranEditorTasks(AbstractFortranEditor editor)
+    private FortranEditorTasks(FortranEditor editor)
     {
         this.editor = editor;
         editor.reconcilerTasks = this;
@@ -52,7 +52,7 @@ public class FortranEditorTasks
 
     private Parser parser = new Parser();
 
-    private AbstractFortranEditor editor;
+    private FortranEditor editor;
 
     private Runner runner;
 
@@ -112,7 +112,7 @@ public class FortranEditorTasks
         {
             if (editor == null) return;
 
-            String vpgEnabledProperty = SearchPathProperties.getProperty(editor.getIFile(),
+            String vpgEnabledProperty = new SearchPathProperties().getProperty(editor.getIFile(),
                                                  SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
             if (vpgEnabledProperty != null && vpgEnabledProperty.equals("true"))
             {
@@ -152,14 +152,13 @@ public class FortranEditorTasks
                 super("Updating Fortran editor with new parse information");
             }
 
-            private SourceForm determineSourceForm()
+            private ISourceForm determineSourceForm()
             {
-                if (editor instanceof FixedFormFortranEditor)
-                    return SourceForm.FIXED_FORM;
-                else if (editor.getIFile() == null || editor.getIFile().getProject() == null)
-                    return SourceForm.UNPREPROCESSED_FREE_FORM;
+                ISourceForm sourceForm = SourceForm.of(editor.getIFile());
+                if (editor.getIFile() == null || editor.getIFile().getProject() == null)
+                    return sourceForm.configuredWith(new IncludeLoaderCallback(editor.getIFile().getProject()));
                 else
-                    return SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(editor.getIFile().getProject()));
+                    return sourceForm;
             }
 
             @Override
@@ -178,12 +177,11 @@ public class FortranEditorTasks
                     {
                         String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
 
-                        SourceForm sourceForm = determineSourceForm();
-                        IAccumulatingLexer lexer = LexerFactory.createLexer(new StringReader(editorContents),
+                        ISourceForm sourceForm = determineSourceForm();
+                        IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(new StringReader(editorContents),
                                                                             editor.getIFile(),
                                                                             editor.getIFile().getName(),
-                                                                            sourceForm,
-                                                                            true /*false*/);
+                                                                            sourceForm);
                         ASTExecutableProgramNode astRootNode = parser.parse(lexer);
                         if (astRootNode == null) return;
 

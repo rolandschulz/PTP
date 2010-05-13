@@ -10,11 +10,7 @@
             class="org.eclipse.photran.internal.cdtinterface.core.FortranLanguage"
             id="org.eclipse.photran.cdtinterface.fortran"
             name="Fortran">
-         <contentType id="org.eclipse.photran.core.fixedFormFortranSource"/>
-         <contentType id="org.eclipse.photran.core.freeFormFortranSource"/>
-         <!-- NOTE: These have to be here since CDT doesn't seem to let us to contribute them elsewhere -->
-         <contentType id="org.eclipse.photran.core.cppFreeFormFortranSource"/>
-         <contentType id="org.eclipse.photran.core.cppFixedFormFortranSource"/>
+         <contentType id="org.eclipse.photran.core.fortranSource"/>
       </language>
    </extension>
 

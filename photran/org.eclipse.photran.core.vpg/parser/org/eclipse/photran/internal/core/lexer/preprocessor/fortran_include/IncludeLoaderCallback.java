@@ -69,7 +69,7 @@ public class IncludeLoaderCallback
     
     protected IFile getIncludedFile(String fileToInclude) throws FileNotFoundException
     {
-        String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(project, SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME));
+        String[] paths = new SearchPathProperties().getListProperty(project, SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME);
     	for (int i = 0; i < paths.length; i++)
         {
     	    IResource folder = ResourcesPlugin.getWorkspace().getRoot().findMember(paths[i]);

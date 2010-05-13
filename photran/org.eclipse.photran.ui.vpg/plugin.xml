@@ -171,8 +171,7 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.RefactoringActionSet">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
    </extension>
 
@@ -260,24 +259,13 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.AnalysisActionSet">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
    </extension>
    <extension point="org.eclipse.ui.popupMenus">
      <viewerContribution
-        targetID="#FixedFormFortranEditorContextMenu"
-        id="org.eclipse.photran.ui.FixedNavigationContribution">
-       <action
-            class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
-            definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
-            id="org.eclipse.photran.ui.OpenDeclarationMenuAction"
-            label="&amp;Open Declaration"
-            menubarPath="group.open"/>
-     </viewerContribution>
-     <viewerContribution
-        targetID="#FreeFormFortranEditorContextMenu"
-        id="org.eclipse.photran.ui.FreeNavigationContribution">
+        targetID="#FortranEditorContextMenu"
+        id="org.eclipse.photran.ui.NavigationContribution">
        <action
             class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
             definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
@@ -398,57 +386,18 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.SearchActionSet">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
    </extension>
    <!-- 5. Contribute the actions to the Fortran editors' popup menus -->
    <extension point="org.eclipse.ui.popupMenus">
-     <!-- Fixed form editor -->
      <viewerContribution
-         id="org.eclipse.photran.ui.vpg.FixedFortranFindReferencesContribution"
-         targetID="#FixedFormFortranEditorContextMenu">
+         id="org.eclipse.photran.ui.vpg.FortranFindReferencesContribution"
+         targetID="#FortranEditorContextMenu">
       <menu
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
             label="Re&amp;ferences"
             path="group.find"><!-- See ITextEditorActionConstants - was originally group.search according to IContextMenuConstants -->
-         <separator
-               name="FindAllReferencesGroup">
-         </separator>
-      </menu>
-      <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$FileActionDelegate"
-            definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
-            icon="icons/full/obj16/search_ref_obj.gif"
-            id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileAction"
-            label="File"
-            menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
-      </action>
-      <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$ProjectActionDelegate"
-            definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
-            icon="icons/full/obj16/search_ref_obj.gif"
-            id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectAction"
-            label="Project"
-            menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
-      </action>
-      <action
-            class="org.eclipse.photran.internal.ui.search.FortranFindReferencesActionDelegate$WorkspaceActionDelegate"
-            definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
-            icon="icons/full/obj16/search_ref_obj.gif"
-            id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceAction"
-            label="Workspace"
-            menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
-      </action>
-     </viewerContribution>
-     <!-- Free form editor -->
-     <viewerContribution
-         id="org.eclipse.photran.ui.vpg.FreeFortranFindReferencesContribution"
-         targetID="#FreeFormFortranEditorContextMenu">
-      <menu
-            id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
-            label="Re&amp;ferences"
-            path="group.find"><!-- Same as above -->
          <separator
                name="FindAllReferencesGroup">
          </separator>
@@ -597,12 +546,10 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.DebugActionSet">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
       <actionSetPartAssociation targetID="org.eclipse.rephraserengine.ui.DebugActionSet">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
    </extension>
 

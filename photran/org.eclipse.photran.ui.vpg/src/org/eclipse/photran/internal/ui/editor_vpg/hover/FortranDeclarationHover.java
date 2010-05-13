@@ -25,7 +25,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.swt.SWT;
@@ -42,7 +42,7 @@ import org.eclipse.ui.part.IWorkbenchPartOrientation;
  */
 public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
 {
-    private AbstractFortranEditor fEditor;
+    private FortranEditor fEditor;
     private boolean hoverTipEnabled;
 
     private TokenList activeTokenList = null;
@@ -64,14 +64,14 @@ public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
      * @param sourceViewer
      * @param editor
      */
-    public FortranDeclarationHover(ISourceViewer sourceViewer, AbstractFortranEditor editor)
+    public FortranDeclarationHover(ISourceViewer sourceViewer, FortranEditor editor)
     {
         Assert.isNotNull(sourceViewer);
         fEditor = editor;
         
         if (editor == null) return;
 
-        hoverTipEnabled = SearchPathProperties.getProperty(editor.getIFile(), 
+        hoverTipEnabled = new SearchPathProperties().getProperty(editor.getIFile(), 
             SearchPathProperties.ENABLE_HOVER_TIP_PROPERTY_NAME).equals("true");
 
         

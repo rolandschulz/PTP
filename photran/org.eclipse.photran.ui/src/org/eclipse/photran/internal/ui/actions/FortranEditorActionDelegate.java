@@ -19,7 +19,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
@@ -44,7 +44,7 @@ public abstract class FortranEditorActionDelegate
     ///////////////////////////////////////////////////////////////////////////
 
     protected IWorkbenchWindow window = null;
-    protected AbstractFortranEditor fEditor = null;
+    protected FortranEditor fEditor = null;
 
     ///////////////////////////////////////////////////////////////////////////
     // Constructors
@@ -52,7 +52,7 @@ public abstract class FortranEditorActionDelegate
 
     public FortranEditorActionDelegate() {}
 
-    public FortranEditorActionDelegate(AbstractFortranEditor ed) { fEditor = ed; }
+    public FortranEditorActionDelegate(FortranEditor ed) { fEditor = ed; }
 
     ///////////////////////////////////////////////////////////////////////////
     // IActionDelegate Implementation
@@ -66,7 +66,7 @@ public abstract class FortranEditorActionDelegate
         if (this.window != null)
         {
             IEditorPart editor = this.window.getActivePage().getActiveEditor();
-            fEditor = editor instanceof AbstractFortranEditor ? (AbstractFortranEditor)editor : null;
+            fEditor = editor instanceof FortranEditor ? (FortranEditor)editor : null;
         }
 
         if (this.fEditor != null)
@@ -108,14 +108,14 @@ public abstract class FortranEditorActionDelegate
 
     public void setActiveEditor(IAction action, IEditorPart targetEditor)
     {
-        fEditor = targetEditor instanceof AbstractFortranEditor ? (AbstractFortranEditor)targetEditor : null;
+        fEditor = targetEditor instanceof FortranEditor ? (FortranEditor)targetEditor : null;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Utility Methods for Subclasses
     ///////////////////////////////////////////////////////////////////////////
 
-    protected AbstractFortranEditor getFortranEditor()
+    protected FortranEditor getFortranEditor()
     {
         return fEditor;
     }

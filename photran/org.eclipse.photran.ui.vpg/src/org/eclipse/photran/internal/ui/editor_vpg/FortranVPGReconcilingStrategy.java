@@ -3,20 +3,20 @@ package org.eclipse.photran.internal.ui.editor_vpg;
 import org.eclipse.cdt.internal.ui.text.CCompositeReconcilingStrategy;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 @SuppressWarnings("restriction")
 public class FortranVPGReconcilingStrategy extends CCompositeReconcilingStrategy
 {
-    protected final AbstractFortranEditor editor;
+    protected final FortranEditor editor;
     
     public FortranVPGReconcilingStrategy(ISourceViewer sourceViewer, ITextEditor editor, String documentPartitioning)
     {
         super(sourceViewer, editor, documentPartitioning);
-        if (editor instanceof AbstractFortranEditor)
+        if (editor instanceof FortranEditor)
         {
-            this.editor = (AbstractFortranEditor)editor;
+            this.editor = (FortranEditor)editor;
         }
         else
         {

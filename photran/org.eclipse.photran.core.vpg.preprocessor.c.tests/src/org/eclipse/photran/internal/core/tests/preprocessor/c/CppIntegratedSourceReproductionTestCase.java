@@ -12,14 +12,11 @@ package org.eclipse.photran.internal.core.tests.preprocessor.c;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 
-import org.eclipse.photran.internal.core.lexer.CPreprocessedSourceForm;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
-import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
+import org.eclipse.photran.internal.core.lexer.sourceform.CPreprocessedFreeSourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 import org.eclipse.photran.internal.tests.AbstractParserTestCase;
@@ -31,15 +28,9 @@ public class CppIntegratedSourceReproductionTestCase extends AbstractParserTestC
         super(file, isFixedForm, testCaseDescription);
     }
 
-    @Override protected SourceForm createSourceForm()
+    @Override protected ISourceForm createSourceForm()
     {
-        return new CPreprocessedSourceForm(new IncludeLoaderCallback(null)
-        {
-            @Override public Reader getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
-            {
-                throw new FileNotFoundException("#include lines not supported in JUnit tests");
-            }
-        });
+        return new CPreprocessedFreeSourceForm();
     }
 
     @Override

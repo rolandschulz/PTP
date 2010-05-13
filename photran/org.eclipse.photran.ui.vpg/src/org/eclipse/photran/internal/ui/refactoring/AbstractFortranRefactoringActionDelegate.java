@@ -24,7 +24,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.ui.actions.FortranEditorActionDelegate;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.vpg.PhotranResourceFilter;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 import org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring;
@@ -108,7 +108,7 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
             RefactoringWizardOpenOperation wiz = new RefactoringWizardOpenOperation(wizard);
             wiz.run(shell, name);
 
-            AbstractFortranEditor activeFortranEditor = getFortranEditor();
+            FortranEditor activeFortranEditor = getFortranEditor();
             if (activeFortranEditor != null)
                 activeFortranEditor.forceOutlineViewUpdate();
         }

@@ -41,8 +41,7 @@ public class FViewLabelProvider extends CViewLabelProvider
         {
             String fileName = ((TranslationUnit)element).getFile().getName();
             IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(fileName);
-            if (contentType.isKindOf(FortranCorePlugin.fixedFormContentType())
-                || contentType.isKindOf(FortranCorePlugin.freeFormContentType())) {
+            if (contentType.isKindOf(FortranCorePlugin.fortranContentType())) {
                 if(fortranFileImage == null) {
                     fortranFileImage = CDTInterfacePlugin.getImageDescriptor("icons/obj16/f_file_obj.gif").createImage();
                 }

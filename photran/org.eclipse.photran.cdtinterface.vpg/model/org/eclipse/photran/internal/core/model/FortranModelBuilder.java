@@ -14,10 +14,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
+import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
@@ -71,19 +72,18 @@ public class FortranModelBuilder implements IFortranModelBuilder
         try
         {
             IFile file = translationUnit.getFile();
-            SourceForm sourceForm = determineSourceForm(file);
+            ISourceForm sourceForm = determineSourceForm(file);
             String filename = determineFilename(file);
-            lexer = LexerFactory.createLexer(
+            lexer = new ASTLexerFactory().createLexer(
                 new StringReader(translationUnit.getBuffer().getContents()),
                 file,
                 filename,
-                sourceForm,
-                true /*false*/);
+                sourceForm);
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
             IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());
 
-            createSourceFormNode(sourceForm.getDescription(filename));
+            createSourceFormNode(SourceForm.descriptionFor(file));
 
             if (isParseTreeModelEnabled())
             {
@@ -142,19 +142,13 @@ public class FortranModelBuilder implements IFortranModelBuilder
 			return file.getName();
 	}
 
-	private SourceForm determineSourceForm(IFile file)
+	private ISourceForm determineSourceForm(IFile file)
 	{
-		if (isFixedForm)
-		{
-			return SourceForm.FIXED_FORM;
-		}
+	    ISourceForm sourceForm = SourceForm.of(file);
+		if (isLocal(file) && file.getProject() != null)
+			return sourceForm.configuredWith(new IncludeLoaderCallback(file.getProject()));
 		else
-		{
-			if (isLocal(file) && file.getProject() != null)
-				return SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject()));
-			else
-				return SourceForm.UNPREPROCESSED_FREE_FORM;
-		}
+		    return sourceForm;
 	}
 
 	private boolean isLocal(IFile file)

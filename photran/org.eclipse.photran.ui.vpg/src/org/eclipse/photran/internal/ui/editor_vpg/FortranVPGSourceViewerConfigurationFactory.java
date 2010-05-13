@@ -15,9 +15,9 @@ import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.editor.IFortranSourceViewerConfigurationFactory;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor.FortranSourceViewerConfiguration;
+import org.eclipse.photran.internal.ui.editor.FortranEditor.FortranSourceViewerConfiguration;
 import org.eclipse.photran.internal.ui.editor_vpg.contentassist.FortranCompletionProcessor;
 import org.eclipse.photran.internal.ui.editor_vpg.folding.FortranFoldingProvider;
 import org.eclipse.photran.internal.ui.editor_vpg.hover.FortranDeclarationHover;
@@ -31,7 +31,7 @@ import org.eclipse.photran.internal.ui.editor_vpg.hover.FortranDeclarationHover;
 @SuppressWarnings("restriction")
 public class FortranVPGSourceViewerConfigurationFactory implements IFortranSourceViewerConfigurationFactory
 {
-    public SourceViewerConfiguration create(final AbstractFortranEditor editor)
+    public SourceViewerConfiguration create(final FortranEditor editor)
     {
         new FortranFoldingProvider().setup(editor);
         
@@ -46,13 +46,13 @@ public class FortranVPGSourceViewerConfigurationFactory implements IFortranSourc
 
             @Override public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
             {
-                IContentAssistant result = fortranCompletionProcessor.setup((AbstractFortranEditor)editor);
+                IContentAssistant result = fortranCompletionProcessor.setup((FortranEditor)editor);
                 return result == null ? super.getContentAssistant(sourceViewer) : result;
             }
 
             @Override public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
             {
-                return new FortranDeclarationHover(sourceViewer, (AbstractFortranEditor)editor);
+                return new FortranDeclarationHover(sourceViewer, (FortranEditor)editor);
             }
         };
     }

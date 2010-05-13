@@ -18,7 +18,7 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -33,9 +33,9 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
     
     private String errorMessage = null;
     
-    public IContentAssistant setup(AbstractFortranEditor editor)
+    public IContentAssistant setup(FortranEditor editor)
     {
-        String contentAssistEnabledProperty = SearchPathProperties.getProperty(
+        String contentAssistEnabledProperty = new SearchPathProperties().getProperty(
             editor.getIFile(),
             SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME);
         if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true"))
@@ -46,7 +46,7 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
             FortranEditorTasks.instance(editor).addVPGTask(new FortranCompletionProcessorVPGTask(this));
             
             ContentAssistant assistant = new ContentAssistant();
-            for (String partitionType : AbstractFortranEditor.PARTITION_TYPES)
+            for (String partitionType : FortranEditor.PARTITION_TYPES)
                 assistant.setContentAssistProcessor(this, partitionType);
             assistant.enableAutoActivation(false); //assistant.setAutoActivationDelay(500);
             assistant.setProposalPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);

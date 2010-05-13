@@ -24,6 +24,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.interfaces.IRenameRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
@@ -221,7 +222,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
             {
                 continue;
             }
-            else if (FortranCorePlugin.hasFixedFormContentType(file))
+            else if (SourceForm.isFixedForm(file))
             {
                 fixedFormFiles.add(file);
                 status.addError("The fixed form file " + file.getName() + " will not be refactored.");
@@ -254,7 +255,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
             {
                 continue;
             }
-            else if (FortranCorePlugin.hasCppContentType(file))
+            else if (SourceForm.isCPreprocessed(file))
             {
                 cppFiles.add(file);
                 status.addError("The C-preprocessed file " + file.getName() + " will not be refactored.");

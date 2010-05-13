@@ -22,7 +22,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.photran.internal.ui.editor_vpg.IFortranEditorASTTask;
@@ -48,7 +48,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
 {
     public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException
     {
-        AbstractFortranEditor editor = getFortranEditor();
+        FortranEditor editor = getFortranEditor();
         Shell shell = editor.getShell();
         
         if (PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(editor.getIFile()))
@@ -69,12 +69,12 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
     
     private class OpenDeclarationASTTask implements IFortranEditorASTTask
     {
-        @SuppressWarnings("unused") private AbstractFortranEditor editor;
+        @SuppressWarnings("unused") private FortranEditor editor;
         private TextSelection selection;
         private Shell shell;
         private IWorkbenchPage page;
         
-        public OpenDeclarationASTTask(AbstractFortranEditor editor, TextSelection selection, Shell shell, IWorkbenchPage page)
+        public OpenDeclarationASTTask(FortranEditor editor, TextSelection selection, Shell shell, IWorkbenchPage page)
         {
             this.editor = editor;
             this.selection = selection;

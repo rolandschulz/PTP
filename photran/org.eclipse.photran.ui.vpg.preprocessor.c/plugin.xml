@@ -20,8 +20,7 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.vpg.preprocessor.c.CPPActionSet">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
    </extension>
 </plugin>

@@ -1467,22 +1467,15 @@
             valueType="string"
             id="intel.linux.fortran.compiler.cmdline.addlopts">
          </option>
-
-<!-- CDT does not yet support multiple content types so comment out these inputType attributes for now
-            sourceContentType="org.eclipse.photran.core.fortranSource"
-            dependencyContentType="org.eclipse.cdt.core.fortranSource"
--->
-
-         <!--NOTE:
-          If you are changing file extensions in "sources" or "dependencyExtensions" keep 
-          in mind that those extensions are duplicated in the following files:
-          org.eclipse.photran.managedbuilder.intel.ui/plugin.xml
-          org.eclipse.photran.managedbuilder.gnu.ui/plugin.xml
-          org.eclipse.photran.managedbuilder.xlf.ui/plugin.xml
-          org.eclipse.photran.core/plugin.xml -->
-         <inputType
+         <!--inputType
             sources="f90,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP,i,i90"
             dependencyExtensions="f90,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP,i,i90"
+            dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
+            id="photran.managedbuild.tool.intel.fortran.compiler.input">
+         </inputType-->
+         <inputType
+            sourceContentType="org.eclipse.photran.core.fortranSource"
+            dependencyContentType="org.eclipse.photran.core.fortranSource"
             dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
             id="photran.managedbuild.tool.intel.fortran.compiler.input">
          </inputType>

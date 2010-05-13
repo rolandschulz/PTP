@@ -50,7 +50,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.photran.internal.cdtinterface.ui.editor.CDTBasedSourceViewerConfiguration;
 import org.eclipse.photran.internal.cdtinterface.ui.editor.CDTBasedTextEditor;
-import org.eclipse.photran.internal.core.FortranCorePlugin;
+import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
@@ -83,11 +83,15 @@ import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
  * @author Jeff Overbey
  * @author Kurt Hendle - folding support
  */
-public abstract class AbstractFortranEditor extends CDTBasedTextEditor implements ISelectionChangedListener
+public class FortranEditor extends CDTBasedTextEditor implements ISelectionChangedListener
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constants
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static final String EDITOR_ID = "org.eclipse.photran.ui.FortranEditor";
+
+    protected static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
 
     protected static final String SOURCE_VIEWER_CONFIG_EXTENSION_POINT_ID =
         "org.eclipse.photran.ui.sourceViewerConfig";
@@ -123,7 +127,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     // Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    public AbstractFortranEditor()
+    public FortranEditor()
     {
         super();
         setSourceViewerConfiguration(createSourceViewerConfiguration());
@@ -140,6 +144,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         WorkbenchChainedTextFontFieldEditor.startPropagate(store, JFaceResources.TEXT_FONT);
 
         useCDTRulerContextMenuID();
+        setEditorContextMenuId(CONTEXT_MENU_ID);
 
         contentTypeMismatch = false;
     }
@@ -190,14 +195,6 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
 
         addWatermark(parent);
     }
-
-    /*
-     * TODO: The code above for drawing a horizontal ruler doesn't work when projection support
-     * (folding) is enabled, since it uses a ProjectionViewer and the ugly "childComp = ..."
-     * needs to change somehow.  In the mean time, we'll enable the ruler in the fixed-form
-     * editor and folding in the free-form editor.
-     */
-    protected abstract boolean shouldDisplayHorizontalRulerRatherThanFolding();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Context Menu Contribution
@@ -302,7 +299,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         if (contentType == null) return;
 
         boolean expectedSourceForm = this.isFixedForm();
-        boolean actualSourceForm = FortranCorePlugin.isFixedFormContentType(contentType);
+        boolean actualSourceForm = SourceForm.isFixedForm(file);
         if (actualSourceForm != expectedSourceForm)
             contentTypeMismatch = true;
     }
@@ -328,7 +325,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
             if (!active)
             {
                 active = true;
-                widget = AbstractFortranEditor.this.getSourceViewer().getTextWidget();
+                widget = FortranEditor.this.getSourceViewer().getTextWidget();
                 final Font font = new Font(null, new FontData("Arial", 14, SWT.NORMAL));
                 final Color lightGray = new Color(null, new RGB(192, 192, 192));
                 listener = new PaintListener()
@@ -402,7 +399,21 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         fHRuler.moveAbove(null);
     }
 
-    protected abstract FortranHorizontalRuler getFortranHorizontalRuler(Composite mainComposite);
+    /*
+     * TODO: The code for drawing a horizontal ruler doesn't work when projection support
+     * (folding) is enabled, since it uses a ProjectionViewer and the ugly "childComp = ..."
+     * needs to change somehow.  In the mean time, we provide the option to choose one or
+     * the other, but not both.
+     */
+    protected boolean shouldDisplayHorizontalRulerRatherThanFolding()
+    {
+        return FortranPreferences.ENABLE_FREE_FORM_FOLDING.getValue() == false;
+    }
+
+    protected FortranHorizontalRuler getFortranHorizontalRuler(Composite mainComposite)
+    {
+        return new FortranHorizontalRuler(getVerticalRuler(), mainComposite, isFixedForm());
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Gray Vertical Lines
@@ -431,7 +442,18 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         }
     }
 
-    protected abstract int[] getColumnsToDrawVerticalLinesOn();
+    protected int[] getColumnsToDrawVerticalLinesOn()
+    {
+        if (isFixedForm())
+        {
+            int endColumnWidth = FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue();
+            return new int[] { 5, 6, endColumnWidth };
+        }
+        else
+        {
+            return new int[0];
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Preference Page Support
@@ -464,7 +486,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
                 IFortranSourceViewerConfigurationFactory factory =
                     (IFortranSourceViewerConfigurationFactory)
                     configs[configs.length-1].createExecutableExtension("factory");
-                return factory.create(AbstractFortranEditor.this);
+                return factory.create(FortranEditor.this);
             }
             catch (CoreException e)
             {
@@ -488,13 +510,16 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
         document.setDocumentPartitioner(partitioner);
     }
 
-    protected abstract ITokenScanner getTokenScanner();
+    protected ITokenScanner getTokenScanner()
+    {
+        return new FortranKeywordRuleBasedScanner(isFixedForm(), getSourceViewer());
+    }
 
     public static class FortranSourceViewerConfiguration extends CDTBasedSourceViewerConfiguration
     {
         protected PresentationReconciler reconciler;
 
-        public FortranSourceViewerConfiguration(AbstractFortranEditor editor)
+        public FortranSourceViewerConfiguration(FortranEditor editor)
         {
             super(editor);
         }
@@ -530,7 +555,7 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
 
         protected ITokenScanner getTokenScanner()
         {
-            return ((AbstractFortranEditor)editor).getTokenScanner();
+            return ((FortranEditor)editor).getTokenScanner();
         }
     }
 
@@ -538,7 +563,10 @@ public abstract class AbstractFortranEditor extends CDTBasedTextEditor implement
     // Utility Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    public abstract boolean isFixedForm();
+    public boolean isFixedForm()
+    {
+        return SourceForm.isFixedForm(getIFile());
+    }
 
     public IFile getIFile()
     {

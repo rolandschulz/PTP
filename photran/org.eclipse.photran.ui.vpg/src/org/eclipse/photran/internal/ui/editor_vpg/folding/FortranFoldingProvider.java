@@ -20,7 +20,7 @@ import org.eclipse.photran.internal.core.lexer.TokenList;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTNode;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.photran.internal.ui.editor_vpg.DefinitionMap;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranEditorTasks;
 import org.eclipse.photran.internal.ui.editor_vpg.FortranVPGSourceViewerConfigurationFactory;
@@ -31,16 +31,16 @@ import org.eclipse.swt.widgets.Display;
  * Provides folding structure for the Fortran editor (i.e., its ability to collapse functions, modules, etc.).
  * <p>
  * This class implements {@link IFortranEditorASTTask} and is installed by
- * {@link FortranVPGSourceViewerConfigurationFactory#create(org.eclipse.photran.internal.ui.editor.AbstractFortranEditor)}
+ * {@link FortranVPGSourceViewerConfigurationFactory#create(org.eclipse.photran.internal.ui.editor.FortranEditor)}
  * 
  * @author Jeff Overbey
  * @author Kurt Hendle
  */
 public class FortranFoldingProvider implements IFortranEditorASTTask
 {
-    protected AbstractFortranEditor editor = null;
+    protected FortranEditor editor = null;
 
-    public void setup(AbstractFortranEditor editor)
+    public void setup(FortranEditor editor)
     {
         this.editor = editor;
         FortranEditorTasks.instance(editor).addASTTask(this);

@@ -8,33 +8,13 @@
          point="org.eclipse.ui.editors"
          id="org.eclipse.photran.ui.FortranEditor">
          
-      <!-- Since freeFormFortranSource and fixedFormFortranSource are "sub-content types" of fortranSource,
-           we will bind both editors to the fortranSource content type; however, whichever content type
-           binding is given first will be "tighter" and used as the default.
-           That way, fixed form files will open in the fixed form editor by default, but they can also
-           be opened in the free form editor (right click, and choose Open With).  Similarly, free form files
-           can be opened in the fixed form editor. -->
       <editor
             default="true"
-            name="Fortran Editor (Free Format)"
+            name="Fortran Editor"
             icon="icons/full/obj16/f_file_obj.gif"
-            class="org.eclipse.photran.internal.ui.editor.FreeFormFortranEditor"
+            class="org.eclipse.photran.internal.ui.editor.FortranEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            id="org.eclipse.photran.ui.FreeFormFortranEditor">
-         <contentTypeBinding
-              contentTypeId="org.eclipse.photran.core.freeFormFortranSource" />
-         <contentTypeBinding
-              contentTypeId="org.eclipse.photran.core.fortranSource" />
-      </editor>
-      <editor
-            default="true"
-            name="Fortran Editor (Fixed Format)"
-            icon="icons/full/obj16/f_file_obj.gif"
-            class="org.eclipse.photran.internal.ui.editor.FixedFormFortranEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            id="org.eclipse.photran.ui.FixedFormFortranEditor">
-         <contentTypeBinding
-              contentTypeId="org.eclipse.photran.core.fixedFormFortranSource" />
+            id="org.eclipse.photran.ui.FortranEditor">
          <contentTypeBinding
               contentTypeId="org.eclipse.photran.core.fortranSource" />
       </editor>
@@ -61,18 +41,8 @@
 
    <extension point="org.eclipse.ui.popupMenus">
 	  <viewerContribution 
-	        targetID="#FixedFormFortranEditorContextMenu" 
+	        targetID="#FortranEditorContextMenu" 
 	        id="org.eclipse.photran.ui.FixedBlockCommentEditorContribution">
-	     <action 
-	           label="Comment/Uncomment" 
-               definitionId="org.eclipse.photran.ui.CommentCommand"
-	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
-	           menubarPath="group.edit" 
-	           id="org.eclipse.photran.ui.BlockCommentMenuAction"/>
-	  </viewerContribution>
-	  <viewerContribution 
-	        targetID="#FreeFormFortranEditorContextMenu" 
-	        id="org.eclipse.photran.ui.FreeBlockCommentEditorContribution">
 	     <action 
 	           label="Comment/Uncomment" 
                definitionId="org.eclipse.photran.ui.CommentCommand"
@@ -113,8 +83,7 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation targetID="org.eclipse.photran.ui.CommentUncomment">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
    </extension>
    <extension
@@ -137,18 +106,8 @@
    <extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
-            targetID="org.eclipse.photran.ui.FreeFormFortranEditor"
-            id="org.eclipse.photran.ui.FreeFormBreakpointRulerAction">
-         <action
-               label="Toggle Breakpoint"
-               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
-               actionID="RulerDoubleClick"
-               id="org.eclipse.cdt.debug.ui.CEditor.RulerTobbleBreakpointAction">
-         </action>
-      </editorContribution>
-      <editorContribution
-            targetID="org.eclipse.photran.ui.FixedFormFortranEditor"
-            id="org.eclipse.photran.ui.FixedFormBreakpointRulerAction">
+            targetID="org.eclipse.photran.ui.FortranEditor"
+            id="org.eclipse.photran.ui.BreakpointRulerAction">
          <action
                label="Toggle Breakpoint"
                class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
@@ -164,7 +123,7 @@
             class="org.eclipse.cdt.debug.internal.ui.actions.ToggleCBreakpointsTargetFactory">
             <enablement>
             <or>
-               <instanceof value="org.eclipse.photran.internal.ui.editor.AbstractFortranEditor"/>
+               <instanceof value="org.eclipse.photran.internal.ui.editor.FortranEditor"/>
             </or>
          </enablement>
       </toggleTargetFactory>
@@ -173,17 +132,7 @@
    <!--extension point="org.eclipse.core.runtime.adapters">
       <factory 
             class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory"
-            adaptableType="org.eclipse.photran.internal.ui.editor.FreeFormFortranEditor">
-            <adapter
-                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
-            </adapter>
-            <adapter
-                type="org.eclipse.debug.ui.actions.IRunToLineTarget">
-            </adapter>
-      </factory>
-      <factory 
-            class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
-            adaptableType="org.eclipse.photran.internal.ui.editor.FixedFormFortranEditor">
+            adaptableType="org.eclipse.photran.internal.ui.editor.FortranEditor">
             <adapter
                 type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
             </adapter>
@@ -200,8 +149,7 @@
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation
             targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
-         <part id="org.eclipse.photran.ui.FreeFormFortranEditor"/>
-         <part id="org.eclipse.photran.ui.FixedFormFortranEditor"/>
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>      
    </extension>
 
@@ -260,7 +208,25 @@
             </or>          
          </enabledWhen>
       </page>
-    </extension>    
+          <page
+            objectClass="org.eclipse.core.resources.IProject"
+            adaptable="true"
+            name="Source Form"
+            class="org.eclipse.photran.internal.ui.properties.SourceFormPropertyPage"
+            id="org.eclipse.photran.ui.SourceFormPropertyPage"
+            category="org.eclipse.photran.ui.newui.Page_head_general">
+         <filter
+               name="projectNature"
+               value="org.eclipse.photran.core.fnature">
+         </filter>            
+         <enabledWhen>
+            <or>
+              <instanceof value="org.eclipse.core.resources.IProject"/>
+              <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+            </or>          
+         </enabledWhen>
+      </page>
+   </extension>
 
    <!--=============================================-->
    <!-- Source Viewer Configuration Extension Point -->

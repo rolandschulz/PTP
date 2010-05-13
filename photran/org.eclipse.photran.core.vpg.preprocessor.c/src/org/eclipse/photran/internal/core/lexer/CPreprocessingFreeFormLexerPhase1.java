@@ -53,7 +53,7 @@ public class CPreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
 	
 	private Token lastReadInFile = null;
 
-    public CPreprocessingFreeFormLexerPhase1(Reader in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
+    public CPreprocessingFreeFormLexerPhase1(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
     {
         this(new CPreprocessingReader(file, filename, new LineAppendingReader(in)), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
     }

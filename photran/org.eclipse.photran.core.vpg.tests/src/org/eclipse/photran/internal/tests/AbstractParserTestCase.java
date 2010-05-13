@@ -16,8 +16,10 @@ import java.io.IOException;
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
+import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.util.SemanticError;
@@ -58,8 +60,8 @@ public abstract class AbstractParserTestCase extends TestCase
         
         try
         {
-            SourceForm sourceForm = createSourceForm();
-            ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(file, sourceForm, true));
+            ISourceForm sourceForm = createSourceForm();
+            ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(file, sourceForm));
             assertTrue(ast != null);
             handleAST(ast);
         }
@@ -74,16 +76,9 @@ public abstract class AbstractParserTestCase extends TestCase
         }
     }
 
-    protected SourceForm createSourceForm()
+    protected ISourceForm createSourceForm()
     {
-        SourceForm sourceForm = (isFixedForm ? SourceForm.FIXED_FORM : SourceForm.UNPREPROCESSED_FREE_FORM); /*SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(null)
-        {
-            @Override public InputStream getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
-            {
-                throw new FileNotFoundException("INCLUDE lines not supported in JUnit tests");
-            }
-        }));*/
-        return sourceForm;
+        return isFixedForm ? new UnpreprocessedFixedSourceForm() : new UnpreprocessedFreeSourceForm();
     }
 
     /**

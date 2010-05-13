@@ -22,8 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.photran.internal.core.lexer.CPreprocessingReader;
-import org.eclipse.photran.internal.ui.editor.FixedFormFortranEditor;
-import org.eclipse.photran.internal.ui.editor.FreeFormFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.Workbench;
 
@@ -60,8 +59,7 @@ public class DisplayPreprocessedSource extends FortranEditorActionDelegate
             IDE.openEditor(
             		Workbench.getInstance().getActiveWorkbenchWindow().getActivePage(),
             		tempFile.toURI(),
-            		isFixedForm ? FixedFormFortranEditor.EDITOR_ID
-            				    : FreeFormFortranEditor.EDITOR_ID,
+            		FortranEditor.EDITOR_ID,
             		true);
         }
         catch (Exception e)

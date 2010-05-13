@@ -19,9 +19,8 @@ import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.dependence.LoopDependences;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.LexerException;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
@@ -62,7 +61,7 @@ public abstract class BaseTestCase extends TestCase
     protected <T extends IBodyConstruct> T parseStmt(String stmt) throws IOException, LexerException, SyntaxException
     {
         String program = stmt + "\nend program\n";
-        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(new StringReader(program), null, null, SourceForm.UNPREPROCESSED_FREE_FORM, true));
+        ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(new StringReader(program), null, null));
         assertTrue(ast != null);
         LoopReplacer.replaceAllLoopsIn(ast);
         return (T)((ASTMainProgramNode)ast.getProgramUnitList().get(0)).getBody().get(0);

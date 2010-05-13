@@ -14,23 +14,19 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.photran.internal.core.properties.SearchPathProperties;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.dialogs.PropertyPage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 /**
  * Fortran Refactoring Engine Search Paths project properties page.  Allows the user to specify module paths and include paths for a project.
@@ -43,80 +39,29 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * Modified by Timofey Yuvashev
  */
 
-public class SearchPathsPropertyPage extends PropertyPage
+public class SearchPathsPropertyPage extends FortranPropertyPage
 {
-    /*
-     * This class is needed for only one reason: there is no setters in BooleanFieldEditor
-     *  for the button/check-box. So I cannot programmatically set whether or not the button
-     *  is checked, which I need to be able to do. So the only reason I created this class
-     *  is to provide the said functionality.
-     */
-    public static class FortranBooleanFieldEditor extends BooleanFieldEditor
-    {
-        //DO NOT SET THIS VALUE TO ANYTHING!! This field is initialized via getChangeControl(Composite parent)
-        // which is called from super() constructor. Since fields are initialized AFTER the super() constructor
-        // is called, if you set this to, let's say NULL, then AFTER it was already initialized to a proper value
-        // by the super() constructor, it will get re-set to NULL, and you don't want that. So, don't set this
-        // field to anything!
-        private Button myCheckBox;
-        
-        public FortranBooleanFieldEditor(String enableVpgPropertyName, 
-            String string,
-            Composite composite)
-        {
-            super(enableVpgPropertyName, string, composite);
-        }
-
-        ////// !! Copied from BooleanFieldEditor !! /////
-        /**
-         * Returns the change button for this field editor.
-         * @param parent The Composite to create the receiver in.
-         *
-         * @return the change button
-         */
-        @Override protected Button getChangeControl(Composite parent) 
-        {
-            if (myCheckBox == null) {
-                myCheckBox = new Button(parent, SWT.CHECK | SWT.LEFT);
-                myCheckBox.setFont(parent.getFont());
-                myCheckBox.addSelectionListener(new SelectionAdapter() {
-                    public void widgetSelected(SelectionEvent e) {
-                        boolean isSelected = myCheckBox.getSelection();
-                        valueChanged(!isSelected, isSelected);
-                    }
-                });
-                myCheckBox.addDisposeListener(new DisposeListener() {
-                    public void widgetDisposed(DisposeEvent event) {
-                        myCheckBox = null;
-                    }
-                });
-            } else {
-                checkParent(myCheckBox, parent);
-            }
-            return myCheckBox;
-        }  
-        
-        public void setValue(boolean value)
-        {
-            if(myCheckBox != null)
-                myCheckBox.setSelection(value);
-        }
-    }
-    
-
     private FortranBooleanFieldEditor enableVPG, enableDeclView, enableContentAssist, enableHoverTip;
     private WorkspacePathEditor modulePathEditor, includePathEditor;
+    
+    private SearchPathProperties properties;
     
     /**
      * @see PreferencePage#createContents(Composite)
      */
     protected Control createContents(Composite parent)
     {
-        IProject proj = (IProject)getElement(); 
+        IProject proj = (IProject)getElement();
+        properties = new SearchPathProperties(proj);
+        IPreferenceStore scopedStore = properties.getPropertyStore();
+        scopedStore.addPropertyChangeListener(new IPropertyChangeListener()
+        {
+            public void propertyChange(PropertyChangeEvent event)
+            {
+                setDirty();
+            }
+        });
         
-        SearchPathProperties.setProject(proj);
-        ScopedPreferenceStore scopedStore = SearchPathProperties.scopedStore;
-              
         final Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(1, true));
         GridData data = new GridData(GridData.FILL);
@@ -149,9 +94,8 @@ public class SearchPathsPropertyPage extends PropertyPage
         
         enableVPG.setPreferenceStore(scopedStore);
         enableVPG.load();
-        SearchPathProperties.setProperty(proj, 
-                                         SearchPathProperties.ENABLE_VPG_PROPERTY_NAME, 
-                                         String.valueOf(enableVPG.getBooleanValue()));
+        properties.setProperty(proj, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME, 
+                                     String.valueOf(enableVPG.getBooleanValue()));
 
         enableDeclView = new FortranBooleanFieldEditor(SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME, 
                                                 "Enable Fortran Declaration view", 
@@ -221,7 +165,7 @@ public class SearchPathsPropertyPage extends PropertyPage
         includePathEditor.loadDefault();
     }
     
-    public boolean performOk()
+    @Override public boolean doPerformOk()
     {
         enableVPG.store();
         enableDeclView.store();
@@ -230,19 +174,19 @@ public class SearchPathsPropertyPage extends PropertyPage
         modulePathEditor.store();
         includePathEditor.store();
         
-        ScopedPreferenceStore scopedStore = SearchPathProperties.scopedStore;
         try
         {
-            scopedStore.save();
+            properties.save();
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            FortranUIPlugin.log(e);
+            MessageDialog.openError(getShell(),
+                "Error Saving Project Properties",
+                "The project properties could not be saved.\n" +
+                e.getClass().getName() + ": " +
+                e.getMessage());
         }
-        
-        MessageDialog.openInformation(getShell(), "Preferences Changed", "You may need to close and re-open any " +
-            "Fortran editors for the new settings to take effect.");
         
         PhotranVPG.getInstance().queueJobToEnsureVPGIsUpToDate();
         

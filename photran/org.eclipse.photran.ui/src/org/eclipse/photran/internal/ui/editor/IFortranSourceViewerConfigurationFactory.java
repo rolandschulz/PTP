@@ -4,5 +4,5 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 public interface IFortranSourceViewerConfigurationFactory
 {
-    SourceViewerConfiguration create(AbstractFortranEditor editor);
+    SourceViewerConfiguration create(FortranEditor editor);
 }

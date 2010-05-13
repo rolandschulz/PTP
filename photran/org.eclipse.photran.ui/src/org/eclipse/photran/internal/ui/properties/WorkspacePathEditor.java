@@ -17,7 +17,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.ListEditor;
-import org.eclipse.photran.internal.core.properties.SearchPathProperties;
+import org.eclipse.photran.internal.core.properties.AbstractProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
@@ -92,12 +92,12 @@ public class WorkspacePathEditor extends ListEditor
     @Override
     protected String createList(String[] items)
     {
-        return SearchPathProperties.createList(items);
+        return AbstractProperties.createList(items);
     }
 
     @Override
     protected String[] parseString(String stringList)
     {
-        return SearchPathProperties.parseString(stringList);
+        return AbstractProperties.parseString(stringList);
     }
 }

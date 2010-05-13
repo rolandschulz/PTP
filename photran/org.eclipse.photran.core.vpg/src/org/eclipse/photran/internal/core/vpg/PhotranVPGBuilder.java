@@ -22,24 +22,22 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
-import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerException;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
+import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.rephraserengine.core.vpg.VPGDependency;
 import org.eclipse.rephraserengine.core.vpg.VPGEdge;
@@ -188,10 +186,10 @@ public class PhotranVPGBuilder extends PhotranVPG
     {
         if (isVirtualFile(filename)) return;
 
-        SourceForm sourceForm = determineSourceForm(filename);
+        ISourceForm sourceForm = determineSourceForm(filename);
         try
         {
-            IAccumulatingLexer lexer = LexerFactory.createLexer(getIFileForFilename(filename), sourceForm, true /*false*/);
+            IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(getIFileForFilename(filename), sourceForm);
             long start = System.currentTimeMillis();
             calculateDependencies(filename, lexer);
             debug("  - Elapsed time in calculateDependencies: " + (System.currentTimeMillis()-start) + " ms", filename);
@@ -202,19 +200,10 @@ public class PhotranVPGBuilder extends PhotranVPG
         }
     }
 
-    private SourceForm determineSourceForm(final String filename)
+    private ISourceForm determineSourceForm(final String filename)
     {
         IFile file = getIFileForFilename(filename);
-        IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filename);
-
-        SourceForm sourceForm;
-        if (contentType != null && contentType.isKindOf(FortranCorePlugin.fixedFormContentType()))
-            sourceForm = SourceForm.FIXED_FORM;
-        else if (file == null || file.getProject() == null)
-            sourceForm = SourceForm.UNPREPROCESSED_FREE_FORM;
-        else
-        {
-            sourceForm = SourceForm.preprocessedFreeForm(new IncludeLoaderCallback(file.getProject())
+        return SourceForm.of(file).configuredWith(new IncludeLoaderCallback(file.getProject())
             {
                 @Override
                 public Reader getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException
@@ -235,8 +224,6 @@ public class PhotranVPGBuilder extends PhotranVPG
                     PhotranVPG.getInstance().log.logError(message, new PhotranTokenRef(topLevelFile, offset, 0));
                 }
             });
-        }
-        return sourceForm;
     }
 
     private void calculateDependencies(String filename, IAccumulatingLexer lexer)
@@ -340,11 +327,11 @@ public class PhotranVPGBuilder extends PhotranVPG
         IFile file = getIFileForFilename(filename); if (file == null) return null;
         try
         {
-            SourceForm sourceForm = determineSourceForm(filename);
+            ISourceForm sourceForm = determineSourceForm(filename);
             try
             {
                 if (stream == null) stream = new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset()));
-                IAccumulatingLexer lexer = LexerFactory.createLexer(stream, file, filename, sourceForm, true);
+                IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(stream, file, filename, sourceForm);
                 long start = System.currentTimeMillis();
                 ASTExecutableProgramNode ast = parser.parse(lexer);
                 debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);

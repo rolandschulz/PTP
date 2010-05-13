@@ -18,10 +18,12 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.eclipse.photran.internal.core.SyntaxException;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.LexerException;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm;
+import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser;
@@ -35,7 +37,7 @@ public class TestOpenMPComments extends TestCase
 {
     public void testFreeFormOpenMPComments() throws Exception
     {
-        ASTExecutableProgramNode ast = parse(SourceForm.UNPREPROCESSED_FREE_FORM,
+        ASTExecutableProgramNode ast = parse(new UnpreprocessedFreeSourceForm(),
             //         1    1    2    2    3    3
             //----5----0----5----0----5----0----5
             "! This is a sample OpenMP program\n" + // Starts at offset 0
@@ -73,7 +75,7 @@ public class TestOpenMPComments extends TestCase
     
     public void testFixedFormOpenMPComments() throws Exception
     {
-        ASTExecutableProgramNode ast = parse(SourceForm.FIXED_FORM,
+        ASTExecutableProgramNode ast = parse(new UnpreprocessedFixedSourceForm(),
             //         1    1    2    2    3    3
             //----5----0----5----0----5----0----5
             "! This is a sample OpenMP program\n" + // Starts at offset 0
@@ -127,9 +129,9 @@ public class TestOpenMPComments extends TestCase
         }
     }
     
-    private ASTExecutableProgramNode parse(SourceForm sourceForm, String string) throws IOException, LexerException, SyntaxException
+    private ASTExecutableProgramNode parse(ISourceForm sourceForm, String string) throws IOException, LexerException, SyntaxException
     {
-        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(new StringReader(string), null, "<stdin>", sourceForm, true));
+        ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(new StringReader(string), null, "<stdin>", sourceForm));
         assertTrue(ast != null);
         return ast;
     }

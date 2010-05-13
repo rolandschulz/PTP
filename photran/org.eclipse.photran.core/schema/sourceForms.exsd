@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.photran.core.vpg" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.photran.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.photran.core.vpg" id="sourceform" name="Source Form"/>
+         <meta.schema plugin="org.eclipse.photran.core" id="sourceform" name="Source Form"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="sourceform"/>
+            <element ref="source-form" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,41 +47,58 @@
       </complexType>
    </element>
 
-   <element name="sourceform">
+   <element name="source-form">
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  A unique identifier of the model builder. Note that the identifier is prefixed with the ID of the contributing plug-in.
+                  A unique identifier of the source form. If the identifier is unqualified, it will be automatically prefixed with the ID of the contributing plug-in.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  A human readable and translatable name of the model builder.
+                  A human readable and translatable name of the source form.
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
                </appInfo>
             </annotation>
          </attribute>
+         <attribute name="defaultForFilenameExtensions" type="string">
+            <annotation>
+               <documentation>
+                  A comma-separated list of filename extensions for which this source form will apply (e.g., &quot;f,for,fix,F,FOR,FIX&quot;).
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  A class extending &lt;code&gt;org.eclipse.photran.internal.cdtinterface.dom.IFortranDOMParser&lt;/code&gt;.
+                  A class implementing &lt;code&gt;org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm&lt;/code&gt;.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.photran.internal.core.lexer.SourceForm:"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm"/>
                </appInfo>
             </annotation>
          </attribute>
-         <attribute name="contentType" type="string">
+         <attribute name="priority" use="required">
             <annotation>
                <documentation>
-                  
+                  If multiple source forms apply to a given file, the one(s) with the highest priority will be preferred.  This is used to allow contributed source forms (e.g., C preprocessed source forms) to take precedence over default source forms (e.g., unpreprocessed source forms).
                </documentation>
             </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="high">
+                  </enumeration>
+                  <enumeration value="medium">
+                  </enumeration>
+                  <enumeration value="low">
+                  </enumeration>
+               </restriction>
+            </simpleType>
          </attribute>
       </complexType>
    </element>
@@ -91,7 +108,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         6.0
       </documentation>
    </annotation>
 

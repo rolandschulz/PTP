@@ -10,9 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.refactoring.infrastructure;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,9 +33,8 @@ import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
@@ -94,7 +91,7 @@ public abstract class FortranResourceRefactoring
         {
             for (IFile file : this.selectedFiles)
             {
-                if (FortranCorePlugin.hasFixedFormContentType(file))
+                if (org.eclipse.photran.internal.core.lexer.sourceform.SourceForm.isFixedForm(file))
                 {
                     status.addWarning("Indentation and line length is NOT checked when refactoring FIXED form files. " +
                         "Use at your own risk.");
@@ -146,7 +143,7 @@ public abstract class FortranResourceRefactoring
 
         for (IFile file : files)
         {
-            if (!filesToRemove.contains(file) && FortranCorePlugin.hasFixedFormContentType(file))
+            if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.lexer.sourceform.SourceForm.isFixedForm(file))
             {
                 status.addError("The fixed form file " + file.getName() + " will not be refactored.");
                 filesToRemove.add(file);
@@ -162,9 +159,9 @@ public abstract class FortranResourceRefactoring
 
         for (IFile file : files)
         {
-            if (!filesToRemove.contains(file) && FortranCorePlugin.hasCppContentType(file))
+            if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.lexer.sourceform.SourceForm.isCPreprocessed(file))
             {
-                status.addError("The C-Preprocessed file " + file.getName() + " will not be refactored.");
+                status.addError("The C-preprocessed file " + file.getName() + " will not be refactored.");
                 filesToRemove.add(file);
             }
         }
@@ -273,10 +270,8 @@ public abstract class FortranResourceRefactoring
     {
         try
         {
-            final String charset = Charset.defaultCharset().name();
-            IAccumulatingLexer lexer = LexerFactory.createLexer(
-                new InputStreamReader(new ByteArrayInputStream(string.getBytes(charset)), charset), null, "(none)",
-                SourceForm.UNPREPROCESSED_FREE_FORM, true);
+            IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(
+                new StringReader(string), null, "(none)");
             Parser parser = new Parser();
 
             FortranAST ast = new FortranAST(null, parser.parse(lexer), lexer.getTokenList());

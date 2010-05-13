@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+<!-- =========================== -->
+<!-- Nature for Fortran Projects -->
+<!-- =========================== -->
+   <extension
+         id="fnature"
+         name="%fnature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.photran.internal.core.FProjectNature">
+         </run>
+      </runtime>
+   </extension>
 
 <!-- ==============-->
 <!-- Error Parsers -->
@@ -70,105 +83,52 @@
       </errorparser>
    </extension>
 
-<!-- Old CDT stuff, don't think we need it - Jeff -->
-<!--
-   <extension
-         point="org.eclipse.cdt.core.CLanguage">
-      <language
-            name="Fortran"
-            id="org.eclipse.photran.core.language.fortran">
-      </language>
-   </extension>
-   <extension
-         point="org.eclipse.cdt.core.CFileType">
-      <fileType
-            name="%fileTypeMapping.fortranSourceFile"
-            type="source"
-            id="org.eclipse.photran.core.fileType.fortran_source"
-            language="org.eclipse.photran.core.language.fortran">
-      </fileType>
-      <fileType
-            name="%fileTypeMapping.fortranHeaderFile"
-            type="header"
-            id="org.eclipse.photran.core.fileType.fortran_header"
-            language="org.eclipse.photran.core.language.fortran">
-      </fileType>
-   </extension>
-   <extension
-         point="org.eclipse.cdt.core.CFileTypeAssociation">
-      <association
-            type="org.eclipse.photran.core.fileType.fortran_source"
-            pattern="*.f,*.f77,*.f90,*.f95">
-      </association>
-      <association
-            type="org.eclipse.photran.core.fileType.fortran_header"
-            pattern="*.fh">
-      </association>
-   </extension>
-   -->
-
-<!-- ======================================-->
-<!-- Fortran Content Types/File Extensions -->
-<!-- ======================================-->
+<!-- =====================================-->
+<!-- Fortran Content Type/File Extensions -->
+<!-- =====================================-->
   <extension point="org.eclipse.core.contenttype.contentTypes">
 
-      <!-- A "base" content type, so that we can refer to both free and fixed form at once -->
 	  <content-type id="fortranSource" name="Fortran Source File"
 		  base-type="org.eclipse.core.runtime.text"/>
 
-      <!-- Individual content types for free and fixed format -->
-	  <content-type id="freeFormFortranSource" name="Fortran Source File - Free Format"
-		  base-type="org.eclipse.photran.core.fortranSource"/>
-	  <content-type id="fixedFormFortranSource" name="Fortran Source File - Fixed Format"
-		  base-type="org.eclipse.photran.core.fortranSource"/>
-
-      <!--NOTE:
-          If you are changing file extensions in "sources" or "dependencyExtensions" keep 
-          in mind that those extensions are duplicated in the following files:
-          org.eclipse.photran.managedbuilder.intel.ui/plugin.xml
-          org.eclipse.photran.managedbuilder.gnu.ui/plugin.xml
-          org.eclipse.photran.managedbuilder.xlf.ui/plugin.xml
-          org.eclipse.photran.core/plugin.xml -->
       <!-- Associated filename extensions -->
+      <!-- NOTE: These extensions are duplicated in the following files...
+                 org.eclipse.photran.managedbuilder.intel.ui/plugin.xml
+                 org.eclipse.photran.managedbuilder.gnu.ui/plugin.xml
+                 org.eclipse.photran.managedbuilder.xlf.ui/plugin.xml
+                 org.eclipse.photran.core/plugin.xml
+          ...as well as in the source-form contributions in
+                 org.eclipse.photran.core/plugin.xml   (this file)
+                 org.eclipse.photran.core.vpg/plugin.xml
+                 org.eclipse.photran.core.vpg.preprocessor.c/plugin.xml
+          If you change them here, change them in the other places as well.-->
 	  <file-association 
-          content-type="org.eclipse.photran.core.freeFormFortranSource"
-          file-extensions="f90,f95,f03,f08,F90,F95,F03,F08"/>
-	  <file-association 
-          content-type="org.eclipse.photran.core.fixedFormFortranSource"
-          file-extensions="f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP"/>
+          content-type="org.eclipse.photran.core.fortranSource"
+          file-extensions="f90,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,F77,FPP"/>
 
-      <!-- Content types for C-preprocessed free and fixed format -->
-      <!-- NOTE:
-               These have to be here because CDT C preprocessed content types are referenced in
-           org.eclipse.photran.cdtinterface, and CDT attempts to load every referenced content
-           type in LanguageManager#collectContentTypeIds.  In other words, this guarantees that
-           CDT won't crash when Photran's C preprocessor support is not installed.
-               Note, however, that these content types are associated with the .F90, .FIX, etc.
-           filename extensions in the org.eclipse.photran.core.vpg.preprocessor.c project, not
-           here.  This ensures that, if the user has C preprocessor support installed (i.e., the
-           vpg.preprocessor.c plug-ins are present), such files will be associated with the
-           C preprocessed content type, and otherwise they will be associated with the ordinary
-           (non-prepreprocessed) content type. -->
-	  <content-type id="cppFreeFormFortranSource" name="Fortran Source File - Free Format - C Preprocessed"
-		  base-type="org.eclipse.photran.core.freeFormFortranSource"
-		  priority="high"/>
-	  <content-type id="cppFixedFormFortranSource" name="Fortran Source File - Fixed Format - C Preprocessed"
-		  base-type="org.eclipse.photran.core.fixedFormFortranSource"
-		  priority="high"/>
   </extension>
 
-<!-- =================================================================================== -->
-<!-- Photran Nature for Fortran Projects                                                 -->
-<!-- =================================================================================== -->
-   <extension
-         id="fnature"
-         name="%fnature.name"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="org.eclipse.photran.internal.core.FProjectNature">
-         </run>
-      </runtime>
-   </extension>
+<!-- =================== -->
+<!-- Source Form Support -->
+<!-- =================== -->
+
+  <!-- Source Form Extension Point -->
+  <extension-point id="sourceForms" name="Source Form" schema="schema/sourceForms.exsd"/>
+
+  <!-- Default Source Form Contributions -->
+  <extension point="org.eclipse.photran.core.sourceForms">
+      <source-form
+          id="unpreprocessedFreeForm"
+          name="Free Form - INCLUDE lines ignored"
+          class="org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm"
+          priority="low"
+          defaultForFilenameExtensions="f90,f95,f03,f08,F90,F95,F03,F08" />
+      <source-form
+          id="unpreprocessedFixedForm"
+          name="Fixed Form - INCLUDE lines ignored"
+          class="org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm"
+          priority="low"
+          defaultForFilenameExtensions="f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,F77,FPP" />
+  </extension>
 
 </plugin>

@@ -16,8 +16,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.analysis.types.TypeChecker;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
-import org.eclipse.photran.internal.core.lexer.SourceForm;
+import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
@@ -39,7 +38,7 @@ public class TypeCheckerTestCase extends TestCase
         // a parseable program, then extract the expression from the program's AST
 
         String program = "a = " + expression + "\nend";
-        ASTExecutableProgramNode ast = new Parser().parse(LexerFactory.createLexer(new StringReader(program), null, "<literal text>", SourceForm.UNPREPROCESSED_FREE_FORM, true /*false*/));
+        ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(new StringReader(program), null, "<literal text>"));
         assertNotNull(ast);
         ASTMainProgramNode mainProg = (ASTMainProgramNode)ast.getProgramUnitList().get(0);
         ASTAssignmentStmtNode assignmentStmt = (ASTAssignmentStmtNode)mainProg.getBody().get(0);

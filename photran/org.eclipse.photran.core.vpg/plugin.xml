@@ -35,7 +35,14 @@
           <adapter type="org.eclipse.rephraserengine.core.preservation.ResetOffsetLength" />
        </factory>
    </extension>
-
-   <!-- Source Form Extension Point -->
-   <extension-point id="sourceform" name="Source Form" schema="schema/sourceform.exsd"/>
+   
+  <!-- Source Form Contributions -->
+  <extension point="org.eclipse.photran.core.sourceForms">
+      <source-form
+          id="freeForm"
+          name="Free Form"
+          class="org.eclipse.photran.internal.core.lexer.sourceform.FreeSourceForm"
+          priority="medium"
+          defaultForFilenameExtensions="f90,f95,f03,f08,F90,F95,F03,F08" />
+  </extension>
 </plugin>

@@ -183,8 +183,8 @@ public class ModuleLoader extends VisibilityCollector
 
 	private List<IFile> applyModulePaths(List<IFile> files)
     {
-        String[] paths = SearchPathProperties.parseString(SearchPathProperties.getProperty(fileContainingUseStmt,
-                                                                                           SearchPathProperties.MODULE_PATHS_PROPERTY_NAME));
+        String[] paths = new SearchPathProperties().getListProperty(fileContainingUseStmt,
+                                                                    SearchPathProperties.MODULE_PATHS_PROPERTY_NAME);
         if (paths.length == 0) return files; // Do not apply if property not set
 
         List<IFile> result = new LinkedList<IFile>();

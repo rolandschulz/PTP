@@ -209,11 +209,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     @Override
     public boolean shouldProcessFile(IFile file)
     {
-        String filename = file.getName();
-        return FortranCorePlugin.hasFixedFormContentType(filename)    || 
-               FortranCorePlugin.hasFreeFormContentType(filename)     ||
-               FortranCorePlugin.hasCppFixedFormContentType(filename) ||
-               FortranCorePlugin.hasCppFreeFormContentType(filename);
+        return FortranCorePlugin.hasFortranContentType(file.getName()); 
     }
 
     @Override
@@ -223,7 +219,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         {
             if (!project.isAccessible()) return false;
             if (!project.hasNature(FProjectNature.F_NATURE_ID)) return false;
-            return FortranCorePlugin.inTestingMode() || SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
+            return FortranCorePlugin.inTestingMode() || new SearchPathProperties().getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true");
         }
         catch (CoreException e)
         {
@@ -242,7 +238,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
                 return "The project " + project.getName() + " is not a Fortran project.  "
                      + "Plase convert it to a Fortran project and enable analysis and "
                      + "refactoring in the project properties.";
-            else if (!SearchPathProperties.getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"))
+            else if (!new SearchPathProperties().getProperty(project, SearchPathProperties.ENABLE_VPG_PROPERTY_NAME).equals("true"))
                 return "Please enable analysis and refactoring in the project properties for "
                      + project.getName() + ".";
             else
@@ -718,7 +714,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         if (FortranCorePlugin.inTestingMode()) return true;
 
-        String vpgEnabledProperty = SearchPathProperties.getProperty(
+        String vpgEnabledProperty = new SearchPathProperties().getProperty(
             file,
             SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
         return vpgEnabledProperty != null && vpgEnabledProperty.equals("true");

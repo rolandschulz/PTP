@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.util.IterableWrapper;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
+import org.eclipse.photran.internal.ui.editor.FortranEditor;
 import org.eclipse.rephraserengine.core.util.OffsetLength;
 import org.eclipse.rephraserengine.core.vpg.eclipse.VPGSchedulingRule;
 import org.eclipse.ui.IEditorPart;
@@ -52,7 +52,7 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
         if (this.window != null)
         {
             IEditorPart editor = this.window.getActivePage().getActiveEditor();
-            fEditor = editor instanceof AbstractFortranEditor ? (AbstractFortranEditor)editor : null;
+            fEditor = editor instanceof FortranEditor ? (FortranEditor)editor : null;
         }
         
         if (this.fEditor != null)

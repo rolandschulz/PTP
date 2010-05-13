@@ -30,135 +30,134 @@ import org.osgi.framework.BundleContext;
  */
 public class FortranCorePlugin extends Plugin
 {
-    public static final String FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.fixedFormFortranSource";
-    public static final String FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.freeFormFortranSource";
-  
-    //Including a C-Preprocessor content type so that we can disable the refactorings if any of the files
-    // involved are C-Preprocessed
-    public static final String C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE = "org.eclipse.photran.core.cppFreeFormFortranSource";
-    public static final String C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE = "org.eclipse.photran.core.cppFixedFormFortranSource";
-    
-    public static final IContentType fixedFormContentType()
+    public static final String PLUGIN_ID = "org.eclipse.photran.core";
+
+    public static final String FORTRAN_CONTENT_TYPE = "org.eclipse.photran.core.fortranSource";
+
+    public static final IContentType fortranContentType()
     {
-        return Platform.getContentTypeManager().getContentType(FIXED_FORM_CONTENT_TYPE);
+        return Platform.getContentTypeManager().getContentType(FORTRAN_CONTENT_TYPE);
     }
 
-    public static final IContentType freeFormContentType()
+    public static boolean hasFortranContentType(IFile file)
     {
-        return Platform.getContentTypeManager().getContentType(FREE_FORM_CONTENT_TYPE);
+        return hasFortranContentType(getFilenameForIFile(file));
     }
-    
-    public static final boolean isFixedFormContentType(String contentTypeID)
+
+    public static boolean hasFortranContentType(String filename)
     {
-        if (contentTypeID == null) return false;
-        //Content types are defined in .xml files. Currently they are defined by file extensions.
-        // cppPreprocessor content types are children of Free and Fixed form content types,
-        // which in turn are children of FortranContentType
-        IContentType ct = Platform.getContentTypeManager().getContentType(contentTypeID);
-        return ct == null ? false : ct.isKindOf(fixedFormContentType());
+        IContentType ct = getContentTypeOf(filename);
+        return ct != null && ct.isKindOf(fortranContentType());
     }
+
+//    public static final boolean isFixedFormContentType(String contentTypeID)
+//    {
+//        if (contentTypeID == null) return false;
+//        //Content types are defined in .xml files. Currently they are defined by file extensions.
+//        // cppPreprocessor content types are children of Free and Fixed form content types,
+//        // which in turn are children of FortranContentType
+//        IContentType ct = Platform.getContentTypeManager().getContentType(contentTypeID);
+//        return ct == null ? false : ct.isKindOf(fixedFormContentType());
+//    }
     
     protected static final IContentType getContentTypeOf(String filename)
     {
         return findContentType(filename);
     }
-  
-    protected static final IContentType cppFixedFormContentType()
-    {
-        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE);
-    }
-    
-    protected static final IContentType cppFreeFormContentType()
-    {
-        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE);
-    }
-    
-    public static boolean hasFixedFormContentType(IFile file)
-    {
-        return hasFixedFormContentType(getFilenameForIFile(file));
-    }
-
-    public static boolean hasFreeFormContentType(IFile file)
-    {
-        return hasFreeFormContentType(getFilenameForIFile(file));
-    }
-    
-    public static boolean hasCppFixedFormContentType(IFile file)
-    {
-        return hasCppFixedFormContentType(getFilenameForIFile(file));
-    }
-
-    public static boolean hasCppFreeFormContentType(IFile file)
-    {
-        return hasCppFreeFormContentType(getFilenameForIFile(file));
-    }
-    
-    public static boolean hasCppContentType(IFile file)
-    {
-        return hasCppContentType(getFilenameForIFile(file));
-    }
+//  
+//    protected static final IContentType cppFixedFormContentType()
+//    {
+//        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE);
+//    }
+//    
+//    protected static final IContentType cppFreeFormContentType()
+//    {
+//        return Platform.getContentTypeManager().getContentType(C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE);
+//    }
+//    
+//    public static boolean hasFixedFormContentType(IFile file)
+//    {
+//        return hasFixedFormContentType(getFilenameForIFile(file));
+//    }
+//
+//    public static boolean hasFreeFormContentType(IFile file)
+//    {
+//        return hasFreeFormContentType(getFilenameForIFile(file));
+//    }
+//    
+//    public static boolean hasCppFixedFormContentType(IFile file)
+//    {
+//        return hasCppFixedFormContentType(getFilenameForIFile(file));
+//    }
+//
+//    public static boolean hasCppFreeFormContentType(IFile file)
+//    {
+//        return hasCppFreeFormContentType(getFilenameForIFile(file));
+//    }
+//    
+//    public static boolean hasCppContentType(IFile file)
+//    {
+//        return hasCppContentType(getFilenameForIFile(file));
+//    }
 
     private static String getFilenameForIFile(IFile file)
     {
         return file == null ? null : file.getFullPath().toString();
     }
 
-    public static boolean hasFixedFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f");
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(fixedFormContentType());
-        }
-    }
-    
-    public static boolean hasFreeFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".f90");
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(freeFormContentType());
-        }
-    }
-    
-    public static boolean hasCppFixedFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".F"); 
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(cppFixedFormContentType());
-        }
-    }
-    
-    public static boolean hasCppFreeFormContentType(String filename)
-    {
-        if (inTestingMode()) // Fortran content types not set in testing workspace
-            return filename.endsWith(".F90"); 
-        else
-        {
-            IContentType ct = getContentTypeOf(filename);
-            return ct != null && ct.isKindOf(cppFreeFormContentType());
-        }
-    }
-    
-    public static boolean hasCppContentType(String filename)
-    {
-        return hasCppFreeFormContentType(filename) || 
-               hasCppFixedFormContentType(filename);
-    }
+//    public static boolean hasFixedFormContentType(String filename)
+//    {
+//        if (inTestingMode()) // Fortran content types not set in testing workspace
+//            return filename.endsWith(".f");
+//        else
+//        {
+//            IContentType ct = getContentTypeOf(filename);
+//            return ct != null && ct.isKindOf(fixedFormContentType());
+//        }
+//    }
+//    
+//    public static boolean hasFreeFormContentType(String filename)
+//    {
+//        if (inTestingMode()) // Fortran content types not set in testing workspace
+//            return filename.endsWith(".f90");
+//        else
+//        {
+//            IContentType ct = getContentTypeOf(filename);
+//            return ct != null && ct.isKindOf(freeFormContentType());
+//        }
+//    }
+//    
+//    public static boolean hasCppFixedFormContentType(String filename)
+//    {
+//        if (inTestingMode()) // Fortran content types not set in testing workspace
+//            return filename.endsWith(".F"); 
+//        else
+//        {
+//            IContentType ct = getContentTypeOf(filename);
+//            return ct != null && ct.isKindOf(cppFixedFormContentType());
+//        }
+//    }
+//    
+//    public static boolean hasCppFreeFormContentType(String filename)
+//    {
+//        if (inTestingMode()) // Fortran content types not set in testing workspace
+//            return filename.endsWith(".F90"); 
+//        else
+//        {
+//            IContentType ct = getContentTypeOf(filename);
+//            return ct != null && ct.isKindOf(cppFreeFormContentType());
+//        }
+//    }
+//    
+//    public static boolean hasCppContentType(String filename)
+//    {
+//        return hasCppFreeFormContentType(filename) || 
+//               hasCppFixedFormContentType(filename);
+//    }
     
     public static final String[] getAllFortranContentTypes()
     {
-        return new String[] { FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, 
-                              FortranCorePlugin.FREE_FORM_CONTENT_TYPE, 
-                              FortranCorePlugin.C_PREPROCESSOR_FIXED_FORM_CONTENT_TYPE, 
-                              FortranCorePlugin.C_PREPROCESSOR_FREE_FORM_CONTENT_TYPE
+        return new String[] { FortranCorePlugin.FORTRAN_CONTENT_TYPE, 
                             };
     }
     
