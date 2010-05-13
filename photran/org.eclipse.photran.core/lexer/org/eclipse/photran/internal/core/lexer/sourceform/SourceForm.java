@@ -228,38 +228,11 @@ public class SourceForm
 
     public static boolean isFixedForm(IFile file)
     {
-        if (file == null) return false;
-        
-        // FIXME
-        String name = file.getName();
-        return name.endsWith(".f")
-            || name.endsWith(".for")
-            || name.endsWith(".ftn")
-            || name.endsWith(".fix")
-            || name.endsWith(".f77")
-            || name.endsWith(".fpp")
-            || name.endsWith(".F")
-            || name.endsWith(".FOR")
-            || name.endsWith(".FTN")
-            || name.endsWith(".FIX")
-            || name.endsWith(".FPP");
+        return SourceForm.of(file).isFixedForm();
     }
 
     public static boolean isCPreprocessed(IFile file)
     {
-        if (file == null) return false;
-        
-        // FIXME
-        String name = file.getName();
-        return name.endsWith(".F90")
-            || name.endsWith(".F95")
-            || name.endsWith(".F03")
-            || name.endsWith(".F08")
-            || name.endsWith(".fpp")
-            || name.endsWith(".F")
-            || name.endsWith(".FOR")
-            || name.endsWith(".FTN")
-            || name.endsWith(".FIX")
-            || name.endsWith(".FPP");
+        return SourceForm.of(file).isCPreprocessed();
     }
 }

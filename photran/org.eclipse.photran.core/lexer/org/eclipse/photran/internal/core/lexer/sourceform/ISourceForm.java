@@ -69,4 +69,14 @@ public interface ISourceForm
      * @return <code>this</code>
      */
     ISourceForm configuredWith(Object data);
+
+    /**
+     * @return true iff this source form represents (some variant of) fixed source form
+     */
+    boolean isFixedForm();
+
+    /**
+     * @return true iff this source form allows (and processes) C preprocessor directives
+     */
+    boolean isCPreprocessed();
 }

@@ -43,4 +43,7 @@ public class CPreprocessedFreeSourceForm implements ISourceForm
     {
         return this;
     }
+    
+    public boolean isFixedForm()     { return false; }
+    public boolean isCPreprocessed() { return true; }
 }

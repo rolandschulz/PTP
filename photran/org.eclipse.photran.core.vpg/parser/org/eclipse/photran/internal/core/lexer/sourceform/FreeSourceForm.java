@@ -52,4 +52,7 @@ public class FreeSourceForm implements ISourceForm
 
         return this;
     }
+    
+    public boolean isFixedForm()     { return false; }
+    public boolean isCPreprocessed() { return false; }
 }

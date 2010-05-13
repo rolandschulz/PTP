@@ -39,4 +39,7 @@ public class UnpreprocessedFixedSourceForm implements ISourceForm
     {
         return this;
     }
+    
+    public boolean isFixedForm()     { return true; }
+    public boolean isCPreprocessed() { return false; }
 }
