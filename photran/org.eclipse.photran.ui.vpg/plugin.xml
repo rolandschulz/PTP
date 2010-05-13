@@ -575,7 +575,7 @@
       <view
             category="org.eclipse.photran.ui.views"
             class="org.eclipse.photran.internal.ui.views.vpgproblems.VGPProblemView"
-            icon="icons/full/eview16/source.gif"
+            icon="icons/full/eview16/problems_view.gif"
             id="org.eclipse.photran.ui.VGPProblemView"
             name="Fortran Analysis/Refactoring Problems">
       </view>

@@ -39,17 +39,22 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
 		folder1.addView(FortranView.FORTRAN_VIEW_ID);
-		folder1.addView(IPageLayout.ID_RES_NAV);
-		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
+		//folder1.addView(IPageLayout.ID_RES_NAV);
+		//folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
 		IFolderLayout folder2= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.75, editorArea); //$NON-NLS-1$
 		folder2.addView(IPageLayout.ID_PROBLEM_VIEW);
 		folder2.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		//folder2.addView(IPageLayout.ID_PROP_SHEET);
 		folder2.addView("org.eclipse.photran.ui.DeclarationView");
+        folder2.addView("org.eclipse.photran.ui.VGPProblemView");
+        folder2.addView(IPageLayout.ID_BOOKMARKS);
 		
-		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT,(float)0.75, editorArea); //$NON-NLS-1$
+		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.75, editorArea); //$NON-NLS-1$
 		folder3.addView(IPageLayout.ID_OUTLINE);
+        
+        IFolderLayout folder4= layout.createFolder("bottomLeft", IPageLayout.BOTTOM, (float)0.75, "topLeft"); //$NON-NLS-1$ $NON-NLS-2$
+        folder4.addView(IPageLayout.ID_PROGRESS_VIEW);
 
 		layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);	// This is the "Open Type" search toolbar action
 		layout.addActionSet("org.eclipse.photran.ui.SearchActionSet");
