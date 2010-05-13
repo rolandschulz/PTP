@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+    <title>GEM Plug-in User Guide</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>GEM Plug-In for Eclipse</h1>
+        </td>
+    </tr>
+</table>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Release 1.5.0</i>
+
+<br></br>
+<p>
+<b>GEM-Graphical Explorer of Message Passing</b>, is a graphical front end for In-situ Partial Order (ISP), a dynamic formal
+verification tool for MPI C/C++ programs, developed at the University of Utah. GEM
+greatly enhances the usability of ISP by providing an intuitive graphical way to track down
+bugs in MPI C/C++ programs, examine post-runtime results and to analyze MPI runtime
+behavior. 
+</p>
+
+<p>
+GEM can be used by anyone who can write simple MPI C/C++ programs, and requires no
+special training. GEM allows you to formally verify your MPI C/C++ programs automatically
+without any extra efforts on your part (apart from compiling and making your examples)
+and flags the following errors:
+</p>
+
+<ul>
+    <li>Deadlocks</li>
+    <li>Assertion violations</li>
+    <li>Object leaks</li>
+</ul>
+
+<p>
+In addition, GEM helps you understand as well as step through all relevant process interleavings
+(schedules). Notice our use of the word <i>relevant</i>: even a short MPI program may have too many
+(an &quot;exponential number&quot;) of interleavings. For example, an MPI program with five processes, each
+containing five MPI calls, can have well in excess of 1000 interleavings. However, ISP generates
+a new interleaving only when it represents a truly new (as yet unexamined) behavior of your programs.
+</p> 
+
+<h2>Overview, Background, and Setup information</h2>
+
+<ol>
+    <li> <a href="overview.html">ISP Overview</a>
+    <li> <a href="prereqs.html">GEM Plug-in Prerequisites</a>  
+</ol>
+
+<h2>Help Topics</h2>
+
+<ol>
+    <li><a href="preferences.html">GEM Plug-in Preferences</a></li>
+    <li><a href="output.html">Understanding GEM Console Output</a></li>
+    <li><a href="consoleView.html">Console View</a></li> 
+    <li><a href="analyzerView.html">Analyzer View</a></li>
+    <li><a href="happensBeforeViewer.html">Happens Before Viewer</a></li>    
+    <li><a href="makefiles.html">Makefile Support</a></li>
+    <li><a href="troubleshooting.html">Troubleshooting the GEM Plug-in</a></li>
+</ol>
+
+<p>Other related topics:</p>
+
+<ol>
+    <li><a href="http://eclipse.org/ptp/isp/">Latest Release of the ISP Eclipse Plugin</a>
+    <li><a href="http://www.cs.utah.edu/formal_verification/ISP-release/">Latest Release of ISP</a> - Including user manual and test code
+    <li><a href="http://www.cs.utah.edu/formal_verification/">Gauss Group Home</a> - All current work and publications
+    <li><a href="http://www.cs.utah.edu/">University of Utah School of Computing</a>
+</ol>
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+</center>
+
+</body>
+</html>

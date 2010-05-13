@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="GEM Plug-in User Guide" topic="html/toc.html">
+    <topic label="Overview"  href="html/overview.html"/>
+    <topic label="GEM Plug-in Prerequisites"  href="html/prereqs.html"/> 
+    <topic label="GEM Plug-in Preferences"  href="html/preferences.html"/>
+    <topic label="Understanding GEM Console Output" href="html/output.html" />
+    <topic label="Console View"  href="html/consoleView.html"/>    
+    <topic label="Analyzer View" href="html/analyzerView.html" />
+    <topic label="Happens Before Viewer" href="html/happensBeforeViewer.html" />
+    <topic label="Makefile Support" href="html/makefiles.html" />
+    <topic label="Troubleshooting the GEM Plug-in"  href="html/troubleshooting.html"/>
+</toc>

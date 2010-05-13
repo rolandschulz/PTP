@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+
+<plugin>
+
+   <!-- Managed Build Verification Menu Group --> 
+   <extension 
+        point="org.eclipse.ui.popupMenus">
+        
+      <!-- PopUpMenus extension point and contributions (nameFilter="*.c") -->
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.gem.verificationPopUpMenuC"
+            nameFilter="*.c"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="GEM"
+               path="additions"
+               id="verificationMenu">
+            <separator name="verificationGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.analyzerPopupC"
+               label="Formally Verify MPI Program"
+               menubarPath="verificationMenu/verificationGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>
+      
+      <!-- PopUpMenus extension point and contributions (nameFilter="*.cpp") -->
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.gem.verificationPopUpMenuCpp"
+            nameFilter="*.cpp"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="GEM"
+               path="additions"
+               id="verificationMenu">
+            <separator name="verificationGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.analyzerPopupCpp"
+               label="Formally Verify MPI Program"
+               menubarPath="verificationMenu/verificationGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>
+      
+      <!-- PopUpMenus extension point and contributions (nameFilter="*.c++") -->
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.gem.verificationPopUpMenuC++"
+            nameFilter="*.c++"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="GEM"
+               path="additions"
+               id="verificationMenu">
+            <separator name="verificationGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.analyzerPopupC++"
+               label="Formally Verify MPI Program"
+               menubarPath="verificationMenu/verificationGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>
+      
+      <!-- PopUpMenus extension point and contributions (nameFilter="*.cp") -->
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.gem.verificationPopUpMenuCp"
+            nameFilter="*.cp"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="GEM"
+               path="additions"
+               id="verificationMenu">
+            <separator name="verificationGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.analyzerPopupCp"
+               label="Formally Verify MPI Program"
+               menubarPath="verificationMenu/verificationGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>
+      
+      <!-- PopUpMenus extension point and contributions (nameFilter="*.cc") -->
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.gem.verificationPopUpMenuCc"
+            nameFilter="*.cc"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="GEM"
+               path="additions"
+               id="verificationMenu">
+            <separator name="verificationGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.analyzerPopupCc"
+               label="Formally Verify MPI Program"
+               menubarPath="verificationMenu/verificationGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>      
+      
+      
+      <!-- Logfile Menu Group -->        
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.gem.logfilePopupMenu"
+            nameFilter="*.log"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="GEM"
+               path="additions"
+               id="logfileMenu">
+            <separator name="logfileGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.HbvLogFilePopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.hbvLogPopup"
+               label="Launch Happens Before Viewer"
+               menubarPath="logfileMenu/logfileGroup"
+               icon="icons/hbv-trident.gif">
+         </action>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.AnalyzerLogFilePopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.AnalyzerFromLogPopUpAction"
+               label="Analyze Log File"
+               menubarPath="logfileMenu/logfileGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>
+      
+      <!-- Makefile Executable Verification Menu Group -->        
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.ptp.gem.makefilePopupMenu"
+            nameFilter="*.gem"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="GEM"
+               path="additions"
+               id="executableMenu">
+            <separator name="executableGroup"/>
+         </menu>
+         <action
+               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               enablesFor="1"
+               id="org.eclipse.ptp.gem.executablePopup"
+               label="Formally Verify MPI Executable"
+               menubarPath="executableMenu/executableGroup"
+               icon="icons/trident.gif">
+         </action>
+      </objectContribution>
+   </extension>   
+
+   
+   <!-- Preferences extension point and Initializer -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.gem.preferences.GemPreferencePage"
+            id="org.eclipse.ptp.gem.preferences.GemPreferences"
+            name="GEM">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.gem.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+    
+    
+   <!-- Commands extension point and contributions (for toolbar buttons) -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.ptp.gem.commands.category"
+            name="GEM Commands Category">
+      </category>
+      <command
+            categoryId="org.eclipse.ptp.gem.commands.category"
+            id="org.eclipse.ptp.gem.commands.numprocsCommand"
+            name="Set Number of Processes">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.gem.commands.category"
+            id="org.eclipse.ptp.gem.commands.analyzerCommand"
+            name="Formally Verify MPI Program">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.gem.commands.category"
+            id="org.eclipse.ptp.gem.commands.consoleCommand"
+            name="View GEM Console Output">
+      </command>
+   </extension>
+   
+       
+   <!-- Handlers extension point -->
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.ptp.gem.handlers.GemHandler"
+            commandId="org.eclipse.ptp.gem.commands.numprocsCommand">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.gem.handlers.GemHandler"
+            commandId="org.eclipse.ptp.gem.commands.analyzerCommand">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.gem.handlers.GemHandler"
+            commandId="org.eclipse.ptp.gem.commands.consoleCommand">
+      </handler>
+   </extension>
+   
+   
+   <!-- Menus extension point and contributions (toolbar buttons) -->
+   <extension point="org.eclipse.ui.menus">
+     <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+        <toolbar id="org.eclipse.ptp.gem.toolbar">
+        </toolbar>
+     </menuContribution>
+     <menuContribution locationURI="toolbar:org.eclipse.ptp.gem.toolbar?after=additions">
+            <command
+                  commandId="org.eclipse.ptp.gem.commands.analyzerCommand"
+                  icon="icons/trident.gif"
+                  id="org.eclipse.ptp.gem.toolbar.refCommand"
+                  style="pulldown"
+                  tooltip="Formally Verify MPI Program">
+            </command>
+      </menuContribution>
+      <menuContribution locationURI="menu:org.eclipse.ptp.gem.toolbar.refCommand?after=additions">
+            <command
+                  commandId="org.eclipse.ptp.gem.commands.numprocsCommand"
+                  icon="icons/triple-trident.gif"
+                  id="org.eclipse.ptp.gem.toolbar.menu.command1">
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.gem.commands.analyzerCommand"
+                  icon="icons/trident.gif"
+                  id="org.eclipse.ptp.gem.toolbar.menu.command2">
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.gem.commands.consoleCommand"
+                  icon="icons/magnified-trident.gif"
+                  id="org.eclipse.ptp.gem.toolbar.menu.command3">
+            </command>
+      </menuContribution>
+    </extension>
+    
+    
+   <!-- Views extension point -->
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="GEM Console"
+            icon="icons/magnified-trident.gif"
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.gem.views.GemConsole"
+            id="org.eclipse.ptp.gem.views.GemConsole">
+      </view>
+      <view
+            name="GEM Analyzer"
+            icon="icons/trident.gif"
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.gem.views.GemAnalyzer"
+            id="org.eclipse.ptp.gem.views.GemAnalyzer">
+      </view>
+   </extension>
+   
+ </plugin>
