@@ -59,14 +59,13 @@ AIFArraySize(AIF *a)
 }
 
 /*
- * Parse array type descriptor and extract the minimum and maximum
- * array index values for each dimension. Also, if size is not NULL,
- * will return the size of dimension.
+ * Parse array type descriptor and extract the minimum index and
+ * number of elements for each dimension.
  */
 int
-AIFArrayBounds(AIF *a, int rank, int **min, int **max, int **size)
+AIFArrayBounds(AIF *a, int rank, int **min, int **size)
 {
-	if ( a == (AIF *)NULL || min == (int **)NULL || max == (int **)NULL )
+	if ( a == (AIF *)NULL || min == (int **)NULL || size == (int **)NULL )
 	{
 		SetAIFError(AIFERR_BADARG, NULL);
 		return -1;
@@ -78,7 +77,7 @@ AIFArrayBounds(AIF *a, int rank, int **min, int **max, int **size)
 		return -1;
 	}
 
-	FDSArrayBounds(AIF_FORMAT(a), rank, min, max, size);
+	FDSArrayBounds(AIF_FORMAT(a), rank, min, size);
 
 	return 0;
 }
@@ -134,6 +133,7 @@ _aif_array_slice_post(char **fds, char **data, char **rdata, char **res)
 	int 	datalen;
 	int 	index;
 	char *	fmt;
+	char **	d;
 
 	_fds_resolve(fds);
 
@@ -207,7 +207,8 @@ _aif_array_slice_post(char **fds, char **data, char **rdata, char **res)
 			return 0;
 
 		case AIF_PTR_REFERENCE:
-			_ptrname_to_int(*data + 1, &index);
+			d = data;
+			_ptrname_to_int(d, &index);
 			if ( res[index] != NULL )
 			{
 				*(*rdata)++ = AIF_PTR_NAME;
@@ -319,8 +320,7 @@ _aif_array_slice_pre(char **fds, char **data, char **res)
 
 			case AIF_PTR_NAME:
 				(*data)++;
-				_ptrname_to_int(*data, &index);
-				*data += 4;
+				_ptrname_to_int(data, &index);
 				res[index] = *data;
 				_aif_array_slice_pre(fds, data, res);
 				return 0;
@@ -345,20 +345,21 @@ _aif_array_slice_pre(char **fds, char **data, char **res)
  * XXX: TOFIX
  */
 AIF *
-AIFArraySlice(AIF *a, int rank, int *mn, int *mx)
+AIFArraySlice(AIF *a, int rank, int *mn, int *sz)
 {
-	int		i;
-	int		nrank = 0;
+	int			i;
+	int			nrank = 0;
 	int *		rankp;
-	int		rl;
+	int			rl;
 	char *		rf;
 	char *		fds;
+	char *		r;
 	AIF *		ra;
 	AIFIndex *	ix1;
 	AIFIndex *	ix2 = (AIFIndex *)NULL;
 	char *		res_array[MAX_VALUES_SEEN+1] = {NULL};
 
-	if ( a == (AIF *)NULL || mn == (int *)NULL || mx == (int *)NULL )
+	if ( a == (AIF *)NULL || mn == (int *)NULL || sz == (int *)NULL )
 	{
 		SetAIFError(AIFERR_BADARG, NULL);
 		return (AIF *)NULL;
@@ -391,27 +392,25 @@ AIFArraySlice(AIF *a, int rank, int *mn, int *mx)
 	rf = fds = (char *)_aif_alloc(rl);
 
 	/*
-	** Caluculate nrank, the number of dimensions of the (new) array.
-	** This corresponds to the number of elements where mn != mx
+	** Calculate nrank, the number of dimensions of the (new) array.
+	** This corresponds to the number of elements where sz > 0
 	** (i.e. where an empty slice has not been specified.)
-	** When mn & mx == -1 we slice the whole dimension.
+	** When sz == -1 we slice the whole dimension.
 	*/
 	for ( i = 0 ; i < rank ; i++ )
 	{
-		if ( mn[i] < 0 && mx[i] < 0 )
+		if ( sz[i] < 0 )
 		{
 			mn[i] = ix1->i_min[i];
-			mx[i] = ix1->i_max[i];
+			sz[i] = ix1->i_size[i];
 		}
 		else if
 		(
 			mn[i] < ix1->i_min[i] 
 			||
-			mn[i] > ix1->i_max[i]
+			mn[i] >= ix1->i_min[i] + ix1->i_size[i]
 			||
-			mx[i] < ix1->i_min[i] 
-			||
-			mx[i] > ix1->i_max[i]
+			sz[i] > ix1->i_size[i]
 		)
 		{
 			SetAIFError(AIFERR_INDEX, NULL);
@@ -420,14 +419,21 @@ AIFArraySlice(AIF *a, int rank, int *mn, int *mx)
 			_aif_free(rankp);
 			return (AIF *)NULL;
 		}
-		else if ( mn[i] == mx[i] )
+		else if ( sz[i] == 0 ) {
 			continue;
+		}
 
 		rankp[nrank++] = i;
 
-		snprintf(rf, rl, "[r%d..%dis4]", mn[i], mx[i]);
-		rf += strlen(rf);
-		rl -= strlen(rf);
+		*rf++ = FDS_ARRAY_START;
+		rl--;
+		r = FDSRangeInit(mn[i], sz[i]);
+		strncpy(rf, r, rl);
+		rf += strlen(r);
+		rl -= strlen(r);
+		*rf++ = FDS_ARRAY_END;
+		rl--;
+		_aif_free(r);
 	}
 
 	strcpy(rf, ix1->i_btype);
@@ -460,14 +466,14 @@ AIFArraySlice(AIF *a, int rank, int *mn, int *mx)
 		int subsize = 0;
 		int len;
 
-		if ( !AIFIndexInRange(rank, ix1->i_index, mn, mx) )
+		if ( !AIFIndexInRange(rank, ix1->i_index, mn, sz) )
 		{
 			AIFArrayIndexInc(ix1);
 			continue;
 		}
 
 		limit = AIFIndexOffset(ix1->i_rank, ix1->i_index, 
-					ix1->i_min, ix1->i_max, NULL);
+					ix1->i_min, ix1->i_size, NULL);
 		for ( counter = 0; counter < limit; counter++ )
 		{
 			subsize = FDSDataSize(ix1->i_btype,AIF_DATA(a)+size);
@@ -487,7 +493,7 @@ AIFArraySlice(AIF *a, int rank, int *mn, int *mx)
 
 		size = 0; subsize = 0;
 		limit = AIFIndexOffset(ix2->i_rank, ix2->i_index, 
-					ix2->i_min, ix2->i_max, NULL);
+					ix2->i_min, ix2->i_size, NULL);
 		for ( counter = 0; counter < limit; counter++ )
 		{
 			subsize = FDSDataSize(ix2->i_btype,AIF_DATA(ra)+size);
@@ -594,9 +600,15 @@ AIFArrayPerm(AIF *a, int *index)
 
 	for ( i = 0 ; i < ix->i_rank ; i++ )
 	{
-		snprintf(rf, rl, "[r%d..%dis4]", ix->i_min[index[i]], ix->i_max[index[i]]);
-		rf += strlen(rf);
-		rl -= strlen(rf);
+		char * r = FDSRangeInit(ix->i_min[index[i]], ix->i_size[index[i]]);
+		*rf++ = FDS_ARRAY_START;
+		rl--;
+		strncpy(rf, r, rl);
+		rf += strlen(r);
+		rl -= strlen(r);
+		*rf++ = FDS_ARRAY_END;
+		rl--;
+		_aif_free(r);
 	}
 
 	strcat(AIF_FORMAT(ra), ix->i_btype);
@@ -615,7 +627,7 @@ AIFArrayPerm(AIF *a, int *index)
 		int	subsize = 0;
 
 		limit = AIFIndexOffset(ix->i_rank, ix->i_index,
-				ix->i_min, ix->i_max, NULL);
+				ix->i_min, ix->i_size, NULL);
 
 		for ( counter = 0; counter < limit; counter++ )
 		{
@@ -628,7 +640,7 @@ AIFArrayPerm(AIF *a, int *index)
 
 		size = 0; subsize = 0;
 		limit = AIFIndexOffset(ix->i_rank, ix->i_index,
-				ix->i_min, ix->i_max, index);
+				ix->i_min, ix->i_size, NULL);
 
 		data_array[limit] = d;
 		len_array[limit] = len;
@@ -696,7 +708,7 @@ AIFArrayMinIndex(AIF *a, int n)
 }
 
 int
-AIFArrayMaxIndex(AIF *a, int n)
+AIFArrayRankSize(AIF *a, int n)
 {
 	if ( a == (AIF *)NULL )
 	{
@@ -710,7 +722,7 @@ AIFArrayMaxIndex(AIF *a, int n)
 		return -1;
 	}
 
-	return FDSArrayMaxIndex(AIF_FORMAT(a), n);
+	return FDSArrayRankSize(AIF_FORMAT(a), n);
 }
 
 /*
@@ -747,13 +759,13 @@ AIFArrayIndexInit(AIF *a)
 
 /*
  * Check that the index value of each index in rankp is within the range
- * specified by min and max. Returns 1 if they are, otherwise 0.
+ * min .. min+size-1. Returns 1 if they are, otherwise 0.
  *
- * Note: rankp, index, min and max are guaranteed to have at least
+ * Note: rankp, index, min and size are guaranteed to have at least
  * rank elements.
  */
 int
-AIFIndexInRange(int rank, int *index, int *min, int *max)
+AIFIndexInRange(int rank, int *index, int *min, int *size)
 {
 	int	d;
 
@@ -762,7 +774,7 @@ AIFIndexInRange(int rank, int *index, int *min, int *max)
 		if ( min[d] < 0 )
 			continue;
 
-		if ( index[d] < min[d] || index[d] > max[d] )
+		if ( index[d] < min[d] || index[d] >= min[d] + size[d] )
 			return 0;
 	}
 
@@ -780,7 +792,7 @@ AIFArrayIndexInc(AIFIndex *ix)
 
 	for ( d = ix->i_rank - 1 ; d >= 0 ; d-- )
 	{
-		if ( ++(ix->i_index[d]) > ix->i_max[d] )
+		if ( ++(ix->i_index[d]) >= ix->i_min[d] + ix->i_size[d] )
 		{
 			ix->i_index[d] = ix->i_min[d];
 			continue;
@@ -800,7 +812,7 @@ AIFArrayIndexFree(AIFIndex *ix)
 	_aif_free(ix->i_btype);
 	_aif_free(ix->i_index);
 	_aif_free(ix->i_min);
-	_aif_free(ix->i_max);
+	_aif_free(ix->i_size);
 	_aif_free(ix);
 }
 
@@ -829,7 +841,7 @@ AIFArrayElementToDoublest(AIF *a, AIFIndex *ix, AIFDOUBLEST *val)
 		return -1;
 	}
 
-	return _aif_to_doublest(AIF_DATA(a) + AIFIndexOffset(ix->i_rank, ix->i_index, ix->i_min, ix->i_max, NULL) * ix->i_bsize, ix->i_bsize, val);
+	return _aif_to_doublest(AIF_DATA(a) + AIFIndexOffset(ix->i_rank, ix->i_index, ix->i_min, ix->i_size, NULL) * ix->i_bsize, ix->i_bsize, val);
 }
 
 int
@@ -871,7 +883,7 @@ AIFArrayElementToLongest(AIF *a, AIFIndex *ix, AIFLONGEST *val)
 		return -1;
 	}
 
-	return _aif_to_longest(AIF_DATA(a) + AIFIndexOffset(ix->i_rank, ix->i_index, ix->i_min, ix->i_max, NULL) * ix->i_bsize, ix->i_bsize, val);
+	return _aif_to_longest(AIF_DATA(a) + AIFIndexOffset(ix->i_rank, ix->i_index, ix->i_min, ix->i_size, NULL) * ix->i_bsize, ix->i_bsize, val);
 }
 
 int
@@ -889,7 +901,7 @@ AIFArrayElementToInt(AIF *a, AIFIndex *ix, int *val)
 }
 
 AIF *
-_aif_array_ref(AIF *a, int rank, int *index, int *min, int *max, char *btype, int bsize)
+_aif_array_ref(AIF *a, int rank, int *index, int *min, int *size, char *btype, int bsize)
 {
 	AIF *	ae;
 	int	counter;
@@ -900,7 +912,7 @@ _aif_array_ref(AIF *a, int rank, int *index, int *min, int *max, char *btype, in
 
 	ae = MakeAIF(strdup(btype), NULL);
 
-	offset = AIFIndexOffset(rank, index, min, max, (int *)NULL);
+	offset = AIFIndexOffset(rank, index, min, size, (int *)NULL);
 	dataEnd = AIF_DATA(a);
 
 	for ( counter = 0 ; counter <= offset ; counter++ )
@@ -967,7 +979,7 @@ AIFArrayElement(AIF *a, AIFIndex *ix)
 	if ( ix->i_finished )
 		return (AIF *)NULL;
 
-	return _aif_array_ref(a, ix->i_rank, ix->i_index, ix->i_min, ix->i_max, ix->i_btype, ix->i_bsize);
+	return _aif_array_ref(a, ix->i_rank, ix->i_index, ix->i_min, ix->i_size, ix->i_btype, ix->i_bsize);
 }
 
 /*
@@ -1003,7 +1015,7 @@ AIFArrayRef(AIF *a, int rank, int *loc)
 
 	for ( i = 0 ; i < rank ; i++ )
 	{
-		if ( loc[i] < ix->i_min[i] || loc[i] > ix->i_max[i] )
+		if ( loc[i] < ix->i_min[i] || loc[i] >= ix->i_min[i] + ix->i_size[i] )
 		{
 			AIFArrayIndexFree(ix);
 			SetAIFError(AIFERR_INDEX, NULL);
@@ -1011,7 +1023,7 @@ AIFArrayRef(AIF *a, int rank, int *loc)
 		}
 	}
 
-	ae = _aif_array_ref(a, ix->i_rank, loc, ix->i_min, ix->i_max, ix->i_btype, ix->i_bsize);
+	ae = _aif_array_ref(a, ix->i_rank, loc, ix->i_min, ix->i_size, ix->i_btype, ix->i_bsize);
 
 	AIFArrayIndexFree(ix);
 
@@ -1051,7 +1063,7 @@ AIFSetArrayData(AIF *dst, AIFIndex *ix, AIF *src)
 		return -1;
 	}
 
-	dd = AIF_DATA(dst) + AIFIndexOffset(ix->i_rank, ix->i_index, ix->i_min, ix->i_max, NULL) * ix->i_bsize;
+	dd = AIF_DATA(dst) + AIFIndexOffset(ix->i_rank, ix->i_index, ix->i_min, ix->i_size, NULL) * ix->i_bsize;
 
 	memcpy(dd, AIF_DATA(src), ix->i_bsize);
 
@@ -1060,10 +1072,10 @@ AIFSetArrayData(AIF *dst, AIFIndex *ix, AIF *src)
 
 /*
  * Calculate the data offset in the array given the current value
- * of the indexes, and the minimum and maximum indices of each dimension.
+ * of the indexes, and the minimum indexes and size of each dimension.
  */
 int
-AIFIndexOffset(int rank, int *index, int *min, int *max, int *perm)
+AIFIndexOffset(int rank, int *index, int *min, int *size, int *perm)
 {
 	int	d;
 	int	p;
@@ -1074,7 +1086,7 @@ AIFIndexOffset(int rank, int *index, int *min, int *max, int *perm)
 	{
 		p = PERMUTE(perm, d);
 		off += (index[p] - min[p]) * sz;
-		sz *= max[p] - min[p] + 1;
+		sz *= size[p];
 	}
 
 	return off;
