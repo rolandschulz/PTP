@@ -15,8 +15,8 @@ java -Xmx1024M -cp $SRCDIR/ludwig.jar \
 	-reduce "<SFVarName>" "<SFDummyArgName>" \
 	-package "org.eclipse.photran.internal.core.parser" \
 	-prec "<DeferredShapeSpecList> > <AssumedShapeSpec>" \
-	-prec "<BodyPlusInternals> < <Label>, T_ICON" \
-	-prec "<TypeBoundProcedurePart> < T_ICON" \
+	-prec "<BodyPlusInternals> > <Label>, T_ICON" \
+	-prec "<TypeBoundProcedurePart> > T_ICON" \
 	-shift T_IDENT "<CommonBlock>" \
 	-shift T_LBRACKET "<DataRef>" \
 	-shift T_LBRACKET "<SFDataRef>" \

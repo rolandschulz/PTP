@@ -868,6 +868,8 @@ public class FreeFormLexerPhase2 implements ILexer
 
                 if (t.getTerminal() != Terminal.T_RPAREN
                     && t.getTerminal() != Terminal.T_RESULT
+                    && t.getTerminal() != Terminal.T_UNDERSCORE // < These are to handle identifiers containing
+                    && t.getTerminal() != Terminal.T_IDENT      // < underscores in fixed form (Bug 305134)
                     && t.getTerminal() != Terminal.T_EOS
                     // Fortran 2003
                     && t.getTerminal() != Terminal.T_BIND

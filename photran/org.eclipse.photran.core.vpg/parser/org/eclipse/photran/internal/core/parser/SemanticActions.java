@@ -6163,41 +6163,41 @@ final class SemanticActions
                 {
                     return handleDataStmtError1(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.ASSIGNMENT_STMT_ERROR_2_INDEX:
+                case Production.ALLOCATE_STMT_ERROR_2_INDEX:
                 {
-                    return handleAssignmentStmtError2(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleAllocateStmtError2(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.FORALL_CONSTRUCT_STMT_ERROR_3_INDEX:
+                case Production.ASSIGNMENT_STMT_ERROR_3_INDEX:
                 {
-                    return handleForallConstructStmtError3(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleAssignmentStmtError3(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
                 case Production.FORALL_CONSTRUCT_STMT_ERROR_4_INDEX:
                 {
                     return handleForallConstructStmtError4(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.IF_THEN_STMT_ERROR_5_INDEX:
+                case Production.FORALL_CONSTRUCT_STMT_ERROR_5_INDEX:
                 {
-                    return handleIfThenStmtError5(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleForallConstructStmtError5(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
                 case Production.IF_THEN_STMT_ERROR_6_INDEX:
                 {
                     return handleIfThenStmtError6(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.ELSE_IF_STMT_ERROR_7_INDEX:
+                case Production.IF_THEN_STMT_ERROR_7_INDEX:
                 {
-                    return handleElseIfStmtError7(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleIfThenStmtError7(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
                 case Production.ELSE_IF_STMT_ERROR_8_INDEX:
                 {
                     return handleElseIfStmtError8(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.ELSE_STMT_ERROR_9_INDEX:
+                case Production.ELSE_IF_STMT_ERROR_9_INDEX:
                 {
-                    return handleElseStmtError9(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleElseIfStmtError9(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.SELECT_CASE_STMT_ERROR_10_INDEX:
+                case Production.ELSE_STMT_ERROR_10_INDEX:
                 {
-                    return handleSelectCaseStmtError10(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleElseStmtError10(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
                 case Production.SELECT_CASE_STMT_ERROR_11_INDEX:
                 {
@@ -6211,21 +6211,25 @@ final class SemanticActions
                 {
                     return handleSelectCaseStmtError13(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.CASE_STMT_ERROR_14_INDEX:
+                case Production.SELECT_CASE_STMT_ERROR_14_INDEX:
                 {
-                    return handleCaseStmtError14(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleSelectCaseStmtError14(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.FORMAT_STMT_ERROR_15_INDEX:
+                case Production.CASE_STMT_ERROR_15_INDEX:
                 {
-                    return handleFormatStmtError15(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleCaseStmtError15(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.FUNCTION_STMT_ERROR_16_INDEX:
+                case Production.FORMAT_STMT_ERROR_16_INDEX:
                 {
-                    return handleFunctionStmtError16(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleFormatStmtError16(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
-                case Production.SUBROUTINE_STMT_ERROR_17_INDEX:
+                case Production.FUNCTION_STMT_ERROR_17_INDEX:
                 {
-                    return handleSubroutineStmtError17(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                    return handleFunctionStmtError17(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
+                }
+                case Production.SUBROUTINE_STMT_ERROR_18_INDEX:
+                {
+                    return handleSubroutineStmtError18(productionIndex, valueStack, valueStackOffset, valueStackSize, discardedSymbols);
                 }
                 default:
                     throw new IllegalStateException();
@@ -7950,28 +7954,28 @@ final class SemanticActions
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("hasConcatOp", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 0));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("hasEqOp")));
-                    embeddedList.add((IASTNode)(node.get("hasGeOp")));
+                    embeddedList.add((IASTNode)(node.get("hasOrOp")));
                     embeddedList.add((IASTNode)(node.get("definedUnaryOp")));
-                    embeddedList.add((IASTNode)(node.get("hasConcatOp")));
-                    embeddedList.add((IASTNode)(node.get("hasDivideOp")));
-                    embeddedList.add((IASTNode)(node.get("hasNotOp")));
-                    embeddedList.add((IASTNode)(node.get("hasEqvOp")));
+                    embeddedList.add((IASTNode)(node.get("hasGeOp")));
+                    embeddedList.add((IASTNode)(node.get("hasMinusOp")));
+                    embeddedList.add((IASTNode)(node.get("hasNeqvOp")));
+                    embeddedList.add((IASTNode)(node.get("hasEqOp")));
+                    embeddedList.add((IASTNode)(node.get("hasEqEqOp")));
                     embeddedList.add((IASTNode)(node.get("hasAndOp")));
                     embeddedList.add((IASTNode)(node.get("hasSlashEqOp")));
-                    embeddedList.add((IASTNode)(node.get("hasOrOp")));
-                    embeddedList.add((IASTNode)(node.get("hasNeqvOp")));
-                    embeddedList.add((IASTNode)(node.get("hasPlusOp")));
+                    embeddedList.add((IASTNode)(node.get("hasConcatOp")));
                     embeddedList.add((IASTNode)(node.get("hasNeOp")));
-                    embeddedList.add((IASTNode)(node.get("hasLeOp")));
-                    embeddedList.add((IASTNode)(node.get("hasMinusOp")));
-                    embeddedList.add((IASTNode)(node.get("hasGtOp")));
+                    embeddedList.add((IASTNode)(node.get("hasDivideOp")));
                     embeddedList.add((IASTNode)(node.get("customDefinedOp")));
-                    embeddedList.add((IASTNode)(node.get("hasEqEqOp")));
+                    embeddedList.add((IASTNode)(node.get("hasGtOp")));
                     embeddedList.add((IASTNode)(node.get("hasTimesOp")));
-                    embeddedList.add((IASTNode)(node.get("hasLtOp")));
-                    embeddedList.add((IASTNode)(node.get("definedBinaryOp")));
+                    embeddedList.add((IASTNode)(node.get("hasLeOp")));
+                    embeddedList.add((IASTNode)(node.get("hasPlusOp")));
                     embeddedList.add((IASTNode)(node.get("hasPowerOp")));
+                    embeddedList.add((IASTNode)(node.get("hasNotOp")));
+                    embeddedList.add((IASTNode)(node.get("definedBinaryOp")));
+                    embeddedList.add((IASTNode)(node.get("hasLtOp")));
+                    embeddedList.add((IASTNode)(node.get("hasEqvOp")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
 
@@ -8142,50 +8146,50 @@ final class SemanticActions
         {
                     // Case 5
                     ASTOperatorNode result = new ASTOperatorNode();
-                    result.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasEqOp");
-                    if (result.hasEqOp != null) result.hasEqOp.setParent(result);
-                    result.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasGeOp");
-                    if (result.hasGeOp != null) result.hasGeOp.setParent(result);
+                    result.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasOrOp");
+                    if (result.hasOrOp != null) result.hasOrOp.setParent(result);
                     result.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("definedUnaryOp");
                     if (result.definedUnaryOp != null) result.definedUnaryOp.setParent(result);
-                    result.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasConcatOp");
-                    if (result.hasConcatOp != null) result.hasConcatOp.setParent(result);
-                    result.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasDivideOp");
-                    if (result.hasDivideOp != null) result.hasDivideOp.setParent(result);
-                    result.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasNotOp");
-                    if (result.hasNotOp != null) result.hasNotOp.setParent(result);
-                    result.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasEqvOp");
-                    if (result.hasEqvOp != null) result.hasEqvOp.setParent(result);
+                    result.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasGeOp");
+                    if (result.hasGeOp != null) result.hasGeOp.setParent(result);
+                    result.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasMinusOp");
+                    if (result.hasMinusOp != null) result.hasMinusOp.setParent(result);
+                    result.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasNeqvOp");
+                    if (result.hasNeqvOp != null) result.hasNeqvOp.setParent(result);
+                    result.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasEqOp");
+                    if (result.hasEqOp != null) result.hasEqOp.setParent(result);
+                    result.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasEqEqOp");
+                    if (result.hasEqEqOp != null) result.hasEqEqOp.setParent(result);
                     result.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasAndOp");
                     if (result.hasAndOp != null) result.hasAndOp.setParent(result);
                     result.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasSlashEqOp");
                     if (result.hasSlashEqOp != null) result.hasSlashEqOp.setParent(result);
-                    result.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasOrOp");
-                    if (result.hasOrOp != null) result.hasOrOp.setParent(result);
-                    result.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasNeqvOp");
-                    if (result.hasNeqvOp != null) result.hasNeqvOp.setParent(result);
-                    result.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasPlusOp");
-                    if (result.hasPlusOp != null) result.hasPlusOp.setParent(result);
+                    result.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasConcatOp");
+                    if (result.hasConcatOp != null) result.hasConcatOp.setParent(result);
                     result.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasNeOp");
                     if (result.hasNeOp != null) result.hasNeOp.setParent(result);
-                    result.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasLeOp");
-                    if (result.hasLeOp != null) result.hasLeOp.setParent(result);
-                    result.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasMinusOp");
-                    if (result.hasMinusOp != null) result.hasMinusOp.setParent(result);
-                    result.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasGtOp");
-                    if (result.hasGtOp != null) result.hasGtOp.setParent(result);
+                    result.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasDivideOp");
+                    if (result.hasDivideOp != null) result.hasDivideOp.setParent(result);
                     result.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("customDefinedOp");
                     if (result.customDefinedOp != null) result.customDefinedOp.setParent(result);
-                    result.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasEqEqOp");
-                    if (result.hasEqEqOp != null) result.hasEqEqOp.setParent(result);
+                    result.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasGtOp");
+                    if (result.hasGtOp != null) result.hasGtOp.setParent(result);
                     result.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasTimesOp");
                     if (result.hasTimesOp != null) result.hasTimesOp.setParent(result);
-                    result.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasLtOp");
-                    if (result.hasLtOp != null) result.hasLtOp.setParent(result);
-                    result.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("definedBinaryOp");
-                    if (result.definedBinaryOp != null) result.definedBinaryOp.setParent(result);
+                    result.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasLeOp");
+                    if (result.hasLeOp != null) result.hasLeOp.setParent(result);
+                    result.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasPlusOp");
+                    if (result.hasPlusOp != null) result.hasPlusOp.setParent(result);
                     result.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasPowerOp");
                     if (result.hasPowerOp != null) result.hasPowerOp.setParent(result);
+                    result.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasNotOp");
+                    if (result.hasNotOp != null) result.hasNotOp.setParent(result);
+                    result.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("definedBinaryOp");
+                    if (result.definedBinaryOp != null) result.definedBinaryOp.setParent(result);
+                    result.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasLtOp");
+                    if (result.hasLtOp != null) result.hasLtOp.setParent(result);
+                    result.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hasEqvOp");
+                    if (result.hasEqvOp != null) result.hasEqvOp.setParent(result);
                     return result;
 
         }
@@ -12162,12 +12166,12 @@ final class SemanticActions
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
                     node.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
                     if (node.hiddenTLeneq != null) node.hiddenTLeneq.setParent(node);
-                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isAssumedLength");
-                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.lengthExpr = (IExpr)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("lengthExpr");
                     if (node.lengthExpr != null) node.lengthExpr.setParent(node);
                     node.isColon = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isColon");
                     if (node.isColon != null) node.isColon.setParent(node);
+                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isAssumedLength");
+                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 3);
                     if (node.hiddenTComma != null) node.hiddenTComma.setParent(node);
                     node.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 4);
@@ -12187,12 +12191,12 @@ final class SemanticActions
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
                     node.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
                     if (node.hiddenTLeneq != null) node.hiddenTLeneq.setParent(node);
-                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isAssumedLength");
-                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.lengthExpr = (IExpr)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("lengthExpr");
                     if (node.lengthExpr != null) node.lengthExpr.setParent(node);
                     node.isColon = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isColon");
                     if (node.isColon != null) node.isColon.setParent(node);
+                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isAssumedLength");
+                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 3);
                     if (node.hiddenTComma != null) node.hiddenTComma.setParent(node);
                     node.kindExpr = (IExpr)valueStack.get(valueStackOffset + 4);
@@ -12225,12 +12229,12 @@ final class SemanticActions
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
                     node.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
                     if (node.hiddenTLeneq != null) node.hiddenTLeneq.setParent(node);
-                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isAssumedLength");
-                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.lengthExpr = (IExpr)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("lengthExpr");
                     if (node.lengthExpr != null) node.lengthExpr.setParent(node);
                     node.isColon = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isColon");
                     if (node.isColon != null) node.isColon.setParent(node);
+                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isAssumedLength");
+                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 3);
                     if (node.hiddenTRparen != null) node.hiddenTRparen.setParent(node);
                     return node;
@@ -12242,12 +12246,12 @@ final class SemanticActions
                     ASTCharSelectorNode node = new ASTCharSelectorNode();
                     node.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 0);
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
-                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("isAssumedLength");
-                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.lengthExpr = (IExpr)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("lengthExpr");
                     if (node.lengthExpr != null) node.lengthExpr.setParent(node);
                     node.isColon = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("isColon");
                     if (node.isColon != null) node.isColon.setParent(node);
+                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("isAssumedLength");
+                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 2);
                     if (node.hiddenTRparen != null) node.hiddenTRparen.setParent(node);
                     return node;
@@ -12267,12 +12271,12 @@ final class SemanticActions
                     if (node.hiddenTComma2 != null) node.hiddenTComma2.setParent(node);
                     node.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 4);
                     if (node.hiddenTLeneq != null) node.hiddenTLeneq.setParent(node);
-                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 5)).get("isAssumedLength");
-                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.lengthExpr = (IExpr)((Map<String, Object>)valueStack.get(valueStackOffset + 5)).get("lengthExpr");
                     if (node.lengthExpr != null) node.lengthExpr.setParent(node);
                     node.isColon = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 5)).get("isColon");
                     if (node.isColon != null) node.isColon.setParent(node);
+                    node.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 5)).get("isAssumedLength");
+                    if (node.isAssumedLength != null) node.isAssumedLength.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 6);
                     if (node.hiddenTRparen != null) node.hiddenTRparen.setParent(node);
                     return node;
@@ -12284,9 +12288,9 @@ final class SemanticActions
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("lengthExpr", (IExpr)valueStack.get(valueStackOffset + 0));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("isAssumedLength")));
                     embeddedList.add((IASTNode)(node.get("lengthExpr")));
                     embeddedList.add((IASTNode)(node.get("isColon")));
+                    embeddedList.add((IASTNode)(node.get("isAssumedLength")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
 
@@ -12297,9 +12301,9 @@ final class SemanticActions
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("isAssumedLength", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 0));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("isAssumedLength")));
                     embeddedList.add((IASTNode)(node.get("lengthExpr")));
                     embeddedList.add((IASTNode)(node.get("isColon")));
+                    embeddedList.add((IASTNode)(node.get("isAssumedLength")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
 
@@ -12310,9 +12314,9 @@ final class SemanticActions
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("isColon", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 0));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("isAssumedLength")));
                     embeddedList.add((IASTNode)(node.get("lengthExpr")));
                     embeddedList.add((IASTNode)(node.get("isColon")));
+                    embeddedList.add((IASTNode)(node.get("isAssumedLength")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
 
@@ -12322,9 +12326,9 @@ final class SemanticActions
                     // Cases 3 and 4
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("hiddenTLparen", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 0));
-                    node.put("isAssumedLength", (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("isAssumedLength"));
                     node.put("lengthExpr", (IExpr)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("lengthExpr"));
                     node.put("isColon", (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("isColon"));
+                    node.put("isAssumedLength", (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("isAssumedLength"));
                     node.put("hiddenTRparen", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 2));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
                     embeddedList.add((IASTNode)(node.get("hiddenTLparen")));
@@ -14208,10 +14212,10 @@ final class SemanticActions
         {
                     // Cases 1 and 2
                     ASTDataStmtValueNode node = new ASTDataStmtValueNode();
-                    node.constant = (ASTConstantNode)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("constant");
-                    if (node.constant != null) node.constant.setParent(node);
                     node.isNull = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("isNull");
                     if (node.isNull != null) node.isNull.setParent(node);
+                    node.constant = (ASTConstantNode)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("constant");
+                    if (node.constant != null) node.constant.setParent(node);
                     node.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hiddenTLparen");
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hiddenTRparen");
@@ -14227,10 +14231,10 @@ final class SemanticActions
                     if (node.hasConstIntKind != null) node.hasConstIntKind.setParent(node);
                     node.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
                     if (node.hiddenTAsterisk != null) node.hiddenTAsterisk.setParent(node);
-                    node.constant = (ASTConstantNode)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("constant");
-                    if (node.constant != null) node.constant.setParent(node);
                     node.isNull = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isNull");
                     if (node.isNull != null) node.isNull.setParent(node);
+                    node.constant = (ASTConstantNode)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("constant");
+                    if (node.constant != null) node.constant.setParent(node);
                     node.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("hiddenTLparen");
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("hiddenTRparen");
@@ -14246,10 +14250,10 @@ final class SemanticActions
                     if (node.namedConstKind != null) node.namedConstKind.setParent(node);
                     node.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
                     if (node.hiddenTAsterisk != null) node.hiddenTAsterisk.setParent(node);
-                    node.constant = (ASTConstantNode)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("constant");
-                    if (node.constant != null) node.constant.setParent(node);
                     node.isNull = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("isNull");
                     if (node.isNull != null) node.isNull.setParent(node);
+                    node.constant = (ASTConstantNode)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("constant");
+                    if (node.constant != null) node.constant.setParent(node);
                     node.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("hiddenTLparen");
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("hiddenTRparen");
@@ -14263,8 +14267,8 @@ final class SemanticActions
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("constant", (ASTConstantNode)valueStack.get(valueStackOffset + 0));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("constant")));
                     embeddedList.add((IASTNode)(node.get("isNull")));
+                    embeddedList.add((IASTNode)(node.get("constant")));
                     embeddedList.add((IASTNode)(node.get("hiddenTLparen")));
                     embeddedList.add((IASTNode)(node.get("hiddenTRparen")));
                     node.put("errorRecoveryList", embeddedList);
@@ -14279,8 +14283,8 @@ final class SemanticActions
                     node.put("hiddenTLparen", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1));
                     node.put("hiddenTRparen", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 2));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("constant")));
                     embeddedList.add((IASTNode)(node.get("isNull")));
+                    embeddedList.add((IASTNode)(node.get("constant")));
                     embeddedList.add((IASTNode)(node.get("hiddenTLparen")));
                     embeddedList.add((IASTNode)(node.get("hiddenTRparen")));
                     node.put("errorRecoveryList", embeddedList);
@@ -17701,50 +17705,50 @@ final class SemanticActions
                     node.lhsExpr = (ASTUFTermNode)valueStack.get(valueStackOffset + 0);
                     if (node.lhsExpr != null) node.lhsExpr.setParent(node);
                     ASTOperatorNode tmp1 = new ASTOperatorNode();
-                    tmp1.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
-                    if (tmp1.hasEqOp != null) tmp1.hasEqOp.setParent(tmp1);
-                    tmp1.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
-                    if (tmp1.hasGeOp != null) tmp1.hasGeOp.setParent(tmp1);
+                    tmp1.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
+                    if (tmp1.hasOrOp != null) tmp1.hasOrOp.setParent(tmp1);
                     tmp1.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedUnaryOp");
                     if (tmp1.definedUnaryOp != null) tmp1.definedUnaryOp.setParent(tmp1);
-                    tmp1.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
-                    if (tmp1.hasConcatOp != null) tmp1.hasConcatOp.setParent(tmp1);
-                    tmp1.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
-                    if (tmp1.hasDivideOp != null) tmp1.hasDivideOp.setParent(tmp1);
-                    tmp1.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
-                    if (tmp1.hasNotOp != null) tmp1.hasNotOp.setParent(tmp1);
-                    tmp1.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
-                    if (tmp1.hasEqvOp != null) tmp1.hasEqvOp.setParent(tmp1);
+                    tmp1.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
+                    if (tmp1.hasGeOp != null) tmp1.hasGeOp.setParent(tmp1);
+                    tmp1.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
+                    if (tmp1.hasMinusOp != null) tmp1.hasMinusOp.setParent(tmp1);
+                    tmp1.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
+                    if (tmp1.hasNeqvOp != null) tmp1.hasNeqvOp.setParent(tmp1);
+                    tmp1.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
+                    if (tmp1.hasEqOp != null) tmp1.hasEqOp.setParent(tmp1);
+                    tmp1.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
+                    if (tmp1.hasEqEqOp != null) tmp1.hasEqEqOp.setParent(tmp1);
                     tmp1.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasAndOp");
                     if (tmp1.hasAndOp != null) tmp1.hasAndOp.setParent(tmp1);
                     tmp1.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasSlashEqOp");
                     if (tmp1.hasSlashEqOp != null) tmp1.hasSlashEqOp.setParent(tmp1);
-                    tmp1.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
-                    if (tmp1.hasOrOp != null) tmp1.hasOrOp.setParent(tmp1);
-                    tmp1.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
-                    if (tmp1.hasNeqvOp != null) tmp1.hasNeqvOp.setParent(tmp1);
-                    tmp1.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
-                    if (tmp1.hasPlusOp != null) tmp1.hasPlusOp.setParent(tmp1);
+                    tmp1.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
+                    if (tmp1.hasConcatOp != null) tmp1.hasConcatOp.setParent(tmp1);
                     tmp1.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeOp");
                     if (tmp1.hasNeOp != null) tmp1.hasNeOp.setParent(tmp1);
-                    tmp1.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
-                    if (tmp1.hasLeOp != null) tmp1.hasLeOp.setParent(tmp1);
-                    tmp1.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
-                    if (tmp1.hasMinusOp != null) tmp1.hasMinusOp.setParent(tmp1);
-                    tmp1.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
-                    if (tmp1.hasGtOp != null) tmp1.hasGtOp.setParent(tmp1);
+                    tmp1.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
+                    if (tmp1.hasDivideOp != null) tmp1.hasDivideOp.setParent(tmp1);
                     tmp1.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("customDefinedOp");
                     if (tmp1.customDefinedOp != null) tmp1.customDefinedOp.setParent(tmp1);
-                    tmp1.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
-                    if (tmp1.hasEqEqOp != null) tmp1.hasEqEqOp.setParent(tmp1);
+                    tmp1.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
+                    if (tmp1.hasGtOp != null) tmp1.hasGtOp.setParent(tmp1);
                     tmp1.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasTimesOp");
                     if (tmp1.hasTimesOp != null) tmp1.hasTimesOp.setParent(tmp1);
-                    tmp1.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
-                    if (tmp1.hasLtOp != null) tmp1.hasLtOp.setParent(tmp1);
-                    tmp1.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
-                    if (tmp1.definedBinaryOp != null) tmp1.definedBinaryOp.setParent(tmp1);
+                    tmp1.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
+                    if (tmp1.hasLeOp != null) tmp1.hasLeOp.setParent(tmp1);
+                    tmp1.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
+                    if (tmp1.hasPlusOp != null) tmp1.hasPlusOp.setParent(tmp1);
                     tmp1.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPowerOp");
                     if (tmp1.hasPowerOp != null) tmp1.hasPowerOp.setParent(tmp1);
+                    tmp1.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
+                    if (tmp1.hasNotOp != null) tmp1.hasNotOp.setParent(tmp1);
+                    tmp1.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
+                    if (tmp1.definedBinaryOp != null) tmp1.definedBinaryOp.setParent(tmp1);
+                    tmp1.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
+                    if (tmp1.hasLtOp != null) tmp1.hasLtOp.setParent(tmp1);
+                    tmp1.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
+                    if (tmp1.hasEqvOp != null) tmp1.hasEqvOp.setParent(tmp1);
                     node.concatOp = tmp1;
                     if (tmp1 != null) tmp1.setParent(node);
                     node.rhsPrimary = (ASTUFPrimaryNode)valueStack.get(valueStackOffset + 2);
@@ -17830,50 +17834,50 @@ final class SemanticActions
                     node.lhsExpr = (IExpr)valueStack.get(valueStackOffset + 0);
                     if (node.lhsExpr != null) node.lhsExpr.setParent(node);
                     ASTOperatorNode tmp1 = new ASTOperatorNode();
-                    tmp1.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
-                    if (tmp1.hasEqOp != null) tmp1.hasEqOp.setParent(tmp1);
-                    tmp1.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
-                    if (tmp1.hasGeOp != null) tmp1.hasGeOp.setParent(tmp1);
+                    tmp1.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
+                    if (tmp1.hasOrOp != null) tmp1.hasOrOp.setParent(tmp1);
                     tmp1.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedUnaryOp");
                     if (tmp1.definedUnaryOp != null) tmp1.definedUnaryOp.setParent(tmp1);
-                    tmp1.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
-                    if (tmp1.hasConcatOp != null) tmp1.hasConcatOp.setParent(tmp1);
-                    tmp1.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
-                    if (tmp1.hasDivideOp != null) tmp1.hasDivideOp.setParent(tmp1);
-                    tmp1.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
-                    if (tmp1.hasNotOp != null) tmp1.hasNotOp.setParent(tmp1);
-                    tmp1.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
-                    if (tmp1.hasEqvOp != null) tmp1.hasEqvOp.setParent(tmp1);
+                    tmp1.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
+                    if (tmp1.hasGeOp != null) tmp1.hasGeOp.setParent(tmp1);
+                    tmp1.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
+                    if (tmp1.hasMinusOp != null) tmp1.hasMinusOp.setParent(tmp1);
+                    tmp1.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
+                    if (tmp1.hasNeqvOp != null) tmp1.hasNeqvOp.setParent(tmp1);
+                    tmp1.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
+                    if (tmp1.hasEqOp != null) tmp1.hasEqOp.setParent(tmp1);
+                    tmp1.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
+                    if (tmp1.hasEqEqOp != null) tmp1.hasEqEqOp.setParent(tmp1);
                     tmp1.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasAndOp");
                     if (tmp1.hasAndOp != null) tmp1.hasAndOp.setParent(tmp1);
                     tmp1.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasSlashEqOp");
                     if (tmp1.hasSlashEqOp != null) tmp1.hasSlashEqOp.setParent(tmp1);
-                    tmp1.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
-                    if (tmp1.hasOrOp != null) tmp1.hasOrOp.setParent(tmp1);
-                    tmp1.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
-                    if (tmp1.hasNeqvOp != null) tmp1.hasNeqvOp.setParent(tmp1);
-                    tmp1.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
-                    if (tmp1.hasPlusOp != null) tmp1.hasPlusOp.setParent(tmp1);
+                    tmp1.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
+                    if (tmp1.hasConcatOp != null) tmp1.hasConcatOp.setParent(tmp1);
                     tmp1.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeOp");
                     if (tmp1.hasNeOp != null) tmp1.hasNeOp.setParent(tmp1);
-                    tmp1.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
-                    if (tmp1.hasLeOp != null) tmp1.hasLeOp.setParent(tmp1);
-                    tmp1.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
-                    if (tmp1.hasMinusOp != null) tmp1.hasMinusOp.setParent(tmp1);
-                    tmp1.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
-                    if (tmp1.hasGtOp != null) tmp1.hasGtOp.setParent(tmp1);
+                    tmp1.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
+                    if (tmp1.hasDivideOp != null) tmp1.hasDivideOp.setParent(tmp1);
                     tmp1.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("customDefinedOp");
                     if (tmp1.customDefinedOp != null) tmp1.customDefinedOp.setParent(tmp1);
-                    tmp1.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
-                    if (tmp1.hasEqEqOp != null) tmp1.hasEqEqOp.setParent(tmp1);
+                    tmp1.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
+                    if (tmp1.hasGtOp != null) tmp1.hasGtOp.setParent(tmp1);
                     tmp1.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasTimesOp");
                     if (tmp1.hasTimesOp != null) tmp1.hasTimesOp.setParent(tmp1);
-                    tmp1.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
-                    if (tmp1.hasLtOp != null) tmp1.hasLtOp.setParent(tmp1);
-                    tmp1.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
-                    if (tmp1.definedBinaryOp != null) tmp1.definedBinaryOp.setParent(tmp1);
+                    tmp1.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
+                    if (tmp1.hasLeOp != null) tmp1.hasLeOp.setParent(tmp1);
+                    tmp1.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
+                    if (tmp1.hasPlusOp != null) tmp1.hasPlusOp.setParent(tmp1);
                     tmp1.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPowerOp");
                     if (tmp1.hasPowerOp != null) tmp1.hasPowerOp.setParent(tmp1);
+                    tmp1.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
+                    if (tmp1.hasNotOp != null) tmp1.hasNotOp.setParent(tmp1);
+                    tmp1.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
+                    if (tmp1.definedBinaryOp != null) tmp1.definedBinaryOp.setParent(tmp1);
+                    tmp1.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
+                    if (tmp1.hasLtOp != null) tmp1.hasLtOp.setParent(tmp1);
+                    tmp1.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
+                    if (tmp1.hasEqvOp != null) tmp1.hasEqvOp.setParent(tmp1);
                     node.operator = tmp1;
                     if (tmp1 != null) tmp1.setParent(node);
                     node.rhsExpr = (IExpr)valueStack.get(valueStackOffset + 2);
@@ -17897,50 +17901,50 @@ final class SemanticActions
                     node.lhsExpr = (ASTCExprNode)valueStack.get(valueStackOffset + 0);
                     if (node.lhsExpr != null) node.lhsExpr.setParent(node);
                     ASTOperatorNode tmp1 = new ASTOperatorNode();
-                    tmp1.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
-                    if (tmp1.hasEqOp != null) tmp1.hasEqOp.setParent(tmp1);
-                    tmp1.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
-                    if (tmp1.hasGeOp != null) tmp1.hasGeOp.setParent(tmp1);
+                    tmp1.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
+                    if (tmp1.hasOrOp != null) tmp1.hasOrOp.setParent(tmp1);
                     tmp1.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedUnaryOp");
                     if (tmp1.definedUnaryOp != null) tmp1.definedUnaryOp.setParent(tmp1);
-                    tmp1.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
-                    if (tmp1.hasConcatOp != null) tmp1.hasConcatOp.setParent(tmp1);
-                    tmp1.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
-                    if (tmp1.hasDivideOp != null) tmp1.hasDivideOp.setParent(tmp1);
-                    tmp1.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
-                    if (tmp1.hasNotOp != null) tmp1.hasNotOp.setParent(tmp1);
-                    tmp1.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
-                    if (tmp1.hasEqvOp != null) tmp1.hasEqvOp.setParent(tmp1);
+                    tmp1.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
+                    if (tmp1.hasGeOp != null) tmp1.hasGeOp.setParent(tmp1);
+                    tmp1.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
+                    if (tmp1.hasMinusOp != null) tmp1.hasMinusOp.setParent(tmp1);
+                    tmp1.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
+                    if (tmp1.hasNeqvOp != null) tmp1.hasNeqvOp.setParent(tmp1);
+                    tmp1.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
+                    if (tmp1.hasEqOp != null) tmp1.hasEqOp.setParent(tmp1);
+                    tmp1.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
+                    if (tmp1.hasEqEqOp != null) tmp1.hasEqEqOp.setParent(tmp1);
                     tmp1.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasAndOp");
                     if (tmp1.hasAndOp != null) tmp1.hasAndOp.setParent(tmp1);
                     tmp1.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasSlashEqOp");
                     if (tmp1.hasSlashEqOp != null) tmp1.hasSlashEqOp.setParent(tmp1);
-                    tmp1.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
-                    if (tmp1.hasOrOp != null) tmp1.hasOrOp.setParent(tmp1);
-                    tmp1.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
-                    if (tmp1.hasNeqvOp != null) tmp1.hasNeqvOp.setParent(tmp1);
-                    tmp1.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
-                    if (tmp1.hasPlusOp != null) tmp1.hasPlusOp.setParent(tmp1);
+                    tmp1.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
+                    if (tmp1.hasConcatOp != null) tmp1.hasConcatOp.setParent(tmp1);
                     tmp1.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeOp");
                     if (tmp1.hasNeOp != null) tmp1.hasNeOp.setParent(tmp1);
-                    tmp1.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
-                    if (tmp1.hasLeOp != null) tmp1.hasLeOp.setParent(tmp1);
-                    tmp1.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
-                    if (tmp1.hasMinusOp != null) tmp1.hasMinusOp.setParent(tmp1);
-                    tmp1.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
-                    if (tmp1.hasGtOp != null) tmp1.hasGtOp.setParent(tmp1);
+                    tmp1.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
+                    if (tmp1.hasDivideOp != null) tmp1.hasDivideOp.setParent(tmp1);
                     tmp1.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("customDefinedOp");
                     if (tmp1.customDefinedOp != null) tmp1.customDefinedOp.setParent(tmp1);
-                    tmp1.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
-                    if (tmp1.hasEqEqOp != null) tmp1.hasEqEqOp.setParent(tmp1);
+                    tmp1.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
+                    if (tmp1.hasGtOp != null) tmp1.hasGtOp.setParent(tmp1);
                     tmp1.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasTimesOp");
                     if (tmp1.hasTimesOp != null) tmp1.hasTimesOp.setParent(tmp1);
-                    tmp1.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
-                    if (tmp1.hasLtOp != null) tmp1.hasLtOp.setParent(tmp1);
-                    tmp1.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
-                    if (tmp1.definedBinaryOp != null) tmp1.definedBinaryOp.setParent(tmp1);
+                    tmp1.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
+                    if (tmp1.hasLeOp != null) tmp1.hasLeOp.setParent(tmp1);
+                    tmp1.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
+                    if (tmp1.hasPlusOp != null) tmp1.hasPlusOp.setParent(tmp1);
                     tmp1.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPowerOp");
                     if (tmp1.hasPowerOp != null) tmp1.hasPowerOp.setParent(tmp1);
+                    tmp1.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
+                    if (tmp1.hasNotOp != null) tmp1.hasNotOp.setParent(tmp1);
+                    tmp1.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
+                    if (tmp1.definedBinaryOp != null) tmp1.definedBinaryOp.setParent(tmp1);
+                    tmp1.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
+                    if (tmp1.hasLtOp != null) tmp1.hasLtOp.setParent(tmp1);
+                    tmp1.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
+                    if (tmp1.hasEqvOp != null) tmp1.hasEqvOp.setParent(tmp1);
                     node.concatOp = tmp1;
                     if (tmp1 != null) tmp1.setParent(node);
                     node.rhsPrimary = (ASTCPrimaryNode)valueStack.get(valueStackOffset + 2);
@@ -23444,10 +23448,10 @@ final class SemanticActions
                     ASTRdCtlSpecNode node = new ASTRdCtlSpecNode();
                     node.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hiddenTLparen");
                     if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
-                    node.readUnitIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("readUnitIsAsterisk");
-                    if (node.readUnitIsAsterisk != null) node.readUnitIsAsterisk.setParent(node);
                     node.readUnitExpr = (ASTUFExprNode)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("readUnitExpr");
                     if (node.readUnitExpr != null) node.readUnitExpr.setParent(node);
+                    node.readUnitIsAsterisk = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("readUnitIsAsterisk");
+                    if (node.readUnitIsAsterisk != null) node.readUnitIsAsterisk.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hiddenTRparen");
                     if (node.hiddenTRparen != null) node.hiddenTRparen.setParent(node);
                     return node;
@@ -23475,8 +23479,8 @@ final class SemanticActions
                     node.put("hiddenTRparen", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 2));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
                     embeddedList.add((IASTNode)(node.get("hiddenTLparen")));
-                    embeddedList.add((IASTNode)(node.get("readUnitIsAsterisk")));
                     embeddedList.add((IASTNode)(node.get("readUnitExpr")));
+                    embeddedList.add((IASTNode)(node.get("readUnitIsAsterisk")));
                     embeddedList.add((IASTNode)(node.get("hiddenTRparen")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
@@ -23491,8 +23495,8 @@ final class SemanticActions
                     node.put("hiddenTRparen", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 2));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
                     embeddedList.add((IASTNode)(node.get("hiddenTLparen")));
-                    embeddedList.add((IASTNode)(node.get("readUnitIsAsterisk")));
                     embeddedList.add((IASTNode)(node.get("readUnitExpr")));
+                    embeddedList.add((IASTNode)(node.get("readUnitIsAsterisk")));
                     embeddedList.add((IASTNode)(node.get("hiddenTRparen")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
@@ -23639,50 +23643,50 @@ final class SemanticActions
                     if (tmp0.hiddenRparen2 != null) tmp0.hiddenRparen2.setParent(tmp0);
                     node.primary1 = tmp0;
                     if (tmp0 != null) tmp0.setParent(node);
-                    node.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
-                    if (node.hasEqOp != null) node.hasEqOp.setParent(node);
-                    node.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
-                    if (node.hasGeOp != null) node.hasGeOp.setParent(node);
+                    node.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
+                    if (node.hasOrOp != null) node.hasOrOp.setParent(node);
                     node.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedUnaryOp");
                     if (node.definedUnaryOp != null) node.definedUnaryOp.setParent(node);
-                    node.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
-                    if (node.hasConcatOp != null) node.hasConcatOp.setParent(node);
-                    node.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
-                    if (node.hasDivideOp != null) node.hasDivideOp.setParent(node);
-                    node.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
-                    if (node.hasNotOp != null) node.hasNotOp.setParent(node);
-                    node.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
-                    if (node.hasEqvOp != null) node.hasEqvOp.setParent(node);
+                    node.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
+                    if (node.hasGeOp != null) node.hasGeOp.setParent(node);
+                    node.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
+                    if (node.hasMinusOp != null) node.hasMinusOp.setParent(node);
+                    node.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
+                    if (node.hasNeqvOp != null) node.hasNeqvOp.setParent(node);
+                    node.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
+                    if (node.hasEqOp != null) node.hasEqOp.setParent(node);
+                    node.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
+                    if (node.hasEqEqOp != null) node.hasEqEqOp.setParent(node);
                     node.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasAndOp");
                     if (node.hasAndOp != null) node.hasAndOp.setParent(node);
                     node.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasSlashEqOp");
                     if (node.hasSlashEqOp != null) node.hasSlashEqOp.setParent(node);
-                    node.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
-                    if (node.hasOrOp != null) node.hasOrOp.setParent(node);
-                    node.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
-                    if (node.hasNeqvOp != null) node.hasNeqvOp.setParent(node);
-                    node.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
-                    if (node.hasPlusOp != null) node.hasPlusOp.setParent(node);
+                    node.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
+                    if (node.hasConcatOp != null) node.hasConcatOp.setParent(node);
                     node.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeOp");
                     if (node.hasNeOp != null) node.hasNeOp.setParent(node);
-                    node.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
-                    if (node.hasLeOp != null) node.hasLeOp.setParent(node);
-                    node.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
-                    if (node.hasMinusOp != null) node.hasMinusOp.setParent(node);
-                    node.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
-                    if (node.hasGtOp != null) node.hasGtOp.setParent(node);
+                    node.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
+                    if (node.hasDivideOp != null) node.hasDivideOp.setParent(node);
                     node.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("customDefinedOp");
                     if (node.customDefinedOp != null) node.customDefinedOp.setParent(node);
-                    node.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
-                    if (node.hasEqEqOp != null) node.hasEqEqOp.setParent(node);
+                    node.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
+                    if (node.hasGtOp != null) node.hasGtOp.setParent(node);
                     node.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasTimesOp");
                     if (node.hasTimesOp != null) node.hasTimesOp.setParent(node);
-                    node.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
-                    if (node.hasLtOp != null) node.hasLtOp.setParent(node);
-                    node.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
-                    if (node.definedBinaryOp != null) node.definedBinaryOp.setParent(node);
+                    node.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
+                    if (node.hasLeOp != null) node.hasLeOp.setParent(node);
+                    node.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
+                    if (node.hasPlusOp != null) node.hasPlusOp.setParent(node);
                     node.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPowerOp");
                     if (node.hasPowerOp != null) node.hasPowerOp.setParent(node);
+                    node.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
+                    if (node.hasNotOp != null) node.hasNotOp.setParent(node);
+                    node.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
+                    if (node.definedBinaryOp != null) node.definedBinaryOp.setParent(node);
+                    node.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
+                    if (node.hasLtOp != null) node.hasLtOp.setParent(node);
+                    node.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
+                    if (node.hasEqvOp != null) node.hasEqvOp.setParent(node);
                     node.primary2 = (ASTCPrimaryNode)valueStack.get(valueStackOffset + 2);
                     if (node.primary2 != null) node.primary2.setParent(node);
                     return node;
@@ -23698,50 +23702,50 @@ final class SemanticActions
                     if (node.formatIdExpr != null) node.formatIdExpr.setParent(node);
                     node.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("hiddenTRparen");
                     if (node.hiddenTRparen != null) node.hiddenTRparen.setParent(node);
-                    node.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
-                    if (node.hasEqOp != null) node.hasEqOp.setParent(node);
-                    node.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
-                    if (node.hasGeOp != null) node.hasGeOp.setParent(node);
+                    node.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
+                    if (node.hasOrOp != null) node.hasOrOp.setParent(node);
                     node.definedUnaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedUnaryOp");
                     if (node.definedUnaryOp != null) node.definedUnaryOp.setParent(node);
-                    node.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
-                    if (node.hasConcatOp != null) node.hasConcatOp.setParent(node);
-                    node.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
-                    if (node.hasDivideOp != null) node.hasDivideOp.setParent(node);
-                    node.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
-                    if (node.hasNotOp != null) node.hasNotOp.setParent(node);
-                    node.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
-                    if (node.hasEqvOp != null) node.hasEqvOp.setParent(node);
+                    node.hasGeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGeOp");
+                    if (node.hasGeOp != null) node.hasGeOp.setParent(node);
+                    node.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
+                    if (node.hasMinusOp != null) node.hasMinusOp.setParent(node);
+                    node.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
+                    if (node.hasNeqvOp != null) node.hasNeqvOp.setParent(node);
+                    node.hasEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqOp");
+                    if (node.hasEqOp != null) node.hasEqOp.setParent(node);
+                    node.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
+                    if (node.hasEqEqOp != null) node.hasEqEqOp.setParent(node);
                     node.hasAndOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasAndOp");
                     if (node.hasAndOp != null) node.hasAndOp.setParent(node);
                     node.hasSlashEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasSlashEqOp");
                     if (node.hasSlashEqOp != null) node.hasSlashEqOp.setParent(node);
-                    node.hasOrOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasOrOp");
-                    if (node.hasOrOp != null) node.hasOrOp.setParent(node);
-                    node.hasNeqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeqvOp");
-                    if (node.hasNeqvOp != null) node.hasNeqvOp.setParent(node);
-                    node.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
-                    if (node.hasPlusOp != null) node.hasPlusOp.setParent(node);
+                    node.hasConcatOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasConcatOp");
+                    if (node.hasConcatOp != null) node.hasConcatOp.setParent(node);
                     node.hasNeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNeOp");
                     if (node.hasNeOp != null) node.hasNeOp.setParent(node);
-                    node.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
-                    if (node.hasLeOp != null) node.hasLeOp.setParent(node);
-                    node.hasMinusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasMinusOp");
-                    if (node.hasMinusOp != null) node.hasMinusOp.setParent(node);
-                    node.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
-                    if (node.hasGtOp != null) node.hasGtOp.setParent(node);
+                    node.hasDivideOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasDivideOp");
+                    if (node.hasDivideOp != null) node.hasDivideOp.setParent(node);
                     node.customDefinedOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("customDefinedOp");
                     if (node.customDefinedOp != null) node.customDefinedOp.setParent(node);
-                    node.hasEqEqOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqEqOp");
-                    if (node.hasEqEqOp != null) node.hasEqEqOp.setParent(node);
+                    node.hasGtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasGtOp");
+                    if (node.hasGtOp != null) node.hasGtOp.setParent(node);
                     node.hasTimesOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasTimesOp");
                     if (node.hasTimesOp != null) node.hasTimesOp.setParent(node);
-                    node.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
-                    if (node.hasLtOp != null) node.hasLtOp.setParent(node);
-                    node.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
-                    if (node.definedBinaryOp != null) node.definedBinaryOp.setParent(node);
+                    node.hasLeOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLeOp");
+                    if (node.hasLeOp != null) node.hasLeOp.setParent(node);
+                    node.hasPlusOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPlusOp");
+                    if (node.hasPlusOp != null) node.hasPlusOp.setParent(node);
                     node.hasPowerOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasPowerOp");
                     if (node.hasPowerOp != null) node.hasPowerOp.setParent(node);
+                    node.hasNotOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasNotOp");
+                    if (node.hasNotOp != null) node.hasNotOp.setParent(node);
+                    node.definedBinaryOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("definedBinaryOp");
+                    if (node.definedBinaryOp != null) node.definedBinaryOp.setParent(node);
+                    node.hasLtOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasLtOp");
+                    if (node.hasLtOp != null) node.hasLtOp.setParent(node);
+                    node.hasEqvOp = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("hasEqvOp");
+                    if (node.hasEqvOp != null) node.hasEqvOp.setParent(node);
                     node.primary2 = (ASTCPrimaryNode)valueStack.get(valueStackOffset + 2);
                     if (node.primary2 != null) node.primary2.setParent(node);
                     return node;
@@ -25298,10 +25302,10 @@ final class SemanticActions
         {
                     // Case 10
                     ASTFmtSpecNode node = new ASTFmtSpecNode();
-                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("colonFormatSep");
-                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("slashFormatSep");
                     if (node.slashFormatSep != null) node.slashFormatSep.setParent(node);
+                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("colonFormatSep");
+                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     ASTListNode<ASTFmtSpecNode> list = new ASTListNode<ASTFmtSpecNode>();
                     list.add(node);
                     node.setParent(list);
@@ -25312,10 +25316,10 @@ final class SemanticActions
         {
                     // Case 10
                     ASTFmtSpecNode node = new ASTFmtSpecNode();
-                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("colonFormatSep");
-                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("slashFormatSep");
                     if (node.slashFormatSep != null) node.slashFormatSep.setParent(node);
+                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("colonFormatSep");
+                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.formatEdit = (ASTFormatEditNode)valueStack.get(valueStackOffset + 1);
                     if (node.formatEdit != null) node.formatEdit.setParent(node);
                     ASTListNode<ASTFmtSpecNode> list = new ASTListNode<ASTFmtSpecNode>();
@@ -25328,10 +25332,10 @@ final class SemanticActions
         {
                     // Case 11
                     ASTFmtSpecNode node = new ASTFmtSpecNode();
-                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("colonFormatSep");
-                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("slashFormatSep");
                     if (node.slashFormatSep != null) node.slashFormatSep.setParent(node);
+                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("colonFormatSep");
+                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     ASTListNode<ASTFmtSpecNode> list = (ASTListNode<ASTFmtSpecNode>)valueStack.get(valueStackOffset);
                     list.add(node);
                     node.setParent(list);
@@ -25342,10 +25346,10 @@ final class SemanticActions
         {
                     // Case 11
                     ASTFmtSpecNode node = new ASTFmtSpecNode();
-                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("colonFormatSep");
-                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("slashFormatSep");
                     if (node.slashFormatSep != null) node.slashFormatSep.setParent(node);
+                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 1)).get("colonFormatSep");
+                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.formatEdit = (ASTFormatEditNode)valueStack.get(valueStackOffset + 2);
                     if (node.formatEdit != null) node.formatEdit.setParent(node);
                     ASTListNode<ASTFmtSpecNode> list = (ASTListNode<ASTFmtSpecNode>)valueStack.get(valueStackOffset);
@@ -25374,10 +25378,10 @@ final class SemanticActions
                     ASTFmtSpecNode node = new ASTFmtSpecNode();
                     node.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
                     if (node.hiddenTComma != null) node.hiddenTComma.setParent(node);
-                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("colonFormatSep");
-                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("slashFormatSep");
                     if (node.slashFormatSep != null) node.slashFormatSep.setParent(node);
+                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("colonFormatSep");
+                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     ASTListNode<ASTFmtSpecNode> list = (ASTListNode<ASTFmtSpecNode>)valueStack.get(valueStackOffset);
                     list.add(node);
                     node.setParent(list);
@@ -25390,10 +25394,10 @@ final class SemanticActions
                     ASTFmtSpecNode node = new ASTFmtSpecNode();
                     node.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
                     if (node.hiddenTComma != null) node.hiddenTComma.setParent(node);
-                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("colonFormatSep");
-                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("slashFormatSep");
                     if (node.slashFormatSep != null) node.slashFormatSep.setParent(node);
+                    node.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 2)).get("colonFormatSep");
+                    if (node.colonFormatSep != null) node.colonFormatSep.setParent(node);
                     node.formatEdit = (ASTFormatEditNode)valueStack.get(valueStackOffset + 3);
                     if (node.formatEdit != null) node.formatEdit.setParent(node);
                     ASTListNode<ASTFmtSpecNode> list = (ASTListNode<ASTFmtSpecNode>)valueStack.get(valueStackOffset);
@@ -25519,8 +25523,8 @@ final class SemanticActions
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("slashFormatSep", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 0));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("colonFormatSep")));
                     embeddedList.add((IASTNode)(node.get("slashFormatSep")));
+                    embeddedList.add((IASTNode)(node.get("colonFormatSep")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
 
@@ -25531,8 +25535,8 @@ final class SemanticActions
                     Map<String, Object> node = new HashMap<String, Object>();
                     node.put("colonFormatSep", (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 0));
                     ASTListNode<IASTNode> embeddedList = new ASTListNode<IASTNode>();
-                    embeddedList.add((IASTNode)(node.get("colonFormatSep")));
                     embeddedList.add((IASTNode)(node.get("slashFormatSep")));
+                    embeddedList.add((IASTNode)(node.get("colonFormatSep")));
                     node.put("errorRecoveryList", embeddedList);
                     return node;
 
@@ -28884,7 +28888,25 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleAssignmentStmtError2(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleAllocateStmtError2(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        {
+                    // Cases 1 and 2
+                    ASTAllocateStmtNode node = new ASTAllocateStmtNode();
+                    node.label = (org.eclipse.photran.internal.core.lexer.Token)((Map<String, Object>)valueStack.get(valueStackOffset + 0)).get("label");
+                    if (node.label != null) node.label.setParent(node);
+                    node.hiddenTAllocate = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 1);
+                    if (node.hiddenTAllocate != null) node.hiddenTAllocate.setParent(node);
+                    node.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)valueStack.get(valueStackOffset + 2);
+                    if (node.hiddenTLparen != null) node.hiddenTLparen.setParent(node);
+                    node.discardedSymbols = (List<IASTNode>)discardedSymbols;
+                    if (node.discardedSymbols != null)
+                        for (IASTNode n : node.discardedSymbols)
+                            if (n != null)
+                                n.setParent(node);
+                    return node;
+
+        }
+        public Object handleAssignmentStmtError3(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTAssignmentStmtNode node = new ASTAssignmentStmtNode();
@@ -28903,7 +28925,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleForallConstructStmtError3(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleForallConstructStmtError4(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTForallConstructStmtNode node = new ASTForallConstructStmtNode();
@@ -28919,7 +28941,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleForallConstructStmtError4(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleForallConstructStmtError5(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTForallConstructStmtNode node = new ASTForallConstructStmtNode();
@@ -28939,7 +28961,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleIfThenStmtError5(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleIfThenStmtError6(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTIfThenStmtNode node = new ASTIfThenStmtNode();
@@ -28955,7 +28977,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleIfThenStmtError6(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleIfThenStmtError7(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTIfThenStmtNode node = new ASTIfThenStmtNode();
@@ -28975,7 +28997,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleElseIfStmtError7(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleElseIfStmtError8(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTElseIfStmtNode node = new ASTElseIfStmtNode();
@@ -28991,7 +29013,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleElseIfStmtError8(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleElseIfStmtError9(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTElseIfStmtNode node = new ASTElseIfStmtNode();
@@ -29009,7 +29031,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleElseStmtError9(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleElseStmtError10(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTElseStmtNode node = new ASTElseStmtNode();
@@ -29025,7 +29047,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleSelectCaseStmtError10(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleSelectCaseStmtError11(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTSelectCaseStmtNode node = new ASTSelectCaseStmtNode();
@@ -29045,7 +29067,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleSelectCaseStmtError11(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleSelectCaseStmtError12(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTSelectCaseStmtNode node = new ASTSelectCaseStmtNode();
@@ -29061,7 +29083,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleSelectCaseStmtError12(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleSelectCaseStmtError13(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTSelectCaseStmtNode node = new ASTSelectCaseStmtNode();
@@ -29083,7 +29105,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleSelectCaseStmtError13(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleSelectCaseStmtError14(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTSelectCaseStmtNode node = new ASTSelectCaseStmtNode();
@@ -29101,7 +29123,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleCaseStmtError14(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleCaseStmtError15(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTCaseStmtNode node = new ASTCaseStmtNode();
@@ -29117,7 +29139,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleFormatStmtError15(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleFormatStmtError16(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTFormatStmtNode node = new ASTFormatStmtNode();
@@ -29133,7 +29155,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleFunctionStmtError16(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleFunctionStmtError17(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTFunctionStmtNode node = new ASTFunctionStmtNode();
@@ -29153,7 +29175,7 @@ final class SemanticActions
                     return node;
 
         }
-        public Object handleSubroutineStmtError17(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
+        public Object handleSubroutineStmtError18(int productionIndex, List<Object> valueStack, int valueStackOffset, int valueStackSize, List<? extends Object> discardedSymbols)
         {
                     // Cases 1 and 2
                     ASTSubroutineStmtNode node = new ASTSubroutineStmtNode();

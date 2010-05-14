@@ -1620,6 +1620,7 @@ ASTAttrSpecNode:<AttrSpec> ::=
 # F03 R623 -- TODO: This leads to some tricky conflicts (probably need to duplicate <TypeSpecNoPrefix>) -- fix later
 #  | (inline):<LblDef> -:T_ALLOCATE -:T_LPAREN <TypeSpecNoPrefix> -:T_COLON -:T_COLON <AllocationList> -:T_COMMA -:T_STATEQ statusVariable:<Variable> -:T_RPAREN -:T_EOS
 #  | (inline):<LblDef> -:T_ALLOCATE -:T_LPAREN <TypeSpecNoPrefix> -:T_COLON -:T_COLON <AllocationList>                                                 -:T_RPAREN -:T_EOS
+  | (inline):<LblDef> -:T_ALLOCATE -:T_LPAREN (error) T_EOS
 
 # R623 chain rule deleted
 
@@ -3166,9 +3167,8 @@ ASTAttrSpecNode:<ProcAttrSpec> ::=   # Merges with R503 <AttrSpec>
   | <PrefixSpecList> -:T_FUNCTION
 
 (list):<PrefixSpecList> ::=
-  |                    <PrefixSpec>
+  |                  <PrefixSpec>
   | <PrefixSpecList> <PrefixSpec>
-
 
 # R1219
 <PrefixSpec> ::=
@@ -3201,7 +3201,7 @@ ASTAttrSpecNode:<ProcAttrSpec> ::=   # Merges with R503 <AttrSpec>
   | (inline):<LblDef> (inline):<SubroutinePrefix> <SubroutineName> -:T_LPAREN <SubroutinePars> -:T_RPAREN -:T_BIND -:T_LPAREN -:T_IDENT -:T_RPAREN -:T_EOS
 
 <SubroutinePrefix> ::=
-  |                    -:T_SUBROUTINE
+  |                  -:T_SUBROUTINE
   | <PrefixSpecList> -:T_SUBROUTINE
 
 (list):<SubroutinePars> ::=

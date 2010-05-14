@@ -28,20 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTAccessSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isPrivate; // in ASTAccessSpecNode
     org.eclipse.photran.internal.core.lexer.Token isPublic; // in ASTAccessSpecNode
-
-    public boolean isPrivate()
-    {
-        return this.isPrivate != null;
-    }
-
-    public void setIsPrivate(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isPrivate = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isPrivate; // in ASTAccessSpecNode
 
     public boolean isPublic()
     {
@@ -51,6 +39,18 @@ public class ASTAccessSpecNode extends ASTNode
     public void setIsPublic(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isPublic = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isPrivate()
+    {
+        return this.isPrivate != null;
+    }
+
+    public void setIsPrivate(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isPrivate = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -70,8 +70,8 @@ public class ASTAccessSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isPrivate;
-        case 1:  return this.isPublic;
+        case 0:  return this.isPublic;
+        case 1:  return this.isPrivate;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -80,8 +80,8 @@ public class ASTAccessSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isPublic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isPublic = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isPrivate = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

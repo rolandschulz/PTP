@@ -45,7 +45,7 @@ public class Parser
     public OutputStream DEBUG = new OutputStream() { @Override public void write(int b) {} };
 
     protected static final int NUM_STATES = 3223;
-    protected static final int NUM_PRODUCTIONS = 1543;
+    protected static final int NUM_PRODUCTIONS = 1544;
     protected static final int NUM_TERMINALS = 246;
     protected static final int NUM_NONTERMINALS = 493;
 
@@ -3038,22 +3038,23 @@ public class Parser
         public static final Production VARIABLE_COMMA_1524 = new Production(Nonterminal.VARIABLE_COMMA, 2, "<VariableComma> ::= <VariableName> T_COMMA");
         public static final Production INVALID_ENTITY_DECL_ERROR_0 = new Production(Nonterminal.INVALID_ENTITY_DECL, 1, "<InvalidEntityDecl> ::= <ObjectName>");
         public static final Production DATA_STMT_ERROR_1 = new Production(Nonterminal.DATA_STMT, 2, "<DataStmt> ::= <LblDef> T_DATA");
-        public static final Production ASSIGNMENT_STMT_ERROR_2 = new Production(Nonterminal.ASSIGNMENT_STMT, 2, "<AssignmentStmt> ::= <LblDef> <Name>");
-        public static final Production FORALL_CONSTRUCT_STMT_ERROR_3 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 2, "<ForallConstructStmt> ::= <LblDef> T_FORALL");
-        public static final Production FORALL_CONSTRUCT_STMT_ERROR_4 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 4, "<ForallConstructStmt> ::= <LblDef> <Name> T_COLON T_FORALL");
-        public static final Production IF_THEN_STMT_ERROR_5 = new Production(Nonterminal.IF_THEN_STMT, 2, "<IfThenStmt> ::= <LblDef> T_IF");
-        public static final Production IF_THEN_STMT_ERROR_6 = new Production(Nonterminal.IF_THEN_STMT, 4, "<IfThenStmt> ::= <LblDef> <Name> T_COLON T_IF");
-        public static final Production ELSE_IF_STMT_ERROR_7 = new Production(Nonterminal.ELSE_IF_STMT, 2, "<ElseIfStmt> ::= <LblDef> T_ELSEIF");
-        public static final Production ELSE_IF_STMT_ERROR_8 = new Production(Nonterminal.ELSE_IF_STMT, 3, "<ElseIfStmt> ::= <LblDef> T_ELSE T_IF");
-        public static final Production ELSE_STMT_ERROR_9 = new Production(Nonterminal.ELSE_STMT, 2, "<ElseStmt> ::= <LblDef> T_ELSE");
-        public static final Production SELECT_CASE_STMT_ERROR_10 = new Production(Nonterminal.SELECT_CASE_STMT, 4, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECTCASE");
-        public static final Production SELECT_CASE_STMT_ERROR_11 = new Production(Nonterminal.SELECT_CASE_STMT, 2, "<SelectCaseStmt> ::= <LblDef> T_SELECTCASE");
-        public static final Production SELECT_CASE_STMT_ERROR_12 = new Production(Nonterminal.SELECT_CASE_STMT, 5, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECT T_CASE");
-        public static final Production SELECT_CASE_STMT_ERROR_13 = new Production(Nonterminal.SELECT_CASE_STMT, 3, "<SelectCaseStmt> ::= <LblDef> T_SELECT T_CASE");
-        public static final Production CASE_STMT_ERROR_14 = new Production(Nonterminal.CASE_STMT, 2, "<CaseStmt> ::= <LblDef> T_CASE");
-        public static final Production FORMAT_STMT_ERROR_15 = new Production(Nonterminal.FORMAT_STMT, 2, "<FormatStmt> ::= <LblDef> T_FORMAT");
-        public static final Production FUNCTION_STMT_ERROR_16 = new Production(Nonterminal.FUNCTION_STMT, 3, "<FunctionStmt> ::= <LblDef> <FunctionPrefix> <FunctionName>");
-        public static final Production SUBROUTINE_STMT_ERROR_17 = new Production(Nonterminal.SUBROUTINE_STMT, 3, "<SubroutineStmt> ::= <LblDef> <SubroutinePrefix> <SubroutineName>");
+        public static final Production ALLOCATE_STMT_ERROR_2 = new Production(Nonterminal.ALLOCATE_STMT, 3, "<AllocateStmt> ::= <LblDef> T_ALLOCATE T_LPAREN");
+        public static final Production ASSIGNMENT_STMT_ERROR_3 = new Production(Nonterminal.ASSIGNMENT_STMT, 2, "<AssignmentStmt> ::= <LblDef> <Name>");
+        public static final Production FORALL_CONSTRUCT_STMT_ERROR_4 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 2, "<ForallConstructStmt> ::= <LblDef> T_FORALL");
+        public static final Production FORALL_CONSTRUCT_STMT_ERROR_5 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 4, "<ForallConstructStmt> ::= <LblDef> <Name> T_COLON T_FORALL");
+        public static final Production IF_THEN_STMT_ERROR_6 = new Production(Nonterminal.IF_THEN_STMT, 2, "<IfThenStmt> ::= <LblDef> T_IF");
+        public static final Production IF_THEN_STMT_ERROR_7 = new Production(Nonterminal.IF_THEN_STMT, 4, "<IfThenStmt> ::= <LblDef> <Name> T_COLON T_IF");
+        public static final Production ELSE_IF_STMT_ERROR_8 = new Production(Nonterminal.ELSE_IF_STMT, 2, "<ElseIfStmt> ::= <LblDef> T_ELSEIF");
+        public static final Production ELSE_IF_STMT_ERROR_9 = new Production(Nonterminal.ELSE_IF_STMT, 3, "<ElseIfStmt> ::= <LblDef> T_ELSE T_IF");
+        public static final Production ELSE_STMT_ERROR_10 = new Production(Nonterminal.ELSE_STMT, 2, "<ElseStmt> ::= <LblDef> T_ELSE");
+        public static final Production SELECT_CASE_STMT_ERROR_11 = new Production(Nonterminal.SELECT_CASE_STMT, 4, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECTCASE");
+        public static final Production SELECT_CASE_STMT_ERROR_12 = new Production(Nonterminal.SELECT_CASE_STMT, 2, "<SelectCaseStmt> ::= <LblDef> T_SELECTCASE");
+        public static final Production SELECT_CASE_STMT_ERROR_13 = new Production(Nonterminal.SELECT_CASE_STMT, 5, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECT T_CASE");
+        public static final Production SELECT_CASE_STMT_ERROR_14 = new Production(Nonterminal.SELECT_CASE_STMT, 3, "<SelectCaseStmt> ::= <LblDef> T_SELECT T_CASE");
+        public static final Production CASE_STMT_ERROR_15 = new Production(Nonterminal.CASE_STMT, 2, "<CaseStmt> ::= <LblDef> T_CASE");
+        public static final Production FORMAT_STMT_ERROR_16 = new Production(Nonterminal.FORMAT_STMT, 2, "<FormatStmt> ::= <LblDef> T_FORMAT");
+        public static final Production FUNCTION_STMT_ERROR_17 = new Production(Nonterminal.FUNCTION_STMT, 3, "<FunctionStmt> ::= <LblDef> <FunctionPrefix> <FunctionName>");
+        public static final Production SUBROUTINE_STMT_ERROR_18 = new Production(Nonterminal.SUBROUTINE_STMT, 3, "<SubroutineStmt> ::= <LblDef> <SubroutinePrefix> <SubroutineName>");
 
         protected static final int EXECUTABLE_PROGRAM_1_INDEX = 1;
         protected static final int EXECUTABLE_PROGRAM_2_INDEX = 2;
@@ -4581,22 +4582,23 @@ public class Parser
         protected static final int VARIABLE_COMMA_1524_INDEX = 1524;
         protected static final int INVALID_ENTITY_DECL_ERROR_0_INDEX = 1525;
         protected static final int DATA_STMT_ERROR_1_INDEX = 1526;
-        protected static final int ASSIGNMENT_STMT_ERROR_2_INDEX = 1527;
-        protected static final int FORALL_CONSTRUCT_STMT_ERROR_3_INDEX = 1528;
+        protected static final int ALLOCATE_STMT_ERROR_2_INDEX = 1527;
+        protected static final int ASSIGNMENT_STMT_ERROR_3_INDEX = 1528;
         protected static final int FORALL_CONSTRUCT_STMT_ERROR_4_INDEX = 1529;
-        protected static final int IF_THEN_STMT_ERROR_5_INDEX = 1530;
+        protected static final int FORALL_CONSTRUCT_STMT_ERROR_5_INDEX = 1530;
         protected static final int IF_THEN_STMT_ERROR_6_INDEX = 1531;
-        protected static final int ELSE_IF_STMT_ERROR_7_INDEX = 1532;
+        protected static final int IF_THEN_STMT_ERROR_7_INDEX = 1532;
         protected static final int ELSE_IF_STMT_ERROR_8_INDEX = 1533;
-        protected static final int ELSE_STMT_ERROR_9_INDEX = 1534;
-        protected static final int SELECT_CASE_STMT_ERROR_10_INDEX = 1535;
+        protected static final int ELSE_IF_STMT_ERROR_9_INDEX = 1534;
+        protected static final int ELSE_STMT_ERROR_10_INDEX = 1535;
         protected static final int SELECT_CASE_STMT_ERROR_11_INDEX = 1536;
         protected static final int SELECT_CASE_STMT_ERROR_12_INDEX = 1537;
         protected static final int SELECT_CASE_STMT_ERROR_13_INDEX = 1538;
-        protected static final int CASE_STMT_ERROR_14_INDEX = 1539;
-        protected static final int FORMAT_STMT_ERROR_15_INDEX = 1540;
-        protected static final int FUNCTION_STMT_ERROR_16_INDEX = 1541;
-        protected static final int SUBROUTINE_STMT_ERROR_17_INDEX = 1542;
+        protected static final int SELECT_CASE_STMT_ERROR_14_INDEX = 1539;
+        protected static final int CASE_STMT_ERROR_15_INDEX = 1540;
+        protected static final int FORMAT_STMT_ERROR_16_INDEX = 1541;
+        protected static final int FUNCTION_STMT_ERROR_17_INDEX = 1542;
+        protected static final int SUBROUTINE_STMT_ERROR_18_INDEX = 1543;
 
         protected static final Production[] values = new Production[]
         {
@@ -6127,22 +6129,23 @@ public class Parser
             VARIABLE_COMMA_1524,
             INVALID_ENTITY_DECL_ERROR_0,
             DATA_STMT_ERROR_1,
-            ASSIGNMENT_STMT_ERROR_2,
-            FORALL_CONSTRUCT_STMT_ERROR_3,
+            ALLOCATE_STMT_ERROR_2,
+            ASSIGNMENT_STMT_ERROR_3,
             FORALL_CONSTRUCT_STMT_ERROR_4,
-            IF_THEN_STMT_ERROR_5,
+            FORALL_CONSTRUCT_STMT_ERROR_5,
             IF_THEN_STMT_ERROR_6,
-            ELSE_IF_STMT_ERROR_7,
+            IF_THEN_STMT_ERROR_7,
             ELSE_IF_STMT_ERROR_8,
-            ELSE_STMT_ERROR_9,
-            SELECT_CASE_STMT_ERROR_10,
+            ELSE_IF_STMT_ERROR_9,
+            ELSE_STMT_ERROR_10,
             SELECT_CASE_STMT_ERROR_11,
             SELECT_CASE_STMT_ERROR_12,
             SELECT_CASE_STMT_ERROR_13,
-            CASE_STMT_ERROR_14,
-            FORMAT_STMT_ERROR_15,
-            FUNCTION_STMT_ERROR_16,
-            SUBROUTINE_STMT_ERROR_17,
+            SELECT_CASE_STMT_ERROR_14,
+            CASE_STMT_ERROR_15,
+            FORMAT_STMT_ERROR_16,
+            FUNCTION_STMT_ERROR_17,
+            SUBROUTINE_STMT_ERROR_18,
         };
     }
 

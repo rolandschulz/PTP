@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTAllocateStmtNode extends ASTNode implements IActionStmt
+public class ASTAllocateStmtNode extends ASTNodeWithErrorRecoverySymbols implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTAllocateStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAllocate; // in ASTAllocateStmtNode
