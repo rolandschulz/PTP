@@ -244,30 +244,32 @@ ReferenceAIF(int name)
 }
 
 /*
- * toWhat represents the sort of thing to which a null pointer needs to be
- * created.  If it is named, that name is used in the resulting AIF; otherwise,
- * the format of toWhat is used to generate the format of the new AIF.
+ * Create a null pointer.
+ *
+ * The argument supplies the type that the pointer points to.  If it is named,
+ * that name is used in the resulting AIF; otherwise,
+ * the format of the argument is used to generate the format of the new AIF.
  */
 AIF *
-AIFNull(AIF *toWhat)
+AIFNullPointer(AIF *i)
 {
 	int	name;
 	AIF *	a;
 	char *	fmt;
-	char *	oldFormat = AIF_FORMAT(toWhat);
+	char *	oldFormat = AIF_FORMAT(i);
 
 	ResetAIFError();
 
 	a = NewAIF(0, 1);
 
-	if ( *oldFormat == '%' )
+	if ( *oldFormat == FDS_NAME )
 	{
 		/*
 		** a reference
 		*/
 		sscanf(oldFormat, "%%%d/", &name);
 		fmt = strdup(AIF_REFERENCE_TYPE(name));
-		AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(NULL, fmt));
+		AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(AIF_ADDRESS_TYPE(sizeof(char *)), fmt));
 		_aif_free(fmt);
 	}
 	else
@@ -275,7 +277,7 @@ AIFNull(AIF *toWhat)
 		/* 
 		** repeat the format
 		*/
-		AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(NULL, oldFormat));
+		AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(AIF_ADDRESS_TYPE(sizeof(char *)), oldFormat));
 	}
 
 	AIF_DATA(a)[0] = AIF_PTR_NIL;
@@ -295,7 +297,7 @@ PointerNameToAIF(AIF *i)
 
 	sscanf(fmt, "%%%d/", &name);
 
-	AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(NULL, AIF_FORMAT(i)));
+	AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(AIF_ADDRESS_TYPE(sizeof(char *)), AIF_FORMAT(i)));
 
 	*(AIF_DATA(a)) = (char) AIF_PTR_NAME;
 	_int_to_ptrname( (int) name, AIF_DATA(a)+1);
@@ -308,25 +310,25 @@ PointerNameToAIF(AIF *i)
 }
 
 AIF *
-PointerReferenceToAIF(AIF *toWhat)
+PointerReferenceToAIF(AIF *i)
 {
 	int	name;
 	AIF *	a;
 	char *	fmt;
-	char *	oldFormat = AIF_FORMAT(toWhat);
+	char *	oldFormat = AIF_FORMAT(i);
 
 	ResetAIFError();
 
 	a = NewAIF(0, 2);
 
-	if ( *oldFormat == '%' )
+	if ( *oldFormat == FDS_NAME )
 	{
 		/*
 		** a reference
 		*/
 		sscanf(oldFormat, "%%%d/", &name);
 		fmt = strdup(AIF_REFERENCE_TYPE(name));
-		AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(NULL, fmt));
+		AIF_FORMAT(a) = strdup(AIF_POINTER_TYPE(AIF_ADDRESS_TYPE(sizeof(char *)), fmt));
 		_aif_free(fmt);
 	}
 
@@ -451,8 +453,15 @@ GetDefaultAddress(int size)
 	return addr;
 }
 
-/* Converts hexadecimal display to binary. String length is used
- * and only hexadecimal pairs are handled.
+/*
+ * Converts a hexadecimal string 'in_string' representing an address of size 'in_size'
+ * bytes to binary and copies to 'out_string'.
+ *
+ * If 'in_string' is NULL, the null address will be used.
+ *
+ * if 'in_string' is smaller than the address size, it will be assumed to be
+ * padded with zeros.
+ *
  */
 static void 
 HexToByte(char *out_string, char *in_string, int in_size)
@@ -500,15 +509,15 @@ HexToByte(char *out_string, char *in_string, int in_size)
 }
 /*
  * Convert a null terminated array of hexadecimal characters to
- * an AIF address of length len.
+ * an AIF address of length 'len'.
  *
- * NOTE: there must be at least len*2 characters in the array
+ * If 'addr' is NULL, returns the null address. 'addr' will be assumed
+ * to be padded with zeros.
  */
 AIF *
 AddressToAIF(char *addr, int len)
 {
 	AIF * a;
-	char * buf;
 	
 	a = NewAIF(0, len);
 	AIF_FORMAT(a) = strdup(AIF_ADDRESS_TYPE(len));
@@ -827,17 +836,17 @@ DoubleToAIF(double f)
 /*
  * Convert an array to AIF.
  *
- * AIF *ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
+ * AIF *ArrayToAIF(int rank, int *min, int *size, char *data, int len, char *btype)
  *
  * - rank is the rank of the array
  * - min is the index lower bound, or an array of lower bounds if rank > 1
- * - max is the index upper bound, or an array of upper bounds if rank > 1
+ * - size is the dimension size, or an array of dimension sizes if rank > 1
  * - data is a pointer to the array data, or NULL, and must be normalised
  * - len is length in bytes of the entire array
  * - btype is the type of the array elements
  */
 AIF *
-ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
+ArrayToAIF(int rank, int *min, int *size, char *data, int len, char *btype)
 {
 	int	i;
 	int	bsize;
@@ -855,7 +864,7 @@ ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
 
 	for ( i = rank - 1  ; i >= 0 ; i-- )
 	{
-		rtype = strdup(AIF_RANGE_TYPE(min[i], max[i], itype));
+		rtype = strdup(AIF_RANGE_TYPE(min[i], size[i], itype));
 		fds = strdup(AIF_ARRAY_TYPE(rtype, btype));
 
 		_aif_free(rtype);
@@ -878,22 +887,23 @@ ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
 }
 
 /*
- * Create an empty array containing elemenst min..max and
- * with a base type given by btype
+ * Create an empty array containing elements min..max and
+ * with a base type given by btype. If size = 0, create
+ * an array of zero elements.
  */
 AIF *
-EmptyArrayToAIF(int min, int max, AIF *btype)
+EmptyArrayToAIF(int min, int size, AIF *btype)
 {
 	AIF *	a;
 	int len = 0;
 
-	if (AIF_FORMAT(btype)[0] != FDS_CHAR_POINTER) {
-		len = (max - min + 1) * AIFTypeSize(btype);
+	if (AIF_FORMAT(btype)[0] != FDS_CHAR_POINTER && size >= 0) {
+		len = size * AIFTypeSize(btype);
 	}
 
 	a = NewAIF(0, len);
 	
-	AIF_FORMAT(a) = FDSArrayInit(min, max, AIF_FORMAT(btype));
+	AIF_FORMAT(a) = FDSArrayInit(min, size, AIF_FORMAT(btype));
 	
 	ResetAIFError();
 	
@@ -907,21 +917,18 @@ void
 AIFAddArrayElement(AIF *a, int idx, AIF *el)
 {
 	int	min;
-	int	max;
+	int	size;
 	int len = AIFTypeSize(el);
-
-	//if (len == 0 || AIFTypeSize(a) == 0)
-		//return;
 
 	if (AIF_FORMAT(el)[0] == FDS_CHAR_POINTER) {
 		AIFAddComplexArrayElement(a, el);
-	}
-	else {
+	} else {
 		min = FDSArrayMinIndex(AIF_FORMAT(a), 0);
-		max = FDSArrayMaxIndex(AIF_FORMAT(a), 0);
+		size = FDSArrayRankSize(AIF_FORMAT(a), 0);
 		
-		if (idx < min || idx > max)
+		if (idx < min || idx >= min + size) {
 			return;
+		}
 					
 		memcpy(AIF_DATA(a) + len * (idx - min), AIF_DATA(el), len);
 	}
@@ -1057,7 +1064,10 @@ AIFGetEnum(AIF *a)
 }
 
 /*
- * Create an empty AIF union type.
+ * Create an empty AIF union type. A union contains
+ * all the values in the same way as a struct, since the
+ * data is not simply a sequence of bytes but is structured
+ * in AIF.
  */
 AIF *
 EmptyUnionToAIF(char *id) 
@@ -1074,25 +1084,56 @@ EmptyUnionToAIF(char *id)
 }
 
 /*
- * Add a filed to an AIF union.
+ * Add a field to an AIF union.
  */
 int
-AIFAddFieldToUnion(AIF *a, char *field, char *fmt)
+AIFAddFieldToUnion(AIF *a, char *field, AIF *content)
 {
-	char *nfmt;
+	int		data_len;
+	int		old_len;
+	int		new_len;
+	char *	new_fmt;
+	char *	new_data;
+	char *	dummy;
 
-	nfmt = FDSAddFieldToUnion(AIF_FORMAT(a), field, fmt);
-
-	if ( nfmt == NULL )
+	if ( !FDSUnionFieldByName(AIF_FORMAT(a), field, &dummy) )
 	{
+		_aif_free(dummy);
+		SetAIFError(AIFERR_BADARG, NULL);
 		return -1;
 	}
-	else
-	{
-		_aif_free(AIF_FORMAT(a));
-		AIF_FORMAT(a) = nfmt;
-		return 0;
+
+	data_len = FDSDataSize(AIF_FORMAT(a), AIF_DATA(a));
+	old_len = AIF_LEN(a);
+	new_len = old_len + AIF_LEN(content);
+
+	new_data = _aif_alloc(new_len);
+
+	if (data_len > 0) {
+		memcpy(new_data, AIF_DATA(a), data_len);
 	}
+	memcpy(new_data+data_len, AIF_DATA(content), AIF_LEN(content));
+	memcpy(new_data+data_len + AIF_LEN(content), AIF_DATA(a) + data_len, old_len - data_len);
+
+	if ( AIF_DATA(a) ) {
+		_aif_free(AIF_DATA(a));
+	}
+
+	AIF_DATA(a) = _aif_alloc(new_len);
+	AIF_LEN(a) = new_len;
+
+	memcpy(AIF_DATA(a), new_data, new_len);
+
+	new_fmt = FDSAddFieldToUnion(AIF_FORMAT(a), field, AIF_FORMAT(content));
+
+	_aif_free(AIF_FORMAT(a));
+	AIF_FORMAT(a) = new_fmt;
+
+	_aif_free(new_data);
+
+	ResetAIFError();
+
+	return 0;
 }
 
 /*
@@ -1101,32 +1142,8 @@ AIFAddFieldToUnion(AIF *a, char *field, char *fmt)
 int
 AIFSetUnion(AIF *a, char *field, AIF *data)
 {
-	char *type;
-	int   len;
-
-	if ( FDSUnionFieldByName(AIF_FORMAT(a), field, &type) < 0 )
-	{
-		SetAIFError(AIFERR_FIELD, NULL);
-		return -1;
-	}
-
-	if ( strcmp(type, AIF_FORMAT(data)) != 0 )
-	{
-		SetAIFError(AIFERR_BADARG, NULL);
-		return -1;
-	}
-
-	len = FDSTypeSize(AIF_FORMAT(a));
-	AIF_LEN(a) = len;
-
-	if ( AIF_DATA(a) != NULL )
-		_aif_free(AIF_DATA(a));
-
-	AIF_DATA(a) = _aif_alloc(len);
-	memcpy(AIF_DATA(a), AIF_DATA(data), len);
-
-        return 0;
-
+	SetAIFError(AIFERR_NOTIMP, NULL);
+	return -1;
 }
 
 /*
@@ -1181,17 +1198,18 @@ EmptyStructToAIF(char *id)
 int
 AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
 {
-	int	pubLength;
-	int	oldLength;
-	int	newLength;
-	char *	newFormat;
-	char *	newData;
-	char *	dummyString;
+	int		data_len;
+	int		old_len;
+	int		new_len;
+	char *	new_fmt;
+	char *	new_data;
+	char *	dummy;
 
-	if ( !FDSStructFieldByName(AIF_FORMAT(a), field, &dummyString) )
+
+	if ( !FDSStructFieldByName(AIF_FORMAT(a), field, &dummy) )
 	{
+		_aif_free(dummy);
 		SetAIFError(AIFERR_BADARG, NULL);
-		_aif_free(dummyString);
 		return -1;
 	}
 
@@ -1203,30 +1221,33 @@ AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
 	Currently FDSDataSize() can only handle public members of structs, so
 	it is safe to replace _data_len_public() with FDSDataSize().
 	*/
-	pubLength = FDSDataSize(AIF_FORMAT(a), AIF_DATA(a));
-	oldLength = AIF_LEN(a);
-	newLength = oldLength + AIF_LEN(content);
+	data_len = FDSDataSize(AIF_FORMAT(a), AIF_DATA(a));
+	old_len = AIF_LEN(a);
+	new_len = old_len + AIF_LEN(content);
 
-	newData = _aif_alloc(newLength);
+	new_data = _aif_alloc(new_len);
 
-	memcpy(newData, AIF_DATA(a), pubLength);
-	memcpy(newData+pubLength, AIF_DATA(content), AIF_LEN(content));
-	memcpy(newData+pubLength+AIF_LEN(content), AIF_DATA(a)+pubLength, oldLength-pubLength);
+	if (data_len > 0) {
+		memcpy(new_data, AIF_DATA(a), old_len);
+	}
+	memcpy(new_data + data_len, AIF_DATA(content), AIF_LEN(content));
+	memcpy(new_data + data_len + AIF_LEN(content), AIF_DATA(a) + data_len, old_len - data_len);
 
-	if ( AIF_DATA(a) )
+	if ( AIF_DATA(a) ) {
 		_aif_free(AIF_DATA(a));
+	}
 
-	AIF_DATA(a) = _aif_alloc(newLength);
-	AIF_LEN(a) = newLength;
+	AIF_DATA(a) = _aif_alloc(new_len);
+	AIF_LEN(a) = new_len;
 
-	memcpy(AIF_DATA(a), newData, newLength);
+	memcpy(AIF_DATA(a), new_data, new_len);
 
-	newFormat = FDSAddFieldToStruct(AIF_FORMAT(a), field, AIF_FORMAT(content));
+	new_fmt = FDSAddFieldToStruct(AIF_FORMAT(a), field, AIF_FORMAT(content));
 
 	_aif_free(AIF_FORMAT(a));
-	AIF_FORMAT(a) = newFormat;
+	AIF_FORMAT(a) = new_fmt;
 
-	_aif_free(newData);
+	_aif_free(new_data);
 
 	ResetAIFError();
 
@@ -2662,7 +2683,7 @@ _aif_enum_to_str(int depth, char **fds, char **data)
 	/* check whether it is an empty enum or not */
 	char * 		f = *fds;
 
-	while ( *f != FDS_ID )
+	while ( *f != FDS_TYPENAME_END )
 		f++;
 
 	f++;
