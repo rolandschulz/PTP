@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 
 import org.eclipse.cdt.core.model.CModelException;
@@ -24,7 +22,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.photran.internal.ui.vpg.Activator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
@@ -35,6 +32,8 @@ import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 /**
+ * Action to open a marker.
+ * <p>
  * Based on OpenAction from CDT
  * (org.eclipse.cdt.internal.ui.actions.OpenAction)
  *

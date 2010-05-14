@@ -32,8 +32,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
+ * Action to display the entire message for a marker in a separate dialog.
  *
- * @author tyuvash2
+ * @author Timofey Yuvashev
  */
 public class ShowFullMessageAction extends SelectionDispatchAction
 {

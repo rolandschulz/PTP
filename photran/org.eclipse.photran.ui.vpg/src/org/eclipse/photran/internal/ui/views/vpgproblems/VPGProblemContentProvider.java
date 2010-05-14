@@ -8,7 +8,6 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
 import java.util.List;
@@ -21,6 +20,8 @@ import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
+ * Content provider for the VPG Problems View.
+ * <p>
  * Based on samples provided in Java Developer’s Guide to Eclipse,
  * Chapter 18 (http://www.jdg2e.com/ch18.views/doc/index.htm);
  * © Copyright International Business Machines Corporation, 2003, 2004, 2006.
@@ -29,7 +30,7 @@ import org.eclipse.jface.viewers.Viewer;
  *
  * @author Timofey Yuvashev
  */
-public class VGPProblemContentProvider implements IStructuredContentProvider,
+public class VPGProblemContentProvider implements IStructuredContentProvider,
                                                   IResourceChangeListener
 {
     private StructuredViewer viewer = null;

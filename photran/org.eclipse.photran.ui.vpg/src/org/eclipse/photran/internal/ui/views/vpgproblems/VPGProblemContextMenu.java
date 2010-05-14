@@ -8,13 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.photran.internal.ui.views.vpgproblems;
-
-/*
- * This class sets up the popup menu for our VGP Problems view
- * @author Timofey Yuvashev
- */
 
 import org.eclipse.cdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.jface.action.MenuManager;
@@ -25,16 +19,21 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.actions.ActionFactory;
 
-public class VGPProblemContextMenu extends MenuManager
+/**
+ * Sets up the popup menu for the VPG Problems view
+ * 
+ * @author Timofey Yuvashev
+ */
+public class VPGProblemContextMenu extends MenuManager
 {
-    public VGPProblemContextMenu(IViewSite site, String title)
+    public VPGProblemContextMenu(IViewSite site, String title)
     {
         super(title);
         
         OpenMarkedFileAction openAct = new OpenMarkedFileAction(site);
         add(openAct);
         
-        CopyMarkedFileAction copyAct = new CopyMarkedFileAction((VGPProblemView)site.getPart(), "Copy");
+        CopyMarkedFileAction copyAct = new CopyMarkedFileAction((VPGProblemView)site.getPart(), "Copy");
         add(copyAct);
         
        /* RemoveMarkerAction remAct = new RemoveMarkerAction(site);

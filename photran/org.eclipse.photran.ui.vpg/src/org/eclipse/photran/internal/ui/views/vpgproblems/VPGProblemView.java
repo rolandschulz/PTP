@@ -10,16 +10,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
-/*
- * Most of the code was copied from Eclipse JFace TableView Tutorial
- * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html) and
- * Java Developer's Guide to Eclipse, Chapter 18,
- * (http://www.jdg2e.com/jdg2e_CD_for_eclipse321/plug-in_development/examples/com.ibm.jdg2e.view.marker/src-marker/com/ibm/jdg2e/view/marker/MarkerView.java)
- *
- * Timofey Yuvashev
- */
-
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -56,7 +47,17 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
+/**
+ * Fortran Analysis/Refactoring Problems view, A.K.A. VPG Problems view.
+ * <p>
+ * Most of the code was copied from Eclipse JFace TableView Tutorial
+ * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html) and
+ * Java Developer's Guide to Eclipse, Chapter 18,
+ * (http://www.jdg2e.com/jdg2e_CD_for_eclipse321/plug-in_development/examples/com.ibm.jdg2e.view.marker/src-marker/com/ibm/jdg2e/view/marker/MarkerView.java)
+ *
+ * @author Timofey Yuvashev
+ */
+public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 {
     private TableViewer tableViewer             = null;
     private TableSorter tableSorter             = null;
@@ -105,14 +106,14 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         getSite().setSelectionProvider(tableViewer);
 
         //TODO: Change the default string
-        MenuManager manager = new VGPProblemContextMenu(getViewSite(), "Problems View Menu");
+        MenuManager manager = new VPGProblemContextMenu(getViewSite(), "Problems View Menu");
         tableViewer.getTable().setMenu(manager.createContextMenu(tableViewer.getTable()));
 
         //Register Viewer ContextMenu with other workbench parts
         getSite().registerContextMenu(manager, tableViewer);
 
-        tableViewer.setContentProvider(new VGPProblemContentProvider());
-        tableViewer.setLabelProvider(new VGPProblemLabelProvider());
+        tableViewer.setContentProvider(new VPGProblemContentProvider());
+        tableViewer.setLabelProvider(new VPGProblemLabelProvider());
 
         PhotranVPG.getInstance().log.addLogListener(this);
 
@@ -219,7 +220,8 @@ public class VGPProblemView extends ViewPart implements VPGLog.ILogListener
         int sevWarn = IMarker.SEVERITY_WARNING;
         int sevErr  = IMarker.SEVERITY_ERROR;
 
-        List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+        // Copy list to avoid ConcurrentModificationException
+        List<IMarker> markers = new ArrayList<IMarker>(PhotranVPG.getInstance().recomputeErrorLogMarkers());
         countMarkers(markers);
 
         //String infoStr = String.valueOf(MARKER_COUNT[sevInfo]) + " Infos";

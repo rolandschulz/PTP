@@ -23,8 +23,9 @@ import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.PlatformUI;
 
 /**
+ * Action to remove a marker.
  * 
- * @author tyuvash2
+ * @author Timofey Yuvashev
  */
 public class RemoveMarkerAction extends SelectionDispatchAction
 {

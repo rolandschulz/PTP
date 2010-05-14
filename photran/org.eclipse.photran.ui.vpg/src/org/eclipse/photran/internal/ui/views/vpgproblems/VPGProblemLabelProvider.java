@@ -8,7 +8,6 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
 import org.eclipse.cdt.internal.ui.CPluginImages;
@@ -19,6 +18,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
+ * Label provider for the VPG Problems view.
+ * <p>
  * Based on samples provided in Java Developer’s Guide to Eclipse,
  * Chapter 18 (http://www.jdg2e.com/ch18.views/doc/index.htm);
  * © Copyright International Business Machines Corporation, 2003, 2004, 2006.
@@ -28,7 +29,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * @author Timofey Yuvashev
  */
 @SuppressWarnings("restriction")
-public class VGPProblemLabelProvider implements ITableLabelProvider
+public class VPGProblemLabelProvider implements ITableLabelProvider
 {
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
@@ -60,7 +61,7 @@ public class VGPProblemLabelProvider implements ITableLabelProvider
         {
             IMarker m = (IMarker)item;
             //Depending on which column we are populating, we return different values
-            // To see the columns in order, look in VGPProblemView.java
+            // To see the columns in order, look in VPGProblemView.java
             switch(index)
             {
                 //case 0: return String.valueOf(m.getId());                           //Marker ID

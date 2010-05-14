@@ -15,8 +15,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredViewer;
 
 /**
+ * Filter action for the VPG Problems view.
  * 
- * @author tyuvash2
+ * @author Timofey Yuvashev
  */
 public class VPGViewFilterAction extends Action
 {

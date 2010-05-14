@@ -8,7 +8,6 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
 import org.eclipse.core.resources.IMarker;
@@ -17,6 +16,8 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
+ * Sorter for the VPG Problems view.
+ * <p>
  * Based on Eclipse JFace TableView Tutorial; thanks to Lars Vogel
  * for posting the tutorial
  * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html)
@@ -63,7 +64,7 @@ public class TableSorter extends ViewerSorter
         IMarker m2 = (IMarker)e2;
         int result = EQUAL;
         //Based on which column we want to sort, we compare different data.
-        //For the list of columns, look in VGPProblemView.java
+        //For the list of columns, look in VPGProblemView.java
         switch(this.propertyIndex)
         {
             case 0:

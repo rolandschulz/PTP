@@ -47,7 +47,7 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		folder2.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		//folder2.addView(IPageLayout.ID_PROP_SHEET);
 		folder2.addView("org.eclipse.photran.ui.DeclarationView");
-        folder2.addView("org.eclipse.photran.ui.VGPProblemView");
+        folder2.addView("org.eclipse.photran.ui.VPGProblemView");
         folder2.addView(IPageLayout.ID_BOOKMARKS);
 		
 		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.75, editorArea); //$NON-NLS-1$

@@ -32,11 +32,11 @@ public class CopyMarkedFileAction extends Action
 {
     private static final String SEPARATOR = " ";
     
-    VGPProblemView myView = null;
+    VPGProblemView myView = null;
     /**
      * @param site
      */
-    public CopyMarkedFileAction(VGPProblemView view, String text)
+    public CopyMarkedFileAction(VPGProblemView view, String text)
     {
         super(text);
         myView = view;
