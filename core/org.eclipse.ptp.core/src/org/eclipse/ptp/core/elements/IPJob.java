@@ -64,43 +64,50 @@ public interface IPJob extends IPElement {
 	public ILaunchConfiguration getLaunchConfiguration();
 
 	/**
-	 * @param attributeDefinition
+	 * Retrieve the attribute associated with the given attribute
+	 * definition for one of the job's processes.
+	 * 
+	 * @param attributeDefinition the attribute returned is defined for this definition
 	 * @param processJobRank the process in question
-	 * @return
+	 * @return the process' attribute associated with this attribute definition
 	 */
 	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
 	A getProcessAttribute(D attributeDefinition, int processJobRank);
 
 	/**
-	 * @param attrDefId
+	 * Retrieve the attribute associated with the id for an attribute
+	 * definition for one of the job's processes.
+	 * 
+	 * @param attrDefId  the id associated with the attribute definition used to determine which attribute
+	 *   is returned
 	 * @param processJobRank the process in question
-	 * @return
+	 * @return the process' attribute associated with this attribute definition id
 	 */
 	public IAttribute<?,?,?> getProcessAttribute(String attrDefId, int processJobRank);
 	
 	/**
-	 * @param processJobRanks
-	 * @return
+	 * Return all the attribute definitions that are known by the specified processes.
+	 * 
+	 * @param processJobRanks the set of processes from which the attribute definitions are returned
+	 * @return set of IAttributeDefinition keys
 	 */
 	public Set<IAttributeDefinition<?, ?, ?>> getProcessAttributeKeys(
 			BitSet processJobRanks);
 	
 	/**
+	 * Return all of the attributes from all of the specified processes owned by this job.
+	 * 
 	 * @param processJobRanks limit the returned attributes
 	 *  to this subset of process job ranks
-	 * @return
+	 * @return the set of all attributes possessed by the specified processes
 	 */
 	public Set<IAttribute<?, ?, ?>> getProcessAttributes(BitSet processJobRanks);
-	
+		
 	/**
-	 * @param attributeDefinition
-	 * @return
-	 */
-	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	Set<A> getProcessAttributes(D attributeDefinition);
-	
-	/**
-	 * @param attributeDefinition
+	 * Return the set of all attributes for this attribute definition from the
+	 * specified set of this job's child processes
+	 * 
+	 * @param attributeDefinition the attributes returned are all defined for this definition
 	 * @param processJobRanks limit the returned attributes
 	 *  to this subset of process job ranks
 	 * @return
@@ -110,7 +117,10 @@ public interface IPJob extends IPElement {
 
 	
 	/**
-	 * @param attrDefId
+	 * Return the set of all attributes specified by this attribute definition id from the
+	 * specified set of this job's child processes
+	 * 
+	 * @param attrDefId the attributes returned are all defined for the definition with this id
 	 * @param processJobRanks limit the returned attributes
 	 *  to this subset of process job ranks
 	 * @return

@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -44,8 +44,8 @@ import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.attributes.AttributeIndexSet;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
+import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
@@ -225,15 +225,6 @@ public class PJob extends Parent implements IPJobControl {
 			results.addAll(attrs);
 		}
 		return results;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(org.eclipse.ptp.core.attributes.IAttributeDefinition)
-	 */
-	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
-	Set<A> getProcessAttributes(D attributeDefinition) {
-		AttributeIndexSet<A> jobRanksForAttr = getAttributeIndexSet(attributeDefinition);
-		return jobRanksForAttr.getAttributes();
 	}
 
 	/* (non-Javadoc)
