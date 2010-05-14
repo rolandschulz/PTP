@@ -36,7 +36,7 @@ typedef struct
 	int 	AIFArrayBounds;
 	int 	AIFArrayIndexType;
 	int 	AIFArrayMinIndex;
-	int 	AIFArrayMaxIndex;
+	int 	AIFArrayRankSize;
 	int 	AIFArraySize;
 	int 	AIFArraySlice;
 	int 	AIFArrayPerm;
