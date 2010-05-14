@@ -20,10 +20,11 @@ aggregate: {ID|N1=T1,...; N2=T2,...; N3=T3,...; N4=T4,...}
 	- Nn is the name of the field
 	- Tn is a format string representing the type of the field
 	- The type specifier is divided into four sections separated by ";"
-	  - The first section is used to store public data (eg: N1)
-	  - The second section is used to store protected data (eg: N2)
-	  - The third section is used to store private data (eg: N3)
-	  - The fourth section is used to store hidden data (eg: N3)
+	  - The first section is used to store public access fields (eg: N1)
+	  - The second section is used to store protected access fields (eg: N2)
+	  - The third section is used to store private access fields (eg: N3)
+	  - The fourth section is used to store package access fields (eg: N4)
+	- Structures only supply fields in the public section
 	  
 array: [R]T
 	- R is a range indicating low and high bounds. If R is empty then 
@@ -50,12 +51,12 @@ C-style string: paN
 	  byte first) of the string in bytes.  These bytes follow immediately.
 	- There is no null included in the string
 	
-enumeration: <ID|S1=V1,S2=V2,...>is4
+enumeration: <ID|S1=V1,S2=V2,...>isN
 	- ID is an optional name for the type
 	- Sn=Vn are name/value tuples where Sn is the name of the 
 	  enumerated value and Vn is the value of the enumeration. 
 	- The value of the enumeration is an integer whose type 
-	  is "is4" (signed integer with 4 bytes)
+	  is "isN" (signed integer of length N bytes)
 	  
 floating: fN
 	- Represents a floating point value of arbitrary length
@@ -97,9 +98,10 @@ pointer: ^aNT
 	  the address value.
 	- Names are 4 byte unsigned integers
 
-range: rL..UT
-	- Represents a range from L to U, inclusive
-	- L and U are integer types specified by T
+range: rL,NT
+	- IF N>0, represents a range from L to L+N-1, inclusive
+	- If N==0 the range is empty
+	- L and N are integer types specified by T
 
 reference to named component: >N/
 	- Used in circular linked types to make representation finite
