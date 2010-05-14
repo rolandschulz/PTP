@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     IBM Corporation - initial API and implementation 
- *     Albert L. Rossi (NCSA) - full implementation (bug 310188)
+ * Copyright (c) 2010 University of Illinois 
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License v1.0 which accompanies 
+ * this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+ * 	
+ * Contributors: 
+ * 	Albert L. Rossi - design and implementation
+ *                  - modified, eliminated unused methods 05/11/2010
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.utils;
 
@@ -19,7 +18,6 @@ import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -29,6 +27,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -38,98 +37,77 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * A set of convenience wrappers around jface and swt widget construction
+ * A set of convenience wrappers around JFace and SWT widget construction
  * routines.
  * 
  * @author arossi
- * 
  */
 public class WidgetUtils {
+	public static final Color DKBL = Display.getDefault().getSystemColor(
+			SWT.COLOR_DARK_BLUE);
+	public static final Color DKMG = Display.getDefault().getSystemColor(
+			SWT.COLOR_DARK_MAGENTA);
+	public static final Color DKRD = Display.getDefault().getSystemColor(
+			SWT.COLOR_DARK_RED);
+
 	private WidgetUtils() {
 	}
 
-	public static TableColumn addTableColumn(final TableViewer viewer, final String columnName, int style) {
+	public static TableColumn addTableColumn(final TableViewer viewer,
+			final String columnName, int style, SelectionListener l) {
 		Table t = viewer.getTable();
 
 		TableColumn c = new TableColumn(t, style);
 		c.setText(columnName);
-
+		if (l != null)
+			c.addSelectionListener(l);
 		return c;
 	}
 
-	public static Button createButton(Composite parent, String buttonText, Image image, int style, int colSpan, SelectionListener l) {
-
-		Button button = new Button(parent, style);
-		button.setText(buttonText);
-		if (image != null) {
-			button.setImage(image);
-		}
-
-		if (l != null)
-			button.addSelectionListener(l);
-
-		GridData data = new GridData();
-		data.horizontalAlignment = GridData.FILL;
-		data.horizontalSpan = colSpan;
-		button.setLayoutData(data);
-
-		return button;
-
-	}
-
-	public static Composite createComposite(Composite parent, int cols, int x, int y) {
-		ScrolledComposite scroller = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		scroller.setLayoutData(new GridData(GridData.FILL_BOTH));
-		scroller.setExpandHorizontal(true);
-		scroller.setExpandVertical(true);
-
-		Composite main = new Composite(scroller, SWT.NONE);
+	public static Group createAnonymousNonFillingGroup(Composite parent,
+			int columns) {
 		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 		data.horizontalAlignment = SWT.FILL;
 		data.grabExcessHorizontalSpace = true;
 		data.horizontalSpan = 1;
 		data.verticalAlignment = SWT.LEFT;
 		data.grabExcessVerticalSpace = false;
-		main.setLayoutData(data);
 
 		GridLayout layout = new GridLayout();
-		main.setLayout(layout);
-		layout.numColumns = cols;
+		layout.numColumns = columns;
 		layout.verticalSpacing = 1;
-		scroller.setContent(main);
-		scroller.setMinSize(x, y);
-		return main;
+
+		Group group = new Group(parent, SWT.SHADOW_NONE | SWT.NO_TRIM);
+		group.setLayout(layout);
+		group.setLayoutData(data);
+
+		return group;
 	}
 
-	public static Composite createContainer(Composite parent, String name, boolean fill, int minHeight) {
-		Group container = new Group(parent, SWT.NONE);
-		if (name != null)
-			container.setText(name);
+	public static Button createButton(Composite parent, String buttonText,
+			Image image, int style, int colSpan, boolean fill,
+			SelectionListener l) {
 
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-		data.horizontalAlignment = SWT.FILL;
-		data.grabExcessHorizontalSpace = true;
-		data.minimumHeight = minHeight;
-		data.heightHint = minHeight;
+		Button button = new Button(parent, style);
+		button.setText(buttonText);
+		if (image != null)
+			button.setImage(image);
 
-		if (fill) {
-			data.verticalAlignment = SWT.FILL;
-			data.grabExcessVerticalSpace = true;
-		} else {
-			data.verticalAlignment = SWT.CENTER;
-		}
+		if (l != null)
+			button.addSelectionListener(l);
 
-		container.setLayoutData(data);
+		GridData data = new GridData();
+		if (fill)
+			data.horizontalAlignment = SWT.FILL;
+		data.grabExcessHorizontalSpace = false;
+		data.horizontalSpan = colSpan;
+		button.setLayoutData(data);
 
-		GridLayout layout = new GridLayout();
-		container.setLayout(layout);
-		layout.numColumns = 1;
-		layout.verticalSpacing = 9;
-
-		return container;
+		return button;
 	}
 
-	public static Group createFillingGroup(Composite parent, String text, int columns, int colSpan, boolean verticalFill) {
+	public static Group createFillingGroup(Composite parent, String text,
+			int columns, int colSpan, boolean verticalFill) {
 		GridData data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
@@ -142,7 +120,7 @@ public class WidgetUtils {
 		layout.numColumns = columns;
 		layout.verticalSpacing = 9;
 
-		Group group = new Group(parent, SWT.SHADOW_NONE);
+		Group group = new Group(parent, SWT.NO_TRIM | SWT.SHADOW_NONE);
 		if (text != null)
 			group.setText(text);
 		group.setLayout(layout);
@@ -151,7 +129,8 @@ public class WidgetUtils {
 		return group;
 	}
 
-	public static Table createFillingTable(Composite parent, int numColumns, int suggestedWidth, int colSpan, int tableStyle) {
+	public static Table createFillingTable(Composite parent, int numColumns,
+			int suggestedWidth, int colSpan, int tableStyle) {
 		GridData data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
@@ -167,26 +146,31 @@ public class WidgetUtils {
 		t.setLayoutData(data);
 
 		TableLayout layout = new TableLayout();
-		for (int i = 0; i < numColumns; i++) {
-			layout.addColumnData(new ColumnPixelData(suggestedWidth / numColumns));
-		}
+		for (int i = 0; i < numColumns; i++)
+			layout.addColumnData(new ColumnPixelData(suggestedWidth
+					/ numColumns));
 		t.setLayout(layout);
 
 		return t;
 	}
 
-	public static Combo createItemCombo(Composite container, String labelString, String[] items, String initial, String tooltip,
-			ModifyListener listener, int colSpan) {
+	public static Combo createItemCombo(Composite container,
+			String labelString, String[] items, String initial, String tooltip,
+			boolean fill, ModifyListener listener, int colSpan) {
 		if (labelString != null) {
 			Label label = new Label(container, SWT.NONE);
 			label.setText(labelString);
-			if (tooltip != null) {
+			if (tooltip != null)
 				label.setToolTipText(tooltip);
-			}
 		}
 
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.FILL_HORIZONTAL);
-		data.horizontalSpan = colSpan;
+		GridData data = new GridData();
+		if (fill)
+			data.horizontalAlignment = SWT.FILL;
+		data.grabExcessHorizontalSpace = false;
+		if (colSpan != -1)
+			data.horizontalSpan = colSpan;
+		data.widthHint = 100;
 
 		Combo combo = new Combo(container, SWT.BORDER);
 		combo.setItems(items);
@@ -199,52 +183,34 @@ public class WidgetUtils {
 		return combo;
 	}
 
-	public static Label createLabel(Composite container, String text, int style, int colSpan) {
+	public static Label createLabel(Composite container, String text,
+			int style, int colSpan) {
 		GridData data = new GridData();
 		data.horizontalSpan = colSpan;
 
 		Label label = new Label(container, style);
 		if (text == null)
-			text = ""; //$NON-NLS-1$
+			text = ConfigUtils.EMPTY_STRING;
 		label.setText(text.trim());
 		label.setLayoutData(data);
 
 		return label;
 	}
 
-	public static Text createLabelledText(Composite container, String labelString, String initialValue, int colSpan,
-			ModifyListener listener, Color color) {
-		Label label = new Label(container, SWT.NONE);
-		label.setText(labelString);
-		if (color != null)
-			label.setBackground(color);
-
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.FILL_HORIZONTAL);
-		data.horizontalSpan = colSpan;
-
-		Text text = new Text(container, SWT.BORDER);
-		if (color != null)
-			text.setBackground(color);
-		text.setLayoutData(data);
-		if (initialValue != null)
-			text.setText(initialValue);
-		if (listener != null)
-			text.addModifyListener(listener);
-
-		return text;
-	}
-
-	public static Spinner createSpinner(Composite container, String labelString, int min, int max, int initial, int colSpan,
-			ModifyListener listener) {
+	public static Spinner createSpinner(Composite container,
+			String labelString, int min, int max, int initial, int colSpan,
+			boolean fill, ModifyListener listener) {
 		if (labelString != null) {
 			GridData data = new GridData();
-
 			Label label = new Label(container, SWT.NONE);
 			label.setText(labelString);
 			label.setLayoutData(data);
 		}
 
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.FILL_HORIZONTAL);
+		GridData data = new GridData();
+		if (fill)
+			data.horizontalAlignment = SWT.FILL;
+		data.grabExcessHorizontalSpace = false;
 		data.horizontalSpan = colSpan;
 
 		Spinner s = new Spinner(container, SWT.NONE);
@@ -258,8 +224,13 @@ public class WidgetUtils {
 		return s;
 	}
 
-	public static Text createText(Composite container, String initialValue, ModifyListener listener, Color color) {
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.FILL_HORIZONTAL);
+	public static Text createText(Composite container, String initialValue,
+			boolean fill, ModifyListener listener, Color color) {
+
+		GridData data = new GridData();
+		if (fill)
+			data.horizontalAlignment = SWT.FILL;
+		data.grabExcessHorizontalSpace = true;
 		Text text = new Text(container, SWT.BORDER);
 		if (color != null)
 			text.setBackground(color);
@@ -272,10 +243,11 @@ public class WidgetUtils {
 		return text;
 	}
 
-	public static void errorMessage(Shell s, Throwable e, String message, String title, boolean causeTrace) {
-		Throwable t = e.getCause();
-		String lineSep = System.getProperty("line.separator"); //$NON-NLS-1$
-		String append = ""; //$NON-NLS-1$
+	public static void errorMessage(Shell s, Throwable e, String message,
+			String title, boolean causeTrace) {
+		String append = e == null ? ConfigUtils.EMPTY_STRING : e.getMessage();
+		Throwable t = e == null ? null : e.getCause();
+		String lineSep = System.getProperty("line.separator");
 		if (causeTrace) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
@@ -283,10 +255,8 @@ public class WidgetUtils {
 				t.printStackTrace(pw);
 				append = sw.toString();
 			}
-		} else {
-			if (t != null)
-				append = t.getMessage();
-		}
-		MessageDialog.openError(s, title, message + lineSep + e.getMessage() + lineSep + append);
+		} else if (t != null)
+			append = t.getMessage();
+		MessageDialog.openError(s, title, message + lineSep + lineSep + append);
 	}
 }

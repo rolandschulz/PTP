@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="org.eclipse.ptp.ui.preferences.rmPreferencesPage"
-            class="org.eclipse.ptp.rm.pbs.ui.preferences.PBSPreferencePage"
-            id="org.eclipse.ptp.pbs.ui.preferences.PBSPreferencePage"
-            name="PBS">
-      </page>
-   </extension>
    <extension
          point="org.eclipse.ptp.launch.rmLaunchConfigurations">
       <launchConfiguration

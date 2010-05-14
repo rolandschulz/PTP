@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation 
  *     Albert L. Rossi (NCSA) - full implementation (bug 310188)
+ *     						  - modifications to store template and memento
+ *     							(05/11/2010)
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui;
 
@@ -19,23 +21,23 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProv
 import org.eclipse.ptp.rm.pbs.core.PBSPreferenceManager;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
+import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 /**
  * Service provider for IBM Parallel Environment
  */
-public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPBSResourceManagerConfiguration {
-	private static final String TAG_PBSD_PATH = "pbsdPath"; //$NON-NLS-1$
-	private static final String TAG_PBSD_ARGS = "pbsdArgs"; //$NON-NLS-1$
-	private static final String TAG_PBSD_DEFAULTS = "pbsdDefaults"; //$NON-NLS-1$
-	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
-	private final Preferences preferences = PBSPreferenceManager.getPreferences();
+public class PBSServiceProvider extends
+		AbstractRemoteResourceManagerServiceProvider implements
+		IPBSResourceManagerConfiguration {
+	private final Preferences preferences = PBSPreferenceManager
+			.getPreferences();
 
 	public PBSServiceProvider() {
 		super();
-		setDescription("PBS Resource Manager"); //$NON-NLS-1$
+		setDescription(Messages.PBSResourceManager);
 	}
 
 	/**
@@ -66,30 +68,20 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	 */
 	@Override
 	public IResourceManagerControl createResourceManager() {
-		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
-		return new PBSResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin
+				.getDefault().getUniverse();
+		return new PBSResourceManager(Integer.valueOf(universe
+				.getNextResourceManagerId()), universe, this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration
-	 * #getPBSdArgs()
+	/**
+	 * @return name of the default template (file) for this resource manager
+	 *         (set in the edit wizard).
 	 */
-	public String getPBSdArgs() {
-		return getString(TAG_PBSD_ARGS, preferences.getString(EMPTY_STRING));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration
-	 * #getPBSdPath()
-	 */
-	public String getPBSdPath() {
-		return getString(TAG_PBSD_PATH, preferences.getString(EMPTY_STRING));
+	public String getDefaultTemplateName() {
+		return getString(getResourceManagerId()
+				+ Messages.PBSServiceProvider_defaultTemplateName,
+				ConfigUtils.EMPTY_STRING);
 	}
 
 	/*
@@ -101,17 +93,6 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	@Override
 	public String getResourceManagerId() {
 		return getId();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration
-	 * #getUseDefaults()
-	 */
-	public boolean getUseDefaults() {
-		return getBoolean(TAG_PBSD_DEFAULTS, true);
 	}
 
 	/*
@@ -134,43 +115,21 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	public void setDefaultNameAndDesc() {
 		String name = "PBS"; //$NON-NLS-1$
 		String conn = getConnectionName();
-		if (conn != null && !conn.equals("")) { //$NON-NLS-1$
+		if (conn != null && !conn.equals(""))
 			name += "@" + conn; //$NON-NLS-1$
-		}
 		setName(name);
-		setDescription("PBS Resource Manager"); //$NON-NLS-1$
+		setDescription(Messages.PBSResourceManager);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration
-	 * #setPBSdArgs(java.lang.String)
+	/**
+	 * @param name
+	 *            of the default template (file) for this resource manager (set
+	 *            in the edit wizard).
 	 */
-	public void setPBSdArgs(String pbsdArgs) {
-		putString(TAG_PBSD_ARGS, pbsdArgs);
+	public void setDefaultTemplateName(String name) {
+		putString(
+				getResourceManagerId() + Messages.PBSServiceProvider_defaultTemplateName,
+				name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration
-	 * #setPBSdPath(java.lang.String)
-	 */
-	public void setPBSdPath(String pbsdPath) {
-		putString(TAG_PBSD_PATH, pbsdPath);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration
-	 * #setUseDefaults(boolean)
-	 */
-	public void setUseDefaults(boolean useDefaults) {
-		putBoolean(TAG_PBSD_DEFAULTS, useDefaults);
-	}
 }
