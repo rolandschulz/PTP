@@ -104,7 +104,7 @@ extern int		_fds_count_bytes(char **);
 extern int		_fds_count_bytes_na(char **);
 extern void		_fds_advance(char **);
 extern int		_fds_array_min_index(char *);
-extern int		_fds_array_max_index(char *);
+extern int		_fds_array_size(char *);
 extern int		_fds_getnum(char *);
 extern char *	_fds_lookup(char **);
 extern void		_fds_resolve(char **);
