@@ -514,7 +514,11 @@ ProcessCLIResultRecord(MIResultRecord *rr, void *data)
 }
 
 /*
- * Process OOB callbacks and remove records from oobs list.
+ * Process OOB callbacks.
+ *
+ * Async OOB's are removed from oobs list.
+ * Stream OOB's are left on the oobs list so they are available
+ * as part of the command result.
  */
 static void
 DoOOBCallbacks(MISession *sess, List *oobs)
@@ -570,6 +574,9 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 				}
 				break;
 			}
+
+			RemoveFromList(oobs, (void *)oob);
+			MIOOBRecordFree(oob);
 			break;
 
 		case MIOOBRecordTypeStream:
@@ -594,9 +601,6 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 			}
 			break;
 		}
-
-		RemoveFromList(oobs, (void *)oob);
-		MIOOBRecordFree(oob);
 	}
 }
 
