@@ -37,9 +37,9 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_ARRAY_START, '%', 's', FDS_ARRAY_END, '%', 's', '\0' },
 
-	{ FDS_STRUCT_START, '%', 's', FDS_ID, ';', ';', ';', FDS_STRUCT_END, '\0' },
+	{ FDS_STRUCT_START, '%', 's', FDS_TYPENAME_END, ';', ';', ';', FDS_STRUCT_END, '\0' },
 
-	{ FDS_UNION_START, '%', 's', FDS_ID, FDS_UNION_END, '\0' },
+	{ FDS_UNION_START, '%', 's', FDS_TYPENAME_END, FDS_UNION_END, '\0' },
 
 	{ FDS_FUNCTION, FDS_FUNCTION_ARG_END, '%', 's', '\0' },
 
@@ -55,11 +55,9 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_CHARACTER, '\0' },
 
-	{ FDS_RANGE, '%', 'd', 
-	  FDS_RANGE_SEP, FDS_RANGE_SEP, 
-	  '%', 'd', '%', 's', '\0' },
+	{ FDS_RANGE, '%', 'd', FDS_RANGE_SEP, '%', 'd', '%', 's', '\0' },
 
-	{ FDS_ENUM_START, '%', 's', FDS_ID, FDS_ENUM_END, FDS_INTEGER, '%', 'c', '4', '\0' },
+	{ FDS_ENUM_START, '%', 's', FDS_TYPENAME_END, FDS_ENUM_END, FDS_INTEGER, '%', 'c', '4', '\0' },
 
 	{ FDS_BOOLEAN, '%', 'd', '\0' },
 	
@@ -80,7 +78,10 @@ static char _fds_struct_field_end[] = { FDS_STRUCT_ACCESS_SEP, FDS_STRUCT_FIELD_
 static char _fds_union_field_name_end[] = {FDS_UNION_FIELD_NAME_END, '\0' };
 static char _fds_union_field_end[] = { FDS_UNION_FIELD_SEP, FDS_UNION_END, '\0' };
 
-static char	_fds_buf[BUFSIZ];
+#define MAX_CALLS	2
+
+static char *	_fds_buf[MAX_CALLS];
+static int		_fds_pos = 0;
 
 char *
 _fds_skipnum(char *str)
@@ -355,8 +356,6 @@ int
 FDSTypeSize(char *type)
 {
 	int	s;
-	int	min;
-	int	max;
 	int	rank;
 	int	size;
 	int	subsize;
@@ -451,9 +450,7 @@ FDSTypeSize(char *type)
 		if ( (s = FDSTypeSize(_fds_base_type(type))) < 0 )
 			return -1;
 
-		min = _fds_array_min_index(type);
-		max = _fds_array_max_index(type);
-		return s * (max - min + 1);
+		return s * _fds_array_size(type);
 
 	case FDS_ENUM_START: /* enumeration */
 		return 4; /* all enumerations are based on 4-byte integers */
@@ -485,8 +482,10 @@ FDSIsSigned(char *fds)
 }
 
 /*
- * We support nested calls to TypeToFDS() by making a copy of any 
- * string arguments before overwriting the static buffer. e.g.
+ * Create an FDS type description. The result does not
+ * need to be freed.
+ *
+ * Calls to TypeToFDS() may be nested as follows:
  * 
  *    TypeToFDS(AIF_ARRAY, 
  *      TypeToFDS(AIF_RANGE, 0, 10, 
@@ -494,15 +493,20 @@ FDSIsSigned(char *fds)
  *      ),
  *      TypeToFDS(AIF_INTEGER, 10)
  *   );
+ *
+ * TypeToFDS currently only allows two nested calls. If
+ * an FDS type is created requiring more than two, this will
+ * need to be increased.
  */
 char *
 TypeToFDS(int type, ...)
 {
-        va_list 	args;
+	va_list	args;
 	int		v1;
 	int		v2;
-	char *		v3;
-	char *		v4;
+	char *	v3;
+	char *	v4;
+	char *	buf;
 
 	if ( type < 0 || type >= NUM_AIF_TYPES )
 		type = AIF_INVALID;
@@ -514,119 +518,100 @@ TypeToFDS(int type, ...)
 	case AIF_INTEGER:
 		v1 = va_arg(args, int);
 		v2 = va_arg(args, int);
-
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED, v2);
+		asprintf(&buf, _fds_type_str[type], v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED, v2);
 		break;
 
 	case AIF_FLOATING:
 	case AIF_VOID:
 	case AIF_REFERENCE:
 		v1 = va_arg(args, int);
-
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1);
+		asprintf(&buf, _fds_type_str[type], v1);
 		break;
 
 	case AIF_POINTER:
 		v3 = va_arg(args, char *);
-		if (v3 == NULL)
-			v3 = strdup("x");
-		else
-			v3 = strdup(v3);
-
-		v4 = strdup(va_arg(args, char *));		
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v4);
-		_aif_free(v3);
-		_aif_free(v4);
+		v4 = va_arg(args, char *);
+		asprintf(&buf, _fds_type_str[type], v3, v4);
 		break;
 
 	case AIF_FUNCTION:
-		v3 = strdup(va_arg(args, char *));
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3);
-		_aif_free(v3);
+		v3 = va_arg(args, char *);
+		asprintf(&buf, _fds_type_str[type], v3);
 		break;
 
 	case AIF_ENUM:
 		v3 = va_arg(args, char *);
-		if (v3 == NULL)
-			v3 = strdup("");
-		else
-			v3 = strdup(v3);
+		if (v3 == NULL) {
+			v3 = "";
+		}
 		v1 = va_arg(args, int);
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED);
-		_aif_free(v3);
+		asprintf(&buf, _fds_type_str[type], v3, v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED);
 		break;
 
 	case AIF_CHAR_POINTER:
-		v3 = strdup(va_arg(args, char *));
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3);
-		_aif_free(v3);
+		v3 = va_arg(args, char *);
+		asprintf(&buf, _fds_type_str[type], v3);
 		break;
 
 	case AIF_ADDRESS:
 	case AIF_BOOLEAN:
 		v1 = va_arg(args, int);
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1);
+		asprintf(&buf, _fds_type_str[type], v1);
 		break;
 
 	case AIF_STRING:
 	case AIF_CHARACTER:
-		strcpy(_fds_buf, _fds_type_str[type]);
+		asprintf(&buf, _fds_type_str[type]);
 		break;
 
 	case AIF_STRUCT:
 	case AIF_UNION:
 		v3 = va_arg(args, char *);
-		if (v3 == NULL)
-			v3 = strdup("");
-		else
-			v3 = strdup(v3);
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3);
-		_aif_free(v3);
+		if (v3 == NULL) {
+			v3 = "";
+		}
+		asprintf(&buf, _fds_type_str[type], v3);
 		break;
 
 	case AIF_RANGE:
 		v1 = va_arg(args, int);
 		v2 = va_arg(args, int);
-		v3 = strdup(va_arg(args, char *));
-
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1, v2, v3);
-
-		_aif_free(v3);
+		v3 = va_arg(args, char *);
+		asprintf(&buf, _fds_type_str[type], v1, v2, v3);
 		break;
 
 	case AIF_ARRAY:
-		v3 = strdup(va_arg(args, char *));
-		v4 = strdup(va_arg(args, char *));
-
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v4);
-
-		_aif_free(v3);
-		_aif_free(v4);
+		v3 = va_arg(args, char *);
+		v4 = va_arg(args, char *);
+		asprintf(&buf, _fds_type_str[type], v3, v4);
 		break;
 
 	case AIF_NAME:
 	case AIF_REGION:
 		v1 = va_arg(args, int);
 		v3 = va_arg(args, char *);
-
-		if ( v3 == NULL )
-			v3 = strdup("");
-		else
-			v3 = strdup(v3);
-
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1, v3);
-
-		_aif_free(v3);
+		if ( v3 == NULL ) {
+			v3 = "";
+		}
+		asprintf(&buf, _fds_type_str[type], v1, v3);
 		break;
 
 	case AIF_INVALID:
 	default:
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[AIF_INVALID], 0);
+		asprintf(&buf, _fds_type_str[AIF_INVALID], 0);
 	}
 
 	va_end(args);
 
-	return _fds_buf;
+	if (_fds_pos > MAX_CALLS) {
+		_fds_pos = 0;
+	}
+	if (_fds_buf[_fds_pos] != NULL) {
+		free(_fds_buf[_fds_pos]);
+	}
+	_fds_buf[_fds_pos++] = buf;
+
+	return buf;
 }
 
 int
@@ -693,7 +678,7 @@ FDSTypeCompare(char *f1, char *f2)
 
 		for ( n = 0 ; n < ix1->i_rank ; n++ )
 		{
-			if ( ix1->i_max[n] - ix1->i_min[n] != ix2->i_max[n] - ix2->i_min[n] )
+			if ( ix1->i_size[n] != ix2->i_size[n] )
 			{
 				AIFArrayIndexFree(ix1);
 				AIFArrayIndexFree(ix2);
@@ -821,21 +806,24 @@ FDSArrayMinIndex(char *fds, int n)
 }
 
 int
-_fds_array_max_index(char *type)
+_fds_array_size(char *type)
 {
 	char *	p;
 
 	if ( *++type != FDS_RANGE )
 		return -1;
 
-	p = _fds_skipnum(++type); /* skip MinValue */
-	p += 2;                /* skip '..' */
+	p = _fds_skipnum(++type);	/* skip MinValue */
+	p++;						/* skip ',' */
 
 	return _fds_getnum(p);
 }
 
+/*
+ * Number of elements in dimension n
+ */
 int
-FDSArrayMaxIndex(char *fds, int n)
+FDSArrayRankSize(char *fds, int n)
 {
 	while ( FDSType(fds) == AIF_ARRAY && n > 0 )
 	{
@@ -843,7 +831,7 @@ FDSArrayMaxIndex(char *fds, int n)
 		n--;
 	}
 
-	return (n == 0) ? _fds_array_max_index(fds) : -1;
+	return (n == 0) ? _fds_array_size(fds) : -1;
 }
 
 /*
@@ -869,33 +857,31 @@ FDSArrayRank(char *fds)
 int
 FDSArraySize(char *fds)
 {
-	int	min;
-	int	max;
+	int	num;
 	int	size = 1;
 
 	while ( FDSType(fds) == AIF_ARRAY )
 	{
-		min = _fds_array_min_index(fds);
-		max = _fds_array_max_index(fds);
+		num = _fds_array_size(fds);
 		fds = _fds_base_type(fds);
 
-		size *= max - min + 1;
+		size *= num;
 	}
 
 	return size;
 }
 
 char *
-FDSRangeInit(int min, int max)
+FDSRangeInit(int min, int size)
 {
-	return strdup(TypeToFDS(AIF_RANGE, min, max, "is4"));
+	return strdup(TypeToFDS(AIF_RANGE, min, size, "is4"));
 }
 
 char *
-FDSArrayInit(int min, int max, char *btype)
+FDSArrayInit(int min, int size, char *btype)
 {
 	char *	res;
-	char *	range = FDSRangeInit(min, max);
+	char *	range = FDSRangeInit(min, size);
 	
 	res = strdup(TypeToFDS(AIF_ARRAY, range, btype));
 	_aif_free(range);
@@ -903,46 +889,30 @@ FDSArrayInit(int min, int max, char *btype)
 }
 
 /*
- * Parse array type descriptor and extract the minimum and maximum
- * array index values for each dimension. Also, if size is not NULL,
- * will return the size of dimension.
+ * Parse array type descriptor and extract the minimum index value and number
+ * of elements for each dimension.
  */
 void
-FDSArrayBounds(char *fds, int rank, int **min, int **max, int **size)
+FDSArrayBounds(char *fds, int rank, int **min, int **size)
 {
 	int		i;
 	int *		mn;
-	int *		mx;
-	int *		s=NULL;
+	int *		sz;
 
 	*min = (int *)_aif_alloc(rank*sizeof(int));
-
-	*max = (int *)_aif_alloc(rank*sizeof(int));
-
-	if( size != NULL )
-		*size = (int *)_aif_alloc(rank*sizeof(int));
+	*size = (int *)_aif_alloc(rank*sizeof(int));
 
 	mn = *min;
-	mx = *max;
+	sz = *size;
 
-	if ( size != NULL )
-		s = *size;
-
-	for ( i = 0 ; i < rank ; i++)
-	{
+	for ( i = 0 ; i < rank ; i++) {
 		*mn = _fds_array_min_index(fds);
-		*mx = _fds_array_max_index(fds);
-
-		if ( size != NULL )
-		{
-			*s = *mx - *mn + 1;
-			s++;
-		}
+		*sz = _fds_array_size(fds);
 
 		fds = _fds_base_type(fds);
 
 		mn++;
-		mx++;
+		sz++;
 	}
 }
 
@@ -995,11 +965,11 @@ FDSArrayIndexInit(char *fmt)
 	ix->i_bsize = FDSTypeSize(ix->i_btype);
 	ix->i_index = (int *)_aif_alloc(ix->i_rank * sizeof(int));
 
-	FDSArrayBounds(fmt, ix->i_rank, &(ix->i_min), &(ix->i_max), (int **)NULL);
+	FDSArrayBounds(fmt, ix->i_rank, &(ix->i_min), &(ix->i_size));
 
 	for ( d = ix->i_rank - 1 ; d >= 0 ; d-- )
 	{
-		nel *= ix->i_max[d] - ix->i_min[d] + 1;
+		nel *= ix->i_size[d];
 		ix->i_index[d] = ix->i_min[d];
 	}
 
@@ -1030,7 +1000,7 @@ FDSArrayIndexInit(char *fmt)
 	} \
 	if ( *(fds++) != FDS_STRUCT_START ) \
 		return (res); \
-	while ( *(fds) != FDS_ID ) \
+	while ( *(fds) != FDS_TYPENAME_END ) \
 		(fds)++; \
 	(fds)++; \
 	if ( *(fds) == '\0' ) \
@@ -1043,7 +1013,7 @@ FDSArrayIndexInit(char *fmt)
 char *
 _fds_skiptomatch(char *fds)
 {
-	char	ender = NULL;
+	char	ender = 0;
 
 	/*
 	** assert *fds == '{' or '['; find the matching '}' or ']'
@@ -1152,7 +1122,7 @@ FDSNumFields(char *fds)
 	if ( *(fds++) != FDS_STRUCT_START )
 		return -1;
 
-	while ( *(fds) != FDS_ID )
+	while ( *(fds) != FDS_TYPENAME_END )
 		(fds)++;
 	(fds)++;
 
@@ -1227,32 +1197,30 @@ FDSStructFieldByName(char *fds, char *name, char **type)
 
 	STRUCT_START(fds, -1);
 
-	while ( *fds != '\0' && *fds != FDS_STRUCT_END )
-	{
+	while ( *fds != '\0' && *fds != FDS_STRUCT_END ) {
 		nm = fds;
 
 		fds = _fds_skipto(fds, _fds_struct_field_name_end);
 
-		if ( *fds == '\0' )
+		if ( *fds == '\0' ) {
 			return -1;
+		}
 
 		*fds = '\0'; /* temporarily */
 
-		if ( strcmp(nm, name) == 0 )
-		{
+		if ( strcmp(nm, name) == 0 ) {
 			*fds = FDS_STRUCT_FIELD_NAME_END;
 
-                        if ( (*type = _field_attribute(
-						nm,
-						_fds_struct_field_name_end, 
-						_fds_struct_field_end
-						)) == NULL )
+			if ( (*type = _field_attribute(nm,
+							_fds_struct_field_name_end,
+							_fds_struct_field_end)) == NULL ) {
 				return -1;
+			}
 
 			return 0;
 		}
-		else
-			*fds = FDS_STRUCT_FIELD_NAME_END;
+
+		*fds = FDS_STRUCT_FIELD_NAME_END;
 
 		fds = _fds_skipto(fds, _fds_struct_field_end);
 		fds++;
@@ -1601,7 +1569,7 @@ _data_len_public(char *fds)
 	if ( *(fds++) != FDS_STRUCT_START ) 
         	return -1;
 
-        while ( *(fds) != FDS_ID ) 
+        while ( *(fds) != FDS_TYPENAME_END )
                	(fds)++; 
         (fds)++; 
 
@@ -1676,7 +1644,7 @@ _field_attribute(char *s, char *starter, char *ender)
 	} \
 	if ( *(fds++) != FDS_ENUM_START ) \
 		return (res); \
-	while ( *(fds) != FDS_ID ) \
+	while ( *(fds) != FDS_TYPENAME_END ) \
 		(fds)++; \
 	(fds)++; \
 	if ( *(fds) == '\0' || *(fds) == FDS_ENUM_END ) \
@@ -1804,7 +1772,7 @@ FDSAddConstToEnum(char *fds, char *name, int val)
 		return NULL;
 	}
 
-	if ( *(end-1) != FDS_ID )
+	if ( *(end-1) != FDS_TYPENAME_END )
 		*end++ = FDS_ENUM_CONST_SEP;
 
 	sprintf(end, "%s%s", field, strrchr(fds, FDS_ENUM_END));
@@ -1837,7 +1805,7 @@ FDSEnumAdd(char **fds, char *name, int val)
 	} \
 	if ( *(fds++) != FDS_UNION_START ) \
 		return (res); \
-	while ( *(fds) != FDS_ID ) \
+	while ( *(fds) != FDS_TYPENAME_END ) \
 		(fds)++; \
 	(fds)++; \
 	if ( *(fds) == '\0' || *(fds) == FDS_UNION_END ) \
@@ -1902,18 +1870,10 @@ FDSAddFieldToUnion(char *fds, char *name, char *type)
 
 	if ( FDSUnionFieldByName(fds, name, &dummy) == 0 )
 	{
+		_aif_free(dummy);
 		SetAIFError(AIFERR_BADARG, NULL);
 		return NULL;
 	}
-
-	/* XXX TODO
-	if ( FDSEnumFieldByValue(fds, name, &nfmt) == 0 )
-	{
-		SetAIFError(AIFERR_BADARG, NULL);
-		_aif_free(nfmt);
-		return NULL;
-	}
-	*/
 
 	snprintf(field, BUFSIZ, "%s%c%s", name, FDS_UNION_FIELD_NAME_END, type);
 
@@ -1933,7 +1893,7 @@ FDSAddFieldToUnion(char *fds, char *name, char *type)
 		return NULL;
 	}
 
-	if ( *(end-1) != FDS_ID )
+	if ( *(end-1) != FDS_TYPENAME_END )
 		*end++ = FDS_UNION_FIELD_SEP;
 
 	sprintf(end, "%s%c", field, FDS_UNION_END);
@@ -2075,7 +2035,7 @@ FDSAddFieldToClass(char *fds, aifaccess acc, char *name, char *type)
 			break;
 	}
 
-	if ( *(end-1) != FDS_ID && *(end-1) != FDS_STRUCT_ACCESS_SEP )
+	if ( *(end-1) != FDS_TYPENAME_END && *(end-1) != FDS_STRUCT_ACCESS_SEP )
 		*end++ = FDS_STRUCT_FIELD_SEP;
 
 	sprintf(end, "%s%c%s%s",
@@ -2129,7 +2089,7 @@ FDSSetIdentifier(char **fds, char *id)
 	     *temp == FDS_STRUCT_START || 
 	     *temp == FDS_ENUM_START )
 	{
-		if ( *(temp+1) != FDS_ID )
+		if ( *(temp+1) != FDS_TYPENAME_END )
 		{
 			_aif_free(new);
                 	SetAIFError(AIFERR_BADARG, NULL);
@@ -2170,14 +2130,14 @@ FDSGetIdentifier(char *fds)
 	{
 		fds++;
 
-		if ( *fds == FDS_ID )
+		if ( *fds == FDS_TYPENAME_END )
 		{
-                	SetAIFError(AIFERR_BADARG, NULL);
+			SetAIFError(AIFERR_BADARG, NULL);
 			return NULL;
 		}
 
 		temp = fds;
-		fds = strchr(fds, FDS_ID);
+		fds = strchr(fds, FDS_TYPENAME_END);
 
 		id_len = fds - temp;
 		id = _aif_alloc( id_len + 1 );
@@ -2187,7 +2147,7 @@ FDSGetIdentifier(char *fds)
 	}
 	else
 	{
-                SetAIFError(AIFERR_BADARG, NULL);
+		SetAIFError(AIFERR_BADARG, NULL);
 		return NULL;
 	}
 }
@@ -2527,7 +2487,7 @@ _fds_skip_data(char **fds, char **data)
 		return;
 
 	case AIF_STRUCT:
-		(*fds)++; /* past open brace */
+		(*fds)++; /* past FDS_STRUCT_START */
 		_fds_skipid(fds);
 
 		while ( **fds != FDS_STRUCT_END )
@@ -2546,7 +2506,24 @@ _fds_skip_data(char **fds, char **data)
 				(*fds)++;
 		}
 
-		(*fds)++; /* past close brace */
+		(*fds)++; /* past FDS_STRUCT_END */
+		return;
+
+	case AIF_UNION:
+		(*fds)++; /* past FDS_UNION_START */
+		_fds_skipid(fds);
+
+		while ( **fds != FDS_UNION_END )
+		{
+			*fds = strchr(*fds, FDS_UNION_FIELD_NAME_END) + 1;
+				/* to start of field */
+			_fds_skip_data(fds, data);
+
+			if ( **fds == FDS_UNION_FIELD_SEP )
+				(*fds)++;
+		}
+
+		(*fds)++; /* past FDS_UNION_END */
 		return;
 
 	case AIF_CHAR_POINTER:
@@ -2579,8 +2556,8 @@ _fds_skip_data(char **fds, char **data)
 void
 _fds_skipid(char **fds)
 {
-	if (**fds != FDS_ID)
-		*fds = strchr(*fds, FDS_ID);
+	if (**fds != FDS_TYPENAME_END)
+		*fds = strchr(*fds, FDS_TYPENAME_END);
 	*fds += 1;
 }
 
