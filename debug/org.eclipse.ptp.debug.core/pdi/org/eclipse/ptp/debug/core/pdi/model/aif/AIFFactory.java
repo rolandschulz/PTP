@@ -23,12 +23,13 @@ import java.util.Random;
 import org.eclipse.ptp.debug.core.PDebugUtils;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIF;
+import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeAddress;
+import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeAggregate;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeArray;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeBool;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeChar;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeCharPointer;
-import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeClass;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeEnum;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeFloat;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeFunction;
@@ -36,25 +37,25 @@ import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeIncomplete;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeInt;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeNamed;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypePointer;
+import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeRange;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeReference;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeString;
-import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeStruct;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeUnion;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeVoid;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueAddress;
+import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueAggregate;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueChar;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueCharPointer;
-import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueClass;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueEnum;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueFloat;
+import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueFunction;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueInt;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueNamed;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValuePointer;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueReference;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueString;
-import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueStruct;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueUnion;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueUnknown;
 import org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueVoid;
@@ -67,35 +68,43 @@ public class AIFFactory {
 	public static class SimpleByteBuffer {
 		byte[] bytes;
 		int pos = 0;
+
 		SimpleByteBuffer(byte[] bytes) {
 			if (bytes == null) {
 				bytes = new byte[0];
 			}
 			this.bytes = bytes;
 		}
+
 		public boolean end() {
 			return (pos == bytes.length);
 		}
+
 		public byte get() {
 			return bytes[pos++];
 		}
+
 		public byte get(int pos) {
 			return bytes[pos];
 		}
+
 		public byte[] getByte() {
 			return bytes;
 		}
+
 		public int getCapacity() {
 			return bytes.length;
 		}
+
 		public int getPosition() {
 			return pos;
 		}
+
 		public void setPos(int pos) {
 			this.pos = pos;
 		}
 	}
-	
+
 	public static final char FDS_ARRAY = '[';
 	public static final char FDS_BOOL = 'b';
 	public static final char FDS_CHAR = 'c';
@@ -105,181 +114,74 @@ public class AIFFactory {
 	public static final char FDS_INT = 'i';
 	public static final char FDS_POINTER = '^';
 	public static final char FDS_STRING = 's';
-	public static final char FDS_STRUCT_CLASS = '{';
+	public static final char FDS_AGGREGATE = '{';
 	public static final char FDS_UNION = '(';
 	public static final char FDS_VOID = 'v';
 	public static final char FDS_REFERENCE = '>';
 	public static final char FDS_NAMED = '%';
 	public static final char FDS_ADDRESS = 'a';
+	public static final char FDS_RANGE = 'r';
 
 	public static final char FDS_CHAR_POINTER = 'p';
 	public static final int FDS_FLOAT_SIZE_POS = 1;
 	public static final int FDS_VOID_SIZE_POS = 1;
 	public static final int FDS_INTEGER_SIGN_POS = 1;
 	public static final int FDS_INTEGER_SIZE_POS = 2;
-	
-	public static final int FDS_RANGE_DOT_LEN = 2;
-	public static final String SIGN_OPEN = "["; //$NON-NLS-1$
-	public static final String SIGN_CLOSE = "]"; //$NON-NLS-1$
-	public static final String SIGN_STROKE = "|"; //$NON-NLS-1$
-	public static final String SIGN_COMMA = ","; //$NON-NLS-1$
-	public static final String SIGN_EQUAL = "="; //$NON-NLS-1$
-	public static final String SIGN_SEMI_COLON = ";"; //$NON-NLS-1$
-	public static final String SIGN_COLON = ":"; //$NON-NLS-1$
-	
-	public static final String SIGN_DOT = "."; //$NON-NLS-1$
-	public static final String FDS_STRUCT_END = ";;;}"; //$NON-NLS-1$
-	public static final String FDS_CLASS_END = "}"; //$NON-NLS-1$
-	public static final String FDS_UNION_END = ")"; //$NON-NLS-1$
-	public static final String FDS_ENUM_END =  ">"; //$NON-NLS-1$
-	public static final String FDS_FUNCTION_END =  "/"; //$NON-NLS-1$
-	public static final String FDS_REFERENCE_END = "/"; //$NON-NLS-1$
-	
-	public static final String FDS_NAMED_END = "/"; //$NON-NLS-1$
+
+	public static final char FDS_ARRAY_END = ']';
+	public static final char FDS_TYPENAME_END = '|';
+	public static final char FDS_AGGREGATE_FIELD_NAME_END = '=';
+	public static final char FDS_AGGREGATE_FIELD_SEP = ',';
+	public static final char FDS_AGGREGATE_ACCESS_SEP = ';';
+	public static final char FDS_AGGREGATE_END = '}';
+	public static final char FDS_UNION_FIELD_NAME_END = '=';
+	public static final char FDS_UNION_FIELD_SEP = ',';
+	public static final char FDS_UNION_END = ')';
+	public static final char FDS_ENUM_CONST_SEP = ',';
+	public static final char FDS_ENUM_SEP = '=';
+	public static final char FDS_ENUM_END = '>';
+	public static final char FDS_FUNCTION_END = '/';
+	public static final char FDS_FUNCTION_ARG_SEP = ',';
+	public static final char FDS_REFERENCE_END = '/';
+	public static final char FDS_NAMED_END = '/';
+	public static final char FDS_RANGE_SEP = ',';
+
 	public static final int NO_SIZE = 0;
 	public static final int SIZE_BOOL = 1;
 	public static final int SIZE_CHAR = 1;
 	public static final int SIZE_FLOAT = 4;
 	public static final int SIZE_DOUBLE = 8;
-	
 	public static final int SIZE_INVALID = 0;
+
 	public static final IAIFType UNKNOWNTYPE = new AIFTypeIncomplete();
-	
 	public static final IAIFValue UNKNOWNVALUE = new AIFValueUnknown(UNKNOWNTYPE);
-	
+
+	private static IAIFType fLastType;
+
 	/**
+	 * Construct an AIF type given a FDS.
+	 * 
 	 * @param fmt
-	 * @param start_pos
-	 * @param end_pos
-	 * @return
+	 *            format descriptor string
+	 * @return IAIFType representing the FDS
+	 * @throws AIFFormatException
+	 *             if the string can't be parsed
 	 */
-	public static String extractFormat(String fmt, int start_pos, int end_pos) {
-		return fmt.substring(start_pos, end_pos);
-	}
-	
-	/**
-	 * Create an AIF object
-	 * 
-	 * @param fds
-	 * @param data
-	 * @param description
-	 * @return
-	 */
-	public static IAIF newAIF(String fds, byte[] data, String description) {
-		return new AIF(fds, data, description);
-	}
-	
-	/**
-	 * Create an AIF object
-	 * 
-	 * @param aifType
-	 * @param aifValue
-	 * @return
-	 */
-	public static IAIF newAIF(IAIFType aifType, IAIFValue aifValue) {
-		return new AIF(aifType, aifValue);
-	}
-	
-	/**
-	 * Create an AIF object
-	 * 
-	 * @param fds
-	 * @param data
-	 * @return
-	 */
-	public static IAIF newAIF(String fds, byte[] data) {
-		return new AIF(fds, data);
+	public static IAIFType getAIFType(String fmt) throws AIFFormatException {
+		parseType(fmt);
+		return fLastType;
 	}
 
 	/**
-	 * @param fmt
-	 * @return
-	 */
-	public static IAIFType getAIFType(String fmt) {
-		if (fmt == null || fmt.length() == 0) {
-			PDebugUtils.println(Messages.AIFFactory_0 + fmt);
-			return UNKNOWNTYPE;			
-		}
-		switch (fmt.charAt(0)) {
-		case FDS_CHAR: //char is signed or unsigned ???
-			PDebugUtils.println(Messages.AIFFactory_1 + fmt);
-			return new AIFTypeChar();
-		case FDS_FLOAT:
-			int float_size = Character.digit(fmt.charAt(FDS_FLOAT_SIZE_POS), 10);
-			PDebugUtils.println(Messages.AIFFactory_2 + fmt + Messages.AIFFactory_3 + float_size);
-			return new AIFTypeFloat(float_size);
-		case FDS_INT: //long and int is same???  long long type
-			boolean signed = (fmt.charAt(FDS_INTEGER_SIGN_POS) == 's');
-			int int_size = Character.digit(fmt.charAt(FDS_INTEGER_SIZE_POS), 10);
-			PDebugUtils.println(Messages.AIFFactory_4 + fmt + Messages.AIFFactory_5 + int_size);
-			return new AIFTypeInt(signed, int_size);
-		case FDS_CHAR_POINTER:
-			PDebugUtils.println(Messages.AIFFactory_6 + fmt);
-			return new AIFTypeCharPointer(getAIFType(fmt.substring(1, 3)));
-		case FDS_STRING:
-			PDebugUtils.println(Messages.AIFFactory_7 + fmt);
-			return new AIFTypeString();
-		case FDS_BOOL:
-			PDebugUtils.println(Messages.AIFFactory_8 + fmt);
-			return new AIFTypeBool();
-		case FDS_ENUM:
-			PDebugUtils.println(Messages.AIFFactory_9 + fmt);
-			int enum_end_pos = getEndPosFromLast(fmt, FDS_ENUM_END);
-			String enum_type = fmt.substring(enum_end_pos+FDS_ENUM_END.length());
-			return new AIFTypeEnum(extractFormat(fmt, 1, enum_end_pos), getAIFType(enum_type));
-		case FDS_FUNCTION:
-			PDebugUtils.println(Messages.AIFFactory_10 + fmt);
-			int func_end_pos = getEndPosFromLast(fmt, FDS_FUNCTION_END);
-			String func_type = fmt.substring(func_end_pos+FDS_FUNCTION_END.length());
-			return new AIFTypeFunction(extractFormat(fmt, 1, func_end_pos), getAIFType(func_type));
-		case FDS_STRUCT_CLASS: //struct or class
-			int struct_end_pos = getEndPosFromLast(fmt, FDS_STRUCT_END);
-			if (fmt.length() == struct_end_pos + FDS_STRUCT_END.length()) {
-				PDebugUtils.println(Messages.AIFFactory_11 + fmt);
-				return new AIFTypeStruct(extractFormat(fmt, 1, struct_end_pos));
-			}
-			else {
-				struct_end_pos = getEndPosFromLast(fmt, FDS_CLASS_END);
-				PDebugUtils.println(Messages.AIFFactory_12 + fmt);
-				return new AIFTypeClass(extractFormat(fmt, 1, struct_end_pos));
-			}
-		case FDS_UNION:
-			PDebugUtils.println(Messages.AIFFactory_13 + fmt);
-			int union_end_pos = getEndPosFromLast(fmt, FDS_UNION_END);
-			return new AIFTypeUnion(extractFormat(fmt, 1, union_end_pos));
-		case FDS_REFERENCE:
-			PDebugUtils.println(Messages.AIFFactory_14 + fmt);
-			int ref_end_pos = getEndPosFromStart(fmt, FDS_REFERENCE_END);
-			return new AIFTypeReference(extractFormat(fmt, 1, ref_end_pos));
-		case FDS_ADDRESS:
-			PDebugUtils.println(Messages.AIFFactory_15 + fmt);
-			return new AIFTypeAddress(Character.digit(fmt.charAt(1), 10));
-		case FDS_POINTER:
-			PDebugUtils.println(Messages.AIFFactory_16 + fmt);
-			return new AIFTypePointer(getAIFType(fmt.substring(1, 3)), getAIFType(fmt.substring(3)));
-		case FDS_VOID:
-			PDebugUtils.println(Messages.AIFFactory_17 + fmt);
-			int void_size = Character.digit(fmt.charAt(FDS_VOID_SIZE_POS), 10);
-			return new AIFTypeVoid(void_size);
-		case FDS_ARRAY:
-			PDebugUtils.println(Messages.AIFFactory_18 + fmt);
-			int array_end_pos = getEndPosFromStart(fmt, SIGN_CLOSE);
-			return new AIFTypeArray(extractFormat(fmt, 1, array_end_pos), getAIFType(fmt.substring(array_end_pos+1)));
-		case FDS_NAMED:
-			PDebugUtils.println(Messages.AIFFactory_19 + fmt);
-			int named_end_pos = getEndPosFromStart(fmt, FDS_NAMED_END);
-			return new AIFTypeNamed(extractFormat(fmt, 1, named_end_pos), getAIFType(fmt.substring(named_end_pos+1)));
-		default:
-			PDebugUtils.println(Messages.AIFFactory_20 + fmt);
-			return new AIFTypeIncomplete();
-		}
-	}
-	
-	/**
+	 * Create a value given a type and an array containing the value data.
+	 * 
 	 * @param parent
+	 *            parent value (if this value has a parent)
 	 * @param type
+	 *            type of the value
 	 * @param data
-	 * @return
+	 *            raw data
+	 * @return an IAIFValue representing the data
 	 */
 	public static IAIFValue getAIFValue(IValueParent parent, IAIFType type, byte[] data) {
 		if (data == null || data.length < 0) {
@@ -287,107 +189,273 @@ public class AIFFactory {
 		}
 		return getAIFValue(parent, type, new SimpleByteBuffer(data));
 	}
-	
+
 	/**
+	 * Create a value given a type and a buffer containing the value data.
+	 * 
 	 * @param parent
+	 *            parent value (if this value has a parent)
 	 * @param type
+	 *            type of the value
 	 * @param buffer
-	 * @return
+	 *            buffer containing the data
+	 * @return an IAIFValue representing the value
 	 */
 	public static IAIFValue getAIFValue(IValueParent parent, IAIFType type, SimpleByteBuffer buffer) {
 		if (buffer.end()) {
 			return new AIFValueUnknown(type);
 		} else if (type instanceof IAIFTypeChar) {
-			 return new AIFValueChar((IAIFTypeChar)type, buffer);
+			return new AIFValueChar((IAIFTypeChar) type, buffer);
 		} else if (type instanceof IAIFTypeFloat) {
-			return new AIFValueFloat((IAIFTypeFloat)type, buffer);
+			return new AIFValueFloat((IAIFTypeFloat) type, buffer);
 		} else if (type instanceof IAIFTypeInt) {
-			return new AIFValueInt((IAIFTypeInt)type, buffer);
+			return new AIFValueInt((IAIFTypeInt) type, buffer);
 		} else if (type instanceof IAIFTypeCharPointer) {
-			return new AIFValueCharPointer((IAIFTypeCharPointer)type, buffer);
+			return new AIFValueCharPointer((IAIFTypeCharPointer) type, buffer);
 		} else if (type instanceof IAIFTypeString) {
-			return new AIFValueString((IAIFTypeString)type, buffer);
+			return new AIFValueString((IAIFTypeString) type, buffer);
 		} else if (type instanceof IAIFTypeBool) {
-			return new AIFValueBool((IAIFTypeBool)type, buffer);
+			return new AIFValueBool((IAIFTypeBool) type, buffer);
 		} else if (type instanceof IAIFTypeArray) {
-			return new AIFValueArray((IAIFTypeArray)type, buffer);
+			return new AIFValueArray((IAIFTypeArray) type, buffer);
 		} else if (type instanceof IAIFTypeEnum) {
-			return new AIFValueEnum((IAIFTypeEnum)type, buffer);		
+			return new AIFValueEnum((IAIFTypeEnum) type, buffer);
 		} else if (type instanceof IAIFTypeAddress) {
-			return new AIFValueAddress((IAIFTypeAddress)type, buffer);
+			return new AIFValueAddress((IAIFTypeAddress) type, buffer);
 		} else if (type instanceof IAIFTypePointer) {
-			return new AIFValuePointer(parent, (IAIFTypePointer)type, buffer);
+			return new AIFValuePointer(parent, (IAIFTypePointer) type, buffer);
 		} else if (type instanceof IAIFTypeNamed) {
-			return new AIFValueNamed(parent, (IAIFTypeNamed)type, buffer);
+			return new AIFValueNamed(parent, (IAIFTypeNamed) type, buffer);
 		} else if (type instanceof IAIFTypeReference) {
-			return new AIFValueReference(parent, (IAIFTypeReference)type, buffer);
-		} else if (type instanceof IAIFTypeStruct) {
-			return new AIFValueStruct(parent, (IAIFTypeStruct)type, buffer);			
+			return new AIFValueReference(parent, (IAIFTypeReference) type, buffer);
 		} else if (type instanceof IAIFTypeUnion) {
-			return new AIFValueUnion(parent, (IAIFTypeUnion)type, buffer);
-		} else if (type instanceof IAIFTypeClass) {
-			return new AIFValueClass(parent, (IAIFTypeClass)type, buffer);
+			return new AIFValueUnion(parent, (IAIFTypeUnion) type, buffer);
+		} else if (type instanceof IAIFTypeAggregate) {
+			return new AIFValueAggregate(parent, (IAIFTypeAggregate) type, buffer);
 		} else if (type instanceof IAIFTypeVoid) {
-			return new AIFValueVoid((IAIFTypeVoid)type, buffer);
-		/*
+			return new AIFValueVoid(type, buffer);
 		} else if (type instanceof IAIFTypeFunction) {
-			return new AIFValueFunction((IAIFTypeFunction)type, data);			
-		*/				
-		}		
+			return new AIFValueFunction((IAIFTypeFunction) type, buffer);
+		}
 		return new AIFValueUnknown(type);
 	}
-	
+
 	/**
+	 * Find the first character position immediately after an integer in the
+	 * string starting at position 'pos'. If 'neg' is true then negative
+	 * integers are allowed.
+	 * 
 	 * @param format
-	 * @param pos
-	 * @return
+	 *            format string
+	 * @param start
+	 *            position in string to start
+	 * @param neg
+	 *            allow negative numbers
+	 * @return first character after integer
 	 */
-	public static int getDigitPos(String format, int pos) {
+	public static int getFirstNonDigitPos(String format, int start, boolean neg) {
 		int len = format.length();
-		while (pos < len) {
-			char aChar = format.charAt(pos);
-			if (!Character.isDigit(aChar)) {
+		if (format.charAt(start) == '-') {
+			start++;
+		}
+		while (start < len) {
+			if (!Character.isDigit(format.charAt(start))) {
 				break;
 			}
-			pos++;
+			start++;
 		}
-		return pos;
+		return start;
 	}
-	
+
 	/**
-	 * @param fmt
-	 * @param regex
-	 * @return
+	 * Get the last type that was successfully parsed.
+	 * 
+	 * @return IAIFType
 	 */
-	public static int getEndPosFromLast(String fmt, String regex) {
-		return fmt.lastIndexOf(regex);
+	public static IAIFType getType() {
+		return fLastType;
 	}
-	
+
 	/**
-	 * @param fmt
-	 * @param regex
-	 * @return
+	 * Create an IAIF object from a type and a value
+	 * 
+	 * @param aifType
+	 *            type of the object
+	 * @param aifValue
+	 *            value of the object
+	 * @return new IAIF object
 	 */
-	public static int getEndPosFromStart(String fmt, String regex) {
-		return fmt.indexOf(regex);
+	public static IAIF newAIF(IAIFType aifType, IAIFValue aifValue) {
+		return newAIF(aifType, aifValue, ""); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * testing purpose 
+	 * Create an IAIF object from a type and a value
+	 * 
+	 * @param aifType
+	 *            type of the object
+	 * @param aifValue
+	 *            value of the object
+	 * @param desc
+	 *            description
+	 * @return new IAIF object
+	 */
+	public static IAIF newAIF(IAIFType aifType, IAIFValue aifValue, String desc) {
+		return new AIF(aifType, aifValue, desc);
+	}
+
+	/**
+	 * Create an AIF object given an FDS and value data
+	 * 
+	 * @param fds
+	 *            format descriptor string
+	 * @param data
+	 *            value data
+	 * @return new IAIF object
+	 * @throws AIFFormatException
+	 *             if the FDS can't be parsed
+	 */
+	public static IAIF newAIF(String fds, byte[] data) throws AIFFormatException {
+		return newAIF(fds, data, ""); //$NON-NLS-1$
+	}
+
+	/**
+	 * Create an AIF object given an FDS and value data
+	 * 
+	 * @param fds
+	 *            format descriptor string
+	 * @param data
+	 *            value data
+	 * @param description
+	 * @return new IAIF object
+	 * @throws AIFFormatException
+	 *             if the FDS can't be parsed
+	 */
+	public static IAIF newAIF(String fds, byte[] data, String description) throws AIFFormatException {
+		IAIFType type = AIFFactory.getAIFType(fds);
+		IAIFValue val = AIFFactory.getAIFValue(null, type, data);
+		return newAIF(type, val, description);
+	}
+
+	/**
+	 * Parse a complete AIF type from the format descriptor. A newly constructed
+	 * IAIFType objects will be available by calling {@link getType()}
+	 * 
+	 * @param fmt
+	 *            format descriptor
+	 * @return remainder of string after removing the complete FDS
+	 * @throws AIFFormatException
+	 *             if the string can't be parsed
+	 */
+	public static String parseType(String fmt) throws AIFFormatException {
+		AIFType type;
+		String debugStr = ""; //$NON-NLS-1$
+
+		if (fmt == null || fmt.length() == 0) {
+			PDebugUtils.println(Messages.AIFFactory_0 + fmt);
+			fLastType = UNKNOWNTYPE;
+			return fmt;
+		}
+
+		char typeChar = fmt.charAt(0);
+		fmt = fmt.substring(1);
+
+		switch (typeChar) {
+		case FDS_CHAR: // char is signed or unsigned ???
+			debugStr = Messages.AIFFactory_1;
+			type = new AIFTypeChar();
+			break;
+		case FDS_FLOAT:
+			debugStr = Messages.AIFFactory_2;
+			type = new AIFTypeFloat();
+			break;
+		case FDS_INT:
+			debugStr = Messages.AIFFactory_4;
+			type = new AIFTypeInt();
+			break;
+		case FDS_CHAR_POINTER:
+			debugStr = Messages.AIFFactory_6;
+			type = new AIFTypeCharPointer();
+			break;
+		case FDS_STRING:
+			debugStr = Messages.AIFFactory_7;
+			type = new AIFTypeString();
+			break;
+		case FDS_BOOL:
+			debugStr = Messages.AIFFactory_8;
+			type = new AIFTypeBool();
+			break;
+		case FDS_ENUM:
+			debugStr = Messages.AIFFactory_9;
+			type = new AIFTypeEnum();
+			break;
+		case FDS_FUNCTION:
+			debugStr = Messages.AIFFactory_10;
+			type = new AIFTypeFunction();
+			break;
+		case FDS_AGGREGATE: // struct or class
+			debugStr = Messages.AIFFactory_12;
+			type = new AIFTypeAggregate();
+			break;
+		case FDS_UNION:
+			debugStr = Messages.AIFFactory_13;
+			type = new AIFTypeUnion();
+			break;
+		case FDS_REFERENCE:
+			debugStr = Messages.AIFFactory_14;
+			type = new AIFTypeReference();
+			break;
+		case FDS_ADDRESS:
+			debugStr = Messages.AIFFactory_15;
+			type = new AIFTypeAddress();
+			break;
+		case FDS_POINTER:
+			debugStr = Messages.AIFFactory_16;
+			type = new AIFTypePointer();
+			break;
+		case FDS_VOID:
+			debugStr = Messages.AIFFactory_17;
+			type = new AIFTypeVoid();
+			break;
+		case FDS_ARRAY:
+			debugStr = Messages.AIFFactory_18;
+			type = new AIFTypeArray();
+			break;
+		case FDS_RANGE:
+			debugStr = Messages.AIFFactory_21;
+			type = new AIFTypeRange();
+			break;
+		case FDS_NAMED:
+			debugStr = Messages.AIFFactory_19;
+			type = new AIFTypeNamed();
+			break;
+		default:
+			PDebugUtils.println(Messages.AIFFactory_20 + fmt);
+			fLastType = new AIFTypeIncomplete();
+			return ""; //$NON-NLS-1$
+		}
+
+		fmt = type.parse(fmt);
+		PDebugUtils.println(debugStr + type.toString());
+		fLastType = type;
+		return fmt;
+
+	}
+
+	/**
+	 * testing purpose
 	 */
 	public static int random_num(int min, int max) {
-	    Random generator = new Random();
-	    long range = (long)max - (long)min + 1;
-	    long fraction = (long)(range * generator.nextDouble());
-	    return (int)(fraction + min);
+		Random generator = new Random();
+		long range = (long) max - (long) min + 1;
+		long fraction = (long) (range * generator.nextDouble());
+		return (int) (fraction + min);
 	}
 
 	/**
 	 * @return
 	 */
 	public static IAIF UNKNOWNAIF() {
-		return new AIF(UNKNOWNTYPE, UNKNOWNVALUE);
+		return newAIF(UNKNOWNTYPE, UNKNOWNVALUE);
 	}
 }
-
-
