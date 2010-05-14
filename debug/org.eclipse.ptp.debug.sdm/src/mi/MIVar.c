@@ -48,15 +48,19 @@ MIVarFree(MIVar *var)
 {
 	int i;
 
-	if (var->name != NULL)
+	if (var->name != NULL) {
 		free(var->name);
-	if (var->type != NULL)
+	}
+	if (var->type != NULL) {
 		free(var->type);
-	if (var->exp != NULL)
+	}
+	if (var->exp != NULL) {
 		free(var->exp);
+	}
 	if (var->children != NULL) {
-		for (i = 0; i < var->numchild; i++)
+		for (i = 0; i < var->numchild; i++) {
 			MIVarFree(var->children[i]);
+		}
 		free(var->children);
 	}
 	free(var);
@@ -136,8 +140,9 @@ parseChildren(MIValue *val, List **res)
 			if (strcmp(result->variable, "child") == 0) { //$NON-NLS-1$
 				value = result->value;
 				if (value->type == MIValueTypeTuple) {
-					if (children == NULL)
+					if (children == NULL) {
 						children = NewList();
+					}
 					AddToList(children, MIVarParse(value->results));
 				}
 			}
@@ -181,6 +186,7 @@ MIGetVarListChildrenInfo(MICommand *cmd, MIVar *var)
 		for (num = 0, SetList(children); (child = (MIVar *)GetListElement(children)) != NULL; ) {
 			var->children[num++] = child;
 		}
+		DestroyList(children, NULL);
 	}
 }
 
@@ -192,8 +198,9 @@ MIGetVarEvaluateExpressionInfo(MICommand *cmd)
 	MIResultRecord *	rr;
 	char *			expr = NULL;
 
-	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL) {
 		return NULL;
+	}
 
 	rr = cmd->output->rr;
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
@@ -215,8 +222,9 @@ MIGetDataEvaluateExpressionInfo(MICommand *cmd)
 	MIResultRecord *	rr;
 	char *			expr = NULL;
 
-	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL) {
 		return NULL;
+	}
 
 	rr = cmd->output->rr;
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
@@ -280,14 +288,12 @@ MIGetVarUpdateParser(MIValue* miVal, List *varchanges)
 
 	if (miVal->type == MIValueTypeTuple) {
 		MIGetVarUpdateParseValue(miVal, varchanges);
-	}
-	else if (miVal->type == MIValueTypeList) {
+	} else if (miVal->type == MIValueTypeList) {
 		if (EmptyList(miVal->values)) {
 			for (SetList(miVal->results); (result = (MIResult *)GetListElement(miVal->results)) != NULL;) {
 				MIGetVarUpdateParser(result->value, varchanges);
 			}
-		}
-		else {
+		} else {
 			for (SetList(miVal->values); (value = (MIValue *)GetListElement(miVal->values)) != NULL;) {
 				MIGetVarUpdateParser(value, varchanges);
 			}
@@ -316,8 +322,9 @@ MIGetVarUpdateInfo(MICommand *cmd, List** varchanges)
 MIVar *
 MIGetVarInfoType(MICommand *cmd)
 {
-	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
+	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL) {
 		return NULL;
+	}
 
 	return MIVarParse(cmd->output->rr->results);
 }
@@ -333,8 +340,9 @@ MIGetVarInfoNumChildren(MICommand *cmd, MIVar *var)
 	MIResult *	result;
 	char *		str;
 
-	if (var == NULL)
+	if (var == NULL) {
 		var = MIVarNew();
+	}
 
 	results = cmd->output->rr->results;
 	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
