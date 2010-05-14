@@ -1,29 +1,28 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2010 University of Illinois.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     IBM Corporation - initial API and implementation 
- *     Albert L. Rossi (NCSA) - full implementation (bug 310188)
+ *     Albert L. Rossi (NCSA) - design and implementation (bug 310188)
+ *                            - added column 05/11/2010
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.providers;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.ptp.rm.pbs.ui.AttributePlaceholder;
+import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * Used to extract labels for viewers whose model is the AttributePlaceholder.
  * 
- * @see org.eclipse.ptp.rm.pbs.ui.AttributePlaceholder
+ * @see org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder
  * @author arossi
  */
 public class AttributeLabelProvider implements ITableLabelProvider {
-
 	public AttributeLabelProvider() {
 		super();
 	}
@@ -44,9 +43,10 @@ public class AttributeLabelProvider implements ITableLabelProvider {
 		case 0:
 			return ap.getName();
 		case 1:
+			return ap.getDefaultString();
+		case 2:
 			return ap.getToolTip();
 		default:
-
 		}
 		return "";
 	}

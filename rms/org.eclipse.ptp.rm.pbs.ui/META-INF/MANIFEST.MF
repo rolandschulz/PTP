@@ -9,6 +9,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
+ org.eclipse.debug.ui,
  org.eclipse.ptp.services.core,
  org.eclipse.ptp.services.ui,
  org.eclipse.ptp.core,
@@ -21,6 +22,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rm.ui,
  org.eclipse.ptp.rm.core
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.pbs.ui,
- org.eclipse.ptp.rm.pbs.ui.preferences
+Export-Package: org.eclipse.ptp.rm.pbs.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
