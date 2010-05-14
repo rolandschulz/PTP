@@ -233,8 +233,19 @@ public class FortranEditorTasks
 
                 if (vpgAST != null)
                 {
+                    // Copy list of tasks so we can iterate over it without a
+                    // ConcurrentModificationException and without having to
+                    // synchronize for the entire time we're running the tasks,
+                    // since this will block the UI thread if AST tasks also
+                    // want to run
+                    Set<IFortranEditorVPGTask> vpgTasks;
+                    synchronized (FortranEditorTasks.instance(editor))
+                    {
+                        vpgTasks = new HashSet<IFortranEditorVPGTask>(FortranEditorTasks.instance(editor).vpgTasks);
+                    }
+
                     defMap = createDefMap();
-                    for (IFortranEditorVPGTask task : FortranEditorTasks.instance(editor).vpgTasks)
+                    for (IFortranEditorVPGTask task : vpgTasks)
                         task.handle(editor.getIFile(), vpgAST, defMap);
                 }
 
