@@ -12,12 +12,18 @@ package org.eclipse.photran.internal.ui.properties;
 
 import java.io.IOException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.properties.SourceFormProperties;
 import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
@@ -112,8 +118,48 @@ public class SourceFormPropertyPage extends FortranPropertyPage
                 e.getMessage());
         }
         
-        // FIXME PhotranVPG.getInstance().queueJobToEnsureVPGIsUpToDate();
+        touchProject();
         
         return true;
+    }
+
+    /**
+     * Updates the timestamps on all Fortran source files in the project in order to
+     * force them to be re-indexed.
+     */
+    private void touchProject()
+    {
+        try
+        {
+            IProject proj = (IProject)getElement();
+            proj.accept(new IResourceVisitor()
+            {
+                public boolean visit(IResource resource) throws CoreException
+                {
+                    if (resource instanceof IFile
+                        && FortranCorePlugin.hasFortranContentType((IFile)resource))
+                    {
+                        touch((IFile)resource);
+                    }
+                    return true;
+                }
+            });
+        }
+        catch (CoreException e)
+        {
+            FortranCorePlugin.log("Error touching project after source form changes", e);
+        }
+    }
+
+    private void touch(IFile file)
+    {
+        try
+        {
+            file.touch(new NullProgressMonitor());
+        }
+        catch (CoreException e)
+        {
+            FortranCorePlugin.log("Error touching file during project traversal source form changes", e);
+        }
     }
 }
