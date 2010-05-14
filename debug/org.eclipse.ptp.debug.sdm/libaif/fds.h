@@ -13,6 +13,7 @@
 #ifndef _FDS_H
 #define _FDS_H
 
+#define FDS_ADDRESS					'a'
 #define FDS_ARRAY_END				']'
 #define FDS_ARRAY_START				'['
 #define FDS_BOOLEAN					'b'
@@ -25,7 +26,6 @@
 #define FDS_FUNCTION				'&'
 #define FDS_FUNCTION_ARG_END		'/'
 #define FDS_FUNCTION_ARG_SEP		','
-#define FDS_ID						'|'
 #define FDS_INTEGER					'i'
 #define FDS_INTEGER_SIGNED			's'
 #define FDS_INTEGER_UNSIGNED		'u'
@@ -34,17 +34,17 @@
 #define FDS_NAME_END				'/'
 #define FDS_POINTER					'^'
 #define FDS_RANGE					'r'
-#define FDS_RANGE_SEP				'.'
+#define FDS_RANGE_SEP				','
 #define FDS_REFERENCE				'>'
 #define FDS_REFERENCE_END			'/'
 #define FDS_REGION					'z'
 #define FDS_STRING					's'
-#define FDS_ADDRESS					'a'
 #define FDS_STRUCT_ACCESS_SEP		';'
 #define FDS_STRUCT_END				'}'
 #define FDS_STRUCT_FIELD_NAME_END	'='
 #define FDS_STRUCT_FIELD_SEP		','
 #define FDS_STRUCT_START			'{'
+#define FDS_TYPENAME_END			'|'
 #define FDS_UNION_END				')'
 #define FDS_UNION_FIELD_NAME_END	'='
 #define FDS_UNION_FIELD_SEP			','
@@ -63,10 +63,10 @@ extern int			FDSArrayRank(char *);
 extern int			FDSArraySize(char *);
 extern char *		FDSArrayIndexType(char *);
 extern int			FDSArrayMinIndex(char *, int);
-extern int			FDSArrayMaxIndex(char *, int);
+extern int			FDSArrayRankSize(char *, int);
 extern AIFIndex *	FDSArrayIndexInit(char *);
 extern void			FDSArrayInfo(char *, int *, char **, char **);
-extern void			FDSArrayBounds(char *, int , int **, int **, int **);
+extern void			FDSArrayBounds(char *, int , int **, int **);
 extern char *		FDSBaseType(char *);
 extern int			FDSClassAdd(char **, aifaccess, char *, char *);
 extern int			FDSClassFieldByName(char *, char *, char **);
