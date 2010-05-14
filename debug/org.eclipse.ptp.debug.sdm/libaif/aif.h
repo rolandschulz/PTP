@@ -109,12 +109,12 @@ struct AIFIndex
 {
 	int		i_finished;
 	int		i_rank;
-	int		i_nel;
-	int *	i_min;
-	int *	i_max;
-	int *	i_index;
-	char *	i_btype;
-	int		i_bsize;
+	int		i_nel;		/* total number of elements in array */
+	int *	i_min;		/* array of minimum indexes */
+	int *	i_size;		/* array containing the number of elements in each dimension */
+	int *	i_index;	/* current index values */
+	char *	i_btype;	/* base type of array */
+	int		i_bsize;	/* base type size */
 };
 typedef struct AIFIndex	AIFIndex;
 
@@ -127,7 +127,7 @@ struct AIF
 
 	struct
 	{
-		unsigned		a_data_len;
+		unsigned	a_data_len;
 		char *		a_data_val;
 	} a_data;
 };
@@ -254,10 +254,10 @@ typedef struct AIFFILE	AIFFILE;
 extern AIF *		AIFAdd(AIF *, AIF *);
 extern int			AIFAddConstToEnum(AIF *, char *, AIF *);
 extern int			AIFAddFieldToStruct(AIF *, char *, AIF *);
-extern int			AIFAddFieldToUnion(AIF *, char *, char *);
+extern int			AIFAddFieldToUnion(AIF *, char *, AIF *);
 extern void			AIFAddArrayElement(AIF *, int, AIF *);
 extern AIF *		AIFAnd(AIF *, AIF *);
-extern int			AIFArrayBounds(AIF *, int, int **, int **, int **);
+extern int			AIFArrayBounds(AIF *, int, int **, int **);
 extern AIF *		AIFArrayElement(AIF *, AIFIndex *);
 extern int			AIFArrayElementToDouble(AIF *, AIFIndex *, double *);
 extern int			AIFArrayElementToDoublest(AIF *, AIFIndex *, AIFDOUBLEST *);
@@ -270,10 +270,10 @@ extern int			AIFArrayIndexInRange(int, int *, int *, int *);
 extern int			AIFArrayIndexToStr(char **, AIFIndex *);
 extern char *		AIFArrayIndexType(AIF *);
 extern int			AIFArrayInfo(AIF *, int *, char **, int *);
-extern int			AIFArrayMaxIndex(AIF *, int);
 extern int			AIFArrayMinIndex(AIF *, int);
 extern AIF *		AIFArrayPerm(AIF *, int *);
 extern int			AIFArrayRank(AIF *);
+extern int			AIFArrayRankSize(AIF *, int);
 extern AIF *		AIFArrayRef(AIF *, int, int *);
 extern int			AIFArraySize(AIF *);
 extern AIF *		AIFArraySlice(AIF *, int, int *, int *);
@@ -310,7 +310,7 @@ extern AIF *		AIFMul(AIF *, AIF *);
 extern AIF *		AIFNeg(AIF *);
 extern void			AIFNormalise(char *, int, char *, int);
 extern AIF *		AIFNot(AIF *);
-extern AIF *		AIFNull(AIF *);
+extern AIF *		AIFNullPointer(AIF *);
 extern int			AIFNumFields(AIF *);
 extern AIFFILE *	AIFOpenSet(char *, int);
 extern AIF *		AIFOr(AIF *, AIF *);
