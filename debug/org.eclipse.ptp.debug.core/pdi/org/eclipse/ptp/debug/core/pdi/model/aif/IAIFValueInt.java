@@ -20,53 +20,65 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents int value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFValueInt extends IValueIntegral {
 	/**
 	 * Determines whether this value is long
+	 * 
 	 * @return true if this value if long
 	 */
-	boolean isLong();
-	
+	public boolean isLong();
+
 	/**
 	 * Determines whether this value is short
+	 * 
 	 * @return true if this value is short
 	 */
-	boolean isShort();
-	
+	public boolean isShort();
+
 	/**
 	 * Determines whether this value is int
+	 * 
 	 * @return true if this value is int
 	 */
-	boolean isInt();
-	
+	public boolean isInt();
+
 	/**
 	 * Returns byte array of this value
-	 * @return bute array of this value 
-	 * @throws AIFException on failure
+	 * 
+	 * @return bute array of this value
+	 * @throws AIFException
+	 *             on failure
 	 */
-	byte[] byteValue() throws AIFException;
-	
-	/**
-	 * Returns value of this value
-	 * @return value of this value
-	 * @throws AIFException on failure
-	 */
-	long longValue() throws AIFException;
-	
-	/**
-	 * Returns value of this value
-	 * @return value of this value
-	 * @throws AIFException on failure
-	 */
-	short shortValue() throws AIFException;
+	public byte[] byteValue() throws AIFException;
 
 	/**
 	 * Returns value of this value
+	 * 
 	 * @return value of this value
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	int intValue() throws AIFException;
+	public long longValue() throws AIFException;
+
+	/**
+	 * Returns value of this value
+	 * 
+	 * @return value of this value
+	 * @throws AIFException
+	 *             on failure
+	 */
+	public short shortValue() throws AIFException;
+
+	/**
+	 * Returns value of this value
+	 * 
+	 * @return value of this value
+	 * @throws AIFException
+	 *             on failure
+	 */
+	public int intValue() throws AIFException;
 }

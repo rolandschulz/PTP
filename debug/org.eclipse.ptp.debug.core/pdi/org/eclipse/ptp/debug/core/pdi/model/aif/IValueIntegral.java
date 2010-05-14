@@ -22,14 +22,17 @@ import java.math.BigInteger;
 
 /**
  * Represents integral value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IValueIntegral extends IAIFValue {
 	/**
 	 * Returns value of this value
+	 * 
 	 * @return value of this value
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	BigInteger bigIntegerValue() throws AIFException;
+	public BigInteger bigIntegerValue() throws AIFException;
 }

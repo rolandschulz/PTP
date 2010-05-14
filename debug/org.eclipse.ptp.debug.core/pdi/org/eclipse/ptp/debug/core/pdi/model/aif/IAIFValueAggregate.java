@@ -20,7 +20,17 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents class value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFValueClass extends IValueAggregate {}
+public interface IAIFValueAggregate extends IAIFValue {
+	/**
+	 * Get the value of the field corresponding to name
+	 * 
+	 * @param name
+	 *            name of aggregate field
+	 * @return field value
+	 */
+	public IAIFValue getFieldValue(String name);
+}

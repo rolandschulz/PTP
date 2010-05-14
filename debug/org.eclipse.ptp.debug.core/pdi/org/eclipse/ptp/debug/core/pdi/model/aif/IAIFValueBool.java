@@ -20,14 +20,17 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents boolean value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFValueBool extends IValueIntegral {
 	/**
-	 * Determines whether this value is true 
+	 * Determines whether this value is true
+	 * 
 	 * @return true if this value is true
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	boolean booleanValue() throws AIFException;
+	public boolean booleanValue() throws AIFException;
 }

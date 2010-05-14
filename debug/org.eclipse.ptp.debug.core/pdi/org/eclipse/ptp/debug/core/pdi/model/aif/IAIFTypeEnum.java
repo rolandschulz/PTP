@@ -20,51 +20,29 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents enum type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFTypeEnum extends ITypeIntegral {
 	/**
-	 * Returns base type of the current type
-	 * @return base type of the current type
+	 * Returns name of the enumeration
+	 * 
+	 * @return name of the enumeration
 	 */
-	IAIFType getBaseType();
-	
+	public String getName();
+
 	/**
-	 * Returns name of the current type
-	 * @return name of the current type
+	 * Returns an array of the enumeration names
+	 * 
+	 * @return an array of the enumeration names
 	 */
-	String getName();
-	
+	public String[] getNames();
+
 	/**
-	 * Returns a list of fields of the current type
-	 * @return a list of fields of the current type
+	 * Returns an array of the enumeration values corresponding to each name
+	 * 
+	 * @return an array of the enumeration values
 	 */
-	String[] getFields();
-	
-	/**
-	 * Returns a list of type names of the current type
-	 * @return a list of type names of the current type
-	 */
-	String[] getTypes();
-	
-	/**
-	 * Returns the name of field of the current type by given position
-	 * @param index position of this enum type
-	 * @return the name of field of the current type
-	 */
-	String getField(int index);
-	
-	/**
-	 * Returns name of value of this type by given position
-	 * @param index position of this type
-	 * @return name of value of this type by given position
-	 */
-	String getValue(int index);
-	
-	/**
-	 * Returns number of children of this type
-	 * @return number of children of this type
-	 */
-	int getNumberOfChildren();
+	public Integer[] getValues();
 }

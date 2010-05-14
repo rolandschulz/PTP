@@ -19,11 +19,32 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
- * Represents a union type. A union is similar to a structure, but all fields
+ * Represents a union type. A union is similar to an aggregate, but all fields
  * begin at the same location in memory.
  * 
  * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeUnion extends ITypeAggregate {}
+public interface IAIFTypeUnion extends IAIFType {
+	/**
+	 * Returns name of this type
+	 * 
+	 * @return name of this type
+	 */
+	public String getName();
+
+	/**
+	 * Returns an array containing the field names of this type
+	 * 
+	 * @return array of field names
+	 */
+	public String[] getFieldNames();
+
+	/**
+	 * Returns an array containing the types of each field
+	 * 
+	 * @return array of this type
+	 */
+	public IAIFType[] getFieldTypes();
+}

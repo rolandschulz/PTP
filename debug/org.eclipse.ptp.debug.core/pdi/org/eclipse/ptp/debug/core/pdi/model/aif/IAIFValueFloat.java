@@ -20,33 +20,40 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents float value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFValueFloat extends IValueParent {
 	/**
 	 * Determines whether this value is float
+	 * 
 	 * @return true if this value if float
 	 */
-	boolean isFloat();
-	
+	public boolean isFloat();
+
 	/**
 	 * Determines if this value is double
+	 * 
 	 * @return true if this value is double
 	 */
-	boolean isDouble();
-	
+	public boolean isDouble();
+
 	/**
 	 * Returns value of this value
+	 * 
 	 * @return value of this value
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	double doubleValue() throws AIFException;
-	
+	public double doubleValue() throws AIFException;
+
 	/**
 	 * Returns value of this value
+	 * 
 	 * @return value of this value
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	float floatValue() throws AIFException;	
+	public float floatValue() throws AIFException;
 }

@@ -20,13 +20,15 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents reference value in IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFValueReference extends IValueParent {
 	/**
 	 * Returns name of this value
+	 * 
 	 * @return name of this value
 	 */
-	String getName();
+	public String getName();
 }

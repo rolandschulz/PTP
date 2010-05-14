@@ -20,19 +20,22 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents named value in IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFValueNamed extends IValueDerived {
 	/**
 	 * Returns IAIFValue of this value
+	 * 
 	 * @return IAIFValue of this value
 	 */
-	IAIFValue getValue();
+	public IAIFValue getValue();
 
 	/**
 	 * Returns name of this value
+	 * 
 	 * @return name of this value
 	 */
-	String getName();
+	public String getName();
 }
