@@ -143,7 +143,8 @@ public class FortranSearchQuery extends SearchQuery<SearchResult>
      */
     private void foundDefinition(PhotranTokenRef ref)
     {
-        Token token = ref.findToken();
+        Token token = ref.findTokenOrReturnNull();
+        if (token == null) return;
         for (Definition def : token.resolveBinding()) {
             if (shouldAccept(def)) {
                 if ((searchFlags & FIND_DECLARATIONS) != 0) {
