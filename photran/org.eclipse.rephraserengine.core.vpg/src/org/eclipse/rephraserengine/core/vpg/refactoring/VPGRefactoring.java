@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -87,13 +89,38 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
 
     protected void logVPGErrors(RefactoringStatus status)
     {
+        logVPGErrors(status, (Collection<IFile>)null);
+    }
+
+    protected void logVPGErrors(RefactoringStatus status, IFile file)
+    {
+        logVPGErrors(status, file == null ? null : Collections.singleton(file));
+    }
+
+    protected void logVPGErrors(RefactoringStatus status, Collection<IFile> files)
+    {
         for (VPGLog<T, ? extends TokenRef<T>>.Entry entry : vpg.log.getEntries())
         {
-            if (entry.isWarning())
-                status.addWarning(entry.getMessage(), createContext(entry.getTokenRef()));
-            else
-                status.addError(entry.getMessage(), createContext(entry.getTokenRef()));
+            if (files == null || contains(files, entry.getTokenRef()))
+            {
+                if (entry.isWarning())
+                    status.addWarning(entry.getMessage(), createContext(entry.getTokenRef()));
+                else
+                    status.addError(entry.getMessage(), createContext(entry.getTokenRef()));
+            }
         }
+    }
+
+    private boolean contains(Collection<IFile> files, TokenRef<T> tokenRef)
+    {
+        if (files == null || tokenRef == null || tokenRef.getFilename() == null)
+            return false;
+        
+        IFile file = EclipseVPG.getIFileForFilename(tokenRef.getFilename());
+        if (file == null)
+            return false;
+        
+        return files.contains(file);
     }
 
     @Override

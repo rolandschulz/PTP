@@ -81,7 +81,7 @@ public abstract class FortranEditorRefactoring
         checkIfFileIsAccessibleAndWritable(fileInEditor);
 
         this.astOfFileInEditor = vpg.acquireTransientAST(fileInEditor);
-        logVPGErrors(status);
+        logVPGErrors(status, fileInEditor);
         if (astOfFileInEditor == null)
             fail("The file in the editor cannot be parsed.");
     }

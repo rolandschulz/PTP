@@ -75,7 +75,7 @@ public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure
     {
-        logVPGErrors(status);
+        logVPGErrors(status, this.selectedFiles);
 
         try
         {

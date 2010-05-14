@@ -85,7 +85,7 @@ public abstract class FortranResourceRefactoring
     @Override
     protected final void preCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
-        status.addWarning("C preprocessor directives are IGNORED by the refactoring engine.  Use at your own risk.");
+        //status.addWarning("C preprocessor directives are IGNORED by the refactoring engine.  Use at your own risk.");
      
         if (FIXED_FORM_REFACTORING_ENABLED)
         {

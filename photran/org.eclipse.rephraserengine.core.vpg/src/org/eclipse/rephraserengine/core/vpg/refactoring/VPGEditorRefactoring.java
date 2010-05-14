@@ -39,7 +39,7 @@ public abstract class VPGEditorRefactoring<A, T, V extends EclipseVPG<A, T, ? ex
         checkIfFileIsAccessibleAndWritable(fileInEditor);
 
         this.astOfFileInEditor = vpg.acquireTransientAST(fileInEditor);
-        logVPGErrors(status);
+        logVPGErrors(status, fileInEditor);
         if (astOfFileInEditor == null)
             fail("The file in the editor cannot be parsed.");
     }
