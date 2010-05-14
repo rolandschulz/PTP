@@ -140,19 +140,19 @@ main(int argc, char *argv[])
 	if ( tests == 0 || tests & TEST_SERIES_1 )
 		TestAllConstructors();
 
-	if ( tests == 0 || tests & TEST_SERIES_2 )
+	if ( tests & TEST_SERIES_2 )
 		TestAllAscii();
 
 	if ( tests == 0 || tests & TEST_SERIES_3 )
 		TestAllArithmetic();
 
-	if ( tests == 0 || tests & TEST_SERIES_4 )
+	if ( tests & TEST_SERIES_4 )
 		TestAllCircularData();
 
 	if ( tests == 0 || tests & TEST_SERIES_5 )
 		TestAllEPS();
 
-	if ( tests == 0 || tests & TEST_SERIES_6 )
+	if ( tests & TEST_SERIES_6 )
 		TestAllCompareByName();
 
 	fprintf(stdout, "\n****** END OF TEST ******\n");
@@ -173,7 +173,7 @@ TestAllConstructors()
 	AIF *aString, *aFloat, *aDouble, *anInt, *aPointer, *aStruct;
 	AIF *anArray, *anEnum, *aUnion;
 	TestFlags flag = all;
-	int min, max;
+	int min, size;
 
 
 	fprintf(stdout, "*********************************** \n");
@@ -211,8 +211,8 @@ TestAllConstructors()
 	AIFAddFieldToStruct(aStruct, "field3", aStruct);
 	AIFTest("subtest10", aStruct, "with three fields", flag);
 
-	min = 0; max = 9;
-	anArray = ArrayToAIF(1, &min, &max, "abcdefghij", 10, "c");
+	min = 0; size = 10;
+	anArray = ArrayToAIF(1, &min, &size, "abcdefghij", 10, "c");
 	AIFTest("subtest11", anArray, "array of 10 chars", flag);
 
 	AIFAddFieldToStruct(aStruct, "field4", anArray);
@@ -222,18 +222,18 @@ TestAllConstructors()
 	aStruct = EmptyStructToAIF("test_struct");
 	aStruct = NameAIF(aStruct, 0);
 	AIFAddFieldToStruct(aStruct, "value", IntToAIF(2));
-	AIFAddFieldToStruct(aStruct, "next", AIFNull(aStruct));
-	aPointer = PointerToAIF(AddressToAIF(NULL, 4), aStruct);
+	AIFAddFieldToStruct(aStruct, "next", AIFNullPointer(aStruct));
+	aPointer = AIFNullPointer(aStruct);
 	aStruct = EmptyStructToAIF("test_struct");
 	AIFAddFieldToStruct(aStruct, "value", IntToAIF(1));
 	AIFAddFieldToStruct(aStruct, "next", aPointer);
-	aPointer = PointerToAIF(AddressToAIF(NULL, 4), aStruct);
+	aPointer = AIFNullPointer(aStruct);
 	AIFTest("subtest13", aPointer, "linked list 1 -> 2 ", flag);
 
 	/* test an array of structs. */
 	{
 		char data[BUFSIZ], *dest;
-		int min=1, max=9, subMin = 1, subMax = 2;
+		int min=1, size=9, subMin = 1, subSize = 2;
 		int index;
 		int smallArray[2] = {1,2};
 
@@ -245,19 +245,19 @@ TestAllConstructors()
 			AIFNormalise(dest, sizeof(int), (char *)(smallArray+index), sizeof(int));
 			dest += sizeof(int);
 		}
-		anArray = ArrayToAIF(1, &subMin, &subMax, data, 2*sizeof(int),
+		anArray = ArrayToAIF(1, &subMin, &subSize, data, 2*sizeof(int),
 			AIF_FORMAT(IntToAIF(0)));
 		AIFAddFieldToStruct(aStruct, "b", anArray);
 		AIFTest("subtest14", aStruct, "underlying struct: {a=2.1 b=[1 2]}", flag);
 
 
 		dest = data;
-		for (index = min; index <= max; index++) 
+		for (index = min; index < min + size; index++)
 		{
 			memcpy(dest, AIF_DATA(aStruct), AIF_LEN(aStruct));
 			dest += AIF_LEN(aStruct);
 		}
-		anArray = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(aStruct), AIF_FORMAT(aStruct));
+		anArray = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(aStruct), AIF_FORMAT(aStruct));
 		AIFTest("subtest15", anArray, "array of 9 underlying structs", flag);
 	}
 
@@ -281,8 +281,8 @@ TestAllConstructors()
 	AIFTest("subtest19", aStruct, "same struct but the enum is set to another value", flag);
 
 	AIFSetEnum(anEnum, "const2");
-	aPointer = PointerToAIF(NULL, anEnum);
-	aPointer = PointerToAIF(NULL, aPointer);
+	aPointer = AIFNullPointer(anEnum);
+	aPointer = AIFNullPointer(aPointer);
 	AIFAddFieldToStruct(aStruct, "field2", aPointer);
 	AIFTest("subtest20", aStruct, "field2 is a pointer to a pointer to an enum", flag);
 
@@ -290,9 +290,9 @@ TestAllConstructors()
 	/* test an array of enums. */
 	{
 		char data[BUFSIZ], *dest;
-		int min=1, max=15, index, val;
+		int min=1, size=15, index, val;
 		dest = data;
-		for (index = min; index <= max; index++)
+		for (index = min; index < min + size; index++)
 		{
 			val = rand() % 3;
 			switch (val)
@@ -311,7 +311,7 @@ TestAllConstructors()
 			dest += AIF_LEN(anEnum);
 		}
 
-		anArray = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum), AIF_FORMAT(anEnum));
+		anArray = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(anEnum), AIF_FORMAT(anEnum));
 		AIFTest("subtest21", anArray, "array of 15 underlying enums (random)", flag);
 	}
 
@@ -319,9 +319,8 @@ TestAllConstructors()
 	aUnion = EmptyUnionToAIF("test_union");
 	AIFTest("subtest22", aUnion, "empty union", flag);
 
-	AIFAddFieldToUnion(aUnion, "const1", "is4");
-	AIFAddFieldToUnion(aUnion, "const2", "is4");
-	AIFSetUnion(aUnion, "const1", IntToAIF(10));
+	AIFAddFieldToUnion(aUnion, "const1", IntToAIF(2));
+	AIFAddFieldToUnion(aUnion, "const2", FloatToAIF(5.6));
 	AIFTest("subtest23", aUnion, "union: 10", flag);
 
 	aStruct = EmptyStructToAIF("test_struct");
@@ -337,9 +336,6 @@ TestAllConstructors()
 	fprintf(stdout, "\n");
 }
 
-
-
-
 void
 _testAscii(char *tst, char *fds, char *data, char *msg, TestFlags flag)
 {
@@ -349,6 +345,9 @@ _testAscii(char *tst, char *fds, char *data, char *msg, TestFlags flag)
 	AIFFree(toTest);
 }
 
+/*
+ * TODO: update to the new formats
+ */
 void 
 TestAllAscii()
 {
@@ -371,42 +370,39 @@ TestAllAscii()
 
 	_testAscii("subtest5", "{|a=is4,b=is4;;;}", "0000000200000003", "{a=2, b=3}", flag);
 
-	_testAscii("subtest6", "[r0..1is4]is4", "0000000200000003", "[2, 3]", flag);
+	_testAscii("subtest6", "[r0,2is4]is4", "0000000200000003", "[2, 3]", flag);
 
-	_testAscii("subtest7", "%0/{|val=is4,next=^>0/,msg=^c;;;}", "00000003000163", "{val=3, next=nil, msg=^c}", flag);
+	_testAscii("subtest7", "%0/{|val=is4,next=^a4>0/,msg=pa4;;;}", "00000003000163", "{val=3, next=nil, msg=pa4}", flag);
 
-	_testAscii("subtest8", "%0/{|val=is4,next=^>0/,msg=^c;;;}", "0000000101000000020200000000000000030300000000016301620161", "a->b->c->self", flag);
+	_testAscii("subtest8", "%0/{|val=is4,next=^a4>0/,msg=pa4;;;}", "0000000101000000020200000000000000030300000000016301620161", "a->b->c->self", flag);
 
-	_testAscii("subtest9", "[r0..1is4]%0/{|val=is4,next=^>0/,msg=^c;;;}", "00000001010000000202000000000000000303000000000163016201610000000203000000000162", "array of two lists of pointers", flag);
+	_testAscii("subtest9", "[r0,2is4]%0/{|val=is4,next=^a4>0/,msg=pa4;;;}", "00000001010000000202000000000000000303000000000163016201610000000203000000000162", "array of two lists of pointers", flag);
 
-	_testAscii("subtest10", "%0/{|val=is4,next=^>0/,msg=^c;;;}", "00000003020000000000000003030000000001630163", "{val=3, next=self, msg=^c}", flag);
+	_testAscii("subtest10", "%0/{|val=is4,next=^a4>0/,msg=pa4;;;}", "00000003020000000000000003030000000001630163", "{val=3, next=self, msg=^c}", flag);
 
 	_testAscii("subtest11", "s", "000b613a20686f20686f20686f", "a: ho ho ho", flag);
 
-	_testAscii("subtest12", "[r0..1is4]%0/{|val=is4,next=^>0/,msg=s;;;}", "0000000101000000020200000000000000030300000000000b633a20686f20686f20686f000b623a20686f20686f20686f000b613a20686f20686f20686f000000020300000000000b623a20686f20686f20686f", "d[,]", flag);
+	_testAscii("subtest12", "[r0,2is4]%0/{|val=is4,next=^a4>0/,msg=s;;;}", "0000000101000000020200000000000000030300000000000b633a20686f20686f20686f000b623a20686f20686f20686f000b613a20686f20686f20686f000000020300000000000b623a20686f20686f20686f", "d[,]", flag);
 
-	_testAscii("subtest13", "[r0..99is4]^%0/{|name=s,data=is4,next=^>0/}", "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "empty hash table", flag);
+	_testAscii("subtest13", "[r0,100is4]^a4%0/{|name=s,data=is4,next=^a4>0/}", "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "empty hash table", flag);
 
-	_testAscii("subtest14", "[r0..99is4]^%0/{|name=s,data=is4,next=^>0/;;;}", "00000000000000000000000000000000000100057468657265000000010000000000010005746865726500000001000000000000000000010002686900000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "hash table containing hi, there, there", flag);
+	_testAscii("subtest14", "[r0,100is4]^a4%0/{|name=s,data=is4,next=^a4>0/;;;}", "00000000000000000000000000000000000100057468657265000000010000000000010005746865726500000001000000000000000000010002686900000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "hash table containing hi, there, there", flag);
 
-	_testAscii("subtest15", "[r0..1is4]%0/{|val=is4,next=^>0/,msg=s;;;}", "0011111101000000020200000111000000030300000111000b633a20686f20686f20686f000b623a20686f20686f20616f000b613a20686f20686f20686f000000020300000111000b623a20686f20686f20686f", "d[,]", flag);
+	_testAscii("subtest15", "[r0,2is4]%0/{|val=is4,next=^a4>0/,msg=s;;;}", "0011111101000000020200000111000000030300000111000b633a20686f20686f20686f000b623a20686f20686f20616f000b613a20686f20686f20686f000000020300000111000b623a20686f20686f20686f", "d[,]", flag);
 
-	_testAscii("subtest16", "%0/{|val=is4,next=^>0/,msg=^c;;;}", "0000000101000000020200000133000000030300000133016301620161", "a->b->c->self", flag);
+	_testAscii("subtest16", "%0/{|val=is4,next=^a4>0/,msg=pa4;;;}", "0000000101000000020200000133000000030300000133016301620161", "a->b->c->self", flag);
 
-	_testAscii("subtest17", "[r0..1is4]%0/{|val=is4,next=^>0/,msg=^c;;;}", "00000001010000000202000001330000000303000001330163016201610000000203000001330162", "array of two lists of pointers", flag);
+	_testAscii("subtest17", "[r0,2is4]%0/{|val=is4,next=^a4>0/,msg=pa4;;;}", "00000001010000000202000001330000000303000001330163016201610000000203000001330162", "array of two lists of pointers", flag);
 
-	_testAscii("subtest18", "[r0..2is4][r0..1is4]is4", "000000060000000700000002000000030000000400000005", "array of two lists of pointers", flag);
+	_testAscii("subtest18", "[r0,3is4][r0,2is4]is4", "000000060000000700000002000000030000000400000005", "array of two lists of pointers", flag);
 
 	_testAscii("subtest19", "v4", "00000006", "void", flag);
 
-	_testAscii("subtest20", "&is4,^^c/is4", "6D61696E00", "function with args (int, char **) returning int", flag);
+	_testAscii("subtest20", "&is4,^a4pa4/is4", "6D61696E00", "function with args (int, char **) returning int", flag);
 
 	fprintf(stdout, "\n");
 
 }
-
-
-
 
 void
 _testArithmetic(char *msg1, AIF *a, char *msg2, TestFlags flag, AIF *b)
@@ -491,7 +487,7 @@ TestAllArithmetic()
 
 	{
 		char data[BUFSIZ], *dest;
-		int min=1, max=2;
+		int min=1, size=2;
 		AIF *anArray1, *anArray2;
 		AIF *anInt1 = IntToAIF(10);
 		AIF *anInt2 = IntToAIF(20);
@@ -501,21 +497,21 @@ TestAllArithmetic()
 		dest += AIF_LEN(anInt1);
 		memcpy(dest, AIF_DATA(anInt1), AIF_LEN(anInt1));
 		dest += AIF_LEN(anInt1);
-		anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt1), AIF_FORMAT(anInt1));
+		anArray1 = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(anInt1), AIF_FORMAT(anInt1));
 
 		dest = data;
 		memcpy(dest, AIF_DATA(anInt2), AIF_LEN(anInt2));
 		dest += AIF_LEN(anInt2);
 		memcpy(dest, AIF_DATA(anInt2), AIF_LEN(anInt2));
 		dest += AIF_LEN(anInt2);
-		anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt2), AIF_FORMAT(anInt2));
+		anArray2 = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(anInt2), AIF_FORMAT(anInt2));
 
 		_testArithmetic("subtest18", anArray1, "anArray1 and anArray2", flag, anArray2);
 	}
 
 	{
 		char data[BUFSIZ], *dest;
-		int min=1, max=2;
+		int min=1, size=2;
 		AIF *anArray1, *anArray2;
 
 		dest = data;
@@ -525,7 +521,7 @@ TestAllArithmetic()
 		AIFSetEnum(anEnum1, "const2");
 		memcpy(dest, AIF_DATA(anEnum1), AIF_LEN(anEnum1));
 		dest += AIF_LEN(anEnum1);
-		anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum1), AIF_FORMAT(anEnum1));
+		anArray1 = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(anEnum1), AIF_FORMAT(anEnum1));
 
 		dest = data;
 		AIFSetEnum(anEnum2, "const1");
@@ -534,14 +530,14 @@ TestAllArithmetic()
 		AIFSetEnum(anEnum2, "const2");
 		memcpy(dest, AIF_DATA(anEnum2), AIF_LEN(anEnum2));
 		dest += AIF_LEN(anEnum2);
-		anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anEnum2), AIF_FORMAT(anEnum2));
+		anArray2 = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(anEnum2), AIF_FORMAT(anEnum2));
 
 		_testArithmetic("subtest19", anArray1, "anArray1 and anArray2", flag, anArray2);
 	}
 
 	{
 		char data[BUFSIZ], *dest;
-		int min=1, max=2;
+		int min=1, size=2;
 		AIF *anArray1, *anArray2;
 		AIF *anInt = IntToAIF(3);
 		AIF *aFloat = FloatToAIF(7);
@@ -551,14 +547,14 @@ TestAllArithmetic()
 			dest += AIF_LEN(anInt);
 			memcpy(dest, AIF_DATA(anInt), AIF_LEN(anInt));
 			dest += AIF_LEN(anInt);
-			anArray1 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(anInt), AIF_FORMAT(anInt));
+			anArray1 = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(anInt), AIF_FORMAT(anInt));
 
 			dest = data;
 			memcpy(dest, AIF_DATA(aFloat), AIF_LEN(aFloat));
 			dest += AIF_LEN(aFloat);
 			memcpy(dest, AIF_DATA(aFloat), AIF_LEN(aFloat));
 			dest += AIF_LEN(aFloat);
-			anArray2 = ArrayToAIF(1, &min, &max, data, (max-min+1)*AIF_LEN(aFloat), AIF_FORMAT(aFloat));
+			anArray2 = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(aFloat), AIF_FORMAT(aFloat));
 
 		_testArithmetic("subtest20", anArray1, "anArray1 and anArray2", flag, anArray2);
 	}
@@ -585,9 +581,6 @@ TestAllArithmetic()
 	fprintf(stdout, "\n");
 
 }
-
-
-
 
 void
 _testCircularData(char * msg, AIF *a, AIF *b, TestFlags flag)
@@ -618,6 +611,9 @@ _testCircularData(char * msg, AIF *a, AIF *b, TestFlags flag)
 	printf("\n----------------------------------\n\n");
 }
 
+/*
+ * TODO: replace with constructors
+ */
 void 
 TestAllCircularData()
 {
@@ -654,9 +650,6 @@ TestAllCircularData()
 
 
 }
-
-
-
 
 void
 _testEPS(AIF *lo, AIF *hi, AIF *a)
@@ -783,17 +776,17 @@ TestAllEPS()
 	printf("\n>>>>>>> ARRAY\n");
 	{
 		char data[BUFSIZ], *dest;
-		int index, submin, submax;
+		int index, submin, subsize;
 		int smallArray[5] = {3,4,5,6,7};
 		dest = data;
 		submin = 1;
-		submax = 5;
-		for (index = 0; index < 5; index++)
+		subsize = 5;
+		for (index = 0; index < subsize; index++)
 		{
 			AIFNormalise(dest, sizeof(int), (char *) (smallArray+index), sizeof(int));
 			dest += sizeof(int);
 		}
-		a = ArrayToAIF(1, &submin, &submax, data, 5*sizeof(int), AIF_FORMAT(IntToAIF(0)));
+		a = ArrayToAIF(1, &submin, &subsize, data, subsize*sizeof(int), AIF_FORMAT(IntToAIF(0)));
 
 	}
 	lo = IntToAIF(10);
@@ -837,9 +830,10 @@ TestAllEPS()
 	AIFFree(a);
 
 	//AIF_POINTER
+	/* FIXME
 	printf("\n>>>>>>> POINTER\n");
 	a = IntToAIF(5); lo = IntToAIF(3); hi = IntToAIF(8);
-	a = PointerToAIF(NULL, a);
+	a = AIFNullPointer(a);
 	_testEPS(lo, hi, a);
 	AIFFree(lo); AIFFree(hi);
 
@@ -853,11 +847,9 @@ TestAllEPS()
 	_testEPS(lo, hi, a);
 	AIFFree(lo); AIFFree(hi);
 	AIFFree(a);
+	*/
 
 }
-
-
-
 
 void
 _testCompareByName(int dep, AIF *a, AIF *b, char *method)
@@ -900,6 +892,10 @@ _testCompareByName(int dep, AIF *a, AIF *b, char *method)
 	else
 		return;
 }
+
+/*
+ * FIXME: Need to update formats.
+ */
 
 void 
 TestAllCompareByName()
@@ -963,9 +959,6 @@ TestAllCompareByName()
 
 	AIFSetOption(AIFOPT_CMP_METHOD, AIF_CMP_BY_POSITION);
 }
-
-
-
 
 /*
  * There are some test codes that share the same code in this file,
@@ -1371,20 +1364,19 @@ _aif_test_array(AIF *a, TestFlags f)
 	// Test AIFArrayBounds
 	if (f.AIFArrayBounds == 1) {
 
-		int *min, *max, *size;
+		int *min, *size;
 
-		if ( AIFArrayBounds(a, ix->i_rank, &min, &max, &size) < 0 )
+		if ( AIFArrayBounds(a, ix->i_rank, &min, &size) < 0 )
 			fprintf(stdout, "\n\tAIFArrayBounds ERROR: %s", AIFErrorStr());
 		else
 		{
 			fprintf(stdout, "\n\tAIFArrayBounds: ");
 
 			for ( tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
-				fprintf(stdout, "[rank:%d min:%d max:%d size:%d] ",
-						tmp3, min[tmp3], max[tmp3], size[tmp3]);
+				fprintf(stdout, "[rank:%d min:%d size:%d] ",
+						tmp3, min[tmp3], size[tmp3]);
 
 			_aif_free(min);
-			_aif_free(max);
 			_aif_free(size);
 		}
 
@@ -1417,16 +1409,16 @@ _aif_test_array(AIF *a, TestFlags f)
 
 	}
 
-	// Test AIFArrayMaxIndex
-	if (f.AIFArrayMaxIndex == 1) {
+	// Test AIFArrayRankSize
+	if (f.AIFArrayRankSize == 1) {
 
 		for ( tmp1 = 0 ; tmp1 < ix->i_rank ; tmp1++ )
 		{
-			if ( (tmp3 = AIFArrayMaxIndex(a, tmp1)) < 0 )
-				fprintf(stdout, "\n\tAIFArrayMaxIndex ERROR: %s",
+			if ( (tmp3 = AIFArrayRankSize(a, tmp1)) < 0 )
+				fprintf(stdout, "\n\tAIFArrayRankSize ERROR: %s",
 						AIFErrorStr());
 			else
-				fprintf(stdout, "\n\tAIFArrayMaxIndex: [rank %d: %d]", tmp1, tmp3);
+				fprintf(stdout, "\n\tAIFArrayRankSize: [rank %d: %d]", tmp1, tmp3);
 		}
 
 	}
@@ -1446,18 +1438,18 @@ _aif_test_array(AIF *a, TestFlags f)
 	if (f.AIFArraySlice == 1) {
 
 		int * mn;
-		int * mx;
+		int * sz;
 
 		mn = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
-		mx = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
+		sz = (int *)_aif_alloc(sizeof(int) * ix->i_rank);
 	
 		// AIFArraySlice (first element)
 		for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
 		{
 			mn[tmp3] = ix->i_min[tmp3];
-			mx[tmp3] = ix->i_min[tmp3];
+			sz[tmp3] = 1;
 		}
-		ax = AIFArraySlice(a, ix->i_rank, mn, mx);
+		ax = AIFArraySlice(a, ix->i_rank, mn, sz);
 		if ( ax != (AIF *)NULL )
 		{
 			fprintf(stdout, "\n\tAIFArraySlice (first): ");
@@ -1472,10 +1464,9 @@ _aif_test_array(AIF *a, TestFlags f)
 		// AIFArraySlice (last element)
 		for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
 		{
-			mn[tmp3] = ix->i_max[tmp3];
-			mx[tmp3] = ix->i_max[tmp3];
+			mn[tmp3] = ix->i_min[tmp3] + ix->i_size[tmp3] - 1;
 		}
-		ax = AIFArraySlice(a, ix->i_rank, mn, mx);
+		ax = AIFArraySlice(a, ix->i_rank, mn, sz);
 		if ( ax != (AIF *)NULL )
 		{
 			fprintf(stdout, "\n\tAIFArraySlice (last): ");
@@ -1490,18 +1481,18 @@ _aif_test_array(AIF *a, TestFlags f)
 		// AIFArraySlice (2nd to 2nd last or all)
 		for (tmp3 = 0; tmp3 < ix->i_rank; tmp3++)
 		{
-			if (ix->i_min[tmp3] < ix->i_max[tmp3] - 1)
+			if (ix->i_size[tmp3] > 3)
 			{
 				mn[tmp3] = ix->i_min[tmp3] + 1;
-				mx[tmp3] = ix->i_max[tmp3] - 1;
+				sz[tmp3] = ix->i_size[tmp3] - 2;
 			}
 			else
 			{
 				mn[tmp3] = ix->i_min[tmp3];
-				mx[tmp3] = ix->i_max[tmp3];
+				sz[tmp3] = ix->i_size[tmp3];
 			}
 		}
-		ax = AIFArraySlice(a, ix->i_rank, mn, mx);
+		ax = AIFArraySlice(a, ix->i_rank, mn, sz);
 		if ( ax != (AIF *)NULL )
 		{
 			fprintf(stdout, "\n\tAIFArraySlice (2nd to 2nd last or all): ");
@@ -1515,7 +1506,7 @@ _aif_test_array(AIF *a, TestFlags f)
 
 
 		_aif_free(mn);
-		_aif_free(mx);
+		_aif_free(sz);
 
 	}
 
@@ -1663,7 +1654,7 @@ _aif_test_array(AIF *a, TestFlags f)
 			fprintf(stdout, "\n\tAIFArrayRef (first) ERROR: %s", AIFErrorStr());
 
 		for (tmp1 = 0; tmp1 < ix->i_rank; tmp1++)
-			loc[tmp1] = ix->i_max[tmp1];
+			loc[tmp1] = ix->i_min[tmp1] + ix->i_size[tmp1] - 1;
 
 		ax = AIFArrayRef(a, ix->i_rank, loc);
 		if ( ax != (AIF *)NULL )
