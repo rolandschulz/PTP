@@ -22,14 +22,17 @@ import java.math.BigInteger;
 
 /**
  * Represents char pointer value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFValueCharPointer extends IAIFValueString {
 	/**
 	 * Returns address value of this value
+	 * 
 	 * @return address value of this value
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	BigInteger pointerValue() throws AIFException;
+	public BigInteger pointerValue() throws AIFException;
 }

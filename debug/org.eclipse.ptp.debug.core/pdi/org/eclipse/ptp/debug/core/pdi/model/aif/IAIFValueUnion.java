@@ -20,7 +20,18 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents union value in IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFValueUnion extends IValueAggregate {}
+public interface IAIFValueUnion extends IAIFValue {
+	/**
+	 * Get the value of the field corresponding to name
+	 * 
+	 * @param name
+	 *            name of union field
+	 * @return union value
+	 */
+	public IAIFValue getFieldValue(String name);
+
+}

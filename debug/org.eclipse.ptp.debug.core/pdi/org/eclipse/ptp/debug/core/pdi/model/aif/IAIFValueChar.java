@@ -20,21 +20,26 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents char value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFValueChar extends IValueIntegral {
 	/**
 	 * Returns char of this value
+	 * 
 	 * @return char of this value
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	char charValue() throws AIFException;
-	
+	public char charValue() throws AIFException;
+
 	/**
 	 * Returns byte of this value
+	 * 
 	 * @return byte of this value
-	 * @throws AIFException on failure
+	 * @throws AIFException
+	 *             on failure
 	 */
-	byte byteValue() throws AIFException;
+	public byte byteValue() throws AIFException;
 }

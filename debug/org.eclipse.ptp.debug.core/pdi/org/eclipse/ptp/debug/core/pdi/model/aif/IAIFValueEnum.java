@@ -20,7 +20,15 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents enum value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFValueEnum extends IValueIntegral {}
+public interface IAIFValueEnum extends IValueIntegral {
+	/**
+	 * Get the integer value of this enum
+	 * 
+	 * @return enum value
+	 */
+	public int intValue();
+}
