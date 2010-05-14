@@ -147,7 +147,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
             {
                 IMarker marker = def.createMarker();
                 if (marker == null)
-                    MessageDialog.openError(shell, "Error", "Unable to create marker");
+                    MessageDialog.openError(shell, "Error (" + def.getTokenRef() + ")", "Unable to create marker");
                 else
                     IDE.openEditor(page, marker, true);
             }
