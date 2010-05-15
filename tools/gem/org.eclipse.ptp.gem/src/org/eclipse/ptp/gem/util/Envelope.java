@@ -58,7 +58,9 @@ public class Envelope {
 	private int tag;
 
 	// Intra and inter CB edges
+	@SuppressWarnings("unused")
 	private ArrayList<CB> intraCb;
+	@SuppressWarnings("unused")
 	private ArrayList<CB> interCb;
 
 	// For outputting to string, determine what to output.
@@ -70,6 +72,7 @@ public class Envelope {
 	// For assertions.
 	private boolean assertion;
 	private String assert_message;
+	@SuppressWarnings("unused")
 	private String assert_function;
 
 	// For resource leaks.
@@ -83,10 +86,8 @@ public class Envelope {
 			.compile("^([0-9]+)\\s+([0-9]+)\\s+ASSERT[ ]+Message:[ ]+[0-9]+ (.+?)Function:[ ]+[0-9]+ (.+?) File:[ ]+[0-9]+ (.+?) ([-]?[0-9]+)$"); //$NON-NLS-1$
 	private static Pattern leakRegex = Pattern
 			.compile("^([0-9]+)\\s+([0-9]+)\\s+Leak\\s+(.+?)\\s+\\{\\s+\\}\\s+\\{\\s+\\}\\s+Match:\\s+-1\\s+-1\\sFile:[ ]+[0-9]+ (.+?) ([-]?[0-9]+)$"); //$NON-NLS-1$
-	private static Pattern communicatorRegex = Pattern
-			.compile("^([0-9]+)_(?:([0-9]+):)*$"); //$NON-NLS-1$
-	private static Pattern interCbRegex = Pattern
-			.compile("^(?:\\[\\s+([0-9]+)\\s+([0-9]+)\\s+\\]\\s+)*$"); //$NON-NLS-1$
+	private static Pattern communicatorRegex = Pattern.compile("^([0-9]+)_(?:([0-9]+):)*$"); //$NON-NLS-1$
+	private static Pattern interCbRegex = Pattern.compile("^(?:\\[\\s+([0-9]+)\\s+([0-9]+)\\s+\\]\\s+)*$"); //$NON-NLS-1$
 	private static Pattern intraCbRegex = Pattern.compile("^([0-9]+\\s+)*$"); //$NON-NLS-1$
 
 	/**
@@ -102,7 +103,8 @@ public class Envelope {
 	/**
 	 * Returns the interleaving for this Envelope.
 	 * 
-	 * @param interleaving The interleaving for this Envelope.
+	 * @param interleaving
+	 *            The interleaving for this Envelope.
 	 * @return void
 	 */
 	public void setInterleaving(int interleaving) {
@@ -152,7 +154,8 @@ public class Envelope {
 	/**
 	 * Sets the issue index for this Envelope.
 	 * 
-	 * @param The issue index for this Envelope.
+	 * @param The
+	 *            issue index for this Envelope.
 	 * @return void
 	 */
 	public void setIssueIndex(int value) {
@@ -309,7 +312,8 @@ public class Envelope {
 	/**
 	 * Adds the specified Envelope to the list of collective matches.
 	 * 
-	 * @param envelope The Envelope to add.
+	 * @param envelope
+	 *            The Envelope to add.
 	 * @return void
 	 */
 	public void addCollectiveMatch(Envelope envelope) {
@@ -327,7 +331,8 @@ public class Envelope {
 	/**
 	 * Pairs the specified envelope with its match.
 	 * 
-	 * @param envelope The Envelope to match.
+	 * @param envelope
+	 *            The Envelope to match.
 	 * @return void
 	 */
 	public void pairWithEnvelope(Envelope envelope) {
@@ -339,7 +344,8 @@ public class Envelope {
 	 * Parses the input line in to an envelope, or returns null if there was a
 	 * parse error and an envelope couldn't be matched.
 	 * 
-	 * @param line The log file line to parse with regular expressions.
+	 * @param line
+	 *            The log file line to parse with regular expressions.
 	 * @return Envelope The Envelope representing the MPI function call.
 	 */
 	public static Envelope parse(String line) {
@@ -444,9 +450,7 @@ public class Envelope {
 			case 7: {
 
 				// If communicator, only first filled in.
-				if (!isNullOrEmpty(value)
-						&& isNullOrEmpty(envelopeMatch.group(i + 1))
-						&& isNullOrEmpty(envelopeMatch.group(i + 2))) {
+				if (!isNullOrEmpty(value) && isNullOrEmpty(envelopeMatch.group(i + 1)) && isNullOrEmpty(envelopeMatch.group(i + 2))) {
 					parseCommunicator(env, value);
 					env.tag = 0;
 					env.tag_set = false;
@@ -457,8 +461,7 @@ public class Envelope {
 				}
 
 				// If all three tokens are present, then it's a send or receive.
-				else if (!isNullOrEmpty(value)
-						&& !isNullOrEmpty(envelopeMatch.group(i + 1))
+				else if (!isNullOrEmpty(value) && !isNullOrEmpty(envelopeMatch.group(i + 1))
 						&& !isNullOrEmpty(envelopeMatch.group(i + 2))) {
 					if (env.func_name.toLowerCase().contains("recv") //$NON-NLS-1$
 							|| env.func_name.toLowerCase().contains("probe")) { //$NON-NLS-1$
@@ -505,8 +508,7 @@ public class Envelope {
 					while (matcher.find()) {
 						index = matcher.group().trim();
 						if (!isNullOrEmpty(index)) {
-							intraCb.add(new CB(env.rank, Integer
-									.parseInt(index)));
+							intraCb.add(new CB(env.rank, Integer.parseInt(index)));
 						}
 					}
 				}
@@ -523,8 +525,7 @@ public class Envelope {
 				if (interCbMatcher.matches()) {
 
 					// This will put a single integer into each match group
-					Pattern pattern = Pattern
-							.compile("[\\s+([0-9])+\\s+[0-9]+)\\s+]\\s+"); //$NON-NLS-1$
+					Pattern pattern = Pattern.compile("[\\s+([0-9])+\\s+[0-9]+)\\s+]\\s+"); //$NON-NLS-1$
 					Matcher matcher = pattern.matcher(value);
 
 					String rank = ""; //$NON-NLS-1$
@@ -535,8 +536,7 @@ public class Envelope {
 							index = matcher.group().trim();
 						}
 						if (!isNullOrEmpty(rank) && !isNullOrEmpty(index)) {
-							interCb.add(new CB(Integer.parseInt(rank), Integer
-									.parseInt(index)));
+							interCb.add(new CB(Integer.parseInt(rank), Integer.parseInt(index)));
 						}
 					}
 					env.interCb = interCb;
@@ -570,14 +570,14 @@ public class Envelope {
 	 * @param none
 	 * @return String The String representation of this Envelope.
 	 */
+	@Override
 	public String toString() {
 		if (toStringOutput != null) {
 			return toStringOutput;
 		}
 
 		if (assertion) {
-			Pattern assertPattern = Pattern
-					.compile("^Assertion `(.+?)' failed.$"); //$NON-NLS-1$
+			Pattern assertPattern = Pattern.compile("^Assertion `(.+?)' failed.$"); //$NON-NLS-1$
 			Matcher m = assertPattern.matcher(assert_message);
 			if (m.matches()) {
 				toStringOutput = String.format("{0}({1})", func_name, m //$NON-NLS-1$
@@ -690,7 +690,8 @@ public class Envelope {
 	/**
 	 * Returns true if the specified String is null or empty, false otherwise.
 	 * 
-	 * @param value The string that is being checked
+	 * @param value
+	 *            The string that is being checked
 	 * @return boolean isNullOrEmpty
 	 */
 	private static boolean isNullOrEmpty(String value) {
@@ -704,13 +705,14 @@ public class Envelope {
 	 * Parses out the ranks that are members of the communicator matched with
 	 * the communicator regular expression.
 	 * 
-	 * @param env The Envelope being updated
-	 * @param value The String holding the ranks that need to be parsed
+	 * @param env
+	 *            The Envelope being updated
+	 * @param value
+	 *            The String holding the ranks that need to be parsed
 	 */
 	private static void parseCommunicator(Envelope env, String value) {
 		if (value == null) {
-			GemUtilities.showErrorDialog(Messages.Envelope_53,
-					Messages.Envelope_54);
+			GemUtilities.showErrorDialog(Messages.Envelope_53, Messages.Envelope_54);
 			return;
 		}
 
@@ -730,8 +732,7 @@ public class Envelope {
 			while (matcher.find()) {
 				String commMemberRank = matcher.group().trim().replace(":", ""); //$NON-NLS-1$ //$NON-NLS-2$
 				if (!isNullOrEmpty(commMemberRank)) {
-					env.communicator_ranks
-							.add(Integer.parseInt(commMemberRank));
+					env.communicator_ranks.add(Integer.parseInt(commMemberRank));
 				}
 			}
 		}
