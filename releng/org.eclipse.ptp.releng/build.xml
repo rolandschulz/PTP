@@ -288,7 +288,7 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.isp-feature"/>
+			<param name="tagmodule" value="org.eclipse.ptp/releng/org.eclipse.ptp.gem-feature"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		
@@ -670,11 +670,11 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/isp/org.eclipse.ptp.isp"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/tools/isp/org.eclipse.ptp.isp.help"/>
+			<param name="tagmodule" value="org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem.help"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
