@@ -21,20 +21,32 @@ package org.eclipse.ptp.debug.internal.core.pdi.aif;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 
 public class AIFValueUnknown extends AIFValue {
 	public AIFValueUnknown(IAIFType type) {
 		super(type);
-		size = AIFFactory.NO_SIZE;
+		setSize(AIFFactory.NO_SIZE);
 	}
-	protected void parse(SimpleByteBuffer buffer) {}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
+	protected void parse(SimpleByteBuffer buffer) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
 	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = Messages.AIFValueUnknown_0;
-		}
-		return result;
+		return Messages.AIFValueUnknown_0;
 	}
 }

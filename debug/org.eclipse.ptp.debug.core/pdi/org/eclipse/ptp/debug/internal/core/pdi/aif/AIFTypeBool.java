@@ -19,19 +19,38 @@
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeBool;
 
 public class AIFTypeBool extends TypeIntegral implements IAIFTypeBool {
-	//b
-	public AIFTypeBool() {
-		this(true);
-	}
-	public AIFTypeBool(boolean signed) {
-		super(signed);
-	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#sizeof()
+	 */
+	@Override
 	public int sizeof() {
 		return AIFFactory.SIZE_BOOL;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#parse(java.lang
+	 * .String)
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		return super.parse("u1" + fmt); //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#toString()
+	 */
+	@Override
 	public String toString() {
 		return "b" + sizeof(); //$NON-NLS-1$
 	}

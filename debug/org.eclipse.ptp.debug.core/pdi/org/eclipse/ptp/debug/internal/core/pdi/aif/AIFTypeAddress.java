@@ -18,19 +18,47 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
 
 public class AIFTypeAddress extends AIFType implements IAIFTypeAddress {
-	int size = 0;
-	//char*: a4
-	public AIFTypeAddress(int size) {
-		this.size = size;
-	}
+	private int fSize = 0;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
-		return String.valueOf(AIFFactory.FDS_ADDRESS) + size;
+		return String.valueOf(AIFFactory.FDS_ADDRESS) + sizeof();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
 	public int sizeof() {
-		return size;
-	}	
+		return fSize;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		int pos = AIFFactory.getFirstNonDigitPos(fmt, 0, false);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeAddress_0);
+		}
+		fSize = Integer.parseInt(fmt.substring(0, pos));
+		return fmt.substring(pos);
+	}
 }

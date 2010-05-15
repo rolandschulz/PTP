@@ -18,28 +18,57 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeDerived;
-
 
 /**
  * @author Clement chu
  * 
  */
 public abstract class TypeDerived extends AIFType implements ITypeDerived {
-	protected IAIFType basetype;
-	
-	public TypeDerived(IAIFType basetype) {
-		this.basetype = basetype;
-	}
+	private IAIFType fBasetype;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.ITypeDerived#getBaseType()
+	 */
 	public IAIFType getBaseType() {
-		return basetype;
+		return fBasetype;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
 	public int sizeof() {
-		return basetype.sizeof();
+		return getBaseType().sizeof();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
 		return getBaseType().toString();
 	}
-}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		fmt = AIFFactory.parseType(fmt);
+		fBasetype = AIFFactory.getType();
+		return fmt;
+	}
+}

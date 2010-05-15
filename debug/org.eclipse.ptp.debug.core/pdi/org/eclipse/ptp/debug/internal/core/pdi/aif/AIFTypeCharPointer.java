@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeCharPointer;
@@ -28,20 +30,54 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeCharPointer;
  * 
  */
 public class AIFTypeCharPointer extends AIFTypeString implements IAIFTypeCharPointer {
-	private IAIFType addr;
-	//char*: pa4
-	int size = AIFFactory.SIZE_INVALID;
-	
-	public AIFTypeCharPointer(IAIFType addr) {
-		this.addr = addr;
-	}
-	public int sizeof() {
-		return getAddressType().sizeof() + size;
-	}
+	private IAIFType fAddrType;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeCharPointer#getAddressType
+	 * ()
+	 */
 	public IAIFTypeAddress getAddressType() {
-		return (IAIFTypeAddress)addr;
+		return (IAIFTypeAddress) fAddrType;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		fmt = AIFFactory.parseType(fmt);
+		IAIFType type = AIFFactory.getType();
+		if (!(type instanceof IAIFTypeAddress)) {
+			throw new AIFFormatException(Messages.AIFTypeCharPointer_0);
+		}
+		fAddrType = type;
+		return fmt;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeString#sizeof()
+	 */
+	@Override
+	public int sizeof() {
+		return getAddressType().sizeof() + super.sizeof();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFTypeString#toString()
+	 */
+	@Override
 	public String toString() {
-		return AIFFactory.FDS_CHAR_POINTER + addr.toString();
-	}		
+		return AIFFactory.FDS_CHAR_POINTER + getAddressType().toString();
+	}
 }

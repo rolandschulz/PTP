@@ -20,11 +20,36 @@ package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 
 public class AIFTypeIncomplete extends AIFType {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		return fmt;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
 	public int sizeof() {
 		return AIFFactory.SIZE_INVALID;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
 		return Messages.AIFTypeIncomplete_0;
 	}

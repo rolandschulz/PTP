@@ -22,34 +22,45 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeCharPointer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueCharPointer;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueCharPointer extends AIFValueString implements IAIFValueCharPointer {	
+public class AIFValueCharPointer extends AIFValueString implements IAIFValueCharPointer {
 	IAIFValue addrValue;
 
 	public AIFValueCharPointer(IAIFTypeCharPointer type, SimpleByteBuffer buffer) {
 		super(type, buffer);
-		((AIFTypeCharPointer)type).size = size;
+		((AIFTypeCharPointer) type).setSizeof(sizeof());
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValueString#parse(org.
+	 * eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
 	protected void parse(SimpleByteBuffer buffer) {
-		addrValue = AIFFactory.getAIFValue(null, ((IAIFTypeCharPointer)type).getAddressType(), buffer);
+		addrValue = AIFFactory.getAIFValue(null, ((IAIFTypeCharPointer) getType()).getAddressType(), buffer);
 		super.parse(buffer);
-		size += addrValue.sizeof();
+		setSize(sizeof() + addrValue.sizeof());
 	}
-	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = ""; //$NON-NLS-1$
-		}
-		return result;
-	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueCharPointer#pointerValue
+	 * ()
+	 */
 	public BigInteger pointerValue() throws AIFException {
 		return ValueIntegral.bigIntegerValue(addrValue.getValueString());
-	}	
+	}
 }

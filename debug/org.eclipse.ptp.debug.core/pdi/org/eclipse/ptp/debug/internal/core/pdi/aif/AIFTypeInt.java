@@ -18,20 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeInt;
 
-
 public class AIFTypeInt extends TypeIntegral implements IAIFTypeInt {
-	private int size;
-	//is?
-	public AIFTypeInt(int size) {
-		this(true, size);
-	}
-	public AIFTypeInt(boolean signed, int size) {
-		super(signed);
-		this.size = size;
-	}
-	public int sizeof() {
-		return size;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.valueOf(AIFFactory.FDS_INT) + super.toString();
 	}
 }

@@ -18,19 +18,48 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeVoid;
 
-
 public class AIFTypeVoid extends AIFType implements IAIFTypeVoid {
-	private int size;
-	
-	public AIFTypeVoid(int size) {
-		this.size = size;
-	}
+	private int fSize;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
 	public int sizeof() {
-		return size;
+		return fSize;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		int pos = AIFFactory.getFirstNonDigitPos(fmt, 0, false);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeVoid_0);
+		}
+		fSize = Integer.parseInt(fmt.substring(0, pos));
+		return fmt.substring(pos);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
-		return "v" + sizeof(); //$NON-NLS-1$
+		return String.valueOf(AIFFactory.FDS_VOID) + sizeof();
 	}
+
 }

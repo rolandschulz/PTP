@@ -18,66 +18,51 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeAggregate;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IValueAggregate;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IValueParent;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAggregate;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueAggregate;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class ValueAggregate extends ValueParent implements IValueAggregate {
-	protected List<IAIFValue> values = new ArrayList<IAIFValue>();
-	
-	public ValueAggregate(IValueParent parent, ITypeAggregate type, SimpleByteBuffer buffer) {
+public class AIFValueAggregate extends ValueParent implements IAIFValueAggregate {
+	private final Map<String, IAIFValue> values = new HashMap<String, IAIFValue>();
+
+	public AIFValueAggregate(IValueParent parent, IAIFTypeAggregate type, SimpleByteBuffer buffer) {
 		super(parent, type);
 		parse(buffer);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueAggregate#getFieldValue
+	 * (java.lang.String)
 	 */
-	protected void parse(SimpleByteBuffer buffer) {
-		ITypeAggregate typeAggregate = (ITypeAggregate)getType();
-		int num_children = typeAggregate.getNumberOfChildren();
-		for (int i=0; i<num_children; i++) {
-			IAIFType aifType = typeAggregate.getType(i);
-			IAIFValue val = AIFFactory.getAIFValue(getParent(), aifType, buffer);
-			values.add(val);
-			size += val.sizeof();
-		}
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#getChildrenNumber()
-	 */
-	public int getChildrenNumber() throws AIFException {
-		return values.size();
+	public IAIFValue getFieldValue(String name) {
+		return values.get(name);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
 	 */
 	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = getString();
-		}
-		return result;
-	}
-	
-	private String getString() throws AIFException {
 		String content = "{"; //$NON-NLS-1$
 		int length = values.size();
-		for (int i=0; i<length; i++) {
-			IAIFValue value = (IAIFValue)values.get(i);
+		for (int i = 0; i < length; i++) {
+			IAIFValue value = values.get(i);
 			content += value.getValueString();
 			if (i < length - 1) {
 				content += ","; //$NON-NLS-1$
@@ -85,11 +70,33 @@ public abstract class ValueAggregate extends ValueParent implements IValueAggreg
 		}
 		return content + "}"; //$NON-NLS-1$
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IValueAggregate#getValue(int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#length()
 	 */
-	public IAIFValue getValue(int index) {
-		return values.get(index);
+	@Override
+	public int length() throws AIFException {
+		return values.size();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
+	protected void parse(SimpleByteBuffer buffer) {
+		IAIFTypeAggregate typeAggregate = (IAIFTypeAggregate) getType();
+		String[] names = typeAggregate.getFieldNames(IAIFTypeAggregate.AIF_CLASS_ACCESS_ALL);
+		IAIFType[] types = typeAggregate.getFieldTypes(IAIFTypeAggregate.AIF_CLASS_ACCESS_ALL);
+		for (int i = 0; i < names.length; i++) {
+			IAIFValue val = AIFFactory.getAIFValue(getParent(), types[i], buffer);
+			values.put(names[i], val);
+			setSize(sizeof() + val.sizeof());
+		}
 	}
 }

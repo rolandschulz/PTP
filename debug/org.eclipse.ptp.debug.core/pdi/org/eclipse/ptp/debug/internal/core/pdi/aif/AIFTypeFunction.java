@@ -19,27 +19,40 @@
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFunction;
 
 public class AIFTypeFunction extends TypeDerived implements IAIFTypeFunction {
 	private String[] args = new String[0];
-	
-	//&A1,A2,.../T	
-	public AIFTypeFunction(String format, IAIFType basetype) {
-		super(basetype);
-		parse(format);
-	}
-	private void parse(String fmt) {
-		args = fmt.split(AIFFactory.SIGN_COMMA);
-	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#toString()
+	 */
+	@Override
 	public String toString() {
-		String content = "&"; //$NON-NLS-1$
-		for (int i = 0; i<args.length; i++) {
+		String content = String.valueOf(AIFFactory.FDS_FUNCTION);
+		for (int i = 0; i < args.length; i++) {
 			content += args[i];
 			if (i < args.length - 1)
-				content += ","; //$NON-NLS-1$
+				content += AIFFactory.FDS_FUNCTION_ARG_SEP;
 		}
-		return content + "/" + super.toString(); //$NON-NLS-1$
+		return content + AIFFactory.FDS_FUNCTION_END + super.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#parse(java.lang
+	 * .String)
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		int pos = fmt.indexOf(AIFFactory.FDS_FUNCTION_END);
+		String argsStr = fmt.substring(0, pos);
+		args = argsStr.split(String.valueOf(AIFFactory.FDS_FUNCTION_ARG_SEP));
+		return super.parse(fmt.substring(pos));
 	}
 }

@@ -21,80 +21,105 @@ package org.eclipse.ptp.debug.internal.core.pdi.aif;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeEnum;
 
 public class AIFTypeEnum extends TypeIntegral implements IAIFTypeEnum {
-	private List<String> fields = new ArrayList<String>();
-	private List<String> values = new ArrayList<String>();
-	private IAIFType basetype;
-	private String name;
-	
-	//<ID|S1=V1,S2=V2>is4
-	public AIFTypeEnum(String format, IAIFType basetype) {
-		this(format, true, basetype);
+	private final List<String> fNames = new ArrayList<String>();
+	private final List<Integer> fValues = new ArrayList<Integer>();
+	private String fName = ""; //$NON-NLS-1$
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeEnum#getNames()
+	 */
+	public String[] getNames() {
+		return fNames.toArray(new String[0]);
 	}
-	public AIFTypeEnum(String format, boolean signed, IAIFType basetype) {
-		super(signed);
-		this.basetype = basetype;
-		parse(format);
-	}
-	public IAIFType getBaseType() {
-		return basetype;
-	}
-	public int sizeof() {
-		return getNumberOfChildren() * basetype.sizeof();
-	}
-	
-	protected void parse(String fmt) {
-		fmt = parseName(fmt);
-		if (fmt.length() > 0) {
-			String[] pairs = fmt.split(AIFFactory.SIGN_COMMA);
-			for (int i=0; i<pairs.length; i++) {
-				String[] results = pairs[i].split(AIFFactory.SIGN_EQUAL);
-				fields.add(results[0]);
-				values.add(results[1]);
-			}
-		}
-	}
-	protected String parseName(String fmt) {
-		int pos = fmt.indexOf(AIFFactory.SIGN_STROKE);
-		name = fmt.substring(0, pos);
-		int last_pos = fmt.lastIndexOf(AIFFactory.FDS_ENUM_END);
-		if (last_pos == -1)
-			return ""; //$NON-NLS-1$
-		
-		return fmt.substring(pos+1, last_pos);
-	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeEnum#getName()
+	 */
 	public String getName() {
-		return name;
+		return fName;
 	}
-	public String[] getFields() {
-		return (String[])fields.toArray(new String[0]);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeEnum#getValues()
+	 */
+	public Integer[] getValues() {
+		return fValues.toArray(new Integer[0]);
 	}
-	public String[] getTypes() {
-		return (String[])values.toArray(new String[0]);
-	}
-	public String getField(int index) {
-		return (String)fields.get(index);
-	}
-	public String getValue(int index) {
-		return (String)values.get(index);
-	}
-	public int getNumberOfChildren() {
-		return fields.size();
-	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#toString()
+	 */
+	@Override
 	public String toString() {
-		String content = "<" + getName() + AIFFactory.SIGN_STROKE; //$NON-NLS-1$
-		for (int i=0; i<fields.size(); i++) {
-			content += (String)fields.get(i) + "=" + (String)values.get(i); //$NON-NLS-1$
-			if (i < fields.size()-1) {
-				content += ","; //$NON-NLS-1$
+		String content = String.valueOf(AIFFactory.FDS_ENUM);
+		content += getName() + AIFFactory.FDS_TYPENAME_END;
+		for (int i = 0; i < fNames.size(); i++) {
+			content += fNames.get(i) + AIFFactory.FDS_ENUM_SEP + fValues.get(i);
+			if (i < fNames.size() - 1) {
+				content += AIFFactory.FDS_ENUM_CONST_SEP;
 			}
 		}
-		return content + ">" + super.toString();		 //$NON-NLS-1$
+		return content + AIFFactory.FDS_ENUM_END + String.valueOf(AIFFactory.FDS_INT) + super.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#parse(java.lang
+	 * .String)
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		fmt = parseName(fmt);
+		while (fmt.length() > 0 && fmt.charAt(0) != AIFFactory.FDS_ENUM_END) {
+			fmt = parseField(fmt);
+			if (fmt.charAt(0) == AIFFactory.FDS_ENUM_CONST_SEP) {
+				fmt = fmt.substring(1);
+			}
+		}
+		if (fmt.charAt(0) != AIFFactory.FDS_ENUM_END) {
+			throw new AIFFormatException(Messages.AIFTypeEnum_0);
+		}
+		fmt = fmt.substring(2); // skip enum end and "i"
+		return super.parse(fmt);
+	}
+
+	private String parseField(String fmt) throws AIFFormatException {
+		int pos = fmt.indexOf(AIFFactory.FDS_ENUM_SEP);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeEnum_1);
+		}
+		fNames.add(fmt.substring(0, pos));
+		fmt = fmt.substring(pos + 1);
+		pos = AIFFactory.getFirstNonDigitPos(fmt, 0, true);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeEnum_2);
+		}
+		fValues.add(Integer.parseInt(fmt.substring(0, pos)));
+		return fmt.substring(pos);
+	}
+
+	protected String parseName(String fmt) throws AIFFormatException {
+		int pos = fmt.indexOf(AIFFactory.FDS_TYPENAME_END);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeEnum_3);
+		}
+		fName = fmt.substring(0, pos);
+		return fmt.substring(pos + 1);
 	}
 }

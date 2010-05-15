@@ -19,34 +19,70 @@
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
 
 public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
-	private IAIFType addr;
-	//char*: ^a4c
-	//^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}
-	//^%1/{s1 *|a=f8,b=^%2/{s *|a=f8,b=^>2/;;;},c=^>1/;;;}
-	public AIFTypePointer(IAIFType addr, IAIFType basetype) {
-		super(basetype);
-		this.addr = addr;
+	public static void main(String[] args) {
+		// IAIFType testType =
+		// AIFFactory.getAIFType("^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}");
+		IAIFType testType;
+		try {
+			testType = AIFFactory.getAIFType("^a4^a4"); //$NON-NLS-1$
+			System.out.println("----: " + ((IAIFTypePointer) testType).getBaseType()); //$NON-NLS-1$
+			System.out.println("----: " + testType); //$NON-NLS-1$
+			System.out.println("----: " + testType.sizeof()); //$NON-NLS-1$
+		} catch (AIFFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	public String toString() {
-		return AIFFactory.FDS_POINTER + addr.toString() + super.toString();
+
+	private IAIFType fAddrType;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer#getAddressType()
+	 */
+	public IAIFTypeAddress getAddressType() {
+		return (IAIFTypeAddress) fAddrType;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#sizeof()
+	 */
+	@Override
 	public int sizeof() {
 		return super.sizeof() + getAddressType().sizeof() + 1;
 	}
-	public IAIFTypeAddress getAddressType() {
-		return (IAIFTypeAddress)addr;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.valueOf(AIFFactory.FDS_POINTER) + getAddressType().toString() + super.toString();
 	}
-	
-	public static void main(String[] args) {
-		//IAIFType testType = AIFFactory.getAIFType("^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}");
-		IAIFType testType = AIFFactory.getAIFType("^a4^a4"); //$NON-NLS-1$
-		System.out.println("----: " + ((IAIFTypePointer)testType).getBaseType()); //$NON-NLS-1$
-		System.out.println("----: " + testType); //$NON-NLS-1$
-		System.out.println("----: " + testType.sizeof()); //$NON-NLS-1$
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#parse(java.lang
+	 * .String)
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		fmt = AIFFactory.parseType(fmt);
+		fAddrType = AIFFactory.getType();
+		return super.parse(fmt);
 	}
 }

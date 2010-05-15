@@ -18,7 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 
-
-public abstract class AIFType implements IAIFType {}
+public abstract class AIFType implements IAIFType {
+	/**
+	 * Parse the format string. The result is the string with the full type
+	 * description removed.
+	 * 
+	 * @param fmt
+	 *            format description
+	 * @return remainder of string
+	 * @throws AIFFormatException
+	 *             if the string can't be parsed
+	 */
+	public abstract String parse(String fmt) throws AIFFormatException;
+}

@@ -18,33 +18,63 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeEnum;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueEnum;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeEnum;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueEnum;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueEnum extends ValueIntegral implements IAIFValueEnum {
-	IAIFValue value;
-	
+	private int fValue = 0;
+
 	public AIFValueEnum(IAIFTypeEnum type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
 	protected void parse(SimpleByteBuffer buffer) {
-		IAIFTypeEnum pType = (IAIFTypeEnum)type;
-		value = AIFFactory.getAIFValue(null, pType.getBaseType(), buffer);
-		size = value.sizeof();
-	}
-	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = value.getValueString();
+		byte[] dst = new byte[getType().sizeof()];
+		for (int i = 0; i < dst.length; i++) {
+			dst[i] = buffer.get();
 		}
-		return result;
+		ByteBuffer buf = ByteBuffer.wrap(dst, 0, dst.length);
+		try {
+			fValue = buf.getInt();
+		} catch (BufferUnderflowException e) {
+		}
+		setSize(getType().sizeof());
+	}
+
+	public int intValue() {
+		return fValue;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
+	public String getValueString() throws AIFException {
+		Integer[] values = ((IAIFTypeEnum) getType()).getValues();
+		for (int i = 0; i < values.length; i++) {
+			if (values[i].intValue() == intValue()) {
+				return ((IAIFTypeEnum) getType()).getNames()[i];
+			}
+		}
+		return ""; //$NON-NLS-1$
 	}
 }

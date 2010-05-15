@@ -19,76 +19,77 @@
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 
 public class AIF implements IAIF {
-	private IAIFType aifType;
-	private IAIFValue aifValue;
-	private String typeDesc = ""; //$NON-NLS-1$
+	private IAIFType fType;
+	private IAIFValue fValue;
+	private String fDesc = ""; //$NON-NLS-1$
 
-	public AIF(IAIFType aifType, IAIFValue aifValue) {
-		this.aifType = aifType;
-		this.aifValue = aifValue;
+	public AIF(IAIFType aifType, IAIFValue aifValue, String desc) {
+		fType = aifType;
+		fValue = aifValue;
+		fDesc = desc;
 	}
-	
-	public AIF(String fds, byte[] data) {
-		aifType = AIFFactory.getAIFType(fds);
-		aifValue = AIFFactory.getAIFValue(null, aifType, data);
-	}
-	
-	public AIF(String fds, byte[] data, String desc) {
-		this(fds, data);
-		typeDesc = desc;
-	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIF#getDescription()
 	 */
 	public String getDescription() {
-		return this.typeDesc;
+		return fDesc;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIF#getType()
 	 */
 	public IAIFType getType() {
-		return aifType;
+		return fType;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIF#getValue()
 	 */
 	public IAIFValue getValue() {
-		return aifValue;
+		return fValue;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		try {
-			return "<" + aifType.toString() + "," + aifValue.toString() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return "<" + getType().toString() + "," + getValue().toString() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (Exception e) {
 			return Messages.AIF_4 + e.getMessage();
 		}
 	}
-	
+
 	/**
 	 * Set the AIF type
+	 * 
 	 * @param t
 	 */
 	protected void setType(IAIFType t) {
-		aifType = t;
+		fType = t;
 	}
-	
+
 	/**
 	 * Set the AIF value
+	 * 
 	 * @param v
 	 */
 	protected void setValue(IAIFValue v) {
-		aifValue = v;
+		fValue = v;
 	}
 }

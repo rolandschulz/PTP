@@ -20,11 +20,11 @@ package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeNamed;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueNamed;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IValueParent;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
@@ -33,29 +33,59 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 public class AIFValueNamed extends ValueDerived implements IAIFValueNamed {
 	IAIFValue value;
 	String name;
-	
+
 	public AIFValueNamed(IValueParent parent, IAIFTypeNamed type, SimpleByteBuffer buffer) {
 		super(parent, type);
 		this.name = type.getName();
 		parse(buffer);
 	}
-	protected void parse(SimpleByteBuffer buffer) {
-		value = AIFFactory.getAIFValue(this, ((IAIFTypeNamed)type).getBaseType(), buffer);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueNamed#getName()
+	 */
+	public String getName() {
+		return name;
 	}
-	public int getChildrenNumber() throws AIFException {
-		return value.getChildrenNumber();
-	}
-	
-	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = value.getValueString();
-		}
-		return result;
-	}	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueNamed#getValue()
+	 */
 	public IAIFValue getValue() {
 		return value;
 	}
-	public String getName() {
-		return name;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
+	public String getValueString() throws AIFException {
+		return value.getValueString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#length()
+	 */
+	@Override
+	public int length() throws AIFException {
+		return value.length();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
+	protected void parse(SimpleByteBuffer buffer) {
+		value = AIFFactory.getAIFValue(this, ((IAIFTypeNamed) getType()).getBaseType(), buffer);
 	}
 }

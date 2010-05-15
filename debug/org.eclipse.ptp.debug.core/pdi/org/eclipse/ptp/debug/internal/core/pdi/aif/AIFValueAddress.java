@@ -21,33 +21,52 @@ package org.eclipse.ptp.debug.internal.core.pdi.aif;
 import java.math.BigInteger;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueAddress;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueAddress extends AIFValue implements IAIFValueAddress {
-	String addr = ""; //$NON-NLS-1$
+	private String fAddr = ""; //$NON-NLS-1$
 
 	public AIFValueAddress(IAIFTypeAddress type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
 	protected void parse(SimpleByteBuffer buffer) {
-		size = type.sizeof();
-		for (int i=0; i<size; i++) {
-			addr += Integer.toHexString(0x0100 + (buffer.get() & 0x00FF)).substring(1);
+		setSize(getType().sizeof());
+		for (int i = 0; i < sizeof(); i++) {
+			fAddr += Integer.toHexString(0x0100 + (buffer.get() & 0x00FF)).substring(1);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
 	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = "0x" + addr; //$NON-NLS-1$
-		}
-		return result;
+		return "0x" + fAddr; //$NON-NLS-1$
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueAddress#getAddress()
+	 */
 	public BigInteger getAddress() throws AIFException {
 		return ValueIntegral.bigIntegerValue(getValueString());
 	}
