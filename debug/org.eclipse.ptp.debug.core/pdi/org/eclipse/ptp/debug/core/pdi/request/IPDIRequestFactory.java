@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 
 /**
  * @author clement
- *
+ * 
  */
 public interface IPDIRequestFactory {
 	/**
@@ -37,7 +37,7 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDICommandRequest getCommandRequest(TaskSet tasks, String command);
-	
+
 	/**
 	 * @param session
 	 * @param tasks
@@ -50,8 +50,9 @@ public interface IPDIRequestFactory {
 	 * @param asChar
 	 * @return
 	 */
-	public IPDIDataReadMemoryRequest getDataReadMemoryRequest(IPDISession session, TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar);
-	
+	public IPDIDataReadMemoryRequest getDataReadMemoryRequest(IPDISession session, TaskSet tasks, long offset, String address,
+			int wordFormat, int wordSize, int rows, int cols, Character asChar);
+
 	/**
 	 * @param tasks
 	 * @param offset
@@ -61,8 +62,9 @@ public interface IPDIRequestFactory {
 	 * @param value
 	 * @return
 	 */
-	public IPDIDataWriteMemoryRequest getDataWriteMemoryRequest(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value);
-	
+	public IPDIDataWriteMemoryRequest getDataWriteMemoryRequest(TaskSet tasks, long offset, String address, int wordFormat,
+			int wordSize, String value);
+
 	/**
 	 * @param tasks
 	 * @param bpt
@@ -70,49 +72,41 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDIDeleteBreakpointRequest getDeleteBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt, boolean allowUpdate);
-	
+
 	/**
 	 * @param tasks
 	 * @param varId
 	 * @return
 	 */
 	public IPDIDeleteVariableRequest getDeletePartialExpressionRequest(TaskSet tasks, String exprId);
-	
+
 	/**
 	 * @param tasks
 	 * @param bpt
 	 * @return
 	 */
 	public IPDIDisableBreakpointRequest getDisableBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt);
-	
+
 	/**
 	 * @param tasks
 	 * @param bpt
 	 * @return
 	 */
 	public IPDIEnableBreakpointRequest getEnableBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt);
-	
+
 	/**
 	 * @param tasks
 	 * @param expr
 	 * @return
 	 */
 	public IPDIEvaluateExpressionRequest getEvaluateExpressionRequest(TaskSet tasks, String expr);
-	
+
 	/**
 	 * @param tasks
 	 * @return
 	 */
 	public IPDIGetInfoThreadsRequest getGetInfoThreadsRequest(TaskSet tasks);
-	
-	/**
-	 * @param tasks
-	 * @param expr
-	 * @param exprId
-	 * @return
-	 */
-	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId);
-	
+
 	/**
 	 * @param tasks
 	 * @param expr
@@ -120,14 +114,15 @@ public interface IPDIRequestFactory {
 	 * @param listChildren
 	 * @return
 	 */
-	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren);
+	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId,
+			boolean listChildren);
 
 	/**
 	 * @param tasks
 	 * @return
 	 */
 	public IPDIGetStackInfoDepthRequest getGetStackInfoDepthRequest(TaskSet tasks);
-	
+
 	/**
 	 * @param session
 	 * @param tasks
@@ -136,13 +131,13 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDIListArgumentsRequest getListArgumentsRequest(TaskSet tasks, int diff, int diff2);
-	
+
 	/**
 	 * @param tasks
 	 * @return
 	 */
 	public IPDIListLocalVariablesRequest getListLocalVariablesRequest(TaskSet tasks);
-	
+
 	/**
 	 * @param session
 	 * @param tasks
@@ -150,14 +145,14 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDIListSignalsRequest getListSignalsRequest(IPDISession session, TaskSet tasks, String name);
-	
+
 	/**
 	 * @param session
 	 * @param tasks
 	 * @return
 	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks);
-		
+
 	/**
 	 * @param session
 	 * @param tasks
@@ -166,37 +161,39 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks, int low, int high);
-	
+
 	/**
 	 * @param tasks
 	 * @param passSignal
 	 * @return
 	 */
 	public IPDIGoRequest getResumeRequest(TaskSet tasks, boolean passSignal);
-	
+
 	/**
 	 * @param tasks
 	 * @param bpt
 	 * @param allowUpdate
 	 * @return
 	 */
-	public IPDISetAddressBreakpointRequest getSetAddressBreakpointRequest(TaskSet tasks, IPDIAddressBreakpoint bpt, boolean allowUpdate);
-	
+	public IPDISetAddressBreakpointRequest getSetAddressBreakpointRequest(TaskSet tasks, IPDIAddressBreakpoint bpt,
+			boolean allowUpdate);
+
 	/**
 	 * @param tasks
 	 * @param level
 	 * @return
 	 */
 	public IPDISetCurrentStackFrameRequest getSetCurrentStackFrameRequest(TaskSet tasks, int level);
-	
+
 	/**
 	 * @param tasks
 	 * @param bpt
 	 * @param allowUpdate
 	 * @return
 	 */
-	public IPDISetFunctionBreakpointRequest getSetFunctionBreakpointRequest(TaskSet tasks, IPDIFunctionBreakpoint bpt, boolean allowUpdate);
-	
+	public IPDISetFunctionBreakpointRequest getSetFunctionBreakpointRequest(TaskSet tasks, IPDIFunctionBreakpoint bpt,
+			boolean allowUpdate);
+
 	/**
 	 * @param tasks
 	 * @param bpt
@@ -204,7 +201,7 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDISetLineBreakpointRequest getSetLineBreakpointRequest(TaskSet tasks, IPDILineBreakpoint bpt, boolean allowUpdate);
-	
+
 	/**
 	 * @param session
 	 * @param tasks
@@ -212,7 +209,7 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDISetThreadSelectRequest getSetThreadSelectRequest(IPDISession session, TaskSet tasks, int id);
-	
+
 	/**
 	 * @param tasks
 	 * @param bpt
@@ -220,7 +217,7 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDISetWatchpointRequest getSetWatchpointRequest(TaskSet tasks, IPDIWatchpoint bpt, boolean allowUpdate);
-	
+
 	/**
 	 * @param tasks
 	 * @param app
@@ -230,28 +227,28 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDIStartDebuggerRequest getStartDebuggerRequest(TaskSet tasks, String app, String path, String dir, String[] args);
-	
+
 	/**
 	 * @param tasks
 	 * @param count
 	 * @return
 	 */
 	public IPDIStepFinishRequest getStepFinishRequest(TaskSet tasks, int count);
-	
+
 	/**
 	 * @param tasks
 	 * @param count
 	 * @return
 	 */
 	public IPDIStepIntoRequest getStepIntoRequest(TaskSet tasks, int count);
-	
+
 	/**
 	 * @param tasks
 	 * @param count
 	 * @return
 	 */
 	public IPDIStepOverRequest getStepOverRequest(TaskSet tasks, int count);
-	
+
 	/**
 	 * @param tasks
 	 * @return
@@ -276,6 +273,5 @@ public interface IPDIRequestFactory {
 	 * @return
 	 */
 	public IPDITerminateRequest getTerminateRequest(TaskSet tasks);
-	
-}
 
+}
