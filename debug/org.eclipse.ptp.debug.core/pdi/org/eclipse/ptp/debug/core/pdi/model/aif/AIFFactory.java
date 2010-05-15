@@ -142,6 +142,8 @@ public class AIFFactory {
 	public static final char FDS_ENUM_END = '>';
 	public static final char FDS_FUNCTION_END = '/';
 	public static final char FDS_FUNCTION_ARG_SEP = ',';
+	public static final char FDS_INTEGER_SIGNED = 's';
+	public static final char FDS_INTEGER_UNSIGNED = 'u';
 	public static final char FDS_REFERENCE_END = '/';
 	public static final char FDS_NAMED_END = '/';
 	public static final char FDS_RANGE_SEP = ',';

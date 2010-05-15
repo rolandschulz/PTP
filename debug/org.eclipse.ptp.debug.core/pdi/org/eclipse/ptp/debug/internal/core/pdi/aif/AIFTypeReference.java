@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
 
 /**
@@ -26,21 +28,50 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
  * 
  */
 public class AIFTypeReference extends AIFType implements IAIFTypeReference {
-	private String name;
-	//>name/
-	public AIFTypeReference(String name) {
-		this.name = name;
-	}
-	public char type() {
-		return AIFFactory.FDS_REFERENCE;
-	}
+	private String fName;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference#getName()
+	 */
 	public String getName() {
-		return name;
+		return fName;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
 	public int sizeof() {
 		return AIFFactory.NO_SIZE;
-	}	
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
 		return AIFFactory.FDS_REFERENCE + getName() + AIFFactory.FDS_REFERENCE_END;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		int pos = fmt.indexOf(AIFFactory.FDS_REFERENCE_END);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeReference_0);
+		}
+		fName = fmt.substring(0, pos);
+		return fmt.substring(pos + 1);
 	}
 }

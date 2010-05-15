@@ -19,9 +19,9 @@
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFunction;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFunction;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
@@ -32,14 +32,25 @@ public class AIFValueFunction extends ValueDerived implements IAIFValueFunction 
 		super(type);
 		parse(buffer);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
 	protected void parse(SimpleByteBuffer buffer) {
-		size = type.sizeof();
+		setSize(getType().sizeof());
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
 	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = String.valueOf(""); //$NON-NLS-1$
-		}
-		return null;
+		return String.valueOf(""); //$NON-NLS-1$
 	}
 }
-

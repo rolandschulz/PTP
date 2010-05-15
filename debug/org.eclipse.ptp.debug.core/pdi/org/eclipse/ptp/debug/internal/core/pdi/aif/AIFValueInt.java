@@ -23,83 +23,130 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeInt;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
-	ByteBuffer byteBuffer;
-	
+	private ByteBuffer byteBuffer;
+
 	public AIFValueInt(IAIFTypeInt type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
 	protected void parse(SimpleByteBuffer buffer) {
-		byte[] dst = new byte[type.sizeof()]; 
-		for (int i=0; i<dst.length; i++) {
+		byte[] dst = new byte[getType().sizeof()];
+		for (int i = 0; i < dst.length; i++) {
 			dst[i] = buffer.get();
 		}
 		byteBuffer = ByteBuffer.wrap(dst, 0, dst.length);
-		size = type.sizeof();
+		setSize(getType().sizeof());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
 	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = getString();
-		}
-		return result;
-	}
-	private String getString() throws AIFException {
 		if (isShort()) {
 			return String.valueOf(shortValue());
-		}
-		else if (isInt()) {
+		} else if (isInt()) {
 			return String.valueOf(intValue());
-		}
-		else if (isLong()) {
+		} else if (isLong()) {
 			return String.valueOf(longValue());
-		}
-		else {
+		} else {
 			return new String(byteValue());
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt#isLong()
+	 */
 	public boolean isLong() {
-		return (size == 8);
+		return (sizeof() == 8);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt#isShort()
+	 */
 	public boolean isShort() {
-		return (size == 2);
+		return (sizeof() == 2);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt#isInt()
+	 */
 	public boolean isInt() {
-		return (size == 4);
+		return (sizeof() == 4);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt#byteValue()
+	 */
 	public byte[] byteValue() throws AIFException {
 		return byteBuffer.array();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt#longValue()
+	 */
 	public long longValue() throws AIFException {
 		try {
 			return byteBuffer.getLong();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		} finally {
-			byteBuffer.rewind();			
+			byteBuffer.rewind();
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt#shortValue()
+	 */
 	public short shortValue() throws AIFException {
 		try {
 			return byteBuffer.getShort();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		} finally {
-			byteBuffer.rewind();			
+			byteBuffer.rewind();
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt#intValue()
+	 */
 	public int intValue() throws AIFException {
 		try {
 			return byteBuffer.getInt();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		} finally {
-			byteBuffer.rewind();			
+			byteBuffer.rewind();
 		}
 	}
 }

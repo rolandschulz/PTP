@@ -22,36 +22,45 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueFloat extends ValueParent implements IAIFValueFloat {
-	ByteBuffer byteBuffer;
-	
+	private ByteBuffer byteBuffer;
+
 	public AIFValueFloat(IAIFTypeFloat type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
 	protected void parse(SimpleByteBuffer buffer) {
-		byte[] dst = new byte[type.sizeof()]; 
-		for (int i=0; i<dst.length; i++) {
+		byte[] dst = new byte[getType().sizeof()];
+		for (int i = 0; i < dst.length; i++) {
 			dst[i] = buffer.get();
 		}
 		byteBuffer = ByteBuffer.wrap(dst, 0, dst.length);
-		size = type.sizeof();
+		setSize(getType().sizeof());
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
 	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = getString();
-		}
-		return result;
-	}
-	private String getString() throws AIFException {
 		if (isFloat()) {
 			return String.valueOf(floatValue());
 		} else if (isDouble()) {
@@ -60,74 +69,53 @@ public class AIFValueFloat extends ValueParent implements IAIFValueFloat {
 			return new String(byteBuffer.array());
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat#floatValue()
+	 */
 	public float floatValue() throws AIFException {
 		try {
 			return byteBuffer.getFloat();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		} finally {
-			byteBuffer.rewind();			
+			byteBuffer.rewind();
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat#doubleValue()
+	 */
 	public double doubleValue() throws AIFException {
 		try {
 			return byteBuffer.getDouble();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		} finally {
-			byteBuffer.rewind();			
+			byteBuffer.rewind();
 		}
 	}
-	
-	public boolean isDouble() {
-		return (type.sizeof() == 8);
-	}
-	public boolean isFloat() {
-		return (type.sizeof() == 4);
-	}
+
 	/*
-	public double doubleValue() throws PCDIException {
-		double result = 0;
-		String valueString = getValueString();
-		if (isNaN(valueString))
-			result = Double.NaN;
-		else if (isNegativeInfinity(valueString))
-			result = Double.NEGATIVE_INFINITY;
-		else if (isPositiveInfinity(valueString))
-			result = Double.POSITIVE_INFINITY;
-		else {		
-			try {
-				result = Double.parseDouble(valueString);
-			} catch (NumberFormatException e) {
-			}
-		}
-		return result;
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat#isDouble()
+	 */
+	public boolean isDouble() {
+		return (getType().sizeof() == 8);
 	}
-	public float floatValue() throws PCDIException {
-		float result = 0;
-		String valueString = getValueString();
-		if (isNaN(valueString))
-			result = Float.NaN;
-		else if (isNegativeInfinity(valueString))
-			result = Float.NEGATIVE_INFINITY;
-		else if (isPositiveInfinity(valueString))
-			result = Float.POSITIVE_INFINITY;
-		else {		
-			try {
-				result = Float.parseFloat(valueString);
-			} catch (NumberFormatException e) {
-			}
-		}
-		return result;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat#isFloat()
+	 */
+	public boolean isFloat() {
+		return (getType().sizeof() == 4);
 	}
-	private boolean isPositiveInfinity(String valueString) {
-		return (valueString != null) ? valueString.indexOf("inf") != -1 : false;
-	}
-	private boolean isNegativeInfinity(String valueString) {
-		return (valueString != null) ? valueString.indexOf("-inf") != -1 : false;
-	}
-	private boolean isNaN(String valueString) {
-		return (valueString != null) ? valueString.indexOf("nan") != -1 : false;
-	}
-	*/
 }

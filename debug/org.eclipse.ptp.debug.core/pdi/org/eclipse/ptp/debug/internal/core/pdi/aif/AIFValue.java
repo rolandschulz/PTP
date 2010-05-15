@@ -20,31 +20,56 @@ package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public abstract class AIFValue implements IAIFValue {
-	protected IAIFType type = null;
-	protected String result = null;
-	protected int size = 0;
-	
+	private IAIFType fType = null;
+	private String fResult = null;
+	private int fSize = 0;
+
 	public AIFValue(IAIFType type) {
-		this.type = type;
+		fType = type;
 	}
-	public IAIFType getType() {
-		return type;
-	}
-	public int getChildrenNumber() throws AIFException {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#length()
+	 */
+	public int length() throws AIFException {
 		return 0;
 	}
-	public boolean hasChildren() throws AIFException {
-		return (getChildrenNumber() > 0);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getType()
+	 */
+	public IAIFType getType() {
+		return fType;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#sizeof()
+	 */
+	public int sizeof() {
+		return fSize;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
 		try {
 			return getValueString();
@@ -52,23 +77,18 @@ public abstract class AIFValue implements IAIFValue {
 			return Messages.AIFValue_0 + e.getMessage();
 		}
 	}
-	
+
+	protected void setResult(String result) {
+		fResult = result;
+	}
+
+	protected void setSize(int size) {
+		fSize = size;
+	}
+
+	protected String getResult() {
+		return fResult;
+	}
+
 	protected abstract void parse(SimpleByteBuffer buffer);
-	public int sizeof() {
-		return size;
-	}
-	/*
-	protected ByteBuffer byteBuffer(byte[] data) {
-		return byteBuffer(data, 0);
-	}
-	protected ByteBuffer byteBuffer(byte[] data, int offset) {
-		return ByteBuffer.wrap(data, offset, data.length);
-	}
-	protected byte[] createByteArray(byte[] data, int from, int size) {
-//System.out.println("---data len: " + data.length  + ", from: " + from + ", size: " + size);
-		byte[] newByte = new byte[size];
-		System.arraycopy(data, from, newByte, 0, size);
-		return newByte;
-	}
-	*/
 }

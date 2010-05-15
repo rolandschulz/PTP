@@ -18,24 +18,66 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeIntegral;
-
 
 /**
  * @author Clement chu
  * 
  */
 public abstract class TypeIntegral extends AIFType implements ITypeIntegral {
-	boolean signed;
-	
-	public TypeIntegral(boolean signed) {
-		this.signed = signed;
-	}
-	public boolean isSigned() {
-		return signed;
-	}
-	public String toString() {
-		return "i" + (isSigned()?"s":"u") + sizeof(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}	
-}
+	private boolean fSigned;
+	private int fSize;
 
+	public TypeIntegral() {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.ITypeIntegral#isSigned()
+	 */
+	public boolean isSigned() {
+		return fSigned;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return (isSigned() ? String.valueOf(AIFFactory.FDS_INTEGER_SIGNED) : String.valueOf(AIFFactory.FDS_INTEGER_UNSIGNED))
+				+ sizeof();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		fSigned = (fmt.charAt(0) == AIFFactory.FDS_INTEGER_SIGNED);
+		int pos = AIFFactory.getFirstNonDigitPos(fmt, 1, false);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.TypeIntegral_0);
+		}
+		fSize = Integer.parseInt(fmt.substring(1, pos));
+		return fmt.substring(pos);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
+	public int sizeof() {
+		return fSize;
+	}
+}

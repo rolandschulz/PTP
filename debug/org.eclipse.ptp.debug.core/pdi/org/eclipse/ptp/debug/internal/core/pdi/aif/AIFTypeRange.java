@@ -22,45 +22,49 @@ import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeInt;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange;
 
-public class AIFTypeArray extends TypeDerived implements IAIFTypeArray {
-	public static void main(String[] args) {
-		String fmt = "[r0,2is4][r-1,3is4][r10,4is4][r-10,5is4][r0,6is4]is4"; //$NON-NLS-1$
-		IAIFType type;
-		try {
-			type = AIFFactory.getAIFType(fmt);
-			if (type instanceof IAIFTypeArray) {
-				System.err.println("range: " + ((IAIFTypeArray) type).getRange()); //$NON-NLS-1$
-				System.err.println("base: " + ((IAIFTypeArray) type).getBaseType()); //$NON-NLS-1$
-			}
-			System.err.println("size: " + type.sizeof()); //$NON-NLS-1$
-		} catch (AIFFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private IAIFTypeRange fRange;
+public class AIFTypeRange extends AIFType implements IAIFTypeRange {
+	private int fLower;
+	private int fSize;
+	private IAIFTypeInt fRangeType;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray#getRange()
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
 	 */
-	public IAIFTypeRange getRange() {
-		return fRange;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#sizeof()
-	 */
-	@Override
 	public int sizeof() {
-		return getRange().getSize() * super.sizeof();
+		return fRangeType.sizeof();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange#getLower()
+	 */
+	public int getLower() {
+		return fLower;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange#getRangeType()
+	 */
+	public IAIFTypeInt getRangeType() {
+		return fRangeType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange#getSize()
+	 */
+	public int getSize() {
+		return fSize;
 	}
 
 	/*
@@ -70,27 +74,36 @@ public class AIFTypeArray extends TypeDerived implements IAIFTypeArray {
 	 */
 	@Override
 	public String toString() {
-		return String.valueOf(AIFFactory.FDS_ARRAY) + getRange().toString() + AIFFactory.FDS_ARRAY_END + getBaseType().toString();
+		return String.valueOf(AIFFactory.FDS_RANGE) + getLower() + AIFFactory.FDS_RANGE_SEP + getSize() + getRangeType().toString();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#parse(java.lang
-	 * .String)
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
 	 */
 	@Override
 	public String parse(String fmt) throws AIFFormatException {
-		fmt = AIFFactory.parseType(fmt);
-		if (fmt.charAt(0) != AIFFactory.FDS_ARRAY_END) {
-			throw new AIFFormatException(Messages.AIFTypeArray_1);
+		int low_pos = AIFFactory.getFirstNonDigitPos(fmt, 0, true);
+		try {
+			fLower = Integer.parseInt(fmt.substring(0, low_pos));
+		} catch (NumberFormatException e) {
+			throw new AIFFormatException(Messages.AIFTypeRange_0);
 		}
+		int size_pos = AIFFactory.getFirstNonDigitPos(fmt, low_pos + 1, false);
+		try {
+			fSize = Integer.parseInt(fmt.substring(low_pos + 1, size_pos));
+		} catch (NumberFormatException e) {
+			throw new AIFFormatException(Messages.AIFTypeRange_1);
+		}
+		fmt = AIFFactory.parseType(fmt.substring(size_pos));
 		IAIFType type = AIFFactory.getType();
-		if (!(type instanceof IAIFTypeRange)) {
-			throw new AIFFormatException(Messages.AIFTypeArray_0);
+		if (!(type instanceof IAIFTypeInt)) {
+			throw new AIFFormatException(Messages.AIFTypeRange_2);
 		}
-		fRange = (IAIFTypeRange) type;
-		return super.parse(fmt.substring(1));
+		fRangeType = (IAIFTypeInt) type;
+		return fmt;
 	}
 }

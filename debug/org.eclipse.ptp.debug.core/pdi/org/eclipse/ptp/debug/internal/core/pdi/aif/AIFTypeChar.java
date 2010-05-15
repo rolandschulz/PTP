@@ -19,20 +19,39 @@
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeChar;
 
 public class AIFTypeChar extends TypeIntegral implements IAIFTypeChar {
-	//c
-	public AIFTypeChar() {
-		this(true);
-	}
-	public AIFTypeChar(boolean signed) {
-		super(signed);
-	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#sizeof()
+	 */
+	@Override
 	public int sizeof() {
 		return AIFFactory.SIZE_CHAR;
-	}	
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#parse(java.lang
+	 * .String)
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		return super.parse("u1" + fmt); //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeIntegral#toString()
+	 */
+	@Override
 	public String toString() {
-		return "c" + sizeof(); //$NON-NLS-1$
+		return "c"; //$NON-NLS-1$
 	}
 }

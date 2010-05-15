@@ -18,36 +18,51 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeNamed;
-import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeAggregate;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFTypeNamed extends TypeDerived implements IAIFTypeNamed {
-	private String name = null;
-	
-	//%0/{s|a=is4,b=^>0/;;;}
-	public AIFTypeNamed(String name, IAIFType basetype) {
-		super(basetype);
-		this.name = name;
-	}
+	private String fName = null;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeNamed#getName()
+	 */
 	public String getName() {
-		return name;
+		return fName;
 	}
-	
-	public String toString() {
-		return AIFFactory.FDS_NAMED + getName() + AIFFactory.FDS_NAMED_END + getBaseType().toString();
-	}
-	
-	public String getField(int index) {
-		if (basetype instanceof ITypeAggregate) {
-			return ((ITypeAggregate)basetype).getField(index);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#parse(java.lang
+	 * .String)
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		int pos = fmt.indexOf(AIFFactory.FDS_NAMED_END);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeNamed_0);
 		}
-		return null;
+		fName = fmt.substring(0, pos);
+		return super.parse(fmt.substring(pos + 1));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.valueOf(AIFFactory.FDS_NAMED) + getName() + AIFFactory.FDS_NAMED_END + getBaseType().toString();
 	}
 }
-

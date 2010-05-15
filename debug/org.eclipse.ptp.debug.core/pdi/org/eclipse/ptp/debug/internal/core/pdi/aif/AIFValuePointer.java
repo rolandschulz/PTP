@@ -22,40 +22,101 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueNamed;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValuePointer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IValueParent;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
-	IAIFValue value = null;
-	IAIFValue addrValue = null;
-	
+	private IAIFValue value = null;
+	private IAIFValue addrValue = null;
+
 	public AIFValuePointer(IValueParent parent, IAIFTypePointer type, SimpleByteBuffer buffer) {
 		super(parent, type);
 		parse(buffer);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValuePointer#getValue()
+	 */
+	public IAIFValue getValue() {
+		if (value instanceof IAIFValueNamed) {
+			return ((IAIFValueNamed) value).getValue();
+		}
+		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
+	public String getValueString() throws AIFException {
+		if (addrValue != null) {
+			return addrValue.getValueString();
+		} else {
+			return ""; //$NON-NLS-1$
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#length()
+	 */
+	@Override
+	public int length() throws AIFException {
+		int children = value.length();
+		if (children == 0) {
+			return 1;
+		}
+		return children;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValuePointer#pointerValue()
+	 */
+	public BigInteger pointerValue() throws AIFException {
+		if (addrValue == null) {
+			return BigInteger.ZERO;
+		}
+		return ValueIntegral.bigIntegerValue(addrValue.getValueString());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
 	protected void parse(SimpleByteBuffer buffer) {
 		int marker = buffer.get();
-		IAIFTypePointer pType = (IAIFTypePointer)type;
+		IAIFTypePointer pType = (IAIFTypePointer) getType();
 
 		switch (marker) {
 		case 0:
-	        IAIFTypeAddress aType = pType.getAddressType();
-	        addrValue = AIFFactory.getAIFValue(null, aType, new byte[aType.sizeof()]);
-	        value = AIFFactory.UNKNOWNVALUE;
+			IAIFTypeAddress aType = pType.getAddressType();
+			addrValue = AIFFactory.getAIFValue(null, aType, new byte[aType.sizeof()]);
+			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		case 1:
 			addrValue = AIFFactory.getAIFValue(null, pType.getAddressType(), buffer);
 			value = AIFFactory.getAIFValue(getParent(), pType.getBaseType(), buffer);
-			size = addrValue.sizeof() + value.sizeof();
+			setSize(addrValue.sizeof() + value.sizeof());
 			break;
 		case 2:
 			break;
@@ -65,38 +126,5 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		}
-	}
-	/**
-	 * Get the children number of pointer.  Return 1 if the base type is primitive 
-	 * 
-	 */
-	public int getChildrenNumber() throws AIFException {
-		int children = value.getChildrenNumber();
-		if (children == 0) {
-			return 1;
-		}
-		return children;
-	}
-	public String getValueString() throws AIFException {
-		if (result == null) {
-			if (addrValue != null) {
-				result = addrValue.getValueString();
-			} else {
-				result = ""; //$NON-NLS-1$
-			}
-		}
-		return result;
-	}
-	public BigInteger pointerValue() throws AIFException {
-		if (addrValue == null) {
-			return BigInteger.ZERO;
-		}
-		return ValueIntegral.bigIntegerValue(addrValue.getValueString());
-	}
-	public IAIFValue getValue() {
-		if (value instanceof IAIFValueNamed) {
-			return ((IAIFValueNamed)value).getValue();
-		}
-		return value;
 	}
 }

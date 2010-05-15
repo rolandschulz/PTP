@@ -18,36 +18,66 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import org.eclipse.ptp.debug.core.pdi.messages.Messages;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat;
 
-
 public class AIFTypeFloat extends AIFType implements IAIFTypeFloat {
-	int size;
-	boolean complex;
-	boolean imaginary;
-	boolean islong;
-	
-	public AIFTypeFloat(int size) {
-		this(size, false, false, false);
-	}
-	public AIFTypeFloat(int size, boolean complex, boolean imaginary, boolean islong) {
-		this.size = size;
-		this.complex = complex;
-		this.imaginary = imaginary;
-		this.islong = islong;
-	}
+	private int fSize;
+	private final boolean fComplex = false;
+	private final boolean fImaginary = false;
+	private final boolean fIsLong = false;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat#isComplex()
+	 */
 	public boolean isComplex() {
-		return complex;
+		return fComplex;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat#isImaginary()
+	 */
 	public boolean isImaginary() {
-		return imaginary;
+		return fImaginary;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat#isLong()
+	 */
 	public boolean isLong() {
-		return islong;
+		return fIsLong;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		int pos = AIFFactory.getFirstNonDigitPos(fmt, 0, false);
+		if (pos == -1) {
+			throw new AIFFormatException(Messages.AIFTypeFloat_0);
+		}
+		fSize = Integer.parseInt(fmt.substring(0, pos));
+		return fmt.substring(pos);
+	}
+
 	public int sizeof() {
-		return size;
+		return fSize;
 	}
+
+	@Override
 	public String toString() {
 		return "f" + sizeof(); //$NON-NLS-1$
 	}

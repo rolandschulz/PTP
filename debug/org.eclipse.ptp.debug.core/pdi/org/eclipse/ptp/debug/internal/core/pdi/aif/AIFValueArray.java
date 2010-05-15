@@ -20,33 +20,30 @@ package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueArray;
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueArray extends ValueDerived implements IAIFValueArray {
-	IAIFValue[] values = new IAIFValue[0];
-	SimpleByteBuffer buffer = null;
-	
+	private IAIFValue[] values = new IAIFValue[0];
+	private SimpleByteBuffer buffer = null;
+
 	public AIFValueArray(IAIFTypeArray type, SimpleByteBuffer buffer) {
 		super(type);
 		this.buffer = buffer;
 	}
-	protected void parse(SimpleByteBuffer buffer) {
-		IAIFTypeArray arrType = (IAIFTypeArray)type;
-		IAIFType baseType = arrType.getBaseType();
-		this.values = new IAIFValue[arrType.getRange()];
-		for (int i=0; i<values.length; i++) {
-			values[i] = AIFFactory.getAIFValue(this, baseType, buffer);
-			size += values[i].sizeof();
-		}
-	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueArray#getValues()
+	 */
 	public IAIFValue[] getValues() {
 		if (values.length == 0 && buffer != null) {
 			parse(buffer);
@@ -54,16 +51,16 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 		}
 		return values;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
 	public String getValueString() throws AIFException {
-		if (result == null) {
-			result = getString();
-		}
-		return result;
-	}
-	private String getString() throws AIFException {
 		String content = "["; //$NON-NLS-1$
 		IAIFValue[] aifValues = getValues();
-		for (int i=0; i<aifValues.length; i++) {
+		for (int i = 0; i < aifValues.length; i++) {
 			content += aifValues[i].getValueString();
 			if (i < aifValues.length - 1) {
 				content += ","; //$NON-NLS-1$
@@ -71,5 +68,23 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 		}
 		content += "]"; //$NON-NLS-1$
 		return content;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFValue#parse(org.eclipse
+	 * .ptp.debug.core.pdi.model.aif.AIFFactory.SimpleByteBuffer)
+	 */
+	@Override
+	protected void parse(SimpleByteBuffer buffer) {
+		IAIFTypeArray arrType = (IAIFTypeArray) getType();
+		IAIFType baseType = arrType.getBaseType();
+		this.values = new IAIFValue[arrType.getRange().getSize()];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = AIFFactory.getAIFValue(this, baseType, buffer);
+			setSize(sizeof() + values[i].sizeof());
+		}
 	}
 }

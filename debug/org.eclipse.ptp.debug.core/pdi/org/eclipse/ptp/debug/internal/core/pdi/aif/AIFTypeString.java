@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeString;
 
 /**
@@ -26,15 +27,40 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeString;
  * 
  */
 public class AIFTypeString extends AIFType implements IAIFTypeString {
-	int size = AIFFactory.SIZE_INVALID;
-	
-	public int sizeof() {
-		return size;
+	private int fSize = AIFFactory.SIZE_INVALID;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.aif.AIFType#parse(java.lang.String
+	 * )
+	 */
+	@Override
+	public String parse(String fmt) throws AIFFormatException {
+		return fmt;
 	}
+
 	public void setSizeof(int size) {
-		this.size = size;
+		fSize = size;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
+	public int sizeof() {
+		return fSize;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString() {
 		return String.valueOf(AIFFactory.FDS_STRING);
-	}		
+	}
 }
