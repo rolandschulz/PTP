@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.etfw.ppw"
       label="%featureName"
-      version="1.0.1.qualifier"
+      version="4.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.ptp.etfw.ppw">
 
@@ -19,7 +19,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://ppw.hcs.ufl.edu/eclipse/update/"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/tools/ptp/updates/helios"/>
    </url>
 
    <requires>
