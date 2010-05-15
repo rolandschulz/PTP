@@ -23,53 +23,57 @@ import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 /**
- * A build service provider that uses the Remote Tools API to provide execution services.
- *  
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * A build service provider that uses the Remote Tools API to provide execution
+ * services.
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. Please do not use this API without consulting with
+ * the RDT team.
  * 
  * @author crecoskie
  */
 public class RemoteBuildServiceProvider extends ServiceProvider implements IRemoteExecutionServiceProvider {
-	
+
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID = "RemoteBuildServiceProvider.remoteToolsProviderID"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME = "RemoteBuildServiceProvider.remoteToolsConnectionName"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION = "RemoteBuildServiceProvider.configLocation"; //$NON-NLS-1$
-	
+
 	public static final String ID = "org.eclipse.ptp.rdt.ui.RemoteBuildServiceProvider"; //$NON-NLS-1$
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.BuildService"; //$NON-NLS-1$
 	public static final String NAME = Messages.getString("RemoteBuildServiceProvider.0"); //$NON-NLS-1$
 
 	private IRemoteConnection fRemoteConnection = null;
 
-
-
 	private static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
 		if (remoteServices == null || connection == null) {
 			return null;
 		}
 		// get the user's home directory
-		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, ""); //$NON-NLS-1$
-		IFileStore homeStore = processBuilder.getHomeDirectory();
-		URI uri = homeStore.toURI();
-		String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(uri);
-		IPath path = new Path(pathString);
-		path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
-		return path.toString();
-		
+		String homeDir = connection.getProperty(IRemoteConnection.USER_HOME_PROPERTY);
+		if (homeDir != null) {
+			IFileStore homeStore = remoteServices.getFileManager(connection).getResource(homeDir);
+			URI uri = homeStore.toURI();
+			String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(uri);
+			IPath path = new Path(pathString);
+			path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
+			return path.toString();
+		}
+		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConfigLocation()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
+	 * #getConfigLocation()
 	 */
 	public String getConfigLocation() {
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, getDefaultPath(getRemoteServices(), getConnection()));
@@ -79,25 +83,30 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		putString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, configLocation);
 	}
 
+	@Override
 	public String getConfigurationString() {
 		if (isConfigured()) {
 			return getRemoteServices().getName() + ": " + getRemoteConnectionName(); //$NON-NLS-1$
 		}
 		return null;
 	}
-		
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
+	 * #getConnection()
 	 */
 	public IRemoteConnection getConnection() {
-		if(fRemoteConnection == null && getRemoteConnectionName() != null) {
+		if (fRemoteConnection == null && getRemoteConnectionName() != null) {
 			IRemoteServices services = getRemoteServices();
 			if (services != null) {
 				IRemoteConnectionManager manager = services.getConnectionManager();
 				if (manager != null) {
 					fRemoteConnection = manager.getConnection(getRemoteConnectionName());
-					
-					if(fRemoteConnection != null && !fRemoteConnection.isOpen()) {
+
+					if (fRemoteConnection != null && !fRemoteConnection.isOpen()) {
 						try {
 							fRemoteConnection.open(new NullProgressMonitor());
 						} catch (RemoteConnectionException e) {
@@ -110,25 +119,31 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		}
 		return fRemoteConnection;
 	}
-	
+
 	/**
 	 * Get the remote connection name
 	 * 
-	 * @return remote connection name or null if provider has not been configured
+	 * @return remote connection name or null if provider has not been
+	 *         configured
 	 */
 	public String getRemoteConnectionName() {
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getRemoteServices()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
+	 * #getRemoteServices()
 	 */
 	public IRemoteServices getRemoteServices() {
 		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteToolsProviderID());
 	}
 
 	/**
-	 * Gets the ID of the Remote Tools provider that this provider uses for its execution services.
+	 * Gets the ID of the Remote Tools provider that this provider uses for its
+	 * execution services.
 	 * 
 	 * @return remote tools provider ID
 	 */
@@ -136,13 +151,13 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, null);
 	}
 
-	
 	public boolean isConfigured() {
 		return (getRemoteToolsProviderID() != null && getRemoteConnectionName() != null);
 	}
-	
+
 	/**
-	 * Sets the connection that this provider should use for its execution services.
+	 * Sets the connection that this provider should use for its execution
+	 * services.
 	 * 
 	 * @param connection
 	 */
@@ -156,15 +171,16 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	}
 
 	/**
-	 * Sets the ID of the Remote Tools provider that this provider should use for its execution services.
+	 * Sets the ID of the Remote Tools provider that this provider should use
+	 * for its execution services.
 	 * 
 	 * @param id
 	 */
 	public void setRemoteToolsProviderID(String id) {
 		putString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, id);
 	}
-	
-	
+
+	@Override
 	public String toString() {
 		return "RemoteBuildServiceProvider(" + getRemoteConnectionName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
