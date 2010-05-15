@@ -14,3 +14,6 @@ Require-Bundle: org.eclipse.ptp.etfw;bundle-version="1.0.1",
  org.eclipse.ui.ide;bundle-version="3.5.1"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.etfw.ppw.Activator
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Localization: plugin
+
