@@ -75,11 +75,12 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIWatchpointScopeInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIWatchpointTriggerInfo;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAggregate;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
-import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeStruct;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceNotFoundElement;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
@@ -98,18 +99,18 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	private static PDebugModelPresentation instance = null;
 	public final static String DISPLAY_FULL_PATHS = "DISPLAY_FULL_PATHS"; //$NON-NLS-1$
 	private static final String DUMMY_STACKFRAME_LABEL = "..."; //$NON-NLS-1$
-	
+
 	public static PDebugModelPresentation getDefault() {
 		if (instance == null)
 			instance = new PDebugModelPresentation();
 		return instance;
 	}
-	
+
 	protected Map<String, Object> attributes = new HashMap<String, Object>(3);
-	private OverlayImageCache imageCache = new OverlayImageCache();
+	private final OverlayImageCache imageCache = new OverlayImageCache();
 
 	protected UIDebugManager uiDebugManager = null;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -122,11 +123,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame frame) {
 		try {
 			if (frame instanceof IPStackFrame) {
-				PAnnotationManager.getDefault().addAnnotation(editorPart, (IPStackFrame)frame);
+				PAnnotationManager.getDefault().addAnnotation(editorPart, (IPStackFrame) frame);
 				return true;
 			}
-		}
-		catch (CoreException e) {
+		} catch (CoreException e) {
 			return false;
 		}
 		return false;
@@ -134,13 +134,18 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.debug.ui.IDebugModelPresentation#computeDetail(org.eclipse.debug.core.model.IValue, org.eclipse.debug.ui.IValueDetailListener)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.IDebugModelPresentation#computeDetail(org.eclipse
+	 * .debug.core.model.IValue, org.eclipse.debug.ui.IValueDetailListener)
 	 */
 	public void computeDetail(IValue value, IValueDetailListener listener) {
 		PValueDetailProvider.getDefault().computeDetail(value, listener);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
 	 */
 	@Override
@@ -149,47 +154,52 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		attributes.clear();
 		super.dispose();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput, java.lang.Object)
+	 * 
+	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.
+	 * IEditorInput, java.lang.Object)
 	 */
 	public String getEditorId(IEditorInput input, Object element) {
 		return PDebugUIUtils.getEditorId(input, element);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorInput(java.lang.Object)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ISourcePresentation#getEditorInput(java.lang.Object)
 	 */
 	public IEditorInput getEditorInput(Object element) {
 		return PDebugUIUtils.getEditorInput(element);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 	 */
+	@Override
 	public Image getImage(Object element) {
 		Image baseImage = getBaseImage(element);
 		if (baseImage != null) {
 			ImageDescriptor[] overlays = new ImageDescriptor[] { null, null, null, null };
-			if (element instanceof IPDebugElementStatus && !((IPDebugElementStatus)element).isOK()) {
-				switch(((IPDebugElementStatus)element).getSeverity()) { 
-					case IPDebugElementStatus.WARNING: 
-						overlays[OverlayImageDescriptor.BOTTOM_LEFT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_WARNING); 
-						break;
-					case IPDebugElementStatus.ERROR: 
-						overlays[OverlayImageDescriptor.BOTTOM_LEFT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ERROR);
-						break;
+			if (element instanceof IPDebugElementStatus && !((IPDebugElementStatus) element).isOK()) {
+				switch (((IPDebugElementStatus) element).getSeverity()) {
+				case IPDebugElementStatus.WARNING:
+					overlays[OverlayImageDescriptor.BOTTOM_LEFT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_WARNING);
+					break;
+				case IPDebugElementStatus.ERROR:
+					overlays[OverlayImageDescriptor.BOTTOM_LEFT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ERROR);
+					break;
 				}
 			}
-			if (element instanceof IWatchExpression && ((IWatchExpression)element).hasErrors())
-				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ERROR); 
-			if (element instanceof IPVariable && ((IPVariable)element).isArgument()) 
-				overlays[OverlayImageDescriptor.TOP_RIGHT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ARGUMENT); 
-			if (element instanceof IPGlobalVariable && !(element instanceof IRegister)) 
+			if (element instanceof IWatchExpression && ((IWatchExpression) element).hasErrors())
+				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ERROR);
+			if (element instanceof IPVariable && ((IPVariable) element).isArgument())
+				overlays[OverlayImageDescriptor.TOP_RIGHT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_ARGUMENT);
+			if (element instanceof IPGlobalVariable && !(element instanceof IRegister))
 				overlays[OverlayImageDescriptor.TOP_RIGHT] = PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVRS_GLOBAL);
 
 			return getImageCache().getImageFor(new OverlayImageDescriptor(baseImage, overlays));
@@ -199,6 +209,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 */
 	@Override
@@ -208,7 +219,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			return null;
 		StringBuffer baseText = new StringBuffer(bt);
 		if (element instanceof IPDebugElementStatus && !((IPDebugElementStatus) element).isOK()) {
-			baseText.append(NLS.bind(" <{0}>", new Object[] { ((IPDebugElementStatus)element).getMessage() })); //$NON-NLS-1$
+			baseText.append(NLS.bind(" <{0}>", new Object[] { ((IPDebugElementStatus) element).getMessage() })); //$NON-NLS-1$
 		}
 		if (element instanceof IAdaptable) {
 			IEnableDisableTarget target = (IEnableDisableTarget) ((IAdaptable) element).getAdapter(IEnableDisableTarget.class);
@@ -221,57 +232,71 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return baseText.toString();
 	}
-	
+
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
 		// Empty
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String, java.lang.Object)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String
+	 * , java.lang.Object)
 	 */
 	public void setAttribute(String attribute, Object value) {
 		if (value == null)
 			return;
 		getAttributes().put(attribute, value);
 	}
-	
+
 	private ImageDescriptor[] computeBreakpointOverlays(IPBreakpoint breakpoint) {
 		ImageDescriptor[] overlays = new ImageDescriptor[] { null, null, null, null };
 		try {
 			if (breakpoint.isGlobal()) {
-				overlays[OverlayImageDescriptor.TOP_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_GLOB_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_GLOB_DI);
+				overlays[OverlayImageDescriptor.TOP_LEFT] = (breakpoint.isEnabled()) ? PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_GLOB_EN) : PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_GLOB_DI);
 			}
 			if (breakpoint.isConditional()) {
-				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_COND_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_COND_DI);
+				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_COND_EN) : PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_COND_DI);
 			}
 			if (breakpoint.isInstalled()) {
-				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_INST_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_INST_DI);
+				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_INST_EN) : PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_INST_DI);
 			}
 			if (breakpoint instanceof IPAddressBreakpoint) {
-				overlays[OverlayImageDescriptor.TOP_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_ADDR_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_ADDR_DI);
+				overlays[OverlayImageDescriptor.TOP_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_ADDR_EN) : PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_ADDR_DI);
 			}
 			if (breakpoint instanceof IPFunctionBreakpoint) {
-				overlays[OverlayImageDescriptor.BOTTOM_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_FUNC_EN) : PDebugImage.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_FUNC_DI);
+				overlays[OverlayImageDescriptor.BOTTOM_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_FUNC_EN) : PDebugImage
+						.getDescriptor(PDebugImage.IMG_DEBUG_OVER_BPT_FUNC_DI);
 			}
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
 		return overlays;
 	}
-	
+
 	private Map<String, Object> getAttributes() {
 		return attributes;
 	}
-	
+
 	/**
 	 * Get base image
+	 * 
 	 * @param element
 	 * @return
 	 */
 	private Image getBaseImage(Object element) {
 		if (element instanceof IPDebugTarget) {
-			IPDebugTarget target = (IPDebugTarget)element;
+			IPDebugTarget target = (IPDebugTarget) element;
 			if (target.isPostMortem()) {
 				return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_DEBUG_TARGET_TERMINATED);
 			}
@@ -281,18 +306,16 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_DEBUG_TARGET);
 		}
 		if (element instanceof IPThread) {
-			IPThread thread = (IPThread)element;
-			IPDebugTarget target = (IPDebugTarget)thread.getDebugTarget();
+			IPThread thread = (IPThread) element;
+			IPDebugTarget target = thread.getDebugTarget();
 			if (target.isPostMortem()) {
 				return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_THREAD_TERMINATED);
 			}
 			if (thread.isSuspended()) {
 				return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_THREAD_SUSPENDED);
-			}
-			else if (thread.isTerminated()) {
+			} else if (thread.isTerminated()) {
 				return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_THREAD_TERMINATED);
-			}
-			else {
+			} else {
 				return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_THREAD_RUNNING);
 			}
 		}
@@ -306,22 +329,22 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			return getBreakpointImage((IPBreakpoint) element);
 		}
 		if (element instanceof IRegisterGroup) {
-			return getRegisterGroupImage((IRegisterGroup)element);
+			return getRegisterGroupImage((IRegisterGroup) element);
 		}
 		if (element instanceof IExpression) {
-			return getExpressionImage((IExpression)element);
+			return getExpressionImage((IExpression) element);
 		}
 		if (element instanceof IRegister) {
-			return getRegisterImage((IRegister)element);
+			return getRegisterImage((IRegister) element);
 		}
 		if (element instanceof IVariable) {
-			return getVariableImage((IVariable)element);
+			return getVariableImage((IVariable) element);
 		}
 		if (element instanceof IPModule) {
-			return getModuleImage((IPModule)element);
+			return getModuleImage((IPModule) element);
 		}
-		if (element instanceof IPSignal) { 
-			return getSignalImage((IPSignal)element);
+		if (element instanceof IPSignal) {
+			return getSignalImage((IPSignal) element);
 		}
 		return super.getImage(element);
 	}
@@ -330,16 +353,16 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		boolean showQualified = isShowQualifiedNames();
 		StringBuffer label = new StringBuffer();
 		try {
-			if (element instanceof IPModule) { 
-				label.append(getModuleText((IPModule)element, showQualified)); 
+			if (element instanceof IPModule) {
+				label.append(getModuleText((IPModule) element, showQualified));
 				return label.toString();
 			}
 			if (element instanceof IPSignal) {
 				label.append(getSignalText((IPSignal) element));
 				return label.toString();
 			}
-			if (element instanceof IRegisterGroup) { 
-				label.append(((IRegisterGroup)element).getName());
+			if (element instanceof IRegisterGroup) {
+				label.append(((IRegisterGroup) element).getName());
 				return label.toString();
 			}
 			if (element instanceof IWatchExpression) {
@@ -358,7 +381,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				return label.toString();
 			}
 			if (element instanceof PSourceNotFoundElement) {
-				return getBaseText(((PSourceNotFoundElement)element).getElement());
+				return getBaseText(((PSourceNotFoundElement) element).getElement());
 			}
 			if (element instanceof IMarker) {
 				IBreakpoint breakpoint = getBreakpoint((IMarker) element);
@@ -399,17 +422,18 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return null;
 	}
-	
+
 	private String getDummyStackFrameLabel(IStackFrame stackFrame) {
 		return DUMMY_STACKFRAME_LABEL;
 	}
-	
+
 	private OverlayImageCache getImageCache() {
 		return imageCache;
 	}
-	
+
 	/**
 	 * Get UIDebugManager
+	 * 
 	 * @return
 	 */
 	private UIDebugManager getUIDebugManager() {
@@ -418,30 +442,29 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return uiDebugManager;
 	}
-	
+
 	private String getVariableTypeName(IAIF aif) {
 		StringBuffer result = new StringBuffer();
 		if (aif != null) {
 			IAIFType type = aif.getType();
 			if (type != null) {
 				result.append(type.toString().trim());
-				if (type instanceof IAIFTypeArray) {
-					int[] dims = ((IAIFTypeArray)type).getDimensionDetails();
-					for (int i = 0; i < dims.length; ++i) {
-						result.append('[');
-						result.append(dims[i]);
-						result.append(']');
-					}
+				while (type instanceof IAIFTypeArray) {
+					IAIFTypeRange range = ((IAIFTypeArray) type).getRange();
+					result.append('[');
+					result.append(range.getSize());
+					result.append(']');
+					type = ((IAIFTypeArray) type).getBaseType();
 				}
 			}
 		}
 		return result.toString();
 	}
-	
+
 	private boolean isEmpty(String string) {
 		return (string == null || string.trim().length() == 0);
 	}
-	
+
 	protected StringBuffer appendBreakpointStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
 		label.append(" "); //$NON-NLS-1$
 		label.append("{"); //$NON-NLS-1$
@@ -451,7 +474,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		label.append("}"); //$NON-NLS-1$
 		return label;
 	}
-	
+
 	protected StringBuffer appendLineNumber(IPLineBreakpoint breakpoint, StringBuffer label) throws CoreException {
 		int lineNumber = breakpoint.getLineNumber();
 		if (lineNumber > 0) {
@@ -460,7 +483,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label;
 	}
-	
+
 	protected StringBuffer appendSourceName(IPBreakpoint breakpoint, StringBuffer label, boolean qualified) throws CoreException {
 		String handle = breakpoint.getSourceHandle();
 		if (!isEmpty(handle)) {
@@ -471,35 +494,35 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label;
 	}
-	
+
 	protected IBreakpoint getBreakpoint(IMarker marker) {
 		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoint(marker);
 	}
-	
+
 	protected Image getBreakpointImage(IPBreakpoint breakpoint) {
 		try {
 			if (breakpoint instanceof IPLineBreakpoint)
 				return getLineBreakpointImage((IPLineBreakpoint) breakpoint);
 			if (breakpoint instanceof IPWatchpoint) {
-				return getWatchpointImage((IPWatchpoint)breakpoint);
+				return getWatchpointImage((IPWatchpoint) breakpoint);
 			}
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
 		return null;
 	}
-	
+
 	protected String getBreakpointText(IBreakpoint breakpoint, boolean qualified) throws CoreException {
 		if (breakpoint instanceof IPLineBreakpoint) {
 			return getLineBreakpointText((IPLineBreakpoint) breakpoint, qualified);
 		}
 		return ""; //$NON-NLS-1$
 	}
-	
+
 	protected Image getExpressionImage(IExpression element) {
 		return DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_EXPRESSION);
 	}
-	
+
 	protected Image getLineBreakpointImage(IPLineBreakpoint breakpoint) throws CoreException {
 		String job_id = breakpoint.getJobId();
 		String cur_job_id = getUIDebugManager().getCurrentJobId();
@@ -516,20 +539,22 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			if (bpt_set_id.equals(cur_set_id)) {
 				descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTCURSET_EN : PDebugImage.IMG_DEBUG_BPTCURSET_DI;
 			} else {
-				IElementSet set = (IElementSet)setManager.getElementByID(bpt_set_id);
+				IElementSet set = (IElementSet) setManager.getElementByID(bpt_set_id);
 				if (set == null)
 					descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTCURSET_EN : PDebugImage.IMG_DEBUG_BPTCURSET_DI;
 				else {
 					if (set.containsMatchSet(cur_set_id))
-						descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTMULTISET_EN : PDebugImage.IMG_DEBUG_BPTMULTISET_DI;
+						descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTMULTISET_EN
+								: PDebugImage.IMG_DEBUG_BPTMULTISET_DI;
 					else
 						descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTNOSET_EN : PDebugImage.IMG_DEBUG_BPTNOSET_DI;
 				}
 			}
 		}
-		return getImageCache().getImageFor(new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(breakpoint)));
+		return getImageCache().getImageFor(
+				new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(breakpoint)));
 	}
-	
+
 	protected String getLineBreakpointText(IPLineBreakpoint breakpoint, boolean qualified) throws CoreException {
 		StringBuffer label = new StringBuffer();
 		appendSourceName(breakpoint, label, qualified);
@@ -537,61 +562,60 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		appendBreakpointStatus(breakpoint, label);
 		return label.toString();
 	}
-	
+
 	protected Image getModuleImage(IPModule element) {
-		switch(element.getType()) {
-			case IPModule.EXECUTABLE:
-				if (element.areSymbolsLoaded()) {
-					return PDebugImage.getImage(PDebugImage.IMG_DEBUG_EXECUTABLE_WITH_SYMBOLS);
-				}
-				return PDebugImage.getImage(PDebugImage.IMG_DEBUG_EXECUTABLE);
-			case IPModule.SHARED_LIBRARY:
-				if ( element.areSymbolsLoaded() ) {
-					return PDebugImage.getImage(PDebugImage.IMG_DEBUG_SHARED_LIBRARY_WITH_SYMBOLS);
-				}
-				return PDebugImage.getImage(PDebugImage.IMG_DEBUG_SHARED_LIBRARY);
+		switch (element.getType()) {
+		case IPModule.EXECUTABLE:
+			if (element.areSymbolsLoaded()) {
+				return PDebugImage.getImage(PDebugImage.IMG_DEBUG_EXECUTABLE_WITH_SYMBOLS);
+			}
+			return PDebugImage.getImage(PDebugImage.IMG_DEBUG_EXECUTABLE);
+		case IPModule.SHARED_LIBRARY:
+			if (element.areSymbolsLoaded()) {
+				return PDebugImage.getImage(PDebugImage.IMG_DEBUG_SHARED_LIBRARY_WITH_SYMBOLS);
+			}
+			return PDebugImage.getImage(PDebugImage.IMG_DEBUG_SHARED_LIBRARY);
 		}
 		return null;
 	}
-	
+
 	protected String getModuleText(IPModule module, boolean qualified) {
 		StringBuffer sb = new StringBuffer();
 		IPath path = module.getImageName();
 		if (!path.isEmpty()) {
 			sb.append(path.lastSegment());
-		}
-		else {
-			sb.append(Messages.PDebugModelPresentation_5);		
+		} else {
+			sb.append(Messages.PDebugModelPresentation_5);
 		}
 		return sb.toString();
 	}
-	
+
 	protected Image getRegisterGroupImage(IRegisterGroup element) {
-		IEnableDisableTarget target = (IEnableDisableTarget)element.getAdapter(IEnableDisableTarget.class);
+		IEnableDisableTarget target = (IEnableDisableTarget) element.getAdapter(IEnableDisableTarget.class);
 		if (target != null && !target.isEnabled())
 			return PDebugImage.getImage(PDebugImage.IMG_DEBUG_REGISTER_GROUP_DISABLED);
 		return PDebugImage.getImage(PDebugImage.IMG_DEBUG_REGISTER_GROUP);
 	}
-	
+
 	protected String getRegisterGroupText(IRegisterGroup group) {
 		String name = Messages.PDebugModelPresentation_6;
 		try {
 			name = group.getName();
-		}
-		catch(DebugException e) {
+		} catch (DebugException e) {
 			PTPDebugUIPlugin.log(e.getStatus());
 		}
 		return name;
 	}
-	
+
 	protected Image getRegisterImage(IRegister element) {
-		return ((element instanceof IPVariable && ((IPVariable)element).isEnabled())) ? PDebugImage.getImage(PDebugImage.IMG_DEBUG_REGISTER) : PDebugImage.getImage(PDebugImage.IMG_DEBUG_REGISTER_DISABLED);
+		return ((element instanceof IPVariable && ((IPVariable) element).isEnabled())) ? PDebugImage
+				.getImage(PDebugImage.IMG_DEBUG_REGISTER) : PDebugImage.getImage(PDebugImage.IMG_DEBUG_REGISTER_DISABLED);
 	}
-	
+
 	protected Image getSignalImage(IPSignal signal) {
 		return PDebugImage.getImage(PDebugImage.IMG_DEBUG_SIGNAL);
 	}
-	
+
 	protected String getSignalText(IPSignal signal) {
 		StringBuffer sb = new StringBuffer(Messages.PDebugModelPresentation_7);
 		try {
@@ -601,7 +625,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return sb.toString();
 	}
-	
+
 	protected String getStackFrameText(IStackFrame f, boolean qualified) throws DebugException {
 		if (f instanceof IPStackFrame) {
 			IPStackFrame frame = (IPStackFrame) f;
@@ -618,7 +642,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 					if (!function.contains("(")) { //$NON-NLS-1$
 						label.append("()"); //$NON-NLS-1$
 					}
-		            label.append(" "); //$NON-NLS-1$
+					label.append(" "); //$NON-NLS-1$
 					if (frame.getFile() != null) {
 						IPath path = new Path(frame.getFile());
 						if (!path.isEmpty()) {
@@ -639,7 +663,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return (f.getAdapter(IPDummyStackFrame.class) != null) ? getDummyStackFrameLabel(f) : f.getName();
 	}
-	
+
 	protected String getTargetText(IDebugTarget target, boolean qualified) throws DebugException {
 		IPDebugTarget t = (IPDebugTarget) target.getAdapter(IPDebugTarget.class);
 		if (t != null) {
@@ -651,9 +675,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 					String reason = ""; //$NON-NLS-1$
 					if (info != null && info instanceof IPDISignalInfo) {
 						IPDISignalInfo sigInfo = (IPDISignalInfo) info;
-						reason = ' ' + NLS.bind(Messages.PDebugModelPresentation_10, new Object[] { sigInfo.getName(), sigInfo.getDescription() });
+						reason = ' ' + NLS.bind(Messages.PDebugModelPresentation_10,
+								new Object[] { sigInfo.getName(), sigInfo.getDescription() });
 					} else if (info != null && info instanceof IPDIExitInfo) {
-						reason = ' ' + NLS.bind(Messages.PDebugModelPresentation_11, new Object[] { new Integer(((IPDIExitInfo) info).getCode()) });
+						reason = ' ' + NLS.bind(Messages.PDebugModelPresentation_11, new Object[] { new Integer(
+								((IPDIExitInfo) info).getCode()) });
 					}
 					return NLS.bind(label, new Object[] { target.getName(), reason });
 				} else if (state.equals(PDebugElementState.SUSPENDED)) {
@@ -663,7 +689,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return target.getName();
 	}
-	
+
 	protected String getThreadText(IThread thread, boolean qualified) throws DebugException {
 		IPDebugTarget target = (IPDebugTarget) thread.getDebugTarget().getAdapter(IPDebugTarget.class);
 		if (target.isPostMortem()) {
@@ -684,9 +710,13 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			if (element != null) {
 				Object info = element.getCurrentStateInfo();
 				if (info != null && info instanceof IPDISignalInfo) {
-					reason = NLS.bind(Messages.PDebugModelPresentation_23, new Object[] { ((IPDISignalInfo) info).getName(), ((IPDISignalInfo) info).getDescription() });
+					reason = NLS.bind(Messages.PDebugModelPresentation_23, new Object[] { ((IPDISignalInfo) info).getName(),
+							((IPDISignalInfo) info).getDescription() });
 				} else if (info != null && info instanceof IPDIWatchpointTriggerInfo) {
-					reason = NLS.bind(Messages.PDebugModelPresentation_17, new Object[] { ((IPDIWatchpointTriggerInfo) info).getOldValue(), ((IPDIWatchpointTriggerInfo) info).getNewValue() });
+					reason = NLS.bind(
+							Messages.PDebugModelPresentation_17,
+							new Object[] { ((IPDIWatchpointTriggerInfo) info).getOldValue(),
+									((IPDIWatchpointTriggerInfo) info).getNewValue() });
 				} else if (info != null && info instanceof IPDIWatchpointScopeInfo) {
 					reason = Messages.PDebugModelPresentation_18;
 				} else if (info != null && info instanceof IPDIBreakpointInfo) {
@@ -699,11 +729,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return NLS.bind(Messages.PDebugModelPresentation_13, new Object[] { thread.getName() });
 	}
-	
+
 	protected String getValueText(IValue value) {
 		StringBuffer label = new StringBuffer();
 		if (value instanceof IPDebugElementStatus && !((IPDebugElementStatus) value).isOK()) {
-			label.append(NLS.bind(Messages.PDebugModelPresentation_22, new Object[] { ((IPDebugElementStatus)value).getMessage() }));
+			label.append(NLS.bind(Messages.PDebugModelPresentation_22, new Object[] { ((IPDebugElementStatus) value).getMessage() }));
 		} else if (value instanceof IPValue) {
 			IAIF aif = null;
 			try {
@@ -719,7 +749,8 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 						if (valueString.length() == 0)
 							valueString = "."; //$NON-NLS-1$
 						label.append(valueString);
-					} else if (aif == null || (!(aif.getType() instanceof IAIFTypeArray) && !(aif.getType() instanceof IAIFTypeStruct))) {
+					} else if (aif == null
+							|| (!(aif.getType() instanceof IAIFTypeArray) && !(aif.getType() instanceof IAIFTypeAggregate))) {
 						if (valueString.length() > 0) {
 							label.append(valueString);
 						}
@@ -730,29 +761,32 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label.toString();
 	}
-	
+
 	protected Image getVariableImage(IVariable element) {
 		if (element instanceof IPVariable) {
 			IAIF aif = null;
 			try {
-				aif = ((IPVariable)element).getAIF();
-			}
-			catch(DebugException e) {
+				aif = ((IPVariable) element).getAIF();
+			} catch (DebugException e) {
 				// use default image
 			}
 			if (aif == null)
-				return PDebugImage.getImage((((IPVariable)element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE : PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE_DISABLED);
+				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE
+						: PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE_DISABLED);
 			IAIFType type = aif.getType();
 			if (type instanceof IAIFTypePointer || type instanceof IAIFTypeReference)
-				return PDebugImage.getImage((((IPVariable)element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_POINTER : PDebugImage.IMG_DEBUG_VARIABLE_POINTER_DISABLED);
-			else if (type instanceof IAIFTypeArray || type instanceof IAIFTypeStruct)
-				return PDebugImage.getImage((((IPVariable)element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_AGGREGATE : PDebugImage.IMG_DEBUG_VARIABLE_AGGREGATE_DISABLED);
+				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_POINTER
+						: PDebugImage.IMG_DEBUG_VARIABLE_POINTER_DISABLED);
+			else if (type instanceof IAIFTypeArray || type instanceof IAIFTypeAggregate)
+				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_AGGREGATE
+						: PDebugImage.IMG_DEBUG_VARIABLE_AGGREGATE_DISABLED);
 			else
-				return PDebugImage.getImage((((IPVariable)element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE : PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE_DISABLED);
+				return PDebugImage.getImage((((IPVariable) element).isEnabled()) ? PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE
+						: PDebugImage.IMG_DEBUG_VARIABLE_SIMPLE_DISABLED);
 		}
 		return null;
 	}
-	
+
 	protected String getVariableText(IVariable var) throws DebugException {
 		StringBuffer label = new StringBuffer();
 		if (var instanceof IPVariable) {
@@ -779,7 +813,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label.toString();
 	}
-	
+
 	protected String getWatchExpressionText(IWatchExpression expression) {
 		StringBuffer result = new StringBuffer();
 		result.append('"').append(expression.getExpressionText()).append('"');
@@ -790,7 +824,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			if (value instanceof IPValue) {
 				IAIF aif = null;
 				try {
-					aif = ((IPValue)value).getAIF();
+					aif = ((IPValue) value).getAIF();
 				} catch (DebugException e1) {
 				}
 				if (aif != null && isShowVariableTypeNames()) {
@@ -813,7 +847,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return result.toString();
 	}
-	
+
 	protected Image getWatchpointImage(IPWatchpoint watchpoint) throws CoreException {
 		String descriptor = null;
 		if (watchpoint.isEnabled()) {
@@ -823,8 +857,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				descriptor = PDebugImage.IMG_DEBUG_WRITE_WATCHPOINT_ENABLED;
 			else
 				descriptor = PDebugImage.IMG_DEBUG_WATCHPOINT_ENABLED;
-		}
-		else {
+		} else {
 			if (watchpoint.isReadType() && !watchpoint.isWriteType())
 				descriptor = PDebugImage.IMG_DEBUG_READ_WATCHPOINT_DISABLED;
 			else if (!watchpoint.isReadType() && watchpoint.isWriteType())
@@ -832,15 +865,16 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			else
 				descriptor = PDebugImage.IMG_DEBUG_WATCHPOINT_DISABLED;
 		}
-		return getImageCache().getImageFor(new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(watchpoint)));
+		return getImageCache().getImageFor(
+				new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(watchpoint)));
 	}
-	
+
 	protected boolean isShowQualifiedNames() {
 		Boolean showQualified = (Boolean) getAttributes().get(DISPLAY_FULL_PATHS);
 		showQualified = (showQualified == null) ? Boolean.FALSE : showQualified;
 		return showQualified.booleanValue();
 	}
-	
+
 	protected boolean isShowVariableTypeNames() {
 		Boolean show = (Boolean) getAttributes().get(DISPLAY_VARIABLE_TYPE_NAMES);
 		show = show == null ? Boolean.FALSE : show;

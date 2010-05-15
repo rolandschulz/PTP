@@ -30,7 +30,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionReque
 
 /**
  * @author clement
- *
+ * 
  */
 public abstract class VariableDescriptor extends SessionObject implements IPDIVariableDescriptor {
 	/**
@@ -53,7 +53,7 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		}
 		return false;
 	}
-	
+
 	// Casting info.
 	protected String[] castingTypes;
 	protected int castingIndex;
@@ -67,11 +67,12 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 	protected int stackdepth;
 	protected String qualifiedName = null;
 	protected String fFullName = null;
-	protected String fTypename = null;	
+	protected String fTypename = null;
 	protected String varId = null;
 	protected IAIF aif = null;
-	
-	public VariableDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame stack, String n, String fn, int pos, int depth) {
+
+	public VariableDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame stack, String n, String fn,
+			int pos, int depth) {
 		super(session, tasks);
 		fName = n;
 		fFullName = fn;
@@ -80,14 +81,14 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		position = pos;
 		stackdepth = depth;
 	}
-	
+
 	public VariableDescriptor(IPDISession session, IPDIVariableDescriptor desc) {
 		super(session, desc.getTasks());
 		this.fName = desc.getName();
 		this.fFullName = desc.getFullName();
 		try {
-			this.fStackFrame = (StackFrame)desc.getStackFrame();
-			this.fThread = (Thread)desc.getThread();
+			this.fStackFrame = desc.getStackFrame();
+			this.fThread = desc.getThread();
 		} catch (PDIException e) {
 		}
 		this.position = desc.getPosition();
@@ -96,7 +97,7 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		this.castingLength = desc.getCastingArrayEnd();
 		this.castingTypes = desc.getCastingTypes();
 	}
-	
+
 	/*
 	 * FIXME -- it designs for GDB
 	 */
@@ -132,7 +133,7 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		}
 		return fn;
 	}
-	
+
 	/**
 	 * @param varDesc
 	 * @return
@@ -140,10 +141,8 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 	public boolean equalDescriptors(IPDIVariableDescriptor varDesc) {
 		if (varDesc instanceof VariableDescriptor) {
 			VariableDescriptor desc = (VariableDescriptor) varDesc;
-			if (desc.getName().equals(getName())
-				&& desc.getCastingArrayStart() == getCastingArrayStart()
-				&& desc.getCastingArrayEnd() == getCastingArrayEnd()
-				&& equalsCasting(desc, this)) {
+			if (desc.getName().equals(getName()) && desc.getCastingArrayStart() == getCastingArrayStart()
+					&& desc.getCastingArrayEnd() == getCastingArrayEnd() && equalsCasting(desc, this)) {
 
 				// Check the threads
 				IPDIThread varThread = null;
@@ -154,7 +153,8 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 				} catch (PDIException e) {
 					// ignore
 				}
-				if ((ourThread == null && varThread == null) || (varThread != null && ourThread != null && varThread.equals(ourThread))) {
+				if ((ourThread == null && varThread == null)
+						|| (varThread != null && ourThread != null && varThread.equals(ourThread))) {
 					// check the stackFrames
 					IPDIStackFrame varFrame = null;
 					IPDIStackFrame ourFrame = null;
@@ -179,26 +179,28 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		}
 		return super.equals(varDesc);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getAIF()
 	 */
 	public IAIF getAIF() throws PDIException {
 		if (aif == null) {
-			Target target = (Target)fStackFrame.getTarget();
-			Thread currentThread = (Thread)target.getCurrentThread();
+			Target target = (Target) fStackFrame.getTarget();
+			Thread currentThread = target.getCurrentThread();
 			IPDIStackFrame currentFrame = currentThread.getCurrentStackFrame();
 			target.lockTarget();
 			try {
-				target.setCurrentThread(fStackFrame.getThread(), false);				
-				((Thread)fStackFrame.getThread()).setCurrentStackFrame(fStackFrame, false);
-			
-				IPDIEvaluatePartialExpressionRequest request = session.getRequestFactory().getEvaluatePartialExpressionRequest(getTasks(), getQualifiedName(), varId);
+				target.setCurrentThread(fStackFrame.getThread(), false);
+				((Thread) fStackFrame.getThread()).setCurrentStackFrame(fStackFrame, false);
+
+				IPDIEvaluatePartialExpressionRequest request = session.getRequestFactory().getEvaluatePartialExpressionRequest(
+						getTasks(), getQualifiedName(), varId, false);
 				session.getEventRequestManager().addEventRequest(request);
 				aif = request.getPartialAIF(getTasks());
 				varId = request.getId(getTasks());
-			} 
-			finally {
+			} finally {
 				target.setCurrentThread(currentThread, false);
 				currentThread.setCurrentStackFrame(currentFrame, false);
 				target.releaseTarget();
@@ -206,30 +208,39 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		}
 		return aif;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getCastingArrayEnd()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#
+	 * getCastingArrayEnd()
 	 */
 	public int getCastingArrayEnd() {
 		return castingLength;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getCastingArrayStart()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#
+	 * getCastingArrayStart()
 	 */
 	public int getCastingArrayStart() {
 		return castingIndex;
 	}
-	
+
 	/**
 	 * @return
 	 */
 	public String[] getCastingTypes() {
 		return castingTypes;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getFullName()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getFullName()
 	 */
 	public String getFullName() {
 		if (fFullName == null) {
@@ -237,23 +248,33 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		}
 		return fFullName;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getName()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getName()
 	 */
 	public String getName() {
 		return fName;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getPosition()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getPosition()
 	 */
 	public int getPosition() {
 		return position;
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getQualifiedName()
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getQualifiedName
+	 * ()
 	 */
 	public String getQualifiedName() throws PDIException {
 		if (qualifiedName == null) {
@@ -261,30 +282,44 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		}
 		return qualifiedName;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getStackDepth()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getStackDepth
+	 * ()
 	 */
 	public int getStackDepth() {
 		return stackdepth;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getStackFrame()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getStackFrame
+	 * ()
 	 */
 	public IPDIStackFrame getStackFrame() throws PDIException {
 		return fStackFrame;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getThread()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getThread()
 	 */
 	public IPDIThread getThread() throws PDIException {
 		return fThread;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getTypeName()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getTypeName()
 	 */
 	public String getTypeName() throws PDIException {
 		if (fTypename == null) {
@@ -292,57 +327,77 @@ public abstract class VariableDescriptor extends SessionObject implements IPDIVa
 		}
 		return fTypename;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getVariableDescriptorAsArray(int, int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#
+	 * getVariableDescriptorAsArray(int, int)
 	 */
 	public IPDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws PDIException {
 		return session.getVariableManager().getVariableDescriptorAsArray(this, start, length);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getVariableDescriptorAsType(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#
+	 * getVariableDescriptorAsType(java.lang.String)
 	 */
 	public IPDIVariableDescriptor getVariableDescriptorAsType(String type) throws PDIException {
 		return session.getVariableManager().getVariableDescriptorAsType(this, type);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#getId()
 	 */
 	public String getId() {
 		return varId;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#setAIF(org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#setAIF(org
+	 * .eclipse.ptp.debug.core.pdi.model.aif.IAIF)
 	 */
 	public void setAIF(IAIF aif) {
 		this.aif = aif;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#setCastingArrayEnd(int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#
+	 * setCastingArrayEnd(int)
 	 */
 	public void setCastingArrayEnd(int end) {
 		castingLength = end;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#setCastingArrayStart(int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#
+	 * setCastingArrayStart(int)
 	 */
 	public void setCastingArrayStart(int start) {
 		castingIndex = start;
 	}
-	
+
 	/**
 	 * @param t
 	 */
 	public void setCastingTypes(String[] t) {
 		castingTypes = t;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor#sizeof()
 	 */
 	public int sizeof() throws PDIException {
