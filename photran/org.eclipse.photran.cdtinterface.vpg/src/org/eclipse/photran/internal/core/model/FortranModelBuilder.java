@@ -15,6 +15,7 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
+import org.eclipse.photran.internal.core.lexer.FixedFormReplacement;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
@@ -251,14 +252,22 @@ public class FortranModelBuilder implements IFortranModelBuilder
     {
         if (nameToken != null)
         {
-            int fileOffset = nameToken.getFileOffset();
-            int length     = nameToken.getLength();
-            int line       = nameToken.getLine();
-            
             elt.setElementName(nameToken.getText());
-            elt.setIdPos(fileOffset, length);
-            elt.setPos(fileOffset, length);
-            elt.setLines(line, line);
+            
+            // Don't attempt to highlight identifiers that come from INCLUDE files or
+            // macro expansions.  We can't highlight something that's in another file,
+            // and likewise we'll punt on trying to highlight the macro.
+            if (nameToken.getPreprocessorDirective() == null
+                || nameToken.getPreprocessorDirective() instanceof FixedFormReplacement)
+            {
+                int fileOffset = nameToken.getFileOffset();
+                int length     = nameToken.getLength();
+                int line       = nameToken.getLine();
+                
+                elt.setIdPos(fileOffset, length);
+                elt.setPos(fileOffset, length);
+                elt.setLines(line, line);
+            }
         }
         else
         {
