@@ -36,6 +36,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange;
 
 /**
  * @author Clement chu
@@ -56,22 +57,27 @@ public class PExpression extends PLocalVariable implements IExpression {
 	 */
 	public PExpression(PStackFrame frame, IPDITargetExpression pdiExpression, IPDIVariableDescriptor varObject) {
 		super(frame, varObject);
-		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(
-				IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT)));
+		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences()
+				.getInt(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT)));
 		fText = pdiExpression.getExpressionText();
 		fPDIExpression = pdiExpression;
 		fStackFrame = frame;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#canEnableDisable()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PVariable#canEnableDisable()
 	 */
 	@Override
 	public boolean canEnableDisable() {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#dispose()
 	 */
 	@Override
@@ -91,22 +97,29 @@ public class PExpression extends PLocalVariable implements IExpression {
 		setDisposed(true);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#getExpressionString()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PVariable#getExpressionString()
 	 */
 	@Override
 	public String getExpressionString() throws DebugException {
 		return getExpressionText();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IExpression#getExpressionText()
 	 */
 	public String getExpressionText() {
 		return fText;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#getValue()
 	 */
 	@Override
@@ -119,8 +132,12 @@ public class PExpression extends PLocalVariable implements IExpression {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PVariable#handleDebugEvents
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	@Override
 	public void handleDebugEvents(IPDIEvent[] events) {
@@ -144,7 +161,9 @@ public class PExpression extends PLocalVariable implements IExpression {
 		super.handleDebugEvents(events);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#isEnabled()
 	 */
 	@Override
@@ -152,8 +171,12 @@ public class PExpression extends PLocalVariable implements IExpression {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#getStackFrame()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#getStackFrame
+	 * ()
 	 */
 	@Override
 	protected IPStackFrame getStackFrame() {
@@ -173,10 +196,8 @@ public class PExpression extends PLocalVariable implements IExpression {
 					if (variable != null) {
 						final IAIF aif = variable.getAIF();
 						if (aif != null && aif.getType() instanceof IAIFTypeArray) {
-							final int[] dims = ((IAIFTypeArray) aif.getType()).getDimensionDetails();
-							if (dims.length > 0 && dims[0] > 0) {
-								fValue = PValueFactory.createIndexedValue(this, variable, 0, dims[0]);
-							}
+							final IAIFTypeRange range = ((IAIFTypeArray) aif.getType()).getRange();
+							fValue = PValueFactory.createIndexedValue(this, variable, 0, range.getSize());
 						} else {
 							fValue = PValueFactory.createValue(this, variable);
 						}
@@ -189,15 +210,21 @@ public class PExpression extends PLocalVariable implements IExpression {
 		return fValue;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#isBookkeepingEnabled()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PVariable#isBookkeepingEnabled
+	 * ()
 	 */
 	@Override
 	protected boolean isBookkeepingEnabled() {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#resetValue()
 	 */
 	@Override

@@ -32,6 +32,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange;
 
 /**
  * @author Clement chu
@@ -52,8 +53,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			setPDIVariable((varObject instanceof IPDIVariable) ? (IPDIVariable) varObject : null);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#createShadow(int, int)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #createShadow(int, int)
 		 */
 		public IInternalVariable createShadow(int start, int length) throws DebugException {
 			IInternalVariable iv = null;
@@ -65,8 +70,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			return iv;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#createShadow(java.lang.String)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #createShadow(java.lang.String)
 		 */
 		public IInternalVariable createShadow(String type) throws DebugException {
 			IInternalVariable iv = null;
@@ -78,14 +87,20 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			return iv;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#dispose(boolean)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #dispose(boolean)
 		 */
 		public void dispose(boolean destroy) {
 			invalidate(destroy);
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
 		@Override
@@ -96,8 +111,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			return false;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#getQualifiedName()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #getQualifiedName()
 		 */
 		public String getQualifiedName() throws DebugException {
 			if (fQualifiedName == null) {
@@ -110,8 +129,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			return fQualifiedName;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#getValue()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #getValue()
 		 */
 		public synchronized IPValue getValue() throws DebugException {
 			if (fValue.equals(PValueFactory.NULL_VALUE)) {
@@ -120,10 +143,8 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 					try {
 						final IAIF aif = var.getAIF();
 						if (aif != null && aif.getType() instanceof IAIFTypeArray) {
-							final int[] dims = ((IAIFTypeArray) aif.getType()).getDimensionDetails();
-							if (dims.length > 0 && dims[0] > 0) {
-								fValue = PValueFactory.createIndexedValue(getVariable(), var, 0, dims[0]);
-							}
+							final IAIFTypeRange range = ((IAIFTypeArray) aif.getType()).getRange();
+							fValue = PValueFactory.createIndexedValue(getVariable(), var, 0, range.getSize());
 						} else {
 							fValue = PValueFactory.createValue(getVariable(), var);
 						}
@@ -135,8 +156,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			return fValue;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#invalidateValue()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #invalidateValue()
 		 */
 		public void invalidateValue() {
 			if (fValue instanceof AbstractPValue) {
@@ -148,22 +173,34 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isArgument()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #isArgument()
 		 */
 		public boolean isArgument() {
 			return (getPDIVariableObject() instanceof IPDIArgumentDescriptor);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isChanged()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #isChanged()
 		 */
 		public boolean isChanged() {
 			return fChanged;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isEditable()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #isEditable()
 		 */
 		public boolean isEditable() throws DebugException {
 			final IPDIVariable var = getPDIVariable();
@@ -176,22 +213,35 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			return false;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isSameDescriptor(org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #isSameDescriptor(org.eclipse.ptp.debug.core.pdi.model.
+		 * IPDIVariableDescriptor)
 		 */
 		public boolean isSameDescriptor(IPDIVariableDescriptor desc) {
 			return getPDIVariableObject().equals(desc);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#isSameVariable(org.eclipse.ptp.debug.core.pdi.model.IPDIVariable)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #isSameVariable(org.eclipse.ptp.debug.core.pdi.model.IPDIVariable)
 		 */
 		public boolean isSameVariable(IPDIVariable pdiVar) {
 			return (fPDIVariable != null) ? fPDIVariable.equals(pdiVar) : false;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#preserve()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #preserve()
 		 */
 		public synchronized void preserve() {
 			setChanged(false);
@@ -200,8 +250,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#resetValue()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #resetValue()
 		 */
 		public void resetValue() {
 			if (fValue instanceof AbstractPValue) {
@@ -209,8 +263,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#setChanged(boolean)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #setChanged(boolean)
 		 */
 		public synchronized void setChanged(boolean changed) {
 			if (changed) {
@@ -222,8 +280,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			fChanged = changed;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#setValue(java.lang.String)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #setValue(java.lang.String)
 		 */
 		public void setValue(String expression) throws DebugException {
 			IPDIVariable pdiVariable = null;
@@ -239,8 +301,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable#sizeof()
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.debug.internal.core.model.PVariable.IInternalVariable
+		 * #sizeof()
 		 */
 		public int sizeof() {
 			if (getPDIVariableObject() != null) {
@@ -334,15 +400,20 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 		fDescriptor = descriptor;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#canEnableDisable()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PVariable#canEnableDisable()
 	 */
 	@Override
 	public boolean canEnableDisable() {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#dispose()
 	 */
 	@Override
@@ -351,22 +422,30 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 		setDisposed(true);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPVariable#getAIF()
 	 */
 	public IAIF getAIF() throws DebugException {
 		return getValue().getAIF();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPGlobalVariable#getDescriptor()
 	 */
 	public IPGlobalVariableDescriptor getDescriptor() {
 		return fDescriptor;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PVariable#handleDebugEvents
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	@Override
 	public void handleDebugEvents(IPDIEvent[] events) {
@@ -383,8 +462,12 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 		super.handleDebugEvents(events);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PVariable#createOriginal(org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PVariable#createOriginal(org
+	 * .eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor)
 	 */
 	@Override
 	protected void createOriginal(IPDIVariableDescriptor vo) {

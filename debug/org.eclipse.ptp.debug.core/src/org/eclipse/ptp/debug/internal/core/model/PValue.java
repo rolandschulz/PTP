@@ -36,12 +36,14 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAggregate;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFloat;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeInt;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeString;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeUnion;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueChar;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFloat;
@@ -49,7 +51,6 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueInt;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValuePointer;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueReference;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueString;
-import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.pdi.model.aif.ITypeDerived;
 
 /**
@@ -71,7 +72,9 @@ public class PValue extends AbstractPValue {
 		setStatus(IPDebugElementStatus.ERROR, message);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPValue#dispose()
 	 */
 	@Override
@@ -82,7 +85,9 @@ public class PValue extends AbstractPValue {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPValue#getAIF()
 	 */
 	public IAIF getAIF() throws DebugException {
@@ -94,14 +99,18 @@ public class PValue extends AbstractPValue {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IValue#getReferenceTypeName()
 	 */
 	public String getReferenceTypeName() throws DebugException {
 		return (getParentVariable() != null) ? getParentVariable().getReferenceTypeName() : null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IValue#getValueString()
 	 */
 	public String getValueString() throws DebugException {
@@ -123,7 +132,9 @@ public class PValue extends AbstractPValue {
 		return fValueString;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IValue#getVariables()
 	 */
 	public IVariable[] getVariables() throws DebugException {
@@ -131,21 +142,25 @@ public class PValue extends AbstractPValue {
 		return list.toArray(new IVariable[list.size()]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IValue#hasVariables()
 	 */
 	public boolean hasVariables() throws DebugException {
 		final IAIF aif = getAIF();
 		if (aif != null) {
 			final IAIFType type = aif.getType();
-			if (type instanceof ITypeAggregate || type instanceof ITypeDerived) {
+			if (type instanceof IAIFTypeAggregate || type instanceof IAIFTypeUnion || type instanceof ITypeDerived) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IValue#isAllocated()
 	 */
 	public boolean isAllocated() throws DebugException {
@@ -161,8 +176,7 @@ public class PValue extends AbstractPValue {
 		final PVariableFormat format = getParentVariable().getFormat();
 		final char charValue = value.charValue();
 		if (PVariableFormat.NATURAL.equals(format)) {
-			return ((Character.isISOControl(charValue) && charValue != '\b' && charValue != '\t' && charValue != '\n'
-					&& charValue != '\f' && charValue != '\r') || charValue < 0) ? "" : "\'" + value.getValueString() + "\'"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return value.getValueString();
 		} else if (PVariableFormat.DECIMAL.equals(format)) {
 			return Integer.toString((byte) charValue);
 		} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
@@ -314,7 +328,7 @@ public class PValue extends AbstractPValue {
 			return processUnderlyingValue(type, ((IAIFValueReference) value).getParent());
 		} else if (type instanceof IAIFTypeString) {
 			return getWCharValueString((IAIFValueString) value);
-		} else if (type instanceof ITypeAggregate) {
+		} else if (type instanceof IAIFTypeAggregate || type instanceof IAIFTypeUnion) {
 			return "{...}"; //$NON-NLS-1$
 		} else {
 			return value.getValueString();
@@ -364,7 +378,9 @@ public class PValue extends AbstractPValue {
 		return fVariables;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPValue#preserve()
 	 */
 	@Override
@@ -389,7 +405,9 @@ public class PValue extends AbstractPValue {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPValue#reset()
 	 */
 	@Override
@@ -402,8 +420,12 @@ public class PValue extends AbstractPValue {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPValue#setChanged(boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.AbstractPValue#setChanged(boolean
+	 * )
 	 */
 	@Override
 	protected synchronized void setChanged(boolean changed) {
