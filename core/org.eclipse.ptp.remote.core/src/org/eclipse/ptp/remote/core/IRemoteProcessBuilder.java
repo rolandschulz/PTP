@@ -30,8 +30,7 @@ public interface IRemoteProcessBuilder {
 	 * 
 	 * @return This process builder
 	 */
-	public IRemoteProcessBuilder connection(
-			IRemoteConnection conn);
+	public IRemoteProcessBuilder connection(IRemoteConnection conn);
 
 	/**
 	 * Returns this process builder's operating system program and arguments.
@@ -62,13 +61,6 @@ public interface IRemoteProcessBuilder {
 	 * @return an IFileStore reference to the working directory
 	 */
 	public IFileStore directory();
-	
-	/**
-	 * Returns the user's home directory on the target system.
-	 * 
-	 * @return IFileStore corresponding to the location, or <code>null</code> if the home directory cannot be determined.
-	 */
-	public IFileStore getHomeDirectory();
 
 	/**
 	 * Sets this process builder's working directory.
@@ -79,8 +71,9 @@ public interface IRemoteProcessBuilder {
 	public IRemoteProcessBuilder directory(IFileStore directory);
 
 	/**
-	 * Returns a string map view of this process builder's environment. The returned map
-	 * behaves in the same manner as described in {@link java.lang.ProcessBuilder#environment()}.
+	 * Returns a string map view of this process builder's environment. The
+	 * returned map behaves in the same manner as described in
+	 * {@link java.lang.ProcessBuilder#environment()}.
 	 * 
 	 * @return the process builder's environment
 	 */
@@ -100,8 +93,7 @@ public interface IRemoteProcessBuilder {
 	 * @param redirectErrorStream
 	 * @return This process builder
 	 */
-	public IRemoteProcessBuilder redirectErrorStream(
-			boolean redirectErrorStream);
+	public IRemoteProcessBuilder redirectErrorStream(boolean redirectErrorStream);
 
 	/**
 	 * Starts a new process using the attributes of this process builder.

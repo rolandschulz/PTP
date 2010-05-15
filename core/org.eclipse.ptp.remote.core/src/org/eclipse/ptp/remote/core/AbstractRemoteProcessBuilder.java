@@ -22,97 +22,122 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	private IRemoteConnection fRemoteConnection;
 	private IFileStore fRemoteDir = null;
 	private boolean fRedirectErrorStream = false;
-	
+
 	public AbstractRemoteProcessBuilder(IRemoteConnection conn, List<String> command) {
 		fRemoteConnection = conn;
 		fCommandArgs = command;
 	}
-	
+
 	public AbstractRemoteProcessBuilder(IRemoteConnection conn, String... command) {
 		this(conn, Arrays.asList(command));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection()
 	 */
 	public IRemoteConnection connection() {
 		return fRemoteConnection;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection(org.eclipse.ptp.remote.core.IRemoteConnection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection(org.eclipse
+	 * .ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteProcessBuilder connection(IRemoteConnection conn) {
 		fRemoteConnection = conn;
 		return this;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command()
 	 */
 	public List<String> command() {
 		return fCommandArgs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.util.List)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.util.List)
 	 */
 	public IRemoteProcessBuilder command(List<String> command) {
 		fCommandArgs = command;
 		return this;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.lang.String
+	 * )
 	 */
 	public IRemoteProcessBuilder command(String... command) {
 		fCommandArgs = Arrays.asList(command);
 		return this;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory()
 	 */
 	public IFileStore directory() {
 		return fRemoteDir;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#getHomeDirectory()
-	 */
-	public IFileStore getHomeDirectory() {
-		return null;
-	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory(org.eclipse.core.filesystem.IFileStore)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory(org.eclipse
+	 * .core.filesystem.IFileStore)
 	 */
 	public IRemoteProcessBuilder directory(IFileStore directory) {
 		fRemoteDir = directory;
 		return this;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#environment()
 	 */
 	public abstract Map<String, String> environment();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream()
 	 */
 	public boolean redirectErrorStream() {
 		return fRedirectErrorStream;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream(boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream
+	 * (boolean)
 	 */
 	public IRemoteProcessBuilder redirectErrorStream(boolean redirectErrorStream) {
 		this.fRedirectErrorStream = redirectErrorStream;
 		return this;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
 	public abstract IRemoteProcess start() throws IOException;

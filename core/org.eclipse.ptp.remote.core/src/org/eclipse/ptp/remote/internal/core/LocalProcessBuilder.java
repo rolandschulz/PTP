@@ -28,18 +28,9 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
 public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getHomeDirectory()
-	 */
-	@Override
-	public IFileStore getHomeDirectory() {
-		String pathString = System.getProperty("user.home");
-		return EFS.getLocalFileSystem().getStore(new Path(pathString));
-	}
+	private final ProcessFactory localProcessBuilder;
+	private final Map<String, String> remoteEnv = new HashMap<String, String>();
 
-	private ProcessFactory localProcessBuilder;
-	private Map<String, String> remoteEnv = new HashMap<String, String>();
-	
 	public LocalProcessBuilder(IRemoteConnection conn, List<String> command) {
 		super(conn, command);
 		remoteEnv.putAll(System.getenv());
@@ -49,8 +40,10 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 	public LocalProcessBuilder(IRemoteConnection conn, String... command) {
 		this(conn, Arrays.asList(command));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
 	 */
 	@Override
@@ -62,28 +55,35 @@ public class LocalProcessBuilder extends AbstractRemoteProcessBuilder {
 		}
 		return dir;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#environment()
 	 */
+	@Override
 	public Map<String, String> environment() {
 		return remoteEnv;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
+	@Override
 	public IRemoteProcess start() throws IOException {
 		String commandArray[] = command().toArray(new String[0]);
 		String environmentArray[] = new String[environment().size()];
 		int index = 0;
-		for (Entry<String,String>  entry : environment().entrySet()) {
+		for (Entry<String, String> entry : environment().entrySet()) {
 			environmentArray[index++] = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
 		}
 		Process localProc;
 		if (directory() != null) {
 			try {
-				localProc = localProcessBuilder.exec(commandArray, environmentArray, 
+				localProc = localProcessBuilder.exec(commandArray, environmentArray,
 						directory().toLocalFile(EFS.NONE, new NullProgressMonitor()));
 			} catch (CoreException e) {
 				throw new IOException(e.getMessage());

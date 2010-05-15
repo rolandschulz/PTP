@@ -36,18 +36,18 @@ import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
 
 public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
-	private final static 	String EXIT_CMD = "exit"; //$NON-NLS-1$
-	private final static 	String CMD_DELIMITER = ";"; //$NON-NLS-1$
-	
+	private final static String EXIT_CMD = "exit"; //$NON-NLS-1$
+	private final static String CMD_DELIMITER = ";"; //$NON-NLS-1$
+
 	private final RSEConnection fConnection;
 	private final RSEFileManager fFileMgr;
-	
+
 	private Map<String, String> fRemoteEnv = new HashMap<String, String>();
 
 	public RSEProcessBuilder(IRemoteConnection conn, IRemoteFileManager fileMgr, List<String> command) {
 		super(conn, command);
-		fConnection = (RSEConnection)conn;
-		fFileMgr = (RSEFileManager)fileMgr;
+		fConnection = (RSEConnection) conn;
+		fFileMgr = (RSEFileManager) fileMgr;
 		fRemoteEnv = conn.getEnv();
 	}
 
@@ -55,19 +55,6 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		this(conn, fileMgr, Arrays.asList(command));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
-	 */
-//	@Override
-//	public IFileStore directory() {
-//		IFileStore dir = super.directory();
-//		if (dir == null) {
-//			dir = fFileMgr.getResource(connection().getWorkingDirectory());
-//			directory(dir);
-//		}
-//		return dir;
-//	}
-	
 	/**
 	 * Convert environment map back to environment strings.
 	 * 
@@ -76,13 +63,15 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	private String[] getEnvironment() {
 		String[] env = new String[fRemoteEnv.size()];
 		int pos = 0;
-		for (Map.Entry<String, String> entry: fRemoteEnv.entrySet()) {
+		for (Map.Entry<String, String> entry : fRemoteEnv.entrySet()) {
 			env[pos++] = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
 		}
 		return env;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
 	 */
 	@Override
@@ -90,35 +79,41 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		return fRemoteEnv;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start()
 	 */
+	@Override
 	public IRemoteProcess start() throws IOException {
-		// The exit command is called to force the remote shell to close after our command 
-		// is executed. This is to prevent a running process at the end of the debug session.
+		// The exit command is called to force the remote shell to close after
+		// our command
+		// is executed. This is to prevent a running process at the end of the
+		// debug session.
 		// See Bug 158786.
 		List<String> cmdArgs = command();
 		if (cmdArgs.size() < 1) {
 			throw new IndexOutOfBoundsException();
 		}
-		
+
 		String remoteCmd = ""; //$NON-NLS-1$
-		
+
 		for (int i = 0; i < cmdArgs.size(); i++) {
 			if (i > 0) {
 				remoteCmd += " "; //$NON-NLS-1$
 			}
 			remoteCmd += spaceEscapify(cmdArgs.get(i));
 		}
-		
+
 		remoteCmd += CMD_DELIMITER + EXIT_CMD;
-		
+
 		IShellService shellService = fConnection.getRemoteShellService();
 		if (shellService == null) {
 			throw new IOException(Messages.RSEProcessBuilder_0);
 		}
-		
-		// This is necessary because runCommand does not actually run the command right now.
+
+		// This is necessary because runCommand does not actually run the
+		// command right now.
 		IHostShell hostShell = null;
 		try {
 			String initialDir = ""; //$NON-NLS-1$
@@ -131,85 +126,80 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return new RSEProcess(hostShell, redirectErrorStream());
 	}
-	
+
 	private String spaceEscapify(String inputString) {
-		if(inputString == null)
+		if (inputString == null)
 			return null;
 		return inputString.replaceAll(" ", "\\\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
 	 */
 	@Override
 	public IFileStore directory() {
-		if(super.directory() == null) {
-			// get CWD
-			Map<String, String> envMap = environment();
-			
+		if (super.directory() == null) {
 			// check PWD first for UNIX systems
-			String cwd = envMap.get("PWD");
-			
+			String cwd = environment().get("PWD"); //$NON-NLS-1$
+
 			// if that didn't work, try %CD% for Windows systems
-			if(cwd == null) {
-				cwd = envMap.get("CD");
+			if (cwd == null) {
+				cwd = environment().get("CD"); //$NON-NLS-1$
 			}
-			
-			if(cwd != null) {
-				URI uri=null;
-				try {
-					uri = new URI("rse", fConnection.getHost().getHostName(), cwd, null);
-				} catch (URISyntaxException e) {
-					RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
-				}
-				try {
-					return EFS.getStore(uri);
-				} catch (CoreException e) {
-					RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
-				}
+
+			if (cwd != null) {
+				return fFileMgr.getResource(cwd);
 			}
-				
+
 		}
 		return super.directory();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getHomeDirectory()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getHomeDirectory
+	 * ()
 	 */
 	public IFileStore getHomeDirectory() {
 		// determine the home directory using environment variables
 		Map<String, String> envMap = environment();
-		
+
 		// check HOME first for UNIX systems
 		String homeDir = envMap.get("HOME");
-		if(homeDir == null) {
+		if (homeDir == null) {
 			homeDir = ""; //$NON-NLS-1$
 		}
-		
+
 		// if that didn't work, try %USERPROFILE% for Windows systems
-		if(homeDir == null) {
+		if (homeDir == null) {
 			homeDir = envMap.get("USERPROFILE");
 			IPath homePath = new Path(homeDir);
 			homeDir = "/" + homePath.toString();
 		}
-		
-		if(homeDir != null) {
-			URI uri=null;
+
+		if (homeDir != null) {
+			URI uri = null;
 			try {
 				uri = new URI("rse", fConnection.getHost().getHostName(), homeDir, null);
 			} catch (URISyntaxException e) {
-				RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
+				RSEAdapterCorePlugin.getDefault().getLog()
+						.log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
 			}
 			try {
 				return EFS.getStore(uri);
 			} catch (CoreException e) {
-				RSEAdapterCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
+				RSEAdapterCorePlugin.getDefault().getLog()
+						.log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
 			}
 		}
-		
+
 		return null;
 	}
 
