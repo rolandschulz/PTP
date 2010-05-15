@@ -126,10 +126,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.isp"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.rdt.xlc"
          version="0.0.0"/>
 
@@ -139,6 +135,10 @@
 
    <includes
          id="org.eclipse.ptp.rdt.remotejars"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.gem"
          version="0.0.0"/>
 
 </feature>
