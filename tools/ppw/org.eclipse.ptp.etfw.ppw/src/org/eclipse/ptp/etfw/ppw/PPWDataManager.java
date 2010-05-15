@@ -41,7 +41,7 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 public class PPWDataManager extends AbstractToolDataManager {
 	boolean externalTarget = false;
-	
+
 	@Override
 	public void cleanup() {
 		// TODO Auto-generated method stub
@@ -58,30 +58,31 @@ public class PPWDataManager extends AbstractToolDataManager {
 		externalTarget = external;
 	}
 
-	public void process(String projname, ILaunchConfiguration configuration,
-			final String directory) throws CoreException {
+	@Override
+	public void process(String projname, ILaunchConfiguration configuration, final String directory) throws CoreException {
 		try {
 			// Argument(s) to pass to PPW -- the name of the PAR file to open
 			final String[] args = new String[1];
-			
+
 			if (externalTarget || projname == null) {
-				Display.getDefault().syncExec(new Runnable() {	
+				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						Shell s = PlatformUI.getWorkbench().getDisplay().getActiveShell();
-						
-						if (s == null){
+
+						if (s == null) {
 							s = PlatformUI.getWorkbench().getDisplay().getShells()[0];
 						}
-						
+
 						FileDialog dl = new FileDialog(s, SWT.OPEN);
 						dl.setFilterPath(directory);
-						dl.setFilterExtensions(new String[] {"*.par"}); //$NON-NLS-1$
+						dl.setFilterExtensions(new String[] { "*.par" }); //$NON-NLS-1$
 						dl.setText(Messages.PPWDataManager_0);
 						String file = dl.open();
 						if (file != null) {
 							args[0] = file;
 						} else {
-							// Dialog was canceled or an error occurred... so just return
+							// Dialog was canceled or an error occurred... so
+							// just return
 							return;
 						}
 					}
@@ -89,7 +90,7 @@ public class PPWDataManager extends AbstractToolDataManager {
 			} else {
 				boolean renameSuccess = false;
 				File parFile = new File(directory + File.separator + "ppw_eclipse.par"); //$NON-NLS-1$
-				
+
 				File newFile = null;
 				final int FILE_CNT_LIM = 64;
 				for (int i = 1; i < FILE_CNT_LIM; i++) {
@@ -99,140 +100,130 @@ public class PPWDataManager extends AbstractToolDataManager {
 						break;
 					}
 				}
-				
+
 				if (renameSuccess) {
 					args[0] = newFile.getPath();
 				} else {
 					args[0] = parFile.getPath();
 				}
 			}
-			
-			// Set up handler for source-code highlighting in Eclipse
-			EclipseHandler handler = new EclipseHandler() {
-				public boolean highlightSourceLine(final String filename, final int line) {
-					
-					class SourceView implements Runnable {
-						public void run() {
-							openSource(filename, line);							
-						}
-					}
-					
-					SourceView sv = new SourceView();
-					Display.getDefault().syncExec(sv);
-					
-					return true;
-				}
-			};
-			
-			// Launch PPW by directly calling into the GUIController
-			GUIController.setInEclipse(true);
-			GUIController.setEclipseHandler(handler);
-			GUIController.go(args);
-			
+
+			new PPWController(this, args);
+
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public boolean highlightSourceLine(final String filename, final int line) {
+		class SourceView implements Runnable {
+			public void run() {
+				openSource(filename, line);
+			}
+		}
+
+		SourceView sv = new SourceView();
+		Display.getDefault().syncExec(sv);
+
+		return true;
+	}
+
 	/*
 	 * Adapted from org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView
 	 */
 	void openSource(String filename, int line) {
-        try {
-            IWorkspace workspace = ResourcesPlugin.getWorkspace();
-            IWorkspaceRoot root = workspace.getRoot();
+		try {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			IWorkspaceRoot root = workspace.getRoot();
 
-            IFile file = getFile(filename, root.members());
+			IFile file = getFile(filename, root.members());
 
-            if (file == null) {
-                return;
-            }
-            IEditorInput iEditorInput = new FileEditorInput(file);
-            
-            IWorkbenchPage p = getActivePage();
-            String editorid="org.eclipse.cdt.ui.editor.CEditor"; //$NON-NLS-1$
-            
-            IEditorPart part = null;
-            if (p != null) {
-                part = p.openEditor(iEditorInput, editorid, true);
-            }
-           
-            
-            //IEditorPart part = EditorUtility.openInEditor(file);
+			if (file == null) {
+				return;
+			}
+			IEditorInput iEditorInput = new FileEditorInput(file);
 
-            TextEditor textEditor = (TextEditor) part;
+			IWorkbenchPage p = getActivePage();
+			String editorid = "org.eclipse.cdt.ui.editor.CEditor"; //$NON-NLS-1$
 
-            final int start = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getLineOffset(
-                    line - 1);
-            final int end = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getLineOffset(
-                    line);
+			IEditorPart part = null;
+			if (p != null) {
+				part = p.openEditor(iEditorInput, editorid, true);
+			}
 
-            textEditor.setHighlightRange(start, end - start, true);
+			// IEditorPart part = EditorUtility.openInEditor(file);
 
-            AbstractTextEditor abstractTextEditor = textEditor;
+			TextEditor textEditor = (TextEditor) part;
 
-            ISourceViewer viewer = null;
+			final int start = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getLineOffset(line - 1);
+			final int end = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getLineOffset(line);
 
-            final Field fields[] = AbstractTextEditor.class.getDeclaredFields();
-            for (int i = 0; i < fields.length; ++i) {
-                if ("fSourceViewer".equals(fields[i].getName())) { //$NON-NLS-1$
-                    Field f = fields[i];
-                    f.setAccessible(true);
-                    viewer = (ISourceViewer) f.get(abstractTextEditor);
-                    break;
-                }
-            }
+			textEditor.setHighlightRange(start, end - start, true);
 
-            if (viewer != null) {
-                viewer.revealRange(start, end - start);
-                viewer.setSelectedRange(start, end - start);
-            }
+			AbstractTextEditor abstractTextEditor = textEditor;
 
-        } catch (Throwable t) {
-           // t.printStackTrace();
-        }
+			ISourceViewer viewer = null;
+
+			final Field fields[] = AbstractTextEditor.class.getDeclaredFields();
+			for (int i = 0; i < fields.length; ++i) {
+				if ("fSourceViewer".equals(fields[i].getName())) { //$NON-NLS-1$
+					Field f = fields[i];
+					f.setAccessible(true);
+					viewer = (ISourceViewer) f.get(abstractTextEditor);
+					break;
+				}
+			}
+
+			if (viewer != null) {
+				viewer.revealRange(start, end - start);
+				viewer.setSelectedRange(start, end - start);
+			}
+
+		} catch (Throwable t) {
+			// t.printStackTrace();
+		}
 	}
-	
+
 	/*
 	 * Borrowed from org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView
 	 */
-    IFile getFile(String filename, IResource[] resources) {
-        try {
-            for (int j = 0; j < resources.length; j++) {
-                if (resources[j] instanceof IFile) {
-                    IFile f = (IFile) resources[j];
-                    if (f.getName().equals(filename)) {
-                        return f;
-                    }
-                } else if (resources[j] instanceof IFolder) {
-                    IFile f = getFile(filename, ((IFolder) resources[j]).members());
-                    if (f != null) {
-                        return f;
-                    }
-                } else if (resources[j] instanceof IProject) {
-                    IFile f = getFile(filename, ((IProject) resources[j]).members());
-                    if (f != null) {
-                        return f;
-                    }
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        return null;
-    }
-	
+	IFile getFile(String filename, IResource[] resources) {
+		try {
+			for (int j = 0; j < resources.length; j++) {
+				if (resources[j] instanceof IFile) {
+					IFile f = (IFile) resources[j];
+					if (f.getName().equals(filename)) {
+						return f;
+					}
+				} else if (resources[j] instanceof IFolder) {
+					IFile f = getFile(filename, ((IFolder) resources[j]).members());
+					if (f != null) {
+						return f;
+					}
+				} else if (resources[j] instanceof IProject) {
+					IFile f = getFile(filename, ((IProject) resources[j]).members());
+					if (f != null) {
+						return f;
+					}
+				}
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		return null;
+	}
+
 	/*
 	 * Borrowed from org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView
 	 */
-    public static IWorkbenchPage getActivePage() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window != null) {
-            return window.getActivePage();
-        }
-        return null;
-    }
-    
+	public static IWorkbenchPage getActivePage() {
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null) {
+			return window.getActivePage();
+		}
+		return null;
+	}
+
 	@Override
 	public void view() {
 		// ---- currently unused ----
