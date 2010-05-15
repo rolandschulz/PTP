@@ -91,7 +91,7 @@ public abstract class FortranResourceRefactoring
         {
             for (IFile file : this.selectedFiles)
             {
-                if (org.eclipse.photran.internal.core.lexer.sourceform.SourceForm.isFixedForm(file))
+                if (org.eclipse.photran.internal.core.sourceform.SourceForm.isFixedForm(file))
                 {
                     status.addWarning("Indentation and line length is NOT checked when refactoring FIXED form files. " +
                         "Use at your own risk.");
@@ -143,7 +143,7 @@ public abstract class FortranResourceRefactoring
 
         for (IFile file : files)
         {
-            if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.lexer.sourceform.SourceForm.isFixedForm(file))
+            if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.sourceform.SourceForm.isFixedForm(file))
             {
                 status.addError("The fixed form file " + file.getName() + " will not be refactored.");
                 filesToRemove.add(file);
@@ -159,7 +159,7 @@ public abstract class FortranResourceRefactoring
 
         for (IFile file : files)
         {
-            if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.lexer.sourceform.SourceForm.isCPreprocessed(file))
+            if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.sourceform.SourceForm.isCPreprocessed(file))
             {
                 status.addError("The C-preprocessed file " + file.getName() + " will not be refactored.");
                 filesToRemove.add(file);

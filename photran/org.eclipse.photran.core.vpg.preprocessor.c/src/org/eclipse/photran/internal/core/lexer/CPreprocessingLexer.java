@@ -55,13 +55,13 @@ public abstract class CPreprocessingLexer implements ILexer
 
     public CPreprocessingLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
     {
-        this(new CPreprocessingReader(file, filename, new LineAppendingReader(in)), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
+        this(new CPreprocessingReader(file, filename, new LineAppendingReader(in)), file, filename, accumulateWhitetext);
     }
 
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)
-    private CPreprocessingLexer(CPreprocessingReader cpp, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    private CPreprocessingLexer(CPreprocessingReader cpp, IFile file, String filename, boolean accumulateWhitetext)
     {
-        this.phase1Lexer = createDelegateLexer(cpp, file, filename, tokenFactory, accumulateWhitetext);
+        this.phase1Lexer = createDelegateLexer(cpp, file, filename, accumulateWhitetext);
         this.producerMap = cpp.getProducerMap();
         this.includeMap = cpp.getIncludeMap();
 
@@ -71,7 +71,7 @@ public abstract class CPreprocessingLexer implements ILexer
 
     protected abstract ILexer createDelegateLexer(
         CPreprocessingReader cpp, IFile file, String filename,
-        TokenFactory tokenFactory, boolean accumulateWhitetext);
+        boolean accumulateWhitetext);
 
     public Token yylex() throws IOException, LexerException
     {
@@ -239,8 +239,6 @@ public abstract class CPreprocessingLexer implements ILexer
         phase1Lexer.setTokenAsCurrent(token);
     }
 
-    public TokenFactory getTokenFactory() { return phase1Lexer.getTokenFactory(); }
-    
     public String getFilename() { return phase1Lexer.getFilename(); }
 
     public int getLastTokenLine() { return phase1Lexer.getLastTokenLine(); }

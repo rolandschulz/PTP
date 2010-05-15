@@ -17,7 +17,7 @@ import java.util.TreeMap;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
+import org.eclipse.photran.internal.core.sourceform.SourceForm;
 
 /**
  * Provides access to the source form settings for a project.

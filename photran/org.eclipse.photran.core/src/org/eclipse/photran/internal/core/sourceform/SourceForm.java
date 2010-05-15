@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.lexer.sourceform;
+package org.eclipse.photran.internal.core.sourceform;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.lexer.LexerFactory;
 import org.eclipse.photran.internal.core.properties.SourceFormProperties;
 
 /**
@@ -40,7 +39,7 @@ import org.eclipse.photran.internal.core.properties.SourceFormProperties;
  * 
  * @author Jeff Overbey
  */
-public class SourceForm
+public final class SourceForm
 {
     private static final String SOURCE_FORM_EXTENSION_POINT_ID = "org.eclipse.photran.core.sourceForms";
 
@@ -94,7 +93,7 @@ public class SourceForm
 
     private static ISourceForm of(String filename, SourceFormProperties properties)
     {
-        if (filename == null) return new UnpreprocessedFreeSourceForm();
+        if (filename == null) return defaultSourceForm();
         
         try
         {
@@ -103,13 +102,40 @@ public class SourceForm
             if (config != null)
                 return (ISourceForm)config.createExecutableExtension("class");
             else
-                return new UnpreprocessedFreeSourceForm();
+                return defaultSourceForm();
         }
         catch (CoreException e)
         {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static ISourceForm defaultSourceForm()
+    {
+        try
+        {
+            return (ISourceForm)findDefaultSourceFormExtension().createExecutableExtension("class");
+        }
+        catch (CoreException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static IConfigurationElement findDefaultSourceFormExtension()
+    {
+        for (IConfigurationElement config : allSourceFormConfigs())
+            if (isDefaultHandler(config))
+                return config;
+        
+        throw new IllegalStateException("No default source form defined");
+    }
+
+    private static boolean isDefaultHandler(IConfigurationElement config)
+    {
+        return config.getAttribute("priority").equals("default");
     }
 
     private static String descriptionFor(String filename, SourceFormProperties properties)
@@ -119,7 +145,7 @@ public class SourceForm
         if (config != null)
             return nameOf(config);
         else
-            return UnpreprocessedFreeSourceForm.DESCRIPTION;
+            return nameOf(findDefaultSourceFormExtension());
     }
     
     private static IConfigurationElement findExtensionHandling(String filename, SourceFormProperties properties)

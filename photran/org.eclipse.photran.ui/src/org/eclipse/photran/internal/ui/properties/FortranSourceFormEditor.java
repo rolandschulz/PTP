@@ -10,13 +10,12 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.properties;
 
-import java.util.TreeMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.jface.preference.FieldEditor;
-import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
-import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.properties.SourceFormProperties;
+import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionEvent;

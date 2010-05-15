@@ -39,11 +39,6 @@ public class LexerPhase3 implements IAccumulatingLexer
     {
         return phase2Lexer.getFilename();
     }
-    
-    public TokenFactory getTokenFactory()
-    {
-    	return phase2Lexer.getTokenFactory();
-    }
 
     public int getLastTokenCol()
     {

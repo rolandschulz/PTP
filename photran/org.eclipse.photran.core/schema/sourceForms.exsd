@@ -86,7 +86,9 @@
          <attribute name="priority" use="required">
             <annotation>
                <documentation>
-                  If multiple source forms apply to a given file, the one(s) with the highest priority will be preferred.  This is used to allow contributed source forms (e.g., C preprocessed source forms) to take precedence over default source forms (e.g., unpreprocessed source forms).
+                  If multiple source forms apply to a given file, the one(s) with the highest priority will be preferred.  This is used to allow contributed source forms (e.g., C preprocessed source forms) to take precedence over built-in source forms (e.g., unpreprocessed source forms).
+
+The &quot;default&quot; value may not be used by contributed source forms; there should only be one &quot;default&quot; contribution, and this is built in.
                </documentation>
             </annotation>
             <simpleType>
@@ -96,6 +98,8 @@
                   <enumeration value="medium">
                   </enumeration>
                   <enumeration value="low">
+                  </enumeration>
+                  <enumeration value="default">
                   </enumeration>
                </restriction>
             </simpleType>

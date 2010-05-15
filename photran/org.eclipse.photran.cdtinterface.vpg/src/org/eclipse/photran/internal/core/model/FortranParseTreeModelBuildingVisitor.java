@@ -196,7 +196,7 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
     {
         String description = methodNameDescPrefix + token.getClass().getSimpleName();
         FortranElement element = new FortranElement.UnknownNode(getCurrentParent(), description);
-        element.setIdentifier(token);
+        modelBuilder.configureElement(element, token);
         try
         {
             modelBuilder.addF90Element(element);

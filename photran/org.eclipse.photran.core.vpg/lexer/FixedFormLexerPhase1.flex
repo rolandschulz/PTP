@@ -56,12 +56,9 @@ import org.eclipse.core.resources.IFile;
 
     private FixedFormLexerPrepass prepass;
 
-    private TokenFactory tokenFactory;
-
-    public FixedFormLexerPhase1(Reader in, FixedFormLexerPrepass _prepass, TokenFactory tokenFactory) {
+    public FixedFormLexerPhase1(Reader in, FixedFormLexerPrepass _prepass) {
         this(new LineAppendingReader(in));
         this.prepass=_prepass;
-        this.tokenFactory = tokenFactory;
     }
 
     //unset start of line state
@@ -146,10 +143,10 @@ import org.eclipse.core.resources.IFile;
         else
             tokenText = prepass.getTokenText(lastTokenFileOffset, lastTokenLength);
 
-        prevToken = tokenFactory.createToken(terminal,
-                                        prepass.getWhitespaceBefore(tokLine, tokCol, tokOff),
-                                        tokenText,
-                                        "");
+        prevToken = new Token(terminal,
+                              prepass.getWhitespaceBefore(tokLine, tokCol, tokOff),
+                              tokenText,
+                              "");
 
         if(!tokenText.equals(yytext()) && terminal != Terminal.T_EOS)
         {
@@ -188,9 +185,9 @@ import org.eclipse.core.resources.IFile;
 
     private String filename = "<stdin>";
 
-    public FixedFormLexerPhase1(Reader in, FixedFormLexerPrepass _prepass, IFile file, String filename, TokenFactory tokenFactory)
+    public FixedFormLexerPhase1(Reader in, FixedFormLexerPrepass _prepass, IFile file, String filename)
     {
-        this(in, _prepass, tokenFactory);
+        this(in, _prepass);
         this.lastTokenFile = new FileOrIFile(file);
         this.filename = filename;
     }
@@ -198,11 +195,6 @@ import org.eclipse.core.resources.IFile;
     public String getFilename()
     {
         return filename;
-    }
-
-    public TokenFactory getTokenFactory()
-    {
-        return tokenFactory;
     }
 
     public int getLastTokenLine()

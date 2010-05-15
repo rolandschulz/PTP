@@ -14,32 +14,32 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.photran.internal.core.lexer.FixedFormLexerPhase2;
+import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
+import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase2;
 import org.eclipse.photran.internal.core.lexer.ILexer;
-import org.eclipse.photran.internal.core.lexer.TokenFactory;
+import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 
 /**
- * An {@link ISourceForm} for fixed form Fortran source code that contains
+ * An {@link ISourceForm} for free form Fortran source code that contains
  * neither INCLUDE lines nor any kind of preprocessor directive.
  * 
  * @author Jeff Overbey
  */
-public class UnpreprocessedFixedSourceForm implements ISourceForm
+public class UnpreprocessedFreeSourceForm implements ISourceForm
 {
-    public static final String DESCRIPTION = "Fixed Form";
-    
-    public ILexer createLexer(
-        Reader in, IFile file, String filename,
-        TokenFactory tokenFactory, boolean accumulateWhitetext) throws IOException
+    public static final String DESCRIPTION = "Free Form";
+
+    @SuppressWarnings("unchecked")
+    public ILexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
     {
-        return new FixedFormLexerPhase2(in, file, filename, tokenFactory);
+        return new FreeFormLexerPhase2(new FreeFormLexerPhase1(in, file, filename, accumulateWhitetext));
     }
 
-    public UnpreprocessedFixedSourceForm configuredWith(Object data)
+    public UnpreprocessedFreeSourceForm configuredWith(Object data)
     {
         return this;
     }
     
-    public boolean isFixedForm()     { return true; }
+    public boolean isFixedForm()     { return false; }
     public boolean isCPreprocessed() { return false; }
 }

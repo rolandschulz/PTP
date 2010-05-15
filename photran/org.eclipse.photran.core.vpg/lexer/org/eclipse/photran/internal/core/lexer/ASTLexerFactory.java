@@ -19,31 +19,24 @@ import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
-import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
+import org.eclipse.photran.internal.core.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.sourceform.SourceForm;
 
 /**
- * A collection of (static) factory methods for creating Fortran lexers.
+ * A factory for creating Fortran lexers that feed the Fortran parser.
+ * <p>
+ * <i>Historical Note:</i>
+ * There used to be a separate <code>LexerFactory</code> for lexers that were intended for
+ * uses other than feeding the parser (e.g., a lexer-based model builder or MBS dependency
+ * analyzer); its methods returned an {@link ILexer} rather than an {@link IAccumulatingLexer}.
+ * However, those uses have since disappeared, and so the two classes were consolidated into
+ * this single class.
  * 
  * @author Jeff Overbey
  */
-public class LexerFactory
+public class ASTLexerFactory
 {
-    protected final TokenFactory tokenFactory;
-    protected final boolean accumulateWhitetext;
-    
-    public LexerFactory(TokenFactory tokenFactory)
-    {
-        this(tokenFactory, true);
-    }
-    
-    public LexerFactory(TokenFactory tokenFactory, boolean accumulateWhitetext)
-    {
-        this.tokenFactory = tokenFactory;
-        this.accumulateWhitetext = accumulateWhitetext;
-    }
-    
-    public ILexer createLexer(IFile file) throws CoreException, IOException
+    public IAccumulatingLexer createLexer(IFile file) throws CoreException, IOException
     {
         return createLexer(
             new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset())),
@@ -51,7 +44,7 @@ public class LexerFactory
             SourceForm.determineFilename(file));
     }
     
-    public ILexer createLexer(IFile file, ISourceForm sourceForm) throws CoreException, IOException
+    public IAccumulatingLexer createLexer(IFile file, ISourceForm sourceForm) throws CoreException, IOException
     {
         return createLexer(
             new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset())),
@@ -60,7 +53,7 @@ public class LexerFactory
             sourceForm);
     }
 
-    public ILexer createLexer(File file) throws IOException
+    public IAccumulatingLexer createLexer(File file) throws IOException
     {
         return createLexer(
             new BufferedReader(new FileReader(file)),
@@ -68,7 +61,7 @@ public class LexerFactory
             file.getAbsolutePath());
     }
 
-    public ILexer createLexer(File file, ISourceForm sourceForm) throws IOException
+    public IAccumulatingLexer createLexer(File file, ISourceForm sourceForm) throws IOException
     {
         return createLexer(
             new BufferedReader(new FileReader(file)),
@@ -77,7 +70,7 @@ public class LexerFactory
             sourceForm);
     }
     
-    public ILexer createLexer(Reader in, IFile file, String filename) throws IOException
+    public IAccumulatingLexer createLexer(Reader in, IFile file, String filename) throws IOException
     {
         return createLexer(
             in,
@@ -86,8 +79,8 @@ public class LexerFactory
             SourceForm.of(file, filename));
     }
     
-    public ILexer createLexer(Reader in, IFile file, String filename, ISourceForm sourceForm) throws IOException
+    public IAccumulatingLexer createLexer(Reader in, IFile file, String filename, ISourceForm sourceForm) throws IOException
     {
-        return sourceForm.createLexer(in, file, filename, tokenFactory, accumulateWhitetext);
+        return new LexerPhase3(sourceForm.<ILexer>createLexer(in, file, filename, true));
     }
 }

@@ -1589,7 +1589,7 @@ public class FreeFormLexerPhase2 implements ILexer
             else
             {
                 // split "xyz=" into "xyz" "="
-                IToken eq = getTokenFactory().createToken(Terminal.T_EQUALS, "=");
+                IToken eq = new Token(Terminal.T_EQUALS, "=");
                 //eq.setTerminal(Terminal.T_EQUALS);
                 //eq.setFilename(t.getFilename());
                 //eq.setStartLine(t.getEndLine());
@@ -1635,7 +1635,7 @@ public class FreeFormLexerPhase2 implements ILexer
             //int numCharsRemoved = t.getTokenText().length() - textAfterStar.length() - 1;
 
             // split "integer*3" into "integer" "*" "3"
-            IToken star = getTokenFactory().createToken(Terminal.T_ASTERISK, "*");
+            IToken star = new Token(Terminal.T_ASTERISK, "*");
             //star.setTerminal(Terminal.T_ASTERISK);
             //star.setFilename(t.getFilename());
             //star.setStartLine(t.getEndLine());
@@ -1646,7 +1646,7 @@ public class FreeFormLexerPhase2 implements ILexer
             //star.setLength(1);
             //star.setText("*");
 
-            IToken num = getTokenFactory().createToken(Terminal.T_ICON, textAfterStar);
+            IToken num = new Token(Terminal.T_ICON, textAfterStar);
             //num.setTerminal(Terminal.T_ICON);
             //num.setFilename(t.getFilename());
             //num.setStartLine(star.getEndLine());
@@ -1818,11 +1818,6 @@ public class FreeFormLexerPhase2 implements ILexer
     public String getFilename()
     {
         return yylex.getFilename();
-    }
-
-    public TokenFactory getTokenFactory()
-    {
-    	return yylex.getTokenFactory();
     }
 
     public int getLastTokenLine()

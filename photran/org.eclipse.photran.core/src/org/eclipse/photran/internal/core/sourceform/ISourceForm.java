@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * Copyright (c) 2010 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,12 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.core.lexer.sourceform;
+package org.eclipse.photran.internal.core.sourceform;
 
 import java.io.IOException;
 import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.photran.internal.core.lexer.ILexer;
-import org.eclipse.photran.internal.core.lexer.TokenFactory;
 
 /**
  * Interface implemented by contributions to the {@value SourceForm#SOURCE_FORM_EXTENSION_POINT_ID}
@@ -53,7 +51,7 @@ public interface ISourceForm
      *     </ol>
      * </ol>
      */
-    ILexer createLexer(Reader in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext) throws IOException;
+    <T> T createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException;
     
     /**
      * Configures this source form.

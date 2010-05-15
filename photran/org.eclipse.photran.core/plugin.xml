@@ -108,27 +108,10 @@
 
   </extension>
 
-<!-- =================== -->
-<!-- Source Form Support -->
-<!-- =================== -->
+<!-- =========================== -->
+<!-- Source Form Extension Point -->
+<!-- =========================== -->
 
-  <!-- Source Form Extension Point -->
   <extension-point id="sourceForms" name="Source Form" schema="schema/sourceForms.exsd"/>
-
-  <!-- Default Source Form Contributions -->
-  <extension point="org.eclipse.photran.core.sourceForms">
-      <source-form
-          id="unpreprocessedFreeForm"
-          name="Free Form - INCLUDE lines ignored"
-          class="org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm"
-          priority="low"
-          defaultForFilenameExtensions="f90,f95,f03,f08,F90,F95,F03,F08" />
-      <source-form
-          id="unpreprocessedFixedForm"
-          name="Fixed Form - INCLUDE lines ignored"
-          class="org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm"
-          priority="low"
-          defaultForFilenameExtensions="f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,F77,FPP" />
-  </extension>
 
 </plugin>

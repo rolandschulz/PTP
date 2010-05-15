@@ -14,8 +14,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
+import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.resources.IResourceFilter;
 

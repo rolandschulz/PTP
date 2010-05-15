@@ -10,8 +10,6 @@ import java.io.IOException;
 public interface ILexer
 {
     IToken yylex() throws IOException, LexerException;
-
-    TokenFactory getTokenFactory();
     
     String getFilename();
 

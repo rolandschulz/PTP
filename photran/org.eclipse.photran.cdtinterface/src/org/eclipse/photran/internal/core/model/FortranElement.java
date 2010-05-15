@@ -18,7 +18,6 @@ import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
-import org.eclipse.photran.internal.core.lexer.IToken;
 
 /**
  * An Fortran element in the C Model.
@@ -51,77 +50,12 @@ public abstract class FortranElement extends SourceManipulation // Parent
     implements ICElement, IParent, ISourceReference, IContributedCElement
 {
     /**
-     * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,
-     * subroutines, etc.). For the ones that do, this is the <code>Token</code> for that name. It
-     * is expected to contain position information within the source file.
+     * Creates an empty <code>FortranElement</code> under the given parent.
      */
-    protected IToken identifier = null;
-
-    /**
-     * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,
-     * subroutines, etc.). For the ones that do, this is the <code>Token</code> for that name. It
-     * is expected to contain position information within the source file.
-     *
-     * @return the identifier <code>Token</code> for this element.
-     */
-    public IToken getIdentifier()
+	public FortranElement(Parent parent)
     {
-        return identifier;
+        super(parent, "", /* type */ -1);
     }
-
-    /**
-     * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,
-     * subroutines, etc.). For the ones that do, this sets the <code>Token</code> for that name.
-     * It is expected to contain position information within the source file.
-     *
-     * @param identifier The identifier <code>Token</code> for this element.
-     */
-    public void setIdentifier(IToken identifier)
-    {
-        this.identifier = identifier;
-
-        // Don't attempt to highlight identifiers that come from INCLUDE files or
-        // macro expansions.  We can't highlight something that's in another file,
-        // and likewise we'll punt on trying to highlight the macro.
-        if (identifier != null && identifier.getPreprocessorDirective() == null)
-        {
-            int offset = identifier.getFileOffset();
-            int length = identifier.getLength();
-            int line = identifier.getLine();
-
-            setIdPos(offset, length);
-            setPos(offset, length);
-            setLines(line, line);
-        }
-    }
-
-	//-------------------------------------------------------------
-
-	/**
-     * Creates a new <code>FortranElement</code> under the given parent, which has the given name
-     * (passed as a <code>Token</code>) from the source text.
-     *
-     * @param parent
-     * @param identifier
-     * @param parseTreeNode
-     */
-	public FortranElement(Parent parent, IToken identifier)
-    {
-        super(parent, identifier != null ? identifier.getText() : "(anonymous)", -1);
-        this.setIdentifier(identifier);
-    }
-
-    /**
-     * Creates a new <code>FortranElement</code> under the given parent, which has the given name
-     * (textual representation).
-     *
-     * @param parent
-     * @param name
-     */
-	public FortranElement(Parent parent, String name) //, int type)
-    {
-		super(parent, name == null ? "(anonymous)" : name, -1); //type);
-	}
 
 	public Object getAdapter(Class required)
     {
@@ -167,7 +101,8 @@ public abstract class FortranElement extends SourceManipulation // Parent
     {
         public UnknownNode(Parent parent, String name)
         {
-            super(parent, name);
+            super(parent);
+            setElementName(name);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -184,7 +119,8 @@ public abstract class FortranElement extends SourceManipulation // Parent
     {
         public ErrorNode(Parent parent, String name)
         {
-            super(parent, name);
+            super(parent);
+            setElementName(name);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -198,9 +134,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class MainProgram extends FortranElement
     {
-        public MainProgram(Parent parent, IToken nameToken)
+        public MainProgram(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -219,9 +155,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class Module extends FortranElement
     {
-        public Module(Parent parent, IToken nameToken)
+        public Module(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -240,9 +176,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class Submodule extends FortranElement
     {
-        public Submodule(Parent parent, IToken nameToken)
+        public Submodule(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -261,9 +197,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class DerivedType extends FortranElement
     {
-        public DerivedType(Parent parent, IToken nameToken)
+        public DerivedType(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -282,9 +218,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class Function extends FortranElement
     {
-        public Function(Parent parent, IToken nameToken)
+        public Function(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -303,9 +239,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class Subroutine extends FortranElement
     {
-        public Subroutine(Parent parent, IToken nameToken)
+        public Subroutine(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -325,9 +261,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class Subprogram extends FortranElement
     {
-        public Subprogram(Parent parent, IToken nameToken)
+        public Subprogram(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -346,9 +282,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class Interface extends FortranElement
     {
-        public Interface(Parent parent, IToken nameToken)
+        public Interface(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -367,9 +303,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class BlockData extends FortranElement
     {
-        public BlockData(Parent parent, IToken nameToken)
+        public BlockData(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()
@@ -388,9 +324,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
     public static class Variable extends FortranElement
     {
-        public Variable(Parent parent, IToken nameToken)
+        public Variable(Parent parent)
         {
-            super(parent, nameToken);
+            super(parent);
         }
 
         public ImageDescriptor getBaseImageDescriptor()

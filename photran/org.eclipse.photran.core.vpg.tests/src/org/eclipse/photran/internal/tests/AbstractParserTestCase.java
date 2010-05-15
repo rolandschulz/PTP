@@ -17,11 +17,11 @@ import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
-import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.util.SemanticError;
 
 /**

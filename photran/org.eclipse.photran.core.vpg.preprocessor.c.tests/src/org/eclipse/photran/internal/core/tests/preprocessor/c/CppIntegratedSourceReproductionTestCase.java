@@ -16,9 +16,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.eclipse.photran.internal.core.lexer.sourceform.CPreprocessedFreeSourceForm;
-import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
+import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 import org.eclipse.photran.internal.tests.AbstractParserTestCase;
 
 public class CppIntegratedSourceReproductionTestCase extends AbstractParserTestCase

@@ -26,15 +26,13 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.core.parser.IScannerInfo;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.photran.internal.cdtinterface.dom.IFortranDOMParser;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
+import org.eclipse.photran.internal.core.model.EmptyFortranModelBuilder;
 import org.eclipse.photran.internal.core.model.IFortranModelBuilder;
-import org.eclipse.photran.internal.core.model.SimpleFortranModelBuilder;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
@@ -68,11 +66,9 @@ public class FortranLanguage extends AbstractLanguage
 	        catch (CoreException e) {;}
 	    }
 	        
-	    if (modelBuilder == null) modelBuilder = new SimpleFortranModelBuilder();
+	    if (modelBuilder == null) modelBuilder = new EmptyFortranModelBuilder();
 	    
 	    modelBuilder.setTranslationUnit(tu);
-	    if (tu.getResource() instanceof IFile)
-	        modelBuilder.setIsFixedForm(SourceForm.isFixedForm((IFile)tu.getResource()));
 	    return modelBuilder;
 	}
 

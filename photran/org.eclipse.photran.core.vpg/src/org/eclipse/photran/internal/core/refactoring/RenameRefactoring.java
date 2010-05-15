@@ -24,9 +24,9 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.interfaces.IRenameRefactoring;
+import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 
 /**

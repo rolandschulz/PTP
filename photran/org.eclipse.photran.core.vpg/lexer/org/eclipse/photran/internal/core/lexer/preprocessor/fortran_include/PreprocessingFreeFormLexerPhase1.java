@@ -15,12 +15,10 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.photran.internal.core.lexer.ASTTokenFactory;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
 import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.LineAppendingReader;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.lexer.TokenFactory;
 
 /**
  * Phase 1 lexer that handles Fortran INCLUDE directives.
@@ -42,13 +40,13 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
 
     public PreprocessingFreeFormLexerPhase1(Reader in, IFile file, String filename, IncludeLoaderCallback callback, boolean accumulateWhitetext) throws IOException
     {
-        this(new FortranPreprocessor(new LineAppendingReader(in), file, filename, callback), file, filename, ASTTokenFactory.getInstance(), accumulateWhitetext);
+        this(new FortranPreprocessor(new LineAppendingReader(in), file, filename, callback), file, filename, accumulateWhitetext);
     }
     
     // This would not be here if we could assign the preprocessor to a variable in the above ctor (grrr)
-    private PreprocessingFreeFormLexerPhase1(FortranPreprocessor preprocessor, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    private PreprocessingFreeFormLexerPhase1(FortranPreprocessor preprocessor, IFile file, String filename, boolean accumulateWhitetext)
     {
-        super(preprocessor, file, filename, tokenFactory, accumulateWhitetext);
+        super(preprocessor, file, filename, accumulateWhitetext);
         this.preprocessor = preprocessor;
         this.lastDirective = null;
     }

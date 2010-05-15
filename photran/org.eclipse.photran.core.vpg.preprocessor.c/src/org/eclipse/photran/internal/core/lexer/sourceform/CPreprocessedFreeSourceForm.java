@@ -19,7 +19,7 @@ import org.eclipse.photran.internal.core.lexer.CPreprocessingReader;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase1;
 import org.eclipse.photran.internal.core.lexer.FreeFormLexerPhase2;
 import org.eclipse.photran.internal.core.lexer.ILexer;
-import org.eclipse.photran.internal.core.lexer.TokenFactory;
+import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 
 /**
  * An {@link ISourceForm} for free form Fortran source code that may
@@ -31,7 +31,7 @@ public class CPreprocessedFreeSourceForm implements ISourceForm
 {
     public ILexer createLexer(
         Reader in, IFile file, String filename,
-        TokenFactory tokenFactory, boolean accumulateWhitetext) throws IOException
+        boolean accumulateWhitetext) throws IOException
     {
         return new FreeFormLexerPhase2(
             new CPreprocessingFreeFormLexerPhase1(
@@ -60,9 +60,9 @@ public class CPreprocessedFreeSourceForm implements ISourceForm
 
         @Override protected ILexer createDelegateLexer(
             CPreprocessingReader cpp, IFile file, String filename,
-            TokenFactory tokenFactory, boolean accumulateWhitetext)
+            boolean accumulateWhitetext)
         {
-            return new FreeFormLexerPhase1(cpp, file, filename, tokenFactory, accumulateWhitetext);
+            return new FreeFormLexerPhase1(cpp, file, filename, accumulateWhitetext);
         }
     }
 }

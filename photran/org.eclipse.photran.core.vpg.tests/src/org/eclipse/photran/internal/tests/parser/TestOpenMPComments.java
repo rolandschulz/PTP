@@ -21,12 +21,12 @@ import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 
 /**
  * Unit tests for {@link Token#getOpenMPComments()}.

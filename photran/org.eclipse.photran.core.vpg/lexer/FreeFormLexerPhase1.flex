@@ -93,17 +93,17 @@ import org.eclipse.core.resources.IFile;
 
         if (accumulateWhitetext)
         {
-            lastToken = tokenFactory.createToken(terminal,
-                     whiteBeforeSB.toString(),
-                     terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext(),
-                     whiteAfterSB.toString());
+            lastToken = new Token(terminal,
+                                  whiteBeforeSB.toString(),
+                                  terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext(),
+                                  whiteAfterSB.toString());
             whiteBeforeSB = new StringBuffer();
             whiteAfterSB = new StringBuffer();
         }
         else
         {
-            lastToken = tokenFactory.createToken(terminal,
-                     terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext());
+            lastToken = new Token(terminal,
+                                  terminal == Terminal.T_SCON ? stringBuffer.toString() : yytext());
         }
         return lastToken;
     }
@@ -120,25 +120,18 @@ import org.eclipse.core.resources.IFile;
     //}
 
     private String filename = "<stdin>";
-    protected TokenFactory tokenFactory;
 
-    public FreeFormLexerPhase1(Reader in, IFile file, String filename, TokenFactory tokenFactory, boolean accumulateWhitetext)
+    public FreeFormLexerPhase1(Reader in, IFile file, String filename, boolean accumulateWhitetext)
     {
         this(new LineAppendingReader(in));
         this.lastTokenFile = new FileOrIFile(file);
         this.filename = filename;
-        this.tokenFactory = tokenFactory;
         this.accumulateWhitetext = accumulateWhitetext;
     }
 
     public String getFilename()
     {
         return filename;
-    }
-
-    public TokenFactory getTokenFactory()
-    {
-        return tokenFactory;
     }
 
     public int getLastTokenLine()

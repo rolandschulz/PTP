@@ -16,11 +16,12 @@ import org.eclipse.photran.internal.core.FortranAST;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
+import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
-import org.eclipse.photran.internal.core.lexer.sourceform.ISourceForm;
-import org.eclipse.photran.internal.core.lexer.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
+import org.eclipse.photran.internal.core.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.sourceform.SourceForm;
 
 /**
  * This is a Fortran model builder which uses the Fortran parser to construct the model.
@@ -48,7 +49,6 @@ public class FortranModelBuilder implements IFortranModelBuilder
 {
     private TranslationUnit translationUnit;
     private Map<ICElement, Object /*CElementInfo*/> newElements;
-    private boolean isFixedForm;
 
     public void setTranslationUnit(ITranslationUnit tu)
     {
@@ -56,12 +56,6 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
         this.translationUnit = (TranslationUnit)tu;
     }
-
-    public void setIsFixedForm(boolean isFixedForm)
-    {
-        this.isFixedForm = isFixedForm;
-    }
-
 
     public void parse(boolean quickParseMode) throws Exception
     {
@@ -247,5 +241,28 @@ public class FortranModelBuilder implements IFortranModelBuilder
         this.newElements.put(element, element.getElementInfo());
 
         return element;
+    }
+
+    /**
+     * Callback method invoked by the {@link FortranModelBuildingVisitor} to set file position
+     * information for a node.
+     */
+    public void configureElement(FortranElement elt, Token nameToken)
+    {
+        if (nameToken != null)
+        {
+            int fileOffset = nameToken.getFileOffset();
+            int length     = nameToken.getLength();
+            int line       = nameToken.getLine();
+            
+            elt.setElementName(nameToken.getText());
+            elt.setIdPos(fileOffset, length);
+            elt.setPos(fileOffset, length);
+            elt.setLines(line, line);
+        }
+        else
+        {
+            elt.setElementName("(anonymous)");
+        }
     }
 }

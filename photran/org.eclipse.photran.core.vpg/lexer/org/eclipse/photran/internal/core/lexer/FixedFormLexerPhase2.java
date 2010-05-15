@@ -29,7 +29,7 @@ public class FixedFormLexerPhase2 implements ILexer
 
     private IToken nextToken = null;
 
-    public FixedFormLexerPhase2(Reader in, IFile file, String filename, TokenFactory tokenFactory)
+    public FixedFormLexerPhase2(Reader in, IFile file, String filename)
     {
         final Reader input = new LineAppendingReader(in);
         final FixedFormLexerPrepass prepass = new FixedFormLexerPrepass(input);
@@ -56,7 +56,7 @@ public class FixedFormLexerPhase2 implements ILexer
             }
         };
 
-        FixedFormLexerPhase1 fixedLexer1 = new FixedFormLexerPhase1(prepassReader, prepass, file, filename, tokenFactory);
+        FixedFormLexerPhase1 fixedLexer1 = new FixedFormLexerPhase1(prepassReader, prepass, file, filename);
         freeLexer2 = new FreeFormLexerPhase2(fixedLexer1)
         {
             @Override
@@ -99,11 +99,6 @@ public class FixedFormLexerPhase2 implements ILexer
     public String getFilename()
     {
         return freeLexer2.getFilename();
-    }
-
-    public TokenFactory getTokenFactory()
-    {
-    	return freeLexer2.getTokenFactory();
     }
     
     public int getLastTokenLine()
