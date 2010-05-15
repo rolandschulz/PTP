@@ -25,78 +25,88 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
-
 /**
  * @author clement
- *
+ * 
  */
-public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractEventResultRequest implements IPDIEvaluatePartialExpressionRequest {
-	private String expr;
-	private String exprId;
-	private boolean listChildren = false;
-	private boolean express = false;
-	
-	public AbstractEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId) {
-		this(tasks, expr, exprId, false, (exprId != null));
-	}
-	
+public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractEventResultRequest implements
+		IPDIEvaluatePartialExpressionRequest {
+	private final String fExpr;
+	private final String fExprId;
+	private boolean fListChildren = false;
+
 	public AbstractEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren) {
-		this(tasks, expr, exprId, listChildren, false);
-	}
-	
-	public AbstractEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren, boolean express) {
 		super(tasks);
-		this.expr = expr;
-		this.exprId = exprId;
-		this.listChildren = listChildren;
-		this.express = express;
+		this.fExpr = expr;
+		this.fExprId = exprId;
+		this.fListChildren = listChildren;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
-		debugger.evaluatePartialExpression(tasks, expr, exprId, listChildren, express);
+		debugger.evaluatePartialExpression(tasks, fExpr, fExprId, fListChildren, false);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
 		return Messages.AbstractEvaluatePartialExpressionRequest_0;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getPartialAIF(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest
+	 * #getPartialAIF(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public IAIF getPartialAIF(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Object[]) {
-			Object[] returnValues = (Object[])obj;
-			return (IAIF)returnValues[1];
+			Object[] returnValues = (Object[]) obj;
+			return (IAIF) returnValues[1];
 		}
-		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_1, expr));
+		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_1, fExpr));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest#getId(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest
+	 * #getId(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public String getId(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Object[]) {
-			Object[] returnValues = (Object[])obj;
-			return (String)returnValues[0];
+			Object[] returnValues = (Object[]) obj;
+			return (String) returnValues[0];
 		}
-		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_2, exprId));
+		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_2, fExprId));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#toString()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * toString()
 	 */
+	@Override
 	public String toString() {
-		return NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_3, 
-				new Object[] {getName(), getTasks(), expr, exprId, listChildren, express}); 
+		return NLS.bind(Messages.AbstractEvaluatePartialExpressionRequest_3, new Object[] { getName(), getTasks(), fExpr, fExprId,
+				fListChildren, false });
 	}
 }
