@@ -96,8 +96,7 @@ public class GemHandler extends AbstractHandler {
 		if (editor == null) {
 			sourceFilePath = GemUtilities.getLastFile();
 			if (sourceFilePath.equals("")) { //$NON-NLS-1$
-				GemUtilities.showErrorDialog(Messages.GemHandler_6,
-						Messages.GemHandler_7);
+				GemUtilities.showErrorDialog(Messages.GemHandler_6, Messages.GemHandler_7);
 				return null;
 			}
 		} else {
@@ -113,15 +112,14 @@ public class GemHandler extends AbstractHandler {
 		// Filter extensions
 		int dotIndex = sourceFilePath.lastIndexOf("."); //$NON-NLS-1$
 		if (dotIndex == -1) {
-			GemUtilities.showErrorDialog(Messages.GemHandler_9,
-					Messages.GemHandler_10);
+			GemUtilities.showErrorDialog(Messages.GemHandler_9, Messages.GemHandler_10);
 			return null;
 		}
 		String extension = sourceFilePath.substring(dotIndex);
 		boolean isSourceFileExtension = extension.equals(".c") //$NON-NLS-1$
 				|| extension.equals(".cpp") || extension.equals(".c++") //$NON-NLS-1$ //$NON-NLS-2$
 				|| extension.equals(".cc") || extension.equals(".cp"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (isSourceFileExtension || extension.equals(".log")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (isSourceFileExtension || extension.equals(".log")) { //$NON-NLS-1$
 			// If it was a log then don't use the path to it, use the path to
 			// the file it was created from.
 			if (extension.equals(".log")) { //$NON-NLS-1$
@@ -135,8 +133,7 @@ public class GemHandler extends AbstractHandler {
 					int index = sourceFilePath.lastIndexOf(" "); //$NON-NLS-1$
 					sourceFilePath = sourceFilePath.substring(0, index);
 					index = sourceFilePath.lastIndexOf(" "); //$NON-NLS-1$
-					sourceFilePath = sourceFilePath.substring(index + 1,
-							sourceFilePath.length());
+					sourceFilePath = sourceFilePath.substring(index + 1, sourceFilePath.length());
 				} catch (FileNotFoundException e) {
 				}
 			}
@@ -154,16 +151,14 @@ public class GemHandler extends AbstractHandler {
 			// Open the Analyzer View
 			try {
 				page.showView(GemAnalyzer.ID);
-				GemUtilities.activateAnalyzer(sourceFilePath, logFilePath,
-						true, false);
+				GemUtilities.activateAnalyzer(sourceFilePath, logFilePath, true, false);
 			} catch (PartInitException pie) {
 				GemUtilities.showExceptionDialog(Messages.GemHandler_19, pie);
 				GemUtilities.logError(Messages.GemHandler_20, pie);
 			}
 
 		} else {
-			GemUtilities.showErrorDialog(Messages.GemHandler_21,
-					Messages.GemHandler_22);
+			GemUtilities.showErrorDialog(Messages.GemHandler_21, Messages.GemHandler_22);
 		}
 		return null;
 	}
