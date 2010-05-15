@@ -4,8 +4,5 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="lexer"/>
-	<classpathentry kind="src" path="errorparsers"/>
-	<classpathentry kind="src" path="preferences"/>
-	<classpathentry kind="src" path="properties"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
