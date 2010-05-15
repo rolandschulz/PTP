@@ -10,37 +10,41 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core.pdi.request;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.request.AbstractEvaluatePartialExpressionRequest;
+import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugAIF;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
 
 public class SDMEvaluatePartialExpressionRequest extends AbstractEvaluatePartialExpressionRequest {
-	public SDMEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId) {
-		this(tasks, expr, exprId, false, (exprId != null));
-	}
-	
 	public SDMEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren) {
-		this(tasks, expr, exprId, listChildren, false);
+		super(tasks, expr, exprId, listChildren);
 	}
-	
-	public SDMEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String varid, boolean listChildren, boolean express) {
-		super(tasks, expr, varid, listChildren, express);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest#storeResult(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventResultRequest
+	 * #storeResult(org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent)
 	 */
+	@Override
 	protected void storeResult(TaskSet rTasks, Object result) {
 		if (result instanceof IProxyDebugDataEvent) {
 			Object[] objs = new Object[2];
-			objs[0] = ((IProxyDebugDataEvent)result).getName();
-			ProxyDebugAIF proxyAIF = ((IProxyDebugDataEvent)result).getData();
-			objs[1] = AIFFactory.newAIF(proxyAIF.getFDS(), proxyAIF.getData(), proxyAIF.getDescription());
+			objs[0] = ((IProxyDebugDataEvent) result).getName();
+			ProxyDebugAIF proxyAIF = ((IProxyDebugDataEvent) result).getData();
+			try {
+				objs[1] = AIFFactory.newAIF(proxyAIF.getFDS(), proxyAIF.getData(), proxyAIF.getDescription());
+			} catch (AIFFormatException e) {
+				throw new RuntimeException(NLS.bind(Messages.SDMEvaluatePartialExpressionRequest_0, e.getLocalizedMessage()));
+			}
 			results.put(rTasks, objs);
-		}
-		else {
+		} else {
 			storeUnknownResult(rTasks, result);
 		}
 	}

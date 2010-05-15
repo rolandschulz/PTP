@@ -15,7 +15,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.sdm.core.messages.messages"; //$NON-NLS-1$
-	
+
 	public static String PDIDebugger_0;
 	public static String PDIDebugger_1;
 	public static String PDIDebugger_2;
@@ -62,10 +62,8 @@ public class Messages extends NLS {
 	public static String PDIDebugger_43;
 	public static String PDIDebugger_44;
 	public static String PDIDebugger_45;
-	
 	public static String ProxyDebugClient_0;
 	public static String ProxyDebugClient_1;
-
 	public static String SDMDebugger_0;
 	public static String SDMDebugger_1;
 	public static String SDMDebugger_2;
@@ -80,18 +78,16 @@ public class Messages extends NLS {
 	public static String SDMDebugger_13;
 	public static String SDMDebugger_14;
 	public static String SDMDebugger_15;
-
+	public static String SDMEvaluateExpressionRequest_0;
+	public static String SDMEvaluatePartialExpressionRequest_0;
 	public static String SDMEventManager_0;
 	public static String SDMEventManager_1;
 	public static String SDMEventManager_2;
 	public static String SDMEventManager_3;
 	public static String SDMEventManager_4;
 	public static String SDMEventManager_5;
-
 	public static String SDMListSignalsRequest_0;
-
 	public static String SDMListStackFramesRequest_0;
-
 	public static String SDMRunner_0;
 	public static String SDMRunner_2;
 	public static String SDMRunner_3;
@@ -114,9 +110,8 @@ public class Messages extends NLS {
 	public static String SDMRunner_20;
 	public static String SDMRunner_21;
 	public static String SDMRunner_22;
-
 	public static String SDMSetThreadSelectRequest_0;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

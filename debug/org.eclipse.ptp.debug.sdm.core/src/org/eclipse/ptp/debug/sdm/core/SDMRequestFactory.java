@@ -36,104 +36,134 @@ import org.eclipse.ptp.debug.sdm.core.pdi.request.SDMListStackFramesRequest;
 import org.eclipse.ptp.debug.sdm.core.pdi.request.SDMSetCurrentStackFrameRequest;
 import org.eclipse.ptp.debug.sdm.core.pdi.request.SDMSetThreadSelectRequest;
 
-
 public class SDMRequestFactory extends AbstractRequestFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getDataReadMemoryRequest(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int, int, int, java.lang.Character)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getDataReadMemoryRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
+	 * org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int, int,
+	 * int, java.lang.Character)
 	 */
-	public IPDIDataReadMemoryRequest getDataReadMemoryRequest(IPDISession session, TaskSet tasks,
-			long offset, String address, int wordFormat, int wordSize,
-			int rows, int cols, Character asChar) {
+	public IPDIDataReadMemoryRequest getDataReadMemoryRequest(IPDISession session, TaskSet tasks, long offset, String address,
+			int wordFormat, int wordSize, int rows, int cols, Character asChar) {
 		return new SDMDataReadMemoryRequest(session, tasks, offset, address, wordFormat, wordSize, rows, cols, asChar);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getEvaluateExpressionRequest(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getEvaluateExpressionRequest(org.eclipse.ptp.core.util.TaskSet,
+	 * java.lang.String)
 	 */
 	public IPDIEvaluateExpressionRequest getEvaluateExpressionRequest(TaskSet tasks, String expr) {
 		return new SDMEvaluateExpressionRequest(tasks, expr);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getEvaluatePartialExpressionRequest(org.eclipse.ptp.core.util.TaskSet, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getEvaluatePartialExpressionRequest(org.eclipse.ptp.core.util.TaskSet,
+	 * java.lang.String, java.lang.String, boolean)
 	 */
-	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks,
-			String expr, String exprId) {
-		return new SDMEvaluatePartialExpressionRequest(tasks, expr, exprId);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getEvaluatePartialExpressionRequest(org.eclipse.ptp.core.util.TaskSet, java.lang.String, java.lang.String, boolean)
-	 */
-	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks,
-			String expr, String exprId, boolean listChildren) {
+	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId,
+			boolean listChildren) {
 		return new SDMEvaluatePartialExpressionRequest(tasks, expr, exprId, listChildren);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getGetInfoThreadsRequest(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getGetInfoThreadsRequest(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public IPDIGetInfoThreadsRequest getGetInfoThreadsRequest(TaskSet tasks) {
 		return new SDMGetInfoThreadsRequest(tasks);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getGetStackInfoDepthRequest(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getGetStackInfoDepthRequest(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIGetStackInfoDepthRequest getGetStackInfoDepthRequest(
-			TaskSet tasks) {
+	public IPDIGetStackInfoDepthRequest getGetStackInfoDepthRequest(TaskSet tasks) {
 		return new SDMGetStackInfoDepthRequest(tasks);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getListArgumentsRequest(org.eclipse.ptp.core.util.TaskSet, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getListArgumentsRequest(org.eclipse.ptp.core.util.TaskSet, int, int)
 	 */
 	public IPDIListArgumentsRequest getListArgumentsRequest(TaskSet tasks, int diff, int diff2) {
 		return new SDMListArgumentsRequest(tasks, diff, diff2);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getListLocalVariablesRequest(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getListLocalVariablesRequest(org.eclipse.ptp.core.util.TaskSet)
 	 */
-	public IPDIListLocalVariablesRequest getListLocalVariablesRequest(
-			TaskSet tasks) {
+	public IPDIListLocalVariablesRequest getListLocalVariablesRequest(TaskSet tasks) {
 		return new SDMListLocalVariablesRequest(tasks);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getListSignalsRequest(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getListSignalsRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
+	 * org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
 	public IPDIListSignalsRequest getListSignalsRequest(IPDISession session, TaskSet tasks, String name) {
 		return new SDMListSignalsRequest(session, tasks, name);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getListStackFramesRequest(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getListStackFramesRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
+	 * org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks) {
 		return new SDMListStackFramesRequest(session, tasks);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getListStackFramesRequest(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getListStackFramesRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
+	 * org.eclipse.ptp.core.util.TaskSet, int, int)
 	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks, int low, int high) {
 		return new SDMListStackFramesRequest(session, tasks, low, high);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getSetCurrentStackFrameRequest(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getSetCurrentStackFrameRequest(org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public IPDISetCurrentStackFrameRequest getSetCurrentStackFrameRequest(
-			TaskSet tasks, int level) {
+	public IPDISetCurrentStackFrameRequest getSetCurrentStackFrameRequest(TaskSet tasks, int level) {
 		return new SDMSetCurrentStackFrameRequest(tasks, level);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#getSetThreadSelectRequest(org.eclipse.ptp.debug.core.pdi.IPDISession, org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
+	 * getSetThreadSelectRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
+	 * org.eclipse.ptp.core.util.TaskSet, int)
 	 */
-	public IPDISetThreadSelectRequest getSetThreadSelectRequest(
-			IPDISession session, TaskSet tasks, int id) {
+	public IPDISetThreadSelectRequest getSetThreadSelectRequest(IPDISession session, TaskSet tasks, int id) {
 		return new SDMSetThreadSelectRequest(session, tasks, id);
 	}
 
