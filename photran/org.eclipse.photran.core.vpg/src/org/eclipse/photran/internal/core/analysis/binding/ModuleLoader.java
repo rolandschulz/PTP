@@ -164,7 +164,8 @@ public class ModuleLoader extends VisibilityCollector
     	List<IFile> files = vpg.findFilesThatExportModule(moduleName);
         if (files.isEmpty())
         {
-            vpg.log.logError("There are no files that export a module named " + moduleName, useStmt.getName().getTokenRef());
+            if (!isIntrinsicModule())
+                vpg.log.logError("There are no files that export a module named " + moduleName, useStmt.getName().getTokenRef());
             return;
         }
 
@@ -179,6 +180,15 @@ public class ModuleLoader extends VisibilityCollector
 
 		for (IFile file : files)
         	bindToSymbolsIn(file);
+    }
+
+    /**
+     * @return true iff {@link #moduleName} is the name of an intrinsic module
+     */
+    private boolean isIntrinsicModule()
+    {
+        // Fortran 2003
+        return moduleName.equals("iso_c_binding");
     }
 
 	private List<IFile> applyModulePaths(List<IFile> files)
