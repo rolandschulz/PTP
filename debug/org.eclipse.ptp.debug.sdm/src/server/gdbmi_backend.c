@@ -2129,6 +2129,7 @@ GetPtypeValue(char *exp)
 #define T_ARRAY			19
 #define T_STRUCT		20
 #define T_POINTER		21
+#define T_CLASS			22
 
 static int
 get_simple_type(char *type)
@@ -2221,6 +2222,9 @@ get_complex_type(char *type)
 		}
 		if (strncmp(type, "struct", 6) == 0) {
 			return T_STRUCT;
+		}
+		if (strncmp(type, "class", 5) == 0) {
+			return T_CLASS;
 		}
 		return T_OTHER;
 	}
@@ -2485,9 +2489,9 @@ GetStructAIF(MIVar *var, int named)
 
 	named++;
 
-	a = EmptyStructToAIF(get_type_name(var->type));
+	a = EmptyAggregateToAIF(get_type_name(var->type));
 
-	for (i=0; i<var->numchild; i++) {
+	for (i=0; i < var->numchild; i++) {
 		v = var->children[i];
 		//check whether child contains parent
 		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
@@ -2497,7 +2501,34 @@ GetStructAIF(MIVar *var, int named)
 			AIFFree(a);
 			return NULL;
 		}
-		AIFAddFieldToStruct(a, v->exp, ac);
+		AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, v->exp, ac);
+	}
+	return a;
+}
+
+static AIF *
+GetClassAIF(MIVar *var, int named)
+{
+	int		i;
+	MIVar *	v;
+	AIF *	a;
+	AIF *	ac;
+
+	named++;
+
+	a = EmptyAggregateToAIF(get_type_name(var->type));
+
+	for (i=0; i < var->numchild; i++) {
+		v = var->children[i];
+		//check whether child contains parent
+		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
+			a = GetNamedAIF(a, named);
+			ac = AIFNullPointer(a);
+		} else if ((ac = GetAIF(v, named)) == NULL) {
+			AIFFree(a);
+			return NULL;
+		}
+		AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, v->exp, ac);
 	}
 	return a;
 }
@@ -2624,6 +2655,9 @@ GetComplexAIF(MIVar *var, int named)
 	case T_STRUCT:
 		a = GetStructAIF(var, named);
 		break;
+	case T_CLASS:
+		a = GetClassAIF(var, named);
+		break;
 	default:
 		/*
 		 * Maybe it was simple all along
@@ -2710,12 +2744,34 @@ GetPartialStructAIF(MIVar *var)
 	AIF *	a;
 	int		i;
 
-	a = EmptyStructToAIF(get_type_name(var->type));
+	a = EmptyAggregateToAIF(get_type_name(var->type));
 
 	if (var->children != NULL) {
 		for (i = 0; i < var->numchild; i++) {
 			ac = GetPartialAIF(var->children[i]);
-			AIFAddFieldToStruct(a, var->children[i]->exp, ac);
+			AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, var->children[i]->exp, ac);
+			AIFFree(ac);
+		}
+	}
+	return a;
+}
+
+/*
+ * Create a class type corresponding to 'var'.
+ */
+static AIF *
+GetPartialClassAIF(MIVar *var)
+{
+	AIF *	ac;
+	AIF *	a;
+	int		i;
+
+	a = EmptyAggregateToAIF(get_type_name(var->type));
+
+	if (var->children != NULL) {
+		for (i = 0; i < var->numchild; i++) {
+			ac = GetPartialAIF(var->children[i]);
+			AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, var->children[i]->exp, ac);
 			AIFFree(ac);
 		}
 	}
@@ -2778,10 +2834,14 @@ GetPartialPointerAIF(MIVar *var)
 		case T_STRUCT:
 			a = GetPartialStructAIF(var);
 			break;
+		case T_CLASS:
+			a = GetPartialClassAIF(var);
+			break;
 		default:
 			if (var->numchild == 1) {
 				a = GetPartialAIF(var->children[0]);
 			}
+			a = VoidToAIF(0, 0);
 			break;
 		}
 	} else {
@@ -2837,6 +2897,9 @@ GetPartialComplexAIF(MIVar *var)
 		break;
 	case T_STRUCT:
 		a = GetPartialStructAIF(var);
+		break;
+	case T_CLASS:
+		a = GetPartialClassAIF(var);
 		break;
 	default:
 		/*

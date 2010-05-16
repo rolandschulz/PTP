@@ -75,8 +75,8 @@ _aif_print(FILE *fp, int depth, char **fds, char **data)
         case AIF_REGION:
                 return _aif_print_region(fp, depth, fds, data);
 
-        case AIF_STRUCT:
-                return _aif_print_struct(fp, depth, fds, data);
+        case AIF_AGGREGATE:
+                return _aif_print_aggregate(fp, depth, fds, data);
 
         case AIF_NAME:
                 return _aif_print_name(fp, depth, fds, data);
@@ -242,13 +242,13 @@ _aif_print_region(FILE *fp, int depth, char **fds, char **data)
 }
 
 int
-_aif_print_struct(FILE *fp, int depth, char **fds, char **data)
+_aif_print_aggregate(FILE *fp, int depth, char **fds, char **data)
 {
 	char *	str;
 	
 	_str_init();
 
-	if ( _aif_struct_to_str(depth, fds, data) < 0 )
+	if ( _aif_aggregate_to_str(depth, fds, data) < 0 )
 		return -1;
 
 	str = _str_get();
@@ -520,7 +520,7 @@ AIFPrintRegion(FILE *fp, int depth, AIF *a)
 }
 
 int
-AIFPrintStruct(FILE *fp, int depth, AIF *a)
+AIFPrintAggregate(FILE *fp, int depth, AIF *a)
 {
 	char *	fmt;
 	char *	data;
@@ -534,7 +534,7 @@ AIFPrintStruct(FILE *fp, int depth, AIF *a)
 	fmt = AIF_FORMAT(a);
 	data = AIF_DATA(a);
 
-	return _aif_print_struct(fp, depth, &fmt, &data);
+	return _aif_print_aggregate(fp, depth, &fmt, &data);
 }
 
 int

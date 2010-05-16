@@ -10,7 +10,7 @@ libaif_a_SOURCES =			aif.c \
 							print.c \
 							error.c \
 							io.c \
-							struct.c \
+							aggregate.c \
 							util.c \
 							aif.x
 					

@@ -162,20 +162,20 @@ _aif_array_slice_post(char **fds, char **data, char **rdata, char **res)
 			return 0;
 		}
 
-	case AIF_STRUCT:
+	case AIF_AGGREGATE:
 		(*fds)++;
 		_fds_skipid(fds);
 
-		while ( **fds != FDS_STRUCT_ACCESS_SEP )
+		while ( **fds != FDS_AGGREGATE_ACCESS_SEP )
 		{
-			*fds = strchr(*fds, FDS_STRUCT_FIELD_NAME_END) + 1;
+			*fds = strchr(*fds, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 			_aif_array_slice_post(fds, data, rdata, res);
 
-			if ( **fds == FDS_STRUCT_FIELD_SEP )
+			if ( **fds == FDS_AGGREGATE_FIELD_SEP )
 				(*fds)++;
 		}
 
-		*fds = strchr(*fds, FDS_STRUCT_END) + 1;
+		*fds = strchr(*fds, FDS_AGGREGATE_END) + 1;
 
 		return 0;
 
@@ -283,20 +283,20 @@ _aif_array_slice_pre(char **fds, char **data, char **res)
 			return 0;
 		}
 
-	case AIF_STRUCT:
+	case AIF_AGGREGATE:
 		(*fds)++;
 		_fds_skipid(fds);
 
-		while ( **fds != FDS_STRUCT_ACCESS_SEP )
+		while ( **fds != FDS_AGGREGATE_ACCESS_SEP )
 		{
-			*fds = strchr(*fds, FDS_STRUCT_FIELD_NAME_END) + 1;
+			*fds = strchr(*fds, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 			_aif_array_slice_pre(fds, data, res);
 
-			if ( **fds == FDS_STRUCT_FIELD_SEP )
+			if ( **fds == FDS_AGGREGATE_FIELD_SEP )
 				(*fds)++;
 		}
 
-		*fds = strchr(*fds, FDS_STRUCT_END) + 1;
+		*fds = strchr(*fds, FDS_AGGREGATE_END) + 1;
 
 		return 0;
 
@@ -913,7 +913,7 @@ _aif_array_ref(AIF *a, int rank, int *index, int *min, int *size, char *btype, i
 	ae = MakeAIF(strdup(btype), NULL);
 
 	offset = AIFIndexOffset(rank, index, min, size, (int *)NULL);
-	dataEnd = AIF_DATA(a);
+	dataStart = dataEnd = AIF_DATA(a);
 
 	for ( counter = 0 ; counter <= offset ; counter++ )
 	{

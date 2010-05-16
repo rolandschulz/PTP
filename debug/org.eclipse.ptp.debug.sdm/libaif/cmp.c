@@ -91,7 +91,7 @@ _aif_is_zero(char **fds, char **data, int len, int *val)
 				(*fds)++;
 		}
 
-		*fds = strchr(*fds, FDS_STRUCT_END) + 1; /*past close brace*/
+		*fds = strchr(*fds, FDS_AGGREGATE_END) + 1; /*past close brace*/
 		*data += bytes;
 
 		return 0;
@@ -165,28 +165,28 @@ _aif_is_zero(char **fds, char **data, int len, int *val)
 		return 0;
 
 	/*
-	** only uses the public section in AIF_STRUCT 
+	** only uses the public section in AIF_AGGREGATE
 	*/
-	case AIF_STRUCT:
+	case AIF_AGGREGATE:
 		*val = 1; /* zero unless shown otherwise */
 
 		(*fds)++; /* past open brace */
 		_fds_skipid(fds);
 
-		while ( **fds != FDS_STRUCT_ACCESS_SEP )
+		while ( **fds != FDS_AGGREGATE_ACCESS_SEP )
 		{
-			*fds = strchr(*fds, FDS_STRUCT_FIELD_NAME_END) + 1; /* to start of field */
+			*fds = strchr(*fds, FDS_AGGREGATE_FIELD_NAME_END) + 1; /* to start of field */
 
 			if ( _aif_is_zero(fds, data, len, val) < 0 )
 				return -1;
 
 			if ( *val == 0 )
 				return 0; /* zero res means no need to look further */
-			if ( **fds == FDS_STRUCT_FIELD_SEP )
+			if ( **fds == FDS_AGGREGATE_FIELD_SEP )
 				(*fds)++;
 		}
 
-		*fds = strchr(*fds, FDS_STRUCT_END) + 1; /*past close brace*/
+		*fds = strchr(*fds, FDS_AGGREGATE_END) + 1; /*past close brace*/
 
 		return 0;
 
@@ -385,7 +385,7 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 	AIFLONGEST	val1;
 	AIFLONGEST	val2;
 
-	/* these cmp_by_name, f2_x* and d2_x* are used by 'case AIF_STRUCT' */
+	/* these cmp_by_name, f2_x* and d2_x* are used by 'case AIF_AGGREGATE' */
 	int	cmp_by_name = 0;
 	char *	f2_x1;
 	char *	f2_x2;
@@ -770,14 +770,14 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 		}
 
 	/*
-	** only uses the public section in AIF_STRUCT
+	** only uses the public section in AIF_AGGREGATE
 	*/
-	case AIF_STRUCT:
+	case AIF_AGGREGATE:
 		/* 
-		** structure equivalence: we ignore field names
+		** aggregate equivalence: we ignore field names
 		*/
 
-		if ( FDSType(*f2) != AIF_STRUCT )
+		if ( FDSType(*f2) != AIF_AGGREGATE )
 		{
 			SetAIFError(AIFERR_CONV, NULL);
 			*res = 1;
@@ -792,7 +792,7 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 			f2_x2 = NULL;
 			d2_x2 = NULL;
 			_fds_skip_data(&f2_x1, &d2_x1);
-			if ( _fds_struct_arrange(*f1, *f2, *d2, &f2_x2, &d2_x2) < 0 )
+			if ( _fds_aggregate_arrange(*f1, *f2, *d2, &f2_x2, &d2_x2) < 0 )
 			{
 				SetAIFError(AIFERR_CONV, NULL);
 				*res = 1;
@@ -812,9 +812,9 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 
 		*res = 0; /* first assumption, they are equal */
 
-		while ( **f1 != FDS_STRUCT_ACCESS_SEP )
+		while ( **f1 != FDS_AGGREGATE_ACCESS_SEP )
 		{
-			if ( **f2 == FDS_STRUCT_ACCESS_SEP )
+			if ( **f2 == FDS_AGGREGATE_ACCESS_SEP )
 			{ 
 				/* 
 				** f1 has more fields
@@ -833,8 +833,8 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 				return -1;
 			}
 
-			*f1 = strchr(*f1, FDS_STRUCT_FIELD_NAME_END) + 1; /* to start of field */
-			*f2 = strchr(*f2, FDS_STRUCT_FIELD_NAME_END) + 1; /* to start of field */
+			*f1 = strchr(*f1, FDS_AGGREGATE_FIELD_NAME_END) + 1; /* to start of field */
+			*f2 = strchr(*f2, FDS_AGGREGATE_FIELD_NAME_END) + 1; /* to start of field */
 
 			success = _aif_compare(depth, res, f1, d1, f2, d2);
 
@@ -869,14 +869,14 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 				return 0;
 			}
 
-			if ( **f1 == FDS_STRUCT_FIELD_SEP )
+			if ( **f1 == FDS_AGGREGATE_FIELD_SEP )
 				(*f1)++;
 
-			if ( **f2 == FDS_STRUCT_FIELD_SEP )
+			if ( **f2 == FDS_AGGREGATE_FIELD_SEP )
 				(*f2)++;
 		}
 
-		if ( **f2 != FDS_STRUCT_ACCESS_SEP )
+		if ( **f2 != FDS_AGGREGATE_ACCESS_SEP )
 		{
 			/*
 			** f2 has more fields 
@@ -895,8 +895,8 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 			return -1;
 		}
 
-		*f1 = strchr(*f1, FDS_STRUCT_END) + 1; /*past close brace*/
-		*f2 = strchr(*f2, FDS_STRUCT_END) + 1; /*past close brace*/
+		*f1 = strchr(*f1, FDS_AGGREGATE_END) + 1; /*past close brace*/
+		*f2 = strchr(*f2, FDS_AGGREGATE_END) + 1; /*past close brace*/
 
 		if (cmp_by_name == 1)
 		{
@@ -1165,8 +1165,8 @@ _aif_eps(char *lo_fds, char *lo_data, int lo_len, char *hi_fds, char *hi_data, i
 			return 0;
 		}
 
-	/* only works with the public section in AIF_STRUCT */
-	case AIF_STRUCT:
+	/* only works with the public section in AIF_AGGREGATE */
+	case AIF_AGGREGATE:
 		{
 			int 		tmp;
 
@@ -1185,7 +1185,7 @@ _aif_eps(char *lo_fds, char *lo_data, int lo_len, char *hi_fds, char *hi_data, i
 			while ( *t_ft1 != ';' )
 			{
 	
-				t_ft1 = strchr(t_ft1, FDS_STRUCT_FIELD_NAME_END) + 1;
+				t_ft1 = strchr(t_ft1, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 
 				t_dt2 = t_dt1;
 				t_ft2 = t_ft1;
@@ -1254,7 +1254,7 @@ _aif_eps(char *lo_fds, char *lo_data, int lo_len, char *hi_fds, char *hi_data, i
  * val = 0		if	eps(a[i]) == 0 for ANY i
  * val = 1		if	eps(a[i]) == 1 for ANY i
  *
- * AIF_STRUCT (type of lo & hi is AIF_STRUCT)
+ * AIF_AGGREGATE (type of lo & hi is AIF_AGGREGATE)
  * val = -1		if	eps(element[i]) == -1 for ALL i
  * val = 0		if	eps(element[i]) == 0 for ANY i
  * val = 1		if	eps(element[i]) == 1 for ANY i
@@ -1329,7 +1329,7 @@ _aif_diff(int depth, char **rf, char **rd,
 	int	datalen; /* to keep track of the length of the resultant data */
 	int	currentlen; /* current data length */
 
-	/* these cmp_by_name, f2_x* and d2_x* are used by 'case AIF_STRUCT' */
+	/* these cmp_by_name, f2_x* and d2_x* are used by 'case AIF_AGGREGATE' */
 	int	cmp_by_name = 0;
 	char *	f2_x1;
 	char *	f2_x2;
@@ -1565,9 +1565,9 @@ _aif_diff(int depth, char **rf, char **rd,
 
 		return 0;
 
-	/* only works with the public section in AIF_STRUCT */
-	case AIF_STRUCT:
-		if ( FDSType(*f2) != AIF_STRUCT )
+	/* only works with the public section in AIF_AGGREGATE */
+	case AIF_AGGREGATE:
+		if ( FDSType(*f2) != AIF_AGGREGATE )
 		{
 			SetAIFError(AIFERR_TYPE, NULL);
 			return -1;
@@ -1581,7 +1581,7 @@ _aif_diff(int depth, char **rf, char **rd,
 			f2_x2 = NULL;
 			d2_x2 = NULL;
 			_fds_skip_data(&f2_x1, &d2_x1);
-			if ( _fds_struct_arrange(*f1, *f2, *d2, &f2_x2, &d2_x2) < 0 )
+			if ( _fds_aggregate_arrange(*f1, *f2, *d2, &f2_x2, &d2_x2) < 0 )
 			{
 				SetAIFError(AIFERR_CONV, NULL);
 				return -1;
@@ -1642,8 +1642,8 @@ _aif_diff(int depth, char **rf, char **rd,
 				return -1;
 			}
 
-			*f1 = strchr(*f1, FDS_STRUCT_FIELD_NAME_END) + 1; /* to start of field*/
-			*f2 = strchr(*f2, FDS_STRUCT_FIELD_NAME_END) + 1; /* to start of field*/
+			*f1 = strchr(*f1, FDS_AGGREGATE_FIELD_NAME_END) + 1; /* to start of field*/
+			*f2 = strchr(*f2, FDS_AGGREGATE_FIELD_NAME_END) + 1; /* to start of field*/
 
 			fmt = *f1;
 

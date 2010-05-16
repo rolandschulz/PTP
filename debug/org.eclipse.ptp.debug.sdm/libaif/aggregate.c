@@ -1,5 +1,5 @@
 /*
- * Routines specific to AIF structure objects.
+ * Routines specific to AIF aggregate (struct/class) objects.
  *
  * Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
  *
@@ -32,7 +32,7 @@ AIFNumFields(AIF *a)
 		return -1;
 	}
 
-	if ( AIFType(a) != AIF_STRUCT )
+	if ( AIFType(a) != AIF_AGGREGATE )
 	{
 		SetAIFError(AIFERR_TYPE, NULL);
 		return -1;
@@ -53,13 +53,13 @@ AIFFieldType(AIF *a, char *name)
 		return AIF_INVALID;
 	}
 
-	if ( AIFType(a) != AIF_STRUCT )
+	if ( AIFType(a) != AIF_AGGREGATE )
 	{
 		SetAIFError(AIFERR_TYPE, NULL);
 		return AIF_INVALID;
 	}
 
-	if ( FDSStructFieldByName(AIF_FORMAT(a), name, &type) < 0 )
+	if ( FDSAggregateFieldByName(AIF_FORMAT(a), name, &type) < 0 )
 	{
 		SetAIFError(AIFERR_FDS, NULL);
 		return AIF_INVALID;
@@ -99,7 +99,7 @@ AIFFieldToLongest(AIF *a, char *name, AIFLONGEST *val)
 		return -1;
 	}
 
-	if ( AIFType(a) != AIF_STRUCT )
+	if ( AIFType(a) != AIF_AGGREGATE )
 	{
 		SetAIFError(AIFERR_TYPE, NULL);
 		return -1;
@@ -107,7 +107,7 @@ AIFFieldToLongest(AIF *a, char *name, AIFLONGEST *val)
 
 	if ( name != NULL )
 	{
-		if ( FDSStructFieldByName(AIF_FORMAT(a), name, &type) < 0 )
+		if ( FDSAggregateFieldByName(AIF_FORMAT(a), name, &type) < 0 )
 		{
 			SetAIFError(AIFERR_FDS, NULL);
 			return -1;
@@ -149,7 +149,7 @@ AIFFieldToDoublest(AIF *a, char *name, AIFDOUBLEST *val)
 		return -1;
 	}
 
-	if ( AIFType(a) != AIF_STRUCT )
+	if ( AIFType(a) != AIF_AGGREGATE )
 	{
 		SetAIFError(AIFERR_TYPE, NULL);
 		return -1;
@@ -157,7 +157,7 @@ AIFFieldToDoublest(AIF *a, char *name, AIFDOUBLEST *val)
 
 	if ( name != NULL )
 	{
-		if ( FDSStructFieldByName(AIF_FORMAT(a), name, &type) < 0  )
+		if ( FDSAggregateFieldByName(AIF_FORMAT(a), name, &type) < 0  )
 		{
 			SetAIFError(AIFERR_FDS, NULL);
 			return -1;

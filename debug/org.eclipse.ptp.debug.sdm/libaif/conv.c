@@ -1176,16 +1176,16 @@ AIFGetUnion(AIF *a, char *field)
 }
 
 /*
- * Create an empty AIF structure.
+ * Create an empty AIF aggregate.
  */
 AIF *
-EmptyStructToAIF(char *id)
+EmptyAggregateToAIF(char *id)
 {
 	AIF *	a;
 
 	a = NewAIF(0, 0);
 
-	AIF_FORMAT(a) = FDSStructInit(id);
+	AIF_FORMAT(a) = FDSAggregateInit(id);
 
 	ResetAIFError();
 
@@ -1193,10 +1193,10 @@ EmptyStructToAIF(char *id)
 }
 
 /* 
- * Add a field to the public section of a structure
+ * Add a field to an aggregate
  */
 int
-AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
+AIFAddFieldToAggregate(AIF *a, AIFAccess acc, char* field, AIF *content)
 {
 	int		data_len;
 	int		old_len;
@@ -1206,7 +1206,7 @@ AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
 	char *	dummy;
 
 
-	if ( !FDSStructFieldByName(AIF_FORMAT(a), field, &dummy) )
+	if ( !FDSAggregateFieldByName(AIF_FORMAT(a), field, &dummy) )
 	{
 		_aif_free(dummy);
 		SetAIFError(AIFERR_BADARG, NULL);
@@ -1242,7 +1242,7 @@ AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
 
 	memcpy(AIF_DATA(a), new_data, new_len);
 
-	new_fmt = FDSAddFieldToStruct(AIF_FORMAT(a), field, AIF_FORMAT(content));
+	new_fmt = FDSAddFieldToAggregate(AIF_FORMAT(a), acc, field, AIF_FORMAT(content));
 
 	_aif_free(AIF_FORMAT(a));
 	AIF_FORMAT(a) = new_fmt;
@@ -1255,22 +1255,22 @@ AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
 }
 
 /* 
- * Set the value of a field in a structure
+ * Set the value of a field in an aggregate
  */
 int
-AIFSetStruct(AIF *a, char* field, AIF *content)
+AIFSetAggregate(AIF *a, char* field, AIF *content)
 {
 	int	preLength;
 	char *	dummyString;
 	int	index;
 
-	if ( FDSStructFieldByName(AIF_FORMAT(a), field, &dummyString) )
+	if ( FDSAggregateFieldByName(AIF_FORMAT(a), field, &dummyString) )
 	{
 		SetAIFError(AIFERR_BADARG, NULL);
 		return -1;
 	}
 
-	index = FDSStructFieldIndex(AIF_FORMAT(a), field);
+	index = FDSAggregateFieldIndex(AIF_FORMAT(a), field);
 	preLength = _data_len_index(AIF_FORMAT(a), index);
 	preLength -= FDSTypeSize(dummyString);
 	_aif_free(dummyString);
@@ -1283,10 +1283,10 @@ AIFSetStruct(AIF *a, char* field, AIF *content)
 }
 
 /*
- * Get the value of a field in a structure
+ * Get the value of a field in an aggregate
  */
 AIF *
-AIFGetStruct(AIF *a, char *field)
+AIFGetAggregate(AIF *a, char *field)
 {
 	AIF  * new;
 	char * type;
@@ -1294,7 +1294,7 @@ AIFGetStruct(AIF *a, char *field)
 	int    pre;
 	int    index;
 
-	if ( FDSStructFieldByName(AIF_FORMAT(a), field, &type) < 0 )
+	if ( FDSAggregateFieldByName(AIF_FORMAT(a), field, &type) < 0 )
 	{
 		SetAIFError(AIFERR_FIELD, NULL);
 		return NULL;
@@ -1308,7 +1308,7 @@ AIFGetStruct(AIF *a, char *field)
 
 	new = NewAIF(0, len);
 
-	index = FDSStructFieldIndex(AIF_FORMAT(a), field);
+	index = FDSAggregateFieldIndex(AIF_FORMAT(a), field);
 	pre = _data_len_index(AIF_FORMAT(a), index);
 	pre -= len;
 
@@ -2332,7 +2332,7 @@ AIFArrayIndexToStr(char **str, AIFIndex *ix)
 }
 
 int
-_aif_struct_to_str(int depth, char **fds, char **data)
+_aif_aggregate_to_str(int depth, char **fds, char **data)
 {
 	char *	inFds;	
 	char	buf[BUFSIZ];
@@ -2350,16 +2350,16 @@ _aif_struct_to_str(int depth, char **fds, char **data)
 
 	_fds_skipid(fds);
 
-	while ( **fds != FDS_STRUCT_END )
+	while ( **fds != FDS_AGGREGATE_END )
 	{
-		if ( isStruct 	&& (*fds)[0] == FDS_STRUCT_ACCESS_SEP
-				&& (*fds)[1] == FDS_STRUCT_ACCESS_SEP
-				&& (*fds)[2] == FDS_STRUCT_ACCESS_SEP )
+		if ( isStruct 	&& (*fds)[0] == FDS_AGGREGATE_ACCESS_SEP
+				&& (*fds)[1] == FDS_AGGREGATE_ACCESS_SEP
+				&& (*fds)[2] == FDS_AGGREGATE_ACCESS_SEP )
 		{
 			(*fds) += 3;
 			break;
 		}
-		else if ( **fds == FDS_STRUCT_ACCESS_SEP )
+		else if ( **fds == FDS_AGGREGATE_ACCESS_SEP )
 		{
 			isStruct = 0;	/* it is a class */
 			
@@ -2368,7 +2368,7 @@ _aif_struct_to_str(int depth, char **fds, char **data)
 			continue;
 		}
 
-		if ( (inFds = strchr(*fds, FDS_STRUCT_FIELD_NAME_END)) == NULL )
+		if ( (inFds = strchr(*fds, FDS_AGGREGATE_FIELD_NAME_END)) == NULL )
 			break;
 
 		*inFds = 0; /* temporarily */
@@ -2376,13 +2376,13 @@ _aif_struct_to_str(int depth, char **fds, char **data)
 		snprintf(buf, BUFSIZ-1, "%s = ", *fds);
 		_str_cat(buf);
 
-		*inFds++ = FDS_STRUCT_FIELD_NAME_END;
+		*inFds++ = FDS_AGGREGATE_FIELD_NAME_END;
 
 		*fds = inFds; /* to start of field */
 
 		_aif_to_str(depth, fds, data);
 
-		if ( **fds == FDS_STRUCT_FIELD_SEP )
+		if ( **fds == FDS_AGGREGATE_FIELD_SEP )
 		{
 			(*fds)++;
 			_str_cat(", ");
@@ -2397,7 +2397,7 @@ _aif_struct_to_str(int depth, char **fds, char **data)
 }
 
 int
-AIFStructToStr(char **str, int depth, AIF *a)
+AIFAggregateToStr(char **str, int depth, AIF *a)
 {
 	char *	fmt;
 	char *	data;
@@ -2413,7 +2413,7 @@ AIFStructToStr(char **str, int depth, AIF *a)
 
 	_str_init();
 
-	if ( _aif_struct_to_str(depth, &fmt, &data) < 0 )
+	if ( _aif_aggregate_to_str(depth, &fmt, &data) < 0 )
 		return -1;
 
 	*str = _str_get();
@@ -2786,8 +2786,8 @@ _aif_to_str(int depth, char **fds, char **data)
 	case AIF_REGION:
 		return _aif_region_to_str(depth, fds, data);
 
-	case AIF_STRUCT:
-		return _aif_struct_to_str(depth, fds, data);
+	case AIF_AGGREGATE:
+		return _aif_aggregate_to_str(depth, fds, data);
 
 	case AIF_NAME:
 		return _aif_name_to_str(depth, fds, data);

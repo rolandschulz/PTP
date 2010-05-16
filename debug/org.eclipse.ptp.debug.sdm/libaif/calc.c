@@ -1023,9 +1023,9 @@ _aif_binary_op(aifop op,
 
 		return 0;
 
-	/* only works with the public section in AIF_STRUCT */
-	case AIF_STRUCT:
-		if ( FDSType(*f2) != AIF_STRUCT )
+	/* only works with the public section in AIF_AGGREGATE */
+	case AIF_AGGREGATE:
+		if ( FDSType(*f2) != AIF_AGGREGATE )
 		{
 			if ( FDSType(*f2) == AIF_VOID )
 			{
@@ -1073,8 +1073,8 @@ _aif_binary_op(aifop op,
 				return -1;
 			}
 
-			*f1 = strchr(*f1, FDS_STRUCT_FIELD_NAME_END) + 1; /* to start of field*/
-			*f2 = strchr(*f2, FDS_STRUCT_FIELD_NAME_END) + 1; /* to start of field*/
+			*f1 = strchr(*f1, FDS_AGGREGATE_FIELD_NAME_END) + 1; /* to start of field*/
+			*f2 = strchr(*f2, FDS_AGGREGATE_FIELD_NAME_END) + 1; /* to start of field*/
 			
 			fmt = *f1;
 
@@ -1147,8 +1147,8 @@ _aif_binary_op(aifop op,
 			char * ptr_type_1 = *d1;
 			char * ptr_type_2 = *d2;
 
-			char * target1 ;//FIXME: = _find_target(d1, 0);
-			char * target2 ;//FIXME: = _find_target(d2, MAX_VALUES_SEEN/2);
+			char * target1 = 0;//FIXME: = _find_target(d1, 0);
+			char * target2 = 0;//FIXME: = _find_target(d2, MAX_VALUES_SEEN/2);
 
 			char * fres;
 			char * dres;
@@ -1615,8 +1615,8 @@ _aif_unary_op(aifop op, char **rf, char **rd, char **fds, char **data)
 			return 0;
 		}
 
-	/* only works with the public section in AIF_STRUCT */
-	case AIF_STRUCT:
+	/* only works with the public section in AIF_AGGREGATE */
+	case AIF_AGGREGATE:
 		if ( *rd == NULL )
 		{
 			*rd = (char *)_aif_alloc(BUFSIZ); /* no way to know how big! */
@@ -1636,7 +1636,7 @@ _aif_unary_op(aifop op, char **rf, char **rd, char **fds, char **data)
 			char * fres = NULL;
 			char * fmt;
 
-			*fds = strchr(*fds, FDS_STRUCT_FIELD_NAME_END) + 1; /*to start of field*/
+			*fds = strchr(*fds, FDS_AGGREGATE_FIELD_NAME_END) + 1; /*to start of field*/
 			fmt = *fds;
 
 			i = _fds_count_bytes_na(fds);

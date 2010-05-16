@@ -84,7 +84,7 @@ int 	_aif_test_float(AIF *, TestFlags);
 int 	_aif_test_array(AIF *, TestFlags);
 int 	_aif_test_pointer(AIF *, TestFlags);
 int 	_aif_test_region(AIF *, TestFlags);
-int 	_aif_test_struct(AIF *, TestFlags);
+int 	_aif_test_aggregate(AIF *, TestFlags);
 int 	_aif_test_name(AIF *, TestFlags);
 int 	_aif_test_reference(AIF *, TestFlags);
 int 	_aif_test_string(AIF *, TestFlags);
@@ -170,7 +170,7 @@ main(int argc, char *argv[])
 void 
 TestAllConstructors()
 {
-	AIF *aString, *aFloat, *aDouble, *anInt, *aPointer, *aStruct;
+	AIF *aString, *aFloat, *aDouble, *anInt, *aPointer, *aAggregate;
 	AIF *anArray, *anEnum, *aUnion;
 	TestFlags flag = all;
 	int min, size;
@@ -199,46 +199,46 @@ TestAllConstructors()
 	aPointer = PointerToAIF(AddressToAIF("ffffffff", 4), aPointer);
 	AIFTest("subtest6", aPointer, "a double pointer", flag);
 
-	aStruct = EmptyStructToAIF("test_struct");
-	AIFTest("subtest7", aStruct, "empty struct", flag);
+	aAggregate = EmptyAggregateToAIF("test_aggregate");
+	AIFTest("subtest7", aAggregate, "empty aggregate", flag);
 
-	AIFAddFieldToStruct(aStruct, "field1", aFloat);
-	AIFTest("subtest8", aStruct, "with one field", flag);
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field1", aFloat);
+	AIFTest("subtest8", aAggregate, "with one field", flag);
 
-	AIFAddFieldToStruct(aStruct, "field2", IntToAIF(16));
-	AIFTest("subtest9", aStruct, "with two fields", flag);
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field2", IntToAIF(16));
+	AIFTest("subtest9", aAggregate, "with two fields", flag);
 
-	AIFAddFieldToStruct(aStruct, "field3", aStruct);
-	AIFTest("subtest10", aStruct, "with three fields", flag);
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field3", aAggregate);
+	AIFTest("subtest10", aAggregate, "with three fields", flag);
 
 	min = 0; size = 10;
 	anArray = ArrayToAIF(1, &min, &size, "abcdefghij", 10, "c");
 	AIFTest("subtest11", anArray, "array of 10 chars", flag);
 
-	AIFAddFieldToStruct(aStruct, "field4", anArray);
-	AIFTest("subtest12", aStruct, "after the array is field 4", flag);
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field4", anArray);
+	AIFTest("subtest12", aAggregate, "after the array is field 4", flag);
 
 	/* test a linked list: 1 -> 2 -> nil */
-	aStruct = EmptyStructToAIF("test_struct");
-	aStruct = NameAIF(aStruct, 0);
-	AIFAddFieldToStruct(aStruct, "value", IntToAIF(2));
-	AIFAddFieldToStruct(aStruct, "next", AIFNullPointer(aStruct));
-	aPointer = AIFNullPointer(aStruct);
-	aStruct = EmptyStructToAIF("test_struct");
-	AIFAddFieldToStruct(aStruct, "value", IntToAIF(1));
-	AIFAddFieldToStruct(aStruct, "next", aPointer);
-	aPointer = AIFNullPointer(aStruct);
+	aAggregate = EmptyAggregateToAIF("test_aggregate");
+	aAggregate = NameAIF(aAggregate, 0);
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "value", IntToAIF(2));
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "next", AIFNullPointer(aAggregate));
+	aPointer = AIFNullPointer(aAggregate);
+	aAggregate = EmptyAggregateToAIF("test_aggregate");
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "value", IntToAIF(1));
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "next", aPointer);
+	aPointer = AIFNullPointer(aAggregate);
 	AIFTest("subtest13", aPointer, "linked list 1 -> 2 ", flag);
 
-	/* test an array of structs. */
+	/* test an array of aggregates. */
 	{
 		char data[BUFSIZ], *dest;
 		int min=1, size=9, subMin = 1, subSize = 2;
 		int index;
 		int smallArray[2] = {1,2};
 
-		aStruct = EmptyStructToAIF("test_struct");
-		AIFAddFieldToStruct(aStruct, "a", FloatToAIF(2.1));
+		aAggregate = EmptyAggregateToAIF("test_aggregate");
+		AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "a", FloatToAIF(2.1));
 		dest = data;
 		for (index = 0; index < 2; index++) 
 		{
@@ -247,18 +247,18 @@ TestAllConstructors()
 		}
 		anArray = ArrayToAIF(1, &subMin, &subSize, data, 2*sizeof(int),
 			AIF_FORMAT(IntToAIF(0)));
-		AIFAddFieldToStruct(aStruct, "b", anArray);
-		AIFTest("subtest14", aStruct, "underlying struct: {a=2.1 b=[1 2]}", flag);
+		AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "b", anArray);
+		AIFTest("subtest14", aAggregate, "underlying aggregate: {a=2.1 b=[1 2]}", flag);
 
 
 		dest = data;
 		for (index = min; index < min + size; index++)
 		{
-			memcpy(dest, AIF_DATA(aStruct), AIF_LEN(aStruct));
-			dest += AIF_LEN(aStruct);
+			memcpy(dest, AIF_DATA(aAggregate), AIF_LEN(aAggregate));
+			dest += AIF_LEN(aAggregate);
 		}
-		anArray = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(aStruct), AIF_FORMAT(aStruct));
-		AIFTest("subtest15", anArray, "array of 9 underlying structs", flag);
+		anArray = ArrayToAIF(1, &min, &size, data, size*AIF_LEN(aAggregate), AIF_FORMAT(aAggregate));
+		AIFTest("subtest15", anArray, "array of 9 underlying aggregates", flag);
 	}
 
 
@@ -271,20 +271,20 @@ TestAllConstructors()
 	AIFSetEnum(anEnum, "const1");
 	AIFTest("subtest17", anEnum, "enum: 10", flag);
 
-	aStruct = EmptyStructToAIF("test_enum");
-	AIFAddFieldToStruct(aStruct, "field1", anEnum);
-	AIFTest("subtest18", aStruct, "an enum in a struct", flag);
+	aAggregate = EmptyAggregateToAIF("test_enum");
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field1", anEnum);
+	AIFTest("subtest18", aAggregate, "an enum in a aggregate", flag);
 
 	AIFSetEnum(anEnum, "const3");
-	aStruct = EmptyStructToAIF("test_enum");
-	AIFAddFieldToStruct(aStruct, "field1", anEnum);
-	AIFTest("subtest19", aStruct, "same struct but the enum is set to another value", flag);
+	aAggregate = EmptyAggregateToAIF("test_enum");
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field1", anEnum);
+	AIFTest("subtest19", aAggregate, "same aggregate but the enum is set to another value", flag);
 
 	AIFSetEnum(anEnum, "const2");
 	aPointer = AIFNullPointer(anEnum);
 	aPointer = AIFNullPointer(aPointer);
-	AIFAddFieldToStruct(aStruct, "field2", aPointer);
-	AIFTest("subtest20", aStruct, "field2 is a pointer to a pointer to an enum", flag);
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field2", aPointer);
+	AIFTest("subtest20", aAggregate, "field2 is a pointer to a pointer to an enum", flag);
 
 
 	/* test an array of enums. */
@@ -323,11 +323,11 @@ TestAllConstructors()
 	AIFAddFieldToUnion(aUnion, "const2", FloatToAIF(5.6));
 	AIFTest("subtest23", aUnion, "union: 10", flag);
 
-	aStruct = EmptyStructToAIF("test_struct");
-	AIFAddFieldToStruct(aStruct, "field1", IntToAIF(1));
-	AIFAddFieldToStruct(aStruct, "field2", StringToAIF("Hello World"));
-	AIFAddFieldToStruct(aStruct, "field3", IntToAIF(2));
-	AIFTest("subtest24", aStruct, "a struct: 1, Hello World, 2", flag);
+	aAggregate = EmptyAggregateToAIF("test_aggregate");
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field1", IntToAIF(1));
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field2", StringToAIF("Hello World"));
+	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "field3", IntToAIF(2));
+	AIFTest("subtest24", aAggregate, "a aggregate: 1, Hello World, 2", flag);
 
 	/* Testing for a long string */
 	aString = StringToAIF("AIF0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789AIF");
@@ -416,7 +416,7 @@ _testArithmetic(char *msg1, AIF *a, char *msg2, TestFlags flag, AIF *b)
 void 
 TestAllArithmetic()
 {
-	AIF *anEnum1, *anEnum2, *aStruct1, *aStruct2;
+	AIF *anEnum1, *anEnum2, *aAggregate1, *aAggregate2;
 	TestFlags flag = none;
 
 	flag.AIFNeg = 1;
@@ -460,21 +460,21 @@ TestAllArithmetic()
 	AIFSetEnum(anEnum2, "const1");
 	_testArithmetic("subtest11", anEnum1, "anEnum1 and anEnum2", flag, anEnum2);
 
-	aStruct1 = EmptyStructToAIF("test_struct1");
-	aStruct2 = EmptyStructToAIF("test_struct2");
-	AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(16));
-	AIFAddFieldToStruct(aStruct1, "field2", IntToAIF(18));
-	AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
-	AIFAddFieldToStruct(aStruct2, "field2", IntToAIF(17));
-	_testArithmetic("subtest12", aStruct1, "aStruct1 and aStruct2", flag, aStruct2);
+	aAggregate1 = EmptyAggregateToAIF("test_aggregate1");
+	aAggregate2 = EmptyAggregateToAIF("test_aggregate2");
+	AIFAddFieldToAggregate(aAggregate1, AIF_ACCESS_PUBLIC, "field1", IntToAIF(16));
+	AIFAddFieldToAggregate(aAggregate1, AIF_ACCESS_PUBLIC, "field2", IntToAIF(18));
+	AIFAddFieldToAggregate(aAggregate2, AIF_ACCESS_PUBLIC, "field1", IntToAIF(17));
+	AIFAddFieldToAggregate(aAggregate2, AIF_ACCESS_PUBLIC, "field2", IntToAIF(17));
+	_testArithmetic("subtest12", aAggregate1, "aAggregate1 and aAggregate2", flag, aAggregate2);
 
-	aStruct1 = EmptyStructToAIF("test_struct1");
-	aStruct2 = EmptyStructToAIF("test_struct2");
-	AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(18));
-	AIFAddFieldToStruct(aStruct1, "field2", anEnum1);
-	AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
-	AIFAddFieldToStruct(aStruct2, "field2", anEnum2);
-	_testArithmetic("subtest13", aStruct1, "aStruct1 and aStruct2", flag, aStruct2);
+	aAggregate1 = EmptyAggregateToAIF("test_aggregate1");
+	aAggregate2 = EmptyAggregateToAIF("test_aggregate2");
+	AIFAddFieldToAggregate(aAggregate1, AIF_ACCESS_PUBLIC, "field1", IntToAIF(18));
+	AIFAddFieldToAggregate(aAggregate1, AIF_ACCESS_PUBLIC, "field2", anEnum1);
+	AIFAddFieldToAggregate(aAggregate2, AIF_ACCESS_PUBLIC, "field1", IntToAIF(17));
+	AIFAddFieldToAggregate(aAggregate2, AIF_ACCESS_PUBLIC, "field2", anEnum2);
+	_testArithmetic("subtest13", aAggregate1, "aAggregate1 and aAggregate2", flag, aAggregate2);
 
 	_testArithmetic("subtest14", anEnum1, "anEnum1 and 17", flag, IntToAIF(17));
 
@@ -559,13 +559,13 @@ TestAllArithmetic()
 		_testArithmetic("subtest20", anArray1, "anArray1 and anArray2", flag, anArray2);
 	}
 
-	aStruct1 = EmptyStructToAIF("test_struct1");
-	aStruct2 = EmptyStructToAIF("test_struct2");
-	AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(10));
-	AIFAddFieldToStruct(aStruct1, "field2", IntToAIF(10));
-	AIFAddFieldToStruct(aStruct2, "field1", FloatToAIF(7));
-	AIFAddFieldToStruct(aStruct2, "field2", FloatToAIF(7));
-	_testArithmetic("subtest21", aStruct1, "aStruct1 and aStruct2", flag, aStruct2);
+	aAggregate1 = EmptyAggregateToAIF("test_aggregate1");
+	aAggregate2 = EmptyAggregateToAIF("test_aggregate2");
+	AIFAddFieldToAggregate(aAggregate1, AIF_ACCESS_PUBLIC, "field1", IntToAIF(10));
+	AIFAddFieldToAggregate(aAggregate1, AIF_ACCESS_PUBLIC, "field2", IntToAIF(10));
+	AIFAddFieldToAggregate(aAggregate2, AIF_ACCESS_PUBLIC, "field1", FloatToAIF(7));
+	AIFAddFieldToAggregate(aAggregate2, AIF_ACCESS_PUBLIC, "field2", FloatToAIF(7));
+	_testArithmetic("subtest21", aAggregate1, "aAggregate1 and aAggregate2", flag, aAggregate2);
 
 
 	_testArithmetic("subtest22", UnsignedIntToAIF(16), "unsigned 16 and unsigned 17", flag, UnsignedIntToAIF(17));
@@ -805,13 +805,13 @@ TestAllEPS()
 	AIFFree(lo); AIFFree(hi);
 	AIFFree(a);
 
-	//AIF_STRUCT
-	printf("\n>>>>>>> STRUCT\n");
+	//AIF_AGGREGATE
+	printf("\n>>>>>>> AGGREGATE\n");
 	{
-		a = EmptyStructToAIF("test_struct");
-		AIFAddFieldToStruct(a, "val1", IntToAIF(11));
-		AIFAddFieldToStruct(a, "val2", IntToAIF(12));
-		AIFAddFieldToStruct(a, "val3", IntToAIF(13));
+		a = EmptyAggregateToAIF("test_aggregate");
+		AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, "val1", IntToAIF(11));
+		AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, "val2", IntToAIF(12));
+		AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, "val3", IntToAIF(13));
 	}
 	lo = IntToAIF(18);
 	hi = IntToAIF(20);
@@ -1022,8 +1022,8 @@ _aif_test(AIF *a, TestFlags f)
 	case AIF_REGION:
 			return _aif_test_region(a, f);
 
-	case AIF_STRUCT:
-			return _aif_test_struct(a, f);
+	case AIF_AGGREGATE:
+			return _aif_test_aggregate(a, f);
 
 	case AIF_NAME:
 			return _aif_test_name(a, f);
@@ -1748,7 +1748,7 @@ _aif_test_region(AIF *a, TestFlags f)
 }
 
 int
-_aif_test_struct(AIF *a, TestFlags f)
+_aif_test_aggregate(AIF *a, TestFlags f)
 {
 	return 0;
 }
