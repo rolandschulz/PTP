@@ -1,18 +1,9 @@
-Due to licensing restrictions, most of the Fortran code used for testing
+Due to licensing restrictions, some of the Fortran code used for testing
 the parser cannot be made publicly available.  The corresponding JUnit
-tests will NOT fail if these directories do not exist; an informational
-message will be displayed instead.
+tests will display an informational message if these directories do not
+exist, but no tests should fail.  (See ParseIBEAMCppMod.java for one
+example of such a test.)
 
-If you are working on the lexer/parser and require access to this code,
-please e-mail one of the developers.
+See the Photran Developer's Guide for more information.
 
-To add more confidential Fortran code to the parser test suite:
-(1) Add the code in subdirectories under parser-test-code
-    (by convention, their names start with "confidential-")
-(2) Add these subdirectories to .cvsignore
-(3) Use the ParseIBEAM or ParseConfidential*Files classes as
-    examples of how to have the code parsed.  Be sure to pass
-    "false" for the mustExist parameter.
-(4) Distribute the code to the other developers working on the parser.
-
---Jeff Overbey (23 Sept 06)
+--Jeff Overbey (23 Sept 06, updated 16 May 10)
