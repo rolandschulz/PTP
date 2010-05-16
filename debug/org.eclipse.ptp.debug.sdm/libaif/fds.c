@@ -37,7 +37,7 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_ARRAY_START, '%', 's', FDS_ARRAY_END, '%', 's', '\0' },
 
-	{ FDS_STRUCT_START, '%', 's', FDS_TYPENAME_END, ';', ';', ';', FDS_STRUCT_END, '\0' },
+	{ FDS_AGGREGATE_START, '%', 's', FDS_TYPENAME_END, ';', ';', ';', FDS_AGGREGATE_END, '\0' },
 
 	{ FDS_UNION_START, '%', 's', FDS_TYPENAME_END, FDS_UNION_END, '\0' },
 
@@ -72,9 +72,9 @@ static char _fds_name_end[] = {FDS_NAME_END, '\0'};
 static char _fds_enum_end[] = {FDS_ENUM_END, '\0'};
 static char _fds_enum_const_name_end[] = {FDS_ENUM_SEP, '\0' };
 static char _fds_enum_const_end[] = { FDS_ENUM_CONST_SEP, FDS_ENUM_END, '\0' };
-static char _fds_struct_access_sep[] = {FDS_STRUCT_ACCESS_SEP, '\0'};
-static char _fds_struct_field_name_end[] = {FDS_STRUCT_FIELD_NAME_END, '\0' };
-static char _fds_struct_field_end[] = { FDS_STRUCT_ACCESS_SEP, FDS_STRUCT_FIELD_SEP, FDS_STRUCT_END, '\0' };
+static char _fds_aggregate_access_sep[] = {FDS_AGGREGATE_ACCESS_SEP, '\0'};
+static char _fds_aggregate_field_name_end[] = {FDS_AGGREGATE_FIELD_NAME_END, '\0' };
+static char _fds_aggregate_field_end[] = { FDS_AGGREGATE_ACCESS_SEP, FDS_AGGREGATE_FIELD_SEP, FDS_AGGREGATE_END, '\0' };
 static char _fds_union_field_name_end[] = {FDS_UNION_FIELD_NAME_END, '\0' };
 static char _fds_union_field_end[] = { FDS_UNION_FIELD_SEP, FDS_UNION_END, '\0' };
 
@@ -107,7 +107,7 @@ _fds_skipto(char *str, char *set)
 	{
 		if
 		(
-			*str == FDS_STRUCT_START 
+			*str == FDS_AGGREGATE_START
 			|| 
 			*str == FDS_UNION_START 
 			|| 
@@ -196,8 +196,8 @@ FDSType(char *str)
 		type = AIF_ARRAY;
 		break;
 
-	case FDS_STRUCT_START:  /* struct */
-		type = AIF_STRUCT;
+	case FDS_AGGREGATE_START:  /* struct or class */
+		type = AIF_AGGREGATE;
 		break;
 
 	case FDS_UNION_START:  /* union */
@@ -316,10 +316,10 @@ _fds_base_type(char *type)
 
 /* In AIF, we can find out about the size of the AIF object by looking at the
  * AIF_LEN(), but this method cannot be used to find out about the size
- * of each individual element in a struct. To overcome this problem, we can use
+ * of each individual element in a aggregate. To overcome this problem, we can use
  * FDSTypeSize() with the FDS for each element.
  * 
- * However, FDSTypeSize() cannot be used to know the real size if the struct
+ * However, FDSTypeSize() cannot be used to know the real size if the aggregate
  * contains references or strings (since we also need to access the data to
  * know the size of these data types).
  * 
@@ -349,7 +349,7 @@ FDSDataSize(char *fds, char *data)
  * If the size cannot fit in a int, then it is silently truncated.
  * returns size if successful, -1 otherwise.
  *
- * Note: we no longer know the size of structs or unions so these are
+ * Note: we no longer know the size of aggregates or unions so these are
  * always -1.
  */
 int
@@ -391,22 +391,22 @@ FDSTypeSize(char *type)
 	case FDS_VOID: /* void */
 		return _fds_getnum(type + 1);
 
-	case FDS_STRUCT_START: /* struct */
+	case FDS_AGGREGATE_START: /* aggregate */
 		type++; /* past open brace */
 		size = 0;
 		subsize = 0;
 
 		_fds_skipid(&type);
 		
-		while ( *type != FDS_STRUCT_END )
+		while ( *type != FDS_AGGREGATE_END )
 		{
-			if ( *type == FDS_STRUCT_ACCESS_SEP )
+			if ( *type == FDS_AGGREGATE_ACCESS_SEP )
 			{
 				type++;
 				continue;
 			}
 
-			type = strchr(type, FDS_STRUCT_FIELD_NAME_END) + 1;
+			type = strchr(type, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 
 			/* to start of field */
 			if ( (subsize = FDSTypeSize(type)) < 0 )
@@ -416,7 +416,7 @@ FDSTypeSize(char *type)
 
 			_fds_advance(&type);
 
-			if ( *type == FDS_STRUCT_FIELD_SEP )
+			if ( *type == FDS_AGGREGATE_FIELD_SEP )
 				type++;
 		}
 		return size;
@@ -564,7 +564,7 @@ TypeToFDS(int type, ...)
 		asprintf(&buf, _fds_type_str[type]);
 		break;
 
-	case AIF_STRUCT:
+	case AIF_AGGREGATE:
 	case AIF_UNION:
 		v3 = va_arg(args, char *);
 		if (v3 == NULL) {
@@ -693,7 +693,7 @@ FDSTypeCompare(char *f1, char *f2)
 		break;
 
 	case AIF_UNION:
-	case AIF_STRUCT:
+	case AIF_AGGREGATE:
 		if ( FDSNumFields(f1) != FDSNumFields(f2) )
 		{
 			res = 0;
@@ -704,9 +704,9 @@ FDSTypeCompare(char *f1, char *f2)
 		{
 			if
 			(
-				FDSStructFieldByNumber(f1, n, &n1, &t1) < 0 
+				FDSAggregateFieldByNumber(f1, n, &n1, &t1) < 0
 				||
-				FDSStructFieldByNumber(f2, n, &n2, &t2) < 0 
+				FDSAggregateFieldByNumber(f2, n, &n2, &t2) < 0
 			)
 				return 0;
 
@@ -979,35 +979,35 @@ FDSArrayIndexInit(char *fmt)
 }
 
 /************************************************************
- ********************** STRUCT ROUTINES **********************
+ ********************** AGGREGATE ROUTINES **********************
  ************************************************************/
 
 /*
- * The fds of a struct has this format:
+ * The fds of a aggregate has this format:
  *
  *  {name|entry,...;entry,...;entry,...;entry,...}
  *
- *  name is the name of the structure, or empty for an unnamed type
+ *  name is the name of the aggregate, or empty for an unnamed type
  *  each entry has the format "name=type"
- *  a structure comprises 4 sections seperated by ';', corresponding
+ *  a aggregate comprises 4 sections separated by ';', corresponding
  *    to public, private, protected and hidden members 
  */
 
-#define STRUCT_START(fds, res) \
+#define AGGREGATE_START(fds, res) \
 	if (*(fds) == FDS_NAME) { \
 		(fds) = _fds_skipto((fds), _fds_name_end); \
 		(fds)++; \
 	} \
-	if ( *(fds++) != FDS_STRUCT_START ) \
+	if ( *(fds++) != FDS_AGGREGATE_START ) \
 		return (res); \
 	while ( *(fds) != FDS_TYPENAME_END ) \
 		(fds)++; \
 	(fds)++; \
 	if ( *(fds) == '\0' ) \
 		return (res); \
-	while ( *(fds) == FDS_STRUCT_ACCESS_SEP ) \
+	while ( *(fds) == FDS_AGGREGATE_ACCESS_SEP ) \
 		(fds)++; \
-	if ( *(fds) == FDS_STRUCT_END ) \
+	if ( *(fds) == FDS_AGGREGATE_END ) \
 		return (res);
 
 char *
@@ -1021,8 +1021,8 @@ _fds_skiptomatch(char *fds)
 
 	switch ( *fds )
 	{
-	case FDS_STRUCT_START:
-		ender = FDS_STRUCT_END;
+	case FDS_AGGREGATE_START:
+		ender = FDS_AGGREGATE_END;
 		break;
 
 	case FDS_ARRAY_START:
@@ -1047,7 +1047,7 @@ _fds_skiptomatch(char *fds)
 
 		if
 		(
-			*fds == FDS_STRUCT_START 
+			*fds == FDS_AGGREGATE_START
 			|| 
 			*fds == FDS_UNION_START 
 			|| 
@@ -1067,25 +1067,25 @@ _fds_skiptomatch(char *fds)
 char *
 _fds_skiptofield(char *fds, int n)
 {
-	STRUCT_START(fds, NULL);
+	AGGREGATE_START(fds, NULL);
 
-	while ( *fds != '\0' && *fds != FDS_STRUCT_END && n > 0 )
+	while ( *fds != '\0' && *fds != FDS_AGGREGATE_END && n > 0 )
 	{
-		if ( *fds == FDS_STRUCT_FIELD_SEP )
+		if ( *fds == FDS_AGGREGATE_FIELD_SEP )
 			n--;
-		else if ( *fds == FDS_STRUCT_ACCESS_SEP )
+		else if ( *fds == FDS_AGGREGATE_ACCESS_SEP )
 		{
 			if 
 			( 
-			 	*(fds+1) != FDS_STRUCT_ACCESS_SEP
+			 	*(fds+1) != FDS_AGGREGATE_ACCESS_SEP
 				&&
-				*(fds+1) != FDS_STRUCT_END
+				*(fds+1) != FDS_AGGREGATE_END
 			)
 				n--;
 		}
 		else if
 		(
-			*fds == FDS_STRUCT_START 
+			*fds == FDS_AGGREGATE_START
 			|| 
 			*fds == FDS_UNION_START 
 			|| 
@@ -1099,7 +1099,7 @@ _fds_skiptofield(char *fds, int n)
 
 	}
 
-	if ( *fds == '\0' || *fds == FDS_STRUCT_END )
+	if ( *fds == '\0' || *fds == FDS_AGGREGATE_END )
 		return NULL;
 
 	return fds;
@@ -1119,7 +1119,7 @@ FDSNumFields(char *fds)
 		fds++;
 	}
 
-	if ( *(fds++) != FDS_STRUCT_START )
+	if ( *(fds++) != FDS_AGGREGATE_START )
 		return -1;
 
 	while ( *(fds) != FDS_TYPENAME_END )
@@ -1129,29 +1129,29 @@ FDSNumFields(char *fds)
 	if ( *fds == '\0' )
 		return -1;
 
-	while ( *fds == FDS_STRUCT_ACCESS_SEP )
+	while ( *fds == FDS_AGGREGATE_ACCESS_SEP )
 		(fds)++;
 
-	if ( *fds == FDS_STRUCT_END )
+	if ( *fds == FDS_AGGREGATE_END )
 		return 0;
 
-	while ( *fds != '\0' && *fds != FDS_STRUCT_END )
+	while ( *fds != '\0' && *fds != FDS_AGGREGATE_END )
 	{
-		if ( *fds == FDS_STRUCT_FIELD_SEP )
+		if ( *fds == FDS_AGGREGATE_FIELD_SEP )
 			n++;
-		else if ( *fds == FDS_STRUCT_ACCESS_SEP )
+		else if ( *fds == FDS_AGGREGATE_ACCESS_SEP )
 		{
 			if 
 			( 
-			 	*(fds+1) != FDS_STRUCT_ACCESS_SEP
+			 	*(fds+1) != FDS_AGGREGATE_ACCESS_SEP
 				&&
-				*(fds+1) != FDS_STRUCT_END
+				*(fds+1) != FDS_AGGREGATE_END
 			)
 				n++;
 		}
 		else if
 		(
-			*fds == FDS_STRUCT_START 
+			*fds == FDS_AGGREGATE_START
 			|| 
 			*fds == FDS_UNION_START 
 			|| 
@@ -1172,15 +1172,15 @@ FDSNumFields(char *fds)
  * The function ignores access specifiers
  */
 int
-FDSStructFieldByNumber(char *fds, int n, char **name, char **type)
+FDSAggregateFieldByNumber(char *fds, int n, char **name, char **type)
 {
 	if ( (fds = _fds_skiptofield(fds, n)) == NULL )
 		return -1;
 
-        if ( (*name = _field_attribute(fds, NULL, _fds_struct_field_name_end)) == NULL )
+        if ( (*name = _field_attribute(fds, NULL, _fds_aggregate_field_name_end)) == NULL )
 		return -1;
 
-        if ( (*type = _field_attribute(fds, _fds_struct_field_name_end, _fds_struct_field_end)) == NULL )
+        if ( (*type = _field_attribute(fds, _fds_aggregate_field_name_end, _fds_aggregate_field_end)) == NULL )
 		return -1;
 
 	return 0;
@@ -1191,16 +1191,16 @@ FDSStructFieldByNumber(char *fds, int n, char **name, char **type)
  * The function ignores access specifiers
  */
 int
-FDSStructFieldByName(char *fds, char *name, char **type)
+FDSAggregateFieldByName(char *fds, char *name, char **type)
 {
 	char *	nm;
 
-	STRUCT_START(fds, -1);
+	AGGREGATE_START(fds, -1);
 
-	while ( *fds != '\0' && *fds != FDS_STRUCT_END ) {
+	while ( *fds != '\0' && *fds != FDS_AGGREGATE_END ) {
 		nm = fds;
 
-		fds = _fds_skipto(fds, _fds_struct_field_name_end);
+		fds = _fds_skipto(fds, _fds_aggregate_field_name_end);
 
 		if ( *fds == '\0' ) {
 			return -1;
@@ -1209,20 +1209,20 @@ FDSStructFieldByName(char *fds, char *name, char **type)
 		*fds = '\0'; /* temporarily */
 
 		if ( strcmp(nm, name) == 0 ) {
-			*fds = FDS_STRUCT_FIELD_NAME_END;
+			*fds = FDS_AGGREGATE_FIELD_NAME_END;
 
 			if ( (*type = _field_attribute(nm,
-							_fds_struct_field_name_end,
-							_fds_struct_field_end)) == NULL ) {
+							_fds_aggregate_field_name_end,
+							_fds_aggregate_field_end)) == NULL ) {
 				return -1;
 			}
 
 			return 0;
 		}
 
-		*fds = FDS_STRUCT_FIELD_NAME_END;
+		*fds = FDS_AGGREGATE_FIELD_NAME_END;
 
-		fds = _fds_skipto(fds, _fds_struct_field_end);
+		fds = _fds_skipto(fds, _fds_aggregate_field_end);
 		fds++;
 	}
 
@@ -1230,7 +1230,7 @@ FDSStructFieldByName(char *fds, char *name, char **type)
 }
 
 /*
- * Arrange the members of AIF struct defined by fds and data into a new_fds
+ * Arrange the members of AIF aggregate defined by fds and data into a new_fds
  * and a new_data so that the FDS looks like fdsref
  *
  * If number_of_members of fdsref > number_of_members of fds 
@@ -1246,7 +1246,7 @@ FDSStructFieldByName(char *fds, char *name, char **type)
  * It allocates the memory for new_fds and new_data
  */
 int
-_fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **new_data)
+_fds_aggregate_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **new_data)
 {
 	char * ptr_fds = fds;
 	char * ptr_data = data;
@@ -1268,34 +1268,34 @@ _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **
 	** we do not use FDSNumFields() since we are only interested in the
 	** public section */
 	tmp = fds;
-	STRUCT_START(tmp, -1);
-	while ( *tmp != FDS_STRUCT_ACCESS_SEP )
+	AGGREGATE_START(tmp, -1);
+	while ( *tmp != FDS_AGGREGATE_ACCESS_SEP )
 	{
-		tmp = strchr(tmp, FDS_STRUCT_FIELD_NAME_END) + 1;
+		tmp = strchr(tmp, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 		if
 		(
-                        *tmp == FDS_STRUCT_START || *tmp == FDS_UNION_START ||
+                        *tmp == FDS_AGGREGATE_START || *tmp == FDS_UNION_START ||
                         *tmp == FDS_ARRAY_START || *tmp == FDS_ENUM_START
                 )
                         tmp = _fds_skiptomatch(tmp) + 1;
 
-		tmp = _fds_skipto(tmp, _fds_struct_field_end);
+		tmp = _fds_skipto(tmp, _fds_aggregate_field_end);
 		number_fds++;
 	}
 
 	tmp = fdsref;
-	STRUCT_START(tmp, -1);
-	while ( *tmp != FDS_STRUCT_ACCESS_SEP )
+	AGGREGATE_START(tmp, -1);
+	while ( *tmp != FDS_AGGREGATE_ACCESS_SEP )
 	{
-		tmp = strchr(tmp, FDS_STRUCT_FIELD_NAME_END) + 1;
+		tmp = strchr(tmp, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 		if
 		(
-                        *tmp == FDS_STRUCT_START || *tmp == FDS_UNION_START ||
+                        *tmp == FDS_AGGREGATE_START || *tmp == FDS_UNION_START ||
                         *tmp == FDS_ARRAY_START || *tmp == FDS_ENUM_START
                 )
                         tmp = _fds_skiptomatch(tmp) + 1;
 
-		tmp = _fds_skipto(tmp, _fds_struct_field_end);
+		tmp = _fds_skipto(tmp, _fds_aggregate_field_end);
 		number_fdsref++;
 	}
 
@@ -1322,13 +1322,13 @@ _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **
 
 	ptr_fds = fds;
 	ptr_data = data;
-	STRUCT_START(ptr_fds, -1);
+	AGGREGATE_START(ptr_fds, -1);
 	for (n=0; n<number_fds; n++)
 	{
 		fds_members[n] = ptr_fds;
 		data_members[n] = ptr_data;
 
-		ptr_fds = strchr(ptr_fds, FDS_STRUCT_FIELD_NAME_END) + 1;
+		ptr_fds = strchr(ptr_fds, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 		_fds_skip_data(&ptr_fds, &ptr_data);
 		fds_members_len[n] = ptr_fds - fds_members[n];
 		data_members_len[n] = ptr_data - data_members[n];
@@ -1340,21 +1340,21 @@ _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **
 
 	/* we start building up the new_fds and new_data */
 	ptr_fds = fds;
-	STRUCT_START(ptr_fds, -1);
+	AGGREGATE_START(ptr_fds, -1);
 	memcpy(*new_fds, fds, ptr_fds - fds); /* copy the id to the new_fds */
 
 	ptr_fds = *new_fds + (ptr_fds - fds);
 	ptr_data = *new_data;
 
 	tmp = fdsref;
-	STRUCT_START(tmp, -1);
-	while ( *tmp != FDS_STRUCT_ACCESS_SEP )
+	AGGREGATE_START(tmp, -1);
+	while ( *tmp != FDS_AGGREGATE_ACCESS_SEP )
 	{
 		char endchar, *end;
 
-		if ( *tmp == FDS_STRUCT_FIELD_SEP ) tmp++;
+		if ( *tmp == FDS_AGGREGATE_FIELD_SEP ) tmp++;
 		end = tmp;
-		end = _fds_skipto(end, _fds_struct_field_end);
+		end = _fds_skipto(end, _fds_aggregate_field_end);
 		endchar = *end; /* we store *end since *end can be ',' or ';' */
 		*end = '\0'; /* temporarily */
 
@@ -1367,12 +1367,12 @@ _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **
 				/* tmp and fds_members[*] contain
 				** 'field_name=field_type', but we only want
 				** to compare field_name */
-				char * temp_a = strchr(tmp, FDS_STRUCT_FIELD_NAME_END);
-				char * temp_b = strchr(fds_members[n], FDS_STRUCT_FIELD_NAME_END);
+				char * temp_a = strchr(tmp, FDS_AGGREGATE_FIELD_NAME_END);
+				char * temp_b = strchr(fds_members[n], FDS_AGGREGATE_FIELD_NAME_END);
 				int strcmp_res;
 				*temp_a = *temp_b = '\0'; /* temporarily */
 				strcmp_res = strcmp(tmp, fds_members[n]);
-				*temp_a = *temp_b = FDS_STRUCT_FIELD_NAME_END;
+				*temp_a = *temp_b = FDS_AGGREGATE_FIELD_NAME_END;
 				if (strcmp_res == 0)
 					break;
 			}
@@ -1397,7 +1397,7 @@ _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **
 		ptr_data += data_members_len[n];
 		ptr_fds += fds_members_len[n];
 		*end = endchar;
-		*(ptr_fds++) = FDS_STRUCT_FIELD_SEP;
+		*(ptr_fds++) = FDS_AGGREGATE_FIELD_SEP;
 		tmp = end;
 	}
 
@@ -1412,7 +1412,7 @@ _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **
 				memcpy(ptr_fds, fds_members[n], fds_members_len[n]);
 				ptr_data += data_members_len[n];
 				ptr_fds += fds_members_len[n];
-				*(ptr_fds++) = FDS_STRUCT_FIELD_SEP;
+				*(ptr_fds++) = FDS_AGGREGATE_FIELD_SEP;
 			}
 		}
 	}
@@ -1430,12 +1430,12 @@ _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **
 }
 
 int
-FDSStructFieldSize(char *fds, char *name)
+FDSAggregateFieldSize(char *fds, char *name)
 {
 	char *type;
 	int   size;
 
-	if ( FDSStructFieldByName(fds, name, &type) )
+	if ( FDSAggregateFieldByName(fds, name, &type) )
 	{
                 SetAIFError(AIFERR_BADARG, NULL);
                 return -1;
@@ -1454,19 +1454,19 @@ FDSStructFieldSize(char *fds, char *name)
  * if the field cannot be found, it returns -1
  */
 int
-FDSStructFieldIndex(char *fds, char *name)
+FDSAggregateFieldIndex(char *fds, char *name)
 {
 	int	counter = 0;
 	int	len;
 	char *	nm;
 
-	STRUCT_START(fds, -1);
+	AGGREGATE_START(fds, -1);
 
-	while ( *fds != '\0' && *fds != FDS_STRUCT_END )
+	while ( *fds != '\0' && *fds != FDS_AGGREGATE_END )
 	{
 		nm = fds;
 
-		fds = _fds_skipto(fds, _fds_struct_field_name_end);
+		fds = _fds_skipto(fds, _fds_aggregate_field_name_end);
 
 		if ( *fds == '\0' )
 			return -1;
@@ -1477,7 +1477,7 @@ FDSStructFieldIndex(char *fds, char *name)
 			return counter;
 
 		counter++;
-		fds = _fds_skipto(fds, _fds_struct_field_end);
+		fds = _fds_skipto(fds, _fds_aggregate_field_end);
 		fds++;
 	}
 
@@ -1485,34 +1485,9 @@ FDSStructFieldIndex(char *fds, char *name)
 }
 
 char *
-FDSStructInit(char *id)
+FDSAggregateInit(char *id)
 {
-	return strdup(TypeToFDS(AIF_STRUCT, id));
-}
-
-/*
- * puts the new field in the public section 
- */
-char *
-FDSAddFieldToStruct(char *fds, char *name, char *type)
-{
-	return FDSAddFieldToClass(fds, AIFACC_PUBLIC, name, type);
-}
-
-int
-FDSStructAdd(char **fds, char *name, char *type)
-{
-	char * temp;
-
-	temp = FDSAddFieldToStruct(*fds, name, type);
-
-	if ( temp == NULL ) 
-		return -1;
-
-	_aif_free(*fds);
-	*fds = temp;
-
-	return 0;
+	return strdup(TypeToFDS(AIF_AGGREGATE, id));
 }
 
 /*
@@ -1524,17 +1499,17 @@ _data_len_index(char *fds, int n)
 	int size = 0;
 	int subsize = 0;
 
-	STRUCT_START(fds, -1);
+	AGGREGATE_START(fds, -1);
 		
-	while ( *fds != '\0' && *fds != FDS_STRUCT_END && n >= 0 )
+	while ( *fds != '\0' && *fds != FDS_AGGREGATE_END && n >= 0 )
 	{
-		if ( *fds == FDS_STRUCT_ACCESS_SEP )
+		if ( *fds == FDS_AGGREGATE_ACCESS_SEP )
 		{
 			fds++;
 			continue;
 		}
 
-		fds = _fds_skipto(fds, _fds_struct_field_name_end);
+		fds = _fds_skipto(fds, _fds_aggregate_field_name_end);
 
 		if ( *fds++ == '\0' )
 			return 0;
@@ -1549,7 +1524,7 @@ _data_len_index(char *fds, int n)
 
 		_fds_advance(&fds);
 
-		if ( *fds == FDS_STRUCT_FIELD_SEP )
+		if ( *fds == FDS_AGGREGATE_FIELD_SEP )
 			fds++;
 	}
 
@@ -1566,7 +1541,7 @@ _data_len_public(char *fds)
         	(fds) = _fds_skipto((fds), _fds_name_end); 
         	(fds)++; 
 	} 
-	if ( *(fds++) != FDS_STRUCT_START ) 
+	if ( *(fds++) != FDS_AGGREGATE_START )
         	return -1;
 
         while ( *(fds) != FDS_TYPENAME_END )
@@ -1575,15 +1550,15 @@ _data_len_public(char *fds)
 
 	if ( *(fds) == '\0' ) 
         	return -1;
-	if ( *(fds) == FDS_STRUCT_ACCESS_SEP )
+	if ( *(fds) == FDS_AGGREGATE_ACCESS_SEP )
         	return 0;
 		
-	while ( *fds != FDS_STRUCT_END )
+	while ( *fds != FDS_AGGREGATE_END )
 	{
-		if ( *fds == FDS_STRUCT_ACCESS_SEP )
+		if ( *fds == FDS_AGGREGATE_ACCESS_SEP )
 			break;
 
-		fds = _fds_skipto(fds, _fds_struct_field_name_end);
+		fds = _fds_skipto(fds, _fds_aggregate_field_name_end);
 
 		if ( *fds++ == '\0' )
 			return 0;
@@ -1596,7 +1571,7 @@ _data_len_public(char *fds)
 
 		_fds_advance(&fds);
 
-		if ( *fds == FDS_STRUCT_FIELD_SEP )
+		if ( *fds == FDS_AGGREGATE_FIELD_SEP )
 			fds++;
 	}
 
@@ -1920,56 +1895,14 @@ FDSUnionAdd(char **fds, char *name, char *type)
 }
 
 char *
-FDSClassInit(char *id)
-{
-	return FDSStructInit(id);
-}
-
-/*
- * returns a newly alloced string for name and type
- */
-int
-FDSClassFieldByName(char *fds, char *name, char **type)
-{
-	return FDSStructFieldByName(fds, name, type);
-}
-
-/*
- * returns a newly alloced string for name and type
- */
-int
-FDSClassFieldByNumber(char *fds, int n, char **name, char **type)
-{
-	return FDSStructFieldByNumber(fds, n, name, type);
-}
-
-/*
- * The function ignores access specifiers
- * return value indicates the position of the field
- * the counter starts at 0, ie: first element is at position 0
- * if the field cannot be found, it returns -1
- */
-int
-FDSClassFieldIndex(char *fds, char *name)
-{
-	return FDSStructFieldIndex(fds, name);
-}
-
-int
-FDSClassFieldSize(char *fds, char *name)
-{
-	return FDSStructFieldSize(fds, name);
-}
-
-char *
-FDSAddFieldToClass(char *fds, aifaccess acc, char *name, char *type)
+FDSAddFieldToAggregate(char *fds, AIFAccess acc, char *name, char *type)
 {
 	char * 	temp;
 	char *	nfmt;
 	char *	end;
 	char *  rest;
 
-	if ( FDSClassFieldByName(fds, name, &nfmt) == 0 )
+	if ( FDSAggregateFieldByName(fds, name, &nfmt) == 0 )
 	{
 		SetAIFError(AIFERR_BADARG, NULL);
 		_aif_free(nfmt);
@@ -1995,7 +1928,7 @@ FDSAddFieldToClass(char *fds, aifaccess acc, char *name, char *type)
 
 	if
 	(
-		(end = _fds_skipto(temp+1, _fds_struct_access_sep)) == NULL
+		(end = _fds_skipto(temp+1, _fds_aggregate_access_sep)) == NULL
 		||
 		end - temp < 1
 	)
@@ -2005,42 +1938,53 @@ FDSAddFieldToClass(char *fds, aifaccess acc, char *name, char *type)
 		return NULL;
 	}
 
-	rest = _fds_skipto(fds+1, _fds_struct_access_sep);
+	rest = _fds_skipto(fds+1, _fds_aggregate_access_sep);
 
 	switch ( acc )
 	{
-		case AIFACC_PRIVATE:
-			end = _fds_skipto(++end, _fds_struct_access_sep);
+		case AIF_ACCESS_PACKAGE:
+			end = _fds_skipto(++end, _fds_aggregate_access_sep);
 			if ( end == NULL )
 			{
 				SetAIFError(AIFERR_BADARG, NULL);
 				_aif_free(nfmt);
 				return NULL;
 			}
-			rest = _fds_skipto(++rest, _fds_struct_access_sep);
+			rest = _fds_skipto(++rest, _fds_aggregate_access_sep);
 			/* fall through */
 
-		case AIFACC_PROTECTED:
-			end = _fds_skipto(++end, _fds_struct_access_sep);
+		case AIF_ACCESS_PRIVATE:
+			end = _fds_skipto(++end, _fds_aggregate_access_sep);
 			if ( end == NULL )
 			{
 				SetAIFError(AIFERR_BADARG, NULL);
 				_aif_free(nfmt);
 				return NULL;
 			}
-			rest = _fds_skipto(++rest, _fds_struct_access_sep);
+			rest = _fds_skipto(++rest, _fds_aggregate_access_sep);
 			/* fall through */
 
-		case AIFACC_PUBLIC:
+		case AIF_ACCESS_PROTECTED:
+			end = _fds_skipto(++end, _fds_aggregate_access_sep);
+			if ( end == NULL )
+			{
+				SetAIFError(AIFERR_BADARG, NULL);
+				_aif_free(nfmt);
+				return NULL;
+			}
+			rest = _fds_skipto(++rest, _fds_aggregate_access_sep);
+			/* fall through */
+
+		case AIF_ACCESS_PUBLIC:
 			break;
 	}
 
-	if ( *(end-1) != FDS_TYPENAME_END && *(end-1) != FDS_STRUCT_ACCESS_SEP )
-		*end++ = FDS_STRUCT_FIELD_SEP;
+	if ( *(end-1) != FDS_TYPENAME_END && *(end-1) != FDS_AGGREGATE_ACCESS_SEP )
+		*end++ = FDS_AGGREGATE_FIELD_SEP;
 
 	sprintf(end, "%s%c%s%s",
 		name,
-		FDS_STRUCT_FIELD_NAME_END, 
+		FDS_AGGREGATE_FIELD_NAME_END,
 		type,
 		rest);
 
@@ -2050,11 +1994,11 @@ FDSAddFieldToClass(char *fds, aifaccess acc, char *name, char *type)
 }
 
 int
-FDSClassAdd(char **fds, aifaccess acc, char *name, char *type)
+FDSAggregateAdd(char **fds, AIFAccess acc, char *name, char *type)
 {
 	char * temp;
 
-	temp = FDSAddFieldToClass(*fds, acc, name, type);
+	temp = FDSAddFieldToAggregate(*fds, acc, name, type);
 
 	if ( temp == NULL )
 		return -1;
@@ -2086,7 +2030,7 @@ FDSSetIdentifier(char **fds, char *id)
 	}
 
 	if ( *temp == FDS_UNION_START || 
-	     *temp == FDS_STRUCT_START || 
+	     *temp == FDS_AGGREGATE_START ||
 	     *temp == FDS_ENUM_START )
 	{
 		if ( *(temp+1) != FDS_TYPENAME_END )
@@ -2125,7 +2069,7 @@ FDSGetIdentifier(char *fds)
 	}
 
 	if ( *fds == FDS_UNION_START || 
-	     *fds == FDS_STRUCT_START || 
+	     *fds == FDS_AGGREGATE_START ||
 	     *fds == FDS_ENUM_START )
 	{
 		fds++;
@@ -2194,26 +2138,26 @@ _fds_advance(char **fds)
 		break;
 
 	case AIF_UNION:
-	case AIF_STRUCT:
+	case AIF_AGGREGATE:
 		_fds_skipid(fds);
 
 		for ( ;; ) {
 
-			if ( **fds == FDS_STRUCT_ACCESS_SEP )
+			if ( **fds == FDS_AGGREGATE_ACCESS_SEP )
 			{
 				(*fds)++;
 				continue;
 			}
 			
-			if ( **fds == FDS_STRUCT_END )
+			if ( **fds == FDS_AGGREGATE_END )
 				break;
 
-			while ( *(*fds)++ != FDS_STRUCT_FIELD_NAME_END )
+			while ( *(*fds)++ != FDS_AGGREGATE_FIELD_NAME_END )
 				; /* past the field name */
 
 			_fds_advance(fds); /* past the field type */
 
-			if ( **fds == FDS_STRUCT_FIELD_SEP ) 
+			if ( **fds == FDS_AGGREGATE_FIELD_SEP )
 				(*fds)++;
 		}
 		(*fds)++; /* past closing brace */
@@ -2486,27 +2430,27 @@ _fds_skip_data(char **fds, char **data)
 		AIFArrayIndexFree(ix);
 		return;
 
-	case AIF_STRUCT:
-		(*fds)++; /* past FDS_STRUCT_START */
+	case AIF_AGGREGATE:
+		(*fds)++; /* past FDS_AGGREGATE_START */
 		_fds_skipid(fds);
 
-		while ( **fds != FDS_STRUCT_END )
+		while ( **fds != FDS_AGGREGATE_END )
 		{
-			if ( **fds == FDS_STRUCT_ACCESS_SEP )
+			if ( **fds == FDS_AGGREGATE_ACCESS_SEP )
 			{
 				(*fds)++;
 				continue;
 			}
 
-			*fds = strchr(*fds, FDS_STRUCT_FIELD_NAME_END) + 1;
+			*fds = strchr(*fds, FDS_AGGREGATE_FIELD_NAME_END) + 1;
 				/* to start of field */
 			_fds_skip_data(fds, data);
 
-			if ( **fds == FDS_STRUCT_FIELD_SEP )
+			if ( **fds == FDS_AGGREGATE_FIELD_SEP )
 				(*fds)++;
 		}
 
-		(*fds)++; /* past FDS_STRUCT_END */
+		(*fds)++; /* past FDS_AGGREGATE_END */
 		return;
 
 	case AIF_UNION:
