@@ -26,22 +26,6 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeRange;
 
 public class AIFTypeArray extends TypeDerived implements IAIFTypeArray {
-	public static void main(String[] args) {
-		String fmt = "[r0,2is4][r-1,3is4][r10,4is4][r-10,5is4][r0,6is4]is4"; //$NON-NLS-1$
-		IAIFType type;
-		try {
-			type = AIFFactory.getAIFType(fmt);
-			if (type instanceof IAIFTypeArray) {
-				System.err.println("range: " + ((IAIFTypeArray) type).getRange()); //$NON-NLS-1$
-				System.err.println("base: " + ((IAIFTypeArray) type).getBaseType()); //$NON-NLS-1$
-			}
-			System.err.println("size: " + type.sizeof()); //$NON-NLS-1$
-		} catch (AIFFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	private IAIFTypeRange fRange;
 
 	/*

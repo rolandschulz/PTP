@@ -25,21 +25,6 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypePointer;
 
 public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
-	public static void main(String[] args) {
-		// IAIFType testType =
-		// AIFFactory.getAIFType("^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}");
-		IAIFType testType;
-		try {
-			testType = AIFFactory.getAIFType("^a4^a4"); //$NON-NLS-1$
-			System.out.println("----: " + ((IAIFTypePointer) testType).getBaseType()); //$NON-NLS-1$
-			System.out.println("----: " + testType); //$NON-NLS-1$
-			System.out.println("----: " + testType.sizeof()); //$NON-NLS-1$
-		} catch (AIFFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	private IAIFType fAddrType;
 
 	/*
