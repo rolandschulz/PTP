@@ -13,13 +13,15 @@ package org.eclipse.ptp.debug.core.tests.suite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.ptp.debug.core.tests.AIFTests;
 import org.eclipse.ptp.debug.core.tests.TaskSetTests;
 
 public class DebugCoreTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite(DebugCoreTestSuite.class.getName());
-		
+
 		suite.addTestSuite(TaskSetTests.class);
+		suite.addTestSuite(AIFTests.class);
 		return suite;
 	}
 
