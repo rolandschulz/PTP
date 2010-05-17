@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THHistoryListAction
- * Version: 1.3
+ * Version: 1.5
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
@@ -46,7 +46,7 @@ public class THHistoryListAction extends Action {
 	
 	private class HistoryListDialog extends StatusDialog {
 		
-		private ListDialogField fHistoryList;
+		private ListDialogField<ICElement> fHistoryList;
 		private IStatus fHistoryStatus;
 		private ICElement fResult;
 		
@@ -58,22 +58,22 @@ public class THHistoryListAction extends Action {
 				Messages.THHistoryListAction_Remove, 
 			};
 					
-			IListAdapter adapter= new IListAdapter() {
-				public void customButtonPressed(ListDialogField field, int index) {
+			IListAdapter<ICElement> adapter= new IListAdapter<ICElement>() {
+				public void customButtonPressed(ListDialogField<ICElement> field, int index) {
 					doCustomButtonPressed();
 				}
-				public void selectionChanged(ListDialogField field) {
+				public void selectionChanged(ListDialogField<ICElement> field) {
 					doSelectionChanged();
 				}
 				
-				public void doubleClicked(ListDialogField field) {
+				public void doubleClicked(ListDialogField<ICElement> field) {
 					doDoubleClicked();
 				}				
 			};
 		
 			LabelProvider labelProvider= new CUILabelProvider(THHistoryAction.LABEL_OPTIONS, CElementImageProvider.OVERLAY_ICONS);
 			
-			fHistoryList= new ListDialogField(adapter, buttonLabels, labelProvider);
+			fHistoryList= new ListDialogField<ICElement>(adapter, buttonLabels, labelProvider);
 			fHistoryList.setLabelText(Messages.THHistoryListAction_HistoryList_label); 
 			fHistoryList.setElements(Arrays.asList(historyEntries));
 			
@@ -126,7 +126,7 @@ public class THHistoryListAction extends Action {
 		
 		private void doSelectionChanged() {
 			StatusInfo status= new StatusInfo();
-			List selected= fHistoryList.getSelectedElements();
+			List<?> selected= fHistoryList.getSelectedElements();
 			if (selected.size() != 1) {
 				status.setError(""); //$NON-NLS-1$
 				fResult= null;
