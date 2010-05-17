@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THDropTargetListener
- * Version: 1.2
+ * Version: 1.3
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
@@ -70,7 +70,7 @@ public class THDropTargetListener implements DropTargetListener {
 	private ICElement checkLocalSelection() {
 		ISelection sel= LocalSelectionTransfer.getTransfer().getSelection();
 		if (sel instanceof IStructuredSelection) {
-			for (Iterator iter = ((IStructuredSelection)sel).iterator(); iter.hasNext();) {
+			for (Iterator<?> iter = ((IStructuredSelection)sel).iterator(); iter.hasNext();) {
 				Object element = iter.next();
 				if (element instanceof ICElement) {
 					return (ICElement) element;

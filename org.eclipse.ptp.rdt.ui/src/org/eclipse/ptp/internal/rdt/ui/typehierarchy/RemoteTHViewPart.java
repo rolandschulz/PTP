@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.THViewPart
- * Version: 1.16
+ * Version: 1.18
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
@@ -494,6 +494,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 		parent.setTopCenter(memberToolBar);
 		
 		memberToolBar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+			@Override
 			public void getName(AccessibleEvent e) {
 				if (e.childID != ACC.CHILDID_SELF) {
 					ToolItem item = memberToolBar.getItem(e.childID);
@@ -1019,7 +1020,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	private ICElement selectionToElement(ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection ss= (IStructuredSelection) selection;
-			for (Iterator iter = ss.iterator(); iter.hasNext(); ) {
+			for (Iterator<?> iter = ss.iterator(); iter.hasNext(); ) {
 				Object cand= iter.next();
 				if (cand instanceof ICElement) {
 					return (ICElement) cand;
@@ -1038,7 +1039,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	private THNode selectionToNode(ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection ss= (IStructuredSelection) selection;
-			for (Iterator iter = ss.iterator(); iter.hasNext(); ) {
+			for (Iterator<?> iter = ss.iterator(); iter.hasNext(); ) {
 				Object cand= iter.next();
 				if (cand instanceof THNode) {
 					return (THNode) cand;
