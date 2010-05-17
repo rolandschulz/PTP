@@ -56,7 +56,7 @@ am_libaif_a_OBJECTS = libaif_a-aif.$(OBJEXT) libaif_a-calc.$(OBJEXT) \
 	libaif_a-fds.$(OBJEXT) libaif_a-array.$(OBJEXT) \
 	libaif_a-conv.$(OBJEXT) libaif_a-cmp.$(OBJEXT) \
 	libaif_a-print.$(OBJEXT) libaif_a-error.$(OBJEXT) \
-	libaif_a-io.$(OBJEXT) libaif_a-struct.$(OBJEXT) \
+	libaif_a-io.$(OBJEXT) libaif_a-aggregate.$(OBJEXT) \
 	libaif_a-util.$(OBJEXT)
 libaif_a_OBJECTS = $(am_libaif_a_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
@@ -183,7 +183,7 @@ libaif_a_SOURCES = aif.c \
 							print.c \
 							error.c \
 							io.c \
-							struct.c \
+							aggregate.c \
 							util.c \
 							aif.x
 
@@ -269,6 +269,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-aggregate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-aif.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-array.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-calc.Po@am__quote@
@@ -278,7 +279,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-fds.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-print.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-struct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libaif_a-util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testaif-testaif.Po@am__quote@
 
@@ -422,19 +422,19 @@ libaif_a-io.obj: io.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -c -o libaif_a-io.obj `if test -f 'io.c'; then $(CYGPATH_W) 'io.c'; else $(CYGPATH_W) '$(srcdir)/io.c'; fi`
 
-libaif_a-struct.o: struct.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -MT libaif_a-struct.o -MD -MP -MF $(DEPDIR)/libaif_a-struct.Tpo -c -o libaif_a-struct.o `test -f 'struct.c' || echo '$(srcdir)/'`struct.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libaif_a-struct.Tpo $(DEPDIR)/libaif_a-struct.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='struct.c' object='libaif_a-struct.o' libtool=no @AMDEPBACKSLASH@
+libaif_a-aggregate.o: aggregate.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -MT libaif_a-aggregate.o -MD -MP -MF $(DEPDIR)/libaif_a-aggregate.Tpo -c -o libaif_a-aggregate.o `test -f 'aggregate.c' || echo '$(srcdir)/'`aggregate.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libaif_a-aggregate.Tpo $(DEPDIR)/libaif_a-aggregate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='aggregate.c' object='libaif_a-aggregate.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -c -o libaif_a-struct.o `test -f 'struct.c' || echo '$(srcdir)/'`struct.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -c -o libaif_a-aggregate.o `test -f 'aggregate.c' || echo '$(srcdir)/'`aggregate.c
 
-libaif_a-struct.obj: struct.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -MT libaif_a-struct.obj -MD -MP -MF $(DEPDIR)/libaif_a-struct.Tpo -c -o libaif_a-struct.obj `if test -f 'struct.c'; then $(CYGPATH_W) 'struct.c'; else $(CYGPATH_W) '$(srcdir)/struct.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libaif_a-struct.Tpo $(DEPDIR)/libaif_a-struct.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='struct.c' object='libaif_a-struct.obj' libtool=no @AMDEPBACKSLASH@
+libaif_a-aggregate.obj: aggregate.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -MT libaif_a-aggregate.obj -MD -MP -MF $(DEPDIR)/libaif_a-aggregate.Tpo -c -o libaif_a-aggregate.obj `if test -f 'aggregate.c'; then $(CYGPATH_W) 'aggregate.c'; else $(CYGPATH_W) '$(srcdir)/aggregate.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libaif_a-aggregate.Tpo $(DEPDIR)/libaif_a-aggregate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='aggregate.c' object='libaif_a-aggregate.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -c -o libaif_a-struct.obj `if test -f 'struct.c'; then $(CYGPATH_W) 'struct.c'; else $(CYGPATH_W) '$(srcdir)/struct.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -c -o libaif_a-aggregate.obj `if test -f 'aggregate.c'; then $(CYGPATH_W) 'aggregate.c'; else $(CYGPATH_W) '$(srcdir)/aggregate.c'; fi`
 
 libaif_a-util.o: util.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libaif_a_CFLAGS) $(CFLAGS) -MT libaif_a-util.o -MD -MP -MF $(DEPDIR)/libaif_a-util.Tpo -c -o libaif_a-util.o `test -f 'util.c' || echo '$(srcdir)/'`util.c
