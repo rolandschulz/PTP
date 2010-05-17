@@ -11,8 +11,6 @@
     </topic>
     <topic href="html/reference/outline_view.html" label="Outline view">
     </topic>
-    <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_make_targets_view.htm" label="Make Targets view">
-    </topic>
     <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy view">
     </topic>
     <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy view">
@@ -21,7 +19,7 @@
     </topic>
     <topic href="html/reference/problems_view.htm" label="Problems view">
     </topic>
-    <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_properties_view.htm" label="Properties view">
+    <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_search_view.htm" label="Search view">
     </topic>
  </topic>
  <topic label="Remote C/C++ Properties">
@@ -31,7 +29,7 @@
        <topic href="html/reference/remote_properties_symbols.html" label="Symbols">
        </topic>
     </topic>
-    <topic href="html/reference/remote_services.html" label="Remote Services Property Page">
+    <topic href="html/reference/remote_services.html" label="Service Configurations Property Page">
     </topic>
  </topic> 
 	<topic label="Remote C/C++ New Project Wizard"  href="html/reference/remote_c_new_project_wizard.html">
@@ -39,7 +37,7 @@
     </topic>
     <topic href="html/reference/remote_c_new_project_wizard_2.html" label="Configurations Page">
     </topic>
-    <topic href="html/reference/remote_c_new_project_wizard_3.html" label="Service Providers Page">
+    <topic href="html/reference/remote_c_new_project_wizard_3.html" label="Configure Services Page">
     </topic> 
 	</topic>
  <topic label="Import/Export Project Settings Wizards">

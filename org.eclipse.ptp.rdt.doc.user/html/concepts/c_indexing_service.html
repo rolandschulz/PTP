@@ -8,7 +8,7 @@
 
    <body>
       <h2>
-         C/C++ Indexing Service
+         Code Indexing Service
       </h2>
       <p>
          The C/C++ Indexing Service is the underlying backbone behind RDT's C/C++ source analysis features.  This feature parses your source code,
@@ -23,13 +23,10 @@
       <li><a href=../reference/remote_call_hierarchy.html>Call Hierarchy View</a></li>
       <li><a href=../reference/remote_type_heirarchy.html>Type Hierarchy View</a></li>
       </UL>
-      <p>There are two implementations of this service supplied by RDT:</p>
-      <UL type="disc">
-      <li>Null C/C++ Indexing Service - This implementation does nothing when requests for index information are made.  This is useful if you wish to
-      use other services but do not want to enable indexing.</li>
-      <li>RDT Remote C/C++ Indexing Service - This implementation uses the <a href="PLUGINS_ROOT/org.eclipse.rse.doc.user/gettingstarted/g_start.html">Remote Systems Explorer</a>'s dstore protocol to access a server that you
+      
+      The RSE C/C++ Indexing Service is supplied by RDT.  This implementation uses the <a href="PLUGINS_ROOT/org.eclipse.rse.doc.user/gettingstarted/g_start.html">Remote Systems Explorer</a>'s dstore protocol to access a server that you
       deploy on the remote machine where your project resides.  The actual parsing and indexing are done on the remote machine in order to reduce
       network traffic, and only the results of the queries are sent back to populate the user interface.</li>
-      </UL>
+
    </body>
 </html>
