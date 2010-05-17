@@ -33,9 +33,9 @@ detail what must be done to correctly set up a remote project.
 	<li>
 		To create a new Remote C/C++ Project begin by opening the 
 		<strong>New Remote C/C++ Project Wizard</strong> by going to 
-		<strong>File &gt; New &gt; New Remote C/C++ Project</strong>.
+		<strong>File &gt; New &gt; Remote C/C++ Project</strong>.
 		<br><br>
-		<img src="../../images/new_project_wizard/menu_create_project.png" alt="File > New > New Remote C/C++ Project">
+		<img src="../../images/new_project_wizard/menu_create_project.png" alt="File > New > Remote C/C++ Project">
 		<br><br><br>
 	</li>
 
@@ -45,27 +45,28 @@ detail what must be done to correctly set up a remote project.
 		<img src="../../images/new_project_wizard/wizard_enter_project_name.png" alt="Enter Project Name">
 		<br><br><br>
 	</li>
-
+	
 	<li>
-		Uncheck the checkbox that says <strong>Use default location</strong>. The default location
-		is the local file system which is not appropriate for remote projects.
+		Choose a remote provider for hosting the remote project. RDT currently ships with the <strong>RSE
+		file system</strong>, so it is recommended that you choose that.
 		<br><br>
-		<img src="../../images/new_project_wizard/wizard_uncheck_default_location.png" alt="Uncheck Default Location">
+		<img src="../../images/new_project_wizard/wizard_choose_file_system.png" alt="Choose Remote Provider">
 		<br><br><br>
 	</li>
 
 	<li>
-		Choose a file system type for hosting the remote project. RDT currently ships with the <strong>RSE
-		file system</strong>, so it is recommended that you choose that. Do not choose <strong>default</strong>
-		because the default file system is the local file system.
+		Select a remote connection associated with the remote provider.  Create one if one did not
+		already exist by clicking <strong>New</strong>.
 		<br><br>
-		<img src="../../images/new_project_wizard/wizard_choose_file_system.png" alt="Choose File System">
+		<img src="../../images/new_project_wizard/wizard_choose_remote_connection.png" alt="Choose Remote Provider">
 		<br><br><br>
 	</li>
+
+	
 
 	<li>
 		Now the location of the project root folder must be entered into the <strong>Location</strong> field.
-		This field requires a correctly formatted URI (Uniform Resource Identifier). If you do not know the
+		If you do not know the
 		URI of the project folder then it is recommended that you use the <strong>Browse...</strong> button.  
 		<br><br>
 		<img src="../../images/new_project_wizard/wizard_browse_file_system.png" alt="Browse File System">
@@ -92,14 +93,14 @@ detail what must be done to correctly set up a remote project.
 		You may create a sub-folder by editing the URI and adding the name of the sub-folder 
 		at the end.
 		<br><br>
-		<img src="../../images/new_project_wizard/wizard_uri.png" alt="Choose a Folder">
+		<img src="../../images/new_project_wizard/wizard_uri.png" alt="Enter URI">
 		<br><br><br>
 	</li>
 
 	<li>
-		In the <strong>Project type</strong> field expand <strong>Remote Makefile Project</strong> and select 
-		<strong>Empty Project</strong>. If this project type is not chosen then executing remote
-		builds will not work.
+		Under the <strong>Project type</strong> field, select a project type.  For the purpose of this
+		tutorial, expand <strong>Remote Makefile Project</strong> and select 
+		<strong>Empty Project</strong>.
 		<br><br>
 		<img src="../../images/new_project_wizard/wizard_select_makefile_project.png" alt="Select Makefile Project">
 		<br><br><br>
@@ -140,36 +141,33 @@ detail what must be done to correctly set up a remote project.
 
 
 	<li>
-		The next page of the wizard requires you to manually configure RDT services.
-		First configure the <strong>Build</strong> service. Select <strong>RDT Remote Build Service</strong>
-		as the service provider, then click <strong>Configure</strong>.
+		The next page of the wizard allows you to configure remote services associated with
+		the new remote project.  You can create a new configuration or add the new project
+		to an existing configuration.  Click on <strong>Advanced Settings</strong> to configure
+		RDT services.
 		<br><br>
-		<img src="../../images/new_project_wizard/services_build.png" alt="Configure the Build Service">
+		<img src="../../images/new_project_wizard/configure_services.png" alt="Configure Remote Services">
 		<br><br><br>
 	</li>
 	
 	<li>
-		Select the same provider and connection that you used on the first page of the wizard
-		then click <strong>OK</strong>.
+		Select <strong>Code Indexing</strong> service under <strong>C/C++ Development</strong>.
+		Make sure the <strong>Enable Service</strong> checkbox is checked.  Accept the default
+		settings.
 		<br><br>
-		<img src="../../images/new_project_wizard/services_build_configure.png" alt="Configure the Build Service">
+		<img src="../../images/new_project_wizard/services_indexing.png" alt="Configure indexing service">
 		<br><br><br>
 	</li>
 	
 	<li>
-		Now configure the <strong>C/C++ Indexing</strong> service. Select <strong>RDT Remote C/C++ Indexing Service</strong>
-		as the service provider, then click <strong>Configure</strong>.
+		Select <strong>Build</strong> service under <strong>C/C++ Development</strong>.
+		Make sure the <strong>Enable Service</strong> checkbox is checked.  Accept the default
+		settings.  Click <strong>OK</strong>.
 		<br><br>
-		<img src="../../images/new_project_wizard/services_indexing.png" alt="Configure the Build Service">
+		<img src="../../images/new_project_wizard/services_build.png" alt="Configure build service">
 		<br><br><br>
 	</li>
 	
-	<li>
-		Select the same connection that you used on the first page of the wizard, then click <strong>OK</strong>.
-		<br><br>
-		<img src="../../images/new_project_wizard/services_indexing_configure.png" alt="Configure the Build Service">
-		<br><br><br>
-	</li>
 	
 	<li>
 		Click <strong>Finish</strong>. Creating the project may take a few minutes. Once the project has been 
