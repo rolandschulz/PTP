@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.ui.actions.OpenViewActionGroup
- * Version: 1.17
+ * Version: 1.19
  */
 
 package org.eclipse.ptp.internal.rdt.ui.actions;
@@ -79,6 +79,8 @@ public class OpenViewActionGroup extends ActionGroup {
 	 * org.eclipse.jface.viewers.IStructuredSelection</code>.
 	 * 
 	 * @param page the page that owns this action group
+	 * 
+	 * @noreference This constructor is not intended to be referenced by clients.
 	 */
 	public OpenViewActionGroup(Page page) {
 		createSiteActions(page.getSite(), null);
@@ -286,7 +288,7 @@ public class OpenViewActionGroup extends ActionGroup {
 	
 	private static ICElement getElement(ISelection sel) {
 		if (!sel.isEmpty() && sel instanceof IStructuredSelection) {
-			List list= ((IStructuredSelection)sel).toList();
+			List<?> list= ((IStructuredSelection)sel).toList();
 			if (list.size() == 1) {
 				Object element= list.get(0);
 				if (element instanceof ICElement) {

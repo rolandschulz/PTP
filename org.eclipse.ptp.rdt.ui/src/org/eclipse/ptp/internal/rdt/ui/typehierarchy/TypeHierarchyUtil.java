@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.typehierarchy.TypeHierarchyUI
- * Version: 1.12
+ * Version: 1.13
  */
 package org.eclipse.ptp.internal.rdt.ui.typehierarchy;
 
