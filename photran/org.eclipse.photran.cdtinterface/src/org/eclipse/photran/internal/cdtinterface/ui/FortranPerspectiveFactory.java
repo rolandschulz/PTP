@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.cdtinterface.ui;
 
+import org.eclipse.cdt.internal.ui.CPerspectiveFactory;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
@@ -21,20 +22,22 @@ import org.eclipse.ui.console.IConsoleConstants;
 /**
  * The Fortran perspective.
  * <p>
- * This is identical to CPerspectiveFactory, except we replace the C/C++ Projects View with the
- * Fortran Projects view.
+ * This is identical to {@link CPerspectiveFactory}, except we replace the C/C++ Projects View with
+ * the Fortran Projects view.
  * 
  * @author Jeff Overbey
  */
 /*
- * In this project, this is the only place where we have to actually copy code from the CDT.
+ * I, unfortunately, had to copy this code from CDT and modify it.
  * Inheritance doesn't work since there is no way I know of to let the CDT add the C/C++ Projects
  * View (super.createInitialLayout()) and then remove it in our own implementation.
  */
+@SuppressWarnings("restriction")
 public class FortranPerspectiveFactory implements IPerspectiveFactory
 {
 	@SuppressWarnings("deprecation")
-    public void createInitialLayout(IPageLayout layout) {
+    public void createInitialLayout(IPageLayout layout)
+	{
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
@@ -46,19 +49,19 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		folder2.addView(IPageLayout.ID_PROBLEM_VIEW);
 		folder2.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 		//folder2.addView(IPageLayout.ID_PROP_SHEET);
-		folder2.addView("org.eclipse.photran.ui.DeclarationView");
-        folder2.addView("org.eclipse.photran.ui.VPGProblemView");
+		folder2.addView("org.eclipse.photran.ui.DeclarationView"); //$NON-NLS-1$
+        folder2.addView("org.eclipse.photran.ui.VPGProblemView"); //$NON-NLS-1$
         folder2.addView(IPageLayout.ID_BOOKMARKS);
 		
 		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.75, editorArea); //$NON-NLS-1$
 		folder3.addView(IPageLayout.ID_OUTLINE);
         
-        IFolderLayout folder4= layout.createFolder("bottomLeft", IPageLayout.BOTTOM, (float)0.75, "topLeft"); //$NON-NLS-1$ $NON-NLS-2$
+        IFolderLayout folder4= layout.createFolder("bottomLeft", IPageLayout.BOTTOM, (float)0.75, "topLeft"); //$NON-NLS-1$ //$NON-NLS-2$ $NON-NLS-2$
         folder4.addView(IPageLayout.ID_PROGRESS_VIEW);
 
 		layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);	// This is the "Open Type" search toolbar action
-		layout.addActionSet("org.eclipse.photran.ui.SearchActionSet");
-		layout.addActionSet("org.eclipse.photran.cdtinterface.FortranElementCreationActionSet");
+		layout.addActionSet("org.eclipse.photran.ui.SearchActionSet"); //$NON-NLS-1$
+		layout.addActionSet("org.eclipse.photran.cdtinterface.FortranElementCreationActionSet"); //$NON-NLS-1$
 		layout.addActionSet(IPageLayout.ID_NAVIGATE_ACTION_SET);
 		
 		// views - build console
@@ -81,27 +84,26 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory
 		addFortranWizardShortcuts(layout);
 	}
 	
-	private void addFortranWizardShortcuts(IPageLayout layout) {
-		// new actions - Fortran project creation wizard
-		String[] wizIDs = FortranWizardRegistry.getProjectWizardIDs();
-		for (int i = 0; i < wizIDs.length; ++i) {
-			layout.addNewWizardShortcut(wizIDs[i]);
-		}
-		
-		// new actions - Fortran folder creation wizard
-		wizIDs = FortranWizardRegistry.getFolderWizardIDs();
-		for (int i = 0; i < wizIDs.length; ++i) {
-			layout.addNewWizardShortcut(wizIDs[i]);
-		}
-		// new actions - Fortran file creation wizard
-		wizIDs = FortranWizardRegistry.getFileWizardIDs();
-		for (int i = 0; i < wizIDs.length; ++i) {
-			layout.addNewWizardShortcut(wizIDs[i]);
-		}
-		// new actions - Fortran type creation wizard
-		wizIDs = FortranWizardRegistry.getTypeWizardIDs();
-		for (int i = 0; i < wizIDs.length; ++i) {
-			layout.addNewWizardShortcut(wizIDs[i]);
-		}
-	}
+    private void addFortranWizardShortcuts(IPageLayout layout)
+    {
+        // new actions - Fortran project creation wizard
+        String[] wizIDs = FortranWizardRegistry.getProjectWizardIDs();
+        for (int i = 0; i < wizIDs.length; ++i)
+            layout.addNewWizardShortcut(wizIDs[i]);
+
+        // new actions - Fortran folder creation wizard
+        wizIDs = FortranWizardRegistry.getFolderWizardIDs();
+        for (int i = 0; i < wizIDs.length; ++i)
+            layout.addNewWizardShortcut(wizIDs[i]);
+
+        // new actions - Fortran file creation wizard
+        wizIDs = FortranWizardRegistry.getFileWizardIDs();
+        for (int i = 0; i < wizIDs.length; ++i)
+            layout.addNewWizardShortcut(wizIDs[i]);
+
+        // new actions - Fortran type creation wizard
+        wizIDs = FortranWizardRegistry.getTypeWizardIDs();
+        for (int i = 0; i < wizIDs.length; ++i)
+            layout.addNewWizardShortcut(wizIDs[i]);
+    }
 }

@@ -21,14 +21,14 @@ import org.eclipse.jface.action.IAction;
 @SuppressWarnings("restriction")
 public class NewFolderDropDownAction extends AbstractWizardDropDownAction
 {
-	public NewFolderDropDownAction()
-	{
-	    super();
-//		WorkbenchHelp.setHelp(this, ICHelpContextIds.OPEN_FOLDER_WIZARD_ACTION);
-	}
+    public NewFolderDropDownAction()
+    {
+        super();
+        // WorkbenchHelp.setHelp(this, ICHelpContextIds.OPEN_FOLDER_WIZARD_ACTION);
+    }
 
-	protected IAction[] getWizardActions()
-	{
-		return FortranWizardRegistry.getFolderWizardActions();
-	}
+    protected IAction[] getWizardActions()
+    {
+        return FortranWizardRegistry.getFolderWizardActions();
+    }
 }

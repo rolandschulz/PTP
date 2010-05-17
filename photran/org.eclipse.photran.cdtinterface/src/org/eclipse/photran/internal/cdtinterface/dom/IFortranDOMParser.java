@@ -27,24 +27,30 @@ import org.eclipse.core.runtime.CoreException;
  * See the org.eclipse.photran.cdtinterface.domparser extension point.
  * <p>
  * A DOM parser would parse a Fortran file and return an abstract syntax tree that is compatible
- * with CDT's DOM.  Photran does not, by default, provide a DOM parser; it uses its own abstract
- * syntax tree (see the VPG plug-ins).  This interface and extension point are provided in case
- * a CDT-compliant DOM becomes available in the future.  (A Fortran DOM parser was prototyped at IBM
- * Research but, at the time of writing, is incomplete and not publicly available.)
+ * with CDT's DOM. Photran does not, by default, provide a DOM parser; it uses its own abstract
+ * syntax tree (see the VPG plug-ins). This interface and extension point are provided in case a
+ * CDT-compliant DOM becomes available in the future. (A Fortran DOM parser was prototyped at IBM
+ * Research but, at the time of writing, is incomplete and not publicly available. The public
+ * distribution of Photran does not contain a DOM parser.)
  * 
  * @author Jeff Overbey
  */
+@SuppressWarnings("deprecation")
 public interface IFortranDOMParser
 {
-    /** @see ILanguage#getASTTranslationUnit(CodeReader, IScannerInfo, ICodeReaderFactory, IIndex, IParserLogService) */
-    IASTTranslationUnit getASTTranslationUnit(CodeReader reader,
-        IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
-        IIndex index, IParserLogService log) throws CoreException;
+    /**
+     * @see ILanguage#getASTTranslationUnit(CodeReader, IScannerInfo, ICodeReaderFactory, IIndex,
+     *      IParserLogService)
+     */
+    IASTTranslationUnit getASTTranslationUnit(CodeReader reader, IScannerInfo scanInfo,
+        ICodeReaderFactory fileCreator, IIndex index, IParserLogService log) throws CoreException;
 
-    /** @see ILanguage#getCompletionNode(CodeReader, IScannerInfo, ICodeReaderFactory, IIndex, IParserLogService, int) */
-    IASTCompletionNode getCompletionNode(CodeReader reader,
-        IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
-        IIndex index, IParserLogService log, int offset)
+    /**
+     * @see ILanguage#getCompletionNode(CodeReader, IScannerInfo, ICodeReaderFactory, IIndex,
+     *      IParserLogService, int)
+     */
+    IASTCompletionNode getCompletionNode(CodeReader reader, IScannerInfo scanInfo,
+        ICodeReaderFactory fileCreator, IIndex index, IParserLogService log, int offset)
         throws CoreException;
 
     /** @see ILanguage#getSelectedNames(IASTTranslationUnit, int, int) */

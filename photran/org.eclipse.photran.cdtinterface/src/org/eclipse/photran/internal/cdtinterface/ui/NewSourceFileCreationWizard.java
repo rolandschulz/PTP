@@ -11,9 +11,13 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.cdtinterface.ui;
 
+import org.eclipse.cdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.cdt.internal.ui.wizards.filewizard.AbstractFileCreationWizard;
+import org.eclipse.cdt.internal.ui.wizards.filewizard.NewSourceFileCreationWizardPage;
 import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.jface.text.templates.Template;
 import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 
 /**
  * Wizard to create a new source file.
@@ -25,18 +29,31 @@ import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
 @SuppressWarnings("restriction")
 public class NewSourceFileCreationWizard extends AbstractFileCreationWizard
 {
+    private static final String BANNER_IMAGE = "icons/wizban/newffile_wiz.gif"; //$NON-NLS-1$
+
     public NewSourceFileCreationWizard()
     {
         super();
-		setDefaultPageImageDescriptor(CDTInterfacePlugin.getImageDescriptor("icons/wizban/newffile_wiz.gif"));
+        setDefaultPageImageDescriptor(CDTInterfacePlugin.getImageDescriptor(BANNER_IMAGE));
         setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
-		setWindowTitle("New Fortran Source File");
+        setWindowTitle(Messages.NewSourceFileCreationWizard_WindowTitle);
     }
 
-    public void addPages() {
+    public void addPages()
+    {
         super.addPages();
-        fPage = new NewSourceFileCreationWizardPage();
+
+        fPage = new FortranSourceFileCreationWizardPage();
         addPage(fPage);
         fPage.init(getSelection());
+    }
+
+    public static class FortranSourceFileCreationWizardPage extends NewSourceFileCreationWizardPage
+    {
+        protected Template[] getApplicableTemplates()
+        {
+            return StubUtility.getFileTemplatesForContentTypes(
+                FortranCorePlugin.getAllFortranContentTypes(), null);
+        }
     }
 }

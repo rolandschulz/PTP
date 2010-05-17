@@ -25,9 +25,9 @@ import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
  * Every model element beneath a Fortran Translation Unit is a subclass of
  * <code>FortranElement</code>. The <code>FortranElement</code> hierarchy is a Fortran-specific
  * extension of <code>ICElement</code>.
- *
+ * 
  * @author Jeff Overbey
- *
+ * 
  * @see ICElement
  * @see Parent
  */
@@ -36,9 +36,9 @@ import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
  * <code>FortranElement</code>. Why? Because (1) the subclasses are all tiny, and (2) prefixing
  * every instance with <code>FortranElement.</code> will make it very clear that we're working in
  * our (customized) part of the <code>ICElement</code>/model hierarchy.
- *
- * <code>FortranElement</code> was originally a subclass of <code>SourceManipulation</code>,
- * but that wasn't right since we don't support parse tree rewriting via the
+ * 
+ * <code>FortranElement</code> was originally a subclass of <code>SourceManipulation</code>, but
+ * that wasn't right since we don't support parse tree rewriting via the
  * <code>ISourceManipulation</code> interface. So we are subclassing <code>Parent</code> instead
  * (which still isn't quite right for, say, variables, but isn't hurting anything) and implementing
  * a few methods by copying them directly from <code>SourceManipulation</code>. See also
@@ -46,50 +46,54 @@ import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
  * <code>SourceManipulationInfo</code>.
  */
 @SuppressWarnings("restriction")
-public abstract class FortranElement extends SourceManipulation // Parent
+public abstract class FortranElement extends SourceManipulation
     implements ICElement, IParent, ISourceReference, IContributedCElement
 {
+    private static final String ICONS_DIRECTORY = "icons/model/"; //$NON-NLS-1$
+
+    private static final int NO_TYPE = -1;
+
     /**
      * Creates an empty <code>FortranElement</code> under the given parent.
      */
-	public FortranElement(Parent parent)
+    public FortranElement(Parent parent)
     {
-        super(parent, "", /* type */ -1);
+        super(parent, "", NO_TYPE); //$NON-NLS-1$
     }
 
-	public Object getAdapter(Class required)
+    public Object getAdapter(Class required)
     {
-		if (ImageDescriptor.class.equals(required))
-			return getBaseImageDescriptor();
-		else
-			return super.getAdapter(required);
-	}
+        if (ImageDescriptor.class.equals(required))
+            return getBaseImageDescriptor();
+        else
+            return super.getAdapter(required);
+    }
 
-	protected abstract ImageDescriptor getBaseImageDescriptor();
+    protected abstract ImageDescriptor getBaseImageDescriptor();
 
-	/**
+    /**
      * Returns an <code>ImageDescriptor</code> for an icon in the icons folder of the core plugin.
      * Based on code in <code>CPluginImages</code>.
-     *
+     * 
      * @param filename
      * @return <code>ImageDescriptor</code>
      */
-	public static ImageDescriptor getImageDescriptorForIcon(String filename)
+    public static ImageDescriptor getImageDescriptorForIcon(String filename)
     {
-	    return CDTInterfacePlugin.getImageDescriptor("icons/model/" + filename);
-	}
+        return CDTInterfacePlugin.getImageDescriptor(ICONS_DIRECTORY + filename);
+    }
 
     /**
      * Returns an <code>ImageDescriptor</code> for elements that don't have a dedicated icon.
-     *
+     * 
      * @return <code>ImageDescriptor</code>
      */
     public static ImageDescriptor unknownImageDescriptor()
     {
-        return getImageDescriptorForIcon("unknown.gif");
+        return getImageDescriptorForIcon("unknown.gif"); //$NON-NLS-1$
     }
 
-	// --- Concrete Subclasses -------------------------------------------
+    // --- Concrete Subclasses -------------------------------------------
 
     /**
      * An element for anything that is not covered by one of the specific classes below.
@@ -107,7 +111,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public ImageDescriptor getBaseImageDescriptor()
         {
-            return getImageDescriptorForIcon("unknown.gif");
+            return getImageDescriptorForIcon("unknown.gif"); //$NON-NLS-1$
         }
     }
 
@@ -125,7 +129,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public ImageDescriptor getBaseImageDescriptor()
         {
-            return getImageDescriptorForIcon("skullface.gif");
+            return getImageDescriptorForIcon("skullface.gif"); //$NON-NLS-1$
         }
     }
 
@@ -146,7 +150,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("mainprogram.gif");
+            return getImageDescriptorForIcon("mainprogram.gif"); //$NON-NLS-1$
         }
     }
 
@@ -167,7 +171,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("module.gif");
+            return getImageDescriptorForIcon("module.gif"); //$NON-NLS-1$
         }
     }
 
@@ -188,7 +192,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("submodule.gif");
+            return getImageDescriptorForIcon("submodule.gif"); //$NON-NLS-1$
         }
     }
 
@@ -209,7 +213,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("derivedtype.gif");
+            return getImageDescriptorForIcon("derivedtype.gif"); //$NON-NLS-1$
         }
     }
 
@@ -230,7 +234,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("function.gif");
+            return getImageDescriptorForIcon("function.gif"); //$NON-NLS-1$
         }
     }
 
@@ -251,13 +255,13 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("subroutine.gif");
+            return getImageDescriptorForIcon("subroutine.gif"); //$NON-NLS-1$
         }
     }
 
     /**
-     * An element representing a subroutine or function when we're not sure
-     * which one it is (e.g., in an EXTERNAL or MODULE PROCEDURE statement)
+     * An element representing a subroutine or function when we're not sure which one it is (e.g.,
+     * in an EXTERNAL or MODULE PROCEDURE statement)
      */
     public static class Subprogram extends FortranElement
     {
@@ -273,7 +277,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("subroutine.gif");
+            return getImageDescriptorForIcon("subroutine.gif"); //$NON-NLS-1$
         }
     }
 
@@ -313,9 +317,9 @@ public abstract class FortranElement extends SourceManipulation // Parent
             return imageDescriptor();
         }
 
-        public static  ImageDescriptor imageDescriptor()
+        public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("subroutine.gif");
+            return getImageDescriptorForIcon("subroutine.gif"); //$NON-NLS-1$
         }
     }
 
@@ -336,7 +340,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
 
         public static ImageDescriptor imageDescriptor()
         {
-            return getImageDescriptorForIcon("variable.gif");
+            return getImageDescriptorForIcon("variable.gif"); //$NON-NLS-1$
         }
     }
 }

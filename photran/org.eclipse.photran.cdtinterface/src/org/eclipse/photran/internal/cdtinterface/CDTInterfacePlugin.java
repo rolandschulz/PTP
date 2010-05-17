@@ -11,6 +11,8 @@
 package org.eclipse.photran.internal.cdtinterface;
 
 import org.eclipse.ui.plugin.*;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
 
@@ -21,6 +23,8 @@ import org.osgi.framework.BundleContext;
  */
 public class CDTInterfacePlugin extends AbstractUIPlugin
 {
+    private static final String PLUGIN_ID = "org.eclipse.photran.cdtinterface"; //$NON-NLS-1$
+
     // The shared instance.
     private static CDTInterfacePlugin plugin;
 
@@ -65,6 +69,21 @@ public class CDTInterfacePlugin extends AbstractUIPlugin
      */
     public static ImageDescriptor getImageDescriptor(String path)
     {
-        return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.photran.cdtinterface", path);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    public static void log(Throwable e)
+    {
+        log("Error", e); //$NON-NLS-1$
+    }
+
+    public static void log(String message, Throwable e)
+    {
+        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, e));
+    }
+
+    public static void log(IStatus status)
+    {
+        getDefault().getLog().log(status);
     }
 }

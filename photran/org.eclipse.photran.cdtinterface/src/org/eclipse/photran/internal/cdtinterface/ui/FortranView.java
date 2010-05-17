@@ -24,10 +24,12 @@ import org.eclipse.cdt.internal.ui.viewsupport.CUILabelProvider;
 @SuppressWarnings("restriction")
 public class FortranView extends CView
 {
-    public static final String FORTRAN_VIEW_ID = "org.eclipse.photran.ui.FortranView";
+    public static final String FORTRAN_VIEW_ID = "org.eclipse.photran.ui.FortranView"; //$NON-NLS-1$
     
     protected CUILabelProvider createLabelProvider()
     {
-        return new FViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS);
+        return new FViewLabelProvider(
+            AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS,
+            AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS);
     }
 }

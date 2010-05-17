@@ -61,6 +61,10 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  *
  * @author Jeff Overbey, mostly copied from {@link CEditor}
  */
+/*
+ * The parts of this code that don't follow Photran's source formatting conventions were copied
+ * from CDT.
+ */
 @SuppressWarnings("restriction")
 public abstract class CDTBasedTextEditor extends TextEditor implements ISelectionChangedListener
 {
@@ -116,7 +120,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
     /**
      * @see org.eclipse.ui.texteditor.AbstractTextEditor#editorContextMenuAboutToShow(org.eclipse.jface.action.IMenuManager)
      */
-    //@Override
+    @Override
     public void editorContextMenuAboutToShow(IMenuManager menu)
     {
         super.editorContextMenuAboutToShow(menu);
@@ -198,42 +202,6 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
                 page.setInput(workingCopy);
         }
     }
-
-//    /**
-//     * Gets the outline page of the c-editor.
-//     *
-//     * @return Outline page.
-//     */
-//    public CContentOutlinePage getOutlinePage() {
-//        if (fOutlinePage == null) {
-//            // CContentOutlinePage currently does nothing with its editor
-//            // parameter,
-//            // so we can pass in null rather than trying to convince it to use
-//            // our
-//            // editor (e.g., by subclassing CEditor).
-//            fOutlinePage = new CContentOutlinePage(null);
-//            fOutlinePage.addSelectionChangedListener(this);
-//        }
-//        setOutlinePageInput(fOutlinePage, getEditorInput());
-//        return fOutlinePage;
-//    }
-//
-//    /**
-//     * Sets an input for the outline page.
-//     *
-//     * @param page
-//     *            Page to set the input.
-//     * @param input
-//     *            Input to set.
-//     */
-//    public static void setOutlinePageInput(CContentOutlinePage page,
-//            IEditorInput input) {
-//        if (page != null) {
-//            IWorkingCopyManager manager = CUIPlugin.getDefault()
-//                    .getWorkingCopyManager();
-//            page.setInput(manager.getWorkingCopy(input));
-//        }
-//    }
 
     // ISelectionChangedListener Implementation ///////////////////////////////////////////////////
     // (for updating editor when Outline clicked)

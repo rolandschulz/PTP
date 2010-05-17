@@ -17,14 +17,18 @@ import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * This class provides images to the FortranView. Specifically, it checks for the contentType
- * of source files in the view and returns the Photran icon for files with Fortran-based content.
- *
+ * Provides images to the {@link FortranView}.
+ * <p>
+ * Specifically, this class checks for the contentType of source files in the view and returns the
+ * Photran icon for files with Fortran-based content.
+ * 
  * @author Matt Scarpino
  */
 @SuppressWarnings("restriction")
 public class FViewLabelProvider extends CViewLabelProvider
 {
+    private static final String FORTRAN_FILE_ICON = "icons/obj16/f_file_obj.gif"; //$NON-NLS-1$
+
     private Image fortranFileImage;
 
     public FViewLabelProvider(int textFlags, int imageFlags)
@@ -32,27 +36,39 @@ public class FViewLabelProvider extends CViewLabelProvider
         super(textFlags, imageFlags);
     }
 
-    // This is something of a hack. Originally I tried using AdapterFactory objects and WorkspaceAdapters,
-    // but they never seemed to work. This works, but it's not particularly elegant and the image only
-    // shows up in the Fortran navigator.
+    // This is something of a hack. Originally I tried using AdapterFactory objects and
+    // WorkspaceAdapters, but they never seemed to work. This works, but it's not particularly
+    // elegant and the image only shows up in the Fortran navigator.
     public Image getImage(Object element)
+    {
+        if (isFortranFile(element))
+            return fortranFileImage();
+        else
+            return super.getImage(element);
+    }
+
+    private boolean isFortranFile(Object element)
     {
         if (element instanceof TranslationUnit && ((TranslationUnit)element).getFile() != null)
         {
             String fileName = ((TranslationUnit)element).getFile().getName();
             IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(fileName);
-            if (contentType.isKindOf(FortranCorePlugin.fortranContentType())) {
-                if(fortranFileImage == null) {
-                    fortranFileImage = CDTInterfacePlugin.getImageDescriptor("icons/obj16/f_file_obj.gif").createImage();
-                }
-                return fortranFileImage;
-            }
+            return contentType.isKindOf(FortranCorePlugin.fortranContentType());
         }
-        return super.getImage(element);
+        else return false;
     }
 
-    public void dispose() {
-        if(fortranFileImage != null)
+    private Image fortranFileImage()
+    {
+        if (fortranFileImage == null)
+            fortranFileImage = CDTInterfacePlugin.getImageDescriptor(FORTRAN_FILE_ICON).createImage();
+
+        return fortranFileImage;
+    }
+
+    public void dispose()
+    {
+        if (fortranFileImage != null)
             fortranFileImage.dispose();
         super.dispose();
     }

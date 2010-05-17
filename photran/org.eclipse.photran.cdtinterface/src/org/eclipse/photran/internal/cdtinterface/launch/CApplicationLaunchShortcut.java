@@ -74,7 +74,7 @@ import org.eclipse.ui.dialogs.TwoPaneElementSelector;
 public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 
 	// JO
-    private static final String ID_LAUNCH_FORTRAN_APP = "org.eclipse.photran.launch.localCLaunch";
+    private static final String ID_LAUNCH_FORTRAN_APP = "org.eclipse.photran.launch.localCLaunch"; //$NON-NLS-1$
 
     public void launch(IEditorPart editor, String mode) {
 		searchAndLaunch(new Object[] { editor.getEditorInput()}, mode);

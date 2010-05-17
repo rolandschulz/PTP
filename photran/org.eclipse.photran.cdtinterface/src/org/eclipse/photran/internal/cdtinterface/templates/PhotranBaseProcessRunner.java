@@ -21,6 +21,7 @@ import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,20 +31,23 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * <p>
  * This class simply contains code that is common between {@link AddAllBinaryParsersProcessRunner}
  * and {@link AddFortranErrorParsersProcessRunner}.
- *
+ * 
  * @author Jeff Overbey
  */
 public abstract class PhotranBaseProcessRunner extends ProcessRunner
 {
     @Override
-    public final void process(TemplateCore template, ProcessArgument[] args, String processId,
-        IProgressMonitor monitor) throws ProcessFailureException
+    public final void process(TemplateCore template,
+                              ProcessArgument[] args,
+                              String processId,
+                              IProgressMonitor monitor) throws ProcessFailureException
     {
         try
         {
             Map<String, String> valueStore = template.getValueStore();
 
-            IProject proj = ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName"));
+            IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+            IProject proj = workspaceRoot.getProject(valueStore.get("projectName")); //$NON-NLS-1$
             if (!proj.exists()) return;
 
             IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(proj);

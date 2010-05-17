@@ -17,12 +17,15 @@ import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
  * 
  * @author Jeff Overbey
  */
-public class NewSourceFolderCreationWizard extends org.eclipse.cdt.ui.wizards.NewSourceFolderCreationWizard
+public class NewSourceFolderCreationWizard
+     extends org.eclipse.cdt.ui.wizards.NewSourceFolderCreationWizard
 {
-	public NewSourceFolderCreationWizard()
+    private static final String BANNER_IMAGE = "icons/wizban/newsrcfldr_wiz.gif"; //$NON-NLS-1$
+
+    public NewSourceFolderCreationWizard()
 	{
 		super();
-		setDefaultPageImageDescriptor(CDTInterfacePlugin.getImageDescriptor("icons/wizban/newsrcfldr_wiz.gif"));
-		setWindowTitle("New Source Folder");
+		setDefaultPageImageDescriptor(CDTInterfacePlugin.getImageDescriptor(BANNER_IMAGE));
+		setWindowTitle(Messages.NewSourceFolderCreationWizard_WindowTitle);
 	}
 }

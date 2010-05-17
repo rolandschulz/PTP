@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.photran.internal.cdtinterface.CDTInterfacePlugin;
 import org.eclipse.photran.internal.core.FProjectNature;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
@@ -30,51 +31,24 @@ import org.eclipse.ui.IViewPart;
  */
 public class ProjectConversionAction implements IViewActionDelegate
 {
+    private FortranView view;
+    private ArrayList<IProject> projects;
 
-    ArrayList projects = null;
-    FortranView view;
-
+    /**
+     * Callback invoked to initialize this action.
+     */
     public void init(IViewPart v)
     {
         view = (FortranView)v;
-        projects = new ArrayList();
+        projects = new ArrayList<IProject>();
     }
 
-    // Add Fortran nature to selected C/C++ projects
-    // Refresh view to display nature image
-    @SuppressWarnings("restriction")
-    public void run(IAction action)
-    {
-        IProject project;
-        if(projects.size() != 0)
-        {
-            try
-            {
-                Iterator e = projects.iterator();
-                while(e.hasNext()) {
-                    project = (IProject)e.next();
-                    if(project.hasNature(FProjectNature.F_NATURE_ID))
-                        continue;
-                    IProjectDescription description = project.getDescription();
-                    String[] natures = description.getNatureIds();
-                    String[] newNatures = new String[natures.length + 1];
-                    System.arraycopy(natures, 0, newNatures, 1, natures.length);
-                    newNatures[0] = FProjectNature.F_NATURE_ID;
-                    description.setNatureIds(newNatures);
-                    project.setDescription(description, null);
-                }
-                view.getViewer().refresh();
-                projects.clear();
-            }
-            catch (CoreException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // Determine if any of the selected resources are C/C++ projects
-    // If so, add them to the ArrayList
+    /**
+     * Callback invoked when the workbench selection changes.
+     * <p>
+     * Determines if any of the selected resources are C/C++ projects, and, if so, adds them to
+     * {@link #projects}.
+     */
     public void selectionChanged(IAction action, ISelection selection)
     {
         if (selection instanceof IStructuredSelection)
@@ -87,6 +61,51 @@ public class ProjectConversionAction implements IViewActionDelegate
                 if (element instanceof ICProject)
                     projects.add(((ICProject)element).getProject());
             }
+        }
+    }
+
+    /**
+     * Callback invoked to run this action.
+     * <p>
+     * Adds the Fortran nature to selected C/C++ projects, and refreshes the view to display the new
+     * nature image (i.e., to make sure the project is displayed with an &quot;F&quot; icon).
+     */
+    @SuppressWarnings("restriction")
+    public void run(IAction action)
+    {
+        if (!projects.isEmpty())
+        {
+            addFortranNatureToSelectedProjects();
+            view.getViewer().refresh();
+            projects.clear();
+        }
+    }
+
+    private void addFortranNatureToSelectedProjects()
+    {
+        for (IProject project : projects)
+            addFortranNatureTo(project);
+    }
+
+    private void addFortranNatureTo(IProject project)
+    {
+        try
+        {
+            if (!project.hasNature(FProjectNature.F_NATURE_ID))
+            {
+                IProjectDescription description = project.getDescription();
+                String[] natures = description.getNatureIds();
+                String[] newNatures = new String[natures.length + 1];
+                System.arraycopy(natures, 0, newNatures, 1, natures.length);
+                newNatures[0] = FProjectNature.F_NATURE_ID;
+                description.setNatureIds(newNatures);
+                project.setDescription(description, null);
+            }
+        }
+        catch (CoreException e)
+        {
+            CDTInterfacePlugin.log(e);
+            e.printStackTrace();
         }
     }
 }

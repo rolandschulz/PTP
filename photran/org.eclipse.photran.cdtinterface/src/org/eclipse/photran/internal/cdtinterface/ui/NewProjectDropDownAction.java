@@ -23,14 +23,15 @@ import org.eclipse.ui.PlatformUI;
 @SuppressWarnings("restriction")
 public class NewProjectDropDownAction extends AbstractWizardDropDownAction
 {
-	public NewProjectDropDownAction()
-	{
-	    super();
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, ICHelpContextIds.OPEN_PROJECT_WIZARD_ACTION);
-	}
-	
-	protected IAction[] getWizardActions()
-	{
-		return FortranWizardRegistry.getProjectWizardActions();
-	}
+    public NewProjectDropDownAction()
+    {
+        super();
+        PlatformUI.getWorkbench().getHelpSystem()
+            .setHelp(this, ICHelpContextIds.OPEN_PROJECT_WIZARD_ACTION);
+    }
+
+    protected IAction[] getWizardActions()
+    {
+        return FortranWizardRegistry.getProjectWizardActions();
+    }
 }

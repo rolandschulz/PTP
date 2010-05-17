@@ -23,41 +23,54 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 
 /**
- * Implements the
- * <code>org.eclipse.photran.cdtinterface.addAllBinaryParsers</code>
- * template process runner, which enables all binary parsers on a project.
+ * Implements the <code>org.eclipse.photran.cdtinterface.addAllBinaryParsers</code> template process
+ * runner, which enables all binary parsers on a project.
  * <p>
- * When this should be run, it is specified in the template.xml file.
- *
+ * When this should be run, it is specified in a template.xml file.
+ * 
  * @author Jeff Overbey
  */
 public class AddAllBinaryParsersProcessRunner extends PhotranBaseProcessRunner
 {
+    private static final String BINARY_PARSERS_EXTENSION_POINT = "org.eclipse.cdt.core.BinaryParser"; //$NON-NLS-1$
+
     @Override
     protected void modify(IProject proj, IConfiguration cf) throws CoreException
     {
+        setBinaryParsers(proj, collectAllBinaryParsers());
+    }
+
+    private ArrayList<String> collectAllBinaryParsers()
+    {
         ArrayList<String> binaryParsers = new ArrayList<String>(16);
-
-        IExtensionPoint extPt = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.cdt.core.BinaryParser");
-        for (IExtension ext : extPt.getExtensions())
+        for (IExtension ext : binaryParsersExtPt().getExtensions())
         {
-            String thisBinaryParser = ext.getNamespaceIdentifier() + "." + ext.getSimpleIdentifier();
+            String thisBinaryParser = ext.getNamespaceIdentifier()
+                + "." + ext.getSimpleIdentifier(); //$NON-NLS-1$
 
-            if (!contains(binaryParsers, thisBinaryParser))
-                binaryParsers.add(thisBinaryParser);
+            if (!contains(binaryParsers, thisBinaryParser)) binaryParsers.add(thisBinaryParser);
         }
+        return binaryParsers;
+    }
 
-        ICProjectDescription desc = CoreModel.getDefault().getProjectDescription(proj);
-        CoreModelUtil.setBinaryParserIds(desc.getConfigurations(),
-            binaryParsers.toArray(new String[binaryParsers.size()]));
-        CoreModel.getDefault().setProjectDescription(proj, desc);
+    private IExtensionPoint binaryParsersExtPt()
+    {
+        return Platform.getExtensionRegistry().getExtensionPoint(BINARY_PARSERS_EXTENSION_POINT);
     }
 
     private boolean contains(ArrayList<String> binaryParsers, String thisBinaryParser)
     {
         for (String id : binaryParsers)
-            if (id.equalsIgnoreCase(thisBinaryParser))
-                return true;
+            if (id.equalsIgnoreCase(thisBinaryParser)) return true;
         return false;
+    }
+
+    private void setBinaryParsers(IProject proj, ArrayList<String> binaryParsers)
+        throws CoreException
+    {
+        ICProjectDescription desc = CoreModel.getDefault().getProjectDescription(proj);
+        CoreModelUtil.setBinaryParserIds(desc.getConfigurations(),
+            binaryParsers.toArray(new String[binaryParsers.size()]));
+        CoreModel.getDefault().setProjectDescription(proj, desc);
     }
 }

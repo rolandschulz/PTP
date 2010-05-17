@@ -36,92 +36,107 @@ import org.eclipse.photran.internal.core.model.IFortranModelBuilder;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
- * CDT extension language for Fortran.
+ * Contributes Fortran to the list of languages recognized by CDT.
  * 
  * @author Jeff Overbey
  * 
  * @see ILanguage
  */
+@SuppressWarnings("deprecation")
 public class FortranLanguage extends AbstractLanguage
 {
-    public static final String LANGUAGE_ID = "org.eclipse.photran.cdtinterface.fortran";
+    public static final String LANGUAGE_ID = "org.eclipse.photran.cdtinterface.fortran"; //$NON-NLS-1$
 
-    public static final String FORTRAN_MODEL_BUILDER_EXTENSION_POINT_ID = "org.eclipse.photran.cdtinterface.modelbuilder";
-    public static final String FORTRAN_DOM_PARSER_EXTENSION_POINT_ID = "org.eclipse.photran.cdtinterface.domparser";
+    public static final String FORTRAN_MODEL_BUILDER_EXTENSION_POINT_ID = "org.eclipse.photran.cdtinterface.modelbuilder"; //$NON-NLS-1$
 
-	public String getId()
-	{
-		return LANGUAGE_ID;
-	}
+    public static final String FORTRAN_DOM_PARSER_EXTENSION_POINT_ID = "org.eclipse.photran.cdtinterface.domparser"; //$NON-NLS-1$
 
-	public IContributedModelBuilder createModelBuilder(ITranslationUnit tu)
-	{
-	    IFortranModelBuilder modelBuilder = null;
-	    
-	    IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor(FORTRAN_MODEL_BUILDER_EXTENSION_POINT_ID);
-	    if (configs.length > 0)
-	    {
-	        int index = findPreferredModelBuilder(configs);
-	        try { modelBuilder = (IFortranModelBuilder)configs[index].createExecutableExtension("class"); }
-	        catch (CoreException e) {;}
-	    }
-	        
-	    if (modelBuilder == null) modelBuilder = new EmptyFortranModelBuilder();
-	    
-	    modelBuilder.setTranslationUnit(tu);
-	    return modelBuilder;
-	}
+    public String getId()
+    {
+        return LANGUAGE_ID;
+    }
+
+    public IContributedModelBuilder createModelBuilder(ITranslationUnit tu)
+    {
+        IFortranModelBuilder modelBuilder = null;
+
+        IConfigurationElement[] configs = Platform.getExtensionRegistry()
+            .getConfigurationElementsFor(FORTRAN_MODEL_BUILDER_EXTENSION_POINT_ID);
+        if (configs.length > 0)
+        {
+            int index = findPreferredModelBuilder(configs);
+            try
+            {
+                modelBuilder = (IFortranModelBuilder)configs[index]
+                    .createExecutableExtension("class"); //$NON-NLS-1$
+            }
+            catch (CoreException e)
+            {
+                ;
+            }
+        }
+
+        if (modelBuilder == null) modelBuilder = new EmptyFortranModelBuilder();
+
+        modelBuilder.setTranslationUnit(tu);
+        return modelBuilder;
+    }
 
     private int findPreferredModelBuilder(IConfigurationElement[] configs)
     {
         for (int i = 0; i < configs.length; i++)
-            if (configs[i].getAttribute("id").equals(FortranPreferences.PREFERRED_MODEL_BUILDER.getValue()))
-                return i;
+            if (configs[i].getAttribute("id").equals( //$NON-NLS-1$
+                FortranPreferences.PREFERRED_MODEL_BUILDER.getValue())) return i;
         return 0;
     }
 
-    public IASTTranslationUnit getASTTranslationUnit(CodeReader reader,
-			IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
-			IIndex index, IParserLogService log) throws CoreException
-	{
+    public IASTTranslationUnit getASTTranslationUnit(CodeReader reader, IScannerInfo scanInfo,
+        ICodeReaderFactory fileCreator, IIndex index, IParserLogService log) throws CoreException
+    {
         IFortranDOMParser domParser = getDOMParser();
         if (domParser == null)
             return null;
         else
             return domParser.getASTTranslationUnit(reader, scanInfo, fileCreator, index, log);
-	}
+    }
 
-	public IASTCompletionNode getCompletionNode(CodeReader reader,
-			IScannerInfo scanInfo, ICodeReaderFactory fileCreator,
-			IIndex index, IParserLogService log, int offset)
-			throws CoreException
-	{
+    public IASTCompletionNode getCompletionNode(CodeReader reader, IScannerInfo scanInfo,
+        ICodeReaderFactory fileCreator, IIndex index, IParserLogService log, int offset)
+        throws CoreException
+    {
         IFortranDOMParser domParser = getDOMParser();
         if (domParser == null)
             return null;
         else
             return domParser.getCompletionNode(reader, scanInfo, fileCreator, index, log, offset);
-	}
-	
-	public IASTName[] getSelectedNames(IASTTranslationUnit ast, int start, int length)
-	{
+    }
+
+    public IASTName[] getSelectedNames(IASTTranslationUnit ast, int start, int length)
+    {
         IFortranDOMParser domParser = getDOMParser();
         if (domParser == null)
             return new IASTName[0];
         else
             return domParser.getSelectedNames(ast, start, length);
-	}
+    }
 
     private IFortranDOMParser getDOMParser()
     {
         IFortranDOMParser modelBuilder = null;
-        
-        IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor(FORTRAN_DOM_PARSER_EXTENSION_POINT_ID);
+
+        IConfigurationElement[] configs = Platform.getExtensionRegistry()
+            .getConfigurationElementsFor(FORTRAN_DOM_PARSER_EXTENSION_POINT_ID);
         if (configs.length > 0)
         {
             int index = findPreferredDOMParser(configs);
-            try { modelBuilder = (IFortranDOMParser)configs[index].createExecutableExtension("class"); }
-            catch (CoreException e) {;}
+            try
+            {
+                modelBuilder = (IFortranDOMParser)configs[index].createExecutableExtension("class"); //$NON-NLS-1$
+            }
+            catch (CoreException e)
+            {
+                ;
+            }
         }
         return modelBuilder;
     }
@@ -129,20 +144,21 @@ public class FortranLanguage extends AbstractLanguage
     private int findPreferredDOMParser(IConfigurationElement[] configs)
     {
         for (int i = 0; i < configs.length; i++)
-            if (configs[i].getAttribute("id").equals(FortranPreferences.PREFERRED_DOM_PARSER.getValue()))
-                return i;
+            if (configs[i].getAttribute("id").equals( //$NON-NLS-1$
+                FortranPreferences.PREFERRED_DOM_PARSER.getValue())) return i;
         return 0;
     }
 
-	// JO - This is not required as of CDT 4.0, but it is used by the Fortran dependency calculator, so I'm leaving it in...
+    // JO - This is not required as of CDT 4.0, but it is used by the Fortran dependency calculator,
+    // so I'm leaving it in...
     public Collection getRegisteredContentTypeIds()
     {
         return Arrays.asList(FortranCorePlugin.getAllFortranContentTypes());
     }
 
-	public int getLinkageID()
-	{
-	    // FYI AbstractIndexerTask#runTask does not currently process FORTRAN_LINKAGE_ID
-		return ILinkage.FORTRAN_LINKAGE_ID;
-	}
+    public int getLinkageID()
+    {
+        // FYI AbstractIndexerTask#runTask does not currently process FORTRAN_LINKAGE_ID
+        return ILinkage.FORTRAN_LINKAGE_ID;
+    }
 }
