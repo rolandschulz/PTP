@@ -528,6 +528,7 @@
               id="photran.managedbuild.tool.xlf.fortran.compiler.input">
           </inputType-->
           <inputType
+              languageId="org.eclipse.photran.cdtinterface.fortran"
               sourceContentType="org.eclipse.photran.core.fortranSource"
               dependencyContentType="org.eclipse.photran.core.fortranSource"
               dependencyCalculator="org.eclipse.photran.managedbuilder.core/org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"

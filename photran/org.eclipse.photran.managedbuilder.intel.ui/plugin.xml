@@ -1468,12 +1468,13 @@
             id="intel.linux.fortran.compiler.cmdline.addlopts">
          </option>
          <!--inputType
-            sources="f90,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP,i,i90"
+            sources="`,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP,i,i90"
             dependencyExtensions="f90,f95,f03,f08,F90,F95,F03,F08,f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,FPP,i,i90"
             dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
             id="photran.managedbuild.tool.intel.fortran.compiler.input">
          </inputType-->
          <inputType
+            languageId="org.eclipse.photran.cdtinterface.fortran"
             sourceContentType="org.eclipse.photran.core.fortranSource"
             dependencyContentType="org.eclipse.photran.core.fortranSource"
             dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"

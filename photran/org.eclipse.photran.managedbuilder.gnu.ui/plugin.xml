@@ -546,7 +546,7 @@
               id="photran.managedbuild.tool.gnu.fortran.compiler.input"
               languageId="org.eclipse.photran.cdtinterface.fortran">
           </inputType-->
-          <inputType            
+          <inputType
               sourceContentType="org.eclipse.photran.core.fortranSource"
               dependencyContentType="org.eclipse.photran.core.fortranSource"
               dependencyCalculator="org.eclipse.photran.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
