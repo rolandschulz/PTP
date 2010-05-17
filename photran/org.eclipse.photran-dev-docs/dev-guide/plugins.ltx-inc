@@ -58,26 +58,25 @@ to integration with the CDT.  It includes:
 \item The FortranLanguage class, which adds Fortran to the list of languages
       recognized by CDT
 \item Fortran model elements and icons for the Outline and Fortran Projects views
-\item An extension point for contributing Fortran model builders, and a
-      simple lexical analyzer-based model builder (which, generally speaking,
-      is not used)
+\item An extension point for contributing Fortran model builders
 \item The Fortran perspective, Fortran Projects view, and other CDT-based
       parts of the user interface
 \item New Project wizards and Fortran project templates
 \end{itemize}
 
-For more information about CDT, see Chapter~\ref{cha:cdt}.
+More information about CDT integration is provided in Part~II of the
+\textit{Photran Developer's Guide.}
 
 \item \textbf{org.eclipse.photran.core}
 
-This is the Photran Core plug-in. It contains much of the Fortran-specific
-``behind the scenes'' functionality:
+This is the Photran Core plug-in. It contains much of the ``behind the scenes''
+functionality which allows Eclipse to support Fortran projects (although it does
+\textit{not} contain the Fortran parser/analysis infrastructure).
 
 \begin{itemize}
-\item Utility classes
+\item Workspace preferences for Fortran projects
 \item Error parsers for Fortran compilers
-\item Fortran lexical analyzer
-\item Workspace preferences
+\item Utility classes
 \end{itemize}
 
 \item \textbf{org.eclipse.photran.managedbuilder.core}, \\
@@ -89,7 +88,8 @@ Craig Rasmussen at Los Alamos National Lab.
 
 \item \textbf{org.eclipse.photran.ui}
 
-This contains the Fortran-specific components of the user interface:
+This contains the Fortran-specific components of the user interface that are
+not derived from CDT and do not depend on the Fortran parser.  These are:
 
 \begin{itemize}
 \item Fortran Editors
@@ -102,7 +102,7 @@ This contains the Fortran-specific components of the user interface:
 
 The following projects support parsing, analysis, and refactoring of Fortran
 sources. They are written in Java 5. The Virtual Program Graph is described in
-more detail in Chapter~\ref{cha:parsing}.
+more detail in Part~II of the \textit{Photran Developer's Guide.}
 
 \begin{itemize}
 

@@ -11,7 +11,6 @@
 	\item For the configuration that you have just created, switch to the ``Arguments'' tab.
 	\item Change the ``VM arguments'' field to \texttt{-ea -Xms40m -Xmx512m}
 	\item Switch to the ``Environment'' tab.
-	\item Create a new environment variable called \texttt{TESTING} with a value of 1.
 	\item \textit{(Optional)} If you are running Linux or Mac OS X and have gfortran installed,
 	            some of Photran's refactoring unit tests can attempt to compile
 	            and run the Fortran test programs before and after the refactoring in order

@@ -29,7 +29,7 @@ under Tools $>$ PTP by selecting one of the ``Photran'' components.
 
 \vspace{-0.2in}
 
-\section{How To Read This Guide}
+\section*{How To Read This Guide}
 
 The \textit{Photran Developer's Guide} is intended to complement the
 source code in the repository; it is not a substitute for reading
@@ -45,7 +45,7 @@ you want to work on.
 
 \vspace{-0.2in}
 
-\section{Getting Started} 
+\section*{Getting Started} 
 
 If you have not already, work through the items on the ``Checklist for New
 Developers'' at the beginning of this manual.

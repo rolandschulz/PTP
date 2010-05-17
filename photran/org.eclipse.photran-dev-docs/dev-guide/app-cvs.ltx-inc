@@ -1,15 +1,39 @@
 % Getting the Photran Sources from CVS
 \vspace{-0.5in}
 
-\emph{BEFORE YOU BEGIN: Make sure you are running \textbf{Eclipse 3.6} (Helios)
-and a \textbf{Java 5} or later JVM.
-%We recommend the
-%\href{http://www.eclipse.org/downloads/packages/eclipse-rcpplug-developers/ganymeder}{Eclipse for RCP/Plug-in Developers Package}.
-}
-
 {\scriptsize Revision: \footnotesize \$Id$ $}
 
+\textbf{Before you begin\dots}
+
 \vspace{-1em}
+
+\begin{enumerate}
+\item You must be running \textbf{Eclipse 3.6 (Helios)} on a Java 5 or later JVM, and Eclipse must
+      have the Java Development Tools and the Plug-in Development Environment installed.  Generally,
+      this means you should install the \textit{Eclipse for RCP/Plug-in Developers Package} or the
+      \textit{Eclipse SDK.}
+      \begin{itemize}
+      \item As of May, 2010, Eclipse 3.6 \textit{has not yet been released.}  You can download a
+      release candidate of the Eclipse SDK from
+      \href{http://download.eclipse.org/eclipse/downloads/drops/S-3.6RC1-201005131500/}
+           {http://download.eclipse.org/eclipse/downloads/drops/S-3.6RC1-201005131500/}.
+      \end{itemize}
+\item \textit{(Optional)} We also recommend that you install the following Eclipse plug-ins:
+      \begin{enumerate}
+      \item \href{http://subclipse.tigris.org/}{\textbf{Subclipse}} --
+            provides Subversion support
+      \item \href{http://findbugs.sourceforge.net/}{\textbf{FindBugs}} --
+            a static analysis tool for Java
+      \item \href{http://www.eclemma.org/}{\textbf{EclEmma}} --
+            a Java code coverage tool
+      \item \href{http://metrics.sourceforge.net/}{\textbf{Metrics}} --
+            provides code metrics for Java code
+      \item \href{http://www.eclipse.org/photran/download.php}{\textbf{Photran}} --
+            even though you're developing Photran, it is helpful to have Photran \textit{installed}
+            in your development environment.  This will allow you to use Photran to write Fortran
+            code for unit tests, etc.
+      \end{enumerate}
+\end{enumerate}
 
 \newcounter{running_counter}
 \textbf{Part~I.  Check out the CDT 7.0 sources from CVS}
