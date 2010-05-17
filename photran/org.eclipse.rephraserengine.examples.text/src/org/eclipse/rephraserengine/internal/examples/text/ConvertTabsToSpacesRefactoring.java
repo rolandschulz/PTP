@@ -129,7 +129,8 @@ public final class ConvertTabsToSpacesRefactoring extends Refactoring implements
         TextFileChange change = new TextFileChange("Replace tabs in " + file.getName(), file);
         change.setEdit(new MultiTextEdit());
 
-        Reader in = new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset()));
+        Reader in = new BufferedReader(new InputStreamReader(file.getContents(true),
+                                                             file.getCharset()));
         int offset = 0;
         int column = 0;
         int numberOfTabsReplaced = 0;
