@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 QNX Software Systems and others.
+ * Copyright (c) 2005, 2010 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.WorkingSetFindAction
- * Version: 1.8
+ * Version: 1.9
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
@@ -38,18 +38,22 @@ public class WorkingSetFindAction extends FindAction {
 		setText(string); 
 	}
 
+	@Override
 	protected String getScopeDescription() {
 		return findAction.getScopeDescription();
 	}
 
+	@Override
 	protected ICElement[] getScope() {
 		return findAction.getScope();
 	}
 
+	@Override
 	protected int getLimitTo() {
 		return findAction.getLimitTo();
 	}
-	
+
+	@Override
 	public void run() {
 		findAction.run();
 	}

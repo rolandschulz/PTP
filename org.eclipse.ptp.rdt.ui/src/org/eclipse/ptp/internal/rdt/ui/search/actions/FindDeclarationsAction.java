@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.FindDeclarationsAction
- * Version: 1.12
+ * Version: 1.13
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
@@ -51,14 +51,17 @@ public class FindDeclarationsAction extends FindAction {
 		setToolTipText(tooltip);
 	}
 
+	@Override
 	protected ICElement[] getScope() {
 		return null;
 	}
-	
+
+	@Override
 	protected String getScopeDescription() {
 		return CSearchMessages.WorkspaceScope; 
 	}
-	
+
+	@Override
 	protected int getLimitTo() {
 		return PDOMSearchQuery.FIND_DECLARATIONS_DEFINITIONS;
 	}
