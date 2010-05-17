@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.FindRefsInWorkingSetAction
- * Version: 1.14
+ * Version: 1.15
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
@@ -40,6 +40,7 @@ public class FindRefsInWorkingSetAction extends FindInWorkingSetAction {
 				workingSets);
 	}
 	
+	@Override
 	protected int getLimitTo() {
 		return PDOMSearchQuery.FIND_REFERENCES;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup
- * Version: 1.7
+ * Version: 1.10
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
@@ -59,6 +59,7 @@ public class SelectionSearchGroup extends ActionGroup {
 	/* 
 	 * Method declared on ActionGroup.
 	 */
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		super.fillContextMenu(menu);
 		
@@ -69,14 +70,13 @@ public class SelectionSearchGroup extends ActionGroup {
 	public static boolean canActionBeAdded(ISelection selection) {
 		if(selection instanceof ITextSelection) {
 			return (((ITextSelection)selection).getLength() > 0);
-		} else {
-			return getElement(selection) != null;
 		}
+		return getElement(selection) != null;
 	}
 	
 	private static ICElement getElement(ISelection sel) {
 		if (!sel.isEmpty() && sel instanceof IStructuredSelection) {
-			List list= ((IStructuredSelection)sel).toList();
+			List<?> list= ((IStructuredSelection)sel).toList();
 			if (list.size() == 1) {
 				Object element= list.get(0);
 				if (element instanceof ICElement) {
@@ -90,6 +90,7 @@ public class SelectionSearchGroup extends ActionGroup {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.actions.ActionGroup#dispose()
 	 */
+	@Override
 	public void dispose() {
 		if (fDeclarationsSearchGroup != null) {
 			fDeclarationsSearchGroup.dispose();
