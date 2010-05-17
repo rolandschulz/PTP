@@ -19,17 +19,18 @@
     <th><strong>Function</strong></th>
   </tr>
   <tr>
-    <td>Project Name</td>
+    <td>Project name</td>
     <td>The name of the project. There must not already be a project with the chosen name.</td>
   </tr>
   <tr>
-    <td>Use Default Location</td>
-    <td>This must be unchecked. The default location is the local file system which is not suitable for remote projects.</td>
-  </tr>
-  <tr>
-    <td>Choose file system</td>
+    <td>Remote Provider</td>
     <td>Lists available remote file system providers that allow the project contents to reside on a remote machine. 
         Each item is an <a href="PLUGINS_ROOT/org.eclipse.rse.doc.user/tasks/tusingefs.html">EFS provider</a>.
+    </td>
+  </tr>
+    <tr>
+    <td>Connection</td>
+    <td>Lists available remote connection associated with the chosen remote file system provider.
     </td>
   </tr>
   <tr>
@@ -38,8 +39,7 @@
   </tr>
   <tr>
     <td>Project Type</td>
-    <td>Specifies a project type from the list provided. It is highly recommended that for remote projects
-        the <strong>Remote Makefile Project</strong> type be selected, otherwise remote builds will not work.
+    <td>Specifies a project type from the list provided.
     </td>
   </tr>
   <tr>
