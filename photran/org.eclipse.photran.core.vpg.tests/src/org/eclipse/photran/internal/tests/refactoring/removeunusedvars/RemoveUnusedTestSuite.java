@@ -12,8 +12,6 @@ package org.eclipse.photran.internal.tests.refactoring.removeunusedvars;
 
 import junit.framework.Test;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.internal.core.refactoring.RemoveUnusedVariablesRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
@@ -35,13 +33,9 @@ public class RemoveUnusedTestSuite extends PhotranRefactoringTestSuiteFromMarker
 
     public RemoveUnusedTestSuite() throws Exception
     {
-        super(Activator.getDefault(), "Running Remove Unused Variables refactoring in", DIR, RemoveUnusedVariablesRefactoring.class);
-    }
-
-    @Override
-    protected boolean configureRefactoring(RemoveUnusedVariablesRefactoring refactoring, IFile file, TextSelection selection, String[] markerText)
-    {
-        boolean shouldSucceed = Boolean.parseBoolean(markerText[2]);
-        return shouldSucceed;
+        super(Activator.getDefault(),
+              "Running Remove Unused Variables refactoring in",
+              DIR,
+              RemoveUnusedVariablesRefactoring.class);
     }
 }

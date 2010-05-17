@@ -76,7 +76,10 @@ public class Spawner
             output.start();
             int exitCode = process.waitFor();
             if (exitCode != 0)
+            {
+                System.err.println(output.toString());
                 throw new Exception("Process exited abnormally with exit code " + exitCode + "\n" + output.toString());
+            }
             waitFor(output);
         }
         return output.toString();

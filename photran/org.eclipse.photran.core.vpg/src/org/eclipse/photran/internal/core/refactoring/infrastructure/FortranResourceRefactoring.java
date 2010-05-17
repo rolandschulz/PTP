@@ -177,6 +177,19 @@ public abstract class FortranResourceRefactoring
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
 
+    // SOURCE FORMATTING //////////////////////////////////////////////////////
+
+    /**
+     * @return the whitespace preceding the given token.  Note that {@link Token#getWhiteBefore()}
+     *         may return comments and line continuations, while this method only returns everything
+     *         <i>following</i> the last <tt>\n</tt> (if any), so those will be omitted.
+     */
+    protected String extractWhitespacePreceding(Token token)
+    {
+        String result = token.getWhiteBefore();
+        return result.substring(result.lastIndexOf('\n')+1);
+    }
+
     // REFACTORING STATUS /////////////////////////////////////////////////////
 
     protected RefactoringStatusContext createContext(Token token)

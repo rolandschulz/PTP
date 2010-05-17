@@ -147,7 +147,7 @@ public class Reindenter
 
     private final class LineColComputer extends ASTVisitorWithLoops
     {
-        private IFile file;
+        @SuppressWarnings("unused") private IFile file;
         private int fileOffset = 0, line = 1, col = 1;
         private IPreprocessorReplacement lastPreprocRepl = null;
 

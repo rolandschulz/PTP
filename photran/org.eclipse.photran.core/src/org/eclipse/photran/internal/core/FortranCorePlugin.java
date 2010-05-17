@@ -220,7 +220,11 @@ public class FortranCorePlugin extends Plugin
     
     public static boolean inTestingMode()
     {
-        return System.getenv("TESTING") != null;
+        //return System.getenv("TESTING") != null;
+        
+        // This will return true if Photran is being run via the JUnit Plug-in Test runner
+        String app = System.getProperty("eclipse.application");
+        return app != null && app.toLowerCase().contains("junit");
     }
 
     // The shared instance.

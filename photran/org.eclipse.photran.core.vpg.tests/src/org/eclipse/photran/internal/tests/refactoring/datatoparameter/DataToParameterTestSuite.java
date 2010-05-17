@@ -12,8 +12,6 @@ package org.eclipse.photran.internal.tests.refactoring.datatoparameter;
 
 import junit.framework.Test;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.internal.core.refactoring.DataToParameterRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
@@ -35,13 +33,9 @@ public class DataToParameterTestSuite extends PhotranRefactoringTestSuiteFromMar
 
     public DataToParameterTestSuite() throws Exception
     {
-        super(Activator.getDefault(), "Running Data to Parameter refactoring in", DIR, DataToParameterRefactoring.class);
-    }
-
-    @Override
-    protected boolean configureRefactoring(DataToParameterRefactoring refactoring, IFile file, TextSelection selection, String[] markerText)
-    {
-        boolean shouldSucceed = Boolean.parseBoolean(markerText[2]);
-        return shouldSucceed;
+        super(Activator.getDefault(),
+              "Running Data to Parameter refactoring in",
+              DIR,
+              DataToParameterRefactoring.class);
     }
 }

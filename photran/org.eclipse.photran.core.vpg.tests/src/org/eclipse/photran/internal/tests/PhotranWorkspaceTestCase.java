@@ -227,9 +227,11 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
 
         System.out.println(toString(args));
         String output = Spawner.run(project.getLocation().toFile(), args);
+        //System.out.println(output);
 
         System.out.println(exe);
         String output2 = Spawner.run(project.getLocation().toFile(), exe);
+        //System.out.println(output2);
 
         return output + "\n" + output2;
     }

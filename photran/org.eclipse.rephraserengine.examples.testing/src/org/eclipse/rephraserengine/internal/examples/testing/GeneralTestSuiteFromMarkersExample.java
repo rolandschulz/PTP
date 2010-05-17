@@ -55,9 +55,12 @@ public class GeneralTestSuiteFromMarkersExample extends GeneralTestSuiteFromMark
         public void testExample() throws IOException
         {
             String[] lineColStrings = markerText.split(",");
+            for (int i = 0; i < lineColStrings.length; i++)
+                lineColStrings[i] = lineColStrings[i].trim();
+            
             assertTrue(lineColStrings.length >= 2);
-            int line = Integer.parseInt(lineColStrings[0].trim());
-            int col = Integer.parseInt(lineColStrings[1].trim());
+            int line = Integer.parseInt(lineColStrings[0]);
+            int col = Integer.parseInt(lineColStrings[1]);
             
             String fileContents = StringUtil.read(fileContainingMarker);
             int offset = StringUtil.offsetOf(line, col, fileContents);

@@ -12,8 +12,6 @@ package org.eclipse.photran.internal.tests.refactoring.standardizestmts;
 
 import junit.framework.Test;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.internal.core.refactoring.StandardizeStatementsRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
@@ -24,7 +22,8 @@ import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers
  * @author Tim Yuvashev
  * @author Jeff Overbey
  */
-public class StandardizeStmtsTestSuite extends PhotranRefactoringTestSuiteFromMarkers<StandardizeStatementsRefactoring>
+public class StandardizeStmtsTestSuite
+     extends PhotranRefactoringTestSuiteFromMarkers<StandardizeStatementsRefactoring>
 {
     private static final String DIR = "refactoring-test-code/standardize-stmts";
 
@@ -35,13 +34,9 @@ public class StandardizeStmtsTestSuite extends PhotranRefactoringTestSuiteFromMa
 
     public StandardizeStmtsTestSuite() throws Exception
     {
-        super(Activator.getDefault(), "Running Standardize Statements refactoring in", DIR, StandardizeStatementsRefactoring.class);
-    }
-
-    @Override
-    protected boolean configureRefactoring(StandardizeStatementsRefactoring refactoring, IFile file, TextSelection selection, String[] markerText)
-    {
-        boolean shouldSucceed = Boolean.parseBoolean(markerText[2]);
-        return shouldSucceed;
+        super(Activator.getDefault(),
+              "Running Standardize Statements refactoring in",
+              DIR,
+              StandardizeStatementsRefactoring.class);
     }
 }

@@ -45,14 +45,14 @@ public abstract class PhotranTestCase extends TestCase
 {
     public PhotranTestCase()
     {
-        super();
-        if (!FortranCorePlugin.inTestingMode()) fail("WHEN RUNNING JUNIT TESTS, THE \"TESTING\" ENVIRONMENT VARIABLE MUST BE SET");
+        this(null);
     }
 
     public PhotranTestCase(String name)
     {
         super(name);
-        if (!FortranCorePlugin.inTestingMode()) fail("WHEN RUNNING JUNIT TESTS, THE \"TESTING\" ENVIRONMENT VARIABLE MUST BE SET");
+        if (!FortranCorePlugin.inTestingMode())
+            fail("PHOTRAN'S UNIT TESTS MUST BE RUN AS A JUNIT PLUG-IN TEST");
     }
 
     protected ASTExecutableProgramNode parse(String string) throws IOException, LexerException, SyntaxException

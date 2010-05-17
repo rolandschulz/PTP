@@ -31,9 +31,10 @@ import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IActionStmt;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.parser.IExpr;
+import org.eclipse.photran.internal.core.parser.ISpecificationPartConstruct;
 import org.eclipse.photran.internal.core.parser.ISpecificationStmt;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 
 
@@ -52,7 +53,7 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
 
     private IExpr selectedExpr;
     private IActionStmt enclosingStmt;
-    @SuppressWarnings("unchecked") private IASTListNode enclosingStmtList;
+    @SuppressWarnings("rawtypes") private IASTListNode enclosingStmtList;
     private ScopingNode enclosingScope;
 
     private String decl = null;
@@ -88,13 +89,13 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
     // Initial Preconditions
     ///////////////////////////////////////////////////////////////////////////
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         ensureProjectHasRefactoringEnabled(status);
 
-        IASTNode selection = this.findEnclosingNode(this.astOfFileInEditor, this.selectedRegionInEditor);
+        IASTNode selection = findEnclosingNode(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selection == null || !(selection instanceof IExpr))
             fail("Please select an expression to extract.");
 
@@ -148,7 +149,7 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
 
         IBodyConstruct decl = parseLiteralStatementNoFail(this.decl);
         if (decl == null || !(decl instanceof ASTTypeDeclarationStmtNode))
-            fail("The text entered is not a valid type declaration statement.");
+            fail("The text entered (\"" + this.decl + "\") is not a valid type declaration statement.");
 
         declToInsert = (ASTTypeDeclarationStmtNode)decl;
 
@@ -170,6 +171,7 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
     private void checkForConflictingBindings(IProgressMonitor pm, RefactoringStatus status)
     {
         Definition def = arbitraryDefinitionInScope();
+        if (def == null) return; // No declarations in scope, so the new one can't conflict
 
         checkForConflictingBindings(pm,
             new ConflictingBindingErrorHandler(status),
@@ -240,7 +242,7 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void insertDeclaration()
     {
         IASTListNode body = enclosingScope.getBody();
@@ -259,7 +261,8 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
             IASTNode thisStmt = body.get(i);
             if (thisStmt instanceof ASTTypeDeclarationStmtNode)
                 lastTypeDeclStmt = i;
-            if (thisStmt instanceof ISpecificationStmt)
+            if (thisStmt instanceof ISpecificationPartConstruct
+                    || thisStmt instanceof ISpecificationStmt)
                 lastSpecStmt = i;
             if (thisStmt instanceof ASTUseStmtNode)
                 lastUseStmt = i;
@@ -278,14 +281,18 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
     @SuppressWarnings("unchecked")
     private void insertAssignment()
     {
-        ASTAssignmentStmtNode assignmentStmt = (ASTAssignmentStmtNode)parseLiteralStatement(name + " = " + selectedExpr);
+        IExpr expr = (IExpr)selectedExpr.clone();
+        expr.findFirstToken().setWhiteBefore("");
+        
+        ASTAssignmentStmtNode assignmentStmt = (ASTAssignmentStmtNode)parseLiteralStatement(name + " = " + expr);
         enclosingStmtList.insertBefore(enclosingStmt, assignmentStmt);
         Reindenter.reindent(assignmentStmt, astOfFileInEditor);
     }
 
     private void replaceExpression()
     {
-        IExpr variable = parseLiteralExpression(name);
+        IExpr variable = parseLiteralExpression(name.trim());
+        variable.findFirstToken().setWhiteBefore(selectedExpr.findFirstToken().getWhiteBefore());
         selectedExpr.replaceWith(variable);
     }
 }
