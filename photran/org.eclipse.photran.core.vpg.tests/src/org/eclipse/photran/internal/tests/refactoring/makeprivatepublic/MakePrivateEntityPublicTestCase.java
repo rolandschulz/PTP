@@ -24,13 +24,13 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  *
  * @author Kurt Hendle
  */
-public class MakePrivateEntityPublicTestCase extends RefactoringTestCase
+public class MakePrivateEntityPublicTestCase extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/make-private-entity-public";
 

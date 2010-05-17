@@ -2,7 +2,6 @@ package org.eclipse.rephraserengine.testing.junit3;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -23,35 +22,33 @@ import junit.framework.TestSuite;
  */
 public abstract class TestSuiteFromMarkers extends GeneralTestSuiteFromMarkers
 {
-    public TestSuiteFromMarkers(String description, String marker, String fileOrDirectory, FilenameFilter filenameFilter) throws Exception
+    public TestSuiteFromMarkers(String description, String marker, File fileOrDirectory, FilenameFilter filenameFilter) throws Exception
     {
         super(description, marker, fileOrDirectory, filenameFilter);
     }
 
-    public TestSuiteFromMarkers(String description, String marker, String fileOrDirectory, final String filenameExtension) throws Exception
+    public TestSuiteFromMarkers(String description, String marker, File fileOrDirectory, final String filenameExtension) throws Exception
     {
         super(description, marker, fileOrDirectory, filenameExtension);
     }
 
     @Override
-    protected final Test createTestFor(List<File> allFiles, File fileContainingMarker, int markerOffset, String markerText)
+    protected final Test createTestFor(File fileContainingMarker, int markerOffset, String markerText)
     {
         TestSuite suite = new TestSuite(fileContainingMarker.getName() + " - " + markerText);
-        suite.addTest(new SimpleFileTestCase(allFiles, fileContainingMarker, markerOffset, markerText) {});
+        suite.addTest(new SimpleFileTestCase(fileContainingMarker, markerOffset, markerText) {});
         return suite;
     }
 
     public abstract class SimpleFileTestCase extends TestCase
     {
-        protected final List<File> allFiles;
         protected final File fileContainingMarker;
         protected final int markerOffset;
         protected final String markerText;
 
-        public SimpleFileTestCase(List<File> allFiles, File fileContainingMarker, int markerOffset, String markerText)
+        public SimpleFileTestCase(File fileContainingMarker, int markerOffset, String markerText)
         {
             super("test");
-            this.allFiles = allFiles;
             this.fileContainingMarker = fileContainingMarker;
             this.markerOffset = markerOffset;
             this.markerText = markerText;
@@ -59,9 +56,9 @@ public abstract class TestSuiteFromMarkers extends GeneralTestSuiteFromMarkers
 
         public void test() throws Exception
         {
-            TestSuiteFromMarkers.this.test(allFiles, fileContainingMarker, markerOffset, markerText);
+            TestSuiteFromMarkers.this.test(fileContainingMarker, markerOffset, markerText);
         }
     }
 
-    protected abstract void test(List<File> allFiles, File fileContainingMarker, int markerOffset, String markerText) throws Exception;
+    protected abstract void test(File fileContainingMarker, int markerOffset, String markerText) throws Exception;
 }

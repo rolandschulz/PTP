@@ -11,7 +11,6 @@
 package org.eclipse.rephraserengine.internal.examples.testing;
 
 import java.io.File;
-import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.Test;
@@ -33,12 +32,11 @@ public class TestSuiteFromMarkersExample extends TestSuiteFromMarkers
 
     public TestSuiteFromMarkersExample() throws Exception
     {
-        super("Running TestSuiteFromMarkersExample in", "<<<", "test-files-2", ".txt");
+        super("Running TestSuiteFromMarkersExample in", "<<<", new File("test-files-2"), ".txt");
     }
 
     @Override
-    protected void test(List<File> allFiles,
-                        File fileContainingMarker,
+    protected void test(File fileContainingMarker,
                         int markerOffset,
                         String markerText) throws Exception
     {

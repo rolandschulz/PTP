@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * Copyright (c) 2009-2010 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,13 +11,12 @@
 package org.eclipse.photran.internal.tests;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.TreeMap;
 
-import junit.framework.TestSuite;
+import junit.framework.Test;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -30,12 +29,12 @@ import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
+import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
-import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.vpg.refactoring.VPGResourceRefactoring;
+import org.eclipse.rephraserengine.testing.junit3.GeneralTestSuiteFromMarkers;
 
 /**
  * A test suite constructed by importing files from a directory in the source tree, searching its
@@ -47,81 +46,54 @@ import org.eclipse.rephraserengine.core.vpg.refactoring.VPGResourceRefactoring;
  *
  * @author Jeff Overbey
  */
-public abstract class MarkerBasedRefactoringTestSuite<R extends VPGResourceRefactoring<IFortranAST, Token, PhotranVPG>> extends TestSuite
+public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResourceRefactoring<IFortranAST, Token, PhotranVPG>>
+              extends GeneralTestSuiteFromMarkers
 {
     protected static final String MARKER = "!<<<<<";
 
-    protected Class<R> refactoringClass;
-    protected TreeMap<PhotranTokenRef, String> markers;
-
-    protected MarkerBasedRefactoringTestSuite(Plugin activator, String descriptionPrefix, String directory, Class<R> clazz) throws Exception
+    protected static final FilenameFilter FORTRAN_FILE_FILTER = new FilenameFilter()
     {
-        this.refactoringClass = clazz;
-
-        File dir = new File(directory);
-        assert dir.exists();
-        assert dir.canRead();
-        assert dir.isDirectory();
-
-        for (File subdir : dir.listFiles())
+        public boolean accept(File dir, String filename)
         {
-            if (subdir.getName().equalsIgnoreCase("CVS")
-                || subdir.getName().equalsIgnoreCase(".svn")) continue;
-
-            String description = descriptionPrefix + " " + subdir.getName();
-            String subdirPath = directory + "/" + subdir.getName();
-
-            populateMarkers(activator, subdirPath);
-
-            TestSuite subsuite = new TestSuite(description);
-            for (PhotranTokenRef tr : markers.keySet())
-                subsuite.addTest(new IndividualRefactoringTestCase(activator, description, subdirPath, tr, markers.get(tr)));
-
-            this.addTest(subsuite);
-        }
-    }
-
-    private void populateMarkers(Plugin activator, String subdir) throws Exception
-    {
-        markers = new TreeMap<PhotranTokenRef, String>();
-
-        for (File file : new File(subdir).listFiles())
-        {
-            String filename = file.getName();
-            if (!filename.endsWith(".result")
+            return !filename.endsWith(".result")
                 && !filename.equalsIgnoreCase("CVS")
-                && !filename.equalsIgnoreCase(".svn"))
-            {
-                String fileContents = readTestFile(activator, subdir, filename);
-                for (int index = fileContents.indexOf(MARKER);
-                     index >= 0;
-                     index = fileContents.indexOf(MARKER, index+1))
-                {
-                    int eol = fileContents.indexOf('\n', index);
-                    if (eol == 0) eol = fileContents.length();
-                    int length = eol-index;
-
-                    markers.put(
-                        new PhotranTokenRef(filename, index, length),
-                        fileContents.substring(index+MARKER.length(), eol).trim());
-                }
-            }
+                && !filename.equalsIgnoreCase(".svn");
         }
+    };
+    
+    protected Plugin activator;
+    protected Class<R> refactoringClass;
 
-        if (markers.isEmpty())
-            throw new Exception("No markers of the form " + MARKER + " found in files in " + subdir);
-    }
-
-    private String readTestFile(Plugin activator, String subdir, String filename) throws Exception
+    protected PhotranRefactoringTestSuiteFromMarkers(Plugin activator, String descriptionPrefix, String directory, Class<R> clazz) throws Exception
     {
-        return new RefactoringTestCase()
-        {
-            @Override public String readTestFile(Plugin activator, String subdir, String filename) throws IOException, URISyntaxException
-            {
-                return super.readTestFile(activator, subdir, filename);
-            }
-        }.readTestFile(activator, subdir, filename);
+        super(descriptionPrefix, MARKER, new File(directory), FORTRAN_FILE_FILTER,
+              activator, // initializationData[0]
+              clazz);    // initializationData[1]
     }
+
+    @SuppressWarnings("unchecked")
+    @Override protected void initialize(Object... initializationData)
+    {
+        this.activator = (Plugin)initializationData[0];
+        this.refactoringClass = (Class<R>)initializationData[1];
+    }
+
+    
+    @Override protected Test createTestFor(File fileContainingMarker, int markerOffset, String markerText) throws Exception
+    {
+        return new IndividualRefactoringTestCase(activator, description, fileContainingMarker, markerText);
+    }
+    
+//    private String readTestFile(Plugin activator, String subdir, String filename) throws Exception
+//    {
+//        return new RefactoringTestCase()
+//        {
+//            @Override public String readTestFile(Plugin activator, String subdir, String filename) throws IOException, URISyntaxException
+//            {
+//                return super.readTestFile(activator, subdir, filename);
+//            }
+//        }.readTestFile(activator, subdir, filename);
+//    }
 
     /**
      * This method is invoked to instantiate the refactoring class.  Override if necessary.
@@ -160,47 +132,45 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends VPGResourceRefac
         return true;
     }
 
-    public class IndividualRefactoringTestCase extends RefactoringTestCase
+    public class IndividualRefactoringTestCase extends PhotranWorkspaceTestCase
     {
         private Plugin activator;
         private String description;
-        private String subdir;
-        private PhotranTokenRef marker;
+        private File fileContainingMarker;
         private String markerText;
 
         private TreeMap<String, IFile> files = new TreeMap<String, IFile>();
 
-        public IndividualRefactoringTestCase(Plugin activator, String description, String subdir, PhotranTokenRef marker, String markerText) throws Exception
+        public IndividualRefactoringTestCase(Plugin activator, String description, File fileContainingMarker, String markerText) throws Exception
         {
             this.activator = activator;
             this.description = description;
-            this.subdir = subdir;
-            this.marker = marker;
+            this.fileContainingMarker = fileContainingMarker;
             this.markerText = markerText;
             this.setName("test");
         }
 
         public void test() throws Exception
         {
-            importFiles(subdir);
+            importFiles(fileContainingMarker.getParent());
 
             NullProgressMonitor pm = new NullProgressMonitor();
             project.refreshLocal(IResource.DEPTH_INFINITE, pm);
+            System.out.println("Compiling and running program prior to transformation - " + description);
             String before = compileAndRunFortranProgram(
-                "compilation before transformation",
                 files.keySet().toArray(new String[files.size()]));
 
             R refactoring = createRefactoring();
 
-            IFile file = files.get(marker.getFilename());
+            IFile file = files.get(fileContainingMarker.getName());
             String[] markerStrings = markerText.split(",");
             assertTrue(markerStrings.length >= 2);
             int line = Integer.parseInt(markerStrings[0]);
             int col = Integer.parseInt(markerStrings[1]);
-            int offset = getLineColOffset(marker.getFilename(), new LineCol(line, col));
+            int offset = getLineColOffset(fileContainingMarker.getName(), new LineCol(line, col));
             TextSelection selection = new TextSelection(offset, 0);
 
-            description += " (" + marker.getFilename() + " " + Arrays.toString(markerStrings) + ")";
+            description += " (" + fileContainingMarker.getName() + " " + Arrays.toString(markerStrings) + ")";
 
             initializeRefactoring(refactoring, file, selection, markerStrings);
             RefactoringStatus status = refactoring.checkInitialConditions(pm);
@@ -222,18 +192,18 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends VPGResourceRefac
 
             if (shouldSucceed)
             {
+                System.out.println("Compiling and running program after transformation - " + description);
                 String after = compileAndRunFortranProgram(
-                    "compilation after transformation",
                     files.keySet().toArray(new String[files.size()]));
                 System.out.println(after);
                 assertEquals(before, after);
 
-                if (markers.size() == 1)
+                if (new File(fileContainingMarker.getPath() + ".result").exists())
                 {
                     for (String filename : files.keySet())
                     {
                         assertEquals(
-                            readTestFile(activator, subdir, filename + ".result").replaceAll("\\r", ""), // expected result
+                            readTestFile(activator, fileContainingMarker.getParent(), filename + ".result").replaceAll("\\r", ""), // expected result
                             readWorkspaceFile(filename).replaceAll("\\r", ""));               // actual refactored file
                     }
                 }
@@ -261,18 +231,6 @@ public abstract class MarkerBasedRefactoringTestSuite<R extends VPGResourceRefac
             IProgressMonitor pm = new NullProgressMonitor();
             project.refreshLocal(IResource.DEPTH_INFINITE, pm);
             PhotranVPG.getInstance().ensureVPGIsUpToDate(pm);
-        }
-
-        protected String compileAndRunFortranProgram(String description, String... filenamesOpt) throws Exception
-        {
-            try
-            {
-                return super.compileAndRunFortranProgram(filenamesOpt);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(description + " failed " + description + ":\n" + e.getMessage(), e);
-            }
         }
     }
 }

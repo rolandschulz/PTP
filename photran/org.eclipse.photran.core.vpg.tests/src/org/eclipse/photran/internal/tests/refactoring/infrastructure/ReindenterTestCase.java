@@ -24,9 +24,9 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
 import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
-public class ReindenterTestCase extends RefactoringTestCase
+public class ReindenterTestCase extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/infrastructure/reindenter";
 

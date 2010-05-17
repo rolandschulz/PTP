@@ -12,7 +12,6 @@ package org.eclipse.rephraserengine.internal.examples.testing;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -35,7 +34,7 @@ public class GeneralTestSuiteFromMarkersExample extends GeneralTestSuiteFromMark
 
     public GeneralTestSuiteFromMarkersExample() throws Exception
     {
-        super("Running GeneralTestSuiteFromMarkersExample in", "<<<", "test-files-2", ".txt");
+        super("Running GeneralTestSuiteFromMarkersExample in", "<<<", new File("test-files-2"), ".txt");
     }
 
     // To prevent the JUnit runner from trying to instantiate and run ExampleTestCase,
@@ -68,8 +67,7 @@ public class GeneralTestSuiteFromMarkersExample extends GeneralTestSuiteFromMark
     }
 
     @Override
-    protected Test createTestFor(List<File> allFiles,
-                                 File fileContainingMarker,
+    protected Test createTestFor(File fileContainingMarker,
                                  int markerOffset,
                                  String markerText)
     {

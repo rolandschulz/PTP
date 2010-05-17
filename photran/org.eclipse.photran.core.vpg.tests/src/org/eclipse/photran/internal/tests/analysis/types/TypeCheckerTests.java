@@ -10,25 +10,17 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.tests.analysis.types;
 
-import java.io.StringReader;
-
-import junit.framework.TestCase;
-
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.analysis.types.TypeChecker;
-import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
-import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.IExpr;
-import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.tests.PhotranTestCase;
 
 /**
- * Fortran type checker unit tests
+ * Unit tests for the Fortran type checker.
  *
  * @author Stoyan Gaydarov
  */
-public class TypeCheckerTestCase extends TestCase
+public class TypeCheckerTests extends PhotranTestCase
 {
 
     /** Parses a Fortran expression.  Does not bind identifiers, etc. */
@@ -37,12 +29,7 @@ public class TypeCheckerTestCase extends TestCase
         // We can only parse entire programs, so we embed the expression in
         // a parseable program, then extract the expression from the program's AST
 
-        String program = "a = " + expression + "\nend";
-        ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(new StringReader(program), null, "<literal text>"));
-        assertNotNull(ast);
-        ASTMainProgramNode mainProg = (ASTMainProgramNode)ast.getProgramUnitList().get(0);
-        ASTAssignmentStmtNode assignmentStmt = (ASTAssignmentStmtNode)mainProg.getBody().get(0);
-        IExpr exprNode = assignmentStmt.getRhs();
+        IExpr exprNode = parseExpression(expression);
         return TypeChecker.getTypeOf(exprNode);
     }
 

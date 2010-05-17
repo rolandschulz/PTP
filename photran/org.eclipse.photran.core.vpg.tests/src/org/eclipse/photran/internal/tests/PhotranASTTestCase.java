@@ -14,22 +14,21 @@ import java.io.File;
 import java.io.IOException;
 
 import junit.framework.ComparisonFailure;
-import junit.framework.TestCase;
 
-import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.util.SemanticError;
 
 /**
- * A test case for parsing a single file.  Created by <code>ParserTestSuite</code>.
+ * Base class for a test case that takes an AST as input.
+ * <p>
+ * Test cases based on this will usually be created by a {@link PhotranTestSuiteFromFiles}.
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
-public abstract class AbstractParserTestCase extends TestCase
+public abstract class PhotranASTTestCase extends PhotranTestCase
 {
     protected File file = null;
     protected boolean isFixedForm = false;
@@ -41,7 +40,7 @@ public abstract class AbstractParserTestCase extends TestCase
      * @param filename the file to parse
      * @param isFixedForm true iff the file is in fixed format
      */
-    public AbstractParserTestCase(File file, boolean isFixedForm, String testCaseDescription)
+    public PhotranASTTestCase(File file, boolean isFixedForm, String testCaseDescription)
     {
         super("test"); // name of method to run
         this.file = file;
@@ -60,8 +59,7 @@ public abstract class AbstractParserTestCase extends TestCase
         
         try
         {
-            ISourceForm sourceForm = createSourceForm();
-            ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(file, sourceForm));
+            ASTExecutableProgramNode ast = parse(file, createSourceForm());
             assertTrue(ast != null);
             handleAST(ast);
         }

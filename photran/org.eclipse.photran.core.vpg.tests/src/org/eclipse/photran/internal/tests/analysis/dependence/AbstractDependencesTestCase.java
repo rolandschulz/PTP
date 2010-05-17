@@ -8,24 +8,16 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.tests;
+package org.eclipse.photran.internal.tests.analysis.dependence;
 
 import java.io.IOException;
-import java.io.StringReader;
-
-import junit.framework.TestCase;
 
 import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.dependence.LoopDependences;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
-import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
-import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
-import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
-import org.eclipse.photran.internal.core.parser.IBodyConstruct;
-import org.eclipse.photran.internal.core.parser.Parser;
+import org.eclipse.photran.internal.tests.PhotranTestCase;
 import org.eclipse.rephraserengine.core.analysis.dependence.GCDTest;
 import org.eclipse.rephraserengine.core.analysis.dependence.GeneralizedGCDTest;
 
@@ -34,7 +26,7 @@ import org.eclipse.rephraserengine.core.analysis.dependence.GeneralizedGCDTest;
  *
  * @author Jeff Overbey
  */
-public abstract class BaseTestCase extends TestCase
+public abstract class AbstractDependencesTestCase extends PhotranTestCase
 {
     protected LoopDependences dependences(String loop) throws IOException, LexerException, SyntaxException
     {
@@ -55,15 +47,5 @@ public abstract class BaseTestCase extends TestCase
         ASTAssignmentStmtNode result = parseStmt(stmt);
         assertNotNull(result);
         return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T extends IBodyConstruct> T parseStmt(String stmt) throws IOException, LexerException, SyntaxException
-    {
-        String program = stmt + "\nend program\n";
-        ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(new StringReader(program), null, null));
-        assertTrue(ast != null);
-        LoopReplacer.replaceAllLoopsIn(ast);
-        return (T)((ASTMainProgramNode)ast.getProgramUnitList().get(0)).getBody().get(0);
     }
 }

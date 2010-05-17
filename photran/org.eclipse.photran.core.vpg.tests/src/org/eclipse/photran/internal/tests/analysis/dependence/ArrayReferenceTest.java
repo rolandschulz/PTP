@@ -11,13 +11,12 @@
 package org.eclipse.photran.internal.tests.analysis.dependence;
 
 import org.eclipse.photran.internal.core.analysis.dependence.VariableReference;
-import org.eclipse.photran.internal.tests.BaseTestCase;
 
 /**
  * 
  * @author Jeff Overbey
  */
-public class ArrayReferenceTest extends BaseTestCase
+public class ArrayReferenceTest extends AbstractDependencesTestCase
 {
     public void test1DLHS() throws Exception
     {

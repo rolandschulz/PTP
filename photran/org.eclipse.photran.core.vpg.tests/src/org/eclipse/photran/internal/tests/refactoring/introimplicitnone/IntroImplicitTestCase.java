@@ -22,9 +22,9 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.IntroImplicitNoneRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
-public class IntroImplicitTestCase extends RefactoringTestCase
+public class IntroImplicitTestCase extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/intro-implicit-none";
 

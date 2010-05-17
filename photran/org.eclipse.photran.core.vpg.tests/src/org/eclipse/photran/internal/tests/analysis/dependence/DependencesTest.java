@@ -11,14 +11,13 @@
 package org.eclipse.photran.internal.tests.analysis.dependence;
 
 import org.eclipse.photran.internal.core.analysis.dependence.LoopDependences;
-import org.eclipse.photran.internal.tests.BaseTestCase;
 
 /**
  * Unit tests for the Dependences class, which collects array dependences in a perfect loop nest.
  *
  * @author Jeff Overbey
  */
-public class DependencesTest extends BaseTestCase
+public class DependencesTest extends AbstractDependencesTestCase
 {
     public void testPage38() throws Exception
     {

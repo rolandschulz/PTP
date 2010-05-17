@@ -19,9 +19,9 @@ import org.eclipse.photran.internal.core.lexer.sourceform.CPreprocessedFreeSourc
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
 import org.eclipse.photran.internal.core.sourceform.ISourceForm;
-import org.eclipse.photran.internal.tests.AbstractParserTestCase;
+import org.eclipse.photran.internal.tests.PhotranASTTestCase;
 
-public class CppIntegratedSourceReproductionTestCase extends AbstractParserTestCase
+public class CppIntegratedSourceReproductionTestCase extends PhotranASTTestCase
 {
     public CppIntegratedSourceReproductionTestCase(File file, boolean isFixedForm, String testCaseDescription)
     {

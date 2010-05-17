@@ -19,7 +19,7 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  * Unit tests for {@link Definition#resolveInterfaceBinding()}
@@ -27,7 +27,7 @@ import org.eclipse.photran.internal.tests.RefactoringTestCase;
  *
  * @author Jeff Overbey
  */
-public class InterfaceLinkTests extends RefactoringTestCase
+public class InterfaceLinkTests extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "vpg-test-code/interface-links";
 

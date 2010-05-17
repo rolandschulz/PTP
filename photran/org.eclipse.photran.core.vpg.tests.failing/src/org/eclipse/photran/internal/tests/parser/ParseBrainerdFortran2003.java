@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import junit.framework.Test;
 
-import org.eclipse.photran.internal.tests.FailingParserTestSuite;
+import org.eclipse.photran.internal.tests.parser.MultiTestSuite.FailingParserTestSuite;
 
 public class ParseBrainerdFortran2003
 {

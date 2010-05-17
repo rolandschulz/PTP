@@ -24,13 +24,13 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.MinOnlyListRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  *
  * @author Kurt Hendle
  */
-public class MinOnlyListTestCase extends RefactoringTestCase
+public class MinOnlyListTestCase extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/min-only-list";
 

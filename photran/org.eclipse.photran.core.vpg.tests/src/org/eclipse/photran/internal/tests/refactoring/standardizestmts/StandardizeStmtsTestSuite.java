@@ -14,10 +14,9 @@ import junit.framework.Test;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.photran.internal.core.refactoring.DataToParameterRefactoring;
 import org.eclipse.photran.internal.core.refactoring.StandardizeStatementsRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.MarkerBasedRefactoringTestSuite;
+import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
 
 /**
  * Unit tests for the Standardize Statements refactoring.
@@ -25,7 +24,7 @@ import org.eclipse.photran.internal.tests.MarkerBasedRefactoringTestSuite;
  * @author Tim Yuvashev
  * @author Jeff Overbey
  */
-public class StandardizeStmtsTestSuite extends MarkerBasedRefactoringTestSuite<StandardizeStatementsRefactoring>
+public class StandardizeStmtsTestSuite extends PhotranRefactoringTestSuiteFromMarkers<StandardizeStatementsRefactoring>
 {
     private static final String DIR = "refactoring-test-code/standardize-stmts";
 

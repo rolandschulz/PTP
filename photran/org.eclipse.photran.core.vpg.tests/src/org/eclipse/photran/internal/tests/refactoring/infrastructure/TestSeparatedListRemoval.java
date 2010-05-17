@@ -17,14 +17,14 @@ import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
-import org.eclipse.photran.internal.tests.BaseTestCase;
+import org.eclipse.photran.internal.tests.PhotranTestCase;
 
 /**
  * Test to verify that ASTSeparatedListNode#remove correctly removes commas
  * 
  * @author Jeff Overbey
  */
-public class TestSeparatedListRemoval extends BaseTestCase
+public class TestSeparatedListRemoval extends PhotranTestCase
 {
     public void testSeparatedListRemoval() throws IOException, LexerException, SyntaxException
     {

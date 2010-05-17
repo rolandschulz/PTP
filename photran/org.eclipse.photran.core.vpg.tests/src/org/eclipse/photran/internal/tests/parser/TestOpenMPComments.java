@@ -10,48 +10,40 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.tests.parser;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.eclipse.photran.internal.core.SyntaxException;
-import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
-import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm;
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
-import org.eclipse.photran.internal.core.parser.Parser;
-import org.eclipse.photran.internal.core.sourceform.ISourceForm;
+import org.eclipse.photran.internal.tests.PhotranTestCase;
 
 /**
  * Unit tests for {@link Token#getOpenMPComments()}.
  * 
  * @author Jeff Overbey
  */
-public class TestOpenMPComments extends TestCase
+public class TestOpenMPComments extends PhotranTestCase
 {
     public void testFreeFormOpenMPComments() throws Exception
     {
-        ASTExecutableProgramNode ast = parse(new UnpreprocessedFreeSourceForm(),
-            //         1    1    2    2    3    3
-            //----5----0----5----0----5----0----5
-            "! This is a sample OpenMP program\n" + // Starts at offset 0
-            "program OpenMP\n" +                                    // 34
-            "    integer :: num_threads, id\n" +                    // 49
-            "    !$omp parallel private(num_threads, id) \n" +      // 80
-            "    id = omp_get_thread_num()\n" +
-            "    print *, 'This is thread ', id\n" +
-            "    if (id == 0) then\n" +
-            "      num_threads = omp_get_num_threads()\n" +
-            "      print *, 'Total threads: ', num_threads\n" +
-            "    end if\n" +
-            "    !$omp end parallel\n" +
-            "end program\n");
+        ASTExecutableProgramNode ast = parse(//         1    1    2    2    3    3
+        //----5----0----5----0----5----0----5
+        "! This is a sample OpenMP program\n" + // Starts at offset 0
+        "program OpenMP\n" +                                    // 34
+        "    integer :: num_threads, id\n" +                    // 49
+        "    !$omp parallel private(num_threads, id) \n" +      // 80
+        "    id = omp_get_thread_num()\n" +
+        "    print *, 'This is thread ', id\n" +
+        "    if (id == 0) then\n" +
+        "      num_threads = omp_get_num_threads()\n" +
+        "      print *, 'Total threads: ', num_threads\n" +
+        "    end if\n" +
+        "    !$omp end parallel\n" +
+        "end program\n",
+            new UnpreprocessedFreeSourceForm());
         //System.out.println(ast);
         
         List<Token> comments = OpenMPCommentVisitor.getOpenMPCommentsIn(ast);
@@ -75,21 +67,21 @@ public class TestOpenMPComments extends TestCase
     
     public void testFixedFormOpenMPComments() throws Exception
     {
-        ASTExecutableProgramNode ast = parse(new UnpreprocessedFixedSourceForm(),
-            //         1    1    2    2    3    3
-            //----5----0----5----0----5----0----5
-            "! This is a sample OpenMP program\n" + // Starts at offset 0
-            "       program OpenMP\n" +                             // 34
-            "       integer :: num_threads, id\n" +                 // 56
-            "c$omp  parallel private(num_threads, id)\n" +          // 90
-            "       id = omp_get_thread_num()\n" +
-            "       print *, 'This is thread ', id\n" +
-            "       if (id .eq. 0) then\n" +
-            "           num_threads = omp_get_num_threads()\n" +
-            "           print *, 'Total threads: ', num_threads\n" +
-            "       end if\n" +
-            "c$omp  end parallel\n" +
-            "       end program\n");
+        ASTExecutableProgramNode ast = parse(//         1    1    2    2    3    3
+        //----5----0----5----0----5----0----5
+        "! This is a sample OpenMP program\n" + // Starts at offset 0
+        "       program OpenMP\n" +                             // 34
+        "       integer :: num_threads, id\n" +                 // 56
+        "c$omp  parallel private(num_threads, id)\n" +          // 90
+        "       id = omp_get_thread_num()\n" +
+        "       print *, 'This is thread ', id\n" +
+        "       if (id .eq. 0) then\n" +
+        "           num_threads = omp_get_num_threads()\n" +
+        "           print *, 'Total threads: ', num_threads\n" +
+        "       end if\n" +
+        "c$omp  end parallel\n" +
+        "       end program\n",
+            new UnpreprocessedFixedSourceForm());
         //System.out.println(ast);
         
         List<Token> comments = OpenMPCommentVisitor.getOpenMPCommentsIn(ast);
@@ -127,12 +119,5 @@ public class TestOpenMPComments extends TestCase
         {
             ompComments.addAll(token.getOpenMPComments());
         }
-    }
-    
-    private ASTExecutableProgramNode parse(ISourceForm sourceForm, String string) throws IOException, LexerException, SyntaxException
-    {
-        ASTExecutableProgramNode ast = new Parser().parse(new ASTLexerFactory().createLexer(new StringReader(string), null, "<stdin>", sourceForm));
-        assertTrue(ast != null);
-        return ast;
     }
 }

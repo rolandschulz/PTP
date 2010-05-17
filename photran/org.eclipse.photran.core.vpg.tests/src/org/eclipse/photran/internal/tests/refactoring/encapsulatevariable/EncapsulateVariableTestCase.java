@@ -24,13 +24,13 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.EncapsulateVariableRefactoring;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  *
  * @author Tim
  */
-public class EncapsulateVariableTestCase extends RefactoringTestCase
+public class EncapsulateVariableTestCase extends PhotranWorkspaceTestCase
 {
     private ArrayList<String> myFilenames;
     private String selectionFile;

@@ -16,7 +16,6 @@ import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramNameNode;
 import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
-import org.eclipse.photran.internal.tests.AbstractSourceEditorTestCase;
 
 public class TestChangeText extends AbstractSourceEditorTestCase
 {

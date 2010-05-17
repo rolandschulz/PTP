@@ -16,14 +16,14 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  * Unit tests for checking token offsets
  *
  * @author Jeff Overbey
  */
-public class TokenOffsetTests extends RefactoringTestCase
+public class TokenOffsetTests extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/encapsulate-variable";
     private static final String FILE = "test-encap-01a-basic-integer.f90";

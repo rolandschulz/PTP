@@ -14,10 +14,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.eclipse.photran.internal.tests.AbstractParserTestCase;
-import org.eclipse.photran.internal.tests.AbstractParserTestSuite;
+import org.eclipse.photran.internal.tests.PhotranASTTestCase;
+import org.eclipse.photran.internal.tests.PhotranTestSuiteFromFiles;
 
-public abstract class CppIntegratedSourceReproductionTestSuite extends AbstractParserTestSuite
+public abstract class CppIntegratedSourceReproductionTestSuite extends PhotranTestSuiteFromFiles
 {
     public CppIntegratedSourceReproductionTestSuite(String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {
@@ -30,7 +30,7 @@ public abstract class CppIntegratedSourceReproductionTestSuite extends AbstractP
     }
 
     @Override
-    protected AbstractParserTestCase createTestFor(File file, boolean isFixedForm, String fileDescription)
+    protected PhotranASTTestCase createTestFor(File file, boolean isFixedForm, String fileDescription)
     {
         return new CppIntegratedSourceReproductionTestCase(file, isFixedForm, fileDescription);
     }

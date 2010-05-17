@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.internal.core.refactoring.DataToParameterRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.MarkerBasedRefactoringTestSuite;
+import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
 
 /**
  * Unit tests for the Data to Parameter refactoring.
@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.tests.MarkerBasedRefactoringTestSuite;
  * @author Tim Yuvashev
  * @author Jeff Overbey
  */
-public class DataToParameterTestSuite extends MarkerBasedRefactoringTestSuite<DataToParameterRefactoring>
+public class DataToParameterTestSuite extends PhotranRefactoringTestSuiteFromMarkers<DataToParameterRefactoring>
 {
     private static final String DIR = "refactoring-test-code/data-to-parameter";
 

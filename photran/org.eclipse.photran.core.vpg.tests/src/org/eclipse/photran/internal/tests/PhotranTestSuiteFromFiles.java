@@ -20,19 +20,27 @@ import junit.framework.Test;
 import org.eclipse.rephraserengine.testing.junit3.GeneralTestSuiteFromFiles;
 
 /**
- * Attempts to parse all of the Fortran source code found in the subdirectories of a particular directory.
- * Created by the various classes in org.eclipse.photran.internal.core.tests.parser.
+ * Base class for a test suite that contains one test for each file in a directory.
+ * <p>
+ * This class takes a given directory (usually in the org.eclipse.photran.core.vpg.tests
+ * source tree), finds all of the Fortran source files in that directory or a subdirectory,
+ * and then creates a test case for each file.
+ * <p>
+ * The creation of the test case is delegated to {@link #createTestFor(File, boolean, String)},
+ * which subclasses must override.
  * 
  * @author Jeff Overbey
+ * 
+ * @see PhotranASTTestCase
  */
-public abstract class AbstractParserTestSuite extends GeneralTestSuiteFromFiles
+public abstract class PhotranTestSuiteFromFiles extends GeneralTestSuiteFromFiles
 {
     public static final String TEST_ROOT = "../org.eclipse.photran.core.vpg.tests/parser-test-code/";
     
     protected String directory;
     protected boolean isFixedForm;
     
-    public AbstractParserTestSuite(String description, String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
+    public PhotranTestSuiteFromFiles(String description, String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {
         super(description + (isFixedForm ? " fixed form" : " free form"),
               directorySuffix,
@@ -84,5 +92,5 @@ public abstract class AbstractParserTestSuite extends GeneralTestSuiteFromFiles
         return createTestFor(file, isFixedForm, describe(file));
     }
     
-    protected abstract AbstractParserTestCase createTestFor(File file, boolean isFixedForm, String fileDescription);
+    protected abstract PhotranASTTestCase createTestFor(File file, boolean isFixedForm, String fileDescription);
 }

@@ -21,13 +21,13 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.KeywordCaseRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  * Test cases for Keyword Case Refactoring
  * @author Kurt Hendle
  */
-public class KeywordCaseTestCase extends RefactoringTestCase
+public class KeywordCaseTestCase extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/keyword-case";
 

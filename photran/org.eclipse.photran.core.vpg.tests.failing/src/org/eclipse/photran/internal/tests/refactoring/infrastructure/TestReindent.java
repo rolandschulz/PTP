@@ -1,6 +1,5 @@
 package org.eclipse.photran.internal.tests.refactoring.infrastructure;
 
-import org.eclipse.photran.internal.tests.AbstractSourceEditorTestCase;
 
 public class TestReindent extends AbstractSourceEditorTestCase
 {

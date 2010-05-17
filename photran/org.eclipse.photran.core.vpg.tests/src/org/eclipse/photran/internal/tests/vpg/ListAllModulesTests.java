@@ -17,14 +17,14 @@ import java.util.List;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  * Unit tests for {@link PhotranVPG#listAllModules()}
  *
  * @author Jeff Overbey
  */
-public class ListAllModulesTests extends RefactoringTestCase
+public class ListAllModulesTests extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "vpg-test-code/list-modules";
 
@@ -53,16 +53,5 @@ public class ListAllModulesTests extends RefactoringTestCase
         assertCollectionsEqual(
             new String[] { "module1", "module2", "module3", "module4" },
             PhotranVPG.getInstance().listAllModules());
-    }
-
-    private <T> void assertCollectionsEqual(T[] expectedArray, Iterable<T> actualIterable)
-    {
-        List<T> expected = Arrays.asList(expectedArray);
-
-        List<T> actual = new ArrayList<T>();
-        for (T entry : actualIterable)
-            actual.add(entry);
-
-        assertEquals(expected, actual);
     }
 }

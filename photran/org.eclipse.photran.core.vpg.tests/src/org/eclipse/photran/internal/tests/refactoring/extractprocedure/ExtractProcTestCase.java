@@ -23,9 +23,9 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.ExtractProcedureRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
-public class ExtractProcTestCase extends RefactoringTestCase
+public class ExtractProcTestCase extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/extract-procedure";
 

@@ -14,7 +14,6 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IInternalSubprogram;
-import org.eclipse.photran.internal.tests.AbstractSourceEditorTestCase;
 
 public class TestRemove extends AbstractSourceEditorTestCase
 {

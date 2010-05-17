@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.internal.core.refactoring.RemoveUnusedVariablesRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.MarkerBasedRefactoringTestSuite;
+import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
 
 /**
  * Unit tests for the Remove Unused Local Variables refactoring.
@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.tests.MarkerBasedRefactoringTestSuite;
  * @author Tim Yuvashev
  * @author Jeff Overbey
  */
-public class RemoveUnusedTestSuite extends MarkerBasedRefactoringTestSuite<RemoveUnusedVariablesRefactoring>
+public class RemoveUnusedTestSuite extends PhotranRefactoringTestSuiteFromMarkers<RemoveUnusedVariablesRefactoring>
 {
     private static final String DIR = "refactoring-test-code/remove-unused-local-vars";
 

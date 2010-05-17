@@ -25,10 +25,10 @@ import org.eclipse.photran.internal.core.refactoring.interfaces.IRenameRefactori
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 import org.eclipse.photran.internal.tests.refactoring.rename.RenameTestSuite.Ident;
 
-public abstract class RenameTestCase extends RefactoringTestCase
+public abstract class RenameTestCase extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/rename";
 
@@ -48,6 +48,70 @@ public abstract class RenameTestCase extends RefactoringTestCase
         this.newName = newName;
         this.position = position;
         this.setName("test");
+    }
+    
+//    public void testLevenshtein()
+//    {
+//        assertEquals(0, levenshteinDistance("", ""));
+//        assertEquals(0, levenshteinDistance("kitten", "kitten"));
+//        assertEquals(6, levenshteinDistance("", "kitten"));
+//        assertEquals(6, levenshteinDistance("kitten", ""));
+//        assertEquals(3, levenshteinDistance("kitten", "sitting"));
+//        assertEquals(3, levenshteinDistance("kitten", "kit"));
+//        assertEquals(1, levenshteinDistance("kitten", "kittten"));
+//        assertEquals(2, levenshteinDistance("kitten", "kien"));
+//    }
+
+    /**
+     * Computes the Levenshtein distance between two strings.
+     *
+     * @return the Levenshtein distance between <code>s</code> and <code>t</code>
+     */
+    /*
+     * This is a well-known algorithm; see, for example,
+     * http://en.wikipedia.org/wiki/Levenshtein_distance
+     */
+    protected int levenshteinDistance(String s, String t)
+    {
+        int m = s.length(), n = t.length();
+
+        int[][] d = new int[m+1][n+1];
+
+        for (int i = 1; i <= m; i++)
+            d[i][0] = i;
+        for (int j = 1; j <= n; j++)
+            d[0][j] = j;
+
+        for (int i = 1; i <= m; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                int cost = s.charAt(i-1) == t.charAt(j-1) ? 0 : 1;
+                d[i][j] = min(d[i-1][j] + 1,       // deletion
+                              d[i][j-1] + 1,       // insertion
+                              d[i-1][j-1] + cost); // substitution
+            }
+        }
+
+        return d[m][n];
+    }
+
+    private int min(int a, int b, int c)
+    {
+        return Math.min(Math.min(a, b), c);
+    }
+
+    protected void assertLevDist(String errorMessage, int expected, String s, String t)
+    {
+        int actual = levenshteinDistance(s, t);
+
+        if (actual != expected)
+        {
+            // Use assertEquals so that JUnit will pop up a comparison viewer
+            assertEquals("Unexpected Levenshtein distance " + actual + " (expected " + expected + ") " + errorMessage,
+                         s,
+                         t);
+        }
     }
 
     /**

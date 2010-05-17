@@ -20,7 +20,7 @@ import junit.framework.TestCase;
  * 
  * @author Jeff Overbey
  */
-public class HugeFile extends TestCase
+public class ParseHugeFile extends TestCase
 {
 //    private String hugeFile = null;
     

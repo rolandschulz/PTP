@@ -24,14 +24,14 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  * Unit tests for {@link PhotranVPG#listAllModules()}
  *
  * @author Jeff Overbey
  */
-public class CheckCanAddDeclTests extends RefactoringTestCase
+public class CheckCanAddDeclTests extends PhotranWorkspaceTestCase
 {
     private static final String DIR = "refactoring-test-code/infrastructure/check-can-add-decl";
 

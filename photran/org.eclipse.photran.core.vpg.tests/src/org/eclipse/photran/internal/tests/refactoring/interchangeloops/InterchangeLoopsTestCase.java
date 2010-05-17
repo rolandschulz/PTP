@@ -23,13 +23,13 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.RefactoringTestCase;
+import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 
 /**
  *
  * @author Tim
  */
-public class InterchangeLoopsTestCase extends RefactoringTestCase
+public class InterchangeLoopsTestCase extends PhotranWorkspaceTestCase
 {
     private String myFilename = null;
     private NullProgressMonitor pm = new NullProgressMonitor();
