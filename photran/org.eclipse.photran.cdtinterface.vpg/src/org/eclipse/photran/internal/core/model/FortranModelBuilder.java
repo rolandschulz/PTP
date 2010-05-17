@@ -53,7 +53,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
     public void setTranslationUnit(ITranslationUnit tu)
     {
-        if (!(tu instanceof TranslationUnit)) throw new Error("Unexpected subclass of ITranslationUnit");
+        if (!(tu instanceof TranslationUnit)) throw new Error("Unexpected subclass of ITranslationUnit"); //$NON-NLS-1$
 
         this.translationUnit = (TranslationUnit)tu;
     }
@@ -82,7 +82,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
             if (isParseTreeModelEnabled())
             {
-            	 LoopReplacer.replaceAllLoopsIn(ast.getRoot());
+                 LoopReplacer.replaceAllLoopsIn(ast.getRoot());
                  ast.accept(new FortranParseTreeModelBuildingVisitor(translationUnit, this));
             }
             else
@@ -106,7 +106,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
         {
             String message = e.getMessage();
             if (!e.getClass().equals(Exception.class))
-                message = e.getClass().getSimpleName() + ": " + message; // Not a legit parser error
+                message = e.getClass().getSimpleName() + ": " + message; // Not a legit parser error //$NON-NLS-1$
             FortranElement elt = createParseFailureNode(translationUnit, message);
             if (lexer != null)
             {
@@ -127,29 +127,29 @@ public class FortranModelBuilder implements IFortranModelBuilder
         setIsStructureKnown(wasSuccessful);
     }
 
-	private String determineFilename(IFile file)
-	{
-		if (file == null)
-			return "";
-		else if (isLocal(file)) // C preprocessor requires absolute path
-			return file.getLocation().toFile().getAbsolutePath();
-		else
-			return file.getName();
-	}
+    private String determineFilename(IFile file)
+    {
+        if (file == null)
+            return ""; //$NON-NLS-1$
+        else if (isLocal(file)) // C preprocessor requires absolute path
+            return file.getLocation().toFile().getAbsolutePath();
+        else
+            return file.getName();
+    }
 
-	private ISourceForm determineSourceForm(IFile file)
-	{
-	    ISourceForm sourceForm = SourceForm.of(file);
-		if (isLocal(file) && file.getProject() != null)
-			return sourceForm.configuredWith(new IncludeLoaderCallback(file.getProject()));
-		else
-		    return sourceForm;
-	}
+    private ISourceForm determineSourceForm(IFile file)
+    {
+        ISourceForm sourceForm = SourceForm.of(file);
+        if (isLocal(file) && file.getProject() != null)
+            return sourceForm.configuredWith(new IncludeLoaderCallback(file.getProject()));
+        else
+            return sourceForm;
+    }
 
-	private boolean isLocal(IFile file)
-	{
-		return file != null && file.getLocation() != null;
-	}
+    private boolean isLocal(IFile file)
+    {
+        return file != null && file.getLocation() != null;
+    }
 
     public void setIsStructureKnown(boolean isStructureKnown)
     {
@@ -165,7 +165,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
     private FortranElement createSourceFormNode(String desc) throws CModelException
     {
-        desc = "<" + desc + ">";
+        desc = "<" + desc + ">"; //$NON-NLS-1$ //$NON-NLS-2$
         FortranElement element = new FortranElement.UnknownNode(translationUnit, desc);
         translationUnit.addChild(element);
         this.newElements.put(element, element.getElementInfo());
@@ -271,7 +271,7 @@ public class FortranModelBuilder implements IFortranModelBuilder
         }
         else
         {
-            elt.setElementName("(anonymous)");
+            elt.setElementName("(anonymous)"); //$NON-NLS-1$
         }
     }
 }

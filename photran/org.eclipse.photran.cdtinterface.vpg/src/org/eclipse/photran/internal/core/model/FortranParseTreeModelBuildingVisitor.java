@@ -76,7 +76,7 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
 
     // --VISITOR METHODS-------------------------------------------------
 
-    private String methodNameDescPrefix = "";
+    private String methodNameDescPrefix = ""; //$NON-NLS-1$
     
     @Override public void visitASTNode(IASTNode node)
     {
@@ -128,9 +128,9 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
     {
         for (int i = 0; i < list.size(); i++)
         {
-            methodNameDescPrefix = "get(" + i + "): ";
+            methodNameDescPrefix = "get(" + i + "): "; //$NON-NLS-1$ //$NON-NLS-2$
             if (list.get(i) != null)
-            	list.get(i).accept(this);
+                list.get(i).accept(this);
         }
     }
 
@@ -139,17 +139,17 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
         return m.getDeclaringClass() == node.getClass()
                 && m.getReturnType() != null
                 && m.getParameterTypes().length == 0
-                && !m.getName().equals("getParent")
-                && !m.getName().equals("getChildren")
-                && !m.getName().equals("findFirstToken")
-                && !m.getName().equals("findLastToken");
+                && !m.getName().equals("getParent") //$NON-NLS-1$
+                && !m.getName().equals("getChildren") //$NON-NLS-1$
+                && !m.getName().equals("findFirstToken") //$NON-NLS-1$
+                && !m.getName().equals("findLastToken"); //$NON-NLS-1$
     }
 
     private void addMethodDesc(IASTNode node, java.lang.reflect.Method m)
     {
         try
         {
-            methodNameDescPrefix = m.getName() + "(): ";
+            methodNameDescPrefix = m.getName() + "(): "; //$NON-NLS-1$
             
             if (IASTNode.class.isAssignableFrom(m.getReturnType()))
             {
@@ -173,7 +173,7 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
         if (n == null)
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    methodNameDescPrefix + "null"));
+                    methodNameDescPrefix + "null")); //$NON-NLS-1$
         else
             n.accept(this);
     }
@@ -185,7 +185,7 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
         if (n == null)
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    methodNameDescPrefix + "null"));
+                    methodNameDescPrefix + "null")); //$NON-NLS-1$
         else
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
@@ -205,31 +205,31 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getTerminal(): Terminal." + findTerminal(token.getTerminal())));
+                    "getTerminal(): Terminal." + findTerminal(token.getTerminal()))); //$NON-NLS-1$
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getText(): \"" + token.getText().replaceAll("\\n", "\\\\n") + "\""));
+                    "getText(): \"" + token.getText().replaceAll("\\n", "\\\\n") + "\"")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getPreprocessorDirective(): " + token.getPreprocessorDirective()));
+                    "getPreprocessorDirective(): " + token.getPreprocessorDirective())); //$NON-NLS-1$
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getPhysicalFile(): " + token.getPhysicalFile()));
+                    "getPhysicalFile(): " + token.getPhysicalFile())); //$NON-NLS-1$
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getFileOffset(): " + token.getFileOffset()));
+                    "getFileOffset(): " + token.getFileOffset())); //$NON-NLS-1$
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getLogicalFile(): " + token.getLogicalFile()));
+                    "getLogicalFile(): " + token.getLogicalFile())); //$NON-NLS-1$
             
             modelBuilder.addF90Element(
                 new FortranElement.UnknownNode(getCurrentParent(),
-                    "getStreamOffset(): " + token.getStreamOffset()));
+                    "getStreamOffset(): " + token.getStreamOffset())); //$NON-NLS-1$
             
             doneAddingChildrenFor(token);
         }
@@ -258,6 +258,6 @@ public final class FortranParseTreeModelBuildingVisitor extends GenericASTVisito
             }
         }
         
-        return "?";
+        return "?"; //$NON-NLS-1$
     }
 }

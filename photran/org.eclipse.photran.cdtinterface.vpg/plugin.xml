@@ -8,7 +8,7 @@
       <modelbuilder
             class="org.eclipse.photran.internal.core.model.FortranModelBuilder"
             id="defaultModelBilder"
-            name="Default Photran Model Builder" />
+            name="%modelbuilder.name" />
    </extension>
 
 </plugin>
