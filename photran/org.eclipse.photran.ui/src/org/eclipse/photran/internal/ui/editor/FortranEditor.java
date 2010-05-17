@@ -407,7 +407,10 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
      */
     protected boolean shouldDisplayHorizontalRulerRatherThanFolding()
     {
-        return FortranPreferences.ENABLE_FREE_FORM_FOLDING.getValue() == false;
+        if (isFixedForm())
+            return FortranPreferences.ENABLE_FIXED_FORM_FOLDING.getValue() == false;
+        else
+            return FortranPreferences.ENABLE_FREE_FORM_FOLDING.getValue() == false;
     }
 
     protected FortranHorizontalRuler getFortranHorizontalRuler(Composite mainComposite)

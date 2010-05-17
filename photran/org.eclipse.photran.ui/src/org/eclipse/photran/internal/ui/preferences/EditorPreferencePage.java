@@ -34,9 +34,11 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
                                         "Enable folding rather than ruler in free-form Fortran editors",
                                         getFieldEditorParent()));
 
+        /* Fixed form folding does not seem to work, so disable it for now
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FIXED_FORM_FOLDING.getName(),
                                         "Enable folding rather than ruler in fixed-form Fortran editors",
                                         getFieldEditorParent()));
+        */
         
         IntegerFieldEditor intEditor = new IntegerFieldEditor(FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getName(),
                                                               "Fixed-form line length",
