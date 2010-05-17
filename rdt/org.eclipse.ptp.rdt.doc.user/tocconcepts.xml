@@ -7,7 +7,7 @@
    <topic href="html/concepts/services.html" label="Services">
       <topic href="html/concepts/build_service.html" label="Build Service">
       </topic>
-      <topic href="html/concepts/c_indexing_service.html" label="C/C++ Indexing Service">
+      <topic href="html/concepts/c_indexing_service.html" label="Code Indexing Service">
       </topic>
    </topic>
    <topic href="html/concepts/providers.html" label="Providers">
