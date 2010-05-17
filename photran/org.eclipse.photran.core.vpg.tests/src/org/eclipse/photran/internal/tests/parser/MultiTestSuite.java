@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Set;
 
+import junit.framework.Assert;
 import junit.framework.TestSuite;
 
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
@@ -39,13 +40,50 @@ public class MultiTestSuite extends TestSuite
     {
         setName("Running multiple tests on " + directorySuffix);
         
-        addTest(new ParserTestSuite(directorySuffix, isFixedForm, mustExist) {});
-        if (!isFixedForm) addTest(new SourceReproductionTestSuite(directorySuffix, isFixedForm, mustExist) {});
+        if (isFixedForm)
+            addTest(new ParserTestSuite(directorySuffix, isFixedForm, mustExist) {});
+        else
+            addTest(new SourceReproductionTestSuite(directorySuffix, isFixedForm, mustExist) {});
+
         if (!isFixedForm) addTest(new LoopReplacerSRTestSuite(directorySuffix, isFixedForm, mustExist) {});
     }
     
     public MultiTestSuite() {;} // to keep JUnit quiet
     public void test() {} // to keep JUnit quiet
+
+    private static void checkCorrectParenting(final ASTExecutableProgramNode ast)
+    {
+        ast.accept(new GenericASTVisitor()
+        {
+            private IASTNode expectedParent = null;
+            
+            @Override public void visitASTNode(IASTNode node)
+            {
+                if (node != ast && node.getParent() == null)
+                    System.err.println("!"); // Set breakpoint here
+                
+                if (node == ast)
+                    Assert.assertNull(node.getParent());
+                else
+                    Assert.assertNotNull(node.getParent());
+                
+                Assert.assertEquals(expectedParent, node.getParent());
+                IASTNode myParent = expectedParent;
+                
+                expectedParent = node;
+                traverseChildren(node);
+                expectedParent = myParent;
+            }
+            
+            @Override public void visitToken(Token token)
+            {
+                if (token.getParent() == null)
+                    System.err.println("!"); // Set breakpoint here
+                
+                Assert.assertEquals(expectedParent, token.getParent());
+            }
+        });
+    }
 
     public static abstract class ParserTestSuite extends PhotranTestSuiteFromFiles
     {
@@ -100,40 +138,6 @@ public class MultiTestSuite extends TestSuite
             checkCorrectParenting(ast);
         }
         
-        private void checkCorrectParenting(final ASTExecutableProgramNode ast)
-        {
-            ast.accept(new GenericASTVisitor()
-            {
-                private IASTNode expectedParent = null;
-                
-                @Override public void visitASTNode(IASTNode node)
-                {
-                    if (node != ast && node.getParent() == null)
-                        System.err.println("!"); // Set breakpoint here
-                    
-                    if (node == ast)
-                        assertNull(node.getParent());
-                    else
-                        assertNotNull(node.getParent());
-                    
-                    assertEquals(expectedParent, node.getParent());
-                    IASTNode myParent = expectedParent;
-                    
-                    expectedParent = node;
-                    traverseChildren(node);
-                    expectedParent = myParent;
-                }
-                
-                @Override public void visitToken(Token token)
-                {
-                    if (token.getParent() == null)
-                        System.err.println("!"); // Set breakpoint here
-                    
-                    assertEquals(expectedParent, token.getParent());
-                }
-            });
-        }
-        
         public ParserTestCase() { super(null, false, ""); } // to keep JUnit quiet
     }
 
@@ -161,6 +165,8 @@ public class MultiTestSuite extends TestSuite
         @Override
         protected void handleAST(ASTExecutableProgramNode ast) throws IOException
         {
+            checkCorrectParenting(ast);
+            
             String originalSourceCode = getSourceCodeFromFile(file);
             transform(ast);
             String reproducedSourceCode = getSourceCodeFromAST(ast);

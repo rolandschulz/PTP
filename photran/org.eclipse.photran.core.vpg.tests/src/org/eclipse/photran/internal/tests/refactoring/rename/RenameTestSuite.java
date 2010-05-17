@@ -20,6 +20,14 @@ import org.eclipse.photran.internal.core.util.LineCol;
 
 public abstract class RenameTestSuite extends TestSuite
 {
+    /**
+     * If this is set to <code>true</code>, a test case will be added where the refactoring is
+     * initiated from every occurrence of the variable name.  If it is <code>false</code>, the
+     * refactoring will only be initiated once for each identifier, and the selection will be
+     * the first occurrence of that identifier in the file.
+     */
+    private static boolean TEST_ALL_REFERENCES = false;
+    
     ///////////////////////////////////////////////////////////////////////////
     //
     // RECORD POSITIONS OF ALL IDENTIFIERS IN RENAME1.F90, AND
@@ -89,7 +97,7 @@ public abstract class RenameTestSuite extends TestSuite
         subSubSuite.setName("Renaming " + describe(ident, newName));
         
         for (String filename : ident.getFiles())
-            for (LineCol position : ident.getReferences(filename))
+            for (LineCol position : referencesTo(ident, filename))
                 subSubSuite.addTest(createSuccessTestCase(ident, newName, filename, position));
         
         currentSubSuite.addTest(subSubSuite);
@@ -102,10 +110,22 @@ public abstract class RenameTestSuite extends TestSuite
         subSubSuite.setName("Attempting to rename " + describe(ident, newName));
         
         for (String filename : ident.getFiles())
-            for (LineCol position : ident.getReferences(filename))
+            for (LineCol position : referencesTo(ident, filename))
                 subSubSuite.addTest(createFailureTestCase(ident, newName, filename, position));
         
         currentSubSuite.addTest(subSubSuite);
+    }
+
+    private LineCol[] referencesTo(Ident ident, String filename)
+    {
+        LineCol[] allReferences = ident.getReferences(filename);
+        
+        if (TEST_ALL_REFERENCES)
+            return allReferences;
+        else if (allReferences.length == 0)
+            return new LineCol[] { };
+        else
+            return new LineCol[] { allReferences[0] };
     }
 
     protected TestCase createSuccessTestCase(Ident ident, String newName, String filename, LineCol position)
