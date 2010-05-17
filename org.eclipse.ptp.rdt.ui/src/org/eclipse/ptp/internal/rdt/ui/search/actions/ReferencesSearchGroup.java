@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.ReferencesSearchGroup
- * Version: 1.16
+ * Version: 1.18
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
@@ -66,6 +66,7 @@ public class ReferencesSearchGroup extends ActionGroup {
 	/* 
 	 * Method declared on ActionGroup.
 	 */
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		
 		super.fillContextMenu(menu);
@@ -87,18 +88,18 @@ public class ReferencesSearchGroup extends ActionGroup {
 		incomingMenu.add(fFindRefsProjectAction);
 		incomingMenu.add(fFindRefsInWorkingSetAction);
 		
-		for (int i=0; i<actions.length; i++){
-			incomingMenu.add(actions[i]);
+		for (FindAction action : actions) {
+			incomingMenu.add(action);
 		}
 		
 	}	
 	
 	private FindAction[] getWorkingSetActions() {
-		ArrayList actions= new ArrayList(CSearchUtil.LRU_WORKINGSET_LIST_SIZE);
+		ArrayList<FindAction> actions= new ArrayList<FindAction>(CSearchUtil.LRU_WORKINGSET_LIST_SIZE);
 		
-		Iterator iter= CSearchUtil.getLRUWorkingSets().iterator();
+		Iterator<IWorkingSet[]> iter= CSearchUtil.getLRUWorkingSets().iterator();
 		while (iter.hasNext()) {
-			IWorkingSet[] workingSets= (IWorkingSet[])iter.next();
+			IWorkingSet[] workingSets= iter.next();
 			FindAction action;
 			if (fEditor != null)
 				action= new WorkingSetFindAction(fEditor, new FindRefsInWorkingSetAction(fEditor, workingSets), CSearchUtil.toString(workingSets));
@@ -108,12 +109,13 @@ public class ReferencesSearchGroup extends ActionGroup {
 			actions.add(action);
 		}
 		
-		return (FindAction[])actions.toArray(new FindAction[actions.size()]);
+		return actions.toArray(new FindAction[actions.size()]);
 	}
 	
 	/* 
 	 * Overrides method declared in ActionGroup
 	 */
+	@Override
 	public void dispose() {
 		fFindRefsAction= null;
 		fFindRefsProjectAction=null;

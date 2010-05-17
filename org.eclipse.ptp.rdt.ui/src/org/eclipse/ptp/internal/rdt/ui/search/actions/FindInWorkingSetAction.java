@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.FindInWorkingSetAction
- * Version: 1.2
+ * Version: 1.5
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
@@ -52,28 +52,31 @@ public abstract class FindInWorkingSetAction extends FindAction {
 		setToolTipText(tooltip); 
 		fWorkingSets= workingSets;
 	}
-	
+
+	@Override
 	final public void run() {
 		IWorkingSet[] initial= fWorkingSets;
 		if (fWorkingSets == null) {
 			fWorkingSets= askForWorkingSets();
 		}
 		if (fWorkingSets != null) {
-			scopeDescription = Messages.format(CSearchMessages.WorkingSetScope, new String[] {CSearchUtil.toString(fWorkingSets)}); 
+			scopeDescription = Messages.format(CSearchMessages.WorkingSetScope, CSearchUtil.toString(fWorkingSets)); 
 			super.run();
 		}
 		fWorkingSets= initial;
 	}
 
+	@Override
 	final protected String getScopeDescription() {
 		return scopeDescription;
 	}
 
+	@Override
 	final protected ICElement[] getScope() {
 		if (fWorkingSets == null) {
 			return new ICElement[0];
 		}
-		List scope = new ArrayList();
+		List<ICElement> scope = new ArrayList<ICElement>();
 		for (int i = 0; i < fWorkingSets.length; ++i) {
 			IAdaptable[] elements = fWorkingSets[i].getElements();
 			for (int j = 0; j < elements.length; ++j) {
@@ -83,7 +86,7 @@ public abstract class FindInWorkingSetAction extends FindAction {
 			}
 		}
 		
-		return (ICElement[])scope.toArray(new ICElement[scope.size()]);
+		return scope.toArray(new ICElement[scope.size()]);
 	}
 	
 	private IWorkingSet[] askForWorkingSets() {
