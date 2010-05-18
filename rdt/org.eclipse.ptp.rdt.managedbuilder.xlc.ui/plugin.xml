@@ -34,11 +34,12 @@
                   id="org.eclipse.ptp.rdt.managedbuild.toolchain.xlc.exe.debug"
                   name="%ToolChainName.Dbg"
                   osList="all"
+                  scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteXLCPerFileProfile"
+		          supportsManagedBuild="false"
                   targetTool="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.debug;org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.debug">
 			      <targetPlatform
 					  id="org.eclipse.ptp.rdt.managedbuild.target.xlc.platform.exe.debug"
 				 	  name="%PlatformName.Dbg"
-                      binaryParser="org.eclipse.cdt.core.XCOFF32"            					  
 					  osList="all"					  
 					  archList="all">
 				  </targetPlatform>
@@ -99,11 +100,12 @@
                   id="org.eclipse.ptp.rdt.managedbuild.toolchain.xlc.exe.release"
                   name="%ToolChainName.Rel"
                   osList="all"
+                  scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteXLCPerFileProfile"
+		          supportsManagedBuild="false"
                   targetTool="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.release;org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.release">
 		          <targetPlatform
 		              id="org.eclipse.ptp.rdt.managedbuild.target.xlc.platform.exe.release"
 		              name="%PlatformName.Rel"		             
-		              binaryParser="org.eclipse.cdt.core.XCOFF32"
 		              osList="all"
 		              archList="all">		              
 		          </targetPlatform>
@@ -161,6 +163,8 @@
                   id="org.eclipse.ptp.rdt.managedbuild.toolchain.xlc.base"
                   name="%ToolChainName.Dbg"
                   osList="all"
+                  scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteXLCPerFileProfile"
+		          supportsManagedBuild="false"
                   targetTool="org.eclipse.ptp.rdt.managedbuild.tool.xlc.c.linker.exe.debug;org.eclipse.ptp.rdt.managedbuild.tool.xlc.cpp.linker.exe.debug">
 			  	  <builder
 					  superClass="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.builder1"
