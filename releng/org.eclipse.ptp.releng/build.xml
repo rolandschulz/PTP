@@ -11,8 +11,8 @@
 	<target name="init">
 		<touch file="${user.home}/.cvspass" />
 		<tstamp/>
-		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/S-3.6M7-201004291549/eclipse-SDK-3.6M7-linux-gtk-ppc.tar.gz"/>
-		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/7.0.0/I.I201005031211/cdt-master-7.0.0-I201005031211.zip"/>
+		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/S-3.6RC1-201005131500/eclipse-SDK-3.6RC1-linux-gtk-ppc.tar.gz"/>
+		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/7.0.0/I.I201005141101/cdt-master-7.0.0-I201005141101.zip"/>
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/helios/mylyn-3.4.0.I20100430-1600-e3.4.zip"/>
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/S-3.2M7-201005032039/RSE-SDK-3.2M7.zip"/>
 		<property name="tauJars" value="${user.home}/tau_jars.zip"/>
