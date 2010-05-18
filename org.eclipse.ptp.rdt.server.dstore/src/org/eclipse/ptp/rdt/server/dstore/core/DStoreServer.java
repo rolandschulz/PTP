@@ -26,7 +26,7 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	private ClientConnection fDStoreConnection = null;
 	private int fDStorePort = 0;
 
-	private static final String SUCCESS_STRING = "Server Started Successfully";  //$NON-NLS-1$
+	private static final String SUCCESS_STRING = "Server Started Successfully"; //$NON-NLS-1$
 
 	public DStoreServer() {
 		super(Messages.DStoreServer_0);
@@ -39,6 +39,13 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 		return fDStoreConnection.getDataStore();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner#doFinishServer
+	 * ()
+	 */
 	@Override
 	protected void doFinishServer() {
 		if (fDStoreConnection != null) {
@@ -60,6 +67,13 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner#doStartServer
+	 * ()
+	 */
 	@Override
 	protected boolean doStartServer() {
 		int port;
@@ -67,25 +81,31 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 			port = getRemoteConnection().forwardLocalPort("localhost", fDStorePort, null); //$NON-NLS-1$
 		} catch (RemoteConnectionException e) {
 			if (DebugUtil.SERVER_TRACING) {
-				System.err.println(Messages.DStoreServer_1 + e.getLocalizedMessage()); 
+				System.err.println(Messages.DStoreServer_1 + e.getLocalizedMessage());
 			}
 			return false;
 		}
 		fDStoreConnection.setHost("localhost"); //$NON-NLS-1$
 		fDStoreConnection.setPort(Integer.toString(port));
 		if (DebugUtil.SERVER_TRACING) {
-			System.out.println(Messages.DStoreServer_2); 
+			System.out.println(Messages.DStoreServer_2);
 		}
 		ConnectionStatus status = fDStoreConnection.connect(null, 0);
 		DataStore dataStore = fDStoreConnection.getDataStore();
 		dataStore.showTicket(null);
 		dataStore.registerLocalClassLoader(getClass().getClassLoader());
 		if (DebugUtil.SERVER_TRACING) {
-			System.out.println(Messages.DStoreServer_3); 
+			System.out.println(Messages.DStoreServer_3);
 		}
 		return status.isConnected();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner#
+	 * doVerifyServerRunningFromStderr(java.lang.String)
+	 */
 	@Override
 	protected boolean doVerifyServerRunningFromStderr(String output) {
 		switch (fState) {
@@ -109,6 +129,12 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner#
+	 * doVerifyServerRunningFromStdout(java.lang.String)
+	 */
 	@Override
 	protected boolean doVerifyServerRunningFromStdout(String output) {
 		return false;
