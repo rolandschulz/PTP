@@ -57,14 +57,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A unique identifier for this remote service
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A human readable name for the remote service
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
@@ -74,14 +74,14 @@
          <attribute name="scheme" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  An EFS scheme name for this service
                </documentation>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The fully qualified name of the Java class implementing &lt;samp&gt;org.eclipse.ptp.remote.core.IRemoteServicesFactory&lt;/samp&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.ptp.remote.core.IRemoteServicesFactory"/>

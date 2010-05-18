@@ -11,6 +11,11 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="resourceManager"/>
@@ -54,14 +59,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A unique identifier for this resource manager
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A human readable name for the resource manager
                </documentation>
                <appInfo>
                   <meta.attribute translatable="true"/>
