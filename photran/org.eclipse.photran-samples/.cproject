@@ -92,6 +92,7 @@
 				<pathentry kind="src" path="src-interfaces"/>
 				<pathentry kind="src" path="src-fortran2008"/>
 				<pathentry kind="src" path="src-op-overload"/>
+				<pathentry kind="src" path="src-types"/>
 			</storageModule>
 		</cconfiguration>
 	</storageModule>

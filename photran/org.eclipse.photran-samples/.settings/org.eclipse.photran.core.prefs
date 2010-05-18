@@ -1,0 +1,8 @@
+#Tue May 18 02:43:35 CDT 2010
+EnableContentAssist=true
+EnableDeclView=true
+EnableHoverTip=true
+EnableVPG=true
+FortranIncludePaths=/org.eclipse.photran-samples\n
+FortranModulePaths=/org.eclipse.photran-samples\n
+eclipse.preferences.version=1
