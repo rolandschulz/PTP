@@ -5,7 +5,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="OpenMP Problems"
+            name="%view.name"
             icon="icons/openMPproblem.gif"
             category="org.eclipse.ptp.ui.views" 
             class="org.eclipse.ptp.pldt.openmp.ui.pv.views.OpenMPProblemsView"
@@ -16,7 +16,7 @@
    <!-- MARKER_ID       = "org.eclipse.ptp.pldt.openmp.ui.pv.openMPProblemMarker" -->
    <extension point="org.eclipse.core.resources.markers"
 		id="openMPProblemMarker"
-        name="OpenMP Problem Marker">
+        name="%extension.name">
       <super type="org.eclipse.core.resources.textmarker"/>
       <attribute name="description"/>
       <attribute name="resource"/>

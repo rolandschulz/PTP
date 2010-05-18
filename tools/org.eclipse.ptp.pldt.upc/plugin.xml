@@ -8,14 +8,14 @@
             class="org.eclipse.ptp.pldt.upc.prefs.UPCPreferencePage"
             id="org.eclipse.ptp.pldt.upc.prefpage"
             category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
-            name="UPC"/>
+            name="%page.name"/>
          
    </extension>
 
    <!--  UPC markers -->
    <extension point="org.eclipse.core.resources.markers"
 		id="upcMarker"
-        name="upc Artifact Marker">
+        name="%extension.name">
       <super type="org.eclipse.core.resources.textmarker"/>
    </extension>
    <!-- this changes the marker image in the editor marker bar  -->
@@ -33,7 +33,7 @@
             icon="icons/upc.gif" 
             
             presentationLayer="3"
-            label="upc Annotation Marker"
+            label="%specification.label"
             
             textPreferenceKey="upcIndication"
             textPreferenceValue="true"
@@ -77,7 +77,7 @@
       <command
             defaultHandler="org.eclipse.ptp.pldt.upc.actions.RunAnalyseUPCcommandHandler"
             id="org.eclipse.ptp.pldt.upc.command2"
-            name="find upc artifacts">
+            name="%command.name">
       </command>
    </extension>
       <extension
@@ -87,7 +87,7 @@
          <command
                commandId="org.eclipse.ptp.pldt.upc.command2"
                icon="icons/upc.gif"
-               label="Show UPC Artifacts">
+               label="%command.label">
          </command>
       </menuContribution>
    </extension>
