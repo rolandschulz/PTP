@@ -18,16 +18,16 @@
          point="org.eclipse.ui.commands">
       <category
             id="org.eclipse.ptp.pldt.common.analysisDropdownCategory"
-            name="Analysis Dropdown Category">
+            name="%category.name">
       </category>
       <command
             id="org.eclipse.ptp.pldt.common.dropDownCommand"
             categoryId="org.eclipse.ptp.pldt.common.analysisDropdownCategory"
             defaultHandler="org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler"
-            name="Analysis dropdown menu">
+            name="%command.name">
          <commandParameter
                id="org.eclipse.ptp.pldt.common.dropDownCommand.msg"
-               name="Message"
+               name="%commandParameter.name"
                optional="true"
                typeId="String">
          </commandParameter>
