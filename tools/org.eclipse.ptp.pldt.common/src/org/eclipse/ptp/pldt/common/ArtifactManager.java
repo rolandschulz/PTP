@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2008 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,7 +147,7 @@ public class ArtifactManager {
 		hashMap.clear();
 	}
 	public String toString(){
-		return "ArtifactManager for "+id_;
+		return "ArtifactManager for "+id_; //$NON-NLS-1$
 	}
 
 

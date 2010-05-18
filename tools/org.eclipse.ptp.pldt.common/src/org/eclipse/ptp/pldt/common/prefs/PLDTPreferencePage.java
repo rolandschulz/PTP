@@ -1,3 +1,13 @@
+/**********************************************************************
+ * Copyright (c) 2010 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.pldt.common.prefs;
 
 import org.eclipse.jface.preference.*;
@@ -28,7 +38,7 @@ public class PLDTPreferencePage
 	public PLDTPreferencePage() {
 		super(GRID);
 		setPreferenceStore(CommonPlugin.getDefault().getPreferenceStore());
-		setDescription("PTP Parallel Language Development Tools");
+		setDescription(Messages.PLDTPreferencePage_ptp_par_lang_dev_tools);
 	}
 	
 	/**
@@ -38,7 +48,7 @@ public class PLDTPreferencePage
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
-		String conf = "Show Analysis Confirmation with count of number of artifacts found";
+		String conf = Messages.PLDTPreferencePage_show_confirmation_q;
         BooleanFieldEditor bed = new BooleanFieldEditor(IDs.SHOW_ANALYSIS_CONFIRMATION,conf,getFieldEditorParent());
         //StringFieldEditor sed = new StringFieldEditor(MpiIDs.MPI_BUILD_CMD, MPI_BUILD_COMMAND_LABEL,getFieldEditorParent());
         addField(bed);

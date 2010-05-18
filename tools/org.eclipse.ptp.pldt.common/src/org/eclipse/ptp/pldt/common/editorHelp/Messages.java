@@ -8,19 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.pldt.common.prefs;
+package org.eclipse.ptp.pldt.common.editorHelp;
 
-/**
- * Constant definitions for plug-in preferences
- */
-public class PreferenceConstants {
+import org.eclipse.osgi.util.NLS;
 
-	public static final String P_PATH = "pathPreference"; //$NON-NLS-1$
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.common.editorHelp.messages"; //$NON-NLS-1$
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-	public static final String P_BOOLEAN = "booleanPreference"; //$NON-NLS-1$
+	private Messages() {
+	}
 
-	public static final String P_CHOICE = "choicePreference"; //$NON-NLS-1$
-
-	public static final String P_STRING = "stringPreference"; //$NON-NLS-1$
-	
+	public static String generic_c_help_book;
 }

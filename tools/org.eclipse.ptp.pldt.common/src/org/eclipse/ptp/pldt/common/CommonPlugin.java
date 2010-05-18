@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation.
+ * Copyright (c) 2005, 2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ public class CommonPlugin extends AbstractUIPlugin {
 
 	private static boolean eclipseTraceOn = false;
 	private static boolean haveReadTraceStatus = false;
-	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.common";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.common"; //$NON-NLS-1$
 	
   /**
    * To use dynamic tracing (User instructions):
@@ -66,9 +66,9 @@ public class CommonPlugin extends AbstractUIPlugin {
    */
 	public static boolean getTraceOn() {
 		if (!haveReadTraceStatus) {
-			String traceFilter = Platform.getDebugOption("org.eclipse.ptp.pldt.common/debug/pldtTrace");
+			String traceFilter = Platform.getDebugOption("org.eclipse.ptp.pldt.common/debug/pldtTrace"); //$NON-NLS-1$
 			if (traceFilter != null) {
-				System.out.println("CommonPlugin.getTraceOn(): pldtTrace trace filtering is on; traceFilter= " + traceFilter);
+				System.out.println("CommonPlugin.getTraceOn(): pldtTrace trace filtering is on; traceFilter= " + traceFilter); //$NON-NLS-1$
 				eclipseTraceOn = true;
 			}
 			haveReadTraceStatus = true;
@@ -149,7 +149,7 @@ public class CommonPlugin extends AbstractUIPlugin {
     {
         try {
             if (resourceBundle == null)
-                resourceBundle = ResourceBundle.getBundle("org.ptp.pldt.common.CommonPluginResources");
+                resourceBundle = ResourceBundle.getBundle("org.ptp.pldt.common.CommonPluginResources"); //$NON-NLS-1$
         } catch (MissingResourceException x) {
             resourceBundle = null;
         }

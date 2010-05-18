@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation.
+ * Copyright (c) 2005, 2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,7 +54,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
         this.removeMarkers=removeMarkers;
         this.artifactManager_=ArtifactManager.getManager(markerID_);
         if(artifactManager_==null){
-        	System.out.println("no manager yet!");
+        	System.out.println("no manager yet!"); //$NON-NLS-1$
         }
     }    
     
@@ -94,13 +94,13 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
     public boolean visitFile(IResource resource, Artifact[] artifacts)
     {
         try {
-            if (traceOn) System.out.println("ArtifactMarkingVisitor.visitFile: " + resource.getName());
+            if (traceOn) System.out.println("ArtifactMarkingVisitor.visitFile: " + resource.getName()); //$NON-NLS-1$
             // first clear existing markers (not: not doing anything ArtifactManager now.)
             if(removeMarkers) {
             	removeMarkers(resource, this.markerID_);
             }
             int numArtifacts=artifactManager_.getArtifacts().length;
-            if(traceOn)System.out.println("numArtifacts: "+numArtifacts);
+            if(traceOn)System.out.println("numArtifacts: "+numArtifacts); //$NON-NLS-1$
             
             String fn = resource.getProjectRelativePath().toString();
 
@@ -137,7 +137,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
      */
     protected void createMarkers(IResource resource, String fn, Artifact[] artifacts) throws CoreException
     {
-        if (traceOn) System.out.println("ArtifactMarkingVisitor.createMarkers: " + resource.getName() + " #artifacts=" + artifacts.length);
+        if (traceOn) System.out.println("ArtifactMarkingVisitor.createMarkers: " + resource.getName() + " #artifacts=" + artifacts.length); //$NON-NLS-1$ //$NON-NLS-2$
 
         for (int i = 0; i < artifacts.length; i++) {
             Artifact artifact = artifacts[i];
@@ -176,7 +176,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
                 // If making other views, e.g. tree view, add to model tree for view here..
             } else {
                 if (traceOn)
-                    System.out.println("*** artifact for " + fn + "is null! ********");
+                    System.out.println("*** artifact for " + fn + "is null! ********"); //$NON-NLS-1$ //$NON-NLS-2$
                 else {
                 }
             }
@@ -195,15 +195,15 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
      */
     protected void createArtifactMarker(IResource resource, Artifact artifact, String fn) throws CoreException
     {
-        if (traceOn) System.out.println("Artifact desc=" + artifact.getShortName() + "  fn=" + fn);
+        if (traceOn) System.out.println("Artifact desc=" + artifact.getShortName() + "  fn=" + fn); //$NON-NLS-1$ //$NON-NLS-2$
         Map<String, Object> attrs = createCommonMarkerAttrs(resource, artifact, fn);
         // message attribute will be used for hover over editor location
         attrs.put(IMarker.MESSAGE, artifact.getShortName());
         // create the marker all at once, so get ONLY a single resourceChange event.
         MarkerUtilities.createMarker(resource, attrs, this.markerID_);  // 154
         if (traceOn)
-            System.out.println("marker created: for " + fn + " - " + artifact.getShortName() + " line "
-                    + artifact.getLine() + " start " + artifact.getSourceInfo().getStart() + " end "
+            System.out.println("marker created: for " + fn + " - " + artifact.getShortName() + " line " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    + artifact.getLine() + " start " + artifact.getSourceInfo().getStart() + " end " //$NON-NLS-1$ //$NON-NLS-2$
                     + artifact.getSourceInfo().getEnd());
         
         artifactManager_.addArtifactToHash(artifact);
@@ -251,7 +251,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
         attrs.put(IDs.ID, id); // used to look up to get artifact from marker later
         attrs.put(IDs.LINE, Integer.toString(artifact.getLine()));
         if (traceOn)
-            System.out.println("marker created: for " + fn + " - " + artifact.getDescription() + " line " + artifact.getLine());
+            System.out.println("marker created: for " + fn + " - " + artifact.getDescription() + " line " + artifact.getLine()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         return attrs;
     }
 
@@ -264,7 +264,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
      */
     public static Artifact[] getPIs(IResource r)
     {
-        System.out.println("*UNIMPLEMENTED** ArtifactMarkingVisitor.getPIs: " + r.getName());
+        System.out.println("*UNIMPLEMENTED** ArtifactMarkingVisitor.getPIs: " + r.getName()); //$NON-NLS-1$
         return null;
     }
 
@@ -275,7 +275,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
      */
     private void removeMarkers(IResource resource, String markerID)
     {
-        if (traceOn) System.out.println("ArtifactMarkingVisitor.removeMarkers: " + resource.getName());
+        if (traceOn) System.out.println("ArtifactMarkingVisitor.removeMarkers: " + resource.getName()); //$NON-NLS-1$
 
         try {
             resource.deleteMarkers(markerID, false, IResource.DEPTH_INFINITE);
@@ -284,7 +284,7 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
         } catch (CoreException e) {
             System.out.println(e);
             System.out.println(e.toString());
-            System.out.println("Problem deleting markers on " + resource.getProjectRelativePath());
+            System.out.println("Problem deleting markers on " + resource.getProjectRelativePath()); //$NON-NLS-1$
         }
     }
 
@@ -329,9 +329,9 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
      */
     public static void showArtifact(Artifact artifact)
     {
-        System.out.println("Artifact name: " + artifact.getShortName());
-        System.out.println("   Description: " + artifact.getDescription());
-        System.out.println("   Filename:    " + artifact.getFileName());
+        System.out.println("Artifact name: " + artifact.getShortName()); //$NON-NLS-1$
+        System.out.println("   Description: " + artifact.getDescription()); //$NON-NLS-1$
+        System.out.println("   Filename:    " + artifact.getFileName()); //$NON-NLS-1$
 
     }
 

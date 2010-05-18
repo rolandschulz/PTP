@@ -59,7 +59,7 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	 * but the editor now has the focus).
 	 */
 	public AnalysisDropdownHandler(){
-		if(traceOn)System.out.println("AnalysisDropdownHandler() ctor... should not be >1 of these");
+		if(traceOn)System.out.println("AnalysisDropdownHandler() ctor... should not be >1 of these"); //$NON-NLS-1$
 		assert(instance==null);  // we presume this is a singleton
 		instance=this;
 		ISelectionService ss=null;
@@ -74,15 +74,15 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 			if(sel instanceof IStructuredSelection) {
 				lastSelection=(IStructuredSelection)sel;
 				if(traceOn)
-					System.out.println("  ...got initial selection.");
+					System.out.println("  ...got initial selection."); //$NON-NLS-1$
 			}
 		} catch (Exception e) {
 			Throwable t=e.getCause();
 			//e.printStackTrace();
-			String msg ="(no cause)";
+			String msg ="(no cause)"; //$NON-NLS-1$
 			if(t!=null)
 				msg=t.getMessage();
-			System.out.println("AnalysisDropdownHandler <init> "+ e.getMessage()+" cause: "+msg);
+			System.out.println("AnalysisDropdownHandler <init> "+ e.getMessage()+" cause: "+msg); //$NON-NLS-1$ //$NON-NLS-2$
 			// FIXME this gets hit on target workbench shutdown. WHY?
 			// BRT maybe we DO want to return here; sometimes ss=null (Junit tests) and the code below fails sometimes.
 			//return;
@@ -93,7 +93,7 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 		// If we still don't know the selection then find out the selection in the
 		// project explorer view - its guess is probably right.
 		if (lastSelection == null) {
-			String projExpID = "org.eclipse.ui.navigator.ProjectExplorer";
+			String projExpID = "org.eclipse.ui.navigator.ProjectExplorer"; //$NON-NLS-1$
 			ISelection apSel = ss.getSelection(projExpID);
 			if (apSel != null & apSel instanceof IStructuredSelection) {
 				if (!apSel.isEmpty()) {
@@ -104,17 +104,17 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if(traceOn)System.out.println("AnalysisDropdownHandler.execute()...");
+		if(traceOn)System.out.println("AnalysisDropdownHandler.execute()..."); //$NON-NLS-1$
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if(traceOn)System.out.println("selection: "+selection);
+		if(traceOn)System.out.println("selection: "+selection); //$NON-NLS-1$
 		
 		if(lastAnalysisHandler!=null){
-			if(traceOn)System.out.println("Last analysis was: "+lastAnalysisHandler);
+			if(traceOn)System.out.println("Last analysis was: "+lastAnalysisHandler); //$NON-NLS-1$
 			lastAnalysisHandler.execute(event);
 		}
 		else {
-			final String msg = "No analysis has been done yet to repeat.";
-			MessageDialog.openInformation(null, "Repeat Analysis", msg);
+			final String msg = Messages.AnalysisDropdownHandler_9;
+			MessageDialog.openInformation(null, Messages.AnalysisDropdownHandler_10, msg);
 		}
 
 	    return null;
@@ -131,7 +131,7 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 			lastAnalysisSelection=selection;
 		}
 		
-		if(traceOn)System.out.println("lastAnalysisHandler set to: "+lastAnalysisHandler);
+		if(traceOn)System.out.println("lastAnalysisHandler set to: "+lastAnalysisHandler); //$NON-NLS-1$
 		
 	}
 	public static IStructuredSelection getLastAnalysisSelection(){
@@ -146,7 +146,7 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if(selection instanceof IStructuredSelection) {
 			lastSelection=(IStructuredSelection)selection;
-			if(traceOn)System.out.println("ADDH.selectionChanged, got structured selection");
+			if(traceOn)System.out.println("ADDH.selectionChanged, got structured selection"); //$NON-NLS-1$
 		}
 		
 	}

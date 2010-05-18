@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,8 +48,8 @@ public class FunctionPrototypeSummaryImpl implements IFunctionPrototypeSummary
 
     public String getPrototypeString(boolean namefirst)
     {
-        return namefirst ? name + "(" + arguments + ") " + returnType : returnType + " "
-                + name + "(" + arguments + ")";
+        return namefirst ? name + "(" + arguments + ") " + returnType : returnType + " " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + name + "(" + arguments + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 	public void setArguments(String arguments) {

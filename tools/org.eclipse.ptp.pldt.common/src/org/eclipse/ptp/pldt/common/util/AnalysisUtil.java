@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2006 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,17 +40,17 @@ public class AnalysisUtil {
 	 * @return
 	 */
 	public static boolean validForAnalysis(String filename, boolean isCPP) {
-		int loc = filename.lastIndexOf(".");
+		int loc = filename.lastIndexOf("."); //$NON-NLS-1$
 		if (loc <= 0) // if no dot, or filename is ".foo", not valid for
 						// analysis.
 			return false;
 		String ext = filename.substring(loc + 1);
 		ext = ext.toLowerCase();
 		boolean result = false;
-		if (ext.startsWith("c") ||ext.startsWith("f") ) // c or fortran
+		if (ext.startsWith("c") ||ext.startsWith("f") ) // c or fortran //$NON-NLS-1$ //$NON-NLS-2$
 			result = true;
 		else
-			if(isCPP && ext.startsWith("h")) // C++ can have code in header files
+			if(isCPP && ext.startsWith("h")) // C++ can have code in header files //$NON-NLS-1$
 			  result=true;
 		return result;
 	}

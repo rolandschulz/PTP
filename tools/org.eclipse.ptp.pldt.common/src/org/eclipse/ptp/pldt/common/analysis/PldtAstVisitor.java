@@ -60,10 +60,10 @@ import org.eclipse.ui.PlatformUI;
 public class PldtAstVisitor extends CASTVisitor {
 
 
-	public static String ARTIFACT_CALL = "Artifact Call";
-	public static String ARTIFACT_CONSTANT = "Artifact Constant";
-	protected static String ARTIFACT_NAME = "Artifact Name";
-	protected static String PREFIX = "";
+	public static String ARTIFACT_CALL = "Artifact Call"; //$NON-NLS-1$
+	public static String ARTIFACT_CONSTANT = "Artifact Constant"; //$NON-NLS-1$
+	protected static String ARTIFACT_NAME = "Artifact Name"; //$NON-NLS-1$
+	protected static String PREFIX = ""; //$NON-NLS-1$
 	private static /*final*/ boolean traceOn=false;
 	
 	private static boolean dontAskToModifyIncludePathAgain=false;
@@ -104,7 +104,7 @@ public class PldtAstVisitor extends CASTVisitor {
 		dontAskToModifyIncludePathAgain=false;
 		this.allowPrefixOnlyMatch=prefixOnlyMatch;
 		if(!traceOn) traceOn=CommonPlugin.getTraceOn();
-		if(traceOn)System.out.println("PldtAstVisitor, traceOn="+traceOn);
+		if(traceOn)System.out.println("PldtAstVisitor, traceOn="+traceOn); //$NON-NLS-1$
 	}
 	/**
 	 * Constructor without prefixOnlyMatch arg, assumes false
@@ -154,14 +154,14 @@ public class PldtAstVisitor extends CASTVisitor {
 		if ((this.allowPrefixOnlyMatch&&matchesPrefix(strName)) || isArtifact(funcName)) { // brt C++ test 2/16/10
 			SourceInfo sourceInfo = getSourceInfo(astExpr, Artifact.FUNCTION_CALL);
 			if (sourceInfo != null) {
-				if(traceOn) System.out.println("found artifact: " + funcName.toString());
+				if(traceOn) System.out.println("found artifact: " + funcName.toString()); //$NON-NLS-1$
 				// Note: we're determining the artifact name twice. (also in chooseName())
 				String artName=funcName.toString();
 				String rawName=funcName.getRawSignature();
 				//String bName=funcName.getBinding().getName();
 				if(!artName.equals(rawName)) {
-					if(rawName.length()==0)rawName="  ";
-					artName=artName+"  ("+rawName+")"; // indicate orig pre-pre-processor value in parens
+					if(rawName.length()==0)rawName="  "; //$NON-NLS-1$
+					artName=artName+"  ("+rawName+")"; // indicate orig pre-pre-processor value in parens //$NON-NLS-1$ //$NON-NLS-2$
 					// note: currently rawName seems to always be empty.
 				}
 					scanReturn.addArtifact(new Artifact(fileName, sourceInfo
@@ -214,7 +214,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			IASTFileLocation floc = name2.getFileLocation();
 			if (floc == null) {
 				if (traceOn)
-					System.out.println("PldtAstVisitor  IASTFileLocn null for "+ name2 + " (" + funcName + ")");
+					System.out.println("PldtAstVisitor  IASTFileLocn null for "+ name2 + " (" + funcName + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				return false; // (e.g. 'ptr' )
 			}
 			String filename = floc.getFileName();
@@ -224,7 +224,7 @@ public class PldtAstVisitor extends CASTVisitor {
 				return true;
 			} else {
 				if (traceOn) {
-					System.out.println(name+ " was found in "+ path+ " but  PLDT preferences have been set to only include: "+ includes_.toString());
+					System.out.println(name+ " was found in "+ path+ " but  PLDT preferences have been set to only include: "+ includes_.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				// add them here?
 				if (allowIncludePathAdd()) {
@@ -297,7 +297,7 @@ public class PldtAstVisitor extends CASTVisitor {
 			return false;
 		for (String includeDir : includes_) {
 			IPath includePath = new Path(includeDir);
-			if(traceOn)System.out.println("PldtAstVisitor: is "+includeFilePath+" found in "+includeDir+"?");
+			if(traceOn)System.out.println("PldtAstVisitor: is "+includeFilePath+" found in "+includeDir+"?"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (includePath.isPrefixOf(includeFilePath))
 				return true;
 		}
@@ -420,27 +420,27 @@ public class PldtAstVisitor extends CASTVisitor {
 		boolean doitThisTime=false;
 		
 		if(store==null || id == null) {
-			CommonPlugin.log(IStatus.ERROR, "PLDT: Visitor subclass does not implement getPreferenceStore() or "+
-					"getIncludesPrefID() to return non-null values.");
+			CommonPlugin.log(IStatus.ERROR, "PLDT: Visitor subclass does not implement getPreferenceStore() or "+ //$NON-NLS-1$
+					"getIncludesPrefID() to return non-null values."); //$NON-NLS-1$
 			return false;
 		}
 		
 		try {
 		 String value = store.getString(id);
-		if(traceOn)System.out.println("value: "+value);
+		if(traceOn)System.out.println("value: "+value); //$NON-NLS-1$
 		
 		if (!dontAskAgain) {
         // probably inefficient string construction, but rarely called.
-        String msg = "The following API: \n  "
+        String msg = Messages.PldtAstVisitor_20
             + name
-            + "\nwas found in the following path: \n  "
+            + Messages.PldtAstVisitor_21
             + path.toString()
-            + "\nwhich is not in the "
+            + Messages.PldtAstVisitor_22
             + type
-            + " preferences path list of: \n  "
+            + Messages.PldtAstVisitor_23
             + value
-            + ".\nDo you want to add it?  If so, further APIs found here will be automatically recognized.";
-        String title = "Add " + type + " include path?";
+            + Messages.PldtAstVisitor_24;
+        String title = Messages.PldtAstVisitor_25 + type + Messages.PldtAstVisitor_26;
         boolean[] twoAnswers = askUI(title, msg, dontAskToModifyIncludePathAgain);
         doitThisTime = twoAnswers[0];
         dontAskAgain = twoAnswers[1];
@@ -472,7 +472,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	 * @return artifact type name such as "MPI", "OpenMP" etc.
 	 */	
 	protected String getTypeName() {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -534,7 +534,7 @@ public class PldtAstVisitor extends CASTVisitor {
 	      }
 	      
 	      // see also: openYesNoCancelQuestion
-	      String toggleMessage="Don't ask again";
+	      String toggleMessage=Messages.PldtAstVisitor_28;
 	      IPreferenceStore store = null;
 	      String key = null;
 	      MessageDialogWithToggle md;

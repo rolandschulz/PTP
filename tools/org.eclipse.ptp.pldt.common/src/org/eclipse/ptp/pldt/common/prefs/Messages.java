@@ -10,17 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.common.prefs;
 
-/**
- * Constant definitions for plug-in preferences
- */
-public class PreferenceConstants {
+import org.eclipse.osgi.util.NLS;
 
-	public static final String P_PATH = "pathPreference"; //$NON-NLS-1$
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.common.prefs.messages"; //$NON-NLS-1$
+	public static String PLDTPreferencePage_ptp_par_lang_dev_tools;
+	public static String PLDTPreferencePage_show_confirmation_q;
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-	public static final String P_BOOLEAN = "booleanPreference"; //$NON-NLS-1$
-
-	public static final String P_CHOICE = "choicePreference"; //$NON-NLS-1$
-
-	public static final String P_STRING = "stringPreference"; //$NON-NLS-1$
-	
+	private Messages() {
+	}
 }
