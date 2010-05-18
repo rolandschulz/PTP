@@ -10,13 +10,13 @@
          <action
                class="org.eclipse.ptp.pldt.openmp.analysis.textview.ShowConcurrencyAction"
                id="org.eclipse.ptp.pldt.openmp.analysis.showConcurrency"
-               label="Show Concurrency"
+               label="%action.label"
                menubarPath="additions"/>
       </viewerContribution>
    </extension>
    <extension
          id="openMPConcurrencyMarker"
-         name="openMPConcurrencyMarker"
+         name="%extension.name"
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
             annotationType="org.eclipse.ptp.pldt.openmp.analysis.concurrency"
@@ -28,7 +28,7 @@
             includeOnPreferencePage="true"
             isGoToNextNavigationTarget="false"
             isGoToNextNavigationTargetKey="isConcurrencyRecordGoToNextNavigationTarget"
-            label="Concurrency Marker"
+            label="%specification.label"
             overviewRulerPreferenceKey="concurrencyIndicationInOverviewRuler"
             overviewRulerPreferenceValue="false"
             presentationLayer="5"
@@ -47,7 +47,7 @@
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             isGoToNextNavigationTarget="false"
-            label="NonConcurrency Marker"
+            label="%specification.label.0"
             overviewRulerPreferenceKey="nonConcurrencyIndicationInOverviewRuler"
             overviewRulerPreferenceValue="false"
             presentationLayer="5"
