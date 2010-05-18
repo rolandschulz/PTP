@@ -31,7 +31,7 @@
    <!--  MPI Barrier markers -->
    <extension point="org.eclipse.core.resources.markers"
 		id="mpiBarrierMarker"
-        name="MPI Barrier Artifact Marker">
+        name="%barrier.artifact.marker">
       <super type="org.eclipse.core.resources.textmarker"/>
       <attribute name="fileName"/>
       <attribute name="theLineNo"/>
@@ -57,7 +57,7 @@
             icon="icons/barrier.gif" 
             
             presentationLayer="3"
-            label="MPI Barrier Annotation Marker"
+            label="%barrier.annotation.marker"
             
             textPreferenceKey="mpiIndication"
             textPreferenceValue="true"
@@ -84,7 +84,7 @@
    <!-- Matching Set Artifacts -->
    <extension point="org.eclipse.core.resources.markers"
 		id="mpiBarrierMatchingSetMarker"
-        name="MPI Barrier Matching Set Marker">
+        name="%barrier.matchingset.marker">
       <super type="org.eclipse.core.resources.textmarker"/>
       <attribute name="fileName"/>
       <attribute name="theLineNo"/>
@@ -110,7 +110,7 @@
             icon="icons/barrier.gif" 
             
             presentationLayer="3"
-            label="MPI Barrier Matching Set Annotation Marker"
+            label="%barrier.matchingset.annotation.marker"
             
             textPreferenceKey="mpiIndicationMatch"
             textPreferenceValue="true"
@@ -136,7 +136,7 @@
    <!-- Barrier Error Artifacts -->
    <extension point="org.eclipse.core.resources.markers"
 		id="mpiErrorMarker"
-        name="MPI Barrier Error Marker">
+        name="%mpi.barrier.error.marker">
       <super type="org.eclipse.core.resources.problemmarker"/>
       <attribute name="fileName"/>
       <attribute name="theLineNo"/>
@@ -163,7 +163,7 @@
             icon="icons/barrier.gif" 
             
             presentationLayer="3"
-            label="MPI Barrier Error Annotation Marker"
+            label="%mpi.barrier.error.annotation.marker"
             
             textPreferenceKey="mpiIndicationError"
             textPreferenceValue="true"
@@ -191,7 +191,7 @@
          <command
                defaultHandler="org.eclipse.ptp.pldt.mpi.analysis.actions.RunAnalyseMPIAnalysiscommandHandler"
                id="org.eclipse.ptp.pldt.mpi.analysis.command2"
-               name="MPI Barrier Analysis">
+               name="%barrier.analysis.command.name">
          </command>
       </extension>
       <extension point="org.eclipse.ui.menus">
@@ -200,9 +200,9 @@
             <command
                   commandId="org.eclipse.ptp.pldt.mpi.analysis.command2"
                   icon="icons/barrier.gif"
-                  label="MPI Barrier Analysis"
+                  label="%barrier.analysis.command.label"
                   style="push"
-                  tooltip="Run MPI Barrier Analysis on selected project, folder, or file">
+                  tooltip="%run.barrier.analysis.command.tooltip">
             </command>
          </menuContribution>
 
