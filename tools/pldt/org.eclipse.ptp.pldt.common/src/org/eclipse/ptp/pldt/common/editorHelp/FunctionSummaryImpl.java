@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation.
+ * Copyright (c) 2005, 2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,10 +94,10 @@ public class FunctionSummaryImpl implements IFunctionSummary
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
-        buf.append("name=").append(this.getName()).append('\n');
-        buf.append("namespace=").append(this.getNamespace()).append('\n');
-        buf.append("desc=").append(this.getDescription()).append('\n');
-        buf.append("...");
+        buf.append("name=").append(this.getName()).append('\n'); //$NON-NLS-1$
+        buf.append("namespace=").append(this.getNamespace()).append('\n'); //$NON-NLS-1$
+        buf.append("desc=").append(this.getDescription()).append('\n'); //$NON-NLS-1$
+        buf.append("..."); //$NON-NLS-1$
         return buf.toString();
     }
 }

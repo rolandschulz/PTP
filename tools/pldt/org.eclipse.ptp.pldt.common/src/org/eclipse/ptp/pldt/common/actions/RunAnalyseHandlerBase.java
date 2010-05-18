@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation.
+ * Copyright (c) 2005, 2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,7 +111,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		this.markerID = markerID;
 		
 		traceOn=CommonPlugin.getTraceOn();
-		if(traceOn)System.out.println("RunAnalyseBase.ctor: traceOn="+traceOn);
+		if(traceOn)System.out.println("RunAnalyseBase.ctor: traceOn="+traceOn); //$NON-NLS-1$
 		
 		// get the navigator, project explorer, c/C++ projects view, etc
 		//need to get selectionChanged on that, to cache the most recent selection there,
@@ -123,7 +123,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		if (traceOn)
-			System.out.println("RunAnalyseBase.setActivePart()...");
+			System.out.println("RunAnalyseBase.setActivePart()..."); //$NON-NLS-1$
 		shell = targetPart.getSite().getShell();
 	}
 
@@ -135,7 +135,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 	public void run() {
 		if (traceOn)
-			System.out.println("RunAnalyseHandlerBase.run()...");
+			System.out.println("RunAnalyseHandlerBase.run()..."); //$NON-NLS-1$
 
 		cancelledByUser = false;
 		err = false;
@@ -146,8 +146,8 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
  
 		if ((selection == null) || selection.isEmpty()) {
 			MessageDialog
-					.openWarning(null, "No files selected for analysis.",
-							"Please select a source file or container (folder or project) to analyze.");
+					.openWarning(null, Messages.RunAnalyseHandlerBase_no_files_selected,
+							Messages.RunAnalyseHandlerBase_please_select);
 
 			return;
 		} else {
@@ -156,9 +156,9 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			if (areIncludePathsNeeded() && includes.isEmpty()) {
 				//System.out.println("RunAnalyseHandlerBase.run(), no include paths found.");
 				MessageDialog.openWarning(shell, name
-						+ " Include Paths Not Found",
-						"Please first specify the " + name
-								+ " include paths in the Preferences page.");
+						+ Messages.RunAnalyseHandlerBase_include_paths_not_found,
+						Messages.RunAnalyseHandlerBase_please_first_specify + name
+								+ Messages.RunAnalyseHandlerBase_incl_paths_in_pref_page);
 
 			} else {
 
@@ -180,9 +180,9 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 				} catch (InvocationTargetException e) {
 					err = true;
 					Throwable cause = e.getCause();
-					System.out.println("Error running analysis: ITE: "
+					System.out.println("Error running analysis: ITE: " //$NON-NLS-1$
 							+ e.getMessage());
-					System.out.println("  cause: " + cause + " - "
+					System.out.println("  cause: " + cause + " - " //$NON-NLS-1$ //$NON-NLS-2$
 							+ cause.getMessage());
 					
 					cause.printStackTrace();
@@ -193,16 +193,16 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			}// end else
 		}
 		if (traceOn)
-			System.out.println("RunAnalyseBase: retd from run iterator, err="
+			System.out.println("RunAnalyseBase: retd from run iterator, err=" //$NON-NLS-1$
 					+ err);
-		String artsFound = "\nNumber of " + name + " Artifacts found: "
+		String artsFound = "\nNumber of " + name + " Artifacts found: " //$NON-NLS-1$ //$NON-NLS-2$
 				+ cumulativeArtifacts;
 		if (cancelledByUser) {
-			MessageDialog.openInformation(null, "Partial Analysis Complete.",
-					"Partial Analysis complete.  Cancelled by User."
+			MessageDialog.openInformation(null, Messages.RunAnalyseHandlerBase_partial_analysis_complete,
+					Messages.RunAnalyseHandlerBase_15
 							+ artsFound);
 		} else {
-			String msg = "***Analysis is complete.";
+			String msg = Messages.RunAnalyseHandlerBase_cancelled_by_user;
 			if (!err) {
 				String key = IDs.SHOW_ANALYSIS_CONFIRMATION;
 				IPreferenceStore pf = CommonPlugin.getDefault()
@@ -210,27 +210,27 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 				boolean showDialog = pf
 						.getBoolean(IDs.SHOW_ANALYSIS_CONFIRMATION);
 				if (showDialog) {
-					String title = "Analysis complete.";
-					StringBuffer sMsg = new StringBuffer(cumulativeArtifacts + " " + name
-							+ " Artifacts found");
+					String title = Messages.RunAnalyseHandlerBase_analysis_complete;
+					StringBuffer sMsg = new StringBuffer(cumulativeArtifacts + " " + name //$NON-NLS-1$
+							+ Messages.RunAnalyseHandlerBase_artifacts_found);
 					// provide some explanation of why perhaps no artifacts were found.
 					// Note: should this perhaps be in a "Details" section of the dialog?
 					if(cumulativeArtifacts==0) {
-						sMsg.append("\n\n").append(name).append(" Artifacts are defined as APIs found in the include path specified in the ");
-						sMsg.append(name).append(" preferences.  The same include path should be present in the project properties, ");
-						sMsg.append("regardless of whether or not a build command (e.g. mpicc) implicitly does this for compilation.");
+						sMsg.append(Messages.RunAnalyseHandlerBase_20).append(name).append(Messages.RunAnalyseHandlerBase_21);
+						sMsg.append(name).append(Messages.RunAnalyseHandlerBase_22);
+						sMsg.append(Messages.RunAnalyseHandlerBase_23);
 					}
-					String togMsg = "Don't show me this again";
+					String togMsg = Messages.RunAnalyseHandlerBase_dont_show_this_again;
 					MessageDialogWithToggle.openInformation(shell, title, sMsg.toString(),
 							togMsg, false, pf, key);
-					showStatusMessage(sMsg.toString(), "RunAnalyseBase.run()");
+					showStatusMessage(sMsg.toString(), "RunAnalyseBase.run()"); //$NON-NLS-1$
 				}
 				activateProblemsView();
 				activateArtifactView();
 			} else { // error occurred
-				showStatusMessage(msg, "RunAnalyseBase.run() error");
-				msg = "Analysis completed with errors";
-				MessageDialog.openError(null, "Analysis completed with errors",
+				showStatusMessage(msg, "RunAnalyseBase.run() error"); //$NON-NLS-1$
+				msg = Messages.RunAnalyseHandlerBase_27;
+				MessageDialog.openError(null, Messages.RunAnalyseHandlerBase_28,
 						msg + artsFound);
 			}
 		}
@@ -259,7 +259,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		// files that will be analyzed.
 		int count = countFilesSelected();
 
-		monitor.beginTask("Analysis", count);
+		monitor.beginTask(Messages.RunAnalyseHandlerBase_29, count);
 		// Get elements of a possible multiple selection
 		Iterator<IStructuredSelection> iter = selection.iterator();
 		while (iter.hasNext()) {
@@ -279,7 +279,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 					// cdt40
 					// IASTTranslationUnit atu = tu.getAST(); not yet
 					boolean err = runResource(monitor, ce, indent, includes);
-					if(traceOn)System.out.println("Error (err="+err+")running analysis on "+ce.getResource().getName());
+					if(traceOn)System.out.println("Error (err="+err+")running analysis on "+ce.getResource().getName()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
@@ -310,7 +310,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 */
 	private void showStatusMessage(String message, String debugMessage) {
 		if (false) {
-			message += " - ";
+			message += " - "; //$NON-NLS-1$
 			message += debugMessage;
 		}
 		IWorkbenchWindow ww = CommonPlugin.getDefault().getWorkbench()
@@ -372,7 +372,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 				    
 					if (validForAnalysis(filename,cpp)) {
 						if (traceOn)
-							println(getSpaces(indent) + "file: " + filename);
+							println(getSpaces(indent) + "file: " + filename); //$NON-NLS-1$
 						results = analyse(monitor, (ITranslationUnit) ce,
 								includes);
 
@@ -380,11 +380,11 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 								|| results.wasError();
 						if (foundError) {
 							int stopHere = 0;
-							System.out.println("found error on "
-									+ file.getName() + " " + stopHere);
+							System.out.println("found error on " //$NON-NLS-1$
+									+ file.getName() + " " + stopHere); //$NON-NLS-1$
 						}
 						if (traceOn)
-							println("******** RunAnalyseBase, analysis complete; ScanReturn="
+							println("******** RunAnalyseBase, analysis complete; ScanReturn=" //$NON-NLS-1$
 									+ results);
 						if (results != null) {
 							// apply markers to the file
@@ -394,7 +394,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 					} else {
 						if (traceOn)
 							println(getSpaces(indent)
-									+ "---omit: not valid file: " + filename);
+									+ "---omit: not valid file: " + filename); //$NON-NLS-1$
 					}
 					return foundError;
 				}
@@ -440,12 +440,12 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 			// container could be project or folder		
 		} // end if !monitor.isCanceled()
 		else {
-			String name = "";
+			String name = ""; //$NON-NLS-1$
 			//cdt40
 				name = ce.getElementName();
 				//String p=ce.getPath().toString();
 			 
-			System.out.println("Cancelled by User, aborting analysis on subsequent files... "
+			System.out.println("Cancelled by User, aborting analysis on subsequent files... " //$NON-NLS-1$
 							+ name);
 			throw new InterruptedException();
 		}
@@ -460,7 +460,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
   protected boolean isCPPproject(ICElement ce) {
     IProject p = ce.getCProject().getProject();
     try {
-      IProjectNature nature = p.getNature("org.eclipse.cdt.core.ccnature");
+      IProjectNature nature = p.getNature("org.eclipse.cdt.core.ccnature"); //$NON-NLS-1$
       if(nature!=null) {
         return true;
       }
@@ -481,19 +481,19 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	public ScanReturn analyse(IProgressMonitor monitor, ITranslationUnit tu,
 			List<String> includes) {
 		if (traceOn)
-			println("RunAnalyseBase.analyse()...");
+			println("RunAnalyseBase.analyse()..."); //$NON-NLS-1$
 		//ScanReturn nr = null;
 		String errMsg = null;
 
-		monitor.subTask("Starting Analysis...");
+		monitor.subTask(Messages.RunAnalyseHandlerBase_42);
 
 		// fully qualified file location
 		// String rawPath = tu.getRawLocation().toString();
 		String rawPath = tu.getLocation().toString();// cdt40
 		if (traceOn)
-			println("RunAnalyseBase:              file = " + tu.getLocation());
+			println("RunAnalyseBase:              file = " + tu.getLocation()); //$NON-NLS-1$
 
-		monitor.subTask(" on " + rawPath);
+		monitor.subTask(Messages.RunAnalyseHandlerBase_44 + rawPath);
 		// did tu parse w/o errors?  If we can determine that, we can
 		// warn user; otherwise OpenMP analysis will, for example, "finish with errors"
 		// e.g. if header file can't be found.
@@ -509,34 +509,34 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		ScanReturn scanReturn = doArtifactAnalysis(tu, includes);
 		monitor.worked(1);
 		if (traceOn)
-			println("Artifact analysis complete...");
+			println("Artifact analysis complete..."); //$NON-NLS-1$
 		int numArtifacts = scanReturn.getArtifactList().size();
 		cumulativeArtifacts = cumulativeArtifacts + numArtifacts;
 
 		if (traceOn)
-			System.out.println("Artifacts found for "
-					+ tu.getResource().getProjectRelativePath() + ": " + numArtifacts);
+			System.out.println("Artifacts found for " //$NON-NLS-1$
+					+ tu.getResource().getProjectRelativePath() + ": " + numArtifacts); //$NON-NLS-1$
 		if (traceOn)
-			System.out.println("   Total # found: " + cumulativeArtifacts);
+			System.out.println("   Total # found: " + cumulativeArtifacts); //$NON-NLS-1$
 
 		if (scanReturn == null) {
-			System.out.println("ScanReturn result is NULL.  No results for "
+			System.out.println("ScanReturn result is NULL.  No results for " //$NON-NLS-1$
 					+ tu.getResource().getProjectRelativePath());
-			errMsg = "Error: No results were returned from analysis of "
+			errMsg = "Error: No results were returned from analysis of " //$NON-NLS-1$
 					+ tu.getResource().getProjectRelativePath();
-			MessageDialog.openError(shell, "Error in Analysis", errMsg);
+			MessageDialog.openError(shell, "Error in Analysis", errMsg); //$NON-NLS-1$
 		} else {
 			if (traceOn)
-				System.out.println("RunAnalyzeBase: ScanReturn received for "
+				System.out.println("RunAnalyzeBase: ScanReturn received for " //$NON-NLS-1$
 						+ tu.getElementName());
 		}
 
 		if (scanReturn != null) {
 			boolean wasError = scanReturn.wasError();
 			if (traceOn)
-				System.out.println("error occurred =" + wasError);
+				System.out.println("error occurred =" + wasError); //$NON-NLS-1$
 			if (wasError) {
-				System.out.println("RunAnalyseBase.analyse...Error...");
+				System.out.println("RunAnalyseBase.analyse...Error..."); //$NON-NLS-1$
 			}
 		}
 		return scanReturn;
@@ -549,15 +549,15 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 *            the number of spaces to return (used for successively
 	 *            indenting debug statements based on depth of nesting)
 	 */
-	private static final String SPACES = "                                                                                            ";
+	private static final String SPACES = "                                                                                            "; //$NON-NLS-1$
 
 	private String getSpaces(int indent) {
-		String indentSpace = "";
+		String indentSpace = ""; //$NON-NLS-1$
 		try {
 			indentSpace = SPACES.substring(0, indent);
 		} catch (StringIndexOutOfBoundsException e) {
-			println("RunAnalyseBase: Nesting level " + indent
-					+ " exceeds print indent; INCR at each level is "
+			println("RunAnalyseBase: Nesting level " + indent //$NON-NLS-1$
+					+ " exceeds print indent; INCR at each level is " //$NON-NLS-1$
 					+ INDENT_INCR);
 			// e.printStackTrace();
 		}
@@ -604,13 +604,13 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * @return a string indicating what it is
 	 */
 	public String getPrefacedName(Object obj) {
-		String preface = "";
+		String preface = ""; //$NON-NLS-1$
 		if (obj instanceof IFolder)
-			preface = "Contents of Folder: ";
+			preface = Messages.RunAnalyseHandlerBase_60;
 		else if (obj instanceof IProject)
-			preface = "Contents of Project: ";
+			preface = Messages.RunAnalyseHandlerBase_61;
 		else if (obj instanceof IFile)
-			preface = "Source file: ";
+			preface = Messages.RunAnalyseHandlerBase_62;
 		String res = preface + ((IResource) obj).getName();
 		return res;
 	}
@@ -639,9 +639,9 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 	 * Implemented for Handler; this replaces run() which is for actions.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if(traceOn)System.out.println("RunAnalyseHandlerBase.execute()...");
+		if(traceOn)System.out.println("RunAnalyseHandlerBase.execute()..."); //$NON-NLS-1$
 		getSelection(event);
-		if(traceOn)System.out.println("selection: "+selection);
+		if(traceOn)System.out.println("selection: "+selection); //$NON-NLS-1$
 		run();
 		AnalysisDropdownHandler.setLastHandledAnalysis(this, selection);
 	    return null;
@@ -668,11 +668,11 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
       index = CCorePlugin.getIndexManager().getIndex(tu.getCProject());
       IASTTranslationUnit ast = tu.getAST(index, ITranslationUnit.AST_SKIP_ALL_HEADERS);
       //IASTTranslationUnit ast = tu.getAST(index, 0);
-      if(traceOn)System.out.println("    getAST(index,AST_SKIP_ALL_HEADERS)");
+      if(traceOn)System.out.println("    getAST(index,AST_SKIP_ALL_HEADERS)"); //$NON-NLS-1$
       
       return ast;
     } catch (CoreException e) {
-      CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error getting AST (from index) for project "+tu.getCProject());
+      CommonPlugin.log(IStatus.ERROR,"RunAnalyseMPICommandHandler.getAST():Error getting AST (from index) for project "+tu.getCProject()); //$NON-NLS-1$
       return null;
     }
     

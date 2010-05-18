@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007,2008 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -161,7 +161,7 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
       for (int i = 0; i < exts.length; i++) {
         String ext = exts[i];
         if(filename.endsWith(ext)){
-          System.out.println("found "+ext+" in file: "+file.getName()+"  count+1");
+          System.out.println("found "+ext+" in file: "+file.getName()+"  count+1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           return 1;
         }
       }

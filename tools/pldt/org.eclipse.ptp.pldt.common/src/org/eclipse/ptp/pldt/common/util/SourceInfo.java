@@ -1,3 +1,13 @@
+/**********************************************************************
+ * Copyright (c) 2010 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ptp.pldt.common.util;
 
 /**
@@ -98,10 +108,10 @@ public class SourceInfo
      */
     public String toString(){
     	StringBuffer s = new StringBuffer();
-    	s.append("SourceInfo line:").append(getStartingLine());
-    	s.append(" startPos:").append(getStart());
-    	s.append(" endPos:").append(getEnd());
-    	s.append(" constructType:").append(getConstructType());
+    	s.append("SourceInfo line:").append(getStartingLine()); //$NON-NLS-1$
+    	s.append(" startPos:").append(getStart()); //$NON-NLS-1$
+    	s.append(" endPos:").append(getEnd()); //$NON-NLS-1$
+    	s.append(" constructType:").append(getConstructType()); //$NON-NLS-1$
     	return s.toString();
     }
 }

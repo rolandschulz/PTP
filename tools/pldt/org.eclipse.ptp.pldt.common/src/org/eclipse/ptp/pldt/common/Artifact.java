@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ public class Artifact implements IArtifact
     /** Constant used in marker to indicate type of artifact is a pragma*/
     public static final int      PRAGMA             = 3;
 
-    public static final String[] CONSTRUCT_TYPE_NAMES = { "None", "Function Call", "Constant","Pragma" };
+    public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.Artifact_none, Messages.Artifact_function_call, Messages.Artifact_constant,Messages.Artifact_pragma };
 
     /**
      * Create an Artifact to keep track of an something found in a file.
@@ -151,13 +151,13 @@ public class Artifact implements IArtifact
      */
     public String toString()
     {
-        StringBuffer buf = new StringBuffer("Artifact: ");
-        buf.append(" id=").append(uniqueID_);
-        buf.append(" ").append(shortName_);
-        buf.append(" line=").append(line_).append(" filename=").append(fileName_);
-        buf.append(" desc=").append(description_);
-        buf.append(" start=").append(getSourceInfo().getStart());
-        buf.append(" end=").append(getSourceInfo().getEnd());
+        StringBuffer buf = new StringBuffer(Messages.Artifact_artifact);
+        buf.append(" id=").append(uniqueID_); //$NON-NLS-1$
+        buf.append(" ").append(shortName_); //$NON-NLS-1$
+        buf.append(" line=").append(line_).append(" filename=").append(fileName_); //$NON-NLS-1$ //$NON-NLS-2$
+        buf.append(" desc=").append(description_); //$NON-NLS-1$
+        buf.append(" start=").append(getSourceInfo().getStart()); //$NON-NLS-1$
+        buf.append(" end=").append(getSourceInfo().getEnd()); //$NON-NLS-1$
         return buf.toString();
     }
 

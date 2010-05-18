@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2008 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.cdt.ui.text.ICHelpInvocationContext;
  *
  */
 public class CHelpBookImpl implements ICHelpBook {
-	private String title = "Generic C Help Book";
+	private String title = Messages.generic_c_help_book;
 	private static final boolean traceOn=false;
 
 	private String pluginId;
@@ -66,7 +66,7 @@ public class CHelpBookImpl implements ICHelpBook {
 			String cn=this.getClass().getSimpleName();
 			String finfo=(fs!=null)?(fs.toString().substring(0,25)):null;
 			if(finfo!=null)
-				System.out.println("CHelpBookImpl "+cn+" getFunctionInfo for "+name+ "= "+finfo);
+				System.out.println("CHelpBookImpl "+cn+" getFunctionInfo for "+name+ "= "+finfo); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		return fs;
 	}
