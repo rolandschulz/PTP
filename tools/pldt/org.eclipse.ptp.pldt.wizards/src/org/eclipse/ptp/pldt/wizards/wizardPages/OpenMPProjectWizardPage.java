@@ -50,34 +50,34 @@ import org.eclipse.ui.PlatformUI;
  * 
  */
 public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
-	public static final String DOT = ".";
+	public static final String DOT = "."; //$NON-NLS-1$
 	private static final boolean traceOn=false;
 	public static final boolean wizardTraceOn=false;
 
 	private Composite composite;
-	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectWizardPage";
+	public static final String PAGE_ID="org.eclipse.ptp.pldt.wizards.wizardPages.OpenMPProjectWizardPage"; //$NON-NLS-1$
 
 	// The following are IDs for storing info in MBSPageData so it can be retrieved in OpenMPProjectProcess (ProcessRunner)
 	// when the wizard is done.
 	/**
 	 * Store in MBSPageData  (with this ID) whether user wants to include OpenMP info in the project.
 	 */
-	public static final String DO_OpenMP_INCLUDES = "doOpenMPincludes";
+	public static final String DO_OpenMP_INCLUDES = "doOpenMPincludes"; //$NON-NLS-1$
 	/**
 	 * store in MBSPageData (with this ID) what the include path to OpenMP will be.
 	 */
-	public static final String INCLUDE_PATH_PROP_ID = "includePath";
+	public static final String INCLUDE_PATH_PROP_ID = "includePath"; //$NON-NLS-1$
 	/**
 	 * store in MBSPageData (with this ID) what the library name for the linker is.
 	 */
-	public static final String LIB_PROP_ID = "lib";
+	public static final String LIB_PROP_ID = "lib"; //$NON-NLS-1$
 	/**
 	 * store in MBSPageData (with this ID) what the library search path is.
 	 */
-	public static final String LIBRARY_SEARCH_PATH_PROP_ID = "libPath";
+	public static final String LIBRARY_SEARCH_PATH_PROP_ID = "libPath"; //$NON-NLS-1$
 	
-	public static final String OpenMP_COMPILE_COMMAND_PROP_ID = "OpenMPCompileCommand";
-	public static final String OpenMP_LINK_COMMAND_PROP_ID = "OpenMPLinkCommand";
+	public static final String OpenMP_COMPILE_COMMAND_PROP_ID = "OpenMPCompileCommand"; //$NON-NLS-1$
+	public static final String OpenMP_LINK_COMMAND_PROP_ID = "OpenMPLinkCommand"; //$NON-NLS-1$
 
 	private String currentOpenMPIncludePath;
 	private String currentLibName;
@@ -111,7 +111,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 * By default we DO use OpenMP project settings in a new project.<br>
 	 */
 	private boolean useOpenMPProjectSettings=true;
-	private String desc = "OpenMP Project Page";
+	private String desc = Messages.OpenMPProjectWizardPage_openmp_project_page;
 	
 	/**
 	 * The CDT new project wizard page for OpenMP projects.  
@@ -120,9 +120,9 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 * 
 	 */
 	public OpenMPProjectWizardPage() throws CoreException {
-		super("OpenMP Project Settings");
+		super(Messages.OpenMPProjectWizardPage_openmp_project_settings);
 		prefIDincludes=OpenMPIDs.OpenMP_INCLUDES;
-		if(wizardTraceOn)System.out.println("OpenMPProjectWizardPage().ctor...");
+		if(wizardTraceOn)System.out.println("OpenMPProjectWizardPage().ctor..."); //$NON-NLS-1$
 
 		//CommonPlugin.log(IStatus.ERROR,"Test error");
 		//CommonPlugin.log(IStatus.WARNING,"Test warning");
@@ -130,14 +130,14 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		// access the preference store from the OpenMP plugin
 		preferenceStore = OpenMPPlugin.getDefault().getPreferenceStore();
 		String mip=preferenceStore.getString(prefIDincludes);
-		if(traceOn)System.out.println("Got OpenMP include pref from other plugin: "+mip);
+		if(traceOn)System.out.println("Got OpenMP include pref from other plugin: "+mip); //$NON-NLS-1$
 
 		// Set the defaults here in the wizard page constructor and just
 		// overwrite them if the user changes them.
 		defaultOpenMPIncludePath = preferenceStore.getString(prefIDincludes);
 		if(defaultOpenMPIncludePath.length()==0) {
 			// warn if no OpenMP preferences have been set
-			String newIncludePath=showNoPrefs("OpenMP",prefIDincludes);
+			String newIncludePath=showNoPrefs("OpenMP",prefIDincludes); //$NON-NLS-1$
 			defaultOpenMPIncludePath=newIncludePath;
 		}
 		setDefaultOtherNames(defaultOpenMPIncludePath);
@@ -159,11 +159,11 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	private static void showNoPrefs1() {
 		if(!alreadyShown) {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			StringBuffer buf=new StringBuffer("No OpenMP Preferences set; ");
-			buf.append("Default project setting will be more useful if OpenMP preferences are set first. ");
-			buf.append("\nUse Window > Preferences and select Parallel Language Development Tools, which may be under PTP preferences.");
-			buf.append("You can cancel out of new project wizard to enter OpenMP preferences now.");
-			MessageDialog.openWarning(shell, "No OpenMP Preferences set", buf.toString());
+			StringBuffer buf=new StringBuffer(Messages.OpenMPProjectWizardPage_no_prefs_set);
+			buf.append(Messages.OpenMPProjectWizardPage_no_prefs_set_2);
+			buf.append(Messages.OpenMPProjectWizardPage_no_prefs_set_3);
+			buf.append(Messages.OpenMPProjectWizardPage_no_prefs_set_4);
+			MessageDialog.openWarning(shell, Messages.OpenMPProjectWizardPage_no_prefs_set_5, buf.toString());
 			alreadyShown= true;
 		}
 	}
@@ -182,7 +182,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 * @param openMPincludePath
 	 */
 	private void setDefaultOtherNames(String openMPincludePath) {
-		defaultOpenMPLibName="";//"openmp";
+		defaultOpenMPLibName="";//"openmp"; //$NON-NLS-1$
 		setCurrentOpenMPLibName(defaultOpenMPLibName);
 		
 		// if >1 path in openmp include path, use just the first
@@ -196,7 +196,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		path=path.removeLastSegments(1);
 		path=path.addTrailingSeparator();
 
-		defaultOpenMPLibPath=""; // path.toString()+"lib";   // default is blank: -fopenmp option does it all
+		defaultOpenMPLibPath=""; // path.toString()+"lib";   // default is blank: -fopenmp option does it all //$NON-NLS-1$
 		//System.out.println("defaultOpenMPLibPath="+defaultOpenMPLibPath);
 		setCurrentOpenMPLibPath(defaultOpenMPLibPath);
 		
@@ -256,7 +256,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	}
 
 	public String getName() {
-		return new String(desc + " name");
+		return new String(desc + " name"); //$NON-NLS-1$
 	}
 
 	/**
@@ -280,7 +280,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 * @param selectedPath
 	 */
 	private void updateIncludePathField(String selectedPath) {
-		if(traceOn)System.out.println("MPWP.updateLocationField to " + selectedPath);
+		if(traceOn)System.out.println("MPWP.updateLocationField to " + selectedPath); //$NON-NLS-1$
 		includePathField.setText(selectedPath);
 	}
 	/**
@@ -289,7 +289,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 * @param selectedPath
 	 */
 	private void updateLibPathField(String selectedPath) {
-		if(traceOn)System.out.println("MPWP.updateLocationField to " + selectedPath);
+		if(traceOn)System.out.println("MPWP.updateLocationField to " + selectedPath); //$NON-NLS-1$
 		libPathField.setText(selectedPath);
 	}
 
@@ -303,7 +303,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		String dirName = getPathFromPathField(includePathField);
 
 		DirectoryDialog dialog = new DirectoryDialog(includePathField.getShell());
-		dialog.setMessage("OpenMP Include path:");
+		dialog.setMessage(Messages.OpenMPProjectWizardPage_openmp_include_path);
 
 		dialog.setFilterPath(dirName);
 
@@ -313,7 +313,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 			updateIncludePathField(selectedDirectory);
 
 			includePathField.setText(selectedDirectory);
-			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
+			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory); //$NON-NLS-1$
 			// set value to where we can find it in the ProcessRunner later
 			setCurrentOpenMPIncludePath(selectedDirectory);
 		}
@@ -324,7 +324,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		String dirName = getPathFromPathField(libPathField);
 
 		DirectoryDialog dialog = new DirectoryDialog(libPathField.getShell());
-		dialog.setMessage("OpenMP library search path:");
+		dialog.setMessage(Messages.OpenMPProjectWizardPage_openp_library_search_path);
 
 		dialog.setFilterPath(dirName);
 
@@ -334,7 +334,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 			updateLibPathField(selectedDirectory);
 
 			libPathField.setText(selectedDirectory);
-			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory);
+			if(traceOn)System.out.println("Directory found via browse: " + selectedDirectory); //$NON-NLS-1$
 			// set value to where we can find it in the ProcessRunner later
 			setCurrentOpenMPLibPath(selectedDirectory);
 		}
@@ -365,11 +365,11 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	private void createUserEntryArea(Composite composite, boolean defaultEnabled) {
 		//?? err? causes things to happen in wrong order??   IProject project = this.getProject();
 		//String name = project.getName();
-		if(wizardTraceOn)System.out.println("OpenMPProjectWizardPage.createUserEntryArea() " );
+		if(wizardTraceOn)System.out.println("OpenMPProjectWizardPage.createUserEntryArea() " ); //$NON-NLS-1$
 		
 		includePathLabel = new Label(composite, SWT.NONE);
-		includePathLabel.setText("Include path:");
-		includePathLabel.setToolTipText("Location of OpenMP include path(s)");
+		includePathLabel.setText(Messages.OpenMPProjectWizardPage_include_path);
+		includePathLabel.setToolTipText(Messages.OpenMPProjectWizardPage_include_path_tooltip);
 
 		// Include path location  entry field
 		includePathField = new Text(composite, SWT.BORDER);
@@ -381,16 +381,16 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		includePathField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentOpenMPIncludePath(includePathField.getText());
-				if(traceOn)System.out.println("locationField.modifyText(): " + currentOpenMPIncludePath);
+				if(traceOn)System.out.println("locationField.modifyText(): " + currentOpenMPIncludePath); //$NON-NLS-1$
 			}
 		});
 
 		// browse button
 		browseButton = new Button(composite, SWT.PUSH);
-		browseButton.setText("Browse...");
+		browseButton.setText(Messages.OpenMPProjectWizardPage_browse);
 		browseButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if(traceOn)System.out.println("Browse button pressed.");
+				if(traceOn)System.out.println("Browse button pressed."); //$NON-NLS-1$
 				handleLocationBrowseButtonPressed();
 
 			}
@@ -400,8 +400,8 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		// we just store all info where we can find it when the OpenMPProjectProcess(ProcessRunner) runs after all the wizard pages are done.
 		
 		libLabel=new Label(composite, SWT.NONE);
-		libLabel.setText("Library name:");
-		libLabel.setToolTipText("Library name:");
+		libLabel.setText(Messages.OpenMPProjectWizardPage_library_name);
+		libLabel.setToolTipText(Messages.OpenMPProjectWizardPage_library_name_tooltip);
 		
 		libNameField=new Text(composite,SWT.BORDER);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -412,15 +412,15 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		libNameField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentOpenMPLibName(libNameField.getText());
-				if(traceOn)System.out.println("libNameField.modifyText(): " + currentLibName);
+				if(traceOn)System.out.println("libNameField.modifyText(): " + currentLibName); //$NON-NLS-1$
 			}
 		});
 		
-		(new Label(composite,SWT.NONE)).setText(" ");//spacer
+		(new Label(composite,SWT.NONE)).setText(" ");//spacer //$NON-NLS-1$
 		
 		libPathLabel=new Label(composite, SWT.NONE);
-		libPathLabel.setText("Library search path:");
-		libPathLabel.setToolTipText("Library name:");
+		libPathLabel.setText(Messages.OpenMPProjectWizardPage_lib_search_path);
+		libPathLabel.setToolTipText(Messages.OpenMPProjectWizardPage_lib_search_path_tooltip);
 		
 		
 		libPathField=new Text(composite,SWT.BORDER);
@@ -432,23 +432,23 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		libPathField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentOpenMPLibPath(libPathField.getText());
-				if(traceOn)System.out.println("libPathField.modifyText(): " + currentLibPath);
+				if(traceOn)System.out.println("libPathField.modifyText(): " + currentLibPath); //$NON-NLS-1$
 			}
 		});
 		
 //		 browse button
 
 		browseButton2 = new Button(composite, SWT.PUSH);
-		browseButton2.setText("Browse...");
+		browseButton2.setText(Messages.OpenMPProjectWizardPage_browse);
 		browseButton2.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if(traceOn)System.out.println("Browse button pressed. DO SOMETHING HERE.");
+				if(traceOn)System.out.println("Browse button pressed. DO SOMETHING HERE."); //$NON-NLS-1$
 				handleLocationBrowseButton2Pressed();
 
 			}
 		});
 		openMPCompileCommandLabel= new Label(composite,SWT.NONE);
-		openMPCompileCommandLabel.setText("OpenMP compile command: ");
+		openMPCompileCommandLabel.setText(Messages.OpenMPProjectWizardPage_omp_compile_command);
 		openMPCompileCommandField=new Text(composite,SWT.BORDER);
 		GridData gd3 = new GridData(GridData.FILL_HORIZONTAL);
 		gd3.widthHint=SIZING_TEXT_FIELD_WIDTH;
@@ -458,13 +458,13 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		openMPCompileCommandField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentOpenMPCompileCommand(openMPCompileCommandField.getText());
-				if(traceOn)System.out.println("OpenMPCompileCommandField.modifyText(): " + currentOpenMPCompileCommand);
+				if(traceOn)System.out.println("OpenMPCompileCommandField.modifyText(): " + currentOpenMPCompileCommand); //$NON-NLS-1$
 			}
 		});
-		(new Label(composite,SWT.NONE)).setText(" ");//spacer
+		(new Label(composite,SWT.NONE)).setText(" ");//spacer //$NON-NLS-1$
 		
 		openMPLinkCommandLabel= new Label(composite,SWT.NONE);
-		openMPLinkCommandLabel.setText("OpenMP link command: ");
+		openMPLinkCommandLabel.setText(Messages.OpenMPProjectWizardPage_omp_link_command);
 		openMPLinkCommandField=new Text(composite,SWT.BORDER);
 		GridData gd4 = new GridData(GridData.FILL_HORIZONTAL);
 		gd4.widthHint=SIZING_TEXT_FIELD_WIDTH;
@@ -474,10 +474,10 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		openMPLinkCommandField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentOpenMPLinkCommand(openMPLinkCommandField.getText());
-				if(traceOn)System.out.println("OpenMPLinkCommandField.modifyText(): " + currentOpenMPLinkCommand);
+				if(traceOn)System.out.println("OpenMPLinkCommandField.modifyText(): " + currentOpenMPLinkCommand); //$NON-NLS-1$
 			}
 		});
-		(new Label(composite,SWT.NONE)).setText(" ");//spacer
+		(new Label(composite,SWT.NONE)).setText(" ");//spacer //$NON-NLS-1$
 
 		
 	}
@@ -501,7 +501,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		useOpenMPProjectSettingsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		useOpenMPProjectSettingsButton.setText("Add OpenMP project settings to this project");
+		useOpenMPProjectSettingsButton.setText(Messages.OpenMPProjectWizardPage_add_project_settings_to_this_project);
 		GridData gd=new GridData();
 		gd.horizontalSpan=columns;
 		useOpenMPProjectSettingsButton.setLayoutData(gd);
@@ -527,7 +527,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 		});
 
 		useDefaultsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		useDefaultsButton.setText("Use default information");
+		useDefaultsButton.setText(Messages.OpenMPProjectWizardPage_use_default_info_q);
 		useDefaultsButton.setSelection(defaultEnabled);
 		useDefaultsButton.setEnabled(false);
 		GridData buttonData = new GridData();
@@ -606,7 +606,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	}
 
 	public String getDescription() {
-		String tmp="Select the OpenMP include path, lib name, library search path, and build command information to be automatically be added to the new project.";
+		String tmp=Messages.OpenMPProjectWizardPage_select_stuff_to_be_added_to_proj;
 		return tmp;
 	}
 
@@ -625,7 +625,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	}
 
 	public String getTitle() {
-		return "OpenMP Project Settings";
+		return Messages.OpenMPProjectWizardPage_omp_project_settings_title;
 	}
 
 	public void performHelp() {
@@ -658,7 +658,7 @@ public class OpenMPProjectWizardPage extends AbstractProjectWizardPage {
 	 */
 	public void setVisible(boolean visible) {
 		composite.setVisible(visible);
-		if(traceOn)System.out.println("OpenMPProjectWizardPage.setVisible: " + visible);
+		if(traceOn)System.out.println("OpenMPProjectWizardPage.setVisible: " + visible); //$NON-NLS-1$
 
 	}
 

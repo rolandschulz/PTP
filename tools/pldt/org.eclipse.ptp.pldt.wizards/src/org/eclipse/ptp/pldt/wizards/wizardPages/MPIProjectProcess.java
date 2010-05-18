@@ -57,7 +57,7 @@ public class MPIProjectProcess extends ProcessRunner {
 	public void process(TemplateCore template, ProcessArgument[] args,
 			String processId, IProgressMonitor monitor)
 			throws ProcessFailureException {
-		if(wizTraceOn)System.out.println("MPIProjectProcess().run()...");
+		if(wizTraceOn)System.out.println("MPIProjectProcess().run()..."); //$NON-NLS-1$
 		
 		valueStore= template.getValueStore();
 		String pageID = MPIProjectWizardPage.PAGE_ID;
@@ -69,43 +69,43 @@ public class MPIProjectProcess extends ProcessRunner {
 			doMpiIncludes = Boolean.valueOf((String) obj);
 		if (!doMpiIncludes) {
 			if (traceOn)
-				System.out.println("Do not save MPI info in this project.");
+				System.out.println("Do not save MPI info in this project."); //$NON-NLS-1$
 			return;
 		}
 
  		// this process must be executed after a separate process which creates the project
-		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName"));
+		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName")); //$NON-NLS-1$
 		if(!proj.exists()) {
-			System.out.println("Project does not exist!. Quitting. No MPI info added to project.");
+			System.out.println(Messages.MPIProjectProcess_proj_does_not_exist_quit);
 			return;	
 		}
 
-		if(traceOn)System.out.println("Project: " + proj.getName());
+		if(traceOn)System.out.println(Messages.MPIProjectProcess_project + proj.getName());
 
 		// Collect the values that the user entered on the wizard page
 		String propID = MPIProjectWizardPage.INCLUDE_PATH_PROP_ID;
-		String newIncludePath = getNewPropValue(pageID, propID,"c:/mpich2/include");
-		if(traceOn)System.out.println("Got prop: "+propID+"="+newIncludePath);
+		String newIncludePath = getNewPropValue(pageID, propID,"c:/mpich2/include"); //$NON-NLS-1$
+		if(traceOn)System.out.println("Got prop: "+propID+"="+newIncludePath); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		propID = MPIProjectWizardPage.LIB_PROP_ID;
-		String newLib=getNewPropValue(pageID,propID,"lib");
+		String newLib=getNewPropValue(pageID,propID,"lib"); //$NON-NLS-1$
 		
 		propID=MPIProjectWizardPage.LIBRARY_SEARCH_PATH_PROP_ID;
-		String newLibSearchPath=getNewPropValue(pageID,propID,"c:/mpich2/lib");
+		String newLibSearchPath=getNewPropValue(pageID,propID,"c:/mpich2/lib"); //$NON-NLS-1$
 		
 		propID=MPIProjectWizardPage.MPI_COMPILE_COMMAND_PROP_ID;
-		String mpiCompileCommand=getNewPropValue(pageID,propID,"mpicc");
+		String mpiCompileCommand=getNewPropValue(pageID,propID,"mpicc"); //$NON-NLS-1$
 		
 		propID=MPIProjectWizardPage.MPI_LINK_COMMAND_PROP_ID;
-		String mpiLinkCommand=getNewPropValue(pageID,propID,"mpicc");
+		String mpiLinkCommand=getNewPropValue(pageID,propID,"mpicc"); //$NON-NLS-1$
 
 		IManagedBuildInfo info = null;
 		try {
 			info = ManagedBuildManager.getBuildInfo(proj);
 			// note: assumed null if this is not a managed build project? will we get here in that case?
-			if(traceOn)System.out.println("Build info: " + info);
+			if(traceOn)System.out.println("Build info: " + info); //$NON-NLS-1$
 		} catch (Exception e) {
-			System.out.println("MPIProjectProcess.run(), "+e.getMessage());
+			System.out.println("MPIProjectProcess.run(), "+e.getMessage()); //$NON-NLS-1$
 			e.printStackTrace();
 			return;
 		}
@@ -118,20 +118,20 @@ public class MPIProjectProcess extends ProcessRunner {
 		IConfiguration[] configs = mProj.getConfigurations();
 		for (int i = 0; i < configs.length; i++) {
 			IConfiguration cf = configs[i];
-			if(traceOn)System.out.println("Config " + i + ": " + cf.getName());
+			if(traceOn)System.out.println("Config " + i + ": " + cf.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 			addIncludePath(cf, newIncludePath);
 			addLinkerOpt(cf,newLib,newLibSearchPath);
 			setCompileCommand(cf,mpiCompileCommand);
 			setLinkCommand(cf,mpiLinkCommand);		
 		}
-		if(traceOn)System.out.println("MPIProjectProcess, newIncludePath: "+newIncludePath);
-		if(traceOn)System.out.println("   newLib: "+newLib+"  newLibSrchPth: "+newLibSearchPath);
-		if(traceOn)System.out.println("   compileCmd: "+mpiCompileCommand);
-		if(traceOn)System.out.println("   linkCmd: "+mpiLinkCommand);
+		if(traceOn)System.out.println("MPIProjectProcess, newIncludePath: "+newIncludePath); //$NON-NLS-1$
+		if(traceOn)System.out.println("   newLib: "+newLib+"  newLibSrchPth: "+newLibSearchPath); //$NON-NLS-1$ //$NON-NLS-2$
+		if(traceOn)System.out.println("   compileCmd: "+mpiCompileCommand); //$NON-NLS-1$
+		if(traceOn)System.out.println("   linkCmd: "+mpiLinkCommand); //$NON-NLS-1$
 		// ManagedBuildManger.saveBuildInfo(...) assures that the
 		// values are persisted in the build model, otherwise they will
 		// be lost when you shut down Eclipse.
-		if(traceOn)System.out.println("ManagedBuildManager.saveBuildInfo...");
+		if(traceOn)System.out.println("ManagedBuildManager.saveBuildInfo..."); //$NON-NLS-1$
 		
 		ManagedBuildManager.saveBuildInfo(proj, true);
 
@@ -157,12 +157,12 @@ public class MPIProjectProcess extends ProcessRunner {
 		Object obj = valueStore.get(pageID+MPIProjectWizardPage.DOT+propID);
 		// if selection made on page, obj is non-null.
 		String newValue = defaultVal;
-		String msg=" ( used default value)";
+		String msg=" ( used default value)"; //$NON-NLS-1$
 		if (obj != null) {
 			newValue = obj.toString();
-			msg="";
+			msg=""; //$NON-NLS-1$
 		}
-		if(traceOn)System.out.println("propID=" + propID + "  value=" + newValue+msg);
+		if(traceOn)System.out.println("propID=" + propID + "  value=" + newValue+msg); //$NON-NLS-1$ //$NON-NLS-2$
 		return newValue;
 	}
 
@@ -181,14 +181,14 @@ public class MPIProjectProcess extends ProcessRunner {
 	 */
 	protected void addIncludePath(IConfiguration cf, String newIncludePath) {
 		// note: could be > 1 path in 'newIncludePath'
-		String ext = "c";
+		String ext = "c"; //$NON-NLS-1$
 		ITool cfTool = cf.getToolFromInputExtension(ext);
 
 		//String id = cfTool.getId(); // "cdt.managedbuild.tool.xlc.c.compiler.exe.debug.1423270745"
 		String name = cfTool.getName();// "XL C Compiler"
 		IOption option = null;
-		if (name.startsWith("XL C")) { // special case for XL C compiler
-			option = cfTool.getOptionById("xlc.c.compiler.option.include.paths");
+		if (name.startsWith("XL C")) { // special case for XL C compiler //$NON-NLS-1$
+			option = cfTool.getOptionById("xlc.c.compiler.option.include.paths"); //$NON-NLS-1$
 		} else { // otherwise we assume there is only one include path option.
 			option = getFirstOptionByType(cf, cfTool, IOption.INCLUDE_PATH);
 		}
@@ -201,12 +201,12 @@ public class MPIProjectProcess extends ProcessRunner {
 			}
 			String[] newIncludePaths = add(includePaths, newIncludePath);
 			if (traceOn)
-				System.out.println("        add " + newIncludePath + " to existing includePaths: "
+				System.out.println("        add " + newIncludePath + " to existing includePaths: " //$NON-NLS-1$ //$NON-NLS-2$
 						+ unroll(includePaths));
 			ManagedBuildManager.setOption(cf, cfTool, option, newIncludePaths);
 		}
 		else{
-			System.out.println("MPIProjectProcess, no option for include paths found.");
+			System.out.println("MPIProjectProcess, no option for include paths found."); //$NON-NLS-1$
 		}
 	}
 
@@ -221,10 +221,10 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * 
 	 */
 	protected void addLinkerOpt(IConfiguration cf, String libName, String libPath) {
-		String ext = "o";
+		String ext = "o"; //$NON-NLS-1$
 		ITool cfTool = cf.getToolFromInputExtension(ext);
 		if(cfTool==null) {
-			MessageDialog.openWarning(null, "Unable to set linker option", "Unable to set linker option.\nNo ITool available... is toolchain invalid?");
+			MessageDialog.openWarning(null, Messages.MPIProjectProcess_unable_to_set_linker_opt, Messages.MPIProjectProcess_unable_to_set_linker_opt_toolchain_invalid_q);
 			return;
 		}
 		IOption lpOpt = getFirstOptionByType(cf, cfTool, IOption.LIBRARY_PATHS);
@@ -236,16 +236,16 @@ public class MPIProjectProcess extends ProcessRunner {
 
 	
 	protected void setCompileCommand(IConfiguration cf, String buildCmd) {
-		if(traceOn)System.out.println("compile cmd: "+buildCmd);
-		ITool compiler = cf.getToolFromInputExtension("c");
+		if(traceOn)System.out.println("compile cmd: "+buildCmd); //$NON-NLS-1$
+		ITool compiler = cf.getToolFromInputExtension("c"); //$NON-NLS-1$
 		compiler.setToolCommand(buildCmd);
 	}
 	
 	protected void setLinkCommand(IConfiguration cf, String buildCmd) {
-		if(traceOn)System.out.println("link cmd: "+buildCmd);
-		ITool linker=cf.getToolFromInputExtension("o");
+		if(traceOn)System.out.println("link cmd: "+buildCmd); //$NON-NLS-1$
+		ITool linker=cf.getToolFromInputExtension("o"); //$NON-NLS-1$
 		if(linker==null) {
-			MessageDialog.openWarning(null, "Unable to set link command", "Unable to set link command.\nNo ITool linker available... is toolchain invalid?");
+			MessageDialog.openWarning(null, Messages.MPIProjectProcess_unable_to_set_link_command, Messages.MPIProjectProcess_unable_to_set_link_command_toolchain_invalid_q);
 			return;
 		}
 		linker.setToolCommand(buildCmd);
@@ -279,14 +279,14 @@ public class MPIProjectProcess extends ProcessRunner {
 				break;
 			
 			default:
-				System.out.println("MPIProjectWizard Process postprocessing (MPIProjectProcess), can't get type of option for " + option.getName());
+				System.out.println("MPIProjectWizard Process postprocessing (MPIProjectProcess), can't get type of option for " + option.getName()); //$NON-NLS-1$
 				return;
 			}
 			// update the option in the managed builder options
 			ManagedBuildManager.setOption(cf, tool, option, valueList);
 
 		} catch (BuildException e) {
-			System.out.println("MPIProjectProcess.addOptionValue(), "+e.getMessage());
+			System.out.println("MPIProjectProcess.addOptionValue(), "+e.getMessage()); //$NON-NLS-1$
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
@@ -308,9 +308,9 @@ public class MPIProjectProcess extends ProcessRunner {
 	 * @param proj the (managed) project for which print all this stuff.
 	 */
 	protected void showOptions(IManagedProject proj) {
-		if(traceOn)System.out.println("Managed Project: "+proj.getName());
-		if(traceOn)System.out.println("Path.SEPARATOR="+Path.SEPARATOR);
-		if(traceOn)System.out.println("Path.DEVICE_SEPARATOR="+Path.DEVICE_SEPARATOR);
+		if(traceOn)System.out.println("Managed Project: "+proj.getName()); //$NON-NLS-1$
+		if(traceOn)System.out.println("Path.SEPARATOR="+Path.SEPARATOR); //$NON-NLS-1$
+		if(traceOn)System.out.println("Path.DEVICE_SEPARATOR="+Path.DEVICE_SEPARATOR); //$NON-NLS-1$
 		IConfiguration[] configs = proj.getConfigurations();
 		try {
 			for (int i = 0; i < configs.length; i++) {
@@ -318,15 +318,15 @@ public class MPIProjectProcess extends ProcessRunner {
 				ITool[] allTools = cf.getTools();
 
 				int numTools = allTools.length;
-				System.out.println("Config " + i + ": " + cf.getName()+ " has "+numTools+" tools.");
+				System.out.println("Config " + i + ": " + cf.getName()+ " has "+numTools+" tools."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 				for (int k = 0; k < allTools.length; k++) {
 					ITool tool = allTools[k];
-					System.out.println("  Tool " + k + ": " + tool.getName());
+					System.out.println("  Tool " + k + ": " + tool.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 					//boolean rc=tool.setToolCommand("foo");
 					String toolCmd=tool.getToolCommand();
 					String toolID=tool.getId();
-					System.out.println("  cmd="+toolCmd+"  toolID="+toolID);
+					System.out.println("  cmd="+toolCmd+"  toolID="+toolID); //$NON-NLS-1$ //$NON-NLS-2$
 					
 					
 					IOption[] options = tool.getOptions();
@@ -335,30 +335,30 @@ public class MPIProjectProcess extends ProcessRunner {
 						IOption opt = options[j];
 						String foundOptionID = opt.getId();
 						int type=opt.getValueType();
-						System.out.println("    option " + j + " " + opt.getName() + " id="
-								+ foundOptionID+"  type="+showType(type));
+						System.out.println("    option " + j + " " + opt.getName() + " id=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								+ foundOptionID+"  type="+showType(type)); //$NON-NLS-1$
 						if(opt.getValueType()==IOption.INCLUDE_PATH) {
 							showIncludePaths(opt);
 						}
 					}
 				}
 
-				System.out.println("Config " + i + ": " + cf.getName()
-						+ "======= End of ALL tools ");
+				System.out.println("Config " + i + ": " + cf.getName() //$NON-NLS-1$ //$NON-NLS-2$
+						+ "======= End of ALL tools "); //$NON-NLS-1$
 				
 				// another way to access Tool
-				String ext = "c";
+				String ext = "c"; //$NON-NLS-1$
 				ITool cfTool = cf.getToolFromInputExtension(ext);
-				System.out.println("Tool by ext: " + ext + " is: " + cfTool.getName());
+				System.out.println("Tool by ext: " + ext + " is: " + cfTool.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 				
 				// Look for include path
 				IOption option = getFirstOptionByType(cf, cfTool, IOption.INCLUDE_PATH);
 				if (option != null) {
 					String oname = option.getName();
-					System.out.println("Option " + option.getId() + " is " + oname);
+					System.out.println("Option " + option.getId() + " is " + oname); //$NON-NLS-1$ //$NON-NLS-2$
 					showIncludePaths(option);
 				}
-				else System.out.println("No include path option found. ");
+				else System.out.println("No include path option found. "); //$NON-NLS-1$
 
 			}
 		} catch (Exception e) {
@@ -367,10 +367,10 @@ public class MPIProjectProcess extends ProcessRunner {
 
 	}
 	protected String showType(int type){
-		if(type==IOption.INCLUDE_PATH) return type+" (IOption.INCLUDE_PATH)";
-		if(type==IOption.LIBRARY_PATHS) return type+" (IOption.LIBRARY_PATHS)";
-		if(type==IOption.LIBRARIES)     return type+" (IOption.LIBRARIES)";
-		return type+" ";
+		if(type==IOption.INCLUDE_PATH) return type+" (IOption.INCLUDE_PATH)"; //$NON-NLS-1$
+		if(type==IOption.LIBRARY_PATHS) return type+" (IOption.LIBRARY_PATHS)"; //$NON-NLS-1$
+		if(type==IOption.LIBRARIES)     return type+" (IOption.LIBRARIES)"; //$NON-NLS-1$
+		return type+" "; //$NON-NLS-1$
 	}
 
 	/**
@@ -385,7 +385,7 @@ public class MPIProjectProcess extends ProcessRunner {
 		String[] includePaths = opt.getIncludePaths();
 		for (int index = 0; index < includePaths.length; index++) {
 			String path = includePaths[index];
-			System.out.println("   include path " + index + ": " + path);
+			System.out.println("   include path " + index + ": " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 	}
@@ -441,7 +441,7 @@ public class MPIProjectProcess extends ProcessRunner {
 		for (int i = 0; i < list.length; i++) {
 			String string = list[i];
 			result.append(string);
-			result.append(", ");
+			result.append(", "); //$NON-NLS-1$
 		}
 		if (result.length() > 2) {
 			result.delete(result.length() - 2, result.length() - 1);

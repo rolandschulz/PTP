@@ -39,7 +39,7 @@ public class MPIProjectProcessCPP extends MPIProjectProcess {
 	 * <p>C++ projects use both a C build command and a C++ build command in their settings.
 	 */
 	protected void setCompileCommand(IConfiguration cf, String buildCmd) {
-		if(traceOn)System.out.println("compile cmd: "+buildCmd);
+		if(traceOn)System.out.println("compile cmd: "+buildCmd); //$NON-NLS-1$
 		// access the preference store from the MPI plugin so we can get c compiler too
 		IPreferenceStore preferenceStore = MpiPlugin.getDefault().getPreferenceStore();
 		String c_build_cmd = preferenceStore.getString(MpiIDs.MPI_BUILD_CMD);
@@ -48,11 +48,11 @@ public class MPIProjectProcessCPP extends MPIProjectProcess {
 		// and so we don't use this
 		//String cpp_build_cmd = preferenceStore.getString(MpiIDs.MPI_CPP_BUILD_CMD);
 		
-		ITool c_compiler = cf.getToolFromInputExtension("c");
-		ITool cpp_compiler = cf.getToolFromInputExtension("cpp");	
+		ITool c_compiler = cf.getToolFromInputExtension("c"); //$NON-NLS-1$
+		ITool cpp_compiler = cf.getToolFromInputExtension("cpp");	 //$NON-NLS-1$
 		
 		c_compiler.setToolCommand(c_build_cmd);
 		cpp_compiler.setToolCommand(buildCmd);
-		if(traceOn)System.out.println("C compiler cmd: "+c_build_cmd+"  C++ compiler cmd: "+buildCmd);
+		if(traceOn)System.out.println("C compiler cmd: "+c_build_cmd+"  C++ compiler cmd: "+buildCmd); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

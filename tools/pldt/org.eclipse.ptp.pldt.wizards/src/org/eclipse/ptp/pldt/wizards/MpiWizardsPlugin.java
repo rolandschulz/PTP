@@ -77,7 +77,7 @@ public class MpiWizardsPlugin extends AbstractUIPlugin {
 	public ResourceBundle getResourceBundle() {
 		try {
 			if (resourceBundle == null)
-				resourceBundle = ResourceBundle.getBundle("org.eclipse.cdt.managedbuilder.ui.tests.TestsPluginResources");
+				resourceBundle = ResourceBundle.getBundle("org.eclipse.cdt.managedbuilder.ui.tests.TestsPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
@@ -92,10 +92,10 @@ public class MpiWizardsPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.cdt.managedbuilder.ui.tests", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.cdt.managedbuilder.ui.tests", path); //$NON-NLS-1$
 	}
 
 	public static String getPluginId() {
-		return "org.eclipse.ptp.pldt.wizards";
+		return "org.eclipse.ptp.pldt.wizards"; //$NON-NLS-1$
 	}
 }

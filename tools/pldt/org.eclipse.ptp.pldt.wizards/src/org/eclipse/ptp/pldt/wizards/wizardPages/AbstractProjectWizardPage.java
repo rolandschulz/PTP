@@ -50,8 +50,8 @@ public abstract class AbstractProjectWizardPage extends AbstractWizardDataPage{
 		//MessageDialogWithLink md = new MessageDialogWithLink(shell,"MPI", "MPI preferences have not been set. Click below to do it now.","Click here to add MPI preferencess now",pp);
 		//int result = md.open();
 		
-		String msg = type+" Preferences have not been set.  Do you want to set them now?";
-		boolean doit = MessageDialog.openQuestion(shell, "No "+type+" Preferences", msg);
+		String msg = type+Messages.AbstractProjectWizardPage_preferences_have_not_been_set;
+		boolean doit = MessageDialog.openQuestion(shell, Messages.AbstractProjectWizardPage_no+type+Messages.AbstractProjectWizardPage_preferences, msg);
 		if(doit) {
 			showPreferenceDialog(type);
 		}
@@ -62,7 +62,7 @@ public abstract class AbstractProjectWizardPage extends AbstractWizardDataPage{
 		PreferenceManager mgr = new PreferenceManager();
 		IPreferencePage preferencePage = getPreferencePage();
 		preferencePage.setTitle(type);
-		IPreferenceNode node = new PreferenceNode("1", preferencePage);
+		IPreferenceNode node = new PreferenceNode("1", preferencePage); //$NON-NLS-1$
 		mgr.addToRoot(node);
 		Shell shell = Display.getCurrent().getActiveShell();
 		PreferenceDialog dialog = new PreferenceDialog(shell, mgr);
