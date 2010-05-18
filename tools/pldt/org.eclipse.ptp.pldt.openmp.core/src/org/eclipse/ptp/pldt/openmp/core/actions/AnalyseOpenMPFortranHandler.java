@@ -1,3 +1,14 @@
+/**********************************************************************
+ * Copyright (c) 2010 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.ptp.pldt.openmp.core.actions;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -13,7 +24,6 @@ import org.eclipse.ptp.pldt.openmp.core.analysis.OpenMPFortranASTVisitor;
 public class AnalyseOpenMPFortranHandler {
 	public void run(String languageID, ITranslationUnit tu, String fileName, ScanReturn msr) {
 		if (languageID.equals(FortranLanguage.LANGUAGE_ID)) {
-			System.out.println("found fortran!");
 			IResource res = tu.getUnderlyingResource();
 			if (!(res instanceof IFile))
 				throw new IllegalStateException();
