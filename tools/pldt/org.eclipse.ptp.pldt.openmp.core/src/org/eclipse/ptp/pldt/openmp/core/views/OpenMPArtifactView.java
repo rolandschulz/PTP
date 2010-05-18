@@ -1,3 +1,14 @@
+/**********************************************************************
+ * Copyright (c) 2010 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.ptp.pldt.openmp.core.views;
 
 import org.eclipse.core.resources.IMarker;
@@ -37,9 +48,9 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 		// super(OpenMPPlugin.getDefault(), "OpenMP Artifact", "OpenMP Artifacts", "Construct", OpenMPPlugin.MARKER_ID);
 		super(
 				OpenMPPlugin.getDefault(),
-				OpenMPPlugin.getResourceString("OpenMPArtifactView.thingname"),
-				OpenMPPlugin.getResourceString("OpenMPArtifactView.thingnames"),
-				OpenMPPlugin.getResourceString("OpenMPArtifactView.extraColName"),
+				OpenMPPlugin.getResourceString("OpenMPArtifactView.thingname"), //$NON-NLS-1$
+				OpenMPPlugin.getResourceString("OpenMPArtifactView.thingnames"), //$NON-NLS-1$
+				OpenMPPlugin.getResourceString("OpenMPArtifactView.extraColName"), //$NON-NLS-1$
 				OpenMPPlugin.MARKER_ID);
 
 	}
@@ -52,11 +63,11 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 		if (temp != null) {
 			Integer constructType = (Integer) temp;
 			int i = constructType.intValue();
-			String val="";
+			String val=""; 
 			if (i < Artifact.CONSTRUCT_TYPE_NAMES.length)
 				val = Artifact.CONSTRUCT_TYPE_NAMES[i];
 			else
-				val = "value is " + i;
+				val = "value is " + i; //$NON-NLS-1$
 		
 			/*
 			val = "value is " + i; // BRT need a more robust lookup
@@ -67,7 +78,7 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 	*/
 			return val;
 		} else
-			return " ";
+			return " "; //$NON-NLS-1$
 	}
     
 
@@ -89,7 +100,8 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
                 Object obj = ((IStructuredSelection) selection).getFirstElement();
                 IMarker marker = (IMarker) obj;
                 if(marker==null){
-                	MessageDialog.openInformation(null, "No selection", "No artifact selected");
+                	MessageDialog.openInformation(null, OpenMPPlugin.getResourceString("OpenMPArtifactView.no_selection"),  //$NON-NLS-1$
+                			OpenMPPlugin.getResourceString("OpenMPArtifactView.no_artifact_selected")); //$NON-NLS-1$
                 	return;
                 }
 
@@ -133,15 +145,16 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
                      
                     
                 } catch (Exception e) {
-                    System.out.println("ATV.doubleclickAction: Error positioning editor page from marker line number");
+                    System.out.println("ATV.doubleclickAction: Error positioning editor page from marker line number"); //$NON-NLS-1$
                     //showStatusMessage("Error positioning editor from marker line number", "error marker goto");
                     e.printStackTrace();
                 }
                  
             }
         };
-        infoAction.setText("Show pragma region");
-        infoAction.setToolTipText("Show region for selected " + thingname_);
+
+        infoAction.setText(OpenMPPlugin.getResourceString("OpenMPArtifactView.show_pragma_region"));  //$NON-NLS-1$
+        infoAction.setToolTipText(OpenMPPlugin.getResourceString("OpenMPArtifactView.show_region_for_selected") + thingname_);//$NON-NLS-1$
         infoAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
                 ISharedImages.IMG_OBJS_INFO_TSK));
 

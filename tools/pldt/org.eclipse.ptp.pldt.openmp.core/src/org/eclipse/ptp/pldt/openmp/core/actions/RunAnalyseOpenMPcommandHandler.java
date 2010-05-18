@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -86,11 +86,11 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 				// Attempt to handle Fortran
 				// Instantiate using reflection to avoid static Photran dependencies
 				try {
-					Class<?> c = Class.forName("org.eclipse.ptp.pldt.openmp.core.actions.AnalyseOpenMPFortranHandler");
-					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class);
+					Class<?> c = Class.forName("org.eclipse.ptp.pldt.openmp.core.actions.AnalyseOpenMPFortranHandler"); //$NON-NLS-1$
+					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class); //$NON-NLS-1$
 					method.invoke(c.newInstance(), languageID, tu, fileName, msr);
 				} catch (Exception e) {
-					System.err.println("RunAnalyseOpenMPcommandHandler.doArtifactAnalysis: Photran not installed");
+					System.err.println("RunAnalyseOpenMPcommandHandler.doArtifactAnalysis: Photran not installed"); //$NON-NLS-1$
 				}
 			}
 		} catch (CoreException e) {
@@ -129,7 +129,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 			if (pList[i] instanceof PASTOMPPragma) {
 				
 				PASTOMPPragma pop = (PASTOMPPragma) pList[i];  
-				if(traceOn)System.out.println("found #pragma, line "+pop.getStartingLine());
+				if(traceOn)System.out.println("found #pragma, line "+pop.getStartingLine()); //$NON-NLS-1$
 				SourceInfo si = getSourceInfo(pop, Artifact.PRAGMA);
 				Artifact a = new Artifact(pop.getFilename(), pop
 						.getStartingLine(), pop.getStartLocation(), pop
