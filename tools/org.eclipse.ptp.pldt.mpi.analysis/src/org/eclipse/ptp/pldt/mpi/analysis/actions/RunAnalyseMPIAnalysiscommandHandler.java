@@ -39,7 +39,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIResourceCollector;
  */
 public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 	protected MPICallGraph callGraph_;
-	boolean traceOn=true;
+	boolean traceOn=false;
 	
 	public RunAnalyseMPIAnalysiscommandHandler(){ 
 		callGraph_ = null;
@@ -100,37 +100,6 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 		return foundError;
 	}
 	
-/*	//ProgressMonitorDialog example?
-public Object execute2(ExecutionEvent event) throws ExecutionException {
-		int numFiles=this.countFilesSelected();
-		// batch ws modifications *and* report progress
-		WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
-			@Override
-			protected void execute(IProgressMonitor monitor)
-					throws CoreException, InvocationTargetException,
-					InterruptedException {
-				err = runResources(monitor, indent, includes);
-			}
-		};
-		ProgressMonitorDialog pmdialog = new ProgressMonitorDialog(
-				shell);
-		try {
-			pmdialog.run(true, true, wmo); // fork=true; if false, not
-											// cancelable
-
-		} catch (InvocationTargetException e) {
-			err = true;
-			System.out.println("Error running analysis: ITE: "
-					+ e.getMessage());
-			System.out.println("  cause: " + e.getCause() + " - "
-					+ e.getCause().getMessage());
-			Throwable th = e.getCause();
-			th.printStackTrace();
-		} catch (InterruptedException e) {
-			cancelledByUser = true;
-		}
-	}
-	*/
 	/**
 	 * Run analysis (collect resource info in the call graph) on a resource (e.g. File or Folder) 
 	 * <br>Will descend to members of folder
