@@ -16,7 +16,7 @@
    <!-- MARKER_ID       = "org.eclipse.ptp.pldt.openmp.core.openMPMarker" -->
    <extension point="org.eclipse.core.resources.markers"
 		id="openMPMarker"
-        name="OpenMP Artifact Marker">
+        name="%extension.name">
       <super type="org.eclipse.core.resources.textmarker"/>
       <attribute name="fileName"/>
       <attribute name="theLineNo"/>
@@ -41,7 +41,7 @@
             icon="icons/openMP.gif" 
             
             presentationLayer="5"
-            label="OpenMP Annotation Marker"
+            label="%specification.label"
             
             textPreferenceKey="openopenmpndication"
             textPreferenceValue="true"
@@ -67,7 +67,7 @@
       point="org.eclipse.ui.preferencePages">
           <page id="org.eclipse.ptp.pldt.openmp.core.prefpage"
             class="org.eclipse.ptp.pldt.openmp.core.prefs.OpenMPPreferencePage"
-            name="OpenMP"
+            name="%page.name"
            category="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
   />
    </extension>
@@ -82,19 +82,19 @@
          <command
                defaultHandler="org.eclipse.ptp.pldt.openmp.core.actions.RunAnalyseOpenMPcommandHandler"
                id="org.eclipse.ptp.pldt.openmp.core.command2"
-               name="Show OpenMP artifacts">
+               name="%command.name">
          </command>
       </extension>
       <extension
             id="teopenmpD"
-            name="tempNAME"
+            name="%extension.name.0"
             point="org.eclipse.ui.menus">
          <menuContribution
                locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1?after=separator2.openmp">
             <command
                   commandId="org.eclipse.ptp.pldt.openmp.core.command2"
                   icon="icons/openMP.gif"
-                  label="Show OpenMP Artifacts"
+                  label="%command.label"
                   style="push">
             </command>
          </menuContribution>
