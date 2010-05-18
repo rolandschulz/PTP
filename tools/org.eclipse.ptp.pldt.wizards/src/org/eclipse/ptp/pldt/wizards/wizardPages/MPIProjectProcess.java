@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
 
 /**
@@ -222,7 +223,10 @@ public class MPIProjectProcess extends ProcessRunner {
 	protected void addLinkerOpt(IConfiguration cf, String libName, String libPath) {
 		String ext = "o";
 		ITool cfTool = cf.getToolFromInputExtension(ext);
-
+		if(cfTool==null) {
+			MessageDialog.openWarning(null, "Unable to set linker option", "Unable to set linker option.\nNo ITool available... is toolchain invalid?");
+			return;
+		}
 		IOption lpOpt = getFirstOptionByType(cf, cfTool, IOption.LIBRARY_PATHS);
 		addOptionValue(cf, cfTool, lpOpt, libPath);
 
@@ -240,6 +244,10 @@ public class MPIProjectProcess extends ProcessRunner {
 	protected void setLinkCommand(IConfiguration cf, String buildCmd) {
 		if(traceOn)System.out.println("link cmd: "+buildCmd);
 		ITool linker=cf.getToolFromInputExtension("o");
+		if(linker==null) {
+			MessageDialog.openWarning(null, "Unable to set link command", "Unable to set link command.\nNo ITool linker available... is toolchain invalid?");
+			return;
+		}
 		linker.setToolCommand(buildCmd);
 		
 	}
