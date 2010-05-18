@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.text.contentassist.DOMCompletionProposalComputer
- * Version: 1.18
+ * Version: 1.27
  */
 
 package org.eclipse.ptp.internal.rdt.ui.contentassist;
