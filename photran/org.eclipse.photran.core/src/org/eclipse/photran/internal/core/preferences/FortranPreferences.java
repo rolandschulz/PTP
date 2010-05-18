@@ -29,26 +29,27 @@ import org.eclipse.swt.graphics.RGB;
  *
  * TODO: Jeff: Make sure we call <code>FortranPreferences.initializeDefaults(getPluginPreferences());</code>
  */
+@SuppressWarnings("deprecation")
 public final class FortranPreferences
 {
-    public static final FortranStringPreference RELEASE_NOTES_SHOWN = new FortranStringPreference("releasenotesversionshown", "");
+    public static final FortranStringPreference RELEASE_NOTES_SHOWN = new FortranStringPreference("releasenotesversionshown", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-    public static final FortranBooleanPreference ENABLE_VPG_LOGGING = new FortranBooleanPreference("vpglogging", false);
-    public static final FortranBooleanPreference SHOW_PARSE_TREE = new FortranBooleanPreference("parsetree", false);
-    public static final FortranBooleanPreference ENABLE_FIXED_FORM_FOLDING = new FortranBooleanPreference("fixedfolding", false);
-    public static final FortranBooleanPreference ENABLE_FREE_FORM_FOLDING = new FortranBooleanPreference("freefolding", false);
+    public static final FortranBooleanPreference ENABLE_VPG_LOGGING = new FortranBooleanPreference("vpglogging", false); //$NON-NLS-1$
+    public static final FortranBooleanPreference SHOW_PARSE_TREE = new FortranBooleanPreference("parsetree", false); //$NON-NLS-1$
+    public static final FortranBooleanPreference ENABLE_FIXED_FORM_FOLDING = new FortranBooleanPreference("fixedfolding", false); //$NON-NLS-1$
+    public static final FortranBooleanPreference ENABLE_FREE_FORM_FOLDING = new FortranBooleanPreference("freefolding", false); //$NON-NLS-1$
 
-    public static final FortranRGBPreference COLOR_COMMENTS    = new FortranRGBPreference("comments",    new RGB(63,  127, 95 ));
-    public static final FortranRGBPreference COLOR_IDENTIFIERS = new FortranRGBPreference("identifiers", new RGB(0,   0,   192));
-    public static final FortranRGBPreference COLOR_INTRINSICS  = new FortranRGBPreference("intrinsics",  new RGB(96,  0,   192));
-    public static final FortranRGBPreference COLOR_KEYWORDS    = new FortranRGBPreference("keywords",    new RGB(127, 0,   85 ));
-    public static final FortranRGBPreference COLOR_STRINGS     = new FortranRGBPreference("strings",     new RGB(42,  0,   255));
-    public static final FortranRGBPreference COLOR_CPP         = new FortranRGBPreference("cpp",         new RGB(128, 128, 128));
+    public static final FortranRGBPreference COLOR_COMMENTS    = new FortranRGBPreference("comments",    new RGB(63,  127, 95 )); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_IDENTIFIERS = new FortranRGBPreference("identifiers", new RGB(0,   0,   192)); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_INTRINSICS  = new FortranRGBPreference("intrinsics",  new RGB(96,  0,   192)); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_KEYWORDS    = new FortranRGBPreference("keywords",    new RGB(127, 0,   85 )); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_STRINGS     = new FortranRGBPreference("strings",     new RGB(42,  0,   255)); //$NON-NLS-1$
+    public static final FortranRGBPreference COLOR_CPP         = new FortranRGBPreference("cpp",         new RGB(128, 128, 128)); //$NON-NLS-1$
 
-    public static final FortranStringPreference PREFERRED_MODEL_BUILDER = new FortranStringPreference("modelbuilder", "");
-    public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", "");
+    public static final FortranStringPreference PREFERRED_MODEL_BUILDER = new FortranStringPreference("modelbuilder", ""); //$NON-NLS-1$ //$NON-NLS-2$
+    public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-    public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference("fixedformcommentcolum", 72, FortranIntegerPreference.NO_LIMIT, 72);
+    public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference("fixedformcommentcolum", 72, FortranIntegerPreference.NO_LIMIT, 72); //$NON-NLS-1$
     
     private FortranPreferences() {}
 

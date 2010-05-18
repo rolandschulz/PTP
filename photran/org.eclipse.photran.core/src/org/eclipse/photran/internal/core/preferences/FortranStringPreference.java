@@ -11,20 +11,23 @@
 package org.eclipse.photran.internal.core.preferences;
 
 /**
- * A preference which hold a string value.
+ * A workspace preference which holds a string value.
  * 
  * @author Jeff Overbey
+ * 
+ * @see FortranPreference
  */
+@SuppressWarnings("deprecation")
 public final class FortranStringPreference extends FortranPreference
 {
     private String defaultValue;
-    
+
     public FortranStringPreference(String name, String defaultValue)
     {
-        super("string", name);
+        super("string", name); //$NON-NLS-1$
         this.defaultValue = defaultValue;
     }
-    
+
     public void setDefault()
     {
         getPreferenceStore().setDefault(getName(), defaultValue);

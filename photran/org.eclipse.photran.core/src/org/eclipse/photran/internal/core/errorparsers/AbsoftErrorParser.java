@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IFile;
 *
 * @author Jeff Overbey
 */
+@SuppressWarnings("deprecation")
 final public class AbsoftErrorParser implements IErrorParser
 {
     /*
@@ -38,7 +39,7 @@ final public class AbsoftErrorParser implements IErrorParser
      *     \w matches [A-Za-z_0-9]
      *     Parentheses define a capturing group
      */
-    private Pattern errorLineRegex = Pattern.compile("\\S+ f90fe: ERROR \\S+, File = (\\S+), Line = (\\d+), Column = \\d+");
+    private Pattern errorLineRegex = Pattern.compile("\\S+ f90fe: ERROR \\S+, File = (\\S+), Line = (\\d+), Column = \\d+"); //$NON-NLS-1$
 
     private boolean expectingErrorMessage = false;
     

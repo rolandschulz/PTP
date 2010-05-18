@@ -49,9 +49,9 @@ public class GFortranErrorParser implements IErrorParser
     //                                                                     |    Line        Column
     //                                                                     |    |           |
     //                                    Regex group number    1          2    3       4   5
-    private static final Pattern startLine = Pattern.compile("^(In file )?(.+):([0-9]+)(\\.([0-9]+))?:$");
-    private static final Pattern errorLine = Pattern.compile("^(Fatal )?Error: .*");
-    private static final Pattern warningLine = Pattern.compile("^Warning: .*");
+    private static final Pattern startLine = Pattern.compile("^(In file )?(.+):([0-9]+)(\\.([0-9]+))?:$"); //$NON-NLS-1$
+    private static final Pattern errorLine = Pattern.compile("^(Fatal )?Error: .*"); //$NON-NLS-1$
+    private static final Pattern warningLine = Pattern.compile("^Warning: .*"); //$NON-NLS-1$
 
     /*
      * This error parser uses the GoF State pattern.  It starts in the first of two states:
@@ -75,20 +75,21 @@ public class GFortranErrorParser implements IErrorParser
     /**
      * @see IErrorParser#processLine(String, ErrorParserManager)
      */
-	public boolean processLine(String line, ErrorParserManager eoParser)
-	{
-	    return currentState.processLine(line, eoParser);
-	}
+    public boolean processLine(String line, ErrorParserManager eoParser)
+    {
+        return currentState.processLine(line, eoParser);
+    }
 
-	/**
-	 * STATE 1: WAITING FOR A START LINE
-	 * <p>
-	 * This is the state of the error parser when it is waiting for a line like
-	 * <pre>cray-pointers.f90:56.21:</pre>
-	 * When it finds one, it switches to the next state (Accumulating an Error Message).
-	 */
-	private class WaitForStartLine implements IErrorParser
-	{
+    /**
+     * STATE 1: WAITING FOR A START LINE
+     * <p>
+     * This is the state of the error parser when it is waiting for a line like
+     * <pre>cray-pointers.f90:56.21:</pre>
+     * 
+     * When it finds one, it switches to the next state (Accumulating an Error Message).
+     */
+    private class WaitForStartLine implements IErrorParser
+    {
         public boolean processLine(String line, ErrorParserManager eoParser)
         {
             Matcher startLineMatcher = startLine.matcher(line);
@@ -100,7 +101,7 @@ public class GFortranErrorParser implements IErrorParser
             }
             return false;
         }
-	}
+    }
 
     /**
      * STATE 2: ACCUMULATING ERROR MESSAGE
@@ -118,20 +119,22 @@ public class GFortranErrorParser implements IErrorParser
      * we display that message in the Problems view, and the error parser returns to
      * its initial state, waiting for the next line.
      */
-	private class AccumulateErrorMessageLines implements IErrorParser
-	{
-	    private String filename;
-	    private int lineNumber;
-	    private StringBuffer errorMessage = new StringBuffer();
+    private class AccumulateErrorMessageLines implements IErrorParser
+    {
+        private String filename;
 
-	    private int linesAccumulated = 1;
+        private int lineNumber;
 
-	    public AccumulateErrorMessageLines(String filename, int lineNumber, String line)
-	    {
-	        this.filename = filename;
-	        this.lineNumber = lineNumber;
-	        errorMessage.append(line);
-	    }
+        private StringBuffer errorMessage = new StringBuffer();
+
+        private int linesAccumulated = 1;
+
+        public AccumulateErrorMessageLines(String filename, int lineNumber, String line)
+        {
+            this.filename = filename;
+            this.lineNumber = lineNumber;
+            errorMessage.append(line);
+        }
 
         public boolean processLine(String line, ErrorParserManager eoParser)
         {
@@ -145,7 +148,7 @@ public class GFortranErrorParser implements IErrorParser
             if (errorMatcher.matches())
             {
                 // Matched "Error: Description" or "Fatal Error: Description"
-                errorMessage.append(" ");
+                errorMessage.append(" "); //$NON-NLS-1$
                 errorMessage.append(line);
                 addMarker(eoParser, true);
                 return true;
@@ -153,7 +156,7 @@ public class GFortranErrorParser implements IErrorParser
             else if (warningMatcher.matches())
             {
                 // Matched "Warning: Description"
-                errorMessage.append(" ");
+                errorMessage.append(" "); //$NON-NLS-1$
                 errorMessage.append(line);
                 addMarker(eoParser, false);
                 return true;
@@ -192,10 +195,10 @@ public class GFortranErrorParser implements IErrorParser
             // it starts with ../ try removing that and hope that
             // maybe it will refer to a workspace location.
 
-            if (filename.startsWith("../") || filename.startsWith("..\\"))
+            if (filename.startsWith("../") || filename.startsWith("..\\")) //$NON-NLS-1$ //$NON-NLS-2$
                 return eoParser.findFileName(filename.substring(3));
 
             return null;
         }
-	}
+    }
 }

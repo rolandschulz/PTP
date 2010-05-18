@@ -25,25 +25,26 @@ import org.eclipse.core.resources.IFile;
  *
  * @author Jeff Overbey
  */
+@SuppressWarnings("deprecation")
 public class IntelFortranErrorParser implements IErrorParser
 {
     public boolean processLine(String line, ErrorParserManager eoParser)
     {
         String /*fortcom,*/ severitystr, filestr, linestr, message;
 
-        StringTokenizer tokenizer = new StringTokenizer(line, ":");
-        if (line.startsWith("fortcom: "))
+        StringTokenizer tokenizer = new StringTokenizer(line, ":"); //$NON-NLS-1$
+        if (line.startsWith("fortcom: ")) //$NON-NLS-1$
         {
             try
             {
                 /*fortcom =*/ tokenizer.nextToken(); // fortcom
                 severitystr = tokenizer.nextToken().trim(); // Error
-                filestr = tokenizer.nextToken(",").substring(2).trim(); // filename
-                linestr = tokenizer.nextToken(":").substring(2).trim(); // line
+                filestr = tokenizer.nextToken(",").substring(2).trim(); // filename //$NON-NLS-1$
+                linestr = tokenizer.nextToken(":").substring(2).trim(); // line //$NON-NLS-1$
                                                                         // n
-                message = tokenizer.nextToken("\r\n").substring(2).trim(); // Message
+                message = tokenizer.nextToken("\r\n").substring(2).trim(); // Message //$NON-NLS-1$
 
-                int severity = (severitystr.equals("Error") ? IMarkerGenerator.SEVERITY_ERROR_RESOURCE
+                int severity = (severitystr.equals("Error") ? IMarkerGenerator.SEVERITY_ERROR_RESOURCE //$NON-NLS-1$
                                                            : IMarkerGenerator.SEVERITY_WARNING);
                 int lineno = Integer.parseInt(linestr.substring(5));
                 IFile file = eoParser.findFilePath(filestr);

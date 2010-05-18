@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
  *
  * @author Walt Brainerd
  */
+@SuppressWarnings("deprecation")
 public class NAGErrorParser implements IErrorParser
 {
      private String fileNameString;
@@ -30,14 +31,14 @@ public class NAGErrorParser implements IErrorParser
 
      private boolean processLineLocal(String line, ErrorParserManager epm)
      {
-          if (line.startsWith("Info:") || 
-              line.startsWith("Warning:") ||
-              line.startsWith("Extension:") ||
-              line.startsWith("Error:") ||
-              line.startsWith("Fatal:") ||
-              line.startsWith("Panic:")) // shouldn't happen, but ...
+          if (line.startsWith("Info:") ||  //$NON-NLS-1$
+              line.startsWith("Warning:") || //$NON-NLS-1$
+              line.startsWith("Extension:") || //$NON-NLS-1$
+              line.startsWith("Error:") || //$NON-NLS-1$
+              line.startsWith("Fatal:") || //$NON-NLS-1$
+              line.startsWith("Panic:")) // shouldn't happen, but ... //$NON-NLS-1$
           {
-              String[] tokens = line.split(" ");
+              String[] tokens = line.split(" "); //$NON-NLS-1$
     		  fileNameString = tokens[1].substring(0,tokens[1].length()-1);
     		  lineNumber = Integer.parseInt(
     				  tokens[3].substring(0,tokens[3].length()-1));
@@ -50,9 +51,9 @@ public class NAGErrorParser implements IErrorParser
  */
 
                IFile file = epm.findFilePath(fileNameString);
-               int severity = (line.startsWith("Error:") || 
-                               line.startsWith("Fatal:") ||
-                               line.startsWith("Panic:"))
+               int severity = (line.startsWith("Error:") ||  //$NON-NLS-1$
+                               line.startsWith("Fatal:") || //$NON-NLS-1$
+                               line.startsWith("Panic:")) //$NON-NLS-1$
                     ? IMarkerGenerator.SEVERITY_ERROR_RESOURCE
                     : IMarkerGenerator.SEVERITY_WARNING;
                //Generate and plant a marker for the message...

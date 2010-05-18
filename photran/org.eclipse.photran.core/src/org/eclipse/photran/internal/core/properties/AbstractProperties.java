@@ -34,7 +34,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 @SuppressWarnings("restriction")
 public abstract class AbstractProperties
 {
-    private static final String SEPARATOR = "\n";
+    private static final String SEPARATOR = "\n"; //$NON-NLS-1$
     
     private ProjectScope projScope = null;
     private ScopedPreferenceStore preferenceStore = null;
@@ -57,7 +57,7 @@ public abstract class AbstractProperties
     public String getProperty(IFile file, String propertyName)
     {
         if (file == null || file.getProject() == null)
-            return "";
+            return ""; //$NON-NLS-1$
         else
             return getProperty(file.getProject(), propertyName);
     }
@@ -176,7 +176,7 @@ public abstract class AbstractProperties
         public void addPropertyChangeListener(IPropertyChangeListener listener) {;}
         public boolean contains(String name) {throw new Error();}
         public void firePropertyChangeEvent(String name, Object oldValue, Object newValue) {;}
-        public boolean getBoolean(String name) { return getProperty().equals("true"); }
+        public boolean getBoolean(String name) { return getProperty().equals("true"); } //$NON-NLS-1$
         public boolean getDefaultBoolean(String name) {throw new Error();}
         public double getDefaultDouble(String name) {throw new Error();}
         public float getDefaultFloat(String name) {throw new Error();}
@@ -204,7 +204,7 @@ public abstract class AbstractProperties
         public void setValue(String name, int value) {;}
         public void setValue(String name, long value) {;}
         public void setValue(String name, String value) { setProperty(value); } ///////
-        public void setValue(String name, boolean value) { setProperty(value ? "true" : "false"); }
+        public void setValue(String name, boolean value) { setProperty(value ? "true" : "false"); } //$NON-NLS-1$ //$NON-NLS-2$
         
         protected abstract String getProperty();
         protected abstract String getDefault();

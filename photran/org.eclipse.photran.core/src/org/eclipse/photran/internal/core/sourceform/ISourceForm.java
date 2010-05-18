@@ -57,8 +57,7 @@ public interface ISourceForm
      * Configures this source form.
      * <p>
      * This is used to configure Fortran's preprocessed source form with an
-     * <code>IncludeLoaderCallback</code>, although other source forms may
-     * use it however they wish.
+     * <code>IncludeLoaderCallback</code>, although other source forms may use it however they wish.
      * <p>
      * Implementations should generally return <code>this</code>.
      * 

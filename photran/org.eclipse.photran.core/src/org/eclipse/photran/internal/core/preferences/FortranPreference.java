@@ -27,11 +27,13 @@ import org.eclipse.photran.internal.core.FortranCorePlugin;
  * <code>FortranStringPreference</code> and <code>FortranBooleanPreference</code> should be
  * eliminated once we start using Java 5.
  */
+@SuppressWarnings("deprecation")
 abstract class FortranPreference
 {
     private final String prefix, suffix;
+
     private final Preferences preferences;
-    
+
     public FortranPreference(String prefix, String suffix)
     {
         this.prefix = prefix;
@@ -44,17 +46,17 @@ abstract class FortranPreference
      */
     public final String getName()
     {
-        return prefix + "." + suffix;
+        return prefix + "." + suffix; //$NON-NLS-1$
     }
 
     /**
      * Sets the default value of this preference
      */
     public abstract void setDefault();
-    
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     // Utility Methods for Subclasses
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     protected Preferences getPreferenceStore()
     {

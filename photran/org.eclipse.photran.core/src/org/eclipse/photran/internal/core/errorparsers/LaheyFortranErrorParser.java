@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IFile;
  * 
  * @author Brian Foote
  */
+@SuppressWarnings("deprecation")
 public class LaheyFortranErrorParser implements IErrorParser
 {
     private boolean laheyFlag;
@@ -45,7 +46,7 @@ public class LaheyFortranErrorParser implements IErrorParser
 
         //If we ever see a line that starts this way, we are
         //henceforth in business...
-        if (line.startsWith("Lahey/Fujitsu")) laheyFlag = true;
+        if (line.startsWith("Lahey/Fujitsu")) laheyFlag = true; //$NON-NLS-1$
 
         //If we've never seen a Lahey ad, are work here is done...
         if (!laheyFlag) return false;
@@ -53,19 +54,19 @@ public class LaheyFortranErrorParser implements IErrorParser
         //We've work to do. See if this is an error line...
         if (line.length()<5) return false;
         String s4 = line.substring(4);
-        if (s4.startsWith("-S:"))
+        if (s4.startsWith("-S:")) //$NON-NLS-1$
         {
-            StringTokenizer tokenizer = new StringTokenizer(line, ":");
+            StringTokenizer tokenizer = new StringTokenizer(line, ":"); //$NON-NLS-1$
             try
             {
                 /*lahey =*/ tokenizer.nextToken(); // __####-S:
                 //$TODO Fix this when we see what a warning looks like...
-                severityString = "Error";
-                fileString = tokenizer.nextToken(",").substring(2).trim();
-                lineString = tokenizer.nextToken(",:").substring(1).trim();
-                message = tokenizer.nextToken("\r\n").substring(2).trim();
+                severityString = "Error"; //$NON-NLS-1$
+                fileString = tokenizer.nextToken(",").substring(2).trim(); //$NON-NLS-1$
+                lineString = tokenizer.nextToken(",:").substring(1).trim(); //$NON-NLS-1$
+                message = tokenizer.nextToken("\r\n").substring(2).trim(); //$NON-NLS-1$
 
-                int severity = (severityString.equals("Error") ? IMarkerGenerator.SEVERITY_ERROR_RESOURCE
+                int severity = (severityString.equals("Error") ? IMarkerGenerator.SEVERITY_ERROR_RESOURCE //$NON-NLS-1$
                                                               : IMarkerGenerator.SEVERITY_WARNING);
                 String lineNumberString = lineString.substring(5);
                 int lineNumber = Integer.parseInt(lineNumberString);

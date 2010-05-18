@@ -88,7 +88,7 @@
 <!-- =====================================-->
   <extension point="org.eclipse.core.contenttype.contentTypes">
 
-	  <content-type id="fortranSource" name="Fortran Source File"
+	  <content-type id="fortranSource" name="%content-type.name"
 		  base-type="org.eclipse.core.runtime.text"/>
 
       <!-- Associated filename extensions -->
@@ -112,6 +112,6 @@
 <!-- Source Form Extension Point -->
 <!-- =========================== -->
 
-  <extension-point id="sourceForms" name="Source Form" schema="schema/sourceForms.exsd"/>
+  <extension-point id="sourceForms" name="%extension-point.name" schema="schema/sourceForms.exsd"/>
 
 </plugin>

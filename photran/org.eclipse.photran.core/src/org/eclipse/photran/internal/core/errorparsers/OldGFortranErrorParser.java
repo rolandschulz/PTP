@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 *
 * @author ?
 */
+@SuppressWarnings("deprecation")
 public class OldGFortranErrorParser implements IErrorParser {
 	
 	String fileName = null;
@@ -66,7 +67,7 @@ public class OldGFortranErrorParser implements IErrorParser {
 				/*
 				 *	In file filename:lineno
 				 */
-				if (line.startsWith("In file ")) {
+				if (line.startsWith("In file ")) { //$NON-NLS-1$
 					fileName = line.substring(8, firstColon);
 					String lineno = line.substring(firstColon + 1);
 					try {
@@ -82,10 +83,10 @@ public class OldGFortranErrorParser implements IErrorParser {
 				 *	(a) Error: desc
 				 *  (b) Fatal Error: desc
 				 */
-				else if (line.startsWith("Error:") || line.startsWith("Fatal Error:")) {
+				else if (line.startsWith("Error:") || line.startsWith("Fatal Error:")) { //$NON-NLS-1$ //$NON-NLS-2$
 					String varName = null;
 					String desc = line.substring(firstColon + 1).trim();
-					int severity = extractSeverity("Error", inheritedSeverity);
+					int severity = extractSeverity("Error", inheritedSeverity); //$NON-NLS-1$
 					
 					if (fileName == null || lineNumber == -1) {
 						return false;
@@ -134,10 +135,10 @@ public class OldGFortranErrorParser implements IErrorParser {
 					}
 
 					// Look for variable name
-					int p = desc.indexOf("Symbol \'");
+					int p = desc.indexOf("Symbol \'"); //$NON-NLS-1$
 				 	if (p != -1) {
 				 		varName = desc.substring(p+8);
-				 		p = varName.indexOf("'");
+				 		p = varName.indexOf("'"); //$NON-NLS-1$
 				 		if (p != -1) {
 				 			varName = varName.substring(0, p);
 				 		} else {
@@ -146,10 +147,10 @@ public class OldGFortranErrorParser implements IErrorParser {
 				 	}
 				 	
 				 	// Remove at (error number)
-				 	p = desc.indexOf("at (");
+				 	p = desc.indexOf("at ("); //$NON-NLS-1$
 				 	if (p != -1) {
 				 		String tail = desc.substring(p+4);
-				 		int q = tail.indexOf(")");
+				 		int q = tail.indexOf(")"); //$NON-NLS-1$
 				 		if (q != -1) {
 				 			desc = desc.substring(0, p) + tail.substring(q+1);
 				 		}

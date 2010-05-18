@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.jface.preference.FieldEditor;
-import org.eclipse.photran.internal.core.properties.SourceFormProperties;
 import org.eclipse.photran.internal.core.sourceform.SourceForm;
+import org.eclipse.photran.internal.core.sourceform.SourceFormProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionEvent;

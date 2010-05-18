@@ -15,20 +15,23 @@ import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * A preference which hold an <code>RGB</code> (color) value.
+ * A workspace preference which holds an {@link RGB} (color) value.
  * 
  * @author Jeff Overbey
+ * 
+ * @see FortranPreference
  */
+@SuppressWarnings("deprecation")
 public final class FortranRGBPreference extends FortranPreference
 {
     private RGB defaultValue;
-    
+
     public FortranRGBPreference(String name, RGB defaultValue)
     {
-        super("rgb", name);
+        super("rgb", name); //$NON-NLS-1$
         this.defaultValue = defaultValue;
     }
-    
+
     public final void setDefault()
     {
         getPreferenceStore().setDefault(getName(), StringConverter.asString(defaultValue));

@@ -25,16 +25,17 @@ import org.eclipse.core.runtime.Path;
  * 
  * @author Craig Rasmussen
  */
+@SuppressWarnings("deprecation")
 public class XLFErrorParser implements IErrorParser
 {
-	Pattern p1 = Pattern.compile("^\"([^\"]*)\", line (\\d+)\\.(\\d+): (\\d+)-(\\d+) \\(([USEWLI])\\) (.*)$");
-	Pattern p2 = Pattern.compile("^\"([^\"]*)\", (\\d+)-(\\d+) \\(([USEWLI])\\) (.*)$");
+	Pattern p1 = Pattern.compile("^\"([^\"]*)\", line (\\d+)\\.(\\d+): (\\d+)-(\\d+) \\(([USEWLI])\\) (.*)$"); //$NON-NLS-1$
+	Pattern p2 = Pattern.compile("^\"([^\"]*)\", (\\d+)-(\\d+) \\(([USEWLI])\\) (.*)$"); //$NON-NLS-1$
 
 	public boolean processLine(String line, ErrorParserManager eoParser) {
 		return processLine(line, eoParser, IMarkerGenerator.SEVERITY_ERROR_RESOURCE);
 	}
 
-	public boolean processLine(String line, ErrorParserManager eoParser, int inheritedSeverity) {
+    public boolean processLine(String line, ErrorParserManager eoParser, int inheritedSeverity) {
 		// XLF error messsage format:
 		//
 		// "<filename>", line <lineno>.<column>: 15<CC>-<NNN> (<S>) <description>
@@ -64,8 +65,8 @@ public class XLFErrorParser implements IErrorParser
         //String colNum;
         //String msgNum;
         String desc;
-        String varName = "";
-        String level = "S";
+        String varName = ""; //$NON-NLS-1$
+        String level = "S"; //$NON-NLS-1$
         int num = -1;
 
         Matcher m = p1.matcher(line);
@@ -159,19 +160,19 @@ public class XLFErrorParser implements IErrorParser
     {
         int severity = defaultSeverity;
 
-        if (desc == "U" || desc == "S")
+        if (desc == "U" || desc == "S") //$NON-NLS-1$ //$NON-NLS-2$
         {
             severity = IMarkerGenerator.SEVERITY_ERROR_BUILD;
         }
-        else if (desc == "E")
+        else if (desc == "E") //$NON-NLS-1$
         {
             severity = IMarkerGenerator.SEVERITY_ERROR_RESOURCE;
         }
-        else if (desc == "W" || desc == "L")
+        else if (desc == "W" || desc == "L") //$NON-NLS-1$ //$NON-NLS-2$
         {
             severity = IMarkerGenerator.SEVERITY_WARNING;
         }
-        else if (desc == "I")
+        else if (desc == "I") //$NON-NLS-1$
         {
             severity = IMarkerGenerator.SEVERITY_INFO;
         }

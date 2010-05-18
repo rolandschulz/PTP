@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.properties.SourceFormProperties;
 
 /**
  * Entrypoint for determining the source form (fixed form, free form, free form with C preprocessor
@@ -41,7 +40,7 @@ import org.eclipse.photran.internal.core.properties.SourceFormProperties;
  */
 public final class SourceForm
 {
-    private static final String SOURCE_FORM_EXTENSION_POINT_ID = "org.eclipse.photran.core.sourceForms";
+    private static final String SOURCE_FORM_EXTENSION_POINT_ID = "org.eclipse.photran.core.sourceForms"; //$NON-NLS-1$
 
     private SourceForm() {;}
 
@@ -58,6 +57,11 @@ public final class SourceForm
         return SourceForm.of(determineFilename(file), propertiesFor(file));
     }
 
+    /**
+     * @return the name of the source form that will handle the given file (i.e., the <i>name</i>
+     *         attribute of the contribution to the {@value #SOURCE_FORM_EXTENSION_POINT_ID}
+     *         extension point)
+     */
     public static String descriptionFor(IFile file)
     {
         return SourceForm.descriptionFor(determineFilename(file), propertiesFor(file));
@@ -83,8 +87,11 @@ public final class SourceForm
     }
 
     /**
-     * @param spec a content type specification, as returned by {@link #allConfiguredContentTypeAssociations()}
-     * @return the description (name) of the source form which will handle that content type
+     * @param spec a content type specification, as returned by
+     *            {@link #allConfiguredContentTypeAssociations()}
+     * @return the description (name) of the source form which will handle the given content type
+     *         (i.e., the <i>name</i> attribute of the contribution to the
+     *         {@value #SOURCE_FORM_EXTENSION_POINT_ID} extension point)
      */
     public static String descriptionForContentType(String spec)
     {
@@ -100,7 +107,7 @@ public final class SourceForm
             IConfigurationElement config = findExtensionHandling(filename, properties);
             
             if (config != null)
-                return (ISourceForm)config.createExecutableExtension("class");
+                return (ISourceForm)config.createExecutableExtension("class"); //$NON-NLS-1$
             else
                 return defaultSourceForm();
         }
@@ -115,7 +122,7 @@ public final class SourceForm
     {
         try
         {
-            return (ISourceForm)findDefaultSourceFormExtension().createExecutableExtension("class");
+            return (ISourceForm)findDefaultSourceFormExtension().createExecutableExtension("class"); //$NON-NLS-1$
         }
         catch (CoreException e)
         {
@@ -130,12 +137,12 @@ public final class SourceForm
             if (isDefaultHandler(config))
                 return config;
         
-        throw new IllegalStateException("No default source form defined");
+        throw new IllegalStateException("No default source form defined"); //$NON-NLS-1$
     }
 
     private static boolean isDefaultHandler(IConfigurationElement config)
     {
-        return config.getAttribute("priority").equals("default");
+        return config.getAttribute("priority").equals("default"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static String descriptionFor(String filename, SourceFormProperties properties)
@@ -175,9 +182,14 @@ public final class SourceForm
 
     private static String nameOf(IConfigurationElement config)
     {
-        return config.getAttribute("name");
+        return config.getAttribute("name"); //$NON-NLS-1$
     }
 
+    /**
+     * @return a list with the name of every available source form (i.e., the <i>name</i> attribute
+     *         of every source form contributed to the {@value #SOURCE_FORM_EXTENSION_POINT_ID}
+     *         extension point)
+     */
     public static Set<String> allSourceForms()
     {
         Set<String> result = new TreeSet<String>();
@@ -186,15 +198,21 @@ public final class SourceForm
         return result;
     }
 
+    /**
+     * @return a list of the filenames and filename extensions associated with the Fortran content
+     *         type.  Filenames ({@link IContentType#FILE_NAME_SPEC}) are returned as-is; filename
+     *         extensions ({@link IContentType#FILE_EXTENSION_SPEC}) are returned as the string
+     *         <tt>*.<i>extension</i></tt>.
+     */
     public static List<String> allConfiguredContentTypeAssociations()
     {
         List<String> result = new ArrayList<String>(32);
         
         for (String spec : FortranCorePlugin.fortranContentType().getFileSpecs(IContentType.FILE_EXTENSION_SPEC))
-            result.add("*." + spec.toLowerCase());
+            result.add("*." + spec.toLowerCase()); //$NON-NLS-1$
 
         for (String spec : FortranCorePlugin.fortranContentType().getFileSpecs(IContentType.FILE_EXTENSION_SPEC))
-            result.add("*." + spec.toUpperCase());
+            result.add("*." + spec.toUpperCase()); //$NON-NLS-1$
 
         for (String spec : FortranCorePlugin.fortranContentType().getFileSpecs(IContentType.FILE_NAME_SPEC))
             result.add(spec);
@@ -209,7 +227,7 @@ public final class SourceForm
 
     private static boolean isHighPriorityHandler(IConfigurationElement config)
     {
-        return config.getAttribute("priority").equals("high");
+        return config.getAttribute("priority").equals("high"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     private static boolean isMediumPriorityHandler(IConfigurationElement config, String filename, SourceFormProperties properties)
@@ -219,7 +237,7 @@ public final class SourceForm
 
     private static boolean isMediumPriorityHandler(IConfigurationElement config)
     {
-        return config.getAttribute("priority").equals("medium");
+        return config.getAttribute("priority").equals("medium"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static boolean canHandle(IConfigurationElement config, String filename, SourceFormProperties properties)
@@ -233,11 +251,11 @@ public final class SourceForm
         }
         else
         {
-            String exts = config.getAttribute("defaultForFilenameExtensions");
+            String exts = config.getAttribute("defaultForFilenameExtensions"); //$NON-NLS-1$
             if (exts == null)
                 return false;
             else
-                return Arrays.asList(exts.split(",[ \t]*"))
+                return Arrays.asList(exts.split(",[ \t]*")) //$NON-NLS-1$
                              .contains(filenameExtensionOf(filename));
         }
     }

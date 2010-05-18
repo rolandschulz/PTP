@@ -24,7 +24,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.properties.SourceFormProperties;
+import org.eclipse.photran.internal.core.sourceform.SourceFormProperties;
 import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

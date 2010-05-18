@@ -22,12 +22,13 @@ import org.eclipse.core.resources.IFile;
  * 
  * @author Brian Foote 
  */
+@SuppressWarnings("deprecation")
 public class G95FortranErrorParser implements IErrorParser
 {
 	private IErrorState state;
 	private String fileNameString;
 	private int lineNumber;
-	private Stack lines;
+	private Stack<String> lines;
 
 	private interface IErrorState
 	{
@@ -41,15 +42,15 @@ public class G95FortranErrorParser implements IErrorParser
 		public boolean processLine(String line, ErrorParserManager epm)
 		{
 			//Andy says there might be a leading blank...
-			if (line.startsWith("In file") || line.startsWith(" In file"))
+			if (line.startsWith("In file") || line.startsWith(" In file")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				String[] tokens = line.split(" ");
-				tokens = tokens[2].split(":");
+				String[] tokens = line.split(" "); //$NON-NLS-1$
+				tokens = tokens[2].split(":"); //$NON-NLS-1$
 				fileNameString = tokens[0];
 				String lineNumberString = tokens[1];
 				lineNumber = Integer.parseInt(lineNumberString);
 				//We'll keep all the lines from here to the Error/Warning line...
-				lines = new Stack();
+				lines = new Stack<String>();
 				lines.push(line);
 				//Skip the include lines and the column indication for the moment...
 				state = new ErrorOrWarningSearchState();
@@ -64,14 +65,14 @@ public class G95FortranErrorParser implements IErrorParser
 		{
 			//Andy says there might be a leading blank here too. 
 			//I haven't seen 'em...
-			if (line.startsWith("Error")
-				|| line.startsWith(" Error")
-				|| line.startsWith("Warning")
-				|| line.startsWith(" Warning"))
+			if (line.startsWith("Error") //$NON-NLS-1$
+				|| line.startsWith(" Error") //$NON-NLS-1$
+				|| line.startsWith("Warning") //$NON-NLS-1$
+				|| line.startsWith(" Warning")) //$NON-NLS-1$
 			{
 				IFile file = epm.findFilePath(fileNameString);
 				int severity =
-					(line.startsWith("Error") || line.startsWith(" Error"))
+					(line.startsWith("Error") || line.startsWith(" Error")) //$NON-NLS-1$ //$NON-NLS-2$
 						? IMarkerGenerator.SEVERITY_ERROR_RESOURCE
 						: IMarkerGenerator.SEVERITY_WARNING;
 				//Generate and plant a marker for the message...

@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IFile;
 *
 * @author Craig Rasmussen
 */
+@SuppressWarnings("deprecation")
 final public class PGIErrorParser implements IErrorParser
 {
     /*
@@ -35,14 +36,14 @@ final public class PGIErrorParser implements IErrorParser
      *     \w matches [A-Za-z_0-9]
      *     Parentheses define a capturing group
      */
-    private Pattern lineError = Pattern.compile("PGF\\w\\w-S-\\d+-([a-zA-Z ]+):* [(](\\S+): (\\d+)[)]");
-    private Pattern nolineError = Pattern.compile("PGF\\w\\w-S-\\d+-([a-zA-Z, ]+)[(](\\S+)[)]");
+    private Pattern lineError = Pattern.compile("PGF\\w\\w-S-\\d+-([a-zA-Z ]+):* [(](\\S+): (\\d+)[)]"); //$NON-NLS-1$
+    private Pattern nolineError = Pattern.compile("PGF\\w\\w-S-\\d+-([a-zA-Z, ]+)[(](\\S+)[)]"); //$NON-NLS-1$
 
     public boolean processLine(String thisLine, ErrorParserManager eoParser)
     {
         //String test = "PGFTN-S-0034-Syntax error at or near :: (life_f.f: 19)"
-        String test = "PGF90-S-0038-Symbol, junk, has not been explicitly declared (life_f.f90)";
-        boolean match = Pattern.matches("PGF\\w\\w-S-\\d+-([a-zA-Z, ]+)[(](\\S+)[)]", test);
+        //String test = "PGF90-S-0038-Symbol, junk, has not been explicitly declared (life_f.f90)";
+        //boolean match = Pattern.matches("PGF\\w\\w-S-\\d+-([a-zA-Z, ]+)[(](\\S+)[)]", test);
         
         String errorMessage = null, filename = null;
         boolean errorFound = false;

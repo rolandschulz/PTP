@@ -23,10 +23,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 /**
  * Project nature for Fortran projects.  Fortran projects always have the C nature as well.
  * <p>
- * This nature is used solely to give Fortran projects the correct appearance (i.e., the correct
- * icons) in the Fortran Projects view.  Internally, Photran always assumes that any C project may
- * also be a Fortran project, so it only checks for the C project nature.
- * <p>
  * This nature is contributed via plugin.xml as {@value #F_NATURE_ID}.
  * 
  * @author Matt Scarpino
