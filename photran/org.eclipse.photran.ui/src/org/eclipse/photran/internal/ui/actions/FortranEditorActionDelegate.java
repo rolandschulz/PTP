@@ -30,15 +30,15 @@ import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.progress.IProgressService;
 
 /**
- * Base class (with utility methods) for Fortran editor actions
+ * Base class (with utility methods) for actions that are initiated from the Fortran editor.
  *
  * @author Jeff Overbey
  */
+@SuppressWarnings("restriction")
 public abstract class FortranEditorActionDelegate
     extends Action
     implements IEditorActionDelegate, IWorkbenchWindowActionDelegate, IRunnableWithProgress
 {
-
     ///////////////////////////////////////////////////////////////////////////
     // Fields
     ///////////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ public abstract class FortranEditorActionDelegate
             catch (InvocationTargetException e)
             {
                 e.printStackTrace();
-                MessageDialog.openError(fEditor.getShell(), "Unhandled Exception", e.getMessage());
+                MessageDialog.openError(fEditor.getShell(), Messages.FortranEditorActionDelegate_UnhandledExceptionTitle, e.getMessage());
             }
             catch (InterruptedException e)
             {

@@ -37,6 +37,8 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
+ * The Fortran &gt; Source Forms project property page.
+ * 
  * @author Jeff Overbey
  */
 public class SourceFormPropertyPage extends FortranPropertyPage
@@ -68,8 +70,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         // See org.eclipse.ui.internal.dialogs.ContentTypesPreferencePage
         // and org.eclipse.cdt.ui.dialogs.DocCommentOwnerBlock
         Link link= new Link(composite, SWT.NONE);
-        link.setText("The list of Fortran filename extensions is determined\n" +
-                     "by the <a>workspace-wide content type settings</a>.");
+        link.setText(Messages.SourceFormPropertyPage_LinkText);
         link.setLayoutData(GridDataFactory.swtDefaults()
                                           .align(SWT.FILL, SWT.TOP)
                                           .grab(true,false)
@@ -78,7 +79,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
             @Override public void widgetSelected(SelectionEvent e) {
                 PreferencesUtil.createPreferenceDialogOn(
                     composite.getShell(),
-                    "org.eclipse.ui.preferencePages.ContentTypes",
+                    "org.eclipse.ui.preferencePages.ContentTypes", //$NON-NLS-1$
                     null,
                     null).open();
             }
@@ -86,7 +87,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         
         sourceForms = new FortranSourceFormEditor(
             SourceFormProperties.SOURCE_FORMS_PROPERTY_NAME,
-            "Source form/filename associations:", 
+            Messages.SourceFormPropertyPage_SourceFormFilenameAssocsLabel, 
             parent);
         
         sourceForms.setPreferenceStore(scopedStore);
@@ -112,9 +113,9 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         {
             FortranUIPlugin.log(e);
             MessageDialog.openError(getShell(),
-                "Error Saving Project Properties",
-                "The project properties could not be saved.\n" +
-                e.getClass().getName() + ": " +
+                Messages.SourceFormPropertyPage_ErrorTitle,
+                Messages.SourceFormPropertyPage_PropertiesCouldNotBeSaved +
+                e.getClass().getName() + ": " + //$NON-NLS-1$
                 e.getMessage());
         }
         
@@ -147,7 +148,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         }
         catch (CoreException e)
         {
-            FortranCorePlugin.log("Error touching project after source form changes", e);
+            FortranCorePlugin.log(Messages.SourceFormPropertyPage_ErrorTouchingProject, e);
         }
     }
 
@@ -159,7 +160,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         }
         catch (CoreException e)
         {
-            FortranCorePlugin.log("Error touching file during project traversal source form changes", e);
+            FortranCorePlugin.log(Messages.SourceFormPropertyPage_ErrorTouchingFile, e);
         }
     }
 }

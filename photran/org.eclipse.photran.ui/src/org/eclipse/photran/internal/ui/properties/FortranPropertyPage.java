@@ -53,9 +53,8 @@ public abstract class FortranPropertyPage extends PropertyPage
         {
             dialogShown = true;
             MessageDialog.openInformation(getShell(),
-                "Preferences Changed",
-                "You may need to close and re-open any " +
-                    "Fortran editors for the new settings to take effect.");
+                Messages.FortranPropertyPage_PreferencesChangedTitle,
+                Messages.FortranPropertyPage_NeedToCloseAndReOpenEditors);
         }
         
         return result;

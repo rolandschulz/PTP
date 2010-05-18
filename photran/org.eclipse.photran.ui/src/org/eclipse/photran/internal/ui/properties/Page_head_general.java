@@ -14,9 +14,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-public class Page_head_general extends PropertyPage {
-	protected Control createContents(Composite parent) {
-		noDefaultAndApplyButton();
-		return parent;
-	}
+/**
+ * A copy of CDT's <code>org.eclipse.cdt.ui.newui.Page_head_general</code>
+ * 
+ * @author Jeff Overbey
+ */
+public class Page_head_general extends PropertyPage
+{
+    protected Control createContents(Composite parent)
+    {
+        noDefaultAndApplyButton();
+        return parent;
+    }
 }

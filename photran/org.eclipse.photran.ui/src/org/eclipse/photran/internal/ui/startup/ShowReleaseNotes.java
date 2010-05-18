@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.ui.startup;
 import java.net.URL;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.ui.FortranUIPlugin;
 import org.eclipse.swt.widgets.Display;
@@ -68,10 +69,10 @@ public final class ShowReleaseNotes implements IStartup
      */
     private boolean runningJUnitTests()
     {
-        if (System.getenv("TESTING") != null) return true;
+        if (FortranCorePlugin.inTestingMode()) return true;
         
-        String app = System.getProperty("eclipse.application");
-        if (app != null && app.toLowerCase().contains("junit")) return true;
+        String app = System.getProperty("eclipse.application"); //$NON-NLS-1$
+        if (app != null && app.toLowerCase().contains("junit")) return true; //$NON-NLS-1$
         
         return false;
     }
@@ -116,7 +117,7 @@ public final class ShowReleaseNotes implements IStartup
                             IWorkbenchBrowserSupport.LOCATION_BAR
                                 | IWorkbenchBrowserSupport.NAVIGATION_BAR,
                             null,
-                            "Welcome",
+                            Messages.ShowReleaseNotes_WelcomeTitle,
                             null)
                         .openURL(new URL(getURL(lastVersion)));
                 }
@@ -131,17 +132,17 @@ public final class ShowReleaseNotes implements IStartup
     private String getURL(String lastVersion)
     {
         Version version = photranVersion();
-        return "http://www.eclipse.org/photran/welcome/"
+        return "http://www.eclipse.org/photran/welcome/" //$NON-NLS-1$
             + version.getMajor()
-            + "."
+            + "." //$NON-NLS-1$
             + version.getMinor()
-            + "/?version="
+            + "/?version=" //$NON-NLS-1$
             + version.toString()
-            + "&os="
+            + "&os=" //$NON-NLS-1$
             + Platform.getOS()
-            + "&arch="
+            + "&arch=" //$NON-NLS-1$
             + Platform.getOSArch()
-            + "&lastVersion="
+            + "&lastVersion=" //$NON-NLS-1$
             + lastVersion;
     }
 

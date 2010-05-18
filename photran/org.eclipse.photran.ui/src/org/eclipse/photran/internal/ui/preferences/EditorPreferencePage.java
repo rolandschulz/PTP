@@ -12,13 +12,8 @@ package org.eclipse.photran.internal.ui.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
-import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 /**
  * Fortran Editor preference page
@@ -28,10 +23,11 @@ import org.eclipse.swt.widgets.Label;
 public class EditorPreferencePage extends AbstractFortranPreferencePage
 {
     private final int MAX_FIXED_FILE_FORMAT_OFFSET = 999;
+
     protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FREE_FORM_FOLDING.getName(),
-                                        "Enable folding rather than ruler in free-form Fortran editors",
+                                        Messages.EditorPreferencePage_EnableFolding,
                                         getFieldEditorParent()));
 
         /* Fixed form folding does not seem to work, so disable it for now
@@ -41,7 +37,7 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
         */
         
         IntegerFieldEditor intEditor = new IntegerFieldEditor(FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getName(),
-                                                              "Fixed-form line length",
+                                                              Messages.EditorPreferencePage_FixedFormLineLength,
                                                                getFieldEditorParent());
         intEditor.setValidRange(72, MAX_FIXED_FILE_FORMAT_OFFSET);
         intEditor.setTextLimit(3);
@@ -50,22 +46,22 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
         //addField(new Separator(getFieldEditorParent()));
         
         addField(new ColorFieldEditor(FortranPreferences.COLOR_COMMENTS.getName(),
-                                      "Comments",
+                                      Messages.EditorPreferencePage_CommentsFieldLabel,
                                       getFieldEditorParent()));
         addField(new ColorFieldEditor(FortranPreferences.COLOR_IDENTIFIERS.getName(),
-                                      "Identifiers",
+                                      Messages.EditorPreferencePage_IdentifiersFieldLabel,
                                       getFieldEditorParent()));
         addField(new ColorFieldEditor(FortranPreferences.COLOR_INTRINSICS.getName(),
-                                      "Intrinsics",
+                                      Messages.EditorPreferencePage_IntrinsicsFieldLabel,
                                       getFieldEditorParent()));
         addField(new ColorFieldEditor(FortranPreferences.COLOR_KEYWORDS.getName(),
-                                      "Keywords",
+                                      Messages.EditorPreferencePage_KeywordsFieldLabel,
                                       getFieldEditorParent()));
         addField(new ColorFieldEditor(FortranPreferences.COLOR_STRINGS.getName(),
-                                      "Strings",
+                                      Messages.EditorPreferencePage_StringsFieldLabel,
                                       getFieldEditorParent()));
         addField(new ColorFieldEditor(FortranPreferences.COLOR_CPP.getName(),
-                                      "C Preprocessor Directives",
+                                      Messages.EditorPreferencePage_CPPDirectivesFieldLabel,
                                       getFieldEditorParent()));
     }
     

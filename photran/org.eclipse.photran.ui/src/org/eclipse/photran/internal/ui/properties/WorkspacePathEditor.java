@@ -26,6 +26,7 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
  * A field editor to edit workspace paths.  Based on <code>org.eclipse.jface.preference.PathEditor</code>.
  * 
  * @author Jeff Overbey
+ * 
  * @see org.eclipse.jface.preference.PathEditor
  */
 public class WorkspacePathEditor extends ListEditor
@@ -79,9 +80,9 @@ public class WorkspacePathEditor extends ListEditor
             // Remember the selection for the next time the dialog is opened
             IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(result);
             if (!resource.exists())
-                MessageDialog.openError(getShell(), "Error", "The selected resource does not exist");
+                MessageDialog.openError(getShell(), Messages.WorkspacePathEditor_ErrorTitle, Messages.WorkspacePathEditor_ResourceDoesNotExist);
             else if (!(resource instanceof IContainer))
-                MessageDialog.openError(getShell(), "Error", "The selected resource is not a container");
+                MessageDialog.openError(getShell(), Messages.WorkspacePathEditor_ErrorTitle, Messages.WorkspacePathEditor_ResourceIsNotAContainer);
             else if (result != null)
                 return result.toOSString();
         }

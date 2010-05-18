@@ -10,7 +10,7 @@
          
       <editor
             default="true"
-            name="Fortran Editor"
+            name="%editor.name"
             icon="icons/full/obj16/f_file_obj.gif"
             class="org.eclipse.photran.internal.ui.editor.FortranEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
@@ -24,7 +24,7 @@
    <extension
             point="org.eclipse.ui.contexts">
           <context
-            name="Fortran Editor"
+            name="%context.name"
             parentId="org.eclipse.ui.textEditorScope"
             id="org.eclipse.photran.ui.FortranEditorContext">
        </context>
@@ -44,7 +44,7 @@
 	        targetID="#FortranEditorContextMenu" 
 	        id="org.eclipse.photran.ui.FixedBlockCommentEditorContribution">
 	     <action 
-	           label="Comment/Uncomment" 
+	           label="%action.label" 
                definitionId="org.eclipse.photran.ui.CommentCommand"
 	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
 	           menubarPath="group.edit" 
@@ -54,25 +54,25 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            name="Source Editing"
-            description="Source Editing"
+            name="%category.name"
+            description="%category.description"
             id="org.eclipse.photran.ui.SourceEditingCategory">
       </category>
       <command
             categoryId="org.eclipse.photran.ui.SourceEditingCategory"
-            description="Comment/Uncomment"
+            description="%command.description"
             id="org.eclipse.photran.ui.CommentCommand"
-            name="Photran Block Comment">
+            name="%command.name">
       </command>
    </extension>
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
-            label="Comment/Uncomment"
-            description="Comment/Uncomment"
+            label="%actionSet.label"
+            description="%actionSet.description"
             visible="false"
             id="org.eclipse.photran.ui.CommentUncomment">
 	     <action 
-	           label="Comment/Uncomment" 
+	           label="%action.label.0" 
                menubarPath="edit/additions"
                definitionId="org.eclipse.photran.ui.CommentCommand"
 	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
@@ -109,7 +109,7 @@
             targetID="org.eclipse.photran.ui.FortranEditor"
             id="org.eclipse.photran.ui.BreakpointRulerAction">
          <action
-               label="Toggle Breakpoint"
+               label="%action.label.1"
                class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
                actionID="RulerDoubleClick"
                id="org.eclipse.cdt.debug.ui.CEditor.RulerTobbleBreakpointAction">
@@ -159,18 +159,18 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            name="Fortran"
+            name="%page.name"
             class="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage"
             id="org.eclipse.photran.ui.MainFortranPreferencePage">
       </page>
       <page
-            name="Editor"
+            name="%page.name.0"
             category="org.eclipse.photran.ui.MainFortranPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.EditorPreferencePage"
             id="org.eclipse.photran.ui.FortranEditorPreferencePage">
       </page>
       <page
-            name="CDT Integration"
+            name="%page.name.1"
             category="org.eclipse.photran.ui.MainFortranPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.CDTFortranPreferencePage"
             id="org.eclipse.photran.ui.CDTFortranPreferencePage">
@@ -185,7 +185,7 @@
       <page
             class="org.eclipse.photran.internal.ui.properties.Page_head_general"
             id="org.eclipse.photran.ui.newui.Page_head_general"
-            name="Fortran General"
+            name="%page.name.2"
             >
          <!--filter
                name="projectNature"
@@ -211,7 +211,7 @@
           <page
             objectClass="org.eclipse.core.resources.IProject"
             adaptable="true"
-            name="Source Form"
+            name="%page.name.3"
             class="org.eclipse.photran.internal.ui.properties.SourceFormPropertyPage"
             id="org.eclipse.photran.ui.SourceFormPropertyPage"
             category="org.eclipse.photran.ui.newui.Page_head_general">
@@ -233,7 +233,7 @@
    <!--=============================================-->
    <extension-point
       id="sourceViewerConfig"
-      name="Source Viewer Configuration"
+      name="%extension-point.name"
       schema="schema/sourceViewerConfig.exsd"/>
    	
    <!--==============================================-->

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.actions;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,13 +75,10 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
      * @param edits a list of <code>Edit</code>s
      * @throws BadLocationException if an <code>Edit</code> threw such an exception.
      */
-    protected void executeEdits(List edits) throws BadLocationException
+    protected void executeEdits(List<Edit> edits) throws BadLocationException
     {
-        for (Iterator it = edits.iterator(); it.hasNext();)
-        {
-            Edit edit = (Edit)it.next();
+        for (Edit edit : edits)
             edit.perform();
-        }
     }
 
     /**
@@ -99,7 +95,7 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
         // ITextSelection ts = selection;
         int selectionOffset = selection.getStartLine();
         int selectionEndOffset = selection.getEndLine();
-        List edits = new LinkedList();
+        List<Edit> edits = new LinkedList<Edit>();
         IDocumentProvider dp = getFortranEditor().getDocumentProvider();
         IDocument doc = dp.getDocument(getFortranEditor().getEditorInput());
 
@@ -108,9 +104,9 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
             int eff;
             eff = doc.getLineOffset(i);
             if (doc.getChar(eff) == '!')
-                edits.add(factory.createEdit(eff, 1, ""));
+                edits.add(factory.createEdit(eff, 1, "")); //$NON-NLS-1$
             else
-                edits.add(factory.createEdit(eff, 0, "!"));
+                edits.add(factory.createEdit(eff, 0, "!")); //$NON-NLS-1$
         }
         executeEdits(edits);
 
@@ -145,7 +141,6 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
          */
         public static class EditFactory
         {
-
             /** The position category basename for this edits. */
             private static final String CATEGORY = "__positionalEditPositionCategory"; //$NON-NLS-1$
 
@@ -194,7 +189,7 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
                 }
                 catch (BadPositionCategoryException e)
                 {
-                    System.err.println("BadPosition within Create edit");
+                    System.err.println("BadPosition within Create edit"); //$NON-NLS-1$
                     Assert.isTrue(false);
                 }
                 return new Edit(fDocument, length, text, position);
@@ -257,6 +252,5 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
         {
             getDocument().replace(getOffset(), getLength(), getText());
         }
-
     }
 }

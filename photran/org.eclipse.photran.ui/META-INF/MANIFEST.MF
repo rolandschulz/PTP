@@ -10,7 +10,6 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.internal.ui,
  org.eclipse.photran.internal.ui.actions,
  org.eclipse.photran.internal.ui.editor,
- org.eclipse.photran.internal.ui.old_editor,
  org.eclipse.photran.internal.ui.preferences,
  org.eclipse.photran.internal.ui.properties,
  org.eclipse.photran.internal.ui.startup

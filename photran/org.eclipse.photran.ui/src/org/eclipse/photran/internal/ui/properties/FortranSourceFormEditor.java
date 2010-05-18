@@ -95,8 +95,8 @@ public class FortranSourceFormEditor extends FieldEditor
         for (int i=0; i<2; i++) {
             new TableColumn(table, SWT.NONE);
         }
-        table.getColumn(0).setText("File Name/Extension");
-        table.getColumn(1).setText("Source Form");
+        table.getColumn(0).setText(Messages.FortranSourceFormEditor_FileNameOrExtensionColumnLabel);
+        table.getColumn(1).setText(Messages.FortranSourceFormEditor_SourceFormColumnLabel);
     }
 
     /* (non-Javadoc)

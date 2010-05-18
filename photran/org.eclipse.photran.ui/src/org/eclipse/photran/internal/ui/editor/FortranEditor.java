@@ -30,6 +30,7 @@ import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.MarginPainter;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -83,24 +84,25 @@ import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
  * @author Jeff Overbey
  * @author Kurt Hendle - folding support
  */
+@SuppressWarnings("deprecation")
 public class FortranEditor extends CDTBasedTextEditor implements ISelectionChangedListener
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constants
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static final String EDITOR_ID = "org.eclipse.photran.ui.FortranEditor";
+    public static final String EDITOR_ID = "org.eclipse.photran.ui.FortranEditor"; //$NON-NLS-1$
 
-    protected static String CONTEXT_MENU_ID = "#FortranEditorContextMenu";
+    protected static String CONTEXT_MENU_ID = "#FortranEditorContextMenu"; //$NON-NLS-1$
 
-    protected static final String SOURCE_VIEWER_CONFIG_EXTENSION_POINT_ID =
-        "org.eclipse.photran.ui.sourceViewerConfig";
+    public static final String SOURCE_VIEWER_CONFIG_EXTENSION_POINT_ID =
+        "org.eclipse.photran.ui.sourceViewerConfig"; //$NON-NLS-1$
 
     public static String[] PARTITION_TYPES = new String[] { IDocument.DEFAULT_CONTENT_TYPE };
 
-    protected static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext";
+    protected static String FORTRAN_EDITOR_CONTEXT_ID = "org.eclipse.photran.ui.FortranEditorContext"; //$NON-NLS-1$
 
-    protected static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand";
+    protected static String BLOCK_COMMENT_COMMAND_ID = "org.eclipse.photran.ui.CommentCommand"; //$NON-NLS-1$
 
     protected static final RGB VERTICAL_LINE_COLOR = new RGB(176, 180, 185);
 
@@ -211,9 +213,9 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
         try
         {
             // Instantiate RefactorMenu using reflection since it's in an optional dependency
-            IContributionItem refactorMenu = (IContributionItem)Class.forName("org.eclipse.rephraserengine.ui.menus.RefactorMenu").newInstance();
+            IContributionItem refactorMenu = (IContributionItem)Class.forName("org.eclipse.rephraserengine.ui.menus.RefactorMenu").newInstance(); //$NON-NLS-1$
             
-            MenuManager refactorSubmenu = new MenuManager("Refactor");
+            MenuManager refactorSubmenu = new MenuManager("Refactor"); //$NON-NLS-1$
             refactorSubmenu.add(refactorMenu);
             menu.appendToGroup(ITextEditorActionConstants.GROUP_EDIT, refactorSubmenu); // cf. CEditor#createActions()
             //menu.add(refactorSubmenu);
@@ -250,8 +252,8 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
         ProjectionViewer viewer =(ProjectionViewer)getSourceViewer();
 
         ProjectionSupport projectionSupport = new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors());
-        projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.error");
-        projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.warning");
+        projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.error"); //$NON-NLS-1$
+        projectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.warning"); //$NON-NLS-1$
         projectionSupport.install();
 
         viewer.doOperation(ProjectionViewer.TOGGLE); // Turn projection mode on
@@ -259,7 +261,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
         annotationModel = viewer.getProjectionAnnotationModel();
     }
 
-    public void updateFoldingStructure(ArrayList/*<Position>*/ positions)
+    public void updateFoldingStructure(ArrayList<Position> positions)
     {
         try
         {
@@ -272,9 +274,9 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
         }
     }
 
-    private HashMap/*<ProjectionAnnotation, Position>*/ mapAnnotationsToPositions(ArrayList/*<Position>*/ positions)
+    private HashMap<ProjectionAnnotation, Position> mapAnnotationsToPositions(ArrayList<Position> positions)
     {
-        HashMap newAnnotations = new HashMap();
+        HashMap<ProjectionAnnotation, Position> newAnnotations = new HashMap<ProjectionAnnotation, Position>();
         for (int i = 0; i < positions.size(); i++)
         {
             ProjectionAnnotation annotation = new ProjectionAnnotation();
@@ -326,7 +328,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
             {
                 active = true;
                 widget = FortranEditor.this.getSourceViewer().getTextWidget();
-                final Font font = new Font(null, new FontData("Arial", 14, SWT.NORMAL));
+                final Font font = new Font(null, new FontData("Arial", 14, SWT.NORMAL)); //$NON-NLS-1$
                 final Color lightGray = new Color(null, new RGB(192, 192, 192));
                 listener = new PaintListener()
                 {
@@ -340,7 +342,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
 //                                   + "indicates that it is a "
 //                                   + (isFixedForm() ? "free-form" : "fixed-form")
 //                                   + " file.";
-                        String msg = "WARNING: Content type mismatch     ";
+                        String msg = "WARNING: Content type mismatch     "; //$NON-NLS-1$
                         Rectangle area = widget.getClientArea();
                         e.gc.setFont(font);
                         e.gc.setForeground(lightGray);
@@ -374,7 +376,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
 
     protected void initializeKeyBindingScopes()
     {
-        setKeyBindingScopes(new String[] { "org.eclipse.ui.textEditorScope", FORTRAN_EDITOR_CONTEXT_ID });
+        setKeyBindingScopes(new String[] { "org.eclipse.ui.textEditorScope", FORTRAN_EDITOR_CONTEXT_ID }); //$NON-NLS-1$
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -488,7 +490,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
             {
                 IFortranSourceViewerConfigurationFactory factory =
                     (IFortranSourceViewerConfigurationFactory)
-                    configs[configs.length-1].createExecutableExtension("factory");
+                    configs[configs.length-1].createExecutableExtension("factory"); //$NON-NLS-1$
                 return factory.create(FortranEditor.this);
             }
             catch (CoreException e)

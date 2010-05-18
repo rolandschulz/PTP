@@ -28,6 +28,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * 
  * @author Jeff Overbey
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractFortranPreferencePage
     extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage

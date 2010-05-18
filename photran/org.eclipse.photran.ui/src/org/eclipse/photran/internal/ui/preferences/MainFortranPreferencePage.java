@@ -33,11 +33,11 @@ public class MainFortranPreferencePage extends AbstractFortranPreferencePage
     protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.SHOW_PARSE_TREE.getName(),
-                                        "(Debugging) Show entire abstract syntax tree rather than Outline view",
+                                        Messages.MainFortranPreferencePage_0,
                                         getFieldEditorParent()));
         
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_VPG_LOGGING.getName(),
-                                        "(Debugging) Enable Fortran indexer (VPG database) logging",
+                                        Messages.MainFortranPreferencePage_1,
                                         getFieldEditorParent()));
     }
 }

@@ -11,7 +11,6 @@
 package org.eclipse.photran.internal.ui.editor;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -45,10 +44,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     protected IToken fDefaultToken;
 
     /** The table of predefined keywords and token for this rule. */
-    protected Map fWords = new HashMap();
+    protected Map<String, IToken> fWords = new HashMap<String, IToken>();
 
     /** The table of predefined identifiers and token for this rule. */
-    protected Map fIdentifiers = new HashMap();
+    protected Map<String, IToken> fIdentifiers = new HashMap<String, IToken>();
 
     /** Buffer used for pattern detection. */
     private StringBuffer fBuffer = new StringBuffer();
@@ -137,15 +136,13 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 populateBuffers(scanner);
 
                 String buffer = fBuffer.toString();
-                IToken token = (IToken)fWords.get(buffer);
+                IToken token = fWords.get(buffer);
 
-                Iterator iter = fWords.keySet().iterator();
-                while (iter.hasNext())
+                for (String key : fWords.keySet())
                 {
-                    String key = (String)iter.next();
                     if (buffer.equalsIgnoreCase(key))
                     {
-                        token = (IToken)fWords.get(key);
+                        token = fWords.get(key);
                         break;
                     }
                 }
@@ -250,7 +247,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 
     private void removeTrailingComment()
     {
-       int excl = fLineBuffer.lastIndexOf("!");
+       int excl = fLineBuffer.lastIndexOf("!"); //$NON-NLS-1$
        if (excl >= 0)
        {
            for (int i = excl, length = fLineBuffer.length(); i < length; i++)
@@ -260,16 +257,16 @@ public class SalesScanKeywordRule extends WordRule implements IRule
 
     private void removeConcatenatedStatements()
     {
-        int precedingSemicolon = fLineBuffer.indexOf(";");
+        int precedingSemicolon = fLineBuffer.indexOf(";"); //$NON-NLS-1$
         while (precedingSemicolon > 0 && precedingSemicolon < fWordCol)
         {
             for (int i = 0; i <= precedingSemicolon; i++)
                 fLineBuffer.setCharAt(i, ' ');
 
-            precedingSemicolon = fLineBuffer.indexOf(";", precedingSemicolon+1);
+            precedingSemicolon = fLineBuffer.indexOf(";", precedingSemicolon+1); //$NON-NLS-1$
         }
 
-        int followingSemicolon = fLineBuffer.indexOf(";", fWordCol);
+        int followingSemicolon = fLineBuffer.indexOf(";", fWordCol); //$NON-NLS-1$
         if (followingSemicolon > 0)
             for (int i = followingSemicolon, length = fLineBuffer.length(); i < length; i++)
                 fLineBuffer.setCharAt(i, ' ');
@@ -337,7 +334,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         {
             int start = 0;
 
-            int cc = line.indexOf("::");
+            int cc = line.indexOf("::"); //$NON-NLS-1$
             lineContainsColonColon = cc > 0;
             if (lineContainsColonColon) start = cc + 2;
 
@@ -404,19 +401,19 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             {
                 if (currentParenDepth == 0)
                 {
-                    if (match("(/"))
+                    if (match("(/")) //$NON-NLS-1$
                         inArrayLiteral = true;
-                    else if (match("/)"))
+                    else if (match("/)")) //$NON-NLS-1$
                         inArrayLiteral = false;
-                    else if (match("then"))
+                    else if (match("then")) //$NON-NLS-1$
                         followingThen = true;
 
                     if (!inArrayLiteral)
                     {
                         // The pos test ensures that we don't match the = in "integer, kind=3 :: if"
-                        if (match(",") && pos >= firstTokenPos)
+                        if (match(",") && pos >= firstTokenPos) //$NON-NLS-1$
                             openContextComma = true;
-                        else if (match("=") && pos >= firstTokenPos && !followingThen)
+                        else if (match("=") && pos >= firstTokenPos && !followingThen) //$NON-NLS-1$
                             openContextEquals = true;
 
                         if (justClosedParen && firstParenthetical)
@@ -429,11 +426,11 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                     }
                 }
                 justClosedParen = false;
-                if (match("("))
+                if (match("(")) //$NON-NLS-1$
                 {
                     currentParenDepth++;
                 }
-                else if (match(")"))
+                else if (match(")")) //$NON-NLS-1$
                 {
                     currentParenDepth--;
                     justClosedParen = true;
@@ -514,25 +511,25 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private boolean applyKeywordRules(int column, String keyword)
         {
             // N.B. These rules apply regardless of the token preceding this one
-            if (keyword.equalsIgnoreCase("only"))
-                return openContextComma && match("use", firstTokenPos);
-            else if (keyword.equalsIgnoreCase("result"))
+            if (keyword.equalsIgnoreCase("only")) //$NON-NLS-1$
+                return openContextComma && match("use", firstTokenPos); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("result")) //$NON-NLS-1$
                 return letterFollowsParenthetical;
-            else if (keyword.equalsIgnoreCase("then"))
-                return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos) || match("forall", firstTokenPos));
+            else if (keyword.equalsIgnoreCase("then")) //$NON-NLS-1$
+                return !openContextEquals && !openContextComma && (match("if", firstTokenPos) || match("else", firstTokenPos) || match("forall", firstTokenPos)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             // BEGIN FORTRAN 2003
-            else if (keyword.equalsIgnoreCase("bind"))
-                return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos))
-                    || match("function", firstTokenPos)
-                    || match("subroutine", firstTokenPos);
-            else if (keyword.equalsIgnoreCase("procedure"))
-                return match("procedure", firstTokenPos) || match("module", firstTokenPos) /* F08 */  || match("end", firstTokenPos);
-            else if (keyword.equalsIgnoreCase("pointer"))
+            else if (keyword.equalsIgnoreCase("bind")) //$NON-NLS-1$
+                return openContextComma && (match("enum", firstTokenPos) || match("type", firstTokenPos)) //$NON-NLS-1$ //$NON-NLS-2$
+                    || match("function", firstTokenPos) //$NON-NLS-1$
+                    || match("subroutine", firstTokenPos); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("procedure")) //$NON-NLS-1$
+                return match("procedure", firstTokenPos) || match("module", firstTokenPos) /* F08 */  || match("end", firstTokenPos); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            else if (keyword.equalsIgnoreCase("pointer")) //$NON-NLS-1$
                 return openContextComma;
-            else if (keyword.equalsIgnoreCase("operator")
-                || keyword.equalsIgnoreCase("assignment")
-                || keyword.equalsIgnoreCase("read")
-                || keyword.equalsIgnoreCase("write"))
+            else if (keyword.equalsIgnoreCase("operator") //$NON-NLS-1$
+                || keyword.equalsIgnoreCase("assignment") //$NON-NLS-1$
+                || keyword.equalsIgnoreCase("read") //$NON-NLS-1$
+                || keyword.equalsIgnoreCase("write")) //$NON-NLS-1$
                 return lineContainsColonColon;
             // END FORTRAN 2003
             else
@@ -548,54 +545,54 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private boolean applyPrecedingKeywordRules(String keyword, String precedingKeyword)
         {
             // BEGIN FORTRAN 2008
-            if (keyword.equalsIgnoreCase("module"))
-                return isPrefixSpec(precedingKeyword) && !precedingKeyword.equalsIgnoreCase("module")
-                    || precedingKeyword.equalsIgnoreCase("end");
+            if (keyword.equalsIgnoreCase("module")) //$NON-NLS-1$
+                return isPrefixSpec(precedingKeyword) && !precedingKeyword.equalsIgnoreCase("module") //$NON-NLS-1$
+                    || precedingKeyword.equalsIgnoreCase("end"); //$NON-NLS-1$
             // END FORTRAN 2008
             // N.B. These rules depend on the token preceding this one
-            else if (isType(keyword) && !keyword.equalsIgnoreCase("type"))
-                return isPrefixSpec(precedingKeyword)|| precedingKeyword.equalsIgnoreCase("implicit");
+            else if (isType(keyword) && !keyword.equalsIgnoreCase("type")) //$NON-NLS-1$
+                return isPrefixSpec(precedingKeyword)|| precedingKeyword.equalsIgnoreCase("implicit"); //$NON-NLS-1$
             else if (isPrefixSpec(keyword))
                 return isType(precedingKeyword);
-            else if (keyword.equalsIgnoreCase("case"))
-                return precedingKeyword.equalsIgnoreCase("select");
-            else if (keyword.equalsIgnoreCase("data"))
-                return precedingKeyword.equalsIgnoreCase("block");
-            else if (keyword.equalsIgnoreCase("subroutine"))
-                return precedingKeyword.equalsIgnoreCase("end") || isPrefixSpec(precedingKeyword);
-            else if (keyword.equalsIgnoreCase("function"))
-                return precedingKeyword.equalsIgnoreCase("end") || isType(precedingKeyword) || isPrefixSpec(precedingKeyword) || match("type", firstTokenPos);
-            else if (keyword.equalsIgnoreCase("if"))
-                return precedingKeyword.equalsIgnoreCase("else") || precedingKeyword.equalsIgnoreCase("end");
-            else if (keyword.equalsIgnoreCase("none"))
-                return precedingKeyword.equalsIgnoreCase("implicit");
-            else if (keyword.equalsIgnoreCase("precision"))
-                return precedingKeyword.equalsIgnoreCase("double");
-            else if (keyword.equalsIgnoreCase("while"))
-                return precedingKeyword.equalsIgnoreCase("do");
+            else if (keyword.equalsIgnoreCase("case")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("select"); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("data")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("block"); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("subroutine")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("end") || isPrefixSpec(precedingKeyword); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("function")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("end") || isType(precedingKeyword) || isPrefixSpec(precedingKeyword) || match("type", firstTokenPos); //$NON-NLS-1$ //$NON-NLS-2$
+            else if (keyword.equalsIgnoreCase("if")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("else") || precedingKeyword.equalsIgnoreCase("end"); //$NON-NLS-1$ //$NON-NLS-2$
+            else if (keyword.equalsIgnoreCase("none")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("implicit"); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("precision")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("double"); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("while")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("do"); //$NON-NLS-1$
             // BEGIN FORTRAN 2003
-            else if (keyword.equalsIgnoreCase("type"))
+            else if (keyword.equalsIgnoreCase("type")) //$NON-NLS-1$
                 return isPrefixSpec(precedingKeyword)
-                    || precedingKeyword.equalsIgnoreCase("implicit")
-                    || precedingKeyword.equalsIgnoreCase("end")
-                    || precedingKeyword.equalsIgnoreCase("select");
-            else if (keyword.equalsIgnoreCase("interface"))
-                return precedingKeyword.equalsIgnoreCase("abstract") || precedingKeyword.equalsIgnoreCase("end");
-            else if (keyword.equalsIgnoreCase("is"))
-                return precedingKeyword.equalsIgnoreCase("type") || precedingKeyword.equalsIgnoreCase("class");
-            else if (keyword.equalsIgnoreCase("default"))
-                return precedingKeyword.equalsIgnoreCase("case") || precedingKeyword.equalsIgnoreCase("class");
+                    || precedingKeyword.equalsIgnoreCase("implicit") //$NON-NLS-1$
+                    || precedingKeyword.equalsIgnoreCase("end") //$NON-NLS-1$
+                    || precedingKeyword.equalsIgnoreCase("select"); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("interface")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("abstract") || precedingKeyword.equalsIgnoreCase("end"); //$NON-NLS-1$ //$NON-NLS-2$
+            else if (keyword.equalsIgnoreCase("is")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("type") || precedingKeyword.equalsIgnoreCase("class"); //$NON-NLS-1$ //$NON-NLS-2$
+            else if (keyword.equalsIgnoreCase("default")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("case") || precedingKeyword.equalsIgnoreCase("class"); //$NON-NLS-1$ //$NON-NLS-2$
             // END FORTRAN 2003
             // BEGIN FORTRAN 2008
-            else if (keyword.equalsIgnoreCase("stop"))
-                return precedingKeyword.equalsIgnoreCase("all");
-            else if (keyword.equalsIgnoreCase("all")
-                  || keyword.equalsIgnoreCase("images")
-                  || keyword.equalsIgnoreCase("memory"))
-                return precedingKeyword.equalsIgnoreCase("sync");
+            else if (keyword.equalsIgnoreCase("stop")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("all"); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("all") //$NON-NLS-1$
+                  || keyword.equalsIgnoreCase("images") //$NON-NLS-1$
+                  || keyword.equalsIgnoreCase("memory")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("sync"); //$NON-NLS-1$
             // END FORTRAN 2008
             else
-                return precedingKeyword.equalsIgnoreCase("end");
+                return precedingKeyword.equalsIgnoreCase("end"); //$NON-NLS-1$
         }
 
         private boolean salesRetainAsKeyword(int column)
@@ -617,7 +614,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             else if (openContextEquals && !openContextComma)
                 return !lineContainsColonColon
                     && letterFollowsParenthetical
-                    && (match("if", firstTokenPos) || match("where", firstTokenPos) || match("forall", firstTokenPos));
+                    && (match("if", firstTokenPos) || match("where", firstTokenPos) || match("forall", firstTokenPos)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             else if (openContextComma)
                 return true;
             else if (letterFollowsParenthetical)
@@ -629,29 +626,29 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private boolean retainTokenFollowingParentheticalAsKeyword()
         {
             return letterFollowsParenthetical
-            && (match("if", firstTokenPos) || match("forall", firstTokenPos))
+            && (match("if", firstTokenPos) || match("forall", firstTokenPos)) //$NON-NLS-1$ //$NON-NLS-2$
             && !openContextEquals;
         }
 
         private boolean isType(String kw)
         {
-            return kw.equalsIgnoreCase("character")
-                || kw.equalsIgnoreCase("complex")
-                || kw.equalsIgnoreCase("double")
-                || kw.equalsIgnoreCase("doubleprecision")
-                || kw.equalsIgnoreCase("integer")
-                || kw.equalsIgnoreCase("logical")
-                || kw.equalsIgnoreCase("real")
-                || kw.equalsIgnoreCase("type");
+            return kw.equalsIgnoreCase("character") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("complex") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("double") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("doubleprecision") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("integer") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("logical") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("real") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("type"); //$NON-NLS-1$
         }
 
         private boolean isPrefixSpec(String kw)
         {
-            return kw.equalsIgnoreCase("recursive")
-                || kw.equalsIgnoreCase("pure")
-                || kw.equalsIgnoreCase("elemental")
-                || kw.equalsIgnoreCase("impure")  // F08
-                || kw.equalsIgnoreCase("module"); // F08
+            return kw.equalsIgnoreCase("recursive") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("pure") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("elemental") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("impure")  // F08 //$NON-NLS-1$
+                || kw.equalsIgnoreCase("module"); // F08 //$NON-NLS-1$
         }
 
         private int findPrecedingKeyword(int wordCol)
@@ -698,7 +695,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         private String precedingKeywordAsString(int column, int precedingKeywordOffset)
         {
             String precedingKeyword = line.substring(precedingKeywordOffset, column);
-            if (precedingKeyword.indexOf("(") >= 0) precedingKeyword = precedingKeyword.substring(0, precedingKeyword.indexOf("("));
+            if (precedingKeyword.indexOf("(") >= 0) precedingKeyword = precedingKeyword.substring(0, precedingKeyword.indexOf("(")); //$NON-NLS-1$ //$NON-NLS-2$
             precedingKeyword = precedingKeyword.trim();
             return precedingKeyword;
         }

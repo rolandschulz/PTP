@@ -11,7 +11,6 @@
 package org.eclipse.photran.internal.ui.editor;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -40,157 +39,187 @@ import org.eclipse.swt.widgets.Display;
  *
  * @author Jeff Overbey
  */
+@SuppressWarnings("deprecation")
 public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
 {
     ///////////////////////////////////////////////////////////////////////////
     // Constants - Words to highlight
     ///////////////////////////////////////////////////////////////////////////
 
-    private static String[] fgKeywords = { "ACCESS", "ACTION", "ADVANCE", "ALLOCATABLE", "ALLOCATE", "ASSIGN", "ASSIGNMENT", "ASSOCIATE", "ASYNCHRONOUS", "BACKSPACE",
-        "BIND", "BLANK", "BLOCK", "BLOCKDATA", "CALL", "CASE", "CLOSE", "CLASS", "COMMON", "CONTAINS", "CONTINUE", "CYCLE", "DATA", "DEALLOCATE", "DEFAULT", "DELIM", "DIMENSION",
-        "DIRECT", "DO", "DOUBLE", "DOUBLEPRECISION", "ELEMENTAL", "ELSE", "ELSEIF", "ELSEWHERE", "END", "ENDBLOCK", "ENDBLOCKDATA", "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", "EQUIVALENCE", "ERR", "EXIST", "EXIT",
-        "EXTENDS", "EXTENSIBLE", "EXTERNAL", "FILE", "FMT", "FLUSH", "FORALL", "FORM", "FORMAT", "FORMATTED", "FUNCTION", "GO", "IF", "IMPLICIT", "IN", "INOUT",
-        "INCLUDE", "INQUIRE", "INTENT", "INTERFACE", "INTRINSIC", "IOLENGTH", "IOSTAT", "INSTRINSIC", "KIND", "LEN", "MODULE", "NAME", "NAMED", "NAMELIST", "NEXTREC",
-        "NML", "NONE", "NON_OVERRIDABLE", "NOPASS", "NULLIFY", "NUMBER", "ONLY", "OPEN", "OPENED", "OPERATOR", "OPTIONAL", "OUT", "PAD", "PARAMETER", "PASS", "PAUSE",
-        "POINTER", "POSITION", "PRECISION", "PRINT", "PRIVATE", "PROCEDURE", "PROGRAM", "PROTECTED", "PUBLIC", "PURE", "READ", "READWRITE", "REC", "RECL", "RECURSIVE", "RESULT",
-        "RETURN", "REWIND", "SAVE", "SELECT", "SEQUENCE", "SEQUENTIAL", "SIZE", "STAT", "STATUS", "STOP", "SUBROUTINE", "TARGET", "THEN", "TO", "TYPE", "UNFORMATTED",
-        "UNIT", "USE", "VOLATILE", "WHERE", "WHILE", "WRITE",
-        // Fortran 2003 keywords to highlight
-        "EXTENDS", "ABSTRACT", "BIND", "GENERIC", "PASS", "NOPASS", "NON_OVERRIDABLE", "DEFERRED", "FINAL",
-        "ENUM", "ENUMERATOR", "CLASS", "VALUE", "ASSOCIATE", "IS",
-        "WAIT", "NON_INTRINSIC", "IMPORT",
-        // Fortran 2008 keywords to highlight
-        "SUBMODULE", "ENDSUBMODULE", "ENDPROCEDURE", "IMPURE", "CODIMENSION", "CONTIGUOUS",
-        "CRITICAL", "ENDCRITICAL", "ALL", "ALLSTOP", "SYNC", "SYNCALL", "SYNCIMAGES",
-        "IMAGES", "SYNCMEMORY", "MEMORY", "LOCK", "UNLOCK"
-        };
+    private static String[] fgKeywords = { "ACCESS", "ACTION", "ADVANCE", "ALLOCATABLE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                          "ALLOCATE", "ASSIGN", "ASSIGNMENT", "ASSOCIATE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                          "ASYNCHRONOUS", "BACKSPACE", "BIND", "BLANK", "BLOCK", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "BLOCKDATA", "CALL", "CASE", "CLOSE", "CLASS", "COMMON", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+                                          "CONTAINS", "CONTINUE", "CYCLE", "DATA", "DEALLOCATE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "DEFAULT", "DELIM", "DIMENSION", "DIRECT", "DO", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "DOUBLE", "DOUBLEPRECISION", "ELEMENTAL", "ELSE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                          "ELSEIF", "ELSEWHERE", "END", "ENDBLOCK", "ENDBLOCKDATA", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "EQUIVALENCE", "ERR", "EXIST", "EXIT", "EXTENDS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "EXTENSIBLE", "EXTERNAL", "FILE", "FMT", "FLUSH", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "FORALL", "FORM", "FORMAT", "FORMATTED", "FUNCTION", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "GO", "IF", "IMPLICIT", "IN", "INOUT", "INCLUDE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+                                          "INQUIRE", "INTENT", "INTERFACE", "INTRINSIC", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                          "IOLENGTH", "IOSTAT", "INSTRINSIC", "KIND", "LEN", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "MODULE", "NAME", "NAMED", "NAMELIST", "NEXTREC", "NML", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+                                          "NONE", "NON_OVERRIDABLE", "NOPASS", "NULLIFY", "NUMBER", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "ONLY", "OPEN", "OPENED", "OPERATOR", "OPTIONAL", "OUT", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+                                          "PAD", "PARAMETER", "PASS", "PAUSE", "POINTER", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "POSITION", "PRECISION", "PRINT", "PRIVATE", "PROCEDURE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "PROGRAM", "PROTECTED", "PUBLIC", "PURE", "READ", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "READWRITE", "REC", "RECL", "RECURSIVE", "RESULT", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "RETURN", "REWIND", "SAVE", "SELECT", "SEQUENCE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "SEQUENTIAL", "SIZE", "STAT", "STATUS", "STOP", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "SUBROUTINE", "TARGET", "THEN", "TO", "TYPE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "UNFORMATTED", //$NON-NLS-1$
+                                          "UNIT", //$NON-NLS-1$
+                                          "USE", //$NON-NLS-1$
+                                          "VOLATILE", //$NON-NLS-1$
+                                          "WHERE", //$NON-NLS-1$
+                                          "WHILE", //$NON-NLS-1$
+                                          "WRITE", //$NON-NLS-1$
+                                          // Fortran 2003 keywords to highlight
+                                          "EXTENDS", "ABSTRACT", "BIND", "GENERIC", "PASS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "NOPASS", "NON_OVERRIDABLE", "DEFERRED", "FINAL", "ENUM", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "ENUMERATOR", "CLASS", "VALUE", "ASSOCIATE", "IS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "WAIT", //$NON-NLS-1$
+                                          "NON_INTRINSIC", //$NON-NLS-1$
+                                          "IMPORT", //$NON-NLS-1$
+                                          // Fortran 2008 keywords to highlight
+                                          "SUBMODULE", "ENDSUBMODULE", "ENDPROCEDURE", "IMPURE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                          "CODIMENSION", "CONTIGUOUS", "CRITICAL", "ENDCRITICAL", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                          "ALL", "ALLSTOP", "SYNC", "SYNCALL", "SYNCIMAGES", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                          "IMAGES", "SYNCMEMORY", "MEMORY", "LOCK", "UNLOCK" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
     //private static String[] fgTextualOperators = { ".AND.", ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".LT.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
-    private static String[] fgTextualOperators = { "AND", "EQ", "EQV", "FALSE", "GE", "GT", "LE", "LT", "NE", "NEQV", "NOT", "OR", "TRUE" };
+    private static String[] fgTextualOperators = { "AND", "EQ", "EQV", "FALSE", "GE", "GT", "LE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+                                                   "LT", "NE", "NEQV", "NOT", "OR", "TRUE" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
     private static String[] fgIntrinsics =
     {
          // From Metcalf and Reid, "Fortran 90/95 Explained", Chapter 8
          // Functions
-         "associated",
-         "present",
-         "kind",
-         "abs",
-         "aimag",
-         "aint",
-         "anint",
-         "ceiling",
-         "cmplx",
-         "floor",
-         "int",
-         "nint",
-         "real",
-         "conjg",
-         "dim",
-         "max",
-         "min",
-         "mod",
-         "modulo",
-         "sign",
-         "acos",
-         "asin",
-         "atan",
-         "atan2",
-         "cos",
-         "cosh",
-         "exp",
-         "log",
-         "log10",
-         "sin",
-         "sinh",
-         "sqrt",
-         "tan",
-         "tanh",
-         "achar",
-         "char",
-         "iachar",
-         "ichar",
-         "lge",
-         "lgt",
-         "lle",
-         "llt",
-         "adjustl",
-         "adjustr",
-         "index",
-         "len_trim",
-         "scan",
-         "verify",
-         "logical",
-         "len",
-         "repeat",
-         "trim",
-         "digits",
-         "epsilon",
-         "huge",
-         "maxexponent",
-         "minexponent",
-         "precision",
-         "radix",
-         "range",
-         "tiny",
-         "exponent",
-         "fraction",
-         "nearest",
-         "rrspacing",
-         "scale",
-         "set_exponent",
-         "spacing",
-         "selected_int_kind",
-         "selected_real_kind",
-         "bit_size",
-         "btest",
-         "iand",
-         "ibclr",
-         "ibits",
-         "ibset",
-         "ieor",
-         "ior",
-         "ishft",
-         "ishftc",
-         "not",
-         "dot_product",
-         "matmul",
-         "all",
-         "any",
-         "count",
-         "maxval",
-         "minval",
-         "product",
-         "sum",
-         "allocated",
-         "lbound",
-         "shape",
-         "size",
-         "ubound",
-         "merge",
-         "pack",
-         "unpack",
-         "reshape",
-         "spread",
-         "cshift",
-         "eoshift",
-         "transpose",
-         "maxloc",
-         "minloc",
-         "null",
+         "associated", //$NON-NLS-1$
+         "present", //$NON-NLS-1$
+         "kind", //$NON-NLS-1$
+         "abs", //$NON-NLS-1$
+         "aimag", //$NON-NLS-1$
+         "aint", //$NON-NLS-1$
+         "anint", //$NON-NLS-1$
+         "ceiling", //$NON-NLS-1$
+         "cmplx", //$NON-NLS-1$
+         "floor", //$NON-NLS-1$
+         "int", //$NON-NLS-1$
+         "nint", //$NON-NLS-1$
+         "real", //$NON-NLS-1$
+         "conjg", //$NON-NLS-1$
+         "dim", //$NON-NLS-1$
+         "max", //$NON-NLS-1$
+         "min", //$NON-NLS-1$
+         "mod", //$NON-NLS-1$
+         "modulo", //$NON-NLS-1$
+         "sign", //$NON-NLS-1$
+         "acos", //$NON-NLS-1$
+         "asin", //$NON-NLS-1$
+         "atan", //$NON-NLS-1$
+         "atan2", //$NON-NLS-1$
+         "cos", //$NON-NLS-1$
+         "cosh", //$NON-NLS-1$
+         "exp", //$NON-NLS-1$
+         "log", //$NON-NLS-1$
+         "log10", //$NON-NLS-1$
+         "sin", //$NON-NLS-1$
+         "sinh", //$NON-NLS-1$
+         "sqrt", //$NON-NLS-1$
+         "tan", //$NON-NLS-1$
+         "tanh", //$NON-NLS-1$
+         "achar", //$NON-NLS-1$
+         "char", //$NON-NLS-1$
+         "iachar", //$NON-NLS-1$
+         "ichar", //$NON-NLS-1$
+         "lge", //$NON-NLS-1$
+         "lgt", //$NON-NLS-1$
+         "lle", //$NON-NLS-1$
+         "llt", //$NON-NLS-1$
+         "adjustl", //$NON-NLS-1$
+         "adjustr", //$NON-NLS-1$
+         "index", //$NON-NLS-1$
+         "len_trim", //$NON-NLS-1$
+         "scan", //$NON-NLS-1$
+         "verify", //$NON-NLS-1$
+         "logical", //$NON-NLS-1$
+         "len", //$NON-NLS-1$
+         "repeat", //$NON-NLS-1$
+         "trim", //$NON-NLS-1$
+         "digits", //$NON-NLS-1$
+         "epsilon", //$NON-NLS-1$
+         "huge", //$NON-NLS-1$
+         "maxexponent", //$NON-NLS-1$
+         "minexponent", //$NON-NLS-1$
+         "precision", //$NON-NLS-1$
+         "radix", //$NON-NLS-1$
+         "range", //$NON-NLS-1$
+         "tiny", //$NON-NLS-1$
+         "exponent", //$NON-NLS-1$
+         "fraction", //$NON-NLS-1$
+         "nearest", //$NON-NLS-1$
+         "rrspacing", //$NON-NLS-1$
+         "scale", //$NON-NLS-1$
+         "set_exponent", //$NON-NLS-1$
+         "spacing", //$NON-NLS-1$
+         "selected_int_kind", //$NON-NLS-1$
+         "selected_real_kind", //$NON-NLS-1$
+         "bit_size", //$NON-NLS-1$
+         "btest", //$NON-NLS-1$
+         "iand", //$NON-NLS-1$
+         "ibclr", //$NON-NLS-1$
+         "ibits", //$NON-NLS-1$
+         "ibset", //$NON-NLS-1$
+         "ieor", //$NON-NLS-1$
+         "ior", //$NON-NLS-1$
+         "ishft", //$NON-NLS-1$
+         "ishftc", //$NON-NLS-1$
+         "not", //$NON-NLS-1$
+         "dot_product", //$NON-NLS-1$
+         "matmul", //$NON-NLS-1$
+         "all", //$NON-NLS-1$
+         "any", //$NON-NLS-1$
+         "count", //$NON-NLS-1$
+         "maxval", //$NON-NLS-1$
+         "minval", //$NON-NLS-1$
+         "product", //$NON-NLS-1$
+         "sum", //$NON-NLS-1$
+         "allocated", //$NON-NLS-1$
+         "lbound", //$NON-NLS-1$
+         "shape", //$NON-NLS-1$
+         "size", //$NON-NLS-1$
+         "ubound", //$NON-NLS-1$
+         "merge", //$NON-NLS-1$
+         "pack", //$NON-NLS-1$
+         "unpack", //$NON-NLS-1$
+         "reshape", //$NON-NLS-1$
+         "spread", //$NON-NLS-1$
+         "cshift", //$NON-NLS-1$
+         "eoshift", //$NON-NLS-1$
+         "transpose", //$NON-NLS-1$
+         "maxloc", //$NON-NLS-1$
+         "minloc", //$NON-NLS-1$
+         "null", //$NON-NLS-1$
 
          // Subroutines
-         "mvbits",
-         "date_and_time",
-         "system_clock",
-         "cpu_time",
-         "random_number",
-         "random_seed"
+         "mvbits", //$NON-NLS-1$
+         "date_and_time", //$NON-NLS-1$
+         "system_clock", //$NON-NLS-1$
+         "cpu_time", //$NON-NLS-1$
+         "random_number", //$NON-NLS-1$
+         "random_seed" //$NON-NLS-1$
     };
 
-    private static String[] fgTypes = { "REAL", "INTEGER", "CHARACTER", "LOGICAL", "COMPLEX" };
+    private static String[] fgTypes = { "REAL", "INTEGER", "CHARACTER", "LOGICAL", "COMPLEX" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
-    private static String[] fgPreprocessor = { "INCLUDE", "#include", "#error", "#warning", "#pragma", "#ifdef", "#ifndef", "#if", "#else", "#elif", "#endif", "#line" };
+    private static String[] fgPreprocessor = { "INCLUDE", "#include", "#error", "#warning", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                              "#pragma", "#ifdef", "#ifndef", "#if", "#else", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                                              "#elif", "#endif", "#line" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     ///////////////////////////////////////////////////////////////////////////
     // Fields - colors
@@ -232,12 +261,12 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         IRule[] rules = new IRule[isFixedForm ? 6+4+1 : 6];
         int i = 0;
 
-        rules[i++] = new EndOfLineRule("#", colorCpp);
+        rules[i++] = new EndOfLineRule("#", colorCpp); //$NON-NLS-1$
 
-        rules[i++] = new MultiLineRule("\"", "\"", colorStrings);
-        rules[i++] = new MultiLineRule("'", "'", colorStrings);
+        rules[i++] = new MultiLineRule("\"", "\"", colorStrings); //$NON-NLS-1$ //$NON-NLS-2$
+        rules[i++] = new MultiLineRule("'", "'", colorStrings); //$NON-NLS-1$ //$NON-NLS-2$
 
-        rules[i++] = new EndOfLineRule("!", colorComments);
+        rules[i++] = new EndOfLineRule("!", colorComments); //$NON-NLS-1$
 
         if (isFixedForm)
         {
@@ -412,7 +441,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         /** The column constraint. */
         protected int fColumn= UNDEFINED;
         /** The table of predefined words and token for this rule. */
-        protected Map fWords= new HashMap();
+        protected Map<String, IToken> fWords= new HashMap<String, IToken>();
         /** Buffer used for pattern detection. */
         private StringBuffer fBuffer= new StringBuffer();
         /**
@@ -430,6 +459,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
          * @param detector the word detector to be used by this rule, may not be <code>null</code>
          * @see #addWord(String, IToken)
          */
+        @SuppressWarnings("unused")
         public Eclipse33WordRule(IWordDetector detector) {
             this(detector, Token.UNDEFINED, false);
         }
@@ -444,6 +474,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
          *          if nothing else is specified, may not be <code>null</code>
          * @see #addWord(String, IToken)
          */
+        @SuppressWarnings("unused")
         public Eclipse33WordRule(IWordDetector detector, IToken defaultToken) {
             this(detector, defaultToken, false);
         }
@@ -490,6 +521,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
          *
          * @param column the column in which the pattern starts
          */
+        @SuppressWarnings("unused")
         public void setColumnConstraint(int column) {
             if (column < 0)
                 column= UNDEFINED;
@@ -512,14 +544,12 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
                     scanner.unread();
 
                     String buffer= fBuffer.toString();
-                    IToken token= (IToken)fWords.get(buffer);
+                    IToken token= fWords.get(buffer);
 
                     if(fIgnoreCase) {
-                        Iterator iter= fWords.keySet().iterator();
-                        while (iter.hasNext()) {
-                            String key= (String)iter.next();
+                        for (String key : fWords.keySet()) {
                             if(buffer.equalsIgnoreCase(key)) {
-                                token= (IToken)fWords.get(key);
+                                token= fWords.get(key);
                                 break;
                             }
                         }

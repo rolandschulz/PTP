@@ -15,7 +15,6 @@ import java.util.Comparator;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.photran.internal.cdtinterface.core.FortranLanguage;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
@@ -42,14 +41,14 @@ public class CDTFortranPreferencePage extends AbstractFortranPreferencePage
         String[][] modelBuilders = listModelBuilders();
         if (modelBuilders != null)
             addField(new ComboFieldEditor(FortranPreferences.PREFERRED_MODEL_BUILDER.getName(),
-                                            "Preferred Model Builder",
+                                            Messages.CDTFortranPreferencePage_PreferredModelBuilderFieldLabel,
                                             modelBuilders,
                                             getFieldEditorParent()));
         
         String[][] domParsers = listDOMParsers();
         if (domParsers != null)
             addField(new ComboFieldEditor(FortranPreferences.PREFERRED_DOM_PARSER.getName(),
-                                            "Preferred DOM Parser",
+                                            Messages.CDTFortranPreferencePage_PreferredDOMParserFieldLabel,
                                             domParsers,
                                             getFieldEditorParent()));
     }
@@ -72,13 +71,11 @@ public class CDTFortranPreferencePage extends AbstractFortranPreferencePage
     {
         String[][] result = new String[configs.length][];
         for (int i = 0; i < configs.length; i++)
-            result[i] = new String[] { configs[i].getAttribute("name"), configs[i].getAttribute("id") };
-        Arrays.sort(result, new Comparator()
+            result[i] = new String[] { configs[i].getAttribute("name"), configs[i].getAttribute("id") }; //$NON-NLS-1$ //$NON-NLS-2$
+        Arrays.sort(result, new Comparator<String[]>()
         {
-            public int compare(Object arg0, Object arg1)
+            public int compare(String[] kvPair1, String[] kvPair2)
             {
-                String[] kvPair1 = (String[])arg0;
-                String[] kvPair2 = (String[])arg1;
                 return kvPair1[0].compareTo(kvPair2[0]);
             }
         });
