@@ -11,7 +11,7 @@
             file="toc.xml"
             primary="true"/>
             <tocIcon
-                  altText="PLDT Help"
+                  altText="%tocIcon.altText"
                   closedIcon="icons/analyze.gif"
                   id="org.eclipse.ptp.pldt.help.icon"
                   openIcon="icons/analyze.gif"/>
