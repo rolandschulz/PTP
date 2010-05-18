@@ -6,7 +6,7 @@
       <page
             class="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
             id="org.eclipse.ptp.pldt.common.prefs.PLDTPreferencePage"
-            name="Parallel Language Development Tools"
+            name="%page.name"
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
             />
    </extension>
@@ -53,7 +53,7 @@
                   commandId="org.eclipse.ptp.pldt.common.dropDownCommand"
                   id="org.eclipse.ptp.pldt.common.toolbar.command1"
                   style="pulldown"
-                  tooltip="Repeat last Parallel Analysis ">
+                  tooltip="%command.tooltip">
             </command>
          </toolbar>
       </menuContribution>
