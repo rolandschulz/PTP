@@ -52,35 +52,35 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A unique identifier for this remote server.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A human readable name for this remote server.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="launchCommand" type="string" use="required">
             <annotation>
                <documentation>
-                  The command used to launch the payload on the remote machine.
+                  The command used to launch the payload on the remote machine. The variable &quot;${payload}&quot; can be used to include the name of the payload (as specified in the &quot;payload&quot; attribute) in the launch command.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="payload" type="string" use="required">
             <annotation>
                <documentation>
-                  Server payload. This will be copied from the plugin to the working directory on the remote machine prior to launch.
+                  Server payload. This will be copied from the plugin to the working directory on the remote machine prior to launch. The payload is cached on the remote machine and only copied if it is necessary.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The fully qualified name of the Java class extending &lt;samp&gt;org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner&lt;/samp&gt;.
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner:"/>
