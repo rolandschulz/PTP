@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,7 +121,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
     ///////////////////////////////////////////////////////////////////////////
 
     /** The entries in the log */
-	protected List<Entry> log = new LinkedList<Entry>();
+	protected List<Entry> log = new ArrayList<Entry>();
 
 	/** Clears the error/warning log. */
 	public void clear()
@@ -134,8 +135,10 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 	{
 	    List<Entry> newLog = new LinkedList<Entry>();
 
-		for (Entry entry : log)
+	    // Iterate using indices to avoid ConcurrentModificationException
+		for (int i = 0; i < log.size(); i++)
 		{
+		    Entry entry = log.get(i);
 			R tokenRef = entry.getTokenRef();
 			if (tokenRef == null || !tokenRef.getFilename().equals(filename))
 				newLog.add(entry);
@@ -256,8 +259,8 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 	/** @return true iff at least one error exists in the error/warning log */
 	public boolean hasErrorsLogged()
 	{
-		for (Entry entry : log)
-			if (entry.isError())
+        for (int i = 0; i < log.size(); i++)
+            if (log.get(i).isError())
 				return true;
 
 		return false;
@@ -278,8 +281,10 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 	/** Prints the error/warning log on the given <code>PrintStream</code> */
 	public void printOn(PrintStream out)
 	{
-	    for (Entry entry : log)
-	    {
+        for (int i = 0; i < log.size(); i++)
+        {
+            Entry entry = log.get(i);
+
 	        out.print(entry.isError() ? "ERROR:   " : "Warning: ");
 	        out.println(entry.getMessage());
 
@@ -356,8 +361,10 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
         {
             R tokenRef = null;
             String message = "";
-            for(Entry entry : log)
+            for (int i = 0; i < log.size(); i++)
             {
+                Entry entry = log.get(i);
+
                 output.write(Boolean.toString(entry.isWarning())+
                     EOL);
                 
