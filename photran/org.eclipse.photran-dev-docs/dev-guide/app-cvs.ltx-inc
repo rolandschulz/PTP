@@ -98,6 +98,24 @@
 	       Right-click on any of the selected plug-ins, and select
 	       Check Out from the pop-up menu.
 	       (Check out will take several minutes.)
+	\item \textit{(Optional)} You may also wish to switch back to the Java perspective and\dots
+      \begin{enumerate}
+      \item Close or delete the org.eclipse.photran.cmdline project.  This project contains code
+            demonstrating how to use Photran's parser outside of Eclipse; most developers won't
+            need to do this, and since it contains many classes copied from the ``real'' Photran
+            projects, it can be confusing having it in your workspace.
+      \item Delete the following projects (they are used for release engineering, so most developers
+            will never need to modify them):
+            \begin{itemize}
+            \item org.eclipse.photran-feature
+            \item org.eclipse.photran.intel-feature
+            \item org.eclipse.photran.master
+            \item org.eclipse.photran.releng
+            \item org.eclipse.photran.vpg-feature
+            \item org.eclipse.photran.xlf-feature
+            \item org.eclipse.rephraserengine-feature
+            \end{itemize}
+      \end{enumerate}
 	\setcounter{running_counter}{\value{enumi}}
 \end{enumerate}
 The sources should all compile (albeit with lots of warnings).
