@@ -37,7 +37,7 @@ public class EventTreeDialog extends Dialog{
 	}
 	
 	protected Control createDialogArea(Composite top){
-		top.getShell().setText("PAPI Event Selection");
+		top.getShell().setText(Messages.getString("EventTreeDialog.PapiEventSelection")); //$NON-NLS-1$
 		Composite parent = (Composite)super.createDialogArea(top);
 		GridLayout gl = new GridLayout();
 		parent.setLayout(gl);
@@ -119,14 +119,14 @@ public class EventTreeDialog extends Dialog{
 	protected void okPressed(){
 		ArrayList<String> badCom=checkCommands();
 		if(badCom.size()>0){
-			String events="";
+			String events=""; //$NON-NLS-1$
 			for(int i=0;i<badCom.size();i++){
 				events+=badCom.get(i);
 				if(i!=badCom.size()-1){
-					events+=", ";
+					events+=", "; //$NON-NLS-1$
 				}
 			}
-			MessageDialog.openWarning(this.getShell(), "Event Modifiers Reqired", "Please select at least one modifier for: "+events);
+			MessageDialog.openWarning(this.getShell(), Messages.getString("EventTreeDialog.EventModifiersRequired"), Messages.getString("EventTreeDialog.PleaseSelectAtLeastOneMod")+events); //$NON-NLS-1$ //$NON-NLS-2$
 			return;
 		}
 		
@@ -177,7 +177,7 @@ public class EventTreeDialog extends Dialog{
 			{
 				for(int k=0;k<et.children.get(i).children.get(j).children.size();k++){
 					Event e = (Event) et.children.get(i).children.get(j).children.get(k);
-					if(e.getCheck() && e.children.size()>0 && e.testCommand().indexOf(":")<0)
+					if(e.getCheck() && e.children.size()>0 && e.testCommand().indexOf(":")<0) //$NON-NLS-1$
 					{
 						selE.add(e.testCommand());
 					}

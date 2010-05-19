@@ -67,7 +67,7 @@ public class PAPISplash extends Dialog{
 				dialog.setFilterPath(correctPath);
 		}
 
-		dialog.setText("Select PAPI Bin Directory");
+		dialog.setText(Messages.PAPISplash_SelectPapiBin);
 		papiPath.setText(dialog.open());
 
 	}
@@ -107,21 +107,21 @@ public class PAPISplash extends Dialog{
 		papiCom.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
 		Label tauarchComment = new Label(papiCom, SWT.WRAP);
-		tauarchComment.setText("PAPI Bin Directory:");
+		tauarchComment.setText(Messages.PAPISplash_PapiBin);
 		papiPath = new Text(papiCom, SWT.BORDER | SWT.SINGLE);
 		papiPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		papiPath.setText(Activator.getDefault().getPreferenceStore().getString(TestPAPI.papiLocationSelectionVar));
 
 		browsePapi = new Button(papiCom,SWT.PUSH);
-		browsePapi.setText("Browse");
+		browsePapi.setText(Messages.PAPISplash_Browse);
 		browsePapi.addSelectionListener(listener);
 		
 		papiCountRadios = new Button[2];
 		papiCountRadios[0] = new Button(parent,
 				SWT.RADIO);
-		papiCountRadios[0].setText("Preset Counters");
+		papiCountRadios[0].setText(Messages.PAPISplash_PresetCounters);
 		papiCountRadios[1] = new Button(parent,SWT.RADIO);
-		papiCountRadios[1].setText("Native Counters");
+		papiCountRadios[1].setText(Messages.PAPISplash_NativeCounters);
 		//papiCountRadios[2] = new Button(parent,SWT.RADIO);
 		//papiCountRadios[2].setText("PAPI-C Selector");
 		int pType=Activator.getDefault().getPreferenceStore().getInt(TestPAPI.papiCounterTypeVar);

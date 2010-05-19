@@ -109,7 +109,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 		projComp.setLayoutData(gd);
 
 		fProjLabel = new Label(projComp, SWT.NONE);
-		fProjLabel.setText(LaunchMessages.getString("CMainTab.&ProjectColon")); //$NON-NLS-1$
+		fProjLabel.setText("&Project:"); //$NON-NLS-1$
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		fProjLabel.setLayoutData(gd);
@@ -132,7 +132,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			}
 		});
 
-		fProjButton = createPushButton(projComp, LaunchMessages.getString("Launch.common.Browse_1"), null);
+		fProjButton = createPushButton(projComp, LaunchMessages.getString("Launch.common.Browse_1"), null); //$NON-NLS-1$
 		fProjButton.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -175,7 +175,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			}
 		});
 
-		fSearchButton = createPushButton(exeComp, LaunchMessages.getString("CMainTab.Search..."), null); //$NON-NLS-1$
+		fSearchButton = createPushButton(exeComp, "Searc&h Project...", null); //$NON-NLS-1$
 		fSearchButton.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -185,7 +185,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 		});
 
 		Button fBrowseForBinaryButton;
-		fBrowseForBinaryButton = createPushButton(exeComp, LaunchMessages.getString("Launch.common.Browse_2"), null); //$NON-NLS-1$
+		fBrowseForBinaryButton = createPushButton(exeComp, "B&rowse...", null); //$NON-NLS-1$
 		fBrowseForBinaryButton.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -209,7 +209,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 		gd.horizontalSpan = colSpan;
 		buildConfComp.setLayoutData(gd);
 		fProgLabel = new Label(buildConfComp, SWT.NONE);
-		fProgLabel.setText("C/C++/Fortran Build Configuration"); 
+		fProgLabel.setText(org.eclipse.ptp.etfw.ui.LaunchMessages.ToolRecompMainTab_LangBuildConf); 
 		gd = new GridData();
 		gd.horizontalSpan = 3;
 		fProgLabel.setLayoutData(gd);
@@ -234,16 +234,16 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 		buildConfCombo.removeAll();
 		ICProject project = getCProject();
 		if (project == null) {
-			MessageDialog.openInformation(getShell(), LaunchMessages.getString("CMainTab.Project_required"), 
-					LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program")); 
+			MessageDialog.openInformation(getShell(), LaunchMessages.getString("CMainTab.Project_required"),  //$NON-NLS-1$
+					LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program"));  //$NON-NLS-1$
 			return;
 		}
 		
 		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
 		if(info==null)
 		{
-			MessageDialog.openInformation(getShell(), LaunchMessages.getString("CMainTab.Project_required"),
-					LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program"));
+			MessageDialog.openInformation(getShell(), LaunchMessages.getString("CMainTab.Project_required"), //$NON-NLS-1$
+					LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
 			return;
 		}
 		
@@ -266,16 +266,16 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 
 		String name = fProjText.getText().trim();
 		if (name.length() == 0) {
-			setErrorMessage(LaunchMessages.getString("CMainTab.Project_not_specified"));
+			setErrorMessage(LaunchMessages.getString("CMainTab.Project_not_specified")); //$NON-NLS-1$
 			return false;
 		}
 		if (!ResourcesPlugin.getWorkspace().getRoot().getProject(name).exists()) {
-			setErrorMessage(LaunchMessages.getString("Launch.common.Project_does_not_exist"));
+			setErrorMessage(LaunchMessages.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
 			return false;
 		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.isOpen()) {
-			setErrorMessage(LaunchMessages.getString("CMainTab.Project_must_be_opened"));
+			setErrorMessage(LaunchMessages.getString("CMainTab.Project_must_be_opened")); //$NON-NLS-1$
 			return false;
 		}
 
@@ -285,13 +285,13 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			{
 				name = buildConfCombo.getText();
 				if (name==null||name.length() == 0) {
-					setErrorMessage("Build configuration not specified");
+					setErrorMessage(org.eclipse.ptp.etfw.ui.LaunchMessages.ToolRecompMainTab_BuildConfNoSpeced);
 					return false;
 				}
 
-				String bcdne = "Build configuration does not exist";
+				String bcdne = org.eclipse.ptp.etfw.ui.LaunchMessages.ToolRecompMainTab_BuildConfNoExist;
 
-				if (name.equals(".") || name.equals("..")) {
+				if (name.equals(".") || name.equals("..")) { //$NON-NLS-1$ //$NON-NLS-2$
 					setErrorMessage(bcdne);
 					return false;
 				}
@@ -299,14 +299,14 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 
 				ICProject thisProject = getCProject();
 				if (thisProject == null) {
-					setErrorMessage(LaunchMessages.getString("Launch.common.Project_does_not_exist"));
+					setErrorMessage(LaunchMessages.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
 					return false;
 				}
 
 				IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(thisProject.getResource());
 				if(info==null)
 				{
-					setErrorMessage("Project has no valid build information");
+					setErrorMessage(org.eclipse.ptp.etfw.ui.LaunchMessages.ToolRecompMainTab_ProjNoValidBuildInfo);
 					return false;
 				}
 
@@ -314,7 +314,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 
 				if(configs.length<1)
 				{
-					setErrorMessage("No valid configurations");
+					setErrorMessage(org.eclipse.ptp.etfw.ui.LaunchMessages.ToolRecompMainTab_NoValidConfs);
 					return false;
 				}
 
@@ -333,29 +333,29 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			{
 				name = fProgText.getText().trim();
 				if (name.length() == 0) {
-					setErrorMessage(LaunchMessages.getString("CMainTab.Program_not_specified")); //$NON-NLS-1$
+					setErrorMessage("Program not specified"); //$NON-NLS-1$
 					return false;
 				}
 				if (name.equals(".") || name.equals("..")) { //$NON-NLS-1$ //$NON-NLS-2$
-					setErrorMessage(LaunchMessages.getString("CMainTab.Program_does_not_exist")); //$NON-NLS-1$
+					setErrorMessage("Program does not exist"); //$NON-NLS-1$
 					return false;
 				}
 				IPath exePath = new Path(name);
 				if (!exePath.isAbsolute()) {
 					if (!project.getFile(name).exists()) {
-						setErrorMessage(LaunchMessages.getString("CMainTab.Program_does_not_exist")); //$NON-NLS-1$
+						setErrorMessage("Program does not exist"); //$NON-NLS-1$
 						return false;
 					}
 					exePath = project.getFile(name).getLocation();
 				} else {
 					if (!exePath.toFile().exists()) {
-						setErrorMessage(LaunchMessages.getString("CMainTab.Program_does_not_exist")); //$NON-NLS-1$
+						setErrorMessage("Program does not exist"); //$NON-NLS-1$
 						return false;
 					}
 				}
 				try {
 					if (!isBinary(project, exePath)) {
-						setErrorMessage(LaunchMessages.getString("CMainTab.Program_is_not_a_recongnized_executable")); //$NON-NLS-1$
+						setErrorMessage("Program is not a recognized executable."); //$NON-NLS-1$
 						return false;
 					}
 				} catch (CoreException e) {

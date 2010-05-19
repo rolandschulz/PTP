@@ -57,7 +57,7 @@ public class Clear implements IObjectActionDelegate {
 		//If nothing is selected we can not proceed
 		if(selection==null)
 		{
-			System.out.println("No Selection");
+			System.out.println(Messages.Clear_NoSelection);
 			return;
 		}
 		/**
@@ -103,7 +103,7 @@ public class Clear implements IObjectActionDelegate {
 			{
 				//Get the function declaration
 				String fullsig = Selector.getFullSigniture((IFunctionDeclaration)cbit);
-				clearRoutSelSec.add(" routine=\""+fullsig+"\"");
+				clearRoutSelSec.add(" routine=\""+fullsig+"\""); //$NON-NLS-1$ //$NON-NLS-2$
 				//Selected routines
 				selrouts.add(fullsig);
 //				selSect=" file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\""+fullsig+"\"";
@@ -119,28 +119,28 @@ public class Clear implements IObjectActionDelegate {
 			{
 				selfiles.add(cbit.getElementName());
 				
-				selSect=" file=\""+cbit.getElementName()+"\" routine=\"#\"";
+				selSect=" file=\""+cbit.getElementName()+"\" routine=\"#\""; //$NON-NLS-1$ //$NON-NLS-2$
 				
-				clearFileSelSec.add("file=\""+cbit.getElementName()+"\"");
+				clearFileSelSec.add("file=\""+cbit.getElementName()+"\""); //$NON-NLS-1$ //$NON-NLS-2$
 				
 //				for(int i=0;i<SelectiveInstrument.instTypes.length;i++)
 //				{
 //					clearFileSelSec.add(SelectiveInstrument.instTypes[i]+selSect);
 //				}
 				
-				clearOtherSelSec.add("file=\""+cbit.getElementName()+"\"");
+				clearOtherSelSec.add("file=\""+cbit.getElementName()+"\""); //$NON-NLS-1$ //$NON-NLS-2$
 				
-				clearOtherSelSec.add("entry file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\"#\" code = \"");
+				clearOtherSelSec.add("entry file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\"#\" code = \""); //$NON-NLS-1$ //$NON-NLS-2$
 				tot++;
 			}
 			else
 				if(type==-1)
 				{
 					String fortclass =cbit.getClass().getName();
-					if(fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$Subroutine")||fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$MainProgram"))
+					if(fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$Subroutine")||fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$MainProgram")) //$NON-NLS-1$ //$NON-NLS-2$
 					{
-						selrouts.add("#"+cbit.getElementName().toUpperCase());
-						selSect=" file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\""+"#"+cbit.getElementName().toUpperCase()+"\"";
+						selrouts.add("#"+cbit.getElementName().toUpperCase()); //$NON-NLS-1$
+						selSect=" file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\""+"#"+cbit.getElementName().toUpperCase()+"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 						
 						for(int i=0;i<SelectiveInstrument.instTypes.length;i++)
 						{
@@ -171,7 +171,7 @@ public class Clear implements IObjectActionDelegate {
 		else
 		{	//if the selection is invalid, stop
 			this.selection = null;
-			System.out.println("Invalid Selection");
+			System.out.println(Messages.Clear_InvalidSelection);
 		}		
 	}
 

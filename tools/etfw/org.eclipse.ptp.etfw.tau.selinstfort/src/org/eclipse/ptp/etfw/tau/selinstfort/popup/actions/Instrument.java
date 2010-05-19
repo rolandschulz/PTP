@@ -71,8 +71,8 @@ public class Instrument implements IEditorActionDelegate {
 			class validateName implements IInputValidator{
 	
 				public String isValid(String newText) {
-					if(newText.equals(""))
-						return "Please enter valid text";
+					if(newText.equals("")) //$NON-NLS-1$
+						return Messages.Instrument_EnterValidText;
 					return null;
 				}
 			}
@@ -80,44 +80,44 @@ public class Instrument implements IEditorActionDelegate {
 			class validateValue implements IInputValidator{
 	
 				public String isValid(String newText) {
-					String err="Please enter a valid double or variable name";
-					if(newText.equals(""))
+					String err=Messages.Instrument_EnterValidDoubleOrVar;
+					if(newText.equals("")) //$NON-NLS-1$
 						return err;
 					
-					String fixed = newText.replaceAll("\\W", "");
+					String fixed = newText.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$
 					if(!newText.equals(fixed))
 					{
 						if(newText.length()-fixed.length()==1)
-							if(newText.indexOf(".")>=0)
-								if(fixed.replaceAll("\\d", "").equals(""))
+							if(newText.indexOf(".")>=0) //$NON-NLS-1$
+								if(fixed.replaceAll("\\d", "").equals("")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									return null;
 						return err;
 					}
 					return null;
 				}
 			}
-			InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), "User Defined Event Name", "Please enter a unique name to associate with this user defined event", "", new validateName());
+			InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.Instrument_UserDefinedEventName, Messages.Instrument_EnterUniqueName, "", new validateName()); //$NON-NLS-3$
 	
 			if(namedialog.open() == Window.CANCEL)return;
 			String testline = namedialog.getValue();
 			
 			
-			InputDialog incdialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), "User Defined Event Value", "Please enter a static value or available numeric variable", "", new validateValue());
+			InputDialog incdialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.Instrument_UserDefinedEventValue, Messages.Instrument_EnterStaticValueOrVariable, "", new validateValue()); //$NON-NLS-3$
 			if(incdialog.open() == Window.CANCEL)return;
 			String testinc = incdialog.getValue();
 			
-			String fixline = "TAU_"+testline.replaceAll("\\W", "");
+			String fixline = "TAU_"+testline.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			LinkedHashSet<String> instlines = new LinkedHashSet<String>();
-			String initline1= "      integer "+fixline+"(2) / 0, 0 /";
-			String initline2= "      save "+fixline;
-			String regline =  "      call TAU_REGISTER_EVENT("+fixline+", \'"+testline+"\')";
-			String evtline =  "      call TAU_EVENT("+fixline+", "+testinc+");";
+			String initline1= "      integer "+fixline+"(2) / 0, 0 /"; //$NON-NLS-1$ //$NON-NLS-2$
+			String initline2= "      save "+fixline; //$NON-NLS-1$
+			String regline =  "      call TAU_REGISTER_EVENT("+fixline+", \'"+testline+"\')"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String evtline =  "      call TAU_EVENT("+fixline+", "+testinc+");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
 	
-			String nosselinitline1 = "entry file=\""+input.getFile().getName()+"\" routine=\"#\" code=\""+initline1+"\"";
-			String nosselinitline2 = "entry file=\""+input.getFile().getName()+"\" routine=\"#\" code=\""+initline2+"\"";
-			String nosselregline = "file=\""+input.getFile().getName()+"\" line="+insertregs+" code=\""+regline+"\"";
-			String nosselinstline = "file=\""+input.getFile().getName()+"\" line="+insertregs+" code=\""+evtline+"\"";
+			String nosselinitline1 = "entry file=\""+input.getFile().getName()+"\" routine=\"#\" code=\""+initline1+"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String nosselinitline2 = "entry file=\""+input.getFile().getName()+"\" routine=\"#\" code=\""+initline2+"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String nosselregline = "file=\""+input.getFile().getName()+"\" line="+insertregs+" code=\""+regline+"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			String nosselinstline = "file=\""+input.getFile().getName()+"\" line="+insertregs+" code=\""+evtline+"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			instlines.add(nosselinitline1);
 			instlines.add(nosselinitline2);
 			instlines.add(nosselregline);

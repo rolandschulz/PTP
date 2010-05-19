@@ -59,7 +59,7 @@ public class ToolMaker {
 		try {
 			factory.newSAXParser().parse(tooldef, tparser);
 		}catch (SAXParseException e) {
-			System.err.println("Error in workflow definition "+e.getSystemId()+" at line "+e.getLineNumber()+", column "+e.getColumnNumber());
+			System.err.println(Messages.ToolMaker_ErrorInWorkflowDefinition+e.getSystemId()+Messages.ToolMaker_AtLine+e.getLineNumber()+Messages.ToolMaker_Column+e.getColumnNumber());
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -103,7 +103,7 @@ public class ToolMaker {
 		
 		toolopt.optionLine=new StringBuffer(toolopt.optName);
 		if(toolopt.type>0)
-			toolopt.optionLine.append("=\"\"");//  +="=\"\"";
+			toolopt.optionLine.append("=\"\"");//  +="=\"\""; //$NON-NLS-1$
 		toolopt.optionLine.append(' ');//+=' ';
 		
 		return toolopt;
@@ -211,7 +211,7 @@ public class ToolMaker {
 
 			if(checkListener != null)
 			toolOpt.argbox.addModifyListener((ModifyListener)checkListener);
-			toolOpt.browser = createPushButton(comp, "Browse");
+			toolOpt.browser = createPushButton(comp, Messages.ToolMaker_Browse);
 			if(browseListener!=null)
 				toolOpt.browser.addSelectionListener(browseListener);
 		}
@@ -265,7 +265,7 @@ public class ToolMaker {
 		{
 			dialogText=opt.optLabel;
 			if(dialogText==null){
-				dialogText="";
+				dialogText=""; //$NON-NLS-1$
 			}
 		}
 		

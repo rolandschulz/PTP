@@ -55,35 +55,35 @@ public class OptionSplash extends Dialog{
 		Composite composite = (Composite) super.createDialogArea(parent);
 		
 		Label introlabel = new Label(composite, SWT.NONE);
-		introlabel.setText("Adjusting the following options as suggested in the tooltips may\n" +
-				"improve your TAU usage experience.");
+		introlabel.setText(Messages.OptionSplash_AdjFollowingOpts +
+				Messages.OptionSplash_ImproveTauUsageExperience);
 		autoref= new Button(composite, SWT.CHECK);
-		autoref.setText("Auto-Refresh");
-		autoref.setToolTipText("TAU Suggests: On");
+		autoref.setText(Messages.OptionSplash_AutoRefresh);
+		autoref.setToolTipText(Messages.OptionSplash_TauSugOn);
 		autoref.setSelection(ResourcesPlugin.getPlugin().getPluginPreferences().getBoolean(ResourcesPlugin.PREF_AUTO_REFRESH));
 		
 		autobuild= new Button(composite, SWT.CHECK);
-		autobuild.setText("Auto-Build");
-		autobuild.setToolTipText("Tau Suggests: Off");
+		autobuild.setText(Messages.OptionSplash_AutoBuild);
+		autobuild.setToolTipText(Messages.OptionSplash_TauSugOff);
 		autobuild.setSelection(ResourcesPlugin.getPlugin().getPluginPreferences().getBoolean(ResourcesPlugin.PREF_AUTO_BUILDING));
 		
-		boolean isAIX=org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix")>=0;
+		boolean isAIX=org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix")>=0; //$NON-NLS-1$
 		if(isAIX)
 		{
 			fixAix= new Button(composite, SWT.CHECK);
 			fixAix.setText(
-			"Automatically use Eclipse internal builder (May be needed for AIX compatibility)"
+			Messages.OptionSplash_AutoEclipseInternal
 			);
-			fixAix.setToolTipText("Tau Suggests: On if you have trouble compiling in AIX.  This option only effects build operations with TAU");
+			fixAix.setToolTipText(Messages.OptionSplash_TauSuggestsOnDesc);
 			Preferences preferences = Activator.getDefault().getPluginPreferences();
-			fixAix.setSelection(preferences.getBoolean("TAUCheckForAIXOptions"));
+			fixAix.setSelection(preferences.getBoolean("TAUCheckForAIXOptions")); //$NON-NLS-1$
 			
 		}
 		
 		doagain= new Button(composite, SWT.CHECK);
-		doagain.setText("Show this screen when you launch a job for Profiling");
-		doagain.setToolTipText("Enable/disable TAU setting splash screen");
-		doagain.setSelection(Activator.getDefault().getPluginPreferences().getBoolean("TAUCheckForAutoOptions"));
+		doagain.setText(Messages.OptionSplash_ShowScreenWhenProf);
+		doagain.setToolTipText(Messages.OptionSplash_EnDisAbleTauSplash);
+		doagain.setSelection(Activator.getDefault().getPluginPreferences().getBoolean("TAUCheckForAutoOptions")); //$NON-NLS-1$
 		
 		return composite;
 	}
@@ -99,10 +99,10 @@ public class OptionSplash extends Dialog{
 			ResourcesPlugin.getPlugin().getPluginPreferences().setValue(ResourcesPlugin.PREF_AUTO_BUILDING, autobuild.getSelection());
 		
 		if(fixAix!=null)
-			Activator.getDefault().getPluginPreferences().setValue("TAUCheckForAIXOptions", fixAix.getSelection());
+			Activator.getDefault().getPluginPreferences().setValue("TAUCheckForAIXOptions", fixAix.getSelection()); //$NON-NLS-1$
 		
 		if(doagain!=null)
-			Activator.getDefault().getPluginPreferences().setValue("TAUCheckForAutoOptions", doagain.getSelection());
+			Activator.getDefault().getPluginPreferences().setValue("TAUCheckForAutoOptions", doagain.getSelection()); //$NON-NLS-1$
 		
 		super.okPressed();
 	}

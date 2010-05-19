@@ -117,7 +117,7 @@ public class PerfDMFView extends ViewPart {
 
 		public String getName() {
 			if(tt==null){
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 			return tt.name;
 		}
@@ -257,7 +257,7 @@ public class PerfDMFView extends ViewPart {
 			return null;
 		}
 		if(name==null){
-			name="Default";
+			name=Messages.PerfDMFView_Default;
 		}
 		Iterator<TreeTuple> dit = databases.iterator();
 		int defdex=0;
@@ -270,11 +270,11 @@ public class PerfDMFView extends ViewPart {
 				database=dtest;
 
 				if(switchDatabaseAction!=null)
-					switchDatabaseAction.setText("Using Database: "+ database.name);
+					switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase+ database.name);
 
 				return(dtest);
 			}
-			if(dtest.name.equals("Default")){
+			if(dtest.name.equals(Messages.PerfDMFView_Default)){
 				defdex=i;
 			}
 			i++;
@@ -282,7 +282,7 @@ public class PerfDMFView extends ViewPart {
 
 		database=databases.get(defdex);
 		if(switchDatabaseAction!=null)
-			switchDatabaseAction.setText("Using Database: "+ database.name);
+			switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase+ database.name);
 
 		return database;//(Database) dbs.get(0);
 	}
@@ -302,12 +302,12 @@ public class PerfDMFView extends ViewPart {
 			IEditorInput iEditorInput = new FileEditorInput(file);
 
 			IWorkbenchPage p = getActivePage();
-			String editorid="org.eclipse.cdt.ui.editor.CEditor";
-			if(file.getContentDescription().toString().indexOf("org.eclipse.photran.core.freeFormFortranSource")>=0||file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fortranSource")>=0)
-				editorid="org.eclipse.photran.ui.FreeFormFortranEditor";
+			String editorid="org.eclipse.cdt.ui.editor.CEditor"; //$NON-NLS-1$
+			if(file.getContentDescription().toString().indexOf("org.eclipse.photran.core.freeFormFortranSource")>=0||file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fortranSource")>=0) //$NON-NLS-1$ //$NON-NLS-2$
+				editorid="org.eclipse.photran.ui.FreeFormFortranEditor"; //$NON-NLS-1$
 			else
-				if(file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fixedFormFortranSource")>=0)
-					editorid="org.eclipse.photran.ui.FixedFormFortranEditor";
+				if(file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fixedFormFortranSource")>=0) //$NON-NLS-1$
+					editorid="org.eclipse.photran.ui.FixedFormFortranEditor"; //$NON-NLS-1$
 
 			IEditorPart part = null;
 			if (p != null) {
@@ -332,7 +332,7 @@ public class PerfDMFView extends ViewPart {
 
 			final Field fields[] = AbstractTextEditor.class.getDeclaredFields();
 			for (int i = 0; i < fields.length; ++i) {
-				if ("fSourceViewer".equals(fields[i].getName())) {
+				if ("fSourceViewer".equals(fields[i].getName())) { //$NON-NLS-1$
 					Field f = fields[i];
 					f.setAccessible(true);
 					viewer = (ISourceViewer) f.get(abstractTextEditor);
@@ -410,12 +410,12 @@ public class PerfDMFView extends ViewPart {
 						String s = null;
 						try {
 							s = q.take();
-							if(s==null||s.equals("DONE"))
+							if(s==null||s.equals("DONE")) //$NON-NLS-1$
 								break;
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						String[] split = s.split(" ");
+						String[] split = s.split(" "); //$NON-NLS-1$
 						final String source = split[2];
 						final int start=Integer.parseInt(split[3]);
 						final int finish=Integer.parseInt(split[5]);
@@ -443,7 +443,7 @@ public class PerfDMFView extends ViewPart {
 				}
 
 				if(database==null){
-					getDatabase("Default");
+					getDatabase(Messages.PerfDMFView_Default);
 					if(database==null){
 						database=ParaProfController.EMPTY;
 						return true;
@@ -523,7 +523,7 @@ public class PerfDMFView extends ViewPart {
 	}
 
 	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
@@ -592,9 +592,9 @@ public class PerfDMFView extends ViewPart {
 				((ViewContentProvider) viewer.getContentProvider()).refresh(viewer);
 			}
 		};
-		refreshAction.setText("Refresh");
-		refreshAction.setToolTipText("Refresh Data");
-		refreshAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/refresh.gif"));
+		refreshAction.setText(Messages.PerfDMFView_Refresh);
+		refreshAction.setToolTipText(Messages.PerfDMFView_RefreshData);
+		refreshAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/refresh.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		doubleClickAction = new Action() {
 			public void run() {
@@ -623,7 +623,7 @@ public class PerfDMFView extends ViewPart {
 				dblist.setHelpAvailable(false);
 				dblist.setContentProvider(dbs);
 				dblist.setLabelProvider(dl);
-				dblist.setTitle("Select Database");
+				dblist.setTitle(Messages.PerfDMFView_SelectDatabase);
 				dblist.setInput(names);
 				dblist.open();
 
@@ -638,17 +638,17 @@ public class PerfDMFView extends ViewPart {
 			}
 
 		};
-		switchDatabaseAction.setText("Using Database: "+database.name);
-		switchDatabaseAction.setToolTipText("Select another database");
+		switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase+database.name);
+		switchDatabaseAction.setToolTipText(Messages.PerfDMFView_SelectOtherDatabase);
 
 		launchparaprofAction = new Action() {
 			public void run() {
 				ppc.openManager();
 			}
 		};
-		launchparaprofAction.setText("Launch ParaProf");
-		launchparaprofAction.setToolTipText("Launch ParaProf");
-		launchparaprofAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/pp.gif"));
+		launchparaprofAction.setText(Messages.PerfDMFView_LaunchParaProf);
+		launchparaprofAction.setToolTipText(Messages.PerfDMFView_LaunchParaProf);
+		launchparaprofAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/pp.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		paraprofAction = new Action() {
 			public void run() {
@@ -659,9 +659,9 @@ public class PerfDMFView extends ViewPart {
 				openInParaProf(node.tt);
 			}
 		};
-		paraprofAction.setText("Open in ParaProf");
-		paraprofAction.setToolTipText("Open in ParaProf");
-		paraprofAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/pp.gif"));
+		paraprofAction.setText(Messages.PerfDMFView_OpenInParaProf);
+		paraprofAction.setToolTipText(Messages.PerfDMFView_OpenInParaProf);
+		paraprofAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/pp.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 

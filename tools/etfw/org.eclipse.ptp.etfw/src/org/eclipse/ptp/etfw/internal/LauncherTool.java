@@ -61,7 +61,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 	
 	
 	public LauncherTool(ILaunchConfiguration conf, ExecTool etool, String progPath,LaunchConfigurationDelegate pd,ILaunch launcher) throws CoreException{
-		super(conf,"Running Application");
+		super(conf,Messages.LauncherTool_RunningApplication);
 		launch=launcher;
 		tool=etool;
 		paraDel=pd;
@@ -86,14 +86,14 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 		try {
 			//System.out.println("In tauManger "+tauManager.getConfiguration().getAttribute(tmp, -1)+" vs launch "+tmpConfig.getAttribute(tmp, -1));
 		if(!performLaunch(paraDel, launch, monitor))
-			return new Status(IStatus.WARNING,"com.ibm.jdg2e.concurrency",IStatus.WARNING,"Nothing to run",null);
+			return new Status(IStatus.WARNING,"com.ibm.jdg2e.concurrency",IStatus.WARNING,Messages.LauncherTool_NothingToRun,null); //$NON-NLS-1$
 		} catch (Exception e) {
 				try {
 					cleanup();
 				} catch (CoreException e1) {}
-			return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"Execution Error",e);
+			return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,Messages.LauncherTool_ExecutionError,e); //$NON-NLS-1$
 		}
-		return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"Execution Complete",null);
+		return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,Messages.LauncherTool_ExecutionComplete,null); //$NON-NLS-1$
 	}
 	
 	/**
@@ -143,12 +143,12 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				//Iterator utilIt=utilList.iterator();
 			
 				String firstExecUtil= getToolExecutable(tool.execUtils[0]);// tool.execUtils[0].toolCommand;// (String)utilIt.next();//confWC.getAttribute(EXEC_UTIL_LIST, (String)null);
-				if(traceOn)System.out.println("PerfLaunchSteps, firstExecUtil="+firstExecUtil);
+				if(traceOn)System.out.println("PerfLaunchSteps, firstExecUtil="+firstExecUtil); //$NON-NLS-1$
 				 
 				//String util1Path=BuildLaunchUtils.checkToolEnvPath(firstExecUtil);
 				File f = new File(firstExecUtil);
 				if(firstExecUtil==null || !f.exists())
-					throw new Exception("Tool "+firstExecUtil+" not found");
+					throw new Exception(Messages.LauncherTool_Tool+firstExecUtil+Messages.LauncherTool_NotFound);
 			
 				confWC.setAttribute(appnameattrib, firstExecUtil);
 				
@@ -157,11 +157,11 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				for(int i=1;i<tool.execUtils.length;i++)
 				{
 					//TODO: Check paths of other tools
-					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration);//tool.execUtils[i].getCommand(configuration);
+					otherUtils+=" "+getToolCommand(tool.execUtils[i],configuration);//tool.execUtils[i].getCommand(configuration); //$NON-NLS-1$
 				}
 				swappedArgs=true;
-				String toArgs=otherUtils+" "+prog+" "+arg;
-				System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+"|"+toArgs);
+				String toArgs=otherUtils+" "+prog+" "+arg; //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.println("PerfLaunchSteps.performLaunch() on: "+firstExecUtil+"|"+toArgs); //$NON-NLS-1$ //$NON-NLS-2$
 				confWC.setAttribute(appargattrib, toArgs);
 				
 				

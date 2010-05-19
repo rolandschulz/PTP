@@ -96,7 +96,7 @@ class ETItem implements IStructuredContentProvider,ITreeContentProvider{//),IAda
 public class EventTree extends ETItem{
 	public EventTree() {
 		super();
-		label="Events";
+		label=Messages.getString("EventTree.Events"); //$NON-NLS-1$
 		desc=null;
 		
 	}

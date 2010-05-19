@@ -98,8 +98,8 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		projectLocation=thisCProject.getResource().getLocation().toOSString();
 		outputLocation=projectLocation;
 		
-		projectBinary="unknown";
-		projectName="unknown";
+		projectBinary=Messages.ToolStep_Unknown;
+		projectName=Messages.ToolStep_Unknown;
 		
 		IOMap=new HashMap<String,String>();
 		//this.tool=Activator.getTool(configuration.getAttribute(SELECTED_TOOL, (String)null));
@@ -222,12 +222,12 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration) throws CoreException
 	{
 		List<String> argList = getToolArgumentList(app,configuration);
-		String args="";
+		String args=""; //$NON-NLS-1$
 		if(argList==null)
 			return(args);
 		
 		for(String a : argList){
-			args+=a+" ";
+			args+=a+" "; //$NON-NLS-1$
 		}
 		
 		//Formerly replaced with projectLocation global variable.  May be the same?
@@ -260,14 +260,14 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	
 	private String parseInput(ToolApp app)
 	{
-		String input="";
-		String oneIn="";
+		String input=""; //$NON-NLS-1$
+		String oneIn=""; //$NON-NLS-1$
 		if(app.inputArgs!=null)
 		for(int i=0;i<app.inputArgs.length;i++)
 		{
-			oneIn="";
+			oneIn=""; //$NON-NLS-1$
 			if(app.inputArgs[i].pathFlag!=null)
-				oneIn+=app.inputArgs[i].pathFlag+" ";
+				oneIn+=app.inputArgs[i].pathFlag+" "; //$NON-NLS-1$
 			if(IOMap.containsKey(app.inputArgs[i].ID))
 			{
 				input+=IOMap.get(app.inputArgs[i].ID);
@@ -277,7 +277,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 			}
 			else
 			{
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 			/*
 			 * 
@@ -290,7 +290,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	
 	private String parseOutput(ToolApp app)
 	{
-		String output="";
+		String output=""; //$NON-NLS-1$
 		
 		/*
 		 * Make and the new directory, associate it with the ID and stick -that- in the iomap!
@@ -299,7 +299,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 			for(int i=0;i<app.outputArgs.length;i++)
 			{
 				if(app.outputArgs[i].pathFlag!=null)
-					output+=app.outputArgs[i].pathFlag+" ";
+					output+=app.outputArgs[i].pathFlag+" "; //$NON-NLS-1$
 				if(IOMap.containsKey(app.outputArgs[i].ID))
 				{
 					output+=IOMap.get(app.outputArgs[i].ID);
@@ -368,7 +368,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		if (command==null)
 			return null;
 		
-		return command+" "+getToolArguments(app,configuration);
+		return command+" "+getToolArguments(app,configuration); //$NON-NLS-1$
 	}
 	
 	/**
