@@ -32,6 +32,7 @@ public final class RDTHelpContextIds {
 	public static final String SERVICE_MODEL_PROPERTIES = PREFIX + "service_model_properties_context"; //$NON-NLS-1$
 	public static final String REMOTE_CALL_HIERARCHY = PREFIX + "remote_call_hierarchy_view_context"; //$NON-NLS-1$
 	public static final String REMOTE_TYPE_HIERARCHY = PREFIX + "remote_type_hierarchy_view_context"; //$NON-NLS-1$
+	public static final String REMOTE_INCLUDE_BROWSER = PREFIX + "remote_include_browser_view_context"; //$NON-NLS-1$
 	public static final String REMOTE_C_CPP_EDITOR = PREFIX + "remote_C_CPP_editor_context"; //$NON-NLS-1$
 	public static final String REMOTE_C_CPP_SEARCH = PREFIX + "remote_C_CPP_search_context"; //$NON-NLS-1$
 	public static final String SERVICE_MODEL_PROPERTY_PAGE = PREFIX + "service_model_properties_context"; //$NON-NLS-1$
