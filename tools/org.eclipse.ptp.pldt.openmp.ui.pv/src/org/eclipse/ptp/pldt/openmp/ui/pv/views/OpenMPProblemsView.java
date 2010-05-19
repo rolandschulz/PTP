@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006,2007 IBM Corp. 
+ * Copyright (c) 2006,2010 IBM Corp. 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,16 +66,16 @@ public class OpenMPProblemsView extends ViewPart {
     private   String                  markerID_   = PvPlugin.MARKER_ID;
     protected UpdateVisitor           visitor_    = new UpdateVisitor();
     
-    private String                    iconName_          = "icons/openMPproblem.gif";
+    private String                    iconName_          = "icons/openMPproblem.gif"; //$NON-NLS-1$
     private AbstractUIPlugin          thePlugin_;
     
     protected boolean                 traceOn     = false;
     
-    private static final String [] columns_ = {" ",
-                                               "Description",
-                                               "Resource",
-                                               "In Folder",
-                                               "Location"
+    private static final String [] columns_ = {" ", //$NON-NLS-1$
+                                               Messages.OpenMPProblemsView_Description,
+                                               Messages.OpenMPProblemsView_Resource,
+                                               Messages.OpenMPProblemsView_InFolder,
+                                               Messages.OpenMPProblemsView_Location
     };
 
     /**
@@ -171,7 +171,7 @@ public class OpenMPProblemsView extends ViewPart {
                 }
             }
             catch(CoreException e) {
-                System.out.println("OpenMPProblemsView exception gettting model elements (markers");
+                System.out.println("OpenMPProblemsView exception gettting model elements (markers"); //$NON-NLS-1$
                 e.printStackTrace();
             }
             return objs;
@@ -205,7 +205,7 @@ public class OpenMPProblemsView extends ViewPart {
                 delta.accept(visitor_);
             }
             catch(CoreException e) {
-                System.out.println("OpenMPProblemsView error in processResoruceChangeDelta");
+                System.out.println("OpenMPProblemsView error in processResoruceChangeDelta"); //$NON-NLS-1$
                 e.printStackTrace();
             }
         }
@@ -233,7 +233,7 @@ public class OpenMPProblemsView extends ViewPart {
                 URL url = thePlugin_.find(path);
                 ImageDescriptor id = ImageDescriptor.createFromURL(url);
                 img = id.createImage();
-                if (traceOn) System.out.println("ATV: ***** created image for " + iconName_);
+                if (traceOn) System.out.println("ATV: ***** created image for " + iconName_); //$NON-NLS-1$
                 iconHash.put(iconName_, img);// save for reuse
             }
             return img;
@@ -241,7 +241,7 @@ public class OpenMPProblemsView extends ViewPart {
         
         public void dispose()
         {
-            if (traceOn) System.out.println("ATV.ViewLabelProvider.dispose(); dispose of icon images");
+            if (traceOn) System.out.println("ATV.ViewLabelProvider.dispose(); dispose of icon images"); //$NON-NLS-1$
             for (Iterator iter = iconHash.values().iterator(); iter.hasNext();) {
                 Image img = (Image) iter.next();
                 img.dispose();
@@ -260,14 +260,14 @@ public class OpenMPProblemsView extends ViewPart {
         public String getColumnText(Object obj, int index)
         {
             if (obj == null) {
-                System.out.println("ATV: LabelProv obj is null; index=" + index);
-                return "ATV obj null";
+                System.out.println("ATV: LabelProv obj is null; index=" + index); //$NON-NLS-1$
+                return "ATV obj null"; //$NON-NLS-1$
             }
             IMarker marker = (IMarker) obj;
             try {
                 switch (index) {
                     case 0:
-                        return "";
+                        return ""; //$NON-NLS-1$
                     case 1:
                         String id = (String) marker.getAttribute(ProblemMarkerAttrIds.DESCRIPTION);
                         return id;
@@ -278,10 +278,10 @@ public class OpenMPProblemsView extends ViewPart {
                     case 4:
                         return ((Integer) marker.getAttribute((ProblemMarkerAttrIds.LOCATION))).toString();
                     default:
-                        return "";
+                        return ""; //$NON-NLS-1$
                 }
             } catch (CoreException ce) {
-                return ("ViewLabelProvider.getColumnText error: "+ce);
+                return ("ViewLabelProvider.getColumnText error: "+ce); //$NON-NLS-1$
             }
         }
 
@@ -290,7 +290,7 @@ public class OpenMPProblemsView extends ViewPart {
 	}
 
 	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
@@ -331,11 +331,11 @@ public class OpenMPProblemsView extends ViewPart {
         //makeShowInfoAction();
 		action1 = new Action() {
 			public void run() {
-				showMessage("Action 1 executed");
+				showMessage(Messages.OpenMPProblemsView_action1executed);
 			}
 		};
-		action1.setText("Action 1");
-		action1.setToolTipText("Action 1 tooltip");
+		action1.setText(Messages.OpenMPProblemsView_action1);
+		action1.setToolTipText(Messages.OpenMPProblemsView_action1tooltip);
 		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
         
@@ -365,9 +365,9 @@ public class OpenMPProblemsView extends ViewPart {
 						int depth = IResource.DEPTH_INFINITE;
 						wsResource.deleteMarkers(markerID_,false,depth);
 						if(traceOn)
-							System.out.println("markers removed id="+markerID_);
+							System.out.println("markers removed id="+markerID_); //$NON-NLS-1$
 					} catch (CoreException e) {
-						System.out.println("RM: exception deleting markers.");
+						System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
 						// e.printStackTrace();
 					}
 					}};
@@ -381,8 +381,8 @@ public class OpenMPProblemsView extends ViewPart {
 				 
 			}//end run()
 		};// end new action
-		removeMarkerAction.setText("Remove Markers");
-		removeMarkerAction.setToolTipText("Remove all markers");
+		removeMarkerAction.setText(Messages.OpenMPProblemsView_removeMarkers);
+		removeMarkerAction.setToolTipText(Messages.OpenMPProblemsView_removeAllMarkers);
 		removeMarkerAction.setImageDescriptor(PlatformUI.getWorkbench()
 				.getSharedImages().getImageDescriptor(
 						ISharedImages.IMG_TOOL_DELETE));// nice "red X" image
@@ -391,7 +391,7 @@ public class OpenMPProblemsView extends ViewPart {
 	private void showMessage(String message) {
 		MessageDialog.openInformation(
 			viewer.getControl().getShell(),
-			"Sample View",
+			Messages.OpenMPProblemsView_SampleView,
 			message);
 	}
 
@@ -433,7 +433,7 @@ public class OpenMPProblemsView extends ViewPart {
 
                     if (validForAnalysis(f.getName())) {
                         if (traceOn)
-                            System.out.println("File " + f.getName() + " is valid for analysis so will process the change...");
+                            System.out.println("File " + f.getName() + " is valid for analysis so will process the change..."); //$NON-NLS-1$ //$NON-NLS-2$
                         if (contentChanged != 0) {
                             // do we need to tell back end (analysis engine) that file changed?
                         }
@@ -446,7 +446,7 @@ public class OpenMPProblemsView extends ViewPart {
                             if (traceOn) showMarkerDeltaKind(delta3);
                             IMarker m = delta3.getMarker();
                             String ln = IMarker.LINE_NUMBER;
-                            if (traceOn) System.out.println("---UpdateVisitor.visit():viewer update marker: (lineNo)");
+                            if (traceOn) System.out.println("---UpdateVisitor.visit():viewer update marker: (lineNo)"); //$NON-NLS-1$
                             // showMarker(m);
                             String[] props = new String[1]; // awkward. why???
                             props[0] = ln;
@@ -456,7 +456,7 @@ public class OpenMPProblemsView extends ViewPart {
                         } // end loop
                     } else {
                         if (traceOn)
-                            System.out.println("File " + f.getName() + " is NOT valid for analysis so will ignore change...");
+                            System.out.println("File " + f.getName() + " is NOT valid for analysis so will ignore change..."); //$NON-NLS-1$ //$NON-NLS-2$
 
                     }
                 } // end if CHANGED
@@ -492,7 +492,7 @@ public class OpenMPProblemsView extends ViewPart {
         private void showMarkerDeltaKind(IMarkerDelta delta3)
         {
 
-            String mid = "", ml = "", mlpi = "";
+            String mid = "", ml = "", mlpi = ""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             try {
                 // note: we're getting marker deltas on ALL markers,
                 // not just artifact markers, which can throw us off.
@@ -503,10 +503,10 @@ public class OpenMPProblemsView extends ViewPart {
                 //mlpi = m.getAttribute(IDs.LINE).toString();
             } catch (Exception e1) {
                 // ignore errors; only tracing for now.
-                System.out.println("ATV.UpdateVisitor error getting marker info ");
+                System.out.println("ATV.UpdateVisitor error getting marker info "); //$NON-NLS-1$
                 e1.printStackTrace();
             }
-            if (traceOn) System.out.println("    markerID_=" + mid + "  lineNo(mkr-mpiA)=" + ml + "-" + mlpi);
+            if (traceOn) System.out.println("    markerID_=" + mid + "  lineNo(mkr-mpiA)=" + ml + "-" + mlpi); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
     } // end class UpdateVisitor
@@ -532,7 +532,7 @@ public class OpenMPProblemsView extends ViewPart {
             try {
                 OpenMPError error = (OpenMPError)marker.getAttribute(ProblemMarkerAttrIds.PROBLEMOBJECT);
                 if (error==null) return;
-                String filename = error.getPath()+"/"+error.getFilename(); 
+                String filename = error.getPath()+"/"+error.getFilename();  //$NON-NLS-1$
                 
                 IResource r = ParserUtil.getResourceForFilename(filename);
                 IFile     f = (r instanceof IFile ? (IFile)r : null);
@@ -541,7 +541,7 @@ public class OpenMPProblemsView extends ViewPart {
                 
                 IWorkbenchPage wbp = viewPart_.getSite().getPage();
                 IEditorPart editor = IDE.openEditor(wbp, f);
-                String      markerID = "org.eclipse.core.resource.textmarker";
+                String      markerID = "org.eclipse.core.resource.textmarker"; //$NON-NLS-1$
                 IMarker     marker1 = f.createMarker(markerID);
                 marker1.setAttribute(IMarker.LINE_NUMBER, error.getLineno());
                 marker1.setAttribute(IMarker.LOCATION, filename);
