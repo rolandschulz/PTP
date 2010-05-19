@@ -85,8 +85,9 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 				String descr = attr.getDefinition().getDescription();
 				Label l = WidgetUtils.createLabel(container, name, SWT.LEFT, 1);
 				l.setToolTipText(ap.getToolTip());
-				valueWidgets.put(getValueWidget(container, ap
-						.getDefaultString(), attr), ap);
+				valueWidgets.put(
+						getValueWidget(container, ap.getDefaultString(), attr),
+						ap);
 				l = WidgetUtils.createLabel(container, descr, SWT.LEFT, 1);
 				l.setForeground(WidgetUtils.DKBL);
 			}
@@ -95,7 +96,7 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 
 	/*
 	 * Constructs the appropriate widget based on the type of attribute. Only
-	 * three mappings implemented here: Integer : Spinner, Boolean : Button,
+	 * four mappings implemented here: Integer : Spinner, Boolean : Button,
 	 * Constrained : Combo, else : Text.
 	 */
 	private Control getValueWidget(Composite container, String defaultString,
@@ -109,15 +110,15 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 			if ("true".equals(value))
 				b.setSelection(true);
 			c = b;
-		} else if (attr instanceof IntegerAttribute) {
+		} else if (attr instanceof IntegerAttribute)
 			/*
 			 * For spinners, the default string should represent the minimum
 			 * value
 			 */
-			c = WidgetUtils.createSpinner(container, null, Integer
-					.parseInt(defaultString), Integer.MAX_VALUE, Integer
-					.parseInt(value), 1, false, listener);
-		} else {
+			c = WidgetUtils.createSpinner(container, null,
+					Integer.parseInt(defaultString), Integer.MAX_VALUE,
+					Integer.parseInt(value), 1, false, listener);
+		else {
 			String name = attr.getDefinition().getId();
 			String constraints = constrained.getProperty(name);
 			if (constraints != null) {
