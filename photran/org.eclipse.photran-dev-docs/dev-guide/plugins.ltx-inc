@@ -44,7 +44,7 @@ related Eclipse plug-ins that the user can install as a whole.
 \end{sidewaysfigure}
 %\end{image}
 
-\section{Base Photran Feature: \\org.eclipse.photran-feature}
+\section{Base Photran Feature: org.eclipse.photran-feature}
 
 The following projects comprise the ``base'' of Photran.
 
@@ -98,7 +98,7 @@ not derived from CDT and do not depend on the Fortran parser.  These are:
 
 \end{itemize}
 
-\section{Virtual Program Graph (VPG) feature: \\org.eclipse.photran.vpg-feature}
+\section{Virtual Program Graph (VPG) feature: org.eclipse.photran.vpg-feature}
 
 The following projects support parsing, analysis, and refactoring of Fortran
 sources. They are written in Java 5. The Virtual Program Graph is described in
@@ -151,7 +151,7 @@ contained in the org.eclipse.photran.core.vpg plug-in.
 
 \end{itemize}
 
-\section{XL Fortran Compiler Feature: \\org.eclipse.photran.xlf-feature}
+\section{XL Fortran Compiler Feature: org.eclipse.photran.xlf-feature}
 
 The following are plug-ins to support the
 \href{http://www-306.ibm.com/software/awdtools/fortran/}{XL Fortran compiler}.
@@ -165,7 +165,7 @@ Rasmussen at LANL.
 
 \end{itemize}
 
-\section{Intel Fortran Compiler Feature: \\org.eclipse.photran.intel-feature}
+\section{Intel Fortran Compiler Feature: org.eclipse.photran.intel-feature}
 
 The following are plug-ins to support the \href{http://www.intel.com/cd/software/products/asmo-na/eng/compilers/284132.htm}{Intel Fortran Compiler}.
 
