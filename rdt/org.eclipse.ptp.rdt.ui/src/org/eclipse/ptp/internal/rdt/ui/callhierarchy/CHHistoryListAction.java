@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHHistoryListAction
- * Version: 1.3
+ * Version: 1.5
  */
 
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
@@ -47,7 +47,7 @@ public class CHHistoryListAction extends Action {
 	
 	private class HistoryListDialog extends StatusDialog {
 		
-		private ListDialogField fHistoryList;
+		private ListDialogField<ICElement> fHistoryList;
 		private IStatus fHistoryStatus;
 		private ICElement fResult;
 		
@@ -59,22 +59,22 @@ public class CHHistoryListAction extends Action {
 				CHMessages.CHHistoryListAction_Remove_label, 
 			};
 					
-			IListAdapter adapter= new IListAdapter() {
-				public void customButtonPressed(ListDialogField field, int index) {
+			IListAdapter<ICElement> adapter= new IListAdapter<ICElement>() {
+				public void customButtonPressed(ListDialogField<ICElement> field, int index) {
 					doCustomButtonPressed();
 				}
-				public void selectionChanged(ListDialogField field) {
+				public void selectionChanged(ListDialogField<ICElement> field) {
 					doSelectionChanged();
 				}
 				
-				public void doubleClicked(ListDialogField field) {
+				public void doubleClicked(ListDialogField<ICElement> field) {
 					doDoubleClicked();
 				}				
 			};
 		
 			LabelProvider labelProvider= new CUILabelProvider(CHHistoryAction.LABEL_OPTIONS, CElementImageProvider.OVERLAY_ICONS);
 			
-			fHistoryList= new ListDialogField(adapter, buttonLabels, labelProvider);
+			fHistoryList= new ListDialogField<ICElement>(adapter, buttonLabels, labelProvider);
 			fHistoryList.setLabelText(CHMessages.CHHistoryListAction_HistoryList_label); 
 			fHistoryList.setElements(Arrays.asList(historyEntries));
 			
@@ -127,12 +127,12 @@ public class CHHistoryListAction extends Action {
 		
 		private void doSelectionChanged() {
 			StatusInfo status= new StatusInfo();
-			List selected= fHistoryList.getSelectedElements();
+			List<ICElement> selected= fHistoryList.getSelectedElements();
 			if (selected.size() != 1) {
 				status.setError(""); //$NON-NLS-1$
 				fResult= null;
 			} else {
-				fResult= (ICElement) selected.get(0);
+				fResult= selected.get(0);
 			}
 			fHistoryList.enableButton(0, fHistoryList.getSize() > selected.size() && selected.size() != 0);			
 			fHistoryStatus= status;
@@ -144,7 +144,7 @@ public class CHHistoryListAction extends Action {
 		}
 		
 		public ICElement[] getRemaining() {
-			List<?> elems= fHistoryList.getElements();
+			List<ICElement> elems= fHistoryList.getElements();
 			return elems.toArray(new ICElement[elems.size()]);
 		}	
 		
