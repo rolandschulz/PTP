@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,6 @@ public class LapiArtifactView extends SimpleTableMarkerView
     {
         // if you need to read icon images, etc. from the plug-in, be sure to pass
         // in an actual Plugin class instance for first arg
-        super(LapiPlugin.getDefault(), "LAPI Artifact", "LAPI Artifacts", "Construct", LapiIDs.MARKER_ID);
+        super(LapiPlugin.getDefault(), Messages.LapiArtifactView_lapi_artifact_column_title, Messages.LapiArtifactView_lapi_artifacts_plural, Messages.LapiArtifactView_construct_column_title, LapiIDs.MARKER_ID);
     }
 }

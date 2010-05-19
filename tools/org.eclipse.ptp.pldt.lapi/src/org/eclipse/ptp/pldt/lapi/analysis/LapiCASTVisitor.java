@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2007 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
  */
 public class LapiCASTVisitor extends PldtAstVisitor 
 {
-    private static final String PREFIX="LAPI_";
+    private static final String PREFIX="LAPI_"; //$NON-NLS-1$
 
     {
         this.shouldVisitExpressions = true;
@@ -47,8 +47,8 @@ public class LapiCASTVisitor extends PldtAstVisitor
     public LapiCASTVisitor(List mpiIncludes, String fileName, ScanReturn msr)
     {
         super(mpiIncludes, fileName, msr);
-		ARTIFACT_CALL = "LAPI Call";
-		ARTIFACT_CONSTANT="LAPI Constant";
+		ARTIFACT_CALL = Messages.LapiCASTVisitor_lapi_call;
+		ARTIFACT_CONSTANT=Messages.LapiCASTVisitor_lapi_constant;
     }
 
 
