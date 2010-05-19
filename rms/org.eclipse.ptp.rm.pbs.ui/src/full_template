@@ -27,7 +27,7 @@
 ## using the Resource Manager Properties "Edit" Tab).
 ##
 ## NOTE: We advise removing either the ncpus or the nodes resource,
-##       depending on the PBS configuration (nodes is more commen);
+##       depending on the PBS configuration (nodes is more common);
 ##       otherwise, the correct value must be set on both redundantly
 ##       in order for the MPI computation to be correct (and 
 ##       some systems might reject a script with both set).
@@ -48,7 +48,7 @@
 #PBS -l ncpus=@Resource_List.ncpus@
 #PBS -l nice=@Resource_List.nice@
 #PBS -l nodes=@Resource_List.nodes@
-#PBS -l ompthread=@Resource_List.ompthreads@
+#PBS -l ompthreads=@Resource_List.ompthreads@
 #PBS -l pcput=@Resource_List.pcput@
 #PBS -l pmem=@Resource_List.pmem@
 #PBS -l pvmem=@Resource_List.pvmem@
