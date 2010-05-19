@@ -13,9 +13,11 @@
     </topic>
     <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy view">
     </topic>
-    <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy view">
+    <topic href="html/reference/remote_type_hierarchy.html" label="Remote Type Hierarchy view">
     </topic>
-    <topic href="../org.eclipse.cdt.doc.user/reference/cdt_u_console_view.htm" label="Console view">
+    <topic href="html/reference/remote_include_browser_view.htm" label="Remote Include Browser view">
+    </topic>
+    <topic href="html/reference/console_view.htm" label="Console view">
     </topic>
     <topic href="html/reference/problems_view.htm" label="Problems view">
     </topic>
