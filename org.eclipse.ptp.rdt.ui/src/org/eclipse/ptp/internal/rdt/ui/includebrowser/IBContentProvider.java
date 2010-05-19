@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBContentProvider
- * Version: 1.15
+ * Version: 1.16
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -115,7 +115,7 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 						else {
 							IIndexFileLocation includesPath= include.getIncludesLocation();
 							if (includesPath == null) {
-								targetFile= new IBFile(include.getName());
+								targetFile= new IBFile(include.getFullName());
 							}
 							else {
 								targetFile= new IBFile(project, includesPath);
