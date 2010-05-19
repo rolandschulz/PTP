@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.properties;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.IPreferenceStore;
 

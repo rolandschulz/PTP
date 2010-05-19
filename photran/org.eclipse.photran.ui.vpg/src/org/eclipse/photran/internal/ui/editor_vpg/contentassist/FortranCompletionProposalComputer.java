@@ -1,6 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -15,12 +26,17 @@ import org.eclipse.photran.internal.core.model.FortranElement;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.swt.graphics.Image;
 
+/**
+ * Computes the list of items be shown in the content assist list.
+ * 
+ * @author Jeff Overbey
+ * 
+ * @see FortranCompletionProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int)
+ */
 class FortranCompletionProposalComputer
 {
     private HashMap<String, TreeSet<Definition>> defs;
     private String scope;
-    private IDocument document;
-    private int offset;
     
     private int prefixIndex;
     private String prefix;
@@ -33,8 +49,6 @@ class FortranCompletionProposalComputer
     {
         this.defs = defs;
         this.scope = scope;
-        this.document = document;
-        this.offset = offset;
 
         this.prefixIndex = findPrefix(document, offset);
         this.prefix = document.get(prefixIndex, offset-prefixIndex).toLowerCase();
@@ -71,6 +85,11 @@ class FortranCompletionProposalComputer
 
     public ICompletionProposal[] compute() throws BadLocationException
     {
+        PhotranVPG.getInstance().debug("FortranCompletionProposalComputer#compute()", null);
+        PhotranVPG.getInstance().debug("    Scope: " + scope, null);
+        if (defs != null && defs.get(scope) != null)
+            PhotranVPG.getInstance().debug("    Definitions in scope: " + defs.get(scope).size(), null);
+        
         TreeSet<FortranCompletionProposal> proposals1 = new TreeSet<FortranCompletionProposal>();
         addProposalsFromDefs(proposals1);
         
@@ -190,6 +209,14 @@ class FortranCompletionProposalComputer
                                    null));
     }
     
+    /**
+     * A single proposal which will appear in the content assist list.
+     * <p>
+     * This class implements {@link Comparable} so that instances can be stored in a
+     * {@link TreeMap}.  This ensures that the resulting list will be sorted alphabetically.
+     * 
+     * @author Jeff Overbey
+     */
     private static class FortranCompletionProposal implements Comparable<FortranCompletionProposal>
     {
         public final String canonicalizedId;

@@ -26,7 +26,7 @@ java -Xmx1024M -cp $SRCDIR/ludwig.jar \
                   import java.io.IOException;" \
 	-description "An LALR(1) parser for Fortran 2008" \
 	-throws "IOException, LexerException, SyntaxException" \
-	-onError "throw new SyntaxException(lookahead);" \
+	-onError "throw new SyntaxException(lookahead, describeTerminalsExpectedInCurrentState());" \
 	-lexerClass IAccumulatingLexer \
 	-parserClass Parser \
 	-tokenType "org.eclipse.photran.internal.core.lexer.Token" \

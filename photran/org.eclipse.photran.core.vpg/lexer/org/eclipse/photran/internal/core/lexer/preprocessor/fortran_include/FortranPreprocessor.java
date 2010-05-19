@@ -226,6 +226,8 @@ public final class FortranPreprocessor extends SingleCharReader
 
     protected Reader findIncludedFile(String fileToInclude) throws IOException
     {
+        if (callback == null) return null;
+
         try
         {
             return callback.getIncludedFileAsStream(fileToInclude);

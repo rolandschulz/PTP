@@ -171,6 +171,8 @@ public class GenericASTVisitor implements IASTVisitor
     public void visitASTEquivalenceObjectNode(ASTEquivalenceObjectNode node) {}
     public void visitASTEquivalenceSetNode(ASTEquivalenceSetNode node) {}
     public void visitASTEquivalenceStmtNode(ASTEquivalenceStmtNode node) {}
+    public void visitASTErrorConstructNode(ASTErrorConstructNode node) {}
+    public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node) {}
     public void visitASTExecutableProgramNode(ASTExecutableProgramNode node) {}
     public void visitASTExitStmtNode(ASTExitStmtNode node) {}
     public void visitASTExplicitCoshapeSpecNode(ASTExplicitCoshapeSpecNode node) {}

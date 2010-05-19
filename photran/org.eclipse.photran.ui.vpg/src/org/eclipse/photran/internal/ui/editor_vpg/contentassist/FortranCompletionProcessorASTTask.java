@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
 import java.util.ArrayList;
@@ -26,31 +36,32 @@ final class FortranCompletionProcessorASTTask implements IFortranEditorASTTask
     {
         if (defMap == null) return true;
         
-        synchronized (fortranCompletionProcessor)
+        final ArrayList<String> scopes = new ArrayList<String>();
+        try
         {
-            final ArrayList<String> scopes = fortranCompletionProcessor.scopes;
-            scopes.clear();
-            try
+            int lastLine = 0;
+            for (Token token : new IterableWrapper<Token>(tokenList))
             {
-                int lastLine = 0;
-                for (Token token : new IterableWrapper<Token>(tokenList))
+                int line = token.getLine();
+                if (line > lastLine)
                 {
-                    int line = token.getLine();
-                    if (line > lastLine)
-                    {
-                        scopes.ensureCapacity(line);
-                        String qualifier = DefinitionMap.getQualifier(token.getEnclosingScope());
-                        while (scopes.size() < line)
-                            scopes.add(qualifier);
-                        lastLine = line;
-                    }
+                    scopes.ensureCapacity(line);
+                    String qualifier = DefinitionMap.getQualifier(token.getEnclosingScope());
+                    while (scopes.size() < line)
+                        scopes.add(qualifier);
+                    lastLine = line;
                 }
             }
-            catch (Throwable e)
+            
+            synchronized (fortranCompletionProcessor)
             {
-                // Ignore
+                fortranCompletionProcessor.scopes = scopes;
             }
-            return true;
         }
+        catch (Throwable e)
+        {
+            // Ignore
+        }
+        return true;
     }
 }

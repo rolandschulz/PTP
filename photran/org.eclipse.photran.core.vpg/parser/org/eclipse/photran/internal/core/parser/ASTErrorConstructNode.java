@@ -26,52 +26,25 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTSignNode extends ASTNode
+public class ASTErrorConstructNode extends ASTNodeWithErrorRecoverySymbols implements IBodyConstruct
 {
-    org.eclipse.photran.internal.core.lexer.Token hasMinusSign; // in ASTSignNode
-    org.eclipse.photran.internal.core.lexer.Token hasPlusSign; // in ASTSignNode
-
-    public boolean hasMinusSign()
-    {
-        return this.hasMinusSign != null;
-    }
-
-    public void setHasMinusSign(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasMinusSign = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public boolean hasPlusSign()
-    {
-        return this.hasPlusSign != null;
-    }
-
-    public void setHasPlusSign(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasPlusSign = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
 
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTSignNode(this);
+        visitor.visitASTErrorConstructNode(this);
+        visitor.visitIBodyConstruct(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 2;
+        return 0;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.hasMinusSign;
-        case 1:  return this.hasPlusSign;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -80,8 +53,6 @@ public class ASTSignNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.hasMinusSign = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.hasPlusSign = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

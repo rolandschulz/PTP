@@ -31,12 +31,17 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
+import org.eclipse.photran.internal.core.lexer.FixedFormReplacement;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
+import org.eclipse.photran.internal.core.parser.ASTErrorConstructNode;
+import org.eclipse.photran.internal.core.parser.ASTErrorProgramUnitNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
+import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.rephraserengine.core.vpg.VPGDependency;
@@ -334,6 +339,7 @@ public class PhotranVPGBuilder extends PhotranVPG
                 IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(stream, file, filename, sourceForm);
                 long start = System.currentTimeMillis();
                 ASTExecutableProgramNode ast = parser.parse(lexer);
+                checkForErrors(ast, filename);
                 debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);
                 return new FortranAST(file, ast, lexer.getTokenList());
             }
@@ -388,6 +394,53 @@ public class PhotranVPGBuilder extends PhotranVPG
                 // Ignore
             }
         }
+    }
+
+    private void checkForErrors(ASTExecutableProgramNode ast, String filename)
+    {
+        class V extends ASTVisitor
+        {
+            private ASTNodeWithErrorRecoverySymbols firstError = null;
+            
+            public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
+            {
+                if (firstError == null)
+                    firstError = node;
+            }
+
+            public void visitASTErrorConstructNode(ASTErrorConstructNode node)
+            {
+                if (firstError == null)
+                    firstError = node;
+            }
+        };
+        
+        V v = new V();
+        ast.accept(v);
+        if (v.firstError != null)
+        {
+            PhotranTokenRef errorTokenRef = getErrorTokenRef(filename, v.firstError.getErrorToken());
+            log.clearEntriesFor(filename);
+            log.logError(filename + " contains syntax errors and may not be refactored correctly.",
+                         errorTokenRef);
+        }
+    }
+
+    private PhotranTokenRef getErrorTokenRef(String filename, Token errorToken)
+    {
+        if (isPreprocessed(errorToken))
+            return null;
+        else
+            // errorToken will have its filename set to null, so we must construct a TokenRef manually
+            return new PhotranTokenRef(filename,
+                                       errorToken.getStreamOffset(),
+                                       errorToken.getLength());
+    }
+
+    private boolean isPreprocessed(Token token)
+    {
+        return token.getPreprocessorDirective() != null
+            && !(token.getPreprocessorDirective() instanceof FixedFormReplacement);
     }
 
     private void logError(IFile file, String message, Throwable e)

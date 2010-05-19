@@ -28,26 +28,14 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTTypeAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isAbstract; // in ASTTypeAttrSpecNode
     ASTAccessSpecNode accessSpec; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isExtends; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isBind; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token parentTypeName; // in ASTTypeAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isAbstract; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token language; // in ASTTypeAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTTypeAttrSpecNode
-
-    public boolean isAbstract()
-    {
-        return this.isAbstract != null;
-    }
-
-    public void setIsAbstract(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isAbstract = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
 
     public ASTAccessSpecNode getAccessSpec()
     {
@@ -97,6 +85,18 @@ public class ASTTypeAttrSpecNode extends ASTNode
     }
 
 
+    public boolean isAbstract()
+    {
+        return this.isAbstract != null;
+    }
+
+    public void setIsAbstract(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAbstract = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
     public org.eclipse.photran.internal.core.lexer.Token getLanguage()
     {
         return this.language;
@@ -124,12 +124,12 @@ public class ASTTypeAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isAbstract;
-        case 1:  return this.accessSpec;
-        case 2:  return this.isExtends;
-        case 3:  return this.isBind;
-        case 4:  return this.hiddenTLparen;
-        case 5:  return this.parentTypeName;
+        case 0:  return this.accessSpec;
+        case 1:  return this.isExtends;
+        case 2:  return this.isBind;
+        case 3:  return this.hiddenTLparen;
+        case 4:  return this.parentTypeName;
+        case 5:  return this.isAbstract;
         case 6:  return this.language;
         case 7:  return this.hiddenTRparen;
         default: throw new IllegalArgumentException("Invalid index");
@@ -140,12 +140,12 @@ public class ASTTypeAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isAbstract = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.accessSpec = (ASTAccessSpecNode)value; if (value != null) value.setParent(this); return;
-        case 2:  this.isExtends = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.isBind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.parentTypeName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.accessSpec = (ASTAccessSpecNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isExtends = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.isBind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.parentTypeName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.isAbstract = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 6:  this.language = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");

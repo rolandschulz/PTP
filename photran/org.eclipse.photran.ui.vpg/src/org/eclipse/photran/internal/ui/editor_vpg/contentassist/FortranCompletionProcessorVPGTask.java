@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2009 University of Illinois at Urbana-Champaign and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     UIUC - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.photran.internal.ui.editor_vpg.contentassist;
 
 import java.util.HashMap;
@@ -27,36 +37,38 @@ final class FortranCompletionProcessorVPGTask implements IFortranEditorVPGTask
     {
         if (ast == null) return;
         
-        synchronized (fortranCompletionProcessor)
+        try
         {
-            try
+            final HashMap<String, TreeSet<Definition>> defs = new HashMap<String, TreeSet<Definition>>();
+            defs.clear();
+            ast.accept(new GenericASTVisitor()
             {
-                final HashMap<String, TreeSet<Definition>> defs = fortranCompletionProcessor.defs;
-                defs.clear();
-                ast.accept(new GenericASTVisitor()
+                @Override public void visitASTNode(IASTNode node)
                 {
-                    @Override public void visitASTNode(IASTNode node)
+                    if (ScopingNode.isScopingNode(node))
                     {
-                        if (ScopingNode.isScopingNode(node))
-                        {
-                            ScopingNode n = (ScopingNode)node;
-                            String qualifier = DefinitionMap.getQualifier(n);
-                            List<Definition> allDefs = n.getAllDefinitions();
-                            
-                            TreeSet<Definition> set = defs.get(qualifier);
-                            if (set == null) set = new TreeSet<Definition>();
-                            set.addAll(allDefs);
-                            defs.put(qualifier, set);
-                        }
+                        ScopingNode n = (ScopingNode)node;
+                        String qualifier = DefinitionMap.getQualifier(n);
+                        List<Definition> allDefs = n.getAllDefinitions();
                         
-                        traverseChildren(node);
+                        TreeSet<Definition> set = defs.get(qualifier);
+                        if (set == null) set = new TreeSet<Definition>();
+                        set.addAll(allDefs);
+                        defs.put(qualifier, set);
                     }
-                });
-            }
-            catch (Throwable e)
+                    
+                    traverseChildren(node);
+                }
+            });
+
+            synchronized (fortranCompletionProcessor)
             {
-                // Ignore
+                fortranCompletionProcessor.defs = defs;
             }
+        }
+        catch (Throwable e)
+        {
+            // Ignore
         }
     }
 }

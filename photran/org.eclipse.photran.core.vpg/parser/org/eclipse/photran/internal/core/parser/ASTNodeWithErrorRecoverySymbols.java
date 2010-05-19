@@ -16,11 +16,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.photran.internal.core.parser.ASTNodeUtil.NonNullIterator;
+import org.eclipse.photran.internal.core.parser.Parser.ErrorRecoveryInfo;
 
 @SuppressWarnings("all")
 public abstract class ASTNodeWithErrorRecoverySymbols extends ASTNode
 {
-    List<IASTNode> discardedSymbols = null;
+    ErrorRecoveryInfo errorInfo = null;
 
     @Override public Iterable<? extends IASTNode> getChildren()
     {
@@ -32,7 +33,7 @@ public abstract class ASTNodeWithErrorRecoverySymbols extends ASTNode
                 {
                     private int index = 0;
                     private int numChildren = getNumASTFields();
-                    private int numErrorChildren = discardedSymbols == null ? 0 : discardedSymbols.size();
+                    private int numErrorChildren = errorInfo == null ? 0 : errorInfo.getDiscardedSymbols().size();
 
                     public boolean hasNext()
                     {
@@ -44,7 +45,7 @@ public abstract class ASTNodeWithErrorRecoverySymbols extends ASTNode
                         if (index < numChildren)
                             return getASTField(index++);
                         else
-                            return discardedSymbols.get(index++ - numChildren);
+                            return errorInfo.<IASTNode>getDiscardedSymbols().get(index++ - numChildren);
                     }
 
                     public void remove()
@@ -56,24 +57,36 @@ public abstract class ASTNodeWithErrorRecoverySymbols extends ASTNode
         };
     }
 
+    public Token getErrorToken()
+    {
+        return errorInfo == null ? null : errorInfo.errorLookahead;
+    }
+
+    public String describeTerminalsExpectedAtErrorPoint()
+    {
+        return errorInfo == null ? "(none)" : errorInfo.describeExpectedSymbols();
+    }
+
     public List<IASTNode> getSymbolsDiscardedDuringErrorRecovery()
     {
-        return discardedSymbols;
+        return errorInfo == null ? null : errorInfo.<IASTNode>getDiscardedSymbols();
     }
 
     @Override public Object clone()
     {
             ASTNodeWithErrorRecoverySymbols copy = (ASTNodeWithErrorRecoverySymbols)super.clone();
-            copy.discardedSymbols = new ArrayList<IASTNode>(this.discardedSymbols.size());
-            for (IASTNode n : this.discardedSymbols)
+            copy.errorInfo = new ErrorRecoveryInfo(errorInfo.errorState,
+                                                   errorInfo.errorLookahead,
+                                                   errorInfo.expectedLookaheadSymbols);
+            for (IASTNode n : this.getSymbolsDiscardedDuringErrorRecovery())
             {
                 if (n == null)
-                    copy.discardedSymbols.add(null);
+                    copy.errorInfo.<IASTNode>getDiscardedSymbols().add(null);
                 else
                 {
                     IASTNode newChild = (IASTNode)n.clone();
                     newChild.setParent(copy);
-                    copy.discardedSymbols.add(newChild);
+                    copy.errorInfo.<IASTNode>getDiscardedSymbols().add(newChild);
                 }
             }
             return copy;

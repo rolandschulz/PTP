@@ -9,6 +9,8 @@ import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTComponentDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTDataComponentDefStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
+import org.eclipse.photran.internal.core.parser.ASTErrorConstructNode;
+import org.eclipse.photran.internal.core.parser.ASTErrorProgramUnitNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
@@ -21,6 +23,7 @@ import org.eclipse.photran.internal.core.parser.ASTIntrinsicStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTMainProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleNode;
 import org.eclipse.photran.internal.core.parser.ASTModuleProcedureStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.ASTProcedureNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTSpecificBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
@@ -62,6 +65,8 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
     private LinkedList<IASTNode> parentParseTreeNodeStack = new LinkedList<IASTNode>();
 
     private LinkedList<FortranElement> parentElementStack = new LinkedList<FortranElement>();
+    
+    private FortranElement errorElement = null;
 
     private Parent getCurrentParent()
     {
@@ -79,6 +84,17 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
             return node == (IASTNode)parentParseTreeNodeStack.getLast();
     }
 
+    private FortranElement getErrorElement()
+    {
+        if (errorElement == null)
+        {
+            errorElement = new FortranElement.ErrorNode(translationUnit, "Syntax Errors"); //$NON-NLS-1$
+            addToModelNoChildren(errorElement);
+        }
+
+        return errorElement;
+    }
+    
     private void addToModel(IASTNode parseTreeNode, FortranElement element)
     {
         try
@@ -130,14 +146,49 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
 
     private <T extends FortranElement> T setPos(T element, IASTNode astNode)
     {
+        return setPos(element, astNode, false);
+    }
+
+    private <T extends FortranElement> T setPos(T element, IASTNode astNode, boolean setIdPos)
+    {
         Token first = astNode.findFirstToken();
         Token last = astNode.findLastToken();
         if (first != null && last != null)
         {
-            element.setPos(first.getFileOffset(), last.getFileOffset()+last.getLength()-first.getFileOffset());
+            int offset = first.getFileOffset();
+            int length = last.getFileOffset()+last.getLength()-offset;
+            if (setIdPos)
+                element.setIdPos(offset, length);
+            element.setPos(offset, length);
             element.setLines(first.getLine(), last.getLine());
         }
         return element;
+    }
+
+    public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
+    {
+        addToModelNoChildren(setPos(configureElement(new FortranElement.ErrorNode(getCurrentParent(), "Erroneous program unit - " + describeError(node)), node.getErrorToken()), node, true)); //$NON-NLS-1$
+        addToModelNoChildren(configureElement(new FortranElement.ErrorNode(getErrorElement(), describeError(node)), node.getErrorToken()));
+    }
+
+    public void visitASTErrorConstructNode(ASTErrorConstructNode node)
+    {
+        addToModelNoChildren(setPos(configureElement(new FortranElement.ErrorNode(getCurrentParent(), "Unrecognized statement or construct - " + describeError(node)), node.getErrorToken()), node, true)); //$NON-NLS-1$
+        addToModelNoChildren(configureElement(new FortranElement.ErrorNode(getErrorElement(), describeError(node)), node.getErrorToken()));
+    }
+    
+    private String describeError(ASTNodeWithErrorRecoverySymbols node)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Unexpected "); //$NON-NLS-1$
+        sb.append(node.getErrorToken());
+        sb.append(" (line "); //$NON-NLS-1$
+        sb.append(node.getErrorToken().getLine());
+        sb.append(", column "); //$NON-NLS-1$
+        sb.append(node.getErrorToken().getCol());
+        sb.append(").  Expected one of the following: "); //$NON-NLS-1$
+        sb.append(node.describeTerminalsExpectedAtErrorPoint());
+        return sb.toString();
     }
 
     public void visitASTMainProgramNode(ASTMainProgramNode node)

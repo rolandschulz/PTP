@@ -171,6 +171,8 @@ public class ASTVisitor implements IASTVisitor
     public void visitASTEquivalenceObjectNode(ASTEquivalenceObjectNode node) { traverseChildren(node); }
     public void visitASTEquivalenceSetNode(ASTEquivalenceSetNode node) { traverseChildren(node); }
     public void visitASTEquivalenceStmtNode(ASTEquivalenceStmtNode node) { traverseChildren(node); }
+    public void visitASTErrorConstructNode(ASTErrorConstructNode node) { traverseChildren(node); }
+    public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node) { traverseChildren(node); }
     public void visitASTExecutableProgramNode(ASTExecutableProgramNode node) { traverseChildren(node); }
     public void visitASTExitStmtNode(ASTExitStmtNode node) { traverseChildren(node); }
     public void visitASTExplicitCoshapeSpecNode(ASTExplicitCoshapeSpecNode node) { traverseChildren(node); }

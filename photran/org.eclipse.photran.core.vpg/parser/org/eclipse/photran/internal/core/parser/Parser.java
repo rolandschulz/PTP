@@ -45,7 +45,7 @@ public class Parser
     public OutputStream DEBUG = new OutputStream() { @Override public void write(int b) {} };
 
     protected static final int NUM_STATES = 3223;
-    protected static final int NUM_PRODUCTIONS = 1544;
+    protected static final int NUM_PRODUCTIONS = 1546;
     protected static final int NUM_TERMINALS = 246;
     protected static final int NUM_NONTERMINALS = 493;
 
@@ -89,13 +89,81 @@ public class Parser
     protected ParsingTables parsingTables;
 
     /**
-     * Symbols discarded while recovering from a syntax error using an
-     * error production.
+     * When the parser uses an error production to recover from a syntax error,
+     * an instance of this class is used to hold information about the error
+     * and the recovery.
+     */
+    public static final class ErrorRecoveryInfo
+    {
+        /**
+         * The symbols that were discarded in order to recover
+         * from the syntax error.
+         */
+        public final LinkedList<? extends Object> discardedSymbols;
+
+        /**
+         * The (lookahead) token that caused the syntax error.
+         * recovery is being performed.
+         */
+        public final org.eclipse.photran.internal.core.lexer.Token errorLookahead;
+
+        /**
+         * A list of terminal symbols were expected at the point where
+         * the syntax error occurred.
+         */
+        public final List<Terminal> expectedLookaheadSymbols;
+
+        /**
+         * Which state the parser was in when it encountered the syntax error.
+         */
+        public final int errorState;
+
+        protected ErrorRecoveryInfo(int errorState,
+                                    org.eclipse.photran.internal.core.lexer.Token errorLookahead,
+                                    List<Terminal> expectedLookaheadSymbols)
+        {
+            this.errorState = errorState;
+            this.errorLookahead = errorLookahead;
+            this.expectedLookaheadSymbols = expectedLookaheadSymbols;
+            this.discardedSymbols = new LinkedList<Object>();
+        }
+
+        public final <T> LinkedList<T> getDiscardedSymbols()
+        {
+            return (LinkedList<T>)discardedSymbols;
+        }
+
+        protected void prependDiscardedSymbol(Object symbol)
+        {
+            this.<Object>getDiscardedSymbols().addFirst(symbol);
+        }
+
+        protected void appendDiscardedSymbol(Object symbol)
+        {
+            this.<Object>getDiscardedSymbols().addLast(symbol);
+        }
+
+        /**
+         * A human-readable description of the terminal symbols were
+         * expected at the point where the syntax error occurred.
+         *
+         * @return a <code>String</code> (non-<code>null</code>)
+         */
+        public final String describeExpectedSymbols()
+        {
+            return describe(expectedLookaheadSymbols);
+        }
+    }
+
+    /**
+     * Information about the parser's successful recovery from a syntax error,
+     * including what symbol caused the error and what tokens were discarded to
+     * recover from that error.
      * <p>
-     * This list is set to a non-<code>null</code> value only while error
+     * This field is set to a non-<code>null</code> value only while error
      * recovery is being performed.
      */
-    protected LinkedList<Object> discardedSymbols;
+    protected ErrorRecoveryInfo errorInfo;
 
     /**
      * Semantic actions to invoke after reduce actions.
@@ -144,7 +212,7 @@ public class Parser
         // Initialize the parsing stacks
         this.stateStack = new IntStack();
         this.valueStack = new Stack<Object>();
-        this.discardedSymbols = null;
+        this.errorInfo = null;
 
         semanticActions.initialize();
 
@@ -246,7 +314,7 @@ public class Parser
                                                        valueStack,
                                                        valueStackOffset,
                                                        valueStackSize,
-                                                       discardedSymbols);
+                                                       errorInfo);
 
         for (int i = 0; i < symbolsToPop; i++)
         {
@@ -282,7 +350,7 @@ public class Parser
      */
     protected void syntaxError() throws IOException, LexerException, SyntaxException
     {
-        throw new SyntaxException(lookahead);
+        throw new SyntaxException(lookahead, describeTerminalsExpectedInCurrentState());
     }
 
     /**
@@ -318,8 +386,22 @@ public class Parser
      */
     public String describeTerminalsExpectedInCurrentState()
     {
-        List<Terminal> terminals = getTerminalsExpectedInCurrentState();
-        if (terminals.isEmpty()) return "(none)";
+        return describe(getTerminalsExpectedInCurrentState());
+    }
+
+    /**
+     * Returns a human-readable description of the terminal symbols that
+     * are passed as an argument.
+     * <p>
+     * The terminal descriptions are determined by {@link Terminal#toString}
+     * and are separated by commas.  If the list is empty (or <code>null</code>),
+     * returns "(none)".
+     *
+     * @return a (non-<code>null</code>) <code>String</code>
+     */
+    public static String describe(List<Terminal> terminals)
+    {
+        if (terminals == null || terminals.isEmpty()) return "(none)";
 
         StringBuilder sb = new StringBuilder();
         for (Terminal t : terminals)
@@ -361,8 +443,8 @@ public class Parser
     {
         assert DEBUG("Syntax error detected; attempting to recover\n");
 
+        errorInfo = new ErrorRecoveryInfo(currentState(), lookahead, getTerminalsExpectedInCurrentState());
         org.eclipse.photran.internal.core.lexer.Token originalLookahead = lookahead;
-        discardedSymbols = new LinkedList<Object>();
 
         while (!doneParsing)
         {
@@ -377,24 +459,24 @@ public class Parser
                    if (stateStack.size() > 1)
                    {
                        stateStack.pop();
-                       discardedSymbols.addFirst(valueStack.pop());
+                       errorInfo.prependDiscardedSymbol(valueStack.pop());
                    }
                    doneParsing = stateStack.size() <= 1;
                    break;
 
                 case ParsingTables.DISCARD_TERMINAL_ACTION:
-                    discardedSymbols.addLast(lookahead);
+                    errorInfo.appendDiscardedSymbol(lookahead);
                     readNextToken();
                     doneParsing = (lookahead.getTerminal() == Terminal.END_OF_INPUT);
                     break;
 
                 case ParsingTables.RECOVER_ACTION:
-                    discardedSymbols.addLast(lookahead);
-                    semanticActions.onErrorRecovery(discardedSymbols);
+                    errorInfo.appendDiscardedSymbol(lookahead);
+                    semanticActions.onErrorRecovery(errorInfo);
                     reduce(value);
                     if (lookahead.getTerminal() != Terminal.END_OF_INPUT)
                         readNextToken(); // Skip past error production lookahead
-                    discardedSymbols = null;
+                    errorInfo = null;
                     assert valueStack.size() >= 1;
                     assert stateStack.size() == valueStack.size() + 1;
 
@@ -409,7 +491,7 @@ public class Parser
 
         // Recovery failed
         lookahead = originalLookahead;
-        discardedSymbols = null;
+        errorInfo = null;
         doneParsing = true;
 
                        assert DEBUG("Unable to recover from syntax error\n");
@@ -3036,25 +3118,27 @@ public class Parser
         public static final Production ASSIGNED_GOTO_STMT_1522 = new Production(Nonterminal.ASSIGNED_GOTO_STMT, 7, "<AssignedGotoStmt> ::= <LblDef> <GoToKw> <VariableName> T_LPAREN <LblRefList> T_RPAREN T_EOS");
         public static final Production ASSIGNED_GOTO_STMT_1523 = new Production(Nonterminal.ASSIGNED_GOTO_STMT, 7, "<AssignedGotoStmt> ::= <LblDef> <GoToKw> <VariableComma> T_LPAREN <LblRefList> T_RPAREN T_EOS");
         public static final Production VARIABLE_COMMA_1524 = new Production(Nonterminal.VARIABLE_COMMA, 2, "<VariableComma> ::= <VariableName> T_COMMA");
-        public static final Production INVALID_ENTITY_DECL_ERROR_0 = new Production(Nonterminal.INVALID_ENTITY_DECL, 1, "<InvalidEntityDecl> ::= <ObjectName>");
-        public static final Production DATA_STMT_ERROR_1 = new Production(Nonterminal.DATA_STMT, 2, "<DataStmt> ::= <LblDef> T_DATA");
-        public static final Production ALLOCATE_STMT_ERROR_2 = new Production(Nonterminal.ALLOCATE_STMT, 3, "<AllocateStmt> ::= <LblDef> T_ALLOCATE T_LPAREN");
-        public static final Production ASSIGNMENT_STMT_ERROR_3 = new Production(Nonterminal.ASSIGNMENT_STMT, 2, "<AssignmentStmt> ::= <LblDef> <Name>");
-        public static final Production FORALL_CONSTRUCT_STMT_ERROR_4 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 2, "<ForallConstructStmt> ::= <LblDef> T_FORALL");
-        public static final Production FORALL_CONSTRUCT_STMT_ERROR_5 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 4, "<ForallConstructStmt> ::= <LblDef> <Name> T_COLON T_FORALL");
-        public static final Production IF_THEN_STMT_ERROR_6 = new Production(Nonterminal.IF_THEN_STMT, 2, "<IfThenStmt> ::= <LblDef> T_IF");
-        public static final Production IF_THEN_STMT_ERROR_7 = new Production(Nonterminal.IF_THEN_STMT, 4, "<IfThenStmt> ::= <LblDef> <Name> T_COLON T_IF");
-        public static final Production ELSE_IF_STMT_ERROR_8 = new Production(Nonterminal.ELSE_IF_STMT, 2, "<ElseIfStmt> ::= <LblDef> T_ELSEIF");
-        public static final Production ELSE_IF_STMT_ERROR_9 = new Production(Nonterminal.ELSE_IF_STMT, 3, "<ElseIfStmt> ::= <LblDef> T_ELSE T_IF");
-        public static final Production ELSE_STMT_ERROR_10 = new Production(Nonterminal.ELSE_STMT, 2, "<ElseStmt> ::= <LblDef> T_ELSE");
-        public static final Production SELECT_CASE_STMT_ERROR_11 = new Production(Nonterminal.SELECT_CASE_STMT, 4, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECTCASE");
-        public static final Production SELECT_CASE_STMT_ERROR_12 = new Production(Nonterminal.SELECT_CASE_STMT, 2, "<SelectCaseStmt> ::= <LblDef> T_SELECTCASE");
-        public static final Production SELECT_CASE_STMT_ERROR_13 = new Production(Nonterminal.SELECT_CASE_STMT, 5, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECT T_CASE");
-        public static final Production SELECT_CASE_STMT_ERROR_14 = new Production(Nonterminal.SELECT_CASE_STMT, 3, "<SelectCaseStmt> ::= <LblDef> T_SELECT T_CASE");
-        public static final Production CASE_STMT_ERROR_15 = new Production(Nonterminal.CASE_STMT, 2, "<CaseStmt> ::= <LblDef> T_CASE");
-        public static final Production FORMAT_STMT_ERROR_16 = new Production(Nonterminal.FORMAT_STMT, 2, "<FormatStmt> ::= <LblDef> T_FORMAT");
-        public static final Production FUNCTION_STMT_ERROR_17 = new Production(Nonterminal.FUNCTION_STMT, 3, "<FunctionStmt> ::= <LblDef> <FunctionPrefix> <FunctionName>");
-        public static final Production SUBROUTINE_STMT_ERROR_18 = new Production(Nonterminal.SUBROUTINE_STMT, 3, "<SubroutineStmt> ::= <LblDef> <SubroutinePrefix> <SubroutineName>");
+        public static final Production PROGRAM_UNIT_ERROR_0 = new Production(Nonterminal.PROGRAM_UNIT, 0, "<ProgramUnit> ::= (empty)");
+        public static final Production BODY_CONSTRUCT_ERROR_1 = new Production(Nonterminal.BODY_CONSTRUCT, 0, "<BodyConstruct> ::= (empty)");
+        public static final Production INVALID_ENTITY_DECL_ERROR_2 = new Production(Nonterminal.INVALID_ENTITY_DECL, 1, "<InvalidEntityDecl> ::= <ObjectName>");
+        public static final Production DATA_STMT_ERROR_3 = new Production(Nonterminal.DATA_STMT, 2, "<DataStmt> ::= <LblDef> T_DATA");
+        public static final Production ALLOCATE_STMT_ERROR_4 = new Production(Nonterminal.ALLOCATE_STMT, 3, "<AllocateStmt> ::= <LblDef> T_ALLOCATE T_LPAREN");
+        public static final Production ASSIGNMENT_STMT_ERROR_5 = new Production(Nonterminal.ASSIGNMENT_STMT, 2, "<AssignmentStmt> ::= <LblDef> <Name>");
+        public static final Production FORALL_CONSTRUCT_STMT_ERROR_6 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 2, "<ForallConstructStmt> ::= <LblDef> T_FORALL");
+        public static final Production FORALL_CONSTRUCT_STMT_ERROR_7 = new Production(Nonterminal.FORALL_CONSTRUCT_STMT, 4, "<ForallConstructStmt> ::= <LblDef> <Name> T_COLON T_FORALL");
+        public static final Production IF_THEN_STMT_ERROR_8 = new Production(Nonterminal.IF_THEN_STMT, 2, "<IfThenStmt> ::= <LblDef> T_IF");
+        public static final Production IF_THEN_STMT_ERROR_9 = new Production(Nonterminal.IF_THEN_STMT, 4, "<IfThenStmt> ::= <LblDef> <Name> T_COLON T_IF");
+        public static final Production ELSE_IF_STMT_ERROR_10 = new Production(Nonterminal.ELSE_IF_STMT, 2, "<ElseIfStmt> ::= <LblDef> T_ELSEIF");
+        public static final Production ELSE_IF_STMT_ERROR_11 = new Production(Nonterminal.ELSE_IF_STMT, 3, "<ElseIfStmt> ::= <LblDef> T_ELSE T_IF");
+        public static final Production ELSE_STMT_ERROR_12 = new Production(Nonterminal.ELSE_STMT, 2, "<ElseStmt> ::= <LblDef> T_ELSE");
+        public static final Production SELECT_CASE_STMT_ERROR_13 = new Production(Nonterminal.SELECT_CASE_STMT, 4, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECTCASE");
+        public static final Production SELECT_CASE_STMT_ERROR_14 = new Production(Nonterminal.SELECT_CASE_STMT, 2, "<SelectCaseStmt> ::= <LblDef> T_SELECTCASE");
+        public static final Production SELECT_CASE_STMT_ERROR_15 = new Production(Nonterminal.SELECT_CASE_STMT, 5, "<SelectCaseStmt> ::= <LblDef> <Name> T_COLON T_SELECT T_CASE");
+        public static final Production SELECT_CASE_STMT_ERROR_16 = new Production(Nonterminal.SELECT_CASE_STMT, 3, "<SelectCaseStmt> ::= <LblDef> T_SELECT T_CASE");
+        public static final Production CASE_STMT_ERROR_17 = new Production(Nonterminal.CASE_STMT, 2, "<CaseStmt> ::= <LblDef> T_CASE");
+        public static final Production FORMAT_STMT_ERROR_18 = new Production(Nonterminal.FORMAT_STMT, 2, "<FormatStmt> ::= <LblDef> T_FORMAT");
+        public static final Production FUNCTION_STMT_ERROR_19 = new Production(Nonterminal.FUNCTION_STMT, 3, "<FunctionStmt> ::= <LblDef> <FunctionPrefix> <FunctionName>");
+        public static final Production SUBROUTINE_STMT_ERROR_20 = new Production(Nonterminal.SUBROUTINE_STMT, 3, "<SubroutineStmt> ::= <LblDef> <SubroutinePrefix> <SubroutineName>");
 
         protected static final int EXECUTABLE_PROGRAM_1_INDEX = 1;
         protected static final int EXECUTABLE_PROGRAM_2_INDEX = 2;
@@ -4580,25 +4664,27 @@ public class Parser
         protected static final int ASSIGNED_GOTO_STMT_1522_INDEX = 1522;
         protected static final int ASSIGNED_GOTO_STMT_1523_INDEX = 1523;
         protected static final int VARIABLE_COMMA_1524_INDEX = 1524;
-        protected static final int INVALID_ENTITY_DECL_ERROR_0_INDEX = 1525;
-        protected static final int DATA_STMT_ERROR_1_INDEX = 1526;
-        protected static final int ALLOCATE_STMT_ERROR_2_INDEX = 1527;
-        protected static final int ASSIGNMENT_STMT_ERROR_3_INDEX = 1528;
-        protected static final int FORALL_CONSTRUCT_STMT_ERROR_4_INDEX = 1529;
-        protected static final int FORALL_CONSTRUCT_STMT_ERROR_5_INDEX = 1530;
-        protected static final int IF_THEN_STMT_ERROR_6_INDEX = 1531;
-        protected static final int IF_THEN_STMT_ERROR_7_INDEX = 1532;
-        protected static final int ELSE_IF_STMT_ERROR_8_INDEX = 1533;
-        protected static final int ELSE_IF_STMT_ERROR_9_INDEX = 1534;
-        protected static final int ELSE_STMT_ERROR_10_INDEX = 1535;
-        protected static final int SELECT_CASE_STMT_ERROR_11_INDEX = 1536;
-        protected static final int SELECT_CASE_STMT_ERROR_12_INDEX = 1537;
+        protected static final int PROGRAM_UNIT_ERROR_0_INDEX = 1525;
+        protected static final int BODY_CONSTRUCT_ERROR_1_INDEX = 1526;
+        protected static final int INVALID_ENTITY_DECL_ERROR_2_INDEX = 1527;
+        protected static final int DATA_STMT_ERROR_3_INDEX = 1528;
+        protected static final int ALLOCATE_STMT_ERROR_4_INDEX = 1529;
+        protected static final int ASSIGNMENT_STMT_ERROR_5_INDEX = 1530;
+        protected static final int FORALL_CONSTRUCT_STMT_ERROR_6_INDEX = 1531;
+        protected static final int FORALL_CONSTRUCT_STMT_ERROR_7_INDEX = 1532;
+        protected static final int IF_THEN_STMT_ERROR_8_INDEX = 1533;
+        protected static final int IF_THEN_STMT_ERROR_9_INDEX = 1534;
+        protected static final int ELSE_IF_STMT_ERROR_10_INDEX = 1535;
+        protected static final int ELSE_IF_STMT_ERROR_11_INDEX = 1536;
+        protected static final int ELSE_STMT_ERROR_12_INDEX = 1537;
         protected static final int SELECT_CASE_STMT_ERROR_13_INDEX = 1538;
         protected static final int SELECT_CASE_STMT_ERROR_14_INDEX = 1539;
-        protected static final int CASE_STMT_ERROR_15_INDEX = 1540;
-        protected static final int FORMAT_STMT_ERROR_16_INDEX = 1541;
-        protected static final int FUNCTION_STMT_ERROR_17_INDEX = 1542;
-        protected static final int SUBROUTINE_STMT_ERROR_18_INDEX = 1543;
+        protected static final int SELECT_CASE_STMT_ERROR_15_INDEX = 1540;
+        protected static final int SELECT_CASE_STMT_ERROR_16_INDEX = 1541;
+        protected static final int CASE_STMT_ERROR_17_INDEX = 1542;
+        protected static final int FORMAT_STMT_ERROR_18_INDEX = 1543;
+        protected static final int FUNCTION_STMT_ERROR_19_INDEX = 1544;
+        protected static final int SUBROUTINE_STMT_ERROR_20_INDEX = 1545;
 
         protected static final Production[] values = new Production[]
         {
@@ -6127,25 +6213,27 @@ public class Parser
             ASSIGNED_GOTO_STMT_1522,
             ASSIGNED_GOTO_STMT_1523,
             VARIABLE_COMMA_1524,
-            INVALID_ENTITY_DECL_ERROR_0,
-            DATA_STMT_ERROR_1,
-            ALLOCATE_STMT_ERROR_2,
-            ASSIGNMENT_STMT_ERROR_3,
-            FORALL_CONSTRUCT_STMT_ERROR_4,
-            FORALL_CONSTRUCT_STMT_ERROR_5,
-            IF_THEN_STMT_ERROR_6,
-            IF_THEN_STMT_ERROR_7,
-            ELSE_IF_STMT_ERROR_8,
-            ELSE_IF_STMT_ERROR_9,
-            ELSE_STMT_ERROR_10,
-            SELECT_CASE_STMT_ERROR_11,
-            SELECT_CASE_STMT_ERROR_12,
+            PROGRAM_UNIT_ERROR_0,
+            BODY_CONSTRUCT_ERROR_1,
+            INVALID_ENTITY_DECL_ERROR_2,
+            DATA_STMT_ERROR_3,
+            ALLOCATE_STMT_ERROR_4,
+            ASSIGNMENT_STMT_ERROR_5,
+            FORALL_CONSTRUCT_STMT_ERROR_6,
+            FORALL_CONSTRUCT_STMT_ERROR_7,
+            IF_THEN_STMT_ERROR_8,
+            IF_THEN_STMT_ERROR_9,
+            ELSE_IF_STMT_ERROR_10,
+            ELSE_IF_STMT_ERROR_11,
+            ELSE_STMT_ERROR_12,
             SELECT_CASE_STMT_ERROR_13,
             SELECT_CASE_STMT_ERROR_14,
-            CASE_STMT_ERROR_15,
-            FORMAT_STMT_ERROR_16,
-            FUNCTION_STMT_ERROR_17,
-            SUBROUTINE_STMT_ERROR_18,
+            SELECT_CASE_STMT_ERROR_15,
+            SELECT_CASE_STMT_ERROR_16,
+            CASE_STMT_ERROR_17,
+            FORMAT_STMT_ERROR_18,
+            FUNCTION_STMT_ERROR_19,
+            SUBROUTINE_STMT_ERROR_20,
         };
     }
 

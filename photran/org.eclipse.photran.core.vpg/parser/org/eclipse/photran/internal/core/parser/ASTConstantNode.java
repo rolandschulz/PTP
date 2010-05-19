@@ -29,10 +29,10 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTConstantNode extends ASTNode
 {
     ASTLogicalConstNode logicalConst; // in ASTConstantNode
-    org.eclipse.photran.internal.core.lexer.Token hasPlus; // in ASTConstantNode
-    org.eclipse.photran.internal.core.lexer.Token hasMinus; // in ASTConstantNode
     ASTNamedConstantUseNode namedConstantKind; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hasPlus; // in ASTConstantNode
     ASTNamedConstantUseNode name; // in ASTConstantNode
+    org.eclipse.photran.internal.core.lexer.Token hasMinus; // in ASTConstantNode
     ASTBozLiteralConstNode bozLiteralConstant; // in ASTConstantNode
     IUnsignedArithmeticConst unsignedArithmeticConstant; // in ASTConstantNode
     org.eclipse.photran.internal.core.lexer.Token hasIntKind; // in ASTConstantNode
@@ -53,30 +53,6 @@ public class ASTConstantNode extends ASTNode
     }
 
 
-    public boolean hasPlus()
-    {
-        return this.hasPlus != null;
-    }
-
-    public void setHasPlus(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasPlus = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public boolean hasMinus()
-    {
-        return this.hasMinus != null;
-    }
-
-    public void setHasMinus(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.hasMinus = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public ASTNamedConstantUseNode getNamedConstantKind()
     {
         return this.namedConstantKind;
@@ -89,6 +65,18 @@ public class ASTConstantNode extends ASTNode
     }
 
 
+    public boolean hasPlus()
+    {
+        return this.hasPlus != null;
+    }
+
+    public void setHasPlus(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasPlus = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
     public ASTNamedConstantUseNode getName()
     {
         return this.name;
@@ -97,6 +85,18 @@ public class ASTConstantNode extends ASTNode
     public void setName(ASTNamedConstantUseNode newValue)
     {
         this.name = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean hasMinus()
+    {
+        return this.hasMinus != null;
+    }
+
+    public void setHasMinus(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.hasMinus = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -189,10 +189,10 @@ public class ASTConstantNode extends ASTNode
         switch (index)
         {
         case 0:  return this.logicalConst;
-        case 1:  return this.hasPlus;
-        case 2:  return this.hasMinus;
-        case 3:  return this.namedConstantKind;
-        case 4:  return this.name;
+        case 1:  return this.namedConstantKind;
+        case 2:  return this.hasPlus;
+        case 3:  return this.name;
+        case 4:  return this.hasMinus;
         case 5:  return this.bozLiteralConstant;
         case 6:  return this.unsignedArithmeticConstant;
         case 7:  return this.hasIntKind;
@@ -209,10 +209,10 @@ public class ASTConstantNode extends ASTNode
         switch (index)
         {
         case 0:  this.logicalConst = (ASTLogicalConstNode)value; if (value != null) value.setParent(this); return;
-        case 1:  this.hasPlus = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.hasMinus = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.namedConstantKind = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
-        case 4:  this.name = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
+        case 1:  this.namedConstantKind = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hasPlus = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.name = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hasMinus = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 5:  this.bozLiteralConstant = (ASTBozLiteralConstNode)value; if (value != null) value.setParent(this); return;
         case 6:  this.unsignedArithmeticConstant = (IUnsignedArithmeticConst)value; if (value != null) value.setParent(this); return;
         case 7:  this.hasIntKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;

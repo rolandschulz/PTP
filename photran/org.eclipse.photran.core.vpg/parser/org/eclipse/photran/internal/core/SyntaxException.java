@@ -30,7 +30,7 @@ public class SyntaxException extends Exception
 
     private Token lookahead;
     
-    public SyntaxException(Token lookahead)
+    public SyntaxException(Token lookahead, String expectedTerminals)
     {
         super("Syntax error: Unexpected "
             + lookahead.getTerminal().toString()
@@ -38,7 +38,8 @@ public class SyntaxException extends Exception
             + lookahead.getPhysicalFile() + ", "
             + "line " + lookahead.getLine()
             + ", column " + lookahead.getCol()
-            + ")");
+            + ").  Expected one of the following: "
+            + expectedTerminals);
         
         this.lookahead = lookahead;
     }

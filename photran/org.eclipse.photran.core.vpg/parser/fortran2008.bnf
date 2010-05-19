@@ -106,6 +106,7 @@
   | <Module>
   | <Submodule> # F08
   | <BlockDataSubprogram>
+  | (error) T_EOS           <= ASTErrorProgramUnitNode
 
 # R203 chain rule eliminated
 
@@ -126,6 +127,7 @@
 (superclass):<BodyConstruct> ::=
   | <SpecificationPartConstruct>
   | <ExecutableConstruct>
+  | (error) T_EOS                  <= ASTErrorConstructNode
 
 # R203 chain rule omitted
 

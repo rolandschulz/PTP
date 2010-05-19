@@ -165,6 +165,8 @@ public interface IASTVisitor
     void visitASTEquivalenceObjectNode(ASTEquivalenceObjectNode node);
     void visitASTEquivalenceSetNode(ASTEquivalenceSetNode node);
     void visitASTEquivalenceStmtNode(ASTEquivalenceStmtNode node);
+    void visitASTErrorConstructNode(ASTErrorConstructNode node);
+    void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node);
     void visitASTExecutableProgramNode(ASTExecutableProgramNode node);
     void visitASTExitStmtNode(ASTExitStmtNode node);
     void visitASTExplicitCoshapeSpecNode(ASTExplicitCoshapeSpecNode node);

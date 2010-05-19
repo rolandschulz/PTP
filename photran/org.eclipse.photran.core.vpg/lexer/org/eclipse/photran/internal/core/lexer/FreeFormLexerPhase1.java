@@ -33,6 +33,7 @@ package org.eclipse.photran.internal.core.lexer;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+
 import org.eclipse.core.resources.IFile;
 
 @SuppressWarnings("unused")

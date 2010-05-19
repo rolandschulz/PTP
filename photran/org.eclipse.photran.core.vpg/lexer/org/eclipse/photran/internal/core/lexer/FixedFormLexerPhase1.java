@@ -35,8 +35,9 @@
 
 package org.eclipse.photran.internal.core.lexer;
 
-import java.util.regex.Pattern;
 import java.io.Reader;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.resources.IFile;
 
 @SuppressWarnings("unused")
