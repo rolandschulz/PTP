@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.callhierarchy.CHViewPart
- * Version: 1.22
+ * Version: 1.26
  */
 
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
@@ -108,7 +108,6 @@ public class RemoteCHViewPart extends ViewPart {
     private static final String TRUE = String.valueOf(true);
     private static final String KEY_WORKING_SET_FILTER = "workingSetFilter"; //$NON-NLS-1$
     private static final String KEY_FILTER_VARIABLES = "variableFilter"; //$NON-NLS-1$
-//    private static final String KEY_FILTER_MACROS = "macroFilter"; //$NON-NLS-1$
     private static final String KEY_SHOW_FILES= "showFilesInLabels"; //$NON-NLS-1$
     
     private IMemento fMemento;
@@ -130,7 +129,6 @@ public class RemoteCHViewPart extends ViewPart {
 
     // filters, sorter
     private ViewerFilter fVariableFilter;
-//    private ViewerFilter fMacroFilter;
     private ViewerComparator fSorterAlphaNumeric;
     private ViewerComparator fSorterReferencePosition;
 	private WorkingSetFilterUI fWorkingSetFilterUI;
@@ -139,7 +137,6 @@ public class RemoteCHViewPart extends ViewPart {
     private Action fReferencedByAction;
     private Action fMakesReferenceToAction;
     private Action fFilterVariablesAction;
-//    private Action fFilterMacrosAction;
     private Action fShowFilesInLabelsAction;
     private Action fNextAction;
     private Action fPreviousAction;
@@ -267,12 +264,10 @@ public class RemoteCHViewPart extends ViewPart {
     private void initializeActionStates() {
         boolean referencedBy= true;
         boolean filterVariables= false;
-//        boolean filterMacros= false;
         boolean showFiles= false;
         
         if (fMemento != null) {
             filterVariables= TRUE.equals(fMemento.getString(KEY_FILTER_VARIABLES));
-//            filterMacros= TRUE.equals(fMemento.getString(KEY_FILTER_MACROS));
             showFiles= TRUE.equals(fMemento.getString(KEY_SHOW_FILES));
         }
         
@@ -282,9 +277,7 @@ public class RemoteCHViewPart extends ViewPart {
         fReferencedByAction.setChecked(referencedBy);
         fMakesReferenceToAction.setChecked(!referencedBy);
         fContentProvider.setComputeReferencedBy(referencedBy);
-        
-//        fFilterMacrosAction.setChecked(filterMacros);
-//        fFilterMacrosAction.run();
+
         fFilterVariablesAction.setChecked(filterVariables);
         fFilterVariablesAction.run();
         updateSorter();
@@ -302,7 +295,6 @@ public class RemoteCHViewPart extends ViewPart {
         if (fWorkingSetFilterUI != null) {
         	fWorkingSetFilterUI.saveState(memento, KEY_WORKING_SET_FILTER);
         }
-//        memento.putString(KEY_FILTER_MACROS, String.valueOf(fFilterMacrosAction.isChecked()));
         memento.putString(KEY_FILTER_VARIABLES, String.valueOf(fFilterVariablesAction.isChecked()));
         memento.putString(KEY_SHOW_FILES, String.valueOf(fShowFilesInLabelsAction.isChecked()));
         super.saveState(memento);
@@ -523,7 +515,6 @@ public class RemoteCHViewPart extends ViewPart {
         tm.add(fNextAction);
         tm.add(fPreviousAction);
         tm.add(new Separator());
-//        tm.add(fFilterMacrosAction);
         tm.add(fFilterVariablesAction);
         tm.add(new Separator());
         tm.add(fReferencedByAction);
@@ -534,16 +525,12 @@ public class RemoteCHViewPart extends ViewPart {
         // local menu
         IMenuManager mm = actionBars.getMenuManager();
 
-//        tm.add(fNext);
-//        tm.add(fPrevious);
-//        tm.add(new Separator());
         fWorkingSetFilterUI.fillActionBars(actionBars);
         mm.add(fReferencedByAction);
         mm.add(fMakesReferenceToAction);
         mm.add(new Separator());
 //        mm.add(fShowFilesInLabelsAction);
         mm.add(new Separator());
-//        mm.add(fFilterMacrosAction);
         mm.add(fFilterVariablesAction);
     }
     
@@ -820,7 +807,7 @@ public class RemoteCHViewPart extends ViewPart {
 	private CHNode selectionToNode(ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection ss= (IStructuredSelection) selection;
-			for (Iterator iter = ss.iterator(); iter.hasNext(); ) {
+			for (Iterator<?> iter = ss.iterator(); iter.hasNext(); ) {
 				Object cand= iter.next();
 				if (cand instanceof CHNode) {
 					return (CHNode) cand;
