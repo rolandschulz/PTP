@@ -1,0 +1,35 @@
+% Creating a Photran Launch Configuration
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $}
+
+\begin{enumerate}
+	\setcounter{enumi}{\value{running_counter}}
+	\item In the Package Explorer view, select the \texttt{org.eclipse.photran.core} project
+	      (or any other plug-in project).
+	\item Right-click on that project and select Debug As $>$ Debug Configurations\ldots. A dialog will appear.
+	\item In that dialog, create a new \textbf{Eclipse Application} launch configuration. Call it ``Photran''.
+	\item For the configuration that you have just created, switch to the ``Arguments'' tab.
+	\item Change the ``VM arguments'' field to: \\
+	      \centerline{-ea -XX:PermSize=64M -XX:MaxPermSize=128 -Xms64m -Xmx768m}
+	      (These arguments will enable assertions, increase the amount of
+	      \href{http://wiki.eclipse.org/FAQ_How_do_I_increase_the_permgen_size_available_to_Eclipse\%3F}
+	           {PermGen space},
+	      and increate the amount of heap space available to Eclipse.)
+	\item \textit{(Optional)} If you will be developing fixed form refactorings, or if you need
+	      fixed form refactoring enabled\dots
+	      \begin{enumerate}
+	      \item Switch to the ``Environment'' tab.
+	      \item Create a new environment variable called \texttt{ENABLE\_FIXED\_FORM\_REFACTORING}
+	            with a value of 1.
+	      \end{enumerate}
+	\item Click the ``Debug'' button.  A new instance of Eclipse will open with the CDT and Photran
+	      plug-ins compiled from the code in your workspace.
+	\item To run it again later, just launch the
+	      ``Photran'' configuration from the Eclipse Run menu.
+	      Debug $>$ Debug History $>$ Photran will launch it in the debugger again
+	      (this will allow you to set breakpoints, watch expressions, etc.), while
+	      Run $>$ Run History $>$ Photran will launch it in a normal JVM (with
+	      debugging disabled).
+
+\end{enumerate}
