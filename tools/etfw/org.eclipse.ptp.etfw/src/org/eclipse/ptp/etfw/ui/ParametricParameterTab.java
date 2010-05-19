@@ -115,7 +115,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		createVerticalSpacer(parent, 3);
 		
 		useParam=new Button(parent,SWT.CHECK);
-		useParam.setText("Enable Parametric Testing");
+		useParam.setText(Messages.ParametricParameterTab_EnableParametric);
 		useParam.addSelectionListener(wl);
 		
 		GridData fill3=new GridData(GridData.FILL_HORIZONTAL);
@@ -127,8 +127,8 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		lab.setLayoutData(fill3);
 		
 		lab = new Label(parent,SWT.NONE);
-		lab.setText("Optimization Levels");
-		lab.setToolTipText("Leave blank for default, may not work with some compilers");
+		lab.setText(Messages.ParametricParameterTab_OptLevels);
+		lab.setToolTipText(Messages.ParametricParameterTab_BlankForDefaultCompWarn);
 		
 		optLevels=new Text(parent,SWT.BORDER);
 		optLevels.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -138,11 +138,11 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		lab.setLayoutData(fill3);
 		
 		
-		String allComText="Checked: one run for every combination of values.  Unchecked: Each parameter must have the same number of values, runs will be executed with the first option, second, and so forth.";
+		String allComText=Messages.ParametricParameterTab_CheckedOneRunPerCombo;
 		
 		if(parallel){
 			lab = new Label(parent,SWT.NONE);
-			lab.setText("MPI Processes");
+			lab.setText(Messages.ParametricParameterTab_MPIProcesses);
 		
 			processors=new Text(parent,SWT.BORDER);
 			processors.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -151,12 +151,12 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 			lab = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 			lab.setLayoutData(fill3);
 		
-			allComText="Check to perform one run for every combination of values: compiler * mpi-processes * arguments * environment-variables.  Unchecked means one parameteric option per processor count (weak scaling)";
+			allComText=Messages.ParametricParameterTab_CheckToRunEachCombo;
 		}
 		
 		//cmpTab=makeArgTable(parent,"Flags","Variables");//TODO: Make a compiler table
 		allCom=new Button(parent,SWT.CHECK);
-		allCom.setText("Run jobs for all combinations");
+		allCom.setText(Messages.ParametricParameterTab_RunJobsForAllCombos);
 		allCom.setToolTipText(allComText);
 		allCom.addSelectionListener(wl);
 		//simWeak.setLayoutData(fill3);
@@ -164,12 +164,12 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		lab = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 		lab.setLayoutData(fill3);
 		
-		argTab=makeArgTable(parent,"Name","Values","Application Arguments");
+		argTab=makeArgTable(parent,Messages.ParametricParameterTab_Name,Messages.ParametricParameterTab_Values,Messages.ParametricParameterTab_AppArgs);
 		
 		lab = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 		lab.setLayoutData(fill3);
 		
-		varTab=makeArgTable(parent,"Name","Values","Environment Variables");
+		varTab=makeArgTable(parent,Messages.ParametricParameterTab_Name,Messages.ParametricParameterTab_Values,Messages.ParametricParameterTab_EnvVars);
 		
 		lab = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 		lab.setLayoutData(fill3);
@@ -181,19 +181,19 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 //		new Label(parent,SWT.NONE);
 		
 		lab=new Label(parent,SWT.NONE);
-		lab.setText("Analysis Application");
+		lab.setText(Messages.ParametricParameterTab_AnalysisApp);
 		script=new Text(parent,SWT.BORDER);
 		script.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		script.addModifyListener(wl);
 		scriptBrowse=new Button(parent,SWT.NONE);
-		scriptBrowse.setText("Browse");
+		scriptBrowse.setText(Messages.ParametricParameterTab_Browse);
 		scriptBrowse.addSelectionListener(new SelectionListener(){
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
 
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd=new FileDialog(parent.getShell());
-				fd.setText("Select a PerfExplorer script");
+				fd.setText(Messages.ParametricParameterTab_SelectPerfExScript);
 				String s =fd.open();
 				if(s!=null){
 					script.setText(s);
@@ -299,7 +299,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		vars.setLayoutData(span2);
 		
 		Button addVar = new Button(parent,SWT.None);
-		addVar.setText("Add");
+		addVar.setText(Messages.ParametricParameterTab_Add);
 		addVar.addSelectionListener(
 				new SelectionListener(){
 
@@ -319,7 +319,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		
 		
 		Button removeVar = new Button(parent,SWT.None);
-		removeVar.setText("Remove");
+		removeVar.setText(Messages.ParametricParameterTab_Remove);
 		removeVar.addSelectionListener(
 				new SelectionListener(){
 
@@ -340,7 +340,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	public String getName() {
-		return "Parametric Study";
+		return Messages.ParametricParameterTab_ParametricStudy;
 	}
 
 	public void initializeFrom(ILaunchConfiguration configuration) {
@@ -349,18 +349,18 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		
 		try {
 			if(parallel){
-				processors.setText(configuration.getAttribute(PARA_NUM_PROCESSORS, "1"));
+				processors.setText(configuration.getAttribute(PARA_NUM_PROCESSORS, "1")); //$NON-NLS-1$
 				
 			}
 			allCom.setSelection(configuration.getAttribute(PARA_ALL_COMBO, false));
-			optLevels.setText(configuration.getAttribute(PARA_OPT_LEVELS, ""));
+			optLevels.setText(configuration.getAttribute(PARA_OPT_LEVELS, "")); //$NON-NLS-1$
 			setTableList(argTab,configuration.getAttribute(PARA_ARG_NAMES, (List<String>)null),configuration.getAttribute(PARA_ARG_VALUES, (List<String>)null),configuration.getAttribute(PARA_ARG_BOOLS, (List<String>)null));
 			setTableList(varTab,configuration.getAttribute(PARA_VAR_NAMES, (List<String>)null),configuration.getAttribute(PARA_VAR_VALUES, (List<String>)null),configuration.getAttribute(PARA_VAR_BOOLS, (List<String>)null));
 			
 			useParam.setSelection(configuration.getAttribute(PARA_USE_PARAMETRIC, false));			
 			
 			
-			script.setText(configuration.getAttribute(PARA_PERF_SCRIPT, ""));
+			script.setText(configuration.getAttribute(PARA_PERF_SCRIPT, "")); //$NON-NLS-1$
 		
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
@@ -380,7 +380,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 			TableItem ti = new TableItem(ta,SWT.NONE);
 			ti.setText(0,data0.get(i));
 			ti.setText(1,data1.get(i));
-			if(checkList.get(i).equals("1")){
+			if(checkList.get(i).equals("1")){ //$NON-NLS-1$
 				ti.setChecked(true);
 			}
 		}
@@ -403,9 +403,9 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		
 		for(TableItem it : tiA){
 			if(it.getChecked())
-				l.add("1");
+				l.add("1"); //$NON-NLS-1$
 			else{
-				l.add("0");
+				l.add("0"); //$NON-NLS-1$
 			}
 		}
 		
@@ -445,9 +445,9 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		
 	}
 
-	private static final String weakError="Checked parameters must have at most 1 flag/name and exactly as many variables a there are processor counts";
+	private static final String weakError=Messages.ParametricParameterTab_25;
 	
-	private static final String noParError="Checked parameters must have at most 1 flag/name and the same number of variables";
+	private static final String noParError=Messages.ParametricParameterTab_26;
 	
 	public boolean isValid(ILaunchConfiguration config){
 		
@@ -553,7 +553,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 	 * @return
 	 */
 	static List<String> getComArgs(String combined) {
-		StringTokenizer st = new StringTokenizer(combined, ",");
+		StringTokenizer st = new StringTokenizer(combined, ","); //$NON-NLS-1$
 		List<String> numProcesses = new ArrayList<String>();
 		while (st.hasMoreTokens()) {
 			numProcesses.add(st.nextToken().trim());
@@ -569,7 +569,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 	static List<String> getRangeArgs(String combined){
 		List<String> numProcesses = new ArrayList<String>();
 		
-		StringTokenizer st = new StringTokenizer(combined, "-");
+		StringTokenizer st = new StringTokenizer(combined, "-"); //$NON-NLS-1$
 		
 		if(st.countTokens()==2){
 			String from=st.nextToken().trim();
@@ -577,7 +577,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 			int fromi=Integer.parseInt(from);
 			int toi=Integer.parseInt(to);
 			for(int i=fromi;i<=toi;i++){
-				numProcesses.add(i+"");
+				numProcesses.add(i+""); //$NON-NLS-1$
 			}
 		}
 		

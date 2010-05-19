@@ -76,9 +76,9 @@ public class TAUPortalUploadDialog extends Dialog {
 	  
 	  private Combo workspaceCombo;
 	  
-	  private String url="";
-	  private String uname="";
-	  private String pwd="";
+	  private String url=""; //$NON-NLS-1$
+	  private String uname=""; //$NON-NLS-1$
+	  private String pwd=""; //$NON-NLS-1$
 	  private File ppk=null;
 	  
 	  public TAUPortalUploadDialog(Shell parentShell, File ppk) {
@@ -97,15 +97,15 @@ public class TAUPortalUploadDialog extends Dialog {
 	    layout.numColumns = 2;
 
 	    Label pwdLabel=new Label(comp,SWT.RIGHT);
-	    pwdLabel.setText("TAU Portal URL: ");
+	    pwdLabel.setText(Messages.TAUPortalUploadDialog_TauPortURL);
 	    
 	    urlField=new Text(comp,SWT.SINGLE|SWT.BORDER);
 	    GridData data = new GridData(GridData.FILL_HORIZONTAL);
 	    urlField.setLayoutData(data);
-	    urlField.setText("https://tau.nic.uoregon.edu");
+	    urlField.setText("https://tau.nic.uoregon.edu"); //$NON-NLS-1$
 	    
 	    Label usernameLabel = new Label(comp, SWT.RIGHT);
-	    usernameLabel.setText("TAU Portal Username: ");
+	    usernameLabel.setText(Messages.TAUPortalUploadDialog_TauPortUname);
 
 	    usernameField = new Text(comp, SWT.SINGLE | SWT.BORDER);
 	    data = new GridData(GridData.FILL_HORIZONTAL);
@@ -113,7 +113,7 @@ public class TAUPortalUploadDialog extends Dialog {
 	    
 
 	    Label passwordLabel = new Label(comp, SWT.RIGHT);
-	    passwordLabel.setText("TAU Portal Password: ");
+	    passwordLabel.setText(Messages.TAUPortalUploadDialog_TauPortPwd);
 
 	    passwordField = new Text(comp, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
 	    data = new GridData(GridData.FILL_HORIZONTAL);
@@ -127,7 +127,7 @@ public class TAUPortalUploadDialog extends Dialog {
 				pwd=passwordField.getText();
 				if(uname.length()==0||pwd.length()==0)
 				{
-					portalStatus.setText("Submit a valid user name and password");
+					portalStatus.setText(Messages.TAUPortalUploadDialog_SubmitValidUnamePass);
 					workspaceCombo.clearSelection();
 				    workspaceCombo.setEnabled(false);
 					return;
@@ -135,9 +135,9 @@ public class TAUPortalUploadDialog extends Dialog {
 				
 				String workspaces = getWorkspaces(url,uname,pwd);
 
-				if(workspaces.equals("NO_VALID_WORKSPACES"))
+				if(workspaces.equals("NO_VALID_WORKSPACES")) //$NON-NLS-1$
 				{
-					portalStatus.setText("Unknown login error.  Try again.");
+					portalStatus.setText(Messages.TAUPortalUploadDialog_LoginError);
 					workspaceCombo.clearSelection();
 				    workspaceCombo.setEnabled(false);
 					return;
@@ -153,7 +153,7 @@ public class TAUPortalUploadDialog extends Dialog {
 				
 				workspaces=workspaces.trim();
 				
-				StringTokenizer tz = new StringTokenizer(workspaces, ",", false);
+				StringTokenizer tz = new StringTokenizer(workspaces, ",", false); //$NON-NLS-1$
 				
 				String wSArray[] = new String[tz.countTokens()];
 				int i=0;
@@ -163,20 +163,20 @@ public class TAUPortalUploadDialog extends Dialog {
 				workspaceCombo.setItems(wSArray);
 				workspaceCombo.setEnabled(true);
 				workspaceCombo.select(0);
-				portalStatus.setText("Select a workspace");
+				portalStatus.setText(Messages.TAUPortalUploadDialog_SelectWorkspace);
 			}
 		};
 	    
 	    
 	    Button login = new Button(comp, SWT.PUSH|SWT.CENTER);
-	    login.setText("Submit Login");
+	    login.setText(Messages.TAUPortalUploadDialog_SubmitLogin);
 	    login.addSelectionListener(subListen);
 	    
 	    portalStatus=new Label(comp,SWT.LEFT);
-	    portalStatus.setText("Submit a valid user name and password             ");
+	    portalStatus.setText(Messages.TAUPortalUploadDialog_SubmitValidEtcSpace);
 
 	    Label workspaceLabel = new Label(comp, SWT.RIGHT);
-	    workspaceLabel.setText("Select Workspace: ");
+	    workspaceLabel.setText(Messages.TAUPortalUploadDialog_SelectWorkspaceTab);
 	    
 	    workspaceCombo = new Combo(comp, SWT.READ_ONLY);
 	    data = new GridData(GridData.FILL_HORIZONTAL);
@@ -188,35 +188,35 @@ public class TAUPortalUploadDialog extends Dialog {
 
 	  protected void createButtonsForButtonBar(Composite parent) {
 	    super.createButtonsForButtonBar(parent);
-	    createButton(parent, RESET_ID, "Reset All", false);
+	    createButton(parent, RESET_ID, Messages.TAUPortalUploadDialog_ResetAll, false);
 	  }
 
 	  protected void buttonPressed(int buttonId) {
 	    if (buttonId == RESET_ID) {
-	      usernameField.setText("");
-	      passwordField.setText("");
+	      usernameField.setText(""); //$NON-NLS-1$
+	      passwordField.setText(""); //$NON-NLS-1$
 	    } else {
 	    	if(buttonId==Window.OK){
 	    		if(!workspaceCombo.getEnabled()){
-	    			portalStatus.setText("Error: No workspace selected");
+	    			portalStatus.setText(Messages.TAUPortalUploadDialog_ErrorNoWorkspace);
 	    			return;
 	    		}
 	    		if(workspaceCombo.getSelectionIndex()==-1)
 	    		{
-	    			portalStatus.setText("Error: No workspace selected");
+	    			portalStatus.setText(Messages.TAUPortalUploadDialog_ErrorNoWorkspace);
 	    			return;
 	    		}
 	    		
 	    		try {
 					String success = uploadPPK(url,uname, pwd, workspaceCombo.getItem(workspaceCombo.getSelectionIndex()), ppk);
-					if(success.indexOf("ERROR")>=0)
+					if(success.indexOf(Messages.TAUPortalUploadDialog_Error)>=0)
 					{
 						portalStatus.setText(success);
 						return;
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					portalStatus.setText("Unknown upload error.  Try again.");
+					portalStatus.setText(Messages.TAUPortalUploadDialog_UploadError);
 					return;
 				}
 	    	}
@@ -256,9 +256,9 @@ public class TAUPortalUploadDialog extends Dialog {
     private static String SHA1(String text)
     throws NoSuchAlgorithmException, UnsupportedEncodingException  {
         MessageDigest md;
-        md = MessageDigest.getInstance("SHA-1");
+        md = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
         byte[] sha1hash = new byte[40];
-        md.update(text.getBytes("iso-8859-1"), 0, text.length());
+        md.update(text.getBytes("iso-8859-1"), 0, text.length()); //$NON-NLS-1$
         sha1hash = md.digest();
         return convertToHex(sha1hash);
     }
@@ -272,12 +272,12 @@ public class TAUPortalUploadDialog extends Dialog {
     	Class sslProvider=null;
     	boolean goodProvider=true;
     	try{
-    	sslProvider=Class.forName("com.sun.net.ssl.internal.ssl.Provider");
+    	sslProvider=Class.forName("com.sun.net.ssl.internal.ssl.Provider"); //$NON-NLS-1$
     	}catch(ClassNotFoundException e){goodProvider=false;}
     	
     	if(!goodProvider)
     	{
-    		sslProvider=Class.forName("com.ibm.jsse.IBMJSSEProvider");
+    		sslProvider=Class.forName("com.ibm.jsse.IBMJSSEProvider"); //$NON-NLS-1$
     	}
     	
         Security.addProvider((Provider)sslProvider.newInstance());//new com.ibm.jsse.IBMJSSEProvider());//com.sun.net.ssl.internal.ssl.Provider());
@@ -296,7 +296,7 @@ public class TAUPortalUploadDialog extends Dialog {
         };
  
         //Install the all-trusting trust manager:
-        SSLContext sc = SSLContext.getInstance("SSL");
+        SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
       sc.init(null, trustAllCerts, new SecureRandom());
        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
        
@@ -304,7 +304,7 @@ public class TAUPortalUploadDialog extends Dialog {
        HostnameVerifier hv = new HostnameVerifier() {
            public boolean verify(String urlHostName, SSLSession session) {
                if (!urlHostName.equalsIgnoreCase(session.getPeerHost())) {
-                   System.out.println("Warning: URL host '"+urlHostName+"' is different to SSLSession host '"+session.getPeerHost()+"'.");
+                   System.out.println(Messages.TAUPortalUploadDialog_WarningURLHost+urlHostName+Messages.TAUPortalUploadDialog_IsDifferent+session.getPeerHost()+"'."); //$NON-NLS-3$
                }
                return true; //also accept different hostname (e.g. domain name instead of IP address)
            }
@@ -325,9 +325,9 @@ public class TAUPortalUploadDialog extends Dialog {
 			pwd2 = SHA1(pwd);
 		
 		
-		String portalURL=url+"/trial/list_workspaces";
-		String data = URLEncoder.encode("username","UTF-8")+"="+URLEncoder.encode(uname,"UTF-8");
-		data += "&"+URLEncoder.encode("password", "UTF-8")+"="+URLEncoder.encode(pwd2, "UTF-8");
+		String portalURL=url+"/trial/list_workspaces"; //$NON-NLS-1$
+		String data = URLEncoder.encode("username","UTF-8")+"="+URLEncoder.encode(uname,"UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		data += "&"+URLEncoder.encode("password", "UTF-8")+"="+URLEncoder.encode(pwd2, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		
 		String workspaces = portalAccess(portalURL,data);
 		
@@ -341,7 +341,7 @@ public class TAUPortalUploadDialog extends Dialog {
 			e.printStackTrace();
 		}
 		
-		return "NO_VALID_WORKSPACES";
+		return "NO_VALID_WORKSPACES"; //$NON-NLS-1$
 	}
     
     /**
@@ -357,22 +357,22 @@ public class TAUPortalUploadDialog extends Dialog {
 		
 		String pwd2 = SHA1(pwd);
 		
-		String portalURL=url+"/trial/batch_upload";
+		String portalURL=url+"/trial/batch_upload"; //$NON-NLS-1$
 		String ppkName = ppkFile.getName();
 		ppkName=ppkName.substring(0, ppkName.lastIndexOf('.'));
 		
-		RandomAccessFile rfile = new RandomAccessFile(ppkFile, "r");
+		RandomAccessFile rfile = new RandomAccessFile(ppkFile, "r"); //$NON-NLS-1$
 		
 		byte barr[]=new byte[(int)rfile.length()];
 		rfile.read(barr);
-		String ppkString=new String(barr,"ISO-8859-1");
-		ppkString=URLEncoder.encode(ppkString,"ISO-8859-1");
+		String ppkString=new String(barr,"ISO-8859-1"); //$NON-NLS-1$
+		ppkString=URLEncoder.encode(ppkString,"ISO-8859-1"); //$NON-NLS-1$
 		
 
-		String data = URLEncoder.encode("username","UTF-8")+"="+URLEncoder.encode(usr,"UTF-8");
-		data += "&"+URLEncoder.encode("password", "UTF-8")+"="+URLEncoder.encode(pwd2, "UTF-8");
-		data += "&"+URLEncoder.encode(ppkName, "UTF-8")+"="+ppkString;
-		data += "&"+URLEncoder.encode("workspace", "UTF-8")+"="+URLEncoder.encode(workspace, "UTF-8");
+		String data = URLEncoder.encode("username","UTF-8")+"="+URLEncoder.encode(usr,"UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		data += "&"+URLEncoder.encode("password", "UTF-8")+"="+URLEncoder.encode(pwd2, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		data += "&"+URLEncoder.encode(ppkName, "UTF-8")+"="+ppkString; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		data += "&"+URLEncoder.encode("workspace", "UTF-8")+"="+URLEncoder.encode(workspace, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		
 		return portalAccess(portalURL,data);
 		
@@ -403,9 +403,9 @@ public class TAUPortalUploadDialog extends Dialog {
 		
 		wr.write(data);
 		wr.flush();
-		String line="";
+		String line=""; //$NON-NLS-1$
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		while ((line = rd.readLine()) != null) {
 			result+=line;
 		}

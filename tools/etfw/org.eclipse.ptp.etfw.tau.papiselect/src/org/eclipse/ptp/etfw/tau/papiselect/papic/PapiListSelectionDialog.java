@@ -114,7 +114,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			IStructuredContentProvider contentProvider,
 			ILabelProvider labelProvider, String message, int papiCountType) {
 		super(parentShell);
-		setTitle("PAPI Counters");//WorkbenchMessages.ListSelection_title);
+		setTitle(Messages.getString("PapiListSelectionDialog.PapiCounters"));//WorkbenchMessages.ListSelection_title); //$NON-NLS-1$
 		papiCon = new PapiSelect(papiloc, papiCountType);
 		inputElement = papiCon.getAvail().toArray();
 		this.contentProvider = contentProvider;
@@ -123,7 +123,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		if (message != null) {
 			setMessage(message);
 		} else {
-			setMessage("Select PAPI counters");//WorkbenchMessages.ListSelection_message);
+			setMessage(Messages.getString("PapiListSelectionDialog.SelectPapiCounters"));//WorkbenchMessages.ListSelection_message); //$NON-NLS-1$
 		}
 	}
 
@@ -145,7 +145,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 				false));
 
 		Button selectButton = createButton(buttonComposite,
-				IDialogConstants.SELECT_ALL_ID, "Select All", false);
+				IDialogConstants.SELECT_ALL_ID, Messages.getString("PapiListSelectionDialog.SelectAll"), false); //$NON-NLS-1$
 
 		SelectionListener listener = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -160,7 +160,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		selectButton.addSelectionListener(listener);
 
 		Button deselectButton = createButton(buttonComposite,
-				IDialogConstants.DESELECT_ALL_ID, "Deselect All", false);
+				IDialogConstants.DESELECT_ALL_ID, Messages.getString("PapiListSelectionDialog.DeselectAll"), false); //$NON-NLS-1$
 
 		listener = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -171,7 +171,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		deselectButton.addSelectionListener(listener);
 
 		Button helpButton = createButton(buttonComposite,
-				IDialogConstants.HELP_ID, "Counter Descriptions", false);
+				IDialogConstants.HELP_ID, Messages.getString("PapiListSelectionDialog.CounterDescs"), false); //$NON-NLS-1$
 		listener = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				displayPapiDescs();
@@ -188,16 +188,16 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		// TODO Make this run with background active
 		Display thisDisplay = PlatformUI.getWorkbench().getDisplay();
 		Shell eDefShell = new Shell(thisDisplay.getActiveShell(), SWT.RESIZE);
-				eDefShell.setText("Counter Descriptions");
+				eDefShell.setText(Messages.getString("PapiListSelectionDialog.CounterDescs")); //$NON-NLS-1$
 				eDefShell.setMinimumSize(200, 100);
 				eDefShell.setSize(400, 300);
 				eDefShell.setLayout(new FillLayout());
 				final Table table = new Table(eDefShell, SWT.BORDER);
 				table.setHeaderVisible(true);
 				TableColumn column1 = new TableColumn(table, SWT.NONE);
-				column1.setText("Counter");
+				column1.setText(Messages.getString("PapiListSelectionDialog.Counter")); //$NON-NLS-1$
 				TableColumn column2 = new TableColumn(table, SWT.NONE);
-				column2.setText("Definition");
+				column2.setText(Messages.getString("PapiListSelectionDialog.Definition")); //$NON-NLS-1$
 				TableItem item;
 				Vector<String> cNames = papiCon.getCounterNames();
 				Vector<String> cDefs = papiCon.getCounterDefs();
@@ -234,7 +234,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
-				PlatformUI.PLUGIN_ID + "."+"list_selection_dialog_context");//IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG);
+				PlatformUI.PLUGIN_ID + "."+"list_selection_dialog_context");//IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**

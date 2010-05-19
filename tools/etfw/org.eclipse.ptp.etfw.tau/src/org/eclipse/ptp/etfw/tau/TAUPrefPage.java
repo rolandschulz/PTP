@@ -78,19 +78,19 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 		gridData.horizontalSpan = 3;
 		gridData.horizontalAlignment = GridData.FILL;
 		
-		if(org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix")>=0)
+		if(org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix")>=0) //$NON-NLS-1$
 		{
-			checkAixOpts=createCheckButton(parent,"Automatically use Eclipse internal builder (May be needed for AIX compatibility)");
+			checkAixOpts=createCheckButton(parent,Messages.TAUPrefPage_AutoEclipseInternal);
 			checkAixOpts.setLayoutData(gridData);
 			checkAixOpts.addSelectionListener(listener);
 		}
 
-		checkAutoOpts=createCheckButton(parent, "Check for TAU System options");
+		checkAutoOpts=createCheckButton(parent, Messages.TAUPrefPage_CheckTauOptions);
 		checkAutoOpts.setLayoutData(gridData);
 		checkAutoOpts.addSelectionListener(listener);
 		
 		testPAPI=new Button(parent, SWT.NONE);
-		testPAPI.setText("Test PAPI");
+		testPAPI.setText(Messages.TAUPrefPage_TestPapi);
 		testPAPI.addSelectionListener(listener);
 		
 		return parent;
@@ -102,9 +102,9 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		
 		//TODO: Add checks
-		checkAutoOpts.setSelection(preferences.getBoolean("TAUCheckForAutoOptions"));
+		checkAutoOpts.setSelection(preferences.getBoolean("TAUCheckForAutoOptions")); //$NON-NLS-1$
 		if(checkAixOpts!=null)
-			checkAixOpts.setSelection(preferences.getBoolean("TAUCheckForAIXOptions"));
+			checkAixOpts.setSelection(preferences.getBoolean("TAUCheckForAIXOptions")); //$NON-NLS-1$
 	}
 	
 	public boolean performOk() 
@@ -112,9 +112,9 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 
 		//TODO: Add checks
-		preferences.setValue("TAUCheckForAutoOptions", checkAutoOpts.getSelection());
+		preferences.setValue("TAUCheckForAutoOptions", checkAutoOpts.getSelection()); //$NON-NLS-1$
 		if(checkAixOpts!=null)
-			preferences.setValue("TAUCheckForAIXOptions", checkAixOpts.getSelection());
+			preferences.setValue("TAUCheckForAIXOptions", checkAixOpts.getSelection()); //$NON-NLS-1$
 
 		Activator.getDefault().savePluginPreferences();
 		return true;

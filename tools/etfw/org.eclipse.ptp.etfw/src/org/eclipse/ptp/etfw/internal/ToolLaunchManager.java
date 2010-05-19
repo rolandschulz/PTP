@@ -32,9 +32,9 @@ import org.eclipse.ptp.etfw.toolopts.PostProcTool;
 
 public class ToolLaunchManager {
 	
-	protected static final String buildText="Instrumenting and Building";
-	protected static final String launchText="Executing Instrumented Project";
-	protected static final String collectText="Collecting Performance Data";
+	protected static final String buildText=Messages.ToolLaunchManager_InstrumentingAndBuilding;
+	protected static final String launchText=Messages.ToolLaunchManager_ExecutingInstrumentedProject;
+	protected static final String collectText=Messages.ToolLaunchManager_CollectingPerfData;
 	
 	//protected String appNameAttribute;
 	//protected String projNameAttribute;

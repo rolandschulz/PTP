@@ -49,8 +49,8 @@ public class TestPAPI {
 		window = Workbench.getInstance().getActiveWorkbenchWindow();
 	}
 
-	protected static final String papiLocationSelectionVar="ID.of.PAPI.bin.directory.location";
-	protected static final String papiCounterTypeVar="ID.of.PAPI.counter.type.selected";
+	protected static final String papiLocationSelectionVar="ID.of.PAPI.bin.directory.location"; //$NON-NLS-1$
+	protected static final String papiCounterTypeVar="ID.of.PAPI.counter.type.selected"; //$NON-NLS-1$
 	
 	/**
 	 * The action has been activated. The argument of the
@@ -75,7 +75,7 @@ public class TestPAPI {
 			if(!pdir.isDirectory()||!pdir.canRead()){
 				return;
 			}
-			File pcxi=new File(papiLoc+File.separator+"papi_xml_event_info");
+			File pcxi=new File(papiLoc+File.separator+"papi_xml_event_info"); //$NON-NLS-1$
 			
 			if(pcxi.canRead()&&pcxi.exists())//papiCountType==2)
 			{
@@ -90,8 +90,8 @@ public class TestPAPI {
 			
 			PapiListSelectionDialog papidialog = new PapiListSelectionDialog(
 					window.getShell(), papiLoc, paprov, papilab,
-					"Select PAPI counters", papiCountType);
-			papidialog.setTitle("PAPI Counters");
+					Messages.TestPAPI_SelectPapiCounters, papiCountType);
+			papidialog.setTitle(Messages.TestPAPI_PapiCounters);
 			papidialog.setHelpAvailable(false);
 			
 			/*
@@ -116,15 +116,15 @@ public class TestPAPI {
 	private void showCounters(Object[] selected)
 	{
 		if ((selected != null) && (selected.length > 0)) {
-			String counters="";
+			String counters=""; //$NON-NLS-1$
 			for(int i=0;i<selected.length;i++)
 			{
-				counters+=selected[i]+"\n";
+				counters+=selected[i]+"\n"; //$NON-NLS-1$
 			}
 			
 			MessageDialog.openInformation(
 			window.getShell(),
-			"Selected PAPI Counters:",
+			Messages.TestPAPI_SelectedPapiCounters,
 			counters);
 			
 //			LinkedHashSet selset = new LinkedHashSet(Arrays

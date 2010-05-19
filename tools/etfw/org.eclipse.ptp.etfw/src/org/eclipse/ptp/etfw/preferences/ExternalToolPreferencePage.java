@@ -112,24 +112,24 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText("External Tool Configuration");
+		aGroup.setText(Messages.ExternalToolPreferencePage_ExToolConf);
 
 		Composite xmlcom = new Composite(aGroup, SWT.NONE);
 		xmlcom.setLayout(createGridLayout(2, false, 0, 0));
 		xmlcom.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
 		Label tauarchComment = new Label(xmlcom, SWT.WRAP);
-		tauarchComment.setText("Tool Definition File:");
+		tauarchComment.setText(Messages.ExternalToolPreferencePage_ToolDefFile);
 		XMLLocs = new List(xmlcom, SWT.BORDER |SWT.V_SCROLL);
 		XMLLocs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		//XMLLocs.add.addModifyListener(listener);
 
 		browseXMLButton = new Button(xmlcom,SWT.PUSH);
-		browseXMLButton.setText("Add");
+		browseXMLButton.setText(Messages.ExternalToolPreferencePage_Add);
 		browseXMLButton.addSelectionListener(listener);
 		
 		removeItemButton=new Button(xmlcom,SWT.PUSH);
-		removeItemButton.setText("Remove");
+		removeItemButton.setText(Messages.ExternalToolPreferencePage_Remove);
 		removeItemButton.addSelectionListener(listener);
 		//TODO: Implement tau-option checking
 //		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
@@ -187,7 +187,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 //		makefilter mfilter = new makefilter();
 //		File test = new File(tlpath);
 
-		dialog.setText("Select tool definition xml file");
+		dialog.setText(Messages.ExternalToolPreferencePage_SelectToolDefXML);
 		
 		String out=getFieldContent(dialog.open());
 		
@@ -232,7 +232,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		String fiList=preferences.getString(XMLLOCID);
 		
-		String[] files = fiList.split(",,,");
+		String[] files = fiList.split(",,,"); //$NON-NLS-1$
 		for(String s : files)
 		{
 			XMLLocs.add(s);//setText(preferences.getString(XMLLOCID));
@@ -247,12 +247,12 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	{
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		
-		String fiList="";
+		String fiList=""; //$NON-NLS-1$
 		
 		for(int i=0;i<XMLLocs.getItemCount();i++){
 			fiList+=XMLLocs.getItem(i);
 			if(i<XMLLocs.getItemCount()-1){
-				fiList+=",,,";
+				fiList+=",,,"; //$NON-NLS-1$
 			}
 		}
 		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());

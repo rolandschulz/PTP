@@ -54,11 +54,11 @@ public class BuildLaunchUtils {
 	public static String findToolBinPath(String toolfind, String suggPath, String queryText, String queryMessage, Shell selshell)
 	{
 			String vtbinpath=BuildLaunchUtils.checkToolEnvPath(toolfind);
-			if(vtbinpath==null||vtbinpath.equals(""))
+			if(vtbinpath==null||vtbinpath.equals("")) //$NON-NLS-1$
 			{
 				vtbinpath=BuildLaunchUtils.askToolPath(suggPath, queryText, queryMessage, selshell);
 				if(vtbinpath==null)
-					vtbinpath="";
+					vtbinpath=""; //$NON-NLS-1$
 			}
 
 		return vtbinpath;
@@ -76,11 +76,11 @@ public class BuildLaunchUtils {
 	public static String findToolBinPath(String toolfind, String suggPath, String toolName, Shell selshell)
 	{
 			String vtbinpath=BuildLaunchUtils.checkToolEnvPath(toolfind);
-			if(vtbinpath==null||vtbinpath.equals(""))
+			if(vtbinpath==null||vtbinpath.equals("")) //$NON-NLS-1$
 			{
 				vtbinpath=BuildLaunchUtils.askToolPath(suggPath, toolName, selshell);
 				if(vtbinpath==null)
-					vtbinpath="";
+					vtbinpath=""; //$NON-NLS-1$
 			}
 
 		return vtbinpath;
@@ -95,11 +95,11 @@ public class BuildLaunchUtils {
 	public static String getToolPath(String toolID)
 	{
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		String toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "."+toolID;
+		String toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "."+toolID; //$NON-NLS-1$
 		String path=pstore.getString(toolBinID);
 		if(path!=null)
 			return path;
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 	
 	/**
@@ -125,11 +125,11 @@ public class BuildLaunchUtils {
 				me = eIt.next();
 				entry=me.getKey();
 				
-				if(entry.equals("internal"))
+				if(entry.equals("internal")) //$NON-NLS-1$
 					continue;
 				
-				String toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry;
-				if (force||pstore.getString(toolBinID).equals("")) 
+				String toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry; //$NON-NLS-1$
+				if (force||pstore.getString(toolBinID).equals(""))  //$NON-NLS-1$
 				{
 					pstore.setValue(toolBinID,
 									BuildLaunchUtils.findToolBinPath((String) me.getValue(), null,entry, ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -155,11 +155,11 @@ public class BuildLaunchUtils {
 				me = eIt.next();
 				entry=me.getKey();
 				
-				if(entry.equals("internal"))
+				if(entry.equals("internal")) //$NON-NLS-1$
 					continue;
 				
-				String toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry;
-				if (force||pstore.getString(toolBinID).equals("")) 
+				String toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry; //$NON-NLS-1$
+				if (force||pstore.getString(toolBinID).equals(""))  //$NON-NLS-1$
 				{
 					pstore.setValue(toolBinID,
 									BuildLaunchUtils.findToolBinPath((String) me.getValue(), null,entry, ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
@@ -183,13 +183,13 @@ public class BuildLaunchUtils {
 				me = eIt.next();
 				entry=me.getKey();
 				
-				if(entry.equals("internal"))
+				if(entry.equals("internal")) //$NON-NLS-1$
 					continue;
 				
-				toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry;
+				toolBinID=IToolLaunchConfigurationConstants.TOOL_BIN_ID+ "." + entry; //$NON-NLS-1$
 				curTool=pstore.getString(toolBinID);
 				
-				if(curTool==null||curTool.equals("")||!(new File(curTool).exists()))
+				if(curTool==null||curTool.equals("")||!(new File(curTool).exists())) //$NON-NLS-1$
 				{
 					String gVal = (String) me.getValue();
 					if(gVal!=null&&gVal.trim().length()>0)
@@ -210,11 +210,11 @@ public class BuildLaunchUtils {
 	 * 
 	 */
 	public static String checkToolEnvPath(String toolname) {
-		if(org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win")>=0)
+		if(org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win")>=0) //$NON-NLS-1$
 			return null;
 		String pPath = null;
 		try {
-			Process p = new ProcessBuilder("which",toolname).start();//Runtime.getRuntime().exec("which "+toolname);
+			Process p = new ProcessBuilder("which",toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p
 					.getInputStream()));
 			pPath = reader.readLine();
@@ -269,7 +269,7 @@ public class BuildLaunchUtils {
 	 * */
 	public static String askToolPath(String archpath, String toolName, Shell selshell) {
 
-		return askToolPath(archpath,"Select "+toolName+" Bin Directory","Please select the directory containing "+toolName+"",selshell);
+		return askToolPath(archpath,Messages.BuildLaunchUtils_Select+toolName+Messages.BuildLaunchUtils_BinDir,Messages.BuildLaunchUtils_PleaseSelectDir+toolName+"",selshell); //$NON-NLS-4$
 	}
 	
 	/**
@@ -278,7 +278,7 @@ public class BuildLaunchUtils {
 	 */
 	public static String getNow(){
 		Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-        String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss";
+        String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss"; //$NON-NLS-1$
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getDefault());
         return sdf.format(cal.getTime());
@@ -318,8 +318,8 @@ public class BuildLaunchUtils {
 			}
 			
 			Process p = pb.start();//Runtime.getRuntime().exec(tool, env, directory);
-			StreamRunner outRun=new StreamRunner(p.getInputStream(),"out",fos);
-			StreamRunner errRun=new StreamRunner(p.getErrorStream(),"err",null);
+			StreamRunner outRun=new StreamRunner(p.getInputStream(),"out",fos); //$NON-NLS-1$
+			StreamRunner errRun=new StreamRunner(p.getErrorStream(),"err",null); //$NON-NLS-1$
 			outRun.start();
 			errRun.start();
 			outRun.join();

@@ -78,7 +78,7 @@ public class ParallelToolRecompMainTab extends ApplicationTab{
 		mainComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label appLabel = new Label(mainComp, SWT.NONE);
-		appLabel.setText("C/C++/Fortran Build Configuration");
+		appLabel.setText(LaunchMessages.ParallelToolRecompMainTab_LangBuildConf);
 		appLabel.setLayoutData(spanGridData(-1, 2));
 
 		buildConfCombo=new Combo(mainComp,SWT.DROP_DOWN | SWT.READ_ONLY
@@ -178,8 +178,8 @@ public class ParallelToolRecompMainTab extends ApplicationTab{
 		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
 		if(info==null)
 		{
-			MessageDialog.openInformation(getShell(), org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Project_required"), 
-					org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program"));
+			MessageDialog.openInformation(getShell(), org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Project_required"),  //$NON-NLS-1$
+					org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
 			return;
 		}
 
@@ -213,7 +213,7 @@ public class ParallelToolRecompMainTab extends ApplicationTab{
 		else{
 			name = getFieldContent(buildConfCombo.getText());
 			if (name == null) {
-				setErrorMessage("Build configuration not specified");
+				setErrorMessage(LaunchMessages.ParallelToolRecompMainTab_BuildConfNotSpeced);
 				return false;
 			}
 		}

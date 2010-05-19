@@ -69,8 +69,8 @@ public class AtomicInstrument implements IEditorActionDelegate {
 		class validateName implements IInputValidator{
 
 			public String isValid(String newText) {
-				if(newText.equals(""))
-					return "Please enter valid text";
+				if(newText.equals("")) //$NON-NLS-1$
+					return Messages.AtomicInstrument_EnterValidText;
 				return null;
 			}
 		}
@@ -78,37 +78,37 @@ public class AtomicInstrument implements IEditorActionDelegate {
 		class validateValue implements IInputValidator{
 
 			public String isValid(String newText) {
-				String err="Please enter a valid double or variable name";
-				if(newText.equals(""))
+				String err=Messages.AtomicInstrument_EnterValidDoubOrVar;
+				if(newText.equals("")) //$NON-NLS-1$
 					return err;
 				
-				String fixed = newText.replaceAll("\\W", "");
+				String fixed = newText.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$
 				if(!newText.equals(fixed))
 				{
 					if(newText.length()-fixed.length()==1)
-						if(newText.indexOf(".")>=0)
-							if(fixed.replaceAll("\\d", "").equals(""))
+						if(newText.indexOf(".")>=0) //$NON-NLS-1$
+							if(fixed.replaceAll("\\d", "").equals("")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								return null;
 					return err;
 				}
 				return null;
 			}
 		}
-		InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), "User Defined Event Name", "Please enter a unique name to associate with this user defined event", "", new validateName());
+		InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.AtomicInstrument_UserDefinedEventName, Messages.AtomicInstrument_EnterUniqueName, "", new validateName()); //$NON-NLS-3$
 
 		if(namedialog.open() == Window.CANCEL)return;
 		String testline = namedialog.getValue();
 		
 		
-		InputDialog incdialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), "User Defined Event Value", "Please enter a static value or available numeric variable", "", new validateValue());
+		InputDialog incdialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.AtomicInstrument_UserDefinedEventValue, Messages.AtomicInstrument_EnterStaticValueOrVariable, "", new validateValue()); //$NON-NLS-3$
 		if(incdialog.open() == Window.CANCEL)return;
 		String testinc = incdialog.getValue();
 		
-		String fixline = testline.replaceAll("\\W", "");
+		String fixline = testline.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		LinkedHashSet<String> instlines = new LinkedHashSet<String>();
-		String regline = "TAU_REGISTER_EVENT(TAU__"+fixline+", \\\""+testline+"\\\");";
-		String evtline = "TAU_EVENT(TAU__"+fixline+", "+testinc+");";
-		String nosselregline = "file =\""+cele.getElementName()+"\" line="+insertregs+" code=\""+regline+" "+evtline+"\"";
+		String regline = "TAU_REGISTER_EVENT(TAU__"+fixline+", \\\""+testline+"\\\");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String evtline = "TAU_EVENT(TAU__"+fixline+", "+testinc+");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String nosselregline = "file =\""+cele.getElementName()+"\" line="+insertregs+" code=\""+regline+" "+evtline+"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		instlines.add(nosselregline);
 		
 		Selector selectinst = new Selector(location);

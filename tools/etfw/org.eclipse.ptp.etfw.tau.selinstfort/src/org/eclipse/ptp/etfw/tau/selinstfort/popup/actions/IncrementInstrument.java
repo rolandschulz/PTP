@@ -61,7 +61,7 @@ public class IncrementInstrument implements IEditorActionDelegate {
 			ITextSelection ts = (ITextSelection) textEditor.getSelectionProvider().getSelection();
 			if(ts.getLength()<=0)
 			{
-				System.out.println("Please select the area you want to instrument.");
+				System.out.println(Messages.IncrementInstrument_SelectAreaToInstrument);
 			}
 			insertregs = ts.getStartLine()+1;
 			insertstops= ts.getEndLine()+1;

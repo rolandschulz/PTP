@@ -34,13 +34,13 @@ import org.eclipse.swt.graphics.Image;
  *
  */
 public class LaunchImages {
-	private static final String NAME_PREFIX = "org.eclipse.ptp.etfw.tau.core.";
+	private static final String NAME_PREFIX = "org.eclipse.ptp.etfw.tau.core."; //$NON-NLS-1$
 	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
     
 	private static URL iconBaseURL = null;
 	
 	static {
-		String pathSuffix = "icons/";
+		String pathSuffix = "icons/"; //$NON-NLS-1$
 		iconBaseURL = Activator.getDefault().getBundle().getEntry(pathSuffix);
 	}
 	
@@ -48,11 +48,11 @@ public class LaunchImages {
 	private static ImageRegistry imageRegistry = null;
 	private static HashMap<String, ImageDescriptor> avoidSWTErrorMap = null;
 
-	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif";
-	public static final String IMG_ANALYSIS_TAB = NAME_PREFIX + "tauLogo.gif";//parallel_tab.gif
-	public static final String IMG_ARGUMENTS_TAB = NAME_PREFIX + "arguments_tab.gif";
-	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif";
-	public static final String IMG_DEBUGGER_TAB = NAME_PREFIX + "debugger_tab.gif";
+	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif"; //$NON-NLS-1$
+	public static final String IMG_ANALYSIS_TAB = NAME_PREFIX + "tauLogo.gif";//parallel_tab.gif //$NON-NLS-1$
+	public static final String IMG_ARGUMENTS_TAB = NAME_PREFIX + "arguments_tab.gif"; //$NON-NLS-1$
+	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif"; //$NON-NLS-1$
+	public static final String IMG_DEBUGGER_TAB = NAME_PREFIX + "debugger_tab.gif"; //$NON-NLS-1$
 	
 	public static final ImageDescriptor DESC_PARALLEL_TAB = createManaged(IMG_PARALLEL_TAB);
 	public static final ImageDescriptor DESC_ANALYSIS_TAB = createManaged(IMG_ANALYSIS_TAB);
@@ -92,7 +92,7 @@ public class LaunchImages {
 			}
 			avoidSWTErrorMap.put(name, result);
 			if (imageRegistry != null) {
-			    System.out.println("Internal Error: Image registry already defined");
+			    System.out.println(Messages.LaunchImages_InternalErrorRegDefined);
 			}
 			return result;
 		} catch (MalformedURLException e) {

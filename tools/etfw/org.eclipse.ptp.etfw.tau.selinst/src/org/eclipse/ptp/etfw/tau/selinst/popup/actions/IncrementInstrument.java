@@ -70,7 +70,7 @@ public class IncrementInstrument implements IEditorActionDelegate {
 		ITextSelection ts = (ITextSelection) textEditor.getSelectionProvider().getSelection();
 		if(ts.getLength()<=0)
 		{
-			System.out.println("Please select the area you want to instrument.");
+			System.out.println(Messages.IncrementInstrument_SelectAreaToInstrument);
 			}
 		insertregs = ts.getStartLine()+1;
 		insertstops= ts.getEndLine()+1;
@@ -93,25 +93,25 @@ public class IncrementInstrument implements IEditorActionDelegate {
 		class ValidateName implements IInputValidator{
 
 			public String isValid(String newText) {
-				if(newText.equals(""))
-					return "Please enter valid text";
+				if(newText.equals("")) //$NON-NLS-1$
+					return Messages.IncrementInstrument_EnterValidText;
 				return null;
 			}
 		}
 		
-		String[] opts={"static timer","dynamic timer","static phase","dynamic phase","Cancel"};
-		MessageDialog timephase = new MessageDialog(CUIPlugin.getActiveWorkbenchShell(), "Instrumentation Type Selection",null,"Please select one of the following incremental user defined event types",MessageDialog.QUESTION,opts,0);
+		String[] opts={"static timer","dynamic timer","static phase","dynamic phase",Messages.IncrementInstrument_Cancel}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		MessageDialog timephase = new MessageDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.IncrementInstrument_InstTypeSelect,null,Messages.IncrementInstrument_SelectOneOfFollowing,MessageDialog.QUESTION,opts,0);
 
 		if(timephase.open() == 4)return null;
 		
 		int optline = timephase.getReturnCode();
 		
-		InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), "User Defined Event Name", "Please enter a unique name to associate with this user defined event", "", new ValidateName());
+		InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.IncrementInstrument_UserDefEventName, Messages.IncrementInstrument_EnterUniqueName, "", new ValidateName()); //$NON-NLS-3$
 
 		if(namedialog.open() == Window.CANCEL)return null;
 		String testline = namedialog.getValue();
 
-		return opts[optline]+" name=\"TAU__"+testline.replaceAll("\\W", "")+"\" file=\""+file+"\" line="+start+" to line="+stop;
+		return opts[optline]+" name=\"TAU__"+testline.replaceAll("\\W", "")+"\" file=\""+file+"\" line="+start+" to line="+stop; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		
 	}
 	

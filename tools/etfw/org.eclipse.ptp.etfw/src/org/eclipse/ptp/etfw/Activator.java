@@ -48,7 +48,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -212,7 +212,7 @@ public class Activator extends AbstractUIPlugin {
 		workflowList = new ArrayList<File>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.workflows");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.workflows"); //$NON-NLS-1$
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {
@@ -225,12 +225,12 @@ public class Activator extends AbstractUIPlugin {
 				IConfigurationElement ce = elements[i];
 				try {
 					String plugspace=ext.getNamespaceIdentifier();
-					String aGetter = ce.getAttribute("XMLFile");
+					String aGetter = ce.getAttribute("XMLFile"); //$NON-NLS-1$
 					
 					//elements[i].
 					//aGetter.setId(ce.getAttribute("id"));
 					//System.out.println(plugspace+" "+aGetter);
-					workflowList.add(new File(new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString().replaceAll(" ", "%20"))));
+					workflowList.add(new File(new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString().replaceAll(" ", "%20")))); //$NON-NLS-1$ //$NON-NLS-2$
 				} 
 				catch (Exception e) {
 					e.printStackTrace();
@@ -272,7 +272,7 @@ public class Activator extends AbstractUIPlugin {
 		
 		
 		String fiList=getPreferenceStore().getString(IToolLaunchConfigurationConstants.XMLLOCID);
-		String[] fiLocs = fiList.split(",,,");
+		String[] fiLocs = fiList.split(",,,"); //$NON-NLS-1$
 		
 		ArrayList<File> files = new ArrayList<File>();
 		File fi=null;
@@ -287,13 +287,13 @@ public class Activator extends AbstractUIPlugin {
 		if(files.size()==0)
 		{
 			//File toolxml= new File();
-			String epath=BuildLaunchUtils.checkToolEnvPath("eclipse");
+			String epath=BuildLaunchUtils.checkToolEnvPath("eclipse"); //$NON-NLS-1$
 			if(epath!=null)
 			{
 				File toolxml=new File(epath);
 				if(toolxml.canRead()&&toolxml.exists())
 				{
-					toolxml=new File(toolxml.getPath()+File.separator+"tool.xml");
+					toolxml=new File(toolxml.getPath()+File.separator+"tool.xml"); //$NON-NLS-1$
 					if(toolxml.canRead()&&toolxml.isFile())
 					{
 						files.add(toolxml);
@@ -323,7 +323,7 @@ public class Activator extends AbstractUIPlugin {
 			}catch(Exception e){
 				tools=null;
 				e.printStackTrace();
-				System.out.println("Problem reading "+files.get(i).toString());
+				System.out.println(Messages.Activator_ProblemReading+files.get(i).toString());
 			}
 			//numOTools=otherTools.length;
 			if(tools!=null)
@@ -366,7 +366,7 @@ public class Activator extends AbstractUIPlugin {
 		perfConfTabs = new ArrayList<AbstractToolConfigurationTab>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.configurationTabs");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.configurationTabs"); //$NON-NLS-1$
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {
@@ -378,7 +378,7 @@ public class Activator extends AbstractUIPlugin {
 			{
 				IConfigurationElement ce = elements[i];
 				try {
-					AbstractToolConfigurationTab aGetter = (AbstractToolConfigurationTab) ce.createExecutableExtension("class");
+					AbstractToolConfigurationTab aGetter = (AbstractToolConfigurationTab) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					//aGetter.setId(ce.getAttribute("id"));
 					perfConfTabs.add(aGetter);
 				} catch (CoreException e) {
@@ -403,7 +403,7 @@ public class Activator extends AbstractUIPlugin {
 		perfConfManagers = new ArrayList<AbstractToolDataManager>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.dataManagers");
+		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.dataManagers"); //$NON-NLS-1$
 		final IExtension[] extensions = extensionPoint.getExtensions();
 		
 		for (int iext = 0; iext < extensions.length; ++iext) {
@@ -415,7 +415,7 @@ public class Activator extends AbstractUIPlugin {
 			{
 				IConfigurationElement ce = elements[i];
 				try {
-					AbstractToolDataManager aGetter = (AbstractToolDataManager) ce.createExecutableExtension("class");
+					AbstractToolDataManager aGetter = (AbstractToolDataManager) ce.createExecutableExtension("class"); //$NON-NLS-1$
 					//aGetter.setId(ce.getAttribute("id"));
 					perfConfManagers.add(aGetter);
 				} catch (CoreException e) {

@@ -40,8 +40,8 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 	public static final int EXCLUDE=1;
 	
 	//These two lists must always be 1-1
-	protected static final String[] instTypes={"loops",                                "io",                                "memory",                                "dynamic timer",                      "static timer",                        "dynamic phase",                       "static phase"};
-	protected static final String[] instIDs=  {"org.eclipse.ptp.etfw.tau.selinst.instloops","org.eclipse.ptp.etfw.tau.selinst.instio","org.eclipse.ptp.etfw.tau.selinst.instmemory","org.eclipse.ptp.etfw.tau.selinst.dyntime","org.eclipse.ptp.etfw.tau.selinst.stattime","org.eclipse.ptp.etfw.tau.selinst.dynphase","org.eclipse.ptp.etfw.tau.selinst.statphase"};
+	protected static final String[] instTypes={"loops",                                "io",                                "memory",                                "dynamic timer",                      "static timer",                        "dynamic phase",                       "static phase"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+	protected static final String[] instIDs=  {"org.eclipse.ptp.etfw.tau.selinst.instloops","org.eclipse.ptp.etfw.tau.selinst.instio","org.eclipse.ptp.etfw.tau.selinst.instmemory","org.eclipse.ptp.etfw.tau.selinst.dyntime","org.eclipse.ptp.etfw.tau.selinst.stattime","org.eclipse.ptp.etfw.tau.selinst.dynphase","org.eclipse.ptp.etfw.tau.selinst.statphase"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 
 	/**
 	 * Constructor for Action1.
@@ -62,7 +62,7 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 	public void run(IAction action) {
 		if(selection==null)
 		{
-			System.out.println("No Selection");
+			System.out.println(Messages.SelectiveInstrument_NoSelection);
 			return;
 		}
 		ICElement cbit=null;
@@ -70,14 +70,14 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 		HashSet<String> selfiles=new HashSet<String>();
 		HashSet<String> selrouts=new HashSet<String>();
 		int type;
-		String selType="";
+		String selType=""; //$NON-NLS-1$
 		int incex=-1;
 		int idDex=-1;
 		String selID=action.getId();
 		
-		if(selID.equals("org.eclipse.ptp.etfw.tau.selinst.excludeselect"))
+		if(selID.equals("org.eclipse.ptp.etfw.tau.selinst.excludeselect")) //$NON-NLS-1$
 			incex=EXCLUDE;
-		else if(selID.equals("org.eclipse.ptp.etfw.tau.selinst.includeselect"))
+		else if(selID.equals("org.eclipse.ptp.etfw.tau.selinst.includeselect")) //$NON-NLS-1$
 			incex=INCLUDE;
 		else
 		for(idDex=0;idDex<instIDs.length;idDex++)
@@ -98,7 +98,7 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 //		else 
 
 
-		if(!selType.equals("")||incex>=0)
+		if(!selType.equals("")||incex>=0) //$NON-NLS-1$
 			while(selit.hasNext())
 			{
 				cbit=(ICElement)selit.next();
@@ -110,12 +110,12 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 					{
 						selrouts.add(fullsig);
 					}
-					else if(!selType.equals(""))
+					else if(!selType.equals("")) //$NON-NLS-1$
 					{
 						if(idDex<=2)
-							selrouts.add(selType+" file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\""+fullsig+"\"");
+							selrouts.add(selType+" file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\""+fullsig+"\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						else
-							selrouts.add(selType+" routine=\""+fullsig+"\"");
+							selrouts.add(selType+" routine=\""+fullsig+"\""); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 				else
@@ -125,30 +125,30 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 						{
 							selfiles.add(cbit.getElementName());
 						}
-						else if(!selType.equals(""))
+						else if(!selType.equals("")) //$NON-NLS-1$
 						{
 							if(idDex<=2)
-								selfiles.add(selType+" file=\""+cbit.getElementName()+"\" routine=\"#\"");
+								selfiles.add(selType+" file=\""+cbit.getElementName()+"\" routine=\"#\""); //$NON-NLS-1$ //$NON-NLS-2$
 							else
-								selfiles.add(selType+" routine=\"#\"");
+								selfiles.add(selType+" routine=\"#\""); //$NON-NLS-1$
 						}
 					}
 					else
 						if(type==-1)
 						{
 							String fortclass =cbit.getClass().getName();
-							if(fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$Subroutine")||fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$MainProgram"))
+							if(fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$Subroutine")||fortclass.equals("org.eclipse.photran.internal.core.model.FortranElement$MainProgram")) //$NON-NLS-1$ //$NON-NLS-2$
 							{
 								if(incex>=0)
 								{
-									selrouts.add("#"+cbit.getElementName().toUpperCase());
+									selrouts.add("#"+cbit.getElementName().toUpperCase()); //$NON-NLS-1$
 								}
-								else if(!selType.equals(""))
+								else if(!selType.equals("")) //$NON-NLS-1$
 								{
 									if(idDex<=2)
-										selrouts.add(selType+" file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\""+"#"+cbit.getElementName().toUpperCase()+"\"");
+										selrouts.add(selType+" file=\""+cbit.getUnderlyingResource().getName()+"\" routine=\""+"#"+cbit.getElementName().toUpperCase()+"\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									else
-										selrouts.add(selType+" routine=\""+"#"+cbit.getElementName().toUpperCase()+"\"");
+										selrouts.add(selType+" routine=\""+"#"+cbit.getElementName().toUpperCase()+"\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								}
 							}
 						}
@@ -161,7 +161,7 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 					selinst.includeFile(selfiles);
 				else if(incex==EXCLUDE)
 					selinst.excludeFile(selfiles);
-				else if(!selType.equals(""))
+				else if(!selType.equals("")) //$NON-NLS-1$
 					selinst.addInst(selfiles);
 			}
 			if(selrouts.size()>0)
@@ -170,7 +170,7 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 					selinst.includeRout(selrouts);
 				else if(incex==EXCLUDE)
 					selinst.excludeRout(selrouts);
-				else if(!selType.equals(""))
+				else if(!selType.equals("")) //$NON-NLS-1$
 					selinst.addInst(selrouts);
 			}
 		}
@@ -185,7 +185,7 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 		else
 		{	//if the selection is invalid, stop
 			this.selection = null;
-			System.out.println("Invalid Selection");
+			System.out.println(Messages.SelectiveInstrument_InvalidSelection);
 		}		
 	}
 

@@ -59,7 +59,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 	
 	private class BinDirPanel
 	{
-		String group="";
+		String group=""; //$NON-NLS-1$
 		Button browseBinButton=null;
 		Text binDir=null;
 		BinListener binLis=new BinListener();
@@ -97,13 +97,13 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 			tauarch.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 			
 			Label taubinComment = new Label(tauarch, SWT.WRAP);
-			taubinComment.setText(group+" Bin Directory:");
+			taubinComment.setText(group+Messages.ToolLocationPreferencePage_BinDir);
 			binDir = new Text(tauarch, SWT.BORDER | SWT.SINGLE);
 			binDir.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			binDir.addModifyListener(binLis);
 
 			browseBinButton = new Button(tauarch,SWT.PUSH);
-			browseBinButton.setText("Browse");
+			browseBinButton.setText(Messages.ToolLocationPreferencePage_Browse);
 			browseBinButton.addSelectionListener(binLis);
 		}
 
@@ -112,7 +112,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		}
 	}
 	
-	public static final String EMPTY_STRING = "";
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	
 	BinDirPanel[] toolGroups=null;
 	
@@ -132,7 +132,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 			while (eIt.hasNext()) 
 			{
 				me = (eIt.next()).getKey().toString();
-				if(!me.equals("internal"))
+				if(!me.equals("internal")) //$NON-NLS-1$
 					groups.add(me);
 			}
 		}
@@ -195,7 +195,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText("Tool Location Configuration");
+		aGroup.setText(Messages.ToolLocationPreferencePage_ToolLocationConf);
 
 		if(toolGroups!=null)
 		for(int i=0;i<toolGroups.length;i++)
@@ -233,7 +233,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 //		makefilter mfilter = new makefilter();
 //		File test = new File(tlpath);
 
-		dialog.setText("Select "+group+" Bin Directory");
+		dialog.setText(Messages.ToolLocationPreferencePage_Select+group+Messages.ToolLocationPreferencePage_BinDirectory);
 		//dialog.setMessage("You must select a valid TAU bin directory.  Such a directory should be created when you configure and install TAU.  It should contain least one valid stub makefile configured with the Program Database Toolkit (pdt)");
 
 		String selectedPath=dialog.open();//null;
@@ -268,7 +268,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		if(toolGroups!=null)
 			for(int i=0;i<toolGroups.length;i++)
 			{
-				toolGroups[i].binDir.setText(preferences.getString(IToolLaunchConfigurationConstants.TOOL_BIN_ID+"."+toolGroups[i].group));// ITAULaunchConfigurationConstants.TAU_BIN_PATH));
+				toolGroups[i].binDir.setText(preferences.getString(IToolLaunchConfigurationConstants.TOOL_BIN_ID+"."+toolGroups[i].group));// ITAULaunchConfigurationConstants.TAU_BIN_PATH)); //$NON-NLS-1$
 			}
 
 	}
@@ -280,7 +280,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		if(toolGroups!=null)
 			for(int i=0;i<toolGroups.length;i++)
 			{
-				preferences.setValue(IToolLaunchConfigurationConstants.TOOL_BIN_ID+"."+toolGroups[i].group,toolGroups[i].binDir.getText());
+				preferences.setValue(IToolLaunchConfigurationConstants.TOOL_BIN_ID+"."+toolGroups[i].group,toolGroups[i].binDir.getText()); //$NON-NLS-1$
 			}
 
 		Activator.getDefault().savePluginPreferences();

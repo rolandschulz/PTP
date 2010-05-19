@@ -73,7 +73,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 	private boolean isManaged;
 	
 	public BuilderTool(ILaunchConfiguration conf, BuildTool btool,Map<String,String> buildMods) throws CoreException{
-		super(conf,"Instrumenting/Building");
+		super(conf,Messages.BuilderTool_InstrumentingBuilding);
 		this.buildMods=buildMods;
 		tool=btool;
 		initBuild(conf);
@@ -81,7 +81,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 	
 	
 	public BuilderTool(ILaunchConfiguration conf, BuildTool btool) throws CoreException{
-		super(conf,"Instrumenting/Building");
+		super(conf,Messages.BuilderTool_InstrumentingBuilding);
 		tool=btool;
 		initBuild(conf);
 	}
@@ -154,8 +154,8 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 	 */
 	public void standardMakeBuild(IProgressMonitor monitor) throws CoreException{
 		
-		File compilerInclude = new File(projectLocation+File.separator+"eclipse.inc");
-		File compilerDef = new File(projectLocation+File.separator+"eclipse.inc.default");
+		File compilerInclude = new File(projectLocation+File.separator+"eclipse.inc"); //$NON-NLS-1$
+		File compilerDef = new File(projectLocation+File.separator+"eclipse.inc.default"); //$NON-NLS-1$
 		try{
 			if(compilerInclude.exists())
 			{
@@ -173,10 +173,10 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 //TODO:  Make this work again (i.e. distinguish between all-compiler and discrete compiler systems)
 			BufferedWriter makeOut = new BufferedWriter(new FileWriter(compilerInclude));
 			String allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
-			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs+"\n");
-			makeOut.write(getToolCommand(tool.getUPCCompiler(),configuration)+" "+allargs+"\n");
+			makeOut.write(getToolCommand(tool.getCcCompiler(),configuration)+" "+allargs+"\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			makeOut.write(getToolCommand(tool.getCxxCompiler(),configuration)+" "+allargs+"\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			makeOut.write(getToolCommand(tool.getF90Compiler(),configuration)+" "+allargs+"\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			makeOut.write(getToolCommand(tool.getUPCCompiler(),configuration)+" "+allargs+"\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			makeOut.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -191,7 +191,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		IMakeTarget select = null;
 		for(int i=0;i<targs.length;i++)
 		{
-			if(targs[i].getName().equals("all"))
+			if(targs[i].getName().equals(Messages.BuilderTool_all))
 			{
 				select = targs[i];
 				break;
@@ -200,7 +200,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		}
 		if(select==null)
 		{
-			System.out.println("No Make Target: all");
+			System.out.println(Messages.BuilderTool_NoMakeTargetAll);
 			runbuilt = false;
 			return;
 		}
@@ -240,7 +240,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 	
 	private boolean initSMBuild() throws CoreException{
 		if (buildInfo == null||!buildInfo.isValid()){
-			System.out.println("No info!!!");
+			System.out.println(Messages.BuilderTool_NoInfo);
 			return false;
 		}
 		
@@ -255,7 +255,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			}
 		}
 		
-		progPath=olddefbuildconf.getEditableBuilder().getBuildLocation()+"?";
+		progPath=olddefbuildconf.getEditableBuilder().getBuildLocation()+"?"; //$NON-NLS-1$
 		
         progPath=newname+File.separator+binary;
 		//System.out.println(progPath);
@@ -272,19 +272,19 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 	
 	private boolean initMMBuild() throws CoreException{
 		if (buildInfo == null||!buildInfo.isValid()){
-			System.out.println("No info!!!");
+			System.out.println(Messages.BuilderTool_NoInfo);
 			return false;
 		}
 		
 		IManagedProject managedBuildProj = buildInfo.getManagedProject();
 		if (managedBuildProj == null){
-			System.out.println("No managed project!!!");
+			System.out.println(Messages.BuilderTool_NoManagedProject);
 			return false;
 		}
 		binary = buildInfo.getBuildArtifactName();
 		String bextension = buildInfo.getBuildArtifactExtension();
 		if(bextension.length()>0)
-			binary=binary+"."+bextension;
+			binary=binary+"."+bextension; //$NON-NLS-1$
 		
 		//Make a list of the configurations already within the project
 		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
@@ -298,9 +298,9 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		}
 		
 		if(selectedconf==null)
-		{System.out.println("No Conf Selected");return false;}
+		{System.out.println(Messages.BuilderTool_NoConfSelected);return false;}
 		if(selectedconf.getName()==null)
-		{System.out.println("Selected conf has no name");return false;}
+		{System.out.println(Messages.BuilderTool_SelConfHasNoName);return false;}
 		
 		//Make the new configuration name, and if there is already a configuration with that name, remove it.
 		String basename=selectedconf.getName();
@@ -308,14 +308,14 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		
         String addname=configuration.getAttribute(TOOLCONFNAME+tool.toolID, DEFAULT_TOOLCONFNAME);
         //if(basename.indexOf(addname)<0)
-        newname=basename+"_"+addname;
+        newname=basename+"_"+addname; //$NON-NLS-1$
 
         if(addname.equals(DEFAULT_TOOLCONFNAME)){
         	String nameMod=tool.toolName;
         	if(nameMod==null){
         		nameMod=tool.toolID;
         	}
-        	newname+="_"+nameMod;
+        	newname+="_"+nameMod; //$NON-NLS-1$
         }
                 
         progPath=newname+File.separator+binary;
@@ -342,10 +342,10 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		//Make a copy of the selected configuration(Clone works, basic create does not) and rename it.
 		if(!confExists)
 		{
-			newBuildConfig = managedBuildProj.createConfigurationClone(selectedconf, selectedconf.getId()+"."+ManagedBuildManager.getRandomNumber());
+			newBuildConfig = managedBuildProj.createConfigurationClone(selectedconf, selectedconf.getId()+"."+ManagedBuildManager.getRandomNumber()); //$NON-NLS-1$
 		}
 		if (newBuildConfig == null){
-			System.out.println("No config!");
+			System.out.println(Messages.BuilderTool_NoConfig);
 			return false;
 		}
 		return true;
@@ -404,7 +404,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		
 		
 		//TODO: Make sure this never has side-effects.
-		String allargs="";
+		String allargs=""; //$NON-NLS-1$
 		if(tool.getGlobalCompiler()!=null && !tool.getGlobalCompiler().equals(tool.getCcCompiler()))
 		{
 			allargs=getToolArguments(tool.getGlobalCompiler(),configuration);
@@ -437,19 +437,19 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			}
 			
 			String toolid=tools[i].getId();
-			if(toolid.indexOf(".c.")>=0)
+			if(toolid.indexOf(".c.")>=0) //$NON-NLS-1$
 			{
 				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCcCompiler(),configuration),allargs,tool.replaceCompiler);
 			}
-			if(toolid.indexOf(".cpp.")>=0)
+			if(toolid.indexOf(".cpp.")>=0) //$NON-NLS-1$
 			{
 				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getCxxCompiler(),configuration),allargs,tool.replaceCompiler);
 			}
-			if(toolid.indexOf(".fortran.")>=0)
+			if(toolid.indexOf(".fortran.")>=0) //$NON-NLS-1$
 			{
 				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getF90Compiler(),configuration),allargs,tool.replaceCompiler);
 			}
-			if(toolid.indexOf(".upc.")>=0)
+			if(toolid.indexOf(".upc.")>=0) //$NON-NLS-1$
 			{
 				numChanges+=modifyCommand(tools[i],getToolCommand(tool.getUPCCompiler(),configuration),allargs,tool.replaceCompiler);
 			}
@@ -503,10 +503,10 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		String toolCommand = tool.getToolCommand();
 		if(replace)
 		{
-			String newcom=command+" "+args;
+			String newcom=command+" "+args; //$NON-NLS-1$
 			if(!newcom.equals(toolCommand))
 			{
-				tool.setToolCommand(command+" "+args);
+				tool.setToolCommand(command+" "+args); //$NON-NLS-1$
 				didChange= 1;
 			}
 		}
@@ -517,7 +517,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			if(lastspc>=0){
 				oldcom=toolCommand.substring(lastspc).trim();
 			}
-			String newcom=command+" "+args+" "+oldcom;
+			String newcom=command+" "+args+" "+oldcom; //$NON-NLS-1$ //$NON-NLS-2$
 			if(!newcom.equals(toolCommand))
 			{
 				tool.setToolCommand(newcom);
@@ -541,8 +541,8 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		try {
 			buildIndstrumented(monitor);
 		} catch (Exception e) {
-			return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"Build Incomplete",e);
+			return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,Messages.BuilderTool_BuildIncomplete,e); //$NON-NLS-1$
 		}
-		return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"Build Successful",null);
+		return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,Messages.BuilderTool_BuildSuccessful,null); //$NON-NLS-1$
 	}
 }

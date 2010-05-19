@@ -161,30 +161,30 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 * Defines/contins the CheckItems available for narrowing the selection of TAU makefiles 
 	 */
 	protected CheckItem checks[] = {
-			new CheckItem("mpi", "MPI", "",
+			new CheckItem("mpi", "MPI", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					ITAULaunchConfigurationConstants.MPI, true),
-					new CheckItem("callpath", "Callpath Profiling", "",
+					new CheckItem("callpath", "Callpath Profiling", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							ITAULaunchConfigurationConstants.CALLPATH, false),
-							new CheckItem("phase", "Phase Based Profiling", "",
+							new CheckItem("phase", "Phase Based Profiling", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									ITAULaunchConfigurationConstants.PHASE, false),
-									new CheckItem("memory", "Memory Profiling", "",
+									new CheckItem("memory", "Memory Profiling", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 											ITAULaunchConfigurationConstants.MEMORY, false),
-											new CheckItem("opari", "OPARI", "",
+											new CheckItem("opari", "OPARI", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 													ITAULaunchConfigurationConstants.OPARI, false),
-													new CheckItem("openmp", "OpenMP", "",
+													new CheckItem("openmp", "OpenMP", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 															ITAULaunchConfigurationConstants.OPENMP, false),
-															new CheckItem("epilog", "Epilog", "",
+															new CheckItem("epilog", "Epilog", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 																	ITAULaunchConfigurationConstants.EPILOG, false),
-																	new CheckItem("vampirtrace", "VampirTrace", "",
+																	new CheckItem("vampirtrace", "VampirTrace", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 																			ITAULaunchConfigurationConstants.VAMPIRTRACE, false),
-																			new CheckItem("papi", "PAPI", "",
+																			new CheckItem("papi", "PAPI", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 																					ITAULaunchConfigurationConstants.PAPI, false),
 																					// Papi is entry 8 (needed for papi composite/MULTI)
-																					new CheckItem("perf", "Perflib", "",
+																					new CheckItem("perf", "Perflib", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 																							ITAULaunchConfigurationConstants.PERF, false),
-																							new CheckItem("trace", "Trace", "",
+																							new CheckItem("trace", Messages.TAUAnalysisTab_31, "", //$NON-NLS-1$ //$NON-NLS-3$
 																									ITAULaunchConfigurationConstants.TRACE, false),
-																									new CheckItem("pdt","PDT","",ITAULaunchConfigurationConstants.PDT,false)};
+																									new CheckItem("pdt","PDT","",ITAULaunchConfigurationConstants.PDT,false)}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	/**
 	 * The index of the mpi button in CheckItem list. Used to enable/disable tauinc.sh box
@@ -273,7 +273,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	protected Map<String, Object> varmap = null;
 
 	//TODO:  This isn't generic.  We need to get this pane explicitly
-	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0];
+	protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0]; //$NON-NLS-1$
 
 	//	protected ToolPane custOpts=null;
 
@@ -341,14 +341,14 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				else if(source.equals(selectRadios[0])||source.equals(selectRadios[3])){
 					if(selectRadios[0].getSelection()||selectRadios[3].getSelection()){
 						selectOpt.setSelected(false);
-						selectOpt.setArg("");
+						selectOpt.setArg(""); //$NON-NLS-1$
 						selectOpt.setEnabled(false);
 					}
 				}
 				else if(source.equals(selectRadios[1])){
 					if(selectRadios[1].getSelection()){
 						selectOpt.setSelected(true);
-						selectOpt.setArg(ToolsOptionsConstants.PROJECT_ROOT+File.separator+"tau.selective");
+						selectOpt.setArg(ToolsOptionsConstants.PROJECT_ROOT+File.separator+"tau.selective"); //$NON-NLS-1$
 						selectOpt.setEnabled(false);
 					}
 				}
@@ -435,13 +435,13 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				while (opts.hasNext()) {
 					check = opts.next();
 
-					if (holdmake.indexOf("-" + check) <= 0) {
+					if (holdmake.indexOf("-" + check) <= 0) { //$NON-NLS-1$
 						allgood = false;
 						break;
 					}
 				}
 				if (allgood == true) {
-					goodopts.addAll(Arrays.asList(holdmake.split("-")));
+					goodopts.addAll(Arrays.asList(holdmake.split("-"))); //$NON-NLS-1$
 				} else {
 					allgood = true;
 				}
@@ -486,7 +486,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 */
 	private void initMakefiles() {
 		//IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		String archpath = BuildLaunchUtils.getToolPath("tau");//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH);
+		String archpath = BuildLaunchUtils.getToolPath("tau");//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH); //$NON-NLS-1$
 
 		File[] mfiles = testTAUEnv(archpath);
 
@@ -523,9 +523,9 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		for (int i = 0; i < mfiles.length; i++) {
 			name = mfiles[i].getName();
 			allmakefiles.add(name);
-			allopts.addAll(Arrays.asList(name.split("-")));
+			allopts.addAll(Arrays.asList(name.split("-"))); //$NON-NLS-1$
 		}
-		allopts.remove("Makefile.tau");
+		allopts.remove("Makefile.tau"); //$NON-NLS-1$
 	}
 
 	/**
@@ -536,7 +536,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 
 		class makefilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
-				if ((name.indexOf("Makefile.tau") != 0)) {
+				if ((name.indexOf("Makefile.tau") != 0)) { //$NON-NLS-1$
 					return false;
 				}
 
@@ -551,7 +551,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		if(lastSlash<0)
 			return null;
 		
-		tlpath = binpath.substring(0,lastSlash) + File.separator + "lib";
+		tlpath = binpath.substring(0,lastSlash) + File.separator + "lib"; //$NON-NLS-1$
 		File taulib = new File(tlpath);
 		File[] mfiles = null;
 		makefilter mfilter = new makefilter();
@@ -568,12 +568,12 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 */
 	private void initMakeCombo() {
 		try {
-			String adding = "";
+			String adding = ""; //$NON-NLS-1$
 
 			makecombo.removeAll();
 			/*Put the list of valid makefiles in selmakefiles*/
 			selectMakefiles();
-			String select = "";
+			String select = ""; //$NON-NLS-1$
 
 			/*If there are valid makefiles, put each one in the fresh combobox*/
 			if ((selmakefiles != null) && (selmakefiles.size() > 0)) {
@@ -584,7 +584,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 					 * We want to select the minimal (shortest) makefile by default
 					 */
 					if ((select.length() > adding.length())
-							|| select.equals("")) {
+							|| select.equals("")) { //$NON-NLS-1$
 						select = adding;
 					}
 					makecombo.add(adding);
@@ -603,7 +603,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			 *  If there are no valid makefiles, make it known
 			 */
 			else {
-				makecombo.add("No Valid Makefiles!");
+				makecombo.add(Messages.TAUAnalysisTab_NoValidMakefiles);
 				makecombo.select(0);
 			}
 			String makeStub = makecombo.getItem(makecombo
@@ -639,7 +639,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		 * If the new makefile has the right options, activate the papi selector
 		 */
 
-		if (makeStub.indexOf("-papi") > 0) {
+		if (makeStub.indexOf("-papi") > 0) { //$NON-NLS-1$
 			papiSelect.setEnabled(true);
 		} else {
 			papiSelect.setEnabled(false);
@@ -648,7 +648,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		/*
 		 * If the new makefile has no PDT, only compiler instrumentation is available
 		 */
-		if(makeStub.indexOf("-pdt")>=0){
+		if(makeStub.indexOf("-pdt")>=0){ //$NON-NLS-1$
 			if(!pdtRadios[0].getEnabled()){
 				pdtRadios[0].setEnabled(true);
 				//pdtRadios[0].setSelection(true);
@@ -676,7 +676,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		 *If MPI box was checked enable tauinc box. Else, uncheck/disable tauinc box
 		 *@author raportil
 		 */
-		if (makeStub.indexOf("-callpath")>=0&&makeStub.indexOf("-mpi")>=0){
+		if (makeStub.indexOf("-callpath")>=0&&makeStub.indexOf("-mpi")>=0){ //$NON-NLS-1$ //$NON-NLS-2$
 			runTauinc.setEnabled(true);
 		} else {
 			runTauinc.setSelection(false);
@@ -693,8 +693,8 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	private void selectMakefiles() {
 		selmakefiles = new LinkedHashSet<String>();
 		Iterator<String> allit = allmakefiles.iterator();
-		String curmake = "";
-		String curopt = "";
+		String curmake = ""; //$NON-NLS-1$
+		String curopt = ""; //$NON-NLS-1$
 		// Look at each makefile individually
 		while (allit.hasNext()) {
 			Iterator<String> nameit = selopts.iterator();
@@ -706,7 +706,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				curopt = nameit.next();
 				// If the makefile is missing a required option, mark it a
 				// failure and keep checking
-				if (curmake.indexOf("-" + curopt) <= 0) {
+				if (curmake.indexOf("-" + curopt) <= 0) { //$NON-NLS-1$
 					hasall = false;
 					break;
 				}
@@ -739,7 +739,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		 * 
 		 * */
 		TabItem anaTab = new TabItem(tabParent, SWT.NULL);
-		anaTab.setText("Analysis Options");
+		anaTab.setText(Messages.TAUAnalysisTab_AnalysisOptions);
 
 		ScrolledComposite scrollAna = new ScrolledComposite(tabParent,SWT.V_SCROLL);
 
@@ -765,16 +765,16 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 						checks[i].buttonText);
 				checks[i].unitCheck.setToolTipText(checks[i].toolText);
 				checks[i].unitCheck.addSelectionListener(listener);
-				papiSelect = createPushButton(papiComp, "Select PAPI Counters",
+				papiSelect = createPushButton(papiComp, Messages.TAUAnalysisTab_SelectPapiCounters,
 						null);
 				papiSelect
-				.setToolTipText("Set PAPI COUNTER environment variables");
+				.setToolTipText(Messages.TAUAnalysisTab_SetPapiEnvVar);
 				papiSelect.addSelectionListener(listener);
 				papiCountRadios = new Button[2];
 				papiCountRadios[0] = createRadioButton(papiComp,
-				"Preset Counters");
+				Messages.TAUAnalysisTab_PresetCounters);
 				papiCountRadios[1] = createRadioButton(papiComp,
-				"Native Counters");
+				Messages.TAUAnalysisTab_NativeCounters);
 				//				papiCountRadios[2] = createRadioButton(papiComp,
 				//				"PAPI-C");
 			} else if(i == pdtIndex){
@@ -787,9 +787,9 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				checks[i].unitCheck.addSelectionListener(listener);
 				pdtRadios = new Button[2];
 				pdtRadios[0] = createRadioButton(pdtComp,
-				"PDT Instrumentation");
+				Messages.TAUAnalysisTab_PDTInstrumentation);
 				pdtRadios[1] = createRadioButton(pdtComp,
-				"Compiler Instrumentation");
+				Messages.TAUAnalysisTab_CompilerInstrumentation);
 				pdtRadios[0].addSelectionListener(listener);
 				pdtRadios[1].addSelectionListener(listener);
 			} else if(i == mpiIndex){
@@ -806,7 +806,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				 * @author raportil
 				 */
 
-				runTauinc = createCheckButton(mpiComp, "Generate MPI include list");
+				runTauinc = createCheckButton(mpiComp, Messages.TAUAnalysisTab_GenerateMPIIncludeList);
 				runTauinc.addSelectionListener(listener);
 			}
 			else{
@@ -830,7 +830,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		makeComp.setLayout(createGridLayout(2, false, 0, 0));
 		makeComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Label makeLab = new Label(makeComp, 0);
-		makeLab.setText("Select Makefile:");
+		makeLab.setText(Messages.TAUAnalysisTab_SelectMakefile);
 		makecombo = new Combo(makeComp, SWT.DROP_DOWN | SWT.READ_ONLY
 				| SWT.BORDER);
 		makecombo.addSelectionListener(listener);
@@ -882,7 +882,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		 * 
 		 * */
 		TabItem selinstTab = new TabItem(tabParent, SWT.NULL);
-		selinstTab.setText("Selective Instrumentation");
+		selinstTab.setText(Messages.TAUAnalysisTab_SelectiveInstrumentation);
 
 		Composite selinstComp = new Composite(tabParent, SWT.NONE);
 		selinstTab.setControl(selinstComp);
@@ -897,16 +897,16 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 
 		selectRadios = new Button[4];
 
-		selectRadios[0] = createRadioButton(selinstComp, "None");
-		selectRadios[0].setToolTipText("Do not use selective instrumentation.");
-		selectRadios[1] = createRadioButton(selinstComp, "Internal");
+		selectRadios[0] = createRadioButton(selinstComp, Messages.TAUAnalysisTab_None);
+		selectRadios[0].setToolTipText(Messages.TAUAnalysisTab_NoSelectiveInstrumentation);
+		selectRadios[1] = createRadioButton(selinstComp, Messages.TAUAnalysisTab_Internal);
 		selectRadios[1]
-		             .setToolTipText("Use the selective instrumentation file generated"
-		            		 + " by selective instrumentation commands in the workspace.");
-		selectRadios[2] = createRadioButton(selinstComp, "User Defined");
+		             .setToolTipText(Messages.TAUAnalysisTab_UseGeneratedSelInstFile
+		            		 + Messages.TAUAnalysisTab_ByWorkspaceCommands);
+		selectRadios[2] = createRadioButton(selinstComp, Messages.TAUAnalysisTab_UserDefined);
 		selectRadios[2]
-		             .setToolTipText("Specify a pre-existing selective instrumentation "
-		            		 + "file.");
+		             .setToolTipText(Messages.TAUAnalysisTab_SpecPreExistingSelInst
+		            		 + Messages.TAUAnalysisTab_File);
 
 		selComp = new Composite(selinstComp, SWT.NONE);
 		selComp.setLayout(createGridLayout(2, false, 0, 0));
@@ -915,10 +915,10 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		tauSelectFile = new Text(selComp, SWT.BORDER | SWT.SINGLE);
 		tauSelectFile.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		tauSelectFile.addModifyListener(listener);
-		browseSelfileButton = createPushButton(selComp, "Browse", null);
+		browseSelfileButton = createPushButton(selComp, Messages.TAUAnalysisTab_Browse, null);
 		browseSelfileButton.addSelectionListener(listener);
 
-		selectRadios[3] = createRadioButton(selinstComp, "Automatic");
+		selectRadios[3] = createRadioButton(selinstComp, Messages.TAUAnalysisTab_Automatic);
 		//selectRadios[3].setEnabled(false);
 		for (int i = 0; i < selectRadios.length; i++) {
 			selectRadios[i].addSelectionListener(listener);
@@ -930,7 +930,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		 * 
 		 * */
 		TabItem dataTab = new TabItem(tabParent, SWT.NULL);
-		dataTab.setText("Data Collection");
+		dataTab.setText(Messages.TAUAnalysisTab_DataCollection);
 
 		Composite dataComp = new Composite(tabParent, SWT.NONE);
 		dataTab.setControl(dataComp);
@@ -957,21 +957,21 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		dbComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label dbLab = new Label(dbComp, 0);
-		dbLab.setText("Select Database:");
+		dbLab.setText(Messages.TAUAnalysisTab_SelectDatabase);
 
 		dbCombo = new Combo(dbComp, SWT.DROP_DOWN | SWT.READ_ONLY| SWT.BORDER);
 		dbCombo.addSelectionListener(listener);
 
-		keepprofsCheck = createCheckButton(dataComp, "Keep profiles");
+		keepprofsCheck = createCheckButton(dataComp, Messages.TAUAnalysisTab_KeepProfiles);
 		keepprofsCheck.addSelectionListener(listener);
 
 		portalCheck = createCheckButton(dataComp,
-		"Upload profile data to TAU Portal");
+		Messages.TAUAnalysisTab_UploadDataToTauPortal);
 		portalCheck.addSelectionListener(listener);
 	}
 
 	public void updateComboFromSelection() {
-		System.out.println("change startup");
+		System.out.println("change startup"); //$NON-NLS-1$
 	}
 
 	/**
@@ -1012,13 +1012,13 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT, 0);
 		configuration.setAttribute(
-				ITAULaunchConfigurationConstants.SELECT_FILE, "");
+				ITAULaunchConfigurationConstants.SELECT_FILE, ""); //$NON-NLS-1$
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.ENVVARS,
 				(Map<String, Object>) null);
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,
-		"");
+		""); //$NON-NLS-1$
 
 		tauOpts.setDefaults(configuration);
 	}
@@ -1072,8 +1072,8 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			int pdtSel=configuration.getAttribute(ITAULaunchConfigurationConstants.PDTSELECT, 0);
 			if(pdtSel>1)pdtSel=0;
 			pdtRadios[pdtSel].setSelection(true);
-			pdtOpt = tauOpts.getOption("-optPDTInst");
-			compOpt = tauOpts.getOption("-optCompInst");
+			pdtOpt = tauOpts.getOption("-optPDTInst"); //$NON-NLS-1$
+			compOpt = tauOpts.getOption("-optCompInst"); //$NON-NLS-1$
 			if(pdtOpt!=null&&compOpt!=null){
 				pdtOpt.setEnabled(false);
 				compOpt.setEnabled(false);
@@ -1102,7 +1102,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			selectRadios[selected].setSelection(true);
 
 			tauSelectFile.setText(configuration.getAttribute(
-					ITAULaunchConfigurationConstants.SELECT_FILE, ""));
+					ITAULaunchConfigurationConstants.SELECT_FILE, "")); //$NON-NLS-1$
 
 			if (!selectRadios[2].getSelection()) {
 				selComp.setEnabled(false);
@@ -1110,7 +1110,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				tauSelectFile.setEnabled(false);
 			}
 
-			selectOpt=tauOpts.getOption("-optTauSelectFile");
+			selectOpt=tauOpts.getOption("-optTauSelectFile"); //$NON-NLS-1$
 			if(selectOpt!=null){
 				selectOpt.setEnabled(false);
 				//selectOpt.setArg(configuration.getAttribute(ITAULaunchConfigurationConstants.INTERNAL_SELECTIVE_FILE, ""));
@@ -1140,10 +1140,10 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			varmap = archvarmap = configuration.getAttribute(
 					ITAULaunchConfigurationConstants.ENVVARS, (Map<String,Object>) null);
 
-			Activator.getDefault().getPluginPreferences().setDefault("TAUCheckForAutoOptions",true);
+			Activator.getDefault().getPluginPreferences().setDefault("TAUCheckForAutoOptions",true); //$NON-NLS-1$
 
 		} catch (CoreException e) {
-			setErrorMessage("Core Exception while initializing Analysis tab: "
+			setErrorMessage(Messages.TAUAnalysisTab_CoreExceptionInitAnalysisTab
 					+ e.getMessage());
 		}
 	}
@@ -1154,7 +1154,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		try{
 		dbs = PerfDMFUIPlugin.getPerfDMFView().getDatabaseNames();
 		}catch(java.lang.NoClassDefFoundError e){
-			System.out.println("Warning: Tau Jars Not Found");
+			System.out.println(Messages.TAUAnalysisTab_WarnTauJarsNotFound);
 		}
 		
 		dbCombo.clearSelection();
@@ -1303,12 +1303,12 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		}
 		String tauMakeName=makecombo.getItem(makecombo.getSelectionIndex());
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKENAME, tauMakeName);
-		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+tlpath+File.separator+makecombo.getItem(makecombo.getSelectionIndex()));
+		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE,"-tau_makefile="+tlpath+File.separator+makecombo.getItem(makecombo.getSelectionIndex())); //$NON-NLS-1$
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB, dbCombo.getItem(dbCombo.getSelectionIndex()));
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB_NAME, PerfDMFView.extractDatabaseName(dbCombo.getItem(dbCombo.getSelectionIndex())));
 
-		configuration.setAttribute(IToolLaunchConfigurationConstants.TOOLCONFNAME+"TAU", "_"+tauMakeName.substring(tauMakeName.lastIndexOf(".")+1));
+		configuration.setAttribute(IToolLaunchConfigurationConstants.TOOLCONFNAME+"TAU", "_"+tauMakeName.substring(tauMakeName.lastIndexOf(".")+1)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		//.setDefault("TAUCheckForAutoOptions",true);
 
 
@@ -1343,7 +1343,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 */
 	protected void handleSelfileBrowseButtonSelected() {
 		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText("Select TAU Selective Instrumentation File");
+		dialog.setText(Messages.TAUAnalysisTab_SelectTauSelInstFile);
 
 		String correctPath = getFieldContent(tauSelectFile.getText());
 		if (correctPath != null) {
@@ -1386,17 +1386,17 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 
 		File papimakefile = new File(papimake);
 		if (!papimakefile.canRead()) {
-			System.out.println("INVALID MAKEFILE FOR PAPI");
+			System.out.println(Messages.TAUAnalysisTab_InvalidPAPIMakefile);
 		}
 
-		String papiline = "";
+		String papiline = ""; //$NON-NLS-1$
 		boolean found = false;
 		try {
 			BufferedReader readmake = new BufferedReader(new FileReader(
 					papimakefile));
 			papiline = readmake.readLine();
 			while (papiline != null) {
-				if (papiline.indexOf("PAPIDIR=") == 0) {
+				if (papiline.indexOf("PAPIDIR=") == 0) { //$NON-NLS-1$
 					found = true;
 					break;
 				}
@@ -1410,23 +1410,23 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		}
 
 		if (found) {
-			papiline = papiline.substring(papiline.indexOf("=") + 1);
-			File papibin = new File(papiline + File.separator + "bin"
-					+ File.separator + "papi_event_chooser");
+			papiline = papiline.substring(papiline.indexOf("=") + 1); //$NON-NLS-1$
+			File papibin = new File(papiline + File.separator + "bin" //$NON-NLS-1$
+					+ File.separator + "papi_event_chooser"); //$NON-NLS-1$
 			if (!papibin.canRead()) {
-				papibin = new File(papiline + File.separator + "share"
-						+ File.separator + "papi" + File.separator + "utils"
-						+ File.separator + "papi_event_chooser");
+				papibin = new File(papiline + File.separator + "share" //$NON-NLS-1$
+						+ File.separator + "papi" + File.separator + "utils" //$NON-NLS-1$ //$NON-NLS-2$
+						+ File.separator + "papi_event_chooser"); //$NON-NLS-1$
 			}
 
 			if (!papibin.canRead()) {
 				throw new FileNotFoundException(
-				"Could not locate papi utilities");
+				Messages.TAUAnalysisTab_CouldNotLocatePapiUtils);
 			}
 
 			papiline = papibin.getParentFile().toString();
 		} else {
-			System.out.println("No PAPIDIR in Makefile!");
+			System.out.println(Messages.TAUAnalysisTab_NoPapiDirInMakefile);
 		}
 
 		return papiline;
@@ -1449,13 +1449,13 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			if(!pdir.isDirectory()||!pdir.canRead()){
 				return;
 			}
-			File pcxi=new File(papiBin+File.separator+"papi_xml_event_info");
+			File pcxi=new File(papiBin+File.separator+"papi_xml_event_info"); //$NON-NLS-1$
 
 
 			if(pcxi.exists())//papiCountRadios[2].getSelection())
 			{
 				//System.out.println(papiBin);
-				final String pTool="papi_xml_event_info";
+				final String pTool="papi_xml_event_info"; //$NON-NLS-1$
 				File pDir=new File(papiBin);
 				String[]files=pDir.list(new FilenameFilter(){
 
@@ -1467,7 +1467,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				});
 
 				if(files.length<1){
-					MessageDialog.openWarning(getShell(),pTool+" Not Found","Please select a different counter selection tool, or select a TAU configuration associated with PAPI version 3.6 or higher.");
+					MessageDialog.openWarning(getShell(),pTool+Messages.TAUAnalysisTab_NotFound,Messages.TAUAnalysisTab_PleaseSelectDiffCounterTool);
 					return;
 				}
 
@@ -1493,8 +1493,8 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				}
 				PapiListSelectionDialog papidialog = new PapiListSelectionDialog(
 						getShell(), papiBin, paprov, papilab,
-						"Select the PAPI counters to use with TAU", papiCountType);
-				papidialog.setTitle("PAPI Counters");
+						Messages.TAUAnalysisTab_SelectPapiCountersForTau, papiCountType);
+				papidialog.setTitle(Messages.TAUAnalysisTab_PapiCounters);
 				papidialog.setHelpAvailable(false);
 				if ((varmap != null) && (varmap.size() > 0)) {
 					papidialog.setInitialSelections(varmap.values().toArray());
@@ -1513,10 +1513,10 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			LinkedHashSet<Object> selset = new LinkedHashSet<Object>(Arrays
 					.asList(selected));
 
-			String pn="PAPI_NATIVE_";
-			String pPre="PAPI_";
+			String pn="PAPI_NATIVE_"; //$NON-NLS-1$
+			String pPre="PAPI_"; //$NON-NLS-1$
 			varmap = new HashMap<String, Object>(selset.size());
-			varmap.put("COUNTER1", "GET_TIME_OF_DAY");
+			varmap.put("COUNTER1", "GET_TIME_OF_DAY"); //$NON-NLS-1$ //$NON-NLS-2$
 			Iterator<Object> varit = selset.iterator();
 			int counter = 2;
 			while (varit.hasNext()) {
@@ -1525,7 +1525,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 				{
 					varTxt=pn+varTxt;
 				}
-				varmap.put("COUNTER" + counter, varTxt);
+				varmap.put("COUNTER" + counter, varTxt); //$NON-NLS-1$
 				counter++;
 			}
 
@@ -1538,7 +1538,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 * @see ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return "TAU";
+		return "TAU"; //$NON-NLS-1$
 	}
 
 	/**
@@ -1553,7 +1553,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	 * @see ILaunchConfigurationTab#getImage()
 	 */
 	public Image getImage() {
-		return LaunchImages.getImage("org.eclipse.ptp.etfw.tau.core.tauLogo.gif");
+		return LaunchImages.getImage("org.eclipse.ptp.etfw.tau.core.tauLogo.gif"); //$NON-NLS-1$
 	}
 
 

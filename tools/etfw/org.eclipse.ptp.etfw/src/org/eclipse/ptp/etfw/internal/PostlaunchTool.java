@@ -34,7 +34,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 	String projName=null;
 	
 	public PostlaunchTool(ILaunchConfiguration conf, PostProcTool ppTool, String outLoc) throws CoreException{
-		super(conf,"Analysis");
+		super(conf,Messages.PostlaunchTool_Analysis);
 		tool=ppTool;
 		projectLocation=outputLocation=outLoc;
 	}
@@ -67,20 +67,20 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 				for(int i=0;i<tool.analysisCommands.length;i++)
 				{
 					//TODO: put internal in defined strings
-					if(tool.analysisCommands[i].toolGroup==null||!tool.analysisCommands[i].toolGroup.equals("internal"))
+					if(tool.analysisCommands[i].toolGroup==null||!tool.analysisCommands[i].toolGroup.equals("internal")) //$NON-NLS-1$
 					{
 						runTool=getToolCommandList(tool.analysisCommands[i],configuration);//tool.analysisCommands[i].toolCommand;
 						//toolPath=BuildLaunchUtils.checkToolEnvPath(runTool);
 						if(tool.forAllLike!=null){
 							File getname = new File(currentFile);
 							String name = getname.getName();
-							if(name.contains(".")){
-								name = name.substring(0,name.lastIndexOf("."));
+							if(name.contains(".")){ //$NON-NLS-1$
+								name = name.substring(0,name.lastIndexOf(".")); //$NON-NLS-1$
 							}
 							for(int runDex=0;runDex<runTool.size();runDex++){
 								String s = runTool.get(runDex);
-								s=s.replace("%%FILE%%", currentFile);
-								s=s.replace("%%FILENAME%%", name);
+								s=s.replace("%%FILE%%", currentFile); //$NON-NLS-1$
+								s=s.replace("%%FILENAME%%", name); //$NON-NLS-1$
 								runTool.set(runDex, s);
 							}
 						}
@@ -94,7 +94,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 						}
 						else
 						{
-							System.out.println("The command "+tool.analysisCommands[i].toolCommand+" could not be run because the application is not in your path.");
+							System.out.println(Messages.PostlaunchTool_TheCommand+tool.analysisCommands[i].toolCommand+Messages.PostlaunchTool_CouldNotRun);
 						}
 					}
 					else
@@ -139,14 +139,14 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 	protected IStatus run(IProgressMonitor monitor) {
 		
 		if(tool==null){
-			return new Status(IStatus.WARNING,"com.ibm.jdg2e.concurrency",IStatus.OK,"No Analysis Tool Provided, No Data Collected",null);
+			return new Status(IStatus.WARNING,"com.ibm.jdg2e.concurrency",IStatus.OK,Messages.PostlaunchTool_NoToolNoData,null); //$NON-NLS-1$
 		}
 		
 		if(outputLocation==null)
 		{
 			if(tool.useDefaultLocation)
 			{
-				outputLocation=System.getProperty("user.home");
+				outputLocation=System.getProperty("user.home"); //$NON-NLS-1$
 			}
 			else
 			{
@@ -158,12 +158,12 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 						s=PlatformUI.getWorkbench().getDisplay().getShells()[0];
 					}
 					DirectoryDialog dl = new DirectoryDialog(s);
-					dl.setText("Select the directory containing performance data");
+					dl.setText(Messages.PostlaunchTool_SelectPerfDir);
 					outputLocation=dl.open();
 				}
 			});
 			if(outputLocation==null){
-				return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"No Data Specified",null);
+				return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,Messages.PostlaunchTool_NoData,null); //$NON-NLS-1$
 			}
 			externalTarget=true;
 		}
@@ -188,7 +188,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 					findFiles(fileSet,workDir,tool.depth,ffn);
 				//String[] files=workDir.list(ffn);
 				if(fileSet.size()<=0){
-					return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"No Valid Files Found",null);
+					return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,Messages.PostlaunchTool_NoValidFiles,null); //$NON-NLS-1$
 				}
 				for(File f : fileSet){
 					currentFile=f.getCanonicalPath();
@@ -201,9 +201,9 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 			}
 			
 		}catch(Exception e){
-			return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,"Data Collection Error",e);
+			return new Status(IStatus.ERROR,"com.ibm.jdg2e.concurrency",IStatus.ERROR,Messages.PostlaunchTool_DataCollectError,e); //$NON-NLS-1$
 		}
-		return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,"Data Collected",null);
+		return new Status(IStatus.OK,"com.ibm.jdg2e.concurrency",IStatus.OK,Messages.PostlaunchTool_DataCollected,null); //$NON-NLS-1$
 	}	
 	
 	class DirFilter implements FileFilter {

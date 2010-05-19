@@ -200,14 +200,14 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 				PlatformUI.getWorkbench()
 						.getDisplay()
 						.getActiveShell(),
-				"TAU Warning",
-				"Your changes will not take full effect until you open and close this window.");
+				Messages.ExternalToolSelectionTab_TAUWarning,
+				Messages.ExternalToolSelectionTab_ChancesNotEffectUntil);
 	}
 	
 	private void addWorkflow(){
 		FileDialog dialog = new FileDialog(getShell());
 
-		dialog.setText("Select tool definition xml file");
+		dialog.setText(Messages.ExternalToolSelectionTab_SelectToolDefXMLFile);
 		
 		String out=getFieldContent(dialog.open());
 		
@@ -223,21 +223,21 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		String fiList=preferences.getString(XMLLOCID);
 		
-		String[] x = fiList.split(",,,");
+		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
 		for(int i=0;i<x.length;i++){
 			files.add(x[i]);
 		}
 		files.add(out);
 		
-		fiList="";
+		fiList=""; //$NON-NLS-1$
 		
 		Iterator<String> fit = files.iterator();
 		
 		while(fit.hasNext()){
 			fiList+=fit.next();
 			if(fit.hasNext()){
-				fiList+=",,,";
+				fiList+=",,,"; //$NON-NLS-1$
 			}
 		}
 		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());
@@ -250,7 +250,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		String fiList=preferences.getString(XMLLOCID);
 		
-		String[] x = fiList.split(",,,");
+		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
 		for(int i=0;i<x.length;i++){
 			files.add(x[i]);
@@ -266,7 +266,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		ld.setLabelProvider(new LabelProvider());
 		ld.setInput(x);
 		ld.setHelpAvailable(false);
-		ld.setTitle("Remove Workflow Files");
+		ld.setTitle(Messages.ExternalToolSelectionTab_RemoveWorkflowFiles);
 		ld.open();
 		if(ld.getReturnCode()==Dialog.CANCEL)
 		{
@@ -277,14 +277,14 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			files.remove((String)y[i]);
 		}
 		
-		fiList="";
+		fiList=""; //$NON-NLS-1$
 		
 		Iterator<String> fit = files.iterator();
 		
 		while(fit.hasNext()){
 			fiList+=fit.next();
 			if(fit.hasNext()){
-				fiList+=",,,";
+				fiList+=",,,"; //$NON-NLS-1$
 			}
 		}
 		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());
@@ -312,7 +312,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		 * 
 		 * */
 		TabItem toolTab = new TabItem(tabParent, SWT.NULL);
-		toolTab.setText("Tool Selection");
+		toolTab.setText(Messages.ExternalToolSelectionTab_ToolSelection);
 
 		ScrolledComposite scrollTool = new ScrolledComposite(tabParent,SWT.V_SCROLL);
 		
@@ -333,24 +333,24 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		toolComboComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label makeLab = new Label(toolComboComp, 0);
-		makeLab.setText("Select Tool:");
+		makeLab.setText(Messages.ExternalToolSelectionTab_SelectTool);
 		
 		toolTypes=new Combo(toolComboComp, SWT.DROP_DOWN|SWT.READ_ONLY|SWT.BORDER);
 		toolTypes.addSelectionListener(listener);
 		addWorkflowB=new Button(toolComboComp, SWT.NONE);
-		addWorkflowB.setText("Add Workflow XML File");
+		addWorkflowB.setText(Messages.ExternalToolSelectionTab_AddWorkflowXMLFile);
 		addWorkflowB.addSelectionListener(listener);
 		removeWorkflowB=new Button(toolComboComp,SWT.NONE);
-		removeWorkflowB.setText("Remove Workflow XML File");
+		removeWorkflowB.setText(Messages.ExternalToolSelectionTab_RemoveWorkflowXMLFile);
 		removeWorkflowB.addSelectionListener(listener);
 		createVerticalSpacer(toolComp, 1);
 
 		buildonlyCheck = createCheckButton(toolComp,
-				"Build the instrumented executable but do not launch it");
+				Messages.ExternalToolSelectionTab_BuildInstrumentedExecutable);
 		buildonlyCheck.addSelectionListener(listener);
 		
 		
-		analyzeonlyCheck=createCheckButton(toolComp,"Select existing performance data to analyze with the selected tool");
+		analyzeonlyCheck=createCheckButton(toolComp,Messages.ExternalToolSelectionTab_SelectExistingPerfData);
 		analyzeonlyCheck.addSelectionListener(listener);
 //		nocleanCheck = createCheckButton(toolComp,
 //				"Keep instrumented executable");
@@ -441,7 +441,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	}
 
 	public void updateComboFromSelection() {
-		System.out.println("change startup");
+		System.out.println("change startup"); //$NON-NLS-1$
 	}
 
 	/**
@@ -468,7 +468,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		
 		if(tools==null||tools.length==0)
 		{
-			toolTypes.add("Specify a valid tool configuration file in Performance Tool preferences");
+			toolTypes.add(Messages.ExternalToolSelectionTab_SpecValidToolConfFile);
 			if(tools==null)
 			{
 				toolTypes.select(0);
@@ -512,7 +512,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		toolTypes.select(0);
 		try {
 			int toolDex;
-			toolDex = toolTypes.indexOf(configuration.getAttribute(SELECTED_TOOL, ""));
+			toolDex = toolTypes.indexOf(configuration.getAttribute(SELECTED_TOOL, "")); //$NON-NLS-1$
 			if(toolDex>=0)
 			{
 				toolTypes.select(toolDex);
@@ -521,7 +521,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			{
 				toolTypes.select(0);
 				//This means the available tools have changed!
-				if(configuration.getAttribute(SELECTED_TOOL, "").equals(""))
+				if(configuration.getAttribute(SELECTED_TOOL, "").equals("")) //$NON-NLS-1$ //$NON-NLS-2$
 					updateLaunchConfigurationDialog();
 			}
 			
@@ -644,7 +644,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 * @see ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return "Performance Analysis";
+		return Messages.ExternalToolSelectionTab_PerfAnalysis;
 	}
 
 	/**
@@ -703,7 +703,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 * @return Contents of text, or null if text is the empty string
 	 */
 	protected String getFieldContent(String text) {
-		if ((text.trim().length() == 0) || text.equals("")) {
+		if ((text.trim().length() == 0) || text.equals("")) { //$NON-NLS-1$
 			return null;
 		}
 
