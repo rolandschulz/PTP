@@ -37,11 +37,8 @@ import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
-import org.eclipse.photran.internal.core.parser.ASTErrorConstructNode;
-import org.eclipse.photran.internal.core.parser.ASTErrorProgramUnitNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.sourceform.ISourceForm;
 import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.rephraserengine.core.vpg.VPGDependency;
@@ -398,28 +395,10 @@ public class PhotranVPGBuilder extends PhotranVPG
 
     private void checkForErrors(ASTExecutableProgramNode ast, String filename)
     {
-        class V extends ASTVisitor
+        ASTNodeWithErrorRecoverySymbols firstError = findFirstErrorIn(ast);
+        if (firstError != null)
         {
-            private ASTNodeWithErrorRecoverySymbols firstError = null;
-            
-            public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
-            {
-                if (firstError == null)
-                    firstError = node;
-            }
-
-            public void visitASTErrorConstructNode(ASTErrorConstructNode node)
-            {
-                if (firstError == null)
-                    firstError = node;
-            }
-        };
-        
-        V v = new V();
-        ast.accept(v);
-        if (v.firstError != null)
-        {
-            PhotranTokenRef errorTokenRef = getErrorTokenRef(filename, v.firstError.getErrorToken());
+            PhotranTokenRef errorTokenRef = getErrorTokenRef(filename, firstError.getErrorToken());
             log.clearEntriesFor(filename);
             log.logError(filename + " contains syntax errors and may not be refactored correctly.",
                          errorTokenRef);

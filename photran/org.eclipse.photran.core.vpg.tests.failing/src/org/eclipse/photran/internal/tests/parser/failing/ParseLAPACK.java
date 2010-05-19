@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.tests.parser;
+package org.eclipse.photran.internal.tests.parser.failing;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,10 +17,10 @@ import junit.framework.Test;
 
 import org.eclipse.photran.internal.tests.parser.MultiTestSuite.FailingParserTestSuite;
 
-public class ParsePOP
+public class ParseLAPACK
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
-        return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.pop", false, false) {};
+        return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.lapack", true, false) {};
     }
 }

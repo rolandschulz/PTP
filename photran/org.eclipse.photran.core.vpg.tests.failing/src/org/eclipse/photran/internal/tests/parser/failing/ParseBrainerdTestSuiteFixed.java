@@ -8,7 +8,7 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.tests.parser;
+package org.eclipse.photran.internal.tests.parser.failing;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,11 +17,11 @@ import junit.framework.Test;
 
 import org.eclipse.photran.internal.tests.parser.MultiTestSuite.FailingParserTestSuite;
 
-public class ParseBrainerdTestSuiteFree
+public class ParseBrainerdTestSuiteFixed
 {
     public static Test suite() throws FileNotFoundException, IOException
     {
         return new FailingParserTestSuite("../../org.eclipse.photran-projects.confidential.walt-brainerd-test-suite",
-            false, false) {};
+            true, false) {};
     }
 }

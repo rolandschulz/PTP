@@ -1,4 +1,4 @@
-package org.eclipse.photran.internal.tests.search;
+package org.eclipse.photran.internal.tests.search.failing;
 
 import java.util.ArrayList;
 

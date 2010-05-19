@@ -1,4 +1,4 @@
-package org.eclipse.photran.internal.tests.refactoring.introimplicitnone;
+package org.eclipse.photran.internal.tests.refactoring.introimplicitnone.failing;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

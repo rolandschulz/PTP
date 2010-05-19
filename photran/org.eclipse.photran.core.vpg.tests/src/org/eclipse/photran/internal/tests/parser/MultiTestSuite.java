@@ -43,9 +43,8 @@ public class MultiTestSuite extends TestSuite
         if (isFixedForm)
             addTest(new ParserTestSuite(directorySuffix, isFixedForm, mustExist) {});
         else
-            addTest(new SourceReproductionTestSuite(directorySuffix, isFixedForm, mustExist) {});
-
-        if (!isFixedForm) addTest(new LoopReplacerSRTestSuite(directorySuffix, isFixedForm, mustExist) {});
+            //addTest(new SourceReproductionTestSuite(directorySuffix, isFixedForm, mustExist) {});
+            addTest(new LoopReplacerSRTestSuite(directorySuffix, isFixedForm, mustExist) {});
     }
     
     public MultiTestSuite() {;} // to keep JUnit quiet
@@ -167,9 +166,9 @@ public class MultiTestSuite extends TestSuite
         {
             checkCorrectParenting(ast);
             
-            String originalSourceCode = getSourceCodeFromFile(file);
+            String originalSourceCode = getSourceCodeFromFile(file).replaceAll("\r", "");
             transform(ast);
-            String reproducedSourceCode = getSourceCodeFromAST(ast);
+            String reproducedSourceCode = getSourceCodeFromAST(ast).replaceAll("\r", "");
             assertEquals(originalSourceCode, reproducedSourceCode);
         }
 
@@ -200,7 +199,7 @@ public class MultiTestSuite extends TestSuite
     {
         public LoopReplacerSRTestSuite(String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
         {
-            super("Replace loops and reproduce source code for", directorySuffix, isFixedForm, mustExist);
+            super("Replace loops and reproduce source for", directorySuffix, isFixedForm, mustExist);
         }
 
         @Override

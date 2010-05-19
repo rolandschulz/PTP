@@ -22,13 +22,17 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.photran.internal.core.parser.ASTErrorConstructNode;
+import org.eclipse.photran.internal.core.parser.ASTErrorProgramUnitNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalNameListNode;
 import org.eclipse.photran.internal.core.parser.ASTExternalStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTNodeWithErrorRecoverySymbols;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
+import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IProgramUnit;
@@ -354,6 +358,30 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
                 return nameToken.getTokenRef();
             else
                 return null;
+    }
+    
+    public static ASTNodeWithErrorRecoverySymbols findFirstErrorIn(ASTExecutableProgramNode ast)
+    {
+        class V extends ASTVisitor
+        {
+            private ASTNodeWithErrorRecoverySymbols firstError = null;
+            
+            public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
+            {
+                if (firstError == null)
+                    firstError = node;
+            }
+
+            public void visitASTErrorConstructNode(ASTErrorConstructNode node)
+            {
+                if (firstError == null)
+                    firstError = node;
+            }
+        };
+        
+        V v = new V();
+        ast.accept(v);
+        return v.firstError;
     }
 
 //    private ArrayList<Definition> mapDefinitions(ArrayList<PhotranTokenRef> tokenRefs)

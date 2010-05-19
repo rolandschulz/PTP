@@ -19,7 +19,9 @@ import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSou
 import org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.sourceform.ISourceForm;
+import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.util.SemanticError;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
 /**
  * Base class for a test case that takes an AST as input.
@@ -61,6 +63,7 @@ public abstract class PhotranASTTestCase extends PhotranTestCase
         {
             ASTExecutableProgramNode ast = parse(file, createSourceForm());
             assertTrue(ast != null);
+            assertNull(PhotranVPG.findFirstErrorIn(ast));
             handleAST(ast);
         }
         catch (ComparisonFailure f)
@@ -76,7 +79,12 @@ public abstract class PhotranASTTestCase extends PhotranTestCase
 
     protected ISourceForm createSourceForm()
     {
-        return isFixedForm ? new UnpreprocessedFixedSourceForm() : new UnpreprocessedFreeSourceForm();
+        if (isFixedForm)
+            return new UnpreprocessedFixedSourceForm();
+        else if (file.getName().endsWith(".F90"))
+            return SourceForm.of(null, file.getPath()); // delegate to create CPP source form
+        else
+            return new UnpreprocessedFreeSourceForm();
     }
 
     /**
