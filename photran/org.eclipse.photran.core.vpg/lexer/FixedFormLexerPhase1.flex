@@ -229,7 +229,7 @@ import org.eclipse.core.resources.IFile;
 
     public void setTokenAsCurrent(IToken token)
     {
-    	//lastTokenFile = token.getFile();
+        //lastTokenFile = token.getFile();
         lastTokenLine = token.getLine();
         lastTokenCol = token.getCol();
         lastTokenFile = token.getPhysicalFile();

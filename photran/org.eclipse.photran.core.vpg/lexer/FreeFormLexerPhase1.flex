@@ -166,7 +166,7 @@ import org.eclipse.core.resources.IFile;
 
     public void setTokenAsCurrent(IToken token)
     {
-    	//lastTokenFile = token.getFile();
+        //lastTokenFile = token.getFile();
         lastTokenLine = token.getLine();
         lastTokenCol = token.getCol();
         lastTokenFile = token.getPhysicalFile();
@@ -487,7 +487,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 "SIZE"[ \t]*"="                                 { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_SIZEEQ); }
 "/"                                             { wantEos = true;                     return token(Terminal.T_SLASH); }
 "/="                                            { wantEos = true;                     return token(Terminal.T_SLASHEQ); }
-"//"                                            { wantEos = true;                     return token(Terminal.T_SLASHSLASH); }
+"//" | "/"{LineContinuation}"/"                 { wantEos = true;                     return token(Terminal.T_SLASHSLASH); }
 "STAT"[ \t]*"="                                 { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_STATEQ); }
 "STATUS"[ \t]*"="                               { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_STATUSEQ); }
 "STOP"                                          { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_STOP); }
