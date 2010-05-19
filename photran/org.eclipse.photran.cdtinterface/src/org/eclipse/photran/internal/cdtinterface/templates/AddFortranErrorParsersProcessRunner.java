@@ -57,7 +57,7 @@ public class AddFortranErrorParsersProcessRunner extends PhotranBaseProcessRunne
 
         for (IExtension ext : errorParsersExtPt().getExtensions())
         {
-            if (ext.getLabel().contains("Photran"));      // If "Photran" is //$NON-NLS-1$
+            if (ext.getLabel().contains("Photran"))       // If "Photran" is //$NON-NLS-1$
             {                                             // in the name,
                 sb.append(';');                           // add this error
                 sb.append(ext.getNamespaceIdentifier());  // parser
