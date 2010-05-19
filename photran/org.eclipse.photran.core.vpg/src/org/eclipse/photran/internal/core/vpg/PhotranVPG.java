@@ -655,10 +655,11 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     {
         List<VPGLog<Token, PhotranTokenRef>.Entry> errorLog = log.getEntries();
         errorLogMarkers = new ArrayList<IMarker>(errorLog.size());
-        for (VPGLog<Token, PhotranTokenRef>.Entry entry : errorLog)
+        for (int i = 0; i < errorLog.size(); i++)
         {
             try
             {
+                VPGLog<Token, PhotranTokenRef>.Entry entry = errorLog.get(i);
                 errorLogMarkers.add(createMarkerFrom(entry));
             }
             catch (CoreException e)
