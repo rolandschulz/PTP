@@ -38,7 +38,10 @@
       <topic href="html/reference/remote_call_hierarchy.html" label="Remote Call Hierarchy View"/>
    </context>
    <context id="remote_type_hierarchy_view_context">
-      <topic href="html/reference/remote_type_heirarchy.html" label="Remote Type Hierarchy"/>
+      <topic href="html/reference/remote_type_hierarchy.html" label="Remote Type Hierarchy"/>
+   </context>
+   <context id="remote_include_browser_view_context">
+  	<topic href="html/reference/remote_include_browser_view.html" label="Remote Include Browser"/>
    </context>
    <context id="remote_C_CPP_editor_context">
       <description>Click below for help</description>
