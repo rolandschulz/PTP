@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,12 +15,12 @@ package org.eclipse.ptp.pldt.lapi;
  */
 public interface LapiIDs
 {
-    // preference page name for LAPI
-    String LAPI_INCLUDES    = "LAPI Includes";
+    /** Preference page name for LAPI */
+    String LAPI_INCLUDES    = Messages.LapiIDs_lapi_includes_pref_page_title;
     
-    String MARKER_ID       = "org.eclipse.ptp.pldt.lapi.lapiMarker";
-    String MARKER_ERROR_ID = "org.eclipse.ptp.lap.lapiErrorMarker";
+    String MARKER_ID       = "org.eclipse.ptp.pldt.lapi.lapiMarker"; //$NON-NLS-1$
+    String MARKER_ERROR_ID = "org.eclipse.ptp.lap.lapiErrorMarker"; //$NON-NLS-1$
     
-    // artifact view id
-    String LAPI_VIEW_ID = "org.eclipse.ptp.pldt.lapi.views.LapiArtifactView";
+    /** Artifact view id */
+    String LAPI_VIEW_ID = "org.eclipse.ptp.pldt.lapi.views.LapiArtifactView"; //$NON-NLS-1$
 }

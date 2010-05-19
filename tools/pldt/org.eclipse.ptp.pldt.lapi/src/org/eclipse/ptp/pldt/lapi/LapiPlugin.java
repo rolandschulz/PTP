@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007 IBM Corporation.
+ * Copyright (c) 2007,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ public class LapiPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.lapi", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.pldt.lapi", path); //$NON-NLS-1$
 	}
     
     /**
@@ -85,6 +85,6 @@ public class LapiPlugin extends AbstractUIPlugin {
     
     public static String getPluginId()
     {
-        return "org.eclipse.ptp.pldt.lapi";
+        return "org.eclipse.ptp.pldt.lapi"; //$NON-NLS-1$
     }
 }
