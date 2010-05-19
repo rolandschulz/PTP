@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBHistoryListAction
- * Version: 1.5
+ * Version: 1.7
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -47,7 +47,7 @@ public class IBHistoryListAction extends Action {
 	
 	private class HistoryListDialog extends StatusDialog {
 		
-		private ListDialogField fHistoryList;
+		private ListDialogField<ITranslationUnit> fHistoryList;
 		private IStatus fHistoryStatus;
 		private ITranslationUnit fResult;
 		
@@ -59,22 +59,22 @@ public class IBHistoryListAction extends Action {
 				IBMessages.IBHistoryListAction_Remove_label, 
 			};
 					
-			IListAdapter adapter= new IListAdapter() {
-				public void customButtonPressed(ListDialogField field, int index) {
+			IListAdapter<ITranslationUnit> adapter= new IListAdapter<ITranslationUnit>() {
+				public void customButtonPressed(ListDialogField<ITranslationUnit> field, int index) {
 					doCustomButtonPressed();
 				}
-				public void selectionChanged(ListDialogField field) {
+				public void selectionChanged(ListDialogField<ITranslationUnit> field) {
 					doSelectionChanged();
 				}
 				
-				public void doubleClicked(ListDialogField field) {
+				public void doubleClicked(ListDialogField<ITranslationUnit> field) {
 					doDoubleClicked();
 				}				
 			};
 		
 			CUILabelProvider labelProvider= new CUILabelProvider(CElementBaseLabels.APPEND_ROOT_PATH, CElementImageProvider.OVERLAY_ICONS);
 			
-			fHistoryList= new ListDialogField(adapter, buttonLabels, labelProvider);
+			fHistoryList= new ListDialogField<ITranslationUnit>(adapter, buttonLabels, labelProvider);
 			fHistoryList.setLabelText(IBMessages.IBHistoryListAction_HistoryList_label); 
 			fHistoryList.setElements(Arrays.asList(elements));
 			
@@ -127,12 +127,12 @@ public class IBHistoryListAction extends Action {
 		
 		private void doSelectionChanged() {
 			StatusInfo status= new StatusInfo();
-			List selected= fHistoryList.getSelectedElements();
+			List<ITranslationUnit> selected= fHistoryList.getSelectedElements();
 			if (selected.size() != 1) {
 				status.setError(""); //$NON-NLS-1$
 				fResult= null;
 			} else {
-				fResult= (ITranslationUnit) selected.get(0);
+				fResult= selected.get(0);
 			}
 			fHistoryList.enableButton(0, fHistoryList.getSize() > selected.size() && selected.size() != 0);			
 			fHistoryStatus= status;
@@ -144,7 +144,7 @@ public class IBHistoryListAction extends Action {
 		}
 		
 		public ITranslationUnit[] getRemaining() {
-			List<?> elems= fHistoryList.getElements();
+			List<ITranslationUnit> elems= fHistoryList.getElements();
 			return elems.toArray(new ITranslationUnit[elems.size()]);
 		}	
 		

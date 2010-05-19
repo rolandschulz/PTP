@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBSetInputJob
- * Version: 1.1
+ * Version: 1.2
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -43,6 +43,7 @@ public class IBSetInputJob extends Job {
 		fDisplay= disp;
 	}
 	
+	@Override
 	protected IStatus run(IProgressMonitor monitor) {
     	if (CCorePlugin.getIndexManager().joinIndexer(IIndexManager.FOREVER, monitor)) {
     		try {

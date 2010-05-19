@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.OpenIncludeBrowserAction
- * Version: 1.1
+ * Version: 1.4
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -26,9 +26,6 @@ import org.eclipse.cdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.LocalIncludeBrowserService;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -49,10 +46,12 @@ public class OpenIncludeBrowserAction extends SelectionDispatchAction {
 		setEnabled(fEditor != null && CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editor.getEditorInput()) != null);
 	}
 
+	@Override
 	public void run(ITextSelection sel) {
 		IncludeBrowserUI.open(fEditor, sel);
 	}
-	
+
+	@Override
 	public void run(IStructuredSelection selection) {
 		if (!selection.isEmpty()) {
 			Object selectedObject= selection.getFirstElement();
@@ -63,9 +62,11 @@ public class OpenIncludeBrowserAction extends SelectionDispatchAction {
 		}
 	}
 
+	@Override
 	public void selectionChanged(ITextSelection sel) {
 	}
-			
+
+	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		if (selection.isEmpty()) {
 			setEnabled(false);
@@ -89,6 +90,7 @@ public class OpenIncludeBrowserAction extends SelectionDispatchAction {
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private Object getAdapter(Object object, Class desiredClass) {
 		if (desiredClass.isInstance(object)) {
 			return object;
