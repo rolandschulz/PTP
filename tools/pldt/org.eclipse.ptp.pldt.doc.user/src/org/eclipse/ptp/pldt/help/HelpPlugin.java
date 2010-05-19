@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ public class HelpPlugin extends AbstractUIPlugin
     /** Resource bundle */
     private ResourceBundle    resourceBundle;
     /** the plug-in ID */
-    public static final String PLUGIN_ID="org.eclipse.ptp.pldt.help";
+    public static final String PLUGIN_ID="org.eclipse.ptp.pldt.help"; //$NON-NLS-1$
 
     /**
      * The constructor.
@@ -83,7 +83,7 @@ public class HelpPlugin extends AbstractUIPlugin
     {
         try {
             if (resourceBundle == null)
-                resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.pldt.help.HelpPluginResources");
+                resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.pldt.help.HelpPluginResources"); //$NON-NLS-1$
         } catch (MissingResourceException x) {
             resourceBundle = null;
         }
