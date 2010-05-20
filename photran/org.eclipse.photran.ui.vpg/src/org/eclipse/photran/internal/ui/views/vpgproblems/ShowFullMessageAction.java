@@ -35,6 +35,14 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * Action to display the entire message for a marker in a separate dialog.
  *
  * @author Timofey Yuvashev
+ * 
+ * @author Esfar Huq
+ * @author Rui Wang
+ * 
+ * Modified the method run()
+ *  1) Added title bar to "Details" dialog 
+ *  2) "Details" dialog wraps
+ *  3) Focus is shifted to "Close" key, so that dialog can be exited by hitting enter key
  */
 public class ShowFullMessageAction extends SelectionDispatchAction
 {
@@ -66,25 +74,27 @@ public class ShowFullMessageAction extends SelectionDispatchAction
     protected void run(IMarker marker)
     {
         Display disp = getSite().getShell().getDisplay();
-        final Shell shell = new Shell(disp, SWT.RESIZE);
+        final Shell shell = new Shell(disp);
         shell.setText("Event Details");
-        shell.setSize(800,600);
-
+        shell.setSize(500, 300);
+        
         GridLayout gridLayout = new GridLayout(1, false);
-        GridData gridData = new GridData(GridData.FILL_BOTH);
+        GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.grabExcessVerticalSpace = true;
 
+        gridData.verticalAlignment = SWT.FILL;
         shell.setLayout(gridLayout);
         shell.setLayoutData(gridData);
 
-        Text message = new Text(shell, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-        message.setSize(700, 500);
+        Text message = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
         message.setLayoutData(gridData);
         message.setText(MarkerUtilities.getMessage(marker));
+       
 
         Button close = new Button(shell, SWT.PUSH);
         close.setText("Close");
+        close.setFocus();
         close.addSelectionListener(new SelectionAdapter()
             {
                 public void widgetSelected(SelectionEvent e)
@@ -94,7 +104,6 @@ public class ShowFullMessageAction extends SelectionDispatchAction
             });
 
         message.pack();
-        shell.pack();
         shell.open();
 
         while(!shell.isDisposed())

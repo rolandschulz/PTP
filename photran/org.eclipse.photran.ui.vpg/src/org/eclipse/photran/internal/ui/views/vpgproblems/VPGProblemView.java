@@ -56,6 +56,11 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * (http://www.jdg2e.com/jdg2e_CD_for_eclipse321/plug-in_development/examples/com.ibm.jdg2e.view.marker/src-marker/com/ibm/jdg2e/view/marker/MarkerView.java)
  *
  * @author Timofey Yuvashev
+ * 
+ * @author Esfar Huq
+ * @author Rui Wang
+ * 
+ * Replaced call to setSorter() to setComparator() in method createPartControl()
  */
 public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 {
@@ -97,7 +102,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
             | SWT.MULTI | SWT.FULL_SELECTION);
 
         tableSorter = new TableSorter();
-        tableViewer.setSorter(this.tableSorter);
+        tableViewer.setComparator(this.tableSorter);
 
         createTableColumns(tableViewer);
         setTableGridData();

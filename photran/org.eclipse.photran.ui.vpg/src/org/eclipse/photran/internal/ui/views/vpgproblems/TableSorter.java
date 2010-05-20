@@ -23,6 +23,11 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html)
  *
  * @author Timofey Yuvashev
+ * 
+ * @author Esfar Huq
+ * @author Rui Wang
+ * 
+ * Fixed the method compare() by removing some outdated cases in the switch statement
  */
 public class TableSorter extends ViewerSorter
 {
@@ -63,64 +68,37 @@ public class TableSorter extends ViewerSorter
         IMarker m1 = (IMarker)e1;
         IMarker m2 = (IMarker)e2;
         int result = EQUAL;
+        
         //Based on which column we want to sort, we compare different data.
         //For the list of columns, look in VPGProblemView.java
         switch(this.propertyIndex)
         {
+            //FIRST COLUMN: Description
             case 0:
-            {
-                long id1 = m1.getId();
-                long id2 = m2.getId();
-
-                if(id1 < id2)
-                    result = LESS;
-                else if(id1 > id2)
-                    result = GREATER;
-                else
-                    result = EQUAL;
-                break;
-            }
-            case 1:
             {
                 String msg1 = MarkerUtilities.getMessage(m1);
                 String msg2 = MarkerUtilities.getMessage(m2);
                 result = msg1.compareTo(msg2);
                 break;
             }
-            case 2:
+            //SECOND COLUMN: Resource
+            case 1:
             {
                 String resource1 = m1.getResource().getName().toString();
                 String resource2 = m2.getResource().getName().toString();
                 result = resource1.compareTo(resource2);
                 break;
             }
-            case 3:
+            //THIRD COLUMN: Path
+            case 2:
             {
                 String path1 = m1.getResource().getProjectRelativePath().toString();
                 String path2 = m2.getResource().getProjectRelativePath().toString();
                 result = path1.compareTo(path2);
                 break;
             }
-            case 4:
-            {
-                int line1 = m1.getAttribute(IMarker.LINE_NUMBER, -1);
-                int line2 = m2.getAttribute(IMarker.LINE_NUMBER, -1);
-                if(line1 < line2)
-                    result = LESS;
-                else if(line1 > line2)
-                    result = GREATER;
-                else
-                    result = EQUAL;
-                break;
-            }
-            case 5:
-            {
-                String type1 = MarkerUtilities.getMarkerType(m1);
-                String type2 = MarkerUtilities.getMarkerType(m2);
-                result = type1.compareTo(type2);
-                break;
-            }
-        }
+        }//end switch
+        
         //If it needs to be ascending sort, simply flip the resulting value
         if(!this.DESCENDING)
             result = -result;

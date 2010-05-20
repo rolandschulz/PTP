@@ -25,8 +25,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
+ * This class handles events where the user right-clicks and "Copy"-ies from table
  * 
  * @author tyuvash2
+ * 
+ * @author Esfar Huq
+ * @author Rui Wang
+ * 
+ * Modified the asText() method, removing id and marker detail fields
  */
 public class CopyMarkedFileAction extends Action
 {
@@ -83,20 +89,15 @@ public class CopyMarkedFileAction extends Action
     // get the message associated with the marker
     protected String asText(IMarker marker)
     {
-        String markerID     = "ID: " + String.valueOf(marker.getId());
         String markerMsg    = "Description: " + MarkerUtilities.getMessage(marker);
         String markerRes    = "Resource: " + marker.getResource().getName().toString();
         String markerPath   = "Path: " + marker.getResource().getProjectRelativePath().toString();
         String markerLoc    = "Location: line " + String.valueOf(MarkerUtilities.getLineNumber(marker));
-        String markerType   = "Error Type: " + MarkerUtilities.getMarkerType(marker);
         
-        String result = markerID   + SEPARATOR +
-                        markerMsg  + SEPARATOR +
+        String result = markerMsg  + SEPARATOR +
                         markerRes  + SEPARATOR +
                         markerPath + SEPARATOR +
-                        markerLoc  + SEPARATOR +
-                        markerType + SEPARATOR;
-        
+                        markerLoc  + SEPARATOR;
         return result;
     }
 }
