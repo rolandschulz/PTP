@@ -13,7 +13,6 @@ package org.eclipse.photran.internal.ui.vpg;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.sourceform.SourceForm;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
@@ -21,11 +20,11 @@ import org.eclipse.rephraserengine.core.resources.IResourceFilter;
 
 /**
  * A resource filter that only matches accessible Fortran source files and Fortran/C/C++ projects
- * that have refactoring enabled in their project properties.  See {@link IResourceFilter}.
+ * that have refactoring enabled in their project properties. See {@link IResourceFilter}.
  * <p>
  * Currently, this filter excludes fixed form source files, since Photran does not (yet) support
  * refactoring fixed form code.
- *
+ * 
  * @author Jeff Overbey
  * 
  * @see IResourceFilter
