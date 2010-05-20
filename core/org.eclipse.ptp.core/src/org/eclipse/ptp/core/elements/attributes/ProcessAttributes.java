@@ -30,10 +30,8 @@ public class ProcessAttributes {
 	
 	private static final String STATE_ATTR_ID = "processState"; //$NON-NLS-1$
 	private static final String STATUS_ATTR_ID = "processStatus"; //$NON-NLS-1$
-	// private static final String PID_ATTR_ID = "processPID"; //$NON-NLS-1$
 	private static final String EXIT_CODE_ATTR_ID = "processExitCode"; //$NON-NLS-1$
 	private static final String SIGNAL_NAME_ATTR_ID = "processSignalName"; //$NON-NLS-1$
-	// private static final String INDEX_ATTR_ID = "processIndex"; //$NON-NLS-1$
 	private static final String STDOUT_ATTR_ID = "processStdout"; //$NON-NLS-1$
 	private static final String STDERR_ATTR_ID = "processStderr"; //$NON-NLS-1$
 	private static final String NODEID_ATTR_ID = "processNodeId"; //$NON-NLS-1$
@@ -46,17 +44,9 @@ public class ProcessAttributes {
 		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", //$NON-NLS-1$
 				Messages.ProcessAttributes_8, true, ""); //$NON-NLS-1$
 
-//	private final static IntegerAttributeDefinition pidAttrDef = 
-//		new IntegerAttributeDefinition(PID_ATTR_ID, "PID",  //$NON-NLS-1$
-//				Messages.ProcessAttributes_1, true, 0);
-	
 	private final static IntegerAttributeDefinition exitCodeAttrDef = 
 		new IntegerAttributeDefinition(EXIT_CODE_ATTR_ID, "Exit Code",  //$NON-NLS-1$
 				Messages.ProcessAttributes_2, true, 0);
-	
-//	private final static IntegerAttributeDefinition indexAttrDef = 
-//		new IntegerAttributeDefinition(INDEX_ATTR_ID, "Index",  //$NON-NLS-1$
-//				Messages.ProcessAttributes_3, true, 0);
 	
 	private final static StringAttributeDefinition signalNameAttrDef = 
 		new StringAttributeDefinition(SIGNAL_NAME_ATTR_ID, "Exit Signal",  //$NON-NLS-1$
@@ -82,17 +72,9 @@ public class ProcessAttributes {
 		return statusAttrDef;
 	}
 	
-//	public static IntegerAttributeDefinition getPIDAttributeDefinition() {
-//		return pidAttrDef;
-//	}
-	
 	public static IntegerAttributeDefinition getExitCodeAttributeDefinition() {
 		return exitCodeAttrDef;
 	}
-	
-//	public static IntegerAttributeDefinition getIndexAttributeDefinition() {
-//		return indexAttrDef;
-//	}
 	
 	public static StringAttributeDefinition getSignalNameAttributeDefinition() {
 		return signalNameAttrDef;
@@ -113,10 +95,8 @@ public class ProcessAttributes {
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				stateAttrDef, 
-			   statusAttrDef, 
-				// pidAttrDef, 
+				statusAttrDef, 
 				exitCodeAttrDef, 
-				// indexAttrDef, 
 				signalNameAttrDef, 
 				stdoutAttrDef,
 				stderrAttrDef,

@@ -72,11 +72,6 @@ public class OpenMPIRuntimeModelPresentation implements IRuntimeModelPresentatio
 			if (state != null) {
 				return state.getValueAsString();
 			}
-//			StringAttribute status = 
-//				element.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
-//			if (status != null) {
-//				return status.getValue();
-//			}
 		}
 		return null;
 	}
