@@ -24,7 +24,7 @@ import org.eclipse.cdt.ui.text.ICHelpInvocationContext;
 
 /**
  * C Help Book implementation for hover help, etc. etc.
- * @author beth
+ * @author Beth Tibbitts
  *
  */
 public class CHelpBookImpl implements ICHelpBook {
@@ -33,7 +33,7 @@ public class CHelpBookImpl implements ICHelpBook {
 
 	private String pluginId;
 
-	protected Map<String,IFunctionSummary> funcName2FuncInfo = new HashMap<String, IFunctionSummary>();
+	protected Map<String, IFunctionSummary> funcName2FuncInfo = new HashMap<String, IFunctionSummary>();
 
 	/**
 	 * Disallow default ctor; must provide plugin id
