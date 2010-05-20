@@ -21,17 +21,18 @@ public class Messages extends NLS {
 	public static String SLURMResourceManagerConfigurationWizardPage_title;
 	public static String SLURMResourceManagerConfigurationWizardPage_description;
 
-	public static String SLURMRMLaunchConfigurationDynamicTab_0;
-	public static String SLURMRMLaunchConfigurationDynamicTab_1;
-	public static String SLURMRMLaunchConfigurationDynamicTab_2;
-	public static String SLURMRMLaunchConfigurationDynamicTab_3;
-	public static String SLURMRMLaunchConfigurationDynamicTab_4;
-	public static String SLURMRMLaunchConfigurationDynamicTab_5;
-	public static String SLURMRMLaunchConfigurationDynamicTab_6;
-	public static String SLURMRMLaunchConfigurationDynamicTab_7;
-	public static String SLURMRMLaunchConfigurationDynamicTab_8;
-	public static String SLURMRMLaunchConfigurationDynamicTab_9;
-	public static String SLURMRMLaunchConfigurationDynamicTab_10;
+	public static String SLURMRMLaunchConfigurationDynamicTab_nprocs;
+	public static String SLURMRMLaunchConfigurationDynamicTab_nnodes;
+	public static String SLURMRMLaunchConfigurationDynamicTab_tlimit;
+	public static String SLURMRMLaunchConfigurationDynamicTab_partition;
+	public static String SLURMRMLaunchConfigurationDynamicTab_reqlist;
+	public static String SLURMRMLaunchConfigurationDynamicTab_exclist;
+	public static String SLURMRMLaunchConfigurationDynamicTab_nprocs_tip;
+	public static String SLURMRMLaunchConfigurationDynamicTab_nnodes_tip;
+	public static String SLURMRMLaunchConfigurationDynamicTab_tlimit_tip;
+	public static String SLURMRMLaunchConfigurationDynamicTab_partition_tip;
+	public static String SLURMRMLaunchConfigurationDynamicTab_reqlist_tip;
+	public static String SLURMRMLaunchConfigurationDynamicTab_exclist_tip;
 
 	public static String SLURMConfigurationWizardPage_name;
 	public static String SLURMConfigurationWizardPage_title;
@@ -44,7 +45,9 @@ public class Messages extends NLS {
 	public static String SLURMConfigurationWizardPage_select;
 	public static String SLURMConfigurationWizardPage_connection_error;
 	public static String SLURMConfigurationWizardPage_connection_error_msg;
+	
 	public static String SLURMConfigurationWizardPage_numProcsInvalid;
+	public static String SLURMConfigurationWizardPage_numNodesInvalid;
 	public static String SLURMConfigurationWizardPage_timeLimitInvalid;
 
 	public static String SLURMPreferencesPage_group_slurmd;

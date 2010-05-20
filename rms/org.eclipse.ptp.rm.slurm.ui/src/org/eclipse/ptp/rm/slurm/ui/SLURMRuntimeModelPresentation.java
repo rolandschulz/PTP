@@ -12,16 +12,15 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.slurm.ui;
 
-import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
+import org.eclipse.ptp.internal.ui.model.PProcessUI;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
-import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
-import org.eclipse.ptp.internal.ui.model.PProcessUI;
+import org.eclipse.ptp.rm.slurm.ui.SLURMModelImages;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.swt.graphics.Image;
@@ -35,15 +34,13 @@ public class SLURMRuntimeModelPresentation implements IRuntimeModelPresentation 
 		if (object instanceof IElement) {
 			IElement element = (IElement)object;
 			IPElement pElement = element.getPElement();
-			// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
 			if (pElement instanceof PProcessUI) {
-				EnumeratedAttribute<State> state =
-					pElement.getAttribute(ProcessAttributes.getStateAttributeDefinition());
-				if (state != null) {
+				StringAttribute status = pElement.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+				if (status != null) {
 					if (element.isSelected()) {
-						return SLURMModelImages.procSelImages.get(state.getValueAsString());
+						return SLURMModelImages.procSelImages.get(status.getValue());
 					}
-					return SLURMModelImages.procImages.get(state.getValueAsString());
+					return SLURMModelImages.procImages.get(status.getValue());
 				}
 			} else if (pElement instanceof IPNode) {
 				StringAttribute status = pElement.getAttribute(NodeAttributes.getStatusAttributeDefinition());
@@ -75,16 +72,10 @@ public class SLURMRuntimeModelPresentation implements IRuntimeModelPresentation 
 			element = (IPElement)object;
 		}
 		if (element != null) {
-			EnumeratedAttribute<State> state = 
-				element.getAttribute(ProcessAttributes.getStateAttributeDefinition());
-			if (state != null) {
-				return state.getValueAsString();
+			StringAttribute status = element.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+			if (status != null) {
+				return status.getValue();
 			}
-//			StringAttribute status = 
-//				element.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
-//			if (status != null) {
-//				return status.getValue();
-//			}
 		}
 		return null;
 	}

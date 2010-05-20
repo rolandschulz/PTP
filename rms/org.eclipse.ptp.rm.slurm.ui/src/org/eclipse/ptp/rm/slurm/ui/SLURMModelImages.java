@@ -63,7 +63,10 @@ public class SLURMModelImages {
 	public static final String SLURM_IMG_NODE_ALLOCATED = "node_alloc.gif"; //$NON-NLS-1$
 	public static final String SLURM_IMG_NODE_DOWN = "node_down.gif"; //$NON-NLS-1$
 	public static final String SLURM_IMG_NODE_UNKNOWN = "node_unknown.gif"; //$NON-NLS-1$
-	
+	public static final String SLURM_IMG_NODE_MIXED = "node_mixed.gif"; //$NON-NLS-1$
+	public static final String SLURM_IMG_NODE_FUTURE = "node_future.gif"; //$NON-NLS-1$
+	public static final String SLURM_IMG_NODE_ERROR = "node_error.gif"; //$NON-NLS-1$
+
 	public static final Map<String, Image> procImages= new HashMap<String, Image>();	
 	public static final Map<String, Image> procSelImages= new HashMap<String, Image>();	
 	public static final Map<String, Image> jobImages= new HashMap<String, Image>();	
@@ -101,7 +104,10 @@ public class SLURMModelImages {
 		ImageManager.createImageDescriptor(NODE_URL, "SLURM_" + SLURM_IMG_NODE_ALLOCATED, SLURM_IMG_NODE_ALLOCATED);//$NON-NLS-1$
 		ImageManager.createImageDescriptor(NODE_URL, "SLURM_" + SLURM_IMG_NODE_DOWN, SLURM_IMG_NODE_DOWN);//$NON-NLS-1$
 		ImageManager.createImageDescriptor(NODE_URL, "SLURM_" + SLURM_IMG_NODE_UNKNOWN, SLURM_IMG_NODE_UNKNOWN);//$NON-NLS-1$
-
+		ImageManager.createImageDescriptor(NODE_URL, "SLURM_" + SLURM_IMG_NODE_MIXED, SLURM_IMG_NODE_MIXED);//$NON-NLS-1$
+		ImageManager.createImageDescriptor(NODE_URL, "SLURM_" + SLURM_IMG_NODE_FUTURE, SLURM_IMG_NODE_FUTURE);//$NON-NLS-1$
+		ImageManager.createImageDescriptor(NODE_URL, "SLURM_" + SLURM_IMG_NODE_ERROR, SLURM_IMG_NODE_ERROR);//$NON-NLS-1$
+		
 		procImages.put(SLURMMPIProcessAttributes.Status.PENDING.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_PROC_PENDING));//$NON-NLS-1$
 		procImages.put(SLURMMPIProcessAttributes.Status.RUNNING.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_PROC_RUNNING));//$NON-NLS-1$
 		procImages.put(SLURMMPIProcessAttributes.Status.SUSPENDED.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_PROC_SUSPENDED));//$NON-NLS-1$
@@ -133,7 +139,9 @@ public class SLURMModelImages {
 		nodeImages.put(SLURMMPINodeAttributes.Status.ALLOCATED.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_NODE_ALLOCATED));//$NON-NLS-1$
 		nodeImages.put(SLURMMPINodeAttributes.Status.DOWN.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_NODE_DOWN));//$NON-NLS-1$
 		nodeImages.put(SLURMMPINodeAttributes.Status.UNKNOWN.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_NODE_UNKNOWN));//$NON-NLS-1$
-
+		nodeImages.put(SLURMMPINodeAttributes.Status.MIXED.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_NODE_MIXED));//$NON-NLS-1$
+		nodeImages.put(SLURMMPINodeAttributes.Status.FUTURE.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_NODE_FUTURE));//$NON-NLS-1$
+		nodeImages.put(SLURMMPINodeAttributes.Status.ERROR.toString(), ImageManager.getImage("SLURM_" + SLURM_IMG_NODE_ERROR));//$NON-NLS-1$
 	}
 
 }

@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.ui.rmLaunchConfiguration;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -19,9 +21,10 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
-import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
@@ -40,44 +43,44 @@ import org.eclipse.swt.widgets.Text;
 public class SLURMRMLaunchConfigurationDynamicTab extends
 		AbstractRMLaunchConfigurationDynamicTab {
 	
-	//jobNumProces
-	private Text numProcsText;
-	private String numProcsString = "1"; //$NON-NLS-1$
-	private static final String NUMBER_OF_PROCESSES_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_0;
-	//jobNumNodes
-	/*
-	private Text NumNodesText;
-	private String numbernodesString = "2";
-	private static final String JOB_NUMBER_OF_NODES_LABEL = "Number of Nodes(-N): ";
-	*/
-	//jobTimeLimit
-	private Text TimeLimitText;
-	private String timeLimitString = "2"; //$NON-NLS-1$
-	private static final String JOB_TIME_LIMIT_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_1;
-	//jobPartition
-	private String partationRequestedString = "3"; //$NON-NLS-1$
-	private static final String JOB_PARTATION_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_2;
-	//jobType
-	private String jobTypeComboString = "mpi"; //$NON-NLS-1$
-	private static final String JOB_TYPE_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_3;
-	//jobIoLabel
-	private String jobIoString = Messages.SLURMRMLaunchConfigurationDynamicTab_4;
-	private static final String JOB_IO_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_5;
-	//jobVerbose
-	private String jobVerboseModString = Messages.SLURMRMLaunchConfigurationDynamicTab_6;
-	private static final String JOB_VERBOSE_MODE_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_7;
-	//jobNodeList
-	private String jobNodeListString = "node0,node1"; //$NON-NLS-1$
-	private static final String JOB_NODE_LIST_LABEL =Messages.SLURMRMLaunchConfigurationDynamicTab_8;
+	//ntasks
+	private Text nProcsText;
+	private String nProcsString = "1"; //$NON-NLS-1$ 
+	private static final String JOB_NUMBER_OF_PROCESSES_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_nprocs;
+	
+	//nnodes
+	private Text nNodesText;
+	private String nNodesString = "1"; //$NON-NLS-1$ 
+	private static final String JOB_NUMBER_OF_NODES_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_nnodes;
+	
+	//tlimit
+	private Text tLimitText;
+	private String tLimitString = "5"; //$NON-NLS-1$
+	private static final String JOB_TIME_LIMIT_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_tlimit;
+	
+	//partition
+	private Text partText;
+	private String partString = ""; //$NON-NLS-1$
+	private static final String JOB_PARTITION_LABEL = Messages.SLURMRMLaunchConfigurationDynamicTab_partition;
+	
+	//nodeList requested
+	private Text reqNodeListText;
+	private String reqNodeListString = ""; //$NON-NLS-1$
+	private static final String JOB_REQUESTED_NODELIST_LABEL =Messages.SLURMRMLaunchConfigurationDynamicTab_reqlist;
+	
+	//nodeList excluded
+	private Text excNodeListText;
+	private String excNodeListString = ""; //$NON-NLS-1$
+	private static final String JOB_EXCLUDED_NODELIST_LABEL =Messages.SLURMRMLaunchConfigurationDynamicTab_exclist;
+	
 	
 	private static final String ATTR_PREFIX = Activator.PLUGIN_ID + ".launchAttributes"; //$NON-NLS-1$
 	private static final String ATTR_NUMPROCS = ATTR_PREFIX + ".numProcs";	 //$NON-NLS-1$
 	private static final String ATTR_NUMNODES = ATTR_PREFIX + ".numNodes"; //$NON-NLS-1$
 	private static final String ATTR_TIMELIMIT = ATTR_PREFIX + ".timeLimit"; //$NON-NLS-1$
-	private static final String ATTR_JOBPARTATION = ATTR_PREFIX + ".jobpartation"; //$NON-NLS-1$
-	private static final String ATTR_JOBTYPE = ATTR_PREFIX + ".jobtype"; //$NON-NLS-1$
-	private static final String ATTR_JOBIO = ATTR_PREFIX + ".jobio"; //$NON-NLS-1$
-	private static final String ATTR_JOBVERBOSEMODE = ATTR_PREFIX + ".jobverbosemode";	 //$NON-NLS-1$
+	private static final String ATTR_JOBPARTITION = ATTR_PREFIX + ".jobPartition"; //$NON-NLS-1$
+	private static final String ATTR_JOBREQNODELIST = ATTR_PREFIX + ".jobReqNodeList"; //$NON-NLS-1$
+	private static final String ATTR_JOBEXCNODELIST = ATTR_PREFIX + ".jobExcNodeList"; //$NON-NLS-1$
 	private static final RMLaunchValidation success = new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	
 	private Composite control;
@@ -91,60 +94,44 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
 			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(numProcsAttrDef, numProcsString);
+			IntegerAttribute iattr0 = new IntegerAttribute(numProcsAttrDef, nProcsString);
 		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
+			return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}
 		
-		/*
 		try {
 			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
 			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobNumNodesAttrDef, numbernodesString);
-			//System.out.println("the iattr value is:"+iattr+"the numprocsString value is:"+numProcsString);
+			IntegerAttribute iattr1 = new IntegerAttribute(jobNumNodesAttrDef, nNodesString);
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage());
 		}
-		*/
-		
+				
 		try {
 			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
 			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobTimeLimitAttrDef, timeLimitString);		
+			IntegerAttribute iattr2 = new IntegerAttribute(jobTimeLimitAttrDef, tLimitString);		
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
 		}
-		/*
 		
-		try {
-			IntegerAttributeDefinition jobPartationAttrDef = getJobPartationAttrDef(rm, queue);
-			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobPartationAttrDef, partationRequestedString);
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_PARTATION_LABEL + e.getMessage());
-		}
+		//Not necessary to check following StringAttribute
 		
-		
-		try {
-			IntegerAttributeDefinition jobTypeComboAttrDef = getJobTypeComboAttrDef(rm, queue);
-			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobTypeComboAttrDef, jobTypeComboString);		
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_TYPE_LABEL + e.getMessage());
-		}
-		
-		
-		try {
-			IntegerAttributeDefinition jobIoAttrDef = getJobIoAttrDef(rm, queue);
-			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobIoAttrDef, jobIoString);		
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_IO_LABEL + e.getMessage());
-		}		
-		*/
-				
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		@SuppressWarnings("unused")
+		StringAttribute sattr3 = new StringAttribute(jobPartitionAttrDef, partString);
+	
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		@SuppressWarnings("unused")
+		StringAttribute sattr4 = new StringAttribute(jobReqNodeListAttrDef, reqNodeListString);		
+	
+
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		@SuppressWarnings("unused")
+		StringAttribute sattr5 = new StringAttribute(jobExcNodeListAttrDef, excNodeListString);		
+					
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
@@ -155,7 +142,6 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1, true));
 		GridData gd;
-		
 		final int numColumns = 2;
 		
 		final Composite comp = new Composite(control, SWT.BORDER);
@@ -168,75 +154,116 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 		gd.horizontalSpan = numColumns;
 		comp.setLayoutData(gd);
 		
-		
-		Label numberOfProcessesnLabel = new Label(comp, SWT.NONE);
-		numberOfProcessesnLabel.setText(NUMBER_OF_PROCESSES_LABEL);
-		final GridData gd_numberOfProcessesnLabel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-		gd_numberOfProcessesnLabel.minimumWidth = numberOfProcessesnLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-		numberOfProcessesnLabel.setLayoutData(gd_numberOfProcessesnLabel);
-		
-		
-		numProcsText = new Text(comp, SWT.BORDER | SWT.WRAP);
-		numProcsText.setTextLimit(10);
-		numProcsText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_9);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, false, numColumns-1, 1);
-		gd.minimumWidth = numProcsText.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-		numProcsText.setLayoutData(gd);
-
+		/* ntasks label */
+		final Label nProcsLabel = new Label(comp, SWT.NONE);
+		nProcsLabel.setText(JOB_NUMBER_OF_PROCESSES_LABEL);
+		final GridData gd_nProcsLabel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd_nProcsLabel.minimumWidth = nProcsLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		nProcsLabel.setLayoutData(gd_nProcsLabel);
+		/* ntasks text */
+		nProcsText = new Text(comp, SWT.BORDER | SWT.WRAP);
+		nProcsText.setTextLimit(20);
+		nProcsText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_nprocs_tip);
+		final GridData gd_nProcsText = new GridData(SWT.FILL, SWT.FILL, true, false, numColumns-1, 1);
+		nProcsText.setLayoutData(gd_nProcsText);
 		// Tell the client of this dynamic tab that the
 		// contents of this tab are affected by the contents
 		// of this widget.
-		numProcsText.addModifyListener(new ModifyListener(){
-
+		nProcsText.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent e) {
-				//System.out.println("The value of numProcsString:"+numProcsString);
-				numProcsString = numProcsText.getText();
-				//System.out.println("The value of numProcsString1:"+numProcsString);
+				nProcsString = nProcsText.getText();
 				fireContentsChanged();
 			}});
-        /*
-		final Label numberOfNodesLabel = new Label(comp, SWT.NONE);
-		numberOfNodesLabel.setText(JOB_NUMBER_OF_NODES_LABEL);
-
-		NumNodesText = new Text(comp, SWT.BORDER | SWT.WRAP);
-		NumNodesText.setTextLimit(10);
-		NumNodesText.setToolTipText("Please input the number of nodes!");
-		final GridData gd_numNodesText = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		NumNodesText.setLayoutData(gd_numNodesText);
-		//NumNodesText   value
-		NumNodesText.addModifyListener(new ModifyListener(){
-
+       
+		/* nnodes label */		
+		final Label nNodesLabel = new Label(comp, SWT.NONE);
+		nNodesLabel.setText(JOB_NUMBER_OF_NODES_LABEL);
+		final GridData gd_nNodesLabel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd_nNodesLabel.minimumWidth = nNodesLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		nNodesLabel.setLayoutData(gd_nNodesLabel);
+		/* nnodes text */
+		nNodesText = new Text(comp, SWT.BORDER | SWT.WRAP);
+		nNodesText.setTextLimit(20);
+		nNodesText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_nnodes_tip);
+		final GridData gd_nNodesText = new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns-1, 1);
+		nNodesText.setLayoutData(gd_nNodesText);
+		nNodesText.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent e) {
-				//System.out.println("The value of numbernodesString:"+numbernodesString);
-				numbernodesString = NumNodesText.getText();
-				//System.out.println("The value of numbernodesString1:"+numbernodesString);
+				nNodesString = nNodesText.getText();
 				fireContentsChanged();
 			}});
 		
-        */
-		final Label timeLimitLabel = new Label(comp, SWT.NONE);
-		timeLimitLabel.setText(JOB_TIME_LIMIT_LABEL);
-
-		TimeLimitText = new Text(comp, SWT.BORDER | SWT.WRAP);
-		TimeLimitText.setTextLimit(10);
-		TimeLimitText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_10);
-		final GridData gd_timeLimitText = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		TimeLimitText.setLayoutData(gd_timeLimitText);
-		//TimeLimitText   value
-		TimeLimitText.addModifyListener(new ModifyListener(){
-
+		/* timelimit  label*/
+		final Label tLimitLabel = new Label(comp, SWT.NONE);
+		tLimitLabel.setText(JOB_TIME_LIMIT_LABEL);
+		final GridData gd_tLimitLabel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd_tLimitLabel.minimumWidth = tLimitLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		tLimitLabel.setLayoutData(gd_tLimitLabel);
+		/* timelimit text */
+		tLimitText = new Text(comp, SWT.BORDER | SWT.WRAP);
+		tLimitText.setTextLimit(10);
+		tLimitText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_tlimit_tip);
+		final GridData gd_tLimitText = new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns-1, 1);
+		tLimitText.setLayoutData(gd_tLimitText);
+		tLimitText.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent e) {
-				//System.out.println("The value of timeLimitString:"+timeLimitString);
-				timeLimitString = TimeLimitText.getText();
-				//System.out.println("The value of timeLimitString1:"+timeLimitString);
+				tLimitString = tLimitText.getText();
 				fireContentsChanged();
 			}});
-		//partationRequestedCombo   value
-		//JobIdText   value
-		//jobTypeCombo   value
-		//JobIOLableText   value
-		//JobVerboseModeText  value
-		//JobNodelistText  value
+		
+		/* partition label */
+		final Label partLabel = new Label(comp, SWT.NONE);
+		partLabel.setText(JOB_PARTITION_LABEL);
+		final GridData gd_partLabel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd_partLabel.minimumWidth = partLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		partLabel.setLayoutData(gd_partLabel);
+		/* partition text */
+		partText = new Text(comp, SWT.BORDER | SWT.WRAP);
+		partText.setTextLimit(20);
+		partText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_partition_tip);
+		final GridData gd_partText = new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns-1, 1);
+		partText.setLayoutData(gd_partText);
+		partText.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent e) {
+				partString = partText.getText();
+				fireContentsChanged();
+			}});
+		
+		/* requested nodeList label */
+		final Label reqNodeListLabel = new Label(comp, SWT.NONE);
+		reqNodeListLabel.setText(JOB_REQUESTED_NODELIST_LABEL);
+		final GridData gd_reqNodeListLabel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd_reqNodeListLabel.minimumWidth = reqNodeListLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		reqNodeListLabel.setLayoutData(gd_reqNodeListLabel);
+		/* requested nodeList text */
+		reqNodeListText = new Text(comp, SWT.BORDER | SWT.WRAP);
+		reqNodeListText.setTextLimit(200);
+		reqNodeListText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_reqlist_tip);
+		final GridData gd_reqNodeListText = new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns-1, 1);
+		reqNodeListText.setLayoutData(gd_reqNodeListText);
+		reqNodeListText.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent e) {
+				reqNodeListString = reqNodeListText.getText();
+				fireContentsChanged();
+			}});
+		
+		/* excluded nodeList label */
+		final Label excNodeListLabel = new Label(comp, SWT.NONE);
+		excNodeListLabel.setText(JOB_EXCLUDED_NODELIST_LABEL);
+		final GridData gd_excNodeListLabel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd_excNodeListLabel.minimumWidth = excNodeListLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		excNodeListLabel.setLayoutData(gd_excNodeListLabel);
+		/* excluded nodeList text */
+		excNodeListText = new Text(comp, SWT.BORDER | SWT.WRAP);
+		excNodeListText.setTextLimit(200);
+		excNodeListText.setToolTipText(Messages.SLURMRMLaunchConfigurationDynamicTab_exclist_tip);
+		final GridData gd_excNodeListText = new GridData(SWT.FILL, SWT.CENTER, true, false, numColumns-1, 1);
+		excNodeListText.setLayoutData(gd_excNodeListText);
+		excNodeListText.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent e) {
+				excNodeListString = excNodeListText.getText();
+				fireContentsChanged();
+			}});
 	}
 
 	/* (non-Javadoc)
@@ -244,73 +271,88 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	 */
 	public IAttribute<?,?,?>[] getAttributes(IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration, String mode) throws CoreException {
-		
-		int numProcs = configuration.getAttribute(ATTR_NUMPROCS, -1);
-		IntegerAttribute iattr = null;
+			
+		int jobnumProcs = configuration.getAttribute(ATTR_NUMPROCS, -1);
+		IntegerAttribute iattr0 = null;
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
-			iattr = new IntegerAttribute(numProcsAttrDef, numProcs);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+			iattr0 = new IntegerAttribute(numProcsAttrDef, jobnumProcs);
 		} catch (IllegalValueException e) {
-			return new IAttribute[0];
+			return new IAttribute[]{iattr0};
 		}
-		
-		/*				
+			
 		int jobNumNodes = configuration.getAttribute(ATTR_NUMNODES, -1);
-		//System.out.println("The value of jobNumNodes is: "+jobNumNodes);
-	
 		IntegerAttribute iattr1 = null;
 		try {
 			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
 			iattr1 = new IntegerAttribute(jobNumNodesAttrDef, jobNumNodes);
-			//System.out.println("The value of NumNodes is: "+iattr1);
 		} catch (IllegalValueException e) {
 			return new IAttribute[1];
 		}
-		*/			
+				
 		int jobTimeLimit = configuration.getAttribute(ATTR_TIMELIMIT, -1);
 		IntegerAttribute iattr2 = null;
 		try {
 			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
 			iattr2 = new IntegerAttribute(jobTimeLimitAttrDef, jobTimeLimit);
-			//System.out.println("The value of TimeLimit is: "+iattr2);
 		} catch (IllegalValueException e) {
 			return new IAttribute[2];
 		}
-		
-		/*			
-		int jobPartation = configuration.getAttribute(ATTR_JOBPARTATION, -1);
-		IntegerAttribute iattr3 = null;
-		try {
-			IntegerAttributeDefinition jobPartationAttrDef = getJobPartationAttrDef(rm, queue);
-			iattr2 = new IntegerAttribute(jobPartationAttrDef, jobPartation);
-		} catch (IllegalValueException e) {
-			return new IAttribute[3];
-		}
+				
+		String jobPartition = configuration.getAttribute(ATTR_JOBPARTITION, "");//$NON-NLS-1$
+		StringAttribute sattr3 = null;	
+		if(jobPartition.length() > 0) {
+			StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+			sattr3 = new StringAttribute(jobPartitionAttrDef, jobPartition);
+		}	
 					
-		int jobTypeCombo = configuration.getAttribute(ATTR_JOBTYPE, -1);
-		IntegerAttribute iattr3 = null;
-		try {
-			IntegerAttributeDefinition jobTypeComboAttrDef = getJobTimeLimitAttrDef(rm, queue);
-			iattr2 = new IntegerAttribute(jobTypeComboAttrDef, jobTypeCombo);
-		} catch (IllegalValueException e) {
-			return new IAttribute[3];
-		}			
-			
-		int jobIo = configuration.getAttribute(ATTR_JOBIO, -1);
-		IntegerAttribute iattr3 = null;
-		try {
-			IntegerAttributeDefinition jobIoAttrDef = getJobIoAttrDef(rm, queue);
-			iattr3 = new IntegerAttribute(jobIoAttrDef, jobIo);
-		} catch (IllegalValueException e) {
-			return new IAttribute[3];
+		String jobReqNodeList = configuration.getAttribute(ATTR_JOBREQNODELIST, "");//$NON-NLS-1$
+		StringAttribute sattr4 = null;
+		if (jobReqNodeList.length() > 0) {
+			StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+			sattr4 = new StringAttribute(jobReqNodeListAttrDef, jobReqNodeList);
+		}	
+						
+		String jobExcNodeList = configuration.getAttribute(ATTR_JOBEXCNODELIST, "");//$NON-NLS-1$
+		StringAttribute sattr5 = null;
+		if (jobExcNodeList.length() > 0) {
+			StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+			sattr5 = new StringAttribute(jobExcNodeListAttrDef, jobExcNodeList);
 		}
-		*/
 		
+		ArrayList int_al = new ArrayList();
+		if (iattr0 != null)
+			int_al.add(iattr0);
+		if (iattr1 != null)
+			int_al.add(iattr1);
+		if (iattr2 != null)
+			int_al.add(iattr2);
 		
+		ArrayList str_al = new ArrayList();
+		if (sattr3 != null)
+			str_al.add(sattr3);
+		if (sattr4 != null)
+			str_al.add(sattr4);
+		if(sattr5 != null)
+			str_al.add(sattr5);
 		
-		return new IAttribute[]{iattr,iattr2};
+		int size1 = int_al.size();
+		int size2 = str_al.size();
+		int size = size1 + size2;
+		IAttribute[] attr = new IAttribute[size]; 
+		int i;
+		for (i = 0; i < size1; i++) {
+			attr[i] = (IntegerAttribute) int_al.get(i);
+		}
+		for (i = 0; i < size2; i++) {
+			attr[size1+i] = (StringAttribute) str_al.get(i);
+		}
+		
+		return attr;
+		
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getControl()
 	 */
@@ -324,94 +366,82 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm,
 			IPQueue queue, ILaunchConfiguration configuration) {
 		
-		int numProcs;
+		int jobnumProcs;
 		try {
-			numProcs = configuration.getAttribute(ATTR_NUMPROCS, 1);
+			jobnumProcs = configuration.getAttribute(ATTR_NUMPROCS, 1);
 		} catch (CoreException e) {
 			try {
-				IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
-				numProcsText.setText(numProcsAttrDef.create().getValueAsString());
+				IntegerAttributeDefinition nProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+				nProcsText.setText(nProcsAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
-				return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL +
+				return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL +
 						e.getMessage() + " : " + e1.getMessage()); //$NON-NLS-1$
 			}
-			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
+			return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}
-		numProcsText.setText(Integer.toString(numProcs));
-		/*
+		nProcsText.setText(Integer.toString(jobnumProcs));
+		
 		int jobNumNodes;
 		try {
 			jobNumNodes = configuration.getAttribute(ATTR_NUMNODES, 1);
 		} catch (CoreException e) {
 			try {
 				IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
-				NumNodesText.setText(jobNumNodesAttrDef.create().getValueAsString());
+				nNodesText.setText(jobNumNodesAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
 				return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL +
-						e.getMessage() + " : " + e1.getMessage());
+						e.getMessage() + " : " + e1.getMessage());//$NON-NLS-1$
 			}
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage());
 		}
-		NumNodesText.setText(Integer.toString(jobNumNodes));
-		*/		
+		nNodesText.setText(Integer.toString(jobNumNodes));
+			
 		int jobTimeLimit;
 		try {
-			jobTimeLimit = configuration.getAttribute(ATTR_TIMELIMIT, 1);
+			jobTimeLimit = configuration.getAttribute(ATTR_TIMELIMIT, 5);
 		} catch (CoreException e) {
 			try {
 				IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
-				TimeLimitText.setText(jobTimeLimitAttrDef.create().getValueAsString());
+				tLimitText.setText(jobTimeLimitAttrDef.create().getValueAsString());
 			} catch (IllegalValueException e1) {
 				return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL +
 						e.getMessage() + " : " + e1.getMessage()); //$NON-NLS-1$
 			}
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
 		}
-		TimeLimitText.setText(Integer.toString(jobTimeLimit));
-		/*		
-		int jobPartation;
+		tLimitText.setText(Integer.toString(jobTimeLimit));
+			
+		String jobPartition;
 		try {
-			jobPartation = configuration.getAttribute(ATTR_JOBPARTATION, 1);
+			jobPartition = configuration.getAttribute(ATTR_JOBPARTITION, "");//$NON-NLS-1$
 		} catch (CoreException e) {
-			try {
-				IntegerAttributeDefinition jobPartationAttrDef = getJobPartationAttrDef(rm, queue);
-				partationRequestedCombo.setText(jobPartationAttrDef.create().getValueAsString());
-			} catch (IllegalValueException e1) {
-				return new RMLaunchValidation(false, JOB_PARTATION_LABEL +
-						e.getMessage() + " : " + e1.getMessage());
-			}
-			return new RMLaunchValidation(false, JOB_PARTATION_LABEL + e.getMessage());
+			StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+			partText.setText(jobPartitionAttrDef.create().getValueAsString());
+			return new RMLaunchValidation(false, JOB_PARTITION_LABEL + e.getMessage());
 		}
-		partationRequestedCombo.setText(Integer.toString(jobPartation));
-		int jobTypeCom;
+		partText.setText(jobPartition);
+		
+		String jobReqNodeList;
 		try {
-			jobTypeCom = configuration.getAttribute(ATTR_JOBTYPE, 1);
+			jobReqNodeList = configuration.getAttribute(ATTR_JOBREQNODELIST, "");//$NON-NLS-1$
 		} catch (CoreException e) {
-			try {
-				IntegerAttributeDefinition jobTypeComboAttrDef = getJobTypeComboAttrDef(rm, queue);
-				jobTypeCombo.setText(jobTypeComboAttrDef.create().getValueAsString());
-			} catch (IllegalValueException e1) {
-				return new RMLaunchValidation(false, JOB_TYPE_LABEL +
-						e.getMessage() + " : " + e1.getMessage());
-			}
-			return new RMLaunchValidation(false, JOB_TYPE_LABEL + e.getMessage());
+			StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+			reqNodeListText.setText(jobReqNodeListAttrDef.create().getValueAsString());
+			return new RMLaunchValidation(false, JOB_REQUESTED_NODELIST_LABEL + e.getMessage());
 		}
-		jobTypeCombo.setText(Integer.toString(jobTypeCom));	
-		int jobIo;
+		reqNodeListText.setText(jobReqNodeList);	
+		
+		String jobExcNodeList;
 		try {
-			jobIo = configuration.getAttribute(ATTR_JOBIO, 1);
+			jobExcNodeList = configuration.getAttribute(ATTR_JOBEXCNODELIST, "");//$NON-NLS-1$
 		} catch (CoreException e) {
-			try {
-				IntegerAttributeDefinition jobIoAttrDef = getJobIoAttrDef(rm, queue);
-				JobIOLableText.setText(jobIoAttrDef.create().getValueAsString());
-			} catch (IllegalValueException e1) {
-				return new RMLaunchValidation(false, JOB_IO_LABEL +
-						e.getMessage() + " : " + e1.getMessage());
-			}
-			return new RMLaunchValidation(false, JOB_IO_LABEL + e.getMessage());
+			StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+			excNodeListText.setText(jobExcNodeListAttrDef.create().getValueAsString());
+			return new RMLaunchValidation(false, JOB_EXCLUDED_NODELIST_LABEL + e.getMessage());
 		}
-		JobIOLableText.setText(Integer.toString(jobIo));
-		*/
+		excNodeListText.setText(jobExcNodeList);	
+		
+		
 		return success;
 	}
 
@@ -423,69 +453,52 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 			IResourceManager rm, IPQueue queue) {
 		
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
 			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(numProcsAttrDef, numProcsString);
+			IntegerAttribute iattr = new IntegerAttribute(numProcsAttrDef, nProcsString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_numProcsInvalid);
 			}
 		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
+			return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}
-		/*
+		
 		try {
 			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
 			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobNumNodesAttrDef, numbernodesString);
+			IntegerAttribute iattr = new IntegerAttribute(jobNumNodesAttrDef, nNodesString);
 			if (iattr.getValue() < 1) {
-				return new RMLaunchValidation(false, Messages.getString("SLURMConfigurationWizardPage.numbernodesInvalid")); //$NON-NLS-1$
+				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_numNodesInvalid);
 			}
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage());
 		}
-		*/
+
 		try {
 			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
 			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobTimeLimitAttrDef, timeLimitString);
+			IntegerAttribute iattr = new IntegerAttribute(jobTimeLimitAttrDef, tLimitString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_timeLimitInvalid);
 			}
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
 		}
-		/*
-		try {
-			IntegerAttributeDefinition jobPartationAttrDef = getJobPartationAttrDef(rm, queue);
-			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobPartationAttrDef, partationRequestedString);
-			if (iattr.getValue() < 1) {
-				return new RMLaunchValidation(false, Messages.getString("SLURMConfigurationWizardPage.numProcsInvalid")); //$NON-NLS-1$
-			}
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_PARTATION_LABEL + e.getMessage());
-		}
-		try {
-			IntegerAttributeDefinition jobTypeComboAttrDef = getJobTypeComboAttrDef(rm, queue);
-			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobTypeComboAttrDef, jobTypeComboString);
-			if (iattr.getValue() < 1) {
-				return new RMLaunchValidation(false, Messages.getString("SLURMConfigurationWizardPage.numProcsInvalid")); //$NON-NLS-1$
-			}
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_TYPE_LABEL + e.getMessage());
-		}
-		try {
-			IntegerAttributeDefinition jobIoAttrDef = getJobIoAttrDef(rm, queue);
-			@SuppressWarnings("unused")
-			IntegerAttribute iattr = new IntegerAttribute(jobIoAttrDef, jobIoString);
-			if (iattr.getValue() < 1) {
-				return new RMLaunchValidation(false, Messages.getString("SLURMConfigurationWizardPage.numProcsInvalid")); //$NON-NLS-1$
-			}
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_IO_LABEL + e.getMessage());
-		}
-		*/
+		
+		//Not necessary to check following StringAttribute
+
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		@SuppressWarnings("unused")
+		StringAttribute sattr0 = new StringAttribute(jobPartitionAttrDef, partString);
+
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		@SuppressWarnings("unused")
+		StringAttribute sattr1 = new StringAttribute(jobReqNodeListAttrDef, reqNodeListString);
+	
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		@SuppressWarnings("unused")
+		StringAttribute sattr2 = new StringAttribute(jobExcNodeListAttrDef, excNodeListString);
+	
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
@@ -495,57 +508,58 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration,
 			IResourceManager rm, IPQueue queue) {
-		IntegerAttribute iattr = null;
+		
+		IntegerAttribute iattr0 = null;
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
-			iattr = new IntegerAttribute(numProcsAttrDef, numProcsString);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
+			iattr0 = new IntegerAttribute(numProcsAttrDef, nProcsString);
 		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
+			return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}
-		configuration.setAttribute(ATTR_NUMPROCS, iattr.getValue());
-		/*
+		configuration.setAttribute(ATTR_NUMPROCS, iattr0.getValue());
+			
 		IntegerAttribute iattr1 = null;
 		try {
 			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
-			iattr1 = new IntegerAttribute(jobNumNodesAttrDef, numbernodesString);
+			iattr1 = new IntegerAttribute(jobNumNodesAttrDef, nNodesString);
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage());
 		}
 		configuration.setAttribute(ATTR_NUMNODES, iattr1.getValue());
-		*/
+		
 		IntegerAttribute iattr2 = null;
 		try {
 			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
-			iattr2 = new IntegerAttribute(jobTimeLimitAttrDef, timeLimitString);
+			iattr2 = new IntegerAttribute(jobTimeLimitAttrDef, tLimitString);
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
 		}
 		configuration.setAttribute(ATTR_TIMELIMIT, iattr2.getValue());
-		/*
-		try {
-			IntegerAttributeDefinition jobPartationAttrDef = getJobPartationAttrDef(rm, queue);
-			iattr = new IntegerAttribute(jobPartationAttrDef, partationRequestedString);
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_PARTATION_LABEL + e.getMessage());
-		}
-		configuration.setAttribute(ATTR_JOBPARTATION, iattr.getValue());
-		try {
-			IntegerAttributeDefinition jobTypeComboAttrDef = getJobTypeComboAttrDef(rm, queue);
-			iattr = new IntegerAttribute(jobTypeComboAttrDef, jobTypeComboString);
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_TYPE_LABEL + e.getMessage());
-		}
-		configuration.setAttribute(ATTR_TIMELIMIT, iattr.getValue());
-		try {
-			IntegerAttributeDefinition jobIoAttrDef = getJobIoAttrDef(rm, queue);
-			iattr = new IntegerAttribute(jobIoAttrDef, jobIoString);
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_IO_LABEL + e.getMessage());
-		}
-		configuration.setAttribute(ATTR_JOBIO, iattr.getValue());
-		*/
-		//System.out.println(ATTR_NUMNODES);
 		
+		StringAttribute sattr0 = null;
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		sattr0 = new StringAttribute(jobPartitionAttrDef, partString);
+		if (sattr0.getValue().length() > 0)
+			configuration.setAttribute(ATTR_JOBPARTITION, sattr0.getValue());
+		else 
+			configuration.removeAttribute(ATTR_JOBPARTITION);
+		
+		StringAttribute sattr1 = null;
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		sattr1 = new StringAttribute(jobReqNodeListAttrDef, reqNodeListString);
+		if (sattr1.getValue().length() > 0)
+			configuration.setAttribute(ATTR_JOBREQNODELIST, sattr1.getValue());
+		else 
+			configuration.removeAttribute(ATTR_JOBREQNODELIST);
+		
+		StringAttribute sattr2 = null;
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		sattr2 = new StringAttribute(jobExcNodeListAttrDef, excNodeListString);
+		if (sattr2.getValue().length() > 0)
+			configuration.setAttribute(ATTR_JOBEXCNODELIST, sattr2.getValue());
+		else 
+			configuration.removeAttribute(ATTR_JOBEXCNODELIST);
+
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
@@ -555,45 +569,36 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration,
 			IResourceManager rm, IPQueue queue) {
 		try {
-			IntegerAttributeDefinition numProcsAttrDef = getNumProcsAttrDef(rm, queue);
+			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
 			configuration.setAttribute(ATTR_NUMPROCS, numProcsAttrDef.create().getValue());
 		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, NUMBER_OF_PROCESSES_LABEL + e.getMessage());
+			return new RMLaunchValidation(false, JOB_NUMBER_OF_PROCESSES_LABEL + e.getMessage());
 		}
-		/*
+		
 		try {
 			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
 			configuration.setAttribute(ATTR_NUMNODES, jobNumNodesAttrDef.create().getValue());
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_NUMBER_OF_NODES_LABEL + e.getMessage());
 		}
-		*/
+		
 		try {
 			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
 			configuration.setAttribute(ATTR_TIMELIMIT, jobTimeLimitAttrDef.create().getValue());
 		} catch (IllegalValueException e) {
 			return new RMLaunchValidation(false, JOB_TIME_LIMIT_LABEL + e.getMessage());
 		}
-		/*
-		try {
-			IntegerAttributeDefinition jobPartationAttrDef = getJobPartationAttrDef(rm, queue);
-			configuration.setAttribute(ATTR_JOBPARTATION, jobPartationAttrDef.create().getValue());
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_PARTATION_LABEL + e.getMessage());
-		}
-		try {
-			IntegerAttributeDefinition jobTypeComboAttrDef = getJobTypeComboAttrDef(rm, queue);
-			configuration.setAttribute(ATTR_JOBTYPE, jobTypeComboAttrDef.create().getValue());
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_TYPE_LABEL + e.getMessage());
-		}	
-		try {
-			IntegerAttributeDefinition jobIoAttrDef = getJobIoAttrDef(rm, queue);
-			configuration.setAttribute(ATTR_JOBIO, jobIoAttrDef.create().getValue());
-		} catch (IllegalValueException e) {
-			return new RMLaunchValidation(false, JOB_IO_LABEL + e.getMessage());
-		}	
-		*/
+		
+		StringAttributeDefinition jobPartitionAttrDef = getJobPartitionAttrDef(rm, queue);
+		configuration.setAttribute(ATTR_JOBPARTITION, jobPartitionAttrDef.create().getValue());
+		
+		StringAttributeDefinition jobReqNodeListAttrDef = getJobReqNodeListAttrDef(rm, queue);
+		configuration.setAttribute(ATTR_JOBREQNODELIST, jobReqNodeListAttrDef.create().getValue());
+		
+		StringAttributeDefinition jobExcNodeListAttrDef = getJobExcNodeListAttrDef(rm, queue);
+		configuration.setAttribute(ATTR_JOBEXCNODELIST, jobExcNodeListAttrDef.create().getValue());
+
+		
 		return success;
 	}
 
@@ -604,25 +609,28 @@ public class SLURMRMLaunchConfigurationDynamicTab extends
 	 * @param queue
 	 * @return
 	 */
-	private IntegerAttributeDefinition getNumProcsAttrDef(IResourceManager rm, IPQueue queue) {
-		return JobAttributes.getNumberOfProcessesAttributeDefinition();
+	private IntegerAttributeDefinition getJobNumProcsAttrDef(IResourceManager rm, IPQueue queue) {
+		return SLURMJobAttributes.getJobNumberOfProcsAttributeDefinition();
 	}
+	
 	private IntegerAttributeDefinition getJobNumNodesAttrDef(IResourceManager rm, IPQueue queue) {
 		return SLURMJobAttributes.getJobNumberOfNodesAttributeDefinition();
 	}
+	
 	private IntegerAttributeDefinition getJobTimeLimitAttrDef(IResourceManager rm, IPQueue queue) {
 		return SLURMJobAttributes.getJobTimelimitAttributeDefinition();
 	}
-	/*
-	private IntegerAttributeDefinition getJobPartationAttrDef(IResourceManager rm, IPQueue queue) {
-		return JobAttributes.getJobPartationAttributeDefinition();
+	
+	private StringAttributeDefinition getJobPartitionAttrDef(IResourceManager rm, IPQueue queue) {
+		return SLURMJobAttributes.getJobPartitionAttributeDefinition();
 	}
-	private IntegerAttributeDefinition getJobTypeComboAttrDef(IResourceManager rm, IPQueue queue) {
-		return JobAttributes.getJobTypeComboAttributeDefinition();
+	
+	private StringAttributeDefinition getJobReqNodeListAttrDef(IResourceManager rm, IPQueue queue) {
+		return SLURMJobAttributes.getJobReqNodeListAttributeDefinition();
 	}
-	private IntegerAttributeDefinition getJobIoAttrDef(IResourceManager rm, IPQueue queue) {
-		return JobAttributes.getJobIoAttributeDefinition();
+	
+	private StringAttributeDefinition getJobExcNodeListAttrDef(IResourceManager rm, IPQueue queue) {
+		return SLURMJobAttributes.getJobExcNodeListAttributeDefinition();
 	}
-	*/
-	//need to modify JobAttributes.java
+
 }
