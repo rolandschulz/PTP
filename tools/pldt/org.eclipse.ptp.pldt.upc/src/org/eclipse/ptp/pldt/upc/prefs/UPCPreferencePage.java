@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2008 IBM Corporation.
+ * Copyright (c) 2008,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.upc.Messages;
 import org.eclipse.ptp.pldt.upc.UPCIDs;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
 import org.eclipse.ui.IWorkbench;
@@ -30,11 +31,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class UPCPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-    private static final String INCLUDES_PREFERENCE_LABEL  = "UPC include paths:";
-    private static final String INCLUDES_PREFERENCE_BROWSE = "Please choose a directory:";
-    private static final String UPC_HELP="Location of UPC help files:";
-    private static final String UPC_HELP_DEFAULT="Use default";
-    private static final String UPC_HELP_DEFAULT_ID="upcHelpUseDefault";
+    private static final String INCLUDES_PREFERENCE_LABEL  = Messages.UPCPreferencePage_preference_label_upc_include_paths;
+    private static final String INCLUDES_PREFERENCE_BROWSE = Messages.UPCPreferencePage_please_choose_a_directory;
+    private static final String UPC_HELP=Messages.UPCPreferencePage_location_of_upc_help_files;
+    private static final String UPC_HELP_DEFAULT=Messages.UPCPreferencePage_use_default;
+    private static final String UPC_HELP_DEFAULT_ID="upcHelpUseDefault"; //$NON-NLS-1$
     //private static final String UPC_HELP_LINUX="Use Linux location: ";
     //private static final String UPC_HELP_AIX="Use AIX location: ";
     //private static final String UPC_HELP_OTHER="Other:";
@@ -43,7 +44,7 @@ public class UPCPreferencePage extends FieldEditorPreferencePage implements IWor
     //private static final String UPC_LOCATION_AIX="/opt/rsct/lapi/eclipse/help";
     //private static final String UPC_LOCATION_LINUX="opt/ibmhpc/lapi/eclipse/help";
     
-    private static final String UPC_WHICH_HELP_ID="default";  // alternatives are: default, aix, linux, other
+    private static final String UPC_WHICH_HELP_ID="default";  // alternatives are: default, aix, linux, other //$NON-NLS-1$
 
     public UPCPreferencePage()
     {
