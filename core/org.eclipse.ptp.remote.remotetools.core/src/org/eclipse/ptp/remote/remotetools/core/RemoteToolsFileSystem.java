@@ -40,8 +40,10 @@ public class RemoteToolsFileSystem extends FileSystem {
 	/**
 	 * Return the connection name encoded in the URI.
 	 * 
-	 * @param uri URI specifying a remote tools connection
+	 * @param uri
+	 *            URI specifying a remote tools connection
 	 * @return name of the connection or null if the URI is invalid
+	 * @since 4.0
 	 */
 	public static String getConnectionNameFor(URI uri) {
 		String name = uri.getAuthority();
@@ -52,20 +54,23 @@ public class RemoteToolsFileSystem extends FileSystem {
 		}
 		return name;
 	}
-	
+
 	/**
 	 * Return the singleton instance of this file system.
+	 * 
 	 * @return the singleton instance of this file system.
 	 */
 	public static RemoteToolsFileSystem getInstance() {
 		return instance;
 	}
-	
+
 	/**
 	 * Return an URI uniquely naming a remote tools remote resource.
 	 * 
-	 * @param connectionName remote tools connection name
-	 * @param path absolute path to resource as valid on the remote system
+	 * @param connectionName
+	 *            remote tools connection name
+	 * @param path
+	 *            absolute path to resource as valid on the remote system
 	 * @return an URI uniquely naming the remote resource.
 	 */
 	public static URI getURIFor(String connectionName, String path) {
@@ -91,40 +96,47 @@ public class RemoteToolsFileSystem extends FileSystem {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.IFileSystem#attributes()
 	 */
+	@Override
 	public int attributes() {
-		//Attributes supported by RSE IFileService
-		return EFS.ATTRIBUTE_READ_ONLY | EFS.ATTRIBUTE_EXECUTABLE
-		     | EFS.ATTRIBUTE_SYMLINK | EFS.ATTRIBUTE_LINK_TARGET;
+		// Attributes supported by RSE IFileService
+		return EFS.ATTRIBUTE_READ_ONLY | EFS.ATTRIBUTE_EXECUTABLE | EFS.ATTRIBUTE_SYMLINK | EFS.ATTRIBUTE_LINK_TARGET;
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#canDelete()
 	 */
+	@Override
 	public boolean canDelete() {
 		return true;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#canWrite()
 	 */
+	@Override
 	public boolean canWrite() {
 		return true;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileSystem#getStore(java.net.URI)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileSystem#getStore(java.net.URI)
 	 */
+	@Override
 	public IFileStore getStore(URI uri) {
-		try  {
+		try {
 			return RemoteToolsFileStore.getInstance(uri);
-		} 
-		catch (Exception e) {
-			//Could be an URI format exception
+		} catch (Exception e) {
+			// Could be an URI format exception
 			PTPRemoteCorePlugin.log(e);
 			return EFS.getNullFileSystem().getStore(uri);
 		}
