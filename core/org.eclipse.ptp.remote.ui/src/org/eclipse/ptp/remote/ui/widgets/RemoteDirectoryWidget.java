@@ -176,6 +176,7 @@ public class RemoteDirectoryWidget extends Composite {
 	 * 
 	 * @param conn
 	 *            remote connection
+	 * @since 4.0
 	 */
 	public void setConnection(IRemoteConnection conn) {
 		if (conn == null) {
@@ -234,7 +235,8 @@ public class RemoteDirectoryWidget extends Composite {
 
 	private IRemoteUIConnectionManager getUIConnectionManager() {
 		if (fRemoteConnection != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices()).getUIConnectionManager();
+			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices())
+					.getUIConnectionManager();
 		}
 		return null;
 	}
