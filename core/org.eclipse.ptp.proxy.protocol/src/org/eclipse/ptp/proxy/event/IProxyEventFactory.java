@@ -32,6 +32,7 @@ public interface IProxyEventFactory {
 	 * @param transID
 	 *            transaction id
 	 * @return new error event
+	 * @since 4.0
 	 */
 	public IProxyErrorEvent newErrorEvent(int transID, int code, String message);
 
@@ -43,6 +44,7 @@ public interface IProxyEventFactory {
 	 * @param args
 	 *            array of arguments for the event
 	 * @return new error event
+	 * @since 4.0
 	 */
 	public IProxyErrorEvent newErrorEvent(int transID, String[] args);
 
@@ -52,6 +54,7 @@ public interface IProxyEventFactory {
 	 * @param transID
 	 *            transaction id
 	 * @return new ok event
+	 * @since 4.0
 	 */
 	public IProxyOKEvent newOKEvent(int transID);
 
@@ -61,6 +64,7 @@ public interface IProxyEventFactory {
 	 * @param transID
 	 *            transaction id
 	 * @return new shutdown event
+	 * @since 4.0
 	 */
 	public IProxyShutdownEvent newShutdownEvent(int transID);
 

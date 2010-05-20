@@ -21,23 +21,45 @@ package org.eclipse.ptp.proxy.debug.event;
 
 public interface IProxyDebugEventListener {
 	public void handleProxyDebugArgsEvent(IProxyDebugArgsEvent e);
+
 	public void handleProxyDebugBreakpointHitEvent(IProxyDebugBreakpointHitEvent e);
+
 	public void handleProxyDebugBreakpointSetEvent(IProxyDebugBreakpointSetEvent e);
+
 	public void handleProxyDebugDataEvent(IProxyDebugDataEvent e);
+
 	public void handleProxyDebugErrorEvent(IProxyDebugErrorEvent e);
+
 	public void handleProxyDebugExitEvent(IProxyDebugExitEvent e);
+
 	public void handleProxyDebugInfoThreadsEvent(IProxyDebugInfoThreadsEvent e);
+
 	public void handleProxyDebugMemoryInfoEvent(IProxyDebugMemoryInfoEvent e);
+
 	public void handleProxyDebugOKEvent(IProxyDebugOKEvent e);
+
+	/**
+	 * @since 4.0
+	 */
 	public void handleProxyDebugOutputEvent(IProxyDebugOutputEvent e);
+
 	public void handleProxyDebugSetThreadSelectEvent(IProxyDebugSetThreadSelectEvent e);
+
 	public void handleProxyDebugSignalEvent(IProxyDebugSignalEvent e);
+
 	public void handleProxyDebugSignalExitEvent(IProxyDebugSignalExitEvent e);
+
 	public void handleProxyDebugSignalsEvent(IProxyDebugSignalsEvent e);
+
 	public void handleProxyDebugStackframeEvent(IProxyDebugStackframeEvent e);
+
 	public void handleProxyDebugStackInfoDepthEvent(IProxyDebugStackInfoDepthEvent e);
+
 	public void handleProxyDebugStepEvent(IProxyDebugStepEvent e);
+
 	public void handleProxyDebugSuspendEvent(IProxyDebugSuspendEvent e);
+
 	public void handleProxyDebugTypeEvent(IProxyDebugTypeEvent e);
+
 	public void handleProxyDebugVarsEvent(IProxyDebugVarsEvent e);
 }

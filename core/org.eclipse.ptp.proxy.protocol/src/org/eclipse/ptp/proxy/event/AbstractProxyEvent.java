@@ -25,9 +25,9 @@
 package org.eclipse.ptp.proxy.event;
 
 public abstract class AbstractProxyEvent implements IProxyEvent {
-	private int eventID;
+	private final int eventID;
 	private int transactionID;
-	private String[] attributes;
+	private final String[] attributes;
 
 	public AbstractProxyEvent(int eventID, int transactionID) {
 		this(eventID, transactionID, null);
@@ -39,6 +39,9 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 		this.attributes = attrs;
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public AbstractProxyEvent(int eventID, String[] attrs) {
 		this(eventID, -1, attrs);
 	}
