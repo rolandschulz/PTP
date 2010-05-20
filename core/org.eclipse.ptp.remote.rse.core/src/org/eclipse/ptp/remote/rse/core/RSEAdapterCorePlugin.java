@@ -27,10 +27,10 @@ public class RSEAdapterCorePlugin extends Plugin {
 
 	// The shared instance
 	private static RSEAdapterCorePlugin plugin;
-	
+
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static RSEAdapterCorePlugin getDefault() {
@@ -63,7 +63,7 @@ public class RSEAdapterCorePlugin extends Plugin {
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), IStatus.ERROR, Messages.Activator_0, e));
 	}
-	
+
 	/**
 	 * The constructor
 	 */
@@ -72,8 +72,12 @@ public class RSEAdapterCorePlugin extends Plugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -81,22 +85,34 @@ public class RSEAdapterCorePlugin extends Plugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
 	}
 
-
+	/**
+	 * @since 4.0
+	 */
 	public static void log(String message, Throwable e) {
 		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, e));
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void logErrorMessage(String message) {
 		log(new Status(IStatus.ERROR, getPluginId(), message, null));
 	}
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public static String getPluginId() {
 		return PLUGIN_ID;
 	}

@@ -44,36 +44,15 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param directory
 	 *            Directory that must be guaranteed to exist
-	 * @param monitor 
+	 * @param monitor
 	 *            Progress monitor used to report operation progress to the user
 	 * @throws RemoteExecutionException
 	 *             The directory could not be created.
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
+	 * @since 3.0
 	 */
-	public void assureDirectory(String directory, IProgressMonitor monitor)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
-
-	/**
-	 * @param remotePath
-	 * @return
-	 * @throws RemoteOperationException
-	 * @throws RemoteConnectionException
-	 * @throws CancelException
-	 */
-	public boolean canExecute(String remotePath)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
-
-	/**
-	 * @param remotePath
-	 * @return
-	 * @throws RemoteOperationException
-	 * @throws RemoteConnectionException
-	 * @throws CancelException
-	 */
-	public boolean canRead(String remotePath) throws RemoteOperationException,
+	public void assureDirectory(String directory, IProgressMonitor monitor) throws RemoteOperationException,
 			RemoteConnectionException, CancelException;
 
 	/**
@@ -83,8 +62,25 @@ public interface IRemoteFileTools {
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 */
-	public boolean canWrite(String remotePath) throws RemoteOperationException,
-			RemoteConnectionException, CancelException;
+	public boolean canExecute(String remotePath) throws RemoteOperationException, RemoteConnectionException, CancelException;
+
+	/**
+	 * @param remotePath
+	 * @return
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
+	public boolean canRead(String remotePath) throws RemoteOperationException, RemoteConnectionException, CancelException;
+
+	/**
+	 * @param remotePath
+	 * @return
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
+	public boolean canWrite(String remotePath) throws RemoteOperationException, RemoteConnectionException, CancelException;
 
 	/**
 	 * Copy a file on remote host.
@@ -95,7 +91,7 @@ public interface IRemoteFileTools {
 	 *            Absolute path to source on remote host.
 	 * @param to
 	 *            Absolute path to destination on remote host.
-	 * @param monitor 
+	 * @param monitor
 	 *            Progress monitor used to report operation progress to the user
 	 * @throws RemoteExecutionException
 	 *             The file could not be copied.
@@ -105,10 +101,10 @@ public interface IRemoteFileTools {
 	 *             The copy operation was canceled by another thread. If the
 	 *             copy involves several files, then the copy may remain
 	 *             incomplete.
+	 * @since 3.0
 	 */
-	public void copyFile(String from, String to, IProgressMonitor monitor)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
+	public void copyFile(String from, String to, IProgressMonitor monitor) throws RemoteOperationException,
+			RemoteConnectionException, CancelException;
 
 	/**
 	 * Create a new directory.
@@ -118,7 +114,7 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param directory
 	 *            Directory to be created.
-	 * @param monitor 
+	 * @param monitor
 	 *            Progress monitor used to report operation progress to the user
 	 * @throws RemoteExecutionException
 	 *             The directory could not be created.
@@ -126,10 +122,10 @@ public interface IRemoteFileTools {
 	 *             The connection failed.
 	 * @throws CancelException
 	 *             The operation was canceled by another thread.
+	 * @since 3.0
 	 */
-	public void createDirectory(String directory, IProgressMonitor monitor)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
+	public void createDirectory(String directory, IProgressMonitor monitor) throws RemoteOperationException,
+			RemoteConnectionException, CancelException;
 
 	/**
 	 * Create a new empty file.
@@ -138,7 +134,7 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param file
 	 *            File to be created.
-	 * @param monitor 
+	 * @param monitor
 	 *            Progress monitor used to report operation progress to the user
 	 * @throws RemoteExecutionException
 	 *             The file could not be created.
@@ -146,31 +142,30 @@ public interface IRemoteFileTools {
 	 *             The connection failed.
 	 * @throws CancelException
 	 *             The operation was canceled by another thread.
+	 * @since 3.0
 	 */
-	public void createFile(String file, IProgressMonitor monitor) throws RemoteOperationException,
+	public void createFile(String file, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
+			CancelException;
+
+	/**
+	 * @param path
+	 * @return
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
+	public IRemoteFileEnumeration createFileEnumeration(String path) throws RemoteOperationException, RemoteConnectionException,
+			CancelException;
+
+	/**
+	 * @param path
+	 * @return
+	 * @throws RemoteOperationException
+	 * @throws RemoteConnectionException
+	 * @throws CancelException
+	 */
+	public IRemoteFileEnumeration createRecursiveFileEnumeration(String path) throws RemoteOperationException,
 			RemoteConnectionException, CancelException;
-
-	/**
-	 * @param path
-	 * @return
-	 * @throws RemoteOperationException
-	 * @throws RemoteConnectionException
-	 * @throws CancelException
-	 */
-	public IRemoteFileEnumeration createFileEnumeration(String path)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
-
-	/**
-	 * @param path
-	 * @return
-	 * @throws RemoteOperationException
-	 * @throws RemoteConnectionException
-	 * @throws CancelException
-	 */
-	public IRemoteFileEnumeration createRecursiveFileEnumeration(String path)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
 
 	/**
 	 * Convenience method to query properties of the given directory on the
@@ -178,7 +173,7 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param directoryPath
 	 *            Absolute path to a directory
-	 * @param monitor 
+	 * @param monitor
 	 *            Progress monitor used to report operation progress to the user
 	 * @return A {@link IRemoteItem} object
 	 * @throws RemoteExecutionException
@@ -186,10 +181,10 @@ public interface IRemoteFileTools {
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 * @throws RemoteOperationException
+	 * @since 3.0
 	 */
-	public IRemoteItem getDirectory(String directoryPath, IProgressMonitor monitor)
-			throws RemoteConnectionException, CancelException,
-			RemoteOperationException;
+	public IRemoteItem getDirectory(String directoryPath, IProgressMonitor monitor) throws RemoteConnectionException,
+			CancelException, RemoteOperationException;
 
 	/**
 	 * Convenience method to query properties of the given file on the remote
@@ -197,7 +192,7 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param filePath
 	 *            Absolute path to a file
-	 * @param monitor 
+	 * @param monitor
 	 *            Progress monitor used to report operation progress to the user
 	 * @return A {@link IRemoteItem} object
 	 * @throws RemoteExecutionException
@@ -205,9 +200,9 @@ public interface IRemoteFileTools {
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 * @throws RemoteOperationException
+	 * @since 3.0
 	 */
-	public IRemoteItem getFile(String filePath, IProgressMonitor monitor)
-			throws RemoteConnectionException, CancelException,
+	public IRemoteItem getFile(String filePath, IProgressMonitor monitor) throws RemoteConnectionException, CancelException,
 			RemoteOperationException;
 
 	/**
@@ -222,9 +217,8 @@ public interface IRemoteFileTools {
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 */
-	public InputStream getInputStream(String file, IProgressMonitor monitor)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
+	public InputStream getInputStream(String file, IProgressMonitor monitor) throws RemoteOperationException,
+			RemoteConnectionException, CancelException;
 
 	/**
 	 * Create a representation of the remote object.
@@ -237,8 +231,7 @@ public interface IRemoteFileTools {
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 */
-	public IRemoteItem getItem(String path) throws RemoteConnectionException,
-			RemoteOperationException, CancelException;
+	public IRemoteItem getItem(String path) throws RemoteConnectionException, RemoteOperationException, CancelException;
 
 	/**
 	 * Get an output stream connected to a file.
@@ -255,8 +248,7 @@ public interface IRemoteFileTools {
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
 	 */
-	public OutputStream getOutputStream(String file, int options,
-			IProgressMonitor monitor) throws RemoteOperationException,
+	public OutputStream getOutputStream(String file, int options, IProgressMonitor monitor) throws RemoteOperationException,
 			RemoteConnectionException, CancelException;
 
 	/**
@@ -265,35 +257,39 @@ public interface IRemoteFileTools {
 	 * @throws RemoteConnectionException
 	 * @return IRemoteCopyTools
 	 */
-	public IRemoteCopyTools getRemoteCopyTools()
-			throws RemoteConnectionException;
+	public IRemoteCopyTools getRemoteCopyTools() throws RemoteConnectionException;
 
 	/**
 	 * Query if the path exists and is a directory on the remote host.
 	 * 
-	 * @param path path of the remote directory
-	 * @param monitor progress monitor used to report operation progress to the user
+	 * @param path
+	 *            path of the remote directory
+	 * @param monitor
+	 *            progress monitor used to report operation progress to the user
 	 * @return true if the remote path is a directory
 	 * @throws RemoteExecutionException
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
+	 * @since 3.0
 	 */
-	public boolean hasDirectory(String path, IProgressMonitor monitor)
-			throws RemoteOperationException, RemoteConnectionException,
+	public boolean hasDirectory(String path, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
 			CancelException;
 
 	/**
 	 * Query if the path exists and is a file on the remote host.
 	 * 
-	 * @param path path of the remote file
-	 * @param monitor progress monitor used to report operation progress to the user
+	 * @param path
+	 *            path of the remote file
+	 * @param monitor
+	 *            progress monitor used to report operation progress to the user
 	 * @return true if the remote path is a file
 	 * @throws RemoteExecutionException
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
+	 * @since 3.0
 	 */
-	public boolean hasFile(String path, IProgressMonitor monitor) throws RemoteOperationException,
-			RemoteConnectionException, CancelException;
+	public boolean hasFile(String path, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
+			CancelException;
 
 	/**
 	 * List all items from a given path on the remote host. If the item is a
@@ -304,17 +300,18 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param path
 	 *            string that represents the remote path
-	 * @param monitor progress monitor used to report operation progress to the user
+	 * @param monitor
+	 *            progress monitor used to report operation progress to the user
 	 * @return An array of items of the remote path. If the item is a directory
 	 *         and it is empty, then the array is empty.
 	 * @throws RemoteExecutionException
 	 *             The path does not exist on the remote host
 	 * @throws RemoteConnectionException
 	 * @throws CancelException
+	 * @since 3.0
 	 */
-	public IRemoteItem[] listItems(String remotePath, IProgressMonitor monitor)
-			throws RemoteConnectionException, RemoteOperationException,
-			CancelException;
+	public IRemoteItem[] listItems(String remotePath, IProgressMonitor monitor) throws RemoteConnectionException,
+			RemoteOperationException, CancelException;
 
 	/**
 	 * Move a file on remote host.
@@ -325,7 +322,8 @@ public interface IRemoteFileTools {
 	 *            Absolute path to source on remote host.
 	 * @param to
 	 *            Absolute path to destination on remote host.
-	 * @param monitor progress monitor used to report operation progress to the user
+	 * @param monitor
+	 *            progress monitor used to report operation progress to the user
 	 * @throws RemoteExecutionException
 	 *             The file could not be moved.
 	 * @throws RemoteConnectionException
@@ -334,10 +332,10 @@ public interface IRemoteFileTools {
 	 *             The move operation was canceled by another thread. If the
 	 *             move involves several files, then the move may remain
 	 *             incomplete.
+	 * @since 3.0
 	 */
-	public void moveFile(String from, String to, IProgressMonitor monitor)
-			throws RemoteOperationException, RemoteConnectionException,
-			CancelException;
+	public void moveFile(String from, String to, IProgressMonitor monitor) throws RemoteOperationException,
+			RemoteConnectionException, CancelException;
 
 	/**
 	 * Delete a directory on remote host.
@@ -346,7 +344,8 @@ public interface IRemoteFileTools {
 	 * 
 	 * @param file
 	 *            Absolute path of the directory to be deleted.
-	 * @param monitor progress monitor used to report operation progress to the user
+	 * @param monitor
+	 *            progress monitor used to report operation progress to the user
 	 * @throws RemoteExecutionException
 	 *             The directory could not be deleted.
 	 * @throws RemoteConnectionException
@@ -355,16 +354,18 @@ public interface IRemoteFileTools {
 	 *             The remove operation was canceled by another thread. The
 	 *             file(s) may have been all removed, partially not removed or
 	 *             not removed at all.
+	 * @since 3.0
 	 */
-	public void removeDirectory(String dir, IProgressMonitor monitor) throws RemoteOperationException,
-			RemoteConnectionException, CancelException;
+	public void removeDirectory(String dir, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
+			CancelException;
 
 	/**
 	 * Delete a file on remote host.
 	 * 
 	 * @param file
 	 *            Absolute path of thefile to be deleted.
-	 * @param monitor progress monitor used to report operation progress to the user
+	 * @param monitor
+	 *            progress monitor used to report operation progress to the user
 	 * @throws RemoteExecutionException
 	 *             The file could not be deleted.
 	 * @throws RemoteConnectionException
@@ -373,7 +374,8 @@ public interface IRemoteFileTools {
 	 *             The remove operation was canceled by another thread. The
 	 *             file(s) may have been all removed, partially not removed or
 	 *             not removed at all.
+	 * @since 3.0
 	 */
-	public void removeFile(String file, IProgressMonitor monitor) throws RemoteOperationException,
-			RemoteConnectionException, CancelException;
+	public void removeFile(String file, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
+			CancelException;
 }

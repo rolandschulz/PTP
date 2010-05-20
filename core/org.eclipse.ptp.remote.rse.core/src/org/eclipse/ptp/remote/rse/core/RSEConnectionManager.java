@@ -21,19 +21,25 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
-
 public class RSEConnectionManager implements IRemoteConnectionManager {
 	private final ISystemRegistry fRegistry;
 	private final IRemoteServices fRemoteServices;
 	private final Map<String, RSEConnection> fConnections = new HashMap<String, RSEConnection>();
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public RSEConnectionManager(ISystemRegistry registry, IRemoteServices services) {
 		fRegistry = registry;
 		fRemoteServices = services;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang
+	 * .String)
 	 */
 	public IRemoteConnection getConnection(String name) {
 		refreshConnections();
@@ -42,9 +48,16 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.net.URI)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java
+	 * .net.URI)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IRemoteConnection getConnection(URI uri) {
 		/*
@@ -56,8 +69,10 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		}
 		return getConnection(name);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
@@ -65,15 +80,18 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		return fConnections.values().toArray(new IRemoteConnection[fConnections.size()]);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java.lang.String, java.util.Map)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java
+	 * .lang.String, java.util.Map)
 	 */
-	public IRemoteConnection newConnection(String name,
-			Map<String, String> attributes) throws RemoteConnectionException {
+	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException {
 		// TODO implement
 		return null;
 	}
-	
+
 	/**
 	 * Check for new fConnections
 	 */
@@ -94,12 +112,16 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		fConnections.putAll(newConns);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection
+	 * (org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public void removeConnection(IRemoteConnection conn) {
 		if (conn instanceof RSEConnection) {
-			((RSEConnection)conn).dispose();
+			((RSEConnection) conn).dispose();
 		}
 		fConnections.remove(conn.getName());
 	}

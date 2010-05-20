@@ -28,12 +28,18 @@ public class RSEFileManager implements IRemoteFileManager {
 		fConnection = conn;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getDirectorySeparator()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteFileManager#getDirectorySeparator()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public String getDirectorySeparator() {
 		IRSESystemType systemType = fConnection.getHost().getSystemType();
-		
+
 		if (systemType.isWindows()) {
 			return "\\"; //$NON-NLS-1$
 		} else {
@@ -41,8 +47,12 @@ public class RSEFileManager implements IRemoteFileManager {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteFileManager#getResource(java.lang.
+	 * String)
 	 */
 	public IFileStore getResource(String pathStr) {
 		IPath path = new Path(pathStr);
@@ -56,15 +66,21 @@ public class RSEFileManager implements IRemoteFileManager {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toPath(java.net.URI)
 	 */
 	public String toPath(URI uri) {
 		return uri.getPath();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime.IPath)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.IRemoteFileManager#toURI(org.eclipse.core.runtime
+	 * .IPath)
 	 */
 	public URI toURI(IPath path) {
 		try {
@@ -74,8 +90,11 @@ public class RSEFileManager implements IRemoteFileManager {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteFileManager#toURI(java.lang.String)
 	 */
 	public URI toURI(String path) {
 		return toURI(new Path(path));
