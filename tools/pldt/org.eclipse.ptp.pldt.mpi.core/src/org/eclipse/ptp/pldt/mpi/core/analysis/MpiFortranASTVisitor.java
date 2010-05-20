@@ -26,19 +26,20 @@ import org.eclipse.ptp.pldt.common.util.SourceInfo;
  * position of the artifacts found.
  * 
  * @author Beth Tibbitts
+ * @since 4.0
  * 
  */
 public class MpiFortranASTVisitor extends GenericASTVisitor {
 	private static final String PREFIX = "MPI_"; //$NON-NLS-1$
 
-	private static  final  boolean traceOn = false;
-	private ScanReturn scanReturn;
-	private String fileName;
+	private static final boolean traceOn = false;
+	private final ScanReturn scanReturn;
+	private final String fileName;
 
 	@Override
 	public void visitASTCallStmtNode(ASTCallStmtNode node) {
 		Token subroutineName = node.getSubroutineName();
-		addArtifact(subroutineName,Artifact.FUNCTION_CALL);
+		addArtifact(subroutineName, Artifact.FUNCTION_CALL);
 	}
 
 	@Override
@@ -46,26 +47,24 @@ public class MpiFortranASTVisitor extends GenericASTVisitor {
 		ASTNameNode nameNode = node.getName();
 		if (nameNode != null) {
 			Token varName = nameNode.getName();
-			addArtifact(varName,Artifact.CONSTANT);
+			addArtifact(varName, Artifact.CONSTANT);
 		}
 	}
 
 	private void addArtifact(Token subroutineName, int artifactType) {
-		String callname=subroutineName.getText().toUpperCase();
-		if(callname.startsWith(PREFIX)){
+		String callname = subroutineName.getText().toUpperCase();
+		if (callname.startsWith(PREFIX)) {
 			int start = subroutineName.getFileOffset();
-			int end=subroutineName.getFileOffset()+subroutineName.getLength();
-			SourceInfo si= new SourceInfo(subroutineName.getLine(), start, end, artifactType);
-			scanReturn.addArtifact(new Artifact(fileName, subroutineName.getLine(), 1,
-					callname, si)); 
+			int end = subroutineName.getFileOffset() + subroutineName.getLength();
+			SourceInfo si = new SourceInfo(subroutineName.getLine(), start, end, artifactType);
+			scanReturn.addArtifact(new Artifact(fileName, subroutineName.getLine(), 1, callname, si));
 		}
 	}
 
 	public MpiFortranASTVisitor(String fileName, ScanReturn scanReturn) {
 		super();
-		this.scanReturn=scanReturn;
-		this.fileName=fileName;
+		this.scanReturn = scanReturn;
+		this.fileName = fileName;
 	}
-
 
 }

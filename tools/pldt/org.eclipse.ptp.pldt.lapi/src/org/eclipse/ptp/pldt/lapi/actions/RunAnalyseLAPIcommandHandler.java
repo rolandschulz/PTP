@@ -27,10 +27,10 @@ import org.eclipse.ptp.pldt.lapi.analysis.LapiCASTVisitor;
 
 /**
  * @author tibbitts
- *
+ * @since 4.0
+ * 
  */
-public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase
-{
+public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase {
 	/**
 	 * Constructor for the "Run Analysis" action
 	 */
@@ -41,22 +41,24 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase
 	/**
 	 * Returns LAPI analysis artifacts for file
 	 * 
-	 * @param tu the translation unit representing the file to be analyzed
-	 * @param includes list of Lapi include paths
+	 * @param tu
+	 *            the translation unit representing the file to be analyzed
+	 * @param includes
+	 *            list of Lapi include paths
 	 * @return analysis results
 	 */
 	@Override
-	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List<String> includes) {
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu, final List<String> includes) {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
 		try {
 			lang = tu.getLanguage();
-            
+
 			IASTTranslationUnit atu = tu.getAST();
 			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
 				atu.accept(new LapiCASTVisitor(includes, fileName, msr));
-			} 
+			}
 
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
@@ -65,11 +67,12 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase
 		return msr;
 	}
 
-
+	@Override
 	protected List<String> getIncludePath() {
 		return LapiPlugin.getDefault().getLapiIncludeDirs();
 	}
 
+	@Override
 	protected void activateArtifactView() {
 		ViewActivater.activateView(LapiIDs.LAPI_VIEW_ID);
 	}
@@ -77,9 +80,9 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase
 	/**
 	 * LAPI doesn't have a problems view (only OpenMP analysis does)
 	 */
+	@Override
 	protected void activateProblemsView() {
 
-	}	
-	 
+	}
 
 }

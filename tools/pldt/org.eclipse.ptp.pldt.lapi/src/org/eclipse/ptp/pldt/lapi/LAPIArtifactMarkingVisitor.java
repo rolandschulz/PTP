@@ -12,10 +12,11 @@ package org.eclipse.ptp.pldt.lapi;
 
 import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 
-public class LAPIArtifactMarkingVisitor extends ArtifactMarkingVisitor
-{
-    public LAPIArtifactMarkingVisitor(String markerId)
-    {
-        super(markerId);
-    }
+/**
+ * @since 4.0
+ */
+public class LAPIArtifactMarkingVisitor extends ArtifactMarkingVisitor {
+	public LAPIArtifactMarkingVisitor(String markerId) {
+		super(markerId);
+	}
 }
