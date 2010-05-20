@@ -68,6 +68,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.resourcesTab"; //$NON-NLS-1$
 
 	private Combo resourceManagerCombo = null;

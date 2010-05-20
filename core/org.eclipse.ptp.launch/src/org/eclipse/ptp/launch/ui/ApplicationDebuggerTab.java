@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
+/**
+ * @since 4.0
+ */
 public class ApplicationDebuggerTab extends DebuggerTab {
 
 	public ApplicationDebuggerTab() {
