@@ -7,10 +7,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.ll.ui.wizards;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -43,15 +39,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
-public class IBMLLResourceManagerOptionWizardPage extends
-		RMConfigurationWizardPage {
+public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardPage {
 	private class EventMonitor implements SelectionListener, ModifyListener {
 		public EventMonitor() {
 			// System.err.println("wizard: EventMonitor entered");
@@ -82,8 +75,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 				}
 			}
 			if (e.widget.equals(proxyLibraryTextWidget)) {
-				String correctPath = getFieldContent(proxyLibraryTextWidget
-						.getText().trim());
+				String correctPath = getFieldContent(proxyLibraryTextWidget.getText().trim());
 				if (validatePath(correctPath, true)) {
 					setErrorMessage(null);
 				} else {
@@ -92,13 +84,11 @@ public class IBMLLResourceManagerOptionWizardPage extends
 				}
 			}
 			if (e.widget.equals(proxyTemplateTextWidget)) {
-				String correctPath = getFieldContent(proxyTemplateTextWidget
-						.getText().trim());
+				String correctPath = getFieldContent(proxyTemplateTextWidget.getText().trim());
 				if (validatePath(correctPath, false)) {
 					setErrorMessage(null);
 				} else {
-					setErrorMessage(Messages
-							.getString("Invalid.llJobCommandFileTemplate")); //$NON-NLS-1$
+					setErrorMessage(Messages.getString("Invalid.llJobCommandFileTemplate")); //$NON-NLS-1$
 					return;
 				}
 
@@ -124,15 +114,11 @@ public class IBMLLResourceManagerOptionWizardPage extends
 			// System.err.println("wizard: widgetSelected entered");
 			Object source = e.getSource();
 			if (source == libraryBrowseButton) {
-				proxyLibraryTextWidget
-						.setText(getRemoteDirectory(
-								Messages
-										.getString("IBMLLResourceManagerOptionWizardPage.0"), proxyLibraryTextWidget.getText())); //$NON-NLS-1$
+				proxyLibraryTextWidget.setText(getRemoteDirectory(
+						Messages.getString("IBMLLResourceManagerOptionWizardPage.0"), proxyLibraryTextWidget.getText())); //$NON-NLS-1$
 			} else if (source == templateBrowseButton) {
-				proxyTemplateTextWidget
-						.setText(getRemotePath(
-								Messages
-										.getString("IBMLLResourceManagerOptionWizardPage.1"), proxyTemplateTextWidget.getText())); //$NON-NLS-1$
+				proxyTemplateTextWidget.setText(getRemotePath(
+						Messages.getString("IBMLLResourceManagerOptionWizardPage.1"), proxyTemplateTextWidget.getText())); //$NON-NLS-1$
 			}
 			updateConfigOptions();
 		}
@@ -175,12 +161,11 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 	private EventMonitor eventMonitor = null;
 
-	private IIBMLLResourceManagerConfiguration config;
+	private final IIBMLLResourceManagerConfiguration config;
 
 	public IBMLLResourceManagerOptionWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
-		this.config = (IIBMLLResourceManagerConfiguration) wizard
-				.getConfiguration();
+		this.config = (IIBMLLResourceManagerConfiguration) wizard.getConfiguration();
 		setTitle(Messages.getString("Wizard.InvocationOptionsTitle")); //$NON-NLS-1$
 		setDescription(Messages.getString("Wizard.InvocationOptions")); //$NON-NLS-1$
 	}
@@ -218,44 +203,34 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		// *********************************************************************
 		// Alternate LoadLeveler Library Install Location
 		// *********************************************************************
-		proxyLibraryGroup = new Group((Composite) preferencePane, SWT.NONE);
+		proxyLibraryGroup = new Group(preferencePane, SWT.NONE);
 		proxyLibraryGroup.setLayout(createGridLayout(3, false, 0, 0));
-		proxyLibraryGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL,
-				5));
-		proxyLibraryGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyLibraryGroupLabel")); //$NON-NLS-1$
+		proxyLibraryGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		proxyLibraryGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyLibraryGroupLabel")); //$NON-NLS-1$
 
-		new Label(proxyLibraryGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyLibraryLabel")); //$NON-NLS-1$
+		new Label(proxyLibraryGroup, SWT.NONE).setText(Messages.getString("IBMLLPrefWizPage.proxyLibraryLabel")); //$NON-NLS-1$
 
-		proxyLibraryTextWidget = new Text(proxyLibraryGroup, SWT.SINGLE
-				| SWT.BORDER);
-		proxyLibraryTextWidget.setLayoutData(new GridData(
-				GridData.FILL_HORIZONTAL));
+		proxyLibraryTextWidget = new Text(proxyLibraryGroup, SWT.SINGLE | SWT.BORDER);
+		proxyLibraryTextWidget.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		libraryListener = new EventMonitor();
 		proxyLibraryTextWidget.addModifyListener(libraryListener);
 		proxyLibraryTextWidget.setText(config.getLibraryPath());
-		proxyLibraryTextWidget.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyLibraryToolTip")); //$NON-NLS-1$
+		proxyLibraryTextWidget.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyLibraryToolTip")); //$NON-NLS-1$
 
-		libraryBrowseButton = SWTUtil.createPushButton(proxyLibraryGroup,
-				Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
+		libraryBrowseButton = SWTUtil.createPushButton(proxyLibraryGroup, Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
 				null);
 		libraryBrowseButton.addSelectionListener(libraryListener);
 
 		// *********************************************************************
 		// Check box group for proxy messages
 		// *********************************************************************
-		proxyOptionsGroup = new Group((Composite) preferencePane, SWT.NONE);
+		proxyOptionsGroup = new Group(preferencePane, SWT.NONE);
 		proxyOptionsGroup.setLayout(new RowLayout());
-		proxyOptionsGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyOptionsGroupLabel")); //$NON-NLS-1$
+		proxyOptionsGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyOptionsGroupLabel")); //$NON-NLS-1$
 
 		proxyTraceMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
-		proxyTraceMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyTraceMessageLabel")); //$NON-NLS-1$
-		proxyTraceMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyTraceMessageToolTip")); //$NON-NLS-1$
+		proxyTraceMessageButton.setText(Messages.getString("IBMLLPrefWizPage.ProxyTraceMessageLabel")); //$NON-NLS-1$
+		proxyTraceMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.ProxyTraceMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getTraceOption();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyTraceMessageButton.setSelection(true);
@@ -263,10 +238,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyTraceMessageButton.addSelectionListener(eventMonitor);
 
 		proxyInfoMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
-		proxyInfoMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyInfoMessageLabel")); //$NON-NLS-1$
-		proxyInfoMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyInfoMessageToolTip")); //$NON-NLS-1$
+		proxyInfoMessageButton.setText(Messages.getString("IBMLLPrefWizPage.ProxyInfoMessageLabel")); //$NON-NLS-1$
+		proxyInfoMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.ProxyInfoMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getInfoMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyInfoMessageButton.setSelection(true);
@@ -274,10 +247,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyInfoMessageButton.addSelectionListener(eventMonitor);
 
 		proxyWarningMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
-		proxyWarningMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyWarningMessageLabel")); //$NON-NLS-1$
-		proxyWarningMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyWarningMessageToolTip")); //$NON-NLS-1$
+		proxyWarningMessageButton.setText(Messages.getString("IBMLLPrefWizPage.ProxyWarningMessageLabel")); //$NON-NLS-1$
+		proxyWarningMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.ProxyWarningMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getWarningMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyWarningMessageButton.setSelection(true);
@@ -285,10 +256,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyWarningMessageButton.addSelectionListener(eventMonitor);
 
 		proxyErrorMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
-		proxyErrorMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyErrorMessageLabel")); //$NON-NLS-1$
-		proxyErrorMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyErrorMessageToolTip")); //$NON-NLS-1$
+		proxyErrorMessageButton.setText(Messages.getString("IBMLLPrefWizPage.ProxyErrorMessageLabel")); //$NON-NLS-1$
+		proxyErrorMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.ProxyErrorMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getErrorMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyErrorMessageButton.setSelection(true);
@@ -296,10 +265,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyErrorMessageButton.addSelectionListener(eventMonitor);
 
 		proxyFatalMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
-		proxyFatalMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyFatalMessageLabel")); //$NON-NLS-1$
-		proxyFatalMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyFatalMessageToolTip")); //$NON-NLS-1$
+		proxyFatalMessageButton.setText(Messages.getString("IBMLLPrefWizPage.ProxyFatalMessageLabel")); //$NON-NLS-1$
+		proxyFatalMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.ProxyFatalMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getFatalMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyFatalMessageButton.setSelection(true);
@@ -307,10 +274,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyFatalMessageButton.addSelectionListener(eventMonitor);
 
 		proxyArgsMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
-		proxyArgsMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyArgsMessageLabel")); //$NON-NLS-1$
-		proxyArgsMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyArgsMessageToolTip")); //$NON-NLS-1$
+		proxyArgsMessageButton.setText(Messages.getString("IBMLLPrefWizPage.ProxyArgsMessageLabel")); //$NON-NLS-1$
+		proxyArgsMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.ProxyArgsMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getArgsMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyArgsMessageButton.setSelection(true);
@@ -320,16 +285,13 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		// *********************************************************************
 		// Check box group for proxy debug
 		// *********************************************************************
-		proxyDebugGroup = new Group((Composite) preferencePane, SWT.NONE);
+		proxyDebugGroup = new Group(preferencePane, SWT.NONE);
 		proxyDebugGroup.setLayout(new RowLayout());
-		proxyDebugGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyDebugGroupLabel")); //$NON-NLS-1$
+		proxyDebugGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyDebugGroupLabel")); //$NON-NLS-1$
 
 		proxyDebugLoopButton = new Button(proxyDebugGroup, SWT.CHECK);
-		proxyDebugLoopButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyDebugLoopLabel")); //$NON-NLS-1$
-		proxyDebugLoopButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyDebugLoopToolTip")); //$NON-NLS-1$
+		proxyDebugLoopButton.setText(Messages.getString("IBMLLPrefWizPage.ProxyDebugLoopLabel")); //$NON-NLS-1$
+		proxyDebugLoopButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.ProxyDebugLoopToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getDebugLoop();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyDebugLoopButton.setSelection(true);
@@ -339,16 +301,13 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		// *********************************************************************
 		// Check box group for gui messages
 		// *********************************************************************
-		guiOptionsGroup = new Group((Composite) preferencePane, SWT.NONE);
+		guiOptionsGroup = new Group(preferencePane, SWT.NONE);
 		guiOptionsGroup.setLayout(new RowLayout());
-		guiOptionsGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.guiOptionsGroupLabel")); //$NON-NLS-1$
+		guiOptionsGroup.setText(Messages.getString("IBMLLPrefWizPage.guiOptionsGroupLabel")); //$NON-NLS-1$
 
 		guiTraceMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
-		guiTraceMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiTraceMessageLabel")); //$NON-NLS-1$
-		guiTraceMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiTraceMessageToolTip")); //$NON-NLS-1$
+		guiTraceMessageButton.setText(Messages.getString("IBMLLPrefWizPage.GuiTraceMessageLabel")); //$NON-NLS-1$
+		guiTraceMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.GuiTraceMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getGuiTraceMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiTraceMessageButton.setSelection(true);
@@ -356,10 +315,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		guiTraceMessageButton.addSelectionListener(eventMonitor);
 
 		guiInfoMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
-		guiInfoMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiInfoMessageLabel")); //$NON-NLS-1$
-		guiInfoMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiInfoMessageToolTip")); //$NON-NLS-1$
+		guiInfoMessageButton.setText(Messages.getString("IBMLLPrefWizPage.GuiInfoMessageLabel")); //$NON-NLS-1$
+		guiInfoMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.GuiInfoMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getGuiInfoMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiInfoMessageButton.setSelection(true);
@@ -367,10 +324,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		guiInfoMessageButton.addSelectionListener(eventMonitor);
 
 		guiWarningMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
-		guiWarningMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiWarningMessageLabel")); //$NON-NLS-1$
-		guiWarningMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiWarningMessageToolTip")); //$NON-NLS-1$
+		guiWarningMessageButton.setText(Messages.getString("IBMLLPrefWizPage.GuiWarningMessageLabel")); //$NON-NLS-1$
+		guiWarningMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.GuiWarningMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getGuiWarningMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiWarningMessageButton.setSelection(true);
@@ -378,10 +333,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		guiWarningMessageButton.addSelectionListener(eventMonitor);
 
 		guiErrorMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
-		guiErrorMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiErrorMessageLabel")); //$NON-NLS-1$
-		guiErrorMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiErrorMessageToolTip")); //$NON-NLS-1$
+		guiErrorMessageButton.setText(Messages.getString("IBMLLPrefWizPage.GuiErrorMessageLabel")); //$NON-NLS-1$
+		guiErrorMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.GuiErrorMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getGuiErrorMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiErrorMessageButton.setSelection(true);
@@ -389,10 +342,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		guiErrorMessageButton.addSelectionListener(eventMonitor);
 
 		guiFatalMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
-		guiFatalMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiFatalMessageLabel")); //$NON-NLS-1$
-		guiFatalMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiFatalMessageToolTip")); //$NON-NLS-1$
+		guiFatalMessageButton.setText(Messages.getString("IBMLLPrefWizPage.GuiFatalMessageLabel")); //$NON-NLS-1$
+		guiFatalMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.GuiFatalMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getGuiFatalMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiFatalMessageButton.setSelection(true);
@@ -400,10 +351,8 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		guiFatalMessageButton.addSelectionListener(eventMonitor);
 
 		guiArgsMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
-		guiArgsMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiArgsMessageLabel")); //$NON-NLS-1$
-		guiArgsMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiArgsMessageToolTip")); //$NON-NLS-1$
+		guiArgsMessageButton.setText(Messages.getString("IBMLLPrefWizPage.GuiArgsMessageLabel")); //$NON-NLS-1$
+		guiArgsMessageButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.GuiArgsMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = config.getGuiArgsMessage();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			guiArgsMessageButton.setSelection(true);
@@ -413,127 +362,97 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		// *********************************************************************
 		// Radio box group for multicluster
 		// *********************************************************************
-		proxyMulticlusterGroup = new Group((Composite) preferencePane, SWT.NONE);
+		proxyMulticlusterGroup = new Group(preferencePane, SWT.NONE);
 		proxyMulticlusterGroup.setLayout(new RowLayout());
-		proxyMulticlusterGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyMulticlusterGroupLabel")); //$NON-NLS-1$
+		proxyMulticlusterGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyMulticlusterGroupLabel")); //$NON-NLS-1$
 
-		proxyLLDefaultRadioButton = new Button(proxyMulticlusterGroup,
-				SWT.RADIO);
-		proxyLLDefaultRadioButton.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultLabel")); //$NON-NLS-1$
+		proxyLLDefaultRadioButton = new Button(proxyMulticlusterGroup, SWT.RADIO);
+		proxyLLDefaultRadioButton.setText(Messages.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultLabel")); //$NON-NLS-1$
 		preferenceValue = config.getDefaultMulticluster();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyLLDefaultRadioButton.setSelection(true);
 		}
 		proxyLLDefaultRadioButton.setData(new Integer(SWT.IMAGE_BMP));
 		proxyLLDefaultRadioButton.addSelectionListener(eventMonitor);
-		proxyLLDefaultRadioButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultToolTip")); //$NON-NLS-1$
+		proxyLLDefaultRadioButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultToolTip")); //$NON-NLS-1$
 
-		proxyForceLocalRadioButton = new Button(proxyMulticlusterGroup,
-				SWT.RADIO);
-		proxyForceLocalRadioButton
-				.setText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalLabel")); //$NON-NLS-1$
+		proxyForceLocalRadioButton = new Button(proxyMulticlusterGroup, SWT.RADIO);
+		proxyForceLocalRadioButton.setText(Messages.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalLabel")); //$NON-NLS-1$
 		preferenceValue = config.getForceProxyLocal();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyForceLocalRadioButton.setSelection(true);
 		}
 		proxyForceLocalRadioButton.setData(new Integer(SWT.IMAGE_BMP));
 		proxyForceLocalRadioButton.addSelectionListener(eventMonitor);
-		proxyForceLocalRadioButton
-				.setToolTipText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalToolTip")); //$NON-NLS-1$
+		proxyForceLocalRadioButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalToolTip")); //$NON-NLS-1$
 
-		proxyForceMulticlusterRadioButton = new Button(proxyMulticlusterGroup,
-				SWT.RADIO);
-		proxyForceMulticlusterRadioButton
-				.setText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterLabel")); //$NON-NLS-1$
+		proxyForceMulticlusterRadioButton = new Button(proxyMulticlusterGroup, SWT.RADIO);
+		proxyForceMulticlusterRadioButton.setText(Messages.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterLabel")); //$NON-NLS-1$
 		preferenceValue = config.getForceProxyMulticluster();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyForceMulticlusterRadioButton.setSelection(true);
 		}
 		proxyForceMulticlusterRadioButton.setData(new Integer(SWT.IMAGE_BMP));
 		proxyForceMulticlusterRadioButton.addSelectionListener(eventMonitor);
-		proxyForceMulticlusterRadioButton
-				.setToolTipText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip")); //$NON-NLS-1$
+		proxyForceMulticlusterRadioButton.setToolTipText(Messages
+				.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip")); //$NON-NLS-1$
 
 		// *********************************************************************
 		// Template name group
 		// *********************************************************************
-		proxyTemplateGroup = new Group((Composite) preferencePane, SWT.NONE);
+		proxyTemplateGroup = new Group(preferencePane, SWT.NONE);
 		proxyTemplateGroup.setLayout(createGridLayout(3, false, 0, 0));
-		proxyTemplateGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL,
-				5));
-		proxyTemplateGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateGroupLabel")); //$NON-NLS-1$
+		proxyTemplateGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		proxyTemplateGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyTemplateGroupLabel")); //$NON-NLS-1$
 
-		new Label(proxyTemplateGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateLabel")); //$NON-NLS-1$
+		new Label(proxyTemplateGroup, SWT.NONE).setText(Messages.getString("IBMLLPrefWizPage.proxyTemplateLabel")); //$NON-NLS-1$
 
-		proxyTemplateTextWidget = new Text(proxyTemplateGroup, SWT.SINGLE
-				| SWT.BORDER);
-		proxyTemplateTextWidget.setLayoutData(new GridData(
-				GridData.FILL_HORIZONTAL));
+		proxyTemplateTextWidget = new Text(proxyTemplateGroup, SWT.SINGLE | SWT.BORDER);
+		proxyTemplateTextWidget.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		templateListener = new EventMonitor();
 		proxyTemplateTextWidget.addModifyListener(templateListener);
 		proxyTemplateTextWidget.setText(config.getTemplateFile());
-		proxyTemplateTextWidget.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateToolTip")); //$NON-NLS-1$
+		proxyTemplateTextWidget.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyTemplateToolTip")); //$NON-NLS-1$
 
-		templateBrowseButton = SWTUtil.createPushButton(proxyTemplateGroup,
-				Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
+		templateBrowseButton = SWTUtil.createPushButton(proxyTemplateGroup, Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
 				null);
 		templateBrowseButton.addSelectionListener(templateListener);
 
 		// *********************************************************************
 		// Template options group
 		// *********************************************************************
-		proxyTemplateOptionsGroup = new Group((Composite) preferencePane,
-				SWT.NONE);
+		proxyTemplateOptionsGroup = new Group(preferencePane, SWT.NONE);
 		proxyTemplateOptionsGroup.setLayout(new RowLayout());
-		proxyTemplateOptionsGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateOptionsGroupLabel")); //$NON-NLS-1$
+		proxyTemplateOptionsGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyTemplateOptionsGroupLabel")); //$NON-NLS-1$
 
-		proxyTemplateNeverRadioButton = new Button(proxyTemplateOptionsGroup,
-				SWT.RADIO);
-		proxyTemplateNeverRadioButton.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateNeverLabel")); //$NON-NLS-1$
+		proxyTemplateNeverRadioButton = new Button(proxyTemplateOptionsGroup, SWT.RADIO);
+		proxyTemplateNeverRadioButton.setText(Messages.getString("IBMLLPrefWizPage.proxyTemplateNeverLabel")); //$NON-NLS-1$
 		proxyTemplateNeverRadioButton.setData(new Integer(SWT.IMAGE_BMP));
 		preferenceValue = config.getSuppressTemplateWrite();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyTemplateNeverRadioButton.setSelection(true);
 		}
 		proxyTemplateNeverRadioButton.addSelectionListener(eventMonitor);
-		proxyTemplateNeverRadioButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateNeverToolTip")); //$NON-NLS-1$
+		proxyTemplateNeverRadioButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyTemplateNeverToolTip")); //$NON-NLS-1$
 
-		proxyTemplateAlwaysRadioButton = new Button(proxyTemplateOptionsGroup,
-				SWT.RADIO);
-		proxyTemplateAlwaysRadioButton.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateAlwaysLabel")); //$NON-NLS-1$
+		proxyTemplateAlwaysRadioButton = new Button(proxyTemplateOptionsGroup, SWT.RADIO);
+		proxyTemplateAlwaysRadioButton.setText(Messages.getString("IBMLLPrefWizPage.proxyTemplateAlwaysLabel")); //$NON-NLS-1$
 		preferenceValue = config.getTemplateWriteAlways();
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
 			proxyTemplateAlwaysRadioButton.setSelection(true);
 		}
 		proxyTemplateAlwaysRadioButton.setData(new Integer(SWT.IMAGE_BMP));
 		proxyTemplateAlwaysRadioButton.addSelectionListener(eventMonitor);
-		proxyTemplateAlwaysRadioButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateAlwaysToolTip")); //$NON-NLS-1$
+		proxyTemplateAlwaysRadioButton.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyTemplateAlwaysToolTip")); //$NON-NLS-1$
 
 		// *********************************************************************
 		// Polling options group
 		// *********************************************************************
-		proxyPollingGroup = new Group((Composite) preferencePane, SWT.NONE);
+		proxyPollingGroup = new Group(preferencePane, SWT.NONE);
 		proxyPollingGroup.setLayout(new RowLayout());
-		proxyPollingGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingGroupLabel")); //$NON-NLS-1$
+		proxyPollingGroup.setText(Messages.getString("IBMLLPrefWizPage.proxyPollingGroupLabel")); //$NON-NLS-1$
 
-		new Label(proxyPollingGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMinLabel")); //$NON-NLS-1$
+		new Label(proxyPollingGroup, SWT.NONE).setText(Messages.getString("IBMLLPrefWizPage.proxyPollingNodeMinLabel")); //$NON-NLS-1$
 
 		proxyPollingNodeMin = new Spinner(proxyPollingGroup, SWT.READ_ONLY);
 		proxyPollingNodeMin.setIncrement(10);
@@ -541,12 +460,10 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyPollingNodeMin.setMaximum(300);
 		proxyPollingNodeMin.setPageIncrement(50);
 		proxyPollingNodeMin.setSelection(config.getMinNodePolling());
-		proxyPollingNodeMin.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMinToolTip")); //$NON-NLS-1$
+		proxyPollingNodeMin.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyPollingNodeMinToolTip")); //$NON-NLS-1$
 		proxyPollingNodeMin.addModifyListener(eventMonitor);
 
-		new Label(proxyPollingGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMaxLabel")); //$NON-NLS-1$
+		new Label(proxyPollingGroup, SWT.NONE).setText(Messages.getString("IBMLLPrefWizPage.proxyPollingNodeMaxLabel")); //$NON-NLS-1$
 
 		proxyPollingNodeMax = new Spinner(proxyPollingGroup, SWT.READ_ONLY);
 		proxyPollingNodeMax.setIncrement(10);
@@ -554,12 +471,10 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyPollingNodeMax.setMaximum(500);
 		proxyPollingNodeMax.setPageIncrement(50);
 		proxyPollingNodeMax.setSelection(config.getMaxNodePolling());
-		proxyPollingNodeMax.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMaxToolTip")); //$NON-NLS-1$
+		proxyPollingNodeMax.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyPollingNodeMaxToolTip")); //$NON-NLS-1$
 		proxyPollingNodeMax.addModifyListener(eventMonitor);
 
-		new Label(proxyPollingGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingJobLabel")); //$NON-NLS-1$
+		new Label(proxyPollingGroup, SWT.NONE).setText(Messages.getString("IBMLLPrefWizPage.proxyPollingJobLabel")); //$NON-NLS-1$
 
 		proxyPollingJob = new Spinner(proxyPollingGroup, SWT.READ_ONLY);
 		proxyPollingJob.setIncrement(10);
@@ -567,15 +482,13 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		proxyPollingJob.setMaximum(300);
 		proxyPollingJob.setPageIncrement(50);
 		proxyPollingJob.setSelection(config.getJobPolling());
-		proxyPollingJob.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingJobToolTip")); //$NON-NLS-1$
+		proxyPollingJob.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyPollingJobToolTip")); //$NON-NLS-1$
 		proxyPollingJob.addModifyListener(eventMonitor);
 
 		setControl(preferencePane);
 	}
 
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -618,52 +531,33 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		serviceID = config.getRemoteServicesId();
 		if (serviceID == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		services = PTPRemoteCorePlugin.getDefault()
-				.getRemoteServices(serviceID);
+		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
 		if (services == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		connectionManager = services.getConnectionManager();
 		if (connectionManager == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		connection = connectionManager
-				.getConnection(config.getConnectionName());
+		connection = connectionManager.getConnection(config.getConnectionName());
 		if (connection == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault()
-				.getRemoteUIServices(services);
+		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
 		if (remoteUIServices != null) {
 			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 			if (fileMgr != null) {
 				fileMgr.setConnection(connection);
-				return fileMgr.browseDirectory(getShell(), message,
-						currentPath, 0);
+				return fileMgr.browseDirectory(getShell(), message, currentPath, 0);
 			}
 		}
-		Activator
-				.getDefault()
-				.logError(
-						"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.21")); //$NON-NLS-1$ //$NON-NLS-2$
+		Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.21")); //$NON-NLS-1$ //$NON-NLS-2$
 		return null;
 	}
 
@@ -685,40 +579,25 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		serviceID = config.getRemoteServicesId();
 		if (serviceID == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		services = PTPRemoteCorePlugin.getDefault()
-				.getRemoteServices(serviceID);
+		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
 		if (services == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		connectionManager = services.getConnectionManager();
 		if (connectionManager == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		connection = connectionManager
-				.getConnection(config.getConnectionName());
+		connection = connectionManager.getConnection(config.getConnectionName());
 		if (connection == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault()
-				.getRemoteUIServices(services);
+		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
 		if (remoteUIServices != null) {
 			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 			if (fileMgr != null) {
@@ -726,10 +605,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 				return fileMgr.browseFile(getShell(), message, currentPath, 0);
 			}
 		}
-		Activator
-				.getDefault()
-				.logError(
-						"getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.11")); //$NON-NLS-1$ //$NON-NLS-2$
+		Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.11")); //$NON-NLS-1$ //$NON-NLS-2$
 		return null;
 	}
 
@@ -763,8 +639,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyTraceMessageButton != null) {
 			selection = proxyTraceMessageButton.getSelection();
-			config.setTraceOption(selection ? IBMLLPreferenceConstants.LL_YES
-					: IBMLLPreferenceConstants.LL_NO);
+			config.setTraceOption(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--trace_messages=y "; //$NON-NLS-1$
 			}
@@ -772,8 +647,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyInfoMessageButton != null) {
 			selection = proxyInfoMessageButton.getSelection();
-			config.setInfoMessage(selection ? IBMLLPreferenceConstants.LL_YES
-					: IBMLLPreferenceConstants.LL_NO);
+			config.setInfoMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--info_messages=y "; //$NON-NLS-1$
 			}
@@ -781,9 +655,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyWarningMessageButton != null) {
 			selection = proxyWarningMessageButton.getSelection();
-			config
-					.setWarningMessage(selection ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setWarningMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--warning_messages=y "; //$NON-NLS-1$
 			}
@@ -791,8 +663,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyErrorMessageButton != null) {
 			selection = proxyErrorMessageButton.getSelection();
-			config.setErrorMessage(selection ? IBMLLPreferenceConstants.LL_YES
-					: IBMLLPreferenceConstants.LL_NO);
+			config.setErrorMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--error_messages=y "; //$NON-NLS-1$
 			}
@@ -800,8 +671,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyFatalMessageButton != null) {
 			selection = proxyFatalMessageButton.getSelection();
-			config.setFatalMessage(selection ? IBMLLPreferenceConstants.LL_YES
-					: IBMLLPreferenceConstants.LL_NO);
+			config.setFatalMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--fatal_messages=y "; //$NON-NLS-1$
 			}
@@ -809,8 +679,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyArgsMessageButton != null) {
 			selection = proxyArgsMessageButton.getSelection();
-			config.setArgsMessage(selection ? IBMLLPreferenceConstants.LL_YES
-					: IBMLLPreferenceConstants.LL_NO);
+			config.setArgsMessage(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--args_messages=y "; //$NON-NLS-1$
 			}
@@ -818,15 +687,13 @@ public class IBMLLResourceManagerOptionWizardPage extends
 
 		if (proxyDebugLoopButton != null) {
 			selection = proxyDebugLoopButton.getSelection();
-			config.setDebugLoop(selection ? IBMLLPreferenceConstants.LL_YES
-					: IBMLLPreferenceConstants.LL_NO);
+			config.setDebugLoop(selection ? IBMLLPreferenceConstants.LL_YES : IBMLLPreferenceConstants.LL_NO);
 			if (selection) {
 				options = options + "--debug_loop=y "; //$NON-NLS-1$
 			}
 		}
 
-		if ((proxyLLDefaultRadioButton != null)
-				&& (proxyForceLocalRadioButton != null)
+		if ((proxyLLDefaultRadioButton != null) && (proxyForceLocalRadioButton != null)
 				&& (proxyForceMulticlusterRadioButton != null)) {
 			if (proxyLLDefaultRadioButton.getSelection()) {
 				options = options + "--multicluster=d "; //$NON-NLS-1$
@@ -838,21 +705,17 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		}
 
 		if (proxyLLDefaultRadioButton != null) {
-			config.setDefaultMulticluster(proxyLLDefaultRadioButton
-					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+			config.setDefaultMulticluster(proxyLLDefaultRadioButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
 					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (proxyForceLocalRadioButton != null) {
-			config
-					.setForceProxyLocal(proxyForceLocalRadioButton
-							.getSelection() ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setForceProxyLocal(proxyForceLocalRadioButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (proxyForceMulticlusterRadioButton != null) {
-			config.setForceProxyMulticluster(proxyForceMulticlusterRadioButton
-					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+			config.setForceProxyMulticluster(proxyForceMulticlusterRadioButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
 					: IBMLLPreferenceConstants.LL_NO);
 		}
 
@@ -873,14 +736,12 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		}
 
 		if (proxyTemplateNeverRadioButton != null) {
-			config.setSuppressTemplateWrite(proxyTemplateNeverRadioButton
-					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+			config.setSuppressTemplateWrite(proxyTemplateNeverRadioButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
 					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (proxyTemplateAlwaysRadioButton != null) {
-			config.setTemplateWriteAlways(proxyTemplateAlwaysRadioButton
-					.getSelection() ? IBMLLPreferenceConstants.LL_YES
+			config.setTemplateWriteAlways(proxyTemplateAlwaysRadioButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
 					: IBMLLPreferenceConstants.LL_NO);
 		}
 
@@ -903,40 +764,33 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		}
 
 		if (guiTraceMessageButton != null) {
-			config
-					.setGuiTraceMessage(guiTraceMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setGuiTraceMessage(guiTraceMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (guiArgsMessageButton != null) {
-			config
-					.setGuiArgsMessage(guiArgsMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setGuiArgsMessage(guiArgsMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (guiInfoMessageButton != null) {
-			config
-					.setGuiInfoMessage(guiInfoMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setGuiInfoMessage(guiInfoMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (guiWarningMessageButton != null) {
-			config
-					.setGuiWarningMessage(guiWarningMessageButton
-							.getSelection() ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setGuiWarningMessage(guiWarningMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (guiErrorMessageButton != null) {
-			config
-					.setGuiErrorMessage(guiErrorMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setGuiErrorMessage(guiErrorMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		if (guiFatalMessageButton != null) {
-			config
-					.setGuiFatalMessage(guiFatalMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
-							: IBMLLPreferenceConstants.LL_NO);
+			config.setGuiFatalMessage(guiFatalMessageButton.getSelection() ? IBMLLPreferenceConstants.LL_YES
+					: IBMLLPreferenceConstants.LL_NO);
 		}
 
 		// System.err.println("Options from wizard page are now set to: " +
@@ -970,44 +824,27 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		}
 		serviceID = config.getRemoteServicesId();
 		if (serviceID == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
-		services = PTPRemoteCorePlugin.getDefault()
-				.getRemoteServices(serviceID);
+		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
 		if (services == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		connectionManager = services.getConnectionManager();
 		if (connectionManager == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
-		connection = connectionManager
-				.getConnection(config.getConnectionName());
+		connection = connectionManager.getConnection(config.getConnectionName());
 		if (connection == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		fileManager = services.getFileManager(connection);
 		if (fileManager == null) {
-			Activator
-					.getDefault()
-					.logError(
-							"validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.31")); //$NON-NLS-1$ //$NON-NLS-2$
+			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.31")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		file = fileManager.getResource(path);
@@ -1016,8 +853,7 @@ public class IBMLLResourceManagerOptionWizardPage extends
 		}
 		try {
 			fileInfo = file.fetchInfo(EFS.NONE, new NullProgressMonitor());
-			return fileInfo.exists()
-					&& (fileInfo.isDirectory() == needDirectory);
+			return fileInfo.exists() && (fileInfo.isDirectory() == needDirectory);
 		} catch (CoreException e) {
 			return false;
 		}
