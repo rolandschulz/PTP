@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.lapi;
 
+import org.eclipse.ptp.pldt.lapi.messages.Messages;
+
 /**
  * LAPI Plugin constants
  */

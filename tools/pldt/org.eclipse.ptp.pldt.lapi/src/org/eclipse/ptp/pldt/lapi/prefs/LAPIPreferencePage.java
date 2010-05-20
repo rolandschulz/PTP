@@ -18,7 +18,7 @@ import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.lapi.LapiIDs;
 import org.eclipse.ptp.pldt.lapi.LapiPlugin;
-import org.eclipse.ptp.pldt.lapi.Messages;
+import org.eclipse.ptp.pldt.lapi.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 

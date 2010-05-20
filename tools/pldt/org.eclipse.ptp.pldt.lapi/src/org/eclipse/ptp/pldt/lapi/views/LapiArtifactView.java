@@ -13,7 +13,7 @@ package org.eclipse.ptp.pldt.lapi.views;
 import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
 import org.eclipse.ptp.pldt.lapi.LapiIDs;
 import org.eclipse.ptp.pldt.lapi.LapiPlugin;
-import org.eclipse.ptp.pldt.lapi.Messages;
+import org.eclipse.ptp.pldt.lapi.messages.Messages;
 
 
 

@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.pldt.lapi;
+package org.eclipse.ptp.pldt.lapi.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.lapi.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.lapi.messages.messages"; //$NON-NLS-1$
 	public static String LapiArtifactView_construct_column_title;
 	public static String LapiArtifactView_lapi_artifact_column_title;
 	public static String LapiArtifactView_lapi_artifacts_plural;
