@@ -13,10 +13,15 @@ package org.eclipse.ptp.rm.pbs.core.rmsystem;
 
 import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 
-public interface IPBSResourceManagerConfiguration extends
-		IRemoteResourceManagerConfiguration {
+public interface IPBSResourceManagerConfiguration extends IRemoteResourceManagerConfiguration {
 
-	String getDefaultTemplateName();
+	/**
+	 * @since 4.0
+	 */
+	public String getDefaultTemplateName();
 
-	void setDefaultTemplateName(String name);
+	/**
+	 * @since 4.0
+	 */
+	public void setDefaultTemplateName(String name);
 }

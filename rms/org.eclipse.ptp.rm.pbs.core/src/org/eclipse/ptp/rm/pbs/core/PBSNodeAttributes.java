@@ -20,19 +20,21 @@ import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSNodeProtocolAttributes;
 
 /**
  * Node attributes
+ * 
+ * @since 4.0
  */
 public class PBSNodeAttributes extends PBSNodeProtocolAttributes {
 
-	private static final IAttributeDefinition<?,?,?>[] attrDefs = new IAttributeDefinition[]{
-				new StringAttributeDefinition(NAME_ATTR_ID, NAME_ATTR_ID, Messages.PBSNodeAttributes_0, true, ""), //$NON-NLS-1$
-				new StringAttributeDefinition(STATE_ATTR_ID, STATE_ATTR_ID, Messages.PBSNodeAttributes_1, true, ""), //$NON-NLS-1$
-				new StringAttributeDefinition(NP_ATTR_ID, NP_ATTR_ID, Messages.PBSNodeAttributes_2, true, ""), //$NON-NLS-1$
-				new StringAttributeDefinition(PROPERTIES_ATTR_ID, PROPERTIES_ATTR_ID, Messages.PBSNodeAttributes_3, true, ""), //$NON-NLS-1$
-				new StringAttributeDefinition(NTYPE_ATTR_ID, NTYPE_ATTR_ID, Messages.PBSNodeAttributes_4, true, ""), //$NON-NLS-1$
-				new StringAttributeDefinition(STATUS_ATTR_ID, STATUS_ATTR_ID, Messages.PBSNodeAttributes_5, true, ""), //$NON-NLS-1$
+	private static final IAttributeDefinition<?, ?, ?>[] attrDefs = new IAttributeDefinition[] {
+			new StringAttributeDefinition(NAME_ATTR_ID, NAME_ATTR_ID, Messages.PBSNodeAttributes_0, true, ""), //$NON-NLS-1$
+			new StringAttributeDefinition(STATE_ATTR_ID, STATE_ATTR_ID, Messages.PBSNodeAttributes_1, true, ""), //$NON-NLS-1$
+			new StringAttributeDefinition(NP_ATTR_ID, NP_ATTR_ID, Messages.PBSNodeAttributes_2, true, ""), //$NON-NLS-1$
+			new StringAttributeDefinition(PROPERTIES_ATTR_ID, PROPERTIES_ATTR_ID, Messages.PBSNodeAttributes_3, true, ""), //$NON-NLS-1$
+			new StringAttributeDefinition(NTYPE_ATTR_ID, NTYPE_ATTR_ID, Messages.PBSNodeAttributes_4, true, ""), //$NON-NLS-1$
+			new StringAttributeDefinition(STATUS_ATTR_ID, STATUS_ATTR_ID, Messages.PBSNodeAttributes_5, true, ""), //$NON-NLS-1$
 	};
-	
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
+
+	public static IAttributeDefinition<?, ?, ?>[] getDefaultAttributeDefinitions() {
 		return attrDefs;
 	}
 }

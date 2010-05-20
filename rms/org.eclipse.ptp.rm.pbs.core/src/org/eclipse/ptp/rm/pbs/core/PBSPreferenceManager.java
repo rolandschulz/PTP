@@ -21,10 +21,16 @@ public class PBSPreferenceManager {
 		return Activator.getDefault().getPluginPreferences();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public static String getSelectedAttributes() {
 		return getPreferences().getString(SELECTED);
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public static String getTemplatePreference() {
 		return getPreferences().getString(TEMPLATE);
 	}
@@ -33,10 +39,16 @@ public class PBSPreferenceManager {
 		Activator.getDefault().savePluginPreferences();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public static void setSelectedAttributes(String selected) {
 		getPreferences().setValue(SELECTED, selected);
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public static void setTemplatePreference(String attrConfig) {
 		getPreferences().setValue(TEMPLATE, attrConfig);
 	}

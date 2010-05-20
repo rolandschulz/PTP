@@ -14,6 +14,9 @@ package org.eclipse.ptp.rm.pbs.core.rtsystem;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeSystem;
 
+/**
+ * @since 4.0
+ */
 public class PBSRuntimeSystem extends AbstractRemoteProxyRuntimeSystem {
 	public PBSRuntimeSystem(PBSProxyRuntimeClient proxy, AttributeDefinitionManager manager) {
 		super(proxy, manager);

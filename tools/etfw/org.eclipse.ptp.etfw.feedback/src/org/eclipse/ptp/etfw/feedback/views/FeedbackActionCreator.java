@@ -20,15 +20,23 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
 import org.eclipse.ptp.etfw.feedback.Activator;
 
+/**
+ * @since 1.1
+ */
 public class FeedbackActionCreator {
-	private boolean traceOn=true;
+	private final boolean traceOn = true;
 	private static final String ATTR_NAME = "name";
 	private static final String ATTR_CLASSNAME = "class";
 	private static final String ATTR_ICON = "icon";
 
 	/**
-	 * Find the eclipse extension (if any) that specifies an optional feedback action
-	 * @param viewID id of the view that action can be added to.  Some action extensions may specify a viewID, in which case they are ONLY added to that view.
+	 * Find the eclipse extension (if any) that specifies an optional feedback
+	 * action
+	 * 
+	 * @param viewID
+	 *            id of the view that action can be added to. Some action
+	 *            extensions may specify a viewID, in which case they are ONLY
+	 *            added to that view.
 	 * 
 	 */
 	public AbstractFeedbackAction findFeedbackAction(String viewID) {
@@ -40,33 +48,42 @@ public class FeedbackActionCreator {
 		for (int i = 0; i < extensions.length; i++) {
 			IExtension extn = extensions[i];
 			String extLabel = extn.getLabel();
-			if (traceOn)System.out.println("Found extension for " + extLabel + "  id=" + extn.getUniqueIdentifier());
+			if (traceOn)
+				System.out.println("Found extension for " + extLabel + "  id=" + extn.getUniqueIdentifier());
 			IConfigurationElement[] configElements = extensions[i].getConfigurationElements();
 			for (int j = 0; j < configElements.length; j++) {
 				IConfigurationElement ice = configElements[j];
-				// from this thing we should be able to make the specific parts that we need.
+				// from this thing we should be able to make the specific parts
+				// that we need.
 				// specifically: an action. We assume one or none found for now.
 				// Could have multiple later??
-				if (traceOn)System.out.println(ice.getAttributeNames());
+				if (traceOn)
+					System.out.println(ice.getAttributeNames());
 				String id = ice.getAttribute("id");// is this the plugin id? no
 				String className = ice.getAttribute(ATTR_CLASSNAME);
 				String name = ice.getAttribute(ATTR_NAME);
 				String icon = ice.getAttribute(ATTR_ICON);
 				String actionViewID = ice.getAttribute("viewID");
-				if(actionViewID!=null) {
-					// if available, viewID specifies that the action extension is only to be added
+				if (actionViewID != null) {
+					// if available, viewID specifies that the action extension
+					// is only to be added
 					// to the view whose view ID is this.
-					if(!actionViewID.equals(viewID))
-						continue;				
+					if (!actionViewID.equals(viewID))
+						continue;
 				}
-				String [] ans=ice.getAttributeNames();
-				if (traceOn)System.out.println("class=" + className + "   name=" + name);
-				// Determine if this action extension is for the view in the current plugin
-				String nsi = ice.getNamespaceIdentifier();// identifies which plugin this extension comes from
+				String[] ans = ice.getAttributeNames();
+				if (traceOn)
+					System.out.println("class=" + className + "   name=" + name);
+				// Determine if this action extension is for the view in the
+				// current plugin
+				String nsi = ice.getNamespaceIdentifier();// identifies which
+															// plugin this
+															// extension comes
+															// from
 				Object parent = ice.getParent();
 				Object obj = null;
 				try {
-					obj = ice.createExecutableExtension(ATTR_CLASSNAME);//err
+					obj = ice.createExecutableExtension(ATTR_CLASSNAME);// err
 					if (obj instanceof AbstractFeedbackAction) {
 						AbstractFeedbackAction fa = (AbstractFeedbackAction) obj;
 						fa.addIcon(icon);
