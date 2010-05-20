@@ -53,7 +53,6 @@ import org.eclipse.ptp.proxy.debug.command.ProxyDebugSetFunctionBreakpointComman
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugSetLineBreakpointCommand;
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugSetThreadSelectCommand;
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugSetWatchpointCommand;
-import org.eclipse.ptp.proxy.debug.command.ProxyDebugSignalInfoCommand;
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugStackInfoDepthCommand;
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugStartSessionCommand;
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugStepCommand;
@@ -66,9 +65,10 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 
 	/**
 	 * Convert a proxy representation of a bitset into a TaskSet
-	 *
+	 * 
 	 * @param str
 	 * @return proxy bitset converted to TaskSet
+	 * @since 4.0
 	 */
 	public static TaskSet decodeTaskSet(String str) {
 		String[] parts = str.split(":"); //$NON-NLS-1$
@@ -79,9 +79,10 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 
 	/**
 	 * Convert a TaskSet to it's proxy representation
-	 *
+	 * 
 	 * @param set
 	 * @return proxy representation of a TaskSet
+	 * @since 4.0
 	 */
 	public static String encodeTaskSet(TaskSet set) {
 		String lenStr = Integer.toHexString(set.taskSize());
@@ -89,149 +90,224 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		return lenStr;
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugBreakpointAfter(TaskSet procs, int bpid, int icount) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugBreakpointAfterCommand(encodeTaskSet(procs), bpid, icount);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugCLIHandle(TaskSet procs, String arg) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugCLICommand(encodeTaskSet(procs), arg);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugConditionBreakpoint(TaskSet procs, int bpid, String expr) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugConditionBreakpointCommand(encodeTaskSet(procs), bpid, expr);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugDeleteBreakpoint(TaskSet procs, int bpid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDeleteBreakpointCommand(encodeTaskSet(procs), bpid);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugDeletePartialExpression(TaskSet procs, String name) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDeletePartialExpressionCommand(encodeTaskSet(procs), name);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugDisableBreakpoint(TaskSet procs, int bpid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugDisableBreakpointCommand(encodeTaskSet(procs), bpid);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugEnableBreakpoint(TaskSet procs, int bpid) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugEnableBreakpointCommand(encodeTaskSet(procs), bpid);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugEvaluateExpression(TaskSet procs, String expr) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugEvaluateExpressionCommand(encodeTaskSet(procs), expr);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
-	public void debugEvaluatePartialExpression(TaskSet procs, String name, String exprId, boolean listChildren, boolean express) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugEvaluatePartialExpressionCommand(encodeTaskSet(procs), name, exprId, listChildren, express);
+	/**
+	 * @since 4.0
+	 */
+	public void debugEvaluatePartialExpression(TaskSet procs, String name, String exprId, boolean listChildren, boolean express)
+			throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugEvaluatePartialExpressionCommand(encodeTaskSet(procs), name, exprId, listChildren,
+				express);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugGetType(TaskSet procs, String expr) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugGetTypeCommand(encodeTaskSet(procs), expr);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugGo(TaskSet procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugGoCommand(encodeTaskSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugInterrupt(TaskSet procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugInterruptCommand(encodeTaskSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugListArguments(TaskSet procs, int low, int high) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListArgumentsCommand(encodeTaskSet(procs), low, high);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugListGlobalVariables(TaskSet procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListGlobalVariablesCommand(encodeTaskSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugListInfoThreads(TaskSet procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListInfoThreadsCommand(encodeTaskSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugListLocalVariables(TaskSet procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListLocalVariablesCommand(encodeTaskSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugListSignals(TaskSet procs, String name) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListSignalsCommand(encodeTaskSet(procs), name);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugListStackframes(TaskSet procs, int low, int high) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugListStackframesCommand(encodeTaskSet(procs), low, high);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugSetCurrentStackframe(TaskSet procs, int level) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSetCurrentStackframeCommand(encodeTaskSet(procs), level);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
-	public void debugSetFuncBreakpoint(TaskSet procs, int bpid, boolean isTemporary, boolean isHardware, String file, String func, String expression, int ignoreCount, int tid) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugSetFunctionBreakpointCommand(encodeTaskSet(procs), bpid, isTemporary, isHardware, file, func, expression, ignoreCount, tid);
+	/**
+	 * @since 4.0
+	 */
+	public void debugSetFuncBreakpoint(TaskSet procs, int bpid, boolean isTemporary, boolean isHardware, String file, String func,
+			String expression, int ignoreCount, int tid) throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugSetFunctionBreakpointCommand(encodeTaskSet(procs), bpid, isTemporary, isHardware,
+				file, func, expression, ignoreCount, tid);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
-	public void debugSetLineBreakpoint(TaskSet procs, int bpid, boolean isTemporary, boolean isHardware, String file, int line, String expression, int ignoreCount, int tid) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugSetLineBreakpointCommand(encodeTaskSet(procs), bpid, isTemporary, isHardware, file, line, expression, ignoreCount, tid);
+	/**
+	 * @since 4.0
+	 */
+	public void debugSetLineBreakpoint(TaskSet procs, int bpid, boolean isTemporary, boolean isHardware, String file, int line,
+			String expression, int ignoreCount, int tid) throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugSetLineBreakpointCommand(encodeTaskSet(procs), bpid, isTemporary, isHardware, file,
+				line, expression, ignoreCount, tid);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugSetThreadSelect(TaskSet procs, int threadNum) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugSetThreadSelectCommand(encodeTaskSet(procs), threadNum);
 		sendCommand(cmd);
 		cmd.completed();
 	}
-	public void debugSetWatchpoint(TaskSet procs, int bpid, String expression, boolean isAccess, boolean isRead, String condition, int ignoreCount) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugSetWatchpointCommand(encodeTaskSet(procs), bpid, expression, isAccess, isRead, condition, ignoreCount);
+
+	/**
+	 * @since 4.0
+	 */
+	public void debugSetWatchpoint(TaskSet procs, int bpid, String expression, boolean isAccess, boolean isRead, String condition,
+			int ignoreCount) throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugSetWatchpointCommand(encodeTaskSet(procs), bpid, expression, isAccess, isRead,
+				condition, ignoreCount);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
-	public void debugSignalInfo(TaskSet procs, String arg) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugSignalInfoCommand(encodeTaskSet(procs), arg);
-		sendCommand(cmd);
-		cmd.completed();
-	}
-
+	/**
+	 * @since 4.0
+	 */
 	public void debugStackInfoDepth(TaskSet procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugStackInfoDepthCommand(encodeTaskSet(procs));
 		sendCommand(cmd);
@@ -244,35 +320,51 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugStep(TaskSet procs, int count, int type) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugStepCommand(encodeTaskSet(procs), count, type);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public void debugTerminate(TaskSet procs) throws IOException {
 		IProxyDebugCommand cmd = new ProxyDebugTerminateCommand(encodeTaskSet(procs));
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
-	public void setDataReadMemoryCommand(TaskSet procs, long offset, String address, String format, int wordSize, int rows, int cols, Character asChar) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugDataReadMemoryCommand(encodeTaskSet(procs), offset, address, format, wordSize, rows, cols, asChar);
-		sendCommand(cmd);
-		cmd.completed();
-	}
-
-	public void setDataWriteMemoryCommand(TaskSet procs, long offset, String address, String format, int wordSize, String value) throws IOException {
-		IProxyDebugCommand cmd = new ProxyDebugDataWriteMemoryCommand(encodeTaskSet(procs), offset, address, format, wordSize, value);
+	/**
+	 * @since 4.0
+	 */
+	public void setDataReadMemoryCommand(TaskSet procs, long offset, String address, String format, int wordSize, int rows,
+			int cols, Character asChar) throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugDataReadMemoryCommand(encodeTaskSet(procs), offset, address, format, wordSize, rows,
+				cols, asChar);
 		sendCommand(cmd);
 		cmd.completed();
 	}
 
 	/**
-	 * Wait for the debugger to connect. We will receive a connected event
-	 * when the debug server actually connects, or a timeout event if the server
+	 * @since 4.0
+	 */
+	public void setDataWriteMemoryCommand(TaskSet procs, long offset, String address, String format, int wordSize, String value)
+			throws IOException {
+		IProxyDebugCommand cmd = new ProxyDebugDataWriteMemoryCommand(encodeTaskSet(procs), offset, address, format, wordSize,
+				value);
+		sendCommand(cmd);
+		cmd.completed();
+	}
+
+	/**
+	 * Wait for the debugger to connect. We will receive a connected event when
+	 * the debug server actually connects, or a timeout event if the server
 	 * fails to connect.
-	 *
+	 * 
 	 * @param monitor
 	 * @return true on successful connection, false otherwise
 	 * @throws IOException
@@ -288,7 +380,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 				while (state == DebugProxyState.CONNECTING && !timeout && !monitor.isCanceled()) {
 					waiting = true;
 					try {
-						//added to wait for 1000
+						// added to wait for 1000
 						waitCondition.await(1000, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
 						// Expect to be interrupted if monitor is canceled

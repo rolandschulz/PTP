@@ -45,6 +45,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int, int,
 	 * int, java.lang.Character)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IPDIDataReadMemoryRequest getDataReadMemoryRequest(IPDISession session, TaskSet tasks, long offset, String address,
 			int wordFormat, int wordSize, int rows, int cols, Character asChar) {
 		return new SDMDataReadMemoryRequest(session, tasks, offset, address, wordFormat, wordSize, rows, cols, asChar);
@@ -57,6 +60,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * getEvaluateExpressionRequest(org.eclipse.ptp.core.util.TaskSet,
 	 * java.lang.String)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IPDIEvaluateExpressionRequest getEvaluateExpressionRequest(TaskSet tasks, String expr) {
 		return new SDMEvaluateExpressionRequest(tasks, expr);
 	}
@@ -67,6 +73,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getEvaluatePartialExpressionRequest(org.eclipse.ptp.core.util.TaskSet,
 	 * java.lang.String, java.lang.String, boolean)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId,
 			boolean listChildren) {
@@ -79,6 +88,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getGetInfoThreadsRequest(org.eclipse.ptp.core.util.TaskSet)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IPDIGetInfoThreadsRequest getGetInfoThreadsRequest(TaskSet tasks) {
 		return new SDMGetInfoThreadsRequest(tasks);
 	}
@@ -88,6 +100,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getGetStackInfoDepthRequest(org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDIGetStackInfoDepthRequest getGetStackInfoDepthRequest(TaskSet tasks) {
 		return new SDMGetStackInfoDepthRequest(tasks);
@@ -99,6 +114,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getListArgumentsRequest(org.eclipse.ptp.core.util.TaskSet, int, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IPDIListArgumentsRequest getListArgumentsRequest(TaskSet tasks, int diff, int diff2) {
 		return new SDMListArgumentsRequest(tasks, diff, diff2);
 	}
@@ -108,6 +126,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getListLocalVariablesRequest(org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDIListLocalVariablesRequest getListLocalVariablesRequest(TaskSet tasks) {
 		return new SDMListLocalVariablesRequest(tasks);
@@ -120,6 +141,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * getListSignalsRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
 	 * org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IPDIListSignalsRequest getListSignalsRequest(IPDISession session, TaskSet tasks, String name) {
 		return new SDMListSignalsRequest(session, tasks, name);
 	}
@@ -130,6 +154,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getListStackFramesRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
 	 * org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks) {
 		return new SDMListStackFramesRequest(session, tasks);
@@ -142,6 +169,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * getListStackFramesRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
 	 * org.eclipse.ptp.core.util.TaskSet, int, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks, int low, int high) {
 		return new SDMListStackFramesRequest(session, tasks, low, high);
 	}
@@ -151,6 +181,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getSetCurrentStackFrameRequest(org.eclipse.ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDISetCurrentStackFrameRequest getSetCurrentStackFrameRequest(TaskSet tasks, int level) {
 		return new SDMSetCurrentStackFrameRequest(tasks, level);
@@ -162,6 +195,9 @@ public class SDMRequestFactory extends AbstractRequestFactory {
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory#
 	 * getSetThreadSelectRequest(org.eclipse.ptp.debug.core.pdi.IPDISession,
 	 * org.eclipse.ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDISetThreadSelectRequest getSetThreadSelectRequest(IPDISession session, TaskSet tasks, int id) {
 		return new SDMSetThreadSelectRequest(session, tasks, id);
