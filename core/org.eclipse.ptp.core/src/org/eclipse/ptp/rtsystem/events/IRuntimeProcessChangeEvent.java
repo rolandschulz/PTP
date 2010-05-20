@@ -20,5 +20,8 @@
 package org.eclipse.ptp.rtsystem.events;
 
 public interface IRuntimeProcessChangeEvent extends IRuntimeChangeEvent {
-	String getJobId();
+	/**
+	 * @since 4.0
+	 */
+	public String getJobId();
 }

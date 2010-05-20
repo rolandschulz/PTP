@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
-import org.eclipse.ptp.pldt.upc.Messages;
 import org.eclipse.ptp.pldt.upc.UPCArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.upc.UPCIDs;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
@@ -28,11 +27,11 @@ import org.eclipse.ptp.pldt.upc.analysis.UPCCASTVisitor;
 
 /**
  * The "Find UPC Artifacts" action/command
+ * 
  * @author Beth Tibbitts
- *
+ * 
  */
-public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
-{
+public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase {
 	/**
 	 * Constructor for the "Run Analysis" action
 	 */
@@ -49,17 +48,17 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 	 * @return
 	 */
 	@Override
-	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,	final List<String> includes) {
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu, final List<String> includes) {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
 		try {
 			lang = tu.getLanguage();
-            
+
 			IASTTranslationUnit atu = tu.getAST();
 			if (lang.getId().equals(UPCLanguage.ID)) {// cdt40
 				atu.accept(new UPCCASTVisitor(includes, fileName, msr));
-			} 
+			}
 
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
@@ -69,12 +68,15 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 	}
 
 	/**
-	 * Determination of whether or not a given filename is valid for UPC artifact analysis
-	 * <br>TODO  Consider using language or content-type instead of file extension?
-	 * Re-visit after https://bugs.eclipse.org/bugs/show_bug.cgi?id=237331 is resolved (UPC  content-type not recognized)
+	 * Determination of whether or not a given filename is valid for UPC
+	 * artifact analysis <br>
+	 * TODO Consider using language or content-type instead of file extension?
+	 * Re-visit after https://bugs.eclipse.org/bugs/show_bug.cgi?id=237331 is
+	 * resolved (UPC content-type not recognized)
 	 * 
 	 * @param filename
-	 * @param isCPP  is the project a C++ project or not
+	 * @param isCPP
+	 *            is the project a C++ project or not
 	 * @return
 	 * 
 	 */
@@ -87,16 +89,18 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 		String ext = filename.substring(loc + 1);
 		ext = ext.toLowerCase();
 		boolean result = true;
-		if (ext.equals("upc"))  //$NON-NLS-1$
+		if (ext.equals("upc")) //$NON-NLS-1$
 			result = true;
 		else
 			result = false;
 		return result;
 	}
+
 	@Override
 	protected List<String> getIncludePath() {
 		return UPCPlugin.getDefault().getUPCIncludeDirs();
 	}
+
 	@Override
 	protected void activateArtifactView() {
 		ViewActivater.activateView(UPCIDs.UPC_VIEW_ID);

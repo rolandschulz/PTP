@@ -18,93 +18,105 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public abstract class AbstractAttribute<T,
-                                        A extends AbstractAttribute<T,A,D>,
-                                        D extends IAttributeDefinition<T,A,D>>
-implements IAttribute<T,A,D> {
+public abstract class AbstractAttribute<T, A extends AbstractAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+		implements IAttribute<T, A, D> {
 
 	private final D definition;
 
 	private boolean enabled;
+
 	public AbstractAttribute(D definition) {
 		this.definition = definition;
 		this.enabled = true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#copy()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public A copy() {
 		return doCopy();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(A other) {
-        int results = getDefinition().compareTo(other.getDefinition());
-        if (results != 0) {
-            return results;
-        }
-        if (getClass() != other.getClass()) {
-            final int hashCode1 = getClass().hashCode();
-            final int hashCode2 = other.getClass().hashCode();
-            return hashCode1 < hashCode2 ? -1 : (hashCode1 > hashCode2 ? 1 : 0);
-        }
-        final int doCompareTo = doCompareTo(other);
-        return doCompareTo;
-    }
+		int results = getDefinition().compareTo(other.getDefinition());
+		if (results != 0) {
+			return results;
+		}
+		if (getClass() != other.getClass()) {
+			final int hashCode1 = getClass().hashCode();
+			final int hashCode2 = other.getClass().hashCode();
+			return hashCode1 < hashCode2 ? -1 : (hashCode1 > hashCode2 ? 1 : 0);
+		}
+		final int doCompareTo = doCompareTo(other);
+		return doCompareTo;
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final A other = (A) obj;
-        if (definition == null) {
-            if (other.definition != null)
-                return false;
-        } else if (!definition.equals(other.definition))
-            return false;
-        final boolean doEquals = doEquals(other);
-        if (!doEquals)
-            return false;
-        return true;
-    }
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final A other = (A) obj;
+		if (definition == null) {
+			if (other.definition != null)
+				return false;
+		} else if (!definition.equals(other.definition))
+			return false;
+		final boolean doEquals = doEquals(other);
+		if (!doEquals)
+			return false;
+		return true;
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getDefinition()
 	 */
 	public D getDefinition() {
 		return definition;
 	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((definition == null) ? 0 : definition.hashCode());
-        result = prime * result + doHashCode();
-        return result;
-    }
-    
-    /* (non-Javadoc)
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((definition == null) ? 0 : definition.hashCode());
+		result = prime * result + doHashCode();
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isEnabled()
 	 */
 	public boolean isEnabled() {
 		return enabled;
 	}
 
-    /**
-	 * @param enabled the enabled to set
+	/**
+	 * @param enabled
+	 *            the enabled to set
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -116,24 +128,25 @@ implements IAttribute<T,A,D> {
 	}
 
 	/**
-     * @param other
-     * @return
-     */
-    protected abstract int doCompareTo(A other);
-
-    /**
+	 * @param other
 	 * @return
+	 */
+	protected abstract int doCompareTo(A other);
+
+	/**
+	 * @return
+	 * @since 4.0
 	 */
 	protected abstract A doCopy();
 
 	/**
-     * @param other
-     * @return
-     */
-    protected abstract boolean doEquals(A other);
-    
-    /**
-     * @return
-     */
-    protected abstract int doHashCode();
+	 * @param other
+	 * @return
+	 */
+	protected abstract boolean doEquals(A other);
+
+	/**
+	 * @return
+	 */
+	protected abstract int doHashCode();
 }

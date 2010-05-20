@@ -20,8 +20,7 @@ package org.eclipse.ptp.core.attributes;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-public class BooleanAttribute 
-extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
+public class BooleanAttribute extends AbstractAttribute<Boolean, BooleanAttribute, BooleanAttributeDefinition> {
 
 	private Boolean value;
 
@@ -29,16 +28,16 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 		super(definition);
 		this.value = initialValue;
 	}
-	
+
 	public BooleanAttribute(BooleanAttributeDefinition definition, String initialValue) {
 		super(definition);
 		this.value = Boolean.valueOf(initialValue);
 	}
-	
+
 	public synchronized Boolean getValue() {
 		return value.booleanValue();
 	}
-	
+
 	public synchronized String getValueAsString() {
 		return value.toString();
 	}
@@ -61,8 +60,13 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 		value = Boolean.valueOf(string);
 	}
 
-    /* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	@Override
 	protected BooleanAttribute doCopy() {
@@ -70,18 +74,18 @@ extends AbstractAttribute<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
 	}
 
 	@Override
-    protected synchronized int doCompareTo(BooleanAttribute other) {
-        return value.compareTo(other.value);
-    }
+	protected synchronized int doCompareTo(BooleanAttribute other) {
+		return value.compareTo(other.value);
+	}
 
-    @Override
-    protected synchronized boolean doEquals(BooleanAttribute other) {
-        return value.equals(other.value);
-    }
+	@Override
+	protected synchronized boolean doEquals(BooleanAttribute other) {
+		return value.equals(other.value);
+	}
 
-    @Override
-    protected synchronized int doHashCode() {
-        return value.hashCode();
-    }
+	@Override
+	protected synchronized int doHashCode() {
+		return value.hashCode();
+	}
 
 }

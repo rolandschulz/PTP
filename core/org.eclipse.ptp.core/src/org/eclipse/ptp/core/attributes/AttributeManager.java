@@ -17,25 +17,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An attribute manager is responsible for managing a set of attribute definition ID's and
- * attributes. It is used where groups of attributes are needed.
+ * An attribute manager is responsible for managing a set of attribute
+ * definition ID's and attributes. It is used where groups of attributes are
+ * needed.
  * 
  * @author greg
- *
+ * 
  */
 public class AttributeManager {
-	private final Map<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> map = 
-		Collections.synchronizedMap(new HashMap<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>>());
-	
+	private final Map<IAttributeDefinition<?, ?, ?>, IAttribute<?, ?, ?>> map = Collections
+			.synchronizedMap(new HashMap<IAttributeDefinition<?, ?, ?>, IAttribute<?, ?, ?>>());
+
 	public AttributeManager() {
 	}
-	
-	public AttributeManager(IAttribute<?,?,?> attr) {
+
+	/**
+	 * @since 4.0
+	 */
+	public AttributeManager(IAttribute<?, ?, ?> attr) {
 		addAttribute(attr);
 	}
-	
-	public AttributeManager(IAttribute<?,?,?>[] attrs) {
-		for (IAttribute<?,?,?> attr : attrs) {
+
+	public AttributeManager(IAttribute<?, ?, ?>[] attrs) {
+		for (IAttribute<?, ?, ?> attr : attrs) {
 			addAttribute(attr);
 		}
 	}
@@ -43,22 +47,22 @@ public class AttributeManager {
 	/**
 	 * @param attr
 	 */
-	public void addAttribute(IAttribute<?,?,?> attr) {
+	public void addAttribute(IAttribute<?, ?, ?> attr) {
 		map.put(attr.getDefinition(), attr);
 	}
 
 	/**
 	 * Add new attributes to the attributes being managed. Handle array
-	 * attributes specially: the new array is appended to an existing array, 
-	 * if any.
+	 * attributes specially: the new array is appended to an existing array, if
+	 * any.
 	 * 
 	 * @param attrs
 	 */
 	@SuppressWarnings("rawtypes")
-	public void addAttributes(IAttribute<?,?,?>[] attrs) {
+	public void addAttributes(IAttribute<?, ?, ?>[] attrs) {
 		synchronized (map) {
-			for (IAttribute<?,?,?> attr : attrs) {
-				IAttributeDefinition<?,?,?> def = attr.getDefinition();
+			for (IAttribute<?, ?, ?> attr : attrs) {
+				IAttributeDefinition<?, ?, ?> def = attr.getDefinition();
 				if (map.containsKey(def) && attr instanceof ArrayAttribute) {
 					ArrayAttribute<?> arrAttr = (ArrayAttribute<?>) attr;
 					addAttributeToArrayAttribute(arrAttr);
@@ -77,7 +81,7 @@ public class AttributeManager {
 	private <T extends Comparable<? super T>> void addAttributeToArrayAttribute(ArrayAttribute<T> attr) {
 		synchronized (map) {
 			ArrayAttributeDefinition<T> def = attr.getDefinition();
-			ArrayAttribute<T> exAttr = (ArrayAttribute<T>)map.get(def);
+			ArrayAttribute<T> exAttr = (ArrayAttribute<T>) map.get(def);
 			final List<T> value = attr.getValue();
 			exAttr.addAll(value);
 		}
@@ -87,9 +91,9 @@ public class AttributeManager {
 	 * @param id
 	 * @return
 	 */
-	public IAttribute<?,?,?> getAttribute(String id) {
+	public IAttribute<?, ?, ?> getAttribute(String id) {
 		synchronized (map) {
-			for (Map.Entry<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> entry : map.entrySet()) {
+			for (Map.Entry<IAttributeDefinition<?, ?, ?>, IAttribute<?, ?, ?>> entry : map.entrySet()) {
 				if (entry.getKey().getId().equals(id)) {
 					return entry.getValue();
 				}
@@ -97,7 +101,7 @@ public class AttributeManager {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param <T>
 	 * @param <A>
@@ -113,47 +117,47 @@ public class AttributeManager {
 	/**
 	 * @return
 	 */
-	public IAttribute<?,?,?>[] getAttributes() {
+	public IAttribute<?, ?, ?>[] getAttributes() {
 		synchronized (map) {
 			return map.values().toArray(new IAttribute[map.size()]);
 		}
 	}
-	
+
 	/**
 	 * @return
 	 */
-	public IAttribute<?,?,?>[] getDisplayAttributes() {
-		List<IAttribute<?,?,?>> attrs = new ArrayList<IAttribute<?,?,?>>();
-		
+	public IAttribute<?, ?, ?>[] getDisplayAttributes() {
+		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
+
 		synchronized (map) {
-			for (IAttribute<?,?,?> attr : map.values()) {
+			for (IAttribute<?, ?, ?> attr : map.values()) {
 				if (attr.getDefinition().getDisplay()) {
 					attrs.add(attr);
 				}
 			}
 		}
-		
+
 		return attrs.toArray(new IAttribute[attrs.size()]);
 	}
-		
+
 	/**
 	 * @return
 	 */
-	public IAttributeDefinition<?,?,?>[] getKeys() {
+	public IAttributeDefinition<?, ?, ?>[] getKeys() {
 		synchronized (map) {
 			return map.keySet().toArray(new IAttributeDefinition[0]);
 		}
 	}
-	
+
 	/**
 	 * @param attr
 	 */
-	public void removeAttribute(IAttribute<?,?,?> attr) {
+	public void removeAttribute(IAttribute<?, ?, ?> attr) {
 		synchronized (map) {
 			map.remove(attr.getDefinition());
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return map.toString();
@@ -165,21 +169,21 @@ public class AttributeManager {
 	@SuppressWarnings("rawtypes")
 	public String[] toStringArray() {
 		ArrayList<String> res = new ArrayList<String>();
-		
+
 		synchronized (map) {
-			for (Map.Entry<IAttributeDefinition<?,?,?>, IAttribute<?,?,?>> entry : map.entrySet()) {
-				IAttribute<?,?,?> attr = entry.getValue();
+			for (Map.Entry<IAttributeDefinition<?, ?, ?>, IAttribute<?, ?, ?>> entry : map.entrySet()) {
+				IAttribute<?, ?, ?> attr = entry.getValue();
 				if (attr instanceof ArrayAttribute) {
-					List<?> arrObj = ((ArrayAttribute<?>)attr).getValue();
+					List<?> arrObj = ((ArrayAttribute<?>) attr).getValue();
 					for (Object obj : arrObj) {
-						res.add(entry.getKey().getId() + "=" + obj.toString());					 //$NON-NLS-1$
+						res.add(entry.getKey().getId() + "=" + obj.toString()); //$NON-NLS-1$
 					}
 				} else {
 					res.add(entry.getKey().getId() + "=" + attr.getValueAsString()); //$NON-NLS-1$
 				}
 			}
 		}
-		
+
 		return res.toArray(new String[res.size()]);
 	}
 }

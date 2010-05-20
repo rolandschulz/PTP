@@ -24,18 +24,23 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 
 /**
  * Represent signal manager to manage signal
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISignalManager extends IPDIManager {
 	/**
 	 * Returns the array of signals defined for this target.
-	 * @param tasks target process 
+	 * 
+	 * @param tasks
+	 *            target process
 	 * @return the array of signals
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public IPDISignal[] getSignals(TaskSet tasks) throws PDIException;
-	
+
 	/**
 	 * @param sig
 	 * @param isIgnore

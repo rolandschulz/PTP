@@ -26,18 +26,22 @@ import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractDataReadMemoryRequest extends AbstractEventResultRequest implements IPDIDataReadMemoryRequest {
-	private long offset;
-	private String address;
-	private int wordFormat;
-	private int wordSize;
-	private int rows;
-	private int cols;
-	private Character asChar;
-	
-	public AbstractDataReadMemoryRequest(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) {
+	private final long offset;
+	private final String address;
+	private final int wordFormat;
+	private final int wordSize;
+	private final int rows;
+	private final int cols;
+	private final Character asChar;
+
+	/**
+	 * @since 4.0
+	 */
+	public AbstractDataReadMemoryRequest(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows,
+			int cols, Character asChar) {
 		super(tasks);
 		this.offset = offset;
 		this.address = address;
@@ -47,27 +51,40 @@ public abstract class AbstractDataReadMemoryRequest extends AbstractEventResultR
 		this.cols = cols;
 		this.asChar = asChar;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.createDataReadMemory(tasks, offset, address, wordFormat, wordSize, rows, cols, asChar);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIDataReadMemoryRequest#getDataReadMemoryInfo(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIDataReadMemoryRequest#
+	 * getDataReadMemoryInfo(org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDIDataReadMemoryInfo getDataReadMemoryInfo(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof IPDIDataReadMemoryInfo) {
-			return (IPDIDataReadMemoryInfo)obj;
+			return (IPDIDataReadMemoryInfo) obj;
 		}
 		throw new PDIException(qTasks, Messages.AbstractDataReadMemoryRequest_0);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {

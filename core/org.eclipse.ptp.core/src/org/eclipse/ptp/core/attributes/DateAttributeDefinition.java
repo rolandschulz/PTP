@@ -33,6 +33,9 @@ public final class DateAttributeDefinition extends AbstractAttributeDefinition<C
 	private final DateFormat outputDateFormat;
 	private final Date defaultValue;
 
+	/**
+	 * @since 4.0
+	 */
 	public DateAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
 			final Date defaultValue, final DateFormat outputDateFormat) {
 		super(uniqueId, name, description, display);
@@ -40,6 +43,9 @@ public final class DateAttributeDefinition extends AbstractAttributeDefinition<C
 		this.outputDateFormat = outputDateFormat;
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public DateAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
 			final Date defaultValue, final DateFormat outputDateFormat, final Date min, final Date max)
 			throws IllegalValueException {
@@ -75,6 +81,9 @@ public final class DateAttributeDefinition extends AbstractAttributeDefinition<C
 		return minDate;
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public DateFormat getDateFormat() {
 		return outputDateFormat;
 	}

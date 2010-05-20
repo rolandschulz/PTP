@@ -78,6 +78,9 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 	 * 
 	 * @see org.eclipse.ptp.proxy.event.IProxyEvent#setTransactionID(int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void setTransactionID(int transactionID) {
 		this.transactionID = transactionID;
 	}

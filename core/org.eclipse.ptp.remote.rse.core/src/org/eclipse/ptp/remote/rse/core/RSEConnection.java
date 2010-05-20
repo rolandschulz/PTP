@@ -78,6 +78,9 @@ public class RSEConnection implements IRemoteConnection {
 		}
 	};
 
+	/**
+	 * @since 4.0
+	 */
 	public RSEConnection(IHost host, IRemoteServices services) {
 		fRseHost = host;
 		fRemoteServices = services;
@@ -255,6 +258,9 @@ public class RSEConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getRemoteServices()
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IRemoteServices getRemoteServices() {
 		return fRemoteServices;
 	}
@@ -283,6 +289,9 @@ public class RSEConnection implements IRemoteConnection {
 	 * @see
 	 * org.eclipse.ptp.remote.IRemoteFileManager#getWorkingDirectory(org.eclipse
 	 * .core.runtime.IProgressMonitor)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public String getWorkingDirectory() {
 		if (fWorkingDir == null) {
@@ -383,6 +392,9 @@ public class RSEConnection implements IRemoteConnection {
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java
 	 * .lang.String)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void setWorkingDirectory(String pathStr) {
 		IPath path = new Path(pathStr);

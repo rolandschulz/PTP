@@ -33,9 +33,11 @@ import org.eclipse.ptp.proxy.runtime.command.ProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.server.AbstractProxyServer;
 
-public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
-		implements IProxyCommandListener {
+public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer implements IProxyCommandListener {
 
+	/**
+	 * @since 4.0
+	 */
 	protected static Map<String, Object> parseArguments(String args[]) {
 		int port = -1;
 		String host = null;
@@ -45,8 +47,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 				try {
 					port = new Integer(args[i].substring(7));
 				} catch (NumberFormatException e) {
-					System.err.println(Messages.AbstractProxyRuntimeServer_0
-							+ args[i + 1].substring(7));
+					System.err.println(Messages.AbstractProxyRuntimeServer_0 + args[i + 1].substring(7));
 				}
 			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
 				host = args[i].substring(7);
@@ -73,20 +74,32 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 	 */
 	private final LinkedBlockingQueue<IProxyCommand> fCommands = new LinkedBlockingQueue<IProxyCommand>();
 
+	/**
+	 * @since 4.0
+	 */
 	protected final IProxyRuntimeEventFactory fEventFactory;
 
+	/**
+	 * @since 4.0
+	 */
 	public int fEventLoopTransID;
 
+	/**
+	 * @since 4.0
+	 */
 	protected Thread fEventThread;
 
+	/**
+	 * @since 4.0
+	 */
 	protected Thread eventThread;
 
 	/**
 	 * @param host
 	 * @param port
+	 * @since 4.0
 	 */
-	public AbstractProxyRuntimeServer(String host, int port,
-			IProxyRuntimeEventFactory eventFactory) {
+	public AbstractProxyRuntimeServer(String host, int port, IProxyRuntimeEventFactory eventFactory) {
 		super(host, port, new ProxyRuntimeCommandFactory());
 		fEventFactory = eventFactory;
 		addListener(this);
@@ -102,6 +115,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 
 	/**
 	 * @return
+	 * @since 4.0
 	 */
 	protected IProxyRuntimeEventFactory getEventFactory() {
 		return fEventFactory;
@@ -109,6 +123,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 
 	/**
 	 * @return
+	 * @since 4.0
 	 */
 	protected Thread getEventThread() {
 		return fEventThread;
@@ -120,6 +135,9 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 	 * @see
 	 * org.eclipse.ptp.proxy.command.IProxyCommandListener#handleCommand(org
 	 * .eclipse.ptp.proxy.command.IProxyCommand)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void handleCommand(IProxyCommand c) {
 		fCommands.add(c);
@@ -143,13 +161,11 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 
 				// instead of getting the base_ID the hard way, rather implement
 				// a getBase_ID method in IProxyRuntimeInitCommand.
-				int base_ID = Integer.parseInt(command.getArguments()[1]
-						.split("=")[1]); //$NON-NLS-1$
+				int base_ID = Integer.parseInt(command.getArguments()[1].split("=")[1]); //$NON-NLS-1$
 				new ElementIDGenerator(base_ID);
 
 				transID = command.getTransactionID();
-				System.out
-						.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (command instanceof IProxyRuntimeInitCommand) {
 					event = fEventFactory.newOKEvent(transID);
 					sendEvent(event);
@@ -162,8 +178,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 			case DISCOVERY:
 				command = fCommands.take();
 				transID = command.getTransactionID();
-				System.out
-						.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (command instanceof IProxyRuntimeModelDefCommand) {
 					event = fEventFactory.newOKEvent(transID);
 					sendEvent(event);
@@ -176,8 +191,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 			case NORMAL:
 				command = fCommands.take();
 				transID = command.getTransactionID();
-				System.out
-						.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (command instanceof IProxyRuntimeStartEventsCommand) {
 					// TODO start event loop
 					// event = eventFactory.newOKEvent(transID); //TODO: send OK
@@ -207,6 +221,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 
 	/**
 	 * @param event
+	 * @since 4.0
 	 */
 	public void sendEvent(IProxyEvent event) throws IOException {
 		// if (!isReady()) {
@@ -231,6 +246,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 
 	/**
 	 * @param thread
+	 * @since 4.0
 	 */
 	protected void setEventThread(Thread thread) {
 		fEventThread = thread;
@@ -238,10 +254,17 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer
 
 	/**
 	 * @param transID
+	 * @since 4.0
 	 */
 	protected abstract void startEventThread(int transID);
 
+	/**
+	 * @since 4.0
+	 */
 	protected abstract void submitJob(int transID, String[] arguments);
 
+	/**
+	 * @since 4.0
+	 */
 	protected abstract void terminateJob(int transID, String[] arguments);
 }

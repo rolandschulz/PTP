@@ -35,6 +35,9 @@ public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractE
 	private final String fExprId;
 	private boolean fListChildren = false;
 
+	/**
+	 * @since 4.0
+	 */
 	public AbstractEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId, boolean listChildren) {
 		super(tasks);
 		this.fExpr = expr;
@@ -70,6 +73,9 @@ public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractE
 	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest
 	 * #getPartialAIF(org.eclipse.ptp.core.util.TaskSet)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IAIF getPartialAIF(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
@@ -86,6 +92,9 @@ public abstract class AbstractEvaluatePartialExpressionRequest extends AbstractE
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEvaluatePartialExpressionRequest
 	 * #getId(org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public String getId(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);

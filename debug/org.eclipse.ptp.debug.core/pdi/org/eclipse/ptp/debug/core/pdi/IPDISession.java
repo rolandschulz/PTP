@@ -39,30 +39,33 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
 
 /**
  * Represents a debug session
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
-	public static final int CONNECTING = 1;  
+	public static final int CONNECTING = 1;
 	public static final int CONNECTED = 2;
 	public static final int STARTED = 3;
 	public static final int EXITING = 4;
 	public static final int EXITED = 5;
-	
+
 	/**
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void processRunningEvent(TaskSet tasks);
-	
+
 	/**
 	 * @return
 	 */
 	public IPDISourceManager getSourceManager();
-	
+
 	/**
 	 * @param tasks
 	 * @param thread_id
 	 * @param vars
+	 * @since 4.0
 	 */
 	public void processSupsendedEvent(TaskSet tasks, final int thread_id, final String[] vars);
 
@@ -72,69 +75,84 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	 * @param path
 	 * @param dir
 	 * @param args
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String dir, String[] args) throws PDIException;
-	
+
 	/**
 	 * Causes this session to exit
-	 * @throws PDIException on failure
+	 * 
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void exit() throws PDIException;
-	
+
 	/**
 	 * Returns debug target on given task id or null if target is not registered
-	 * @param tid task id
+	 * 
+	 * @param tid
+	 *            task id
 	 * @return debug target
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public IPDITarget findTarget(TaskSet task) throws PDIException;
 
 	/**
 	 * Returns the breakpoint manager for this session
+	 * 
 	 * @return IPDIBreakpointManager the breakpoint manager for this session
 	 */
 	public IPDIBreakpointManager getBreakpointManager();
 
 	/**
 	 * Returns a debugger for this session
+	 * 
 	 * @return a debugger for this session
 	 */
 	public IPDIDebugger getDebugger();
-		
+
 	/**
 	 * Get the factory to create events for this session
 	 * 
 	 * @return
 	 */
 	public IPDIEventFactory getEventFactory();
-	
+
 	/**
 	 * Returns the event manager for this session
+	 * 
 	 * @return IPDIEventManager the event request manager for this session
 	 */
 	public IPDIEventManager getEventManager();
-	
+
 	/**
 	 * Returns the event request manager for this session
-	 * @return IPDIEventRequestManager the event request manager for this session
+	 * 
+	 * @return IPDIEventRequestManager the event request manager for this
+	 *         session
 	 */
 	public IPDIEventRequestManager getEventRequestManager();
-	
+
 	/**
 	 * Returns the expression manager for this session
+	 * 
 	 * @return IPDIExpressionManager the expression manager for this session
 	 */
 	public IPDIExpressionManager getExpressionManager();
 
-	/** 
+	/**
 	 * Returns job id associated with this session
+	 * 
 	 * @return job id
 	 */
 	public String getJobID();
-	
+
 	/**
 	 * Returns the memory manager for this session
+	 * 
 	 * @return IPDIMemoryManager the memory manager for this session
 	 */
 	public IPDIMemoryManager getMemoryManager();
@@ -148,109 +166,131 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 
 	/**
 	 * Returns the register manager for this session
+	 * 
 	 * @return IPDIRegisterManager the register manager for this session
 	 */
 	public IPDIRegisterManager getRegisterManager();
 
 	/**
 	 * Returns request factory
+	 * 
 	 * @return request factory
 	 */
 	public IPDIRequestFactory getRequestFactory();
 
 	/**
 	 * Returns the signal manager for this session
+	 * 
 	 * @return IPDISignalManager the signal manager for this session
 	 */
 	public IPDISignalManager getSignalManager();
 
 	/**
 	 * Returns current status of this session
+	 * 
 	 * @return current status of this session
 	 */
 	public int getStatus();
-	
+
 	/**
 	 * Returns the target manager for this session
+	 * 
 	 * @return IPDITargetManager the target manager for this session
 	 */
 	public IPDITargetManager getTargetManager();
 
 	/**
 	 * Returns the task manager for this session
+	 * 
 	 * @return IPDITaskManager the task manager for this session
 	 */
 	public IPDITaskManager getTaskManager();
-	
+
 	/**
 	 * Returns all tasks of this session
+	 * 
 	 * @return all tasks of this session
 	 */
 	public TaskSet getTasks();
-	
+
 	/**
 	 * Returns the thread manager for this session
+	 * 
 	 * @return IPDIThreadManager the thread manager for this session
 	 */
 	public IPDIThreadManager getThreadManager();
-	
+
 	/**
 	 * @return
 	 */
 	public long getTimeout();
-	
+
 	/**
 	 * Returns total tasks in this session
+	 * 
 	 * @return total tasks in this session
 	 */
 	public int getTotalTasks();
-	
+
 	/**
 	 * Returns the variable manager for this session
+	 * 
 	 * @return IPDIVariableManager the variable manager for this session
 	 */
 	public IPDIVariableManager getVariableManager();
-	
+
 	/**
 	 * Returns whether this target/thread is currently suspended.
-	 * @param tasks target process
+	 * 
+	 * @param tasks
+	 *            target process
 	 * @return whether this target/thread is currently suspended
+	 * @since 4.0
 	 */
 	public boolean isSuspended(TaskSet tasks);
-	
+
 	/**
 	 * Returns whether this target/thread is currently terminated.
-	 * @param tasks target process
+	 * 
+	 * @param tasks
+	 *            target process
 	 * @return whether this target/thread is currently terminated
+	 * @since 4.0
 	 */
 	public boolean isTerminated(TaskSet tasks);
-	
+
 	/**
 	 * @param runnable
 	 */
 	public void queueRunnable(Runnable runnable);
-	
+
 	/**
 	 * Sets a timeout for request
 	 */
 	public void setRequestTimeout(long timeout);
-	
+
 	/**
 	 * Set status for session
-	 * @param status status of current session
+	 * 
+	 * @param status
+	 *            status of current session
 	 */
 	public void setStatus(int status);
-	
+
 	/**
-	 * Shutdown this session 
-	 * @param force whether force to terminate debugger 
+	 * Shutdown this session
+	 * 
+	 * @param force
+	 *            whether force to terminate debugger
 	 */
 	public void shutdown(boolean force);
-	
+
 	/**
 	 * Checks whether request tasks can do step return
+	 * 
 	 * @param tasks
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public void validateStepReturn(TaskSet tasks) throws PDIException;	
+	public void validateStepReturn(TaskSet tasks) throws PDIException;
 }

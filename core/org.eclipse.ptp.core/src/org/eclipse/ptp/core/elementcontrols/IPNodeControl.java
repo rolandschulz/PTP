@@ -26,6 +26,7 @@ public interface IPNodeControl extends IPElementControl, IPNode {
 	/**
 	 * @param job
 	 * @param processRanks
+	 * @since 4.0
 	 */
 	public void addJobProcessRanks(IPJobControl job, BitSet processRanks);
 
@@ -35,10 +36,11 @@ public interface IPNodeControl extends IPElementControl, IPNode {
 	 * @return parent machine
 	 */
 	public IPMachineControl getMachineControl();
-	
+
 	/**
 	 * @param job
 	 * @param processRanks
+	 * @since 4.0
 	 */
 	public void removeJobProcessRanks(IPJobControl job, BitSet processRanks);
 }

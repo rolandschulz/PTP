@@ -89,6 +89,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#commandRequest(org.eclipse
 	 * .ptp.core.util.TaskSet, java.lang.String)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void commandRequest(TaskSet tasks, String command) throws PDIException {
 		try {
 			debugCLIHandle(tasks, command);
@@ -104,6 +107,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataReadMemory
 	 * (org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int,
 	 * int, int, java.lang.Character)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void createDataReadMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols,
 			Character asChar) throws PDIException {
@@ -121,6 +127,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * createDataWriteMemory(org.eclipse.ptp.core.util.TaskSet, long,
 	 * java.lang.String, int, int, java.lang.String)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void createDataWriteMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value)
 			throws PDIException {
 		try {
@@ -137,6 +146,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#deleteBreakpoint
 	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void deleteBreakpoint(TaskSet tasks, int bpid) throws PDIException {
 		try {
 			debugDeleteBreakpoint(tasks, bpid);
@@ -151,6 +163,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#deletePartialExpression
 	 * (org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void deletePartialExpression(TaskSet tasks, String var) throws PDIException {
 		try {
@@ -178,6 +193,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluateExpression
 	 * (org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void evaluateExpression(TaskSet tasks, String expr) throws PDIException {
 		try {
 			debugEvaluateExpression(tasks, expr);
@@ -192,6 +210,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#
 	 * evaluatePartialExpression(org.eclipse.ptp.core.util.TaskSet,
 	 * java.lang.String, java.lang.String, boolean, boolean)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void evaluatePartialExpression(TaskSet tasks, String expr, String exprId, boolean listChildren, boolean express)
 			throws PDIException {
@@ -354,6 +375,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listArguments(org
 	 * .eclipse.ptp.core.util.TaskSet, int, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void listArguments(TaskSet tasks, int low, int high) throws PDIException {
 		try {
 			debugListArguments(tasks, low, high);
@@ -368,6 +392,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listGlobalVariables
 	 * (org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void listGlobalVariables(TaskSet tasks) throws PDIException {
 		try {
@@ -384,6 +411,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#listInfoThreads(org
 	 * .eclipse.ptp.core.util.TaskSet)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void listInfoThreads(TaskSet tasks) throws PDIException {
 		try {
 			debugListInfoThreads(tasks);
@@ -398,6 +428,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listLocalVariables
 	 * (org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void listLocalVariables(TaskSet tasks) throws PDIException {
 		try {
@@ -414,6 +447,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#listSignals(org.eclipse
 	 * .ptp.core.util.TaskSet, java.lang.String)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void listSignals(TaskSet tasks, String name) throws PDIException {
 		try {
 			debugListSignals(tasks, name);
@@ -428,6 +464,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#listStackFrames
 	 * (org.eclipse.ptp.core.util.TaskSet, int, int)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void listStackFrames(TaskSet tasks, int low, int depth) throws PDIException {
 		try {
@@ -454,6 +493,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse
 	 * .ptp.core.util.TaskSet)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void restart(TaskSet tasks) throws PDIException {
 		throw new PDIException(null, Messages.PDIDebugger_19);
 	}
@@ -464,6 +506,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
 	 * .ptp.core.util.TaskSet, boolean)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void resume(TaskSet tasks, boolean passSignal) throws PDIException {
 		try {
@@ -480,6 +525,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
 	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void resume(TaskSet tasks, IPDILocation location) throws PDIException {
 		throw new PDIException(null, Messages.PDIDebugger_21);
 	}
@@ -491,6 +539,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
 	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void resume(TaskSet tasks, IPDISignal signal) throws PDIException {
 		throw new PDIException(null, Messages.PDIDebugger_22);
 	}
@@ -501,6 +552,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#retrieveStackInfoDepth
 	 * (org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void retrieveStackInfoDepth(TaskSet tasks) throws PDIException {
 		try {
@@ -517,6 +571,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#retrieveVariableType
 	 * (org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void retrieveVariableType(TaskSet tasks, String var) throws PDIException {
 		try {
 			debugGetType(tasks, var);
@@ -531,6 +588,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#selectThread(org.
 	 * eclipse.ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void selectThread(TaskSet tasks, int tid) throws PDIException {
 		try {
@@ -548,6 +608,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * (org.eclipse.ptp.core.util.TaskSet,
 	 * org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void setAddressBreakpoint(TaskSet tasks, IPDIAddressBreakpoint bpt) throws PDIException {
 		throw new PDIException(tasks, Messages.PDIDebugger_27);
 	}
@@ -558,6 +621,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#
 	 * setConditionBreakpoint(org.eclipse.ptp.core.util.TaskSet, int,
 	 * java.lang.String)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void setConditionBreakpoint(TaskSet tasks, int bpid, String condition) throws PDIException {
 		try {
@@ -574,6 +640,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#setCurrentStackFrame
 	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void setCurrentStackFrame(TaskSet tasks, int level) throws PDIException {
 		try {
 			debugSetCurrentStackframe(tasks, level);
@@ -588,6 +657,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setEnabledBreakpoint
 	 * (org.eclipse.ptp.core.util.TaskSet, int, boolean)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void setEnabledBreakpoint(TaskSet tasks, int bpid, boolean enabled) throws PDIException {
 		try {
@@ -608,6 +680,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * (org.eclipse.ptp.core.util.TaskSet,
 	 * org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void setExceptionpoint(TaskSet tasks, IPDIExceptionpoint bpt) throws PDIException {
 		throw new PDIException(tasks, Messages.PDIDebugger_31);
 	}
@@ -619,6 +694,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setFunctionBreakpoint
 	 * (org.eclipse.ptp.core.util.TaskSet,
 	 * org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void setFunctionBreakpoint(TaskSet tasks, IPDIFunctionBreakpoint bpt) throws PDIException {
 		try {
@@ -647,6 +725,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * (org.eclipse.ptp.core.util.TaskSet,
 	 * org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void setLineBreakpoint(TaskSet tasks, IPDILineBreakpoint bpt) throws PDIException {
 		try {
 			IPDICondition condition = bpt.getCondition();
@@ -674,6 +755,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * (org.eclipse.ptp.core.util.TaskSet,
 	 * org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void setWatchpoint(TaskSet tasks, IPDIWatchpoint bpt) throws PDIException {
 		try {
 			String expression = bpt.getWatchExpression();
@@ -698,6 +782,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse
 	 * .ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void start(TaskSet tasks) throws PDIException {
 		resume(tasks, false);
@@ -725,6 +812,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse
 	 * .ptp.core.util.TaskSet, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void stepInto(TaskSet tasks, int count) throws PDIException {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_INTO);
@@ -740,6 +830,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction
 	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void stepIntoInstruction(TaskSet tasks, int count) throws PDIException {
 		throw new PDIException(null, Messages.PDIDebugger_37);
 	}
@@ -750,6 +843,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse
 	 * .ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void stepOver(TaskSet tasks, int count) throws PDIException {
 		try {
@@ -766,6 +862,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction
 	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void stepOverInstruction(TaskSet tasks, int count) throws PDIException {
 		throw new PDIException(null, Messages.PDIDebugger_39);
 	}
@@ -777,6 +876,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
 	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void stepReturn(TaskSet tasks, IAIF aif) throws PDIException {
 		throw new PDIException(null, Messages.PDIDebugger_40);
 	}
@@ -787,6 +889,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
 	 * .ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void stepReturn(TaskSet tasks, int count) throws PDIException {
 		try {
@@ -802,6 +907,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse
 	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException {
 		throw new PDIException(null, Messages.PDIDebugger_42);
@@ -829,6 +937,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse
 	 * .ptp.core.util.TaskSet)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void suspend(TaskSet tasks) throws PDIException {
 		try {
 			debugInterrupt(tasks);
@@ -843,6 +954,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @see
 	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse
 	 * .ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void terminate(TaskSet tasks) throws PDIException {
 		try {

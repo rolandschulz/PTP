@@ -15,13 +15,16 @@ package org.eclipse.ptp.proxy.runtime.server;
 import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.utils.core.RangeSet;
 
+/**
+ * @since 4.0
+ */
 public class ElementIDGenerator {
 	public static ElementIDGenerator getInstance() {
 		return instance;
 	}
 
 	private int baseIDoffset = 0;
-	private int base_ID;
+	private final int base_ID;
 
 	private static ElementIDGenerator instance = null;
 
@@ -44,8 +47,7 @@ public class ElementIDGenerator {
 
 	public RangeSet getUniqueIDs(int size) {
 		baseIDoffset++;
-		RangeSet range = new RangeSet(base_ID + baseIDoffset, base_ID
-				+ baseIDoffset + size);
+		RangeSet range = new RangeSet(base_ID + baseIDoffset, base_ID + baseIDoffset + size);
 		baseIDoffset += size - 1;
 		return range;
 	}

@@ -39,6 +39,9 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.internal.core.DebugUtil;
 import org.osgi.framework.Bundle;
 
+/**
+ * @since 4.0
+ */
 public abstract class AbstractRemoteServerRunner extends Job {
 	public enum ServerState {
 		STARTING, RUNNING, FINISHED

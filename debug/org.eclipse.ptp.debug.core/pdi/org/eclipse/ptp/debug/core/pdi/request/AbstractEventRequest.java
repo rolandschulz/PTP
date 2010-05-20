@@ -24,21 +24,25 @@ import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
-
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractEventRequest implements IPDIEventRequest {
 	protected int status = UNKNOWN;
 	protected TaskSet tasks = null;
 	protected String message = ""; //$NON-NLS-1$
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public AbstractEventRequest(TaskSet tasks) {
 		this.tasks = tasks.copy();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#cancel()
 	 */
 	public void cancel() {
@@ -49,16 +53,25 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 			error(e.getMessage());
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#completed(org.eclipse.ptp.core.util.TaskSet, java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#completed(org
+	 * .eclipse.ptp.core.util.TaskSet, java.lang.Object)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public boolean completed(TaskSet cTasks, Object result) {
 		tasks.andNot(cTasks);
 		return tasks.isEmpty();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#done()
 	 */
 	public void done() {
@@ -69,9 +82,13 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 			error(e.getMessage());
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#error(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#error(java.lang
+	 * .String)
 	 */
 	public void error(String message) {
 		this.status = IPDIEventRequest.ERROR;
@@ -82,9 +99,13 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 			this.message += " - " + e.getMessage(); //$NON-NLS-1$
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#execute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#execute(org.eclipse
+	 * .ptp.debug.core.pdi.IPDIDebugger)
 	 */
 	public void execute(IPDIDebugger debugger) {
 		try {
@@ -94,48 +115,68 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 			error(e.getMessage());
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getErrorMessage()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getErrorMessage()
 	 */
 	public String getErrorMessage() {
 		return message;
 	}
-	
-	/* (non-Javadoc)
-     * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getResponseAction()
-     */
-    public int getResponseAction() {
-    	return ACTION_NONE;// default action
-    }
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getResponseAction
+	 * ()
+	 */
+	public int getResponseAction() {
+		return ACTION_NONE;// default action
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getStatus()
 	 */
 	public int getStatus() {
 		return status;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISet#getTasks()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public TaskSet getTasks() {
 		return tasks;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#setStatus(int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#setStatus(int)
 	 */
 	public void setStatus(int status) {
 		this.status = status;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		String statusStr = Messages.AbstractEventRequest_0;
-		
+
 		switch (status) {
 		case ERROR:
 			statusStr = Messages.AbstractEventRequest_1;
@@ -150,17 +191,17 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 			statusStr = Messages.AbstractEventRequest_4;
 			break;
 		}
-		
-		return NLS.bind(Messages.AbstractEventRequest_5, new Object[]{getName(), statusStr, getTasks()});
+
+		return NLS.bind(Messages.AbstractEventRequest_5, new Object[] { getName(), statusStr, getTasks() });
 	}
-	
-    /**
+
+	/**
 	 * @param debugger
 	 * @throws PDIException
 	 */
 	protected abstract void doExecute(IPDIDebugger debugger) throws PDIException;
-    
-    /**
+
+	/**
 	 * @throws PDIException
 	 */
 	protected abstract void doFinish() throws PDIException;

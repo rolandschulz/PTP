@@ -25,7 +25,6 @@ import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.listeners.INodeChildListener;
 import org.eclipse.ptp.core.elements.listeners.INodeListener;
 
-
 public interface IPNode extends IPElement {
 
 	/**
@@ -48,11 +47,12 @@ public interface IPNode extends IPElement {
 	 * @return The Machine this Node is part of
 	 */
 	public IPMachine getMachine();
-	
+
 	/**
-	 * Returns the node number of this Node as a String. 
-	 * Node numbers are optionally supplied by the resource manager, so may return <code>null</code>.
-	 * Providing a node number will enable the node numbering ruler in the UI.
+	 * Returns the node number of this Node as a String. Node numbers are
+	 * optionally supplied by the resource manager, so may return
+	 * <code>null</code>. Providing a node number will enable the node numbering
+	 * ruler in the UI.
 	 * 
 	 * @return The node number of this Node as a String
 	 */
@@ -60,14 +60,17 @@ public interface IPNode extends IPElement {
 
 	/**
 	 * Get the job ranks for processes associated with this node and this job
+	 * 
 	 * @param job
 	 * 
 	 * @return collection of process ranks
+	 * @since 4.0
 	 */
 	public BitSet getJobProcessRanks(IPJob job);
-	
+
 	/**
 	 * @return the jobs that have processes running on this node
+	 * @since 4.0
 	 */
 	public Set<? extends IPJob> getJobs();
 
@@ -84,7 +87,7 @@ public interface IPNode extends IPElement {
 	 * @param listener
 	 */
 	public void removeChildListener(INodeChildListener listener);
-	
+
 	/**
 	 * Remove a listener for events related to this node.
 	 * 

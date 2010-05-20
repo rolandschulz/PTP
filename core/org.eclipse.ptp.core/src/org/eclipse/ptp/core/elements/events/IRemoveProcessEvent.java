@@ -16,34 +16,35 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import java.util.BitSet;
 
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 
 /**
- * This event is generated when one or more processes are removed. It is
- * a bulk event that is sent to child listeners on the source element. Since
- * processes belong to a job, but can also be associated with a node, the
- * source element can be either a job or node.
+ * This event is generated when one or more processes are removed. It is a bulk
+ * event that is sent to child listeners on the source element. Since processes
+ * belong to a job, but can also be associated with a node, the source element
+ * can be either a job or node.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener
  * @see org.eclipse.ptp.core.elements.listeners.INodeChildListener
  */
 public interface IRemoveProcessEvent {
-	
+
 	/**
 	 * Get the job that used to own these processes
 	 * 
 	 * @return the job that used to own these processes
+	 * @since 4.0
 	 */
 	public IPJob getJob();
-	
+
 	/**
 	 * Get the removed processes
 	 * 
 	 * @return the removed process
+	 * @since 4.0
 	 */
 	public BitSet getProcesses();
 

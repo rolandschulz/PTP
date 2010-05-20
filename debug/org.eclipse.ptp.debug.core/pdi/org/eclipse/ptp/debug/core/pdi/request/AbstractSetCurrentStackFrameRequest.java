@@ -25,34 +25,50 @@ import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
- *
+ * 
  */
-public abstract class AbstractSetCurrentStackFrameRequest extends AbstractEventResultRequest implements IPDISetCurrentStackFrameRequest {
+public abstract class AbstractSetCurrentStackFrameRequest extends AbstractEventResultRequest implements
+		IPDISetCurrentStackFrameRequest {
 	private int level = 0;
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public AbstractSetCurrentStackFrameRequest(TaskSet tasks, int level) {
 		super(tasks);
 		this.level = level;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.setCurrentStackFrame(tasks, level);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
 		return Messages.AbstractSetCurrentStackFrameRequest_0;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#toString()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * toString()
 	 */
+	@Override
 	public String toString() {
-		return getName() + Messages.AbstractSetCurrentStackFrameRequest_1 + level; 
+		return getName() + Messages.AbstractSetCurrentStackFrameRequest_1 + level;
 	}
 }

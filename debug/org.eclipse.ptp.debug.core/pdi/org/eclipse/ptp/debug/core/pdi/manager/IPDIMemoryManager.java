@@ -28,41 +28,65 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock;
 
 /**
  * Represent memeory manager to manage memory
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIMemoryManager extends IPDIManager {
 	/**
 	 * Returns a memory block specified by given identifier.
-	 * @param qTasks target process
-	 * @param address 
-	 * @param units - number of bytes
-	 * @param wordSize - this parameter has been deprecated and will always be passed as the value 1. If the memory has an addressable size (number of bytes per address) greather than 1, the PDI client should take care not to
+	 * 
+	 * @param qTasks
+	 *            target process
+	 * @param address
+	 * @param units
+	 *            - number of bytes
+	 * @param wordSize
+	 *            - this parameter has been deprecated and will always be passed
+	 *            as the value 1. If the memory has an addressable size (number
+	 *            of bytes per address) greather than 1, the PDI client should
+	 *            take care not to
 	 * @return a memory block with the specified identifier
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public IPDIMemoryBlock createMemoryBlock(TaskSet qTasks, String address, int units, int wordSize) throws PDIException;
-	
+
 	/**
 	 * Returns an array of all memory blocks set for this debug session.
-	 * @param qTasks target process
+	 * 
+	 * @param qTasks
+	 *            target process
 	 * @return an array of all memory blocks set for this debug session
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public IPDIMemoryBlock[] getMemoryBlocks(TaskSet qTasks) throws PDIException;
 
 	/**
 	 * Requests to remove all memory blocks from the debug session.
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public void removeAllBlocks(TaskSet tasks) throws PDIException;
 
 	/**
-	 * Requests to remove the given array of memory blocks from the debug session.
-	 * @param tasks target process
-	 * @param memoryBlock - the array of memory blocks to be removed
-	 * @throws PDIException on failure
+	 * Requests to remove the given array of memory blocks from the debug
+	 * session.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param memoryBlock
+	 *            - the array of memory blocks to be removed
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public void removeBlocks(TaskSet tasks, IPDIMemoryBlock[] memoryBlocks) throws PDIException;
 

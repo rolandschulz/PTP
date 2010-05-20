@@ -20,25 +20,19 @@ import org.eclipse.ptp.utils.core.DisjointBitSets;
 import org.eclipse.ptp.utils.core.ICopier;
 
 /**
- * {@code AttributeIndexSet} associates sets of indices
- * with attribute values.
- * The index sets are enforced to be
- * disjoint among distinct attribute
- * values.
- * <br><br>
- * {@code AttributeIndexSet} will make copies
- * of any attributes set within it.
- * <br>
- * {@code AttributeIndexSet} will not modify
- * the attributes stored in it, nor allow anyone else
- * to.
- *
+ * {@code AttributeIndexSet} associates sets of indices with attribute values.
+ * The index sets are enforced to be disjoint among distinct attribute values. <br>
+ * <br> {@code AttributeIndexSet} will make copies of any attributes set within it. <br>
+ * {@code AttributeIndexSet} will not modify the attributes stored in it, nor
+ * allow anyone else to.
+ * 
  * @author Randy M. Roberts
- *
- * @param <A> the attribute type that implements {@code IAttribute}
+ * 
+ * @param <A>
+ *            the attribute type that implements {@code IAttribute}
+ * @since 4.0
  */
-public class AttributeIndexSet<A extends IAttribute<?, A, ?>>
-implements Iterable<DisjointBitSets.Entry<A>> {
+public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterable<DisjointBitSets.Entry<A>> {
 
 	private final DisjointBitSets<A> disjointBitSets;
 
@@ -52,6 +46,7 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 
 	/**
 	 * Copy constructor
+	 * 
 	 * @param other
 	 */
 	public AttributeIndexSet(AttributeIndexSet<A> other) {
@@ -59,16 +54,16 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 	}
 
 	/**
-	 * @param nIndices the initial number of indices
+	 * @param nIndices
+	 *            the initial number of indices
 	 */
 	public AttributeIndexSet(int nIndices) {
 		// an empty index set
-		this.disjointBitSets = new DisjointBitSets<A>(nIndices,
-				new ICopier<A>() {
-					public A copy(A attr) {
-						return attr.copy();
-					}
-				});
+		this.disjointBitSets = new DisjointBitSets<A>(nIndices, new ICopier<A>() {
+			public A copy(A attr) {
+				return attr.copy();
+			}
+		});
 	}
 
 	/**
@@ -82,17 +77,21 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 
 	/**
 	 * Unions the indices with the indices of the given attribute.
-	 * @param attribute may not be null
-	 * @param indices may not be null
 	 * 
-	 * @throws NullPointerException if provided a null indices or attribute
+	 * @param attribute
+	 *            may not be null
+	 * @param indices
+	 *            may not be null
+	 * 
+	 * @throws NullPointerException
+	 *             if provided a null indices or attribute
 	 */
 	public void addIndicesToAttribute(A attribute, BitSet indices) {
 		disjointBitSets.or(attribute, indices);
 	}
 
 	/**
-	 * clear this {@code AttributeIndexSet} 
+	 * clear this {@code AttributeIndexSet}
 	 */
 	public void clear() {
 		disjointBitSets.clear();
@@ -111,7 +110,8 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 	 * Remove the given indices from all of the attribute's BitSets
 	 * 
 	 * @param clearedIndices
-	 * @throws NullPointerException if provided a null indices
+	 * @throws NullPointerException
+	 *             if provided a null indices
 	 */
 	public void clearIndices(BitSet clearedIndices) {
 		disjointBitSets.andNot(clearedIndices);
@@ -141,8 +141,8 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 	}
 
 	/**
-	 * @return the set of all attributes that are contained by at least
-	 * one index
+	 * @return the set of all attributes that are contained by at least one
+	 *         index
 	 */
 	public Set<A> getAttributes() {
 		return disjointBitSets.getKeys();
@@ -156,13 +156,15 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 	}
 
 	/**
-	 * Retrieve the {@code BitSet} representing the indices that
-	 * contain this value for their attribute.
+	 * Retrieve the {@code BitSet} representing the indices that contain this
+	 * value for their attribute.
 	 * 
-	 * @param attribute may not be null
-	 * @return the {@code BitSet} of indices containing this value
-	 * for the attribute
-	 * @throws NullPointerException if provided a null attribute
+	 * @param attribute
+	 *            may not be null
+	 * @return the {@code BitSet} of indices containing this value for the
+	 *         attribute
+	 * @throws NullPointerException
+	 *             if provided a null attribute
 	 */
 	public BitSet getIndexSet(A attribute) {
 		return disjointBitSets.getBitSet(attribute);
@@ -172,8 +174,9 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 	 * Retrieve an {@code AttributeIndexSet} for a subSet of its indices.
 	 * 
 	 * @param indices
-	 * @return the {@code AttributeIndexSet} determined from the intersection of the
-	 * given indices with the indices contained in this {@code AttributeIndexSet}
+	 * @return the {@code AttributeIndexSet} determined from the intersection of
+	 *         the given indices with the indices contained in this
+	 *         {@code AttributeIndexSet}
 	 */
 	public AttributeIndexSet<A> getSubset(BitSet indices) {
 		return new AttributeIndexSet<A>(disjointBitSets.getSubset(indices));
@@ -181,8 +184,8 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 
 	/**
 	 * @param indices
-	 * @return whether there are indices in common with
-	 * those that contain an attribute.
+	 * @return whether there are indices in common with those that contain an
+	 *         attribute.
 	 */
 	public boolean intersects(BitSet indices) {
 		return disjointBitSets.intersects(indices);
@@ -195,7 +198,9 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 		return disjointBitSets.isEmpty();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Iterable#iterator()
 	 */
 	public Iterator<DisjointBitSets.Entry<A>> iterator() {
@@ -203,13 +208,16 @@ implements Iterable<DisjointBitSets.Entry<A>> {
 	}
 
 	/**
-	 * Sets the given attribute for the given indices.
-	 * These indices will have their previous attributes
-	 * cleared, and set to this value.
-	 * @param attribute may not be null
-	 * @param indices may not be null
+	 * Sets the given attribute for the given indices. These indices will have
+	 * their previous attributes cleared, and set to this value.
 	 * 
-	 * @throws NullPointerException if provided a null indices or attribute
+	 * @param attribute
+	 *            may not be null
+	 * @param indices
+	 *            may not be null
+	 * 
+	 * @throws NullPointerException
+	 *             if provided a null indices or attribute
 	 */
 	public void setIndicesOfAttribute(A attribute, BitSet indices) {
 		disjointBitSets.put(attribute, indices);
