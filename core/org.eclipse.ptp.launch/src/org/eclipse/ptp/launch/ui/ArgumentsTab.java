@@ -45,6 +45,9 @@ public class ArgumentsTab extends LaunchConfigurationTab {
 		}
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.argumentsTab"; //$NON-NLS-1$
 
 	protected Text argumentText = null;

@@ -22,6 +22,9 @@ import org.eclipse.debug.core.ILaunchManager;
  * @author Daniel Felix Ferber
  */
 public class EnvironmentTab extends org.eclipse.debug.ui.EnvironmentTab {
+	/**
+	 * @since 4.0
+	 */
 	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.environmentTab"; //$NON-NLS-1$
 
 	/*

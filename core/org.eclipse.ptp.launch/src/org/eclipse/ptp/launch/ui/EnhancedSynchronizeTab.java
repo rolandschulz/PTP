@@ -80,6 +80,9 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		}
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.synchronizeTab"; //$NON-NLS-1$
 
 	protected Button addUploadRuleButton;
@@ -93,11 +96,22 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	protected Button syncAfterButton;
 
 	protected ArrayList<ISynchronizationRule> rules = new ArrayList<ISynchronizationRule>();
+	/**
+	 * @since 4.0
+	 */
 	protected SynchronizationRuleLabelProvider ruleLabelProvider;
 
+	/**
+	 * @since 4.0
+	 */
 	protected boolean dataChanged = false;
+	/**
+	 * @since 4.0
+	 */
 	protected int eventHandlerEnabled = 0;
-
+	/**
+	 * @since 4.0
+	 */
 	protected Image tabImage;
 
 	protected TabModifyListener modifyListener;

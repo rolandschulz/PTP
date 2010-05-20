@@ -35,6 +35,9 @@ import org.eclipse.swt.widgets.Composite;
  * TODO: NEEDS TO BE DOCUMENTED
  */
 public class DebuggerTab extends AbstractDebuggerTab {
+	/**
+	 * @since 4.0
+	 */
 	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.debuggerTab"; //$NON-NLS-1$
 
 	protected final boolean fAttachMode;
