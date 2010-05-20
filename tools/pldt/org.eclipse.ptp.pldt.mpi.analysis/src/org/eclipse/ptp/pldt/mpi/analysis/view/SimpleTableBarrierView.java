@@ -39,7 +39,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -80,10 +79,10 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
-* TODO: This is basically a copy of class from common plugin
-* (org.eclipse.ptp.pldt.common); need to work toward replacing this with that one -
-* however some changes have been made to this one
- *
+ * TODO: This is basically a copy of class from common plugin
+ * (org.eclipse.ptp.pldt.common); need to work toward replacing this with that
+ * one - however some changes have been made to this one
+ * 
  */
 public class SimpleTableBarrierView extends ViewPart {
 	protected TableViewer viewer;
@@ -186,8 +185,7 @@ public class SimpleTableBarrierView extends ViewPart {
 	public static final int CONSTANT = 2;
 
 	/** types of constructs, for the default case */
-	public static final String[] CONSTRUCT_TYPE_NAMES = { "None",
-			"Function Call", "Constant" };
+	public static final String[] CONSTRUCT_TYPE_NAMES = { "None", "Function Call", "Constant" };
 
 	/**
 	 * Simple Artifact Table View constructor
@@ -199,8 +197,8 @@ public class SimpleTableBarrierView extends ViewPart {
 	 * one) will not be able to find resources (e.g. icon images) if the derived
 	 * class is in its own plug-in, and its icons are, too.
 	 */
-	public SimpleTableBarrierView(AbstractUIPlugin thePlugin, String thingname,
-			String thingnames, String columnName, String markerID) {
+	public SimpleTableBarrierView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String columnName,
+			String markerID) {
 
 		if (thePlugin == null) {
 			thePlugin_ = CommonPlugin.getDefault();
@@ -234,9 +232,8 @@ public class SimpleTableBarrierView extends ViewPart {
 	 *            the marker attributes
 	 * @param markerID_
 	 */
-	public SimpleTableBarrierView(AbstractUIPlugin thePlugin, String thingname,
-			String thingnames, String[] attrNames, String[] colNames,
-			String markerID) {
+	public SimpleTableBarrierView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String[] attrNames,
+			String[] colNames, String markerID) {
 		this(thePlugin, thingname, thingnames, null, markerID);
 		columnNames_ = colNames;
 		columnName_ = null;// set this so we can tell we are using array of
@@ -265,8 +262,7 @@ public class SimpleTableBarrierView extends ViewPart {
 		String classname = this.getClass().getName();
 		// try to find the icon specified in the plugin.xml for this
 		// extension/view
-		IExtension[] ext = Platform.getExtensionRegistry().getExtensionPoint(
-				"org.eclipse.ui.views").getExtensions();
+		IExtension[] ext = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.ui.views").getExtensions();
 		for (int i = 0; i < ext.length; i++) {
 			IExtension extension = ext[i];
 			IConfigurationElement[] ces = extension.getConfigurationElements();
@@ -317,8 +313,7 @@ public class SimpleTableBarrierView extends ViewPart {
 	 * or ignore it and always show the same content (like Task List, for
 	 * example).
 	 */
-	class ViewContentProvider implements IStructuredContentProvider,
-			IResourceChangeListener {
+	class ViewContentProvider implements IStructuredContentProvider, IResourceChangeListener {
 		private IResource input;
 
 		private boolean hasRegistered = false;
@@ -335,12 +330,10 @@ public class SimpleTableBarrierView extends ViewPart {
 				// add me as a resource change listener so i can refresh at
 				// least when markers are changed
 				// POST_CHANGE: only want event notifications for after-the-fact
-				ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
-						IResourceChangeEvent.POST_CHANGE);
+				ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 				hasRegistered = true;
 				if (traceOn)
-					System.out
-							.println("ATV: Registered RCL for ViewContentProvider");
+					System.out.println("ATV: Registered RCL for ViewContentProvider");
 			}
 			if (newInput instanceof IResource) {
 				this.input = (IResource) newInput;
@@ -373,13 +366,11 @@ public class SimpleTableBarrierView extends ViewPart {
 				// false, IResource.DEPTH_INFINITE);
 				objs = input.findMarkers(id, false, IResource.DEPTH_INFINITE);
 			} catch (CoreException e) {
-				System.out
-						.println("ATV, exception getting model elements (markers for Table view)");
+				System.out.println("ATV, exception getting model elements (markers for Table view)");
 				e.printStackTrace();
 			}
 			if (traceOn)
-				System.out.println("ATV.get---Elements, found " + objs.length
-						+ " markers");
+				System.out.println("ATV.get---Elements, found " + objs.length + " markers");
 			return objs;
 
 		}
@@ -403,23 +394,18 @@ public class SimpleTableBarrierView extends ViewPart {
 					public void run() {
 						try {
 							if (traceOn)
-								System.out
-										.println("viewer.update ea mkr in delta-- from resourceChanged()...");
+								System.out.println("viewer.update ea mkr in delta-- from resourceChanged()...");
 							if (traceOn)
-								System.out
-										.println("----processResourceChangeDelta()...");
+								System.out.println("----processResourceChangeDelta()...");
 							processResourceChangeDelta(delta);
 							if (traceOn)
-								System.out
-										.println("----END processResourceChangeDelta()...");
+								System.out.println("----END processResourceChangeDelta()...");
 							if (traceOn)
 								System.out.println("viewer.refresh()");
 							viewer.refresh();
 
 						} catch (Exception e) {
-							System.out
-									.println("ATV: Exception refreshing viewer: "
-											+ e);
+							System.out.println("ATV: Exception refreshing viewer: " + e);
 							e.printStackTrace();
 						}
 
@@ -512,8 +498,7 @@ public class SimpleTableBarrierView extends ViewPart {
 				delta.accept(visitor_);
 
 			} catch (CoreException e2) {
-				System.out
-						.println("Error in PITV.processResourceChangeDelta()..");
+				System.out.println("Error in PITV.processResourceChangeDelta()..");
 				e2.printStackTrace();
 			}
 		}
@@ -535,13 +520,10 @@ public class SimpleTableBarrierView extends ViewPart {
 
 		} catch (CoreException e) {
 			// e.printStackTrace();
-			System.out.println(e.getMessage()
-					+ " ... STV, CoreException getting artifact from hashMap; "
-					+ thingname_ + " id=" + id);
+			System.out.println(e.getMessage() + " ... STV, CoreException getting artifact from hashMap; " + thingname_ + " id="
+					+ id);
 		} catch (NullPointerException ne) {
-			System.out.println(ne.getMessage()
-					+ " ... STV, NullPtrExcp getting artifact from hashMap;"
-					+ thingname_ + " id=" + id);
+			System.out.println(ne.getMessage() + " ... STV, NullPtrExcp getting artifact from hashMap;" + thingname_ + " id=" + id);
 		}
 		return artifact;
 
@@ -557,7 +539,7 @@ public class SimpleTableBarrierView extends ViewPart {
 	protected String getConstructStr(IMarker marker) throws CoreException {
 		Integer temp = (Integer) marker.getAttribute(columnID_);
 		if (temp != null) {
-			Integer constructType = (Integer) temp;
+			Integer constructType = temp;
 			return CONSTRUCT_TYPE_NAMES[constructType.intValue()];
 		} else
 			return " ";
@@ -572,12 +554,11 @@ public class SimpleTableBarrierView extends ViewPart {
 	 * 
 	 * 
 	 */
-	class ViewLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		/**
 		 * Keep icons already created, and reuse the images
 		 */
-		private HashMap iconHash = new HashMap();
+		private final HashMap iconHash = new HashMap();
 
 		private IArtifact artifact;
 
@@ -587,8 +568,10 @@ public class SimpleTableBarrierView extends ViewPart {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+		 * @see
+		 * org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
+		@Override
 		public String getText(Object o) {
 			String temp = super.getText(o);
 			// System.out.println("Text: " + temp);
@@ -606,8 +589,7 @@ public class SimpleTableBarrierView extends ViewPart {
 		 */
 		public String getColumnText(Object obj, int index) {
 			if (obj == null) {
-				System.out
-						.println("ATV: LabelProv obj is null; index=" + index);
+				System.out.println("ATV: LabelProv obj is null; index=" + index);
 				return "ATV obj null";
 			}
 			IMarker marker = (IMarker) obj;
@@ -622,28 +604,24 @@ public class SimpleTableBarrierView extends ViewPart {
 
 					return (String) marker.getAttribute(FILENAME);
 				case 3:
-					String line = (marker.getAttribute(IMarker.LINE_NUMBER))
-							.toString();
+					String line = (marker.getAttribute(IMarker.LINE_NUMBER)).toString();
 
 					if (traceOn) { // all this is for debugging purposes so
 						artifact = getSimpleArtifact(marker);
 						String compLine = line + "-";
 						if (artifact == null) {
 							if (traceOn)
-								System.out
-										.println("ATV getColumnText- null artifact");
+								System.out.println("ATV getColumnText- null artifact");
 						} else {
 							int lineArtifact = artifact.getLine();
 							compLine = compLine + lineArtifact;
 						}
-						System.out
-								.println("ATV.ViewLabelProvider gets marker line: mkr-artifact: "
-										+ compLine);
+						System.out.println("ATV.ViewLabelProvider gets marker line: mkr-artifact: " + compLine);
 						showMarker(marker);
 					}
 					return line;
 				case 4:
-					Integer indexNum = (Integer)marker.getAttribute(IDs.myIndexAttr);
+					Integer indexNum = (Integer) marker.getAttribute(IDs.myIndexAttr);
 					return indexNum.toString();
 				default:
 					String attrName = markerAttrNames_[index - 4];
@@ -665,10 +643,10 @@ public class SimpleTableBarrierView extends ViewPart {
 		 * cell can contain both, an image and text, which will be displayed
 		 * side-by-side)
 		 * 
-		 * @param obj -
-		 *            the object we're getting the image for
-		 * @param index -
-		 *            the column that this image is to go in
+		 * @param obj
+		 *            - the object we're getting the image for
+		 * @param index
+		 *            - the column that this image is to go in
 		 */
 		public Image getColumnImage(Object obj, int index) {
 			// we only put image icon in the first column
@@ -706,8 +684,7 @@ public class SimpleTableBarrierView extends ViewPart {
 				ImageDescriptor id = ImageDescriptor.createFromURL(url);
 				img = id.createImage();
 				if (traceOn)
-					System.out.println("ATV: ***** created image for "
-							+ iconName_);
+					System.out.println("ATV: ***** created image for " + iconName_);
 				iconHash.put(iconName_, img);// save for reuse
 			}
 			return img;
@@ -720,10 +697,10 @@ public class SimpleTableBarrierView extends ViewPart {
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 		 */
 
+		@Override
 		public void dispose() {
 			if (traceOn)
-				System.out
-						.println("ATV.ViewLabelProvider.dispose(); dispose of icon images");
+				System.out.println("ATV.ViewLabelProvider.dispose(); dispose of icon images");
 			for (Iterator iter = iconHash.values().iterator(); iter.hasNext();) {
 				Image img = (Image) iter.next();
 				img.dispose();
@@ -757,6 +734,7 @@ public class SimpleTableBarrierView extends ViewPart {
 		 * Compare two items to determine sort order. Sort items by one or more
 		 * of: artifact name, then file, then line number, then construct
 		 */
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			int result = 0;
 
@@ -775,13 +753,13 @@ public class SimpleTableBarrierView extends ViewPart {
 					String name1 = (String) m1.getAttribute(NAME);
 					String file1 = (String) m1.getAttribute(FILENAME);
 
-					String line1 = (String) m1.getAttribute(LINE).toString();
+					String line1 = m1.getAttribute(LINE).toString();
 					String construct1 = getConstructStr(m1);
 					String sort1 = combine(name1, file1, line1, construct1);
 
 					String name2 = (String) m2.getAttribute(NAME);
 					String file2 = (String) m2.getAttribute(FILENAME);
-					String line2 = (String) m2.getAttribute(LINE).toString();
+					String line2 = m2.getAttribute(LINE).toString();
 					String construct2 = getConstructStr(m2);
 					String sort2 = combine(name2, file2, line2, construct2);
 
@@ -809,8 +787,7 @@ public class SimpleTableBarrierView extends ViewPart {
 		 * @param construct
 		 * @return always return null, subclass can choose to impl. this method.
 		 */
-		protected String combine(String name, String file, String line,
-				String construct) {
+		protected String combine(String name, String file, String line, String construct) {
 			return null;
 		}
 
@@ -845,6 +822,7 @@ public class SimpleTableBarrierView extends ViewPart {
 		/**
 		 * sort items by line number
 		 */
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 
 			int cat1 = category(e1);
@@ -857,15 +835,15 @@ public class SimpleTableBarrierView extends ViewPart {
 				try {
 					IMarker m1 = (IMarker) e1;
 					Object tempObj = m1.getAttribute(LINE);
-					int line1=0;
-					int line2=0;
+					int line1 = 0;
+					int line2 = 0;
 					if (tempObj instanceof Integer) {
-						line1 = ((Integer)tempObj).intValue();
+						line1 = ((Integer) tempObj).intValue();
 						IMarker m2 = (IMarker) e2;
-						tempObj= m2.getAttribute(LINE);
+						tempObj = m2.getAttribute(LINE);
 						// we assume if the first was Integer, this one is, too.
 						assert tempObj instanceof Integer;
-						line2 = ((Integer)tempObj).intValue();
+						line2 = ((Integer) tempObj).intValue();
 
 					}
 					int result = 0;
@@ -901,8 +879,8 @@ public class SimpleTableBarrierView extends ViewPart {
 		 * @return BRT note: Sort isn't quite right: if name,filename identical,
 		 *         "10" would sort before "2" e.g.
 		 */
-		protected String combine(String name, String file, String line,
-				String construct) {
+		@Override
+		protected String combine(String name, String file, String line, String construct) {
 			final String delim = " - ";
 			StringBuffer result = new StringBuffer(name);
 			result.append(delim);
@@ -923,6 +901,7 @@ public class SimpleTableBarrierView extends ViewPart {
 	 * 
 	 */
 	class FilenameSorter extends GenericSorter {
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 
 			int cat1 = category(e1);
@@ -957,11 +936,9 @@ public class SimpleTableBarrierView extends ViewPart {
 				// look at construct
 				if (res == 0) {
 					if (ascending) {
-						res = collator.compare(getConstructStr(m1),
-								getConstructStr(m2));
+						res = collator.compare(getConstructStr(m1), getConstructStr(m2));
 					} else {
-						res = collator.compare(getConstructStr(m2),
-								getConstructStr(m1));
+						res = collator.compare(getConstructStr(m2), getConstructStr(m1));
 					}
 				}
 			} catch (CoreException e) {
@@ -982,19 +959,14 @@ public class SimpleTableBarrierView extends ViewPart {
 		 *         "10" would sort before "2" e.g.
 		 */
 		/*
-		protected String combine(String name, String file, String line,
-				String construct) {
-			final String delim = " - ";
-			StringBuffer result = new StringBuffer(construct);
-			result.append(delim);
-			result.append(name);
-			result.append(delim);
-			result.append(file);
-			result.append(delim);
-			result.append(line);
-			return result.toString();
-		}
-		*/
+		 * protected String combine(String name, String file, String line,
+		 * String construct) { final String delim = " - "; StringBuffer result =
+		 * new StringBuffer(construct); result.append(delim);
+		 * result.append(name); result.append(delim); result.append(file);
+		 * result.append(delim); result.append(line); return result.toString();
+		 * }
+		 */
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 
 			int cat1 = category(e1);
@@ -1010,12 +982,12 @@ public class SimpleTableBarrierView extends ViewPart {
 					int index1 = 0;
 					int index2 = 0;
 					if (tempObj instanceof Integer) {
-						index1 = ((Integer)tempObj).intValue();
+						index1 = ((Integer) tempObj).intValue();
 						IMarker m2 = (IMarker) e2;
-						tempObj= m2.getAttribute(IDs.myIndexAttr);
+						tempObj = m2.getAttribute(IDs.myIndexAttr);
 						// we assume if the first was Integer, this one is, too.
 						assert tempObj instanceof Integer;
-						index2 = ((Integer)tempObj).intValue();
+						index2 = ((Integer) tempObj).intValue();
 
 					}
 					int result = 0;
@@ -1031,24 +1003,23 @@ public class SimpleTableBarrierView extends ViewPart {
 			}
 			return 0;
 		}
-		
+
 	}
 
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		// Widget created and customized and then passed to viewer during
 		// creation :
-		Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI
-				| SWT.FULL_SELECTION);
+		Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
 		TableLayout layout = new TableLayout();
 		table.setLayout(layout);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
-		String[] STD_HEADINGS = { " ", thingname_, "Filename", "LineNo",
-				this.columnName_ };
+		String[] STD_HEADINGS = { " ", thingname_, "Filename", "LineNo", this.columnName_ };
 
 		layout.addColumnData(new ColumnWeightData(1, 1, true));
 		TableColumn tc0 = new TableColumn(table, SWT.NONE);
@@ -1149,10 +1120,12 @@ public class SimpleTableBarrierView extends ViewPart {
 
 		table.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				// System.out.println("widgetDefaultSelected");
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Object obj = e.getSource();
 				if (obj instanceof Table) {
@@ -1171,9 +1144,7 @@ public class SimpleTableBarrierView extends ViewPart {
 							lineNo = artifact.getLine();
 
 						if (traceOn)
-							System.out.println("MARKER id=" + id
-									+ " mkrLineNo=" + mLine
-									+ " artifactLineNo=" + lineNo);
+							System.out.println("MARKER id=" + id + " mkrLineNo=" + mLine + " artifactLineNo=" + lineNo);
 					}
 
 				}
@@ -1196,8 +1167,7 @@ public class SimpleTableBarrierView extends ViewPart {
 
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection sel = (IStructuredSelection) event
-						.getSelection();
+				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 				Object obj = sel.getFirstElement();
 				if (obj instanceof IMarker) {
 					selectedMarker_ = (IMarker) obj;
@@ -1262,40 +1232,35 @@ public class SimpleTableBarrierView extends ViewPart {
 	 */
 	protected void makeShowInfoAction() {
 		infoAction = new Action() {
+			@Override
 			public void run() {
 				String title = thingname_ + " information";
 				if (selectedMarker_ != null) {
-					String idFromMarker = (String) selectedMarker_
-							.getAttribute(uniqueID_, null);
+					String idFromMarker = selectedMarker_.getAttribute(uniqueID_, null);
 					if (idFromMarker == null) {
 						System.out.println("ATV: exception reading marker ID");
 						return;
 					}
 					StringBuffer info = new StringBuffer();
 
-					IArtifact artifact = artifactManager_
-							.getArtifact(idFromMarker);
+					IArtifact artifact = artifactManager_.getArtifact(idFromMarker);
 					info.append("\nFile name: ").append(artifact.getFileName());
 					info.append("\nLine number: ").append(artifact.getLine());
 					info.append("\nName: ").append(artifact.getShortName());
-					info.append("\nDescription: ").append(
-							artifact.getDescription());
+					info.append("\nDescription: ").append(artifact.getDescription());
 
 					MessageDialog.openInformation(null, title, info.toString());
 				}// end if selectedMarker!=null
 				else {
-					MessageDialog.openInformation(null, title, "No "
-							+ thingname_ + " selected.");
+					MessageDialog.openInformation(null, title, "No " + thingname_ + " selected.");
 				}
 				// ------------------
 			}
 		};
 		infoAction.setText("Show Info");
-		infoAction.setToolTipText("Show detailed info for selected "
-				+ thingname_);
-		infoAction.setImageDescriptor(PlatformUI.getWorkbench()
-				.getSharedImages().getImageDescriptor(
-						ISharedImages.IMG_OBJS_INFO_TSK));
+		infoAction.setToolTipText("Show detailed info for selected " + thingname_);
+		infoAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 	}
 
 	/**
@@ -1303,14 +1268,13 @@ public class SimpleTableBarrierView extends ViewPart {
 	 */
 	private void makeFilterAction() {
 		filterAction = new Action() {
+			@Override
 			public void run() {
-				showMessage("Filter " + thingnames_ + "\nDetermine which "
-						+ thingnames_ + " are shown in this view.");
+				showMessage("Filter " + thingnames_ + "\nDetermine which " + thingnames_ + " are shown in this view.");
 			}
 		};
 		filterAction.setText("Filter " + thingnames_);
-		filterAction.setToolTipText("Filter which " + thingnames_
-				+ " are shown in this view");
+		filterAction.setToolTipText("Filter which " + thingnames_ + " are shown in this view");
 	}
 
 	/**
@@ -1321,10 +1285,10 @@ public class SimpleTableBarrierView extends ViewPart {
 	private void makeDoubleClickAction() {
 
 		doubleClickAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
-				Object obj = ((IStructuredSelection) selection)
-						.getFirstElement();
+				Object obj = ((IStructuredSelection) selection).getFirstElement();
 				IMarker marker = (IMarker) obj;
 				try {
 					IFile f = (IFile) marker.getResource();
@@ -1335,26 +1299,20 @@ public class SimpleTableBarrierView extends ViewPart {
 						IEditorPart editor = IDE.openEditor(wbp, f);
 
 						if (traceOn)
-							System.out.println("dca: marker lineNo before "
-									+ MarkerUtilities.getLineNumber(marker));
+							System.out.println("dca: marker lineNo before " + MarkerUtilities.getLineNumber(marker));
 						// note: (re?) setting linenumber here is required to
 						// put marker in editor!?!
 						MarkerUtilities.setLineNumber(marker, lineNo);
 						if (traceOn)
-							System.out.println("dca: marker lineNo after "
-									+ MarkerUtilities.getLineNumber(marker));
+							System.out.println("dca: marker lineNo after " + MarkerUtilities.getLineNumber(marker));
 						IDE.gotoMarker(editor, marker);
 						if (traceOn)
-							System.out
-									.println("ATV: DoubleClickAction, clear status");
+							System.out.println("ATV: DoubleClickAction, clear status");
 						showStatusMessage("", "double click action");
 					}
 				} catch (Exception e) {
-					System.out
-							.println("ATV.doubleclickAction: Error positioning editor page from marker line number");
-					showStatusMessage(
-							"Error positioning editor from marker line number",
-							"error marker goto");
+					System.out.println("ATV.doubleclickAction: Error positioning editor page from marker line number");
+					showStatusMessage("Error positioning editor from marker line number", "error marker goto");
 					e.printStackTrace();
 				}
 			}
@@ -1370,8 +1328,7 @@ public class SimpleTableBarrierView extends ViewPart {
 	}
 
 	private void showMessage(String message) {
-		MessageDialog.openInformation(viewer.getControl().getShell(),
-				viewName_, message);
+		MessageDialog.openInformation(viewer.getControl().getShell(), viewName_, message);
 	}
 
 	private void showStatusMessage(String message, String debugMessage) {
@@ -1379,8 +1336,7 @@ public class SimpleTableBarrierView extends ViewPart {
 			message += " - ";
 			message += debugMessage;
 		}
-		getViewSite().getActionBars().getStatusLineManager()
-				.setMessage(message);
+		getViewSite().getActionBars().getStatusLineManager().setMessage(message);
 		getViewSite().getActionBars().getStatusLineManager().update(true);
 
 	}
@@ -1388,12 +1344,14 @@ public class SimpleTableBarrierView extends ViewPart {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		showStatusMessage("", "setFocus"); // reset status message
 		if (!viewer.getControl().isDisposed())
 			viewer.getControl().setFocus();
 	}
 
+	@Override
 	public void dispose() {
 		if (traceOn)
 			System.out.println("SimpleTableView.dispose()");
@@ -1403,8 +1361,7 @@ public class SimpleTableBarrierView extends ViewPart {
 	}
 
 	public void showMarker(IMarker marker) {
-		System.out.println("Marker-------  IMarker.LINE_NUMBER="
-				+ IMarker.LINE_NUMBER);
+		System.out.println("Marker-------  IMarker.LINE_NUMBER=" + IMarker.LINE_NUMBER);
 		try {
 			Map attrs = marker.getAttributes();
 			Iterator iter = attrs.entrySet().iterator();
@@ -1475,16 +1432,14 @@ public class SimpleTableBarrierView extends ViewPart {
 			temp = marker.getAttribute(attr).toString();
 		} catch (Exception e) { // CoreException or ClassCastException possible
 			e.printStackTrace();
-			System.out.println("ATV: Marker lineNo(" + attr
-					+ ") invalid; using 0");
+			System.out.println("ATV: Marker lineNo(" + attr + ") invalid; using 0");
 			return 0;
 		}
 		int lineNo = 0;
 		try {
 			lineNo = Integer.parseInt(temp);
 		} catch (NumberFormatException nfe) {
-			System.out.println("ATV: Marker lineNo(" + temp + " from attr "
-					+ attr + ") invalid (NumberFormatException); using 0");
+			System.out.println("ATV: Marker lineNo(" + temp + " from attr " + attr + ") invalid (NumberFormatException); using 0");
 		}
 		return lineNo;
 	}
@@ -1516,7 +1471,7 @@ public class SimpleTableBarrierView extends ViewPart {
 	 * 
 	 */
 	public class StackList {
-		private LinkedList list = new LinkedList();
+		private final LinkedList list = new LinkedList();
 
 		public void push(Object v) {
 			list.addFirst(v);
@@ -1556,8 +1511,7 @@ public class SimpleTableBarrierView extends ViewPart {
 			if (resource.getType() == IResource.FILE) {
 				if (delta.getKind() == IResourceDelta.CHANGED) {
 					if (traceOn)
-						System.out.println("UpdateVisitor: file changed: "
-								+ name);
+						System.out.println("UpdateVisitor: file changed: " + name);
 
 					// Handle file changes (saves) by reporting the changes
 					// made to the file, to update backend analysis
@@ -1568,10 +1522,7 @@ public class SimpleTableBarrierView extends ViewPart {
 
 					if (validForAnalysis(f.getName())) {
 						if (traceOn)
-							System.out
-									.println("File "
-											+ f.getName()
-											+ " is valid for analysis so will process the change...");
+							System.out.println("File " + f.getName() + " is valid for analysis so will process the change...");
 						if (contentChanged != 0) {
 							// do we need to tell back end (analysis engine)
 							// that file changed?
@@ -1587,8 +1538,7 @@ public class SimpleTableBarrierView extends ViewPart {
 							IMarker m = delta3.getMarker();
 							String ln = IMarker.LINE_NUMBER;
 							if (traceOn)
-								System.out
-										.println("---UpdateVisitor.visit():viewer update marker: (lineNo)");
+								System.out.println("---UpdateVisitor.visit():viewer update marker: (lineNo)");
 							// showMarker(m);
 							String[] props = new String[1]; // awkward. why???
 							props[0] = ln;
@@ -1598,21 +1548,18 @@ public class SimpleTableBarrierView extends ViewPart {
 						} // end loop
 					} else {
 						if (traceOn)
-							System.out
-									.println("File "
-											+ f.getName()
-											+ " is NOT valid for analysis so will ignore change...");
+							System.out.println("File " + f.getName() + " is NOT valid for analysis so will ignore change...");
 
 					}
 				} // end if CHANGED
 				else if (delta.getKind() == IResourceDelta.ADDED) {
-					//System.out.println("Resource added.");
+					// System.out.println("Resource added.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REPLACED) {
-					//System.out.println("Resource replaced.");
+					// System.out.println("Resource replaced.");
 					checkMarkerDeltas(delta);
 				} else if (delta.getKind() == IResourceDelta.REMOVED) {
-					//System.out.println("Resource removed.");
+					// System.out.println("Resource removed.");
 					checkMarkerDeltas(delta);
 				}
 			} // end if FILE
@@ -1622,7 +1569,7 @@ public class SimpleTableBarrierView extends ViewPart {
 		private void checkMarkerDeltas(IResourceDelta delta) {
 			IMarkerDelta[] md1 = delta.getMarkerDeltas();
 			int len = md1.length;
-			//System.out.println("       ... found " + len + " markerDeltas.");
+			// System.out.println("       ... found " + len + " markerDeltas.");
 		}
 
 		/**
@@ -1670,16 +1617,13 @@ public class SimpleTableBarrierView extends ViewPart {
 				// mlpi = m.getAttribute(IDs.LINE).toString();
 			} catch (Exception e1) {
 				// ignore errors; only tracing for now.
-				System.out
-						.println("ATV.UpdateVisitor error getting marker info ");
-				//e1.printStackTrace();
+				System.out.println("ATV.UpdateVisitor error getting marker info ");
+				// e1.printStackTrace();
 			}
 			if (traceOn)
-				System.out.println("    markerID_=" + mid
-						+ "  lineNo(mkr-mpiA)=" + ml + "-" + mlpi);
+				System.out.println("    markerID_=" + mid + "  lineNo(mkr-mpiA)=" + ml + "-" + mlpi);
 		}
 
 	} // end class UpdateVisitor
 
 }
-
