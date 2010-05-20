@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.core;
 
+import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
+
 /**
  * @author Beth Tibbitts
  *

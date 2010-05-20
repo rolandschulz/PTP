@@ -9,12 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.pldt.openmp.core;
+package org.eclipse.ptp.pldt.openmp.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.openmp.core.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.openmp.core.messages.messages"; //$NON-NLS-1$
 	public static String OpenMPArtifactView_Construct;
 	public static String OpenMPArtifactView_noArtifactSelected;
 	public static String OpenMPArtifactView_noSelection;

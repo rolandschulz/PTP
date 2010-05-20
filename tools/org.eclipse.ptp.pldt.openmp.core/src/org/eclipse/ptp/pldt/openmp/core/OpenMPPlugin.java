@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

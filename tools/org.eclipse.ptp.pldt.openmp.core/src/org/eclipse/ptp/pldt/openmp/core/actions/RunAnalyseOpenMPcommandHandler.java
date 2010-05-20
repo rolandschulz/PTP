@@ -47,7 +47,6 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
  * @author tibbitts
- * @since 4.0
  * 
  */
 public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {

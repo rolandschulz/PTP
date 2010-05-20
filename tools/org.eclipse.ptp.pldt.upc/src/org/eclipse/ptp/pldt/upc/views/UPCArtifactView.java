@@ -11,23 +11,21 @@
 package org.eclipse.ptp.pldt.upc.views;
 
 import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
-import org.eclipse.ptp.pldt.upc.Messages;
 import org.eclipse.ptp.pldt.upc.UPCIDs;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
-
-
+import org.eclipse.ptp.pldt.upc.messages.Messages;
 
 /**
  * A UPC artifact view based on SimpleTableView <br>
  * Note that the ID must be unique.
  * 
  */
-public class UPCArtifactView extends SimpleTableMarkerView
-{
-    public UPCArtifactView()
-    {
-        // if you need to read icon images, etc. from the plug-in, be sure to pass
-        // in an actual Plugin class instance for first arg
-        super(UPCPlugin.getDefault(), Messages.UPCArtifactView_upc_artifact, Messages.UPCArtifactView_upc_artifacts, Messages.UPCArtifactView_construct, UPCIDs.MARKER_ID);
-    }
+public class UPCArtifactView extends SimpleTableMarkerView {
+	public UPCArtifactView() {
+		// if you need to read icon images, etc. from the plug-in, be sure to
+		// pass
+		// in an actual Plugin class instance for first arg
+		super(UPCPlugin.getDefault(), Messages.UPCArtifactView_upc_artifact, Messages.UPCArtifactView_upc_artifacts,
+				Messages.UPCArtifactView_construct, UPCIDs.MARKER_ID);
+	}
 }

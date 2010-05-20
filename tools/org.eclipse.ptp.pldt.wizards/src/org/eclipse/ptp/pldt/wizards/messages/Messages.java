@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.pldt.wizards.wizardPages;
+package org.eclipse.ptp.pldt.wizards.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.wizards.wizardPages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.wizards.messages.messages"; //$NON-NLS-1$
 	public static String AbstractProjectWizardPage_no;
 	public static String AbstractProjectWizardPage_preferences;
 	public static String AbstractProjectWizardPage_preferences_have_not_been_set;
@@ -65,8 +65,8 @@ public class Messages extends NLS {
 	public static String OpenMPProjectWizardPage_openp_library_search_path;
 	public static String OpenMPProjectWizardPage_select_stuff_to_be_added_to_proj;
 	public static String OpenMPProjectWizardPage_use_default_info_q;
-	//public static String project;
-	//public static String project_does_not_exist;
+	// public static String project;
+	// public static String project_does_not_exist;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -14,8 +14,8 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.pldt.openmp.core.Messages;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
