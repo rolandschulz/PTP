@@ -1,4 +1,4 @@
-package org.eclipse.ptp.etfw.tau.perfdmf.views;
+package org.eclipse.ptp.etfw.tau.perfdmf.messages;
 
 import org.eclipse.osgi.util.NLS;
 
