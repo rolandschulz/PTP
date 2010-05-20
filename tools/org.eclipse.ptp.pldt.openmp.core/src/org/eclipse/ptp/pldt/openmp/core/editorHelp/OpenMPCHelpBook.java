@@ -94,60 +94,61 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 				new FunctionPrototypeSummaryImpl("omp_set_nested", //$NON-NLS-1$
 						"void", "int nested"), null)); //$NON-NLS-1$ //$NON-NLS-2$
 		funcMap.put("omp_get_nested", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_get_nested", "", "omp_get_nested description", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				new FunctionPrototypeSummaryImpl(Messages.OpenMPCHelpBook_get_nested,
+				"omp_get_nested", "", Messages.OpenMPCHelpBook_get_nested, //$NON-NLS-1$ //$NON-NLS-2$ 
+				new FunctionPrototypeSummaryImpl("omp_get_nested", //$NON-NLS-1$
 						"int", "void"), null)); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		funcMap.put("omp_init_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_init_lock", "", Messages.OpenMPCHelpBook_74, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_init_lock", "", Messages.OpenMPCHelpBook_init_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_init_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_lock_t *lock"), null)); //$NON-NLS-1$
 		funcMap.put("omp_init_nest_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_init_nest_lock", "", Messages.OpenMPCHelpBook_81, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_init_nest_lock", "", Messages.OpenMPCHelpBook_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_init_nest_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_nest_lock_t *lock"), null)); //$NON-NLS-1$
 		
 		funcMap.put("omp_destroy_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_destroy_lock", "", "Ensures that the specified lock variable lock is uninitialized.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"omp_destroy_lock", "", Messages.OpenMPCHelpBook_destroy_lock, //$NON-NLS-1$ //$NON-NLS-2$ 
 				new FunctionPrototypeSummaryImpl("omp_destroy_lock", //$NON-NLS-1$
 						"void", "omp_lock_t *lock"), null)); //$NON-NLS-1$ //$NON-NLS-2$
 		funcMap.put("omp_destroy_nest_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_destroy_nest_lock", "", Messages.OpenMPCHelpBook_95, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_destroy_nest_lock", "", Messages.OpenMPCHelpBook_destroy_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_destroy_nest_lock", //$NON-NLS-1$
 						"void", "omp_nest_lock_t *lock"), null)); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		funcMap.put("omp_set_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_set_lock", "", Messages.OpenMPCHelpBook_102, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_set_lock", "", Messages.OpenMPCHelpBook_set_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_set_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_lock_t *lock"), null)); //$NON-NLS-1$
 		funcMap.put("omp_set_nest_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_set_nest_lock", "", Messages.OpenMPCHelpBook_109, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_set_nest_lock", "", Messages.OpenMPCHelpBook_set_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_set_nest_lock", "void", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_nest_lock_t *lock"), null)); //$NON-NLS-1$
 		
 		funcMap.put("omp_test_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_test_lock", "", Messages.OpenMPCHelpBook_116, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_test_lock", "", Messages.OpenMPCHelpBook_test_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_test_lock", "int", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_lock_t *lock2"), null)); //$NON-NLS-1$
 		funcMap.put("omp_test_nest_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_test_nest_lock", "", Messages.OpenMPCHelpBook_123, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_test_nest_lock", "", Messages.OpenMPCHelpBook_test_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_test_nest_lock", "int", //$NON-NLS-1$ //$NON-NLS-2$
 						"omp_nest_lock_t *lock"), null)); //$NON-NLS-1$
 		
 		funcMap.put("omp_unset_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_unset_lock", "", Messages.OpenMPCHelpBook_130, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_unset_lock", "", Messages.OpenMPCHelpBook_unset_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_unset_lock", //$NON-NLS-1$
 						"void", "omp_lock_t *lock"), null)); //$NON-NLS-1$ //$NON-NLS-2$
 		funcMap.put("omp_unset_nest_lock", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_unset_nest_lock", "", Messages.OpenMPCHelpBook_137, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_unset_nest_lock", "", Messages.OpenMPCHelpBook_unset_nest_lock, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_unset_nest_lock", //$NON-NLS-1$
 						"void", "omp_nest_lock_t *lock"), null)); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		funcMap.put("omp_get_wtime", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_get_wtime", "", Messages.OpenMPCHelpBook_144, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_get_wtime", "", Messages.OpenMPCHelpBook_get_wtime, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_get_wtime", "double", //$NON-NLS-1$ //$NON-NLS-2$
 						"void"), null)); //$NON-NLS-1$
 		funcMap.put("omp_get_wtick", new FunctionSummaryImpl( //$NON-NLS-1$
-				"omp_get_wtick", "", Messages.OpenMPCHelpBook_151, //$NON-NLS-1$ //$NON-NLS-2$
+				"omp_get_wtick", "", Messages.OpenMPCHelpBook_get_wtick, //$NON-NLS-1$ //$NON-NLS-2$
 				new FunctionPrototypeSummaryImpl("omp_get_wtick", "double", //$NON-NLS-1$ //$NON-NLS-2$
 						"void"), null)); //$NON-NLS-1$
 

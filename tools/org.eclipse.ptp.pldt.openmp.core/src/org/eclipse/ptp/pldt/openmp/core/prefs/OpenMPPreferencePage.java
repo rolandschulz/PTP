@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2008 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,8 +26,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class OpenMPPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-    private static final String INCLUDES_PREFERENCE_LABEL  = Messages.OpenMPPreferencePage_OPENMP_INCLUDE_PATHS;
-    private static final String INCLUDES_PREFERENCE_BROWSE = Messages.OpenMPPreferencePage_OPENMP_INCLUDES_LABEL;
+    private static final String INCLUDES_PREFERENCE_LABEL  = Messages.OpenMPPreferencePage_OpenMP_include_paths;
+    private static final String INCLUDES_PREFERENCE_BROWSE = Messages.OpenMPPreferencePage_PleaseChooseAdirForOpenMPincludes;
 
     public OpenMPPreferencePage()
     {

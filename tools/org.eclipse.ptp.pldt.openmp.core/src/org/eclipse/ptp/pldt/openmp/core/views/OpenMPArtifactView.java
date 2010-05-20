@@ -11,28 +11,28 @@
 
 package org.eclipse.ptp.pldt.openmp.core.views;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
-import org.eclipse.ptp.pldt.common.Artifact;
-import org.eclipse.ptp.pldt.common.ArtifactManager;
-import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
-import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.parser.ParserUtil;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.pldt.common.Artifact;
+import org.eclipse.ptp.pldt.common.ArtifactManager;
+import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
+import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
+import org.eclipse.ptp.pldt.openmp.core.Messages;
+import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 /**
@@ -48,12 +48,13 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 		// super(OpenMPPlugin.getDefault(), "OpenMP Artifact", "OpenMP Artifacts", "Construct", OpenMPPlugin.MARKER_ID);
 		super(
 				OpenMPPlugin.getDefault(),
-				OpenMPPlugin.getResourceString("OpenMPArtifactView.thingname"), //$NON-NLS-1$
-				OpenMPPlugin.getResourceString("OpenMPArtifactView.thingnames"), //$NON-NLS-1$
-				OpenMPPlugin.getResourceString("OpenMPArtifactView.extraColName"), //$NON-NLS-1$
+				Messages.OpenMPArtifactView_OpenMP_Artifact,  
+				Messages.OpenMPArtifactView_OpenMP_Artifacts, 
+				Messages.OpenMPArtifactView_Construct,
 				OpenMPPlugin.MARKER_ID);
 
 	}
+
 
 	/**
 	 * Provide custom info for filling in the last column
@@ -63,7 +64,7 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
 		if (temp != null) {
 			Integer constructType = (Integer) temp;
 			int i = constructType.intValue();
-			String val=""; 
+			String val="";  //$NON-NLS-1$
 			if (i < Artifact.CONSTRUCT_TYPE_NAMES.length)
 				val = Artifact.CONSTRUCT_TYPE_NAMES[i];
 			else
@@ -100,8 +101,8 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
                 Object obj = ((IStructuredSelection) selection).getFirstElement();
                 IMarker marker = (IMarker) obj;
                 if(marker==null){
-                	MessageDialog.openInformation(null, OpenMPPlugin.getResourceString("OpenMPArtifactView.no_selection"),  //$NON-NLS-1$
-                			OpenMPPlugin.getResourceString("OpenMPArtifactView.no_artifact_selected")); //$NON-NLS-1$
+                	MessageDialog.openInformation(null, org.eclipse.ptp.pldt.openmp.core.Messages.OpenMPArtifactView_noSelection,   
+                			org.eclipse.ptp.pldt.openmp.core.Messages.OpenMPArtifactView_noArtifactSelected); 
                 	return;
                 }
 
@@ -153,8 +154,8 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
             }
         };
 
-        infoAction.setText(OpenMPPlugin.getResourceString("OpenMPArtifactView.show_pragma_region"));  //$NON-NLS-1$
-        infoAction.setToolTipText(OpenMPPlugin.getResourceString("OpenMPArtifactView.show_region_for_selected") + thingname_);//$NON-NLS-1$
+        infoAction.setText(Messages.OpenMPArtifactView_showPragmaRegion);   
+        infoAction.setToolTipText(Messages.OpenMPArtifactView_showRegionForSelected + thingname_); 
         infoAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
                 ISharedImages.IMG_OBJS_INFO_TSK));
 
