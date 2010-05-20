@@ -13,6 +13,7 @@ package org.eclipse.ptp.pldt.common;
 
 import java.util.Date;
 
+import org.eclipse.ptp.pldt.common.messages.Messages;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
 
 

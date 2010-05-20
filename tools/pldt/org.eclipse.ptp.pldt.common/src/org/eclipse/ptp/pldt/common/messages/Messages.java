@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.pldt.common;
+package org.eclipse.ptp.pldt.common.messages;
 
 import org.eclipse.osgi.util.NLS;
 
