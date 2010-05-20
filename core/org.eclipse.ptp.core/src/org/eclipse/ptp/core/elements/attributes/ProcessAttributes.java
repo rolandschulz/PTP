@@ -29,7 +29,7 @@ public class ProcessAttributes {
 	}
 	
 	private static final String STATE_ATTR_ID = "processState"; //$NON-NLS-1$
-	// private static final String STATUS_ATTR_ID = "processStatus"; //$NON-NLS-1$
+	private static final String STATUS_ATTR_ID = "processStatus"; //$NON-NLS-1$
 	// private static final String PID_ATTR_ID = "processPID"; //$NON-NLS-1$
 	private static final String EXIT_CODE_ATTR_ID = "processExitCode"; //$NON-NLS-1$
 	private static final String SIGNAL_NAME_ATTR_ID = "processSignalName"; //$NON-NLS-1$
@@ -42,9 +42,9 @@ public class ProcessAttributes {
 		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "State", //$NON-NLS-1$
 				Messages.ProcessAttributes_0, false, State.STARTING);
 	
-//	private final static StringAttributeDefinition statusAttrDef = 
-//		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", //$NON-NLS-1$
-//				Messages.ProcessAttributes_8, true, ""); //$NON-NLS-1$
+	private final static StringAttributeDefinition statusAttrDef = 
+		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", //$NON-NLS-1$
+				Messages.ProcessAttributes_8, true, ""); //$NON-NLS-1$
 
 //	private final static IntegerAttributeDefinition pidAttrDef = 
 //		new IntegerAttributeDefinition(PID_ATTR_ID, "PID",  //$NON-NLS-1$
@@ -78,9 +78,9 @@ public class ProcessAttributes {
 		return stateAttrDef;
 	}
 	
-//	public static StringAttributeDefinition getStatusAttributeDefinition() {
-//		return statusAttrDef;
-//	}
+	public static StringAttributeDefinition getStatusAttributeDefinition() {
+		return statusAttrDef;
+	}
 	
 //	public static IntegerAttributeDefinition getPIDAttributeDefinition() {
 //		return pidAttrDef;
@@ -113,7 +113,7 @@ public class ProcessAttributes {
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				stateAttrDef, 
-				// statusAttrDef, 
+			   statusAttrDef, 
 				// pidAttrDef, 
 				exitCodeAttrDef, 
 				// indexAttrDef, 
