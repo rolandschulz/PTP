@@ -44,6 +44,9 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.core"; //$NON-NLS-1$
+	/**
+	 * @since 4.0
+	 */
 	public static final String REMOTE_SERVICES_EXTENSION_POINT_ID = "remoteServices"; //$NON-NLS-1$
 
 	// The shared instance
@@ -221,7 +224,8 @@ public class PTPRemoteCorePlugin extends Plugin {
 		if (proxy != null) {
 			return proxy.getServices();
 		} else {
-			// initialization might have failed for that set of services previously... try to load it again
+			// initialization might have failed for that set of services
+			// previously... try to load it again
 			retrieveRemoteServices(id);
 			proxy = allRemoteServicesById.get(id);
 			return proxy.getServices();
@@ -294,10 +298,10 @@ public class PTPRemoteCorePlugin extends Plugin {
 			}
 		}
 	}
-	
+
 	/**
-	 * Attempts to load the remote services with a given ID.  If no services are loaded, it
-	 * loads them all.
+	 * Attempts to load the remote services with a given ID. If no services are
+	 * loaded, it loads them all.
 	 * 
 	 * @param id
 	 */
@@ -316,7 +320,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 					RemoteServicesProxy proxy = new RemoteServicesProxy(ce);
 					if (proxy.getId().equals(id)) {
 						allRemoteServicesById.put(proxy.getId(), proxy);
-						allRemoteServicesByScheme.put(proxy.getScheme(), proxy);					
+						allRemoteServicesByScheme.put(proxy.getScheme(), proxy);
 					}
 				}
 			}
