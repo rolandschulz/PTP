@@ -11,6 +11,12 @@
 	<target name="init">
 		<touch file="${user.home}/.cvspass" />
 		<tstamp/>
+		<!-- Update for new simultaneous release -->
+		<property name="eclipseRelease" value="helios"/>
+		<!-- Update for new PTP branch -->
+		<property name="ptpBranchVersion" value="4.0.0"/>
+		<!-- The following properties need to be updated to reflect the version we are building against. -->
+		<!-- NOTE: changing any of these will require corresponding changes in org.eclipse.ptp.rdt.core.remotejars/build.xml -->
 		<!-- Update for new Eclipse version -->
 		<property name="eclipseDist" value="/home/data/httpd/download.eclipse.org/eclipse/downloads/drops/S-3.6RC1-201005131500/eclipse-SDK-3.6RC1-linux-gtk-ppc.tar.gz"/>
 		<!-- Update for new CDT version -->
@@ -19,10 +25,6 @@
 		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/S-3.2RC1-201005200134/RSE-SDK-3.2RC1.zip"/>
 		<!-- Update for new Mylyn version -->
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/helios/mylyn-3.4.0.I20100430-1600-e3.4.zip"/>
-		<!-- Update for new simultaneous release -->
-		<property name="eclipseRelease" value="helios"/>
-		<!-- Update for new PTP branch -->
-		<property name="ptpBranchVersion" value="4.0.0"/>
 		<!-- Properties below here shouldn't need to be changed -->
 		<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 		<property name="buildType" value="I" />
