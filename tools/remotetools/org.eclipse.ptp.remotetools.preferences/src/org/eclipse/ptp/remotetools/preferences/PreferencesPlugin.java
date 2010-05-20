@@ -15,13 +15,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.ui.plugin.*;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.osgi.framework.BundleContext;
-
-import org.eclipse.ptp.remotetools.preferences.events.PreferencesChangeEvent;
 import org.eclipse.ptp.remotetools.preferences.events.IPreferencesChangeListener;
+import org.eclipse.ptp.remotetools.preferences.events.PreferencesChangeEvent;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.BundleContext;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -31,13 +29,13 @@ import org.eclipse.ptp.remotetools.preferences.events.IPreferencesChangeListener
  */
 public class PreferencesPlugin extends AbstractUIPlugin {
 
-	//The shared instance.
+	// The shared instance.
 	private static PreferencesPlugin plugin;
-	
-	private List propertiesListeners;
-	
+
+	private final List propertiesListeners;
+
 	private Preferences.IPropertyChangeListener propertyListener;
-	
+
 	/**
 	 * The constructor.
 	 */
@@ -49,16 +47,17 @@ public class PreferencesPlugin extends AbstractUIPlugin {
 	/**
 	 * This method is called upon plug-in activation
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		propertyListener = new Preferences.IPropertyChangeListener() {
 
 			public void propertyChange(Preferences.PropertyChangeEvent event) {
-				
-				fireValueChanged(event.getProperty(),event.getOldValue(),event.getNewValue());
-				
+
+				fireValueChanged(event.getProperty(), event.getOldValue(), event.getNewValue());
+
 			}
-			
+
 		};
 		this.getPluginPreferences().addPropertyChangeListener(propertyListener);
 	}
@@ -66,6 +65,7 @@ public class PreferencesPlugin extends AbstractUIPlugin {
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		this.getPluginPreferences().removePropertyChangeListener(propertyListener);
@@ -79,27 +79,25 @@ public class PreferencesPlugin extends AbstractUIPlugin {
 	public static PreferencesPlugin getDefault() {
 		return plugin;
 	}
-	
+
 	public void addListener(IPreferencesChangeListener listener) {
-		
+
 		propertiesListeners.add(listener);
 	}
-	
+
 	public void removeListener(IPreferencesChangeListener listener) {
-		
+
 		propertiesListeners.remove(listener);
 	}
-	
-	public void fireValueChanged(String property, Object oldValue,
-            Object newValue) {
-        if (propertiesListeners.size() == 0)
-            return;
-        Iterator i = propertiesListeners.iterator();
-        
-        while (i.hasNext()) { 
-        	IPreferencesChangeListener listener = (IPreferencesChangeListener) i.next();
-        	listener.propertyChange(new PreferencesChangeEvent(this,
-                property, oldValue, newValue));
-        }
-    }
+
+	public void fireValueChanged(String property, Object oldValue, Object newValue) {
+		if (propertiesListeners.size() == 0)
+			return;
+		Iterator i = propertiesListeners.iterator();
+
+		while (i.hasNext()) {
+			IPreferencesChangeListener listener = (IPreferencesChangeListener) i.next();
+			listener.propertyChange(new PreferencesChangeEvent(this, property, oldValue, newValue));
+		}
+	}
 }

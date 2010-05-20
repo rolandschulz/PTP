@@ -11,15 +11,12 @@
  */
 package org.eclipse.ptp.remotetools.environment.generichost.core;
 
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.extension.ITargetTypeExtension;
 import org.eclipse.ptp.remotetools.environment.generichost.ui.ConfigurationPage;
 import org.eclipse.ptp.remotetools.environment.wizard.AbstractEnvironmentDialogPage;
-
 
 /**
  * Factory for the environment.
@@ -28,7 +25,7 @@ import org.eclipse.ptp.remotetools.environment.wizard.AbstractEnvironmentDialogP
  * @since 1.2
  */
 public class Environment implements ITargetTypeExtension {
-	
+
 	public Environment() {
 		super();
 	}
@@ -44,11 +41,11 @@ public class Environment implements ITargetTypeExtension {
 	public AbstractEnvironmentDialogPage dialogPageFactory(ITargetElement targetElement) {
 		return new ConfigurationPage(targetElement.getName(), targetElement.getAttributes());
 	}
-	
+
 	public AbstractEnvironmentDialogPage dialogPageFactory() {
 		return new ConfigurationPage();
 	}
-	
+
 	public String[] getControlAttributeNamesForCipheredKeys() {
 		return ConfigFactory.KEY_CIPHERED_ARRAY;
 	}
