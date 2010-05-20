@@ -29,17 +29,17 @@ public class FileEnumeration implements Enumeration<File> {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
-		} 
+		}
 		while (enumeration.hasMoreElements()) {
 			// System.out.println(enumeration.nextElement().toString());
 		}
 	}
-	
+
 	private File[] files;
 	private int currentFile;
-	
+
 	public FileEnumeration(File root) throws IOException {
-		if (! root.exists()) {
+		if (!root.exists()) {
 			throw new FileNotFoundException();
 		} else if (root.isFile()) {
 			files = new File[1];
@@ -54,20 +54,30 @@ public class FileEnumeration implements Enumeration<File> {
 		}
 		currentFile = 0;
 	}
-	
+
+	/**
+	 * @since 2.0
+	 */
 	public FileEnumeration(String root) throws IOException {
 		this(new File(root));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Enumeration#hasMoreElements()
 	 */
 	public boolean hasMoreElements() {
 		return currentFile < files.length;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Enumeration#nextElement()
+	 */
+	/**
+	 * @since 2.0
 	 */
 	public File nextElement() {
 		if (currentFile < files.length) {
@@ -77,4 +87,3 @@ public class FileEnumeration implements Enumeration<File> {
 		}
 	}
 }
-

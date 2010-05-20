@@ -21,28 +21,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@code DisjointBitSets} associates disjoint {@code BitSet}'s
- * with keys.
- * The {@code BitSet}'s are enforced to be
- * disjoint among distinct keys.
- * <br><br>
- * {@code DisjointBitSets} will make copies
- * of any keys set within it.
- * <br>
- * {@code DisjointBitSets} will not modify
- * the key stored in it, nor allow anyone else
- * to.
- *
+ * {@code DisjointBitSets} associates disjoint {@code BitSet}'s with keys. The
+ * {@code BitSet}'s are enforced to be disjoint among distinct keys. <br>
+ * <br> {@code DisjointBitSets} will make copies of any keys set within it. <br>
+ * {@code DisjointBitSets} will not modify the key stored in it, nor allow
+ * anyone else to.
+ * 
  * @author Randy M. Roberts
- *
- * @param <K> the key type
+ * 
+ * @param <K>
+ *            the key type
+ * @since 2.0
  */
-public class DisjointBitSets<K>
-implements Iterable<DisjointBitSets.Entry<K>> {
+public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 
 	public static class Entry<X> implements Map.Entry<X, BitSet> {
 
-		private BitSet bitSet;
+		private final BitSet bitSet;
 		private final X x;
 
 		public Entry(X x, BitSet bitSet) {
@@ -50,21 +45,27 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 			this.bitSet = bitSet;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.Map.Entry#getKey()
 		 */
 		public X getKey() {
 			return x;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.Map.Entry#getValue()
 		 */
 		public BitSet getValue() {
 			return bitSet;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.Map.Entry#setValue(java.lang.Object)
 		 */
 		public BitSet setValue(BitSet value) {
@@ -76,13 +77,14 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	private final Map<K, BitSet> bitSetMap = new HashMap<K, BitSet>();
 	private final BitSet unionOfBitSets;
 	private ICopier<K> keyCopier;
-	
+
 	public DisjointBitSets() {
-		this((ICopier<K>)null);
+		this((ICopier<K>) null);
 	}
 
 	/**
 	 * Copy constructor
+	 * 
 	 * @param other
 	 */
 	public DisjointBitSets(DisjointBitSets<K> other) {
@@ -100,9 +102,10 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	}
 
 	/**
-	 * @param keyCopier the functor used to make copies of keys
-	 * in order to prevent unwanted external modification of keys
-	 *
+	 * @param keyCopier
+	 *            the functor used to make copies of keys in order to prevent
+	 *            unwanted external modification of keys
+	 * 
 	 */
 	public DisjointBitSets(ICopier<K> keyCopier) {
 		this.keyCopier = keyCopier;
@@ -111,16 +114,19 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	}
 
 	/**
-	 * @param nBits the initial size of {@code BitSet}'s
+	 * @param nBits
+	 *            the initial size of {@code BitSet}'s
 	 */
 	public DisjointBitSets(int nBits) {
 		this(nBits, null);
 	}
 
 	/**
-	 * @param nBits the initial size of {@code BitSet}'s
-	 * @param keyCopier the functor used to make copies of keys
-	 * in order to prevent unwanted external modification of keys
+	 * @param nBits
+	 *            the initial size of {@code BitSet}'s
+	 * @param keyCopier
+	 *            the functor used to make copies of keys in order to prevent
+	 *            unwanted external modification of keys
 	 */
 	public DisjointBitSets(int nBits, ICopier<K> keyCopier) {
 		this.keyCopier = keyCopier;
@@ -132,7 +138,8 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	 * Clears the bits the given set from all of the key's BitSets
 	 * 
 	 * @param set
-	 * @throws NullPointerException if provided a null set
+	 * @throws NullPointerException
+	 *             if provided a null set
 	 */
 	public void andNot(BitSet set) {
 		if (set == null) {
@@ -149,7 +156,7 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 			indicesForAttr.andNot(set);
 			foundEmpties = foundEmpties || indicesForAttr.isEmpty();
 		}
-		
+
 		// we may have some attributes with empty bitsets
 		if (foundEmpties) {
 			removeEmptyBitSets();
@@ -175,14 +182,13 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 		bitset.andNot(set);
 		if (bitset.isEmpty()) {
 			bitSetMap.remove(key);
-		}
-		else {
+		} else {
 			unionOfBitSets.or(bitset);
 		}
 	}
 
 	/**
-	 * clear this {@code DisjointBitSets} 
+	 * clear this {@code DisjointBitSets}
 	 */
 	public void clear() {
 		this.unionOfBitSets.clear();
@@ -197,13 +203,14 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	}
 
 	/**
-	 * Retrieve the {@code BitSet} representing the set that
-	 * contain this value for their key.
+	 * Retrieve the {@code BitSet} representing the set that contain this value
+	 * for their key.
 	 * 
-	 * @param key may not be null
-	 * @return the {@code BitSet} of set containing this value
-	 * for the key
-	 * @throws NullPointerException if provided a null key
+	 * @param key
+	 *            may not be null
+	 * @return the {@code BitSet} of set containing this value for the key
+	 * @throws NullPointerException
+	 *             if provided a null key
 	 */
 	public BitSet getBitSet(K key) {
 		if (key == null) {
@@ -237,14 +244,14 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 		// if not just return null
 		return null;
 	}
-	
+
 	public ICopier<K> getKeyCopier() {
 		return keyCopier;
 	}
 
 	/**
-	 * @return the set of all keys that are contained by at least
-	 * one non-empty {@code BitSet}
+	 * @return the set of all keys that are contained by at least one non-empty
+	 *         {@code BitSet}
 	 */
 	public Set<K> getKeys() {
 		Set<K> keySet = new HashSet<K>();
@@ -260,8 +267,9 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	 * Retrieve an {@code DisjointBitSets} for a subSet of its {@code BitSet}.
 	 * 
 	 * @param bitset
-	 * @return the {@code DisjointBitSets} determined from the intersection of the
-	 * given bitset with the {@code BitSet}'s contained in this {@code DisjointBitSets}
+	 * @return the {@code DisjointBitSets} determined from the intersection of
+	 *         the given bitset with the {@code BitSet}'s contained in this
+	 *         {@code DisjointBitSets}
 	 */
 	public DisjointBitSets<K> getSubset(BitSet bitset) {
 		if (bitset == null) {
@@ -308,9 +316,10 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 
 	/**
 	 * @param bitset
-	 * @return whether there are bitset in common with
-	 * those that contain an key.
-	 * @throws NullPointerException for null bitset
+	 * @return whether there are bitset in common with those that contain an
+	 *         key.
+	 * @throws NullPointerException
+	 *             for null bitset
 	 */
 	public boolean intersects(BitSet bitset) {
 		if (bitset == null) {
@@ -326,7 +335,9 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 		return unionOfBitSets.isEmpty();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Iterable#iterator()
 	 */
 	public Iterator<Entry<K>> iterator() {
@@ -342,24 +353,31 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	}
 
 	/**
-	 * Unions the {@code BitSet} with the current
-	 * {@code BitSet} of the given key.
-	 * @param key may not be null
-	 * @param bitset may not be null
+	 * Unions the {@code BitSet} with the current {@code BitSet} of the given
+	 * key.
 	 * 
-	 * @throws NullPointerException if provided a null {@code BitSet} or key
+	 * @param key
+	 *            may not be null
+	 * @param bitset
+	 *            may not be null
+	 * 
+	 * @throws NullPointerException
+	 *             if provided a null {@code BitSet} or key
 	 */
 	public void or(K key, BitSet bitset) {
 		innerSetBitSet(key, bitset, false);
 	}
 
 	/**
-	 * The {@code BitSet} for this key will be replaced
-	 * with {@code bitset}.
-	 * @param key may not be null
-	 * @param bitset may not be null
+	 * The {@code BitSet} for this key will be replaced with {@code bitset}.
 	 * 
-	 * @throws NullPointerException if provided a null {@code BitSet} or key
+	 * @param key
+	 *            may not be null
+	 * @param bitset
+	 *            may not be null
+	 * 
+	 * @throws NullPointerException
+	 *             if provided a null {@code BitSet} or key
 	 */
 	public void put(K key, BitSet bitset) {
 		innerSetBitSet(key, bitset, true);
@@ -394,8 +412,7 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	private K copyKey(K key) {
 		if (keyCopier == null) {
 			return key;
-		}
-		else {
+		} else {
 			return keyCopier.copy(key);
 		}
 	}
@@ -403,7 +420,8 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 	/**
 	 * @param key
 	 * @param bitset
-	 * @param setting true means overwrite, false means union
+	 * @param setting
+	 *            true means overwrite, false means union
 	 */
 	private void innerSetBitSet(K key, BitSet bitset, boolean setting) {
 		if (key == null) {
@@ -435,15 +453,14 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 		// case.
 		boolean equalsCaseHandled = false;
 		boolean foundEmpties = false;
-		
+
 		for (Map.Entry<K, BitSet> entry : bitSetMap.entrySet()) {
 			K entryKey = entry.getKey();
 			BitSet bitSetForEntry = entry.getValue();
 			if (!key.equals(entryKey)) {
 				// remove bitset from bitSetForEntry
 				bitSetForEntry.andNot(bitset);
-			}
-			else {
+			} else {
 				if (setting) {
 					bitSetForEntry.clear();
 				}
@@ -454,14 +471,14 @@ implements Iterable<DisjointBitSets.Entry<K>> {
 			}
 			foundEmpties = foundEmpties || bitSetForEntry.isEmpty();
 		}
-		
+
 		// If we didn't handle the equals case in the above for-loop,
 		// then we should add a copy of the incoming bitset
 		// into the map.
 		if (!equalsCaseHandled) {
 			bitSetMap.put(key, (BitSet) bitset.clone());
 		}
-		
+
 		// we may have some attributes with empty BitSets
 		if (foundEmpties) {
 			removeEmptyBitSets();
