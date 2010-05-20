@@ -58,6 +58,9 @@ import org.eclipse.swt.widgets.Control;
 public class ServiceModelWizardPage extends MBSCustomPage {
 	public static final String SERVICE_MODEL_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.ui.serviceModelWizardPage"; //$NON-NLS-1$
 	public static final String DEFAULT_CONFIG = Messages.getString("ConfigureRemoteServices.0"); //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
 	public static final String CONFIG_PROPERTY = "org.eclipse.ptp.rdt.ui.ServiceModelWizardPage.serviceConfig"; //$NON-NLS-1$
 
 	boolean fbVisited;

@@ -12,6 +12,9 @@ package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
+/**
+ * @since 2.0
+ */
 public interface IRemoteToolsIndexServiceProvider extends IIndexServiceProvider2 {
 	/**
 	 * Get the remote connection used by a service provider

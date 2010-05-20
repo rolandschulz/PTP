@@ -46,15 +46,17 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.dialogs.IDEResourceInfoUtils;
 
 /**
- * Allows the user to select a provider of Remote Services for a RemoteBuildServiceProvider.
+ * Allows the user to select a provider of Remote Services for a
+ * RemoteBuildServiceProvider.
  * 
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. Please do not use this API without consulting with
+ * the RDT team.
  * 
  * @author crecoskie
  * @see org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider
+ * @since 2.0
  */
 public class RemoteProjectContentsLocationArea {
 
@@ -68,8 +70,8 @@ public class RemoteProjectContentsLocationArea {
 		 * Report the error message
 		 * 
 		 * @param errorMessage
-		 *            String or <code>null</code>. If the errorMessage is
-		 *            null then clear any error state.
+		 *            String or <code>null</code>. If the errorMessage is null
+		 *            then clear any error state.
 		 * @param infoOnly
 		 *            the message is an informational message, but the dialog
 		 *            cannot continue
@@ -77,48 +79,49 @@ public class RemoteProjectContentsLocationArea {
 		 */
 		public void reportError(String errorMessage, boolean infoOnly);
 	}
-	
+
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
 
 	private IProject fExistingProject;
 
-	private IErrorMessageReporter fErrorReporter;
+	private final IErrorMessageReporter fErrorReporter;
 
 	private RemoteBuildServiceProvider fProvider;
-	
-	private Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
-	
+
+	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
+
 	private IRemoteServices fSelectedProvider;
 
-	private Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
+	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 
 	private IRemoteConnection fSelectedConnection;
 
 	private String fProjectName = IDEResourceInfoUtils.EMPTY_STRING;
-	
+
 	private Button fBrowseButton;
-	
+
 	private Button fNewConnectionButton;
-	
+
 	private Combo fProviderCombo;
-	
+
 	private Combo fConnectionCombo;
-	
+
 	private Text fLocationText;
 
-//	public RemoteProjectContentsLocationArea(IServiceProvider provider, Composite composite) {
-//		if(provider instanceof RemoteBuildServiceProvider)
-//			fProvider = (RemoteBuildServiceProvider) provider;
-//		else
-//			throw new IllegalArgumentException(); // should never happen
-//		createContents(composite);
-//	}
+	// public RemoteProjectContentsLocationArea(IServiceProvider provider,
+	// Composite composite) {
+	// if(provider instanceof RemoteBuildServiceProvider)
+	// fProvider = (RemoteBuildServiceProvider) provider;
+	// else
+	// throw new IllegalArgumentException(); // should never happen
+	// createContents(composite);
+	// }
 	public RemoteProjectContentsLocationArea(IErrorMessageReporter reporter, Composite composite) {
 		fErrorReporter = reporter;
 		createContents(composite);
 	}
-	
-    /**
+
+	/**
 	 * Check if the entry in the widget location is valid. If it is valid return
 	 * null. Otherwise return a string that indicates the problem.
 	 * 
@@ -145,15 +148,15 @@ public class RemoteProjectContentsLocationArea {
 
 		return null;
 	}
-    
-    /**
+
+	/**
 	 * Return the browse button. Usually referenced in order to set the layout
 	 * data for a dialog.
 	 * 
 	 * @return Button
 	 */
 	public Button[] getButtons() {
-		return new Button[]{fBrowseButton, fNewConnectionButton};
+		return new Button[] { fBrowseButton, fNewConnectionButton };
 	}
 
 	/**
@@ -164,14 +167,14 @@ public class RemoteProjectContentsLocationArea {
 	}
 
 	/**
-	 * Return the location for the project. 
+	 * Return the location for the project.
 	 * 
 	 * @return String
 	 */
 	public String getProjectLocation() {
 		return fLocationText.getText();
 	}
-    
+
 	/**
 	 * Get the URI for the location field if possible.
 	 * 
@@ -184,11 +187,11 @@ public class RemoteProjectContentsLocationArea {
 	public IRemoteConnection getRemoteConnection() {
 		return fSelectedConnection;
 	}
-	
+
 	public IRemoteServices getRemoteServices() {
 		return fSelectedProvider;
 	}
-	
+
 	/**
 	 * Return whether or not we are currently showing the default location for
 	 * the project.
@@ -196,20 +199,19 @@ public class RemoteProjectContentsLocationArea {
 	 * @return boolean
 	 */
 	public boolean isDefault() {
-//		return useDefaultsButton.getSelection();
+		// return useDefaultsButton.getSelection();
 		return false;
 	}
-	
+
 	/**
 	 * Set the project to base the contents off of.
-	 *
+	 * 
 	 * @param existingProject
 	 */
 	public void setExistingProject(IProject existingProject) {
 		fProjectName = existingProject.getName();
 		fExistingProject = existingProject;
 	}
-	
 
 	/**
 	 * Set the text to the default or clear it if not using the defaults.
@@ -225,7 +227,7 @@ public class RemoteProjectContentsLocationArea {
 		}
 
 	}
-	
+
 	/**
 	 * Attempt to open a connection.
 	 */
@@ -238,10 +240,10 @@ public class RemoteProjectContentsLocationArea {
 
 	/**
 	 * Return the path we are going to display. If it is a file URI then remove
-	 * the file prefix. 
+	 * the file prefix.
 	 * 
-	 * Only do this if the connection is open. Otherwise we will attempt to connect to
-	 * the first machine in the list, which is annoying.
+	 * Only do this if the connection is open. Otherwise we will attempt to
+	 * connect to the first machine in the list, which is annoying.
 	 * 
 	 * @return String
 	 */
@@ -249,8 +251,9 @@ public class RemoteProjectContentsLocationArea {
 		if (getRemoteConnection().isOpen()) {
 			IRemoteFileManager fileMgr = getRemoteServices().getFileManager(getRemoteConnection());
 			URI defaultURI = fileMgr.toURI(getRemoteConnection().getWorkingDirectory());
-	
-			// Handle files specially. Assume a file if there is no project to query
+
+			// Handle files specially. Assume a file if there is no project to
+			// query
 			if (defaultURI != null && defaultURI.getScheme().equals(FILE_SCHEME)) {
 				return Platform.getLocation().append(fProjectName).toOSString();
 			}
@@ -261,7 +264,7 @@ public class RemoteProjectContentsLocationArea {
 		}
 		return ""; //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -270,14 +273,14 @@ public class RemoteProjectContentsLocationArea {
 				.getUIConnectionManager();
 		return connectionManager;
 	}
-	
+
 	private void handleConnectionSelected() {
 		int selectionIndex = fConnectionCombo.getSelectionIndex();
 		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		fLocationText.setText(getDefaultPathDisplayString());
 	}
-	
+
 	private void handleServicesSelected() {
 		int selectionIndex = fProviderCombo.getSelectionIndex();
 		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
@@ -285,124 +288,133 @@ public class RemoteProjectContentsLocationArea {
 		updateNewConnectionButtonEnabled(fNewConnectionButton);
 		handleConnectionSelected();
 	}
-	
+
 	/**
 	 * @param connectionCombo
 	 */
 	private void populateConnectionCombo(final Combo connectionCombo) {
 		connectionCombo.removeAll();
-		
-		//attempt to restore settings from saved state
-//        IRemoteConnection connectionSelected = fProvider.getConnection();
-		
+
+		// attempt to restore settings from saved state
+		// IRemoteConnection connectionSelected = fProvider.getConnection();
+
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
 		int toSelect = 0;
-        
-        for(int k = 0; k < connections.length; k++) {
-        	connectionCombo.add(connections[k].getName(), k);
-        	fComboIndexToRemoteConnectionMap .put(k, connections[k]);
-        	
-//        	if (connectionSelected != null && connectionSelected.getName().compareTo(connections[k].getName()) == 0) {
-//        		toSelect = k;
-//        	}
-        }
-        
-        // set selected connection to be the first one if we're not restoring from settings
-        connectionCombo.select(toSelect);
-        fSelectedConnection = fComboIndexToRemoteConnectionMap.get(toSelect);
+
+		for (int k = 0; k < connections.length; k++) {
+			connectionCombo.add(connections[k].getName(), k);
+			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
+
+			// if (connectionSelected != null &&
+			// connectionSelected.getName().compareTo(connections[k].getName())
+			// == 0) {
+			// toSelect = k;
+			// }
+		}
+
+		// set selected connection to be the first one if we're not restoring
+		// from settings
+		connectionCombo.select(toSelect);
+		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(toSelect);
 	}
-	
+
 	/**
-     * @param button
-     */
-    private void updateNewConnectionButtonEnabled(Button button) {
-    	IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-    	button.setEnabled(connectionManager != null);  	
-    }
-	
+	 * @param button
+	 */
+	private void updateNewConnectionButtonEnabled(Button button) {
+		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
+		button.setEnabled(connectionManager != null);
+	}
+
 	protected Control createContents(Composite parent) {
-    	Group container = new Group(parent, SWT.SHADOW_ETCHED_IN);
-    	
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 3;
-        container.setLayout(layout);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        container.setLayoutData(gd);
-        
-        // Label for "Provider:"
-        Label providerLabel = new Label(container, SWT.LEFT);
-        providerLabel.setText("Remote Provider:"); //$NON-NLS-1$
-        
-        // combo for providers
-        fProviderCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-        // set layout to grab horizontal space
-        fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        fProviderCombo.setLayoutData(gd);
-        fProviderCombo.addSelectionListener(new SelectionAdapter() {
+		Group container = new Group(parent, SWT.SHADOW_ETCHED_IN);
+
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 3;
+		container.setLayout(layout);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		container.setLayoutData(gd);
+
+		// Label for "Provider:"
+		Label providerLabel = new Label(container, SWT.LEFT);
+		providerLabel.setText("Remote Provider:"); //$NON-NLS-1$
+
+		// combo for providers
+		fProviderCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		// set layout to grab horizontal space
+		fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		fProviderCombo.setLayoutData(gd);
+		fProviderCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleServicesSelected();
 			}
-        });
-    
-        //attempt to restore settings from saved state
-//        IRemoteServices providerSelected = fProvider.getRemoteServices(); 
-        
-        // populate the combo with a list of providers
-        IRemoteServices[] providers = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
-        int toSelect = 0;
-        
-        for(int k = 0; k < providers.length; k++) {
-        	fProviderCombo.add(providers[k].getName(), k);
-        	fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
-        	
-//        	if (providerSelected != null && providerSelected.getName().compareTo(providers[k].getName()) == 0) {
-//        		toSelect = k;
-//        	}
-        }
-        
-        // set selected host to be the first one if we're not restoring from settings
-        fProviderCombo.select(toSelect);
-        fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(toSelect);
-        
-        // connection combo
-        // Label for "Connection:"
-        Label connectionLabel = new Label(container, SWT.LEFT);
-        connectionLabel.setText("Connection:"); //$NON-NLS-1$
-        
-        // combo for providers
-        fConnectionCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-        // set layout to grab horizontal space
-        fConnectionCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-        fConnectionCombo.addSelectionListener(new SelectionAdapter() {
+		});
+
+		// attempt to restore settings from saved state
+		// IRemoteServices providerSelected = fProvider.getRemoteServices();
+
+		// populate the combo with a list of providers
+		IRemoteServices[] providers = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+		int toSelect = 0;
+
+		for (int k = 0; k < providers.length; k++) {
+			fProviderCombo.add(providers[k].getName(), k);
+			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
+
+			// if (providerSelected != null &&
+			// providerSelected.getName().compareTo(providers[k].getName()) ==
+			// 0) {
+			// toSelect = k;
+			// }
+		}
+
+		// set selected host to be the first one if we're not restoring from
+		// settings
+		fProviderCombo.select(toSelect);
+		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(toSelect);
+
+		// connection combo
+		// Label for "Connection:"
+		Label connectionLabel = new Label(container, SWT.LEFT);
+		connectionLabel.setText("Connection:"); //$NON-NLS-1$
+
+		// combo for providers
+		fConnectionCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		// set layout to grab horizontal space
+		fConnectionCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		fConnectionCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleConnectionSelected();
 			}
-        });
-        
-        // populate the combo with a list of providers
-        populateConnectionCombo(fConnectionCombo);
-           
-        // new connection button
-        fNewConnectionButton = new Button(container, SWT.PUSH);
-        fNewConnectionButton.setText("New..."); //$NON-NLS-1$
-        updateNewConnectionButtonEnabled(fNewConnectionButton);
-        fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
+		});
+
+		// populate the combo with a list of providers
+		populateConnectionCombo(fConnectionCombo);
+
+		// new connection button
+		fNewConnectionButton = new Button(container, SWT.PUSH);
+		fNewConnectionButton.setText("New..."); //$NON-NLS-1$
+		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-				if(connectionManager != null) {
+				if (connectionManager != null) {
 					connectionManager.newConnection(fNewConnectionButton.getShell());
 				}
 				// refresh list of connections
 				populateConnectionCombo(fConnectionCombo);
 			}
-        });
-        
-        Label locationLabel = new Label(container, SWT.LEFT);
-        locationLabel.setText("Location:"); //$NON-NLS-1$
-        
-        fLocationText = new Text(container, SWT.SINGLE | SWT.BORDER);
+		});
+
+		Label locationLabel = new Label(container, SWT.LEFT);
+		locationLabel.setText("Location:"); //$NON-NLS-1$
+
+		fLocationText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		gd.grabExcessHorizontalSpace = true;
@@ -413,11 +425,12 @@ public class RemoteProjectContentsLocationArea {
 				fErrorReporter.reportError(checkValidLocation(), false);
 			}
 		});
-		
-        // new connection button
-        fBrowseButton = new Button(container, SWT.PUSH);
-        fBrowseButton.setText("Browse..."); //$NON-NLS-1$
-        fBrowseButton.addSelectionListener(new SelectionAdapter() {
+
+		// new connection button
+		fBrowseButton = new Button(container, SWT.PUSH);
+		fBrowseButton.setText("Browse..."); //$NON-NLS-1$
+		fBrowseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (fSelectedConnection != null) {
 					checkConnection();
@@ -428,7 +441,9 @@ public class RemoteProjectContentsLocationArea {
 							if (fileMgr != null) {
 								fileMgr.setConnection(fSelectedConnection);
 								String correctPath = fLocationText.getText();
-								String selectedPath = fileMgr.browseDirectory(fLocationText.getShell(), "Project Location (" + fSelectedConnection.getName() + ")", correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
+								String selectedPath = fileMgr.browseDirectory(
+										fLocationText.getShell(),
+										"Project Location (" + fSelectedConnection.getName() + ")", correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
 								if (selectedPath != null) {
 									fLocationText.setText(selectedPath);
 								}
@@ -437,16 +452,18 @@ public class RemoteProjectContentsLocationArea {
 					}
 				}
 			}
-        });
+		});
 
-        return container;
-    }
-	
-	/* (non-Javadoc)
+		return container;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
 	protected void okPressed() {
-		
+
 		// set the provider
 		fProvider.setRemoteToolsProviderID(fSelectedProvider.getId());
 		fProvider.setRemoteToolsConnection(fSelectedConnection);

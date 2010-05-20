@@ -37,6 +37,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * @since 2.0
+ */
 public class RemoteBuildServiceFileLocationWidget extends Composite {
 
 	private IRemoteConnection fRemoteConnection = null;
