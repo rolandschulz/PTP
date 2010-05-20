@@ -71,11 +71,11 @@ public class OpenMPProjectProcess extends ProcessRunner {
  		// this process must be executed after a separate process which creates the project
 		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName")); //$NON-NLS-1$
 		if(!proj.exists()) {
-			System.out.println(Messages.project_does_not_exist);
+			System.out.println("Project does not exist");//$NON-NLS-1$
 			return;	
 		}
 
-		if(traceOn)System.out.println(Messages.project + proj.getName());
+		if(traceOn)System.out.println("project: " + proj.getName());//$NON-NLS-1$
 
 		// Collect the values that the user entered on the wizard page
 		String propID = OpenMPProjectWizardPage.INCLUDE_PATH_PROP_ID;
@@ -213,11 +213,14 @@ public class OpenMPProjectProcess extends ProcessRunner {
 	 * Add a new linker option.  Assumes that there is ONE instance of an option
 	 * of type <code>IOption.LIBRARY_PATHS</code> and <code>IOption.LIBRARIES</code>.
 	 * This method adds the libName and libPath to these two options.
+	 * <br>
+	 *  11/24/09: do not set linker lib, -fopenmp command does it all; thus this method isn't used.
 	 * @param cf the Configuration to which we want to add to linker options
 	 * @param libName the lib name (e.g. "lib")
 	 * @param libPath the library search path name (e.g. "c:/mypath/lib")
 	 * 
 	 */
+	/*
 	private void addLinkerOpt(IConfiguration cf, String libName, String libPath) {
 		String ext = "o"; //$NON-NLS-1$
 		ITool cfTool = cf.getToolFromInputExtension(ext);
@@ -227,7 +230,8 @@ public class OpenMPProjectProcess extends ProcessRunner {
 
 		IOption libOpt = getFirstOptionByType(cf, cfTool, IOption.LIBRARIES);
 		addOptionValue(cf, cfTool, libOpt, libName);
-	}                                                                                                                     
+	}
+	*/                                                                                                                     
 
 	
 	private void setCompileCommand(IConfiguration cf, String buildCmd) {
