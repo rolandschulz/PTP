@@ -252,7 +252,8 @@ public class FortranModelBuilder implements IFortranModelBuilder
     {
         if (nameToken != null)
         {
-            if (!(elt instanceof FortranElement.ErrorNode))
+            if (!(elt instanceof FortranElement.ErrorNode)
+                && !(elt instanceof FortranElement.UnknownNode))
                 elt.setElementName(nameToken.getText());
             
             // Don't attempt to highlight identifiers that come from INCLUDE files or
