@@ -19,7 +19,7 @@ import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
-import org.eclipse.ptp.pldt.openmp.core.Messages;
+import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 
 
 /**

@@ -25,6 +25,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
 import org.eclipse.ptp.pldt.mpi.core.prefs.MPIPreferencePage;
+import org.eclipse.ptp.pldt.wizards.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;

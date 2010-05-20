@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corp. - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.pldt.openmp.ui.pv.views;
+package org.eclipse.ptp.pldt.openmp.ui.pv.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.openmp.ui.pv.views.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.openmp.ui.pv.messages.messages"; //$NON-NLS-1$
 	public static String OpenMPProblemsView_action1;
 	public static String OpenMPProblemsView_action1executed;
 	public static String OpenMPProblemsView_action1tooltip;

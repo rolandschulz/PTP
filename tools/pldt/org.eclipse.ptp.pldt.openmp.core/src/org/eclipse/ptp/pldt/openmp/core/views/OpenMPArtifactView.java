@@ -27,8 +27,8 @@ import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.views.SimpleTableMarkerView;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
-import org.eclipse.ptp.pldt.openmp.core.Messages;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
@@ -101,8 +101,8 @@ public class OpenMPArtifactView extends SimpleTableMarkerView {
                 Object obj = ((IStructuredSelection) selection).getFirstElement();
                 IMarker marker = (IMarker) obj;
                 if(marker==null){
-                	MessageDialog.openInformation(null, org.eclipse.ptp.pldt.openmp.core.Messages.OpenMPArtifactView_noSelection,   
-                			org.eclipse.ptp.pldt.openmp.core.Messages.OpenMPArtifactView_noArtifactSelected); 
+                	MessageDialog.openInformation(null, org.eclipse.ptp.pldt.openmp.core.messages.Messages.OpenMPArtifactView_noSelection,   
+                			org.eclipse.ptp.pldt.openmp.core.messages.Messages.OpenMPArtifactView_noArtifactSelected); 
                 	return;
                 }
 

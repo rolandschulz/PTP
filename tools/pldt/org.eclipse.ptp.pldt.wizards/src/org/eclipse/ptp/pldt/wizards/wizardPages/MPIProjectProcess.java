@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.pldt.wizards.MpiWizardsPlugin;
+import org.eclipse.ptp.pldt.wizards.messages.Messages;
 
 /**
  * 

@@ -49,6 +49,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
+import org.eclipse.ptp.pldt.openmp.ui.pv.messages.Messages;
 import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
 
 /**

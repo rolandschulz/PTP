@@ -24,6 +24,7 @@ import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
+import org.eclipse.ptp.pldt.wizards.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;

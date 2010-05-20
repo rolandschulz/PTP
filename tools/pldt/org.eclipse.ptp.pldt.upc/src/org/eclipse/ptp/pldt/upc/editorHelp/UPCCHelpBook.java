@@ -18,6 +18,7 @@ import org.eclipse.ptp.pldt.common.editorHelp.CHelpBookImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionPrototypeSummaryImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionSummaryImpl;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
+import org.eclipse.ptp.pldt.upc.messages.Messages;
 
 /**
  * UPC help book - this is the information that is used for the hover help
