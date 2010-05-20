@@ -73,11 +73,6 @@ public class MPICH2RuntimeModelPresentation implements IRuntimeModelPresentation
 			if (state != null) {
 				return state.getValueAsString();
 			}
-//			StringAttribute status = 
-//				element.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
-//			if (status != null) {
-//				return status.getValue();
-//			}
 		}
 		return null;
 	}
