@@ -20,6 +20,7 @@ import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.analysis.PldtAstVisitor;
+import org.eclipse.ptp.pldt.lapi.Messages;
 
 /**
  * This dom-walker collects "artifacts" related to the specific domain <br>
