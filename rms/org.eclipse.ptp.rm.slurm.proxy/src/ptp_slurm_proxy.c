@@ -16,10 +16,15 @@
 #define SLURM_PROXY 
 #endif 
 
-
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
+
+
+//#ifndef USE_POSIX_THREADS
+//#define USE_POSIX_THREADS /*Use thread-safe List operation*/
+//#endif
+
 
 #include "config.h"
 #include <fcntl.h>
@@ -50,6 +55,7 @@
 #include <sys/ptrace.h>
 #include <sys/utsname.h>
 #include <linux/elf.h>
+#include <pthread.h>
 
 
 #include "proxy.h"
@@ -59,7 +65,8 @@
 #include "args.h"
 #include "rangeset.h"
 #include "slurm/slurm.h"
-#include "srun_opt.h"
+#include "slurm/slurm_errno.h"
+#include "job_opt.h"
 
 
 #define PTP_JOBID 			0
@@ -122,7 +129,7 @@
 #define JOB_UPDATE_TIMEOUT			500000 	/*usec*/
 #define NODE_UPDATE_TIMEOUT			500000 	/*usec*/
 
-/* SLURM job status/attributes */
+/* job state/status string */
 #define	SLURM_JOB_STATE_PENDING			"PENDING"
 #define	SLURM_JOB_STATE_RUNNING			"RUNNING"
 #define	SLURM_JOB_STATE_SUSPENDED		"SUSPENDED"
@@ -139,10 +146,12 @@
 #define SLURM_JOB_TIME_LIMIT_ATTR			"jobTimeLimit"	//-t
 #define SLURM_JOB_PARTITION_ATTR			"jobPartition" 	//-p
 #define SLURM_JOB_ID_ATTR					"jobId"        	//--jobid
-#define SLURM_JOB_NODELIST_ATTR				"jobNodeList"  	//-w
+#define SLURM_JOB_NODELIST_ATTR				"jobReqList"  	//-w
+#define SLURM_JOB_EXCNODELIST_ATTR			"jobExcList"	//-x
 #define SLURM_JOB_TYPE_ATTR					"jobType"      	//--jobtype
 #define SLURM_JOB_IOLABEL_ATTR				"jobIoLabel"   	//-l
 #define SLURM_JOB_VERBOSE_ATTR				"jobVerbose"   	//-v
+
 #define SLURM_JOB_EXEC_NAME_ATTR			"execName"
 #define SLURM_JOB_EXEC_PATH_ATTR			"execPath"
 #define SLURM_JOB_WORKING_DIR_ATTR			"workingDir"
@@ -153,7 +162,7 @@
 #define SLURM_JOB_DEBUG_ARGS_ATTR			"debugArgs"
 #define SLURM_JOB_DEBUG_FLAG_ATTR			"debug"
 
-/* SLURM node state and attributes */
+/* node state/status string */
 #define SLURM_NODE_STATE_UNKNOWN		"UNKNOWN"
 #define SLURM_NODE_STATE_DOWN			"DOWN"
 #define SLURM_NODE_STATE_UP				"UP"
@@ -163,7 +172,11 @@
 #define	SLURM_NODE_STATUS_ALLOCATED		"ALLOCATED"
 #define SLURM_NODE_STATUS_UNKNOWN		"UNKNOWN"
 #define SLURM_NODE_STATUS_DOWN			"DOWN"
+#define SLURM_NODE_STATUS_ERROR			"ERROR"
+#define SLURM_NODE_STATUS_MIXED			"MIXED"
+#define SLURM_NODE_STATUS_FUTURE		"FUTURE"
 
+/* node attribute string */
 #define SLURM_NODE_EXTRA_STATE_ATTR		"nodeExtraState"
 #define SLURM_NODE_NUMBER_ATTR			"nodeNumber"
 #define SLURM_NODE_SOCKETS_ATTR			"sockNumber"
@@ -176,19 +189,13 @@
 #define EXIT_JOB_IOTHREAD_FAIL	-2
 #define EXIT_EXEC_FAIL			-3
 
-#define BASEPORT   5000 
+#define BASEPORT   32768 
 
-
-struct sync_msg {
-	int		slurm_jobid;
-	bool 	jobid_set;
-	bool	io_ready;
-};
-typedef struct sync_msg sync_msg;
 
 struct ptp_machine {
 	int		id;
 	List *	nodes;
+	pthread_mutex_t mutex; /*lock to protect the machine's nodes list*/
 };
 typedef struct ptp_machine	ptp_machine;
 
@@ -197,7 +204,6 @@ struct ptp_slurm_node {
 	int			number;	/* node number, assigned by SLURM */
 	char *		name;
 	uint16_t	state; 	/* (uint16_t)node_info_t.state, converted to (char *) */
-	bool 		status_send;
 	uint16_t 	sockets;
 	uint16_t 	cores;
 	uint16_t 	threads;
@@ -207,40 +213,13 @@ struct ptp_slurm_node {
 typedef struct ptp_slurm_node	ptp_node;
 
 struct ptp_slurm_process {
+	void * job; 		/* ptr to job  the process belongs to */
 	int		id;
 	int		node_id;
-	int		task_id; /* MPI rank */
+	int		task_id; 	/* MPI rank */
 	int		pid;
 };
 typedef struct ptp_slurm_process	ptp_process;
-
-struct ptp_slurm_job {
-	int 				ptp_jobid;		/* job ID as known by PTP */
-	int 				slurm_jobid;	/* job ID that will be used by program when it starts */
-	bool				need_alloc;		/* need to allocate new resource */
-	int					debug_jobid;
-	int					num_procs;		/* number of procs requested for program (debugger: num_procs+1) */
-	char * 				cwd;			/* remote current working dir */
-	int					state;			/* job state(slurm definition) */
-	pid_t				srun_pid;		/* pid of the srun process */
-//	pid_t				sdmclnt_pid;
-	bool				debug;			/* job is debug job */
-	bool 				attach;			/* attach debug */
-	int					fd_err;			/* fd of pipe for srun's stderr */
-	int					fd_out;			/* fd of pipe for srun's stdout */
-	int					iothread_id;	/* id of thread forwarding srun's stdio */
-	bool				iothread_exit_req; /* request iothread to exit */
-	bool				iothread_exit;  /* flag inidication iothread has exited  */
-	bool				removable;
-	ptp_process **  	procs;			/* procs of this job */
-	rangeset * 			set;			/* range set of proc ID */
-};
-typedef struct ptp_slurm_job ptp_job;
-
-typedef struct slurmctld_comm_addr {
-	char * hostname;
-	uint16_t port;
-}slurmctld_comm_addr_t;
 
 typedef struct {
    char * hostname;            /* something like inet_addr or node name */
@@ -248,15 +227,35 @@ typedef struct {
    int    pid;                 /* process pid*/
 } MPIR_PROCDESC;
 
-typedef struct {
-	int rank;
-	pid_t pid;
- 	char hostname[256]; /* something like inet_addr */
-	int  port;          /* base port number for sdm routing */
-} route_entry;
+struct ptp_slurm_job {
+	int		ptp_jobid;		/* job ID as known by PTP */
+	int		slurm_jobid;	/* job ID that will be used by program when it starts */
+	int		num_procs;		/* number of procs requested for program (debugger: num_procs+1) */
+	char * 	cwd;			/* remote current working dir */
+	int		state;			/* job state(slurm definition) */
+	pid_t	sdmclnt_pid;
+	bool	debug;			/* job is debug job */
+	int		fd_err[2];			/* pipe fds for job stderr */
+	int		fd_out[2];			/* pipe fds for job stdout */
+	pthread_t	iothr_id;	/* id of job io thread */
+	bool	iothr_exit_req; /* request iothread to exit */
+	bool	iothr_exit;  /* flag inidication iothread has exited */
+	pthread_t	launch_thr_id; /*id of job launch thread*/
+	bool 	launch_thr_exit; /* flag indicating launch thread exited */
+	bool	removable;
+	ptp_process ** 	procs;		/* procs of this job */
+	rangeset *	set;			/* range set of proc ID */
+	bool	newprocess_event_sent;  /* true if NewJob/NewProcess has been sent */
+	bool 	init_state_updated;   /* true if initial state upstate has been sent*/
+	struct timeval	update_timer;   /* timestamp of the last state update */
+	int	proctable_size;
+	MPIR_PROCDESC * proctable;
+	bool step_layout_ready;  /*set if layout information is available*/
+	//job_opt_t * opt; /*pointer to job submit option structure*/
+};
+typedef struct ptp_slurm_job ptp_job;
 
 typedef void SigFunc(int);
-typedef int32_t slurm_fd;
 
 static int SLURM_Initialize(int, int, char **);
 static int SLURM_ModelDef(int, int, char **);
@@ -268,37 +267,39 @@ static int SLURM_Quit(int, int, char **);
 
 static FILE * init_logfp();
 static void debug_log(FILE * fp, char * fmt,...);
-static void * srun_output_forwarding(void * arg);
-static bool job_update_timeout();
-static void update_job_state(int slurm_jobid);
-static bool node_update_timeout();
-static void update_node_state();
+static void job_destroy(ptp_job * job);
+static void * job_launch_internal(void * arg);
+static void * job_io_handler(void * arg);
 static int create_node_list(ptp_machine *mach);
-static void init_job_timer();
-static void init_node_timer();
-static void * write_routing_file(void *);
+static void init_timer(struct timeval * timer);
+static void write_routing_file(ptp_job * job);
 static char * get_path(char * cmd, char * cwd, int mode);
-static int delete_routing_file(char * cwd);
+static void  delete_routing_file(char * cwd);
+static char * get_default_partition();
+static bool partition_verify(char * partition);
+static void opt_release(job_opt_t * opt);
 
-static struct timeval 		job_update_timer;
-static struct timeval		node_update_timer;
-static sync_msg *			sync_msg_addr = NULL;
-static FILE * 				logfp;
-static int 					destroy_job = 0; /* job allocation cancelled by signal */
-static bool 				enable_state_update = false;
-static 	srun_opt_t			opt;
-static allocation_msg_thread_t* msg_thr = NULL;
-static slurmctld_comm_addr_t slurmctld_comm_addr;
-static int			gTransID = 0; /* transaction id for start of event stream, is 0 when events are off */
-static int			gBaseID = -1; /* base ID for event generation */
-static int			gLastID = 1;  /* ID generator */
-static int			gQueueID;     /* ID of default queue */
-static int 			proxy_state = STATE_INIT;
+static FILE *	logfp;
+static int		gTransID = 0; /* transaction id for start of event stream, is 0 when events are off */
+static int		gBaseID = -1; /* base ID for event generation */
+static int		gLastID = 1;  /* ID generator */
+static int		gQueueID;     /* ID of default queue */
+static int 		proxy_state = STATE_INIT;
 static proxy_svr *	slurm_proxy = NULL;
-static List *		gJobList = NULL;
-static List *		gMachineList = NULL;
-static int			ptp_signal_exit = 0;;
+static List *	gJobList = NULL;
+static List *	gMachineList = NULL;
+static int		ptp_signal_exit = 0;;
 
+static pthread_t 	ns_thr_id; /* node state update thread id*/
+static pthread_t 	js_thr_id; /* job state update thread id */
+static bool 		enable_state_update = false;
+static pthread_cond_t state_cv = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t state_mx = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t log_mx = PTHREAD_MUTEX_INITIALIZER;
+static bool	nsu_thr_exit_req = false;
+static bool	jsu_thr_exit_req = false;
+static bool init_node_status_send = false;
+static pthread_mutex_t joblist_mx = PTHREAD_MUTEX_INITIALIZER;
 
 static proxy_svr_helper_funcs helper_funcs = {
 	NULL,					// newconn() - can be used to reject connections
@@ -323,14 +324,13 @@ static proxy_commands command_tab = {
 };
 
 static struct option longopts[] = {
-	{"proxy",			required_argument,	NULL, 	'P'}, 
-	{"port",			required_argument,	NULL, 	'p'}, 
-	{"host",			required_argument,	NULL, 	'h'}, 
-	{NULL,				0,					NULL,	0}
+	{"proxy",		required_argument,	NULL, 	'P'}, 
+	{"port",		required_argument,	NULL, 	'p'}, 
+	{"host",		required_argument,	NULL, 	'h'}, 
+	{"nodeint",		required_argument,	NULL,	't'},/* node state update interval */
+	{"jobint",		required_argument,	NULL,	'T'},/* job state update interval */
+	{NULL,			0,					NULL,	0}
 };
-
-
-
 
 
 /* 
@@ -342,8 +342,9 @@ init_logfp()
 {
 	FILE * fp = stderr;
 	char * logdir = NULL;
-	char * logfile = NULL;
+	char  logfile[256];
 	struct passwd * pw = NULL;
+
 #ifdef DEBUG	
 	pw = getpwuid(getuid());
 	setenv("PTP_SLURM_PROXY_LOGDIR", pw->pw_dir, 1);
@@ -354,12 +355,11 @@ init_logfp()
 	if (access(logdir, R_OK|W_OK) < 0) {
 		return fp;
 	}
-	asprintf(&logfile,"%s/ptp_proxy.log",logdir);
+	sprintf(logfile,"%s/ptp_proxy.log", logdir);
 	fp = fopen(logfile,"w+");
 	if (fp == NULL) { 
 		fp = stderr;
 	}	
-	free(logfile);
 
 	return fp;
 }
@@ -372,363 +372,93 @@ debug_log(FILE * fp, char * fmt,...)
 {
 	va_list va;
 
-	if (fp == NULL) {
+	if (fp == NULL) 
 		return;
-	}
+	
 	va_start(va, fmt);
+	pthread_mutex_lock(&log_mx);
 	vfprintf(fp, fmt, va);
 	fflush(fp);
+	pthread_mutex_unlock(&log_mx);
 	va_end(va);
 
 	return;
 }
 
 /*
- * delete existing routing file of previous debug session
+ * Delete existing/old routing file of previous debug session
  */
-
-static int 
+static void 
 delete_routing_file(char * cwd)
 {
 	char * fname = NULL;
 	char * str1 = NULL;
 	char * str2 = NULL;
 	char dir[MAXPATHLEN];
+	int rc = 0;
 
 	fname = getenv("SDM_ROUTING_FILE");
 	if (fname == NULL) {
-		if (cwd) {
+		if (cwd) 
 			str1 = cwd;	
-		} else {
+		else {
 			getcwd(dir, MAXPATHLEN);
 			str1 = dir;
 		}	
 		str2 = "routing_file";
-		asprintf(&fname, "%s/%s",str1,str2);
-	}
-	
-	return unlink(fname);
+		rc = asprintf(&fname, "%s/%s",str1,str2);
+		if (rc > 0) {
+			unlink(fname);
+			free(fname);
+		}
+	} else 	
+		unlink(fname);
+
+	return; 	
 }
 
-
 /*
- * Write routing file using job topology information from srun process 
- * main steps:
- * (1) read from ELF file value of symbol "MPIR_proctable" and "MPIR_proctable_size"
- * (2) PEEK MPIR_proctable from srun process
- * (3) write routing file 
- */
-static void *
-write_routing_file(void * arg)
+ * Generate routing file for a debug session
+ */ 
+void 
+write_routing_file(ptp_job * job)
 {
-	char * cmd = "srun";
-	int mode = F_OK;
-	char * srun_pathname = NULL;
-	int	fd;
-	int i,k,m;
-	ptp_job * job = NULL;
-	void * proctbl_addr = NULL;
-	void * proctbl_size_addr = NULL;
+	char * fname = NULL;
+	int	rank;
+	char * str1;
+	char * str2;
+	char cwd[MAXPATHLEN];
+	FILE * fp = NULL;
 
-	job = (ptp_job *) arg;
-	srun_pathname = get_path(cmd, NULL, mode);
-	if (srun_pathname) {
-		/* memory-map srun executable */
-		fd = open(srun_pathname,O_RDONLY);
-		struct stat  stat_buf;
-		stat(srun_pathname, &stat_buf);
-		caddr_t maddr = NULL;
-		maddr = mmap(NULL,stat_buf.st_size,PROT_READ,MAP_PRIVATE,fd,0);
-		if (maddr == NULL) {
-			return NULL;
-		}
-		struct utsname uts;
-		uname(&uts);
-		if (strstr(uts.machine, "64") == NULL ) { /* 32bit platform */
-			if (*(maddr+EI_CLASS) == ELFCLASS32) {
-				/* handle 32-bit ELF file */
-				Elf32_Ehdr * ehdr = NULL;
-				Elf32_Addr proctbl_addr32 = 0;
-				Elf32_Addr proctbl_size_addr32 = 0;
-
-				/* get ELF header */
-				ehdr = (Elf32_Ehdr *)maddr;
-				if (ehdr->e_shstrndx == SHN_UNDEF) { 
-					return NULL;
-				}
-				/* get strtbl section header */
-				Elf32_Shdr * sh_strtbl = 
-					(Elf32_Shdr *) (maddr + ehdr->e_shoff + ehdr->e_shstrndx * ehdr->e_shentsize);
-				/* get string table for section names*/
-				char * shstrtbl = (char *) (maddr + sh_strtbl->sh_offset);
-
-				Elf32_Shdr * shdr;
-				Elf32_Shdr * sh_symtab = NULL;
-				Elf32_Shdr * sh_strtab = NULL;
-				for (i = 0; i < ehdr->e_shnum; i++) {
-					shdr = (Elf32_Shdr *) (maddr + ehdr->e_shoff + i * ehdr->e_shentsize);
-					/* get symbol table */
-					if (shdr ->sh_type == SHT_SYMTAB && strcmp(".symtab",shstrtbl+shdr->sh_name) == 0) {
-						sh_symtab = shdr;
-					}
-					/* get string table for data objects */
-					if (shdr ->sh_type == SHT_STRTAB && strcmp(".strtab",shstrtbl+shdr->sh_name) == 0) {
-						sh_strtab = shdr;
-					}
-				}
-				if (sh_symtab == NULL || sh_strtab == NULL) {
-					return NULL;
-				}
-
-				char * strtab = (char *) (maddr + sh_strtab->sh_offset);
-				Elf32_Sym * symtab = (Elf32_Sym *)(maddr + sh_symtab->sh_offset);
-				Elf32_Word index;
-				for (i = 0; i < sh_symtab->sh_size/sh_symtab->sh_entsize; i++) {
-					index =(symtab + i)->st_name;
-					if (ELF32_ST_TYPE((symtab+i)->st_info) == STT_OBJECT &&  
-						strcmp(strtab+index, "MPIR_proctable") == 0) {  
-							proctbl_addr32 = (symtab+i)->st_value;
-					}
-					if (ELF32_ST_TYPE((symtab+i)->st_info) == STT_OBJECT  &&
-						strcmp(strtab+index, "MPIR_proctable_size") == 0) {
-							proctbl_size_addr32 = (symtab + i)->st_value;
-					}
-				}
-				proctbl_addr = (void *) proctbl_addr32;
-				proctbl_size_addr = (void *) proctbl_size_addr32;
-			} else {
-				debug_log(logfp, "ELF file type and platform type don't match!\n");
-				munmap(maddr,stat_buf.st_size);
-				close(fd);
-				return NULL;
-			}
-
-		} else { /* 64bit platform */
-			if (*(maddr+EI_CLASS) == ELFCLASS64) {
-				/* handle 64-bit ELF file */
-				Elf64_Ehdr * ehdr = NULL;
-				Elf64_Shdr * shdr = NULL;
-				Elf64_Shdr * sh_symtab = NULL;
-				Elf64_Shdr * sh_strtab = NULL;
-				Elf64_Addr proctbl_addr64 = 0;
-				Elf64_Addr proctbl_size_addr64 = 0;
-				Elf64_Word index = 0;
-
-				/* get ELF header */
-				ehdr = (Elf64_Ehdr *)maddr;
-				if (ehdr->e_shstrndx == SHN_UNDEF) {
-					return NULL;
-				}
-
-				/* get strtbl section header */
-				Elf64_Shdr * sh_strtbl = 
-					(Elf64_Shdr *) (maddr + ehdr->e_shoff + ehdr->e_shstrndx * ehdr->e_shentsize);
-				/* get string table for section names*/
-				char * shstrtbl = (char *) (maddr + sh_strtbl->sh_offset);
-				for (i = 0; i < ehdr->e_shnum; i++) {
-					shdr = (Elf64_Shdr *) (maddr + ehdr->e_shoff + i * ehdr->e_shentsize);
-					/* get symbol table */
-					if (shdr ->sh_type == SHT_SYMTAB && 
-						strcmp(".symtab",shstrtbl+shdr->sh_name) == 0) {
-						sh_symtab = shdr;
-					}
-					/* get string table for data objects */
-					if (shdr ->sh_type == SHT_STRTAB && 
-						strcmp(".strtab",shstrtbl+shdr->sh_name) == 0) {
-						sh_strtab = shdr;
-					}
-				}
-				if (sh_symtab == NULL || sh_strtab == NULL) {
-					return NULL;
-				}
-
-				char * strtab = (char *) (maddr + sh_strtab->sh_offset);
-				Elf64_Sym * symtab = (Elf64_Sym *)(maddr + sh_symtab->sh_offset);
-
-				for (i = 0; i < sh_symtab->sh_size/sh_symtab->sh_entsize; i++) {
-					index =(symtab + i)->st_name;
-					if (ELF64_ST_TYPE((symtab+i)->st_info) == STT_OBJECT &&	
-							strcmp(strtab+index, "MPIR_proctable") == 0) {
-							proctbl_addr64 = (symtab + i)->st_value;
-					}
-					if (ELF64_ST_TYPE((symtab+i)->st_info) == STT_OBJECT && 
-							strcmp(strtab+index, "MPIR_proctable_size") == 0) { 
-							proctbl_size_addr64 = (symtab + i)->st_value;
-					}
-				}
-				proctbl_addr = (void *) proctbl_addr64;
-				proctbl_size_addr = (void *) proctbl_size_addr64;
-			} else {
-				debug_log(logfp, "ELF file type and platform type don't match!\n");
-				munmap(maddr,stat_buf.st_size);
-				close(fd);
-				return NULL;
-			}	
-		}
-
-		munmap(maddr,stat_buf.st_size);
-		close(fd);
-
-		/* Now ptrace srun process and PEEK MPIR_proctable. */
-		job_info_msg_t * j = NULL;
-		bool sdmsvr_job_running = false;
-		int retry = 0;
-		/* Block until sdmsvr job RUNNING. */
-		while (!sdmsvr_job_running) {
-			if (slurm_load_jobs((time_t)NULL, &j, SHOW_ALL) == 0) {
-				for (k = 0; k < j->record_count; k++) {
-					if ((j->job_array[k]).job_id == job->slurm_jobid) { 
-						if ((j->job_array[k]).job_state == JOB_PENDING) {
-							sleep(1);
-							break;
-						} else if ((j->job_array[k]).job_state == JOB_RUNNING ||
-								  (j->job_array[k]).job_state == JOB_SUSPEND ) {
-							sdmsvr_job_running = true;
-							break;
-						} else {
-							/* ignore other states */
-							return NULL;
-						}
-					}
-				}
-				slurm_free_job_info_msg(j);
-			} else {
-				sleep(1);
-				retry++;
-				if (retry > MAX_RETRY)
-					return NULL;
-			}
-		}
-
-		/* wait for MPIR_proctable to be ready */
-		sleep(5); 
-
-		long ret = 0;
-		int status;
-		unsigned long word; 
-
-		ret = ptrace(PTRACE_ATTACH, job->srun_pid, NULL, NULL);
-		if (ret) {
-			debug_log(logfp, "attach srun error:%s\n",strerror(errno));
-			return NULL;
-		}
-		/* wait for srun process to stop */
-		waitpid(job->srun_pid, &status, WUNTRACED); 
-		
-		/*
-		 * assert MPIR_proctable_size == job->num_procs
-  		 * This test should be OK since MPIR_proctable_size is set by mpir_init()
-		 * during the early stage of srun.
-		 */
-		void * addr = proctbl_size_addr;
-		ret = ptrace(PTRACE_PEEKDATA, job->srun_pid, addr, NULL);
-		if (ret != job->num_procs) {
-			ptrace(PTRACE_DETACH, job->srun_pid, NULL, NULL);
-			return NULL;
-		}
-
-		/* dump MPIR_proctable */
-		route_entry * entbuf = (route_entry *)malloc(job->num_procs * sizeof(route_entry));
-		
-		addr = proctbl_addr;
-		ret = ptrace(PTRACE_PEEKDATA, job->srun_pid, addr, NULL);
-		if (ret < 0) {
-			debug_log(logfp, "ptrace error:%s\n",strerror(errno));
-			goto error;
-		}
-		void * proctable = (void *)ret;
-		/* dump each element of proctable */
-		int count;
-		char * ptr;
-		for (m = 0; m < job->num_procs; m++) {
-			count = 0;
-			/* dump hostname */
-			word = ptrace(PTRACE_PEEKDATA, job->srun_pid, proctable + m*sizeof(MPIR_PROCDESC) + count, NULL);
-			if (word < 0) {
-				debug_log(logfp, "MPIR_proctable dump error:%s\n", strerror(errno));
-				goto error;
-			}
-			void * hostname_addr = (void *)word;
-			bool end_flag = false;
-			long hostname[1024];
-			i = 0;
-			do {
-				/* read until '\0' is found */
-				word = ptrace(PTRACE_PEEKDATA, job->srun_pid, hostname_addr + i*sizeof(word), NULL);
-				if (word < 0) {
-					debug_log(logfp, "MPIR_proctable.hostname dump error:%s\n",strerror(errno));
-					goto error;
-				}
-				hostname[i] = word;
-				ptr = (char *) &hostname[i];
-				for (k = 0; k < sizeof(word); k++) {
-					if (*(ptr + k) == '\0') {
-						end_flag = true;
-						break;
-					}
-				}
-				i += 1;
-			} while (end_flag != true);
-			strcpy(entbuf[m].hostname, (char *)&hostname[0]);
-			count += sizeof(char *);
-
-			/* skip field "executable_name" */
-			count += sizeof(char *);
-			
-			/* dump pid */
-			word = ptrace(PTRACE_PEEKDATA, job->srun_pid, proctable + m*sizeof(MPIR_PROCDESC) + count, NULL);
-			if (word < 0) {
-				debug_log(logfp, "MPIR_proctable.pid dump error:%s\n",strerror(errno));
-				goto error;
-			}
-
-			entbuf[m].rank = m;
-			entbuf[m].port = BASEPORT + m;
-			entbuf[m].pid = (pid_t)word;
-		}
-
+	if (job->step_layout_ready) {
 		/*
 		 * write job topology informatin to routing file
 		 * default to job->cwd/routing_file unless specified by SDM_ROUTING_FILE
 		 */
-		char * fname = NULL;
 		fname = getenv("SDM_ROUTING_FILE");
 		if (fname == NULL) {
-			char * str1;
-			char * str2;
-			char cwd[MAXPATHLEN];
-
-			if (job->cwd) {
+			if (job->cwd) 
 				str1 = job->cwd;	
-			} else {
+			else {
 				getcwd(cwd, MAXPATHLEN);
 				str1 = cwd;
 			}	
 			str2 = "routing_file";
-			asprintf(&fname, "%s/%s",str1,str2);
+			asprintf(&fname, "%s/%s", str1, str2);
 		}
 
-		FILE * fp = fopen(fname,"w+");
+		fp = fopen(fname,"w+");
 		if (fp) {
 			/* write job's process number */
 			fprintf(fp,"%d\n", job->num_procs);
 			/* write MPIR_proctable entries */
-			for (i = 0; i < job->num_procs; i++) {
-				fprintf(fp, "%d %s %d\n", entbuf[i].rank, entbuf[i].hostname, entbuf[i].port);
-			}
+			for (rank = 0; rank < job->num_procs; rank++) 
+				fprintf(fp, "%d %s %d\n", rank, job->proctable[rank].hostname, BASEPORT+rank);
 			fclose(fp);
 		}
-
-		free(fname);
-
-error:
-		ptrace(PTRACE_DETACH, job->srun_pid, NULL, NULL);
-		if (entbuf != NULL) {
-			free(entbuf);
-		}
-	}
-
-	return NULL;
+		if (fname)
+			free(fname);
+	}		
 }
 
 /*
@@ -746,12 +476,46 @@ generate_id(void)
 static ptp_machine *
 new_machine()
 {
-	ptp_machine *	m = (ptp_machine *)malloc(sizeof(ptp_machine));
-	m->id = generate_id();
-	m->nodes = NewList();
-    AddToList(gMachineList, (void *)m);
+	ptp_machine * m = NULL;
+
+	m = (ptp_machine *)malloc(sizeof(ptp_machine));
+	if (m) {	
+		m->id = generate_id();
+		m->nodes = NewList();
+		pthread_mutex_init(&(m->mutex), NULL);
+    	AddToList(gMachineList, (void *)m);
+	}
 
     return m;
+}
+
+
+static void
+lock_joblist()
+{
+	pthread_mutex_lock(&joblist_mx);
+}
+
+
+static void
+unlock_joblist()
+{
+	pthread_mutex_unlock(&joblist_mx);
+}
+
+static void
+lock_nodelist(ptp_machine * m)
+{
+	if(m)
+		pthread_mutex_lock(&(m->mutex));
+}
+
+
+static void
+unlock_nodelist(ptp_machine * m)
+{
+	if (m)
+		pthread_mutex_unlock(&(m->mutex));
 }
 
 /*
@@ -763,67 +527,34 @@ nodestate_to_string(uint16_t slurm_node_state)
 	char * str = NULL;
 
 	switch (slurm_node_state & NODE_STATE_BASE) {
-		case NODE_STATE_UNKNOWN:
-			str =  SLURM_NODE_STATE_UNKNOWN;
-			break;
-		case  NODE_STATE_DOWN:
-			str =  SLURM_NODE_STATE_DOWN;
-			break;
-		case  NODE_STATE_IDLE:
-			str =  SLURM_NODE_STATE_UP;
-			break;
-		case NODE_STATE_ALLOCATED:
-			str =  SLURM_NODE_STATE_UP;
-			break;
-		default:
-			str = SLURM_NODE_STATE_UNKNOWN;
-			break;
+	case NODE_STATE_UNKNOWN:
+		str =  SLURM_NODE_STATE_UNKNOWN;
+		break;
+	case  NODE_STATE_DOWN:
+		str =  SLURM_NODE_STATE_DOWN;
+		break;
+	case  NODE_STATE_IDLE:
+		str =  SLURM_NODE_STATE_UP;
+		break;
+	case NODE_STATE_ALLOCATED:
+		str =  SLURM_NODE_STATE_UP;
+		break;
+	case NODE_STATE_ERROR:
+		str = SLURM_NODE_STATE_DOWN;
+		break;
+	case NODE_STATE_MIXED:
+		str = SLURM_NODE_STATE_UP;
+		break;
+	case NODE_STATE_FUTURE:
+		str = SLURM_NODE_STATE_DOWN;
+		break;
+	default:
+		str = SLURM_NODE_STATE_UNKNOWN;
+		break;
 	}
 
 	return str;
 }
-
-/*
- * Convert SLURM job state code(uint16_t) to STRING.
- */
-static char *
-jobstate_to_string(uint16_t slurm_job_state)
-{
-	char * str = NULL;
-
-	switch (slurm_job_state & (~JOB_COMPLETING)) {
-		case JOB_PENDING:
-			str = SLURM_JOB_STATE_PENDING; 
-			break;
-		case JOB_RUNNING:
-			str = SLURM_JOB_STATE_RUNNING;
-			break;
-		case JOB_SUSPENDED:
-			str = SLURM_JOB_STATE_SUSPENDED;
-			break;
-		case JOB_COMPLETE:
-			str = SLURM_JOB_STATE_COMPLETE; 
-			break;
-		case JOB_CANCELLED:
-			str = SLURM_JOB_STATE_CANCELLED;
-			break;
-		case JOB_FAILED:
-			str = SLURM_JOB_STATE_FAILED;
-			break;
-		case JOB_TIMEOUT:
-			str = SLURM_JOB_STATE_TIMEOUT;
-			break;
-		case JOB_NODE_FAIL:
-			str = SLURM_JOB_STATE_NODEFAIL;
-			break;
-		default:
-			str = "Unknown job state";
-			break;
-	}
-
-	return str;
-}
-
 
 /*
  * Create a new node structure and insert it into machine node list.
@@ -847,13 +578,13 @@ new_node(ptp_machine *mach, node_info_t *ni)
 		n->name = strdup(ni->name);
 	}	
 	n->state = ni->node_state;
-	n->status_send = false;
 	if (ni->arch != NULL) {
 		n->arch = strdup(ni->arch);
 	}	
 	if (ni->os != NULL) {
 		n->os = strdup(ni->os);
 	}
+
     AddToList(mach->nodes, (void *)n);
 
     return n;
@@ -869,13 +600,15 @@ find_node_by_name(char *name)
 	ptp_node * n = NULL;
 	
 	for (SetList(gMachineList); (m = (ptp_machine *)GetListElement(gMachineList)) != NULL;) {
+		lock_nodelist(m);
 		for (SetList(m->nodes); (n = (ptp_node *)GetListElement(m->nodes)) != NULL;) {
 			if (strcmp(name, n->name) == 0)
-				return n;
+				break;
 		}
+		unlock_nodelist(m);
 	}
-	
-	return NULL;
+
+	return n;
 }
 
 /*
@@ -892,9 +625,12 @@ new_process(ptp_job *job, int node_id, int task_id, int pid)
 	p->task_id = task_id;
 	p->pid = pid;
 	p->node_id = node_id;
+	p->job = (void *)job;
 
     job->procs[task_id] = p;
-    insert_in_rangeset(job->set, p->id);
+ 
+ 	//insert_in_rangeset(job->set, p->id);
+ 	insert_in_rangeset(job->set, p->task_id);
 
     return p;
 }
@@ -938,9 +674,6 @@ get_jobid(ptp_job *j, int type)
 		case SLURM_JOBID:
 			id = j->slurm_jobid;
 			break;
-		case DEBUG_JOBID:
-			id = j->debug_jobid;
-			break;
 		default:
 			debug_log(logfp, "Unknown job type\n");
 			break;
@@ -954,65 +687,82 @@ get_jobid(ptp_job *j, int type)
  * Create a new job structure,set job attributes and add to gJobList.  
  */
 static ptp_job *
-new_job(ptp_job * in, bool need_alloc)
+new_job(job_opt_t * opt, uint32_t slurm_jobid)
 {
-	ptp_job * j = (ptp_job *)malloc(sizeof(ptp_job));
+	ptp_job * j = NULL;
+
+	j = (ptp_job *)malloc(sizeof(ptp_job));
 	if (j == NULL) {
-		debug_log(logfp, "Malloc error in new_job()\n");
-		return NULL;
+		debug_log(logfp, "malloc error in new_job()\n");
+		return j;
 	}	
 	memset(j, 0, sizeof(ptp_job));
-	j->ptp_jobid = in->ptp_jobid;
-    j->slurm_jobid = in->slurm_jobid;
-    j->num_procs = in->num_procs;
-    j->debug = in->debug;
-	j->debug_jobid = in->debug_jobid;
-	if (in->cwd) {
-		j->cwd = strdup(in->cwd);
-	}
-	j->need_alloc = need_alloc; 
-	j->attach = false;
-	j->srun_pid = -1;
+	j->ptp_jobid = opt->ptpid;
+    j->slurm_jobid = slurm_jobid;
+    j->num_procs = opt->nprocs;
+    j->debug = opt->debug;
+	if (opt->cwd) 
+		j->cwd = strdup(opt->cwd);
 	j->state = -1;
 	j->removable = false;
-	j->fd_err = -1;
-	j->fd_out = -1;
-	j->iothread_id = -1;
-	j->iothread_exit_req = false;
-	j->iothread_exit = false;
+	j->fd_out[0] = -1;
+	j->fd_out[1] = -1;
+	j->fd_err[0] = -1;
+	j->fd_err[1] = -1;
+	j->iothr_id = -1;
+	j->iothr_exit_req = false;
+	j->iothr_exit = false;
+	j->launch_thr_id = -1;
+	j->launch_thr_exit = false;
 	j->set = new_rangeset();
-	j->procs = (ptp_process **)malloc(sizeof(ptp_process *) * (in->num_procs));
-	memset(j->procs, 0, sizeof(ptp_process *) * (in->num_procs));
-
+	j->procs = (ptp_process **)malloc(sizeof(ptp_process *) * (opt->nprocs));
+	memset(j->procs, 0, sizeof(ptp_process *) * (opt->nprocs));
+	j->init_state_updated = false;
+	j->newprocess_event_sent = false;
+	j->proctable_size = 0;
+	j->proctable = NULL;
+	j->step_layout_ready = false;
+	//j->opt = opt;
+	
     AddToList(gJobList, (void *)j);
 
     return j;
 }
 
 /*
- * Free job space allocated by new_job().
+ * Free space allocated by new_job().
  */
 static void
-free_job(ptp_job *j)
+job_release(ptp_job *j)
 {
 	int i;
 
 	if (j) {
 		if (j->procs) {
 			for (i = 0; i < j->num_procs; i++) {
-				if (j->procs[i] != NULL) { 
+				if (j->procs[i] != NULL)  
 					free_process(j->procs[i]);
-				}	
 			}
 			free(j->procs);
 		}
-		if (j->set) { 
+		if (j->set)  
 			free_rangeset(j->set);
+		if (j->proctable) {
+			for (i = 0; i < j->proctable_size; i++) {
+				if (j->proctable[i].hostname)
+					free(j->proctable[i].hostname);
+				if (j->proctable[i].executable_name)
+					free(j->proctable[i].executable_name);
+			}	
+			free(j->proctable);	
 		}
-		if ( j->cwd) {
+	
+		if (j->cwd)
 			free(j->cwd);
-		}
-		
+
+		//if (j->opt)
+		//	opt_release(j->opt);
+
 		free(j);
 	}	
 }
@@ -1026,34 +776,15 @@ find_job(int jobid, int type)
 {
 	ptp_job * j = NULL;
 	
+	lock_joblist();	
 	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL;) {
 		if (get_jobid(j, type) == jobid) { 
-			return j;
+			break;
 		}	
 	}
+	unlock_joblist();
 
-	return NULL;
-}
-
-/*
- * Determine if the given job is ACTIVE.
- */
-static bool 
-slurm_job_active(ptp_job * job)
-{
-	uint16_t state;
-	bool active = false;
-
-	if (job) {	
-		state = job->state;
-		if (state == JOB_COMPLETE || state == JOB_CANCELLED 
-			|| state == JOB_FAILED || state == JOB_TIMEOUT || state == JOB_NODE_FAIL) {
-			active = false;
-		} else
-			active = true;  /* JOB_COMPLETING is ACTIVE */
-	}
-
-	return active;
+	return j;
 }
 
 /*
@@ -1065,7 +796,6 @@ sendOKEvent(int trans_id)
 	proxy_svr_queue_msg(slurm_proxy, proxy_ok_event(trans_id));
 }
 
-
 /*
  * Send ShutDown event to ptp ui.
  */
@@ -1075,10 +805,10 @@ sendShutdownEvent(int trans_id)
 	proxy_svr_queue_msg(slurm_proxy, proxy_shutdown_event(trans_id));
 }
 
-
 /*
  * Send Message event to ptp ui.
  */
+/* NO use
 static void
 sendMessageEvent(int trans_id, char *level, int code, char *fmt, ...)
 {
@@ -1088,6 +818,7 @@ sendMessageEvent(int trans_id, char *level, int code, char *fmt, ...)
 	proxy_svr_queue_msg(slurm_proxy, proxy_message_event(trans_id, level, code, fmt, ap));
 	va_end(ap);
 }
+*/
 
 /*
  * Send  Error event to ptp ui.
@@ -1113,7 +844,6 @@ sendJobSubErrorEvent(int trans_id, char *jobSubId, char *msg)
 	proxy_svr_queue_msg(slurm_proxy, proxy_submitjob_error_event(trans_id, jobSubId, RTEV_ERROR_SLURM_SUBMIT, msg));
 }
 
-
 /*
  * Send JobTerminateError event to ptp ui.
  */
@@ -1124,6 +854,7 @@ sendJobTerminateErrorEvent(int trans_id, int id, char *msg)
 	
 	asprintf(&job_id, "%d", id);
 	proxy_svr_queue_msg(slurm_proxy, proxy_terminatejob_error_event(trans_id, job_id, RTEV_ERROR_JOB, msg));
+	free(job_id);
 }
 
 /*
@@ -1217,12 +948,16 @@ sendNewNodeEvent(int trans_id, int machid, ptp_machine *mach)
 	
 	asprintf(&machine_id, "%d", machid);
 	m = proxy_new_node_event(trans_id, machine_id, SizeOfList(mach->nodes));
+	
+	lock_nodelist(mach);	
 	for (SetList(mach->nodes); (n = (ptp_node *)GetListElement(mach->nodes)) != NULL;) {
 		asprintf(&node_id, "%d", n->id);
 		proxy_add_node(m, node_id, n->name, nodestate_to_string(n->state), num_node_attrs(n));
 		add_node_attrs(m, n);
 		free(node_id);
 	}
+	unlock_nodelist(mach);
+
 	proxy_svr_queue_msg(slurm_proxy, m);
 	free(machine_id);
 }
@@ -1238,56 +973,70 @@ sendNodeChangeEvent(int trans_id, char * id_range, uint16_t slurm_node_state)
 	char * status = NULL;
 	
 	switch (slurm_node_state & NODE_STATE_BASE) {
-		case NODE_STATE_UNKNOWN:
-			state  = SLURM_NODE_STATE_UNKNOWN;
-			status = SLURM_NODE_STATUS_UNKNOWN;
-			break;
-		case  NODE_STATE_DOWN:
-			state =  SLURM_NODE_STATE_DOWN;
-			status = SLURM_NODE_STATUS_DOWN;
-			break;
-		case  NODE_STATE_IDLE:
-			state =  SLURM_NODE_STATE_UP;
-			status = SLURM_NODE_STATUS_IDLE;
-			break;
-		case NODE_STATE_ALLOCATED:
-			state =  SLURM_NODE_STATE_UP;
-			status = SLURM_NODE_STATUS_ALLOCATED;
-			break;
-		default:
-			state = SLURM_NODE_STATE_UNKNOWN;
-			status = SLURM_NODE_STATUS_UNKNOWN;
-			break;
+	case NODE_STATE_UNKNOWN:
+		state  = SLURM_NODE_STATE_UNKNOWN;
+		status = SLURM_NODE_STATUS_UNKNOWN;
+		break;
+	case  NODE_STATE_DOWN:
+		state =  SLURM_NODE_STATE_DOWN;
+		status = SLURM_NODE_STATUS_DOWN;
+		break;
+	case  NODE_STATE_IDLE:
+		state =  SLURM_NODE_STATE_UP;
+		status = SLURM_NODE_STATUS_IDLE;
+		break;
+	case NODE_STATE_ALLOCATED:
+		state =  SLURM_NODE_STATE_UP;
+		status = SLURM_NODE_STATUS_ALLOCATED;
+		break;
+	case NODE_STATE_ERROR:
+		state = SLURM_NODE_STATE_ERROR;
+		status = SLURM_NODE_STATUS_ERROR;
+		break;
+	case NODE_STATE_MIXED:
+		state = SLURM_NODE_STATE_UP;
+		status = SLURM_NODE_STATUS_MIXED;
+		break;
+	case NODE_STATE_FUTURE:
+		state = SLURM_NODE_STATE_DOWN;
+		status = SLURM_NODE_STATUS_FUTURE;
+		break;
+	default:
+		state = SLURM_NODE_STATE_UNKNOWN;
+		status = SLURM_NODE_STATUS_UNKNOWN;
+		break;
 	}
 
 	m = proxy_node_change_event(trans_id, id_range, 2);
 	proxy_add_string_attribute(m, "nodeState", state);
 	proxy_add_string_attribute(m, "nodeStatus", status);
 	proxy_svr_queue_msg(slurm_proxy, m);
+
+	return;
 }
 
 /*
  * Send NewProcesse event to ptp ui.
- * FIXME: 
- *	Add extra attributes when task topology information is available.
- *  This can be done via slurm_job_step_layout_get() API when updating job state.
  */
 static void
-sendNewProcessEvent(int trans_id, int jobid, ptp_process *p, char *state)
+sendNewProcessEvent(int trans_id, int ptp_jobid, ptp_process *p, char *state)
 {
 	proxy_msg *	m = NULL;
-	char * job_id = NULL;
-	char * proc_id = NULL;
-	char * name = NULL;
 	
+	char jobid[64];
+	char proc_id[64];
+	char name[64];
+
 	if (p == NULL)
 		return;
 	
-	asprintf(&job_id, "%d", jobid);
-	asprintf(&proc_id, "%d", p->id);
-	asprintf(&name, "%d",  p->task_id);
+	sprintf(jobid, "%d", ptp_jobid);
+	/* in rm protocol 4.0, replace p->id with p->task_id */
+	//sprintf(proc_id, "%d", p->id);
+	sprintf(proc_id, "%d", p->task_id);
+	sprintf(name, "%d",  p->task_id);
 	
-	m = proxy_new_process_event(trans_id, job_id, 1);
+	m = proxy_new_process_event(trans_id, jobid, 1);
 	/*
 	 * In SLURM, p->node_id, p->task_id, p->pid can't be obtained during job launching.
 	 * But the debug model requires at least the "PROC_INDEX_ATTR",
@@ -1295,16 +1044,21 @@ sendNewProcessEvent(int trans_id, int jobid, ptp_process *p, char *state)
 	 * Remember that the "task_id" is not the real rank number of a process,
 	 * it is only a FAKED number that can satisfy devbugger's requirement.
 	 */
-	proxy_add_process(m, proc_id, name, state, 2);
-	proxy_add_int_attribute(m, PTP_PROC_NODEID_ATTR, p->node_id);	
-	proxy_add_int_attribute(m, PTP_PROC_INDEX_ATTR, p->task_id);	
-   /* proxy_add_int_attribute(m, PTP_PROC_PID_ATTR, p->pid);*/
+	proxy_add_process(m, proc_id, name, state, 1);
+
+	/*
+	 * NODEID_ATTR will be provided by sendProcessChangeEvent() when job layout is available
+	 */
+	//proxy_add_int_attribute(m, PTP_PROC_NODEID_ATTR, p->node_id);	
+	
+	proxy_add_int_attribute(m, PTP_PROC_INDEX_ATTR, p->task_id);
+
+	/*
+	 * SLURM doesn't provide PID information
+	 */
+   //proxy_add_int_attribute(m, PTP_PROC_PID_ATTR, p->pid);
 	
 	proxy_svr_queue_msg(slurm_proxy, m);
-	
-	free(job_id);
-	free(proc_id);
-	free(name);
 }
 
 /*
@@ -1328,59 +1082,84 @@ sendNewQueueEvent(int trans_id)
 	free(queue_id);
 }
 
+static void
+get_job_state_status(uint16_t slurm_state, char ** state, char ** status)
+{
+	if (!state || !status)
+		return;
+
+	switch (slurm_state & JOB_STATE_BASE) {
+		case JOB_PENDING:
+			*state = "STARTING";
+			*status = "PENDING";
+			break;
+		case JOB_RUNNING:
+			*status = *state = "RUNNING";
+			break;
+		case JOB_SUSPENDED:
+			*status = *state = "SUSPENDED";
+			break;
+		case JOB_COMPLETE:
+			*status = *state = "COMPLETED";
+			break;	
+		case JOB_CANCELLED:
+			*state = "COMPLETED";
+			*status = "CANCELLED";
+			break;
+		case JOB_FAILED:
+			*state = "COMPLETED";
+			*status = "FAILED";
+			break;
+		case JOB_TIMEOUT:
+			*state = "COMPLETED";
+			*status = "TIMEOUT";
+		case JOB_NODE_FAIL:
+			*state = "COMPLETED";
+			*status = "NODEFAIL";
+			break;
+		default:
+			*status = *state = "UNKNOWN";
+			break;
+	}
+
+	return;
+}
+
+static void
+get_proc_state_status(uint16_t slurm_state, char ** state, char ** status)
+{
+	/* 
+	 * Since SLURM does not provide process state,
+	 * fake process state using job state 
+     */
+	get_job_state_status(slurm_state, state, status);		
+}
+
 /*
  * Send ProcessStateChange event to ptp ui.
  */
 static void
 sendProcessStateChangeEvent(int trans_id, ptp_job *j, uint16_t slurm_state)
 {
-	proxy_msg *	m = NULL;
 	char * state;
 	char * status;
+	char jobid[64];
+	proxy_msg *	m = NULL;
 	
 	if (j == NULL || j->num_procs == 0)
 		return;
 		
-	m = proxy_process_change_event(trans_id, rangeset_to_string(j->set), 2);
-	switch (slurm_state) {
-		case JOB_PENDING:
-			state = "STARTING";
-			status = "PENDING";
-			break;
-		case JOB_RUNNING:
-			status = state = "RUNNING";
-			break;
-		case JOB_SUSPENDED:
-			status = state = "SUSPENDED";
-			break;
-		case JOB_COMPLETE:
-			status = state = "COMPLETED";
-			break;	
-		case JOB_CANCELLED:
-			state = "COMPLETED";
-			status = "CANCELLED";
-			break;
-		case JOB_FAILED:
-			state = "COMPLETED";
-			status = "FAILED";
-			break;
-		case JOB_TIMEOUT:
-			state = "COMPLETED";
-			status = "TIMEOUT";
-		case JOB_NODE_FAIL:
-			state = "COMPLETED";
-			status = "NODEFAIL";
-			break;
-		default:
-			status = state = "UNKNOWN";
-			break;
-	}
-	proxy_add_string_attribute(m, "processState", state);
-	proxy_add_string_attribute(m, "processStatus", status);
+	get_proc_state_status(slurm_state, &state, &status);
+
+	//m = proxy_process_change_event(trans_id, rangeset_to_string(j->set), 2);
+	sprintf(jobid, "%d", j->ptp_jobid);
+	m = proxy_process_change_event(trans_id, jobid, rangeset_to_string(j->set), 2);
+
+	proxy_add_string_attribute(m, PTP_PROC_STATE_ATTR, state);
+	proxy_add_string_attribute(m, PTP_PROC_STATUS_ATTR, status);
 
 	proxy_svr_queue_msg(slurm_proxy, m);
 }
-	
 	
 /*
  * Send JobStateChange event to ptp ui.
@@ -1393,59 +1172,55 @@ sendJobStateChangeEvent(int trans_id, int jobid, uint16_t slurm_state)
 	char * state;
 	char * status;
 	
+	
 	asprintf(&job_id, "%d", jobid);
 	m = proxy_job_change_event(trans_id, job_id, 2);
-	switch (slurm_state & (~JOB_COMPLETING)) {
-		case JOB_PENDING:
-			state = "STARTING";
-			status = "PENDING";
-			break;
-		case JOB_RUNNING:
-			status = state = "RUNNING";
-			break;
-		case JOB_SUSPENDED:
-			status = state = "SUSPENDED";
-			break;
-		case JOB_COMPLETE:
-			status = state = "COMPLETED";
-			break;	
-		case JOB_CANCELLED:
-			state = "COMPLETED";
-			status = "CANCELLED";
-			break;
-		case JOB_FAILED:
-			state = "COMPLETED";
-			status = "FAILED";
-			break;
-		case JOB_TIMEOUT:
-			state = "COMPLETED";
-			status = "TIMEOUT";
-		case JOB_NODE_FAIL:
-			state = "COMPLETED";
-			status = "NODEFAIL";
-			break;
-		default:
-			status = state = "UNKNOWN";
-			return;
-	}
-
-	proxy_add_string_attribute(m, "jobState", state);
-	proxy_add_string_attribute(m, "jobStatus", status);
+	get_job_state_status(slurm_state, &state, &status);
+	proxy_add_string_attribute(m, PTP_JOB_STATE_ATTR, state);
+	proxy_add_string_attribute(m, PTP_JOB_STATUS_ATTR,status);
 	proxy_svr_queue_msg(slurm_proxy, m);
 	
 	free(job_id);
 }
 
 /*
- * Send ProcessChange event to ptp ui.
- * Since only job state and no process state are provided in SLURM,
- * this function does nothign.
- * In ptp ui, mark process state equal to job state.
+ * Process Change: node_id, task_id or pid change!
  */
 static void
 sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, int pid)
 {
-	/* do nothing */
+	int cnt = 0;
+	proxy_msg * msg;
+	char jobid[64];
+	char proc_id[64];
+
+	if (p->node_id != node_id || p->task_id != task_id || p->pid != pid) {
+		if (p->node_id != node_id)
+			cnt++;
+		if (p->task_id != task_id)
+			cnt++;
+		if (p->pid != pid)
+			cnt++;
+	
+		//asprintf(&proc_id, "%d", p->id);
+		sprintf(proc_id, "%d", p->task_id);
+		sprintf(jobid, "%d", ((ptp_job *)(p->job))->ptp_jobid);
+		msg = proxy_process_change_event(trans_id, jobid, proc_id, cnt);
+		if (p->node_id != node_id) {
+			p->node_id = node_id;
+			proxy_add_int_attribute(msg, PTP_PROC_NODEID_ATTR, node_id);
+		}
+		if (p->task_id != task_id) {
+			p->task_id = task_id;
+			proxy_add_int_attribute(msg, PTP_PROC_INDEX_ATTR, task_id);
+		}
+		if (p->pid != pid) {
+			p->pid = pid;
+			proxy_add_int_attribute(msg, PTP_PROC_PID_ATTR, pid);
+		}
+		
+		proxy_svr_queue_msg(slurm_proxy, msg);
+	}
 	return;
 }
 
@@ -1453,16 +1228,17 @@ sendProcessChangeEvent(int trans_id, ptp_process *p, int node_id, int task_id, i
  * Send ProcessOutput event to ptp ui.
  */
 static void
-sendProcessOutputEvent(int trans_id, int procid, char *output)
+sendProcessOutputEvent(int trans_id, ptp_process *p, char *output)
 {
-	char * proc_id = NULL;
 	proxy_msg *	m = NULL;
-	
-	asprintf(&proc_id, "%d", procid);
-	m = proxy_process_change_event(trans_id, proc_id, 1);
+	char jobid[64];
+	char proc_id[64];
+
+	sprintf(jobid, "%d", ((ptp_job *)(p->job))->ptp_jobid);
+	sprintf(proc_id, "%d", p->task_id);
+	m = proxy_process_change_event(trans_id, jobid, proc_id, 1);
 	proxy_add_string_attribute(m, PTP_PROC_STDOUT_ATTR, output);
 	proxy_svr_queue_msg(slurm_proxy, m);
-	free(proc_id);	
 }
 
 /*
@@ -1500,6 +1276,7 @@ get_machine_name(int num)
 	static char	hostname[512];
 	
 	gethostname(hostname, 512);
+
 	return hostname;
 }
 
@@ -1535,418 +1312,44 @@ do_slurmproxy_shutdown(void)
 	return 0;
 }
 
-/* 
- * gethostname_short - equivalent to gethostname, but return only the first
- * component of the fully qualified name 
- */
-static int
-gethostname_short (char *name, size_t len)
-{
-	int rc = 0, name_len = 0;
-	char * ptr = NULL, path_name[1024];
-
-	rc = gethostname (path_name, sizeof(path_name));
-	if (rc)
-		return rc;
-
-	ptr = strchr (path_name, '.');
-	if (ptr == NULL)
-		ptr = path_name + strlen(path_name);
-	else
-		ptr[0] = '\0';
-
-	name_len = ptr - path_name;
-	if (name_len > len)
-		return ENAMETOOLONG;
-
-	strcpy (name, path_name);
-
-	return 0;
-}
-
-
 /*
- * Set default srun options.
- */
-static int 
-opt_default(srun_opt_t * opt)
-{
-	char buf[MAXPATHLEN + 1];
-	struct passwd * pw;
-	int i;
-	char hostname[64];
-	
-	if (opt == NULL)
-		return -1;
-	if ((pw = getpwuid(getuid())) != NULL) {
-		strncpy(opt->ps_user, pw->pw_name, MAX_USERNAME);
-		opt->ps_uid = pw->pw_uid;
-	} else {
-		debug_log(logfp, "getpwuid error\n");
-		return -1;
-	}
-	opt->ps_gid = getgid();
-	if ((getcwd(buf, MAXPATHLEN)) == NULL) {
-		debug_log(logfp,"getcwd error\n");
-		return -1;
-	}
-	opt->ps_cwd = strdup(buf); 
-	opt->ps_cwd_set = false;
-	opt->ps_progname = NULL;
-	opt->ps_nprocs = 1;
-	opt->ps_nprocs_set = false;
-	opt->ps_cpus_per_task = 1; 
-	opt->ps_cpus_set = false;
-	opt->ps_min_nodes = 1;
-	opt->ps_max_nodes = 0;
-	opt->ps_min_sockets_per_node = NO_VAL; /* requested min/maxsockets */
-	opt->ps_max_sockets_per_node = NO_VAL;
-	opt->ps_min_cores_per_socket = NO_VAL; /* requested min/maxcores */
-	opt->ps_max_cores_per_socket = NO_VAL;
-	opt->ps_min_threads_per_core = NO_VAL; /* requested min/maxthreads */
-	opt->ps_max_threads_per_core = NO_VAL; 
-	opt->ps_ntasks_per_node      = NO_VAL; /* ntask max limits */
-	opt->ps_ntasks_per_socket    = NO_VAL; 
-	opt->ps_ntasks_per_core      = NO_VAL; 
-	opt->ps_nodes_set = false;
-	opt->ps_cpu_bind_type = 0;
-	opt->ps_cpu_bind = NULL;
-	opt->ps_mem_bind_type = 0;
-	opt->ps_mem_bind = NULL;
-	opt->ps_time_limit = NO_VAL;
-	opt->ps_time_limit_str = NULL;
-	opt->ps_ckpt_interval = 0;
-	opt->ps_ckpt_interval_str = NULL;
-	opt->ps_ckpt_path = NULL;
-	opt->ps_partition = NULL;
-	/* use default value:32 */
-	/* 
-	opt->ps_max_threads = MAX_THREADS;
-	pmi_server_max_threads(opt->ps_max_threads);
-	*/
-	opt->ps_relative = NO_VAL;
-	opt->ps_relative_set = false;
-	opt->ps_job_name = NULL;
-	opt->ps_job_name_set = false;
-	opt->ps_jobid = NO_VAL;
-	opt->ps_jobid_set = false;
-	opt->ps_dependency = NULL;
-	opt->ps_account  = NULL;
-	opt->ps_comment  = NULL;
-	opt->ps_distribution = SLURM_DIST_UNKNOWN;
-	opt->ps_plane_size   = NO_VAL;
-	opt->ps_ofname = NULL;
-	opt->ps_ifname = NULL;
-	opt->ps_efname = NULL;
-	opt->ps_core_type = CORE_DEFAULT;
-	opt->ps_labelio = false;
-	opt->ps_unbuffered = false;
-	opt->ps_overcommit = false;
-	opt->ps_shared = (uint16_t)NO_VAL;
-	opt->ps_exclusive = false;
-	opt->ps_no_kill = false;
-	opt->ps_kill_bad_exit = false;
-	opt->ps_immediate = false;
-	opt->ps_join = false;
-	slurm_ctl_conf_t * slurm_ctl_conf_ptr;
-	slurm_load_ctl_conf((time_t)NULL, &slurm_ctl_conf_ptr);
-	opt->ps_max_wait = slurm_ctl_conf_ptr->wait_time;
-	opt->ps_quit_on_intr = false;
-	opt->ps_disable_status = false;
-	opt->ps_test_only   = false;
-	opt->ps_quiet = 0;
-	opt->ps_job_min_cpus    = NO_VAL;
-	opt->ps_job_min_sockets = NO_VAL;
-	opt->ps_job_min_cores   = NO_VAL;
-	opt->ps_job_min_threads = NO_VAL;
-	opt->ps_job_min_memory  = NO_VAL;
-	opt->ps_task_mem        = NO_VAL;
-	opt->ps_job_min_tmp_disk= NO_VAL;
-	opt->ps_hold = false;
-	opt->ps_constraints = NULL;
-	opt->ps_contiguous = false;
-	opt->ps_nodelist = NULL;
-	opt->ps_exc_nodes = NULL;
-	opt->ps_max_launch_time = 120;/* 120 seconds to launch job */
-	opt->ps_max_exit_timeout= 60; /* Warn user 60 seconds after task exit */
-	/* Default launch msg timeout */
-	opt->ps_msg_timeout = slurm_ctl_conf_ptr->msg_timeout;  
-	for (i=0; i<SYSTEM_DIMENSIONS; i++)
-		opt->ps_geometry[i] = (uint16_t) NO_VAL;
-	opt->ps_reboot = false;
-	opt->ps_no_rotate = false;
-	opt->ps_conn_type = (uint16_t) NO_VAL;
-	opt->ps_blrtsimage = NULL;
-	opt->ps_linuximage = NULL;
-	opt->ps_mloaderimage = NULL;
-	opt->ps_ramdiskimage = NULL;
-	opt->ps_euid = (uid_t) -1;
-	opt->ps_egid = (gid_t) -1;
-	opt->ps_propagate = NULL;  /* propagate specific rlimits */
-	opt->ps_prolog = slurm_ctl_conf_ptr->srun_prolog;
-	opt->ps_epilog = slurm_ctl_conf_ptr->srun_epilog;
-	opt->ps_task_prolog = NULL;
-	opt->ps_task_epilog = NULL;
-	gethostname_short(hostname, sizeof(hostname));
-	opt->ps_ctrl_comm_ifhn = strdup(hostname);
-	opt->ps_pty = false;
-	opt->ps_open_mode = 0;
-	opt->ps_acctg_freq = -1;
-	if (slurm_ctl_conf_ptr) {
-		slurm_free_ctl_conf(slurm_ctl_conf_ptr);
-	}
-
-	return 0;
-}
-
-static int
-set_srun_options_defaults(srun_opt_t * opt)
-{
-	return opt_default(opt);
-}
-
-/*
- * Free space allocated for job "opt". 
- */
-static void 
-free_opt(srun_opt_t * opt)
-{
-	if (opt == NULL)
-		return;
-	if (opt->ps_cwd_set == true && opt->ps_cwd != NULL)
-		free(opt->ps_cwd);
-	if (opt->ps_nodes_set == true && opt->ps_nodelist != NULL)
-		free(opt->ps_nodelist);
-	if (opt->ps_ctrl_comm_ifhn) /* allocated in opt_default() */
-		free(opt->ps_ctrl_comm_ifhn);
-}
-
-/*
- * Free space allocated to save srun args in SLURM_SubmitJob().
- */
-static void 
-free_srun_argv(int srun_argc,char ** srun_argv)
-{
-	int i;
-
-	for (i = 0; i< srun_argc; i++) {
-		if (srun_argv[i] != NULL) {
-			free(srun_argv[i]);
-		}	
-	}
-
-	free(srun_argv);
-}
-
-
-/*
- * Create job description msg from opts for job allocation.
- * By now, -w/-x options are not supported.
+ * Create job description msg from opts before job allocation.
  */
 static job_desc_msg_t * 
-create_job_desc_msg_from_opts(srun_opt_t *opt)
+create_job_desc_msg_from_opts(job_opt_t *opt)
 {
-
-	job_desc_msg_t * j = NULL;
+	job_desc_msg_t * msg = NULL;
 	
-	assert(opt != NULL);
-	if ((j = (job_desc_msg_t *)malloc(sizeof(job_desc_msg_t))) == NULL) {
+	if ((msg = (job_desc_msg_t *)malloc(sizeof(job_desc_msg_t))) == NULL) {
 		debug_log(logfp, "Allocate job_desg_msg fail");
 		return NULL;
 	}
 
-	slurm_init_job_desc_msg(j);
-	if (opt->ps_account) {
-		j->account = strdup(opt->ps_account);
-	}	
-	j->contiguous = opt->ps_contiguous;
-	j->features = opt->ps_constraints;
-	j->immediate = (uint16_t)opt->ps_immediate;
-	j->name = opt->ps_job_name;
-	if (opt->ps_nodelist) 
-		j->req_nodes = strdup(opt->ps_nodelist);
-	/*
-	 * FIXME: handle -w nodelist request
-	 */
-	/*
-	if(j->req_nodes) {
-		hl = hostlist_create(j->req_nodes);
-		hostlist_ranged_string(hl, sizeof(buf), buf);
-		xfree(opt.nodelist);
-		opt.nodelist = xstrdup(buf);
-		hostlist_uniq(hl);
-		hostlist_ranged_string(hl, sizeof(buf), buf);
-		hostlist_destroy(hl);
-		xfree(j->req_nodes);
-		j->req_nodes = xstrdup(buf);
-	}
-	*/
-	if(opt->ps_distribution == SLURM_DIST_ARBITRARY
-	   && !j->req_nodes) {
-		debug_log(logfp,"With Arbitrary distribution you need to \
-				specify a nodelist or hostfile with the -w option");
-		return NULL;
-	}
-	j->exc_nodes = opt->ps_exc_nodes;
-	j->partition = opt->ps_partition;
-	j->min_nodes = opt->ps_min_nodes;
-	if (opt->ps_min_sockets_per_node != NO_VAL)
-		j->min_sockets = (uint16_t)opt->ps_min_sockets_per_node;
-	if (opt->ps_min_cores_per_socket != NO_VAL)
-		j->min_cores = (uint16_t)opt->ps_min_cores_per_socket;
-	if (opt->ps_min_threads_per_core != NO_VAL)
-		j->min_threads = (uint16_t)opt->ps_min_threads_per_core;
-	j->user_id = opt->ps_uid;
-	j->dependency = opt->ps_dependency;
-	if (opt->ps_nice)
-		j->nice = (uint16_t)(NICE_OFFSET + opt->ps_nice);
-	j->task_dist = (uint16_t)opt->ps_distribution;
-	if (opt->ps_plane_size != NO_VAL)
-		j->plane_size = (uint16_t)opt->ps_plane_size;
-	j->group_id = opt->ps_gid;
-	j->mail_type = opt->ps_mail_type;
-	if (opt->ps_ntasks_per_node != NO_VAL)
-		j->ntasks_per_node = (uint16_t)opt->ps_ntasks_per_node;
-	if (opt->ps_ntasks_per_socket != NO_VAL)
-		j->ntasks_per_socket = (uint16_t)opt->ps_ntasks_per_socket;
-	if (opt->ps_ntasks_per_core != NO_VAL)
-		j->ntasks_per_core =(uint16_t)opt->ps_ntasks_per_core;
-	if (opt->ps_mail_user)
-		j->mail_user = strdup(opt->ps_mail_user);
-	if (opt->ps_begin)
-		j->begin_time = opt->ps_begin;
-	if (opt->ps_licenses)
-		j->licenses = strdup(opt->ps_licenses);
-	if (opt->ps_network)
-		j->network = strdup(opt->ps_network);
-	if (opt->ps_comment)
-		j->comment = strdup(opt->ps_comment);
-	if (opt->ps_hold)
-		j->priority = 0;
-	if (opt->ps_jobid != NO_VAL)
-		j->job_id = opt->ps_jobid;
+	slurm_init_job_desc_msg(msg);
+	if (opt->debug)	
+		msg->name = strdup(opt->debug_exec_name);
+	else 
+		msg->name = strdup(opt->exec_name);
+	msg->user_id = opt->uid;
+	msg->group_id = opt->gid;
+	if (opt->nprocs_set)
+		msg->num_tasks = opt->nprocs;
+	if (opt->nodes_set)
+		msg->min_nodes = opt->min_nodes;
+	if (opt->max_nodes)
+		msg->max_nodes = opt->max_nodes;
+	if (opt->tlimit_set)
+		msg->time_limit = opt->tlimit;
+	if (opt->partition)
+		msg->partition = strdup(opt->partition);
+	if (opt->nodelist) 
+		msg->req_nodes = strdup(opt->nodelist);
+	if (opt->exc_nodes)
+		msg->exc_nodes = strdup(opt->exc_nodes);
+	if (opt->jobid_set)
+		msg->job_id = opt->jobid;
 
-	#if SYSTEM_DIMENSIONS
-	if (opt->ps_geometry[0] > 0) {
-		int i;
-		for (i=0; i<SYSTEM_DIMENSIONS; i++)
-			j->geometry[i] = opt->ps_geometry[i];
-	}
-	#endif
-
-	if (opt->ps_conn_type != (uint16_t) NO_VAL)
-		j->conn_type = opt->ps_conn_type;
-	if (opt->ps_reboot)
-		j->reboot = 1;
-	if (opt->ps_no_rotate)
-		j->rotate = 0;
-	if (opt->ps_blrtsimage)
-		j->blrtsimage = strdup(opt->ps_blrtsimage);
-	if (opt->ps_linuximage)
-		j->linuximage = strdup(opt->ps_linuximage);
-	if (opt->ps_mloaderimage)
-		j->mloaderimage = strdup(opt->ps_mloaderimage);
-	if (opt->ps_ramdiskimage)
-		j->ramdiskimage = strdup(opt->ps_ramdiskimage);
-	if (opt->ps_max_nodes)
-		j->max_nodes = opt->ps_max_nodes;
-	if (opt->ps_max_sockets_per_node)
-		j->max_sockets = opt->ps_max_sockets_per_node;
-	if (opt->ps_max_cores_per_socket)
-		j->max_cores = opt->ps_max_cores_per_socket;
-	if (opt->ps_max_threads_per_core)
-		j->max_threads = opt->ps_max_threads_per_core;
-	if (opt->ps_job_min_cpus != NO_VAL)
-		j->job_min_procs = opt->ps_job_min_cpus;
-	if (opt->ps_job_min_sockets != NO_VAL)
-		j->job_min_sockets = opt->ps_job_min_sockets;
-	if (opt->ps_job_min_cores != NO_VAL)
-		j->job_min_cores = opt->ps_job_min_cores;
-	if (opt->ps_job_min_threads != NO_VAL)
-		j->job_min_threads = opt->ps_job_min_threads;
-	if (opt->ps_job_min_memory != NO_VAL)
-		j->job_min_memory = opt->ps_job_min_memory;
-	if (opt->ps_job_min_tmp_disk != NO_VAL)
-		j->job_min_tmp_disk = opt->ps_job_min_tmp_disk;
-	if (opt->ps_overcommit) {
-		j->num_procs  = opt->ps_min_nodes;
-		j->overcommit = opt->ps_overcommit;
-	} else
-		j->num_procs  = opt->ps_nprocs * opt->ps_cpus_per_task;
-	if (opt->ps_nprocs_set)
-		j->num_tasks  = opt->ps_nprocs;
-	if (opt->ps_cpus_set)
-		j->cpus_per_task = opt->ps_cpus_per_task;
-	if (opt->ps_no_kill)
-		j->kill_on_node_fail = 0;
-	if (opt->ps_time_limit != NO_VAL)
-		j->time_limit  = opt->ps_time_limit;
-	j->shared = opt->ps_shared;
-
-	/*
-	 * srun uses the same listening port for the allocation response
-	 * message as for all other message.
-	 * slurmctld_comm_addr structure initialized by slurmctld_msg_init()
-	 */
-	j->alloc_resp_port = slurmctld_comm_addr.port;
-	j->other_port = slurmctld_comm_addr.port;
-
-	return j;
-}
-
-/*
- * Callback handlers for job allocation.
- */
-static void 
-timeout_handler(srun_timeout_msg_t *msg)
-{
-	static time_t last_timeout = 0;
-
-	if (msg->timeout != last_timeout) {
-		last_timeout = msg->timeout;
-		debug_log(logfp,"callback-->timeout_handler:");
-		debug_log(logfp,"job time limit to be reached at %s\n",ctime(&msg->timeout));
-	}
-}
-
-static void 
-user_msg_handler(srun_user_msg_t *msg)
-{
-	debug_log(logfp,"callback-->usr_msg_handler: %s\n", msg->msg);
-}
-
-static void
-ping_handler(srun_ping_msg_t *msg) 
-{
-	debug_log(logfp,"callback-->ping_handler\n");
-}
-
-static void 
-node_fail_handler(srun_node_fail_msg_t *msg)
-{
-	debug_log(logfp,"callback-->node_fail_handler: node fail on %s", msg->nodelist);
-}
-
-static void 
-job_complete_handler(srun_job_complete_msg_t * msg)
-{
-	debug_log(logfp,"callback-->job_complete_handler: Force Terminate job\n");
-}
-
-/*
- * Sleep some time and retry until MAX_RETRY reaches. 
- */
-static bool 
-wait_retry()
-{
-	static int count = 0;
-
-	if (count < MAX_RETRY) {
-		sleep(++count);
-		return true;
-	} else {
-		return false;
-	}	
+	return msg;
 }
 
 /*
@@ -1960,48 +1363,15 @@ xsignal(int signo, SigFunc *f)
 	sa.sa_handler = f;
 	sigemptyset(&sa.sa_mask);
 	sigaddset(&sa.sa_mask, signo);
-	sa.sa_flags = 0;
+	if (signo == SIGCHLD)
+		sa.sa_flags = SA_NOCLDWAIT;/*no zombie process when child terminate*/
+	else 
+		sa.sa_flags = 0;
 	if (sigaction(signo, &sa, &old_sa) < 0) {
 		debug_log(logfp,"xsignal(%d) failed: %m", signo);
 	}	
 
 	return old_sa.sa_handler;
-}
-
-/*
- * Signal handler used during allocating jobs.
- */
-static void
-signal_while_allocating(int signo)
-{
-	destroy_job = 1;
-
-	if (sync_msg_addr && (sync_msg_addr->slurm_jobid > 0)) {
-		/* if job has been allocated, complete it.*/
-		slurm_complete_job(sync_msg_addr->slurm_jobid, 0);
-	}	
-}
-
-/*
- * Pending callback during block job allocation.
- */
-static void
-set_pending_jobid(uint32_t id)
-{
-	/* 
-	 * This callback can set the jobid even in the case of blocking allocation.
-	 * So proxy agent can get the slurm jobid and will not block .
-	 */
-	 if (sync_msg_addr != NULL) {
-		sync_msg_addr->slurm_jobid = (int) id;
-		sync_msg_addr->jobid_set = true;
-	}
-}
-
-static void 
-ignore_signal(int signo)
-{
-	/* do nothing */
 }
 
 /*
@@ -2011,461 +1381,459 @@ static void
 destroy_job_desc_msg(job_desc_msg_t * j)
 {
 	if (j != NULL) {
-		if (j->account != NULL)
-			free(j->account);
-		if (j->req_nodes != NULL) 
+		if (j->name)
+			free(j->name);
+		if (j->partition)
+			free(j->partition);
+		if (j->req_nodes)
 			free(j->req_nodes);
-		if (j->mail_user != NULL)
-			free(j->mail_user);
-		if (j->licenses != NULL)
-			free(j->licenses);
-		if (j->network != NULL)
-			free(j->network);
-		if (j->comment != NULL)
-			free(j->comment);
-		if (j->blrtsimage != NULL)
-			free(j->blrtsimage);
-		if (j->linuximage != NULL)
-			free(j->linuximage);
-		if (j->mloaderimage != NULL)
-			free(j->mloaderimage);
-		if (j->ramdiskimage != NULL)
-			free(j->ramdiskimage);
+		if (j->exc_nodes)
+			free(j->exc_nodes);
 
 		free(j);
 	}
 }
 
 /*
- * Create a socket to communicate with slurmctld 
- * during job allocation. This fd will be closed
- * on executing srun after job allocation.
- */
-slurm_fd 
-slurm_init_msg_engine_port(uint16_t port)
-{
-	slurm_addr addr;
-	int fd;
-	int rc;
-	const int one = 1;
-	const size_t sz1 = sizeof(one);
-
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	if ((fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-		debug_log(logfp,"create slurmctld socket error\n");
-		return fd;
-	}
-	rc = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,&one,sz1);
-	if (rc < 0) {
-		goto error;
-	}
-	rc = bind(fd, &addr, sizeof(addr));
-	if (rc < 0) {
-		goto error;
-	}
-	rc = listen(fd, 128);
-	if(rc < 0) {
-		goto error;
-	}
-	
-	return fd;
-
-error:
-	if ((close(fd) < 0) && (errno == EINTR))
-		close(fd); /* retry */ 
-
-	return rc;
-}
-
-
-/* 
- * Init socket fd to handle message from slurmctld.
- */
-slurm_fd 
-slurmctld_msg_init(srun_opt_t * opt)
-{
-	slurm_addr slurm_address;
-	uint16_t port;
-	static slurm_fd slurmctld_fd = 0;
-	socklen_t name_len;
-	int fval;
-	int rc;
-	
-	if (slurmctld_fd)
-		return slurmctld_fd;
-
-	slurmctld_fd = -1;
-	slurmctld_comm_addr.hostname = NULL;
-	slurmctld_comm_addr.port = 0;
-	
-	/* open socket */
-	if ((slurmctld_fd = slurm_init_msg_engine_port(0)) < 0) {
-		debug_log(logfp, "slurm_init_msg_engine_port error\n");
-		return -1;	
-	}
-
-	/* get socket port number */	
-	name_len = sizeof(slurm_address);
-	if ((rc = getsockname(slurmctld_fd, &slurm_address, &name_len)) < 0) {
-		debug_log(logfp, "getsockname error\n");
-		return -1;
-	}
-
-	/* set non-blocking */
-	fval = fcntl(slurmctld_fd, F_GETFL, 0);
-	fcntl(slurmctld_fd, F_SETFL, fval|O_NONBLOCK);
-
-	/* set FD_CLOEXEC: close slurmctld_fd when exec(srun) after allocation */
-	fval = fcntl(slurmctld_fd, F_GETFD, 0);
-	fcntl(slurmctld_fd, F_SETFD, fval|FD_CLOEXEC);
-	
-	/* set global variable 'slurmctld_comm_addr' */
-	slurmctld_comm_addr.hostname = strdup(opt->ps_ctrl_comm_ifhn);
-	port = ntohs(slurm_address.sin_port);
-	slurmctld_comm_addr.port = port;
-
-	return slurmctld_fd;
-}
-
-/*
- * Allocate job resource in response to SubmitJob cmd.
- * Since job allocation may be bloked, do it in a separate process.
- */
-static resource_allocation_response_msg_t *
-allocate_nodes(srun_opt_t *opt)
-{
-	resource_allocation_response_msg_t *resp = NULL;
-	slurm_allocation_callbacks_t callbacks;
-	
-	/* set the default value of 'destroy_job'*/
-	destroy_job = 0;
-
-	slurmctld_msg_init(opt);
-	job_desc_msg_t * j = create_job_desc_msg_from_opts(opt);
-	if (!j) {
-		return NULL;
-	}	
-	/* 
-	 * Do not re-use existing job id when submitting new job
-	 * from within a running job 
-	 */
-	if ((j->job_id != NO_VAL) && !opt->ps_jobid_set) {
-		if (!opt->ps_jobid_set)	/* let slurmctld set jobid */
-			j->job_id = NO_VAL;
-	}
-	callbacks.ping = ping_handler;
-	callbacks.timeout = timeout_handler;
-	callbacks.job_complete = job_complete_handler;
-	callbacks.user_msg = user_msg_handler;
-	callbacks.node_fail = node_fail_handler;
-
-	/* create message thread to handle pings and such from slurmctld */
-	msg_thr = slurm_allocation_msg_thr_create(&j->other_port, &callbacks);
-
-	xsignal(SIGHUP, signal_while_allocating);
-	xsignal(SIGINT, signal_while_allocating);
-	xsignal(SIGQUIT, signal_while_allocating);
-	xsignal(SIGPIPE, signal_while_allocating);
-	xsignal(SIGTERM, signal_while_allocating);
-	xsignal(SIGUSR1, signal_while_allocating);
-	xsignal(SIGUSR2, signal_while_allocating);
-
-	while (!resp) 
-	{
-		/* 
-		 * BLOCK unitl allocation granted or interrupt by signal
-		 * if allocation blocked/pending, 
-		 * the jobid can be returned to parent by 'set_pending_jobid' callback
-		 */
-		resp = slurm_allocate_resources_blocking(j, 0, set_pending_jobid);
-		if (resp == NULL)
-			fprintf(stderr, "blocking job allocate error!\n");
-		if (destroy_job) /* interrupt by signal */
-			break;
-	 	else if(!resp && !wait_retry()) /* time out */ 
-			break;		
-	}
-
-	xsignal(SIGHUP, ignore_signal);
-	xsignal(SIGINT, ignore_signal);
-	xsignal(SIGQUIT, ignore_signal);
-	xsignal(SIGPIPE, ignore_signal);
-	xsignal(SIGTERM, ignore_signal);
-	xsignal(SIGUSR1, ignore_signal);
-	xsignal(SIGUSR2, ignore_signal);
-
-	destroy_job_desc_msg(j);
-
-	return resp;
-}
-
-
-/*
- * Create a thread to retrieve srun's stdout/stderr,
- * and send to ptp ui.
+ * Create a thread to retrieve job's stdout/stderr,
+ * and send outputs to ptp ui.
  */
 static int 
 create_iothread(ptp_job * job)
 {
-	pthread_attr_t attr;
-	pthread_t iothread_id;
-	int rc;
-				
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	if (pthread_create(&iothread_id, &attr, srun_output_forwarding, (void *)job) == 0) {
-		job->iothread_id = iothread_id;
-		debug_log(logfp, "iothread created for job[%d].\n", job->slurm_jobid);
-		rc = 0;
+	pthread_t io_tid;
+	pthread_attr_t io_attr;
+	int rc = 0;
+
+	pthread_attr_init(&io_attr);
+	pthread_attr_setdetachstate(&io_attr, PTHREAD_CREATE_DETACHED);
+	pthread_attr_setscope(&io_attr, PTHREAD_SCOPE_SYSTEM);
+	if (pthread_create(&io_tid, &io_attr, job_io_handler, (void *)job)) {
+		/*create iothread fail*/
+		debug_log(logfp, "Job[%d] io thread create fail.\n", job->slurm_jobid);
+		rc = -1;
 	} else {
-		debug_log(logfp,"error on creating iothread for job[%d].\n", job->slurm_jobid);
-		rc =  -1;
-	}	
+		debug_log(logfp, "Job[%d] io thread create done.\n", job->slurm_jobid);
+		job->iothr_id = io_tid;
+		rc = 0;
+	}
+
+	pthread_attr_destroy(&io_attr);
 
 	return rc;
 }
 
 /*
- * Allocate job resource (if necessary), launch job
+ * Create a new thread to allocate job resource (if necessary), launch job
  * and forward job stdout to ptp ui. 
  */
 static int 
-allocate_and_launch_job(int trans_id, char * jobsubid, ptp_job * in, srun_opt_t * opt, int srun_argc, char * srun_argv[])
+allocate_and_launch_job(job_opt_t * opt)
+{
+	pthread_t id;
+	pthread_attr_t attr;
+	int rc = 0;
+
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
+
+	if (pthread_create(&id, &attr, job_launch_internal, (void *)opt )) {
+		debug_log(logfp, "create job_launch_internal thread fail.\n");
+		rc = -1;
+	}
+
+	pthread_attr_destroy(&attr);
+	
+	return rc;
+}	
+
+/*
+ * Retrun node->number by matching nodename of elements in mach->nodelist
+ */ 
+static int 
+get_node_id(char * nodename, int * id) {
+	ptp_machine * m = NULL;
+	ptp_node * n;
+	int rc = -1;
+
+	SetList(gMachineList);
+	/* Now only 1 machine is supported */
+	m = (ptp_machine *)GetFirstElement(gMachineList);
+	
+	lock_nodelist(m);
+	for (SetList(m->nodes); (n = (ptp_node *)GetListElement(m->nodes)) != NULL;) {
+		if (strcmp(nodename, n->name) == 0) {
+			*id = n->id;
+			rc = 0;
+			break;
+		}	
+	}
+	unlock_nodelist(m);
+
+	return rc;
+}
+
+/*
+ *malloc space for job proctable and initialize it
+ */ 
+int
+job_proctable_init(ptp_job * job)
+{
+	int rc = -1;
+
+	job->proctable_size = job->num_procs;
+	job->proctable = (MPIR_PROCDESC *)malloc(job->proctable_size * sizeof(MPIR_PROCDESC));
+	if (job->proctable) {
+		memset(job->proctable, 0, job->proctable_size * sizeof(MPIR_PROCDESC));
+		rc = 0;
+	}
+
+	return rc;
+}
+
+static void
+fd_set_exec_close(fd)
+{
+	int val;
+
+	val = fcntl(fd, F_GETFD, 0);
+	val |= FD_CLOEXEC;
+	fcntl(fd, F_SETFD, val);
+}
+
+/*
+ * kernel thread functions:
+ * allocate job resources, create job step and launch it
+ */ 
+static void * 
+job_launch_internal(void * arg)
 {
 	int i;
-	int shmid;
-	int fd_out[2];
-	int fd_err[2];
-	bool need_alloc;
-	pid_t pid;
-	int rc;
-	char * ptr = NULL;
-	sync_msg * pp = NULL, *pc = NULL;
-	char * msg = NULL;
 	ptp_job * job = NULL;
-	char * name = NULL;
 	ptp_process  * p = NULL;
 	int node_id = -1;
 	int task_id = -1;
 	int proc_pid = -1;
 	ptp_machine * m = NULL;
 	ptp_node * n = NULL;
-	int kill_jobid = -1;
-	int allocated_jobid = -1;
 	int node_cnt = 0;
-	resource_allocation_response_msg_t * resp = NULL;
+	job_opt_t * opt = NULL;
+	job_desc_msg_t * job_req = NULL;
+	resource_allocation_response_msg_t * job_resp = NULL;
+	resource_allocation_response_msg_t * lookup_resp = NULL;
+	resource_allocation_response_msg_t * tmp_resp = NULL;
+	char * msg = NULL;
+	char * name = NULL;
+	slurm_step_ctx_params_t  step_params;
+	slurm_step_ctx_t * step_ctx = NULL;
+	slurm_step_launch_params_t launch_params;
+	slurm_step_layout_t * layout = NULL;
+	int fd_out[2];
+	int fd_err[2];
+	bool fd_set = false;
 
-	/* create a shared memory region to communiate/synchronize with child process */
-	if ((shmid = shmget(IPC_PRIVATE, sizeof(sync_msg), SHM_R|SHM_W)) < 0) {
-		debug_log(logfp,"error on creating shared memory\n");
-		return -1;
+	opt = (job_opt_t *)arg;
+
+	if (opt->debug)
+		delete_routing_file(opt->cwd); /*delete existing/old routing file*/
+
+	job_req = create_job_desc_msg_from_opts(opt);
+	if (job_req == NULL) {
+		msg = "create_job_desc_msg fail.";
+		debug_log(logfp, msg);
+		sendJobSubErrorEvent(opt->trans_id, opt->jobsubid, msg);
+		goto done;
 	}
-	/* init shared memory */
-	pp = (sync_msg *)shmat(shmid, 0, 0);
-	pp->slurm_jobid = JOBID_INIT;
-	pp->jobid_set = false; 
-	pp->io_ready = false;
-
-	pipe(fd_out);
-	pipe(fd_err); 
 	
-	if (opt->ps_jobid == NO_VAL && opt->ps_jobid_set == false)
-		need_alloc = true;
-	else {
-		need_alloc = false;
-		allocated_jobid = opt->ps_jobid;
-	}	
-	switch (pid = fork()) {
-	case 0:	/* child: allocate job (if necessary) and launch job using srun cmd */
-		
-		/* the attached shared memory is inherited by child */
-		pc = pp;
+	if (slurm_allocate_resources(job_req, &job_resp)) { /*job allocation error*/
+		msg = slurm_strerror(slurm_get_errno());
+		debug_log(logfp, msg);
+		sendJobSubErrorEvent(opt->trans_id, opt->jobsubid, msg);
+		goto done;
+	}
 
+	/* send OK event for SubmitJob cmd */	
+	sendOKEvent(opt->trans_id);
+	
+	/* send NewJob event */
+	asprintf(&name, SLURM_JOB_NAME_FMT, job_resp->job_id);
+	//sendNewJobEvent(gTransID, job->ptp_jobid, name, jobsubid, JOB_STATE_INIT);
+	sendNewJobEvent(gTransID, opt->ptpid, name, opt->jobsubid, "STARTING");
+	free(name);
+	/*create a new job and inster to gJobList*/
+	job = new_job(opt, job_resp->job_id);
+	job->launch_thr_id = pthread_self();
+	/*
+	 * As required by ptp ui,
+	 * one NewProcess event MUST be sent for each process in this new job.
+	 */
+	task_id = 0;
+	node_id = 0;
+	proc_pid = 0;
+	SetList(gMachineList);
+	/* Now only 1 machine is supported */
+	m = (ptp_machine *)GetFirstElement(gMachineList);
+	
+	lock_nodelist(m);
+	node_cnt = SizeOfList(m->nodes);
+	n = (ptp_node *)GetFirstElement(m->nodes);
+	unlock_nodelist(m);
+
+	node_id = n->id; /* node_id calculated by generateid() */
+
+	for (i = 0; i < job->num_procs; i++) {
 		/*
-		 * save shm addr in a global variable.
-		 * if job allocation blocked, SLURM callback can store the pending job id at this addr, 
-		 * so parent can get the slurm jobid without blocking.
+		 * Let's FAKE proc/node layout map by now.
+		 * The REAL layout information will be sent to ui
+		 * via ProcessChange event after job start.
+		 *
+		 * +node_cnt creates an invalid node_id, so ui will not create the map
+		 * between node and process.
+		 * sendNewProcessEvent() shouldn't make use of these fileds.
+		 *
 		 */
-		sync_msg_addr = pc;
+		task_id = i; /* task_id == task_rank */
 
-		if (need_alloc) { /* require new job allocation */
-			resp = allocate_nodes(opt);			
-			if (resp == NULL || resp->node_list == NULL) { /* allocation fail, rarely happen */
-				pc->slurm_jobid = JOBID_FAIL;
-				pc->jobid_set = true;
-				shmdt(pc);
-				exit(EXIT_JOB_ALLOC_FAIL); 
+		p = new_process(job, node_id + node_cnt, task_id, proc_pid); 
+		sendNewProcessEvent(gTransID, job->ptp_jobid, p, PTP_PROC_STATE_STARTING);
+		proc_pid += 1;
+	 }
+	job->newprocess_event_sent = true;	/* enable job/process state update */
+
+	/*
+	 * job allocation done, but may be pending (no nodes allocated).
+	 * check if nodes granted.
+	 */
+	char * node_list = job_resp->node_list;
+	tmp_resp = job_resp;
+
+	while ((node_list == NULL) || (strlen(node_list) == 0)) {
+		if (lookup_resp != NULL) {
+			slurm_free_resource_allocation_response_msg(lookup_resp);
+			lookup_resp = NULL;
+		}
+		if(slurm_allocation_lookup_lite(job_resp->job_id, &lookup_resp)){ /*lookup error*/
+			if (slurm_get_errno() != ESLURM_JOB_PENDING) {
+				/*
+				 * job allocation fail OR user cancelled
+				 * job state will be updated in handle_jobstate_update
+				 * job structure will be deleted in handle_jobstate_update
+				 */
+				debug_log(logfp,"Job[%d] allocation fail or cancelled\n", job_resp->job_id);
+				slurm_complete_job(job_resp->job_id, NO_VAL);/*Mark job CANCELLED*/
+				goto done;
 			}
-
-			/* allocation granted */
-			if (pc->jobid_set  == false) {
-				pc->slurm_jobid = resp->job_id;
-				pc->jobid_set = true;
-			}	
-			
-			kill_jobid = resp->job_id;
-
-			asprintf(&ptr,"%d",(int)resp->job_id);
-			/* srun will no more allocate resource if SLURM_JOBID set. */
-			setenv("SLURM_JOBID", ptr, 1);
-			fprintf(stderr, "Job %s allcoated done!\n",ptr);	
-			free(ptr);
-			if (resp)
-				slurm_free_resource_allocation_response_msg(resp);
-		} else { 
-			/* run in allocated job (required by ATTACH debug) */
-			pc->slurm_jobid = allocated_jobid;
-			pc->jobid_set = true;
-			asprintf(&ptr,"%d",allocated_jobid);
-			setenv("SLURM_JOBID", ptr, 1);
-			free(ptr);
+		} else {/*lookup success*/
+			node_list = lookup_resp->node_list;	
+			tmp_resp = lookup_resp;
 		}
-		/*
-		 * BLOCK until parent sets io_ready to true,
-		 * which means the io thread is ready.
-		 * Parent sets this flag after getting jobid and create iothread.
-		 */
-		while (!pc->io_ready && wait_retry()) {
-			continue;
-		}
-
-		if (!pc->io_ready) {
-			if (need_alloc){
-				slurm_kill_job(kill_jobid, SIGKILL, 0);
-			}	
-			shmdt(pc);
-			fprintf(stderr, "child exits due to iothread fail\n");
-			exit(EXIT_JOB_IOTHREAD_FAIL); 
-		} else { /* io thread ready */
-			shmdt(pc);
-			/* 
-			 * redirect srun's stdout and stderr 
-			 * job stdout+stderr ==> srun's stdout 
-			 * srun outputs ==> srun's stderr 
-			 */
-			close(fd_out[0]);
-			close(fd_err[0]);
-			dup2(fd_out[1],1);
-			/* dup2(fd_err[1],2); */
-
- 			/* spawn job with srun cmd */
-			rc = execvp(srun_argv[0], srun_argv); 
-			if (rc < 0) {/* rarely happens */
-				if (need_alloc) {
-					/* slurm_complete_job(kill_jobid, 0); */
-					fprintf(stderr,"exec srun fail with %s\n", strerror(errno));
- 					slurm_kill_job(kill_jobid, SIGKILL, 0);
-					fprintf(stderr, "CHILD process kill job!\n");
-				}	
-				exit(EXIT_EXEC_FAIL); 
-			}	
-		}
-		break;
-	case -1:/* error */
-		debug_log(logfp,"child fork error\n");
-		close(fd_out[0]);
-		close(fd_out[1]);
-		close(fd_err[0]);
-		close(fd_err[1]);
-		if (pp)
-			shmdt(pp);
-		shmctl(shmid,IPC_RMID, 0);
-		return -1;
-	default:/* parent */
-		/* BLOCK until child set the slurm jobid  */
-		while (!pp->jobid_set && wait_retry()) {
-			continue;
-		}
-		if (!pp->jobid_set || pp->slurm_jobid == JOBID_FAIL) { 
-			msg = "Job allocation fail! Check RMS and job configuration.\n";
-			debug_log(logfp, msg);
-			sendJobSubErrorEvent(trans_id, jobsubid, msg);
-			close(fd_out[0]);
-			close(fd_out[1]);
-			close(fd_err[0]);
-			close(fd_err[1]);
-			shmdt(pp);
-			kill(pid, SIGKILL); 
-			shmctl(shmid, IPC_RMID, 0);
-			return -1;
-		}
-
-		/* ceate job structure after getting slurm jobid */
-		in->slurm_jobid = pp->slurm_jobid;
-		job = new_job(in, need_alloc);
-		job->srun_pid = pid;
-		
-		/* send OK event for SubmitJob cmd */	
-		sendOKEvent(trans_id);
-	
-		/* send NewJob event */
-		asprintf(&name, SLURM_JOB_NAME_FMT, job->slurm_jobid);
-		//sendNewJobEvent(gTransID, job->ptp_jobid, name, jobsubid, JOB_STATE_INIT);
-		sendNewJobEvent(gTransID, job->ptp_jobid, name, jobsubid, "STARTING");
-		free(name);
-
-		/*
-		 * As required by ptp ui,
-		 * one NewProcess event MUST be sent for each process of this new job.
-		 */
-		task_id = 0;
-		node_id = 0;
-		proc_pid = 0;
-		SetList(gMachineList);
-		/* Now only 1 machine is supported */
-		m = (ptp_machine *)GetFirstElement(gMachineList);
-		SetList(m->nodes);
-		node_cnt = SizeOfList(m->nodes);
-		n = (ptp_node *)GetListElement(m->nodes);
-		node_id = n->id; /* node_id calculated by generateid() */
-
-		for (i = 0; i < job->num_procs; i++) {
-			/*
-			 * SLURM provide no API to get pid ,node_id and task_id.
-			 * And these information can obtained ONLY after job launching.
-			 * So FAKE them by now. 
-			 * +node_cnt creates an invalid nodeid, so ui will not create the map
-			 * between node and process.
-			 * sendNewProcessEvent() shouldn't make use of these fileds.
-			 * FIXME:
-			 *	call slurm_job_step_layout_get() to obtain such information
-			 *	and send to ui via sendProcessChangeEvent	
-			 */
-			p = new_process(job, node_id + node_cnt, task_id, proc_pid); 
-			//sendNewProcessEvent(gTransID, job->ptp_jobid, p, PROC_STATE_STARTING);
-			sendNewProcessEvent(gTransID, job->ptp_jobid, p, "STARTING");
-			task_id += 1;
-			proc_pid += 1;
-		 }
-
-		close(fd_out[1]);
-		close(fd_err[1]);
-		job->fd_out = fd_out[0];
-		job->fd_err = fd_err[0];
-
-		/* 
-		 * Create io thread to redirect srun's stdout (job output). 
-	     * Don't start it before sending the NewProcess events!
-	     */
-		if (create_iothread(job) == 0) {
-			pp->io_ready = true;
-		} else {
-			pp->io_ready = false;
-			job->iothread_exit = true;
-		}
-		shmdt(pp);
-		shmctl(shmid, IPC_RMID, 0);
-		return 0;
+		sleep(2); /*re-check after 2 seconds*/
 	}
 
-	return 0;
+	/***********************OK. nodes granted***********************/
+
+	/*Create job step context*/
+	slurm_step_ctx_params_t_init(&step_params);
+	if (opt->debug)
+		step_params.name = opt->debug_exec_name;
+	else 	
+		step_params.name = opt->exec_name;
+	step_params.job_id = tmp_resp->job_id;
+	//step_params.node_count = job_resp->node_cnt;
+	//step_params.node_list = job_resp->node_list;
+	step_params.node_count = tmp_resp->node_cnt;
+	step_params.node_list = tmp_resp->node_list;
+	step_params.task_count = opt->nprocs;
+	step_params.time_limit = opt->tlimit;
+	step_params.uid = opt->uid;
+	
+	step_ctx = slurm_step_ctx_create(&step_params);
+	if (step_ctx == NULL) {
+		debug_log(logfp, "Job[%d] step_ctx create fail:%s\n", tmp_resp->job_id, slurm_strerror(slurm_get_errno()));
+		slurm_complete_job(tmp_resp->job_id, NO_VAL);/*Mark job CANCELLED*/
+		goto done;
+	}
+	
+	/*
+	 * send job layout information to ptp ui.
+	 * layout is available right after step_ctx created.
+	 * Note: process pid still not available since SLURM jobstep layout not provide it.
+	 */
+	uint32_t step_id;
+	slurm_step_ctx_get(step_ctx, SLURM_STEP_CTX_STEPID, &step_id);
+	layout = slurm_job_step_layout_get(job->slurm_jobid, step_id);
+	if (layout != NULL) {
+		/*layout->node_list:node range, e.g., node[1-5]*/
+		char * node = NULL;
+		int i, j, cnt, node_id = -1, rank;
+
+		job_proctable_init(job);
+		hostlist_t hl;
+		hl = slurm_hostlist_create(layout->node_list);
+		int hl_cnt = slurm_hostlist_count(hl);
+		for (i = 0; i < hl_cnt; i++) {
+			node = slurm_hostlist_shift(hl);
+			if (node != NULL) {
+				get_node_id(node, &node_id);
+				cnt = layout->tasks[i];
+				for (j = 0; j < cnt; j++) {
+					rank = layout->tids[i][j];
+					job->proctable[rank].hostname = strdup(node); 
+					//job->proctable[rank].exec_name skipped 
+					//job->proctable[rank].pid skipped
+					p = job->procs[rank];
+					sendProcessChangeEvent(gTransID, p, node_id, p->task_id, p->pid);
+				}
+				free(node);	
+			}	
+		}
+		slurm_hostlist_destroy(hl);
+		slurm_job_step_layout_free(layout);
+		job->step_layout_ready = true;
+	}
+	else {
+		debug_log(logfp, "job step layout unavailable\n" );
+	}
+
+	/*launch job step*/
+	slurm_step_launch_params_t_init(&launch_params);
+	if (opt->debug) {
+		launch_params.argc = opt->debug_argc;
+		launch_params.argv = opt->debug_argv;
+	} else {
+		launch_params.argc = opt->prog_argc;
+		launch_params.argv = opt->prog_argv;
+	}
+	launch_params.envc = opt->envc;
+	launch_params.env = opt->env;
+	launch_params.cwd = opt->cwd;
+	launch_params.user_managed_io = false;
+	launch_params.labelio = true; /*true to distinguish outputs from different process*/
+
+	/*create two pipes/fifos to handle job's stdout/stderr*/
+	pipe(fd_out);
+	pipe(fd_err);
+	fd_set = true;
+
+	/*set FD_CLOEXEC flag to pipe fds*/
+	fd_set_exec_close(fd_out[0]);
+	fd_set_exec_close(fd_out[1]);
+	fd_set_exec_close(fd_err[0]);
+	fd_set_exec_close(fd_err[1]);
+
+	launch_params.local_fds.out.fd = fd_out[1];
+	launch_params.local_fds.err.fd = fd_err[1];
+	
+	/*create iothread before launching job step*/
+	job->fd_out[0] = fd_out[0];
+	job->fd_out[1] = fd_out[1];
+	job->fd_err[0] = fd_err[0];
+	job->fd_err[1] = fd_err[1];
+
+	if (create_iothread(job)) {
+		debug_log(logfp, "Cancel Jod[%d] coz creating io thread failed.\n", job_resp->job_id);
+		slurm_complete_job(job_resp->job_id, NO_VAL);/*Mark job CANCELLED*/
+		/*close read end of pipes*/
+		close(fd_out[0]);
+		close(fd_err[0]);
+		goto done;
+	}	
+	sleep(2); /*wait for iothread ready*/
+
+	/*launch job step*/
+	if (slurm_step_launch(step_ctx, &launch_params, NULL) != SLURM_SUCCESS) {
+		slurm_complete_job(job_resp->job_id, NO_VAL);/*Mark job CANCELLED*/
+		debug_log(logfp, "Job[%d] step launch fail.\n", job_resp->job_id);
+		goto done;
+	}
+
+	/*wait for job step start*/
+	if (slurm_step_launch_wait_start(step_ctx) != SLURM_SUCCESS) {
+		slurm_kill_job(job_resp->job_id, SIGKILL, 0); /*kill all job step and complete job*/
+		debug_log(logfp, "Job[%d] step wait start fail.\n", job_resp->job_id);
+		goto done;
+	}
+
+	if (job->debug) { /*do extra work for debug launch*/
+		/* handle debug job launch 
+		 * The ORDER is very important.
+		 * (1) launch sdm server as a parallel job. 
+		 *     sdm server must run and in accept state before sdm client starts.
+		 * (2) write routing file for sdm client and servers
+		 * (3) exec sdm client on server node
+		 *		NOTE:This step is done by front end (ptp ui) for ORTE,MPICH2, PE, LL rms.
+		 *		In SLURM, we do it by our proxy.
+		 */
+		if (job->step_layout_ready) {
+			/*write new routing file*/
+			write_routing_file(job);
+			
+			/*
+		 	 * launch sdm client
+	 		 */
+			char * clnt_host = NULL;
+			char * clnt_port = NULL;
+			char * clnt_master = "--master";
+			for (i = 0; i < opt->debug_argc; i++) {
+				if (strstr(opt->debug_argv[i],"--port")) 
+					clnt_port = opt->debug_argv[i];
+				if (strstr(opt->debug_argv[i], "--host")) 
+					clnt_host = opt->debug_argv[i];
+			}
+			pid_t clnt_pid;
+
+			switch (clnt_pid = fork()) 
+			{
+			case 0:/*child*/
+				/*exec sdm client on server node*/
+				/*to locate routing file correctly*/
+				chdir(opt->cwd); 
+				execl(opt->debug_argv[0], opt->debug_argv[0], clnt_host, clnt_port, clnt_master, NULL);
+				break;
+			case -1:
+				debug_log(logfp, "fork sdmclnt error\n");
+				break;
+			default:
+				job->sdmclnt_pid = clnt_pid;
+				break;
+			}
+		}	
+	}
+
+	/*block until job step finish*/
+	slurm_step_launch_wait_finish(step_ctx);
+
+	uint32_t job_ret_code = 0;/*Mark job COMPLETE*/
+	slurm_complete_job(job->slurm_jobid, job_ret_code);
+
+done:
+	if (job_req)
+		destroy_job_desc_msg(job_req);
+	if (job_resp)
+		slurm_free_resource_allocation_response_msg(job_resp);
+	if (lookup_resp) 
+		slurm_free_resource_allocation_response_msg(lookup_resp);
+	if (step_ctx)
+		slurm_step_ctx_destroy(step_ctx);
+	if (opt)
+		opt_release(opt); /*release opt structure*/		
+	
+	if (fd_set) {
+		/*close write end of pipe, ensure io thread exit*/	
+		close(fd_out[1]);
+		close(fd_err[1]);
+	}
+	
+	if (job)
+		job->launch_thr_exit = true;
+
+	pthread_exit(NULL);
 }
 
 /*
- * Return the absolute path of cmd using $PATH and current working directory. 
+ * Return the absolute path of cmd using $PATH and cwd. 
+ * The returned value must be freed by user.
  */
 static char *
 get_path(char * cmd, char * cwd, int mode)
@@ -2479,22 +1847,24 @@ get_path(char * cmd, char * cwd, int mode)
 	if ( (cmd[0] == '.' || cmd[0] == '/')
 		&& access(cmd, mode) == 0) {
 		if (cmd[0] == '.') 
-			asprintf(&fullpath,"%s/%s",cwd,cmd);
+			asprintf(&fullpath,"%s/%s", cwd, cmd);
 		else 
-			asprintf(&fullpath,cmd);
+			asprintf(&fullpath,"%s", cmd);
 	} else {
 		/* search $PATH */
 		path = getenv("PATH");
 		if (path != NULL) {
 			if ((ptr = (char *) malloc(strlen(path) + 1)) != NULL ) {
 				tmp = pos = ptr;
-				memcpy(ptr, path, strlen(path)+1);
+				memcpy(ptr, path, strlen(path));
+				ptr[strlen(path) + 1] = '\0';
 				while((pos = strchr(ptr,':')) != NULL) {
 					*pos = '\0';
-					asprintf(&fullpath, "%s/%s",ptr,cmd);
-					if (access(fullpath, mode) == 0)
-						break;
-					else {
+					asprintf(&fullpath, "%s/%s", ptr, cmd);
+					if (access(fullpath, mode) == 0) {
+						free(tmp);
+						goto done;
+					} else {
 						free(fullpath);
 						fullpath = NULL;
 						ptr = pos + 1;
@@ -2502,7 +1872,7 @@ get_path(char * cmd, char * cwd, int mode)
 				}
 				/* handle the last element */
 				if (*ptr != '\0') {
-					asprintf(&fullpath, "%s/%s",ptr,cmd);
+					asprintf(&fullpath, "%s/%s", ptr, cmd);
 					if (access(fullpath, mode) != 0) {
 						free(fullpath);
 						fullpath = NULL;
@@ -2512,147 +1882,1027 @@ get_path(char * cmd, char * cwd, int mode)
 			}
 		}
 	}
+
+done:
 	return fullpath;
 }
 
 /*
- * Redirect srun's stdout to ptp ui.
- * FIXME:
- * 	  srun's stderr	is ignored.
+ * Redirect job's stdout/stderr to ptp ui.
  */
 void *
-srun_output_forwarding(void * arg)
+job_io_handler(void * arg)
 {
-	int fd = -1;
+	int fd_out = -1;
+	int fd_err = -1;
+	int fd;
 	char * ptr = NULL;
 	ptp_job * job = NULL;
 	int task_id;
 	fd_set rfds;
 	struct timeval tv;
 	char buf[MAX_BUF_SIZE];
-	FILE * fp = NULL;
+	FILE * fp_out = NULL;
+	FILE * fp_err = NULL;
 	int cancel_state;
 	int cancel_type;
 	int	ret;
 	char * p = NULL;
-	pid_t cpid;
-	int status;
 	
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,&cancel_state);
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &cancel_type);
 	
 	job = (ptp_job *)arg;
-	job->iothread_exit = false;
-	/* only handle job stdout */
-	fd = job->fd_out;
+	fd_out = job->fd_out[0];
+	fd_err = job->fd_err[0];
 	
-	while (1)
+	while (job->iothr_exit_req == false)
 	{
-		if (job->iothread_exit_req) {
-			debug_log(logfp, "job[%d] iothread exit on exit_request.\n", job->slurm_jobid);
-			job->iothread_exit = true;
-			if (fp)
-				fclose(fp);
-			pthread_exit(NULL);
-		}
-		
 		tv.tv_sec = 0;
-		tv.tv_usec = 5000;
-		
+		tv.tv_usec = 5000;/* 5ms */
 		/* 
 		 * if timeout, the rfds will be cleared 
 		 * rfds must be set in each iteration
 		 */
 		FD_ZERO(&rfds);
-		FD_SET(fd, &rfds);
-		ret = select(fd+1,&rfds,NULL,NULL,&tv);
+		FD_SET(fd_out, &rfds);
+		FD_SET(fd_err, &rfds);
+		fd = fd_out > fd_err?fd_out:fd_err;
+
+		ret = select(fd+1, &rfds, NULL, NULL, &tv);
 
 		switch(ret)
 		{
 		case -1: /* error */
-			debug_log(logfp,"job[%d] iothread exit on select error\n",job->slurm_jobid);
-			if (fp)
-				fclose(fp);
-			job->iothread_exit = true;
-			pthread_exit(NULL);
+			debug_log(logfp,"job[%d] iothread exit on select error\n", job->slurm_jobid);
+			if (errno == EINTR) {
+				debug_log(logfp, "select got signal. Continue.\n");
+				fprintf(stderr, "select got signal. Continue.\n");
+				continue;
+			} else {	
+				debug_log(logfp, "select error. Exit.\n");
+				fprintf(stderr, "select error. Exit.\n");
+				goto done;
+			}
 			break;
-
 		case 0: /* timeout */
 			break;
-				
 		default: /* fd ready */
-			if (FD_ISSET(fd, &rfds)) {
-				if (fp == NULL) {
-					fp = fdopen(fd,"r");
-				}	
-				if (fgets(buf, sizeof(buf), fp) != NULL) {
-				/* if ((rc = fd_read_line(fd, buf, sizeof(buf)))> 0 ) { */
+			if (FD_ISSET(fd_out, &rfds)) { /* handle job stdout */
+				if (fp_out == NULL)
+					fp_out = fdopen(fd_out,"r");
+				if (fgets(buf, sizeof(buf), fp_out) != NULL) { 
+				//if ((rc = fd_read_line(fd, buf, sizeof(buf)))> 0 ) { 
+					if (job->debug) {
+						fprintf(stderr, "%s\n", buf);
+						continue;
+					}
 					p = buf;
-					/* get task id from srun label */
+					/* get task id from output label */
 					task_id = atoi(p);
 					ptr = strchr(p, ':');
-					ptr ++;
 					if (ptr != NULL) {
+						ptr ++;
 						/* 
 						 * No synchronization needed, 
 						 * since the event list is internally protected by pthread_mutex
 						 */
-						ptp_process * proc;
+						ptp_process * proc = NULL;
 						proc = find_process(job, task_id);
-						sendProcessOutputEvent(gTransID, proc->id, ptr);
-					} else 
-						debug_log(logfp,"process label not found\n");
+						if (proc != NULL)
+							sendProcessOutputEvent(gTransID, proc, ptr);
+					}  
 				} else { /* error or EOF of pipe(write end closed) */
-					debug_log(logfp,"Error/EOF of pipe\n");
-					if (fp)
-						fclose(fp);
-					/* Request iothread to exit.  */	
-					cpid = waitpid(job->srun_pid, &status, 0);
-					if (cpid == job->srun_pid) {
-						if (WIFEXITED(status)) {
-							if (job->need_alloc) {
-								ret = slurm_complete_job(job->slurm_jobid, 0);
-							}	
-							debug_log(logfp, "srun exit code:%d\n", WEXITSTATUS(status));
-						} else if (WIFSIGNALED(status)) {
-							if (job->need_alloc) {
-								slurm_kill_job(job->slurm_jobid, SIGKILL, 0);
-							}	
-							debug_log(logfp, "srun killed by signal[%d]\n", WTERMSIG(status));
-						}
-					}
-					job->iothread_exit = true;
-					debug_log(logfp,"job[%d] iothread exit\n",job->slurm_jobid);
-					pthread_exit(NULL);
+					debug_log(logfp,"job[%d] iothread exit on EOF/ERROR of stdout fd\n",job->slurm_jobid);
+					goto done;
 				}	
-			}	
+			}
+
+			if (FD_ISSET(fd_err, &rfds)) { /* handle job stderr */
+				if (fp_err == NULL)
+					fp_err = fdopen(fd_err,"r");
+				if (fgets(buf, sizeof(buf), fp_err) != NULL) { 
+				//if ((rc = fd_read_line(fd, buf, sizeof(buf)))> 0 ) {
+					if (job->debug) {
+						fprintf(stderr, "%s\n", buf);
+						continue;
+					}
+					p = buf;
+					/* get task id from srun label */
+					task_id = atoi(p);
+					ptr = strchr(p, ':');
+					if (ptr != NULL) {
+						ptr ++;
+						/* 
+						 * No synchronization needed, 
+						 * since the event list is internally protected by pthread_mutex
+						 */
+						ptp_process * proc = NULL;
+						proc = find_process(job, task_id);
+						if (proc)
+							sendProcessOutputEvent(gTransID, proc, ptr);
+					}  
+				} else { /* error or EOF of pipe (write end closed) */
+					debug_log(logfp,"job[%d] iothread exit on Error/EOF of stderr fd.\n",job->slurm_jobid);
+					goto done;
+				}	
+			}
+
 			break; 
 		}	
-	}		
+	}	
+
+	debug_log(logfp, "job[%d] iothread exit on exit_request.\n", job->slurm_jobid);
+
+done:
+	if (fp_out)
+		fclose(fp_out);
+	if (fp_err)
+		fclose(fp_err);
+
+	close(job->fd_out[0]);
+	close(job->fd_err[0]);
+
+	job->iothr_exit = true;
+
+	pthread_exit(NULL);
 	
 	return NULL;
 }
 
 /*
- * Delete removable job from gJobList.
- * A job is removable if and only if:
- * (1) its iothread has exited
- * (2) it's not active
+ * Initialize "opt" with default values
  */
-static void 
-purge_global_joblist()
+int 
+opt_default(job_opt_t * opt)
 {
-	ptp_job * j = NULL;
+	int rc = 0;
+	char buf[MAXPATHLEN + 1];
+	struct passwd * pw;
+
+
+	if ((pw = getpwuid(getuid())) != NULL) {
+		strncpy(opt->user, pw->pw_name, MAX_USERNAME);
+		opt->uid = pw->pw_uid;
+	} else {
+		debug_log(logfp, "getpwuid error.\n");
+		rc = -1;
+		goto done;
+	}
+
+	opt->gid = getgid();
+	opt->nprocs = 1;
+	opt->nprocs_set = false;
+	opt->min_nodes = 1;
+	opt->max_nodes = 0;
+	opt->nodes_set = false;
+	opt->tlimit = NO_VAL;
+	opt->tlimit_set = false;
+	opt->partition = NULL; 
+	opt->jobid = NO_VAL;
+	opt->jobid_set = false;
+	opt->labelio = true; /*TRUE to distinguish process stdout*/
+	opt->nodelist = NULL;
+	opt->exc_nodes = NULL;
+
+	if (getcwd(buf, MAXPATHLEN) == NULL) {
+		rc = -1;
+		goto done;
+	}
+	opt->cwd = strdup(buf); 
+	opt->envc = 0;
+	opt->env = NULL;
+	opt->exec_name = NULL;
+	opt->exec_path = NULL;
+	opt->exec_fullname = NULL;
+	opt->prog_argc = 0;
+	opt->prog_argv = NULL;
 	
-	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL;) {
-		if (j->iothread_exit && !slurm_job_active(j))
-			j->removable = true;
-		if (j->removable) {
-			RemoveFromList(gJobList, j);
-			free_job(j);
+	opt->debug = false;
+	opt->debug_exec_name = NULL;
+	opt->debug_exec_path = NULL;
+	opt->debug_exec_fullname = NULL;
+	opt->debug_argc = 0;
+	opt->debug_argv = NULL;
+	
+	opt->trans_id = -1;
+	opt->ptpid = -1;
+	opt->jobsubid = NULL;
+
+done:
+	return rc;
+}
+
+/*
+ *Set opt according to cmd args
+ */ 
+int 
+opt_args(job_opt_t * opt, int nargs, char ** args)
+{
+	int i,k;
+	char * str = NULL;
+	int num_args = 0;
+	int num_env = 0;
+	int debug_argc = 0;
+
+	for (i = 0; i < nargs; i++) {
+		if (proxy_test_attribute(SLURM_JOB_NUM_PROCS_ATTR, args[i])) {
+			opt->nprocs = proxy_get_attribute_value_int(args[i]);
+			opt->nprocs_set = true;
+		} else if (proxy_test_attribute(SLURM_JOB_NUM_NODES_ATTR, args[i])) {
+			opt->min_nodes = proxy_get_attribute_value_int(args[i]);
+			opt->nodes_set = true;
+		} else if (proxy_test_attribute(SLURM_JOB_TIME_LIMIT_ATTR, args[i])) {
+			opt->tlimit = proxy_get_attribute_value_int(args[i]);
+			opt->tlimit_set = true;
+		} else if (proxy_test_attribute(SLURM_JOB_PARTITION_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0) 
+				opt->partition = strdup(str);
+		} else if (proxy_test_attribute(SLURM_JOB_IOLABEL_ATTR, args[i])) {
+			opt->labelio = proxy_get_attribute_value_bool(args[i]);
+		} else if (proxy_test_attribute(SLURM_JOB_ID_ATTR, args[i])) {
+			opt->jobid = proxy_get_attribute_value_int(args[i]);
+			opt->jobid_set = true;
+		} else if (proxy_test_attribute(SLURM_JOB_NODELIST_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0) 
+				opt->nodelist = strdup(str); 
+		} else if (proxy_test_attribute(SLURM_JOB_EXCNODELIST_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0)
+				opt->exc_nodes = strdup(str);
+		} else if (proxy_test_attribute(SLURM_JOB_EXEC_NAME_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0)
+				opt->exec_name = strdup(str);
+		} else if (proxy_test_attribute(SLURM_JOB_EXEC_PATH_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0)
+				opt->exec_path = strdup(str); 
+		} else if (proxy_test_attribute(SLURM_JOB_WORKING_DIR_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0) {
+				if (opt->cwd)
+					free(opt->cwd); /*free opt->cwd set by opt_default*/
+				opt->cwd = strdup(str); 
+			}
+		} else if (proxy_test_attribute(SLURM_JOB_PROG_ARGS_ATTR, args[i])) {
+			num_args++;
+		} else if (proxy_test_attribute(SLURM_JOB_ENV_ATTR, args[i])) {
+			num_env++;
+		} else if (proxy_test_attribute(SLURM_JOB_DEBUG_ARGS_ATTR, args[i])) {
+			debug_argc++;
+		} else if (proxy_test_attribute(SLURM_JOB_DEBUG_FLAG_ATTR, args[i])) {
+			opt->debug = proxy_get_attribute_value_bool(args[i]);
+		} else if (proxy_test_attribute(SLURM_JOB_DEBUG_EXEC_NAME_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0)
+				opt->debug_exec_name = strdup(str);
+		} else if (proxy_test_attribute(SLURM_JOB_DEBUG_EXEC_PATH_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0)
+				opt->debug_exec_path = strdup(str);
+		}
+	}
+	
+	/*handle enviorment variables*/
+	opt->envc = num_env;
+	if (opt->envc) {
+		opt->env = (char **)malloc(opt->envc * sizeof(char *));
+		if (opt->env == NULL) 
+			goto done;
+		k = 0;	
+		for (i = 0; i < nargs; i++) {
+			if (proxy_test_attribute(SLURM_JOB_ENV_ATTR, args[i])) {
+				str = proxy_get_attribute_value_str(args[i]);
+				if (strlen(str) > 0)
+					opt->env[k++] = strdup(str);
+			}
 		}	
 	}
+	
+
+	/*handle app argv[] parameter*/	
+	if (opt->debug) { /*debug job*/		
+		opt->debug_argc = debug_argc + 1; //+1 for argv[0]
+		opt->debug_argv = (char **)malloc(opt->debug_argc * sizeof(char *));
+		if (opt->debug_argv == NULL)
+			goto done;
+		memset(opt->debug_argv, 0, opt->debug_argc * sizeof(char *));
+		k = 1;
+		//opt->debug_argv[0] reserved and set in opt_verify()
+		for (i = 0; i < nargs; i++) {
+			if (proxy_test_attribute(SLURM_JOB_DEBUG_ARGS_ATTR, args[i])) {
+			str = proxy_get_attribute_value_str(args[i]);
+			if (strlen(str) > 0)
+				opt->debug_argv[k++] = strdup(str);
+			}
+		}	
+	} else { /*non-debug job*/	
+		opt->prog_argc = num_args + 1;//+1 for argv[0]
+		opt->prog_argv = (char **)malloc(opt->prog_argc*sizeof(char *));
+		if (opt->prog_argv == NULL)
+			goto done;
+		memset(opt->prog_argv, 0, opt->prog_argc * sizeof(char *));
+		k = 1;
+		//opt->prog_argv[0] reserved and set in opt_verify()
+		for (i = 0; i < nargs; i++) {
+			if (proxy_test_attribute(SLURM_JOB_PROG_ARGS_ATTR, args[i])) {
+				str = proxy_get_attribute_value_str(args[i]);
+				if (strlen(str) > 0)
+					opt->prog_argv[k++] = strdup(str);
+			}
+		}
+	}	
+
+	return  0;
+
+done:
+	debug_log(logfp, "opt_args() malloc error.\n");
+	//opt_release(opt);
+	return  -1;
 }
+
+/*
+ * Verify arg settings
+ */ 
+bool 
+opt_verify(job_opt_t * opt)
+{
+	bool verified = true;
+	hostlist_t hl = NULL;
+	int hl_cnt = 0;
+	int rc = 0;
+	int dec_cnt, i;
+	char * host = NULL;
+
+	if (opt == NULL)
+		return false;
+
+	if (opt->debug) { /* check debug-job parameters */
+		/* get the fullpath of sdm executable */		
+		if (opt->debug_exec_name == NULL) {
+			verified = false;
+			goto done;
+		}
+
+		if (opt->debug_exec_path == NULL) {
+			opt->debug_exec_fullname = get_path(opt->debug_exec_name, opt->cwd, X_OK);
+			if (opt->debug_exec_fullname == NULL) {
+				verified = false;
+				goto done;
+			}
+		} else {
+			rc = asprintf(&(opt->debug_exec_fullname), "%s/%s", opt->debug_exec_path, opt->debug_exec_name);
+			if (rc == -1) {
+				verified = false;
+				goto done;
+			}
+		}	
+	
+		/* check access right */		
+		if (access(opt->debug_exec_fullname, X_OK) < 0) {
+			verified = false;
+			goto done;
+		} else { 
+			if ((opt->debug_argv[0] = strdup(opt->debug_exec_fullname))== NULL) {
+				verified = false;
+				goto done;
+			}
+		}
+	} else { /* check normal-job  parameters */	
+		if (opt->exec_name == NULL){
+			debug_log(logfp, "program name not specified.\n");
+			verified = false;
+			goto done;
+		}
+
+		/* locate the execuable file to be launched */
+		if (opt->exec_path == NULL) {
+			opt->exec_fullname = get_path(opt->exec_name, opt->cwd, X_OK);
+			if (opt->exec_fullname == NULL) { 
+				verified = false;	
+				goto done;
+			}
+		} else {
+			asprintf(&(opt->exec_fullname), "%s/%s", opt->exec_path, opt->exec_name);
+			/* check access right */		
+			if (access(opt->exec_fullname, X_OK) < 0) {
+				verified = false;
+				goto done;
+			} else {
+				if ((opt->prog_argv[0] = strdup(opt->exec_fullname)) == NULL) {
+					verified = false;
+					goto done;
+				}
+			}
+		}	
+	}		
+	
+
+	/* verify partition request*/
+	if (opt->partition == NULL){
+		opt->partition = get_default_partition();
+	} else {
+		 if (partition_verify(opt->partition) == false) {
+			verified = false;
+			goto done;
+		}
+	}
+	
+	/* verify proc number */
+	if (opt->nprocs <= 0) {
+		debug_log(logfp, "invalid number of processes (-n %d)\n", opt->nprocs);
+		verified = false;
+		goto done;
+	}
+		
+	/* verify -N parameter*/
+	if (opt->min_nodes <= 0 || opt->max_nodes < 0 || 
+		(opt->max_nodes && (opt->min_nodes > opt->max_nodes))) {
+		debug_log(logfp, "invalid number of nodes (-N %d-%d)\n", opt->min_nodes, opt->max_nodes);
+		verified = false;
+		goto done;
+	}
+
+	if (opt->nodelist) {
+		hl = slurm_hostlist_create(opt->nodelist);
+		if (!hl) {
+			debug_log(logfp, "hostlist create error.\n");
+			verified = false;
+			goto done;
+		}
+		slurm_hostlist_uniq(hl);
+		hl_cnt = slurm_hostlist_count(hl);
+		if (opt->nodes_set) {
+			if (hl_cnt > opt->min_nodes)
+				opt->min_nodes = hl_cnt;		
+		} else {
+			opt->min_nodes = hl_cnt;
+			opt->nodes_set = true;
+		}
+	}
+
+	if (opt->nodes_set && opt->nprocs_set) {
+		 /* make sure max_nodex <= nprocs */
+		if (opt->nprocs < opt->max_nodes) 
+			opt->max_nodes = opt->nprocs;
+		/* make sure nprocs >= min_nodes */
+		if (opt->nprocs < opt->min_nodes) {
+			debug_log(logfp, "Can't run %d processes on %d nodes, setting nnodes=%d\n",
+						opt->nprocs, opt->min_nodes, opt->nprocs);
+			opt->min_nodes = opt->nprocs;
+			if (opt->max_nodes && opt->min_nodes > opt->max_nodes)
+				opt->max_nodes = opt->min_nodes;
+			if (hl_cnt > opt->min_nodes) {
+				/*
+				 * shrink the number of requested nodelist 
+				 */ 
+				dec_cnt = hl_cnt - opt->min_nodes;
+				debug_log(logfp, "Shrink requested nodes by %d\n",dec_cnt);
+				for (i = 0; i < dec_cnt; i++) {
+					host = slurm_hostlist_shift(hl);
+					free(host);
+				}
+				/*update opt->nodelist */	
+				slurm_hostlist_ranged_string(hl, strlen(opt->nodelist)+1, opt->nodelist);
+			}
+		}
+	}
+	if (hl)
+		slurm_hostlist_destroy(hl);
+
+done:
+	return verified;	
+}
+
+
+static char *
+get_default_partition()
+{
+	int i = 0;
+	char * ptr = NULL;
+	partition_info_msg_t * part_info_msg = NULL;
+	
+	if (slurm_load_partitions((time_t)NULL, &part_info_msg, SHOW_ALL ) == SLURM_SUCCESS) {
+		for (i = 0; i < part_info_msg->record_count; i++) {
+			if (part_info_msg->partition_array[i].default_part) {
+				ptr = strdup(part_info_msg->partition_array[i].name);
+				break;
+			}
+		}
+		slurm_free_partition_info_msg(part_info_msg);
+	}
+
+	return ptr; /*should be released by caller*/
+}
+
+static bool 
+partition_verify(char * partition)
+{
+	bool rc = false;
+	int i = 0;
+	partition_info_msg_t * part_info_msg = NULL;
+	
+	if (slurm_load_partitions((time_t)NULL, &part_info_msg, SHOW_ALL ) == SLURM_SUCCESS) {
+		for (i = 0; i < part_info_msg->record_count; i++) {
+			if (strcmp(part_info_msg->partition_array[i].name, partition) == 0) {
+				rc = true;
+				break;
+			}
+		}
+		slurm_free_partition_info_msg(part_info_msg);
+	}
+	
+	return rc;
+}
+
+
+/*
+ *create a new opt structure
+ */ 
+job_opt_t * opt_new()
+{
+	job_opt_t * ptr = NULL;
+
+	ptr = (job_opt_t *)malloc(sizeof(job_opt_t));
+	if (ptr) 
+		memset(ptr, 0, sizeof(job_opt_t));
+	
+	return ptr;
+}
+
+/*
+ *Release space malloced for opt elements
+ */ 
+static void 
+opt_release(job_opt_t * opt)
+{
+	int i = 0;
+
+	if (opt){
+		if (opt->partition)
+			free(opt->partition);
+		if (opt->nodelist)
+			free(opt->nodelist);
+		if (opt->exc_nodes)
+			free(opt->exc_nodes);
+		if (opt->cwd)
+			free(opt->cwd);
+		if(opt->env) {	
+			for (i = 0; i < opt->envc; i++) {
+				if (opt->env[i])
+					free(opt->env[i]);
+			}
+			free(opt->env);
+		}	
+		if (opt->exec_name)
+			free(opt->exec_name);
+		if (opt->exec_path)
+			free(opt->exec_path);
+		if(opt->exec_fullname)
+			free(opt->exec_fullname);
+		if (opt->prog_argv) {	
+			for (i = 0; i < opt->prog_argc; i++) {
+				if (opt->prog_argv[i])
+					free(opt->prog_argv[i]);
+			}
+			free(opt->prog_argv);
+		}
+		if (opt->debug_exec_name)
+			free(opt->debug_exec_name);
+		if (opt->debug_exec_path)
+			free(opt->debug_exec_path);
+		if(opt->debug_exec_fullname)
+			free(opt->debug_exec_fullname);
+		if (opt->debug_argv) {	
+			for (i = 0; i < opt->debug_argc; i++) {
+				if (opt->debug_argv[i])
+					free(opt->debug_argv[i]);
+			}
+			free(opt->debug_argv);
+		}
+		if (opt->jobsubid)
+			free(opt->jobsubid);
+
+		free(opt);	
+	}
+}
+
+/*
+ * Check if timer expires with the given timeout value.
+ * timeout: usec
+ */
+static bool
+update_timeout(struct timeval * timer, const int timeout)
+{
+	struct timeval now;
+	int val;
+	bool rc = false;
+	
+	if (timer == NULL)
+		return rc;
+
+	gettimeofday(&now, NULL);
+	val = (now.tv_sec - timer->tv_sec) * 1000000 + (now.tv_usec - timer->tv_usec) - timeout;
+	if (val >= 0)  /* time out */
+		rc = true;
+
+	return rc;
+}
+
+void 
+init_timer(struct timeval * timer)
+{
+	gettimeofday(timer, NULL);
+	return;	
+}
+
+int 
+handle_nodestate_update(node_info_msg_t * ptr, bool init_flag)
+{
+	int i = 0;
+	int rc = -1;
+	ptp_node * node = NULL;
+	rangeset * unk_set = NULL;
+	rangeset * down_set = NULL;
+	rangeset * idle_set = NULL;
+	rangeset * alloc_set = NULL;
+	rangeset * err_set = NULL;
+	rangeset * mix_set = NULL;
+	rangeset * future_set = NULL;
+
+	if (ptr == NULL)
+		return rc;
+
+	unk_set = new_rangeset();
+	idle_set = new_rangeset();
+	down_set = new_rangeset();
+	alloc_set = new_rangeset();
+	err_set = new_rangeset();
+	mix_set = new_rangeset();
+	future_set = new_rangeset();
+	if (!unk_set || !idle_set || !down_set || !alloc_set || !err_set || !mix_set || !future_set)
+		goto cleanup;
+
+	for (i = 0; i < ptr->record_count; i++) {
+		node = find_node_by_name(ptr->node_array[i].name);
+		if (!node) /* node not found in global node list */
+			continue;
+
+		if (!init_flag) {	
+			if (node->state == ptr->node_array[i].node_state)
+				continue; /* handle next node */
+		}
+
+		node->state = ptr->node_array[i].node_state;
+		 /* send node state change */
+		switch (node->state & NODE_STATE_BASE) {
+		case NODE_STATE_UNKNOWN:
+			insert_in_rangeset(unk_set,node->id);
+			break;
+		case NODE_STATE_DOWN:
+			insert_in_rangeset(down_set,node->id);
+			break;
+		case NODE_STATE_IDLE:
+			insert_in_rangeset(idle_set,node->id);
+			break;
+		case NODE_STATE_ALLOCATED:
+			insert_in_rangeset(alloc_set,node->id);
+			break;
+		case NODE_STATE_ERROR:
+			insert_in_rangeset(err_set,node->id);
+			break;
+		case NODE_STATE_MIXED:
+			insert_in_rangeset(mix_set,node->id);
+			break;
+		case NODE_STATE_FUTURE:
+			insert_in_rangeset(future_set,node->id);
+			break;
+		default:
+			debug_log(logfp, "node[%d] unrecognized node state.\n", i);
+			break;
+		}	
+	}	
+				
+	if (!EmptyList(unk_set->elements)) 
+		sendNodeChangeEvent(gTransID,rangeset_to_string(unk_set),NODE_STATE_UNKNOWN);
+	if (!EmptyList(down_set->elements)) 
+		sendNodeChangeEvent(gTransID,rangeset_to_string(down_set),NODE_STATE_DOWN);
+	if (!EmptyList(idle_set->elements)) 
+		sendNodeChangeEvent(gTransID,rangeset_to_string(idle_set),NODE_STATE_IDLE);
+	if (!EmptyList(alloc_set->elements)) 
+		sendNodeChangeEvent(gTransID,rangeset_to_string(alloc_set),NODE_STATE_ALLOCATED);
+	if (!EmptyList(err_set->elements)) 
+		sendNodeChangeEvent(gTransID,rangeset_to_string(err_set),NODE_STATE_ERROR);
+	if (!EmptyList(mix_set->elements)) 
+		sendNodeChangeEvent(gTransID,rangeset_to_string(mix_set),NODE_STATE_MIXED);
+	if (!EmptyList(future_set->elements)) 
+		sendNodeChangeEvent(gTransID,rangeset_to_string(future_set),NODE_STATE_FUTURE);
+
+	rc = 0;
+
+cleanup:
+	if (unk_set) {
+		free_rangeset(unk_set);
+		unk_set = NULL;
+	}
+	if (down_set) {	
+		free_rangeset(down_set);
+		down_set = NULL;
+	}
+	if (idle_set){	
+		free_rangeset(idle_set);
+		idle_set = NULL;
+	}
+	if (alloc_set){	
+		free_rangeset(alloc_set);
+		alloc_set = NULL;
+	}
+	if (err_set) {
+		free_rangeset(err_set);
+		err_set = NULL;
+	}	
+	if (mix_set) {
+		free_rangeset(mix_set);
+		mix_set = NULL;
+	}	
+	if (future_set) {
+		free_rangeset(future_set);
+		future_set = NULL;
+	}	
+
+	return rc;
+}
+
+/*
+ * Update ALL nodes state and send state CHANGE to ui.
+ */
+void *
+ns_update_internal(void * arg)
+{
+	int rc;
+	int ret;
+	int interval = *(int *)arg;
+	static struct timeval ns_timer;	
+	static node_info_msg_t * old_node_ptr = NULL, *new_node_ptr = NULL;
+	node_info_msg_t * nmsg_ptr = NULL;
+	uint16_t show_flags = SHOW_ALL;
+	bool init_flag = false;
+
+
+	init_timer(&ns_timer);
+	/*
+	 * wait for main thread to enable state update
+	 * (after joblist and nodelist are ready,
+	 * and NewNode event has been sent)
+	 */	
+	pthread_mutex_lock(&state_mx);	
+	while (enable_state_update == false) {
+		pthread_cond_wait(&state_cv, &state_mx);
+	}
+	pthread_mutex_unlock(&state_mx);
+
+	while (!nsu_thr_exit_req) {
+		usleep(100000); /*retry after 100ms*/
+		if (init_node_status_send == false) {/*initial node status not sent*/
+			init_flag = true;
+			/*send initial nodestate update*/
+			rc = slurm_load_node((time_t)NULL, &nmsg_ptr, show_flags);
+			if (rc != SLURM_SUCCESS) { 
+				continue;
+			}
+			else {
+				ret = handle_nodestate_update(nmsg_ptr, init_flag);	
+				if (ret == 0) {
+					gettimeofday(&ns_timer, NULL); /*update timer*/
+					init_node_status_send = true;
+				}	
+				slurm_free_node_info_msg(nmsg_ptr);
+				debug_log(logfp, "Initial node status SENT.\n");
+			}
+		} else if (update_timeout(&ns_timer, interval)) {/*time out*/	
+			if (old_node_ptr) {
+				rc = slurm_load_node(old_node_ptr->last_update, &new_node_ptr, show_flags);
+				if (rc == SLURM_SUCCESS) {
+					slurm_free_node_info_msg(old_node_ptr);
+				} else if (slurm_get_errno() == SLURM_NO_CHANGE_IN_DATA) {
+					rc = SLURM_SUCCESS;
+					new_node_ptr = old_node_ptr;
+					gettimeofday(&ns_timer, NULL); /*update ns_timer*/
+					continue; /*If NO change, do nothing*/
+				}
+			} else 
+				rc = slurm_load_node((time_t)NULL, &new_node_ptr, show_flags);
+
+			if (rc != SLURM_SUCCESS) {
+				debug_log(logfp,"slurm_load_node error in update:%s\n", slurm_strerror(rc));
+				continue;
+			}
+
+			old_node_ptr = new_node_ptr;
+			init_flag = false;	
+			ret = handle_nodestate_update(old_node_ptr, init_flag);
+			if (ret == 0) 
+				gettimeofday(&ns_timer, NULL); /*update ns_timer*/
+		} 
+	}
+
+	return NULL;
+}
+
+/*
+ * create a thread to update node state
+ */ 
+int 
+ns_update_thr_create(int nodeint)
+{
+	pthread_attr_t attr;
+	int arg = nodeint;
+	int rc;
+
+	pthread_attr_init(&attr);
+	pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
+	pthread_attr_setstacksize(&attr, 1024*1024);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+	rc = pthread_create(&ns_thr_id, &attr, &ns_update_internal, (void *)&arg);
+	
+	if (rc)
+		debug_log(logfp, "nodestate_update thread create fail.\n");
+
+	pthread_attr_destroy(&attr);	
+			
+	return rc;		
+}
+
+/*
+ * Return true if job finished
+ */ 
+bool 
+is_job_finished(ptp_job * job)
+{
+	return ((job->state & JOB_STATE_BASE) >  JOB_SUSPENDED);
+}
+
+/*
+ *Return true if job completed
+ */ 
+bool 
+is_job_completed(ptp_job * job)
+{
+	return  (is_job_finished(job) && ((job->state & JOB_COMPLETING) == 0));
+}
+
+/*
+ * handle jobstate update related issues
+ */ 
+int 
+handle_jobstate_update(ptp_job * j)
+{	
+	int rc = 0;
+	job_info_msg_t * msg = NULL;
+	uint16_t show_flags = SHOW_ALL;
+
+	rc = slurm_load_job(&msg, j->slurm_jobid, show_flags);
+	if (rc == SLURM_SUCCESS) {
+		if (j->state != (msg->job_array[0]).job_state) { /*state change*/
+			j->state = (msg->job_array[0]).job_state; /*update jobstate*/
+			/* 
+			 * SLURM doesn't provide process state.
+			 * Force process state changs with job state. 
+			 */
+			sendProcessStateChangeEvent(gTransID, j, j->state);
+			sendJobStateChangeEvent(gTransID, j->ptp_jobid, j->state);
+
+			debug_log(logfp, "Send Job/Process StateChange Event: state=%d\n",j->state);
+		}
+		slurm_free_job_info_msg(msg);
+		/*if job completed, ensure iothr exit*/
+		if (is_job_completed(j)) {
+			if (j->iothr_exit == false)
+				j->iothr_exit_req = true;
+		}
+	} else if (errno == ESLURM_INVALID_JOB_ID) {
+		/*
+		 * SLURM keep informatin of complete/fail jobs for MinJobAge (default to 300s) 
+		 * MinJobAge can be set in slurm/etc/slurm.conf.
+		 * 
+		 * job no longer exist in SLURM, do cleanup.
+		 * It's safe to remove and destroy job structure and release job-related memory resources
+		 * 
+		 */
+		debug_log(logfp, "Job[%d] no longer exist in SLURM. Romove it!\n", j->slurm_jobid);
+		/* Note: joblist is locked! */
+		RemoveFromList(gJobList, j);
+		job_destroy(j);
+	} else 
+		debug_log(logfp, "Job[%d]: slurm_load_job error.%s\n", j->slurm_jobid, slurm_strerror(rc));		
+
+	return rc;
+}
+
+/*
+ * Update job/process state and send state CHANGE to ui.
+ */
+void *
+js_update_internal(void * arg)
+{
+	int rc = 0;
+	ptp_job * j = NULL;
+	int interval = *(int *)arg;
+
+	/*wait for main thread to enable state update*/	
+	pthread_mutex_lock(&state_mx);	
+	while (enable_state_update == false) {
+		pthread_cond_wait(&state_cv, &state_mx);
+	}
+	pthread_mutex_unlock(&state_mx);
+
+	while (!jsu_thr_exit_req) {
+		usleep(100000);/*retry after 100ms*/
+		lock_joblist();
+		for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL;) {
+			if (j->newprocess_event_sent == false) /*Don't send update until NewJob/NewProcess event sent*/
+				continue;
+			if (j->init_state_updated == false) {
+				/*send initial state update*/
+				rc = handle_jobstate_update(j);	
+				if (rc == 0) {
+					j->init_state_updated = true;
+					gettimeofday(&j->update_timer, NULL);
+				}	
+			} else {	
+				if (update_timeout(&(j->update_timer), interval)) {
+					rc = handle_jobstate_update(j);	
+					if (rc == 0)
+						gettimeofday(&j->update_timer, NULL);
+				}		
+			}	
+		}
+		unlock_joblist();
+	}
+
+	return NULL;
+}
+
+/*
+ * create a thread to update job state
+ */ 
+int 
+js_update_thr_create(int jobint)
+{
+	pthread_attr_t attr;
+	int arg = jobint;
+	int rc = 0;
+
+	pthread_attr_init(&attr);
+	pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
+	pthread_attr_setstacksize(&attr, 1024*1024);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+	rc = pthread_create(&js_thr_id, &attr, &js_update_internal, (void *)&arg);
+	if (rc)
+		debug_log(logfp, "jobstate_update thread create fail.\n");
+				
+	pthread_attr_destroy(&attr);
+
+	return rc;		
+}
+
+
+/*
+ * signal handler of slurm proxy. 
+ */
+void
+ptp_signal_handler(int sig)
+{
+	if (sig != SIGCHLD)  /* proxy doesn't exit on SIGCHLD */ 
+		ptp_signal_exit = sig;
+
+	fprintf(stderr, "Got signal:%d\n", sig);
+}
+
+
+static void 
+job_destroy(ptp_job * job)
+{
+	/*close job pipe*/
+	/*This is done when io_thr and launch_thr exit*/	
+	//close(job->fd_out[0]);	
+	//close(job->fd_out[1]);	
+	//close(job->fd_err[0]);	
+	//close(job->fd_err[1]);	
+	
+	//if (job->debug)
+	//	kill(job->sdmclnt_pid, SIGKILl)
+	
+	/*free space allocateed for job*/	
+	job_release(job);
+}
+
+
 
 
 /******************************
@@ -2665,7 +2915,6 @@ SLURM_Initialize(int trans_id, int nargs, char **args)
 	int		i;
 	int 	primary = 1;
 	int 	secondary = 2;
-	long	version;
 	
 	debug_log(logfp, "SLURM_Initialize (%d):\n", trans_id);
 	
@@ -2699,8 +2948,7 @@ SLURM_Initialize(int trans_id, int nargs, char **args)
 	 * SLURM version verfication,
 	 * Should work on more versions supporting used API. 
 	 */
-	 version = slurm_api_version();
-	 if (version < SLURM_VERSION_NUM(1,3,4)) {
+	  if (SLURM_VERSION_MAJOR(slurm_api_version()) < 2) { /*This version only works with SLURM-2.x*/
 		sendErrorEvent(trans_id, RTEV_ERROR_SLURM_INIT, "SLURM version number too low");
 		return PTP_PROXY_RES_OK;
 	 }
@@ -2724,467 +2972,6 @@ SLURM_ModelDef(int trans_id, int nargs, char **args)
 	return PTP_PROXY_RES_OK;
 }
 
-int
-SLURM_StopEvents(int trans_id, int nargs, char **args)
-{
-	debug_log(logfp, "SLURM_StopEvents (%d):\n", trans_id); 
-
-	/* Notify that StartEvents complete */
-	sendOKEvent(gTransID);
-	gTransID = 0;
-	sendOKEvent(trans_id);
-
-	return PTP_PROXY_RES_OK;	
-}
-
-
-/*
- * Submit a job with the given executable path and arguments.
- * Main steps:
- * (1)process cmd arguments;
- * (2)distinguish between debug job and non-debug job;
- * (3)allocate resource and spawn job step.
- */
-int
-SLURM_SubmitJob(int trans_id, int nargs, char **args)
-{
-	int		i,k;
-	int		num_args = 0;
-	int		num_env = 0;
-	char *	jobsubid = NULL; /* jobid assigned by RMS (ptp ui) */
-	
-	/* srun options: -n, -N, -t, -p, -l, -v, --jobid, --job_type */
-	int		num_procs = 0; /* -n: number of tasks to run*/
-	int		num_nodes = 0; /* -N: number of nodes on which to run (N=min[-max]) */
-	int		tlimit = -1;   /* -t: time limit */		
-	bool 	tlimit_set = false;
-	char * 	partition = NULL; /* -p: partition requested */
-	bool	partition_set = false;
-	bool	io_label = false; /* -l: prepend task number to lines of stdout/err */
-	bool 	io_label_set = false;
-	bool 	verbose = false;	/* -v:verbose mode */
-	bool	verbose_set = false;
-	char * 	node_list=NULL;	/* -w: request a specific list of hosts */
-	bool	nodelist_set = false;
-	int		allocated_jobid = -1; /* --jobid: run under already allocated job */
-	bool	jobid_set = false;
-	char * 	jobtype = NULL;	/* --job_type:mpi,omp,serial */
-	bool	jobtype_set = false;
-	char *	full_path = NULL;
-	char *	cwd = NULL;
-	char *	exec_path = NULL; /* PATH of executable */
-	char *	pgm_name = NULL; 
-	
-	/* debug job support */ 
-	bool	debug = false;
-	int		debug_argc = 0;
-	char *	debug_exec_name = NULL;
-	char *	debug_exec_path = NULL;
-	char *	debug_full_path = NULL;
-	char **	debug_args = NULL;
-
-	int		srun_argc = 0;
-	char ** srun_argv = NULL;
-	int		ptpid = generate_id();
-
-	debug_log(logfp, "SLURM_SubmitJob (%d):\n", trans_id);
-	/* Process job submit args  */
-	debug_log(logfp, "job submit commands:\n");
-	for (i = 0; i < nargs; i++) {
-		debug_log(logfp, "\t%s\n", args[i]);
-		if (proxy_test_attribute(SLURM_JOB_SUB_ID_ATTR, args[i])) {
-			jobsubid = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_NUM_PROCS_ATTR, args[i])) {
-			num_procs = proxy_get_attribute_value_int(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_NUM_NODES_ATTR, args[i])) {
-			num_nodes = proxy_get_attribute_value_int(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_TIME_LIMIT_ATTR, args[i])) {
-			tlimit_set = true;
-			tlimit = proxy_get_attribute_value_int(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_PARTITION_ATTR, args[i])) {
-			partition_set = true;
-			partition = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_IOLABEL_ATTR, args[i])) {
-			io_label_set = true;
-			io_label = proxy_get_attribute_value_bool(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_VERBOSE_ATTR, args[i])) {
-			verbose_set = true;
-			verbose = proxy_get_attribute_value_bool(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_ID_ATTR, args[i])) {
-			jobid_set = true;
-			allocated_jobid = proxy_get_attribute_value_int(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_TYPE_ATTR, args[i])) {
-			jobtype_set = true;
-			jobtype = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_NODELIST_ATTR, args[i])) {
-			nodelist_set = true;
-			node_list = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_EXEC_NAME_ATTR, args[i])) {
-			pgm_name = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_EXEC_PATH_ATTR, args[i])) {
-			exec_path = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_WORKING_DIR_ATTR, args[i])) {
-			cwd = proxy_get_attribute_value_str(args[i]);
-		} else if (proxy_test_attribute(SLURM_JOB_PROG_ARGS_ATTR, args[i])) {
-			num_args++;
-		} else if (proxy_test_attribute(SLURM_JOB_ENV_ATTR, args[i])) {
-			num_env++;
-		} else if (proxy_test_attribute(SLURM_JOB_DEBUG_ARGS_ATTR, args[i])) {
-			debug_argc++;
-		} else if (proxy_test_attribute(SLURM_JOB_DEBUG_FLAG_ATTR, args[i])) {
-			debug = proxy_get_attribute_value_bool(args[i]);
-		}
-	}
-
-	/* Do some checking first */
-	if (jobsubid == NULL) {
-		sendErrorEvent(trans_id, RTEV_ERROR_SLURM_SUBMIT, "Missing ID on job submission");
-		return PTP_PROXY_RES_OK;
-	}
-	if (proxy_state != STATE_RUNNING) {
-		sendJobSubErrorEvent(trans_id, jobsubid, "Must call INIT first");
-		return PTP_PROXY_RES_OK;
-	}
-	if (nargs < 1) {
-		sendJobSubErrorEvent(trans_id, jobsubid, "Incorrect arg count");
-		return PTP_PROXY_RES_OK;
-	}
-	if (pgm_name == NULL) {
-		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify program name");
-		return PTP_PROXY_RES_OK;
-	}
-	if (num_procs <= 0) {
-		sendJobSubErrorEvent(trans_id, jobsubid, "Must specify number of task to launch");
-		return PTP_PROXY_RES_OK;
-	}
-
-	/*
-	 * Process environment variables. 
-	 * Environment variables will be brought to compute node 
-	 * by SLURM before launching job. 
-	 */
-	if (num_env > 0) {
-		for (i = 0; i < nargs; i++) {
-			if (proxy_test_attribute(SLURM_JOB_ENV_ATTR, args[i]))
-				putenv(proxy_get_attribute_value_str(args[i]));
-		}
-	}
-
-	/* locate the execuable file to be launched */
-	if (exec_path == NULL) {
-		full_path = get_path(pgm_name, cwd, X_OK);
-		if (full_path == NULL) {
-			sendJobSubErrorEvent(trans_id, jobsubid, "executable not found");
-			return PTP_PROXY_RES_OK;
-		}
-	} else {
-		asprintf(&full_path, "%s/%s", exec_path, pgm_name);
-	}	
-	/* check access right */		
-	if (access(full_path, X_OK) < 0) {
-		sendJobSubErrorEvent(trans_id, jobsubid, strerror(errno));
-		if (full_path != NULL)
-			free(full_path);
-		return PTP_PROXY_RES_OK;
-	}
-	
-	/* allocate space for srun args */
-	srun_argv = (char **)malloc(sizeof(char *)*MAX_SRUN_ARG_NUM);
-	if (srun_argv == NULL) {
-		sendJobSubErrorEvent(trans_id, jobsubid, "Memory allocation for srun_args fail");
-		return PTP_PROXY_RES_OK;
-	}
-
-	/****************************handle debug job**************************************/
-	if (debug) {		
-		debug_argc++;
-		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
-		for (i = 0, k = 1; i < nargs; i++) {
-			if (proxy_test_attribute(SLURM_JOB_DEBUG_ARGS_ATTR, args[i])) {
-				debug_args[k++] = proxy_get_attribute_value_str(args[i]);
-			} else if (proxy_test_attribute(SLURM_JOB_DEBUG_EXEC_NAME_ATTR, args[i])) {
-				debug_exec_name = proxy_get_attribute_value_str(args[i]);
-			} else if (proxy_test_attribute(SLURM_JOB_DEBUG_EXEC_PATH_ATTR, args[i])) {
-				debug_exec_path = proxy_get_attribute_value_str(args[i]);
-			}
-		}
-		debug_args[k] = NULL;
-		
-		/* get the fullpath of sdm executable. */		
-		if (debug_exec_path == NULL) {
-			debug_full_path = get_path(debug_exec_name, cwd, X_OK);
-			if (debug_full_path == NULL) {
-				sendJobSubErrorEvent(trans_id, jobsubid, "sdm executuable not found");
-				return PTP_PROXY_RES_OK;
-			}
-		} else {
-			asprintf(&debug_full_path, "%s/%s", debug_exec_path, debug_exec_name);
-		}
-		
-		if (access(debug_full_path, X_OK) < 0) {
-			sendJobSubErrorEvent(trans_id, jobsubid, strerror(errno));
-			if (debug_full_path != NULL) {
-				free(debug_full_path);
-			}	
-			return PTP_PROXY_RES_OK;
-		}
-
-		debug_args[0] = strdup(debug_full_path);
-		if (debug_full_path != NULL) {
-			free(debug_full_path);
-		}	
-	}
-	/*************************************************************************************/
-
-	/* set default srun options */
-	set_srun_options_defaults(&opt);
-
-	/*
-	 * change srun options based on SubmitJob cmd args
-	 * and prepare srun_argc,srun_argv
-	 */
-	int index = 0;
-	srun_argv[index++] = strdup("srun");
-
-	if (num_procs > 0) {
-		opt.ps_nprocs = num_procs;
-		opt.ps_nprocs_set = true;
-		asprintf(&(srun_argv[index]), "--ntasks=%d", opt.ps_nprocs);
-		index += 1;
-	}	
-	if (num_nodes > 0) {
-		opt.ps_min_nodes = num_nodes;
-		opt.ps_nodes_set = true;
-		asprintf(&(srun_argv[index]), "--nodes=%d", opt.ps_min_nodes);
-		index += 1;
-	}
-	if (tlimit_set) {
-		opt.ps_time_limit = tlimit;
-		asprintf(&(srun_argv[index]), "--time=%d", opt.ps_time_limit);
-		index += 1;
-	}
-	if (partition_set) {
-		opt.ps_partition =  partition;
-		asprintf(&(srun_argv[index]), "--partition=%s", opt.ps_partition);
-		index += 1;
-	}
-	/* To distinguish task stdout, this option MUST be set */
-	io_label_set = true;
-	if (io_label_set) { 
-		opt.ps_labelio = io_label;
-		asprintf(&(srun_argv[index]), "--label");
-		index += 1;
-	}
-	if (verbose_set) {
-		asprintf(&(srun_argv[index]), "--verbose");
-		index += 1;
-	}
-	if (jobid_set) {
-		opt.ps_jobid = allocated_jobid;
-		opt.ps_jobid_set = true;
-		asprintf(&(srun_argv[index]), "--jobid=%d", opt.ps_jobid);
-		index += 1;
-	}
-	/* currently --jobtype not supported. */
-	/*
-	if (jobtype_set) {
-		opt.ps_jobtype = jobtype;
-    	asprintf(&(srun_argv[index]), "--jobtype=%s", opt.ps_jobtype);
-		index += 1;
-	}
-	*/
-	if (nodelist_set) {
-		opt.ps_nodelist = strdup(node_list);
-		opt.ps_nodes_set = true;
-		asprintf(&(srun_argv[index]), "--nodelist=%s", opt.ps_nodelist);
-		index += 1;
-	}
-	if (cwd) {
-		if (opt.ps_cwd != NULL)
-			free(opt.ps_cwd);
-		opt.ps_cwd = strdup(cwd);
-		opt.ps_cwd_set = true;
-		/* set job's CWD */ 		
-		asprintf(&(srun_argv[index]), "--chdir=%s", cwd);
-		index += 1;
-	}
-	
-	/* distinguish between debug job and non-debug job */
-	if (debug) {
-		opt.ps_progname = debug_args[0]; 
-		/* set job name,otherwise be NULL */
-		opt.ps_job_name = basename(debug_args[0]);
-	} else {
-		opt.ps_progname = full_path;
-		/* set job name,otherwise be NULL */
-		opt.ps_job_name = basename(full_path);
-	}	
-	asprintf(&(srun_argv[index]), "%s", opt.ps_progname);
-	index += 1;
-	
-	/* program name followd by args */
-	if (num_args > 0) {
-		for (i = 0; i < nargs; i++) {
-			if (proxy_test_attribute(SLURM_JOB_PROG_ARGS_ATTR, args[i])) {
-				asprintf(&(srun_argv[index]), "%s", proxy_get_attribute_value_str(args[i]));
-				index += 1;
-			}	
-		}
-	}
-	srun_argv[index] = NULL; /* mark the end of srun_argv[] */
-
-	srun_argc = index;	
-	debug_log(logfp, "srun cmd:");
-	for (i = 0; i < srun_argc; i++) 
-		debug_log(logfp,"%s ",srun_argv[i]);
-	debug_log(logfp, "\n");
-
-	if (debug) { /* handle debug job */
-		/*
-		 * This ORDER is very important.
-		 * (1) launch sdm server as a parallel job. 
-		 *     sdm server must run and in accept state before sdm client starts.
-		 * (2) write routing file for sdm client and servers
-		 * (3) exec sdm client on server node
-		 *		NOTE:This step is done by front end (ptp ui) for ORTE,MPICH2, PE, LL rms.
-		 *		In SLURM, we do it by ptp_slurm_proxy.
-		 */
-
-
-		/*
-		 * (1) launch sdm server as a parallel job 
-		 */
-		ptp_job j;
-		memset(&j,0, sizeof(ptp_job));
-		j.debug = debug;
-		j.ptp_jobid = ptpid;
-		j.num_procs = num_procs;
-		/* j.sdmclnt_pid = clnt_pid; */
-		if (cwd) {
-			j.cwd = strdup(cwd);
-		}
-
-		/* delete existing routing file first */
-		delete_routing_file(cwd); 
-	
-		allocate_and_launch_job(trans_id, jobsubid, &j, &opt, srun_argc, srun_argv);
-		free_opt(&opt);
-		free_srun_argv(srun_argc,srun_argv);
-        
-		/*  
-		 * (2) generate routing file
-		 */
-		sleep(5);
-		ptp_job * job;
-		job_info_msg_t * msg = NULL;
-		bool sdm_svr_running = false;
-		int i = 0;
-		job = find_job(j.ptp_jobid, PTP_JOBID); 
-		/* wait unitl sdm server job is RUNNING */
-		while (sdm_svr_running == false){
-			if (slurm_load_jobs((time_t)NULL, &msg, SHOW_ALL) == 0) {
-				for (i = 0; i < msg->record_count; i++) {
-					if (msg->job_array[i].job_id == job->slurm_jobid) {
-						if (msg->job_array[i].job_state == JOB_RUNNING) {
-							sdm_svr_running = true;
-						}
-						break;
-					}
-				}	
-				slurm_free_job_info_msg(msg);
-			}
-			sleep(1);
-		}
-
-		/*
-		pthread_t thread;
-		pthread_attr_t attr;
-		pthread_attr_init(&attr);
-		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-		pthread_create(&thread, &attr, write_routing_file,(void *)job);
-		*/
-		write_routing_file((void *)job);
-		/*
-		 * (3) start sdm client
-		 */
-		char * clnt_host = NULL;
-		char * clnt_port = NULL;
-		char * clnt_master = "--master";
-		for (i = 0; i < debug_argc; i++) {
-			if (strstr(debug_args[i],"--port")) {
-				clnt_port = debug_args[i];
-			}
-			if (strstr(debug_args[i], "--host")) {
-				clnt_host = debug_args[i];
-			}
-		}
-		pid_t clnt_pid;
-		if ((clnt_pid = fork()) == 0 ) {
-			/* to locate routing file correctly */
-			chdir(cwd); 
-			/* exec sdm client on server node */
-			execl(debug_args[0], debug_args[0], clnt_host, clnt_port, clnt_master, NULL);
-		} 
-
-	} else { /* handle non-debug job */
-		ptp_job j;
-		memset(&j,0, sizeof(ptp_job));
-		j.debug = debug;
-		j.ptp_jobid = ptpid; /* model element id generated by proxy agent */
-		j.num_procs = num_procs;
-		allocate_and_launch_job(trans_id, jobsubid, &j, &opt, srun_argc, srun_argv);
-		free_opt(&opt);
-		free_srun_argv(srun_argc,srun_argv);
-	}
-
-	return PTP_PROXY_RES_OK;
-}		
-
-/* 
- * Cancel job, given ptp jobid (not slurm jobid).
- */
-int
-SLURM_TerminateJob(int trans_id, int nargs, char **args)
-{
-	int			i;
-	int 		ptp_jobid = -1;
-	ptp_job * 	j = NULL;
-
-	if (proxy_state != STATE_RUNNING) {
-		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "Must call INIT first");
-		return PTP_PROXY_RES_OK;
-	}
-	
-	for (i = 0; i < nargs; i++) {
-		if (proxy_test_attribute(PTP_JOB_ID_ATTR, args[i])) {
-			ptp_jobid = proxy_get_attribute_value_int(args[i]);
-			break;
-		}
-	}
-
-	if (ptp_jobid < 0) {
-		sendJobTerminateErrorEvent(trans_id, ptp_jobid, "Invalid jobid ");
-		return PTP_PROXY_RES_OK;
-	}
-
-	/* convert ptp jobid to slurm jobid */
-	if ((j = find_job(ptp_jobid, PTP_JOBID)) != NULL) {
-		/*
-		 * Kill all job steps and request iothread to exit.
-		 * Removing job structure from the global job list 
-		 * is left to purge_global_joblist().
-		 */
-		kill(j->srun_pid, SIGKILL);
-		j->iothread_exit_req = true;
-		if (j->need_alloc) {
-			slurm_kill_job(j->slurm_jobid, SIGKILL, 0); 
-		}	
-	} 
-	sendOKEvent(trans_id);
-
-	return PTP_PROXY_RES_OK;
-}
-
 /*
  * Enable sending of events.
  * The first msg that must be sent is a description of the model. 
@@ -3195,10 +2982,10 @@ SLURM_TerminateJob(int trans_id, int nargs, char **args)
 int
 SLURM_StartEvents(int trans_id, int nargs, char **args)
 {
-	int	num_machines;
-	int	m;
+	int	num_machines = 0;;
+	int	m = 0;;
 	ptp_machine * mach = NULL;
-	int num_nodes;
+	int num_nodes = 0;
 	
 	debug_log(logfp, "SLURM_StartEvents (%d):\n", trans_id); 
 
@@ -3231,11 +3018,148 @@ SLURM_StartEvents(int trans_id, int nargs, char **args)
 	sendNewQueueEvent(trans_id);
 
 	/* From now on, job state and node state update msg can be sent */
+	pthread_mutex_lock(&state_mx);
 	enable_state_update = true;
+	pthread_cond_broadcast(&state_cv);
+	pthread_mutex_unlock(&state_mx);
 	
 	return PTP_PROXY_RES_OK;
 }
 
+/*
+ * Submit a job with the given executable path and arguments.
+ * Main steps:
+ * (1)process cmd arguments;
+ * (2)distinguish between debug job and non-debug job;
+ * (3)allocate resource and spawn job step.
+	 supported job allocate/task launch options:
+	 -n,-N,-t,-p,-w,-x (-l:default) 
+ */
+int
+SLURM_SubmitJob(int trans_id, int nargs, char **args)
+{
+	int rc = 0;
+	int i = 0;
+	char *	jobsubid = NULL; /* jobid assigned by RMS (ptp ui) */
+	job_opt_t * opt = NULL;
+	int ptpid = generate_id();
+
+	debug_log(logfp, "SLURM_SubmitJob (%d):\n", trans_id);
+	/* Process job submit args  */
+	debug_log(logfp, "job submit commands:\n");
+
+	/* get jobsubid first */
+	for (i = 0; i < nargs; i++) {
+		debug_log(logfp, "\t%s\n", args[i]);
+		if (proxy_test_attribute(SLURM_JOB_SUB_ID_ATTR, args[i])) 
+			jobsubid = proxy_get_attribute_value_str(args[i]);
+	}
+	if (jobsubid == NULL) {
+		sendErrorEvent(trans_id, RTEV_ERROR_SLURM_SUBMIT, "Missing ID on job submission");
+		return PTP_PROXY_RES_OK;
+	}
+
+	/* Do some check first */
+	if (proxy_state != STATE_RUNNING) {
+		sendJobSubErrorEvent(trans_id, jobsubid, "Must call INIT first");
+		return PTP_PROXY_RES_OK;
+	}
+
+	if (nargs < 1) {
+		sendJobSubErrorEvent(trans_id, jobsubid, "Incorrect arg count");
+		return PTP_PROXY_RES_OK;
+	}
+
+	opt = opt_new();
+	if (opt == NULL) {
+		sendJobSubErrorEvent(trans_id, jobsubid, "job_opt_t malloc error");
+		return PTP_PROXY_RES_OK;
+	}
+
+	opt_default(opt);
+	rc = opt_args(opt, nargs, args);
+	if (rc) {
+		sendJobSubErrorEvent(trans_id, jobsubid, "opt_args() error");
+		opt_release(opt); /*release opt structure on failure*/
+		return PTP_PROXY_RES_OK;
+	}
+
+	if (opt_verify(opt) == false) {
+		sendJobSubErrorEvent(trans_id, jobsubid, "Invalid job configuration");
+		opt_release(opt); /*release opt structure on failure*/
+		return PTP_PROXY_RES_OK;
+	}
+	
+	opt->ptpid = ptpid;	/*model element id generated by proxy agent*/
+	opt->trans_id = trans_id;
+	opt->jobsubid = strdup(jobsubid);
+
+	allocate_and_launch_job(opt);
+	
+
+	return PTP_PROXY_RES_OK;
+}		
+
+/* 
+ * Cancel/Terminate a running/pending job, given the ptp jobid (not slurm jobid).
+ */
+int
+SLURM_TerminateJob(int trans_id, int nargs, char **args)
+{
+	int			i;
+	int 		ptp_jobid = -1;
+	ptp_job * 	j = NULL;
+	job_info_msg_t * job_info = NULL;
+	uint16_t show_flags = 0;
+	int rc;
+
+	if (proxy_state != STATE_RUNNING) {
+		sendErrorEvent(trans_id, RTEV_ERROR_JOB, "Must call INIT first");
+		return PTP_PROXY_RES_OK;
+	}
+	
+	for (i = 0; i < nargs; i++) {
+		if (proxy_test_attribute(PTP_JOB_ID_ATTR, args[i])) {
+			ptp_jobid = proxy_get_attribute_value_int(args[i]);
+			break;
+		}
+	}
+
+	if (ptp_jobid < 0) {
+		sendJobTerminateErrorEvent(trans_id, ptp_jobid, "Invalid jobid ");
+		return PTP_PROXY_RES_OK;
+	}
+
+	if ((j = find_job(ptp_jobid, PTP_JOBID)) != NULL) {
+		rc = slurm_load_job(&job_info, j->slurm_jobid, show_flags);			
+		if (rc == 0) {
+			if (job_info->job_array[0].job_state <= JOB_SUSPENDED)	{ /*job PENDING, RUNNING, SUSPENDED*/
+				slurm_kill_job(j->slurm_jobid, SIGKILL, 0); 
+			}
+			slurm_free_job_info_msg(job_info);
+		}
+	}
+
+	sendOKEvent(trans_id);
+
+	return PTP_PROXY_RES_OK;
+}
+
+/*
+ * Enable suspended phase
+ */ 
+int
+SLURM_StopEvents(int trans_id, int nargs, char **args)
+{
+	debug_log(logfp, "SLURM_StopEvents (%d):\n", trans_id); 
+
+	/* Notify that StartEvents complete */
+	sendOKEvent(gTransID);
+	gTransID = 0;
+	sendOKEvent(trans_id);
+
+	return PTP_PROXY_RES_OK;	
+}
 
 /*
  * Compitable interface.
@@ -3262,247 +3186,43 @@ SLURM_Quit(int trans_id, int nargs, char **args)
  ******************************/
 
 /*
- * Init jobstate_update_timer.
- */
-static void 
-init_job_timer()
-{
-	gettimeofday(&job_update_timer, NULL);
-	return;
-}
-
-/*
- * Init nodestate_update_timer.
- */
-static void 
-init_node_timer()
-{
-	gettimeofday(&node_update_timer, NULL);
-	return;
-}
-
-/*
- * Check if timer expires with the given timeout value.
- */
-static bool
-update_timeout(int timer_id, const int timeout)
-{
-	struct timeval * timer;
-	struct timeval now;
-	int val;
-	bool rc = false;
-
-	switch (timer_id) {
-	case JOB_UPDATE_TIMER:
-		timer = &job_update_timer;
-		break;
-	case NODE_UPDATE_TIMER:
-		timer = &node_update_timer;
-		break;
-	default:
-		return false; 
-	}
-	gettimeofday(&now, NULL);
-	val = (now.tv_sec - timer->tv_sec) * 1000000 + (now.tv_usec - timer->tv_usec) - timeout;
-	if (val >= 0) { /* time out */
-		/* update timer */
-		gettimeofday(timer, NULL);
-		rc = true;
-	}
-
-	return rc;
-}
-
-/*
- * Wrapper routine to check job_update_timer.
- */
-static bool
-job_update_timeout()
-{
-	return update_timeout(JOB_UPDATE_TIMER, JOB_UPDATE_TIMEOUT);
-}
-
-/*
- * Wrapper routine to check node_update_timer.
- */
-static bool
-node_update_timeout()
-{
-	return update_timeout(NODE_UPDATE_TIMER, NODE_UPDATE_TIMEOUT);
-}
-
-/*
- * Update job/process state and send state CHANGE to ui.
- */
-static void 
-update_job_state(int slurm_jobid)
-{
-	int i;
-	int errcode;
-	bool job_find;
-	ptp_job * j;
-	job_info_msg_t * msg = NULL;
-
-	errcode = slurm_load_jobs((time_t)NULL, &msg, SHOW_ALL);
-	if (errcode) {
-		debug_log(logfp,"slurm_load_jobs error");
-		return;
-	}
-
-	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL;) {
-		if (slurm_jobid > -1) { 
-			if (j->slurm_jobid != slurm_jobid)
-				continue;
-		}
-		job_find = false;
-		for (i = 0; i < msg->record_count; i++) {
-			if (j->slurm_jobid == (msg->job_array[i]).job_id) {
-				job_find = true;
-				if (j->state != (msg->job_array[i]).job_state) { /*state change*/
-					j->state = (msg->job_array[i]).job_state;
-					/* 
-					 * SLURM doesn't provide process state.
-					 * Force process state changs with job state. 
-					 */
-					sendProcessStateChangeEvent(gTransID, j, j->state);
-					sendJobStateChangeEvent(gTransID, j->ptp_jobid, j->state);
-				}
-				break;
-			}	
-		}
-		if (!job_find) { 
-			/*
-			 * job not found(rarely happens).
-			 * In this case, simply mark this job removable.
-			 * SLURM keep the informatin of complete/fail jobs for MinJobAge (default to 300) seconds
-			 * MinJobAge can be set in slurm/etc/slurm.conf.
-			 */
-			j->removable = true;
-		}
-		if (slurm_jobid > -1)
-			break;
-	}
-	slurm_free_job_info_msg(msg);
-
-	return;
-}
-
-/*
- * Update ALL nodes state and send state CHANGE to ui.
+ * Cleanup work on proxy exit:
+ * 
+ * (1) kill ACTIVE jobs to release nodes (REQUIRED).
+ * (2) After job killed, its launch thread and io thread will automatically exit.
+ * (3) All memory resources will be automatically released when sever exits.
+ * 
  */
 void
-update_node_state()
+destroy_global_joblist()
 {
-	int i;
-	ptp_node * node = NULL;
-	int errcode;
-	node_info_msg_t * msg = NULL;
+	ptp_job * j = NULL;
 
-	rangeset * unknown_set = new_rangeset();
-	rangeset * idle_set = new_rangeset();
-	rangeset * down_set = new_rangeset();
-	rangeset * allocated_set = new_rangeset();
-
-	if (unknown_set == NULL || idle_set == NULL || down_set == NULL || allocated_set == NULL)
-		goto cleanup;
-
-	errcode = slurm_load_node((time_t)NULL, &msg, SHOW_ALL);
-	if (errcode) {
-		debug_log(logfp,"slurm_load_node error.\n");
-		return;
-	} else {
-		for (i = 0; i < msg->record_count; i++) {
-			node = find_node_by_name(msg->node_array[i].name);
-			if (node->state == msg->node_array[i].node_state && node->status_send == true)
-				continue;
-			else { /* node state change */
-				node->state = msg->node_array[i].node_state;
-				if (!node->status_send)
-					node->status_send = true;
-				switch (msg->node_array[i].node_state & NODE_STATE_BASE) {
-				case NODE_STATE_UNKNOWN:
-					insert_in_rangeset(unknown_set,node->id);
-					break;
-				case NODE_STATE_DOWN:
-					insert_in_rangeset(down_set,node->id);
-					break;
-				case NODE_STATE_IDLE:
-					insert_in_rangeset(idle_set,node->id);
-					break;
-				case NODE_STATE_ALLOCATED:
-					insert_in_rangeset(allocated_set,node->id);
-					break;
-				default:
-					debug_log(logfp, "unrecognized node state\n");
-					break;
-				}	
-			}
-		}	
-			
-		if (!EmptyList(unknown_set->elements)) {
-			sendNodeChangeEvent(gTransID,rangeset_to_string(unknown_set),NODE_STATE_UNKNOWN);
-		}
-		if (!EmptyList(down_set->elements)) {
-			sendNodeChangeEvent(gTransID,rangeset_to_string(down_set),NODE_STATE_DOWN);
-		}
-		if (!EmptyList(idle_set->elements)) {
-			sendNodeChangeEvent(gTransID,rangeset_to_string(idle_set),NODE_STATE_IDLE);
-		}
-		if (!EmptyList(allocated_set->elements)) {
-			sendNodeChangeEvent(gTransID,rangeset_to_string(allocated_set),NODE_STATE_ALLOCATED);
-		}
-
-		slurm_free_node_info_msg(msg);
+	debug_log(logfp, "Release all resources on slurm proxy exit\n");
+	
+	lock_joblist();
+	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL;) {
+		if (!is_job_completed(j)) 
+			slurm_kill_job(j->slurm_jobid, SIGKILL, 0);
+		//if (j->debug)
+		//	kill(j->sdmclnt_pid, SIGKILL);
 	}
-
-cleanup:
-	if(unknown_set)
-		free_rangeset(unknown_set);
-	if(down_set)	
-		free_rangeset(down_set);
-	if(idle_set)	
-		free_rangeset(idle_set);
-	if (allocated_set)	
-		free_rangeset(allocated_set);
+	unlock_joblist();
 
 	return;
 }
 
-
 /*
- * signal handler of slurm proxy. 
- */
-RETSIGTYPE
-ptp_signal_handler(int sig)
+ * termiante job/node state update thread
+ */ 
+void 
+terminate_helper_thread()
 {
-	if (sig != SIGCHLD)  /* proxy doesn't exit on SIGCHLD */ 
-		ptp_signal_exit = sig;
-}
+	nsu_thr_exit_req = true;
+	jsu_thr_exit_req = true;
 
-/*
- * Cleanup work on proxy exit:
- *  kill srun process, release job resource, 
- *	terminate io_thread,and free space.
- */
-static void
-delete_global_joblist()
-{
-	ptp_job * j = NULL;
-	int rc;
+	sleep(2);
 
-	debug_log(logfp, "Release all resources on slurm proxy exit\n");
-	for (SetList(gJobList); (j = (ptp_job *)GetListElement(gJobList)) != NULL;) {
-		if (slurm_job_active(j)) {
-			rc = slurm_kill_job(j->slurm_jobid, SIGKILL, 0);
-			//slurm_terminate_job(j->slurm_jobid);
-			//kill(j->srun_pid, SIGKILL);
-		}	
-		if (j->iothread_exit == false) {
-			j->iothread_exit_req = true;
-		}	
-		RemoveFromList(gJobList, j);
-		free_job(j);
-	}
 	return;
 }
 
@@ -3510,45 +3230,34 @@ delete_global_joblist()
  * kernel routine of proxy server
  */
 static int
-server(char *name, char *host, int port)
+server(char *name, char *host, int port, int nodeint, int jobint)
 {
 	int rc = 0;
 	struct timeval	timeout = {0, 20000};
-
+	
 	gJobList = NewList();
 	gMachineList = NewList();
 	
-	init_job_timer();
-	init_node_timer();
-
 	if (proxy_svr_init(name, &timeout, &helper_funcs, &command_tab, &slurm_proxy) != PTP_PROXY_RES_OK) {
 		debug_log(logfp, "proxy failed to initialized\n"); 
-		return 0;
+		return -1;
 	}
 	
 	if (proxy_svr_connect(slurm_proxy, host, port) == PTP_PROXY_RES_OK) {
 		debug_log(logfp, "proxy connected\n"); 
 		
+		/* create threads to update job and node state */	
+		ns_update_thr_create(nodeint);
+		js_update_thr_create(jobint);
+
 		while (ptp_signal_exit == 0 && proxy_state != STATE_SHUTDOWN) {
-			if (proxy_state == STATE_SHUTTING_DOWN) {
+			if (proxy_state == STATE_SHUTTING_DOWN) 
 				proxy_state = STATE_SHUTDOWN;
-			}
-			if (proxy_svr_progress(slurm_proxy) != PTP_PROXY_RES_OK) {
+
+			if (proxy_svr_progress(slurm_proxy) != PTP_PROXY_RES_OK) 
 				break;
-			}	
-			/*
-			 * update job and node state 
-			 * FIXME: implement with a separate thread
-			 */	
-			if (enable_state_update) {
-				if (job_update_timeout())  
-					update_job_state(ALL_JOBSTATE); 
-				if (node_update_timeout()) 
-					update_node_state();
-			}
-			/* delete removable job */
-			purge_global_joblist();
 		}
+
 		if (ptp_signal_exit != 0) {
 			if (proxy_state != STATE_SHUTTING_DOWN
 				&& proxy_state != STATE_SHUTDOWN) {
@@ -3558,18 +3267,26 @@ server(char *name, char *host, int port)
 			rc = ptp_signal_exit;
 			debug_log(logfp, "ptp_slurm_proxy terminated by signal [%d]\n", ptp_signal_exit);
 		}
-	} else { 
+	} else  
 		debug_log(logfp, "proxy connection failed\n"); 
-	}	
+
 	/*
 	 * do cleanup before exiting
 	 */
-	delete_global_joblist();
+	debug_log(logfp, "Proxy server cleanup...\n");
+	/* require node/job state update thread exit */
+	terminate_helper_thread();
+	/* kill job step, release job, kill job launch/io thread */
+	destroy_global_joblist();
+
 	proxy_svr_finish(slurm_proxy);
 	
 	return rc;
 }
 
+
+#define DEFAULT_NODESTATE_UPDATE_INTERVAL  500000 /*usec*/
+#define DEFAULT_JOBSTATE_UPDATE_INTERVAL   500000 /*usec*/
 /*
  * entry routine of proxy server
  */
@@ -3580,9 +3297,11 @@ main(int argc, char *argv[])
 	int		port = PTP_PROXY_TCP_PORT;
 	char *	host = DEFAULT_HOST;
 	char *	proxy_str = DEFAULT_PROXY;
+	int		node_intv = DEFAULT_NODESTATE_UPDATE_INTERVAL;
+	int 	job_intv = DEFAULT_JOBSTATE_UPDATE_INTERVAL;
 	int		rc;
 	
-	while ((ch = getopt_long(argc, argv, "P:p:h:", longopts, NULL)) != -1){ 
+	while ((ch = getopt_long(argc, argv, "P:p:h:t:T:", longopts, NULL)) != -1){ 
 		switch (ch) {
 		case 'P':
 			proxy_str = optarg;
@@ -3593,8 +3312,14 @@ main(int argc, char *argv[])
 		case 'h':
 			host = optarg;
 			break;
+		case 't':
+			node_intv = (int)strtol(optarg, NULL, 10);
+			break;
+		case 'T':
+			job_intv = (int)strtol(optarg, NULL, 10);
+			break;
 		default:
-			fprintf(stderr, "%s [--proxy=proxy] [--host=host_name] [--port=port] \n", argv[0]);
+			fprintf(stderr, "Usage:	%s [--proxy=proxy] [--host=host_name] [--port=port] [--node_intv=interval] [--job_intv=interval]\n", argv[0]);
 			return 1;
 		}
 	}	
@@ -3616,8 +3341,14 @@ main(int argc, char *argv[])
 	xsignal(SIGQUIT, ptp_signal_handler);
 	xsignal(SIGABRT, ptp_signal_handler);
 	xsignal(SIGCHLD, ptp_signal_handler);
+	/*
+	 * SIGPIPE is directed to a specific thread,
+	 * and default action:Term
+	 */
+
+	//sleep(30);
 	
-	rc = server(proxy_str, host, port);
+	rc = server(proxy_str, host, port, node_intv, job_intv);
 	
-	return rc;
+	exit(rc);
 }
