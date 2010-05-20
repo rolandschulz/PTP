@@ -2275,6 +2275,7 @@ VERSION="_$PACKAGE_VERSION"
 if  `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
 	VERSION=
 fi
+
 UTILS="../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}${VERSION}`"
@@ -3503,7 +3504,7 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 else
   eval ac_cv_prog_cc_${ac_cc}_c_o=no
 fi
-rm -f -r core conftest*
+rm -f core conftest*
 
 fi
 if eval test \$ac_cv_prog_cc_${ac_cc}_c_o = yes; then
@@ -3740,7 +3741,7 @@ else
 fi
 
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include -I$SLURMDIR/include"
+CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include -I$SLURMDIR/include -g -O0"
 LIBS="$LIBS -L$UTILS -L$PROXY -L$SLURMDIR/lib"
 CPPFLAGS="$CPPFLAGS -I$SLURMDIR/include"
 
@@ -4427,7 +4428,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f -r conftest*
+rm -f conftest*
 
 fi
 
@@ -4448,7 +4449,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f -r conftest*
+rm -f conftest*
 
 fi
 
@@ -4602,18 +4603,24 @@ fi
 done
 
 
-if test "${ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h+set}" = set; then
-  { echo "$as_me:$LINENO: checking for slurm/slurm.h slurm/slurm_errno.h" >&5
-echo $ECHO_N "checking for slurm/slurm.h slurm/slurm_errno.h... $ECHO_C" >&6; }
-if test "${ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h+set}" = set; then
+
+
+for ac_header in slurm/slurm.h slurm/slurm_errno.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  { echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 fi
-{ echo "$as_me:$LINENO: result: $ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h" >&5
-echo "${ECHO_T}$ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h" >&6; }
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
 else
   # Is the header compilable?
-{ echo "$as_me:$LINENO: checking slurm/slurm.h slurm/slurm_errno.h usability" >&5
-echo $ECHO_N "checking slurm/slurm.h slurm/slurm_errno.h usability... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking $ac_header usability" >&5
+echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6; }
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4621,7 +4628,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
-#include <slurm/slurm.h slurm/slurm_errno.h>
+#include <$ac_header>
 _ACEOF
 rm -f conftest.$ac_objext
 if { (ac_try="$ac_compile"
@@ -4653,15 +4660,15 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 echo "${ECHO_T}$ac_header_compiler" >&6; }
 
 # Is the header present?
-{ echo "$as_me:$LINENO: checking slurm/slurm.h slurm/slurm_errno.h presence" >&5
-echo $ECHO_N "checking slurm/slurm.h slurm/slurm_errno.h presence... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking $ac_header presence" >&5
+echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6; }
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <slurm/slurm.h slurm/slurm_errno.h>
+#include <$ac_header>
 _ACEOF
 if { (ac_try="$ac_cpp conftest.$ac_ext"
 case "(($ac_try" in
@@ -4694,41 +4701,45 @@ echo "${ECHO_T}$ac_header_preproc" >&6; }
 # So?  What about this header?
 case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
   yes:no: )
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h: accepted by the compiler, rejected by the preprocessor!" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h: proceeding with the compiler's result" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h: proceeding with the compiler's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the compiler's result" >&2;}
     ac_header_preproc=yes
     ;;
   no:yes:* )
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h: present but cannot be compiled" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h: present but cannot be compiled" >&2;}
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h:     check for missing prerequisite headers?" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h:     check for missing prerequisite headers?" >&2;}
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h: see the Autoconf documentation" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h: see the Autoconf documentation" >&2;}
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h:     section \"Present But Cannot Be Compiled\"" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h:     section \"Present But Cannot Be Compiled\"" >&2;}
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h: proceeding with the preprocessor's result" >&2;}
-    { echo "$as_me:$LINENO: WARNING: slurm/slurm.h slurm/slurm_errno.h: in the future, the compiler will take precedence" >&5
-echo "$as_me: WARNING: slurm/slurm.h slurm/slurm_errno.h: in the future, the compiler will take precedence" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
+echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: $ac_header:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: $ac_header: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
 
     ;;
 esac
-{ echo "$as_me:$LINENO: checking for slurm/slurm.h slurm/slurm_errno.h" >&5
-echo $ECHO_N "checking for slurm/slurm.h slurm/slurm_errno.h... $ECHO_C" >&6; }
-if test "${ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h+set}" = set; then
+{ echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h=$ac_header_preproc
+  eval "$as_ac_Header=\$ac_header_preproc"
 fi
-{ echo "$as_me:$LINENO: result: $ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h" >&5
-echo "${ECHO_T}$ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h" >&6; }
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
 
 fi
-if test $ac_cv_header_slurm_slurm_h_slurm_slurm_errno_h = yes; then
-  :
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
 else
   { echo "$as_me:$LINENO: SLURM not installed, skipping..." >&5
 echo "$as_me: SLURM not installed, skipping..." >&6;}
@@ -4736,6 +4747,7 @@ echo "$as_me: SLURM not installed, skipping..." >&6;}
 
 fi
 
+done
 
 { echo "$as_me:$LINENO: checking return type of signal handlers" >&5
 echo $ECHO_N "checking return type of signal handlers... $ECHO_C" >&6; }
@@ -5985,21 +5997,22 @@ echo "$as_me: $ac_file is unchanged" >&6;}
   fi
   rm -f "$tmp/out12"
 # Compute $ac_file's index in $config_headers.
+_am_arg=$ac_file
 _am_stamp_count=1
 for _am_header in $config_headers :; do
   case $_am_header in
-    $ac_file | $ac_file:* )
+    $_am_arg | $_am_arg:* )
       break ;;
     * )
       _am_stamp_count=`expr $_am_stamp_count + 1` ;;
   esac
 done
-echo "timestamp for $ac_file" >`$as_dirname -- $ac_file ||
-$as_expr X$ac_file : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$ac_file : 'X\(//\)[^/]' \| \
-	 X$ac_file : 'X\(//\)$' \| \
-	 X$ac_file : 'X\(/\)' \| . 2>/dev/null ||
-echo X$ac_file |
+echo "timestamp for $_am_arg" >`$as_dirname -- "$_am_arg" ||
+$as_expr X"$_am_arg" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"$_am_arg" : 'X\(//\)[^/]' \| \
+	 X"$_am_arg" : 'X\(//\)$' \| \
+	 X"$_am_arg" : 'X\(/\)' \| . 2>/dev/null ||
+echo X"$_am_arg" |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
@@ -6036,7 +6049,7 @@ echo "$as_me: executing $ac_file commands" >&6;}
   # each Makefile.in and add a new line on top of each file to say so.
   # Grep'ing the whole file is not good either: AIX grep has a line
   # limit of 2048, but all sed's we know have understand at least 4000.
-  if sed 10q "$mf" | grep '^#.*generated by automake' > /dev/null 2>&1; then
+  if sed -n 's,^#.*generated by automake.*,X,p' "$mf" | grep X >/dev/null 2>&1; then
     dirpart=`$as_dirname -- "$mf" ||
 $as_expr X"$mf" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	 X"$mf" : 'X\(//\)[^/]' \| \

@@ -18,6 +18,7 @@ VERSION="_$PACKAGE_VERSION"
 if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
 	VERSION=
 fi
+
 UTILS="../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}${VERSION}`"
@@ -54,7 +55,7 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
-CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include -I$SLURMDIR/include"
+CFLAGS="$CFLAGS -Wall -I$UTILS/include -I$PROXY/include -I$SLURMDIR/include -g -O0"
 LIBS="$LIBS -L$UTILS -L$PROXY -L$SLURMDIR/lib"
 CPPFLAGS="$CPPFLAGS -I$SLURMDIR/include"
 
@@ -74,7 +75,7 @@ dnl Check for header files.
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADER([slurm/slurm.h slurm/slurm_errno.h], [], 
+AC_CHECK_HEADERS([slurm/slurm.h slurm/slurm_errno.h], [], 
 	[AC_MSG_NOTICE([SLURM not installed, skipping...])
 	 AS_EXIT
 	])
