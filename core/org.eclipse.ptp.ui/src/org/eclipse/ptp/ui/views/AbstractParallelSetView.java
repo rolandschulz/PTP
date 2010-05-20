@@ -55,7 +55,7 @@ import org.eclipse.ui.PartInitException;
  */
 public abstract class AbstractParallelSetView extends AbstractParallelElementView {
 	protected List<IElement[]> clipboard = new ArrayList<IElement[]>();
-	
+
 	// selected element
 	protected String cur_selected_element_id = IElementManager.EMPTY_ID;
 	// default actions
@@ -66,27 +66,37 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected ParallelAction zoomInAction = null;
 	protected ParallelAction zoomOutAction = null;
 
-	//zoom
+	// zoom
 	protected int zoom_depth = 0;
 	protected Zoom zoom = new Zoom();
 
-	//last action
+	// last action
 	protected int last_action = -1;
 	protected IElementSet last_element_set = null;
-	
+
 	public AbstractParallelSetView(IElementManager manager) {
 		super(manager);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
+	@Override
 	public void dispose() {
 		clipboard.clear();
 		super.dispose();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
@@ -97,6 +107,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		createContextMenu();
 		initialView();
 	}
+
 	protected void createToolBarActionGroup(IToolBarManager toolBarMgr) {
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUIZOOMGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUINAVIGATORGROUP));
@@ -106,7 +117,10 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUISETGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUICHANGESETGROUP));
 	}
-	/** Build-in Toolbar actions
+
+	/**
+	 * Build-in Toolbar actions
+	 * 
 	 * @param toolBarMgr
 	 */
 	protected void buildInToolBarActions(IToolBarManager toolBarMgr) {
@@ -116,7 +130,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		deleteSetAction = new DeleteSetAction(this);
 		deleteProcessAction = new RemoveElementAction(this);
 		changeSetAction = new ChangeSetAction(this);
-		
+
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIZOOMGROUP, zoomOutAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIZOOMGROUP, zoomInAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, createSetAction);
@@ -124,17 +138,26 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteProcessAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUICHANGESETGROUP, changeSetAction);
 	}
-	/** Create toolbar actions
+
+	/**
+	 * Create toolbar actions
+	 * 
 	 * @param toolBarMgr
 	 */
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		buildInToolBarActions(toolBarMgr);
 	}
-	/** Create menu actions
+
+	/**
+	 * Create menu actions
+	 * 
 	 * @param menuMgr
 	 */
-	protected void createMenuActions(IMenuManager menuMgr) {}
-	/** Create context menu
+	protected void createMenuActions(IMenuManager menuMgr) {
+	}
+
+	/**
+	 * Create context menu
 	 * 
 	 */
 	protected void createContextMenu() {
@@ -150,7 +173,10 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		// Be sure to register it so that other plug-ins can add actions.
 		getSite().registerContextMenu(menuMgr, canvas);
 	}
-	/** Create context menu
+
+	/**
+	 * Create context menu
+	 * 
 	 * @param manager
 	 */
 	protected void fillContextMenu(IMenuManager manager) {
@@ -166,39 +192,56 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#update()
 	 */
+	@Override
 	public void update() {
 		updateAction();
 		updateTitle();
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.views.AbstractParallelElementView#updateTitle()
 	 */
+	@Override
 	public void updateTitle() {
 		if (cur_element_set != null)
-			changeTitle(manager.getFullyQualifiedName(getCurrentID()),
-					cur_element_set.getID(), cur_set_size);
+			changeTitle(manager.getFullyQualifiedName(getCurrentID()), cur_element_set.getID(), cur_set_size);
 		else
 			changeTitle(manager.getFullyQualifiedName(getCurrentID()));
 	}
-	/** Update action
+
+	/**
+	 * Update action
 	 * 
 	 */
+	@Override
 	public void updateAction() {
-		boolean deleteActionEnable = (manager.getCurrentSetId().length() == 0 || manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID));
+		boolean deleteActionEnable = (manager.getCurrentSetId().length() == 0 || manager.getCurrentSetId().equals(
+				IElementHandler.SET_ROOT_ID));
 		deleteSetAction.setEnabled(!deleteActionEnable);
 		deleteProcessAction.setEnabled(!deleteActionEnable);
 		createSetAction.setEnabled(cur_set_size > 0);
 		IElementHandler elementHandler = getCurrentElementHandler();
 		changeSetAction.setEnabled(!(elementHandler == null || elementHandler.size() == 0));
-		
+
 		zoomInAction.setEnabled(cur_set_size > 0 && zoom_depth > 0);
 		zoomOutAction.setEnabled(cur_set_size > 0 && zoom_depth < Zoom.max_depth);
 	}
-	/** Open process viewer
-	 * @param element Target PProcessUI (PProcessUI goes away when we address UI scalability. See Bug 311057)
+
+	/**
+	 * Open process viewer
+	 * 
+	 * @param element
+	 *            Target PProcessUI (PProcessUI goes away when we address UI
+	 *            scalability. See Bug 311057)
+	 * @since 4.0
 	 */
 	// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
 	protected void openProcessViewer(final PProcessUI element) {
@@ -214,16 +257,20 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 			}
 		});
 	}
+
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IIconCanvasActionListener
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int[])
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int,
+	 * int[])
 	 */
 	public void handleAction(int type, int[] indexes) {
 		if (cur_element_set == null)
 			return;
-		
+
 		IElement[] elements = canvas.getElements(indexes);
 		switch (type) {
 		case IIconCanvasActionListener.COPY_ACTION:
@@ -239,33 +286,34 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 					clipboard.add(elements);
 					last_action = type;
 					last_element_set = cur_element_set;
-					//manager.removeFromSet(elements, cur_element_set.getID(), cur_element_set.getElementHandler());
-					//selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));
-					//updateTitle();
-					//refresh(false);
+					// manager.removeFromSet(elements, cur_element_set.getID(),
+					// cur_element_set.getElementHandler());
+					// selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));
+					// updateTitle();
+					// refresh(false);
 				}
 			}
 			break;
 		case IIconCanvasActionListener.PASTE_ACTION:
 			if (clipboard.size() > 0) {
-				IElement[] clipElements = (IElement[])clipboard.get(0);
+				IElement[] clipElements = clipboard.get(0);
 				if (last_action == IIconCanvasActionListener.CUT_ACTION) {
 					if (last_element_set != null && !last_element_set.getID().equals(cur_element_set.getID())) {
 						if (last_element_set.size() == clipElements.length) {
-							manager.removeSet(last_element_set.getID(), (IElementHandler)last_element_set.getParent());
-						}
-						else {
-							manager.removeFromSet(clipElements, last_element_set.getID(), (IElementHandler)last_element_set.getParent());
+							manager.removeSet(last_element_set.getID(), (IElementHandler) last_element_set.getParent());
+						} else {
+							manager.removeFromSet(clipElements, last_element_set.getID(),
+									(IElementHandler) last_element_set.getParent());
 						}
 					}
 				}
-				
+
 				if (cur_element_set.isRootSet())
 					createSetAction.run(clipElements);
 				else {
-					manager.addToSet(clipElements, cur_element_set.getID(), (IElementHandler)cur_element_set.getParent());
-					selectSet((IElementSet)((IElementHandler)cur_element_set.getParent()).getElementByID(cur_element_set.getID()));					
-					//update();
+					manager.addToSet(clipElements, cur_element_set.getID(), (IElementHandler) cur_element_set.getParent());
+					selectSet((IElementSet) ((IElementHandler) cur_element_set.getParent()).getElementByID(cur_element_set.getID()));
+					// update();
 					refresh(false);
 				}
 				type = -1;
@@ -281,6 +329,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 			break;
 		}
 	}
+
 	/*****************************************************************
 	 * Zoom
 	 *****************************************************************/
@@ -289,25 +338,32 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 			zoom_depth++;
 			update();
 			if (!canvas.isDisposed()) {
-				canvas.setIconSize(zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH, zoom_depth), zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT, zoom_depth));
-				canvas.setIconSpace(IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_X - zoom_depth, IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_Y);
+				canvas.setIconSize(zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH, zoom_depth),
+						zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT, zoom_depth));
+				canvas.setIconSpace(IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_X - zoom_depth,
+						IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_Y);
 				canvas.setFontSizeSmaller();
 				canvas.resetCanvas();
 			}
 		}
 	}
+
 	public void zoomIn() {
 		if (zoom_depth > 0) {
 			zoom_depth--;
 			update();
 			if (!canvas.isDisposed()) {
-				canvas.setIconSize(zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH, zoom_depth), zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT, zoom_depth));
-				canvas.setIconSpace(IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_X - zoom_depth, IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_Y);
+				canvas.setIconSize(zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH, zoom_depth),
+						zoom.scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT, zoom_depth));
+				canvas.setIconSpace(IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_X - zoom_depth,
+						IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_Y);
 				canvas.setFontSizeBigger();
 				canvas.resetCanvas();
 			}
 		}
 	}
+
+	@Override
 	public Image getStatusIcon(Object obj, int index, boolean isSelected) {
 		Image img = super.getStatusIcon(obj, index, isSelected);
 		if (img != null) {
@@ -315,40 +371,47 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		}
 		return null;
 	}
-    
+
 	class Zoom {
 		protected static final int max_depth = 3;
 		protected Map<Image, Image[]> zoomImageMap = new HashMap<Image, Image[]>();
-		
+
 		public void cleanup() {
 			zoomImageMap.clear();
 		}
+
 		public Image getImage(Image image, int depth) {
 			if (depth == 0)
 				return image;
-			
-			Image[] images = (Image[])zoomImageMap.get(image);
+
+			Image[] images = zoomImageMap.get(image);
 			if (images == null) {
 				images = new Image[max_depth];
 				zoomImageMap.put(image, images);
 			}
 			return getZoomImage(images, image, depth);
 		}
+
 		public Image getZoomImage(Image[] images, Image orgImg, int depth) {
-			if (images[depth-1] == null) {
-				images[depth-1] = scaledImage(orgImg, depth);
+			if (images[depth - 1] == null) {
+				images[depth - 1] = scaledImage(orgImg, depth);
 			}
-			return images[depth-1];
+			return images[depth - 1];
 		}
+
 		public double getScale(int depth) {
 			double fix_factor = 0.2;
 			return (1 - (fix_factor * depth));
 		}
+
 		public int scaled(int measure, int depth) {
-			return (int)(measure * getScale(depth));
+			return (int) (measure * getScale(depth));
 		}
+
 		public Image scaledImage(Image image, int depth) {
-			return new Image(image.getDevice(), image.getImageData().scaledTo(scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH, depth), scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT, depth)));
+			return new Image(image.getDevice(), image.getImageData()
+					.scaledTo(scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH, depth),
+							scaled(IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT, depth)));
 		}
-	}    
+	}
 }

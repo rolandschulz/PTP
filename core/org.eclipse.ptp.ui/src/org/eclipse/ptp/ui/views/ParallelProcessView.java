@@ -66,7 +66,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 		super();
 		setDocumentProvider(new StorageDocumentProvider());
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -82,10 +82,15 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 			}
 		});
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.texteditor.AbstractTextEditor#createPartControl(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
 		myForm = toolkit.createScrolledForm(parent);
@@ -95,27 +100,43 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 		outputSection();
 		initialText();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#dispose()
 	 */
+	@Override
 	public void dispose() {
 		process.getJob().removeChildListener(this);
 		myForm.dispose();
 		toolkit.dispose();
 		super.dispose();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSave(org.eclipse.core.runtime.IProgressMonitor)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.texteditor.AbstractTextEditor#doSave(org.eclipse.core.
+	 * runtime.IProgressMonitor)
 	 */
-	public void doSave(IProgressMonitor monitor) {}
-	
-	/* (non-Javadoc)
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#doSaveAs()
 	 */
-	public void doSaveAs() {}
-	
+	@Override
+	public void doSaveAs() {
+	}
+
+	/**
+	 * @since 4.0
+	 */
 	public void handleEvent(final IChangedProcessEvent e) {
 		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
@@ -123,12 +144,12 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 				if (!procRanks.get(process.getJobRank())) {
 					return;
 				}
-				EnumeratedAttribute<State> statusAttr =
-					e.getAttributes().getAttribute(ProcessAttributes.getStateAttributeDefinition());
+				EnumeratedAttribute<State> statusAttr = e.getAttributes().getAttribute(
+						ProcessAttributes.getStateAttributeDefinition());
 				if (statusAttr != null) {
 					statusLabel.setText(Messages.ParallelProcessView_6 + statusAttr.getValue());
-				} 
-				
+				}
+
 				StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
 				if (stdoutAttr != null) {
 					outputText.append(stdoutAttr.getValue());
@@ -136,30 +157,42 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 			}
 		});
 	}
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public void handleEvent(INewProcessEvent e) {
 		// no-op
 	}
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public void handleEvent(IRemoveProcessEvent e) {
 		// no-op
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite
+	 * , org.eclipse.ui.IEditorInput)
 	 */
+	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
 		setPartName(input.getName());
 		setInput(input);
-		// FIXME PProcessUI goes away when we address UI scalability. See Bug 311057
+		// FIXME PProcessUI goes away when we address UI scalability. See Bug
+		// 311057
 		Object obj = getEditorInput().getAdapter(PProcessUI.class);
 		if (obj instanceof PProcessUI) {
 			process = (PProcessUI) obj;
 			process.getJob().addChildListener(this);
 		}
 	}
-	
+
 	/**
 	 * Initialize the view
 	 */
@@ -167,44 +200,53 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 		pidLabel.setText(Messages.ParallelProcessView_2);
 		statusLabel.setText(Messages.ParallelProcessView_3);
 		outputText.setText(Messages.ParallelProcessView_4);
-		
+
 		if (process != null) {
 			if (process.getPid() == 0) {
-			   pidLabel.setText(Messages.ParallelProcessView_5 + "N/A"); //$NON-NLS-1$
+				pidLabel.setText(Messages.ParallelProcessView_5 + "N/A"); //$NON-NLS-1$
 			} else {
 				pidLabel.setText(Messages.ParallelProcessView_5 + process.getPid());
 			}
 
 			statusLabel.setText(Messages.ParallelProcessView_6 + process.getState());
-			
+
 			/*
 			 * Set initial output text
 			 */
 			outputText.setText(process.getSavedOutput());
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isDirty()
 	 */
+	@Override
 	public boolean isDirty() {
 		return false;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#isSaveAsAllowed()
 	 */
+	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus()
 	 */
+	@Override
 	public void setFocus() {
 		myForm.setFocus();
 	}
-	
+
 	/**
 	 * Convenience method to create a container
 	 * 
@@ -216,13 +258,12 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 	 * @param mw
 	 * @return
 	 */
-	protected Composite createClientContainer(Composite parent, FormToolkit toolkit, int columns, 
-			boolean isEqual, int mh, int mw) {
+	protected Composite createClientContainer(Composite parent, FormToolkit toolkit, int columns, boolean isEqual, int mh, int mw) {
 		Composite container = toolkit.createComposite(parent);
 		container.setLayout(createGridLayout(columns, isEqual, mh, mw));
 		return container;
 	}
-	
+
 	/**
 	 * Convenience method to create a grid layout
 	 * 
@@ -240,7 +281,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 		gridLayout.marginWidth = mw;
 		return gridLayout;
 	}
-	
+
 	/**
 	 * Add the process details to the view
 	 */
@@ -255,7 +296,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 		statusContainer.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 3));
 		statusLabel = toolkit.createLabel(statusContainer, null);
 		statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
+
 		detailsSection.setClient(detailsContainer);
 	}
 
@@ -294,9 +335,14 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 		return gd;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#updateStatusField(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.texteditor.AbstractTextEditor#updateStatusField(java.lang
+	 * .String)
 	 */
+	@Override
 	protected void updateStatusField(String category) {
 		if (category == null) {
 			return;
