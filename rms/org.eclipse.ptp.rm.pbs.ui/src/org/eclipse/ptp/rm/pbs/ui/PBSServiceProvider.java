@@ -29,11 +29,8 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 /**
  * Service provider for IBM Parallel Environment
  */
-public class PBSServiceProvider extends
-		AbstractRemoteResourceManagerServiceProvider implements
-		IPBSResourceManagerConfiguration {
-	private final Preferences preferences = PBSPreferenceManager
-			.getPreferences();
+public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPBSResourceManagerConfiguration {
+	private final Preferences preferences = PBSPreferenceManager.getPreferences();
 
 	public PBSServiceProvider() {
 		super();
@@ -68,20 +65,17 @@ public class PBSServiceProvider extends
 	 */
 	@Override
 	public IResourceManagerControl createResourceManager() {
-		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin
-				.getDefault().getUniverse();
-		return new PBSResourceManager(Integer.valueOf(universe
-				.getNextResourceManagerId()), universe, this);
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+		return new PBSResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 
 	/**
 	 * @return name of the default template (file) for this resource manager
 	 *         (set in the edit wizard).
+	 * @since 4.0
 	 */
 	public String getDefaultTemplateName() {
-		return getString(getResourceManagerId()
-				+ Messages.PBSServiceProvider_defaultTemplateName,
-				ConfigUtils.EMPTY_STRING);
+		return getString(getResourceManagerId() + Messages.PBSServiceProvider_defaultTemplateName, ConfigUtils.EMPTY_STRING);
 	}
 
 	/*
@@ -115,7 +109,7 @@ public class PBSServiceProvider extends
 	public void setDefaultNameAndDesc() {
 		String name = "PBS"; //$NON-NLS-1$
 		String conn = getConnectionName();
-		if (conn != null && !conn.equals(""))
+		if (conn != null && !conn.equals("")) //$NON-NLS-1$
 			name += "@" + conn; //$NON-NLS-1$
 		setName(name);
 		setDescription(Messages.PBSResourceManager);
@@ -125,11 +119,10 @@ public class PBSServiceProvider extends
 	 * @param name
 	 *            of the default template (file) for this resource manager (set
 	 *            in the edit wizard).
+	 * @since 4.0
 	 */
 	public void setDefaultTemplateName(String name) {
-		putString(
-				getResourceManagerId() + Messages.PBSServiceProvider_defaultTemplateName,
-				name);
+		putString(getResourceManagerId() + Messages.PBSServiceProvider_defaultTemplateName, name);
 	}
 
 }

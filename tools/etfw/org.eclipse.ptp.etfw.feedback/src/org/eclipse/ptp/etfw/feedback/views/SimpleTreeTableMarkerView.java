@@ -86,7 +86,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * Like SimpleTableMarkerView - easy view that shows markers - but uses a
- * TreeTable to show some hierarchy. 
+ * TreeTable to show some hierarchy.
  * 
  * Intent: Markers are the leaf nodes.<br>
  * An attribute in the markers indicates the (artificial) parent node, for
@@ -108,7 +108,14 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	private Tree tree; // keep so we can dispose of listeners in dispose()?
 
 	protected Action infoAction;
-	protected Action extensionAction; // possible addition by an plug-in extension
+	/**
+	 * @since 1.1
+	 */
+	protected Action extensionAction; // possible addition by an plug-in
+										// extension
+	/**
+	 * @since 1.1
+	 */
 	protected AbstractFeedbackAction feedbackAction;
 
 	protected Action filterAction;
@@ -209,10 +216,11 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	protected String columnID_ = "constructType"; // id for (variable)
 
 	/**
-	 * whether or not to create parent nodes if they don't exist.
-	 * If true, for each unique "parent=" attribute in the XML items, a parent node of that name will be created,
-	 * and the children will be grouped under it.  org.eclipse.ptp.etfw.sample project uses this.
-	 * If false, then the IFeedbackItems should themselves indicate their parents/children.
+	 * whether or not to create parent nodes if they don't exist. If true, for
+	 * each unique "parent=" attribute in the XML items, a parent node of that
+	 * name will be created, and the children will be grouped under it.
+	 * org.eclipse.ptp.etfw.sample project uses this. If false, then the
+	 * IFeedbackItems should themselves indicate their parents/children.
 	 * 
 	 */
 	private boolean createParentsIfNeeded = false;
@@ -253,8 +261,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * class is in its own plug-in, and its icons are, too. BRT 11/2/09: this
 	 * ctor is called
 	 */
-	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames,
-			String columnName, String markerID, String parentMarkerAttrName) {
+	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String columnName,
+			String markerID, String parentMarkerAttrName) {
 
 		if (thePlugin == null) {
 			thePlugin_ = Activator.getDefault();
@@ -277,8 +285,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	// FIXME should probably have the other ctor call this one with default
 	// value of createParentsIfNeeded
-	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames,
-			String columnName, String markerID, String parentMarkerAttrName, boolean createParentsIfNeeded) {
+	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String columnName,
+			String markerID, String parentMarkerAttrName, boolean createParentsIfNeeded) {
 		this(thePlugin, thingname, thingnames, columnName, markerID, parentMarkerAttrName);
 		this.createParentsIfNeeded = createParentsIfNeeded;
 
@@ -298,8 +306,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 *            the marker attributes
 	 * @param markerID_
 	 */
-	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames,
-			String[] attrNames, String[] colNames, String markerID, String parentMarkerAttribName) {
+	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String[] attrNames,
+			String[] colNames, String markerID, String parentMarkerAttribName) {
 		this(thePlugin, thingname, thingnames, attrNames, colNames, null, markerID, parentMarkerAttribName, false);
 	}
 
@@ -317,21 +325,22 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * @param createParentsIfNeeded
 	 *            * this ctor is called(2)
 	 */
-	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames,
-			String[] attrNames, String[] colNames, int[] widths, String markerID, String parentMarkerAttribName,
-			boolean createParentsIfNeeded) {
+	public SimpleTreeTableMarkerView(AbstractUIPlugin thePlugin, String thingname, String thingnames, String[] attrNames,
+			String[] colNames, int[] widths, String markerID, String parentMarkerAttribName, boolean createParentsIfNeeded) {
 		this(thePlugin, thingname, thingnames, null, markerID, parentMarkerAttribName);
 		columnNames_ = colNames;
-		columnName_ = null;// set this so we can tell we are using array of  attrs/cols
+		columnName_ = null;// set this so we can tell we are using array of
+							// attrs/cols
 		markerAttrNames_ = attrNames;
 		widths_ = widths;
-		 
+
 		this.createParentsIfNeeded = createParentsIfNeeded;
 		int len1 = attrNames.length;
 		int len2 = colNames.length;
 		int len3 = widths.length;
 		if ((len1 != len2) || (len2 != len3)) {
-			System.out.println("WARNING: SimpleTreeTableMarkerView expects attrNames, colNames, and widths to all be the same length.");
+			System.out
+					.println("WARNING: SimpleTreeTableMarkerView expects attrNames, colNames, and widths to all be the same length.");
 		}
 	}
 
@@ -369,7 +378,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						iconName_ = iconName;
 					}
 					this.viewName_ = name;
-					this.viewID_=cElement.getAttribute("id");
+					this.viewID_ = cElement.getAttribute("id");
 					if (markerID_ == null) {
 						// use plugin id for marker id, if not specified
 						markerID_ = this.viewID_;
@@ -451,8 +460,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						System.out.println("input is null in getElements...");
 				}
 				markers = input.findMarkers(id, false, IResource.DEPTH_INFINITE);
-				if(createParentsIfNeeded) {
-					parentList=createParents(markers);
+				if (createParentsIfNeeded) {
+					parentList = createParents(markers);
 				}
 
 				for (int i = 0; i < markers.length; i++) {
@@ -475,13 +484,12 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				System.out.println("STTMV.get---Elements, found " + markers.length + " markers");
 			// the "parents" are the root nodes of the view. they may have
 			// children.
-			if(createParentsIfNeeded) {
-				int len=parentList.size();
+			if (createParentsIfNeeded) {
+				int len = parentList.size();
 				return parentList.toArray();
 			} else {
 				return rootNodeList.toArray();
 			}
-			
 
 		}
 
@@ -502,23 +510,21 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				// if this IS a parent, put *it* in the parent list
 				String parentName = getParentAttr(marker);
 				// make one single parent, if attrs don't have parent info (yet)
-				
+
 				if (parentName == null) {
 					// then this is a parent!
-					list.add(marker);   //???
-				}
-				else {
-					ParentNode pn=getParentNode(parentName);
-					//System.out.println("parent");
-					//list.add(pn);
-					
+					list.add(marker); // ???
+				} else {
+					ParentNode pn = getParentNode(parentName);
+					// System.out.println("parent");
+					// list.add(pn);
+
 				}
 			}
-			if(createParentsIfNeeded) {
-				int len=parentList.size();
+			if (createParentsIfNeeded) {
+				int len = parentList.size();
 				return parentList;
-				}
-			else {
+			} else {
 				return list;// parentList;
 			}
 		}
@@ -718,7 +724,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * get the children (markers) of a parent node
 		 */
 		public Object[] getChildren(Object parentElement) {
-			String parentName=null;
+			String parentName = null;
 			if (parentElement instanceof IMarker) {
 
 				IMarker parentMarker = (IMarker) parentElement;
@@ -728,17 +734,15 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				try {
 					parentName = (String) parentMarker.getAttribute(FeedbackIDs.FEEDBACK_ATTR_ID);
 				} catch (CoreException e1) {
-					System.out
-							.println("unable to get id attr of marker in order to find children with that parent id.");
+					System.out.println("unable to get id attr of marker in order to find children with that parent id.");
 					e1.printStackTrace();
 					return null;
 				}
-			}
-			else if(parentElement instanceof ParentNode) {
+			} else if (parentElement instanceof ParentNode) {
 				ParentNode parentNode = (ParentNode) parentElement;// messy
-				parentName=parentNode.getParentAttrName();
-				//System.out.println("STTMV: parentNode parentName: "+parentName);
-				
+				parentName = parentNode.getParentAttrName();
+				// System.out.println("STTMV: parentNode parentName: "+parentName);
+
 			}
 
 			IMarker[] markers = null;
@@ -755,7 +759,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				String parentAttr = getParentAttr(marker);
 				String itemID = getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_ID);
 
-				if (parentAttr!=null && parentAttr.equals(parentName)) {
+				if (parentAttr != null && parentAttr.equals(parentName)) {
 					children.add(marker);
 				}
 			}
@@ -802,7 +806,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * 
 	 */
 	public class ParentNode {
-		private String parentAttrName;
+		private final String parentAttrName;
 
 		public ParentNode(String parentName) {
 			this.parentAttrName = parentName;
@@ -812,6 +816,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			return parentAttrName;
 		}
 
+		@Override
 		public String toString() {
 			return "ParentNode  parentName=" + parentAttrName;
 		}
@@ -828,7 +833,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	protected String getConstructStr(IMarker marker) throws CoreException {
 		Integer temp = (Integer) marker.getAttribute(columnID_);
 		if (temp != null) {
-			Integer constructType = (Integer) temp;
+			Integer constructType = temp;
 			return CONSTRUCT_TYPE_NAMES[constructType.intValue()];
 		} else
 			return " ";
@@ -847,7 +852,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		/**
 		 * Keep icons already created, and reuse the images
 		 */
-		private HashMap iconHash = new HashMap();
+		private final HashMap iconHash = new HashMap();
 
 		/**
 		 * provide what goes in each column; get the info from the marker
@@ -858,6 +863,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
+		@Override
 		public String getText(Object o) {
 			String temp = super.getText(o);
 			// System.out.println("Text: " + temp);
@@ -918,9 +924,12 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					return (String) marker.getAttribute(attrname);
 				case 4:
 					// assumes attrname is IMarker.LINE_NUMBER;
-					//Note: currently this restricts the attribute/column in this position
-					// to a value that resolves to an int value, presumably the line number location.  
-					// This will be generalized later.  Perhaps include a type for each column.
+					// Note: currently this restricts the attribute/column in
+					// this position
+					// to a value that resolves to an int value, presumably the
+					// line number location.
+					// This will be generalized later. Perhaps include a type
+					// for each column.
 					String line = (marker.getAttribute(IMarker.LINE_NUMBER)).toString();
 					return line;
 				case 5:
@@ -998,6 +1007,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 		 */
 
+		@Override
 		public void dispose() {
 			if (traceOn)
 				System.out.println("STTMV.ViewLabelProvider.dispose(); dispose of icon images");
@@ -1034,6 +1044,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * Compare two items to determine sort order. Sort items by one or more
 		 * of: artifact name, then file, then line number, then construct
 		 */
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			int result = 0;
 
@@ -1052,13 +1063,13 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					String name1 = (String) m1.getAttribute(NAME);
 					String file1 = (String) m1.getAttribute(FILENAME);
 
-					String line1 = (String) m1.getAttribute(LINE).toString();
+					String line1 = m1.getAttribute(LINE).toString();
 					String construct1 = getConstructStr(m1);
 					String sort1 = combine(name1, file1, line1, construct1);
 
 					String name2 = (String) m2.getAttribute(NAME);
 					String file2 = (String) m2.getAttribute(FILENAME);
-					String line2 = (String) m2.getAttribute(LINE).toString();
+					String line2 = m2.getAttribute(LINE).toString();
 					String construct2 = getConstructStr(m2);
 					String sort2 = combine(name2, file2, line2, construct2);
 
@@ -1121,6 +1132,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		/**
 		 * sort items by line number
 		 */
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 
 			int cat1 = category(e1);
@@ -1177,6 +1189,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * @return BRT note: Sort isn't quite right: if name,filename identical,
 		 *         "10" would sort before "2" e.g.
 		 */
+		@Override
 		protected String combine(String name, String file, String line, String construct) {
 			final String delim = " - ";
 			StringBuffer result = new StringBuffer(name);
@@ -1198,6 +1211,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * 
 	 */
 	class FilenameSorter extends GenericSorter {
+		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 
 			int cat1 = category(e1);
@@ -1255,6 +1269,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * @return BRT note: Sort isn't quite right: if name,filename identical,
 		 *         "10" would sort before "2" e.g.
 		 */
+		@Override
 		protected String combine(String name, String file, String line, String construct) {
 			final String delim = " - ";
 			StringBuffer result = new StringBuffer(construct);
@@ -1272,6 +1287,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		tree = new Tree(parent, SWT.BORDER);
 		tree.setLinesVisible(true);
@@ -1373,6 +1389,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			columns[colNo].setResizable(true);
 			columns[colNo].setMoveable(true); // can reorder columns by dragging
 			SelectionListener columnListener = new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent event) {
 					Object src = event.getSource();
 					if (src instanceof TreeColumn) {
@@ -1430,7 +1447,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(infoAction);
-		if(extensionAction!=null) {
+		if (extensionAction != null) {
 			manager.add(extensionAction);
 		}
 		manager.add(removeMarkerAction);
@@ -1456,11 +1473,12 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 */
 	protected void makeShowInfoAction() {
 		infoAction = new Action() {
+			@Override
 			public void run() {
 				String title = thingname_ + " information";
 				if (selectedMarker_ != null) {
 					String info = null;
-					String idFromMarker = (String) selectedMarker_.getAttribute(uniqueID_, null);
+					String idFromMarker = selectedMarker_.getAttribute(uniqueID_, null);
 					if (idFromMarker == null) {
 						// See if implementation (subclass) has any information
 						// to show
@@ -1484,8 +1502,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		};
 		infoAction.setText("Show Info");
 		infoAction.setToolTipText("Show detailed info for selected " + thingname_);
-		infoAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
-				ISharedImages.IMG_OBJS_INFO_TSK));
+		infoAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 	}
 
 	/**
@@ -1493,6 +1511,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 */
 	private void makeFilterAction() {
 		filterAction = new Action() {
+			@Override
 			public void run() {
 				showMessage("Filter " + thingnames_ + "\nDetermine which " + thingnames_ + " are shown in this view.");
 			}
@@ -1509,6 +1528,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	private void makeDoubleClickAction() {
 
 		doubleClickAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection) selection).getFirstElement();
@@ -1538,8 +1558,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						showStatusMessage("", "double click action");
 					}
 				} catch (Exception e) {
-					System.out
-							.println("STTMV.doubleclickAction: Error positioning editor page from marker line number");
+					System.out.println("STTMV.doubleclickAction: Error positioning editor page from marker line number");
 					showStatusMessage("Error positioning editor from marker line number", "error marker goto");
 					e.printStackTrace();
 				}
@@ -1553,6 +1572,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 */
 	protected void makeRemoveMarkerAction() {
 		removeMarkerAction = new Action() {
+			@Override
 			public void run() {
 				// batch changes so we get only one resource change event
 				final IWorkspaceRoot wsResource = ResourcesPlugin.getWorkspace().getRoot();
@@ -1561,7 +1581,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					public void run(IProgressMonitor monitor) throws CoreException {
 						try {
 							int depth = IResource.DEPTH_INFINITE;
-							wsResource.deleteMarkers(markerID_, false, depth); 
+							wsResource.deleteMarkers(markerID_, false, depth);
 							if (traceOn)
 								System.out.println("markers removed.");
 
@@ -1581,13 +1601,16 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		};// end new action
 		removeMarkerAction.setText("Remove Markers");
 		removeMarkerAction.setToolTipText("Remove Markers");
-		removeMarkerAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
-				ISharedImages.IMG_TOOL_DELETE));// nice "red X" image
+		removeMarkerAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));// nice
+																	// "red X"
+																	// image
 
 	}
 
 	private void makeExpandCollapseActions() {
 		expandAllAction = new Action() {
+			@Override
 			public void run() {
 				viewer.expandAll();
 				expandCollapseStatus = EXPAND_COLLAPSE_EXPANDALL;
@@ -1599,6 +1622,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		expandAllAction.setImageDescriptor(descExpand);
 
 		collapseAllAction = new Action() {
+			@Override
 			public void run() {
 				viewer.collapseAll();
 				expandCollapseStatus = EXPAND_COLLAPSE_COLLAPSEALL;
@@ -1620,19 +1644,23 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	protected void maintainExpandCollapseStatus() {
 
 	}
-	
+
 	/**
 	 * Make "show info" action to display artifact information
+	 * 
+	 * @since 1.1
 	 */
 	protected void makeExtensionAction() {
-		FeedbackActionCreator creator=new FeedbackActionCreator();
-		String ps=thePlugin_.toString();//??
-		// do we also want ability to have a view id such that the action ONLY gets attached to that view?
-		feedbackAction= creator.findFeedbackAction(this.viewID_);
+		FeedbackActionCreator creator = new FeedbackActionCreator();
+		String ps = thePlugin_.toString();// ??
+		// do we also want ability to have a view id such that the action ONLY
+		// gets attached to that view?
+		feedbackAction = creator.findFeedbackAction(this.viewID_);
 		if (feedbackAction != null) {
 			extensionAction = new Action() {
+				@Override
 				public void run() {
-					
+
 					if (selectedMarker_ != null) {
 						feedbackAction.run(selectedMarker_);
 					}// end if selectedMarker!=null
@@ -1644,7 +1672,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			extensionAction.setText(feedbackAction.getText());
 			extensionAction.setToolTipText(feedbackAction.getToolTip());
 			extensionAction.setImageDescriptor(feedbackAction.getIconImageDescriptor());
-			//TODO destroy image description on shutdown/dispose?
+			// TODO destroy image description on shutdown/dispose?
 		}
 	}
 
@@ -1699,12 +1727,14 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		showStatusMessage("", "setFocus"); // reset status message
 		if (!viewer.getControl().isDisposed())
 			viewer.getControl().setFocus();
 	}
 
+	@Override
 	public void dispose() {
 		if (traceOn)
 			System.out.println("SimpleTableView.dispose()");
@@ -1791,8 +1821,8 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		try {
 			lineNo = Integer.parseInt(temp);
 		} catch (NumberFormatException nfe) {
-			System.out.println("STTMV: Marker lineNo(" + temp + " from attr " + attr
-					+ ") invalid (NumberFormatException); using 0");
+			System.out
+					.println("STTMV: Marker lineNo(" + temp + " from attr " + attr + ") invalid (NumberFormatException); using 0");
 		}
 		return lineNo;
 	}
@@ -1826,22 +1856,25 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	public String extractMarkerInfo(IMarker marker) {
 		return null;
 	}
+
 	/**
 	 * remove spaces from a string
+	 * 
 	 * @param s
 	 * @return
 	 */
 	public String removeSpaces(String s) {
-		  StringTokenizer st = new StringTokenizer(s," ",false);
-		  String t="";
-		  while (st.hasMoreElements()) t += st.nextElement();
-		  return t;
-		  }
+		StringTokenizer st = new StringTokenizer(s, " ", false);
+		String t = "";
+		while (st.hasMoreElements())
+			t += st.nextElement();
+		return t;
+	}
 
 	/**
 	 * Keep icons already created, and reuse the images
 	 */
-	private HashMap iconHash = new HashMap();
+	private final HashMap iconHash = new HashMap();
 
 	/**
 	 * a Stack that isn't based on Vector - Generic LIFO stack
@@ -1851,7 +1884,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * 
 	 */
 	public class StackList {
-		private LinkedList list = new LinkedList();
+		private final LinkedList list = new LinkedList();
 
 		public void push(Object v) {
 			list.addFirst(v);
@@ -1902,8 +1935,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 					if (validForAnalysis(f.getName())) {
 						if (traceOn)
-							System.out.println("File " + f.getName()
-									+ " is valid for analysis so will process the change...");
+							System.out.println("File " + f.getName() + " is valid for analysis so will process the change...");
 						if (contentChanged != 0) {
 							// do we need to tell back end (analysis engine)
 							// that file changed?
@@ -1929,8 +1961,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 						} // end loop
 					} else {
 						if (traceOn)
-							System.out.println("File " + f.getName()
-									+ " is NOT valid for analysis so will ignore change...");
+							System.out.println("File " + f.getName() + " is NOT valid for analysis so will ignore change...");
 
 					}
 				} // end if CHANGED

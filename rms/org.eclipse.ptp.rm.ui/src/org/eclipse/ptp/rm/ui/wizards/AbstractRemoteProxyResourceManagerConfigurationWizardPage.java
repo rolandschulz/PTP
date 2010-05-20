@@ -159,33 +159,111 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	public static final int VALIDATE_TIMER = 250;
+	/**
+	 * @since 1.1
+	 */
 	protected IRemoteResourceManagerConfiguration config;
+	/**
+	 * @since 1.1
+	 */
 	protected String proxyPath = EMPTY_STRING;
+	/**
+	 * @since 1.1
+	 */
 	protected String proxyArgs = EMPTY_STRING;
+	/**
+	 * @since 1.1
+	 */
 	protected String localAddr = EMPTY_STRING;
+	/**
+	 * @since 1.1
+	 */
 	protected IRemoteServices remoteServices = null;
+	/**
+	 * @since 1.1
+	 */
 	protected IRemoteConnectionManager connectionManager = null;
+	/**
+	 * @since 1.1
+	 */
 	protected IRemoteUIConnectionManager uiConnectionManager = null;
+	/**
+	 * @since 1.1
+	 */
 	protected IRemoteConnection connection = null;
+	/**
+	 * @since 1.1
+	 */
 	protected boolean loading = true;
+	/**
+	 * @since 1.1
+	 */
 	protected boolean isValid;
+	/**
+	 * @since 1.1
+	 */
 	protected boolean muxPortFwd = false;
+	/**
+	 * @since 1.1
+	 */
 	protected boolean portFwdSupported = true;
+	/**
+	 * @since 1.1
+	 */
 	protected boolean proxyPathIsValid = true;
+	/**
+	 * @since 1.1
+	 */
 	protected boolean manualLaunch = false;
 
+	/**
+	 * @since 1.1
+	 */
 	protected final Job validateJob = new ValidateJob();
+	/**
+	 * @since 1.1
+	 */
 	protected final WidgetListener listener = new WidgetListener();
 
+	/**
+	 * @since 1.1
+	 */
 	protected Text proxyPathText = null;
+	/**
+	 * @since 1.1
+	 */
 	protected Button optionsButton = null;
+	/**
+	 * @since 1.1
+	 */
 	protected Button browseButton = null;
+	/**
+	 * @since 1.1
+	 */
 	protected Button noneButton = null;
+	/**
+	 * @since 1.1
+	 */
 	protected Button portForwardingButton = null;
+	/**
+	 * @since 1.1
+	 */
 	protected Button manualButton = null;
+	/**
+	 * @since 1.1
+	 */
 	protected Button newConnectionButton;
+	/**
+	 * @since 1.1
+	 */
 	protected Combo remoteCombo;
+	/**
+	 * @since 1.1
+	 */
 	protected Combo connectionCombo;
+	/**
+	 * @since 1.1
+	 */
 	protected Combo localAddrCombo;
 
 	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard, String title) {
@@ -521,6 +599,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
 	}
 
+	/**
+	 * @since 1.1
+	 */
 	private void registerListeners() {
 		remoteCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -581,6 +662,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	/**
 	 * Update wizard UI selections from settings. This should be called whenever
 	 * any settings are changed.
+	 * 
+	 * @since 1.1
 	 */
 	protected void updateSettings() {
 		/*
@@ -637,6 +720,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * remote system.
 	 * 
 	 * @return true if valid
+	 * @since 1.1
 	 */
 	protected boolean validateProxyPath() {
 		proxyPathIsValid = false;

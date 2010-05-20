@@ -18,12 +18,18 @@ package org.eclipse.ptp.rm.slurm.core;
 
 public class SLURMMPINodeAttributes {
 	public enum Status {
-		IDLE,
-		ALLOCATED,
-		DOWN,
-		UNKNOWN,
+		IDLE, ALLOCATED, DOWN, UNKNOWN,
+		/**
+		 * @since 4.0
+		 */
 		MIXED,
+		/**
+		 * @since 4.0
+		 */
 		FUTURE,
+		/**
+		 * @since 4.0
+		 */
 		ERROR
 	}
 }

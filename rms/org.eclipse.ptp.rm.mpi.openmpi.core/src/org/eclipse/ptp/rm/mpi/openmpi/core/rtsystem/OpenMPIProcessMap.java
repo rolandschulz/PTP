@@ -22,7 +22,7 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class OpenMPIProcessMap {
 
@@ -32,10 +32,10 @@ public class OpenMPIProcessMap {
 	 * @author dfferber
 	 */
 	static public class Application {
-		private int index;
+		private final int index;
 		private String name = new String();
 		final private AttributeManager attributeManager = new AttributeManager();
-		private int numberOfProcessors;
+		private final int numberOfProcessors;
 
 		public Application(int index, String applicationName, int numberOfProcessors) {
 			super();
@@ -69,13 +69,13 @@ public class OpenMPIProcessMap {
 	static public class Node {
 		// Information provided by openmpi 1.2 and 1.3
 		private String name = null;
-		private List<String> resolvedNames = new ArrayList<String>();
+		private final List<String> resolvedNames = new ArrayList<String>();
 		private Iterator<String> iterator = null;
 
 		final private AttributeManager attributeManager = new AttributeManager();
 
 		// References to processes.
-		private List<Process> processes = new ArrayList<Process>();
+		private final List<Process> processes = new ArrayList<Process>();
 
 		public Node(String name) {
 			super();
@@ -85,7 +85,7 @@ public class OpenMPIProcessMap {
 		public String getName() {
 			return name;
 		}
-		
+
 		public String getResolvedName() {
 			if (iterator == null || !iterator.hasNext()) {
 				iterator = resolvedNames.listIterator();
@@ -95,7 +95,7 @@ public class OpenMPIProcessMap {
 			}
 			return iterator.next();
 		}
-		
+
 		public void addResolvedName(String name) {
 			if (!resolvedNames.contains(name)) {
 				resolvedNames.add(name);
@@ -120,12 +120,15 @@ public class OpenMPIProcessMap {
 	 * A process spawned by mpirun for a certain application on a certain node.
 	 */
 	static public class Process {
-		private int index;
-		private int applicationIndex;
-		private Node node;
+		private final int index;
+		private final int applicationIndex;
+		private final Node node;
 
 		final private AttributeManager attributeManager = new AttributeManager();
 
+		/**
+		 * @since 3.0
+		 */
 		public Process(Node node, int index, int applicationIndex) {
 			super();
 			this.node = node;
@@ -152,7 +155,7 @@ public class OpenMPIProcessMap {
 
 	final private AttributeManager attributeManager = new AttributeManager();
 	final private List<Application> applications = new ArrayList<Application>();
-	final private Map<String,Node> nodes = new HashMap<String,Node>();
+	final private Map<String, Node> nodes = new HashMap<String, Node>();
 	final private List<Process> processes = new ArrayList<Process>();
 
 	public OpenMPIProcessMap() {
@@ -182,7 +185,7 @@ public class OpenMPIProcessMap {
 	public void addNode(Node node) {
 		nodes.put(node.getName(), node);
 	}
-	
+
 	public Node getNode(String name) {
 		return nodes.get(name);
 	}
