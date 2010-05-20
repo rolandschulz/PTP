@@ -21,6 +21,9 @@ public class SLURMMPINodeAttributes {
 		IDLE,
 		ALLOCATED,
 		DOWN,
-		UNKNOWN
+		UNKNOWN,
+		MIXED,
+		FUTURE,
+		ERROR
 	}
 }
