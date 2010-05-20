@@ -12,6 +12,9 @@ import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.VariablesPlugin;
 
+/**
+ * @since 4.0
+ */
 public class RemoteVariableManager {
 	private static RemoteVariableManager fInstance = null;
 	private final IStringVariableManager fVarMgr;

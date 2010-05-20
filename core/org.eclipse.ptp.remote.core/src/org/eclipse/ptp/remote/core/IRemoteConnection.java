@@ -22,6 +22,9 @@ public interface IRemoteConnection {
 	public final static String FILE_SERPARATOR_PROPERTY = "file.separator"; //$NON-NLS-1$
 	public final static String PATH_SERPARATOR_PROPERTY = "path.separator"; //$NON-NLS-1$
 	public final static String LINE_SERPARATOR_PROPERTY = "line.separator"; //$NON-NLS-1$
+	/**
+	 * @since 4.0
+	 */
 	public final static String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 
 	/**
@@ -171,6 +174,7 @@ public interface IRemoteConnection {
 	 * Get the remote services provider for this connection.
 	 * 
 	 * @return remote services provider
+	 * @since 4.0
 	 */
 	public IRemoteServices getRemoteServices();
 
@@ -190,6 +194,7 @@ public interface IRemoteConnection {
 	 * directory, may be returned in this case.
 	 * 
 	 * @return String representing the current working directory
+	 * @since 4.0
 	 */
 	public String getWorkingDirectory();
 
@@ -245,7 +250,9 @@ public interface IRemoteConnection {
 	 * Set the working directory. Relative paths will be resolved using this
 	 * path. The path must be valid and absolute for any changes to be made.
 	 * 
-	 * param path String representing the current working directory
+	 * @param path
+	 *            String representing the current working directory
+	 * @since 4.0
 	 */
 	public void setWorkingDirectory(String path);
 
