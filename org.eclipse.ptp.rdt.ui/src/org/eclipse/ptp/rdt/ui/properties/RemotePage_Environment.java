@@ -15,6 +15,12 @@ package org.eclipse.ptp.rdt.ui.properties;
 
 import org.eclipse.cdt.ui.newui.AbstractPage;
 
+/**
+ * @since 2.0
+ */
 public class RemotePage_Environment extends AbstractPage {
-	protected boolean isSingle() { return true; }
+	@Override
+	protected boolean isSingle() {
+		return true;
+	}
 }

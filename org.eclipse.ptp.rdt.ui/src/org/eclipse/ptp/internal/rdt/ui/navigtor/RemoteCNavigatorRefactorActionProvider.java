@@ -25,18 +25,24 @@ import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 
 /**
- * A clone of org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider.
+ * A clone of
+ * org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider.
+ * 
+ * @since 2.0
  */
 public class RemoteCNavigatorRefactorActionProvider extends CommonActionProvider {
 
-	private CNavigatorRefactorActionProvider fCDTRefactorActionProvider;
-	
+	private final CNavigatorRefactorActionProvider fCDTRefactorActionProvider;
+
 	public RemoteCNavigatorRefactorActionProvider() {
 		super();
 		fCDTRefactorActionProvider = new CNavigatorRefactorActionProvider();
 	}
+
 	/*
-	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
+	 * @see
+	 * org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator
+	 * .ICommonActionExtensionSite)
 	 */
 	@Override
 	public void init(ICommonActionExtensionSite actionSite) {
@@ -59,13 +65,13 @@ public class RemoteCNavigatorRefactorActionProvider extends CommonActionProvider
 		ActionContext context = getContext();
 		ISelection selection = context.getSelection();
 		if (selection != null && !selection.isEmpty() && selection instanceof StructuredSelection) {
-			Object sel = ((StructuredSelection)selection).getFirstElement();
+			Object sel = ((StructuredSelection) selection).getFirstElement();
 			if (sel instanceof ICElement && !(sel instanceof ITranslationUnit)) {
-				IProject project = ((ICElement)sel).getCProject().getProject();
-				if (!RemoteNature.hasRemoteNature(project)){
+				IProject project = ((ICElement) sel).getCProject().getProject();
+				if (!RemoteNature.hasRemoteNature(project)) {
 					fCDTRefactorActionProvider.fillContextMenu(menu);
 				}
-			} else { //other resources
+			} else { // other resources
 				fCDTRefactorActionProvider.fillContextMenu(menu);
 			}
 		}

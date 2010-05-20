@@ -1,4 +1,5 @@
 package org.eclipse.ptp.rdt.ui.properties;
+
 /*******************************************************************************
  * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
@@ -10,16 +11,15 @@ package org.eclipse.ptp.rdt.ui.properties;
  * IBM - Initial API and implementation
  *******************************************************************************/
 
-
 import org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 
 /**
  * @author crecoskie
- *
+ * @since 2.0
+ * 
  */
-public class RemoteEnvironmentPropertyPage extends Page_Environment implements
-		IWorkbenchPropertyPage {
+public class RemoteEnvironmentPropertyPage extends Page_Environment implements IWorkbenchPropertyPage {
 
 	/**
 	 * 
