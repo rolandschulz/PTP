@@ -38,6 +38,9 @@ feature@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvs
 feature@org.eclipse.ptp.rdt.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotetools-feature
 feature@org.eclipse.ptp.rdt.remotejars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotejars-feature
 
+! SCI feature
+feature@org.eclipse.ptp.sci=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.sci-feature
+
 ! PTP Plugins
 plugin@org.eclipse.ptp=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp
 plugin@org.eclipse.ptp.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.core
@@ -133,6 +136,9 @@ plugin@org.eclipse.ptp.rdt.server.dstore=@ptpTag@,:pserver:anonymous@dev.eclipse
 ! GEM Plugins
 plugin@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem
 plugin@org.eclipse.ptp.gem.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem.help
+
+! SCI Plugin
+plugin@org.eclipse.ptp.sci=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/sci/org.eclipse.ptp.sci
 
 ! Fragments
 fragment@org.eclipse.ptp.aix.ppc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.aix.ppc
