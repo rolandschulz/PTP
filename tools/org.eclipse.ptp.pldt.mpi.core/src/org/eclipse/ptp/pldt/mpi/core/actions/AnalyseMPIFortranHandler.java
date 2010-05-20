@@ -21,6 +21,9 @@ import org.eclipse.photran.internal.core.parser.Parser;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.mpi.core.analysis.MpiFortranASTVisitor;
 
+/**
+ * @since 4.0
+ */
 public class AnalyseMPIFortranHandler {
 	public void run(String languageID, ITranslationUnit tu, String fileName, ScanReturn msr) {
 		if (languageID.equals(FortranLanguage.LANGUAGE_ID)) {

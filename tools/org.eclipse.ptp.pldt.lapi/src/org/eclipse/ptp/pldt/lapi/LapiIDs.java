@@ -14,15 +14,16 @@ import org.eclipse.ptp.pldt.lapi.messages.Messages;
 
 /**
  * LAPI Plugin constants
+ * 
+ * @since 4.0
  */
-public interface LapiIDs
-{
-    /** Preference page name for LAPI */
-    String LAPI_INCLUDES    = Messages.LapiIDs_lapi_includes_pref_page_title;
-    
-    String MARKER_ID       = "org.eclipse.ptp.pldt.lapi.lapiMarker"; //$NON-NLS-1$
-    String MARKER_ERROR_ID = "org.eclipse.ptp.lap.lapiErrorMarker"; //$NON-NLS-1$
-    
-    /** Artifact view id */
-    String LAPI_VIEW_ID = "org.eclipse.ptp.pldt.lapi.views.LapiArtifactView"; //$NON-NLS-1$
+public interface LapiIDs {
+	/** Preference page name for LAPI */
+	String LAPI_INCLUDES = Messages.LapiIDs_lapi_includes_pref_page_title;
+
+	String MARKER_ID = "org.eclipse.ptp.pldt.lapi.lapiMarker"; //$NON-NLS-1$
+	String MARKER_ERROR_ID = "org.eclipse.ptp.lap.lapiErrorMarker"; //$NON-NLS-1$
+
+	/** Artifact view id */
+	String LAPI_VIEW_ID = "org.eclipse.ptp.pldt.lapi.views.LapiArtifactView"; //$NON-NLS-1$
 }
