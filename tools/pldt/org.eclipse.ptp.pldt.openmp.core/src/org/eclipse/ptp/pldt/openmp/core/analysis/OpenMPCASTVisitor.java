@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,8 +40,8 @@ public class OpenMPCASTVisitor extends PldtAstVisitor
     public OpenMPCASTVisitor(List<String> includes, String fileName, ScanReturn msr)
     {
         super(includes, fileName, msr);
-        ARTIFACT_CALL = Messages.OpenMPCASTVisitor_OPENMP_CALL;
-		ARTIFACT_CONSTANT=Messages.OpenMPCASTVisitor_OPENMP_CONSTANT;
+        ARTIFACT_CALL = Messages.OpenMPCASTVisitor_OpenMP_Call;
+		ARTIFACT_CONSTANT=Messages.OpenMPCASTVisitor_OpenMP_Constant;
     }
 
 

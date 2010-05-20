@@ -50,7 +50,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * 
  */
 public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
-	private static final String OPENMP_DIRECTIVE = Messages.RunAnalyseOpenMPcommandHandler_OPENMP_DIRECTIVE;
+	private static final String OPENMP_DIRECTIVE = Messages.RunAnalyseOpenMPcommandHandler_OpenMP_directive;
 	private static final boolean traceOn = false;
 
 	/**

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005,2008 IBM Corporation.
+ * Copyright (c) 2005,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,12 +14,10 @@ package org.eclipse.ptp.pldt.openmp.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 
-import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -33,16 +31,12 @@ public class OpenMPPlugin extends AbstractUIPlugin {
 	
     // Constants
     // preference page name for OpenMP
-    public static final String OPEN_MP_INCLUDES    = Messages.OpenMPPlugin_OPENMP_INCLUDES;
+    public static final String OPEN_MP_INCLUDES    = Messages.OpenMPPlugin_OpenMP_includes;
     
     public static final String MARKER_ID       = "org.eclipse.ptp.pldt.openmp.core.openMPMarker"; //$NON-NLS-1$
    
     // artifact view id
     public static final String VIEW_ID = "org.eclipse.ptp.pldt.openmp.core.views.OpenMPArtifactView"; //$NON-NLS-1$
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.openmp.core.messages"; //$NON-NLS-1$
-
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-			.getBundle(BUNDLE_NAME);
 
 	/**
 	 * The constructor.
@@ -98,13 +92,7 @@ public class OpenMPPlugin extends AbstractUIPlugin {
         }
         return dirs;
     }
-	public static String getResourceString(String key) {
-		try {
-			return RESOURCE_BUNDLE.getString(key);
-		} catch (MissingResourceException e) {
-			return '!' + key + '!';
-		}
-	}
+
     public static String getPluginId()
     {
         return PLUGIN_ID;
