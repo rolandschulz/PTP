@@ -14,7 +14,7 @@ package org.eclipse.ptp.pldt.common.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.common.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.common.messages.messages"; //$NON-NLS-1$
 	public static String Artifact_artifact;
 	public static String Artifact_constant;
 	public static String Artifact_function_call;
