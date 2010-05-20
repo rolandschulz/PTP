@@ -78,98 +78,133 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			notifyObservers(event);
 		}
 	}
-	
-	private int bpid = 0;
-	private ProxyNotifier proxyNotifier = new ProxyNotifier();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#commandRequest(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	private int bpid = 0;
+	private final ProxyNotifier proxyNotifier = new ProxyNotifier();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#commandRequest(org.eclipse
+	 * .ptp.core.util.TaskSet, java.lang.String)
 	 */
 	public void commandRequest(TaskSet tasks, String command) throws PDIException {
 		try {
 			debugCLIHandle(tasks, command);
 		} catch (IOException e) {
-			throw new PDIException(null, Messages.PDIDebugger_0 + e.getMessage()); 
+			throw new PDIException(null, Messages.PDIDebugger_0 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataReadMemory(org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int, int, int, java.lang.Character)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataReadMemory
+	 * (org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int,
+	 * int, int, java.lang.Character)
 	 */
 	public void createDataReadMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols,
 			Character asChar) throws PDIException {
 		try {
 			setDataReadMemoryCommand(tasks, offset, address, getFormat(wordFormat), wordSize, rows, cols, asChar);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_1 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_1 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#createDataWriteMemory(org.eclipse.ptp.core.util.TaskSet, long, java.lang.String, int, int, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIMemoryBlockManagement#
+	 * createDataWriteMemory(org.eclipse.ptp.core.util.TaskSet, long,
+	 * java.lang.String, int, int, java.lang.String)
 	 */
 	public void createDataWriteMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value)
 			throws PDIException {
 		try {
 			setDataWriteMemoryCommand(tasks, offset, address, getFormat(wordFormat), wordSize, value);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_2 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_2 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#deleteBreakpoint(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#deleteBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
 	public void deleteBreakpoint(TaskSet tasks, int bpid) throws PDIException {
 		try {
 			debugDeleteBreakpoint(tasks, bpid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_3 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_3 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#deletePartialExpression(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#deletePartialExpression
+	 * (org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
 	public void deletePartialExpression(TaskSet tasks, String var) throws PDIException {
 		try {
 			debugDeletePartialExpression(tasks, var);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_4 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_4 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#disconnect(java.util.Observer)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#disconnect(java.util.Observer
+	 * )
 	 */
 	public void disconnect(Observer observer) throws PDIException {
 		stopDebugger();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluateExpression(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluateExpression
+	 * (org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
 	public void evaluateExpression(TaskSet tasks, String expr) throws PDIException {
 		try {
 			debugEvaluateExpression(tasks, expr);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_5 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_5 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#evaluatePartialExpression(org.eclipse.ptp.core.util.TaskSet, java.lang.String, java.lang.String, boolean, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#
+	 * evaluatePartialExpression(org.eclipse.ptp.core.util.TaskSet,
+	 * java.lang.String, java.lang.String, boolean, boolean)
 	 */
 	public void evaluatePartialExpression(TaskSet tasks, String expr, String exprId, boolean listChildren, boolean express)
 			throws PDIException {
 		try {
 			debugEvaluatePartialExpression(tasks, expr, exprId, listChildren, express);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_6 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_6 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#getErrorAction(int)
 	 */
 	public int getErrorAction(int errorCode) {
@@ -190,22 +225,30 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			return IPDIErrorInfo.DBG_WARNING;
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.debug.client.AbstractProxyDebugClient#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.debug.client.AbstractProxyDebugClient#handleEvent
+	 * (org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
 	 */
+	@Override
 	public void handleEvent(IProxyExtendedEvent e) {
 		if (e instanceof IProxyDebugEvent) {
 			proxyNotifier.notify((IProxyDebugEvent) e);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#initialize(java.util.List)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#initialize(java.util.List)
 	 */
 	public void initialize(ILaunchConfiguration configuration, List<String> args, IProgressMonitor monitor) throws PDIException {
 		int port = 0;
-		
+
 		/*
 		 * If there is an existing port specified, use it if possible.
 		 */
@@ -218,21 +261,22 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				break;
 			}
 		}
-		
+
 		try {
 			doInitialize(port);
 		} catch (IOException e) {
-			throw new PDIException(null, Messages.PDIDebugger_7 + e.getMessage()); 
+			throw new PDIException(null, Messages.PDIDebugger_7 + e.getMessage());
 		}
-		
+
 		IResourceManagerControl rm = getResourceManager(configuration);
 		if (rm != null) {
 			port = getSessionPort();
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			if (conf instanceof IRemoteResourceManagerConfiguration) {
-				IRemoteResourceManagerConfiguration remConf = (IRemoteResourceManagerConfiguration)conf;
+				IRemoteResourceManagerConfiguration remConf = (IRemoteResourceManagerConfiguration) conf;
 				if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-					IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remConf.getRemoteServicesId());
+					IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
+							remConf.getRemoteServicesId());
 					if (remoteServices != null) {
 						IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 						if (connMgr != null) {
@@ -240,11 +284,14 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 							if (conn != null) {
 								try {
 									/*
-									 * Bind remote port to all interfaces. This allows the sdm master
-									 * process running on a cluster node to use the tunnel. 
+									 * Bind remote port to all interfaces. This
+									 * allows the sdm master process running on
+									 * a cluster node to use the tunnel.
 									 * 
-									 * FIXME: Since this requires a special option to be enabled in sshd
-									 * on the head node (GatewayPorts), I'd like this to go way.
+									 * FIXME: Since this requires a special
+									 * option to be enabled in sshd on the head
+									 * node (GatewayPorts), I'd like this to go
+									 * way.
 									 */
 									port = conn.forwardRemotePort("", getSessionPort(), monitor); //$NON-NLS-1$
 								} catch (RemoteConnectionException e) {
@@ -254,23 +301,23 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 									return;
 								}
 							} else {
-								throw new PDIException(null, Messages.PDIDebugger_8); 
+								throw new PDIException(null, Messages.PDIDebugger_8);
 							}
 						} else {
-							throw new PDIException(null, Messages.PDIDebugger_9); 
+							throw new PDIException(null, Messages.PDIDebugger_9);
 						}
 					} else {
-						throw new PDIException(null, Messages.PDIDebugger_10); 
+						throw new PDIException(null, Messages.PDIDebugger_10);
 					}
 				}
 			}
 			args.add("--port=" + port); //$NON-NLS-1$
 		} else {
-			throw new PDIException(null, Messages.PDIDebugger_11); 
+			throw new PDIException(null, Messages.PDIDebugger_11);
 		}
-		
+
 		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
-		
+
 		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
 			int level = store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL);
 			if ((level & SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) == SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) {
@@ -279,8 +326,12 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#isConnected(org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#isConnected(org.eclipse.core
+	 * .runtime.IProgressMonitor)
 	 */
 	public boolean isConnected(IProgressMonitor monitor) throws PDIException {
 		try {
@@ -292,190 +343,251 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			return false;
 		} catch (IOException e) {
 			disconnect(null);
-			throw new PDIException(null, Messages.PDIDebugger_12 + e.getMessage()); 
+			throw new PDIException(null, Messages.PDIDebugger_12 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listArguments(org.eclipse.ptp.core.util.TaskSet, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listArguments(org
+	 * .eclipse.ptp.core.util.TaskSet, int, int)
 	 */
 	public void listArguments(TaskSet tasks, int low, int high) throws PDIException {
 		try {
 			debugListArguments(tasks, low, high);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_13 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_13 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listGlobalVariables(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listGlobalVariables
+	 * (org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void listGlobalVariables(TaskSet tasks) throws PDIException {
 		try {
 			debugListGlobalVariables(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_14 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_14 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#listInfoThreads(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#listInfoThreads(org
+	 * .eclipse.ptp.core.util.TaskSet)
 	 */
 	public void listInfoThreads(TaskSet tasks) throws PDIException {
 		try {
 			debugListInfoThreads(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_15 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_15 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listLocalVariables(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#listLocalVariables
+	 * (org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void listLocalVariables(TaskSet tasks) throws PDIException {
 		try {
 			debugListLocalVariables(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_16 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_16 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#listSignals(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#listSignals(org.eclipse
+	 * .ptp.core.util.TaskSet, java.lang.String)
 	 */
 	public void listSignals(TaskSet tasks, String name) throws PDIException {
 		try {
 			debugListSignals(tasks, name);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_17 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_17 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#listStackFrames(org.eclipse.ptp.core.util.TaskSet, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#listStackFrames
+	 * (org.eclipse.ptp.core.util.TaskSet, int, int)
 	 */
 	public void listStackFrames(TaskSet tasks, int low, int depth) throws PDIException {
 		try {
 			debugListStackframes(tasks, low, depth);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_18 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_18 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#register(java.util.Observer)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#register(java.util.Observer)
 	 */
 	public void register(Observer observer) {
 		proxyNotifier.addObserver(observer);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse
+	 * .ptp.core.util.TaskSet)
 	 */
 	public void restart(TaskSet tasks) throws PDIException {
-		throw new PDIException(null, Messages.PDIDebugger_19); 
+		throw new PDIException(null, Messages.PDIDebugger_19);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
+	 * .ptp.core.util.TaskSet, boolean)
 	 */
 	public void resume(TaskSet tasks, boolean passSignal) throws PDIException {
 		try {
 			debugGo(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_20 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_20 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
 	public void resume(TaskSet tasks, IPDILocation location) throws PDIException {
-		throw new PDIException(null, Messages.PDIDebugger_21); 
+		throw new PDIException(null, Messages.PDIDebugger_21);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
 	 */
 	public void resume(TaskSet tasks, IPDISignal signal) throws PDIException {
-		throw new PDIException(null, Messages.PDIDebugger_22); 
+		throw new PDIException(null, Messages.PDIDebugger_22);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISignalManagement#retrieveSignalInfo(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
-	 */
-	public void retrieveSignalInfo(TaskSet tasks, String arg) throws PDIException {
-		try {
-			debugSignalInfo(tasks, arg);
-		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_23 + e.getMessage()); 
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#retrieveStackInfoDepth(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#retrieveStackInfoDepth
+	 * (org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void retrieveStackInfoDepth(TaskSet tasks) throws PDIException {
 		try {
 			debugStackInfoDepth(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_24 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_24 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#retrieveVariableType(org.eclipse.ptp.core.util.TaskSet, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIVariableManagement#retrieveVariableType
+	 * (org.eclipse.ptp.core.util.TaskSet, java.lang.String)
 	 */
 	public void retrieveVariableType(TaskSet tasks, String var) throws PDIException {
 		try {
 			debugGetType(tasks, var);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_25 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_25 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#selectThread(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIThreadManagement#selectThread(org.
+	 * eclipse.ptp.core.util.TaskSet, int)
 	 */
 	public void selectThread(TaskSet tasks, int tid) throws PDIException {
 		try {
 			debugSetThreadSelect(tasks, tid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_26 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_26 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setAddressBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setAddressBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint)
 	 */
 	public void setAddressBreakpoint(TaskSet tasks, IPDIAddressBreakpoint bpt) throws PDIException {
-		throw new PDIException(tasks, Messages.PDIDebugger_27); 
+		throw new PDIException(tasks, Messages.PDIDebugger_27);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setConditionBreakpoint(org.eclipse.ptp.core.util.TaskSet, int, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#
+	 * setConditionBreakpoint(org.eclipse.ptp.core.util.TaskSet, int,
+	 * java.lang.String)
 	 */
 	public void setConditionBreakpoint(TaskSet tasks, int bpid, String condition) throws PDIException {
 		try {
 			debugConditionBreakpoint(tasks, bpid, condition);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_28 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_28 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#setCurrentStackFrame(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIStackframeManagement#setCurrentStackFrame
+	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
 	public void setCurrentStackFrame(TaskSet tasks, int level) throws PDIException {
 		try {
 			debugSetCurrentStackframe(tasks, level);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_29 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_29 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setEnabledBreakpoint(org.eclipse.ptp.core.util.TaskSet, int, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setEnabledBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet, int, boolean)
 	 */
 	public void setEnabledBreakpoint(TaskSet tasks, int bpid, boolean enabled) throws PDIException {
 		try {
@@ -484,19 +596,29 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			else
 				debugDisableBreakpoint(tasks, bpid);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_30 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_30 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setExceptionpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setExceptionpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint)
 	 */
 	public void setExceptionpoint(TaskSet tasks, IPDIExceptionpoint bpt) throws PDIException {
-		throw new PDIException(tasks, Messages.PDIDebugger_31); 
+		throw new PDIException(tasks, Messages.PDIDebugger_31);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setFunctionBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setFunctionBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint)
 	 */
 	public void setFunctionBreakpoint(TaskSet tasks, IPDIFunctionBreakpoint bpt) throws PDIException {
 		try {
@@ -513,12 +635,17 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 					.getLocator().getFunction(), (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0), 0);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_32 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_32 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setLineBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setLineBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint)
 	 */
 	public void setLineBreakpoint(TaskSet tasks, IPDILineBreakpoint bpt) throws PDIException {
 		try {
@@ -535,12 +662,17 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 					.getLocator().getLineNumber(), (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0), 0);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_33 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_33 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setWatchpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIBreakpointManagement#setWatchpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint)
 	 */
 	public void setWatchpoint(TaskSet tasks, IPDIWatchpoint bpt) throws PDIException {
 		try {
@@ -556,121 +688,167 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			debugSetWatchpoint(tasks, id, expression, access, read, (condition != null ? condition.getExpression() : ""), //$NON-NLS-1$
 					(condition != null ? condition.getIgnoreCount() : 0));
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_34 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_34 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse
+	 * .ptp.core.util.TaskSet)
 	 */
 	public void start(TaskSet tasks) throws PDIException {
 		resume(tasks, false);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#startDebugger(java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#startDebugger(java.lang.String
+	 * , java.lang.String, java.lang.String, java.lang.String[])
 	 */
 	public void startDebugger(String app, String path, String dir, String[] args) throws PDIException {
 		try {
 			debugStartSession(app, path, dir, args);
 		} catch (IOException e) {
-			throw new PDIException(null, Messages.PDIDebugger_35 + e.getMessage()); 
+			throw new PDIException(null, Messages.PDIDebugger_35 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse
+	 * .ptp.core.util.TaskSet, int)
 	 */
 	public void stepInto(TaskSet tasks, int count) throws PDIException {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_INTO);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_36 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_36 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction
+	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
 	public void stepIntoInstruction(TaskSet tasks, int count) throws PDIException {
-		throw new PDIException(null, Messages.PDIDebugger_37); 
+		throw new PDIException(null, Messages.PDIDebugger_37);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse
+	 * .ptp.core.util.TaskSet, int)
 	 */
 	public void stepOver(TaskSet tasks, int count) throws PDIException {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_OVER);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_38 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_38 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction
+	 * (org.eclipse.ptp.core.util.TaskSet, int)
 	 */
 	public void stepOverInstruction(TaskSet tasks, int count) throws PDIException {
-		throw new PDIException(null, Messages.PDIDebugger_39); 
+		throw new PDIException(null, Messages.PDIDebugger_39);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
 	 */
 	public void stepReturn(TaskSet tasks, IAIF aif) throws PDIException {
-		throw new PDIException(null, Messages.PDIDebugger_40); 
+		throw new PDIException(null, Messages.PDIDebugger_40);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse.ptp.core.util.TaskSet, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
+	 * .ptp.core.util.TaskSet, int)
 	 */
 	public void stepReturn(TaskSet tasks, int count) throws PDIException {
 		try {
 			debugStep(tasks, count, ProxyDebugClient.STEP_FINISH);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_41 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_41 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
 	 */
 	public void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException {
-		throw new PDIException(null, Messages.PDIDebugger_42); 
+		throw new PDIException(null, Messages.PDIDebugger_42);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDIDebugger#stopDebugger()
 	 */
 	public void stopDebugger() throws PDIException {
 		try {
 			doShutdown();
 		} catch (IOException e) {
-			throw new PDIException(null, Messages.PDIDebugger_43 + e.getMessage()); 
+			throw new PDIException(null, Messages.PDIDebugger_43 + e.getMessage());
 		} finally {
 			proxyNotifier.deleteObservers();
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse
+	 * .ptp.core.util.TaskSet)
 	 */
 	public void suspend(TaskSet tasks) throws PDIException {
 		try {
 			debugInterrupt(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_44 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_44 + e.getMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse
+	 * .ptp.core.util.TaskSet)
 	 */
 	public void terminate(TaskSet tasks) throws PDIException {
 		try {
 			debugTerminate(tasks);
 		} catch (IOException e) {
-			throw new PDIException(tasks, Messages.PDIDebugger_45 + e.getMessage()); 
+			throw new PDIException(tasks, Messages.PDIDebugger_45 + e.getMessage());
 		}
 	}
 
@@ -731,14 +909,14 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		IResourceManager[] rms = universe.getResourceManagers();
 		String rmUniqueName;
 		try {
-			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
+			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+					(String) null);
 		} catch (CoreException e) {
 			throw new PDIException(null, e.getMessage());
 		}
 		for (IResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED &&
-					rm.getUniqueName().equals(rmUniqueName)) {
-				return (IResourceManagerControl)rm;
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED && rm.getUniqueName().equals(rmUniqueName)) {
+				return (IResourceManagerControl) rm;
 			}
 		}
 		return null;
