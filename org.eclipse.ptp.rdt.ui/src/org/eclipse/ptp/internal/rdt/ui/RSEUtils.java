@@ -23,98 +23,97 @@ import org.eclipse.rse.subsystems.files.core.servicesubsystem.IFileServiceSubSys
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
 
-
 public class RSEUtils {
-	
+
 	public static String DEFAULT_CONFIG_DIR_NAME = ".eclipse"; //$NON-NLS-1$
-	
-	private RSEUtils() {}
-	
+
+	private RSEUtils() {
+	}
 
 	/**
 	 * Return the best RSE connection object matching the given host name.
-	 * Attempts to return a connection object where the remote file subsystem
-	 * is connected.
+	 * Attempts to return a connection object where the remote file subsystem is
+	 * connected.
 	 */
 	public static IHost getConnection(String hostName) {
-		if(hostName == null)
+		if (hostName == null)
 			return null;
 
 		ISystemRegistry sr = RSECorePlugin.getTheSystemRegistry();
 		IHost[] connections = sr.getHosts();
 
-		for(IHost con : connections) {
+		for (IHost con : connections) {
 			if (hostName.equalsIgnoreCase(con.getHostName())) {
 				IRemoteFileSubSystem fss = getRemoteFileSubSystem(con);
 				if (fss != null && fss.isConnected()) {
 					return con;
 				}
-			}	
+			}
 		}
-		
+
 		return null;
 	}
-	
 
 	public static IHost getConnection(URI uri) {
-		if(!"rse".equals(uri.getScheme())) //$NON-NLS-1$
+		if (!"rse".equals(uri.getScheme())) //$NON-NLS-1$
 			return null;
-		
+
 		String hostName = uri.getHost();
 		return getConnection(hostName);
 	}
-	
-	//this is different from getConnection, this function will return a host even it is disconnected.
-	public static IHost getAnyConnection(URI uri){
-		if(!"rse".equals(uri.getScheme())) //$NON-NLS-1$
+
+	// this is different from getConnection, this function will return a host
+	// even it is disconnected.
+	/**
+	 * @since 2.0
+	 */
+	public static IHost getAnyConnection(URI uri) {
+		if (!"rse".equals(uri.getScheme())) //$NON-NLS-1$
 			return null;
-		
+
 		String hostName = uri.getHost();
-		
+
 		ISystemRegistry sr = RSECorePlugin.getTheSystemRegistry();
 		IHost[] connections = sr.getHosts();
 
-		for(IHost con : connections) {
+		for (IHost con : connections) {
 			if (hostName.equalsIgnoreCase(con.getHostName())) {
 				return con;
 			}
 		}
 		return null;
 	}
-	
-	
+
 	public static IFileServiceSubSystem getFileServiceSubSystem(IHost host) {
 		IRemoteFileSubSystem[] fileSubsystems = RemoteFileUtility.getFileSubSystems(host);
-		for(IRemoteFileSubSystem subsystem : fileSubsystems) {
-			if(subsystem instanceof IFileServiceSubSystem && subsystem.isConnected()) {
+		for (IRemoteFileSubSystem subsystem : fileSubsystems) {
+			if (subsystem instanceof IFileServiceSubSystem && subsystem.isConnected()) {
 				return (IFileServiceSubSystem) subsystem;
 			}
 		}
 		return null;
 	}
-	
+
 	public static IRemoteFileSubSystem getRemoteFileSubSystem(IHost host) {
 		IRemoteFileSubSystem[] fileSubsystems = RemoteFileUtility.getFileSubSystems(host);
-		for(IRemoteFileSubSystem subsystem : fileSubsystems) {
-			if(subsystem != null && subsystem.isConnected()) {
+		for (IRemoteFileSubSystem subsystem : fileSubsystems) {
+			if (subsystem != null && subsystem.isConnected()) {
 				return subsystem;
 			}
 		}
 		return null;
 	}
-	
-	
+
 	private static IHostFile getUserHome(IHost host) {
 		IFileServiceSubSystem fileSubsystem = getFileServiceSubSystem(host);
-		return fileSubsystem == null ? null :  fileSubsystem.getFileService().getUserHome();
+		return fileSubsystem == null ? null : fileSubsystem.getFileService().getUserHome();
 	}
-	
-	
+
 	public static String getUserHomeDirectory(IHost host) {
 		IHostFile userHome = getUserHome(host);
 		return userHome == null ? null : userHome.getAbsolutePath();
 	}
-	
+
 	public static String getDefaultConfigDirectory(IHost host) {
 		IFileServiceSubSystem fileSubsystem = getFileServiceSubSystem(host);
 		try {
@@ -122,38 +121,35 @@ public class RSEUtils {
 		} catch (Exception e) {
 			return null;
 		}
-		if(fileSubsystem != null) {
+		if (fileSubsystem != null) {
 			IHostFile userHome = fileSubsystem.getFileService().getUserHome();
-			if(userHome != null) {
+			if (userHome != null) {
 				return userHome.getAbsolutePath() + fileSubsystem.getSeparator() + DEFAULT_CONFIG_DIR_NAME;
 			}
 		}
-		
+
 		return null;
 	}
-	
-	
-	
-	
-	
-	public enum VerifyResult { VERIFIED, INVALID, ERROR }
-	
+
+	public enum VerifyResult {
+		VERIFIED, INVALID, ERROR
+	}
+
 	public static VerifyResult verifyRemoteConfigDirectory(IHost host, String path) {
 		IRemoteFileSubSystem fileSubsystem = getRemoteFileSubSystem(host);
-		if(fileSubsystem == null) 
+		if (fileSubsystem == null)
 			return VerifyResult.ERROR;
-		
+
 		try {
 			IRemoteFile dir = fileSubsystem.getRemoteFileObject(path, new NullProgressMonitor());
-			if(dir != null && dir.isDirectory() && dir.canWrite())
+			if (dir != null && dir.isDirectory() && dir.canWrite())
 				return VerifyResult.VERIFIED;
 			else
 				return VerifyResult.INVALID;
-			
+
 		} catch (SystemMessageException e) {
 			return VerifyResult.ERROR;
 		}
-		
-		
+
 	}
 }

@@ -15,37 +15,38 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
- * Provides execution services for shell commands over a remote connection, 
- * and remote file manipulation services.
+ * Provides execution services for shell commands over a remote connection, and
+ * remote file manipulation services.
  * 
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. Please do not use this API without consulting with
+ * the RDT team.
  * 
  * @author crecoskie
  */
 public interface IRemoteExecutionServiceProvider extends IServiceProvider {
-	
+
 	/**
 	 * Gets the provider of remote services.
 	 * 
 	 * @return IRemoteServices
 	 */
 	public IRemoteServices getRemoteServices();
-	
+
 	/**
-	 * Gets the connection to use for this service.  The connection may not be open, so
-	 * clients should check to make sure it is open before using it.
+	 * Gets the connection to use for this service. The connection may not be
+	 * open, so clients should check to make sure it is open before using it.
 	 * 
 	 * @return IRemoteConnection
 	 */
 	public IRemoteConnection getConnection();
-	
+
 	/**
 	 * Gets the path to the configuration area on the the server.
 	 * 
 	 * @return String
+	 * @since 2.0
 	 */
 	public String getConfigLocation();
 }

@@ -20,16 +20,16 @@ import org.eclipse.rse.services.dstore.IDStoreService;
 
 /**
  * Handles configuration of the RSECIndexSubsystem
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. Please do not use this API without consulting with
+ * the RDT team.
  * 
  * @author crecoskie
- *
+ * @since 2.0
+ * 
  */
-public class RSECIndexSubsystemConfiguration extends SubSystemConfiguration
-		implements ISubSystemConfiguration {
+public class RSECIndexSubsystemConfiguration extends SubSystemConfiguration implements ISubSystemConfiguration {
 
 	/**
 	 * 
@@ -38,28 +38,38 @@ public class RSECIndexSubsystemConfiguration extends SubSystemConfiguration
 		// TODO Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.rse.core.subsystems.SubSystemConfiguration#createSubSystemInternal(org.eclipse.rse.core.model.IHost)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.rse.core.subsystems.SubSystemConfiguration#
+	 * createSubSystemInternal(org.eclipse.rse.core.model.IHost)
 	 */
 	@Override
 	public ISubSystem createSubSystemInternal(IHost conn) {
 		return new RSECIndexSubsystem(conn, getConnectorService(conn));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.rse.core.subsystems.SubSystemConfiguration#getConnectorService(org.eclipse.rse.core.model.IHost)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.rse.core.subsystems.SubSystemConfiguration#getConnectorService
+	 * (org.eclipse.rse.core.model.IHost)
 	 */
 	@Override
-	public IConnectorService getConnectorService(IHost host)
-	{
+	public IConnectorService getConnectorService(IHost host) {
 		return DStoreConnectorServiceManager.getInstance().getConnectorService(host, getServiceImplType());
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.rse.core.subsystems.SubSystemConfiguration#getServiceImplType()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.rse.core.subsystems.SubSystemConfiguration#getServiceImplType
+	 * ()
 	 */
-	public Class<IDStoreService> getServiceImplType()
-	{
+	@Override
+	public Class<IDStoreService> getServiceImplType() {
 		return IDStoreService.class;
 	}
 }
