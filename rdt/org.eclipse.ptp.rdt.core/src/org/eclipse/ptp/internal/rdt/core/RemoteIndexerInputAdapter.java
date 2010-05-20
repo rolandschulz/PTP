@@ -8,7 +8,7 @@
  * Contributors:
  *    IBM Corporation - initial API and implementation
  *    Mike Kucera (IBM)
- *******************************************************************************/ 
+ *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
@@ -23,15 +23,21 @@ public class RemoteIndexerInputAdapter extends ASTFilePathResolver {
 	public boolean doesIncludeFileExist(String includePath) {
 		return adapter.doesIncludeFileExist(includePath);
 	}
-	
-	
+
 	@Override
 	public String getASTPath(IIndexFileLocation ifl) {
 		return adapter.getASTPath(ifl);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver#getFileSize(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver#getFileSize(java
+	 * .lang.String)
+	 */
+	/**
+	 * @since 2.0
 	 */
 	@Override
 	public long getFileSize(String astFilePath) {
@@ -53,6 +59,5 @@ public class RemoteIndexerInputAdapter extends ASTFilePathResolver {
 	public IIndexFileLocation resolveIncludeFile(String includePath) {
 		return adapter.resolveIncludeFile(includePath);
 	}
-
 
 }

@@ -227,6 +227,9 @@ public class RemoteIncludeDialog extends Dialog {
 		fHost = host;
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public void setConnection(IRemoteConnection connection) {
 		fRemoteConnection = connection;
 	}

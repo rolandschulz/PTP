@@ -23,22 +23,24 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-
+/**
+ * @since 2.0
+ */
 public class RemoteCEditorHelpContextProvider implements IContextProvider {
 
 	private final ITextEditor editor;
-	
+
 	public RemoteCEditorHelpContextProvider(ITextEditor editor) {
 		this.editor = editor;
 	}
-	
+
 	public IContext getContext(Object arg0) {
 		String selected = getSelectedString(editor);
-		IContext context= HelpSystem.getContext(RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
+		IContext context = HelpSystem.getContext(RDTHelpContextIds.REMOTE_C_CPP_EDITOR);
 		if (context != null) {
 			if (selected != null && selected.length() > 0) {
 				try {
-					context= new CHelpDisplayContext(context, editor, selected);
+					context = new CHelpDisplayContext(context, editor, selected);
 				} catch (CoreException exc) {
 				}
 			}
@@ -53,17 +55,17 @@ public class RemoteCEditorHelpContextProvider implements IContextProvider {
 	public String getSearchExpression(Object arg0) {
 		return getSelectedString(editor);
 	}
-	
-	private static String getSelectedString(ITextEditor editor){
-		try{
-			ITextSelection selection = (ITextSelection)editor.getSite().getSelectionProvider().getSelection();
+
+	private static String getSelectedString(ITextEditor editor) {
+		try {
+			ITextSelection selection = (ITextSelection) editor.getSite().getSelectionProvider().getSelection();
 			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 			IRegion region = CWordFinder.findWord(document, selection.getOffset());
 			if (region != null)
 				return document.get(region.getOffset(), region.getLength());
+		} catch (Exception e) {
 		}
-		catch(Exception e) { }
-		
+
 		return null;
 	}
 }
