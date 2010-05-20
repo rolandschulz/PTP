@@ -116,7 +116,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	 * By default we DO use MPI project settings in this project.<br>
 	 */
 	private boolean useMpiProjectSettings=true;
-	private String desc = Messages.MPIProjectWizardPage_8;
+	private String desc = Messages.mpi_project_page;
 	
 	public static final String MPI_PROJECT_TYPE_C="C"; //$NON-NLS-1$
 	public static final String MPI_PROJECT_TYPE_CPP="C++"; //$NON-NLS-1$
@@ -128,7 +128,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	 * 
 	 */
 	public MPIProjectWizardPage() throws CoreException {
-		super(Messages.MPIProjectWizardPage_11);
+		super(Messages.mpi_project_settings);
 		prefIDincludes=MpiIDs.MPI_INCLUDES;
 		if(wizardTraceOn)System.out.println("MPIProjectWizardPage().ctor..."); //$NON-NLS-1$
 
@@ -150,7 +150,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		// in wizard dialog is blank if this value is not set.  
 		if( /*!allowPrefixOnlyMatch &&*/  defaultMpiIncludePath.length()==0) {
 			// warn if no MPI preferences have been set and allow user to set them right there
-			String newMip=showNoPrefs(Messages.MPIProjectWizardPage_14,prefIDincludes);
+			String newMip=showNoPrefs(Messages.mpi,prefIDincludes);
 			defaultMpiIncludePath=newMip;
 		}
 		setDefaultOtherNames(defaultMpiIncludePath);
@@ -174,11 +174,11 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	private static void showNoPrefs1() {
 		if(!alreadyShown) {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			StringBuffer buf=new StringBuffer(Messages.MPIProjectWizardPage_15);
-			buf.append(Messages.MPIProjectWizardPage_16);
-			buf.append(Messages.MPIProjectWizardPage_17);
-			buf.append(Messages.MPIProjectWizardPage_18);
-			MessageDialog.openWarning(shell, Messages.MPIProjectWizardPage_19, buf.toString());
+			StringBuffer buf=new StringBuffer(Messages.no_mpi_preferences_set);
+			buf.append(Messages.default_project_setting_better_if_prefs_set);
+			buf.append(Messages.use_window_prefs_and_select_pldt);
+			buf.append(Messages.you_can_cancel_out_to_do_mpi_prefs);
+			MessageDialog.openWarning(shell, Messages.no_mpi_prefs_set, buf.toString());
 			alreadyShown= true;
 		}
 	}
@@ -197,7 +197,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	 * @param mpiIncludePath
 	 */
 	private void setDefaultOtherNames(String mpiIncludePath) {
-		defaultMpiLibName=Messages.MPIProjectWizardPage_20;
+		defaultMpiLibName="mpi"; //$NON-NLS-1$
 		setCurrentMpiLibName(defaultMpiLibName);
 		
 		// if >1 path in mpi include path, use just the first
@@ -213,7 +213,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 			IPath path = Path.fromOSString(tempPath);
 			path = path.removeLastSegments(1);
 			path = path.addTrailingSeparator();
-			defaultMpiLibPath = path.toString() + Messages.MPIProjectWizardPage_21;
+			defaultMpiLibPath = path.toString() + "lib"; //$NON-NLS-1$
 			setCurrentMpiLibPath(defaultMpiLibPath);
 			// standardize format for mpi include path, too
 			path = Path.fromOSString(mpiIncludePath);
@@ -319,7 +319,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		String dirName = getPathFromPathField(includePathField);
 
 		DirectoryDialog dialog = new DirectoryDialog(includePathField.getShell());
-		dialog.setMessage(Messages.MPIProjectWizardPage_25);
+		dialog.setMessage(Messages.mpi_include_path);
 
 		dialog.setFilterPath(dirName);
 
@@ -340,7 +340,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		String dirName = getPathFromPathField(libPathField);
 
 		DirectoryDialog dialog = new DirectoryDialog(libPathField.getShell());
-		dialog.setMessage(Messages.MPIProjectWizardPage_27);
+		dialog.setMessage(Messages.mpi_lib_search_path);
 
 		dialog.setFilterPath(dirName);
 
@@ -382,8 +382,8 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		if(wizardTraceOn)System.out.println("MPIProjectWizardPage.createUserEntryArea() " ); //$NON-NLS-1$
 		
 		includePathLabel = new Label(composite, SWT.NONE);
-		includePathLabel.setText(Messages.MPIProjectWizardPage_30);
-		includePathLabel.setToolTipText(Messages.MPIProjectWizardPage_31);
+		includePathLabel.setText(Messages.include_path);
+		includePathLabel.setToolTipText(Messages.locn_of_mpi_incl_path);
 
 		// Include path location  entry field
 		includePathField = new Text(composite, SWT.BORDER);
@@ -401,7 +401,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 
 		// browse button
 		browseButton = new Button(composite, SWT.PUSH);
-		browseButton.setText(Messages.MPIProjectWizardPage_33);
+		browseButton.setText(Messages.browse);
 		browseButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if(traceOn)System.out.println("Browse button pressed."); //$NON-NLS-1$
@@ -414,8 +414,8 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		// we just store all info where we can find it when the MPIProjectProcess (ProcessRunner) runs after all the wizard pages are done.
 		
 		libLabel=new Label(composite, SWT.NONE);
-		libLabel.setText(Messages.MPIProjectWizardPage_35);
-		libLabel.setToolTipText(Messages.MPIProjectWizardPage_36);
+		libLabel.setText(Messages.library_name);
+		libLabel.setToolTipText(Messages.library_name);
 		
 		libNameField=new Text(composite,SWT.BORDER);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -433,8 +433,8 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		(new Label(composite,SWT.NONE)).setText(" ");//spacer //$NON-NLS-1$
 		
 		libPathLabel=new Label(composite, SWT.NONE);
-		libPathLabel.setText(Messages.MPIProjectWizardPage_39);
-		libPathLabel.setToolTipText(Messages.MPIProjectWizardPage_40);
+		libPathLabel.setText(Messages.library_search_path);
+		libPathLabel.setToolTipText(Messages.library_name);
 		
 		
 		libPathField=new Text(composite,SWT.BORDER);
@@ -453,7 +453,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 //		 browse button
 
 		browseButton2 = new Button(composite, SWT.PUSH);
-		browseButton2.setText(Messages.MPIProjectWizardPage_42);
+		browseButton2.setText(Messages.browse);
 		browseButton2.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if(traceOn)System.out.println("Browse button pressed. DO SOMETHING HERE."); //$NON-NLS-1$
@@ -462,7 +462,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 			}
 		});
 		mpiCompileCommandLabel= new Label(composite,SWT.NONE);
-		mpiCompileCommandLabel.setText(Messages.MPIProjectWizardPage_0);
+		mpiCompileCommandLabel.setText(Messages.mpi_compile_cmd);
 		mpiCompileCommandField=new Text(composite,SWT.BORDER);
 		GridData gd3 = new GridData(GridData.FILL_HORIZONTAL);
 		gd3.widthHint=SIZING_TEXT_FIELD_WIDTH;
@@ -478,7 +478,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		(new Label(composite,SWT.NONE)).setText(" ");//spacer //$NON-NLS-1$
 		
 		mpiLinkCommandLabel= new Label(composite,SWT.NONE);
-		mpiLinkCommandLabel.setText(Messages.MPIProjectWizardPage_47);
+		mpiLinkCommandLabel.setText(Messages.mpi_link_cmd);
 		mpiLinkCommandField=new Text(composite,SWT.BORDER);
 		GridData gd4 = new GridData(GridData.FILL_HORIZONTAL);
 		gd4.widthHint=SIZING_TEXT_FIELD_WIDTH;
@@ -488,7 +488,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		mpiLinkCommandField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentMpiLinkCommand(mpiLinkCommandField.getText());
-				if(traceOn)System.out.println(Messages.MPIProjectWizardPage_48 + currentMpiLinkCommand);
+				if(traceOn)System.out.println("mpiLinkCommandField.modifyText(): " + currentMpiLinkCommand); //$NON-NLS-1$
 			}
 		});
 		(new Label(composite,SWT.NONE)).setText(" ");//spacer //$NON-NLS-1$
@@ -513,7 +513,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		useMpiProjectSettingsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		useMpiProjectSettingsButton.setText(Messages.MPIProjectWizardPage_50);
+		useMpiProjectSettingsButton.setText(Messages.add_mpi_proj_settings_to_proj);
 		GridData gd=new GridData();
 		gd.horizontalSpan=columns;
 		useMpiProjectSettingsButton.setLayoutData(gd);
@@ -539,7 +539,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		});
 
 		useDefaultsButton = new Button(group, SWT.CHECK | SWT.RIGHT);
-		useDefaultsButton.setText(Messages.MPIProjectWizardPage_51);
+		useDefaultsButton.setText(Messages.use_default_info);
 		useDefaultsButton.setSelection(defaultEnabled);
 		useDefaultsButton.setEnabled(useMpiProjectSettings);
 		GridData buttonData = new GridData();
@@ -593,7 +593,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	}
 
 	public String getDescription() {
-		String tmp=Messages.MPIProjectWizardPage_52;
+		String tmp=Messages.select_mpi_incl_path_libname_and_etc;
 		return tmp;
 	}
 
@@ -610,7 +610,7 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 	}
 
 	public String getTitle() {
-		return Messages.MPIProjectWizardPage_53;
+		return Messages.mpi_project_settings;
 	}
 
 	public void performHelp() {

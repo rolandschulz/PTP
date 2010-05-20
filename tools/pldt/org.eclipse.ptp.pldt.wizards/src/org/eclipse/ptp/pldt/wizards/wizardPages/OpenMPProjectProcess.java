@@ -71,11 +71,11 @@ public class OpenMPProjectProcess extends ProcessRunner {
  		// this process must be executed after a separate process which creates the project
 		IProject proj= ResourcesPlugin.getWorkspace().getRoot().getProject(valueStore.get("projectName")); //$NON-NLS-1$
 		if(!proj.exists()) {
-			System.out.println(Messages.OpenMPProjectProcess_3);
+			System.out.println(Messages.project_does_not_exist);
 			return;	
 		}
 
-		if(traceOn)System.out.println(Messages.OpenMPProjectProcess_4 + proj.getName());
+		if(traceOn)System.out.println(Messages.project + proj.getName());
 
 		// Collect the values that the user entered on the wizard page
 		String propID = OpenMPProjectWizardPage.INCLUDE_PATH_PROP_ID;
