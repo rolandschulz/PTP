@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2008 IBM Corporation.
+ * Copyright (c) 2008,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,11 +18,11 @@ package org.eclipse.ptp.pldt.upc;
 public interface UPCIDs
 {
     // preference page name for UPC
-    String UPC_INCLUDES    = "UPC Includes";
+    String UPC_INCLUDES    = Messages.UPCIDs_upc_includes;
     
-    String MARKER_ID       = "org.eclipse.ptp.pldt.upc.upcMarker";
-    String MARKER_ERROR_ID = "org.eclipse.ptp.pldt.upc.upcErrorMarker";
+    String MARKER_ID       = "org.eclipse.ptp.pldt.upc.upcMarker"; //$NON-NLS-1$
+    String MARKER_ERROR_ID = "org.eclipse.ptp.pldt.upc.upcErrorMarker"; //$NON-NLS-1$
     
     // artifact view id
-    String UPC_VIEW_ID = "org.eclipse.ptp.pldt.upc.views.upcArtifactView";
+    String UPC_VIEW_ID = "org.eclipse.ptp.pldt.upc.views.upcArtifactView"; //$NON-NLS-1$
 }

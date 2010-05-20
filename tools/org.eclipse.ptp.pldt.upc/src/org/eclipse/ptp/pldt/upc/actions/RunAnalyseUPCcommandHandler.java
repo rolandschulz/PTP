@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2008 IBM Corporation.
+ * Copyright (c) 2008,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.upc.Messages;
 import org.eclipse.ptp.pldt.upc.UPCArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.upc.UPCIDs;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
@@ -79,14 +80,14 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase
 	 */
 	@Override
 	protected boolean validForAnalysis(String filename, boolean isCPP) {
-		int loc = filename.lastIndexOf(".");
+		int loc = filename.lastIndexOf("."); //$NON-NLS-1$
 		if (loc <= 0) // if no dot, or filename is ".foo", not valid for
 						// analysis.
 			return false;
 		String ext = filename.substring(loc + 1);
 		ext = ext.toLowerCase();
 		boolean result = true;
-		if (ext.equals("upc")) 
+		if (ext.equals("upc"))  //$NON-NLS-1$
 			result = true;
 		else
 			result = false;
