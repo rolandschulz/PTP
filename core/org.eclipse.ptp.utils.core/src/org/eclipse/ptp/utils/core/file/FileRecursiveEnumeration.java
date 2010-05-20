@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
-
 public class FileRecursiveEnumeration implements Enumeration<File> {
 
 	public static void main(String[] args) {
@@ -27,38 +26,45 @@ public class FileRecursiveEnumeration implements Enumeration<File> {
 			// System.out.println(enumeration.nextElement().toString());
 		}
 	}
-	
-	private Stack<File> roots;
+
+	private final Stack<File> roots;
 	private FileEnumeration currentDirectory;
 	private File nextFile;
-	private LinkedList<Exception> exceptionList = new LinkedList<Exception>();
-	
+	private final LinkedList<Exception> exceptionList = new LinkedList<Exception>();
+
 	public FileRecursiveEnumeration(File root) {
-		if (! root.exists()) {
+		if (!root.exists()) {
 			throw new IllegalArgumentException();
 		}
 		roots = new Stack<File>();
 		roots.add(root);
 		fetchNextFile();
 	}
-	
+
 	public FileRecursiveEnumeration(String root) {
 		this(new File(root));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Enumeration#hasMoreElements()
 	 */
 	public boolean hasMoreElements() {
 		return nextFile != null;
 	}
-	
+
 	public boolean hasMoreExceptions() {
 		return exceptionList.size() > 0;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Enumeration#nextElement()
+	 */
+	/**
+	 * @since 2.0
 	 */
 	public File nextElement() {
 		File result = nextFile;
@@ -70,7 +76,7 @@ public class FileRecursiveEnumeration implements Enumeration<File> {
 		if (exceptionList.size() == 0) {
 			throw new NoSuchElementException();
 		}
-		return (Exception) exceptionList.removeFirst();
+		return exceptionList.removeFirst();
 	}
 
 	private void fetchNextFile() {
@@ -80,7 +86,7 @@ public class FileRecursiveEnumeration implements Enumeration<File> {
 				if (roots.empty()) {
 					return;
 				}
-				File root = (File)roots.pop();
+				File root = roots.pop();
 				try {
 					currentDirectory = new FileEnumeration(root);
 				} catch (IOException e) {
@@ -88,7 +94,7 @@ public class FileRecursiveEnumeration implements Enumeration<File> {
 				}
 			} else {
 				if (currentDirectory.hasMoreElements()) {
-					nextFile = (File)currentDirectory.nextElement();
+					nextFile = currentDirectory.nextElement();
 					if (nextFile.isDirectory()) {
 						roots.add(nextFile);
 					}
@@ -96,7 +102,7 @@ public class FileRecursiveEnumeration implements Enumeration<File> {
 				} else {
 					currentDirectory = null;
 				}
-			}	
-		}		
+			}
+		}
 	}
 }
