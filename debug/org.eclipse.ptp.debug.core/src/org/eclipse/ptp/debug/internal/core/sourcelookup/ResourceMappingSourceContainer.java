@@ -24,21 +24,21 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 /**
  * Map a path into a local resource location.
  * 
- * Absolute paths of the form <map_path>/file are mapped into <map_container>/file. 
+ * Absolute paths of the form <map_path>/file are mapped into
+ * <map_container>/file.
  * 
- * For example, if:
- * 	<map_path> = /remote/path
- *  <map_container> = P/local/path
- *  
- * 	then the path /remote/path/to/src/file.c is mapped into P/local/path/to/src/file.c
+ * For example, if: <map_path> = /remote/path <map_container> = P/local/path
+ * 
+ * then the path /remote/path/to/src/file.c is mapped into
+ * P/local/path/to/src/file.c
  * 
  * Relative paths are mapped into the corresponding location in <map_container>.
  * 
- * For example:
- * 	src/file.c is mapped into P/local/path/src/file.c
+ * For example: src/file.c is mapped into P/local/path/src/file.c
  * 
  * @author greg
- *
+ * @since 4.0
+ * 
  */
 public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 	public static final String TYPE_ID = PTPDebugCorePlugin.getUniqueIdentifier() + ".containerType.resourceMapping"; //$NON-NLS-1$
@@ -49,13 +49,15 @@ public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 		fPath = Path.EMPTY;
 		fContainer = null;
 	}
-	
+
 	public ResourceMappingSourceContainer(IPath path, IContainer container) {
 		fPath = path;
 		fContainer = container;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -66,9 +68,13 @@ public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 		ResourceMappingSourceContainer entry = (ResourceMappingSourceContainer) o;
 		return (entry.getPath().equals(getPath()) && entry.getContainer().equals(getContainer()));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#findSourceElements(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.sourcelookup.ISourceContainer#findSourceElements
+	 * (java.lang.String)
 	 */
 	public Object[] findSourceElements(String name) throws CoreException {
 		IPath path = new Path(name);
@@ -78,20 +84,21 @@ public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 			}
 			path = path.removeFirstSegments(getPath().segmentCount());
 		}
-		
+
 		IFile file = getContainer().getFile(path);
 		if (file.exists()) {
 			return new Object[] { file };
 		}
 		return EMPTY;
 	}
-	
+
 	/**
-	 * Given a path relative to the container, map this relative 
-	 * to the mapping path (reverse mapping). If the container is
-	 * a remote item, this returns null.
+	 * Given a path relative to the container, map this relative to the mapping
+	 * path (reverse mapping). If the container is a remote item, this returns
+	 * null.
 	 * 
-	 * @param path path to map
+	 * @param path
+	 *            path to map
 	 * @return path mapped relative to the mapping path
 	 */
 	public IPath getCompilationPath(String path) {
@@ -118,14 +125,17 @@ public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 	public IContainer getContainer() {
 		return fContainer;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getName()
 	 */
 	public String getName() {
-		return NLS.bind("{0}/{1} <-> {2}", new Object[] { getContainer().getProject().getName(), getContainer().getProjectRelativePath(), getPath().toOSString() }); //$NON-NLS-1$
+		return NLS
+				.bind("{0}/{1} <-> {2}", new Object[] { getContainer().getProject().getName(), getContainer().getProjectRelativePath(), getPath().toOSString() }); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Get the mapping path
 	 * 
@@ -135,13 +145,15 @@ public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 		return fPath;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getType()
 	 */
 	public ISourceContainerType getType() {
 		return getSourceContainerType(TYPE_ID);
 	}
-	
+
 	/**
 	 * Set the mapping container
 	 * 
@@ -150,7 +162,7 @@ public class ResourceMappingSourceContainer extends AbstractSourceContainer {
 	public void setContainer(IContainer container) {
 		fContainer = container;
 	}
-	
+
 	/**
 	 * Set the mapping path
 	 * 

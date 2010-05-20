@@ -27,78 +27,89 @@ import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents a number of methods to communication to a debugger
+ * 
  * @author clement
- *
+ * 
  */
-public interface IPDIDebugger extends 
-			IPDIBreakpointManagement, 
-			IPDIExecuteManagement, 
-			IPDIVariableManagement, 
-			IPDISignalManagement, 
-			IPDIStackframeManagement, 
-			IPDIThreadManagement, 
-			IPDIMemoryBlockManagement {
+public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManagement, IPDIVariableManagement,
+		IPDISignalManagement, IPDIStackframeManagement, IPDIThreadManagement, IPDIMemoryBlockManagement {
 	/**
 	 * Requests a special command for specify process
-	 * @param tasks target process
-	 * @param command command
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param command
+	 *            command
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public void commandRequest(TaskSet tasks, String command) throws PDIException;
 
 	/**
 	 * Disconnects observer from debugger
-	 * @param observer disconnect observer from debugger
-	 * @throws PDIException on failure
+	 * 
+	 * @param observer
+	 *            disconnect observer from debugger
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void disconnect(Observer observer) throws PDIException;
-	
+
 	/**
 	 * Returns an action when error occurred
 	 * 
-	 * @param errorCode error code
+	 * @param errorCode
+	 *            error code
 	 * @return an action when error occurred
 	 */
 	public int getErrorAction(int errorCode);
-	
+
 	/**
 	 * Connects debugger and adds observer to debugger
 	 * 
 	 * @param monitor
 	 * @return true if connection is established
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public boolean isConnected(IProgressMonitor monitor) throws PDIException;
-	
+
 	/**
 	 * Register observer for notify event from sdm
 	 * 
 	 * @param observer
 	 */
 	public void register(Observer observer);
-	
+
 	/**
 	 * Starts debugger
 	 * 
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void startDebugger(String app, String path, String dir, String[] args) throws PDIException;
-	
+
 	/**
 	 * Stops debugger
 	 * 
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void stopDebugger() throws PDIException;
-	
+
 	/**
-	 * Initialize the debugger. If args is an empty list, attempt to initialize the debugger
-	 * and add any necessary arguments to the list. If args is not empty, then attempt to
-	 * initialize the debugger using the supplied arguments.
+	 * Initialize the debugger. If args is an empty list, attempt to initialize
+	 * the debugger and add any necessary arguments to the list. If args is not
+	 * empty, then attempt to initialize the debugger using the supplied
+	 * arguments.
 	 * 
-	 * @param configuration debugger launch configuration
-	 * @param args debugger arguments
-	 * @param monitor progress monitor
+	 * @param configuration
+	 *            debugger launch configuration
+	 * @param args
+	 *            debugger arguments
+	 * @param monitor
+	 *            progress monitor
 	 * @throws PDIException
 	 */
 	public void initialize(ILaunchConfiguration configuration, List<String> args, IProgressMonitor monitor) throws PDIException;

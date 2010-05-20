@@ -47,6 +47,7 @@ public interface IAIFValue {
 	 * @return number of values available
 	 * @throws AIFException
 	 *             on failure
+	 * @since 4.0
 	 */
 	public int length() throws AIFException;
 

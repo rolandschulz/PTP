@@ -10,22 +10,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
-
 /**
  * @author greg
- *
+ * 
  */
 public interface IPSetManager {
 
 	/**
 	 * @param sid
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void addTasks(String sid, TaskSet tasks);
 
 	/**
 	 * @param sid
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void createSet(String sid, TaskSet tasks);
 
@@ -37,12 +38,14 @@ public interface IPSetManager {
 	/**
 	 * @param sid
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getTasks(String sid);
 
 	/**
 	 * @param sid
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void removeTasks(String sid, TaskSet tasks);
 

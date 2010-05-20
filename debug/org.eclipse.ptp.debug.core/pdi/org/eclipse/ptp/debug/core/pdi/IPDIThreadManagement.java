@@ -22,29 +22,43 @@ import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents thread management
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIThreadManagement {
 	/**
 	 * Requests to retrieve information of threads of specify process
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void listInfoThreads(TaskSet tasks) throws PDIException;
-	
+
 	/**
 	 * Requests to select thread with given thread id of specify process
-	 * @param tasks target process
-	 * @param tid thread id to be selected
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param tid
+	 *            thread id to be selected
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void selectThread(TaskSet tasks, int tid) throws PDIException;
-	
+
 	/**
 	 * Requests to retrieve a stack info depth of specify process
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void retrieveStackInfoDepth(TaskSet tasks) throws PDIException;
 }

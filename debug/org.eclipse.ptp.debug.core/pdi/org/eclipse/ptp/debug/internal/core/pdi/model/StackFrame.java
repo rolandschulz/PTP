@@ -34,78 +34,89 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
-
 /**
  * @author clement
- *
+ * 
  */
 public class StackFrame extends SessionObject implements IPDIStackFrame {
 	public class Arg {
 		String name;
 		String value;
+
 		public Arg(String name, String value) {
 			this.name = name;
 			this.value = value;
 		}
+
 		public String getName() {
 			return name;
 		}
+
 		public String getValue() {
 			return value;
 		}
 	}
-	
-	private IPDIThread pthread;
+
+	private final IPDIThread pthread;
 	private IPDIArgumentDescriptor[] argDescs;
 	private IPDILocalVariableDescriptor[] localDescs;
-	private IPDILocator fLocator;
+	private final IPDILocator fLocator;
 
-	//Frame details
+	// Frame details
 	private int level = -1;
-	private Arg[] args = new Arg[0];
-	
+
 	public StackFrame(IPDISession session, IPDIThread thread, int level, IPDILocator locator) {
 		super(session, thread.getTasks());
 		this.pthread = thread;
 		this.level = level;
 		this.fLocator = locator;
-		if (args != null) 
-			this.args = args;
 	}
-	
+
 	public StackFrame(IPDISession session, IPDIThread thread, int level, String file, String func, int line, BigInteger addr) {
 		this(session, thread, level, PDILocationFactory.newLocator(file, func, line, addr));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#createArgument(org.eclipse.ptp.debug.core.pdi.model.IPDIArgumentDescriptor)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#createArgument(org
+	 * .eclipse.ptp.debug.core.pdi.model.IPDIArgumentDescriptor)
 	 */
 	public IPDIArgument createArgument(IPDIArgumentDescriptor varDesc) throws PDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
-			return session.getVariableManager().createArgument((ArgumentDescriptor)varDesc);
+			return session.getVariableManager().createArgument(varDesc);
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#createLocalVariable(org.eclipse.ptp.debug.core.pdi.model.IPDILocalVariableDescriptor)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#createLocalVariable
+	 * (org.eclipse.ptp.debug.core.pdi.model.IPDILocalVariableDescriptor)
 	 */
 	public IPDILocalVariable createLocalVariable(IPDILocalVariableDescriptor varDesc) throws PDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
-			return createArgument((IPDIArgumentDescriptor)varDesc);
+			return createArgument((IPDIArgumentDescriptor) varDesc);
 		} else if (varDesc instanceof LocalVariableDescriptor) {
-			return session.getVariableManager().createLocalVariable((LocalVariableDescriptor)varDesc);			
+			return session.getVariableManager().createLocalVariable(varDesc);
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#equals(org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#equals(org.eclipse
+	 * .ptp.debug.core.pdi.model.IPDIStackFrame)
 	 */
 	public boolean equals(IPDIStackFrame stackframe) {
 		if (stackframe instanceof StackFrame) {
-			StackFrame stack = (StackFrame)stackframe;
-			boolean equal =  pthread != null && pthread.equals(stack.getThread()) && getLevel() == stack.getLevel();
+			StackFrame stack = (StackFrame) stackframe;
+			boolean equal = pthread != null && pthread.equals(stack.getThread()) && getLevel() == stack.getLevel();
 			if (equal) {
 				IPDILocator otherLocator = stack.getLocator();
 				IPDILocator myLocator = getLocator();
@@ -118,9 +129,13 @@ public class StackFrame extends SessionObject implements IPDIStackFrame {
 		}
 		return super.equals(stackframe);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#getArgumentDescriptors()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#getArgumentDescriptors
+	 * ()
 	 */
 	public IPDIArgumentDescriptor[] getArgumentDescriptors() throws PDIException {
 		if (argDescs == null) {
@@ -128,16 +143,21 @@ public class StackFrame extends SessionObject implements IPDIStackFrame {
 		}
 		return argDescs;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#getLevel()
 	 */
 	public int getLevel() {
 		return level;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#getLocalVariableDescriptors()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#
+	 * getLocalVariableDescriptors()
 	 */
 	public IPDILocalVariableDescriptor[] getLocalVariableDescriptors() throws PDIException {
 		if (localDescs == null) {
@@ -145,8 +165,10 @@ public class StackFrame extends SessionObject implements IPDIStackFrame {
 		}
 		return localDescs;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#getLocator()
 	 */
 	public IPDILocator getLocator() {
@@ -155,21 +177,25 @@ public class StackFrame extends SessionObject implements IPDIStackFrame {
 		}
 		return PDILocationFactory.newLocator("", "", 0, BigInteger.ZERO); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#getTarget()
 	 */
 	public IPDITarget getTarget() {
 		return getThread().getTarget();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame#getThread()
 	 */
 	public IPDIThread getThread() {
 		return pthread;
 	}
-	
+
 	/**
 	 * @throws PDIException
 	 */
@@ -177,7 +203,7 @@ public class StackFrame extends SessionObject implements IPDIStackFrame {
 		getThread().setCurrentStackFrame(this, false);
 		session.stepReturn(getTasks(), 0);
 	}
-	
+
 	/**
 	 * @param aif
 	 * @throws PDIException

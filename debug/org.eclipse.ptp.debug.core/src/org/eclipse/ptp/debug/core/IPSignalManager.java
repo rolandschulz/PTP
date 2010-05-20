@@ -16,12 +16,13 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 
 /**
  * @author greg
- *
+ * 
  */
 public interface IPSignalManager {
 
 	/**
 	 * @param qTasks
+	 * @since 4.0
 	 */
 	public void dispose(TaskSet qTasks);
 
@@ -29,12 +30,14 @@ public interface IPSignalManager {
 	 * @param qTasks
 	 * @return
 	 * @throws DebugException
+	 * @since 4.0
 	 */
 	public IPSignal[] getSignals(TaskSet qTasks) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @param pdiSignal
+	 * @since 4.0
 	 */
 	public void signalChanged(TaskSet qTasks, IPDISignal pdiSignal);
 

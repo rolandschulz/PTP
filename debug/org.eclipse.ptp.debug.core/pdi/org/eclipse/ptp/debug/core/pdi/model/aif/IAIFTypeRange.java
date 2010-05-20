@@ -37,6 +37,7 @@ public interface IAIFTypeRange extends IAIFType {
 	 * Return the type of the range.
 	 * 
 	 * @return range type
+	 * @since 4.0
 	 */
 	public IAIFTypeInt getRangeType();
 
@@ -44,6 +45,7 @@ public interface IAIFTypeRange extends IAIFType {
 	 * Return the number of elements in the range
 	 * 
 	 * @return size of the range
+	 * @since 4.0
 	 */
 	public int getSize();
 }

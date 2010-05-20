@@ -23,14 +23,16 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents to request getting info threads
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIGetInfoThreadsRequest extends IPDIEventRequest {
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public String[] getThreadIds(TaskSet qTasks) throws PDIException;
 }

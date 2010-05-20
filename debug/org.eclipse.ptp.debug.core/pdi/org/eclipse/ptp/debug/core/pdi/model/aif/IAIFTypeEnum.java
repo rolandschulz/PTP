@@ -36,6 +36,7 @@ public interface IAIFTypeEnum extends ITypeIntegral {
 	 * Returns an array of the enumeration names
 	 * 
 	 * @return an array of the enumeration names
+	 * @since 4.0
 	 */
 	public String[] getNames();
 
@@ -43,6 +44,7 @@ public interface IAIFTypeEnum extends ITypeIntegral {
 	 * Returns an array of the enumeration values corresponding to each name
 	 * 
 	 * @return an array of the enumeration values
+	 * @since 4.0
 	 */
 	public Integer[] getValues();
 }

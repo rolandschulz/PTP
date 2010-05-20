@@ -24,14 +24,16 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
 
 /**
  * Represents to request a data read memory
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIDataReadMemoryRequest extends IPDIEventRequest {
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public IPDIDataReadMemoryInfo getDataReadMemoryInfo(TaskSet qTasks) throws PDIException;
 }

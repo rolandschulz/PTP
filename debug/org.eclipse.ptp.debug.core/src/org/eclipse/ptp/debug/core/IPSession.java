@@ -37,19 +37,22 @@ public interface IPSession extends IAdaptable {
 	 * @param args
 	 * @throws CoreException
 	 */
-	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String cwd, String[] args) throws CoreException;
+	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String cwd, String[] args)
+			throws CoreException;
 
 	/**
 	 * @param tasks
 	 * @param refresh
 	 * @param register
+	 * @since 4.0
 	 */
 	public void createDebugTarget(TaskSet tasks, boolean refresh, boolean register);
-	
+
 	/**
 	 * @param tasks
 	 * @param refresh
 	 * @param register
+	 * @since 4.0
 	 */
 	public void deleteDebugTarget(TaskSet tasks, boolean refresh, boolean register);
 
@@ -66,6 +69,7 @@ public interface IPSession extends IAdaptable {
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDebugTarget findDebugTarget(TaskSet tasks);
 
@@ -77,8 +81,8 @@ public interface IPSession extends IAdaptable {
 	public void fireDebugEvent(int change, int breakpoint, IPDebugInfo info);
 
 	/**
-	 * Force processes to terminated state. The flag isError indicates if
-	 * this was as the result of an error.
+	 * Force processes to terminated state. The flag isError indicates if this
+	 * was as the result of an error.
 	 * 
 	 * @param isError
 	 */
@@ -92,19 +96,20 @@ public interface IPSession extends IAdaptable {
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDebugInfo getDebugInfo(TaskSet tasks);
-	
+
 	/**
 	 * @return
 	 */
 	public IPJob getJob();
-	
+
 	/**
 	 * @return
 	 */
 	public IPLaunch getLaunch();
-	
+
 	/**
 	 * @return
 	 */
@@ -137,15 +142,17 @@ public interface IPSession extends IAdaptable {
 
 	/**
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getTasks();
 
 	/**
 	 * @param id
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getTasks(int id);
-	
+
 	/**
 	 * @return
 	 */
@@ -155,6 +162,7 @@ public interface IPSession extends IAdaptable {
 	 * @param tasks
 	 * @param refresh
 	 * @param register
+	 * @since 4.0
 	 */
 	public void reloadDebugTargets(TaskSet tasks, boolean refresh, boolean register);
 }

@@ -26,71 +26,86 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * Handles more than one expression for multi-processes
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIMultiExpressions extends IPDISessionObject {
 	/**
 	 * Stores an expression
-	 * @param expression Expression
+	 * 
+	 * @param expression
+	 *            Expression
 	 */
 	public void addExpression(IPDIExpression expression);
-	
+
 	/**
 	 * @param tasks
 	 * @param monitor
+	 * @since 4.0
 	 */
 	public void cleanExpressionsValue(TaskSet tasks, IProgressMonitor monitor);
-	
+
 	/**
 	 * Returns the value of this expression.
-	 * @param expression an expression for getting value
+	 * 
+	 * @param expression
+	 *            an expression for getting value
 	 * @return the value of this expression
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public IAIF getAIF(IPDIExpression expression) throws PDIException;
-	
+
 	/**
 	 * @param task
 	 * @return
 	 */
 	public IPDIExpression getExpression(int task);
-	
+
 	/**
 	 * Returns an array of expressions
+	 * 
 	 * @return an array of expressions
 	 */
 	public IPDIExpression[] getExpressions();
 
 	/**
 	 * Returns expression text
+	 * 
 	 * @return expression text
 	 */
 	public String getExpressionText();
-	
+
 	/**
 	 * Returns status of this expression
+	 * 
 	 * @return status of this expression
 	 */
 	public boolean isEnabled();
-	
+
 	/**
 	 * Remove an expression from store
-	 * @param tasks TaskSet
+	 * 
+	 * @param tasks
+	 *            TaskSet
+	 * @since 4.0
 	 */
 	public void removeExpression(TaskSet tasks);
-	
+
 	/**
 	 * Remove an expression from store
-	 * @param expression an expression going to be removed
+	 * 
+	 * @param expression
+	 *            an expression going to be removed
 	 */
 	public void removeExpression(IPDIExpression expression);
-	
+
 	/**
 	 * @param enabled
 	 */
 	public void setEnabled(boolean enabled);
-	
+
 	/**
 	 * 
 	 */
@@ -100,6 +115,7 @@ public interface IPDIMultiExpressions extends IPDISessionObject {
 	 * @param tasks
 	 * @param monitor
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void updateExpressionsValue(TaskSet tasks, IProgressMonitor monitor) throws PDIException;
 }

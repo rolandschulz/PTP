@@ -22,6 +22,7 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
  * Represents a class or struct type
  * 
  * @author clement
+ * @since 4.0
  * 
  */
 public interface IAIFTypeAggregate extends IAIFType {

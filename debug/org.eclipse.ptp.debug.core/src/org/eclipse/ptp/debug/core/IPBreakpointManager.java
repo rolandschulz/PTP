@@ -21,11 +21,14 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 public interface IPBreakpointManager {
 
 	/**
-	 * Called when tasks are added to a task set. This causes the breakpoints
-	 * to be set on the new tasks also.
+	 * Called when tasks are added to a task set. This causes the breakpoints to
+	 * be set on the new tasks also.
 	 * 
-	 * @param tasks new tasks being added to the set
-	 * @param breakpoints breakpoints that are to be updated
+	 * @param tasks
+	 *            new tasks being added to the set
+	 * @param breakpoints
+	 *            breakpoints that are to be updated
+	 * @since 4.0
 	 */
 	public void addSetBreakpoints(TaskSet tasks, IPBreakpoint[] breakpoints);
 
@@ -33,15 +36,19 @@ public interface IPBreakpointManager {
 	 * Called when tasks are removed from a task set. This causes the
 	 * breakpoints to be removed from the tasks that are no longer in the set.
 	 * 
-	 * @param tasks tasks being removed from the set
-	 * @param breakpoints breakpoints that are to be updated
+	 * @param tasks
+	 *            tasks being removed from the set
+	 * @param breakpoints
+	 *            breakpoints that are to be updated
+	 * @since 4.0
 	 */
 	public void deleteSetBreakpoints(TaskSet tasks, IPBreakpoint[] breakpoints);
 
 	/**
 	 * Delete a breakpoint. Removes the breakpoint and its marker.
 	 * 
-	 * @param breakpoint breakpoint to remove
+	 * @param breakpoint
+	 *            breakpoint to remove
 	 */
 	public void deleteBreakpoint(IPBreakpoint breakpoint);
 
@@ -65,6 +72,7 @@ public interface IPBreakpointManager {
 	/**
 	 * @param tasks
 	 * @param pdiWatchpoint
+	 * @since 4.0
 	 */
 	public void watchpointOutOfScope(TaskSet tasks, IPDIWatchpoint pdiWatchpoint);
 

@@ -22,24 +22,22 @@ import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents signal management
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISignalManagement {
 	/**
-	 * Requests to retrieve a list signals information with given signal name of specify process
-	 * @param tasks target process 
-	 * @param name name of signal
-	 * @throws PDIException on failure
+	 * Requests to retrieve a list signals information with given signal name of
+	 * specify process
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param name
+	 *            name of signal
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void listSignals(TaskSet tasks, String name) throws PDIException;
-	
-	/**
-	 * Requests to retrieve signal information with given argument of specify process
-	 * @param tasks target process
-	 * @param arg argument 
-	 * @throws PDIException on failure
-	 * @deprecated
-	 */
-	void retrieveSignalInfo(TaskSet tasks, String arg) throws PDIException;	
 }

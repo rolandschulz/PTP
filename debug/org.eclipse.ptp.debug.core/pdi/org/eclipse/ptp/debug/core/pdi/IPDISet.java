@@ -22,13 +22,15 @@ import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents a set of processes in PDI model
+ * 
  * @author clement
  */
 public interface IPDISet {
 	/**
 	 * Returns a list of Task IDs
+	 * 
 	 * @return TaskSet of all processes
+	 * @since 4.0
 	 */
-	TaskSet getTasks();
+	public TaskSet getTasks();
 }
-

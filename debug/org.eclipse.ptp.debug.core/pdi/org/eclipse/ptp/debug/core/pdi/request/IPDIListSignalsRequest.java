@@ -24,9 +24,13 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignalDescriptor;
 
 /**
  * Represents to request a list of signals
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIListSignalsRequest extends IPDIEventRequest {
+	/**
+	 * @since 4.0
+	 */
 	public IPDISignalDescriptor[] getSignals(TaskSet qTasks) throws PDIException;
 }

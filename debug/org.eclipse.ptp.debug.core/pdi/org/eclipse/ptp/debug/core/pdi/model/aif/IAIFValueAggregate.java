@@ -22,6 +22,7 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
  * Represents class value of IAIFValue
  * 
  * @author clement
+ * @since 4.0
  * 
  */
 public interface IAIFValueAggregate extends IAIFValue {

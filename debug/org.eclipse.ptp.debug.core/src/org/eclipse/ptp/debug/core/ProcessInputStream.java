@@ -43,6 +43,9 @@ public class ProcessInputStream extends InputStream implements IJobChildListener
 	private final IPJob job;
 	private final int processJobRank;
 
+	/**
+	 * @since 4.0
+	 */
 	public ProcessInputStream(IPJob job, int processJobRank) {
 		this.job = job;
 		this.processJobRank = processJobRank;
@@ -57,7 +60,9 @@ public class ProcessInputStream extends InputStream implements IJobChildListener
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.InputStream#close()
 	 */
 	@Override
@@ -73,6 +78,9 @@ public class ProcessInputStream extends InputStream implements IJobChildListener
 	 * org.eclipse.ptp.core.elements.listeners.IProcessListener#handleEvent(
 	 * org.eclipse.ptp.core.elements.events.IProcessChangeEvent)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public void handleEvent(IChangedProcessEvent e) {
 		final BitSet processChangedSet = e.getProcesses();
 		// check to see if this event is concerned with
@@ -84,31 +92,47 @@ public class ProcessInputStream extends InputStream implements IJobChildListener
 			close();
 		}
 
-		StringAttribute stdoutAttr = e.getAttributes().getAttribute(
-				ProcessAttributes.getStdoutAttributeDefinition());
+		StringAttribute stdoutAttr = e.getAttributes().getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
 		if (stdoutAttr != null) {
 			addInput(stdoutAttr.getValue() + "\n"); //$NON-NLS-1$
 		}
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewProcessEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+	 * (org.eclipse.ptp.core.elements.events.INewProcessEvent)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void handleEvent(INewProcessEvent e) {
 		// not interested
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent
+	 * (org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void handleEvent(IRemoveProcessEvent e) {
 		// not interested
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.InputStream#read()
 	 */
+	@Override
 	public int read() {
 		synchronized (buffers) {
 			if (count <= pos) {
@@ -119,7 +143,9 @@ public class ProcessInputStream extends InputStream implements IJobChildListener
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.InputStream#read(byte[], int, int)
 	 */
 	@Override
@@ -128,8 +154,7 @@ public class ProcessInputStream extends InputStream implements IJobChildListener
 			String buffer = getBuffer();
 			if (b == null) {
 				throw new NullPointerException();
-			} else if ((off < 0) || (off > b.length) || (len < 0)
-					|| ((off + len) > b.length) || ((off + len) < 0)) {
+			} else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
 				throw new IndexOutOfBoundsException();
 			}
 			if (pos >= count) {
@@ -170,7 +195,7 @@ public class ProcessInputStream extends InputStream implements IJobChildListener
 					buffer = ""; //$NON-NLS-1$
 				}
 			}
-			buffer = (String) buffers.remove(0);
+			buffer = buffers.remove(0);
 			reset(buffer.length());
 			return buffer;
 		}

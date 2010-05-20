@@ -23,10 +23,11 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
- * Represents to request an expression evaluation that generates a partial AIF representation.
+ * Represents to request an expression evaluation that generates a partial AIF
+ * representation.
  * 
  * @author clement
- *
+ * 
  */
 public interface IPDIEvaluatePartialExpressionRequest extends IPDIInternalEventRequest {
 	/**
@@ -35,16 +36,18 @@ public interface IPDIEvaluatePartialExpressionRequest extends IPDIInternalEventR
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public IAIF getPartialAIF(TaskSet qTasks) throws PDIException;
-	
+
 	/**
-	 * Retrieve the ID assigned to this expression. This ID can be used to retrieve additional
-	 * data from the expression.
+	 * Retrieve the ID assigned to this expression. This ID can be used to
+	 * retrieve additional data from the expression.
 	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public String getId(TaskSet qTasks) throws PDIException;
 }

@@ -21,7 +21,8 @@ package org.eclipse.ptp.debug.core.pdi;
 import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
- * Thrown to indicate some unexpected internal error has occurred 
+ * Thrown to indicate some unexpected internal error has occurred
+ * 
  * @author clement
  * 
  */
@@ -30,20 +31,30 @@ public class PDIInternalException extends RuntimeException {
 	 * All serializable objects should have a stable serialVersionUID
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	protected TaskSet tasks;
+
 	/**
-     * Constructs a new exception.
-	 * @param tasks specify tasks throw exception 
+	 * Constructs a new exception.
+	 * 
+	 * @param tasks
+	 *            specify tasks throw exception
+	 * @since 4.0
 	 */
 	public PDIInternalException(TaskSet tasks) {
 		super();
 		this.tasks = tasks;
 	}
+
 	/**
-     * Constructs a new exception.
-	 * @param tasks specify tasks throw exception 
-     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
+	 * Constructs a new exception.
+	 * 
+	 * @param tasks
+	 *            specify tasks throw exception
+	 * @param message
+	 *            the detail message. The detail message is saved for later
+	 *            retrieval by the {@link #getMessage()} method.
+	 * @since 4.0
 	 */
 	public PDIInternalException(TaskSet tasks, String message) {
 		super(message);
@@ -51,4 +62,3 @@ public class PDIInternalException extends RuntimeException {
 	}
 
 }
-

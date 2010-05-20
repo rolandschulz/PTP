@@ -30,44 +30,62 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * Represent expression manager to manage multiple expression
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIExpressionManager extends IPDIManager {
 	/**
 	 * Clean expression value with given tasks
-	 * @param tasks tasks
+	 * 
+	 * @param tasks
+	 *            tasks
 	 * @param monitor
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void cleanMultiExpressions(TaskSet tasks, IProgressMonitor monitor) throws PDIException;
-	
+
 	/**
 	 * Clean expression value with given tasks
+	 * 
 	 * @param exprText
-	 * @param tasks tasks
+	 * @param tasks
+	 *            tasks
 	 * @param monitor
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void cleanMultiExpressions(String exprText, TaskSet tasks, IProgressMonitor monitor) throws PDIException;
-	
+
 	/**
 	 * Creates an expression for specify variable
-	 * @param qTasks task 
-	 * @param expr variable
+	 * 
+	 * @param qTasks
+	 *            task
+	 * @param expr
+	 *            variable
 	 * @return IPDIExpression expression
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	public IPDITargetExpression createExpression(TaskSet qTasks, String expr) throws PDIException;
-	
+
 	/**
-	 * Creates mutliple expression object for a number of processes with one variable
-	 * @param tasks task
-	 * @param exprText variable
-	 * @param enabled status of this expression
+	 * Creates mutliple expression object for a number of processes with one
+	 * variable
+	 * 
+	 * @param tasks
+	 *            task
+	 * @param exprText
+	 *            variable
+	 * @param enabled
+	 *            status of this expression
+	 * @since 4.0
 	 */
 	public void createMutliExpressions(TaskSet tasks, String exprText, boolean enabled);
-	
+
 	/**
 	 * @param frame
 	 * @param expr
@@ -75,58 +93,71 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @throws PDIException
 	 */
 	public IPDIVariable createVariable(IPDIStackFrame frame, String expr) throws PDIException;
-	
+
 	/**
 	 * @param variable
 	 * @throws PDIException
 	 */
 	public void deleteVariable(IPDIVariable variable) throws PDIException;
-	
+
 	/**
 	 * @param qTasks
 	 * @param expressions
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void destroyExpressions(TaskSet qTasks, IPDIExpression[] expressions) throws PDIException;
-	
+
 	/**
 	 * @param qTasks
 	 * @param expr
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public IAIF getExpressionValue(TaskSet qTasks, String expr) throws PDIException;
 
 	/**
 	 * Returns IPDIMultiExpressions with specific expression value
-	 * @param exprText expression value
+	 * 
+	 * @param exprText
+	 *            expression value
 	 * @return IPDIMultiExpressions
 	 */
 	public IPDIMultiExpressions getMultiExpression(String exprText);
-	
+
 	/**
 	 * Returns an array of multiple expressions
+	 * 
 	 * @return an array of multiple expressions
 	 */
 	public IPDIMultiExpressions[] getMultiExpressions();
-	
+
 	/**
 	 * Returns array of enabled IPDIExpression with specific task id
-	 * @param task task id
+	 * 
+	 * @param task
+	 *            task id
 	 * @return array of enabled IPDIExpression with specific task id
 	 */
 	public IPDIExpression[] getMultiExpressions(int task);
-	
+
 	/**
 	 * Remove multiple expressions from store
-	 * @param qTasks task 
-	 * @param exprText expression name
+	 * 
+	 * @param qTasks
+	 *            task
+	 * @param exprText
+	 *            expression name
+	 * @since 4.0
 	 */
 	public void removeMutliExpressions(TaskSet tasks, String exprText);
-	
+
 	/**
 	 * Remove multiple expressions from store
-	 * @param exprText expression name
+	 * 
+	 * @param exprText
+	 *            expression name
 	 */
 	public void removeMutliExpressions(String exprText);
 
@@ -134,30 +165,38 @@ public interface IPDIExpressionManager extends IPDIManager {
 	 * @param qTasks
 	 * @param varList
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void update(TaskSet qTasks, String[] varList) throws PDIException;
-	
+
 	/**
 	 * Update expression value
+	 * 
 	 * @param tasks
 	 * @param monitor
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void updateMultiExpressions(TaskSet tasks, IProgressMonitor monitor) throws PDIException;
-	
+
 	/**
 	 * Update expression value
+	 * 
 	 * @param exprText
 	 * @param tasks
 	 * @param monitor
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void updateMultiExpressions(String exprText, TaskSet tasks, IProgressMonitor monitor) throws PDIException;
-	
+
 	/**
 	 * Update status of multiple expressions
-	 * @param exprText expression name
-	 * @param enabled status of this expression
+	 * 
+	 * @param exprText
+	 *            expression name
+	 * @param enabled
+	 *            status of this expression
 	 */
 	public void updateStatusMultiExpressions(String exprText, boolean enabled);
 }

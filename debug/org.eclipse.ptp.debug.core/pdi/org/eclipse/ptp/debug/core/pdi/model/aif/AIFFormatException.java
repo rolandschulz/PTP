@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
+/**
+ * @since 4.0
+ */
 public class AIFFormatException extends AIFException {
 
 	private static final long serialVersionUID = 6576643238109867525L;

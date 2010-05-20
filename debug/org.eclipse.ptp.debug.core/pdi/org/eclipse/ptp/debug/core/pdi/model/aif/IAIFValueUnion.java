@@ -31,6 +31,7 @@ public interface IAIFValueUnion extends IAIFValue {
 	 * @param name
 	 *            name of union field
 	 * @return union value
+	 * @since 4.0
 	 */
 	public IAIFValue getFieldValue(String name);
 
