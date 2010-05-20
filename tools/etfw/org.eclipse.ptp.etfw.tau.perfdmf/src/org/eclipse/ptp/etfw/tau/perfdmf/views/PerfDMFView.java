@@ -52,6 +52,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
+import org.eclipse.ptp.etfw.tau.perfdmf.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.ParaProfController.Level;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.ParaProfController.TreeTuple;
 import org.eclipse.swt.SWT;
@@ -77,13 +78,15 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 /**
  * Defines a perfdmf database browser view and associated operations
+ * 
  * @author wspear
- *
+ * 
  */
 public class PerfDMFView extends ViewPart {
 	private TreeViewer viewer;
 	private DrillDownAdapter drillDownAdapter;
-	//private Action action1; //TODO: Add an 'upload external performance data' option
+	// private Action action1; //TODO: Add an 'upload external performance data'
+	// option
 	private Action refreshAction;
 	private Action doubleClickAction;
 
@@ -95,28 +98,28 @@ public class PerfDMFView extends ViewPart {
 	ParaProfController ppc;
 
 	List<TreeTuple> databases;
-	private TreeTuple database=null;
+	private TreeTuple database = null;
 
 	class TreeNode implements IAdaptable {
-		private TreeTuple tt;
+		private final TreeTuple tt;
 		private TreeNode parent;
 
-		private ArrayList<TreeNode> children = new ArrayList<TreeNode>();
+		private final ArrayList<TreeNode> children = new ArrayList<TreeNode>();
 
-		public TreeNode(TreeTuple tt){
-			this.tt=tt;
+		public TreeNode(TreeTuple tt) {
+			this.tt = tt;
 		}
 
 		public Object getAdapter(Class adapter) {
 			return null;
 		}
 
-		public int getID(){
+		public int getID() {
 			return tt.id;
 		}
 
 		public String getName() {
-			if(tt==null){
+			if (tt == null) {
 				return ""; //$NON-NLS-1$
 			}
 			return tt.name;
@@ -130,6 +133,7 @@ public class PerfDMFView extends ViewPart {
 			return parent;
 		}
 
+		@Override
 		public String toString() {
 			return getName();
 		}
@@ -165,7 +169,8 @@ public class PerfDMFView extends ViewPart {
 	IFile getFile(String filename, IResource[] resources) {
 		try {
 			for (int j = 0; j < resources.length; j++) {
-				//System.out.println("  considering resource '" + resources[j] + "'");
+				// System.out.println("  considering resource '" + resources[j]
+				// + "'");
 				if (resources[j] instanceof IFile) {
 					IFile f = (IFile) resources[j];
 					// System.out.println("filename = " + f.getName());
@@ -173,13 +178,13 @@ public class PerfDMFView extends ViewPart {
 						return f;
 					}
 				} else if (resources[j] instanceof IFolder) {
-					//System.out.println("recurse on Folder");
+					// System.out.println("recurse on Folder");
 					IFile f = getFile(filename, ((IFolder) resources[j]).members());
 					if (f != null) {
 						return f;
 					}
 				} else if (resources[j] instanceof IProject) {
-					//System.out.println("recurse on Project");
+					// System.out.println("recurse on Project");
 					IFile f = getFile(filename, ((IProject) resources[j]).members());
 					if (f != null) {
 						return f;
@@ -201,100 +206,108 @@ public class PerfDMFView extends ViewPart {
 	}
 
 	/**
-	 * Returns a list of all found databases in the form NAME - CONNECTION-STRING
+	 * Returns a list of all found databases in the form NAME -
+	 * CONNECTION-STRING
+	 * 
 	 * @return
 	 */
-	public String[] getDatabaseNames()
-	{	
+	public String[] getDatabaseNames() {
 		String[] names = new String[databases.size()];
 
-		for(int i=0;i<names.length;i++){
-			names[i]=databases.get(i).name;
+		for (int i = 0; i < names.length; i++) {
+			names[i] = databases.get(i).name;
 		}
 
 		return names;
 	}
 
 	/**
-	 * Returns just the configuration name of the full database identification string provided.
-	 * @param A database name "name - connection string" as provided by getDatabaseNames()
+	 * Returns just the configuration name of the full database identification
+	 * string provided.
+	 * 
+	 * @param A
+	 *            database name "name - connection string" as provided by
+	 *            getDatabaseNames()
 	 * @return
 	 */
-	public static String extractDatabaseName(String name)
-	{
+	public static String extractDatabaseName(String name) {
 
-		//   	 List dbs = Database.getDatabases();
-		//	 
-		//	 if(dbs.size()==0)
-		//		 return null;
-		//	 
-		//	 //String[] names = new String[dbs.size()];
-		//	 
-		//	 Iterator dit = dbs.iterator();
+		// List dbs = Database.getDatabases();
 		//
-		//     while(dit.hasNext())
-		//     {
-		//    	 Database dtest=(Database)dit.next();
-		//    	 if(name.endsWith(dtest.getConfig().getName()+" - "+dtest.getConfig().getConnectionString()))
-		//    			 return dtest.getConfig().getName();
-		//     }
+		// if(dbs.size()==0)
+		// return null;
+		//
+		// //String[] names = new String[dbs.size()];
+		//
+		// Iterator dit = dbs.iterator();
+		//
+		// while(dit.hasNext())
+		// {
+		// Database dtest=(Database)dit.next();
+		// if(name.endsWith(dtest.getConfig().getName()+" - "+dtest.getConfig().getConnectionString()))
+		// return dtest.getConfig().getName();
+		// }
 
-		//return null;
-		//TODO: Until we implement otherwise, database names and ID strings are the same, so this function is redundant
+		// return null;
+		// TODO: Until we implement otherwise, database names and ID strings are
+		// the same, so this function is redundant
 		return name;
 	}
 
 	/**
-	 * Given the name of a database configuration, returns the associated database and sets the 
-	 * current databaseName and displayed database name to that database
+	 * Given the name of a database configuration, returns the associated
+	 * database and sets the current databaseName and displayed database name to
+	 * that database
+	 * 
 	 * @param name
 	 * @return
+	 * @since 2.0
 	 */
-	public TreeTuple getDatabase(String name)
-	{
-		if (databases==null||databases.size() < 1) {
-			database=null;
+	public TreeTuple getDatabase(String name) {
+		if (databases == null || databases.size() < 1) {
+			database = null;
 			return null;
 		}
-		if(name==null){
-			name=Messages.PerfDMFView_Default;
+		if (name == null) {
+			name = Messages.PerfDMFView_Default;
 		}
 		Iterator<TreeTuple> dit = databases.iterator();
-		int defdex=0;
-		int i=0;
-		while(dit.hasNext())
-		{
-			TreeTuple dtest=dit.next();
-			if(dtest.name.equals(name))
-			{
-				database=dtest;
+		int defdex = 0;
+		int i = 0;
+		while (dit.hasNext()) {
+			TreeTuple dtest = dit.next();
+			if (dtest.name.equals(name)) {
+				database = dtest;
 
-				if(switchDatabaseAction!=null)
-					switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase+ database.name);
+				if (switchDatabaseAction != null)
+					switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase + database.name);
 
-				return(dtest);
+				return (dtest);
 			}
-			if(dtest.name.equals(Messages.PerfDMFView_Default)){
-				defdex=i;
+			if (dtest.name.equals(Messages.PerfDMFView_Default)) {
+				defdex = i;
 			}
 			i++;
 		}
 
-		database=databases.get(defdex);
-		if(switchDatabaseAction!=null)
-			switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase+ database.name);
+		database = databases.get(defdex);
+		if (switchDatabaseAction != null)
+			switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase + database.name);
 
-		return database;//(Database) dbs.get(0);
+		return database;// (Database) dbs.get(0);
 	}
 
-	private void openSource(String projectName, String filename, int startLine, int endLine){//final SourceRegion sourceLink) {
+	private void openSource(String projectName, String filename, int startLine, int endLine) {// final
+																								// SourceRegion
+																								// sourceLink)
+																								// {
 
 		try {
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			//IProject[] projects = workspace.getRoot().getProjects();
+			// IProject[] projects = workspace.getRoot().getProjects();
 			IWorkspaceRoot root = workspace.getRoot();
 
-			IFile file = getFile(filename, root.members());//sourceLink.getFilename()
+			IFile file = getFile(filename, root.members());// sourceLink.getFilename()
 
 			if (file == null) {
 				return;
@@ -302,27 +315,25 @@ public class PerfDMFView extends ViewPart {
 			IEditorInput iEditorInput = new FileEditorInput(file);
 
 			IWorkbenchPage p = getActivePage();
-			String editorid="org.eclipse.cdt.ui.editor.CEditor"; //$NON-NLS-1$
-			if(file.getContentDescription().toString().indexOf("org.eclipse.photran.core.freeFormFortranSource")>=0||file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fortranSource")>=0) //$NON-NLS-1$ //$NON-NLS-2$
-				editorid="org.eclipse.photran.ui.FreeFormFortranEditor"; //$NON-NLS-1$
-			else
-				if(file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fixedFormFortranSource")>=0) //$NON-NLS-1$
-					editorid="org.eclipse.photran.ui.FixedFormFortranEditor"; //$NON-NLS-1$
+			String editorid = "org.eclipse.cdt.ui.editor.CEditor"; //$NON-NLS-1$
+			if (file.getContentDescription().toString().indexOf("org.eclipse.photran.core.freeFormFortranSource") >= 0 || file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fortranSource") >= 0) //$NON-NLS-1$ //$NON-NLS-2$
+				editorid = "org.eclipse.photran.ui.FreeFormFortranEditor"; //$NON-NLS-1$
+			else if (file.getContentDescription().toString().indexOf("org.eclipse.photran.core.fixedFormFortranSource") >= 0) //$NON-NLS-1$
+				editorid = "org.eclipse.photran.ui.FixedFormFortranEditor"; //$NON-NLS-1$
 
 			IEditorPart part = null;
 			if (p != null) {
 				part = p.openEditor(iEditorInput, editorid, true);
 			}
 
-
-			//IEditorPart part = EditorUtility.openInEditor(file);
+			// IEditorPart part = EditorUtility.openInEditor(file);
 
 			TextEditor textEditor = (TextEditor) part;
 
-			final int start = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getLineOffset(
-					startLine-1);//sourceLink.getStartLine() - 1
-			final int end = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getLineOffset(
-					endLine);//sourceLink.getEndLine()
+			final int start = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput())
+					.getLineOffset(startLine - 1);// sourceLink.getStartLine() -
+													// 1
+			final int end = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getLineOffset(endLine);// sourceLink.getEndLine()
 
 			textEditor.setHighlightRange(start, end - start, true);
 
@@ -370,10 +381,8 @@ public class PerfDMFView extends ViewPart {
 
 		public Object[] getElements(Object parent) {
 			if (parent.equals(getViewSite())) {
-				if (invisibleRoot == null)
-				{
-					if(!initialize())
-					{
+				if (invisibleRoot == null) {
+					if (!initialize()) {
 						return null;
 					}
 				}
@@ -394,95 +403,97 @@ public class PerfDMFView extends ViewPart {
 			return ((TreeNode) parent).hasChildren();
 		}
 
-
 		/*
-		 * We will set up a dummy model to initialize tree heararchy.
-		 * In a real code, you will connect to a real model and
-		 * expose its hierarchy.
+		 * We will set up a dummy model to initialize tree heararchy. In a real
+		 * code, you will connect to a real model and expose its hierarchy.
 		 */
-		 private boolean initialize() {
+		private boolean initialize() {
 
-			class SourceWatcher implements Runnable{
-				public void run(){
+			class SourceWatcher implements Runnable {
+				public void run() {
 					BlockingQueue<String> q = ppc.getPullQueue();
-					if(q!=null)
-					while(true){
-						String s = null;
-						try {
-							s = q.take();
-							if(s==null||s.equals("DONE")) //$NON-NLS-1$
-								break;
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						String[] split = s.split(" "); //$NON-NLS-1$
-						final String source = split[2];
-						final int start=Integer.parseInt(split[3]);
-						final int finish=Integer.parseInt(split[5]);
-						Display.getDefault().asyncExec(new Runnable() {
-
-							public void run() {
-								openSource(null,source,start,finish);
+					if (q != null)
+						while (true) {
+							String s = null;
+							try {
+								s = q.take();
+								if (s == null || s.equals("DONE")) //$NON-NLS-1$
+									break;
+							} catch (InterruptedException e) {
+								e.printStackTrace();
 							}
+							String[] split = s.split(" "); //$NON-NLS-1$
+							final String source = split[2];
+							final int start = Integer.parseInt(split[3]);
+							final int finish = Integer.parseInt(split[5]);
+							Display.getDefault().asyncExec(new Runnable() {
 
-						});
-					}
+								public void run() {
+									openSource(null, source, start, finish);
+								}
+
+							});
+						}
 
 				}
 			}
 
-				new Thread(new SourceWatcher()).start();
+			new Thread(new SourceWatcher()).start();
 
-				invisibleRoot = new TreeNode(null);
+			invisibleRoot = new TreeNode(null);
 
-				//TreeTuple database=getDatabase("Default");
-				if(databases==null)
-				{   
-					invisibleRoot.addChild(new TreeNode(null));//new TreeNode("none",-1,0,null));
+			// TreeTuple database=getDatabase("Default");
+			if (databases == null) {
+				invisibleRoot.addChild(new TreeNode(null));// new
+															// TreeNode("none",-1,0,null));
+				return true;
+			}
+
+			if (database == null) {
+				getDatabase(Messages.PerfDMFView_Default);
+				if (database == null) {
+					database = ParaProfController.EMPTY;
 					return true;
 				}
+			}
 
-				if(database==null){
-					getDatabase(Messages.PerfDMFView_Default);
-					if(database==null){
-						database=ParaProfController.EMPTY;
-						return true;
+			for (Iterator<TreeTuple> it = ppc.getApplications(database.id).iterator(); it.hasNext();) {
+				TreeTuple app = it.next();
+
+				TreeNode root = new TreeNode(app);
+				for (Iterator<TreeTuple> it2 = ppc.getExperiments(database.id, app.id).iterator(); it2.hasNext();) {
+					TreeTuple exp = it2.next();
+
+					TreeNode tp = new TreeNode(exp);
+
+					for (Iterator<TreeTuple> it3 = ppc.getTrials(database.id, exp.id).iterator(); it3.hasNext();) {
+						TreeTuple trial = it3.next();
+						TreeNode to = new TreeNode(trial);
+						tp.addChild(to);
 					}
+					root.addChild(tp);
 				}
+				invisibleRoot.addChild(root);
 
-				for (Iterator<TreeTuple> it = ppc.getApplications(database.id).iterator(); it.hasNext();) {
-					TreeTuple app = it.next();
-
-					TreeNode root = new TreeNode(app);
-					for (Iterator<TreeTuple> it2 = ppc.getExperiments(database.id, app.id).iterator(); it2.hasNext();) {
-						TreeTuple exp = it2.next();
-
-						TreeNode tp = new TreeNode(exp);
-
-						for (Iterator<TreeTuple> it3 = ppc.getTrials(database.id, exp.id).iterator(); it3.hasNext();) {
-							TreeTuple trial = it3.next();
-							TreeNode to = new TreeNode(trial);
-							tp.addChild(to);
-						}
-						root.addChild(tp);
-					}
-					invisibleRoot.addChild(root);
-
-				}
+			}
 			return true;
-		 }
+		}
 	}
 
 	class ViewLabelProvider extends LabelProvider {
 
+		@Override
 		public String getText(Object obj) {
 			return obj.toString();
 		}
 
+		@Override
 		public Image getImage(Object obj) {
 			String imageKey = ISharedImages.IMG_OBJ_FOLDER;
 
-			if (((TreeNode) obj).tt.level==Level.TRIAL){//.getUserObject() instanceof Trial) {
+			if (((TreeNode) obj).tt.level == Level.TRIAL) {// .getUserObject()
+															// instanceof Trial)
+															// {
 				imageKey = ISharedImages.IMG_OBJ_ELEMENT;
 			}
 			return PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);
@@ -492,23 +503,23 @@ public class PerfDMFView extends ViewPart {
 	class NameSorter extends ViewerSorter {
 	}
 
-
 	/**
 	 * The constructor.
 	 */
 	public PerfDMFView() {
-		ppc=new ParaProfController();
+		ppc = new ParaProfController();
 
 		PerfDMFUIPlugin.registerPerfDMFView(this);
 
-		databases=ppc.getDatabases();
+		databases = ppc.getDatabases();
 
 	}
 
 	/**
-	 * This is a callback that will allow us
-	 * to create the viewer and initialize it.
+	 * This is a callback that will allow us to create the viewer and initialize
+	 * it.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		drillDownAdapter = new DrillDownAdapter(viewer);
@@ -542,7 +553,8 @@ public class PerfDMFView extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		//manager.add(action1);  //TODO: Add an 'upload external performance data' option
+		// manager.add(action1); //TODO: Add an 'upload external performance
+		// data' option
 		manager.add(new Separator());
 		manager.add(refreshAction);
 	}
@@ -550,7 +562,8 @@ public class PerfDMFView extends ViewPart {
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(paraprofAction);
 		manager.add(refreshAction);
-		// manager.add(action1);// //TODO: Add an 'upload external performance data' option
+		// manager.add(action1);// //TODO: Add an 'upload external performance
+		// data' option
 		manager.add(new Separator());
 		drillDownAdapter.addNavigationActions(manager);
 		// Other plug-ins can contribute there actions here
@@ -566,28 +579,28 @@ public class PerfDMFView extends ViewPart {
 
 	private boolean openInParaProf(TreeTuple trial) {
 
-		if(trial.level==Level.TRIAL)
+		if (trial.level == Level.TRIAL)
 			ppc.openTrial(trial.dbid, trial.id);
 		return true;
 	}
 
 	private void makeActions() {
-		/*action1 = new Action() {
-            public void run() {
-                try {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("sampleview.views.SampleView");
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-                //addProfile("This Project", "/tmp/profiles");
-
-            }
-        };
-        action1.setText("Do something cool!");
-        action1.setToolTipText("Action 1 tooltip");
-        action1.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/refresh.gif"));*/   //TODO: Add an 'upload external performance data' option
+		/*
+		 * action1 = new Action() { public void run() { try {
+		 * PlatformUI.getWorkbench
+		 * ().getActiveWorkbenchWindow().getActivePage().showView
+		 * ("sampleview.views.SampleView"); } catch (Throwable t) {
+		 * t.printStackTrace(); } //addProfile("This Project", "/tmp/profiles");
+		 * 
+		 * } }; action1.setText("Do something cool!");
+		 * action1.setToolTipText("Action 1 tooltip");
+		 * action1.setImageDescriptor
+		 * (AbstractUIPlugin.imageDescriptorFromPlugin("PDMA",
+		 * "icons/refresh.gif"));
+		 */// TODO: Add an 'upload external performance data' option
 
 		refreshAction = new Action() {
+			@Override
 			public void run() {
 				((ViewContentProvider) viewer.getContentProvider()).refresh(viewer);
 			}
@@ -597,6 +610,7 @@ public class PerfDMFView extends ViewPart {
 		refreshAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/refresh.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		doubleClickAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection) selection).getFirstElement();
@@ -606,19 +620,19 @@ public class PerfDMFView extends ViewPart {
 				if (to.tt != null) {
 					openInParaProf(to.tt);
 				}
-				//showMessage("Double-click detected on " + obj.toString());
+				// showMessage("Double-click detected on " + obj.toString());
 			}
 		};
 
-		switchDatabaseAction=new Action(){
+		switchDatabaseAction = new Action() {
 
-
-			public void run(){
+			@Override
+			public void run() {
 				ListDialog dblist = new ListDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
-				ArrayContentProvider dbs=new ArrayContentProvider();
-				LabelProvider dl=new LabelProvider();
+				ArrayContentProvider dbs = new ArrayContentProvider();
+				LabelProvider dl = new LabelProvider();
 
-				String[] names=getDatabaseNames();
+				String[] names = getDatabaseNames();
 
 				dblist.setHelpAvailable(false);
 				dblist.setContentProvider(dbs);
@@ -629,19 +643,19 @@ public class PerfDMFView extends ViewPart {
 
 				Object[] result = dblist.getResult();
 
-				if(result!=null&&result.length>=1)
-				{
-					//databaseName=extractDatabaseName(result[0].toString());
-					database=getDatabase(result[0].toString());
+				if (result != null && result.length >= 1) {
+					// databaseName=extractDatabaseName(result[0].toString());
+					database = getDatabase(result[0].toString());
 					((ViewContentProvider) viewer.getContentProvider()).refresh(viewer);
 				}
 			}
 
 		};
-		switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase+database.name);
+		switchDatabaseAction.setText(Messages.PerfDMFView_UsingDatabase + database.name);
 		switchDatabaseAction.setToolTipText(Messages.PerfDMFView_SelectOtherDatabase);
 
 		launchparaprofAction = new Action() {
+			@Override
 			public void run() {
 				ppc.openManager();
 			}
@@ -651,11 +665,12 @@ public class PerfDMFView extends ViewPart {
 		launchparaprofAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("PDMA", "icons/pp.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		paraprofAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection) selection).getFirstElement();
 				TreeNode node = (TreeNode) obj;
-				//Trial trial = (Trial) node.getUserObject();
+				// Trial trial = (Trial) node.getUserObject();
 				openInParaProf(node.tt);
 			}
 		};
@@ -672,20 +687,23 @@ public class PerfDMFView extends ViewPart {
 			}
 		});
 	}
+
 	/*
-    private void showMessage(String message) {
-        MessageDialog.openInformation(viewer.getControl().getShell(), "Performance Data View", message);
-    }*/
+	 * private void showMessage(String message) {
+	 * MessageDialog.openInformation(viewer.getControl().getShell(),
+	 * "Performance Data View", message); }
+	 */
 
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
 
-
-	public boolean showProfile(String project, String projectType, String trialName){//,String dbname
+	public boolean showProfile(String project, String projectType, String trialName) {// ,String
+																						// dbname
 
 		ViewContentProvider vcp = (ViewContentProvider) viewer.getContentProvider();
 
@@ -702,13 +720,13 @@ public class PerfDMFView extends ViewPart {
 				Object[] expObjs = node.getChildren();
 				for (int j = 0; j < expObjs.length; j++) {
 					TreeNode expNode = (TreeNode) expObjs[j];
-					if ( expNode.getName().equals(projectType)) {
+					if (expNode.getName().equals(projectType)) {
 						viewer.setExpandedState(expNode, true);
 
 						Object[] trialObjs = expNode.getChildren();
 						for (int k = 0; k < trialObjs.length; k++) {
 							TreeNode trialNode = (TreeNode) trialObjs[k];
-							if ( trialNode.getName().equals(trialName)) {
+							if (trialNode.getName().equals(trialName)) {
 								StructuredSelection selection = new StructuredSelection(trialNode);
 								viewer.setSelection(selection);
 							}
@@ -723,7 +741,7 @@ public class PerfDMFView extends ViewPart {
 
 	public boolean addProfile(String project, String projectType, String trialName, String directory, String dbname) {
 		TreeTuple database = getDatabase(dbname);
-		if(database==null)
+		if (database == null)
 			return false;
 
 		ppc.uploadTrial(directory, database.id, project, projectType, trialName);
