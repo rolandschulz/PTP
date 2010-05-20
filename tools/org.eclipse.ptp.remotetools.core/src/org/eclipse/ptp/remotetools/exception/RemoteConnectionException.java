@@ -11,15 +11,13 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.exception;
 
-import org.eclipse.osgi.util.NLS;
-
 public class RemoteConnectionException extends RemoteException {
 	private static final long serialVersionUID = 1L;
 
 	int errorCode = UNKNOWN;
 	public static final int UNKNOWN = 0;
 	public static final int LOST_CONNECTION = 1;
-	
+
 	public RemoteConnectionException(String message, Throwable cause) {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
@@ -43,25 +41,9 @@ public class RemoteConnectionException extends RemoteException {
 	public int getErrorCode() {
 		return errorCode;
 	}
-	
+
+	@Override
 	public String getLocalizedMessage() {
 		return super.getMessage();
 	}
-	
-//	public String getMessage() {
-//		String result = "";
-//		switch (errorCode) {
-//		case LOST_CONNECTION:
-//			result = "Connection to remote host was lost";
-//			break;
-//		default:
-//			result = NLS.bind("Unknown connection error, code {0}", Integer.toString(errorCode));
-//			break;
-//		}
-//		if (super.getMessage() != null) {
-//			NLS.bind("{0} ({1})", new Object [] { result, super.getMessage()});
-//		}
-//		return result;
-//	}
-
 }

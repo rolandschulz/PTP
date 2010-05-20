@@ -11,9 +11,6 @@
  *****************************************************************************/
 package org.eclipse.ptp.utils.ui.swt;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Text;
-
 /**
  * Describe a group containing a textbox and associated controls like labels,
  * text descriptions.
@@ -63,7 +60,7 @@ public class TextMold extends GenericControlMold {
 			addBitmask(LIMIT_SIZE);
 		} else {
 			removeBitmask(WIDTH_PROPORTIONAL_NUM_CHARS);
-			removeBitmask(LIMIT_SIZE);			
+			removeBitmask(LIMIT_SIZE);
 		}
 	}
 
@@ -98,18 +95,22 @@ public class TextMold extends GenericControlMold {
 		}
 	}
 
+	@Override
 	protected boolean hasHeight() {
 		return (bitmask & TextMold.MULTILINE_TEXT) != 0;
 	}
 
+	@Override
 	protected int getHeight() {
 		return numberOfLines;
 	}
 
+	@Override
 	protected boolean hasWidth() {
 		return (bitmask & TextMold.WIDTH_PROPORTIONAL_NUM_CHARS) != 0;
 	}
 
+	@Override
 	protected int getWidth() {
 		return size;
 	}

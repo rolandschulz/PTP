@@ -11,7 +11,6 @@
  */
 package org.eclipse.ptp.remotetools.environment.wizard;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.wizard.Wizard;
@@ -19,7 +18,6 @@ import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
-
 
 /**
  * 
@@ -32,6 +30,7 @@ public class EnvironmentWizard extends Wizard {
 	ITargetElement targetElement;
 	String originalKey = ""; //$NON-NLS-1$
 	boolean cancel = false;
+
 	/**
 	 * 
 	 */
@@ -39,28 +38,30 @@ public class EnvironmentWizard extends Wizard {
 		super();
 		this.typeElement = element;
 	}
-	
+
 	public EnvironmentWizard(ITargetElement element) {
 		super();
 		this.typeElement = element.getType();
 		this.targetElement = element;
 	}
-	
+
 	/**
 	 * 
 	 * @see org.eclipse.jface.wizard.IWizard#addPages()
 	 */
+	@Override
 	public void addPages() {
 		super.addPages();
 		this.setWindowTitle(DialogMessages.getString("EnvironmentWizard.0")); //$NON-NLS-1$
-		//Map attributes = null;
+		// Map attributes = null;
 		if (targetElement != null) {
-			//attributes =  new HashMap(targetElement.getAttributes());
+			// attributes = new HashMap(targetElement.getAttributes());
 			originalKey = targetElement.getName();
 		}
-		//AbstractEnvironmentDialogPage page = typeElement.getExtension().dialogPageFactory(attributes,originalKey);
+		// AbstractEnvironmentDialogPage page =
+		// typeElement.getExtension().dialogPageFactory(attributes,originalKey);
 		AbstractEnvironmentDialogPage page;
-		if(targetElement != null) {
+		if (targetElement != null) {
 			page = typeElement.getExtension().dialogPageFactory(targetElement);
 		} else {
 			page = typeElement.getExtension().dialogPageFactory();
@@ -72,17 +73,18 @@ public class EnvironmentWizard extends Wizard {
 	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
+	@Override
 	public boolean performFinish() {
 		if (!cancel) {
-			AbstractEnvironmentDialogPage page = ((AbstractEnvironmentDialogPage)getStartingPage());
+			AbstractEnvironmentDialogPage page = ((AbstractEnvironmentDialogPage) getStartingPage());
 			Map attributes = page.getAttributes();
-			
+
 			if (attributes == null)
 				return false;
-			
+
 			if (targetElement == null) {
 				String id = EnvironmentPlugin.getDefault().getEnvironmentUniqueID();
-				typeElement.addElement(new TargetElement(typeElement,page.getName(),attributes, id));
+				typeElement.addElement(new TargetElement(typeElement, page.getName(), attributes, id));
 			} else {
 				targetElement.setAttributes(attributes);
 				targetElement.setName(page.getName());
@@ -90,33 +92,34 @@ public class EnvironmentWizard extends Wizard {
 		}
 		return true;
 	}
-	
+
+	@Override
 	public boolean performCancel() {
 		this.cancel = true;
-        return true;
-    }
-	
-	/** 
+		return true;
+	}
+
+	/**
 	 * 
 	 * @see org.eclipse.jface.wizard.IWizard#canFinish()
 	 */
+	@Override
 	public boolean canFinish() {
-		
-		AbstractEnvironmentDialogPage page = ((AbstractEnvironmentDialogPage)getStartingPage());
+
+		AbstractEnvironmentDialogPage page = ((AbstractEnvironmentDialogPage) getStartingPage());
 		page.setErrorMessage(null);
 		if (!page.getName().equals(originalKey)) {
 			if (page.getName() != null) {
-				if (!(EnvironmentPlugin.getDefault().getTargetsManager().selectControl(
-						page.getName() ) == null)) {
+				if (!(EnvironmentPlugin.getDefault().getTargetsManager().selectControl(page.getName()) == null)) {
 					page.setErrorMessage(DialogMessages.getString("EnvironmentWizard.1")); //$NON-NLS-1$
 					return false;
-				} 
+				}
 			} else {
 				page.setErrorMessage(DialogMessages.getString("EnvironmentWizard.2")); //$NON-NLS-1$
 				return false;
 			}
 		}
-		
+
 		return page.canFinish();
 	}
 
