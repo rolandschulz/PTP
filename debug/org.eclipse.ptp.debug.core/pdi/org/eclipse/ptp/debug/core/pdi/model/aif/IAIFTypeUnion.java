@@ -38,6 +38,7 @@ public interface IAIFTypeUnion extends IAIFType {
 	 * Returns an array containing the field names of this type
 	 * 
 	 * @return array of field names
+	 * @since 4.0
 	 */
 	public String[] getFieldNames();
 
@@ -45,6 +46,7 @@ public interface IAIFTypeUnion extends IAIFType {
 	 * Returns an array containing the types of each field
 	 * 
 	 * @return array of this type
+	 * @since 4.0
 	 */
 	public IAIFType[] getFieldTypes();
 }

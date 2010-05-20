@@ -24,21 +24,24 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
 
 /**
  * Represents to request setting thread select
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISetThreadSelectRequest extends IPDIEventRequest {
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public IPDIStackFrameDescriptor getStackFrame(TaskSet qTasks) throws PDIException;
-	
+
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public int getThreadId(TaskSet qTasks) throws PDIException;
 }

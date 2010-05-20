@@ -26,15 +26,17 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
  * Represents a request to evaluate an expression
  * 
  * @author clement
- *
+ * 
  */
 public interface IPDIEvaluateExpressionRequest extends IPDIInternalEventRequest {
 	/**
 	 * Get the AIF result of the request
 	 * 
-	 * @param qTasks tasks for which to obtain the result
+	 * @param qTasks
+	 *            tasks for which to obtain the result
 	 * @return an AIF object containing the expression type and value
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public IAIF getAIF(TaskSet qTasks) throws PDIException;
 }

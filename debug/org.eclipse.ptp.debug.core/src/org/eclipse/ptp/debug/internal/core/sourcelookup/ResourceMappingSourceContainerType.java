@@ -27,6 +27,8 @@ import org.w3c.dom.Node;
 
 /**
  * Container type for ResourceMappingSourceContainerType
+ * 
+ * @since 4.0
  */
 public class ResourceMappingSourceContainerType extends AbstractSourceContainerTypeDelegate {
 	private final static String ELEMENT_NAME = "mapEntry"; //$NON-NLS-1$
@@ -34,13 +36,16 @@ public class ResourceMappingSourceContainerType extends AbstractSourceContainerT
 	private final static String PROJECT_NAME = "project"; //$NON-NLS-1$
 	private final static String PROJECT_PATH = "projectPath"; //$NON-NLS-1$
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainerTypeDelegate#createSourceContainer(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainerTypeDelegate#
+	 * createSourceContainer(java.lang.String)
 	 */
 	public ISourceContainer createSourceContainer(String memento) throws CoreException {
 		Node node = parseDocument(memento);
 		if (node.getNodeType() == Node.ELEMENT_NODE) {
-			Element element = (Element)node;
+			Element element = (Element) node;
 			if (ELEMENT_NAME.equals(element.getNodeName())) {
 				String path = element.getAttribute(MAPPING_PATH);
 				IPath remote = new Path(path);
@@ -67,12 +72,16 @@ public class ResourceMappingSourceContainerType extends AbstractSourceContainerT
 		abort(Messages.ResourceMappingSourceContainerType_4, null);
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainerTypeDelegate#getMemento(org.eclipse.debug.core.sourcelookup.ISourceContainer)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.sourcelookup.ISourceContainerTypeDelegate#getMemento
+	 * (org.eclipse.debug.core.sourcelookup.ISourceContainer)
 	 */
 	public String getMemento(ISourceContainer container) throws CoreException {
-		ResourceMappingSourceContainer entry = (ResourceMappingSourceContainer)container;
+		ResourceMappingSourceContainer entry = (ResourceMappingSourceContainer) container;
 		Document document = newDocument();
 		Element element = document.createElement(ELEMENT_NAME);
 		element.setAttribute(MAPPING_PATH, entry.getPath().toOSString());

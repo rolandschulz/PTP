@@ -48,6 +48,7 @@ public interface IAIFTypeArray extends ITypeDerived {
 	 * Returns the array range
 	 * 
 	 * @return array range
+	 * @since 4.0
 	 */
 	public IAIFTypeRange getRange();
 }

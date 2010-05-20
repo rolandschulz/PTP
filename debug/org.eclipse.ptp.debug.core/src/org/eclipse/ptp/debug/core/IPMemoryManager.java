@@ -17,12 +17,13 @@ import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 
 /**
  * @author greg
- *
+ * 
  */
 public interface IPMemoryManager {
 
 	/**
 	 * @param qTasks
+	 * @since 4.0
 	 */
 	public void dispose(TaskSet qTasks);
 
@@ -32,23 +33,27 @@ public interface IPMemoryManager {
 	 * @param length
 	 * @return
 	 * @throws DebugException
+	 * @since 4.0
 	 */
 	public IMemoryBlock getMemoryBlock(TaskSet qTasks, long startAddress, long length) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IMemoryBlockRetrievalExtension getMemoryRetrieval(TaskSet qTasks);
 
 	/**
 	 * @param qTasks
 	 * @param debugTarget
+	 * @since 4.0
 	 */
 	public void initialize(TaskSet qTasks, PDebugTarget debugTarget);
 
 	/**
 	 * @param qTasks
+	 * @since 4.0
 	 */
 	public void save(TaskSet qTasks);
 

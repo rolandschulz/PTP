@@ -7,32 +7,35 @@ import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 
 /**
  * Extend ILaunch to support parallel debug jobs
- *
+ * 
  */
 public interface IPLaunch extends ILaunch {
 	/**
 	 * Get the IPDebugTarget responsible for the processes in procs
 	 * 
-	 * @param tasks TaskSet containing processes we're interested in
+	 * @param tasks
+	 *            TaskSet containing processes we're interested in
 	 * @return IPDebugTarget responsible for processes
+	 * @since 4.0
 	 */
 	public IPDebugTarget getDebugTarget(TaskSet procs);
-	
+
 	/**
 	 * Get the IPDebugTarget responsible for the procId.
 	 * 
-	 * @param procId process we're interested in
+	 * @param procId
+	 *            process we're interested in
 	 * @return IPDebugTarget responsible for procId
 	 */
 	public IPDebugTarget getDebugTarget(int procId);
-	
+
 	/**
 	 * Get the job associated with this launch
 	 * 
 	 * @return IPJob
 	 */
 	public IPJob getPJob();
-	
+
 	/**
 	 * Set the job associated with this launch
 	 * 

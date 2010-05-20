@@ -21,15 +21,26 @@ public class PLaunch extends Launch implements IPLaunch {
 		return pJob;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#setPJob(org.eclipse.ptp.core.elements.IPJob)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.launch.IPLaunch#setPJob(org.eclipse.ptp.core
+	 * .elements.IPJob)
 	 */
 	public void setPJob(IPJob job) {
 		pJob = job;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#getDebugTarget(org.eclipse.ptp.debug.core.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.launch.IPLaunch#getDebugTarget(org.eclipse
+	 * .ptp.debug.core.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPDebugTarget getDebugTarget(TaskSet tasks) {
 		for (final Iterator<?> i = getDebugTargets0().iterator(); i.hasNext();) {
@@ -41,7 +52,9 @@ public class PLaunch extends Launch implements IPLaunch {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.launch.IPLaunch#getDebugTarget(int)
 	 */
 	public IPDebugTarget getDebugTarget(int task_id) {
@@ -54,7 +67,9 @@ public class PLaunch extends Launch implements IPLaunch {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.Launch#isTerminated()
 	 */
 	@Override

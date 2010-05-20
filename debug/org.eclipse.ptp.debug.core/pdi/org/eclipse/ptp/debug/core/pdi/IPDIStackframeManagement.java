@@ -22,24 +22,36 @@ import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
  * Represents stackframe management
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIStackframeManagement {
 	/**
 	 * Lists stack frames with given range of frames
-	 * @param tasks target process
-	 * @param low lower of frame
-	 * @param depth depth of frame
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param low
+	 *            lower of frame
+	 * @param depth
+	 *            depth of frame
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void listStackFrames(TaskSet tasks, int low, int depth) throws PDIException;
-	
+
 	/**
 	 * Sets current stack frame with given level
-	 * @param tasks target process
-	 * @param level level of stack frame
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param level
+	 *            level of stack frame
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void setCurrentStackFrame(TaskSet tasks, int level) throws PDIException;
 }

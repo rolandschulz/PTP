@@ -23,127 +23,196 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
- * Provides the ability to resume a thread.
- * Provides the ability to step into, over, and until from the current execution location.  Implementations must be non-blocking.
- * Provides the ability to step  return from the frame. Implementations must be non-blocking.
+ * Provides the ability to resume a thread. Provides the ability to step into,
+ * over, and until from the current execution location. Implementations must be
+ * non-blocking. Provides the ability to step return from the frame.
+ * Implementations must be non-blocking.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIExecuteManagement {
 	/**
-	 * Causes this target to resume its execution. 
-	 * if passSignal is <code>false</code> and the target was suspended by a signal when resuming the signal will be discarded
-	 * Has no effect on a target that is not suspended.
-	 * @param tasks target process
-	 * @param passSignal whether to discard the signal
-	 * @throws PDIException on failure
+	 * Causes this target to resume its execution. if passSignal is
+	 * <code>false</code> and the target was suspended by a signal when resuming
+	 * the signal will be discarded Has no effect on a target that is not
+	 * suspended.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param passSignal
+	 *            whether to discard the signal
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void resume(TaskSet tasks, boolean passSignal) throws PDIException;
 
 	/**
 	 * Resume execution at location. Note the method does not change stackframe.
-	 * The result is undefined if it jumps outside of the stackframe.
-	 * Can  only be called when the associated target is suspended.
-	 * @param tasks target process
+	 * The result is undefined if it jumps outside of the stackframe. Can only
+	 * be called when the associated target is suspended.
+	 * 
+	 * @param tasks
+	 *            target process
 	 * @param location
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void resume(TaskSet tasks, IPDILocation location) throws PDIException;
 
 	/**
-	 * Resume execution where the program stopped but immediately give the signal.
-	 * @param tasks target process
+	 * Resume execution where the program stopped but immediately give the
+	 * signal.
+	 * 
+	 * @param tasks
+	 *            target process
 	 * @param signal
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void resume(TaskSet tasks, IPDISignal signal) throws PDIException;
 
 	/**
-	 * Steps over the current source line. if count <= 0 it is a loop. Can only be called when the associated target/thread is suspended. 
-	 * @param tasks target process
-	 * @param count as in `step', but do so count times.
-	 * @throws PDIException on failure
+	 * Steps over the current source line. if count <= 0 it is a loop. Can only
+	 * be called when the associated target/thread is suspended.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param count
+	 *            as in `step', but do so count times.
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void stepOver(TaskSet tasks, int count) throws PDIException;
 
 	/**
-	 * Steps over the current machine instruction. Can only be called when the associated target/thread is suspended. if count <= 0 it is a loop.
-	 * @param tasks target process
-	 * @param count as in `stepOverInstruction', but do so count times.
-	 * @throws PDIException on failure
+	 * Steps over the current machine instruction. Can only be called when the
+	 * associated target/thread is suspended. if count <= 0 it is a loop.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param count
+	 *            as in `stepOverInstruction', but do so count times.
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void stepOverInstruction(TaskSet tasks, int count) throws PDIException;
 
 	/**
-	 * Steps into the current source line. Can only be called when the associated target/thread is suspended. if count <= 0 it is a loop.
-	 * @param tasks target process
-	 * @param count as in `step', but do so count times.
-	 * @throws PDIException on failure
+	 * Steps into the current source line. Can only be called when the
+	 * associated target/thread is suspended. if count <= 0 it is a loop.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param count
+	 *            as in `step', but do so count times.
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void stepInto(TaskSet tasks, int count) throws PDIException;
 
 	/**
-	 * Steps into the current machine instruction. Can only be called when the associated target/thread is suspended. if count <= 0 it is a loop.
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * Steps into the current machine instruction. Can only be called when the
+	 * associated target/thread is suspended. if count <= 0 it is a loop.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void stepIntoInstruction(TaskSet tasks, int count) throws PDIException;
 
 	/**
-	 * Continues running until location is reached.
-	 * If the program will be suspended if attempt to exit the current frame.
-	 * Can only be called when the associated target is suspended.
-	 * @param tasks target process
-	 * @param location location
-	 * @throws PDIException on failure
+	 * Continues running until location is reached. If the program will be
+	 * suspended if attempt to exit the current frame. Can only be called when
+	 * the associated target is suspended.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param location
+	 *            location
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException;
-	
+
 	/**
 	 * Continue execution until the frame return.
-	 * @param count as in `step', but do so count times.
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * 
+	 * @param count
+	 *            as in `step', but do so count times.
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void stepReturn(TaskSet tasks, int count) throws PDIException;
 
 	/**
-	 * Cancel execution of the frame and return with value.
-	 * value can be <code>null</code>, if no return value is needed.
-	 * Can only be called when the associated target/thread is suspended.
-	 * @param tasks target process
-	 * @param aif value use as the returning value.
-	 * @throws PDIException on failure
+	 * Cancel execution of the frame and return with value. value can be
+	 * <code>null</code>, if no return value is needed. Can only be called when
+	 * the associated target/thread is suspended.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param aif
+	 *            value use as the returning value.
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void stepReturn(TaskSet tasks, IAIF aif) throws PDIException;
-	
+
 	/**
-	 * Causes this target/thread to suspend its execution. 
-	 * Has no effect on an already suspended thread.
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * Causes this target/thread to suspend its execution. Has no effect on an
+	 * already suspended thread.
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void suspend(TaskSet tasks) throws PDIException;
 
 	/**
 	 * Requests to terminate of specify process
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
-	void terminate(TaskSet tasks) throws PDIException;	
+	void terminate(TaskSet tasks) throws PDIException;
 
 	/**
-	 * TODO not implemented yet in 2.0
-	 * Requests to restart of debugging
+	 * TODO not implemented yet in 2.0 Requests to restart of debugging
+	 * 
 	 * @param tasks
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void restart(TaskSet tasks) throws PDIException;
-	
+
 	/**
 	 * Starts specify process
-	 * @param tasks target process
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void start(TaskSet tasks) throws PDIException;
 }

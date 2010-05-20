@@ -21,34 +21,48 @@ package org.eclipse.ptp.debug.core.pdi;
 import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
- * The memory manager manages the collection of memory blocks specified for the debug session.
+ * The memory manager manages the collection of memory blocks specified for the
+ * debug session.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIMemoryBlockManagement {
 	/**
 	 * Requests to create data read memory
-	 * @param tasks target process
-	 * @param offset 
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param offset
 	 * @param address
-	 * @param wordFormat HEXADECIMAL || OCTAL || BINARY || DECIMAL || RAW || NATURAL
-	 * @param wordSize The size of each memory word in bytes
+	 * @param wordFormat
+	 *            HEXADECIMAL || OCTAL || BINARY || DECIMAL || RAW || NATURAL
+	 * @param wordSize
+	 *            The size of each memory word in bytes
 	 * @param rows
 	 * @param cols
 	 * @param asChar
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
-	void createDataReadMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols, Character asChar) throws PDIException;
-	
+	void createDataReadMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, int rows, int cols,
+			Character asChar) throws PDIException;
+
 	/**
 	 * Requests to create data write memory
-	 * @param tasks target process
+	 * 
+	 * @param tasks
+	 *            target process
 	 * @param offset
 	 * @param address
-	 * @param wordFormat HEXADECIMAL || OCTAL || BINARY || DECIMAL || RAW || NATURAL
+	 * @param wordFormat
+	 *            HEXADECIMAL || OCTAL || BINARY || DECIMAL || RAW || NATURAL
 	 * @param wordSize
 	 * @param value
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	void createDataWriteMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value) throws PDIException;
+	void createDataWriteMemory(TaskSet tasks, long offset, String address, int wordFormat, int wordSize, String value)
+			throws PDIException;
 }

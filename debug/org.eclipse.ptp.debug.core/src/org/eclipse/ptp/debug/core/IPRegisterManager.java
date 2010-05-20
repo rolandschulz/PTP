@@ -20,7 +20,7 @@ import org.eclipse.ptp.debug.internal.core.model.PStackFrame;
 
 /**
  * @author greg
- *
+ * 
  */
 public interface IPRegisterManager {
 
@@ -28,6 +28,7 @@ public interface IPRegisterManager {
 	 * @param qTasks
 	 * @param name
 	 * @param descriptors
+	 * @since 4.0
 	 */
 	public void addRegisterGroup(final TaskSet qTasks, final String name, final IPRegisterDescriptor[] descriptors);
 
@@ -35,12 +36,14 @@ public interface IPRegisterManager {
 	 * @param qTasks
 	 * @return
 	 * @throws DebugException
+	 * @since 4.0
 	 */
 	public IPRegisterDescriptor[] getAllRegisterDescriptors(TaskSet qTasks) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPStackFrame getCurrentFrame(TaskSet qTasks);
 
@@ -49,12 +52,14 @@ public interface IPRegisterManager {
 	 * @param frame
 	 * @return
 	 * @throws DebugException
+	 * @since 4.0
 	 */
 	public IRegisterGroup[] getRegisterGroups(TaskSet qTasks, PStackFrame frame) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @param debugTarget
+	 * @since 4.0
 	 */
 	public void initialize(TaskSet qTasks, PDebugTarget debugTarget);
 
@@ -62,6 +67,7 @@ public interface IPRegisterManager {
 	 * @param qTasks
 	 * @param group
 	 * @param descriptors
+	 * @since 4.0
 	 */
 	public void modifyRegisterGroup(final TaskSet qTasks, final IPPersistableRegisterGroup group,
 			final IPRegisterDescriptor[] descriptors);
@@ -69,16 +75,19 @@ public interface IPRegisterManager {
 	/**
 	 * @param qTasks
 	 * @param groups
+	 * @since 4.0
 	 */
 	public void removeRegisterGroups(final TaskSet qTasks, final IRegisterGroup[] groups);
 
 	/**
 	 * @param qTasks
+	 * @since 4.0
 	 */
 	public void restoreDefaults(final TaskSet qTasks);
 
 	/**
 	 * @param qTasks
+	 * @since 4.0
 	 */
 	public void targetSuspended(TaskSet qTasks);
 

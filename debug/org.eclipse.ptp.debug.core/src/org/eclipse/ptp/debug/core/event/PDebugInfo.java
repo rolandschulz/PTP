@@ -37,6 +37,9 @@ public class PDebugInfo implements IPDebugInfo {
 		this.allUnregTasks = info.getAllUnregisteredTasks();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public PDebugInfo(IPJob job, TaskSet allTasks, TaskSet allRegTasks, TaskSet allUnregTasks) {
 		this.job = job;
 		this.allTasks = allTasks;
@@ -44,28 +47,46 @@ public class PDebugInfo implements IPDebugInfo {
 		this.allUnregTasks = allUnregTasks;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getAllTasks()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public TaskSet getAllTasks() {
 		return allTasks;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getAllRegisteredTasks()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public TaskSet getAllRegisteredTasks() {
 		return allRegTasks;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getAllUnregisteredTasks()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.event.IPDebugInfo#getAllUnregisteredTasks()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public TaskSet getAllUnregisteredTasks() {
 		return allUnregTasks;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.event.IPDebugInfo#getJob()
 	 */
 	public IPJob getJob() {

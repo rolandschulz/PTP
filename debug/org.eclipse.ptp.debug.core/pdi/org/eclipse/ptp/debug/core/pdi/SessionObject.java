@@ -20,30 +20,39 @@ package org.eclipse.ptp.debug.core.pdi;
 
 import org.eclipse.ptp.debug.core.TaskSet;
 
-
 /**
  * @author Clement chu
- *
+ * 
  */
 public class SessionObject implements IPDISessionObject {
 	protected IPDISession session = null;
 	protected TaskSet tasks = null;
 
+	/**
+	 * @since 4.0
+	 */
 	public SessionObject(IPDISession s, TaskSet t) {
 		this.session = s;
 		if (t != null)
 			this.tasks = t.copy();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISessionObject#getSession()
 	 */
 	public IPDISession getSession() {
 		return session;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISet#getTasks()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public TaskSet getTasks() {
 		return tasks;

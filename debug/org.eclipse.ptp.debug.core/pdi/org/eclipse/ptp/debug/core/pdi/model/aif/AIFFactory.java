@@ -114,12 +114,18 @@ public class AIFFactory {
 	public static final char FDS_INT = 'i';
 	public static final char FDS_POINTER = '^';
 	public static final char FDS_STRING = 's';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_AGGREGATE = '{';
 	public static final char FDS_UNION = '(';
 	public static final char FDS_VOID = 'v';
 	public static final char FDS_REFERENCE = '>';
 	public static final char FDS_NAMED = '%';
 	public static final char FDS_ADDRESS = 'a';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_RANGE = 'r';
 
 	public static final char FDS_CHAR_POINTER = 'p';
@@ -128,24 +134,69 @@ public class AIFFactory {
 	public static final int FDS_INTEGER_SIGN_POS = 1;
 	public static final int FDS_INTEGER_SIZE_POS = 2;
 
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_ARRAY_END = ']';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_TYPENAME_END = '|';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_AGGREGATE_FIELD_NAME_END = '=';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_AGGREGATE_FIELD_SEP = ',';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_AGGREGATE_ACCESS_SEP = ';';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_AGGREGATE_END = '}';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_UNION_FIELD_NAME_END = '=';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_UNION_FIELD_SEP = ',';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_UNION_END = ')';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_ENUM_CONST_SEP = ',';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_ENUM_SEP = '=';
 	public static final char FDS_ENUM_END = '>';
 	public static final char FDS_FUNCTION_END = '/';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_FUNCTION_ARG_SEP = ',';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_INTEGER_SIGNED = 's';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_INTEGER_UNSIGNED = 'u';
 	public static final char FDS_REFERENCE_END = '/';
 	public static final char FDS_NAMED_END = '/';
+	/**
+	 * @since 4.0
+	 */
 	public static final char FDS_RANGE_SEP = ',';
 
 	public static final int NO_SIZE = 0;
@@ -254,6 +305,7 @@ public class AIFFactory {
 	 * @param neg
 	 *            allow negative numbers
 	 * @return first character after integer
+	 * @since 4.0
 	 */
 	public static int getFirstNonDigitPos(String format, int start, boolean neg) {
 		int len = format.length();
@@ -273,6 +325,7 @@ public class AIFFactory {
 	 * Get the last type that was successfully parsed.
 	 * 
 	 * @return IAIFType
+	 * @since 4.0
 	 */
 	public static IAIFType getType() {
 		return fLastType;
@@ -301,6 +354,7 @@ public class AIFFactory {
 	 * @param desc
 	 *            description
 	 * @return new IAIF object
+	 * @since 4.0
 	 */
 	public static IAIF newAIF(IAIFType aifType, IAIFValue aifValue, String desc) {
 		return new AIF(aifType, aifValue, desc);
@@ -348,6 +402,7 @@ public class AIFFactory {
 	 * @return remainder of string after removing the complete FDS
 	 * @throws AIFFormatException
 	 *             if the string can't be parsed
+	 * @since 4.0
 	 */
 	public static String parseType(String fmt) throws AIFFormatException {
 		AIFType type;

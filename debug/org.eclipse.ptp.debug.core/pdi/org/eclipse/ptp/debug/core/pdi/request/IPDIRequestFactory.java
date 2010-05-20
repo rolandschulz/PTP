@@ -35,6 +35,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param command
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDICommandRequest getCommandRequest(TaskSet tasks, String command);
 
@@ -49,6 +50,7 @@ public interface IPDIRequestFactory {
 	 * @param cols
 	 * @param asChar
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIDataReadMemoryRequest getDataReadMemoryRequest(IPDISession session, TaskSet tasks, long offset, String address,
 			int wordFormat, int wordSize, int rows, int cols, Character asChar);
@@ -61,6 +63,7 @@ public interface IPDIRequestFactory {
 	 * @param wordSize
 	 * @param value
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIDataWriteMemoryRequest getDataWriteMemoryRequest(TaskSet tasks, long offset, String address, int wordFormat,
 			int wordSize, String value);
@@ -70,6 +73,7 @@ public interface IPDIRequestFactory {
 	 * @param bpt
 	 * @param allowUpdate
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIDeleteBreakpointRequest getDeleteBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt, boolean allowUpdate);
 
@@ -77,6 +81,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param varId
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIDeleteVariableRequest getDeletePartialExpressionRequest(TaskSet tasks, String exprId);
 
@@ -84,6 +89,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param bpt
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIDisableBreakpointRequest getDisableBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt);
 
@@ -91,6 +97,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param bpt
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIEnableBreakpointRequest getEnableBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt);
 
@@ -98,12 +105,14 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param expr
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIEvaluateExpressionRequest getEvaluateExpressionRequest(TaskSet tasks, String expr);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIGetInfoThreadsRequest getGetInfoThreadsRequest(TaskSet tasks);
 
@@ -113,6 +122,7 @@ public interface IPDIRequestFactory {
 	 * @param exprId
 	 * @param listChildren
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIEvaluatePartialExpressionRequest getEvaluatePartialExpressionRequest(TaskSet tasks, String expr, String exprId,
 			boolean listChildren);
@@ -120,6 +130,7 @@ public interface IPDIRequestFactory {
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIGetStackInfoDepthRequest getGetStackInfoDepthRequest(TaskSet tasks);
 
@@ -129,12 +140,14 @@ public interface IPDIRequestFactory {
 	 * @param diff
 	 * @param diff2
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIListArgumentsRequest getListArgumentsRequest(TaskSet tasks, int diff, int diff2);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIListLocalVariablesRequest getListLocalVariablesRequest(TaskSet tasks);
 
@@ -143,6 +156,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param name
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIListSignalsRequest getListSignalsRequest(IPDISession session, TaskSet tasks, String name);
 
@@ -150,6 +164,7 @@ public interface IPDIRequestFactory {
 	 * @param session
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks);
 
@@ -159,6 +174,7 @@ public interface IPDIRequestFactory {
 	 * @param low
 	 * @param high
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks, int low, int high);
 
@@ -166,6 +182,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param passSignal
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIGoRequest getResumeRequest(TaskSet tasks, boolean passSignal);
 
@@ -174,6 +191,7 @@ public interface IPDIRequestFactory {
 	 * @param bpt
 	 * @param allowUpdate
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDISetAddressBreakpointRequest getSetAddressBreakpointRequest(TaskSet tasks, IPDIAddressBreakpoint bpt,
 			boolean allowUpdate);
@@ -182,6 +200,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param level
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDISetCurrentStackFrameRequest getSetCurrentStackFrameRequest(TaskSet tasks, int level);
 
@@ -190,6 +209,7 @@ public interface IPDIRequestFactory {
 	 * @param bpt
 	 * @param allowUpdate
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDISetFunctionBreakpointRequest getSetFunctionBreakpointRequest(TaskSet tasks, IPDIFunctionBreakpoint bpt,
 			boolean allowUpdate);
@@ -199,6 +219,7 @@ public interface IPDIRequestFactory {
 	 * @param bpt
 	 * @param allowUpdate
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDISetLineBreakpointRequest getSetLineBreakpointRequest(TaskSet tasks, IPDILineBreakpoint bpt, boolean allowUpdate);
 
@@ -207,6 +228,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param id
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDISetThreadSelectRequest getSetThreadSelectRequest(IPDISession session, TaskSet tasks, int id);
 
@@ -215,6 +237,7 @@ public interface IPDIRequestFactory {
 	 * @param bpt
 	 * @param allowUpdate
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDISetWatchpointRequest getSetWatchpointRequest(TaskSet tasks, IPDIWatchpoint bpt, boolean allowUpdate);
 
@@ -225,6 +248,7 @@ public interface IPDIRequestFactory {
 	 * @param dir
 	 * @param args
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIStartDebuggerRequest getStartDebuggerRequest(TaskSet tasks, String app, String path, String dir, String[] args);
 
@@ -232,6 +256,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param count
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIStepFinishRequest getStepFinishRequest(TaskSet tasks, int count);
 
@@ -239,6 +264,7 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param count
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIStepIntoRequest getStepIntoRequest(TaskSet tasks, int count);
 
@@ -246,18 +272,21 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param count
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIStepOverRequest getStepOverRequest(TaskSet tasks, int count);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIStopDebuggerRequest getStopDebuggerRequest(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIHaltRequest getSuspendRequest(TaskSet tasks);
 
@@ -265,12 +294,14 @@ public interface IPDIRequestFactory {
 	 * @param tasks
 	 * @param sendEvent
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIHaltRequest getSuspendRequest(TaskSet tasks, boolean sendEvent);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDITerminateRequest getTerminateRequest(TaskSet tasks);
 

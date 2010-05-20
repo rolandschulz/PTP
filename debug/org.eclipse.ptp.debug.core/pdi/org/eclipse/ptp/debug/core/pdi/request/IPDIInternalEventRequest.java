@@ -26,34 +26,37 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * @author clement
- *
+ * 
  */
 public interface IPDIInternalEventRequest extends IPDIEventRequest {
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public Object getResult(TaskSet  qTasks) throws PDIException;
-	
+	public Object getResult(TaskSet qTasks) throws PDIException;
+
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public Map<TaskSet, Object> getResultMap(TaskSet qTasks) throws PDIException;
-	
+
 	/**
 	 * @param qTasks
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void waitUntilCompleted(TaskSet qTasks) throws PDIException;
-	
+
 	/**
 	 * @param qTasks
 	 * @param monitor
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public void waitUntilCompleted(TaskSet qTasks, IProgressMonitor monitor) throws PDIException;
 }
-

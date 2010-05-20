@@ -26,74 +26,118 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 
 /**
- * Represents breakpoint action management. Each methods send to debugger and replied by event.
+ * Represents breakpoint action management. Each methods send to debugger and
+ * replied by event.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIBreakpointManagement {
 	/**
 	 * Requests to set a line breakpoint of specify process
-	 * @param tasks target process 
-	 * @param bpt line breakpoint to be set
- 	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpt
+	 *            line breakpoint to be set
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void setLineBreakpoint(TaskSet tasks, IPDILineBreakpoint bpt) throws PDIException;
-	
+
 	/**
 	 * Requests to set a function breakpoint of specify process
-	 * @param tasks target process
-	 * @param bpt function breakpoint to be set
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpt
+	 *            function breakpoint to be set
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void setFunctionBreakpoint(TaskSet tasks, IPDIFunctionBreakpoint bpt) throws PDIException;
-	
+
 	/**
 	 * Requests to set a address breakpoint of specify process
-	 * @param tasks target process
-	 * @param bpt address breakpoint to be set
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpt
+	 *            address breakpoint to be set
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void setAddressBreakpoint(TaskSet tasks, IPDIAddressBreakpoint bpt) throws PDIException;
 
 	/**
 	 * Requests to set a watchpoint of specify process
-	 * @param tasks target process
-	 * @param bpt watchpoint to be set
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpt
+	 *            watchpoint to be set
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void setWatchpoint(TaskSet tasks, IPDIWatchpoint bpt) throws PDIException;
-	
+
 	/**
 	 * Requests to set an exceptionpoint of specify process
-	 * @param tasks target process
-	 * @param bpt an exceptionpoint to be set
-	 * @throws PDIException failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpt
+	 *            an exceptionpoint to be set
+	 * @throws PDIException
+	 *             failure
+	 * @since 4.0
 	 */
 	void setExceptionpoint(TaskSet tasks, IPDIExceptionpoint bpt) throws PDIException;
-	
+
 	/**
 	 * Requests to delete a given breakpoint of specify process
-	 * @param tasks target process
-	 * @param bpid breakpoint id to be deleted
-	 * @throws PDIException on failure
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpid
+	 *            breakpoint id to be deleted
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void deleteBreakpoint(TaskSet tasks, int bpid) throws PDIException;
-	
+
 	/**
-	 * Requests to set enable / disable a given breakpoint of specify process  
-	 * @param tasks target process
-	 * @param bpid breakpoint id to be enabled / disabled
-	 * @param enabled true if enable
-	 * @throws PDIException on failure
+	 * Requests to set enable / disable a given breakpoint of specify process
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpid
+	 *            breakpoint id to be enabled / disabled
+	 * @param enabled
+	 *            true if enable
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void setEnabledBreakpoint(TaskSet tasks, int bpid, boolean enabled) throws PDIException;
-	
+
 	/**
-	 * Requests to set condition on given breakpoint of specify process 
-	 * @param tasks target process
-	 * @param bpid breakpoint id to be set condition 
-	 * @param condition condition rule
-	 * @throws PDIException on failure
+	 * Requests to set condition on given breakpoint of specify process
+	 * 
+	 * @param tasks
+	 *            target process
+	 * @param bpid
+	 *            breakpoint id to be set condition
+	 * @param condition
+	 *            condition rule
+	 * @throws PDIException
+	 *             on failure
+	 * @since 4.0
 	 */
 	void setConditionBreakpoint(TaskSet tasks, int bpid, String condition) throws PDIException;
 }

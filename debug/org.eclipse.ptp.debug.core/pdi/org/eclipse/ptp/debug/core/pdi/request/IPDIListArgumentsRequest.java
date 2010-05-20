@@ -23,14 +23,16 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents to request a list of arguments
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIListArgumentsRequest extends IPDIEventRequest {
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public String[] getArguments(TaskSet tasks) throws PDIException;
 

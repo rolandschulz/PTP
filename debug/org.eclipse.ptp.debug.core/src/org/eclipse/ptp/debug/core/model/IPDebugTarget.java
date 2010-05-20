@@ -80,6 +80,7 @@ public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IR
 
 	/**
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getTasks();
 

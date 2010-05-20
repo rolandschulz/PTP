@@ -25,9 +25,20 @@ import org.eclipse.ptp.debug.core.TaskSet;
  * @author Clement
  */
 public interface IPDebugInfo {
-	IPJob getJob();
-	TaskSet getAllTasks();
-	TaskSet getAllRegisteredTasks();
-	TaskSet getAllUnregisteredTasks();
-}
+	public IPJob getJob();
 
+	/**
+	 * @since 4.0
+	 */
+	public TaskSet getAllTasks();
+
+	/**
+	 * @since 4.0
+	 */
+	public TaskSet getAllRegisteredTasks();
+
+	/**
+	 * @since 4.0
+	 */
+	public TaskSet getAllUnregisteredTasks();
+}

@@ -19,7 +19,6 @@ import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
 
-
 public interface IPDIModelFactory {
 	/**
 	 * @param session
@@ -29,19 +28,19 @@ public interface IPDIModelFactory {
 	 * @param condition
 	 * @param enabled
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIAddressBreakpoint newAddressBreakpoint(IPDISession session, TaskSet tasks, int type, 
-			IPDILocation location, IPDICondition condition, boolean enabled);
-	
+	public IPDIAddressBreakpoint newAddressBreakpoint(IPDISession session, TaskSet tasks, int type, IPDILocation location,
+			IPDICondition condition, boolean enabled);
+
 	/**
 	 * @param session
 	 * @param argDesc
 	 * @param varId
 	 * @return
 	 */
-	public IPDIArgument newArgument(IPDISession session,
-			IPDIArgumentDescriptor argDesc, String varId);
-	
+	public IPDIArgument newArgument(IPDISession session, IPDIArgumentDescriptor argDesc, String varId);
+
 	/**
 	 * @param session
 	 * @param tasks
@@ -52,10 +51,10 @@ public interface IPDIModelFactory {
 	 * @param pos
 	 * @param depth
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIArgumentDescriptor newArgumentDescriptor(IPDISession session,
-			TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name,
-			String fullName, int pos, int depth);
+	public IPDIArgumentDescriptor newArgumentDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread,
+			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
 	 * @param ignore
@@ -75,18 +74,20 @@ public interface IPDIModelFactory {
 	 * @param enabled
 	 * @param funcBpts
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIExceptionpoint newExceptionpoint(IPDISession session, TaskSet tasks, String clazz, boolean stopOnThrow, 
+	public IPDIExceptionpoint newExceptionpoint(IPDISession session, TaskSet tasks, String clazz, boolean stopOnThrow,
 			boolean stopOnCatch, IPDICondition condition, boolean enabled, IPDIFunctionBreakpoint[] funcBpts);
-	
+
 	/**
 	 * @param session
 	 * @param tasks
 	 * @param ex
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDITargetExpression newExpression(IPDISession session, TaskSet tasks, String ex);
-	
+
 	/**
 	 * @param session
 	 * @param tasks
@@ -95,68 +96,18 @@ public interface IPDIModelFactory {
 	 * @param condition
 	 * @param enabled
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIFunctionBreakpoint newFunctionBreakpoint(IPDISession session, TaskSet tasks, int type, 
-			IPDILocation location, IPDICondition condition, boolean enabled);
-	
+	public IPDIFunctionBreakpoint newFunctionBreakpoint(IPDISession session, TaskSet tasks, int type, IPDILocation location,
+			IPDICondition condition, boolean enabled);
+
 	/**
 	 * @param session
 	 * @param varDesc
 	 * @param varId
 	 * @return
 	 */
-	public IPDIGlobalVariable newGlobalVariable(IPDISession session,
-			IPDIGlobalVariableDescriptor varDesc, String varId);
-	
-	/**
-	 * @param session
-	 * @param tasks
-	 * @param thread
-	 * @param frame
-	 * @param name
-	 * @param fullName
-	 * @param pos
-	 * @param depth
-	 * @return
-	 */
-	public IPDIGlobalVariableDescriptor newGlobalVariableDescriptor(
-			IPDISession session, TaskSet tasks, IPDIThread thread,
-			IPDIStackFrame frame, String name, String fullName, int pos,
-			int depth);
-	
-	/**
-	 * @param session
-	 * @param tasks
-	 * @param type
-	 * @param location
-	 * @param condition
-	 * @param enabled
-	 * @return
-	 */
-	public IPDILineBreakpoint newLineBreakpoint(IPDISession session, TaskSet tasks, int type, 
-			IPDILocation location, IPDICondition condition, boolean enabled);
-	
-	/**
-	 * @param session
-	 * @param tasks
-	 * @param thread
-	 * @param frame
-	 * @param name
-	 * @param fullName
-	 * @param pos
-	 * @param depth
-	 * @param varId
-	 */
-	public IPDILocalVariable newLocalVariable(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name, String fullName, int pos, int depth, String varid);
-	
-	/**
-	 * @param session
-	 * @param varDesc
-	 * @param varId
-	 * @return
-	 */
-	public IPDILocalVariable newLocalVariable(IPDISession session,
-			IPDILocalVariableDescriptor varDesc, String varId);
+	public IPDIGlobalVariable newGlobalVariable(IPDISession session, IPDIGlobalVariableDescriptor varDesc, String varId);
 
 	/**
 	 * @param session
@@ -168,10 +119,61 @@ public interface IPDIModelFactory {
 	 * @param pos
 	 * @param depth
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDILocalVariableDescriptor newLocalVariableDescriptor(IPDISession session,
-			TaskSet tasks, IPDIThread thread, IPDIStackFrame frame, String name,
-			String fullName, int pos, int depth);
+	public IPDIGlobalVariableDescriptor newGlobalVariableDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread,
+			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
+
+	/**
+	 * @param session
+	 * @param tasks
+	 * @param type
+	 * @param location
+	 * @param condition
+	 * @param enabled
+	 * @return
+	 * @since 4.0
+	 */
+	public IPDILineBreakpoint newLineBreakpoint(IPDISession session, TaskSet tasks, int type, IPDILocation location,
+			IPDICondition condition, boolean enabled);
+
+	/**
+	 * @param session
+	 * @param tasks
+	 * @param thread
+	 * @param frame
+	 * @param name
+	 * @param fullName
+	 * @param pos
+	 * @param depth
+	 * @param varId
+	 * @since 4.0
+	 */
+	public IPDILocalVariable newLocalVariable(IPDISession session, TaskSet tasks, IPDIThread thread, IPDIStackFrame frame,
+			String name, String fullName, int pos, int depth, String varid);
+
+	/**
+	 * @param session
+	 * @param varDesc
+	 * @param varId
+	 * @return
+	 */
+	public IPDILocalVariable newLocalVariable(IPDISession session, IPDILocalVariableDescriptor varDesc, String varId);
+
+	/**
+	 * @param session
+	 * @param tasks
+	 * @param thread
+	 * @param frame
+	 * @param name
+	 * @param fullName
+	 * @param pos
+	 * @param depth
+	 * @return
+	 * @since 4.0
+	 */
+	public IPDILocalVariableDescriptor newLocalVariableDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread,
+			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
 	 * @param address
@@ -189,9 +191,10 @@ public interface IPDIModelFactory {
 	 * @param b
 	 * @param info
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIMemoryBlock newMemoryBlock(IPDISession session, TaskSet tasks,
-			String exp, int wordSize, boolean b, IPDIDataReadMemoryInfo info);
+	public IPDIMemoryBlock newMemoryBlock(IPDISession session, TaskSet tasks, String exp, int wordSize, boolean b,
+			IPDIDataReadMemoryInfo info);
 
 	/**
 	 * @param session
@@ -199,6 +202,7 @@ public interface IPDIModelFactory {
 	 * @param ex
 	 * @param enabled
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDIMultiExpressions newMultiExpressions(IPDISession session, TaskSet tasks, String ex, boolean enabled);
 
@@ -212,19 +216,19 @@ public interface IPDIModelFactory {
 	 * @param pos
 	 * @param depth
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIVariableDescriptor newRegisterDescriptor(IPDISession session,
-			TaskSet tasks, IPDIThread thread, IPDIStackFrame frame,
-			String name, String fullName, int pos, int depth);
+	public IPDIVariableDescriptor newRegisterDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread,
+			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
 	 * @param session
 	 * @param tasks
 	 * @param signalDescriptor
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDISignal newSignal(IPDISession session, TaskSet tasks, IPDISignalDescriptor signalDescriptor);
-
 
 	/**
 	 * @param name
@@ -234,8 +238,7 @@ public interface IPDIModelFactory {
 	 * @param description
 	 * @return
 	 */
-	public IPDISignalDescriptor newSignalDescriptor(String name, boolean stop,
-			boolean pass, boolean print, String description);
+	public IPDISignalDescriptor newSignalDescriptor(String name, boolean stop, boolean pass, boolean print, String description);
 
 	/**
 	 * @param session
@@ -257,8 +260,8 @@ public interface IPDIModelFactory {
 	 * @param args
 	 * @return
 	 */
-	public IPDIStackFrame newStackFrame(IPDISession session, IPDIThread thread, int level, String file, String func, 
-			int line, BigInteger addr);
+	public IPDIStackFrame newStackFrame(IPDISession session, IPDIThread thread, int level, String file, String func, int line,
+			BigInteger addr);
 
 	/**
 	 * @param level
@@ -271,6 +274,7 @@ public interface IPDIModelFactory {
 	 * @param session
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public IPDITarget newTarget(IPDISession session, TaskSet tasks);
 
@@ -292,11 +296,10 @@ public interface IPDIModelFactory {
 	 * @param pos
 	 * @param depth
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIVariableDescriptor newThreadStorageDescriptor(
-			IPDISession session, TaskSet tasks, IPDIThread thread,
-			IPDIStackFrame frame, String name, String fullName, int pos,
-			int depth);
+	public IPDIVariableDescriptor newThreadStorageDescriptor(IPDISession session, TaskSet tasks, IPDIThread thread,
+			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
 	 * @param session
@@ -307,7 +310,8 @@ public interface IPDIModelFactory {
 	 * @param condition
 	 * @param enabled
 	 * @return
+	 * @since 4.0
 	 */
-	public IPDIWatchpoint newWatchpoint(IPDISession session, TaskSet tasks, int type, String expression, 
-			int wType, IPDICondition condition, boolean enabled);
+	public IPDIWatchpoint newWatchpoint(IPDISession session, TaskSet tasks, int type, String expression, int wType,
+			IPDICondition condition, boolean enabled);
 }

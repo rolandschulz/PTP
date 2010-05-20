@@ -29,6 +29,7 @@ public interface IAIFValueEnum extends IValueIntegral {
 	 * Get the integer value of this enum
 	 * 
 	 * @return enum value
+	 * @since 4.0
 	 */
 	public int intValue();
 }

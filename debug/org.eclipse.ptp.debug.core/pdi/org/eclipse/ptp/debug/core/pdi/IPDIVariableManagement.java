@@ -36,6 +36,7 @@ public interface IPDIVariableManagement {
 	 *            ID of partial expression to delete
 	 * @throws PDIException
 	 *             on failure
+	 * @since 4.0
 	 */
 	public void deletePartialExpression(TaskSet tasks, String exprId) throws PDIException;
 
@@ -48,6 +49,7 @@ public interface IPDIVariableManagement {
 	 *            expression to evaluate
 	 * @throws PDIException
 	 *             on failure
+	 * @since 4.0
 	 */
 	public void evaluateExpression(TaskSet tasks, String expr) throws PDIException;
 
@@ -66,6 +68,7 @@ public interface IPDIVariableManagement {
 	 *            is expression?
 	 * @throws PDIException
 	 *             on failure
+	 * @since 4.0
 	 */
 	public void evaluatePartialExpression(TaskSet tasks, String expr, String exprId, boolean listChildren, boolean express)
 			throws PDIException;
@@ -81,6 +84,7 @@ public interface IPDIVariableManagement {
 	 *            maximum level
 	 * @throws PDIException
 	 *             failure
+	 * @since 4.0
 	 */
 	public void listArguments(TaskSet tasks, int low, int high) throws PDIException;
 
@@ -91,6 +95,7 @@ public interface IPDIVariableManagement {
 	 *            target process
 	 * @throws PDIException
 	 *             on failure
+	 * @since 4.0
 	 */
 	public void listGlobalVariables(TaskSet tasks) throws PDIException;
 
@@ -101,6 +106,7 @@ public interface IPDIVariableManagement {
 	 *            target process
 	 * @throws PDIException
 	 *             on failure
+	 * @since 4.0
 	 */
 	public void listLocalVariables(TaskSet tasks) throws PDIException;
 
@@ -113,6 +119,7 @@ public interface IPDIVariableManagement {
 	 *            variable name
 	 * @throws PDIException
 	 *             on failure
+	 * @since 4.0
 	 */
 	public void retrieveVariableType(TaskSet tasks, String var) throws PDIException;
 }
