@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.cdt.ui.IFunctionSummary;
 import org.eclipse.cdt.ui.IFunctionSummary.IFunctionPrototypeSummary;
 import org.eclipse.ptp.pldt.common.editorHelp.CHelpBookImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionPrototypeSummaryImpl;
@@ -48,8 +49,8 @@ public class OpenMPCHelpBook extends CHelpBookImpl {
 	 * files by the main() and generateHTML() methods below.
 	 * @return hashmap of the function names and associated info
 	 */
-	private static Map makeFunctionMap() {
-		Map funcMap= new HashMap();
+	private static Map<String, IFunctionSummary> makeFunctionMap() {
+		Map<String, IFunctionSummary> funcMap= new HashMap<String, IFunctionSummary>();
 		funcMap.put("omp_set_num_threads", //$NON-NLS-1$
 						new FunctionSummaryImpl("omp_set_num_threads","", //$NON-NLS-1$ //$NON-NLS-2$
 								Messages.OpenMPCHelpBook_set_num_threads,
