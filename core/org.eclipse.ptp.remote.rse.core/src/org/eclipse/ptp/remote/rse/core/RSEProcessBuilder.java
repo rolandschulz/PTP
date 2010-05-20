@@ -11,21 +11,13 @@
 package org.eclipse.ptp.remote.rse.core;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -44,6 +36,9 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 
 	private Map<String, String> fRemoteEnv = new HashMap<String, String>();
 
+	/**
+	 * @since 4.0
+	 */
 	public RSEProcessBuilder(IRemoteConnection conn, IRemoteFileManager fileMgr, List<String> command) {
 		super(conn, command);
 		fConnection = (RSEConnection) conn;
@@ -51,6 +46,9 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		fRemoteEnv = conn.getEnv();
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public RSEProcessBuilder(IRemoteConnection conn, IRemoteFileManager fileMgr, String... command) {
 		this(conn, fileMgr, Arrays.asList(command));
 	}
@@ -158,49 +156,6 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 
 		}
 		return super.directory();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getHomeDirectory
-	 * ()
-	 */
-	public IFileStore getHomeDirectory() {
-		// determine the home directory using environment variables
-		Map<String, String> envMap = environment();
-
-		// check HOME first for UNIX systems
-		String homeDir = envMap.get("HOME");
-		if (homeDir == null) {
-			homeDir = ""; //$NON-NLS-1$
-		}
-
-		// if that didn't work, try %USERPROFILE% for Windows systems
-		if (homeDir == null) {
-			homeDir = envMap.get("USERPROFILE");
-			IPath homePath = new Path(homeDir);
-			homeDir = "/" + homePath.toString();
-		}
-
-		if (homeDir != null) {
-			URI uri = null;
-			try {
-				uri = new URI("rse", fConnection.getHost().getHostName(), homeDir, null);
-			} catch (URISyntaxException e) {
-				RSEAdapterCorePlugin.getDefault().getLog()
-						.log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
-			}
-			try {
-				return EFS.getStore(uri);
-			} catch (CoreException e) {
-				RSEAdapterCorePlugin.getDefault().getLog()
-						.log(new Status(IStatus.ERROR, RSEAdapterCorePlugin.PLUGIN_ID, e.getMessage()));
-			}
-		}
-
-		return null;
 	}
 
 }
