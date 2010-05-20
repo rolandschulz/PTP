@@ -26,11 +26,11 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterGroup;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 
-
 /**
  * Represent register manager to manage register
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRegisterManager extends IPDIManager {
 	/**
@@ -39,7 +39,7 @@ public interface IPDIRegisterManager extends IPDIManager {
 	 * @throws PDIException
 	 */
 	public IPDIRegister createRegister(IPDIRegisterDescriptor regDesc) throws PDIException;
-	
+
 	/**
 	 * @param register
 	 * @param frame
@@ -48,16 +48,17 @@ public interface IPDIRegisterManager extends IPDIManager {
 	 * @throws PDIException
 	 */
 	public IPDIVariable createShadowRegister(IPDIRegister register, IPDIStackFrame frame, String regName) throws PDIException;
-	
+
 	/**
 	 * @param reg
 	 */
 	public void destroyRegister(IPDIRegister reg);
-	
+
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public IPDIRegisterGroup[] getRegisterGroups(TaskSet qTasks) throws PDIException;
 }

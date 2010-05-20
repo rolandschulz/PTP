@@ -25,43 +25,59 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
-
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractEvaluateExpressionRequest extends AbstractEventResultRequest implements IPDIEvaluateExpressionRequest {
-	private String expr;
-	
+	private final String expr;
+
+	/**
+	 * @since 4.0
+	 */
 	public AbstractEvaluateExpressionRequest(TaskSet tasks, String expr) {
 		super(tasks);
 		this.expr = expr;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.evaluateExpression(tasks, expr);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIDataEvaluateExpressionRequest#getAIF(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIDataEvaluateExpressionRequest
+	 * #getAIF(org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IAIF getAIF(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof IAIF) {
-			return (IAIF)obj;
+			return (IAIF) obj;
 		}
 		throw new PDIException(qTasks, NLS.bind(Messages.AbstractEvaluateExpressionRequest_0, expr));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
 		return Messages.AbstractEvaluateExpressionRequest_1;
 	}
-	
+
 }

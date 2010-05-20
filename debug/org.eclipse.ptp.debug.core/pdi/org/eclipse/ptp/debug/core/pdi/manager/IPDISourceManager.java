@@ -17,8 +17,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public String getDetailTypeName(IPDITarget target, String typename)
-			throws PDIException;
+	public String getDetailTypeName(IPDITarget target, String typename) throws PDIException;
 
 	/**
 	 * @param frame
@@ -26,8 +25,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public String getDetailTypeNameFromVariable(IPDIStackFrame frame,
-			String variable) throws PDIException;
+	public String getDetailTypeNameFromVariable(IPDIStackFrame frame, String variable) throws PDIException;
 
 	/**
 	 * @param qTasks
@@ -35,9 +33,9 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @param end
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public IPDIInstruction[] getInstructions(TaskSet qTasks, BigInteger start,
-			BigInteger end) throws PDIException;
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, BigInteger start, BigInteger end) throws PDIException;
 
 	/**
 	 * @param qTasks
@@ -45,9 +43,9 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @param linenum
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename,
-			int linenum) throws PDIException;
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename, int linenum) throws PDIException;
 
 	/**
 	 * @param qTasks
@@ -56,9 +54,9 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @param lines
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename,
-			int linenum, int lines) throws PDIException;
+	public IPDIInstruction[] getInstructions(TaskSet qTasks, String filename, int linenum, int lines) throws PDIException;
 
 	/**
 	 * @param qTasks
@@ -66,9 +64,9 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @param end
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
-			BigInteger start, BigInteger end) throws PDIException;
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks, BigInteger start, BigInteger end) throws PDIException;
 
 	/**
 	 * @param qTasks
@@ -76,9 +74,9 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @param linenum
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
-			String filename, int linenum) throws PDIException;
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks, String filename, int linenum) throws PDIException;
 
 	/**
 	 * @param qTasks
@@ -87,14 +85,15 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @param lines
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks,
-			String filename, int linenum, int lines) throws PDIException;
+	public IPDIMixedInstruction[] getMixedInstructions(TaskSet qTasks, String filename, int linenum, int lines) throws PDIException;
 
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public String[] getSourcePaths(TaskSet qTasks) throws PDIException;
 
@@ -104,8 +103,7 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public String getTypeName(IPDITarget target, String variable)
-			throws PDIException;
+	public String getTypeName(IPDITarget target, String variable) throws PDIException;
 
 	/**
 	 * @param frame
@@ -113,15 +111,14 @@ public interface IPDISourceManager extends IPDIManager {
 	 * @return
 	 * @throws PDIException
 	 */
-	public String getTypeNameFromVariable(IPDIStackFrame frame, String variable)
-			throws PDIException;
+	public String getTypeNameFromVariable(IPDIStackFrame frame, String variable) throws PDIException;
 
 	/**
 	 * @param qTasks
 	 * @param dirs
 	 * @throws PDIException
+	 * @since 4.0
 	 */
-	public void setSourcePaths(TaskSet qTasks, String[] dirs)
-			throws PDIException;
+	public void setSourcePaths(TaskSet qTasks, String[] dirs) throws PDIException;
 
 }

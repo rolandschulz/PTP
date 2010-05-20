@@ -24,14 +24,16 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
 
 /**
  * Represents to request a list of stackframes
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIListStackFramesRequest extends IPDIInternalEventRequest {
 	/**
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
+	 * @since 4.0
 	 */
 	public IPDIStackFrameDescriptor[] getStackFrames(TaskSet qTasks) throws PDIException;
 }

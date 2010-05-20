@@ -15,22 +15,25 @@ import java.util.Map;
 
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
-
-
-public interface IRemoteConnectionManager {	
+public interface IRemoteConnectionManager {
 	/**
 	 * Gets the remote connection corresponding to the supplied name.
 	 * 
-	 * @param name name of the connection (as returned by {@link IRemoteConnection#getName()})
+	 * @param name
+	 *            name of the connection (as returned by
+	 *            {@link IRemoteConnection#getName()})
 	 * @return remote connection or null if no connection exists
 	 */
 	public IRemoteConnection getConnection(String name);
-	
+
 	/**
 	 * Gets the remote connection corresponding to the supplied URI.
 	 * 
-	 * @param uri URI containing a schema for this remote connection
-	 * @return remote connection or null if no connection exists or the schema is incorrect
+	 * @param uri
+	 *            URI containing a schema for this remote connection
+	 * @return remote connection or null if no connection exists or the schema
+	 *         is incorrect
+	 * @since 4.0
 	 */
 	public IRemoteConnection getConnection(URI uri);
 
@@ -40,21 +43,25 @@ public interface IRemoteConnectionManager {
 	 * @return connections that we know about
 	 */
 	public IRemoteConnection[] getConnections();
-	
+
 	/**
-	 * Creates a remote connection using the supplied attributes. The attributes are specific
-	 * to the remote service provider and can be obtained using {@link IRemoteConnection#getAttributes()}.
+	 * Creates a remote connection using the supplied attributes. The attributes
+	 * are specific to the remote service provider and can be obtained using
+	 * {@link IRemoteConnection#getAttributes()}.
 	 * 
-	 * @param name name of the connection
-	 * @param attributes map containing attributes used to create the connection
+	 * @param name
+	 *            name of the connection
+	 * @param attributes
+	 *            map containing attributes used to create the connection
 	 * @return a new connection or null if the creation failed for some reason
 	 */
 	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException;
-	
+
 	/**
 	 * Remove a connection and all resources associated with it.
 	 * 
-	 * @param connection connection to remove
+	 * @param connection
+	 *            connection to remove
 	 */
 	public void removeConnection(IRemoteConnection connection);
 }

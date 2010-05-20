@@ -16,27 +16,27 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
+/**
+ * @since 4.0
+ */
 public class ProcessOutput {
 	private boolean lastOutputEndedInLineFeed = true;
 	private final BitSet previousOutputProcesses = new BitSet();
 	private String outputDirPath = null;
 	private final OutputTextFile outputFile;
 	private int storeLines = 0;
-	
+
 	public ProcessOutput(IPJob job) {
-		
+
 		setOutputStore();
-		
+
 		/*
 		 * Derive a unique name for the output file
 		 */
-		String name = job.getQueue().getResourceManager().getName()
-		+ "_" + job.getQueue().getName() //$NON-NLS-1$
-		+ "_" + job.getName() ; //$NON-NLS-1$
+		String name = job.getQueue().getResourceManager().getName() + "_" + job.getQueue().getName() //$NON-NLS-1$
+				+ "_" + job.getName(); //$NON-NLS-1$
 
-		outputFile = new OutputTextFile(name, 
-				ProcessAttributes.getStdoutAttributeDefinition().getId(), 
-				outputDirPath, storeLines);
+		outputFile = new OutputTextFile(name, ProcessAttributes.getStdoutAttributeDefinition().getId(), outputDirPath, storeLines);
 
 	}
 
@@ -51,14 +51,14 @@ public class ProcessOutput {
 		if (output.length() == 0) {
 			return;
 		}
-		
+
 		final StringBuilder prefix = new StringBuilder("[");
 		for (Integer rank : new BitSetIterable(processJobRanks)) {
 			prefix.append(rank + ",");
 		}
-		prefix.deleteCharAt(prefix.length()-1);
+		prefix.deleteCharAt(prefix.length() - 1);
 		prefix.append("] ");
-		
+
 		final List<String> lines = Arrays.asList(output.split("\n"));
 		final StringBuilder prefixedOutput = new StringBuilder();
 
@@ -68,28 +68,27 @@ public class ProcessOutput {
 		// then don't start a new line if the same processes
 		// are writing again, otherwise terminate the last
 		// output by starting with a linefeed
-		
+
 		if (!lastOutputEndedInLineFeed) {
 			if (previousOutputProcesses.equals(processJobRanks)) {
-				String firstLine = lineIter.next(); 
+				String firstLine = lineIter.next();
 				prefixedOutput.append(firstLine + "\n");
-			}
-			else {
+			} else {
 				prefixedOutput.append("\n");
 			}
 		}
-		
+
 		while (lineIter.hasNext()) {
 			String line = lineIter.next();
 			prefixedOutput.append(prefix.toString() + line + "\n");
 		}
-		
+
 		// if the output doesn't end with a linefeed
 		// delete the last linefeed of the prefixed output
 		if (!output.endsWith("\n")) {
-			prefixedOutput.deleteCharAt(prefixedOutput.length()-1);
+			prefixedOutput.deleteCharAt(prefixedOutput.length() - 1);
 		}
-		
+
 		// write the prefixed output to the file
 		outputFile.write(prefixedOutput.toString());
 
@@ -101,7 +100,7 @@ public class ProcessOutput {
 	public void delete() {
 		outputFile.delete();
 	}
-	
+
 	public String getSavedOutput(int jobRank) {
 		final String savedOutput = outputFile.getContents();
 		String[] jobLines = savedOutput.split("\n");
@@ -127,7 +126,8 @@ public class ProcessOutput {
 		outputDirPath = preferences.getString(PreferenceConstants.PREFS_OUTPUT_DIR);
 		storeLines = preferences.getInt(PreferenceConstants.PREFS_STORE_LINES);
 		if (outputDirPath == null || outputDirPath.length() == 0) {
-			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME).toOSString();
+			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation()
+					.append(PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME).toOSString();
 		}
 		if (storeLines == 0) {
 			storeLines = PreferenceConstants.DEFAULT_STORE_LINES;

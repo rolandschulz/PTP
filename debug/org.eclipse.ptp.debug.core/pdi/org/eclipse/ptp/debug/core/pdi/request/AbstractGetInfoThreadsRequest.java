@@ -23,38 +23,54 @@ import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
-
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractGetInfoThreadsRequest extends AbstractEventResultRequest implements IPDIGetInfoThreadsRequest {
+	/**
+	 * @since 4.0
+	 */
 	public AbstractGetInfoThreadsRequest(TaskSet tasks) {
 		super(tasks);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.listInfoThreads(tasks);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {
 		return Messages.AbstractGetInfoThreadsRequest_0;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetInfoThreadsRequest#getThreadIds(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIGetInfoThreadsRequest#getThreadIds
+	 * (org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public String[] getThreadIds(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof String[]) {
-			return (String[])obj;
+			return (String[]) obj;
 		}
 		throw new PDIException(qTasks, Messages.AbstractGetInfoThreadsRequest_1);
 	}

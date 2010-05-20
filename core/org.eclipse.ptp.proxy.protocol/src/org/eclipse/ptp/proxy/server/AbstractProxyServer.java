@@ -34,20 +34,27 @@ public abstract class AbstractProxyServer implements IProxyServer {
 
 	public static final int MAX_ERRORS = 5;
 
+	/**
+	 * @since 4.0
+	 */
 	protected ServerState state = ServerState.INIT;
 
-	private String sessHost;
-	private int sessPort;
+	private final String sessHost;
+	private final int sessPort;
 	// private Socket sessSocket;
+	/**
+	 * @since 4.0
+	 */
 	protected ReadableByteChannel sessInput;
+	/**
+	 * @since 4.0
+	 */
 	protected WritableByteChannel sessOutput;
-	private IProxyCommandFactory proxyCommandFactory;
+	private final IProxyCommandFactory proxyCommandFactory;
 	private Thread commandThread;
-	private List<IProxyCommandListener> listeners = Collections
-			.synchronizedList(new ArrayList<IProxyCommandListener>());
+	private final List<IProxyCommandListener> listeners = Collections.synchronizedList(new ArrayList<IProxyCommandListener>());
 
-	public AbstractProxyServer(String host, int port,
-			IProxyCommandFactory factory) {
+	public AbstractProxyServer(String host, int port, IProxyCommandFactory factory) {
 		this.sessHost = host;
 		this.sessPort = port;
 		this.proxyCommandFactory = factory;
@@ -79,6 +86,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	 * Send command to command handlers
 	 * 
 	 * @param cmd
+	 * @since 4.0
 	 */
 	protected void fireProxyCommand(IProxyCommand cmd) {
 		System.out.println("fireProxyCommand: " + cmd.getCommandID()); //$NON-NLS-1$
@@ -98,8 +106,10 @@ public abstract class AbstractProxyServer implements IProxyServer {
 		listeners.remove(listener);
 	}
 
-	protected abstract void runStateMachine() throws InterruptedException,
-			IOException;
+	/**
+	 * @since 4.0
+	 */
+	protected abstract void runStateMachine() throws InterruptedException, IOException;
 
 	/**
 	 * Process commands from the wire
@@ -114,8 +124,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 			System.out.println("false"); //$NON-NLS-1$
 			return false;
 		}
-		System.out.println(packet.getID()
-				+ "," + packet.getTransID() + "," + packet.getArgs()); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println(packet.getID() + "," + packet.getTransID() + "," + packet.getArgs()); //$NON-NLS-1$ //$NON-NLS-2$
 		/*
 		 * Now convert the event into an IProxyEvent
 		 */
@@ -159,8 +168,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 					synchronized (state) {
 						if (!isInterrupted() && state != ServerState.SHUTDOWN) {
 							error = true;
-							System.out
-									.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
+							System.out.println("event thread IOException . . . " + e.getMessage()); //$NON-NLS-1$
 						}
 					}
 				}

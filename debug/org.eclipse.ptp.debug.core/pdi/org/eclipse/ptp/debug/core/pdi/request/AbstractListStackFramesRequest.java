@@ -25,26 +25,36 @@ import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractListStackFramesRequest extends AbstractEventResultRequest implements IPDIListStackFramesRequest {
 	private int low = 0;
 	private int high = 0;
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public AbstractListStackFramesRequest(TaskSet tasks, int low, int high) {
 		super(tasks);
 		this.low = low;
 		this.high = high;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.listStackFrames(tasks, low, high);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {

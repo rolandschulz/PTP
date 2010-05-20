@@ -23,7 +23,6 @@ import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTTranslationUnit;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -48,17 +47,19 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
  * @author tibbitts
- *
+ * 
  */
 public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	private static final String OPENMP_DIRECTIVE = Messages.RunAnalyseOpenMPcommandHandler_OPENMP_DIRECTIVE;
-	private static final boolean traceOn=false;
+	private static final boolean traceOn = false;
+
 	/**
 	 * Constructor for the "Run Analysis" action
 	 */
 	public RunAnalyseOpenMPcommandHandler() {
 		super("OpenMP", new OpenMPArtifactMarkingVisitor(OpenMPPlugin.MARKER_ID), OpenMPPlugin.MARKER_ID); //$NON-NLS-1$
 	}
+
 	/**
 	 * Returns OpenMP analysis artifacts for file
 	 * 
@@ -68,8 +69,7 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 	 * @return
 	 */
 	@Override
-	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu,
-			final List<String> includes) {
+	public ScanReturn doArtifactAnalysis(final ITranslationUnit tu, final List<String> includes) {
 		OpenMPScanReturn msr = new OpenMPScanReturn();
 		final String fileName = tu.getElementName();
 		IASTTranslationUnit atu = null;
@@ -78,13 +78,13 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 			lang = tu.getLanguage();
 
 			atu = tu.getAST();
-			String languageID=lang.getId();
+			String languageID = lang.getId();
 			if (languageID.equals(GCCLanguage.ID)) {// cdt40
 				atu.accept(new OpenMPCASTVisitor(includes, fileName, msr));
-			}
-			else {
+			} else {
 				// Attempt to handle Fortran
-				// Instantiate using reflection to avoid static Photran dependencies
+				// Instantiate using reflection to avoid static Photran
+				// dependencies
 				try {
 					Class<?> c = Class.forName("org.eclipse.ptp.pldt.openmp.core.actions.AnalyseOpenMPFortranHandler"); //$NON-NLS-1$
 					Method method = c.getMethod("run", String.class, ITranslationUnit.class, String.class, ScanReturn.class); //$NON-NLS-1$
@@ -101,46 +101,45 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		IFile file = null;
 		if (res instanceof IFile) {
 			file = (IFile) res;
-		}
-		else{ 
+		} else {
 			System.out.println("RunAnalyseOpenMP.doArtifactAnalysis, file cast won't work..."); //$NON-NLS-1$
 		}
 		// Find the OpenMP #pragmas
-		if(atu!=null) {  // not for Fortran
+		if (atu != null) { // not for Fortran
 			processOpenMPPragmas(msr, atu, file);
 		}
 		return msr;
 	}
+
 	/**
-	 * Special processing to find #pragmas, since the CDT AST
-	 * does not normally include them.<br>
-	 * Also adds the "OpenMP Problems"  
+	 * Special processing to find #pragmas, since the CDT AST does not normally
+	 * include them.<br>
+	 * Also adds the "OpenMP Problems"
+	 * 
 	 * @param msr
 	 * @param astTransUnit
 	 * @param iFile
 	 */
-	protected void processOpenMPPragmas(OpenMPScanReturn msr,
-			IASTTranslationUnit astTransUnit, IFile iFile) {
-		OpenMPAnalysisManager omgr = new OpenMPAnalysisManager(astTransUnit,
-				iFile);
+	protected void processOpenMPPragmas(OpenMPScanReturn msr, IASTTranslationUnit astTransUnit, IFile iFile) {
+		OpenMPAnalysisManager omgr = new OpenMPAnalysisManager(astTransUnit, iFile);
 		PASTNode[] pList = omgr.getPAST();
 
 		for (int i = 0; i < pList.length; i++) {
 			if (pList[i] instanceof PASTOMPPragma) {
-				
-				PASTOMPPragma pop = (PASTOMPPragma) pList[i];  
-				if(traceOn)System.out.println("found #pragma, line "+pop.getStartingLine()); //$NON-NLS-1$
+
+				PASTOMPPragma pop = (PASTOMPPragma) pList[i];
+				if (traceOn)
+					System.out.println("found #pragma, line " + pop.getStartingLine()); //$NON-NLS-1$
 				SourceInfo si = getSourceInfo(pop, Artifact.PRAGMA);
-				Artifact a = new Artifact(pop.getFilename(), pop
-						.getStartingLine(), pop.getStartLocation(), pop
-						.getContent(), OPENMP_DIRECTIVE, si, pop);
+				Artifact a = new Artifact(pop.getFilename(), pop.getStartingLine(), pop.getStartLocation(), pop.getContent(),
+						OPENMP_DIRECTIVE, si, pop);
 				msr.addArtifact(a);
 			}
 		}
 
-		msr.addProblems(OpenMPErrorManager.getCurrentErrorManager()
-						.getErrors());
+		msr.addProblems(OpenMPErrorManager.getCurrentErrorManager().getErrors());
 	}
+
 	/**
 	 * Get exact source locational info for a function call
 	 * 
@@ -156,16 +155,15 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 			if (locations[0] instanceof IASTFileLocation) {
 				astFileLocation = (IASTFileLocation) locations[0];
 				sourceInfo = new SourceInfo();
-				sourceInfo.setStartingLine(astFileLocation
-						.getStartingLineNumber());
+				sourceInfo.setStartingLine(astFileLocation.getStartingLineNumber());
 				sourceInfo.setStart(astFileLocation.getNodeOffset());
-				sourceInfo.setEnd(astFileLocation.getNodeOffset()
-						+ astFileLocation.getNodeLength());
+				sourceInfo.setEnd(astFileLocation.getNodeOffset() + astFileLocation.getNodeLength());
 				sourceInfo.setConstructType(constructType);
 			}
 		}
 		return sourceInfo;
 	}
+
 	/**
 	 * processResults - override from RunAnalyse base, to process both pragma
 	 * artifacts and problems
@@ -186,53 +184,53 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		// DPP - put in stuff for problems view
 		// Just subclass scanreturn and create markers for problems view here
 		List<OpenMPError> problems = osr.getProblems();
-		if(traceOn)System.out.println("RunAnalyseOpenMP.processResults, have "+problems.size()+ " problems."); //$NON-NLS-1$ //$NON-NLS-2$
+		if (traceOn)
+			System.out.println("RunAnalyseOpenMP.processResults, have " + problems.size() + " problems."); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			for (Iterator<OpenMPError> i = problems.iterator(); i.hasNext();)
-				processProblem((OpenMPError) i.next(), resource);
+				processProblem(i.next(), resource);
 		} catch (CoreException e) {
 			System.out.println("RunAnalysisOpenMP.processResults exception: " //$NON-NLS-1$
 					+ e);
 			e.printStackTrace();
 		}
 	}
+
 	/**
-	 * Create problem marker which will put a problem on the OpenMP problems view
+	 * Create problem marker which will put a problem on the OpenMP problems
+	 * view
 	 * 
-	 * @param problem -
-	 *            OpenMPError
-	 * @param resource -
-	 *            IResource
+	 * @param problem
+	 *            - OpenMPError
+	 * @param resource
+	 *            - IResource
 	 * @throws CoreException
 	 */
-	private void processProblem(OpenMPError problem, IResource resource)
-			throws CoreException {
+	private void processProblem(OpenMPError problem, IResource resource) throws CoreException {
 		// build all the attributes
 		Map attrs = new HashMap();
 		attrs.put(ProblemMarkerAttrIds.DESCRIPTION, problem.getDescription());
 		attrs.put(ProblemMarkerAttrIds.RESOURCE, problem.getFilename());
 		attrs.put(ProblemMarkerAttrIds.INFOLDER, problem.getPath());
-		attrs.put(ProblemMarkerAttrIds.LOCATION, new Integer(problem
-				.getLineno()));
+		attrs.put(ProblemMarkerAttrIds.LOCATION, new Integer(problem.getLineno()));
 		// used to reference problem if need
 		attrs.put(ProblemMarkerAttrIds.PROBLEMOBJECT, problem);
 
 		// create the marker all at once, so get ONLY a single resourceChange
 		// event.
-		MarkerUtilities.createMarker(resource, attrs,
-				ProblemMarkerAttrIds.MARKER_ERROR_ID);
+		MarkerUtilities.createMarker(resource, attrs, ProblemMarkerAttrIds.MARKER_ERROR_ID);
 
 	}
+
 	/**
 	 * Remove the OpenMP problem markers currently set on a resource.
 	 * 
-	 * @param resource -
-	 *            IResource
+	 * @param resource
+	 *            - IResource
 	 */
 	private void removeProblemMarkers(IResource resource) {
 		try {
-			resource.deleteMarkers(ProblemMarkerAttrIds.MARKER_ERROR_ID, false,
-					IResource.DEPTH_INFINITE);
+			resource.deleteMarkers(ProblemMarkerAttrIds.MARKER_ERROR_ID, false, IResource.DEPTH_INFINITE);
 		} catch (CoreException e) {
 			System.out.println(e);
 			System.out.println(e.toString());
@@ -241,18 +239,19 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		}
 	}
 
-
+	@Override
 	protected List<String> getIncludePath() {
 		return OpenMPPlugin.getDefault().getIncludeDirs();
 	}
 
+	@Override
 	protected void activateArtifactView() {
 		ViewActivater.activateView(OpenMPPlugin.VIEW_ID);
 	}
 
+	@Override
 	protected void activateProblemsView() {
 		ViewActivater.activateView(PvPlugin.VIEW_ID);
-	}	
-	 
+	}
 
 }

@@ -22,12 +22,15 @@ import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 
-
 /**
  * Represent expression manager to manage processes
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIThreadManager extends IPDIManager {
+	/**
+	 * @since 4.0
+	 */
 	public IPDIThread[] getThreads(TaskSet qTasks) throws PDIException;
 }

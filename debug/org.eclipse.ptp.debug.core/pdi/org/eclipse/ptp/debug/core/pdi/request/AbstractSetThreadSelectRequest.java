@@ -25,37 +25,54 @@ import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractSetThreadSelectRequest extends AbstractEventResultRequest implements IPDISetThreadSelectRequest {
 	private int id = 0;
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public AbstractSetThreadSelectRequest(TaskSet tasks, int id) {
 		super(tasks);
 		this.id = id;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.selectThread(tasks, id);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDISetThreadSelectRequest#getThreadId(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDISetThreadSelectRequest#getThreadId
+	 * (org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public int getThreadId(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Object[]) {
-			Object[] returnValues = (Object[])obj;
-			return ((Integer)returnValues[0]).intValue();
+			Object[] returnValues = (Object[]) obj;
+			return ((Integer) returnValues[0]).intValue();
 		}
 		throw new PDIException(qTasks, Messages.AbstractSetThreadSelectRequest_0);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {

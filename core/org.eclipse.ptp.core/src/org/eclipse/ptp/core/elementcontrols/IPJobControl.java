@@ -29,19 +29,20 @@ public interface IPJobControl extends IPElementControl, IPJob {
 	/**
 	 * Add attributes to a collection of processes.
 	 * 
-	 * @param jobRanks job ranks of processes to be modified
-	 * @param attributes AttributeManager for the
-	 *        attributes to add to each process
+	 * @param jobRanks
+	 *            job ranks of processes to be modified
+	 * @param attributes
+	 *            AttributeManager for the attributes to add to each process
+	 * @since 4.0
 	 */
-	public void addProcessAttributes(BitSet jobRanks,
-			AttributeManager attributes);
+	public void addProcessAttributes(BitSet jobRanks, AttributeManager attributes);
 
 	/**
 	 * @param jobRanks
-	 * @param attrs 
+	 * @param attrs
+	 * @since 4.0
 	 */
-	public void addProcessesByJobRanks(BitSet jobRanks,
-			AttributeManager attrs);
+	public void addProcessesByJobRanks(BitSet jobRanks, AttributeManager attrs);
 
 	/**
 	 * Get the parent of this job
@@ -54,6 +55,7 @@ public interface IPJobControl extends IPElementControl, IPJob {
 	 * Remove processes from the job
 	 * 
 	 * @param jobRanks
+	 * @since 4.0
 	 */
 	public void removeProcessesByJobRanks(BitSet jobRanks);
 

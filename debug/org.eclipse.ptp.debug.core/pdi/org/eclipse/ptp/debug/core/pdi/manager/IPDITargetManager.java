@@ -23,37 +23,45 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDITarget;
 
 /**
  * Represent expression manager to manage processes
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDITargetManager extends IPDIManager {
 	/**
 	 * Returns target of specify tasks
+	 * 
 	 * @param qTasks
 	 * @return target of specify tasks
+	 * @since 4.0
 	 */
 	IPDITarget getTarget(TaskSet qTasks);
 
 	/**
 	 * Returns all targets
+	 * 
 	 * @return all targets
 	 */
 	IPDITarget[] getTargets();
 
 	/**
 	 * Adds task to be a target
+	 * 
 	 * @param qTasks
 	 * @return created target
+	 * @since 4.0
 	 */
 	IPDITarget addTarget(TaskSet qTasks);
 
 	/**
 	 * Returns whether given tasks are deleted its target
+	 * 
 	 * @param qTasks
 	 * @return true if given tasks are deleted its target
+	 * @since 4.0
 	 */
 	boolean removeTarget(TaskSet qTasks);
-	
+
 	/**
 	 * Cleans up storage
 	 */

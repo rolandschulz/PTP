@@ -25,38 +25,55 @@ import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractListArgumentsRequest extends AbstractEventResultRequest implements IPDIListArgumentsRequest {
 	private int low = 0;
 	private int high = 0;
-	
+
+	/**
+	 * @since 4.0
+	 */
 	public AbstractListArgumentsRequest(TaskSet tasks, int low, int high) {
 		super(tasks);
 		this.low = low;
 		this.high = high;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.listArguments(tasks, low, high);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIListArgumentsRequest#getArguments(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIListArgumentsRequest#getArguments
+	 * (org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public String[] getArguments(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof String[]) {
-			return (String[])obj;
+			return (String[]) obj;
 		}
 		throw new PDIException(qTasks, Messages.AbstractListArgumentsRequest_0);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {

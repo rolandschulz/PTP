@@ -30,29 +30,34 @@ public interface IPDITaskManager extends IPDIManager {
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public boolean canAllStepReturn(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getCannotStepReturnTasks(TaskSet tasks);
 
 	/**
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getCanStepReturnTasks();
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getCanStepReturnTasks(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getNonPendingTasks(TaskSet tasks);
 
@@ -61,6 +66,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getNonRunningTasks(TaskSet tasks);
 
@@ -69,6 +75,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getNonSuspendedTasks(TaskSet tasks);
 
@@ -77,17 +84,20 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getNonTerminatedTasks(TaskSet tasks);
 
 	/**
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getPendingTasks();
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getPendingTasks(TaskSet tasks);
 
@@ -95,6 +105,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * Get all registered tasks
 	 * 
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getRegisteredTasks();
 
@@ -103,6 +114,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getRegisteredTasks(TaskSet tasks);
 
@@ -111,6 +123,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getRunningTasks(TaskSet tasks);
 
@@ -118,6 +131,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * Get all suspended tasks
 	 * 
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getSuspendedTasks();
 
@@ -126,6 +140,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getSuspendedTasks(TaskSet tasks);
 
@@ -133,6 +148,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * Get all terminated tasks
 	 * 
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getTerminatedTasks();
 
@@ -141,6 +157,7 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getTerminatedTasks(TaskSet tasks);
 
@@ -149,66 +166,77 @@ public interface IPDITaskManager extends IPDIManager {
 	 * 
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public TaskSet getUnregisteredTasks(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public boolean isAllPending(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public boolean isAllRegistered(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public boolean isAllRunning(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public boolean isAllSuspended(TaskSet tasks);
 
 	/**
 	 * @param tasks
 	 * @return
+	 * @since 4.0
 	 */
 	public boolean isAllTerminated(TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void setCanStepReturnTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void setPendingTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void setRegisterTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void setSuspendTasks(boolean isAdd, TaskSet tasks);
 
 	/**
 	 * @param isAdd
 	 * @param tasks
+	 * @since 4.0
 	 */
 	public void setTerminateTasks(boolean isAdd, TaskSet tasks);
 }

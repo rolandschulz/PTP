@@ -13,7 +13,8 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 /**
  * Output generated from program.
- *
+ * 
+ * @since 4.0
  */
 public interface IPDIOutputEvent extends IPDIEvent {
 	public String getOutput();

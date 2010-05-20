@@ -19,6 +19,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
+/**
+ * @since 4.0
+ */
 public class RemoteServerManager {
 	private final static String REMOTE_SERVER_EXTENSION_POINT_ID = "remoteServer"; //$NON-NLS-1$
 	private final static Map<String, AbstractRemoteServerRunner> fServerMap = new HashMap<String, AbstractRemoteServerRunner>();

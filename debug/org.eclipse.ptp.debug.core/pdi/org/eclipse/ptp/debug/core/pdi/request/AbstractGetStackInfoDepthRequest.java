@@ -23,36 +23,52 @@ import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 
-
 /**
  * @author clement
- *
+ * 
  */
 public abstract class AbstractGetStackInfoDepthRequest extends AbstractEventResultRequest implements IPDIGetStackInfoDepthRequest {
+	/**
+	 * @since 4.0
+	 */
 	public AbstractGetStackInfoDepthRequest(TaskSet tasks) {
 		super(tasks);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.request.AbstractEventRequest#
+	 * doExecute(org.eclipse.ptp.debug.core.pdi.IPDIDebugger)
 	 */
+	@Override
 	public void doExecute(IPDIDebugger debugger) throws PDIException {
 		debugger.retrieveStackInfoDepth(tasks);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIGetStackInfoDepthRequest#getDepth(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.request.IPDIGetStackInfoDepthRequest#getDepth
+	 * (org.eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public int getDepth(TaskSet qTasks) throws PDIException {
 		waitUntilCompleted(qTasks);
 		Object obj = getResult(qTasks);
 		if (obj instanceof Integer) {
-			return ((Integer)obj).intValue();
+			return ((Integer) obj).intValue();
 		}
 		throw new PDIException(qTasks, Messages.AbstractGetStackInfoDepthRequest_0);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest#getName()
 	 */
 	public String getName() {

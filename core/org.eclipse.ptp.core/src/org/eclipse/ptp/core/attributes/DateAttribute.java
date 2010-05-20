@@ -78,6 +78,9 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 		setValueAsString(initialValue);
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	public DateFormat getDateFormat() {
 		return getDefinition().getDateFormat();
 	}
@@ -175,6 +178,9 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	@Override
 	protected DateAttribute doCopy() {

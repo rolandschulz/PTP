@@ -18,49 +18,48 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public interface IAttribute<T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	extends Comparable<A> {
-	
+public interface IAttribute<T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> extends Comparable<A> {
+
 	/**
 	 * @return a copy of this attribute
+	 * @since 4.0
 	 */
 	public A copy();
-	
+
 	/**
 	 * @return the attribute definition object associated with this attribute
 	 */
 	public D getDefinition();
-	
+
 	/**
 	 * @return
 	 */
 	public T getValue();
-	
+
 	/**
 	 * @return string
 	 */
 	public String getValueAsString();
-	
+
 	/**
 	 * @return whether this attribute is enabled.
 	 */
 	public boolean isEnabled();
 
 	/**
-	 * Is the string parsable to a valid
-	 * attribute of this type?
+	 * Is the string parsable to a valid attribute of this type?
 	 * 
 	 * @param string
 	 * @return
 	 */
 	public boolean isValid(String string);
-		
+
 	/**
 	 * @param value
 	 * @throws IllegalValueException
 	 */
 	public void setValue(T value) throws IllegalValueException;
-	
+
 	/**
 	 * @param string
 	 * @throws IAttribute.IllegalValue

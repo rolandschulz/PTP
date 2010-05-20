@@ -9,9 +9,11 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.ptp.proxy.debug.event;
 
+/**
+ * @since 4.0
+ */
 public interface IProxyDebugOutputEvent extends IProxyDebugEvent {
 	public String getOutput();
 }

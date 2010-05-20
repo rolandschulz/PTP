@@ -127,6 +127,7 @@ public class AttributeDefinitionManager {
 	 * @param defaultValue
 	 * @param outputDateFormat
 	 * @return
+	 * @since 4.0
 	 */
 	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final Date defaultValue, final DateFormat outputDateFormat) {
@@ -146,6 +147,7 @@ public class AttributeDefinitionManager {
 	 * @param max
 	 * @return
 	 * @throws IllegalValueException
+	 * @since 4.0
 	 */
 	public DateAttributeDefinition createDateAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final Date defaultValue, final DateFormat outputDateFormat,

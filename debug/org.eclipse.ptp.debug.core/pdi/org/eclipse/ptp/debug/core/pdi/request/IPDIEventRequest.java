@@ -23,84 +23,97 @@ import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.IPDISet;
 
 /**
- * Represents a request for notification of an event.  
+ * Represents a request for notification of an event.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIEventRequest extends IPDISet {
-	//status
+	// status
 	public final static int ERROR = 0x1;
-	public final static int RUNNING = 0x2; 
+	public final static int RUNNING = 0x2;
 	public final static int DONE = 0x3;
 	public final static int CANCELLED = 0x4;
 	public final static int UNKNOWN = 0x5;
-	
-	public final static int ACTION_NONE = 0x1;			//by default, nothing
-	public final static int ACTION_TERMINATED = 0x2;	//terminate all remaining tasks
-	
+
+	public final static int ACTION_NONE = 0x1; // by default, nothing
+	public final static int ACTION_TERMINATED = 0x2; // terminate all remaining
+														// tasks
+
 	/**
 	 * Sets current status of this request
+	 * 
 	 * @param status
 	 */
 	void setStatus(int status);
-	
+
 	/**
 	 * Returns the current status of this request
+	 * 
 	 * @return the current status of this request
 	 */
 	int getStatus();
-	
-    /**
-     * Indicates this request is complete. Clients must call this method
-     * whether the request succeeds, fails, or is cancelled to indicate that
-     * processing is complete. Only clients fulfilling a request should call this
-     * method. Clients making a request are not intended to call this method.
-     */
-    void done();
-    
-    /**
-     * Cancels this request. A request may be cancelled by the originator of request
-     * or a client fulfilling a request. Optionally a cancelled status may be set on
-     * this request with more details. A client fulfilling a request must still call
-     * <code>done()</code> to indicate the request is complete.
-     */
-    void cancel();
-    
-    /**
-     * Indicates this request is executing. 
-     * @param debugger
-     */
-    void execute(IPDIDebugger debugger);
-    
-    /**
-     * Indicates this request has an error.
-     * @param message error message
-     */
-    void error(String message);
-    
-    /**
-     * Returns name of this request 
-     * @return name of this request
-     */
-    String getName();
-    
-    /**
-     * Returns error message of this request
-     * @return error message of this request
-     */
-    String getErrorMessage();
-    
-    /**
-     * Returns whether tasks are completed and set result
-     * @param qTasks
-     * @param result
-     * @return true if the tasks are completed
-     */
-    boolean completed(TaskSet qTasks, Object result);
-    
-    /**
-     * Returns action type for action after completing this request
-     * @return action type
-     */
-    int getResponseAction();
+
+	/**
+	 * Indicates this request is complete. Clients must call this method whether
+	 * the request succeeds, fails, or is cancelled to indicate that processing
+	 * is complete. Only clients fulfilling a request should call this method.
+	 * Clients making a request are not intended to call this method.
+	 */
+	void done();
+
+	/**
+	 * Cancels this request. A request may be cancelled by the originator of
+	 * request or a client fulfilling a request. Optionally a cancelled status
+	 * may be set on this request with more details. A client fulfilling a
+	 * request must still call <code>done()</code> to indicate the request is
+	 * complete.
+	 */
+	void cancel();
+
+	/**
+	 * Indicates this request is executing.
+	 * 
+	 * @param debugger
+	 */
+	void execute(IPDIDebugger debugger);
+
+	/**
+	 * Indicates this request has an error.
+	 * 
+	 * @param message
+	 *            error message
+	 */
+	void error(String message);
+
+	/**
+	 * Returns name of this request
+	 * 
+	 * @return name of this request
+	 */
+	String getName();
+
+	/**
+	 * Returns error message of this request
+	 * 
+	 * @return error message of this request
+	 */
+	String getErrorMessage();
+
+	/**
+	 * Returns whether tasks are completed and set result
+	 * 
+	 * @param qTasks
+	 * @param result
+	 * @return true if the tasks are completed
+	 * @since 4.0
+	 */
+	boolean completed(TaskSet qTasks, Object result);
+
+	/**
+	 * Returns action type for action after completing this request
+	 * 
+	 * @return action type
+	 */
+	int getResponseAction();
 }
