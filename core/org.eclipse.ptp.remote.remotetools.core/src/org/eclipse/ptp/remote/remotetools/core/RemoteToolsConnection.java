@@ -48,6 +48,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private final PTPTargetControl fTargetControl;
 	private final ListenerList fListeners = new ListenerList();
 
+	/**
+	 * @since 4.0
+	 */
 	public RemoteToolsConnection(String name, String address, String userName, ITargetElement element, IRemoteServices services)
 			throws CoreException {
 		fTargetElement = element;
@@ -339,6 +342,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getRemoteServices()
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public IRemoteServices getRemoteServices() {
 		return fRemoteServices;
 	}
@@ -356,6 +362,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory()
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public String getWorkingDirectory() {
 		if (!isOpen()) {
@@ -472,6 +481,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java
 	 * .lang.String)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public void setWorkingDirectory(String path) {
 		if (new Path(path).isAbsolute()) {
