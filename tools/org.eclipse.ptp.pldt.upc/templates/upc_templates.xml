@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+<template name="upc_init_shared_array"  id="org.eclipse.ptp.pldt.upc.templates.c.upcisa"
+	autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" 
+	description="Initialize a UPC shared array in a loop, with address affinity" enabled="true" >
+     int ${var};
+     upc_forall(${var}=0; ${var}&lt;N; ${var}++; &amp;A[${var}]) {
+         A[${var}]=&lt;init value&gt;;
+     }
+     upc_barrier;
+     </template>
+     <template name="upc_init_shared_array_int" id="org.eclipse.ptp.pldt.upc.templates.c.upcisai"
+     autoinsert="true" context="org.eclipse.cdt.ui.text.templates.c" deleted="false" 
+     description="Initialize a UPC shared array in a loop, with integer affinity" enabled="true" >
+     int ${var};
+     upc_forall(${var}=0; ${var}&lt;N; ${var}++; &amp;A[${var}]) {
+         A[${var}]=&lt;init value&gt;;
+     }
+     upc_barrier;
+     </template>
+     </templates>
