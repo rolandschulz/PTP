@@ -24,53 +24,54 @@ import org.eclipse.rse.core.subsystems.IConnectorService;
 
 /**
  * An RSE-based provider of C/C++ indexing services.
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. Please do not use this API without consulting with
+ * the RDT team.
  * 
  * @author crecoskie
- *
+ * @since 2.0
+ * 
  */
 public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider2 {
 
 	public static final String ID = "org.eclipse.ptp.rdt.ui.RSECIndexServiceProvider"; //$NON-NLS-1$
 
-	
 	private RemoteSearchService fSearchService;
 	private IContentAssistService fContentAssistService;
-	
 
 	public synchronized ISearchService getSearchService() {
-		if(!isConfigured())
+		if (!isConfigured())
 			return null;
-		
-		if(fSearchService == null)
+
+		if (fSearchService == null)
 			fSearchService = new RemoteSearchService(fConnectorService);
-		
+
 		return fSearchService;
 	}
 
 	public synchronized IContentAssistService getContentAssistService() {
-		if(!isConfigured())
+		if (!isConfigured())
 			return null;
-		
-		if(fContentAssistService == null)
+
+		if (fContentAssistService == null)
 			fContentAssistService = new RemoteContentAssistService(fConnectorService);
-		
+
 		return fContentAssistService;
 	}
-	
+
+	@Override
 	public IHost getHost() {
 		initializeHost();
 		return super.getHost();
 	}
-	
+
+	@Override
 	public boolean isConfigured() {
 		initializeHost();
 		return super.isConfigured();
 	}
-	
+
 	private void initializeHost() {
 		try {
 			RSECorePlugin.waitForInitCompletion();
@@ -87,26 +88,27 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 			}
 		}
 	}
-	
+
 	public static IConnectorService getDStoreConnectorService(IHost host) {
 		IConnectorService[] connectorServices = host.getConnectorServices();
-		
-		for(int k = 0; k < connectorServices.length; k++) {
-			if(connectorServices[k] instanceof DStoreConnectorService)
+
+		for (int k = 0; k < connectorServices.length; k++) {
+			if (connectorServices[k] instanceof DStoreConnectorService)
 				return connectorServices[k];
 		}
-		
+
 		return null;
 	}
-	
 
+	@Override
 	public String getConfigurationString() {
 		if (isConfigured()) {
 			return fHost.getName();
-		}			
+		}
 		return null;
 	}
-	
+
+	@Override
 	public String toString() {
 		return "RSECIndexServiceProvider(" + getHostName() + "," + getIndexLocation() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}

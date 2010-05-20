@@ -29,24 +29,27 @@ import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
  * Common Navigator action provider for the C-search sub menus.
  * 
  * @see org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup
+ * @since 2.0
  */
 public class RemoteCNavigatorSearchActionProvider extends CommonActionProvider {
 
 	private SelectionSearchGroup fSearchGroup;
 	private org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup fCDTSearchGroup;
-	
+
 	/*
-	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
+	 * @see
+	 * org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator
+	 * .ICommonActionExtensionSite)
 	 */
 	@Override
 	public void init(ICommonActionExtensionSite site) {
-		ICommonViewerWorkbenchSite workbenchSite= null;
+		ICommonViewerWorkbenchSite workbenchSite = null;
 		if (site.getViewSite() instanceof ICommonViewerWorkbenchSite) {
-			workbenchSite= (ICommonViewerWorkbenchSite) site.getViewSite();
+			workbenchSite = (ICommonViewerWorkbenchSite) site.getViewSite();
 		}
 		if (workbenchSite != null) {
 			if (workbenchSite.getPart() != null && workbenchSite.getPart() instanceof IViewPart) {
-				fSearchGroup= new SelectionSearchGroup(workbenchSite.getSite());
+				fSearchGroup = new SelectionSearchGroup(workbenchSite.getSite());
 				fCDTSearchGroup = new org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup(workbenchSite.getSite());
 			}
 		}
@@ -69,7 +72,9 @@ public class RemoteCNavigatorSearchActionProvider extends CommonActionProvider {
 	}
 
 	/*
-	 * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
+	 * @see
+	 * org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars
+	 * )
 	 */
 	@Override
 	public void fillActionBars(IActionBars actionBars) {
@@ -82,32 +87,36 @@ public class RemoteCNavigatorSearchActionProvider extends CommonActionProvider {
 	}
 
 	/*
-	 * @see org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.action.IMenuManager)
+	 * @see
+	 * org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.
+	 * action.IMenuManager)
 	 */
 	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		if (fSearchGroup != null && fCDTSearchGroup != null) {
 			ISelection selection = getContext().getSelection();
 			if (selection != null && !selection.isEmpty() && selection instanceof StructuredSelection) {
-				Object sel = ((StructuredSelection)selection).getFirstElement();
+				Object sel = ((StructuredSelection) selection).getFirstElement();
 				if (sel instanceof ICElement) {
-					IProject project = ((ICElement)sel).getCProject().getProject();
-					if (!RemoteNature.hasRemoteNature(project)){
-						if (org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup.canActionBeAdded(selection)){
+					IProject project = ((ICElement) sel).getCProject().getProject();
+					if (!RemoteNature.hasRemoteNature(project)) {
+						if (org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup.canActionBeAdded(selection)) {
 							fCDTSearchGroup.fillContextMenu(menu);
 						}
 					} else {
-						if (SelectionSearchGroup.canActionBeAdded(selection)){
+						if (SelectionSearchGroup.canActionBeAdded(selection)) {
 							fSearchGroup.fillContextMenu(menu);
 						}
 					}
 				}
-			}			
+			}
 		}
 	}
 
 	/*
-	 * @see org.eclipse.ui.actions.ActionGroup#setContext(org.eclipse.ui.actions.ActionContext)
+	 * @see
+	 * org.eclipse.ui.actions.ActionGroup#setContext(org.eclipse.ui.actions.
+	 * ActionContext)
 	 */
 	@Override
 	public void setContext(ActionContext context) {
@@ -132,5 +141,5 @@ public class RemoteCNavigatorSearchActionProvider extends CommonActionProvider {
 			fCDTSearchGroup.updateActionBars();
 		}
 	}
-	
+
 }

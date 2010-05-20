@@ -24,11 +24,11 @@ import org.eclipse.ptp.rdt.core.remotemake.RemoteMakeBuilder;
 
 /**
  * Project nature for remote standard make projects.
- *
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as
- * part of a work in progress. There is no guarantee that this API will work or
- * that it will remain the same. Please do not use this API without consulting
- * with the RDT team.
+ * 
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. Please do not use this API without consulting with
+ * the RDT team.
  * 
  * @author crecoskie
  */
@@ -38,8 +38,8 @@ public class RemoteMakeNature implements IProjectNature {
 	private IProject fProject;
 
 	/**
-	 * Adds this nature to the given project.  Since this requires modifying the project
-	 * description, this may be a long running operation.
+	 * Adds this nature to the given project. Since this requires modifying the
+	 * project description, this may be a long running operation.
 	 * 
 	 * @param project
 	 * @param monitor
@@ -47,14 +47,14 @@ public class RemoteMakeNature implements IProjectNature {
 	 */
 	public static void addNature(IProject project, IProgressMonitor monitor) throws CoreException {
 		IProjectDescription description = project.getDescription();
-		String[] prevNatures= description.getNatureIds();
-		for (int i= 0; i < prevNatures.length; i++) {
+		String[] prevNatures = description.getNatureIds();
+		for (int i = 0; i < prevNatures.length; i++) {
 			if (NATURE_ID.equals(prevNatures[i]))
 				return;
 		}
-		String[] newNatures= new String[prevNatures.length + 1];
+		String[] newNatures = new String[prevNatures.length + 1];
 		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-		newNatures[prevNatures.length]= NATURE_ID;
+		newNatures[prevNatures.length] = NATURE_ID;
 		description.setNatureIds(newNatures);
 		project.setDescription(description, monitor);
 	}
@@ -107,7 +107,7 @@ public class RemoteMakeNature implements IProjectNature {
 		// Commit the spec change into the project
 		description.setBuildSpec(newCommands);
 		return description;
-	}	
+	}
 
 	/**
 	 * Adds a builder to the build spec for the project.
@@ -118,6 +118,7 @@ public class RemoteMakeNature implements IProjectNature {
 	 * @throws CoreException
 	 * @deprecated
 	 */
+	@Deprecated
 	public static void addToBuildSpec(IProject project, String builderID, IProgressMonitor mon) throws CoreException {
 		IProjectDescription description = project.getDescription();
 		ICommand[] commands = description.getBuildSpec();
@@ -147,37 +148,38 @@ public class RemoteMakeNature implements IProjectNature {
 	 * @param builderID
 	 * @param mon
 	 * @throws CoreException
+	 * @since 2.0
 	 */
 	public static void updateProjectDescription(IProject project, String builderID, IProgressMonitor mon) throws CoreException {
 		// setup builder
 		IProjectDescription description = project.getDescription();
 		ICommand[] commands = new ICommand[1];
-		
+
 		// setup remote makefile builder
 		commands[0] = description.newCommand();
 		commands[0].setBuilderName(builderID);
-		
+
 		// Scanner config builder does not need to be explicitly added,
 		// it will get implicitly called by the scanner discovery nature.
 		// If we explicitly add it here, it will get called twice, so
 		// the code that added it has been removed.
-		
+
 		description.setBuildSpec(commands);
-		
+
 		// add nature
-		String[] prevNatures= description.getNatureIds();
-		for (int i= 0; i < prevNatures.length; i++) {
+		String[] prevNatures = description.getNatureIds();
+		for (int i = 0; i < prevNatures.length; i++) {
 			if (NATURE_ID.equals(prevNatures[i]))
 				return;
 		}
-		String[] newNatures= new String[prevNatures.length + 1];
+		String[] newNatures = new String[prevNatures.length + 1];
 		System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-		newNatures[prevNatures.length]= NATURE_ID;
+		newNatures[prevNatures.length] = NATURE_ID;
 		description.setNatureIds(newNatures);
-		
+
 		project.setDescription(description, mon);
 	}
-	
+
 	/**
 	 * Removes a builder from the project's build spec.
 	 * 
@@ -210,30 +212,37 @@ public class RemoteMakeNature implements IProjectNature {
 		addToBuildSpec(getProject(), RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, null);
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.resources.IProjectNature#configure()
 	 */
 	public void configure() throws CoreException {
 		addBuildSpec();
-		IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(MakeCorePlugin.getDefault().getPluginPreferences(), RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, false);
+		IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(MakeCorePlugin.getDefault().getPluginPreferences(),
+				RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, false);
 		IMakeBuilderInfo projectInfo = MakeCorePlugin.createBuildInfo(getProject(), RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID);
-		projectInfo.setBuildAttribute(IMakeCommonBuildInfo.BUILD_ARGUMENTS, info.getBuildAttribute(IMakeCommonBuildInfo.BUILD_ARGUMENTS, "")); //$NON-NLS-1$
-		projectInfo.setBuildAttribute(IMakeCommonBuildInfo.BUILD_COMMAND, info.getBuildAttribute(IMakeCommonBuildInfo.BUILD_COMMAND, "make")); //$NON-NLS-1$
+		projectInfo.setBuildAttribute(IMakeCommonBuildInfo.BUILD_ARGUMENTS,
+				info.getBuildAttribute(IMakeCommonBuildInfo.BUILD_ARGUMENTS, "")); //$NON-NLS-1$
+		projectInfo.setBuildAttribute(IMakeCommonBuildInfo.BUILD_COMMAND,
+				info.getBuildAttribute(IMakeCommonBuildInfo.BUILD_COMMAND, "make")); //$NON-NLS-1$
 
 		projectInfo.setUseDefaultBuildCmd(info.isDefaultBuildCmd());
 		projectInfo.setStopOnError(info.isStopOnError());
 
 		projectInfo.setAutoBuildEnable(info.isAutoBuildEnable());
-		projectInfo.setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_AUTO, info.getBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_AUTO, "")); //$NON-NLS-1$
-		
+		projectInfo.setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_AUTO,
+				info.getBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_AUTO, "")); //$NON-NLS-1$
+
 		projectInfo.setIncrementalBuildEnable(info.isIncrementalBuildEnabled());
-		projectInfo.setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_INCREMENTAL, info.getBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_INCREMENTAL, "")); //$NON-NLS-1$
+		projectInfo.setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_INCREMENTAL,
+				info.getBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_INCREMENTAL, "")); //$NON-NLS-1$
 
 		projectInfo.setFullBuildEnable(info.isIncrementalBuildEnabled());
 
 		projectInfo.setCleanBuildEnable(info.isCleanBuildEnabled());
-		projectInfo.setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_CLEAN, info.getBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_CLEAN, "")); //$NON-NLS-1$
+		projectInfo.setBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_CLEAN,
+				info.getBuildAttribute(IMakeBuilderInfo.BUILD_TARGET_CLEAN, "")); //$NON-NLS-1$
 
 		projectInfo.setErrorParsers(info.getErrorParsers());
 		projectInfo.setAppendEnvironment(info.appendEnvironment());
@@ -249,30 +258,41 @@ public class RemoteMakeNature implements IProjectNature {
 		removeFromBuildSpec(getProject(), RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
 	 */
 	public void deconfigure() throws CoreException {
 		removeBuildSpec();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.resources.IProjectNature#getProject()
 	 */
 	public IProject getProject() {
 		return fProject;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core
+	 * .resources.IProject)
 	 */
 	public void setProject(IProject project) {
 		fProject = project;
 	}
-	
+
 	/**
 	 * Returns true if the given project has the remote make nature.
-	 * @throws NullPointerException if project is null
+	 * 
+	 * @throws NullPointerException
+	 *             if project is null
+	 * @since 2.0
 	 */
 	public static boolean hasNature(IProject project) {
 		try {
@@ -282,5 +302,5 @@ public class RemoteMakeNature implements IProjectNature {
 			return false;
 		}
 	}
-	
+
 }

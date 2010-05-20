@@ -14,12 +14,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Interface for contributors that know how to construct a URI for a given filesystem.
+ * Interface for contributors that know how to construct a URI for a given
+ * filesystem.
  * 
  * @author crecoskie
- *
+ * @since 2.0
+ * 
  */
 public interface IURICreator {
-	
+
 	public URI createURIForScheme(String scheme, String host, String path, String mappedPath) throws URISyntaxException;
 }

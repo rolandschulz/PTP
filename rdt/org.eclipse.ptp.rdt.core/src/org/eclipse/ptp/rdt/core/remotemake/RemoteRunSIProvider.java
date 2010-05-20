@@ -55,10 +55,9 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
  * @author Mike Kucera
  */
 public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvider {
-	
-	
-	private static final String EXTERNAL_SI_PROVIDER_CONSOLE_ID = MakeCorePlugin.getUniqueIdentifier() + ".ExternalScannerInfoProviderConsole"; //$NON-NLS-1$;
 
+	private static final String EXTERNAL_SI_PROVIDER_CONSOLE_ID = MakeCorePlugin.getUniqueIdentifier()
+			+ ".ExternalScannerInfoProviderConsole"; //$NON-NLS-1$;
 
 	/**
 	 * Subclasses need to provide the actual command to run.
@@ -66,29 +65,27 @@ public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvide
 	protected abstract List<String> getCommand(IProject project, String providerId, IScannerConfigBuilderInfo2 buildInfo);
 
 	/**
-	 * Subclasses need to provide the working directory that the command will run in.
+	 * Subclasses need to provide the working directory that the command will
+	 * run in.
 	 * 
 	 * @return String
+	 * @since 2.0
 	 */
 	protected abstract IPath getWorkingDirectory(IProject project);
-	
-	public boolean invokeProvider(IProgressMonitor monitor, IResource resource,
-			String providerId, IScannerConfigBuilderInfo2 buildInfo,
-			IScannerInfoCollector collector) {
+
+	public boolean invokeProvider(IProgressMonitor monitor, IResource resource, String providerId,
+			IScannerConfigBuilderInfo2 buildInfo, IScannerInfoCollector collector) {
 
 		InfoContext context = new InfoContext(resource.getProject());
 		return invokeProvider(monitor, resource, context, providerId, buildInfo, collector, null);
 	}
 
-	
-	public boolean invokeProvider(IProgressMonitor monitor, IResource resource,
-			InfoContext context, String providerId,
-			IScannerConfigBuilderInfo2 buildInfo,
-			IScannerInfoCollector collector, Properties env) {
-		
+	public boolean invokeProvider(IProgressMonitor monitor, IResource resource, InfoContext context, String providerId,
+			IScannerConfigBuilderInfo2 buildInfo, IScannerInfoCollector collector, Properties env) {
+
 		monitor = (monitor == null) ? new NullProgressMonitor() : monitor;
 		monitor.beginTask(Messages.RemoteRunSiProvider_taskName, 5);
-		
+
 		try {
 			return doInvoke(monitor, resource, context, providerId, buildInfo, collector, env);
 		} catch (Exception e) {
@@ -98,45 +95,42 @@ public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvide
 			monitor.done(); // called before return
 		}
 	}
-	
-	
-	
-	private boolean doInvoke(IProgressMonitor monitor, IResource resource,
-			InfoContext context, String providerId,
-			IScannerConfigBuilderInfo2 buildInfo,
-			IScannerInfoCollector collector, Properties env) throws Exception {
-		
+
+	private boolean doInvoke(IProgressMonitor monitor, IResource resource, InfoContext context, String providerId,
+			IScannerConfigBuilderInfo2 buildInfo, IScannerInfoCollector collector, Properties env) throws Exception {
+
 		IProject project = resource.getProject();
-		
-		if(collector instanceof IScannerInfoCollector2) {
+
+		if (collector instanceof IScannerInfoCollector2) {
 			IScannerInfoCollector2 s2 = (IScannerInfoCollector2) collector;
 			s2.setProject(project);
 		}
-		
+
 		IRemoteExecutionServiceProvider executionProvider = getExecutionServiceProvider(project);
-		if(executionProvider == null || monitor.isCanceled())
+		if (executionProvider == null || monitor.isCanceled())
 			return false;
-		
+
 		IRemoteConnection connection = executionProvider.getConnection();
-		
-		if(connection == null)
+
+		if (connection == null)
 			return false;
-		
-		if(!connection.isOpen())
+
+		if (!connection.isOpen())
 			connection.open(monitor); // throws RemoteConnectionException
-		
+
 		monitor.worked(1);
-		
+
 		// prepare the command to run
 		List<String> runCommand = getCommand(project, providerId, buildInfo);
-		if(runCommand == null || runCommand.isEmpty() || monitor.isCanceled())
+		if (runCommand == null || runCommand.isEmpty() || monitor.isCanceled())
 			return false;
-		
+
 		IRemoteServices remoteServices = executionProvider.getRemoteServices();
 		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, runCommand);
 		processBuilder.redirectErrorStream(true);
-		
-		// get the configuration directory for the provider... this is where the build
+
+		// get the configuration directory for the provider... this is where the
+		// build
 		// should execute
 		String configPath = executionProvider.getConfigLocation();
 		IRemoteFileManager remoteFileManager = remoteServices.getFileManager(connection);
@@ -144,58 +138,59 @@ public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvide
 
 		// set the working directory for the process to be the config directory
 		processBuilder.directory(workingDir);
-		
+
 		monitor.worked(1);
-		
-		// scanner config goes to its own console so that it doesn't stomp on the user's
+
+		// scanner config goes to its own console so that it doesn't stomp on
+		// the user's
 		// build output
 		IConsole console = CCorePlugin.getDefault().getConsole(EXTERNAL_SI_PROVIDER_CONSOLE_ID);
-        console.start(project);
- 		OutputStream cos = new StreamMonitor(new SubProgressMonitor(monitor, 70), console.getOutputStream(), 100);
+		console.start(project);
+		OutputStream cos = new StreamMonitor(new SubProgressMonitor(monitor, 70), console.getOutputStream(), 100);
 		SCMarkerGenerator markerGenerator = new SCMarkerGenerator();
-		
-		// the sniffer parses the results of the command and adds them to the collector
-		ConsoleOutputSniffer sniffer = ScannerInfoConsoleParserFactory.getESIProviderOutputSniffer(
-                cos, cos, project, context, providerId, buildInfo, collector, markerGenerator);
-        OutputStream consoleOut = sniffer == null ? cos : sniffer.getOutputStream();
-        OutputStream consoleErr = sniffer == null ? cos : sniffer.getErrorStream();
-		
-        if(monitor.isCanceled())
-        	return false;
-        
-        monitor.worked(1);
-        
-        // run the command and wait for it to produce output
+
+		// the sniffer parses the results of the command and adds them to the
+		// collector
+		ConsoleOutputSniffer sniffer = ScannerInfoConsoleParserFactory.getESIProviderOutputSniffer(cos, cos, project, context,
+				providerId, buildInfo, collector, markerGenerator);
+		OutputStream consoleOut = sniffer == null ? cos : sniffer.getOutputStream();
+		OutputStream consoleErr = sniffer == null ? cos : sniffer.getErrorStream();
+
+		if (monitor.isCanceled())
+			return false;
+
+		monitor.worked(1);
+
+		// run the command and wait for it to produce output
 		IRemoteProcess remoteProcess = processBuilder.start();
 		RemoteProcessClosure remoteProcessClosure = new RemoteProcessClosure(remoteProcess, consoleOut, consoleErr);
 		remoteProcessClosure.runNonBlocking();
 		remoteProcess.waitFor();
-		
+
 		// we're done
 		consoleOut.close();
 		consoleErr.close();
 		cos.close();
-		
+
 		monitor.worked(1);
-		
-        return true;
+
+		return true;
 	}
-	
-	
+
 	private static IRemoteExecutionServiceProvider getExecutionServiceProvider(IProject project) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
-		try{
+		try {
 			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
-			
+
 			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 			IServiceProvider provider = serviceConfig.getServiceProvider(buildService);
-			
-			if(provider instanceof IRemoteExecutionServiceProvider)
+
+			if (provider instanceof IRemoteExecutionServiceProvider)
 				return (IRemoteExecutionServiceProvider) provider;
-		}
-		catch (ProjectNotConfiguredException e){
-			//occurs when loading a project from RTC, this is forced to run before the project is configured, this is expected
-			//if not due to above reason, then legitimate error
+		} catch (ProjectNotConfiguredException e) {
+			// occurs when loading a project from RTC, this is forced to run
+			// before the project is configured, this is expected
+			// if not due to above reason, then legitimate error
 			return null;
 		}
 		return null;
