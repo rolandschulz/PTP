@@ -15,7 +15,7 @@ package org.eclipse.ptp.rm.slurm.core.rmsystem;
 
 import java.util.BitSet;
 import java.util.Collection;
-
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
@@ -30,6 +30,9 @@ import org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMRuntimeSystem;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rtsystem.IRuntimeSystem;
+import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 
@@ -101,13 +104,15 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 	 */
 	@Override
 	protected IRuntimeSystem doCreateRuntimeSystem() {
+		IRuntimeSystem slurmRMS;
 		ISLURMResourceManagerConfiguration config = (ISLURMResourceManagerConfiguration) getConfiguration();
 		/* load up the control and monitoring systems for SLURM */
 		SLURMProxyRuntimeClient runtimeProxy = new SLURMProxyRuntimeClient(config, SLURMRMID);
 		AttributeDefinitionManager attrDefMgr = getAttributeDefinitionManager();
 		attrDefMgr.setAttributeDefinitions(SLURMJobAttributes.getDefaultAttributeDefinitions());
 		attrDefMgr.setAttributeDefinitions(SLURMNodeAttributes.getDefaultAttributeDefinitions());
-		return new SLURMRuntimeSystem(runtimeProxy, attrDefMgr);
+		slurmRMS = new SLURMRuntimeSystem(runtimeProxy, attrDefMgr);
+		return slurmRMS;
 	}
 
 	/* (non-Javadoc)
@@ -137,6 +142,7 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
 		return updateNodes(machine, nodes, attrs);
 	}
 
+
  	/* (non-Javadoc)
  	 * @see org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateProcesses(org.eclipse.ptp.core.elementcontrols.IPJobControl, java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
  	 */
@@ -161,5 +167,25 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
  	@Override
  	protected boolean doUpdateRM(AttributeManager attrs) {
  		return updateRM(attrs);
+ 	}
+ 	
+ 	/* (non-Javadoc)
+ 	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;)
+ 	 */
+ 	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
+ 		final String title="JobSubmit Error";
+ 		final String msg = e.getErrorMessage();
+ 		
+ 		//System.out.println("Job submit error!");
+ 		//System.out.println(msg);
+ 		/*
+ 		 * see showErrorDialog(title, msg, status) in UIUtils.java;
+ 		 */
+ 		Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                final Shell shell = Display.getDefault().getActiveShell();
+                MessageDialog.openError(shell, title, msg);
+            }
+        });
  	}
 }
