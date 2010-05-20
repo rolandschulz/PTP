@@ -60,31 +60,28 @@ import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.proxy.event.IProxyOKEvent;
 import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 
-public abstract class AbstractProxyDebugClient extends AbstractProxyClient implements IProxyDebugClient,IProxyEventListener {
-	
-	private List<IProxyDebugEventListener>	listeners = 
-		Collections.synchronizedList(new ArrayList<IProxyDebugEventListener>());
+public abstract class AbstractProxyDebugClient extends AbstractProxyClient implements IProxyDebugClient, IProxyEventListener {
 
-	protected boolean					waiting = false;
-	protected boolean					timeout = false;
-	protected final ReentrantLock		waitLock = new ReentrantLock();
-	protected final Condition			waitCondition = waitLock.newCondition();
-	protected volatile DebugProxyState	state;
-	protected IProxyDebugEventFactory	factory;
-	
+	private final List<IProxyDebugEventListener> listeners = Collections
+			.synchronizedList(new ArrayList<IProxyDebugEventListener>());
+
+	protected boolean waiting = false;
+	protected boolean timeout = false;
+	protected final ReentrantLock waitLock = new ReentrantLock();
+	protected final Condition waitCondition = waitLock.newCondition();
+	protected volatile DebugProxyState state;
+	protected IProxyDebugEventFactory factory;
+
 	protected enum DebugProxyState {
-		DISCONNECTED,
-		DISCONNECTING,
-		CONNECTED,
-		CONNECTING
+		DISCONNECTED, DISCONNECTING, CONNECTED, CONNECTING
 	}
-	
+
 	public AbstractProxyDebugClient() {
 		super();
 		this.factory = new ProxyDebugEventFactory();
 		super.setEventFactory(factory);
 	}
-	
+
 	/**
 	 * Initialize the debugger connection.
 	 * 
@@ -96,12 +93,11 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		sessionCreate(port, 0);
 		state = DebugProxyState.CONNECTING;
 	}
-	
 
 	/**
-	 * Shutdown the debugger connection. This can be called if we are either in the CONNECTED
-	 * state, in which case we will receive a disconnected event, or in the CONNECTING state, 
-	 * in which case we will receive an error event.
+	 * Shutdown the debugger connection. This can be called if we are either in
+	 * the CONNECTED state, in which case we will receive a disconnected event,
+	 * or in the CONNECTING state, in which case we will receive an error event.
 	 * 
 	 * @throws IOException
 	 */
@@ -126,22 +122,34 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		removeProxyEventListener(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#addProxyDebugEventListener(org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#
+	 * addProxyDebugEventListener
+	 * (org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
 	 */
 	public void addProxyDebugEventListener(IProxyDebugEventListener listener) {
 		listeners.add(listener);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#removeProxyDebugEventListener(org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#
+	 * removeProxyDebugEventListener
+	 * (org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
 	 */
 	public void removeProxyDebugEventListener(IProxyDebugEventListener listener) {
 		listeners.remove(listener);
 	}
-		
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyConnectedEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyConnectedEvent)
 	 */
 	public void handleEvent(IProxyConnectedEvent e) {
 		waitLock.lock();
@@ -156,8 +164,12 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent)
 	 */
 	public void handleEvent(IProxyDisconnectedEvent e) {
 		waitLock.lock();
@@ -173,16 +185,24 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			waitLock.unlock();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyErrorEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyErrorEvent)
 	 */
 	public void handleEvent(IProxyErrorEvent e) {
 		// Do nothing
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyMessageEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyMessageEvent)
 	 */
 	public void handleEvent(IProxyMessageEvent e) {
 		waitLock.lock();
@@ -199,15 +219,23 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyOKEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyOKEvent)
 	 */
 	public void handleEvent(IProxyOKEvent e) {
 		// Do nothing
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.core.proxy.event.IProxyTimeoutEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyTimeoutEvent)
 	 */
 	public void handleEvent(IProxyTimeoutEvent e) {
 		waitLock.lock();
@@ -221,9 +249,13 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 			waitLock.unlock();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyExtendedEvent)
 	 */
 	public void handleEvent(IProxyExtendedEvent e) {
 		if (e instanceof IProxyDebugArgsEvent) {
@@ -318,6 +350,9 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 
+	/**
+	 * @since 4.0
+	 */
 	protected void fireProxyDebugOutputEvent(IProxyDebugOutputEvent e) {
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {

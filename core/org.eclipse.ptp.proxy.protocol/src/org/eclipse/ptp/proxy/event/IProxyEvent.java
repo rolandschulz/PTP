@@ -57,6 +57,8 @@ public interface IProxyEvent {
 	/**
 	 * Set the transaction ID
 	 * 
+	 * @since 4.0
+	 * 
 	 */
 	public void setTransactionID(int transactionID);
 }

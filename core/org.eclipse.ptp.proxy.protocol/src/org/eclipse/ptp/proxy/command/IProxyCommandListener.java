@@ -31,6 +31,7 @@ public interface IProxyCommandListener {
 	 * 
 	 * @param cmd
 	 *            command to handle
+	 * @since 4.0
 	 */
 	public void handleCommand(IProxyCommand cmd);
 
