@@ -46,10 +46,10 @@ public class ParaProfController {
 	private StreamRunner errRun;
 	private ProcessBuilder pb;
 	private Process proc;
-	private static final String DATABASES = "databases";
-	private static final String APPLICATIONS = "applications";
-	private static final String EXPERIMENTS = "experiments";
-	private static final String TRIALS = "trials";
+	private static final String DATABASES = "databases"; //$NON-NLS-1$
+	private static final String APPLICATIONS = "applications"; //$NON-NLS-1$
+	private static final String EXPERIMENTS = "experiments"; //$NON-NLS-1$
+	private static final String TRIALS = "trials"; //$NON-NLS-1$
 
 	public static TreeTuple EMPTY;
 
@@ -67,8 +67,8 @@ public class ParaProfController {
 	}
 
 	private void createProcess() {
-		String paraprof = BuildLaunchUtils.getToolPath("tau") + File.separator + "paraprof";
-		EMPTY = new TreeTuple("None", -1, -1, Level.DATABASE);
+		String paraprof = BuildLaunchUtils.getToolPath("tau") + File.separator + "paraprof"; //$NON-NLS-1$ //$NON-NLS-2$
+		EMPTY = new TreeTuple("None", -1, -1, Level.DATABASE); //$NON-NLS-1$
 		File checkp = new File(paraprof);
 		if (!checkp.exists()) {
 			return;
@@ -78,7 +78,7 @@ public class ParaProfController {
 		pullQueue = new LinkedBlockingQueue<String>();
 		List<String> command = new ArrayList<String>();
 		command.add(paraprof);
-		command.add("--control");
+		command.add("--control"); //$NON-NLS-1$
 		pb = new ProcessBuilder(command);
 
 		proc = null;
@@ -99,7 +99,7 @@ public class ParaProfController {
 		TreeTuple t;
 		for (int i = 0; i < l.size(); i++) {
 			String name = l.get(i).name;
-			if (name.equals("Default") || name.equals("default")) {
+			if (name.equals("Default") || name.equals("default")) { //$NON-NLS-1$ //$NON-NLS-2$
 				t = l.remove(i);
 				l.add(0, t);
 				break;
@@ -123,12 +123,12 @@ public class ParaProfController {
 	private List<TreeTuple> getInfo(String type, int dbid, int hid, Level level) {
 		List<TreeTuple> out = new ArrayList<TreeTuple>();
 
-		String comBuf = "control list " + type;
+		String comBuf = "control list " + type; //$NON-NLS-1$
 		if (dbid > -1) {
-			comBuf += " " + dbid;
+			comBuf += " " + dbid; //$NON-NLS-1$
 
 			if (hid > -1) {
-				comBuf += " " + hid;
+				comBuf += " " + hid; //$NON-NLS-1$
 			}
 		}
 		int res = issueCommand(comBuf);
@@ -137,12 +137,12 @@ public class ParaProfController {
 		List<String> l = getResults();
 
 		for (String s : l) {
-			if (s.startsWith("control return")) {
-				String[] split = s.split(" ");
+			if (s.startsWith("control return")) { //$NON-NLS-1$
+				String[] split = s.split(" "); //$NON-NLS-1$
 				int id = Integer.parseInt(split[2]);
 				String name = split[3];
 				for (int j = 4; j < split.length; j++) {
-					name += " " + split[j];
+					name += " " + split[j]; //$NON-NLS-1$
 				}
 				out.add(new TreeTuple(name, id, dbid, level));
 			}
@@ -151,7 +151,7 @@ public class ParaProfController {
 	}
 
 	public TreeTuple uploadTrial(String profile, int dbid, String app, String exp, String tri) {
-		String comBuf = "control upload " + profile + " " + dbid + " " + app + " " + exp + " " + tri;
+		String comBuf = "control upload " + profile + " " + dbid + " " + app + " " + exp + " " + tri; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		int res = issueCommand(comBuf);
 		if (res != 0)
 			return null;
@@ -159,8 +159,8 @@ public class ParaProfController {
 		List<String> l = getResults();
 
 		for (String s : l) {
-			if (s.startsWith("control return")) {
-				String[] split = s.split(" ");
+			if (s.startsWith("control return")) { //$NON-NLS-1$
+				String[] split = s.split(" "); //$NON-NLS-1$
 				int id = Integer.parseInt(split[2]);
 				tt = new TreeTuple(tri, id, dbid, Level.TRIAL);
 			}
@@ -174,13 +174,13 @@ public class ParaProfController {
 		List<String> l = new ArrayList<String>();
 		if (pushQueue != null)
 			while (!done) {// for(int i=0;i<dex;i++){
-				String s = "";
+				String s = ""; //$NON-NLS-1$
 				try {
 					s = pushQueue.take();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if (s.equals("control endreturn") || s.equals("DONE")) {
+				if (s.equals("control endreturn") || s.equals("DONE")) { //$NON-NLS-1$ //$NON-NLS-2$
 					done = true;
 				} else {
 					l.add(s);
@@ -196,7 +196,7 @@ public class ParaProfController {
 		}
 
 		if (errRun.exception) {
-			System.out.println("Restarting Paraprof");
+			System.out.println("Restarting Paraprof"); //$NON-NLS-1$
 			killProcess();
 			createProcess();
 			return -1;
@@ -205,12 +205,12 @@ public class ParaProfController {
 	}
 
 	public void openTrial(int dbid, int tid) {
-		String comBuf = "control load " + dbid + " " + tid;
+		String comBuf = "control load " + dbid + " " + tid; //$NON-NLS-1$ //$NON-NLS-2$
 		issueCommand(comBuf);
 	}
 
 	public void openManager() {
-		String comBuf = "control open manager";
+		String comBuf = "control open manager"; //$NON-NLS-1$
 		issueCommand(comBuf);
 	}
 
@@ -245,12 +245,12 @@ public class ParaProfController {
 				while ((line = br.readLine()) != null) {
 
 					if (pushQueue == null || pullQueue == null) {
-						if (line.contains("Exception")) {
+						if (line.contains("Exception")) { //$NON-NLS-1$
 							exception = true;
 						}
 						System.out.println(line);
 					} else {
-						if (line.startsWith("control sourcecode")) {
+						if (line.startsWith("control sourcecode")) { //$NON-NLS-1$
 							pullQueue.add(line);
 						} else
 							pushQueue.add(line);
@@ -260,9 +260,9 @@ public class ParaProfController {
 				e.printStackTrace();
 			}
 			if (pullQueue != null)
-				pullQueue.add("DONE");
+				pullQueue.add("DONE"); //$NON-NLS-1$
 			if (pushQueue != null)
-				pushQueue.add("DONE");
+				pushQueue.add("DONE"); //$NON-NLS-1$
 		}
 	}
 
