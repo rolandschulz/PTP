@@ -76,6 +76,7 @@ public class Artifact implements IArtifact
      * @param shortName
      * @param ignore
      * @param primaryFileName
+     * @since 4.0
      */
     public Artifact(String fileName, int line, int column, String shortName, SourceInfo sourceInfo)
     {
