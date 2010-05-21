@@ -34,8 +34,8 @@ import org.eclipse.rephraserengine.core.vpg.VPGLog;
 import org.eclipse.rephraserengine.core.vpg.eclipse.VPGSchedulingRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -50,10 +50,15 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 /**
  * Fortran Analysis/Refactoring Problems view, A.K.A. VPG Problems view.
  * <p>
- * Most of the code was copied from Eclipse JFace TableView Tutorial
- * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html) and
- * Java Developer's Guide to Eclipse, Chapter 18,
- * (http://www.jdg2e.com/jdg2e_CD_for_eclipse321/plug-in_development/examples/com.ibm.jdg2e.view.marker/src-marker/com/ibm/jdg2e/view/marker/MarkerView.java)
+ * Based on Eclipse JFace TableView Tutorial; thanks to Lars Vogel
+ * for posting the tutorial
+ * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html)
+ * Based on samples provided in Java Developer’s Guide to Eclipse,
+ * Chapter 18 (http://www.jdg2e.com/ch18.views/doc/index.htm and
+ * http://www.jdg2e.com/jdg2e_CD_for_eclipse321/plug-in_development/examples/com.ibm.jdg2e.view.marker/src-marker/com/ibm/jdg2e/view/marker/MarkerView.java)
+ * © Copyright International Business Machines Corporation, 2003, 2004, 2006.
+ * All Rights Reserved.
+ * Code or samples provided therein are provided without warranty of any kind.
  *
  * @author Timofey Yuvashev
  * 
@@ -64,6 +69,24 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  */
 public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 {
+    static enum VPGViewColumn
+    {
+        DESCRIPTION("Description", 44),
+        RESOURCE("Resource", 10),
+        PATH("Path", 20);
+        
+        public final String name;
+        public final int width;
+        
+        private VPGViewColumn(String name, int width)
+        {
+            this.name = name;
+            this.width = width;
+        }
+    }
+    
+    private static RecreateMarkers markersTask = null;
+    
     private TableViewer tableViewer             = null;
     private TableSorter tableSorter             = null;
     private Clipboard clipboard                 = null;
@@ -76,45 +99,26 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     private VPGViewFilterAction warningsMarkerFilterAction  = null;
     private VPGViewFilterAction errorsMarkerFilterAction    = null;
 
-    private static final String[] COLUMN_NAMES = {"Description",
-                                                  "Resource", "Path" /*,
-                                                  "Location"*/};
-    private static final int[] COLUMN_WIDTHS   = {44,
-                                                  10, 20/*,
-                                                  6*/};
-
     //TODO: Depending on how we will handle updates to markers, we might need a
     // way to update this array. Currently, it is populated as Workbench's start-time
     // and remains unchaged since then
     public static int[] MARKER_COUNT = {0,0,0};  //Number of Infos, Warnings and Errors respectively
 
-
-//    /* (non-Javadoc)
-//     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-//     */
     @Override
     public void createPartControl(Composite parent)
     {
         GridLayout overallLayout = new GridLayout(1,false);
         parent.setLayout(overallLayout);
 
-        tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
-            | SWT.MULTI | SWT.FULL_SELECTION);
-
-        tableSorter = new TableSorter();
-        tableViewer.setComparator(this.tableSorter);
-
+        createTableViewer(parent);
         createTableColumns(tableViewer);
         setTableGridData();
 
-        //Share Viewer Selection with other workbench parts
         getSite().setSelectionProvider(tableViewer);
 
         //TODO: Change the default string
-        MenuManager manager = new VPGProblemContextMenu(getViewSite(), "Problems View Menu");
-        tableViewer.getTable().setMenu(manager.createContextMenu(tableViewer.getTable()));
+        MenuManager manager = createMenuManager();
 
-        //Register Viewer ContextMenu with other workbench parts
         getSite().registerContextMenu(manager, tableViewer);
 
         tableViewer.setContentProvider(new VPGProblemContentProvider());
@@ -126,7 +130,21 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         initEvents();
     }
 
-    private static RecreateMarkers markersTask = null;
+    private void createTableViewer(Composite parent)
+    {
+        tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
+            | SWT.MULTI | SWT.FULL_SELECTION);
+
+        tableSorter = new TableSorter();
+        tableViewer.setComparator(this.tableSorter);
+    }
+
+    private MenuManager createMenuManager()
+    {
+        MenuManager manager = new VPGProblemContextMenu(getViewSite(), "Problems View Menu");
+        tableViewer.getTable().setMenu(manager.createContextMenu(tableViewer.getTable()));
+        return manager;
+    }
     
     public void onLogChange()
     {
@@ -296,10 +314,8 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     private TableLayout createTableLayout()
     {
         TableLayout layout = new TableLayout();
-        for(int i = 0; i < COLUMN_WIDTHS.length; i++)
-        {
-            layout.addColumnData(new ColumnWeightData(COLUMN_WIDTHS[i],true));
-        }
+        for (VPGViewColumn col : VPGViewColumn.values())
+            layout.addColumnData(new ColumnWeightData(col.width, true));
         return layout;
     }
 
@@ -314,41 +330,48 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         TableLayout layout = createTableLayout();
         table.setLayout(layout);
 
-        for(int i = 0; i < COLUMN_NAMES.length; i++)
+        for (final VPGViewColumn vpgCol : VPGViewColumn.values())
         {
-            //We need these variables to be final, b/c we want to use them later on in the
-            // definition of widgetSelected() method
-            final int index = i;
-            final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-            final TableColumn column = viewerColumn.getColumn();
+            final TableColumn viewerCol = new TableViewerColumn(viewer, SWT.NONE).getColumn();
 
-            //Create column and set its parameters
-            column.setText(COLUMN_NAMES[i]);
-            column.setToolTipText(COLUMN_NAMES[i]);
-            column.setAlignment(SWT.LEFT);
-            column.setResizable(true);
-            column.setMoveable(true);
+            viewerCol.setText(vpgCol.name);
+            viewerCol.setToolTipText(vpgCol.name);
+            viewerCol.setAlignment(SWT.LEFT);
+            viewerCol.setResizable(true);
+            viewerCol.setMoveable(true);
 
-            //Add an even listener to the column
-            column.addSelectionListener(new SelectionAdapter()
-                {
-                    public void widgetSelected(SelectionEvent e)
-                    {
-                        tableSorter.setColumn(index);
-                        int dir = viewer.getTable().getSortDirection();
-                        if(viewer.getTable().getSortColumn() == column)
-                            dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
-                        else
-                            dir = SWT.DOWN;
-                        viewer.getTable().setSortDirection(dir);
-                        viewer.getTable().setSortColumn(column);
-                        viewer.refresh();
-                    }
-                });
+            viewerCol.addSelectionListener(new ColumnSelectionListener(viewerCol, vpgCol, viewer));
         }
 
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
+    }
+
+    private final class ColumnSelectionListener extends SelectionAdapter
+    {
+        private final TableColumn column;
+        private final VPGViewColumn col;
+        private final TableViewer viewer;
+
+        private ColumnSelectionListener(TableColumn column, VPGViewColumn col, TableViewer viewer)
+        {
+            this.column = column;
+            this.col = col;
+            this.viewer = viewer;
+        }
+
+        public void widgetSelected(SelectionEvent e)
+        {
+            tableSorter.setColumn(col.ordinal());
+            int dir = viewer.getTable().getSortDirection();
+            if(viewer.getTable().getSortColumn() == column)
+                dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+            else
+                dir = SWT.DOWN;
+            viewer.getTable().setSortDirection(dir);
+            viewer.getTable().setSortColumn(column);
+            viewer.refresh();
+        }
     }
 
     /*
@@ -356,41 +379,24 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
      */
     private void initEvents()
     {
-        tableViewer.getTable().addMouseListener(new MouseListener()
-            {
-                public void mouseDoubleClick(MouseEvent dblClick)
-                {
-                    Table t = (Table)dblClick.getSource();
-                    TableItem[] selection = t.getSelection();
-                    for(int i = 0; i < selection.length; i++)
-                    {
-                        if (selection[i].getData() instanceof IMarker)
-                        {
-                            IMarker marker = (IMarker)(selection[i].getData());
-                            if (marker.getResource() != null)
-                            {
-                                try
-                                {
-                                    OpenMarkedFileAction openAction = new OpenMarkedFileAction(getViewSite());
-                                    openAction.run(marker);
-                                }
-                                catch (Throwable x)
-                                {
-                                    ;
-                                }
-                            }
-                        }
+        tableViewer.getTable().addMouseListener(new DoubleClickListener());
+    }
 
-                    }
-                }
+    private final class DoubleClickListener extends MouseAdapter
+    {
+        public void mouseDoubleClick(MouseEvent dblClick)
+        {
+            Table t = (Table)dblClick.getSource();
+            for (TableItem item : t.getSelection())
+                if (item.getData() instanceof IMarker)
+                    openMarker((IMarker)item.getData());
+        }
 
-                public void mouseDown(MouseEvent arg0)
-                {}
-
-                public void mouseUp(MouseEvent arg0)
-                {}
-
-            });
+        private void openMarker(IMarker marker)
+        {
+            if (marker.getResource() != null)
+                new OpenMarkedFileAction(getViewSite()).run(marker);
+        }
     }
 
     public Clipboard getClipboard()
@@ -400,9 +406,6 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         return clipboard;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-     */
     @Override
     public void setFocus()
     {
@@ -413,7 +416,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     @Override
     public void dispose()
     {
-        if(clipboard != null)
+        if (clipboard != null)
             clipboard.dispose();
         super.dispose();
     }

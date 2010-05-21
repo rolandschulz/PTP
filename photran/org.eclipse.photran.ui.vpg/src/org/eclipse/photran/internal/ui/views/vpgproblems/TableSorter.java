@@ -13,6 +13,7 @@ package org.eclipse.photran.internal.ui.views.vpgproblems;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.photran.internal.ui.views.vpgproblems.VPGProblemView.VPGViewColumn;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
@@ -31,77 +32,87 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  */
 public class TableSorter extends ViewerSorter
 {
-    private int propertyIndex;
-    private boolean DESCENDING = true;
-    private static final int LESS       = -1;
-    private static final int GREATER    = 1;
-    private static final int EQUAL      = 0;
+    private int columnIndex;
+    private boolean ascending = true;
 
     public TableSorter()
     {
-        this.propertyIndex = 0;
-        this.DESCENDING = true;
+        this.columnIndex = 0;
+        this.ascending = true;
     }
 
-    public TableSorter(int columnIndex, boolean descending)
-    {
-        this.propertyIndex = columnIndex;
-        this.DESCENDING = descending;
-    }
-
+    /**
+     * Invoked when the user clicks on a column header.  Responds by changing the sort order.
+     */
     public void setColumn(int column)
     {
-        if(column == this.propertyIndex)
-        {
-            this.DESCENDING = !this.DESCENDING;
-        }
+        if (column == this.columnIndex)
+            toggleSortOrder();
         else
-        {
-            this.propertyIndex = column;
-            this.DESCENDING = true;
-        }
+            changeSortColumnTo(column);
     }
 
+    private void toggleSortOrder()
+    {
+        this.ascending = !this.ascending;
+    }
+
+    private void changeSortColumnTo(int column)
+    {
+        this.columnIndex = column;
+        this.ascending = true;
+    }
+
+    /*
+     * Callback invoked to compare table items for sorting.
+     */
     @Override
     public int compare(Viewer viewer, Object e1, Object e2)
     {
         IMarker m1 = (IMarker)e1;
         IMarker m2 = (IMarker)e2;
-        int result = EQUAL;
-        
-        //Based on which column we want to sort, we compare different data.
-        //For the list of columns, look in VPGProblemView.java
-        switch(this.propertyIndex)
+        return compare(m1, m2);
+    }
+
+    private int compare(IMarker m1, IMarker m2)
+    {
+        if (this.ascending)
+            return compareAscending(m1, m2);
+        else
+            return compareDescending(m1, m2);
+    }
+
+    private int compareAscending(IMarker m1, IMarker m2)
+    {
+        switch (VPGViewColumn.values()[this.columnIndex])
         {
-            //FIRST COLUMN: Description
-            case 0:
+            case DESCRIPTION:
             {
                 String msg1 = MarkerUtilities.getMessage(m1);
                 String msg2 = MarkerUtilities.getMessage(m2);
-                result = msg1.compareTo(msg2);
-                break;
+                return msg1.compareTo(msg2);
             }
-            //SECOND COLUMN: Resource
-            case 1:
+
+            case RESOURCE:
             {
                 String resource1 = m1.getResource().getName().toString();
                 String resource2 = m2.getResource().getName().toString();
-                result = resource1.compareTo(resource2);
-                break;
+                return resource1.compareTo(resource2);
             }
-            //THIRD COLUMN: Path
-            case 2:
+
+            case PATH:
             {
                 String path1 = m1.getResource().getProjectRelativePath().toString();
                 String path2 = m2.getResource().getProjectRelativePath().toString();
-                result = path1.compareTo(path2);
-                break;
+                return path1.compareTo(path2);
             }
-        }//end switch
-        
-        //If it needs to be ascending sort, simply flip the resulting value
-        if(!this.DESCENDING)
-            result = -result;
-        return result;
+            
+            default: throw new IllegalStateException();
+        }
+    }
+
+    private int compareDescending(IMarker m1, IMarker m2)
+    {
+        return -compareAscending(m1, m2);
     }
 }
