@@ -78,4 +78,12 @@ public interface IProxyRuntimeEvent extends IProxyExtendedEvent {
 	 */
 	public static final int MESSAGE = EVENT_OFFSET + 50;
 	public static final int ATTR_DEF = EVENT_OFFSET + 51;
+	/**
+	 * @since 4.0
+	 */
+	public static final int ATTRS_GET = EVENT_OFFSET + 52;
+	/**
+	 * @since 4.0
+	 */
+	public static final int ATTRS_QUERY = EVENT_OFFSET + 53;
 }
