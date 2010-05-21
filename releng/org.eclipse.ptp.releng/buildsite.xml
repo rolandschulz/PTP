@@ -72,6 +72,9 @@
    <feature url="features/org.eclipse.ptp.etfw.ppw_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw.ppw" version="4.0.0.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.sci_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.sci" version="4.0.0.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.rdt_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt" version="4.0.0.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>
