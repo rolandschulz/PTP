@@ -98,9 +98,6 @@ import org.osgi.framework.Bundle;
  * All information comes from the marker. Artifact objects containing arbitrary
  * information can be used (not extensively tested here yet).
  * 
- * BRT note: need a SimpleTableView "clear all markers" action
- * 
- * 
  * 
  */
 public class SimpleTableMarkerView extends ViewPart {
