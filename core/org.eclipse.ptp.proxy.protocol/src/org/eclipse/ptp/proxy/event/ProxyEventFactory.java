@@ -37,8 +37,7 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 	 * int, java.lang.String)
 	 */
 	public IProxyErrorEvent newErrorEvent(int transID, int code, String message) {
-		String[] args = new String[] {
-				IProxyErrorEvent.ERROR_CODE_ATTR + "=" + code, //$NON-NLS-1$
+		String[] args = new String[] { IProxyErrorEvent.ERROR_CODE_ATTR + "=" + code, //$NON-NLS-1$
 				IProxyErrorEvent.ERROR_MESSAGE_ATTR + "=" + message //$NON-NLS-1$
 		};
 
@@ -50,6 +49,9 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 	 * 
 	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newErrorEvent(int,
 	 * java.lang.String[])
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IProxyErrorEvent newErrorEvent(int transID, String[] args) {
 		return new ProxyErrorEvent(transID, args);
@@ -68,6 +70,9 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.proxy.event.IProxyEventFactory#newShutdownEvent(int)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public ProxyShutdownEvent newShutdownEvent(int transID) {
 		return new ProxyShutdownEvent(transID);

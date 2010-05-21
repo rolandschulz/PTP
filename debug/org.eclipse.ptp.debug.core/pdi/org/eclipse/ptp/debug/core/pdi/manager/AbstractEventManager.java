@@ -38,29 +38,33 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStopDebuggerRequest;
 import org.eclipse.ptp.debug.internal.core.pdi.manager.AbstractPDIManager;
 
 public abstract class AbstractEventManager extends AbstractPDIManager implements IPDIEventManager {
-	/************************************ 
-	 * event scheduler 
+	/************************************
+	 * event scheduler
 	 ***********************************/
+	/**
+	 * @since 4.0
+	 */
 	public class EventRequestScheduledTask {
 		Timer eventTimer = null;
 		IPDIEventRequest request = null;
-		
+
 		public EventRequestScheduledTask(IPDIEventRequest request) {
 			this.request = request;
 			this.eventTimer = new Timer();
 			scheduleTimeout();
 		}
-		
+
 		public void cancelTimeout() {
 			eventTimer.cancel();
 		}
-		
+
 		public IPDIEventRequest getRequest() {
 			return request;
 		}
-		
+
 		public void scheduleTimeout() {
 			eventTimer.schedule(new TimerTask() {
+				@Override
 				public void run() {
 					PDebugUtils.println(Messages.AbstractEventManager_0 + request);
 					request.error(Messages.AbstractEventManager_1);
@@ -69,48 +73,64 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 			}, session.getTimeout());
 		}
 	}
-	
+
 	/*****************************************
 	 * Request Notifier
 	 *****************************************/
+	/**
+	 * @since 4.0
+	 */
 	public class RequestNotifier extends Observable {
 		public void notify(IPDIEventRequest request) {
 			setChanged();
 			notifyObservers(request);
 		}
 	}
-	
-	private List<IPDIEventListener> listenerList = Collections.synchronizedList(new ArrayList<IPDIEventListener>());
-	private List<EventRequestScheduledTask> requestList = Collections.synchronizedList(new ArrayList<EventRequestScheduledTask>());
-	private RequestNotifier requestNotifier = new RequestNotifier();
-	
+
+	private final List<IPDIEventListener> listenerList = Collections.synchronizedList(new ArrayList<IPDIEventListener>());
+	private final List<EventRequestScheduledTask> requestList = Collections
+			.synchronizedList(new ArrayList<EventRequestScheduledTask>());
+	private final RequestNotifier requestNotifier = new RequestNotifier();
+
 	public AbstractEventManager(IPDISession session) {
 		super(session, false);
 		requestNotifier.addObserver(session.getEventRequestManager());
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#addEventListener(org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#addEventListener
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener)
 	 */
 	public void addEventListener(IPDIEventListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#fireEvent(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#fireEvent(org
+	 * .eclipse.ptp.debug.core.pdi.event.IPDIEvent)
 	 */
 	public void fireEvent(IPDIEvent event) {
 		fireEvents(new IPDIEvent[] { event });
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#fireEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#fireEvents(org
+	 * .eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	public void fireEvents(final IPDIEvent[] events) {
 		if (events.length > 0) {
-			IPDIEventListener[] listeners = (IPDIEventListener[])listenerList.toArray(new IPDIEventListener[0]);
+			IPDIEventListener[] listeners = listenerList.toArray(new IPDIEventListener[0]);
 			for (final IPDIEventListener listener : listeners) {
 				Runnable runnable = new Runnable() {
 					public void run() {
@@ -121,9 +141,13 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#notifyEventRequest(org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#notifyEventRequest
+	 * (org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
 	 */
 	public void notifyEventRequest(IPDIEventRequest request) {
 		synchronized (requestList) {
@@ -133,38 +157,44 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 			requestNotifier.notify(request);
 			PDebugUtils.println(Messages.AbstractEventManager_2 + request);
 			switch (request.getStatus()) {
-			//case IPDIEventRequest.DONE:
-			//case IPDIEventRequest.RUNNING:
+			// case IPDIEventRequest.DONE:
+			// case IPDIEventRequest.RUNNING:
 			case IPDIEventRequest.UNKNOWN:
 				fireEvent(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL, request.getName() + Messages.AbstractEventManager_3, Messages.AbstractEventManager_4)));
-	   			break;
+						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL,
+								request.getName() + Messages.AbstractEventManager_3, Messages.AbstractEventManager_4)));
+				break;
 			case IPDIEventRequest.CANCELLED:
 				fireEvent(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL, request.getName() + Messages.AbstractEventManager_5, Messages.AbstractEventManager_6)));
-	   			break;
+						session.getEventFactory().newErrorInfo(session, request.getTasks(), IPDIErrorInfo.DBG_NORMAL,
+								request.getName() + Messages.AbstractEventManager_5, Messages.AbstractEventManager_6)));
+				break;
 			case IPDIEventRequest.ERROR:
 				int errorType = IPDIErrorInfo.DBG_NORMAL;
 				if (request.getResponseAction() == IPDIEventRequest.ACTION_TERMINATED) {
 					errorType = IPDIErrorInfo.DBG_FATAL;
 					try {
 						session.terminate(request.getTasks().copy());
-					}
-					catch (PDIException ex) {
-						//error on terminate, manually change tasks' status
+					} catch (PDIException ex) {
+						// error on terminate, manually change tasks' status
 						session.getTaskManager().setPendingTasks(false, request.getTasks());
 						session.getTaskManager().setTerminateTasks(true, request.getTasks());
 					}
 				}
 				fireEvent(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, request.getTasks(), errorType, request.getName() + Messages.AbstractEventManager_7, request.getErrorMessage())));
-	   			break;
+						session.getEventFactory().newErrorInfo(session, request.getTasks(), errorType,
+								request.getName() + Messages.AbstractEventManager_7, request.getErrorMessage())));
+				break;
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#registerEventRequest(org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#registerEventRequest
+	 * (org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
 	 */
 	public void registerEventRequest(IPDIEventRequest request) {
 		synchronized (requestList) {
@@ -173,16 +203,18 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 				notifyEventRequest(request);
 				session.setStatus(IPDISession.EXITED);
 				return;
-			}
-			else {
+			} else {
 				PDebugUtils.println(Messages.AbstractEventManager_8 + request);
 				requestList.add(new EventRequestScheduledTask(request));
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#removeAllRegisteredEventRequests()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#
+	 * removeAllRegisteredEventRequests()
 	 */
 	public void removeAllRegisteredEventRequests() {
 		synchronized (requestList) {
@@ -193,30 +225,45 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 			requestList.clear();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#removeEventListener(org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager#removeEventListener
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener)
 	 */
 	public void removeEventListener(IPDIEventListener listener) {
 		listenerList.remove(listener);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#shutdown()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#shutdown()
 	 */
+	@Override
 	public void shutdown() {
 		requestNotifier.deleteObserver(session.getEventRequestManager());
 		listenerList.clear();
 		requestList.clear();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org
+	 * .eclipse.ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	@Override
 	public void update(TaskSet tasks) throws PDIException {
 	}
-	
+
 	/**
 	 * @return
 	 */

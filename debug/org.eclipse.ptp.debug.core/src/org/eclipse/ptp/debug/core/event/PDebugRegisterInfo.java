@@ -27,6 +27,9 @@ import org.eclipse.ptp.debug.core.TaskSet;
 public class PDebugRegisterInfo extends PDebugInfo implements IPDebugRegisterInfo {
 	private final boolean refresh;
 
+	/**
+	 * @since 4.0
+	 */
 	public PDebugRegisterInfo(IPJob job, TaskSet allProcesses, TaskSet allRegProcesses, TaskSet allUnregProcesses, boolean refresh) {
 		super(job, allProcesses, allRegProcesses, allUnregProcesses);
 		this.refresh = refresh;
@@ -37,7 +40,9 @@ public class PDebugRegisterInfo extends PDebugInfo implements IPDebugRegisterInf
 		this.refresh = refresh;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.event.IPDebugRegisterInfo#isRefresh()
 	 */
 	public boolean isRefresh() {

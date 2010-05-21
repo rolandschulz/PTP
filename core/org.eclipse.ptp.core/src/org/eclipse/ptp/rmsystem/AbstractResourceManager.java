@@ -121,7 +121,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 		return attrs.toArray(new IAttribute<?, ?, ?>[0]);
 	}
 
-	private AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
+	private final AttributeDefinitionManager attrDefManager = new AttributeDefinitionManager();
 	private final ListenerList childListeners = new ListenerList();
 	private IResourceManagerConfiguration config;
 	private final Map<String, IPJobControl> jobsById = Collections.synchronizedMap(new HashMap<String, IPJobControl>());
@@ -174,7 +174,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse
+	 * .ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
 	public void addChildListener(IResourceManagerChildListener listener) {
 		childListeners.add(listener);
@@ -183,7 +185,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#addResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
+	 * @see
+	 * org.eclipse.ptp.rm.IResourceManager#addResourceManagerListener(org.eclipse
+	 * .ptp.rm.IResourceManagerListener)
 	 */
 	public void addElementListener(IResourceManagerListener listener) {
 		listeners.add(listener);
@@ -192,8 +196,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#addMachineAttributes(java.util.Collection,
-	 *      org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#
+	 * addMachineAttributes(java.util.Collection,
+	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
 	public void addMachineAttributes(Collection<IPMachineControl> machineControls, IAttribute<?, ?, ?>[] attrs) {
 		List<IPMachine> machines = new ArrayList<IPMachine>(machineControls.size());
@@ -209,8 +214,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#addQueueAttributes(java.util.Collection,
-	 *      org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#
+	 * addQueueAttributes(java.util.Collection,
+	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
 	public void addQueueAttributes(Collection<IPQueueControl> queueControls, IAttribute<?, ?, ?>[] attrs) {
 		List<IPQueue> queues = new ArrayList<IPQueue>(queueControls.size());
@@ -266,6 +272,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * 
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
+	@Override
 	@SuppressWarnings({ "rawtypes" })
 	public Object getAdapter(Class adapter) {
 		if (adapter.isInstance(this)) {
@@ -297,7 +304,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getConfiguration()
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getConfiguration
+	 * ()
 	 */
 	public IResourceManagerConfiguration getConfiguration() {
 		synchronized (this) {
@@ -334,7 +343,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getMachineById(java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#getMachineById(java.lang
+	 * .String)
 	 */
 	public IPMachine getMachineById(String id) {
 		return machinesById.get(id);
@@ -343,14 +354,15 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getMachineControls()
+	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#
+	 * getMachineControls()
 	 */
 	public Collection<IPMachineControl> getMachineControls() {
 		synchronized (machinesById) {
 			List<IPMachineControl> machines = new ArrayList<IPMachineControl>(machinesById.values().size());
 			for (IPMachineControl machine : machinesById.values()) {
 				machines.add(machine);
-			}		
+			}
 			return machines;
 		}
 	}
@@ -364,7 +376,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 		return getMachineControls().toArray(new IPMachineControl[0]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.internal.core.elements.PElement#getName()
 	 */
 	@Override
@@ -372,8 +386,15 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 		return getConfiguration().getName();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getNodeById(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#getNodeById(java.lang.
+	 * String)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IPNode getNodeById(String id) {
 		return nodesById.get(id);
@@ -382,7 +403,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getQueueById(java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#getQueueById(java.lang
+	 * .String)
 	 */
 	public IPQueue getQueueById(String id) {
 		return queuesById.get(id);
@@ -391,7 +414,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getQueueByName(java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#getQueueByName(java.lang
+	 * .String)
 	 */
 	public IPQueue getQueueByName(String name) {
 		return queuesByName.get(name);
@@ -400,14 +425,16 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getQueueControls()
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#getQueueControls
+	 * ()
 	 */
 	public Collection<IPQueueControl> getQueueControls() {
 		synchronized (queuesById) {
 			List<IPQueueControl> queues = new ArrayList<IPQueueControl>(queuesById.values().size());
 			for (IPQueueControl queue : queuesById.values()) {
 				queues.add(queue);
-			}		
+			}
 			return queues;
 		}
 	}
@@ -424,7 +451,8 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getResourceManagerId()
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#getResourceManagerId()
 	 */
 	public String getResourceManagerId() {
 		return getConfiguration().getResourceManagerId();
@@ -454,6 +482,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * 
 	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
 	 */
+	@Override
 	public boolean hasChildren() {
 		return getMachines().length > 0 || getQueues().length > 0;
 	}
@@ -461,7 +490,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org
+	 * .eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
 	public void removeChildListener(IResourceManagerChildListener listener) {
 		childListeners.remove(listener);
@@ -470,7 +501,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#removeResourceManagerListener(org.eclipse.ptp.rm.IResourceManagerListener)
+	 * @see
+	 * org.eclipse.ptp.rm.IResourceManager#removeResourceManagerListener(org
+	 * .eclipse.ptp.rm.IResourceManagerListener)
 	 */
 	public void removeElementListener(IResourceManagerListener listener) {
 		listeners.remove(listener);
@@ -479,7 +512,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#removeTerminatedJobs(org.eclipse.ptp.core.elements.IPQueue)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#removeTerminatedJobs(org
+	 * .eclipse.ptp.core.elements.IPQueue)
 	 */
 	public void removeTerminatedJobs(IPQueue queue) {
 		doRemoveTerminatedJobs((IPQueueControl) queue);
@@ -488,7 +523,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#setConfiguration(org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IResourceManagerControl#setConfiguration
+	 * (org.eclipse.ptp.rmsystem.IResourceManagerConfiguration)
 	 */
 	public void setConfiguration(IResourceManagerConfiguration config) {
 		synchronized (this) {
@@ -547,7 +584,8 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.IResourceManager#startUp(IProgressMonitor monitor)
+	 * @see org.eclipse.ptp.rm.IResourceManager#startUp(IProgressMonitor
+	 * monitor)
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
@@ -570,30 +608,37 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#submitJob(org.eclipse.debug.core.ILaunchConfiguration,
-	 *      org.eclipse.ptp.core.attributes.AttributeManager,
-	 *      org.eclipse.core.runtime.IProgressMonitor)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#submitJob(org.eclipse.
+	 * debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.core.attributes.AttributeManager,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 		return doSubmitJob(null, configuration, attrMgr, monitor);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#submitJob(java.lang.String, 
-	 * 		org.eclipse.debug.core.ILaunchConfiguration, 
-	 * 		org.eclipse.ptp.core.attributes.AttributeManager, 
-	 * 		org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#submitJob(java.lang.String
+	 * , org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.core.attributes.AttributeManager,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void submitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-	throws CoreException {
+			throws CoreException {
 		doSubmitJob(subId, configuration, attrMgr, monitor);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#terminateJob(org.eclipse.ptp.core.elements.IPJob)
+	 * @see
+	 * org.eclipse.ptp.core.elements.IResourceManager#terminateJob(org.eclipse
+	 * .ptp.core.elements.IPJob)
 	 */
 	public void terminateJob(IPJob job) throws CoreException {
 		doTerminateJob(job);
@@ -707,19 +752,18 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 *            parent of the processes
 	 * @param processJobRanks
 	 *            set of job ranks within job
-	 * @param attrs 
+	 * @param attrs
+	 * @since 4.0
 	 */
-	protected void addProcessesByJobRanks(IPJobControl job, BitSet processJobRanks,
-			AttributeManager attrs) {
+	protected void addProcessesByJobRanks(IPJobControl job, BitSet processJobRanks, AttributeManager attrs) {
 
 		// actually add the processes to the job
 		// with the given attributes
 		job.addProcessesByJobRanks(processJobRanks, attrs);
-		
+
 		// retrieve the set of nodes on which these processes are running
-		Set<StringAttribute> nodeIdAttrs = 
-			job.getProcessAttributes(ProcessAttributes.getNodeIdAttributeDefinition(),
-					processJobRanks);
+		Set<StringAttribute> nodeIdAttrs = job.getProcessAttributes(ProcessAttributes.getNodeIdAttributeDefinition(),
+				processJobRanks);
 
 		for (StringAttribute nodeIdAttr : nodeIdAttrs) {
 			/*
@@ -774,13 +818,15 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
+	 * @see
+	 * org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java
+	 * .util.Map)
 	 */
 	@Override
 	protected void doAddAttributeHook(AttributeManager attrs) {
 		/*
-		 * The resource manager name is stored in the configuration so that
-		 * it persists. Map name attributes to the configuration.
+		 * The resource manager name is stored in the configuration so that it
+		 * persists. Map name attributes to the configuration.
 		 */
 		StringAttribute nameAttr = attrs.getAttribute(ElementAttributes.getNameAttributeDefinition());
 		if (nameAttr != null) {
@@ -825,7 +871,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	protected abstract void doShutdown() throws CoreException;
 
 	/**
-	 * Start the resource manager subsystem. 
+	 * Start the resource manager subsystem.
 	 * 
 	 * @param monitor
 	 * @throws CoreException
@@ -833,16 +879,17 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Submit a job with the supplied submission ID.Returns a job that represents the submitted job, or null if
-	 * the progress monitor was canceled.
+	 * Submit a job with the supplied submission ID.Returns a job that
+	 * represents the submitted job, or null if the progress monitor was
+	 * canceled.
 	 * 
 	 * @param subId
 	 * @param attrMgr
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	protected abstract IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-	throws CoreException;
+	protected abstract IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr,
+			IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Terminate a job.
@@ -944,7 +991,8 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/**
 	 * Propagate IResourceManagerSubmitJobErrorEvent to listeners
 	 * 
-	 * @param id job submission id
+	 * @param id
+	 *            job submission id
 	 */
 	protected void fireSubmitJobError(String id, String message) {
 		IResourceManagerSubmitJobErrorEvent e = new ResourceManagerSubmitJobErrorEvent(this, id, message);
@@ -1166,8 +1214,8 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	}
 
 	/**
-	 * Update attributes on a collection of processes. If the nodeId attribute is specified
-	 * then the processes will be moved to the new node.
+	 * Update attributes on a collection of processes. If the nodeId attribute
+	 * is specified then the processes will be moved to the new node.
 	 * 
 	 * @param job
 	 *            parent of processes
@@ -1176,21 +1224,24 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @param attrs
 	 *            attributes to update
 	 * @return true if updated
+	 * @since 4.0
 	 */
 	protected boolean updateProcessesByJobRanks(IPJobControl job, BitSet processJobRanks, AttributeManager attrs) {
 		final StringAttributeDefinition nodeIdAttributeDefinition = ProcessAttributes.getNodeIdAttributeDefinition();
-		
+
 		StringAttribute newNodeId = attrs.getAttribute(nodeIdAttributeDefinition);
-		
-		// if we are update a node attribute we must move processes from one node
+
+		// if we are update a node attribute we must move processes from one
+		// node
 		// to another
 		if (newNodeId != null) {
-			
+
 			IPNodeControl newNode = getNodeControl(newNodeId.getValue());
 			// add the job and the process job ranks to the new node
 			newNode.addJobProcessRanks(job, processJobRanks);
-			
-			// Remove the process job ranks from the nodes that no longer contain these processes
+
+			// Remove the process job ranks from the nodes that no longer
+			// contain these processes
 			Set<StringAttribute> oldNodeIds = job.getProcessAttributes(nodeIdAttributeDefinition, processJobRanks);
 			oldNodeIds.remove(newNodeId);
 			for (StringAttribute oldNodeId : oldNodeIds) {
@@ -1200,12 +1251,12 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 				}
 			}
 		}
-	
+
 		/*
 		 * Update attributes on the job (where they live for the processes)
 		 */
 		job.addProcessAttributes(processJobRanks, attrs);
-	
+
 		return true;
 	}
 

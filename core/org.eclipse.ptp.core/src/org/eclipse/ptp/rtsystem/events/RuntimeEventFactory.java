@@ -44,198 +44,305 @@ import org.eclipse.ptp.internal.rtsystem.events.RuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.utils.core.RangeSet;
 
 public class RuntimeEventFactory implements IRuntimeEventFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeAttributeDefinitionEvent(org.eclipse.ptp.core.attributes.IAttributeDefinition)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeAttributeDefinitionEvent
+	 * (org.eclipse.ptp.core.attributes.IAttributeDefinition)
 	 */
-	public IRuntimeAttributeDefinitionEvent newRuntimeAttributeDefinitionEvent(IAttributeDefinition<?,?,?>[] defs) {
+	public IRuntimeAttributeDefinitionEvent newRuntimeAttributeDefinitionEvent(IAttributeDefinition<?, ?, ?>[] defs) {
 		return new RuntimeAttributeDefinitionEvent(defs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeConnectedStateEvent()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeConnectedStateEvent()
 	 */
 	public IRuntimeConnectedStateEvent newRuntimeConnectedStateEvent() {
 		return new RuntimeConnectedStateEvent();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeDisconnectedEvent(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeDisconnectedEvent(java.lang.String)
 	 */
 	public IRuntimeDisconnectedEvent newRuntimeDisconnectedEvent(String message) {
 		return new RuntimeDisconnectedEvent(message);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeErrorStateEvent()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeErrorStateEvent()
 	 */
 	public IRuntimeErrorStateEvent newRuntimeErrorStateEvent() {
 		return new RuntimeErrorStateEvent();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeJobChangeEvent(org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeJobChangeEvent
+	 * (org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeJobChangeEvent newRuntimeJobChangeEvent(ElementAttributeManager attrs) {
 		return new RuntimeJobChangeEvent(attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeMachineChangeEvent(org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeMachineChangeEvent
+	 * (org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeMachineChangeEvent newRuntimeMachineChangeEvent(ElementAttributeManager attrs) {
 		return new RuntimeMachineChangeEvent(attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeMessageEvent(org.eclipse.ptp.core.attributes.AttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeMessageEvent
+	 * (org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	public IRuntimeMessageEvent newRuntimeMessageEvent(AttributeManager attrs) {
 		return new RuntimeMessageEvent(attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeMessageEvent(org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeMessageEvent
+	 * (org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level,
+	 * java.lang.String)
 	 */
-	public IRuntimeMessageEvent newRuntimeMessageEvent(Level level,
-			String message) {
+	public IRuntimeMessageEvent newRuntimeMessageEvent(Level level, String message) {
 		return new RuntimeMessageEvent(level, message);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewJobEvent(java.lang.String, org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewJobEvent
+	 * (java.lang.String,
+	 * org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeNewJobEvent newRuntimeNewJobEvent(String parent, ElementAttributeManager attrs) {
 		return new RuntimeNewJobEvent(parent, attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewMachineEvent(java.lang.String, org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeNewMachineEvent(java.lang.String,
+	 * org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeNewMachineEvent newRuntimeNewMachineEvent(String parent, ElementAttributeManager attrs) {
 		return new RuntimeNewMachineEvent(parent, attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewNodeEvent(java.lang.String, org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewNodeEvent
+	 * (java.lang.String,
+	 * org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeNewNodeEvent newRuntimeNewNodeEvent(String parent, ElementAttributeManager attrs) {
 		return new RuntimeNewNodeEvent(parent, attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewProcessEvent(java.lang.String, org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeNewProcessEvent(java.lang.String,
+	 * org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeNewProcessEvent newRuntimeNewProcessEvent(String parent, ElementAttributeManager attrs) {
 		return new RuntimeNewProcessEvent(parent, attrs);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewQueueEvent(java.lang.String, org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNewQueueEvent
+	 * (java.lang.String,
+	 * org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeNewQueueEvent newRuntimeNewQueueEvent(String parent, ElementAttributeManager attrs) {
 		return new RuntimeNewQueueEvent(parent, attrs);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeNodeChangeEvent(org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeNodeChangeEvent
+	 * (org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeNodeChangeEvent newRuntimeNodeChangeEvent(ElementAttributeManager attrs) {
 		return new RuntimeNodeChangeEvent(attrs);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeProcessChangeEvent(org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeProcessChangeEvent
+	 * (org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IRuntimeProcessChangeEvent newRuntimeProcessChangeEvent(String jobId, ElementAttributeManager attrs) {
 		return new RuntimeProcessChangeEvent(jobId, attrs);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveAllEventt()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeRemoveAllEventt()
 	 */
 	public IRuntimeRemoveAllEvent newRuntimeRemoveAllEventt() {
 		return new RuntimeRemoveAllEvent();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveJobEvent(org.eclipse.ptp.core.util.RangeSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveJobEvent
+	 * (org.eclipse.ptp.core.util.RangeSet)
 	 */
 	public IRuntimeRemoveJobEvent newRuntimeRemoveJobEvent(RangeSet ids) {
 		return new RuntimeRemoveJobEvent(ids);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveMachineEvent(org.eclipse.ptp.core.util.RangeSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeRemoveMachineEvent(org.eclipse.ptp.core.util.RangeSet)
 	 */
 	public IRuntimeRemoveMachineEvent newRuntimeRemoveMachineEvent(RangeSet ids) {
 		return new RuntimeRemoveMachineEvent(ids);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveNodeEvent(org.eclipse.ptp.core.util.RangeSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeRemoveNodeEvent(org.eclipse.ptp.core.util.RangeSet)
 	 */
 	public IRuntimeRemoveNodeEvent newRuntimeRemoveNodeEvent(RangeSet ids) {
 		return new RuntimeRemoveNodeEvent(ids);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveProcessEvent(org.eclipse.ptp.core.util.RangeSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeRemoveProcessEvent(org.eclipse.ptp.core.util.RangeSet)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IRuntimeRemoveProcessEvent newRuntimeRemoveProcessEvent(String jobId, RangeSet ids) {
 		return new RuntimeRemoveProcessEvent(jobId, ids);
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRemoveQueueEvent(org.eclipse.ptp.core.util.RangeSet)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeRemoveQueueEvent(org.eclipse.ptp.core.util.RangeSet)
 	 */
 	public IRuntimeRemoveQueueEvent newRuntimeRemoveQueueEvent(RangeSet ids) {
 		return new RuntimeRemoveQueueEvent(ids);
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRMChangeEvent(org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRMChangeEvent
+	 * (org.eclipse.ptp.core.elements.attributes.ElementAttributeManager)
 	 */
 	public IRuntimeRMChangeEvent newRuntimeRMChangeEvent(ElementAttributeManager attrs) {
 		return new RuntimeRMChangeEvent(attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeRunningStateEvent()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeRunningStateEvent()
 	 */
 	public IRuntimeRunningStateEvent newRuntimeRunningStateEvent() {
 		return new RuntimeRunningStateEvent();
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeShutdownStateEvent()
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeShutdownStateEvent()
 	 */
 	public IRuntimeShutdownStateEvent newRuntimeShutdownStateEvent() {
 		return new RuntimeShutdownStateEvent();
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeStartupErrorEvent(java.lang.String)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeStartupErrorEvent(java.lang.String)
 	 */
 	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(String message) {
 		return new RuntimeStartupErrorEvent(message);
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeStartupErrorEvent(int, java.lang.String)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeStartupErrorEvent(int, java.lang.String)
 	 */
 	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(int code, String message) {
 		return new RuntimeStartupErrorEvent(code, message);
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeSubmitJobErrorEvent(int, java.lang.String, java.lang.String)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeSubmitJobErrorEvent(int, java.lang.String, java.lang.String)
 	 */
 	public IRuntimeSubmitJobErrorEvent newRuntimeSubmitJobErrorEvent(int code, String message, String jobSubID) {
 		return new RuntimeSubmitJobErrorEvent(code, message, jobSubID);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#newRuntimeTerminateJobErrorEvent(int, java.lang.String, java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
+	 * newRuntimeTerminateJobErrorEvent(int, java.lang.String, java.lang.String)
 	 */
 	public IRuntimeTerminateJobErrorEvent newRuntimeTerminateJobErrorEvent(int code, String message, String jobID) {
 		return new RuntimeTerminateJobErrorEvent(code, message, jobID);

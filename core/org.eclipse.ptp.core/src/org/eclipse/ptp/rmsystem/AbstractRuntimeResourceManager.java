@@ -87,21 +87,22 @@ import org.eclipse.ptp.utils.core.RangeSet;
 
 /**
  * @author greg
- *
+ * 
  */
-public abstract class AbstractRuntimeResourceManager extends
-AbstractResourceManager implements IRuntimeEventListener {
+public abstract class AbstractRuntimeResourceManager extends AbstractResourceManager implements IRuntimeEventListener {
 
-	public enum JobSubState {CANCELED, COMPLETED, ERROR, SUBMITTED}
+	public enum JobSubState {
+		CANCELED, COMPLETED, ERROR, SUBMITTED
+	}
 
 	private class JobSubmission {
-		private ILaunchConfiguration	configuration;
-		private String					id;
-		private IPJob					job = null;
-		private String					reason;
-		private JobSubState				state = JobSubState.SUBMITTED;
-		private final ReentrantLock 	subLock = new ReentrantLock();
-		private final Condition 		subCondition = subLock.newCondition();;
+		private ILaunchConfiguration configuration;
+		private final String id;
+		private IPJob job = null;
+		private String reason;
+		private JobSubState state = JobSubState.SUBMITTED;
+		private final ReentrantLock subLock = new ReentrantLock();
+		private final Condition subCondition = subLock.newCondition();;
 
 		@SuppressWarnings("unused")
 		public JobSubmission(int count) {
@@ -144,7 +145,8 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 
 		/**
-		 * @param reason the reason for the error
+		 * @param reason
+		 *            the reason for the error
 		 */
 		public void setError(String reason) {
 			this.reason = reason;
@@ -152,21 +154,24 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 
 		/**
-		 * @param job the job to set
+		 * @param job
+		 *            the job to set
 		 */
 		public void setJob(IPJob job) {
 			this.job = job;
 		}
 
 		/**
-		 * @param configuaration the configuration to set
+		 * @param configuaration
+		 *            the configuration to set
 		 */
 		public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 			this.configuration = configuration;
 		}
 
 		/**
-		 * @param state the state to set
+		 * @param state
+		 *            the state to set
 		 */
 		public void setState(JobSubState state) {
 			subLock.lock();
@@ -201,35 +206,46 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	private Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
+	private final Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 	private IRuntimeSystem runtimeSystem;
 
-	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe,
-			IResourceManagerConfiguration config) {
+	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id, universe, config);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent)
-	 *
-	 * Note: this allows redefinition of attribute definitions. This is ok as long as they
-	 * are only allowed during the initialization phase.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent)
+	 * 
+	 * Note: this allows redefinition of attribute definitions. This is ok as
+	 * long as they are only allowed during the initialization phase.
 	 */
 	public void handleEvent(IRuntimeAttributeDefinitionEvent e) {
-		for (IAttributeDefinition<?,?,?> attr : e.getDefinitions()) {
+		for (IAttributeDefinition<?, ?, ?> attr : e.getDefinitions()) {
 			getAttributeDefinitionManager().setAttributeDefinition(attr);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeConnectedStateEvent)
 	 */
 	public void handleEvent(IRuntimeConnectedStateEvent e) {
 		// Ignore
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeErrorStateEvent)
 	 */
 	public void handleEvent(IRuntimeErrorStateEvent e) {
 		/*
@@ -237,21 +253,24 @@ AbstractResourceManager implements IRuntimeEventListener {
 		 * and inform upper levels of the problem.
 		 */
 		for (JobSubmission sub : jobSubmissions.values()) {
-			sub.setError(Messages.AbstractRuntimeResourceManager_6); 
+			sub.setError(Messages.AbstractRuntimeResourceManager_6);
 		}
 		jobSubmissions.clear();
 
 		setState(ResourceManagerAttributes.State.ERROR);
-		fireError(Messages.AbstractRuntimeResourceManager_6); 
+		fireError(Messages.AbstractRuntimeResourceManager_6);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeJobChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeJobChangeEvent)
 	 */
 	public void handleEvent(IRuntimeJobChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
-		Map<IPQueueControl, List<IPJobControl>> map = 
-			new HashMap<IPQueueControl, List<IPJobControl>>();
+		Map<IPQueueControl, List<IPJobControl>> map = new HashMap<IPQueueControl, List<IPJobControl>>();
 
 		for (Map.Entry<RangeSet, AttributeManager> mgrEntry : eMgr.getEntrySet()) {
 			AttributeManager attrs = mgrEntry.getValue();
@@ -269,7 +288,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 					}
 					changedJobs.add(job);
 				} else {
-					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_7 + elementId); 
+					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_7 + elementId);
 				}
 			}
 
@@ -281,8 +300,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeMachineChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeMachineChangeEvent)
 	 */
 	public void handleEvent(IRuntimeMachineChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -297,7 +320,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 				if (machine != null) {
 					machines.add(machine);
 				} else {
-					System.out.println(Messages.AbstractRuntimeResourceManager_8 + elementId); 
+					System.out.println(Messages.AbstractRuntimeResourceManager_8 + elementId);
 				}
 			}
 
@@ -306,16 +329,24 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeErrorEvent)
 	 */
 	public void handleEvent(IRuntimeMessageEvent e) {
-		//MessageAttributes.Level level = e.getLevel();
+		// MessageAttributes.Level level = e.getLevel();
 		// FIXME: implement logging
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewJobEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeNewJobEvent)
 	 */
 	public void handleEvent(IRuntimeNewJobEvent e) {
 		IPQueueControl queue = getQueueControl(e.getParentId());
@@ -335,11 +366,11 @@ AbstractResourceManager implements IRuntimeEventListener {
 						job = doCreateJob(queue, elementId, jobAttrs);
 						newJobs.add(job);
 
-						StringAttribute jobSubAttr = 
-							(StringAttribute) jobAttrs.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+						StringAttribute jobSubAttr = jobAttrs.getAttribute(JobAttributes.getSubIdAttributeDefinition());
 						if (jobSubAttr != null) {
 							/*
-							 * Notify any submitJob() calls that the job has been created
+							 * Notify any submitJob() calls that the job has
+							 * been created
 							 */
 							JobSubmission sub = jobSubmissions.remove(jobSubAttr.getValue());
 							if (sub != null) {
@@ -358,8 +389,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewMachineEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeNewMachineEvent)
 	 */
 	public void handleEvent(IRuntimeNewMachineEvent e) {
 		ElementAttributeManager mgr = e.getElementAttributeManager();
@@ -381,8 +416,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewNodeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeNewNodeEvent)
 	 */
 	public void handleEvent(IRuntimeNewNodeEvent e) {
 		IPMachineControl machine = getMachineControl(e.getParentId());
@@ -410,8 +449,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewProcessEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeNewProcessEvent)
 	 */
 	public void handleEvent(IRuntimeNewProcessEvent e) {
 		final String jobId = e.getParentId();
@@ -432,8 +475,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNewQueueEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeNewQueueEvent)
 	 */
 	public void handleEvent(IRuntimeNewQueueEvent e) {
 		ElementAttributeManager mgr = e.getElementAttributeManager();
@@ -455,13 +502,16 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeNodeChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeNodeChangeEvent)
 	 */
 	public void handleEvent(IRuntimeNodeChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
-		Map<IPMachineControl, List<IPNodeControl>> map = 
-			new HashMap<IPMachineControl, List<IPNodeControl>>();
+		Map<IPMachineControl, List<IPNodeControl>> map = new HashMap<IPMachineControl, List<IPNodeControl>>();
 
 		for (Map.Entry<RangeSet, AttributeManager> mgrEntry : eMgr.getEntrySet()) {
 			AttributeManager attrs = mgrEntry.getValue();
@@ -479,7 +529,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 					}
 					changedNodes.add(node);
 				} else {
-					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_9 + elementId); 
+					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_9 + elementId);
 				}
 			}
 
@@ -491,14 +541,18 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeProcessChangeEvent)
 	 */
 	public void handleEvent(IRuntimeProcessChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
 		String jobId = e.getJobId();
 		IPJobControl job = getJobControl(jobId);
-		
+
 		for (Map.Entry<RangeSet, AttributeManager> mgrEntry : eMgr.getEntrySet()) {
 			AttributeManager attrs = mgrEntry.getValue();
 			RangeSet processJobRanks = mgrEntry.getKey();
@@ -511,8 +565,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeQueueChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeQueueChangeEvent)
 	 */
 	public void handleEvent(IRuntimeQueueChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
@@ -536,19 +594,26 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveAllEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeRemoveAllEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveAllEvent e) {
 		cleanUp();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeRemoveJobEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveJobEvent e) {
-		Map<IPQueueControl, List<IPJobControl>> map = 
-			new HashMap<IPQueueControl, List<IPJobControl>>();
+		Map<IPQueueControl, List<IPJobControl>> map = new HashMap<IPQueueControl, List<IPJobControl>>();
 		Set<IPJobControl> removedJobs = new HashSet<IPJobControl>();
 
 		for (String elementId : e.getElementIds()) {
@@ -571,12 +636,15 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveMachineEvent e) {
-		Map<IResourceManager, List<IPMachineControl>> map = 
-			new HashMap<IResourceManager, List<IPMachineControl>>();
+		Map<IResourceManager, List<IPMachineControl>> map = new HashMap<IResourceManager, List<IPMachineControl>>();
 
 		for (String elementId : e.getElementIds()) {
 			IPMachineControl machine = getMachineControl(elementId);
@@ -596,12 +664,15 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeRemoveNodeEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveNodeEvent e) {
-		Map<IPMachineControl, List<IPNodeControl>> map = 
-			new HashMap<IPMachineControl, List<IPNodeControl>>();
+		Map<IPMachineControl, List<IPNodeControl>> map = new HashMap<IPMachineControl, List<IPNodeControl>>();
 
 		for (String elementId : e.getElementIds()) {
 			IPNodeControl node = getNodeControl(elementId);
@@ -621,8 +692,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeRemoveProcessEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveProcessEvent e) {
 		final RangeSet jobRanks = e.getProcessJobRanks();
@@ -633,12 +708,15 @@ AbstractResourceManager implements IRuntimeEventListener {
 		job.removeProcessesByJobRanks(removedProcessJobRanks);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveQueueEvent e) {
-		Map<IResourceManager, List<IPQueueControl>> map = 
-			new HashMap<IResourceManager, List<IPQueueControl>>();
+		Map<IResourceManager, List<IPQueueControl>> map = new HashMap<IResourceManager, List<IPQueueControl>>();
 
 		for (String elementId : e.getElementIds()) {
 			IPQueueControl queue = getQueueControl(elementId);
@@ -673,8 +751,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeRunningStateEvent)
 	 */
 	public void handleEvent(IRuntimeRunningStateEvent e) {
 		ResourceManagerAttributes.State state = State.STARTED;
@@ -689,24 +771,36 @@ AbstractResourceManager implements IRuntimeEventListener {
 		setState(state);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeShutdownStateEvent)
 	 */
 	public void handleEvent(IRuntimeShutdownStateEvent e) {
 		setState(ResourceManagerAttributes.State.STOPPED);
 		cleanUp();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeStartupErrorEvent)
 	 */
 	public void handleEvent(IRuntimeStartupErrorEvent e) {
 		setState(ResourceManagerAttributes.State.ERROR);
 		fireError(e.getErrorMessage());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
 		if (e.getJobSubID() != null) {
@@ -715,11 +809,15 @@ AbstractResourceManager implements IRuntimeEventListener {
 				sub.setError(e.getErrorMessage());
 			}
 		}
-		fireSubmitJobError(e.getJobSubID(), e.getErrorMessage());	
+		fireSubmitJobError(e.getJobSubID(), e.getErrorMessage());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse
+	 * .ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent)
 	 */
 	public void handleEvent(IRuntimeTerminateJobErrorEvent e) {
 		IPJob job = this.getJobControl(e.getJobID());
@@ -727,7 +825,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 		if (job != null) {
 			name = job.getName();
 		}
-		fireError(NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[]{name, e.getErrorMessage()}));
+		fireError(NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[] { name, e.getErrorMessage() }));
 	}
 
 	/**
@@ -750,7 +848,9 @@ AbstractResourceManager implements IRuntimeEventListener {
 	 */
 	protected abstract void doBeforeOpenConnection();
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doCleanUp()
 	 */
 	@Override
@@ -766,7 +866,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 
 	/**
 	 * Template pattern method to actually create the job.
-	 *
+	 * 
 	 * @param queue
 	 * @param jobId
 	 * @return
@@ -775,7 +875,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 
 	/**
 	 * Template pattern method to actually create the machine.
-	 *
+	 * 
 	 * @param machineId
 	 * @return
 	 */
@@ -783,7 +883,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 
 	/**
 	 * Template pattern method to actually create the node.
-	 *
+	 * 
 	 * @param machine
 	 * @param nodeId
 	 * @return
@@ -792,7 +892,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 
 	/**
 	 * Template pattern method to actually create the queue.
-	 *
+	 * 
 	 * @param queueId
 	 * @return
 	 */
@@ -800,20 +900,27 @@ AbstractResourceManager implements IRuntimeEventListener {
 
 	/**
 	 * create a new runtime system
+	 * 
 	 * @return the new runtime system
-	 * @throws CoreException TODO
+	 * @throws CoreException
+	 *             TODO
 	 */
 	protected abstract IRuntimeSystem doCreateRuntimeSystem() throws CoreException;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDisableEvents()
 	 */
+	@Override
 	protected void doDisableEvents() {
 		// TODO Auto-generated method stub
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
 	 */
 	@Override
@@ -822,14 +929,18 @@ AbstractResourceManager implements IRuntimeEventListener {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doEnableEvents()
 	 */
+	@Override
 	protected void doEnableEvents() {
 		// TODO Auto-generated method stub
 
 	}
 
+	@Override
 	protected List<IPJobControl> doRemoveTerminatedJobs(IPQueueControl queue) {
 		List<IPJobControl> terminatedJobs = new ArrayList<IPJobControl>();
 
@@ -845,9 +956,12 @@ AbstractResourceManager implements IRuntimeEventListener {
 		return terminatedJobs;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doShutdown()
 	 */
+	@Override
 	protected void doShutdown() throws CoreException {
 		doBeforeCloseConnection();
 
@@ -856,12 +970,17 @@ AbstractResourceManager implements IRuntimeEventListener {
 		doAfterCloseConnection();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
+	 * .core.runtime.IProgressMonitor)
 	 */
+	@Override
 	protected void doStartup(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		monitor.subTask(Messages.AbstractRuntimeResourceManager_11); 
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_11);
 
 		runtimeSystem = doCreateRuntimeSystem();
 
@@ -870,7 +989,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 
 		monitor.worked(10);
-		monitor.subTask(Messages.AbstractRuntimeResourceManager_5); 
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_5);
 
 		runtimeSystem.addRuntimeEventListener(this);
 
@@ -882,12 +1001,18 @@ AbstractResourceManager implements IRuntimeEventListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(java.lang.String, org.eclipse.debug.core.ILaunchConfiguration, org.eclipse.ptp.core.attributes.AttributeManager, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(java.lang
+	 * .String, org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.core.attributes.AttributeManager,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	protected IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, 
-			AttributeManager attrMgr, IProgressMonitor monitor) 
-	throws CoreException {
+	@Override
+	protected IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -925,8 +1050,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 				break;
 
 			case ERROR:
-				throw new CoreException(new Status(IStatus.ERROR, 
-						PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
 						sub.getErrorReason(), null));
 			}
 		} finally {
@@ -936,9 +1060,14 @@ AbstractResourceManager implements IRuntimeEventListener {
 		return job;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doTerminateJob(org.eclipse.ptp.core.elements.IPJob)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doTerminateJob(org.eclipse
+	 * .ptp.core.elements.IPJob)
 	 */
+	@Override
 	protected void doTerminateJob(IPJob job) throws CoreException {
 		runtimeSystem.terminateJob(job);
 	}
@@ -950,8 +1079,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 	 * @param attrs
 	 * @return changes were made
 	 */
-	abstract protected boolean doUpdateJobs(IPQueueControl queue,
-			Collection<IPJobControl> jobs, AttributeManager attrs);
+	abstract protected boolean doUpdateJobs(IPQueueControl queue, Collection<IPJobControl> jobs, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the machines.
@@ -965,24 +1093,30 @@ AbstractResourceManager implements IRuntimeEventListener {
 	/**
 	 * Template pattern method to update a collection of nodes.
 	 * 
-	 * @param machine parent machine
-	 * @param nodes collection of nodes to update
-	 * @param attrs new/changed attibutes for each node in the collection
+	 * @param machine
+	 *            parent machine
+	 * @param nodes
+	 *            collection of nodes to update
+	 * @param attrs
+	 *            new/changed attibutes for each node in the collection
 	 * @return changes were made
 	 */
-	protected abstract boolean doUpdateNodes(IPMachineControl machine, 
-			Collection<IPNodeControl> nodes, AttributeManager attrs);
+	protected abstract boolean doUpdateNodes(IPMachineControl machine, Collection<IPNodeControl> nodes, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the processes.
 	 * 
-	 * @param job parent job
-	 * @param processJobRanks collection of process job ranks representing processes to update
-	 * @param attrs new/changed attributes for each node in the collection
+	 * @param job
+	 *            parent job
+	 * @param processJobRanks
+	 *            collection of process job ranks representing processes to
+	 *            update
+	 * @param attrs
+	 *            new/changed attributes for each node in the collection
 	 * @return changes were made
+	 * @since 4.0
 	 */
-	protected abstract boolean doUpdateProcesses(IPJobControl job,
-			BitSet processJobRanks, AttributeManager attrs);
+	protected abstract boolean doUpdateProcesses(IPJobControl job, BitSet processJobRanks, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the queues.
@@ -1005,6 +1139,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 	/**
 	 * @param sJobRank
 	 * @return
+	 * @since 4.0
 	 */
 	protected Integer getProcessJobRank(String sJobRank) {
 		Integer procId;
@@ -1019,6 +1154,7 @@ AbstractResourceManager implements IRuntimeEventListener {
 	/**
 	 * @param processJobRanks
 	 * @return
+	 * @since 4.0
 	 */
 	protected BitSet getProcessJobRanks(RangeSet processJobRanks) {
 		final BitSet bitSet = new BitSet(processJobRanks.size());
@@ -1026,10 +1162,8 @@ AbstractResourceManager implements IRuntimeEventListener {
 			Integer rank = getProcessJobRank(sRank);
 			if (rank != null) {
 				bitSet.set(rank);
-			}
-			else {
-				PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_12 +
-						sRank + Messages.AbstractRuntimeResourceManager_13);
+			} else {
+				PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_12 + sRank + Messages.AbstractRuntimeResourceManager_13);
 			}
 		}
 		return bitSet;
