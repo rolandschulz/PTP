@@ -45,6 +45,7 @@ import org.eclipse.ptp.pldt.common.ArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.IDs;
 import org.eclipse.ptp.pldt.common.ScanReturn;
+import org.eclipse.ptp.pldt.common.messages.Messages;
 import org.eclipse.ptp.pldt.common.util.AnalysisUtil;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
