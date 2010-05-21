@@ -24,5 +24,28 @@ public interface IProxyRuntimeCommand extends IProxyCommand {
 	public static final int SUBMIT_JOB = 5;
 	public static final int TERMINATE_JOB = 6;
 	public static final int FILTER_EVENTS = 7;
-
+	/**
+	 * @since 4.0
+	 */
+	public static final int SUSPEND_EVENTS = 8;
+	/**
+	 * @since 4.0
+	 */
+	public static final int RESUME_EVENTS = 9;
+	/**
+	 * @since 4.0
+	 */
+	public static final int SET_FILTERS = 10;
+	/**
+	 * @since 4.0
+	 */
+	public static final int CLEAR_FILTERS = 11;
+	/**
+	 * @since 4.0
+	 */
+	public static final int GET_ATTRIBUTES = 12;
+	/**
+	 * @since 4.0
+	 */
+	public static final int QUERY_ATTRIBUTES = 13;
 }

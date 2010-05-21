@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,16 +11,24 @@
 package org.eclipse.ptp.internal.proxy.runtime.command;
 
 import org.eclipse.ptp.proxy.command.AbstractProxyCommand;
-import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
+import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSuspendEventsCommand;
 
-public class ProxyRuntimeStartEventsCommand extends AbstractProxyCommand
-		implements IProxyRuntimeStartEventsCommand {
+/**
+ * Command class for SUSPEND_EVENTS command. This command is used in proxy flow
+ * control to indicate the proxy must suspend sending event notifications to the
+ * proxy
+ * 
+ * @author David Wootton
+ * 
+ */
+public class ProxyRuntimeSuspendEventsCommand extends AbstractProxyCommand
+		implements IProxyRuntimeSuspendEventsCommand {
 
-	public ProxyRuntimeStartEventsCommand() {
-		super(START_EVENTS);
+	/**
+	 * Create an instance of a SUSPEND_EVENTS command with no parameters
+	 */
+	public ProxyRuntimeSuspendEventsCommand() {
+		super(SUSPEND_EVENTS);
 	}
 
-	public ProxyRuntimeStartEventsCommand(int transID, String[] args) {
-		super(START_EVENTS, transID, args);
-	}
 }

@@ -13,15 +13,15 @@ package org.eclipse.ptp.internal.proxy.runtime.command;
 import org.eclipse.ptp.proxy.command.AbstractProxyCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeFilterEventsCommand;
 
-public class ProxyRuntimeFilterEventsCommand 
-	extends AbstractProxyCommand implements IProxyRuntimeFilterEventsCommand {
+public class ProxyRuntimeFilterEventsCommand extends AbstractProxyCommand
+		implements IProxyRuntimeFilterEventsCommand {
+
+	public ProxyRuntimeFilterEventsCommand(int transID, String[] args) {
+		super(FILTER_EVENTS, transID, args);
+	}
 
 	public ProxyRuntimeFilterEventsCommand(String[] args) {
 		super(FILTER_EVENTS);
 		addArguments(args);
-	}
-	
-	public ProxyRuntimeFilterEventsCommand(int transID, String[] args) {
-		super(FILTER_EVENTS, transID, args);
 	}
 }
