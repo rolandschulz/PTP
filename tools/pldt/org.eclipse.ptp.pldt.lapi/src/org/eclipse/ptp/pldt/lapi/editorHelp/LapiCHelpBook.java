@@ -14,6 +14,7 @@ import org.eclipse.ptp.pldt.common.editorHelp.CHelpBookImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionPrototypeSummaryImpl;
 import org.eclipse.ptp.pldt.common.editorHelp.FunctionSummaryImpl;
 import org.eclipse.ptp.pldt.lapi.LapiPlugin;
+import org.eclipse.ptp.pldt.lapi.messages.Messages;
 
 
 public class LapiCHelpBook extends CHelpBookImpl {
