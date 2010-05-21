@@ -56,12 +56,19 @@ import org.eclipse.ui.PlatformUI;
  * code and for visitors looking for MPI, OpenMP, LAPI, etc. etc. types of artifacts
  * 
  * @author Beth Tibbitts
+ * @since 4.0
  * 
  */
 public class PldtAstVisitor extends CASTVisitor {
 
 
+	/**
+	 * @since 4.0
+	 */
 	public static String ARTIFACT_CALL = "Artifact Call"; //$NON-NLS-1$
+	/**
+	 * @since 4.0
+	 */
 	public static String ARTIFACT_CONSTANT = "Artifact Constant"; //$NON-NLS-1$
 	protected static String ARTIFACT_NAME = "Artifact Name"; //$NON-NLS-1$
 	protected static String PREFIX = ""; //$NON-NLS-1$
@@ -552,14 +559,16 @@ public class PldtAstVisitor extends CASTVisitor {
 	      return dontAskAgain;
 	    }
 	  }
-	  /**
-	   * will be overridden where needed;
-	   * note that for C code, the test for if the prefix matches has already been done
-	   * before this is called so this test isn't necessary.
-	   * FIXME improve this convoluted logic
-	   * @param name
-	   * @return
-	   */
+
+	/**
+	 * will be overridden where needed; note that for C code, the test for if
+	 * the prefix matches has already been done before this is called so this
+	 * test isn't necessary. FIXME improve this convoluted logic
+	 * 
+	 * @param name
+	 * @return
+	 * @since 4.0
+	 */
 	  public boolean matchesPrefix(String name) {
 		  return true;
 	  }
