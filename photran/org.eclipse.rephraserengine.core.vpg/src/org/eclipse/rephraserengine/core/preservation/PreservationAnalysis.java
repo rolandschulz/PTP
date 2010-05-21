@@ -47,7 +47,7 @@ import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Rho;
  *
  * @since 1.0
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class PreservationAnalysis
 {
     private IAdapterManager adapterManager;

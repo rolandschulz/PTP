@@ -18,7 +18,9 @@ import org.eclipse.rephraserengine.core.util.Pair;
 
 /**
  * 
- * @author joverbey
+ * @author Jeff Overbey
+ * 
+ * @since 2.0
  */
 public class ForEach
 {

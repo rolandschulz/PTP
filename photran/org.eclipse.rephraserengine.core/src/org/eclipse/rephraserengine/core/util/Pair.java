@@ -17,6 +17,8 @@ package org.eclipse.rephraserengine.core.util;
  * 
  * @param <T>
  * @param <U>
+ * 
+ * @since 2.0
  */
 public final class Pair<T, U>
 {

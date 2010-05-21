@@ -23,6 +23,8 @@ package org.eclipse.rephraserengine.core.analysis.dependence;
  *
  * @author Jeff Overbey
  * @see IDependenceTester
+ * 
+ * @since 2.0
  */
 public /*was package-private*/ class GCDTest implements IDependenceTester
 {

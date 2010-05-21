@@ -15,6 +15,11 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Iterator;
 
+/**
+ * @author Jeff Overbey
+ *
+ * @since 1.0
+ */
 public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 {
     ///////////////////////////////////////////////////////////////////////////

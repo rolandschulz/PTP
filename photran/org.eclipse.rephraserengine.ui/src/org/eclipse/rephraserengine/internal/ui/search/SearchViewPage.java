@@ -28,6 +28,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 /**
  * @author Doug Schaefer
  * @author Jeff Overbey
+ *
+ * @since 2.0
  */
 @SuppressWarnings("restriction")
 public class SearchViewPage extends AbstractTextSearchViewPage {

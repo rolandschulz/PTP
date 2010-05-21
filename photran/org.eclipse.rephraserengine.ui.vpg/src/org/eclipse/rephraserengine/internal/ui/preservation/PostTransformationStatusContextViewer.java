@@ -27,6 +27,8 @@ import org.eclipse.swt.widgets.Composite;
  * Based on {@link FileStatusContextViewer}
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 @SuppressWarnings("restriction")
 public class PostTransformationStatusContextViewer extends TextStatusContextViewer

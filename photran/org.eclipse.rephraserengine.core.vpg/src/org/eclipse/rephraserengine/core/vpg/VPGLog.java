@@ -31,6 +31,8 @@ import java.util.Set;
  * 
  * @author Jeff Overbey
  * @author Kurt Hendle
+ * 
+ * @since 1.0
  */
 public abstract class VPGLog<T, R extends TokenRef<T>>
 {
@@ -203,6 +205,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
      * @param tokenRef a specific token with which the warning is associated;
      *                 for example, if an identifier was used without being
      *                 initialized, it could reference that identifier
+     * @since 2.0
      */
 	public void logError(Throwable e, R tokenRef)
 	{
@@ -346,12 +349,14 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 
     private static final String EOL_ESCAPE = "&EOL;";
     
+    /**
+     * @since 2.0
+     */
     protected abstract File getLogFile();
 
     /**
      * Writes the log to a file.
-     * 
-     * @throws IOException 
+     * @since 2.0
      */
     public void writeToFile() throws IOException
     {
@@ -397,6 +402,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
      *      TokenRef filename, offset, length
      *      message
      * </pre>
+     * @since 2.0
      */
     public void readLogFromFile()
     {

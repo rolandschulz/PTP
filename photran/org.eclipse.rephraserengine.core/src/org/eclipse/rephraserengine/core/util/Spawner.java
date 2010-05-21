@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public class Spawner
+public final class Spawner
 {
     private Spawner() {}
 

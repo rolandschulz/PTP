@@ -201,14 +201,20 @@ public class WorkbenchSelectionInfo
         return fileInEditor != null;
     }
 
-    /** @return the active editor in the workbench, or <code>null</code> if no editor is active */
+    /**
+     * @return the active editor in the workbench, or <code>null</code> if no editor is active 
+     * @since 2.0
+     */
     public IEditorPart getActiveEditor()
     {
         return activeEditor;
     }
 
-    /** @return the active editor in the workbench, if it is a text editor, or <code>null</code>
-     *  if no editor is active or it is not a text editor */
+    /**
+     * @return the active editor in the workbench, if it is a text editor, or <code>null</code>
+     * if no editor is active or it is not a text editor
+     * @since 2.0
+     */
     public ITextEditor getActiveTextEditor()
     {
         return activeEditor instanceof ITextEditor ? (ITextEditor)activeEditor : null;
@@ -242,10 +248,12 @@ public class WorkbenchSelectionInfo
         return selectionInEditor;
     }
 
-    /** @return the contents of the active editor in the workbench (if the active editor is a
-     *          text editor and its contents can be retrieved), or <code>null</code> otherwise.
-     *          Note that, if the editor's contents have not been saved, the <i>unsaved</i>
-     *          version (i.e., the current text in the editor) will be returned.
+    /**
+     * @return the contents of the active editor in the workbench (if the active editor is a
+     *         text editor and its contents can be retrieved), or <code>null</code> otherwise.
+     *         Note that, if the editor's contents have not been saved, the <i>unsaved</i>
+     *         version (i.e., the current text in the editor) will be returned.
+     * @since 2.0
      */
     public String getEditorContents()
     {

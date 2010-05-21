@@ -58,6 +58,8 @@ import org.eclipse.ui.progress.IProgressService;
  * @see RefactorMenu
  * @see UserInputString
  * @see UserInputBoolean
+ *
+ * @since 1.0
  */
 public class RefactoringAction<T extends Refactoring>
     implements IWorkbenchWindowActionDelegate,

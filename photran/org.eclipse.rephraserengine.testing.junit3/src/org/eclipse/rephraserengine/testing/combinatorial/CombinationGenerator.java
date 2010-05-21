@@ -38,6 +38,8 @@ import java.util.Iterator;
  * </pre>
  * 
  * @author Jeff Overbey
+ * 
+ * @since 2.0
  */
 public class CombinationGenerator implements Iterable<int[]>
 {

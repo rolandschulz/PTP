@@ -27,6 +27,9 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPGLog;
 import org.eclipse.text.edits.ReplaceEdit;
 
+/**
+ * @since 2.0
+ */
 public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends TokenRef<T>, ? extends VPGDB<A, T, ?, ?>, ? extends EclipseVPGLog<T, ?>>>
     extends Refactoring
     implements IRefactoring

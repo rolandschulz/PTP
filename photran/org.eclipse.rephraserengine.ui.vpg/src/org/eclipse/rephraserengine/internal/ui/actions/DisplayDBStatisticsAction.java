@@ -19,6 +19,8 @@ import org.eclipse.rephraserengine.ui.actions.VPGOutputWindowAction;
  * Implements the Display VPG Statistics action in the Refactor/(Debugging) menu
  *
  * @author Jeff Overbey
+ *
+ * @since 1.0
  */
 public class DisplayDBStatisticsAction extends VPGOutputWindowAction
 {

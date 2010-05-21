@@ -52,6 +52,8 @@ import org.eclipse.rephraserengine.internal.core.vpg.db.cdt.InternalCDTDB.IntVec
  * @param <T> token type
  * @param <R> TokenRef type
  * @param <L> log type
+ * 
+ * @since 1.0
  */
 public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
               extends VPGDB<A, T, R, L>

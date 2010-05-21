@@ -24,6 +24,8 @@ import org.eclipse.search.ui.text.Match;
  * 
  * @author Quillback
  * @author Jeff Overbey
+ * 
+ * @since 2.0
  */
 public class SearchMatch extends Match
 {

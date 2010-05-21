@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.CoreException;
  * Utility methods for working with strings.
  * 
  * @author Jeff Overbey
+ * 
+ * @since 2.0
  */
 public class StringUtil
 {

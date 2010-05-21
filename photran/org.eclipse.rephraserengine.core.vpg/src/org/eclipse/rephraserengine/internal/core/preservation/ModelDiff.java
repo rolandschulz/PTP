@@ -27,6 +27,8 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
  * changes is traversed via an Internal Iterator using {@link #processUsing(ModelDiffProcessor)}.
  * 
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public final class ModelDiff
 {

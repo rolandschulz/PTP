@@ -26,6 +26,8 @@ import org.eclipse.rephraserengine.core.util.TwoKeyHashMap;
  *
  * @param <N> namespace type
  * @param <S> symbol type
+ * 
+ * @since 2.0
  */
 public class SymbolTable<N, S>
 {

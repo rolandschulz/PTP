@@ -32,6 +32,8 @@ import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSink
  * A mutable, in-memory copy of part of a program graph.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public final class Model
 {

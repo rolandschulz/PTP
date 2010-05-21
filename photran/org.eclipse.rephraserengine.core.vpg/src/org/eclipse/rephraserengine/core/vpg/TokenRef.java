@@ -21,14 +21,19 @@ import java.io.Serializable;
  * {@link VPG#createTokenRef(String, int, int)}.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public class TokenRef<T> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	private String filename;
-	private int offset;
-	private int length;
+    /** @since 2.0 */
+	protected final String filename;
+    /** @since 2.0 */
+	protected final int offset;
+    /** @since 2.0 */
+	protected final int length;
 
 	/** Constructor.  Creates a TokenRef referring to the token at
 	 *  the given position in the given file. */

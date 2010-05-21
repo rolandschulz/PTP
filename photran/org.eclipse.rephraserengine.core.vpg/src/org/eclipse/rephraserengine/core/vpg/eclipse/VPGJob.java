@@ -24,8 +24,9 @@ import org.eclipse.core.resources.WorkspaceJob;
  * This class is intended to be subclassed directly.
  *
  * @author Jeff Overbey
- *
  * @see org.eclipse.core.resources.WorkspaceJob
+ * 
+ * @since 1.0
  */
 public abstract class VPGJob<A, T> extends WorkspaceJob
 {

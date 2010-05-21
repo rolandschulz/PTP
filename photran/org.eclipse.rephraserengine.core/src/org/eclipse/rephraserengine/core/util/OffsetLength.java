@@ -105,8 +105,11 @@ public final class OffsetLength
     // Inquiry & Comparison Methods
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   /** @return true iff the offset and length are both non-negative, i.e., this
-    *  represents a plausible region of text */
+   /**
+    * @return true iff the offset and length are both non-negative, i.e., this
+    *         represents a plausible region of text
+    * @since 2.0
+    */
    public boolean isValid()
    {
        return this.offset >= 0 && this.length >= 0;

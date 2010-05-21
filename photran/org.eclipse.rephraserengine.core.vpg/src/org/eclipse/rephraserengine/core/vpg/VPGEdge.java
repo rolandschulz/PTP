@@ -22,13 +22,19 @@ package org.eclipse.rephraserengine.core.vpg;
  *
  * @param <A> AST type
  * @param <T> token type
+ *
+ * @since 1.0
  */
 public class VPGEdge<A, T, R extends TokenRef<T>>
 {
-	private VPG<A, T, R, ?, ?> vpg;
-	private R source;
-	private R sink;
-	private int type;
+    /** @since 2.0 */
+    protected final VPG<A, T, R, ?, ?> vpg;
+    /** @since 2.0 */
+    protected final R source;
+    /** @since 2.0 */
+    protected final R sink;
+    /** @since 2.0 */
+    protected final int type;
 
 	/**
 	 * Constructor. Creates an edge of the given type between the given tokens in the given VPG.

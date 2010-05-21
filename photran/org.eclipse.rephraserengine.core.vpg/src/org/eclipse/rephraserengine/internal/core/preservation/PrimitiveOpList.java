@@ -20,6 +20,8 @@ import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
  * A list of {@link PrimitiveOp}s.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public final class PrimitiveOpList implements Iterable<PrimitiveOp>
 {

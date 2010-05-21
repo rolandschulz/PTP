@@ -58,6 +58,8 @@ import org.eclipse.ui.IWorkingSet;
  * @author Doug Schaefer
  * @author Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
  * @author Jeff Overbey - Rephraser Engine generalization
+ *
+ * @since 2.0
  */
 public abstract class SearchPage extends DialogPage implements ISearchPage
 {

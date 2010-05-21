@@ -42,6 +42,8 @@ import org.eclipse.rephraserengine.core.vpg.VPGLog;
  * @param <T> token type
  * @param <R> TokenRef type
  * @param <D> database type
+ * 
+ * @since 1.0
  */
 public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends VPGLog<T, R>>
      extends VPGDB<A, T, R, L>
@@ -57,6 +59,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
             this.id = edgeType;
         }
 
+        @SuppressWarnings("unchecked")
         @Override public boolean equals(Object o)
         {
             try

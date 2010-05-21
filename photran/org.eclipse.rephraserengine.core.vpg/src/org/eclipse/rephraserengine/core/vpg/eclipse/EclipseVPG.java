@@ -45,6 +45,8 @@ import org.eclipse.rephraserengine.core.vpg.VPGDB;
  * This class is intended to be subclassed directly.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends EclipseVPGLog<T, R>>
               extends VPG<A, T, R, D, L>
@@ -448,26 +450,41 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     // IFile-Based AST Acquisition & Release API
     ///////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @since 2.0
+     */
     public A acquireTransientAST(IFile file)
     {
         return file == null ? null : acquireTransientAST(getFilenameForIFile(file));
     }
 
+    /**
+     * @since 2.0
+     */
     public A acquirePermanentAST(IFile file)
     {
         return file == null ? null : acquirePermanentAST(getFilenameForIFile(file));
     }
     
+    /**
+     * @since 2.0
+     */
     public A makeTransientASTPermanent(IFile file)
     {
         return file == null ? null : makeTransientASTPermanent(getFilenameForIFile(file));
     }
 
+    /**
+     * @since 2.0
+     */
     public A makeTransientASTPermanent(IFile file, A ast)
     {
         return file == null ? null : makeTransientASTPermanent(getFilenameForIFile(file), ast);
     }
 
+    /**
+     * @since 2.0
+     */
     public void releaseAST(IFile file)
     {
         if (file != null) releaseAST(getFilenameForIFile(file));
@@ -498,7 +515,10 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         commitChangesFromInMemoryASTs(pm, ticks, getFilenameForIFile(file));
     }
 
-    /** Forces the database to be updated based on the current in-memory ASTs for the given files */
+    /**
+     * Forces the database to be updated based on the current in-memory ASTs for the given files
+     * @since 2.0
+     */
     public void commitChangesFromInMemoryASTs(IProgressMonitor pm, int ticks, Set<IFile> files)
     {
         String[] filenames = new String[files.size()];

@@ -14,6 +14,8 @@ package org.eclipse.rephraserengine.internal.core.preservation;
  * A primitive operation: alpha, epsilon, or rho.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public abstract class PrimitiveOp
 {

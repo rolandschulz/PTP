@@ -35,6 +35,8 @@ import org.eclipse.ui.part.FileEditorInput;
  * This was originally used for Fortran Search Results.
  * 
  * @author kdecker3, slieter2
+ * 
+ * @since 2.0
  */
 public class SearchResult
     extends AbstractTextSearchResult

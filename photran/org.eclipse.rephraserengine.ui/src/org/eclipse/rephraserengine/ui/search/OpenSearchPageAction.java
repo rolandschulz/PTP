@@ -31,6 +31,8 @@ import org.eclipse.ui.internal.Workbench;
  * @author bgheorgh
  * @author Jeff Dammeyer, Andrew Deason, Joe Digiovanna, Nick Sexmith
  * @author Jeff Overbey - moved into Rephraser Engine
+ * 
+ * @since 2.0
  */
 @SuppressWarnings("restriction")
 public abstract class OpenSearchPageAction implements IWorkbenchWindowActionDelegate

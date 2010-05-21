@@ -37,6 +37,8 @@ import org.eclipse.search.ui.text.AbstractTextSearchResult;
  * @author Jeff Overbey
  * 
  * @param <T>
+ * 
+ * @since 2.0
  */
 public abstract class SearchQuery<T extends AbstractTextSearchResult> implements ISearchQuery
 {

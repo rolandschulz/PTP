@@ -31,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * @author Doug Schaefer
  *
+ * @since 2.0
  */
 public class SearchTreeContentProvider implements ITreeContentProvider, ISearchContentProvider{
 

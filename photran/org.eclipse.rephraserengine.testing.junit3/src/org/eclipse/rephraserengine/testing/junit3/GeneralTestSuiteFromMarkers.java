@@ -31,8 +31,9 @@ import org.eclipse.rephraserengine.core.util.StringUtil;
  * Subclasses must override {@link #createTestFor(List, File, int, String))}.
  * 
  * @author Jeff Overbey
- * 
  * @see TestSuiteFromMarkers
+ * 
+ * @since 2.0
  */
 public abstract class GeneralTestSuiteFromMarkers extends TestSuite
 {

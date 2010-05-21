@@ -17,6 +17,8 @@ package org.eclipse.rephraserengine.internal.core.preservation;
  * denotes the set { <i>j</i>, <i>j</i>+1, <i>j</i>+2, ..., <i>k</j>-2, <i>k</j>-1 }.
  *
  * @author Jeff Overbey
+ * 
+ * @since 1.0
  */
 public final class Interval implements Comparable<Interval>
 {

@@ -13,6 +13,8 @@ import java.util.Set;
  * @param <RowType>
  * @param <ColType>
  * @param <CellType>
+ * 
+ * @since 2.0
  */
 public final class TwoKeyHashMap<RowType, ColType, CellType> implements Iterable<CellType>
 {

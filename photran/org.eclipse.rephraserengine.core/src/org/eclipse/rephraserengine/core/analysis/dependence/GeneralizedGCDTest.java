@@ -20,6 +20,8 @@ import java.util.Arrays;
  * THIS IS PRELIMINARY AND EXPERIMENTAL.  IT IS NOT APPROPRIATE FOR PRODUCTION USE.
  *
  * @author Jeff Overbey
+ * 
+ * @since 2.0
  */
 public class GeneralizedGCDTest implements IDependenceTester
 {

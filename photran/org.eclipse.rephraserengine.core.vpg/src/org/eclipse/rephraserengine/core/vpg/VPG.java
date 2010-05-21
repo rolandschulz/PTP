@@ -46,6 +46,8 @@ import org.eclipse.core.runtime.SubProgressMonitor;
  * @param <R> TokenRef type
  * @param <D> database type
  * @param <L> error/warning log type
+ * 
+ * @since 1.0
  */
 public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>, L extends VPGLog<T, R>>
 {
@@ -293,9 +295,12 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 		return dependents;
 	}
 
-    /** Changes the AST for the given file from a transient AST to a permanent
-     *  AST.  The AST will remain in memory until it is explicitly released
-     *  using {@link #releaseAST(String)} or {@link #releaseAllASTs()}.
+    /**
+     * Changes the AST for the given file from a transient AST to a permanent
+     * AST.  The AST will remain in memory until it is explicitly released
+     * using {@link #releaseAST(String)} or {@link #releaseAllASTs()}.
+     * 
+     * @since 2.0
      */
     public A makeTransientASTPermanent(String filename)
     {
@@ -345,6 +350,8 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 	 * by comparing the given argument with every AST in memory.
 	 * 
 	 * @return filename or <code>null</code>
+	 * 
+	 * @since 2.0
 	 */
 	public String getFilenameCorrespondingTo(A ast)
 	{

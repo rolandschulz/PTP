@@ -15,6 +15,8 @@ package org.eclipse.rephraserengine.core.vpg;
  * <a href="../../../overview-summary.html#DEA">More Information</a>
  *
  * @author Jeff Overbey
+ *
+ * @since 1.0
  */
 public class VPGDependency<A, T, R extends TokenRef<T>>
 {

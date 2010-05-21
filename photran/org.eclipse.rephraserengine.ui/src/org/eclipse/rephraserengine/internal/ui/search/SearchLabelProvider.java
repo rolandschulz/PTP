@@ -20,6 +20,8 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * @author Markus Schorn
  * @author Doug Schaefer
  * @author Jeff Overbey
+ *
+ * @since 2.0
  */
 public class SearchLabelProvider extends LabelProvider
 {

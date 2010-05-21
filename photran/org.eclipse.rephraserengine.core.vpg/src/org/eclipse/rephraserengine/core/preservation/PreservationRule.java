@@ -53,6 +53,9 @@ public final class PreservationRule
         this.preserveOutgoing = preserveOutgoing;
     }
 
+    /**
+     * @since 2.0
+     */
     public boolean definitelyShouldNotPreserve(boolean isIncoming, boolean isOutgoing, int edgeType)
     {
         // entirely contained in affected region

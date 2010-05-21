@@ -33,8 +33,9 @@ import junit.framework.TestSuite;
  * Subclasses must override {@link #createTestFor(File)}.
  * 
  * @author Jeff Overbey
- * 
  * @see TestSuiteFromFiles
+ * 
+ * @since 2.0
  */
 public abstract class GeneralTestSuiteFromFiles extends TestSuite
 {

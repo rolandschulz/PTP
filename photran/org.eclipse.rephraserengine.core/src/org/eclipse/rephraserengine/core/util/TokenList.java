@@ -17,6 +17,8 @@ import java.util.Iterator;
  * located quickly by offset.
  * 
  * @author Jeff Overbey
+ * 
+ * @since 2.0
  */
 public abstract class TokenList<T> implements Iterable<T>
 {

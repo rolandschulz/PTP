@@ -18,6 +18,8 @@ import org.eclipse.rephraserengine.ui.actions.VPGWindowActionDelegate;
  * Implements the Reset Database Statistics action in the Refactor/(Debugging) menu
  *
  * @author Jeff Overbey
+ *
+ * @since 1.0
  */
 public class ResetDBStatisticsAction extends VPGWindowActionDelegate
 {

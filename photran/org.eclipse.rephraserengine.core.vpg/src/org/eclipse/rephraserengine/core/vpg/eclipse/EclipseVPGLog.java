@@ -13,6 +13,11 @@ package org.eclipse.rephraserengine.core.vpg.eclipse;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPGLog;
 
+/**
+ * @author Jeff Overbey
+ * 
+ * @since 1.0
+ */
 public abstract class EclipseVPGLog<T, R extends TokenRef<T>> extends VPGLog<T, R>
 {
 }
