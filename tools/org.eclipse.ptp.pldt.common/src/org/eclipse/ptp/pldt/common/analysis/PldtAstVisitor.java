@@ -40,6 +40,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
+import org.eclipse.ptp.pldt.common.messages.Messages;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;

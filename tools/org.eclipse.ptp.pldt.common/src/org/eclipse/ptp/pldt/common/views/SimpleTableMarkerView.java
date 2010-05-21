@@ -64,6 +64,7 @@ import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.IArtifact;
 import org.eclipse.ptp.pldt.common.IDs;
+import org.eclipse.ptp.pldt.common.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;

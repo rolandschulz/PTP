@@ -56,6 +56,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.pldt.common.ArtifactManager;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.IArtifact;
+import org.eclipse.ptp.pldt.common.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -198,7 +199,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	public static final int CONSTANT = 2;
 
 	/** types of constructs, for the default case */
-	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTreeTableMarkerView_none, Messages.SimpleTreeTableMarkerView_function_call, Messages.SimpleTreeTableMarkerView_constant };
+	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.SimpleTreeTableMarkerView_none, Messages.SimpleTreeTableMarkerView_function_call, org.eclipse.ptp.pldt.common.messages.Messages.SimpleTreeTableMarkerView_constant };
 
 	/**
 	 * Simple Artifact Table View constructor

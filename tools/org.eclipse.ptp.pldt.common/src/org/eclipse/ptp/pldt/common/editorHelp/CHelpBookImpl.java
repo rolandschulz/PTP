@@ -21,6 +21,7 @@ import org.eclipse.cdt.ui.ICHelpBook;
 import org.eclipse.cdt.ui.ICHelpResourceDescriptor;
 import org.eclipse.cdt.ui.IFunctionSummary;
 import org.eclipse.cdt.ui.text.ICHelpInvocationContext;
+import org.eclipse.ptp.pldt.common.messages.Messages;
 
 /**
  * C Help Book implementation for hover help, etc. etc.
