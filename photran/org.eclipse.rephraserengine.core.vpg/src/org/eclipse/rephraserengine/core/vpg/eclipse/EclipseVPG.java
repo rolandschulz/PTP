@@ -490,6 +490,9 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         if (file != null) releaseAST(getFilenameForIFile(file));
     }
     
+    /**
+     * @since 2.0
+     */
     public IFile getIFileCorrespondingTo(A ast)
     {
         String filename = getFilenameCorrespondingTo(ast);

@@ -15,7 +15,7 @@ import java.io.PrintStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
-import org.eclipse.rephraserengine.internal.ui.UIUtil;
+import org.eclipse.rephraserengine.ui.UIUtil;
 
 /**
  * Abstract class for an action that simply prints some text and then opens it in a window for the

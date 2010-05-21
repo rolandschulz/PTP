@@ -29,7 +29,7 @@ import org.eclipse.photran.internal.ui.vpg.PhotranResourceFilter;
 import org.eclipse.rephraserengine.core.refactorings.IEditorRefactoring;
 import org.eclipse.rephraserengine.core.refactorings.IResourceRefactoring;
 import org.eclipse.rephraserengine.core.vpg.refactoring.VPGRefactoring;
-import org.eclipse.rephraserengine.internal.ui.UIUtil;
+import org.eclipse.rephraserengine.ui.UIUtil;
 import org.eclipse.rephraserengine.ui.WorkbenchSelectionInfo;
 import org.eclipse.swt.widgets.Shell;
 

@@ -14,8 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.search,
  org.eclipse.ui.editors
-Export-Package: org.eclipse.rephraserengine.internal.ui,
- org.eclipse.rephraserengine.ui,
+Export-Package: org.eclipse.rephraserengine.ui,
  org.eclipse.rephraserengine.ui.search
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.rephraserengine.internal.ui.Activator

@@ -23,7 +23,7 @@ import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
-import org.eclipse.rephraserengine.internal.ui.UIUtil;
+import org.eclipse.rephraserengine.ui.UIUtil;
 
 /**
  * Implements the Display Symbol Table action in the Refactor/(Debugging) menu

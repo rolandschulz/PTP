@@ -27,7 +27,7 @@ import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.rephraserengine.core.refactorings.IRefactoring;
 import org.eclipse.rephraserengine.core.refactorings.UserInputBoolean;
 import org.eclipse.rephraserengine.core.refactorings.UserInputString;
-import org.eclipse.rephraserengine.internal.ui.UIUtil;
+import org.eclipse.rephraserengine.ui.UIUtil;
 import org.eclipse.rephraserengine.ui.menus.RefactorMenu;
 import org.eclipse.rephraserengine.ui.refactoring.CustomUserInputPage;
 import org.eclipse.swt.SWT;

@@ -8,7 +8,7 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.rephraserengine.internal.ui;
+package org.eclipse.rephraserengine.ui;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -37,10 +37,10 @@ import org.eclipse.ui.internal.Workbench;
  *
  * @author Jeff Overbey
  * 
- * @since 1.0
+ * @since 2.0
  */
 @SuppressWarnings("restriction")
-public class UIUtil
+public final class UIUtil
 {
     private UIUtil() {;}
 
