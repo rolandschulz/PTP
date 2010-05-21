@@ -5,30 +5,77 @@
     <link rel="stylesheet" type="text/css" href="../help.css"/>
   </head>
 <body>
-<div><h1> The Fortran Perspective  
-</h1><p>When you write Fortran code, ordinarily you will work in the Fortran perspective.  When you create a new Fortran project (as described above), the wizard will ask if you want to switch to the Fortran perspective, or you can do it manually by clicking Window &gt; Open Perspective &gt; Other... and selecting Fortran from the list.
+<div><h1> Configuring Source Forms and Filename Extensions  
+</h1><p>Photran supports both fixed-form and free-form Fortran code. Photran also supports C preprocessor directives, such as #define, #ifdef, #include, __FILE__, and __LINE__ in Fortran code.
+</p><blockquote><small>
+<i>Fixed form is an older form designed for punch cards. It is more common in Fortran 77 and earlier programs, although it is still part of Fortran 2003. In fixed form, a &quot;c&quot;, &quot;C&quot;, &quot;*&quot;, or &quot;!&quot; in column 1 indicates a comment; columns 1 through 5 are used for a statement label; a character in column 6 indicates a continuation line; and program statements are contained in columns 7 through 72. Anything after column 72 is ignored. (Although column 72 is specified in the Fortran standard, most compilers allow you to change this to permit longer lines; Photran allows you to change it as well, as described in the next section.)
+</i></small>
+</blockquote><p>Photran uses filename extensions to determine whether a file is in fixed- or free-form and whether or not it is C-preprocessed. The default filename extensions are as follows.
+<table cellspacing="0" cellpadding="5" border="1" align="center"><tr><td> 
+<b>Filename Extensions
+</b></td><td> 
+<b>Source Form/Preprocessing
+</b></td></tr><tr><td> .f, .fix, .for, .fpp, .ftn<br> .F, .F77, .FIX, .FOR, .FTN, .FPP, .fpp
+</td><td> Fixed source form
+</td></tr><tr><td> .f08, .f03, .f95, .f90
+</td><td> Free source form with INCLUDE lines<br>
+</td><td> .F08, .F03, .F95, .F90
+</td><td> Free source form with C preprocessor directives
+</td></tr></table></p><h2> Configuring Source Form/Filename Extension Associations  
+</h2><p>The filename extensions listed above are the defaults for new Fortran projects.&nbsp; To change them:
+</p><ol><li>In the Fortran Projects view, right-click on a project, and choose Properties.
+</li><li>In the tree on the left, navigate to Fortran General &gt; Source Form.
+</li><li>For each filename extension(s) you want to change, select the appropriate source form from the dropdown box.
+</li><li>Click OK to close the dialog box.
+</li></ol><p><center>
+<img src="../images/Photran-source-form-config.png"></center>
+</p><h2> Adding Additional Filename Extensions 
+</h2><p>Additional filename extensions can be added by changing the Eclipse Content Type preferences.
+</p><ol><li>Click on Window &gt; Preferences... (Eclipse &gt; Preferences... on Mac OS X).
+<ol><li>In the &quot;Content types:&quot; tree in the right pane, navigate to Text &gt; Fortran Source File.
+</li></ol></li><li>Click the Add... button.
+</li><li>To make all files with a &quot;.fre&quot; filename extension be recognized as Fortran source code, enter 
+<i>*.fre
+</i> in the dialog.&nbsp; You can also specify individual filenames by omitting the *. prefix; for example, entering 
+<i>old-fortran-code.txt
+</i> will make any file named old-fortran-code.txt be recognized as Fortran source code, but not other .txt files.
+</li><li>Click OK to close the dialogs.
+</li></ol><p><b>For more information on configuring content types,
+</b> click on Help &gt; Help Contents in Eclipse and navigate to 
+<b>Workbench User Guide &gt; Reference &gt; Preferences &gt; Content Types.
+</b></p><h1> Configuring Fixed Form Line Width  
+</h1><p>While free source form allows lines to be arbitrarily long, in fixed form, there is a predetermined maximum line width. Often, this is 72 characters (i.e., anything after column 72 is ignored and treated as a comment), although most compilers allow you to change this to permit longer lines. Photran allows you to change it as well.
+To change the maximum line width in fixed form sources...
+</p><ol><li>Open the workbench preferences.  On Windows or Linux, click Window &gt; Preferences; on Mac OS X, click Eclipse &gt; Preferences.
+</li><li>Expand the Fortran category, and choose Editor.
+</li><li>Change the value of the field labeled &quot;fixed form line length.&quot;  The value must be at least 72.
+</li></ol><p>If you have any fixed form editors open, close and reopen them; notice that the rightmost, gray vertical bar has been moved to the column indicated, and the parser (which constructs the Outline view) has adjusted accordingly.
+<b>NOTE:
+</b> This is a workspace-wide preference: It affects all fixed form files in the workspace.  It is not currently possible to adjust this setting per project or per file.
+</p><h1> The Fortran Perspective  
+</h1><p>When you write Fortran code, ordinarily you will work in the Fortran perspective. When you create a new Fortran project (as described above), the wizard will ask if you want to switch to the Fortran perspective, or you can do it manually by clicking Window &gt; Open Perspective &gt; Other... and selecting Fortran from the list.
 <b>For more information on perspectives,
-</b> click on Help &gt; Help Contents in Eclipse, and navigate to
+</b> click on Help &gt; Help Contents in Eclipse, and navigate to 
 <b>Workbench User Guide &gt; Concepts &gt; Perspectives.
-</b>  Perspectives are also covered in the Eclipse tutorial, which can be found in 
+</b> Perspectives are also covered in the Eclipse tutorial, which can be found in 
 <b>Workbench User Guide &gt; Getting started &gt; Basic tutorial.
-</b>In particular, note that you can add views to a perspective by clicking Window &gt; Show View &gt; Other... and selecting a new view from the Show View dialog.  You can also reset the current perspective to its original layout: From the menu bar, choose Window &gt; Reset Perspective.
+</b>In particular, note that you can add views to a perspective by clicking Window &gt; Show View &gt; Other... and selecting a new view from the Show View dialog. You can also reset the current perspective to its original layout: From the menu bar, choose Window &gt; Reset Perspective.
 By default, the Fortran perspective contains a central area for editing code, as well as the following views:
 </p><ul><li>The 
 <b>Fortran Projects
 </b> view displays your project(s) and any files and folders in it.
 </li><li>The 
 <b>Problems
-</b> view will show errors from your Fortran compiler, if Photran can recognize them.  (This requires configuring an 
+</b> view will show errors from your Fortran compiler, if Photran can recognize them. (This requires configuring an 
 <i>error parser,
 </i> described elsewhere in this manual.)
 </li><li>The 
 <b>Console
-</b> view shows the output from your Fortran compiler.  When you run your Fortran program, its output is also displayed in the Console view.
+</b> view shows the output from your Fortran compiler. When you run your Fortran program, its output is also displayed in the Console view.
 </li><li>The 
 <b>Fortran Declaration
 </b> view is described in the 
-<a href="photran6advanced">Photran Advanced Features manual</a>.
+<a href="photran6advanced">Photran Advanced Features manual</img>.
 </li><li>The 
 <b>Outline
 </b> view shows the high-level structure of your program, i.e., the subprograms, modules, derived types, etc. comprising it.
@@ -38,7 +85,7 @@ By default, the Fortran perspective contains a central area for editing code, as
 <b>make
 </b> on a particular target defined in a custom Makefile.
 </li></ul><p><b>For more information on the Make Targets view,
-</b> click on Help &gt; Help Contents in Eclipse, and navigate to
+</b> click on Help &gt; Help Contents in Eclipse, and navigate to 
 <b>C/C++ Development User Guide &gt; Reference &gt; C/C++ Views and Editors &gt; Make Targets view.
 </b></p><h1> The Fortran Projects View  
 </h1><p>The Fortran Projects view displays project files in a tree structure. In this view you can do the following:
@@ -50,44 +97,20 @@ By default, the Fortran perspective contains a central area for editing code, as
 </li><li>Open projects in a new window
 </li><li>Perform some multi-file refactorings (such as Introduce Implicit None; see the 
 <a href="photran6advanced">Photran Advanced Features Manual</a>)
-</li></ul><p>Files can be opened by double-clicking on the filename or by right-clicking on the file and choosing &quot;Open With&quot; from the context menu.  Most other actions are performed by right-clicking on the file and choosing an action from the context menu.
-The Fortran projects view is similar to the C/C++ Projects View.
+</li></ul><p>Files can be opened by double-clicking on the filename or by right-clicking on the file and choosing &quot;Open With&quot; from the context menu. Most other actions are performed by right-clicking on the file and choosing an action from the context menu.
+The Fortran projects view is similar to the C/C++ Projects View. 
 <b>For more information on the Fortran Projects view,
-</b> refer to the documentation on the C/C++ Projects view by clicking on Help &gt; Help Contents in Eclipse and navigating to
+</b> refer to the documentation on the C/C++ Projects view by clicking on Help &gt; Help Contents in Eclipse and navigating to 
 <b>C/C++ Development User Guide &gt; Reference &gt; C/C++ Views and Editors &gt; C/C++ Projects view.
-</b></p><h1> Configuring Content Types: Free vs. Fixed Form 
-</h1><p>Photran supports both fixed-form and free-form Fortran code.  Each source form has its own editor.
-</p><blockquote><small>
-<i>Fixed form is an older form designed for punch cards.  It is more common in Fortran 77 and earlier programs, although it is still part of Fortran 2003.  In fixed form, a &quot;c&quot;, &quot;C&quot;, &quot;*&quot;, or &quot;!&quot; in column 1 indicates a comment; columns 1 through 5 are used for a statement label; a character in column 6 indicates a continuation line; and program statements are contained in columns 7 through 72. Anything after column 72 is ignored.
-</i></small>
-</blockquote><p>Photran uses filename extensions to determine whether a file is in fixed- or free-form.  By default, .f, .fix, .for, .fpp, and .ftn are assumed to be in fixed source form, while .f03, .f95, .f90, and .f77 are assumed to be in free source form.  Additional extensions can be added to this list by changing the Eclipse Content Type preferences.
-<b>For more information on configuring content types,
-</b> click on Help &gt; Help Contents in Eclipse and navigate to
-<b>Workbench User Guide &gt; Reference &gt; Preferences &gt; Content Types.
 </b></p><h1> Using the Fortran editor and Fortran perspective  
-</h1><h2> Selecting free vs. fixed form  
-</h2><p><center>
-<img src="../images/Photran-editor-1.PNG" alt="Free Form Fortran Editor"></img></center>
-Photran has different editors for free- and fixed-form files.  The free-form editor is pictured above.
-The fixed-form editor has vertical bars delineating column six and marking the right-hand side of column 72; it is pictured below.
-When you double-click on a file in the Fortran Projects view, Photran will open it in either the free- or fixed-form editor according to its filename extension.  (See the previous section on how to customize this.)
-You can explicitly choose whether to open a file in the free-form or fixed-form editor by right-clicking on the file in the Fortran Projects view and selecting either Open With &gt; Fortran Editor (Fixed Form) or Open With &gt; Fortran Editor (Free Form).  Opening free-form code in the fixed-form editor (or vice versa) will result in a watermark reading &quot;Warning: Content Type Mismatch&quot; being displayed in the upper right corner of the editor.
-<b>Do not ignore the &quot;Warning: Content Type Mismatch&quot; watermark.
-</b> Photran 
-<i>always
-</i> uses the content type of the file to populate the Outline view and to operate the features described in the 
-<a href="photran6advanced">Advanced Features Manual</a>.  So if you are editing a fixed form file but this watermark is being displayed, Photran thinks it is a free form file.  You MUST change the content types in the Eclipse preferences, as described in the previous section, for the Outline view to display and for any of the advanced features to work.
-<center>
-<img src="../images/Photran-editor-fixed-1.PNG" alt="Fixed Form Fortran Editor"></img></center>
-</p><h2> Outline view  
+</h1><h2> Outline view  
 </h2><p><center>
 <img src="../images/Photran-outline-view.PNG" alt="Outline View"></img></center>
-When a Fortran file is open in the Fortran editor, the Outline view shows an outline of the structural elements of that file: subprograms, main programs, modules, derived types, etc. The Outline view notes the content type of the file (free form or fixed form); it will also note when there is an error in the code.
-To add the Outline view to the current perspective go to Window &gt; Show View &gt; Other... &gt; General &gt; Outline.
+When a Fortran file is open in the Fortran editor, the Outline view shows an outline of the structural elements of that file: subprograms, main programs, modules, derived types, etc. The Outline view notes the content type of the file (free form or fixed form); it will also note when there is an error in the code. To add the Outline view to the current perspective go to Window &gt; Show View &gt; Other... &gt; General &gt; Outline.
 <center>
 <img src="../images/Photran-outline-view-error.PNG" alt="Outline Error"></img></center>
-</p><h2> Overview of the Fortran editors  
-</h2><p>The free form and fixed form editors generally support the same features. The main features to note are the horizontal ruler at the top of the editor, code folding, and smart syntactic highlighting.
+</p><h2> Overview of the Fortran editor  
+</h2><p>The Fortran editor includes a number of features. The main features to note are the horizontal ruler at the top of the editor, code folding, and syntax highlighting.
 The 
 <b>horizontal ruler
 </b> measures the width of the editor in characters: There is either a symbol (-/+) or number for each column in the editor. A plus sign (+) is shown every fifth character, and every tenth character is numbered. It is also possible to turn on the 
@@ -96,29 +119,29 @@ The
 <center>
 <img src="../images/Photran-editor-ruler.PNG" alt="Editor Ruler"></img></center>
 <b>Code folding
-</b> is also supported in the free form editor, but turning on code folding will disable the horizontal ruler; how to do this is described below as well.  When folding is turned on, a minus sign (-) will be displayed in the left margin of the editor next to each program, function, subroutine, etc.; clicking on the minus sign will temporarily collapse the display of that entity to a single line.
+</b> is also supported in the free form editor, but turning on code folding will disable the horizontal ruler; how to do this is described below as well. When folding is turned on, a minus sign (-) will be displayed in the left margin of the editor next to each program, function, subroutine, etc.; clicking on the minus sign will temporarily collapse the display of that entity to a single line.
 <center>
 <img src="../images/Photran-editor-folding-1.PNG" alt="Editor Folding"></img></center>
 The editors also support 
-<b>smart syntactic highlighting.
-</b> As you write programs in Fortran, you will notice that different colors are applied to comments, identifiers, intrinsics, keywords, and strings to make code more readable.  It is possible to change the colors for each of the previously mentioned code components in the Fortran editor preferences (this is discussed in the section &quot;Configuring the Editor,&quot; below). Often, the editor can even distinguish between, for example, the keyword &quot;if&quot; and a variable named &quot;if.&quot;  However, it is not perfect; it uses a faster, but less reliable, heuristic than the actual Fortran parser that drives the Outline view and all of the 
+<b>syntax highlighting.
+</b> As you write programs in Fortran, you will notice that different colors are applied to comments, identifiers, intrinsics, keywords, and strings to make code more readable. It is possible to change the colors for each of the previously mentioned code components in the Fortran editor preferences (this is discussed in the section &quot;Configuring the Editor,&quot; below). Often, the editor can even distinguish between, for example, the keyword &quot;if&quot; and a variable named &quot;if.&quot; However, it is not perfect; it uses a faster, but less reliable, heuristic than the actual Fortran parser that drives the Outline view and all of the 
 <a href="photran6advanced">Advanced Features</a>.
 </p><h2> Comment/uncomment  
-</h2><p>Photran can comment or uncomment a block of Fortran statements, placing an exclamation point (!) before the statements or removing it, respectively.  Select the statements in the Fortran editor.  Then right-click the selection, and choose Comment/Uncomment from the context menu.
+</h2><p>Photran can comment or uncomment a block of Fortran statements, placing an exclamation point (!) before the statements or removing it, respectively. Select the statements in the Fortran editor. Then right-click the selection, and choose Comment/Uncomment from the context menu.
 <center>
 <img src="../images/Photran-comment-action.png"></center>
 </p><h2> Setting bookmarks  
 </h2><p>Bookmarks are an Eclipse feature which allows you to mark important lines in a file and then quickly jump to those lines using the Bookmarks view. To set a bookmark, right-click the grey bar on the left side of the editor at the line where the bookmark should be located and select &quot;Add Bookmark...&quot; from the popup menu. A bookmark can also be placed on a line by locating the cursor on the line, going to Edit &gt; Add Bookmark... in the menu bar. Type in the desired name for the bookmark in the dialog box and click OK. A blue bookmark will show up in the grey bar on the left side of the editor.
 Bookmarks can then be viewed in the Bookmarks view (Window &gt; Show View &gt; Other..., select Bookmarks in the General folder).
 </p><h2> Go to line (Ctrl+L)  
-</h2><p>The &quot;Go To Line...&quot; feature allows you to jump to a specific line number in a file when it is open in a Fortran editor.  In the menu bar, go to Navigate &gt; Go To Line... (or press the hotkey, Ctrl+L  on Windows/Linux or Command+L on Mac) to open the Go To Line dialog box. Typing in the line you wish to navigate to, and clickg OK.  The cursor will be moved to the beginning of the specified line.
+</h2><p>The &quot;Go To Line...&quot; feature allows you to jump to a specific line number in a file when it is open in a Fortran editor. In the menu bar, go to Navigate &gt; Go To Line... (or press the hotkey, Ctrl+L on Windows/Linux or Command+L on Mac) to open the Go To Line dialog box. Typing in the line you wish to navigate to, and clickg OK. The cursor will be moved to the beginning of the specified line.
 </p><h2> Configuring The Editor  
 </h2><h3> Selecting horizontal ruler vs. folding  
-</h3><p>Fortran editors can either display the horizontal ruler, or they can have code folding enabled, but not both.  To determine which will be enabled, go to Window &gt; Preferences in the menu bar. Expand Fortran and select Editor. Check the appropriate box(es) to enable folding in the free-form and/or fixed-form Fortran editor.
+</h3><p>Fortran editors can either display the horizontal ruler, or they can have code folding enabled, but not both. To determine which will be enabled, go to Window &gt; Preferences in the menu bar. Expand Fortran and select Editor. Check the appropriate box(es) to enable folding in the free-form and/or fixed-form Fortran editor.
 </p><h3> Setting colors for syntax highlighting  
 </h3><p>The colors for Fortran syntax highlighting can be modified in the Fortran editor preferences. To modify the color settings, go to Window &gt; Preferences in the menu bar. Expand Fortran and select Editor. The color choosers for Comments, Identifiers, Intrinsics, Keywords, and Strings are available on this page.
 </p><h3> Showing the print margin  
-</h3><p>Editors can optionally display a gray vertical bar at a specified column; generally, this is set in column 80 to act as a visual &quot;print margin.&quot;  To enable display of the print margin, go to Window &gt; Preferences in the menu bar. Under General, expand Editors, and select Text Editors. Check the box for &quot;Show print margin&quot;. Optionally, you can also change the column in which the print margin will be displayed. Click Apply and the print margin should now display in the editor.
+</h3><p>Editors can optionally display a gray vertical bar at a specified column; generally, this is set in column 80 to act as a visual &quot;print margin.&quot; To enable display of the print margin, go to Window &gt; Preferences in the menu bar. Under General, expand Editors, and select Text Editors. Check the box for &quot;Show print margin&quot;. Optionally, you can also change the column in which the print margin will be displayed. Click Apply and the print margin should now display in the editor.
 </p><h3> Setting fixed-form line length  
 </h3><p>In fixed form, Fortran specifies that anything past column 72 (default) is a comment. However, that can be changed to a value other than 72. To change the length of the line, go to Window &gt; Preferences in the menu bar. Under Fortran, select Editor. Change the value of field labeled &quot;Fixed-form line length&quot; to the desired length of the line. Note that the accepted range for the length of the line is 72-999 inclusive.
 </p><h3> Converting tabs to spaces  
@@ -126,11 +149,11 @@ Bookmarks can then be viewed in the Bookmarks view (Window &gt; Show View &gt; O
 Note that this will only apply to 
 <i>new
 </i> tabs that you type; it will not change your existing files.
-</p><blockquote><small>It is easy to replace tabs with spaces in an existing file, as long as the tabs all occur at the beginning of a line.  (For tabs in the middle of a line, this won't work quite right.)  (1) Move the cursor to the beginning of the file; (2) click on Edit &gt; Find/Replace...; (3) in the Find box, type &quot;\t&quot; (without the quotes); (4) in the Replace With box, type 4 or 8 spaces (each tab character will be replaced with exactly what you type, so if you type four spaces, each tab character will be replaced with four spaces); (5) select Search: Forward and Scope: All; (6) check the &quot;regular expression&quot; box; and (7) click Replace All.  This will replace every tab character with spaces.</small>
+</p><blockquote><small>It is easy to replace tabs with spaces in an existing file, as long as the tabs all occur at the beginning of a line. (For tabs in the middle of a line, this won't work quite right.) (1) Move the cursor to the beginning of the file; (2) click on Edit &gt; Find/Replace...; (3) in the Find box, type &quot;\t&quot; (without the quotes); (4) in the Replace With box, type 4 or 8 spaces (each tab character will be replaced with exactly what you type, so if you type four spaces, each tab character will be replaced with four spaces); (5) select Search: Forward and Scope: All; (6) check the &quot;regular expression&quot; box; and (7) click Replace All. This will replace every tab character with spaces.</small>
 </blockquote><h3> Show whitespace  
 </h3><p>Whitespace characters can be displayed by going to Window &gt; Preferences. Under General &gt; Editors &gt; Text Editors, check the box next to &quot;Show whitespace characters&quot; and click Apply. Spaces, tabs, and newlines will now be shown as light gray double-angle quotes (&raquo;), dots (&middot;), and paragraph symbols (&para;), respectively.
 </p><h3> Set Font  
-</h3><p>Photran uses the same font as the basic Eclipse text editor.  To change it, click on Window &gt; Preferences in the menu bar. Under General, expand Appearance, and select Colors and Fonts. In the list on the right, select Text Font.  Click the &quot;Change...&quot; button to change the font.
+</h3><p>Photran uses the same font as the basic Eclipse text editor. To change it, click on Window &gt; Preferences in the menu bar. Under General, expand Appearance, and select Colors and Fonts. In the list on the right, select Text Font. Click the &quot;Change...&quot; button to change the font.
 </p><h3> Show line numbers  
 </h3><p>Line numbers can be displayed in the editor in the Text Editor preferences page. Go to Window &gt; Preferences. Under General &gt; Editors &gt; Text Editors, check the box &quot;Show line numbers&quot; and click Apply.
 </p></div>

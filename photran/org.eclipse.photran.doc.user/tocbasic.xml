@@ -5,6 +5,7 @@
    <topic label="Installing Photran" href="html/basic/InstallingPhotran.html"/>
    <topic label="Getting Started" href="html/basic/GettingStarted.html"/>
    <topic label="Starting a New Project" href="html/basic/StartingNewProject.html"/>
+   <topic label="Upgrading Projects Created with Earlier Versions of Photran" href="html/basic/UpgradingProjects.html"/>
    <topic label="Writing Code" href="html/basic/WritingCode.html"/>
    <topic label="Compiling Fortran Programs" href="html/basic/CompilingFortran.html"/>
    <topic label="Running and Debugging Fortran Programs" href="html/basic/RunningDebuggingFortran.html"/>

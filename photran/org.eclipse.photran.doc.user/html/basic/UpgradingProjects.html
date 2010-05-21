@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1"/>
+    <title>Upgrading Projects Created with Earlier Versions of Photran</title>
+    <link rel="stylesheet" type="text/css" href="../help.css"/>
+  </head>
+<body>
+<div><p>There are three major changes in Photran 6 that affect users of previous versions of Photran:
+</p><ol><li><b>Projects must be converted to Fortran projects.
+</b>&nbsp; In the past, Photran would treat C projects and Fortran projects similarly.&nbsp; In fact, in Photran 4 and earlier versions, Photran's new project wizard actually created C projects!&nbsp; But in Photran 6, many of Photran's features will only be available after a project is converted to a Fortran project.&nbsp; (Every Fortran project is a C project too, so CDT's features will still work on the project.)&nbsp; 
+<a href="photran6#Converting_C%2FC%2B%2B_Projects_to_Fortran_Projects">Learn how to convert projects</a>.<br>
+</li><li><b>Project properties must be reset.
+</b>&nbsp; Photran 6 uses a new mechanism for storing project properties.&nbsp; Unfortunately, this means that the project properties for old projects must be re-created.&nbsp; This includes enabling analysis/refactoring and setting include paths and module paths.<br>
+</li><li><b>Source form settings must be set for the project.
+</b>&nbsp; Previous versions of Photran used Eclipse's workspace-wide settings to distinguish free and fixed form files.&nbsp; In Photran 6, each project has its own settings that determine which filename extensions correspond to free and fixed source form (and which files contain C preprocessor directives).&nbsp; 
+<a href="photran6#Configuring_Source_Forms_and_Filename_Extensions"><u>Learn about source form settings</u></a>.
+</li></ol><p><br>
+</p></div>
+</body>
+</html>

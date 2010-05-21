@@ -234,9 +234,11 @@ from the popup menu.
 </ul>
 </p><h1>Standardize Statements
 </h1><p><ul>
-<li><b>Description:</b> Standardize Statements rewrites all variables declarations, transforming
-them into simple statements, always containing the two points (::) that are characteristic of Fortran,
-making the code more readable.
+<li><b>Description:</b> Standardize Statements rewrites all variables declarations, so that
+<ul>
+<li>there is only one variable declaration per line, and
+<li>every variable declaration contains a double colon (::).
+</ul> This is intended to make the code more readable.
 <li><b>Applies To:</b> All main programs, subprograms, and modules in one or more files.
 <li><b>Operation:</b>
 <ol>
@@ -261,8 +263,7 @@ from the popup menu.
 </ul>
 </p><h1>Remove Unused Variables
 </h1><p><ul>
-<li><b>Description:</b> Remove Unused Variables removes all unused variables in Fortran code,
-making it more clean and readable.
+<li><b>Description:</b> Remove Unused Variables removes declarations of local variables that are never used.
 <li><b>Applies To:</b> All main programs, subprograms, and modules in one or more files.
 <li><b>Operation:</b>
 <ol>
@@ -285,13 +286,9 @@ from the popup menu.
 <center>
 <img src="../images/Photran-Remove-Unused-Variables.png" alt="Example of the Remove Unused Variables refactoring"></img></center>
 </ul>
-</p><h1>Data To Parameter
+</p><h1>Data to Parameter
 </h1><p><ul>
-<li><b>Description:</b> Data To Parameter transform variables declared as data in variables declared with
-parameter attribute, when these are intended to be constants in source code. This refactoring is generally
-used when developers who want to use constants can confuse the data statement with the attribute parameter,
-which is the most suitable in these cases. Making the substitution can generate performance gains, because
-it decreases the access to variables.
+<li><b>Description:</b> When a variable declared in a DATA statement is intended to be a constant, Data to Parameter can be used to change it to a variable with the PARAMETER attribute.  Using the PARAMETER attribute makes it more clear which variables are constants and which ones are not; it can also result in performance gains, since it may allow an optimizing compiler to replace some variable accesses with the constant value.
 <li><b>Applies To:</b> All main programs, subprograms, and modules in one or more files.
 <li><b>Operation:</b>
 <ol>

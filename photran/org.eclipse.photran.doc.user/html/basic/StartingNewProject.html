@@ -92,9 +92,16 @@ gfortran -o hello.exe -g hello.f90
 clean:
 rm -f hello.exe
 </pre>
-</p><h1> Converting C/C++ Projects to Fortran Projects 
-</h1><p>C/C++ projects and Fortran projects can be used interchangeably; all of the functionality of CDT is available in Fortran projects, and all of the functionality of Photran is available in C/C++ projects.  The only difference is what icon appears in the Fortran Projects view.  Nevertheless, this can be a helpful indication of whether a project is primarily written in C/C++ or in Fortran.
-To convert an existing C/C++ project to a Fortran project, switch to the Fortran perspective, right-click on the project in the Fortran Projects view, and select Convert to Fortran Project from the pop-up menu.
+</p><h1> Converting C/C++ Projects to Fortran Projects  
+</h1><p>Every Fortran project is also a C project, so CDT's functionality will work as expected on Fortran projects.&nbsp; However, a C/C++ is 
+<i>not 
+</i>a Fortran project until it has been explicitly converted.&nbsp; (In the Fortran Projects view, a Fortran project will have an &quot;F&quot; icon, while a C/C++ project will have a &quot;C&quot; icon.)
+To convert an existing C/C++ project to a Fortran project:
+</p><ol><li>Switch to the Fortran perspective.
+</li><li>In the Fortran Projects view, right-click on the project you want to convert, and select Convert to Fortran Project from the pop-up menu.
+</li><li>The project should now have an &quot;F&quot; icon in the Fortran Projects view.
+</li></ol><p><center>
+<img src="../images/Photran-f-vs-c-project.png"></center>
 </p></div>
 </body>
 </html>

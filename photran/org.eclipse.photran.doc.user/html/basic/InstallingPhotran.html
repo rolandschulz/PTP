@@ -16,17 +16,19 @@ You must have
 <ol><li>If you downloaded Eclipse from eclipse.org 
 <b>and
 </b> you will be following the instructions below for &quot;Installing on a Machine With Internet Access,&quot; then CDT should be installed automatically when you install Photran.
-</li><li>Otherwise, CDT probably <i>will not</i> be installed automatically.  You will need to install CDT manually.  Follow the instructions below for &quot;Installing on a Machine Without Internet Access.&quot;  These instructions should also be followed if you did not download Eclipse from eclipse.org (e.g., if you installed it from a Linux distribution like Ubuntu).
+</li><li>Otherwise, CDT probably 
+<i>will not
+</i> be installed automatically. You will need to install CDT manually. Follow the instructions below for &quot;Installing on a Machine Without Internet Access.&quot; You should also follow these instructions if you did not download Eclipse from eclipse.org (e.g., if you installed it from a Linux distribution like Ubuntu).
 </li></ol></li><li>Eclipse must be running on a 
 <b>Java 1.5 or later Java Virtual Machine (JVM).
 </b> To get reasonable performance, we recommend Sun's JVM 
-<a href="http://java.com/en/download/manual.jsp">http://java.com/en/download/manual.jsp</a> or IBM's 
+<a href="http://java.com/en/download/manual.jsp">http://java.com/en/download/manual.jsp</a> or IBM's J9 
 <a href="http://wiki.eclipse.org/index.php/J9">http://wiki.eclipse.org/index.php/J9</a>. OpenJDK (the default JVM on newer versions Fedora Linux) also works well, although GNU Classpath (the default JVM on older versions of Fedora) is generally too slow to be useful.
 </li><li>If you want to compile and build Fortran applications, you must have a 
-<b>make utility
-</b> (such as GNU Make) and a 
+<b>make 
+</b>program (such as GNU Make) and a 
 <b>Fortran compiler
-</b> (such as GNU Fortran) in your system path. Many Linux/Unix systems include these; details on installing them in Windows and Mac are below.
+</b> (such as gfortran, the GNU Fortran compiler) in your system path. Many Linux/Unix systems include these; details on installing them in Windows and Mac are below.
 </li></ol><h1> Installation Procedure  
 </h1><h2>Installing on a Machine With Internet Access
 </h2><p>To install Photran, start Eclipse, then...<br>
@@ -35,9 +37,7 @@ You must have
 </li><li>In the Location field, type 
 <b>http://download.eclipse.org/tools/ptp/releases/helios
 </b></li><li>Click OK to close the Add Site dialog.  This will return you to the Install dialog.
-</li><li>Expand &quot;Fortran Development Tools (Photran)&quot; and check the boxes next to &quot;Photran End-User Runtime&quot; 
-<b>and
-</b> &quot;Rephraser Engine End-User Runtime&quot; (the latter is a supporting component)
+</li><li>Expand &quot;Fortran Development Tools (Photran)&quot; and check the box next to &quot;Photran End-User Runtime&quot;
 </li><li>If you are running Linux and have the Intel Fortran Compiler installed, or if you are on a Macintosh and have the IBM XL Fortran compiler installed, expand &quot;Fortran Compiler Support&quot; and select the appropriate compiler.  
 <i>Note that you 
 <b>cannot
@@ -48,19 +48,23 @@ You must have
 </li></ol><p><br>
 </p><h2>Installing on a Machine Without Internet Access
 </h2><p>You will the following files:
-</p><ol><li>If you do not have CDT installed, you will need 
-<a href="http://www.eclipse.org/downloads/download.php?file=/tools/cdt/releases/galileo/dist/cdt-master-6.0.1.zip">cdt-master-6.0.1.zip
-</a> (or the latest 6.0.x &quot;CDT master update archive&quot; from http://download.eclipse.org/tools/cdt/releases/galileo/]).
-</li><li>To install Photran, you will need 
-<a href="http://www.eclipse.org/downloads/download.php?file=/tools/ptp/builds/galileo/I.I200912042036/ptp-master-3.0.0-I200912042036.zip">ptp-master-3.0.0-I200912042036.zip
-</a> (the latest PTP update site archive from 
-<a href="http://wiki.eclipse.org/PTP/builds/photran/5.0.0">http://wiki.eclipse.org/PTP/builds/photran/5.0.0</a>).
-</li></ol><p>If you do not have CDT installed, start Eclipse, then...<br>
+</p><ol><li>If you do not have CDT installed, you will need to download the latest 7.0.x &quot;CDT master update archive&quot; from 
+<a href="http://download.eclipse.org/tools/cdt/releases/helios/">http://download.eclipse.org/tools/cdt/releases/helios/
+</a>).  This should be a file named 
+<b>cdt-master-7.0.x.zip
+</b> (for some value of 
+<i>x
+</i>)
+</li><li>To install Photran, you will need the latest PTP update site archive from 
+<a href="http://wiki.eclipse.org/PTP/builds/4.0.0">http://wiki.eclipse.org/PTP/builds/4.0.0
+</a>).  This should be a file named 
+<b>ptp-master-4.0.0-I2010xxxxxxxx.zip
+</b></li></ol><p>If you do not have CDT installed, start Eclipse, then...<br>
 </p><ol><li>Click on Help &gt; Install New Software...
 </li><li>Click on the &quot;Add...&quot; button
 </li><li>Click on the &quot;Archive...&quot; button
 </li><li>Point it to the file 
-<i>cdt-master-6.0.1.zip
+<i>cdt-master-7.0.x.zip
 </i></li><li>Click OK to close the Add Site dialog.  This will return you to the Install dialog.
 </li><li>Expand &quot;CDT Main Features&quot; and check the box next to &quot;Eclipse C/C++ Development Tools&quot;
 </li><li>Click on the &quot;Next&quot; button
@@ -71,7 +75,7 @@ You must have
 </li><li>Click on the &quot;Add...&quot; button
 </li><li>Click on the &quot;Archive...&quot; button
 </li><li>Point it to the file 
-<i>ptp-master-3.0.0-I200912042036.zip
+<i>ptp-master-4.0.0-I2010xxxxxxxx.zip
 </i></li><li>Click OK to close the Add Site dialog.  This will return you to the Install dialog.
 </li><li>Expand &quot;Fortran Development Tools (Photran)&quot; and check the boxes next to &quot;Photran End-User Runtime&quot; 
 <b>and
@@ -85,7 +89,7 @@ You must have
 </li><li>Click the Finish button and agree to the license to complete the installation.
 </li></ol><p><br>
 </p><h2>Troubleshooting
-</h2><blockquote>The installer in Eclipse 3.6 gives notoriously cryptic error messages, which, unfortunately, are out of Photran's control.  Some of the more common ones are below.  If you run into a different error message and cannot resolve it, please ask for help on the 
+</h2><blockquote>Eclipse's installer gives notoriously cryptic error messages, which, unfortunately, are out of Photran's control.  Some of the more common ones are below.  If you run into a different error message and cannot resolve it, please ask for help on the 
 <a href="http://www.eclipse.org/photran/mailinglists.php">Photran mailing list
 </a>.
 </blockquote><p><br>
@@ -102,10 +106,13 @@ You must have
 </p><blockquote><b>Problem:
 </b> You receive the following error message during installation.
 </blockquote><blockquote><blockquote>Cannot complete the install because one or more required items could not be found.
-</blockquote></blockquote><blockquote><blockquote>Software being installed: Photran End-User Runtime 5.0.0.xxxx (org.eclipse.photran.feature.group 5.0.0.xxxx)
-</blockquote></blockquote><blockquote><blockquote>Missing requirement: Photran End-User Runtime 5.0.0.xxxx (org.eclipse.photran.feature.group 5.0.0.xxxx) requires 'org.eclipse.cdt.feature.group [xxx)' but it could not be found
-</blockquote></blockquote><blockquote><b>Solution:
-</b> You do not have CDT 6.0 installed, and it couldn't be downloaded and installed automatically.  Try installing CDT 6.0 first, then retry installing Photran.
+</blockquote></blockquote><blockquote><blockquote> Software being installed: Photran End-User Runtime 6.0.x.xxxxxxxxxxxx (org.eclipse.photran.feature.group 6.0.x.xxxxxxxxxxxx)
+</blockquote></blockquote><blockquote><blockquote> Missing requirement: Photran VPG CDT Interface Plug-in 6.0.x.xxxxxxxxxxxx (org.eclipse.photran.cdtinterface.vpg 6.0.x.xxxxxxxxxxxx) requires 'bundle org.eclipse.cdt.core 0.0.0' but it could not be found
+</blockquote></blockquote><blockquote><blockquote> Cannot satisfy dependency:
+</blockquote></blockquote><blockquote><blockquote>   From: Photran End-User Runtime 6.0.x.xxxxxxxxxxxx (org.eclipse.photran.feature.group 6.0.x.xxxxxxxxxxxx)
+</blockquote></blockquote><blockquote><blockquote>   To: org.eclipse.photran.cdtinterface.vpg 
+<a href="6.0.x.xxxxxxxxxxxx">6.0.x.xxxxxxxxxxxx</a></blockquote></blockquote><blockquote><b>Solution:
+</b> You do not have CDT 7.0 installed, and it couldn't be downloaded and installed automatically.  Try installing CDT 7.0 first, then retry installing Photran.
 </blockquote><h1> Additional Instructions for Windows Users  
 </h1><p>To compile and run Fortran programs in Photran, you will need to have a Fortran compiler and make utility installed. 
 <a href="http://gcc.gnu.org/fortran/">gfortran

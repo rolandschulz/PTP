@@ -6,13 +6,21 @@
   </head>
 <body>
 <div><h1>Content Assist
-</h1><p>TODO
+</h1><p>As you are typing a Fortran program, 
+<i>content assist
+</i> pops up a list of the subprograms, variables, intrinsics, etc. that are in scope.  It is invoked by pressing Ctrl+Space.  As you start typing a name, the list is refined based on what you have typed; you can then use the arrow keys to choose from the list and press Enter to complete the definition.  Content assist is useful when you don't remember the exact name of a function, or when a function has a long name and you don't want to type all of it. An example is shown below.
+To use content assist, you will need to open the project properties, switch to the Fortran Analysis/Refactoring category, and check the &quot;Enable Fortran content assist (Ctrl+space)&quot; box.  You will need to close and re-open any Fortran editors before you can start using content assist, however.
+<center>
+<img src="../images/ContentAssist.jpg" alt="Fortran Content Assist"></img></center>
 </p><h1> Fortran Declaration View  
-</h1><p>The Fortran Declaration view displays the line of code where variables, programs, and subprograms are declared. If you put your cursor within or highlight a variable name or the name of a subroutine in a call statement, the Fortran Declaration view will then display the actual declaration. For variables, the declaration view displays the variable declaration as well as a comment regarding the type of variable and other information, such as dimension information for an array as shown in the example below.
+</h1><p>The Fortran Declaration view displays the statement where a variable, program, or subprogram is declared. If you place the text editor cursor within (or highlight) a variable name or the name of a subroutine in a CALL statement, the Fortran Declaration view will then display the actual declaration. For variables, the declaration view displays the variable declaration as well as a comment regarding the type of variable and other information, such as dimension information for an array as shown in the example below. For subprograms, it displays the FUNCTION or SUBROUTINE statement, including any comments that precede it.
 <center>
 <img src="../images/Photran-fortran-declaration-view.png" alt="Fortran Declaration View"></img></center>
 </p><h1>Hover Tips
-</h1><p>TODO
+</h1><p>Hover tips display the same text as the Fortran Declaration view (described above); however, they display it in a popup window when the mouse cursor is hovered over an identifier.
+Fortran hover tips are enabled in a project's analysis/refactoring properties.  To turn them on or off, check the box labeled &quot;Enable Fortran Hover Tips&quot; in the project properties under Fortran General &gt; Analysis/Refactoring. (Note that Analysis/Refactoring must also be enabled.)
+<center>
+<img src="../images/PhotranHoverTips.jpg" alt="Fortran Hover Tips"></img></center>
 </p></div>
 </body>
 </html>
