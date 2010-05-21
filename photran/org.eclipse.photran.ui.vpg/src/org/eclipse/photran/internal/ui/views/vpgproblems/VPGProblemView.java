@@ -41,6 +41,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -172,7 +173,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         {
             final List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
             
-            getSite().getShell().getDisplay().syncExec(new Runnable()
+            getDisplay().syncExec(new Runnable()
             {
                 public void run()
                 {
@@ -401,9 +402,14 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 
     public Clipboard getClipboard()
     {
-        if(clipboard == null)
-            clipboard = new Clipboard(getSite().getShell().getDisplay());
+        if (clipboard == null)
+            clipboard = new Clipboard(getDisplay());
         return clipboard;
+    }
+    
+    private Display getDisplay()
+    {
+        return getSite().getWorkbenchWindow().getWorkbench().getDisplay();
     }
 
     @Override
