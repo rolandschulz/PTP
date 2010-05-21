@@ -1,0 +1,323 @@
+% Interactions with CDT
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
+
+\section{Introduction}
+
+The C/C++ Development Tools (CDT)\footnote{See
+\url{http://www.eclipse.org/cdt/}} provide support for C and C++ development
+in Eclipse. CDT uses \textit{make} to compile projects, and it includes an
+integrated debugger which is actually a graphical interface to \textit{gdb}.
+
+In 2006, we contributed a patch to CDT\footnote{See
+\url{https://bugs.eclipse.org/133386}} which provides an extension point
+allowing its core infrastructure to support languages other than C and C++.
+This is appropriate for any language for which code is compiled using
+\textit{make} and debugged using \textit{gdb}.\footnote{The exact mechanism
+is described in  J.~Overbey and C.~Rasmussen, ``Instant IDEs: Supporting New
+Languages in the CDT,'' \textit{Eclipse Technology eXchange Workshop at
+OOPSLA~2005 (eTX 2005),} San Diego, CA, October 17, 2005, and a tutorial
+on the topic was given at EclipseCon~2006.  The details (and code) are now
+outdated, but the concepts are still applicable.}
+
+Photran builds upon the CDT by
+\begin{itemize}
+\item plugging into this extension point (org.eclipse.cdt.core.language).
+      This allows CDT to recognize Fortran source files as ``valid'' source
+      files in C/C++ projects, and it allows Photran to provide the outline
+      structure for these files which is displayed in the Navigator and the
+      Outline view (this structure is called the ``model'' and is discussed
+      below).
+\item subclassing many of CDT's user interface elements (or copying and
+      modifying them when necessary) to provide an IDE for Fortran that
+      looks and works similarly to CDT.
+\item contributing \textit{error parsers} which allow CDT to recognize
+      error messages from many popular Fortran compilers and display them
+      in the Problems view.
+\item contributing new project templates and toolchains, which are shown
+      in the New C/C++ Project dialog
+      (and, of course, the New Fortran Project dialog).
+\end{itemize}
+
+\section{C Projects vs.~Photran Projects}
+
+Prior to version~6.0, C projects and Fortran projects were treated identically.
+As of version 6.0, there is an important distinction:
+\begin{itemize}
+\item every Fortran project is also a C project, but
+\item not every C project is a Fortran project.
+\end{itemize}
+
+In technical terms,
+Fortran projects are C projects that also have a Fortran nature.
+They must be C projects in order to be ``recognized'' by CDT, but
+they must also have the Fortran nature so that Photran can display
+project properties for them and index them without affecting C/C++
+projects that do not contain Fortran code.
+
+\section{CDT Terminology}
+
+The following are CDT terms that will be used extensively when discussing
+Photran.
+
+\begin{itemize}
+
+\item There are two types of projects in CDT:\footnote{In earlier versions of
+CDT, these were actually distinct.  CDT overhauled their build system in
+version~4(?), and these are now treated uniformly in implementation.
+Nevertheless, this distinction was made frequently in historical discussions
+about CDT, and it is important to be aware of.  It is also a useful distinction
+to make from the user's perspective, since the idea of hand-writing a makefile
+seems to intimidate many Fortran programmers.}
+
+\begin{itemize}
+
+\item \textbf{Standard Make projects} require users to
+supply their own Makefile, typically with targets ``clean'' and ``all.''
+CDT/Photran cleans and builds the project by running \texttt{make}.
+(``Standard Make'' is actually old terminology; recent versions of CDT
+call these ``Makefile Projects.''  They are created by choosing
+Makefile Project $>$ Empty Project and selecting ``--~Other Toolchain~--''
+in the New C/C++ Project dialog.)
+
+\item \textbf{Managed Make projects} are similar to standard make projects,
+except that CDT/Photran automatically generates a Makefile and edits the
+Makefile automatically when source files are added to or removed from the
+project. The \textbf{Managed Build System} (MBS) is the part of CDT that
+handles all of this.
+
+\end{itemize}
+
+\item \textbf{Binary parsers} are able to detect whether a file is a legal
+executable for a platform (and extract other information from it). CDT
+provides binary parsers for Windows (PE), Linux (ELF), Mac OS X (Mach~O), and
+others. Photran does not provide any additional binary parsers.
+
+\item \textbf{Error parsers} are provided for many compilers. CDT provides a gcc
+error parser, for example. Photran provides error parsers for Lahey Fortran, F,
+g95, and others. Essentially, error parsers scan the output of \texttt{make} for
+error messages for their associated compiler. When they see an error message
+that they recognize, they extract the filename, line number, and error message,
+and use it to populate the Problems View. See
+Appendix~\ref{ap:creating_an_error_parser} for an example on how to create an
+error parser.
+
+\item CDT keeps a \textbf{model} of all of the files in a project. The model is
+essentially a tree of \textbf{elements}, which all inherit the (CDT Core)
+interface \texttt{ICElement}. It is described in the next section.
+
+\end{itemize}
+
+\section{The Model}
+
+The Fortran Projects view in Photran is essentially a visualization of
+the CDT's \textit{model}, a tree data structure describing the contents
+of all Fortran Projects in the workspace as well as the high-level contents
+(functions, aggregate types, etc.) of source files.
+
+Alain Magloire (CDT) described the model, A.K.A. the \texttt{ICElement}
+hierarchy, in the thread ``Patch to create ICoreModel interface'' on the cdt-dev
+mailing list (April 1, 2005):
+
+{\footnotesize
+\begin{quote}
+\begin{verbatim}
+So I'll explain a little about the ICElement and what we get out of it for
+C/C++.
+
+The ICElement hierarchy can be separated in two:
+(1) - how the Model views the world/resources (all classes above ITranslationUnit)
+(2) - how the Model views the world/language (all classes below ITranslationUnit).
+
+How we(C/C++) view the resources:
+- ICModel  --> [root of the model]
+  - ICProject --> [IProject with special attributes/natures]
+    - ISourceRoot --> [Folder with a special attribute]
+      - ITranslationUnit --> [IFile with special attributes, e.g. extensions *.c]
+      - IBinary --> [IFile with special attributes, elf signature, coff etc]
+      - IArchive --> [IFile with special attributes, "<ar>" signature]
+      - ICContainer -> [folder]
+
+There are also some special helper classes
+  - ILibraryReference [external files use in linking ex:libsocket.so, libm.a, ...]
+  - IIncludeReference [external paths use in preprocessing i.e. /usr/include, ...]
+  - IBinaryContainer [virtual containers regrouping all the binaries found
+    in the project]
+
+This model of the resources gives advantages:
+- navigation of the binaries,
+- navigation of the include files not part of the workspace (stdio.h, socket.h, etc)
+- adding breakpoints
+- search
+- contribution on the objects
+etc.....
+
+[...]
+
+(2) How we view the language.
+
+Lets be clear this is only a simple/partial/incomplete view of the language. For
+example, we do not drill down in blocks, there are no statements(if/else
+conditions) etc .... For a complete interface/view of the language, clients
+should use the __AST__ interface.
+\end{verbatim}
+\end{quote}
+}
+
+\pagebreak
+
+From another of Alain's posts in that thread:
+
+{\footnotesize
+\begin{quote}
+\begin{verbatim}
+Lets make sure we are on the same length about the ICElement hierarchy.
+It was created for a few reasons:
+
+- To provide a simpler layer to the AST.  The AST interface is too complex
+  to handle in most UI tasks.
+- To provide objects for UI contributions/actions.
+- The glue for the Working copies in the Editor(CEditor), IWorkingCopy class
+- The interface for changed events.
+- ...
+
+Basically it was created for the UI needs: Outliner, Object action contributions,
+C/C++ Project view and more.
+
+The CoreModel uses information taken from:
+- the Binary Parser(Elf, Coff, ..)
+- the source Parser(AST parser)
+- the IPathEntry classes
+- the workspace resource tree
+- The ResolverModel (*.c, *.cc extensions), ...
+
+to build the hierarchy.
+\end{verbatim}
+\end{quote}
+}
+
+\shabox{The CDT model should \textbf{not} be confused with the Abstract Syntax
+Tree (AST) model that is discussed in Section~\ref{sec:ast_structure}. They are
+\textbf{not} identical. It is helpful to think of the CDT model as containing a
+\emph{partial/simplified view} of the AST model to represent the
+high-level/organizational elements in the source code (program units, subprogram
+declarations, etc.) \textbf{in addition} to a model of the current workspace
+resources (Fortran projects, Fortran source files, binary executables). In
+other words, the CDT model knows about the resources and the organizational
+units in the source code. The AST,
+on the other hand, completely models \emph{everything} in the source file (but
+nothing about the resources), including low-level elements that the user is
+unlikely to be interested in knowing about (assignment nodes, variable
+declarations). While low-level, these elements are useful for refactoring and 
+program analysis.}
+
+By conforming to the CDT model, Photran is able to reuse various UI
+elements for \emph{free}. For instance, the Outline View for Photran is managed
+by CDT; Photran just needs to provide a CDT-compatible model to represent its
+project and source files.
+
+The \texttt{FortranLanguage} class (in the org.eclipse.photran.cdtinterface
+project) is responsible for initializing concrete
+classes that will build up the model that CDT expects.
+
+There are \textbf{two} options for creating suitable \emph{model builders}:
+\begin{enumerate}
+\item The org.eclipse.photran.cdtinterface plug-in project defines the
+\\ \texttt{org.eclipse.photran.cdtinterface.modelbuilder} extension point that
+other plug-ins can extend. Plug-ins extending that extension point are
+responsible for providing a suitable model builder. Using this option, it is
+possible to have multiple model builders. The model builder to use can be
+selected in the workspace preferences (under Fortran $>$ CDT Interface).
+
+\item If there are no plug-ins that extend the
+\texttt{org.eclipse.photran.cdtinterface.modelbuilder} extension point, then
+Photran falls back on a default implementation provided by the
+\texttt{EmptyFortranModelBuilder} class (which, not surprisingly, builds
+an empty model).
+\end{enumerate}
+
+The Photran VPG (see Section~\ref{sec:virtual_program_graph}) inside the
+org.eclipse.photran.cdtinterface.vpg project uses the first option to
+contribute a model builder. The relevant classes are under the
+\texttt{org.eclipse.photran.internal.core.model} package (notably,
+\texttt{FortranModelBuilder}.)
+
+As mentioned in the post by Alain, all model elements must implement the
+\texttt{ICElement} interface for CDT to recognize them. In Photran, the
+\texttt{FortranElement} class implements the \texttt{ICElement} interface and
+serves as the base class for all Fortran elements such as subroutines,
+functions, modules, variables, etc. Each subclass of \texttt{FortranElement}
+corresponds to an element that can be displayed in the Outline View.
+
+\section{Reusing UI Elements}
+
+Various UI elements in Photran are also reused from the CDT.
+
+\begin{itemize}
+
+\item Many elements are reused directly.
+
+    \begin{itemize}
+
+    \item Photran frequently instantiates or references
+    classes from CDT and uses them as-is.  For example,
+    the \texttt{FortranProjectWizard} uses CDT's
+    \texttt{ICProjectDescription}.
+    
+    \item It is also common for plugin.xml
+    files in Photran to reference contributions from CDT.  For example, the
+    XML declaration for the Fortran perspective includes the line \\
+    \centerline{\texttt{
+    <actionSet id="org.eclipse.cdt.make.ui.makeTargetActionSet"/>
+    }} \\
+    which adds some build-related CDT actions to the menus and toolbars in
+    the Fortran perspective.
+    
+    \item In many cases, the XML describing a particular element in Photran
+    is essentially the same as the corresponding XML in CDT, except the
+    name and/or icon is changed.  This is the case for, e.g., the
+    \textit{Local Fortran Application} launch configuration. 
+    
+    \end{itemize}
+
+\item Many elements are reused through subclassing.  For example, Photran's
+\texttt{NewSourceFolderCreationWizard} subclasses an equivalent class in CDT
+but overrides a method in order to change the title and icon for the wizard.
+
+\item As a last resort, some parts of Photran are copied from CDT and then
+modified as necessary.  This is the case with the
+\texttt{FortranPerspectiveFactory} class, for example: There was no way to
+accomplish the desired effect through subclassing (without modifying CDT),
+so we (unfortunately) had to copy a class from CDT and then modify it
+appropriately for Photran.
+
+\end{itemize}
+
+\section{The CDT Debugger and \texttt{gdb}}
+
+Currently, Photran re-uses the CDT debugger as-is and does not contribute any
+enhancements to it. Here is a brief summary of how the debugger works:
+
+\begin{itemize}
+
+\item The so-called CDT debugger is actually just a graphical interface to
+\texttt{gdb}, or more specifically to \texttt{gdb/mi}. So, if something doesn't
+appear to work, it is advisable to try it in \texttt{gdb} directly or to use
+another \texttt{gdb}-based tool such as DDD.
+
+\item The debugger UI ``contributes'' breakpoint markers and actions to the
+editor. The ``set breakpoint'' action, and the breakpoint markers that appear in
+the ruler of the CDT (and Photran) editors are handled \textbf{entirely} by the
+CDT debug UI; there is no code for this in Photran. The ``set breakpoint''
+action is enabled by calling \lstinline!setRulerContextMenuId("#CEditorRulerContext");! 
+in the \texttt{AbstractFortranEditor} constructor.
+
+\item \texttt{gdb} reads debug symbols from the executable it is debugging.
+That is how it knows what line it's on, what file to open, etc.  Photran
+has \textit{nothing} to do with this: These symbols are written entirely
+by the compiler.  Moreover, the compiler determines what shows up in the
+Variables View.  If the debugger views seem to be a mess, it is the
+compiler's fault, not Photran's.
+
+\end{itemize}

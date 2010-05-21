@@ -1,0 +1,523 @@
+% The Abstract Syntax Tree and Virtual Program Graph
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
+
+\section{How to Get Acquainted with the Program Representation}
+\label{sec:how_to_get_acquainted_with_the_program_representation}
+
+\emph{These features work only on files that are located inside a Fortran
+project with analysis and refactoring enabled.  See the Photran user
+documentation \textit{(Photran Advanced Features Manual)} for instructions.}
+
+\subsection{Visualizing ASTs}
+
+When Photran parses a file, it produces an abstract syntax tree (AST).  This
+is the central data structure used when implementing refactorings, program
+analyses, etc.
+
+Photran can display its abstract syntax tree (AST) for a file in place of the
+ordinary Outline view. This behavior can be enabled from the Fortran workspace
+preferences:
+
+\begin{itemize}
+	\item Click on Window $>$ Preferences in Windows/Linux, or Eclipse $>$ Preferences in Mac OS X.
+	\item Select ``Fortran'' on the left hand side of the preference dialog (do not expand it).
+	\item Select ``(Debugging) Show entire abstract syntax tree rather than Outline view''
+\end{itemize}
+  
+Clicking on a \texttt{Token} in the Outline view will move the cursor
+to that construct's position in the source file.
+
+Figure~\ref{fig:simple_fortran_ast} is an example of this display.
+(It is explained further in Section~{sec:asts}.)
+
+\subsection{Visually Resolving Bindings}
+
+Each use of an identifier in a Fortran program corresponds to a declaration.
+For example, the use of the variable \textit{count} in \texttt{print *, count}
+might correspond to a declaration like \texttt{integer :: count}.  We say that
+the use of the identifier is \textit{bound} to its declaration, and determining
+the declaration that corresponds to a particular use is called \textit{resolving}
+the name binding.
+
+To visualize what declaration a particular variable use is bound to,
+click on an identifier in a Fortran editor (position the cursor over
+it), and press F3 (or click Navigate $>$ Open Declaration, or right-click and
+choose Open Declaration.) The binding will be resolved and the declaration
+highlighted. If there are multiple bindings, a pop-up window will open and one
+can be selected. If the identifier is bound to a declaration in a module defined
+in a different file, an editor will be opened on that file.
+
+\subsection{Visualizing Enclosing Scopes}
+
+Every declaration in a Fortran program exists in a particular \textit{lexical
+scope.}  For example, if a subroutine definition includes a variable declaration
+like \texttt{integer :: i}, then that variable is only visible within the subroutine,
+and that subroutine is its \textit{enclosing scope.}
+In the AST, the subroutine is represented by a \textit{ASTSubroutineSubprogramNode},
+a class which inherits from \textit{ScopingNode}, and it would an the ancestor of the
+\textit{ASTTypeDeclarationStmtNode} representing the variable declaration.
+
+To view the enclosing scope for a particular token in the AST,
+click on any token in the Fortran editor, and click Refactor $>$ (Debugging) $>$
+Select Enclosing Scope. The entire range of source text corresponding to that token's
+enclosing \texttt{ScopingNode} will be highlighted.
+
+\subsection{Visualizing Definitions}
+
+For every declaration in a Fortran program, Photran maintains a \textit{Definition}
+object which summarizes the information available about that symbol.  For example,
+by invoking methods on the \textit{Definition} for a symbol, you could determine
+that the symbol is a local variable named \textit{matrix} and that it is a
+two-dimensional, allocatable array.  Of course, you could figure this out by
+traversing the AST, but that can be very tedious (and expensive).\footnote{Actually,
+Photran \textit{does} have to traverse the AST to figure this out, but it only does
+this once per file, and then it saves the \textit{Definition} to disk (in the
+``VPG database'').  When you ask Photran for a \textit{Definition}, it simply loads
+the information from this database.}
+
+To get a sense of what symbols have \textit{Definition} objects (these are things
+like variable declarations, subprogram declarations, common block names, etc.),
+open a file in the Fortran editor, and click Refactor $>$ (Debugging) $>$
+Display Symbol Table for Current File. Indentation shows scope nesting, and each
+line summarizes the information in a \texttt{Definition} object.
+
+\section{Abstract Syntax Trees}
+\label{sec:asts}
+
+\subsection{Simple AST Example}
+
+The Fortran grammar is very lengthy, containing
+hundreds of rules. Even the simplest Fortran program has a fairly
+non-trivial AST. For instance this simple Fortran program: \\
+
+\begin{lstlisting}[language=Fortran, frame=lines]
+program main
+    integer a
+end	
+\end{lstlisting}
+
+generates the AST shown in Figure~\ref{fig:simple_fortran_ast}.
+%As an exercise,
+%the reader is encouraged to derive the structure of the AST from the grammar
+%specifications in the \emph{fortran2008.bnf} file beginning with \# R201,
+%\verb!<ExecutableProgram>!.
+
+\begin{image}
+	\centering
+			\includegraphics[height=4in]{images/simple_fortran_AST.png}
+			\caption{AST for simple Fortran program as viewed through the Outline View}
+		\label{fig:simple_fortran_ast}
+\end{image}
+
+Fortunately, it is not necessary to know every specification in the grammar. For
+most refactoring and program analysis tasks, it is sufficient to rely on the
+information that the VPG provides (e.g., \textit{Definition} objects) and
+to construct a Visitor to visit \emph{only} the nodes of interest and
+``collect'' the information that is required.
+
+To get a sense of what AST nodes are involved in the particular task you want to
+accomplish, we recommend enabling AST visualization (described above), writing
+some sample programs that exercise the relevant parts of the Fortran gramar, and
+then observing the AST that is displayed.
+
+\subsection{AST Structure for DO-Loops}
+
+Due to a deficiency in the parser, DO-constructs are not recognized as a single
+construct; DO and END DO statements are recognized as ordinary statements
+alongside the statements comprising their body.  There is a package in the
+core.vpg plug-in called org.eclipse.photran.internal.core.analysis.loops which
+provides machinery to fix this, giving DO-loops a ``proper'' AST structure.
+
+If you call \texttt{LoopReplacer.replaceAllLoopsIn(ast)}, it will identify all
+of the new-style DO-loops and change them to \texttt{ASTProperLoopConstructNode}s,
+which a more natural structure, with a loop header, body, and END DO statement.
+Once this is done, visitors must be implemented by subclassing one of the
+Visitor classes \emph{in the org.eclipse.photran.internal.core.analysis.loops
+package;} these have a callback method to handle
+\texttt{ASTProperLoopConstructNode}s.
+
+The AST visualization (described above) shows the AST \textit{after}
+\texttt{LoopReplacer.replaceAllLoopsIn(ast)} has been invoked.
+
+\section{Virtual Program Graph}
+\label{sec:virtual_program_graph}
+
+In Photran, it is \emph{almost} never necessary to call the lexer, parser, or
+analysis components directly. Instead, Photran uses a
+\textbf{virtual program graph}, or VPG, which provides the fa\c{c}ade of a
+whole-program abstract syntax tree (AST) with embedded analysis information.
+
+To the programmer building a refactoring, the VPG appears quite simple.
+\begin{enumerate}
+\item When the programmer requires an AST, the programmer asks the VPG to
+      provide it.  He does not parse the file directly.
+\item Methods on (certain) AST nodes provide name binding information, control flow
+      information, source/AST rewriting, etc.  For example, the programmer can
+      ask an AST node for its control flow successors, or he can tell it to
+      remove itself from the AST, to reindent itself, etc.\footnote{Control flow
+      analysis is not (yet) implemented in Photran.  But, in theory, this is
+      how it should work\dots}
+\item The VPG maintains a database containing the analysis information (e.g.,
+      what names are references to what other names).  Analyses are run when the
+      user saves a file, and the result is saved to the database.  Then, when
+      requests are made for analysis information (e.g., asking for all of the
+      references to a particular name), it can simply be loaded from the database.
+      It is the programmer's responsibility to make sure that the database is
+      up-to-date before he attempts to access it, and that any task that
+      requires database information is scheduled so that it will not attempt to
+      read from the database while analysis information is being updated.
+\end{enumerate}
+
+Photran's VPG is implemented by the class \texttt{PhotranVPG}.  This is a
+\emph{singleton} object whose instance is available via
+\texttt{PhotranVPG.getInstance()}.  The remaining subsections describe how the
+above tasks are implemented in Photran.
+
+\subsection{Acquiring and Releasing ASTs}
+
+ASTs are retrieved by invoking either of these
+methods:
+\begin{code}
+\begin{lstlisting}[numbers=none]
+public IFortranAST acquireTransientAST(IFile file)
+public IFortranAST acquirePermanentAST(IFile file)
+\end{lstlisting}
+%\caption{Acquiring the Fortran AST}
+\end{code}
+
+\vspace{-0.15in}
+
+The returned object is an \texttt{IFortranAST}, an object which has a method for
+returning the root node of the AST as well as methods to quickly locate tokens
+in the AST by offset or line information. A \emph{transient AST} can be garbage
+collected as soon as references to any of its nodes disappear. A \emph{permanent
+AST} will be explicitly kept in memory until a call is made to either of the 
+following methods:
+\begin{code}
+\begin{lstlisting}[numbers=none]
+public void releaseAST(IFile file)
+public void releaseAllASTs()
+\end{lstlisting}
+\caption{Releasing the Fortran AST}
+\end{code}
+
+Often, it is better to acquire a transient AST and rely on the garbage collector
+to reclaim the memory once we are done using it. However, there are times when
+acquiring a permanent AST would be more beneficial performance-wise. For
+instance, if we will be using the same AST multiple times during a refactoring,
+it would be better to just acquire a permanent AST. This prevents the garbage
+collector from reclaiming the memory midway through the refactoring once all
+references to the AST have been invalidated. While it is always possible to
+reacquire the same AST, doing so can be an expensive operation since it requires
+\emph{lexing}, \emph{parsing} \textbf{and} finally \emph{reconstructing} the AST
+from scratch.
+
+Only one AST for a particular file is in memory at any particular point in time,
+so successive requests for the same \texttt{IFile} will return the same
+(pointer-identical) AST until the AST is released (permanent) or garbage
+collected (transient).
+
+The \texttt{acquireTransientAST} and \texttt{acquirePermanentAST} methods return
+an object implementing \texttt{IFortranAST}.  This interface has several methods,
+notably including the following:
+
+\begin{itemize}
+
+\item
+The \texttt{getRoot} method returns the root of the AST, while the
+\texttt{find...} methods provide efficient means to search for tokens based
+on their lexical positioning in the source code.
+
+\item
+The \texttt{accept} method allows an external visitor to traverse the AST. This
+method is usually used when it is necessary to ``collect'' information about
+certain nodes.
+
+\item
+Because \texttt{IFortranAST} extends the \texttt{Iterable} interface, it is
+possible to use the \emph{foreach} loop to conveniently iterate through all the
+tokens in the AST e.g. \\ \lstinline!for (Token token : new IterableWrapper<Token>(ast))!
+
+\end{itemize}
+
+\subsection{Scope and Binding Analysis}
+
+Currently, the only semantic analysis performed by Photran is binding analysis:
+mapping \emph{identifiers} to their \emph{declarations}. Compilers usually do
+this using symbol tables but Photran uses a more IDE/refactoring-based approach.
+
+Certain nodes in a Fortran AST represent a lexical scope. All of these nodes are
+declared as subclasses of \texttt{ScopingNode}:
+
+\begin{itemize}
+\item ASTBlockDataSubprogramNode
+\item ASTDerivedTypeDefNode
+\item ASTExecutableProgramNode
+\item ASTFunctionSubprogramNode
+\item ASTInterfaceBlockNode\footnote{An interface block defines a nested scope only if it is a named interface.Anonymous (unnamed) interfaces provide signatures for subprograms in their enclosing scope.}
+\item ASTMainProgramNode
+\item ASTModuleNode
+\item ASTSubroutineSubprogramNode
+\end{itemize}
+
+Each of the subclasses of \texttt{ScopingNode} represents a scoping unit in
+Fortran. The \texttt{ScopingNode} class has several public methods that provide
+information about a scope. For example, one can retrieve a list of all of the
+symbols declared in that scope; retrieve information about its
+\texttt{IMPLICIT} specification; find its header statement (e.g. a
+\texttt{FUNCTION} or \texttt{PROGRAM} statement); and so forth.
+
+The enclosing scope of a \texttt{Token} can be retrieved by calling the
+following method on the \texttt{Token} object:
+ 
+\begin{lstlisting}[numbers=none]
+public ScopingNode getEnclosingScope()
+\end{lstlisting}
+
+Identifier tokens (\texttt{Token}s for which \texttt{token.getTerminal() ==
+Terminal.T\_IDENT}), which represent functions, variables, etc. in the Fortran
+grammar, are \emph{bound} to a declaration\footnote{The introduction to VPGs
+earlier in this chapter (URL above) provides an example visually.}. Although,
+ideally, every identifier will be bound to exactly one declaration, this is not
+always the case: the programmer may have written incorrect code, or Photran may
+not have enough information to resolve the binding uniquely). So the
+\texttt{resolveBinding} method returns a \emph{list} of \texttt{Definition}
+objects:
+
+\begin{lstlisting}[numbers=none]
+public List<Definition> resolveBinding()
+\end{lstlisting}
+
+A \texttt{Definition} object contains many public methods which provide a wealth
+of information. From a \texttt{Definition} object, it is possible to get a list
+of all the references to a particular declaration (using
+\texttt{findAllReferences}) and where that particular declaration is located in
+the source code (using \texttt{getTokenRef}). Both of these methods return a
+\texttt{PhotranTokenRef} object. See Section~\ref{sub:token_or_tokenref} for a
+comparison between \texttt{Token} and \texttt{TokenRef}.
+
+\subsubsection{Obtaining the \texttt{Definition} of a variable}
+
+If you have a reference to the \texttt{Token} object of that variable (for
+instance through iterating over all \texttt{Tokens} in the current Fortran AST)
+then use:
+
+\begin{lstlisting}[numbers=none, frame=lines]
+// myToken is the reference to that variable
+List<Definition> bindings = myToken.resolveBinding();
+
+if(bindings.size() == 0)
+	throw new Exception(myToken.getText() + " is not declared");
+else if (bindings.size() > 1)
+	throw new Exception(myToken.getText() + " is an ambiguous reference");
+
+Definition definition = bindings.get(0);
+\end{lstlisting}
+
+If you do \textbf{not} have a reference to a \texttt{Token} but you know the
+name of the identifier, you can first construct a \emph{hypothetical}
+\texttt{Token} representing an identifier and search for that in a
+\emph{particular} \texttt{ScopingNode} (possibly obtained by calling the static
+method \texttt{ScopingNode.getEnclosingScope(IASTNode node)}).
+\\
+
+\begin{lstlisting}[numbers=none, frame=lines]
+Token myToken = new Token(Terminal.T_IDENT, "myNameOfIdentifier");
+List<PhotranTokenRef> definitions = myScopingNode.manuallyResolve(myToken);
+\end{lstlisting}
+
+If you want to search for the identifier in \textbf{all} \texttt{ScopingNodes}
+for the current source file, then retrieve all the \texttt{ScopingNodes} and
+manually iterate through each one. Remember that the root of the AST is a
+\texttt{ScopingNode} and you may obtain the root of the AST through the
+\texttt{getRoot} method declared in \texttt{IFortranAST}.
+\\
+
+\begin{lstlisting}[numbers=none, frame=lines]
+List<ScopingNode> scopes = myRoot.getAllContainedScopes();
+
+for (ScopingNode scopingNode : scopes)
+{
+	// search through each ScopingNode
+}
+\end{lstlisting}
+
+\subsubsection{Examples in \texttt{FortranEditorASTActionDelegate} subclasses}
+
+The following subclasses of \texttt{FortranEditorASTActionDelegate} all contain short working examples of how to use the binding analysis API in Photran:
+\begin{itemize}
+	\item DisplaySymbolTable
+	\item FindAllDeclarationsInScope
+	\item OpenDeclaration
+	\item SelectEnclosingScope
+\end{itemize}
+
+
+\subsection{Scheduling and (Avoiding) Concurrent Access}
+
+It is important to note that, because \texttt{PhotranVPG} is a singleton object,
+it may not be accessed concurrently by multiple threads.
+
+Most actions that require an AST will be subclasses of
+\texttt{FortranEditorActionDelegate}. (All refactoring actions in Photran
+are descendants of \texttt{FortranEditorActionDelegate}, for example.)
+These are always scheduled in a way that avoids this problem.
+
+Otherwise, the thread must either be scheduled using a
+\texttt{VPGSchedulingRule} or it must lock the entire workspace. See
+\texttt{EclipseVPG\#queueJobToEnsureVPGIsUpToDate} as an example on how to use
+the \texttt{VPGSchedulingRule} and \texttt{FortranEditorActionDelegate\#run} as
+an example of how to lock the entire workspace.
+
+As a guideline, contributors who are interested in accessing the VPG should
+consider structuring their contributions as descendants of
+\texttt{FortranEditorActionDelegate}. However, if that
+approach is not feasible, then they should consider using
+\texttt{VPGSchedulingRule} before resorting to locking the entire workspace.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newif\ifxxxxxx
+\ifxxxxxx
+
+\section{Background: Program Graphs and the VPG}
+
+\textit{Portions of this section are excerpted from
+Jeff's dissertation proposal (2009).}
+
+\subsection{Theory: Program Graphs}
+
+According to Mens et al.,~
+a \textit{program graph} ``may be viewed, in broad lines, as an abstract syntax
+tree augmented by extra edges.''\footnote{T.~Mens, N.~Van~Eetvelde, S.~Demeyer,
+and D.~Janssens.  ``Formalizing refactorings with graph transformations.''
+\textit{J.~Softw. Maint. Evol.}, 17(4): 247--276, 2005.}  These
+``extra edges'' represent semantic information, such as variable scopes and
+bindings, control flow, inheritance relationships, and so forth.
+
+Unlike a compiler, where the AST, symbol table, and control flow graph are
+usually separate data structures, a program graph combines all such information
+into a single data structure.  In a program graph, there are no symbol tables;
+rather, some nodes in the AST correspond to declarations, and references
+contain an edge pointing to their declaration.  Scopes can similarly be
+represented by AST nodes; symbols can point to the scope in which they are
+defined.  The control flow successors of a node are other AST nodes.  A
+variable's du-chains would likely consist of AST nodes representing assignment
+statements and variable-use expressions.  And so forth.  In other words, in a
+program graph, all program analyses are stated in terms of AST nodes.
+
+Alternatively, one might think of a program graph as an AST with the graph
+structures of a control flow graph, program dependence graph, du-chains,
+etc.~``superimposed.''\footnote{M.~Verbaere, A.~Payement, O.~de~Moor.
+``Scripting refactorings with JunGL.'' In \textit{Proc.~OOPSLA~'06},
+pp.~651--652.}  The nodes of the AST also
+serve as nodes of the various graph structures; the edges connecting them are
+different.
+
+\begin{image}
+	\centering
+			\includegraphics[height=6in]{images/sample_vpg.png}
+			\caption{Sample program graph (AST with semantic edges)
+			for a Java program}
+		\label{test2before}
+\end{image}
+
+An example of a Java program and a plausible program graph representation are
+shown in Figure~\ref{test2before}.  The underlying abstract syntax tree is
+shown in outline form; the dotted lines are the extra edges that make the AST a
+program graph.  We have shown four types of edges.  \textit{Scope} edges link a
+declaration to the class or method in which it is defined.  \textit{Binding}
+edges link the use of an identifier to its corresponding declaration.  Within
+the method body, \textit{control flow} edges form the (intraprocedural) control
+flow graph; the method declaration node is used as the entry block and null as
+the exit block.  Similarly, there are two du-chains, given by \textit{def-use}
+edges.
+
+The advantages of the program graph representation are twofold.  First, it is
+generic enough that it a program graph can be built to represent virtually any
+conventional programming language.  Every program has a syntax which can be
+represented as a syntax tree, and we hypothesize that the semantics needed to
+perform common refactorings can be represented as extra edges (and node
+annotations) on this tree.  The second advantage of the program graph is that
+it summarizes the ``interesting'' aspects of both the syntax and semantics of a
+program in a single representation, obviating the need to maintain a mapping
+between several distinct representations.
+
+\subsection{Implementation: The Virtual Program Graph}
+
+Often, program graphs only conceptual: "Real" programs can be extremely large,
+spanning hundreds of files, and edges may span across these files. For example,
+a function defined in one file may be used in another, so a binding edge would
+span across files. Of course, it is inefficient--and sometimes impossible--to
+store ASTs for several hundred files in memory.
+
+The Rephraser Engine provides a base implementation for a \textit{virtual program
+graph,} which takes a different approach.  For the most part, the VPG allows the
+programmer to pretend that an AST for the entire (several-hundred-file) program
+is available in memory, with edges spanning between files when necessary.
+
+TODO
+
+Therefore, most systems cache information about externally-visible declarations
+in a program database.  Often they expose this to the programmer, so 
+it becomes the programmer's responsibility to parse individual files
+and to distinguish what is available the program database from what is available
+in the AST.
+
+The \textit{virtual program graph}, or
+VPG, provides a cross-reference database and indexing infrastructure TODO
+
+To the programmer building a refactoring, the VPG appears quite simple.
+\begin{itemize}
+\item When the programmer requires an AST, the programmer asks the VPG to
+      provide it.  He does not parse the file directly.
+\item Methods on the AST nodes provide name binding information, control flow
+      information, source/AST rewriting, etc.  For example, the programmer can
+      ask an AST node for its control flow successors, or he can tell it to
+      remove itself from the AST, to reindent itself, etc.
+\end{itemize}
+
+One advantage of the VPG architecture is that programmers developing
+refactorings are insulated from much of the underlying infrastructure.  The VPG
+acts as an AST repository, insulating the programmer from the lexer/parser and
+preprocessor, while the AST nodes insulate the programmer from the semantic
+analyses, the source rewriter, and the program database.
+
+One particularly interesting example is when a subprogram node is asked for all
+of its call sites.  Note that these are not necessarily nodes in the same AST.
+Generally, this information would be stored in the cross-reference database,
+but the programmer need not be aware of this; the VPG can simply provide an
+iterator which provides pointers to AST nodes.  As the iterator progresses,
+ASTs for the various files can be transparently loaded and unloaded from
+memory.  (Recall that the programmer always asks the VPG to provide ASTS; thus,
+careful implementation can guarantee that there are never multiple ASTs for the
+same file in memory.)  In essence, the VPG is intended to provide the illusion
+that there are always ASTs available for the whole program.\footnote{The
+``virtual'' in ``virtual program graph'' is analogous to ``virtual'' in
+``virtual memory:'' The system shields the programmer from knowing whether the
+requested data is already in memory or if it must first be loaded from disk.}
+
+\begin{image}
+	\centering
+			\includegraphics[height=2.5in]{images/vpg_db_er.png}
+			\caption{VPG database schema}
+		\label{fig:vpg_db_er}
+\end{image}
+
+\fi

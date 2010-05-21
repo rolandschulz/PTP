@@ -1,0 +1,338 @@
+% Refactoring
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
+
+\section{Introduction}
+
+A refactoring is a program transformation to improve the quality of the source
+code by making it easier to understand and modify. A refactoring is a special
+kind of transformation because it preserves the \emph{observable behavior} of
+your program -- it neither removes nor adds any functionality.\footnote{For more
+information see
+\href{http://www.amazon.com/Refactoring-Improving-Existing-Addison-Wesley-Technology/dp/0201485672}{Refactoring:
+Improving the Design of Existing Code}}.
+
+As mentioned in Chapter~\ref{cha:introduction}, the purpose in writing
+Photran was to create a refactoring tool for Fortran. Because Photran is
+structured as a plug-in for Eclipse, we can take advantage and reuse many of the
+language-neutral support that Eclipse provides for refactoring. This makes it
+possible to create refactoring tools that \emph{resemble} the Java Development
+Tools that most Eclipse programmers are already familiar with.
+
+However, implementing first-class support for Fortran refactoring is not an easy
+task. It requires having an accurate representation of the underlying Fortran
+source files so that our tools can perform proper program analysis to construct
+our automated refactoring. The VPG (see Chapter~\ref{cha:parsing}) is our
+initial step in providing such a representation; the VPG will be improved in
+future versions of Photran to provide support for many different types of
+refactoring and program analysis.
+
+In this chapter, we describe how to add automated refactorings for Fortran using
+the underlying infrastructure provided by Eclipse (and Photran) as well as the
+analysis tools provided by the VPG.
+
+\section{Structure of a Fortran Refactoring}
+\label{sec:structure_of_a_fortran_refactoring}
+
+Refactorings in Photran are subclassed from either
+\texttt{SingleFileFortranRefactoring} or \texttt{MultipleFileFortranRefactoring}.
+Both of these are subclasses of \texttt{AbstractFortranRefactoring}, which
+is in turn a subclass of the \texttt{Refactoring} class provided by the Eclipse
+Language ToolKit (LTK)\footnote{See
+\href{http://www.eclipse.org/articles/Article-LTK/ltk.html}{The Language
+Toolkit: An API for Automated Refactorings in Eclipse-based IDEs} for an
+introduction to the LTK.}.
+
+The LTK is a language-neutral API for supporting refactorings in the Eclipse
+environment. It provides a generic framework to support the following
+functionalities:
+\begin{enumerate}
+	\item Invoking the refactoring from the user interface (UI).
+	\item Presenting the user with a wizard to step through the refactoring.
+	\item Presenting the user with a preview of the changes to be made.
+\end{enumerate}
+
+In other words, the LTK provides a common UI for refactorings: This allows
+refactorings for Java, C/C++, and Fortran to all have the same look and feel.
+
+A concrete Fortran refactoring must implement the following \emph{four} methods:
+\\
+\begin{code}
+\begin{lstlisting}[numbers=none]
+public abstract String getName();
+
+protected abstract void doCheckInitialConditions(RefactoringStatus status,
+	IProgressMonitor pm) throws PreconditionFailure;
+
+protected abstract void doCheckFinalConditions(RefactoringStatus status,
+	IProgressMonitor pm) throws PreconditionFailure;
+
+protected abstract void doCreateChange(IProgressMonitor pm) throws
+	CoreException, OperationCanceledException;
+\end{lstlisting}
+\caption{Abstract methods of \texttt{AbstractFortranRefactoring} class}
+\label{lst:FortranRefactoring_API}
+\end{code}
+
+\texttt{getName} simply returns the name of the refactoring: ``Rename,''
+``Extract Subroutine,'' ``Introduce Implicit None,'' or something similar. This
+name will be used in the title of the wizard that is displayed to the user.
+
+Initial conditions are checked before any wizard is displayed to the user. An
+example would be making sure that the user has selected an identifier to rename.
+If the check fails, a \texttt{PreconditionFailure} should be thrown with a
+message describing the problem for the user.
+
+Final conditions are checked after the user has provided any input. An example
+would be making sure that the new name that that user has provided is a legal
+identifier.
+
+The actual transformation is done in the \texttt{doCreateChange} method, which
+will be called only after the final preconditions are checked. For more information, see Section~\ref{sec:ast_rewriting}.
+
+The \texttt{AbstractFortranRefactoring} class provides a large number of
+\texttt{protected} utility methods common among refactorings, such as a method
+to determine if a token is a uniquely-bound identifier, a method to parse
+fragments of code that are not complete programs, and a \texttt{fail} method
+which is simply shorthand for throwing a \texttt{PreconditionFailure}. It is
+worth reading through the source code for \texttt{AbstractFortranRefactoring} before
+writing your own utility methods.
+
+\section{Creating Changes: AST Rewriting}
+\label{sec:ast_rewriting}
+
+After determining the files that are affected and the actual changes that are
+required for a particular refactoring, manipulating the source code in the
+\texttt{doCreateChange} method is conceptually straightforward.
+
+Instead of manipulating the text in the files directly (by doing a textual find
+\& replace) we use a more scalable approach: manipulating the Abstract Syntax
+Tree (AST) of the source code. This allows us to make changes based on the
+program's semantics and its syntactic structure. This section assumes some
+familiarity with the AST used in Photran. For more information about the AST,
+refer to Section~\ref{sec:virtual_program_graph}.
+
+\subsection{Common Methods for Manipulating the AST}
+
+In the following paragraphs, we describe some of the approaches that are
+currently being used in Photran for manipulating the AST.
+
+\subsubsection{Changing the Text of \texttt{Token}s}
+
+To change the text of a single token, simply call its \texttt{setText} method.
+This is used in \texttt{RenameRefactoring} to rename tokens while preserving the
+``shape'' of the AST.
+\\
+\begin{code}
+\begin{lstlisting}[firstnumber=273, emph={setText}]
+private void makeChangesTo(IFile file, IProgressMonitor pm) throws Error
+{
+	try
+	{
+    vpg.acquirePermanentAST(file);
+   
+    if (definitionToRename.getTokenRef().getFile().equals(file))
+        definitionToRename.getTokenRef().findToken().setText(newName);
+   
+    for (PhotranTokenRef ref : allReferences)
+        if (ref.getFile().equals(file))
+            ref.findToken().setText(newName);
+   
+    addChangeFromModifiedAST(file, pm);
+   
+    vpg.releaseAST(file);
+	}
+	catch (Exception e)
+	{
+		throw new Error(e);
+	}
+}	
+\end{lstlisting}
+\caption{Use of \texttt{setText} in \texttt{RenamingRefactoring} (see
+RenameRefactoring.java)}
+\end{code}
+
+\subsubsection{Removing/replacing AST Nodes}
+\label{ssub:removing_replacing_AST}
+
+To remove or replace part of an AST, call \texttt{replaceChild},
+\texttt{removeFromTree} or \texttt{replaceWith} on the node itself. These 
+methods are defined in the \texttt{IASTNode} interface that all nodes implement. 
+Line 107 of Listing~\ref{lst:introimplicitnone_doChange} shows an example of the
+\texttt{removeFromTree} method.
+\\
+
+\begin{code}
+\begin{lstlisting}[firstnumber=7236]
+public static interface IASTNode
+{
+	void replaceChild(IASTNode node, IASTNode withNode);
+	void removeFromTree();
+	void replaceWith(IASTNode newNode);
+	...
+}
+\end{lstlisting}
+\caption{AST manipulation methods in \texttt{IASTNode} (see Parser.java) that
+all AST nodes implement}
+\end{code}
+
+In addition, if the \emph{specific} type of the AST is known, then it is
+possible to just call its \emph{setter} method to directly replace particular
+nodes. For more information on the available setters for each node type, see
+Section~\ref{sub:ordinary_ast_nodes}.
+
+\subsubsection{Inserting new AST Nodes} 
+
+Some refactorings require inserting new AST nodes into the current program. For
+instance, the ``Intro Implicit None Refactoring'' inserts new declaration
+statements to make the type of each variable more explicit.
+
+There are \emph{three} steps involved in inserting a new AST node:
+\begin{enumerate}
+	\item Constructing the new AST node.
+	\item Inserting the new AST node into the correct place.
+	\item Re-indenting the new AST node to fit within the current file.
+\end{enumerate}
+
+\paragraph{Constructing the new AST node} The \texttt{AbstractFortranRefactoring} class
+provides convenience methods for constructing new AST nodes. These methods
+should be treated as part of the API for Fortran refactorings . For instance,
+the \texttt{parseLiteralStatement} methods constructs a list of AST nodes for 
+use in the ``Intro Implicit None'' refactoring.
+
+\paragraph{Inserting the new AST node} Inserting the new AST node can be
+accomplished using the approach discussed previously in \emph{Removing/replacing AST Nodes}.
+
+\paragraph{Re-indenting the new AST node} It might be necessary to re-indent the
+newly inserted AST node so that it conforms with the indentation at its
+insertion point. The \texttt{Reindenter} utility class provides the static
+method \texttt{reindent} to perform this task. Refer to line 111 of
+Listing~\ref{lst:introimplicitnone_doChange}.
+\\
+
+\begin{code}
+\begin{lstlisting}[firstnumber=95,
+emph={removeFromTree, addChangeFromModifiedAST, Reindenter}]
+protected void doCreateChange(IProgressMonitor progressMonitor) throws 
+CoreException, OperationCanceledException
+{
+	assert this.selectedScope != null;
+	
+	for (ScopingNode scope : selectedScope.getAllContainedScopes())
+	{
+		if (!scope.isImplicitNone() 
+			&& !(scope instanceof ASTExecutableProgramNode) 
+			&& !(scope instanceof ASTDerivedTypeDefNode))
+		{
+			ASTImplicitStmtNode implicitStmt = findExistingImplicitStatement(scope);
+			if (implicitStmt != null) implicitStmt.removeFromTree();
+	        
+			IASTListNode<IBodyConstruct> newDeclarations = constructDeclarations(scope);
+			scope.getBody().addAll(0, newDeclarations);
+			Reindenter.reindent(newDeclarations, astOfFileInEditor);
+		}
+	}
+			
+	this.addChangeFromModifiedAST(this.fileInEditor, progressMonitor);
+	vpg.releaseAllASTs();
+}	
+\end{lstlisting}
+\caption{Inserting new declarations into an existing scope
+(see \texttt{IntroImplicitNoneRefactoring.java})}
+\label{lst:introimplicitnone_doChange}
+\end{code}
+
+\subsection{Committing Changes}
+
+After all of the changes have been made to a file's AST,
+\texttt{addChangeFromModifiedAST} has to be invoked to actually
+commit the changes. This convenience function creates a new
+\texttt{TextFileChange} for the \emph{entire} content of the file. The
+underlying Eclipse infrastructure performs a \texttt{diff} internally to
+determine what parts have actually changed and present those changes to the user
+in the preview dialog.
+
+\section{Caveats}
+\label{sec:refactoring_caveats}
+
+\textbf{CAUTION:} Internally, the AST is changed only enough to reproduce
+correct source code. After making changes to an AST, most of the accessor
+methods on \texttt{Token}s (\texttt{getLine(), getOffset(),} etc.) will return
+\textit{incorrect} or \emph{null} values.
+
+Therefore, \textit{all program analysis should be done first}; pointers to all
+relevant \textbf{tokens} should be obtained (usually as \texttt{TokenRef}s)
+\textit{prior} to making any modifications to the AST. In general, ensure that
+all analysis (and storing of important information from \texttt{Token}s) should
+be done in the \texttt{doCheckInitialConditions} and
+\texttt{doCheckFinalConditions} methods of your refactoring before the
+\texttt{doCreateChange} method.
+
+\vspace{-0.2in}
+\subsection{\texttt{Token} or \texttt{TokenRef}?}
+\label{sub:token_or_tokenref}
+
+\texttt{Token}s form the leaves of the AST -- therefore they exist as part of
+the Fortran AST. Essentially this means that holding on to a reference to a
+\texttt{Token} object requires the entire AST to be present in memory.
+
+\texttt{TokenRef}s are lightweight descriptions of tokens in an AST. They
+contain only three fields: filename, offset and length. These three fields
+uniquely identify a particular token in a file. Because they are not part of the
+AST, storing a \texttt{TokenRef} does not require the entire AST to be present
+in memory.
+
+For most refactorings, using either \texttt{Token}s or \texttt{TokenRef}s does
+not make much of a difference. However, in a refactoring like ``Rename
+Refactoring'' that could potentially modify hundreds of files, it is impractical
+to store all ASTs in memory at once. Because of the complexity of the Fortran
+language itself, its ASTs can be rather large and complex. Therefore storing
+references to \texttt{TokenRef}s would minimize the number of ASTs that must be
+in memory.
+
+To retrieve an actual \texttt{Token} from a \texttt{TokenRef}, call the
+\texttt{findToken()} method in \texttt{PhotranTokenRef}, a subclass
+of \texttt{TokenRef}.
+
+To create a \texttt{TokenRef} from an actual \texttt{Token}, call the \texttt{getTokenRef} method in \texttt{Token}.
+
+\vspace{-0.2in}
+\section{Examples}
+
+The ``Rename'', ``Introduce Implicit None'' and ``Move COMMON To Module''
+refactorings found in the \texttt{org.eclipse.photran.internal.core.refactoring}
+package inside the \texttt{org.eclipse.photran.core.vpg} project are
+non-trivial but readable and should serve as a model for building future Fortran
+refactorings.
+
+An example of a simpler but rather \emph{useless} refactoring is presented in
+Appendix~\ref{app:obfuscate_refactoring}. It should be taken as a guide on the
+actual steps that are involved in registering a new refactoring with the UI and
+also how to actually construct a working Fortran refactoring.
+
+\section{Common Tasks}
+
+In this section, we briefly summarize some of the common tasks involved in
+writing a new Fortran refactoring.
+
+\noindent \textbf{In an AST, how do I find an ancestor node that is of a
+particular type?}
+\\ Sometimes it might be necessary to traverse the AST \emph{upwards} to look
+for an ancestor node of a particular type. Instead of traversing the AST
+manually, you should call the \texttt{findNearestAncestor(TargetASTNode.class)}
+method on a \texttt{Token} and pass it the \textbf{class} of the ASTNode that
+you are looking for.
+
+\noindent \textbf{How would I create a new AST node from a string?} 
+\\ Call the \texttt{parseLiteralStatement(String string)} or
+\texttt{parseLiteralStatementSequence(String string)} method in
+\texttt{AbstractFortranRefactoring}. The former takes a \texttt{String} that represents
+a single statement while the latter takes a \texttt{String} that represents a
+sequence of statements.
+
+\noindent \textbf{How do I print the text of an AST node and all its children
+nodes?}
+\\ Call the \texttt{SourcePrinter.getSourceCodeFromASTNode(IASTNode node)}
+method. This method returns a \texttt{String} representing the source code of
+its parameter; it includes the user's comments, capitalization and whitespace.

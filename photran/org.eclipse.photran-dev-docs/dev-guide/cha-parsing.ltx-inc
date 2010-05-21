@@ -1,0 +1,317 @@
+% Parsing and Preprocessing
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
+
+\section{Parsing}
+
+Before any program analysis can be done, the source code of the Fortran program
+has to be parsed. Photran provides support for both fixed-form (Fortran 77) and
+free-form Fortran (Fortran 90 \& 95) source code. The parser in Photran is
+generated using the Ludwig parser/AST generator by Jeff Overbey. It is based on
+the \emph{fortran2003.bnf} grammar file.
+
+Figure~\ref{fig:images_parser_chain} shows the lexer \& parser tool chain in
+Photran. Preliminary support for (\texttt{INCLUDE} directives) has also been
+implemented.
+
+\begin{image}
+	\centering
+			\includegraphics[height=3in]{images/parser_chain.png}
+			\caption{Photran preprocessor/lexer/parser chain}
+		\label{fig:images_parser_chain}
+\end{image}
+\section{AST Structure}
+\label{sec:ast_structure}
+
+\section{AST Generation}
+
+Photran's (rewritable) AST is generated along with the parser, so the structure
+of an AST is determined by the structure of the parsing grammar (see the
+\emph{fortran2003.bnf} file). The generated classes are located in the
+\texttt{org.eclipse.photran.internal.core.parser} package in the
+\texttt{org.eclipse.photran.core.vpg} project. The easiest way to visualize the
+structure of a particular file's AST is to view it in the Outline view (see
+Section~\ref{sec:how_to_get_acquainted_with_the_program_representation}).
+However determining all possible ASTs for a particular construct requires
+scrutinizing the parsing grammar file.
+
+\subsection{Ordinary AST Nodes}
+\label{sub:ordinary_ast_nodes}
+
+Generally speaking, there is one AST node for each nonterminal in the grammar
+and one accessor method for each symbol on its right-hand side (unless the
+symbol name is prefixed with a hyphen, in which case it is omitted). For
+example, the following specification\footnote{All grammar
+specifications are taken from the \emph{fortran2003.bnf} file. The \# RXXX number
+provides a reference to the actual specification in the grammar file.}
+
+{\footnotesize\begin{verbatim}
+# R533
+<DataStmtSet> ::= <DataStmtObjectList> -:T_SLASH <DataStmtValueList> -:T_SLASH
+\end{verbatim}}
+
+generates the AST node class \texttt{ASTDataStmtSetNode} shown in
+Listing~\ref{lst:astdatastmtsetnode_api}. Notice the \emph{presence} of the
+\texttt{getDataStmtObjectList} and \texttt{getDataStmtValueList} getters methods
+and the \emph{absence} of any method for accessing T\_SLASH.
+
+\shabox{The convention is to generate a class with the name
+\texttt{\color{LightMagenta}AST}$<$nonterminal
+name$>$\texttt{\color{LightMagenta}Node} that extends \texttt{ASTNode}. For
+instance \# R533 will generate the
+\texttt{{\color{LightMagenta}AST}DataStmtSet{\color{LightMagenta}Node}} class.}
+
+The following sections describe additional annotations that can be used to
+modify the standard convention when necessary. These annotations are not
+considered part of the standard BNF notation but they are supported by the
+underlying Ludwig parser generator.
+
+\begin{code}
+\begin{lstlisting}
+public class ASTDataStmtSetNode extends ASTNode
+{
+	public IASTListNode<IDataStmtObject> getDataStmtObjectList() {...}
+
+	public void setDataStmtObjectList(IASTListNode<IDataStmtObject> newValue) {...}
+
+	public IASTListNode<ASTDataStmtValueNode> getDataStmtValueList() {...}
+
+	public void setDataStmtValueList(IASTListNode<ASTDataStmtValueNode> newValue) {...}
+
+	... 
+}
+\end{lstlisting}
+\caption{\texttt{ASTDataStmtSetNode} generated from \# R533}
+\label{lst:astdatastmtsetnode_api}
+\end{code}
+
+\subsubsection{Annotation \#1: \texttt{(list)}}
+
+Recursive productions are treated specially, since they are used frequently to
+express lists in the grammar. The recursive member is labeled in the grammar
+with the \texttt{(list)} annotation. For example, the following specification
+
+{\footnotesize\begin{verbatim}
+# R538
+(list):<DataStmtValueList> ::=
+  |                               <DataStmtValue>
+  | <DataStmtValueList> -:T_COMMA <DataStmtValue>
+\end{verbatim}}
+
+means that the AST will contain an object of type
+\texttt{List$<$ASTDataStmtValueNode$>$} whenever a \verb!<DataStmtValueList>!
+appears in the grammar. For instance, \# R533 (just described in the previous
+section) uses the \texttt{DataStmtValueList} construct. Notice in
+Listing~\ref{lst:astdatastmtsetnode_api} that the return type of
+\texttt{getDataStmtValueList} is a \texttt{List}.
+
+Putting an object that implements the \texttt{java.util.List} into the tree
+(rather than having a chain of nodes) makes it easier to iterate through the
+list, determine its size and insert new child nodes.
+
+\subsubsection{Annotation \#2: \texttt{(superclass)}}
+
+The \texttt{(superclass)} annotation is used to create an interface that is
+implemented by all symbols on the right-hand side of the specification will
+implement. For example, the following specifications
+
+{\footnotesize\begin{verbatim}
+# R207
+(superclass):<DeclarationConstruct> ::=
+  | <DerivedTypeDef>
+  | <InterfaceBlock>
+  | <TypeDeclarationStmt>
+  | <SpecificationStmt>
+
+...
+
+# R214
+(superclass):<SpecificationStmt> ::=
+  | <AccessStmt>
+  | <AllocatableStmt>
+  | <CommonStmt>
+  | <DataStmt>
+  | <DimensionStmt>
+  | <EquivalenceStmt>
+  | <ExternalStmt>
+  | <IntentStmt>
+  | <IntrinsicStmt>
+  | <NamelistStmt>
+  | <OptionalStmt>
+  | <PointerStmt>
+  | <SaveStmt>
+  | <TargetStmt>
+  | <UnprocessedIncludeStmt>
+\end{verbatim}}
+
+mean that an \textbf{interface} -- not a class -- named
+\texttt{ISpecificationStmt} will be generated for \# R214, and
+\texttt{ASTAccessStmtNode}, \texttt{ASTAllocatableStmtNode},
+\texttt{ASTCommonStmtNode}, etc will implement that interface. In addition,
+because \verb!<SpecificationStmt>! is used inside \# R207 which also uses the
+\texttt{(superclass):} annotation, \texttt{ISpecificationStmt} also extends the
+\texttt{IDeclarationConstruct} interface from \# R207 i.e.
+
+\begin{lstlisting}[numbers=none]
+	public interface ISpecificationStmt extends IASTNode, IDeclarationConstruct
+\end{lstlisting}
+
+So, it is possible for an AST node to implement multiple interfaces based on the 
+specifications in the grammar.
+
+Using the \texttt{(superclass)} annotation gives those nonterminals in \# R214
+nodes a common type; most notably, a \texttt{Visitor} can override the
+\texttt{visit(ISpecificationStmt)} method to treat all three node types
+uniformly.
+
+\subsubsection{Annotation \#3: \texttt{(bool)}}
+
+The \texttt{(bool)} annotation indicates that an accessor method will return a
+\lstinline!boolean! rather than an actual AST node. For example, the following
+specification
+
+{\footnotesize\begin{verbatim}
+# R511
+<AccessSpec> ::=
+  | isPublic(bool):T_PUBLIC
+  | isPrivate(bool):T_PRIVATE
+\end{verbatim}}
+
+will generate the \texttt{ASTAccessSpecNode} class as shown in Listing~\ref{lst:astaccessspecnode_api}.
+
+\begin{code}
+\begin{lstlisting}
+public class ASTAccessSpecNode extends ASTNode
+{
+	// in ASTAccessSpecNode
+	Token isPrivate;
+	// in ASTAccessSpecNode 
+	Token isPublic; 
+	
+	public boolean isPrivate() {...}
+	
+	public void setIsPrivate(Token newValue) {...}
+	
+	public boolean isPublic() {...}
+	
+	public void setIsPublic(Token newValue) {...}
+	
+	...
+}
+\end{lstlisting}
+\caption{ASTAccessSpecNode generated from \# R511}
+\label{lst:astaccessspecnode_api}
+\end{code}
+Notice on lines 8 \& 12 that the methods return \lstinline!boolean! values
+instead of \texttt{ASTNode}s. The \lstinline!boolean! values are usually used to
+test the presence of that particular \texttt{ASTNode} in the source code.
+
+\subsubsection{Annotation \#4: Labels}
+
+Specification \# R511 also illustrates the use of \emph{labels} in the grammar
+file: \verb!isPublic(bool):T_PUBLIC! results in a method called
+\texttt{isPublic} instead of \verb!getT_PUBLIC!. The use of labels can greatly
+enhance the readability of the program by making its intent clearer.
+
+\subsubsection{Annotation \#5: \texttt{(inline)}}
+
+Consider the following specifications for a main program in Fortran:
+
+{\footnotesize\begin{verbatim}
+# R1101
+<MainProgram> ::=
+  |               <MainRange>
+  | <ProgramStmt> <MainRange>
+
+<MainRange> ::=
+  | <Body>              <EndProgramStmt>
+  | <BodyPlusInternals> <EndProgramStmt>
+  |
+\end{verbatim}}
+
+From the standpoint of a typical Fortran programmer, a main program consists of
+a Program statement, a body (list of statements), perhaps some internal
+subprograms, and an End Program statement. This does not match the definition of
+a \verb!<MainProgram>! in the parsing grammar above: \verb!<Body>! and
+\verb!<EndProgStmt>! are relegated to a separate \verb!<MainRange>! nonterminal.
+
+The solution is to label the MainRange nonterminal with the \texttt{(inline)} annotation, indicating that it is to be in-lined:
+
+{\footnotesize\begin{verbatim}
+# R1101
+(customsuperclass=ScopingNode):<MainProgram> ::=
+  |               (inline):<MainRange>
+  | <ProgramStmt> (inline):<MainRange>
+
+<MainRange> ::=
+  | <Body>                       <EndProgramStmt>
+  | (inline):<BodyPlusInternals> <EndProgramStmt>
+  |
+\end{verbatim}}
+
+This means that accessor methods that would otherwise be in a separate
+\texttt{ASTMainRangeNode} class will be placed in the
+\texttt{ASTMainProgramNode} class instead.
+Listing~\ref{lst:astmainprogramnode_api} shows that the accessors that were
+previously in \texttt{ASTMainRangeNode} have been in-lined to
+\texttt{ASTMainProgramNode}. Now there is no longer any need for a
+\texttt{ASTMainRangeNode} class.
+
+\begin{code}
+\begin{lstlisting}
+public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
+{
+	public ASTProgramStmtNode getProgramStmt()
+	
+	public void setProgramStmt(ASTProgramStmtNode newValue)
+	
+	public IASTListNode<IBodyConstruct> getBody()
+	
+	public void setBody(IASTListNode<IBodyConstruct> newValue)
+	
+	public ASTContainsStmtNode getContainsStmt()
+	
+	public void setContainsStmt(ASTContainsStmtNode newValue)
+	
+	public IASTListNode<IInternalSubprogram> getInternalSubprograms()
+	
+	public void setInternalSubprograms(IASTListNode<IInternalSubprogram> newValue)
+	
+	public ASTEndProgramStmtNode getEndProgramStmt()
+	
+	public void setEndProgramStmt(ASTEndProgramStmtNode newValue)
+	
+	...
+}
+\end{lstlisting}
+\caption{\texttt{ASTMainProgramNode} generated from \# R1101}
+\label{lst:astmainprogramnode_api}
+\end{code}
+
+\subsubsection{Annotation \#6: \texttt{(customsuperclass=*)}}
+
+Specification \# R1101 in the previous section also illustrates the use of the
+\\ \texttt{(customsuperclass=ScopingNode)} annotation. This makes
+\texttt{ScopingNode} the parent of the \texttt{ASTMainProgramNode} class. Note
+that \texttt{ScopingNode} (or whichever custom super class is chosen) has to be
+a descendant of \texttt{ASTNode} because every node in the AST has to be of that
+type (either directly or as a descendant).
+
+The \texttt{(customsuperclass=*)} annotation is a useful technique for
+delegating external methods that cannot be expressed through the grammar BNF
+file into a separate hand-coded class while still having the benefits of an
+auto-generated parser and AST.
+
+\subsection{Tokens}
+\label{sub:tokens}
+
+\texttt{Token}s form the leaves of the AST.  They record, among other things,
+
+\begin{itemize}
+\item The terminal symbol in the grammar that the token is an instance of (\texttt{getTerminal()})
+\item The actual text of the token (\texttt{getText()})
+\item The line, column, offset, and length of the token text in the source file (\texttt{getLine(), getCol(), getFileOffset(), getLength()})
+\end{itemize}
+
+Most of the remaining fields are used internally for refactoring.

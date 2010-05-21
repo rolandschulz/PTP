@@ -1,0 +1,158 @@
+% Fortran Editors
+\vspace{-0.5in}
+
+{\scriptsize Revision: \footnotesize \$Id$ $ - based on 2008/08/08 nchen}
+
+\section{Fortran Text Editors}
+
+There are \textbf{two} different text editors in Photran. This is necessary to
+support both the fixed-form Fortran 77 standard and the free-form Fortran 90 \&
+95 standard.
+
+Fortran 77 is known as fixed-form Fortran because it requires certain constructs
+to be \emph{fixed} to particular columns. For instance, Fortran statements can
+only appear between columns 7 - 72; anything beyond column 72 is ignored
+completely. This requirement is an artifact of the days when punched cards were
+used for Fortran programming. However, Fortran 77 compilers still enforce this
+requirement. The fixed-form editor in Photran helps the programmer remember this
+requirement by displaying visual cues to denote the column partitions.
+
+Fortran 90/95 adopted the free-form format that most programmers today are
+accustomed to. Nonetheless, because Fortran 77 is still considered a subset of
+Fortran 90/95, it is possible to write programs following the fixed-form format.
+As such, the free-form editor maintains some visual cues on column numbering
+(although using a more subtle UI).
+
+The UML class diagram in Figure~\ref{fig:images_editor_class_hierarchy} shows
+the hierarchy of the editors in Photran.
+
+\begin{image}
+	\centering
+			\includegraphics[height=3in]{images/editor_hierarchy.png}
+			\caption{Photran editor class hierarchy}
+		\label{fig:images_editor_class_hierarchy}
+\end{image}
+
+Both the \texttt{FixedFormFortranEditor} and \texttt{FreeFormFortranEditor}
+concrete classes inherit from \texttt{AbstractFortranEditor}. Most of the actual
+work is done inside \texttt{AbstractFortranEditor}; its subclasses just specify
+how to decorate the UI.
+
+In general, the implementation of \texttt{AbstractFortranEditor} closely follows
+the standard implementation of text editors in Eclipse. The following section
+highlights some of the Photran-specific mechanisms of the text editor. For more
+information on how text editors work in Eclipse, please consult the Eclipse
+references mentioned in Chapter~\ref{cha:introduction}.
+
+\section{Contributed \texttt{SourceViewerConfiguration}}
+
+Text editors in Eclipse rely on a \texttt{SourceViewerConfiguration} to enhance
+the current editor with features such as auto indenting, syntax highlighting and
+formatting. By default, most of these features are already provided by the
+concrete \texttt{SourceViewerConfiguration} class. However, it is possible to
+provide a custom implementation of a \texttt{SourceViewerConfiguration}. This is
+done by calling the
+\texttt{setSourceViewerConfiguration(SourceViewerConfiguration
+sourceViewerConfiguration)} method in an Eclipse text editor.
+
+Photran provides an additional layer of flexibility by allowing its
+\texttt{SourceViewerConfiguration} to be contributed from other plug-ins. A
+plug-in that is interested in contributing a \texttt{SourceViewerConfiguration}
+to the Photran editors must extend the
+\\\texttt{org.eclipse.photran.ui.sourceViewerConfig} extension point defined in
+the \\\texttt{org.eclipse.photran.ui.vpg} plug-in.
+
+At run-time, Photran \emph{dynamically} instantiates a suitable
+\texttt{SourceViewerConfiguration} by searching through the list of plug-ins
+that extend the \texttt{org.eclipse.photran.ui.sourceViewerConfig} extension.
+
+Currently, there are \textbf{two} \texttt{SourceViewerConfiguration}s in
+Photran: the contributed \texttt{FortranVPGSourceViewerConfigurationFactory} and
+the default (but less feature-full)
+\texttt{FortranModelReconcilingSourceViewerConfiguration}.
+
+\section{Fortran Editor Tasks: VPG \& AST Tasks}
+
+Many actions that a user can invoke actually depend on the current text in the
+text editor. For instance, auto-completion depends on the text that has been
+entered so far to provide feasible completion choices. A good auto-completion
+strategy constantly augments and updates its database of feasible completion
+choices as the user enters or modifies text; it does not have to wait until the
+user saves the current file.
+
+Another important feature of the text editor that requires constant updates is
+syntax highlighting. Syntax highlighting has to work almost instantaneously
+based on what the user has entered. It is not acceptable for the user to
+experience lengthy delays between typing a character and waiting for it to
+syntax highlight correctly.
+
+Eclipse utilizes a \emph{reconciler} to correctly and instantly perform syntax
+highlighting. The reconciler runs in a background thread in Eclipse, constantly
+monitoring the text that the user enters and updating the syntax highlighting as
+necessary. Every text editor in Eclipse -- including Photran's -- has a
+corresponding reconciler.
+
+Photran takes advantage of its existing reconciler
+(\texttt{FortranVPGReconcilingStrategy}) and adds additional Fortran editor
+tasks that should run each time its reconciler runs. The list of tasks to run is
+stored in the singleton \texttt{FortranEditorTasks} object.
+
+Currently, there are two kinds of tasks that can be run: Abstract Syntax Tree
+(AST) editor tasks and Virtual Program Graph(VPG) editor tasks. AST editor tasks
+depend on information from the AST of the current source file; and VPG editor
+tasks depend on information from the VPG of the current source file.
+\texttt{FortranEditorTasks} automatically schedules the VPG editor tasks using
+an instance of \texttt{VPGSchedulingRule} to synchronize access to the
+\texttt{PhotranVPG} singleton object. The AST of the current file is computed
+on-the-fly as the user modifies the source file. The VPG of the current file is
+based off its previous saved version (so it is less up-to-date). For more
+information about the AST and VPG, see Chapter~\ref{cha:parsing}.
+
+AST editor tasks must implement the \texttt{IFortranEditorASTTask} interface and
+VPG editor tasks must implement the \texttt{IFortranEditorVPGTask} interface.
+Additionally, each task has to register itself with the
+\texttt{FortranEditorTasks} object. A task that no longer needs to run should
+also be unregistered. Since these tasks run asynchronously, it is important to
+use proper Java concurrency practices i.e. \textbf{synchronized} methods and statements.
+
+\pagebreak
+
+Below is the API of the \texttt{FortranEditorTasks} class:
+
+\begin{code}
+\begin{lstlisting}
+public class FortranEditorTasks
+{
+	public static FortranEditorTasks instance(AbstractFortranEditor editor)
+
+	public synchronized void addASTTask(IFortranEditorASTTask task)
+
+	public synchronized void addVPGTask(IFortranEditorVPGTask task)
+
+	public synchronized void removeASTTask(IFortranEditorASTTask task)
+
+	public synchronized void removeVPGTask(IFortranEditorVPGTask task)
+
+	public Runner getRunner()
+	
+	...
+} 
+\end{lstlisting}
+\caption{API of \texttt{FortranEditorTasks} (see FortranEditorTasks.java)}  
+\end{code}
+
+It is possible for a class to implement both the \texttt{IFortranEditorASTTask}
+and \texttt{IFortranEditorVPGTask} interfaces. For example, the
+\texttt{DeclarationView} class registers itself for both kinds of editor tasks
+and makes use of the information from both as it attempts to present the
+declaration for the currently selected token of the text editor.
+
+For more information on implementation details, please refer to the following
+classes:
+
+\begin{itemize}
+	\item \texttt{DeclarationView}
+	\item \texttt{FortranCompletionProcessorASTTask}
+	\item \texttt{FortranCompletionProcessorVPGTask}
+	\item \texttt{OpenDeclarationASTTask}
+\end{itemize}
