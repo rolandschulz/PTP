@@ -19,9 +19,6 @@ feature@org.eclipse.ptp.external=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cv
 feature@org.eclipse.ptp.debug.sdm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.sdm-feature
 feature@org.eclipse.ptp.services=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.services-feature
 
-! GEM feature
-feature@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.gem-feature
-
 ! PLDT features
 feature@org.eclipse.ptp.pldt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.pldt-feature
 feature@org.eclipse.ptp.pldt.lapi=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.pldt.lapi-feature
@@ -31,12 +28,19 @@ feature@org.eclipse.ptp.pldt.upc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cv
 feature@org.eclipse.ptp.etfw=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.etfw-feature
 feature@org.eclipse.ptp.etfw.tau=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.etfw.tau-feature
 feature@org.eclipse.ptp.etfw.tau.fortran=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.etfw.tau.fortran-feature
+feature@org.eclipse.ptp.etfw.ppw=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.etfw.ppw-feature
 
 ! RDT features
 feature@org.eclipse.ptp.rdt=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt-feature
 feature@org.eclipse.ptp.rdt.xlc=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.xlc-feature
 feature@org.eclipse.ptp.rdt.remotetools=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotetools-feature
 feature@org.eclipse.ptp.rdt.remotejars=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.rdt.remotejars-feature
+
+! GEM feature
+feature@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.gem-feature
+
+! PPW Feature
+plugin@org.eclipse.ptp.etfw.ppw=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/ppw/org.eclipse.ptp.etfw.ppw
 
 ! SCI feature
 feature@org.eclipse.ptp.sci=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/releng/org.eclipse.ptp.sci-feature
@@ -136,6 +140,9 @@ plugin@org.eclipse.ptp.rdt.server.dstore=@ptpTag@,:pserver:anonymous@dev.eclipse
 ! GEM Plugins
 plugin@org.eclipse.ptp.gem=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem
 plugin@org.eclipse.ptp.gem.help=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem.help
+
+! PPW Plugin
+plugin@org.eclipse.ptp.etfw.ppw=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/ppw/org.eclipse.ptp.etfw.ppw
 
 ! SCI Plugin
 plugin@org.eclipse.ptp.sci=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/tools/sci/org.eclipse.ptp.sci
