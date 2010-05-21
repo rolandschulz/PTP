@@ -77,4 +77,12 @@
          id="org.eclipse.ptp.sci"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.gem"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.etfw.ppw"
+         version="0.0.0"/>
+
 </feature>
