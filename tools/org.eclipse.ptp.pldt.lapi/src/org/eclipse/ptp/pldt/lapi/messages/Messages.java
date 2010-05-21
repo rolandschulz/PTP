@@ -22,6 +22,39 @@ public class Messages extends NLS {
 	public static String LapiIDs_lapi_includes_pref_page_title;
 	public static String LAPIPreferencePage_includes_preference_browse_dialog_title;
 	public static String LAPIPreferencePage_includes_preference_label;
+	
+	public static String LapiCHelpBook_LAPI_Addr_get;
+	public static String LapiCHelpBook_LAPI_Addr_set;
+	public static String LapiCHelpBook_LAPI_Address;
+	public static String LapiCHelpBook_LAPI_Address_init;
+	public static String LapiCHelpBook_LAPI_Address_init64;
+	public static String LapiCHelpBook_LAPI_Amsend;
+	public static String LapiCHelpBook_LAPI_Amsendv;
+	public static String LapiCHelpBook_LAPI_c_help_book_title;
+	public static String LapiCHelpBook_LAPI_Fence;
+	public static String LapiCHelpBook_LAPI_Get;
+	public static String LapiCHelpBook_LAPI_Getcntr;
+	public static String LapiCHelpBook_LAPI_Getv;
+	public static String LapiCHelpBook_LAPI_Gfence;
+	public static String LapiCHelpBook_LAPI_Init;
+	public static String LapiCHelpBook_LAPI_Msg_string;
+	public static String LapiCHelpBook_LAPI_Msgpoll;
+	public static String LapiCHelpBook_LAPI_Nopoll_wait;
+	public static String LapiCHelpBook_LAPI_Probe;
+	public static String LapiCHelpBook_LAPI_Purge_totask;
+	public static String LapiCHelpBook_LAPI_Put;
+	public static String LapiCHelpBook_LAPI_Putv;
+	public static String LapiCHelpBook_LAPI_Qenv;
+	public static String LapiCHelpBook_LAPI_Resume_totask;
+	public static String LapiCHelpBook_LAPI_Rmw;
+	public static String LapiCHelpBook_LAPI_Rmw64;
+	public static String LapiCHelpBook_LAPI_Senv;
+	public static String LapiCHelpBook_LAPI_Setcntr;
+	public static String LapiCHelpBook_LAPI_Setcntr_wstatus;
+	public static String LapiCHelpBook_LAPI_Term;
+	public static String LapiCHelpBook_LAPI_Util;
+	public static String LapiCHelpBook_LAPI_Waitcntr;
+	public static String LapiCHelpBook_LAPI_Xfer;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
