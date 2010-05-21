@@ -19,7 +19,7 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.lapi.LAPIArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.lapi.LapiIDs;
 import org.eclipse.ptp.pldt.lapi.LapiPlugin;
@@ -74,7 +74,7 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase {
 
 	@Override
 	protected void activateArtifactView() {
-		ViewActivater.activateView(LapiIDs.LAPI_VIEW_ID);
+		ViewActivator.activateView(LapiIDs.LAPI_VIEW_ID);
 	}
 
 	/**
