@@ -16,10 +16,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * @deprecated Replaced by the more properly spelled {@link ViewActivator}
+ * @since 4.0
+ * 
  */
-@Deprecated
-public class ViewActivater
+public class ViewActivator
 {
     /**
      * Activate the view identified by the view id.
