@@ -132,7 +132,6 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	 @SuppressWarnings("unchecked")
 	  protected int countFilesSelected(String[] exts) {
 	    int count = 0;
-	    int countExt=0;
 	    // Get elements of a possible multiple selection
 	    Iterator iter = this.selection.iterator();
 	    while (iter.hasNext()) {
