@@ -620,7 +620,6 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 		public Object getParent(Object element) {
 			IMarker marker = (IMarker) element;
-			String parentName = getParentAttr(marker);
 			ParentNode parent = getParent(marker, false);
 			return parent;
 		}
