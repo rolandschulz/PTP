@@ -126,7 +126,7 @@ public class GenerateActionGroup extends ActionGroup {
 //	private FormatAllAction fFormatAll;
 //	private CopyQualifiedNameAction fCopyQualifiedNameAction;
 //	
-//	private static final String QUICK_MENU_ID= "org.eclipse.cdt.ui.edit.text.c.source.quickMenu"; //$NON-NLS-1$
+	private static final String QUICK_MENU_ID= "org.eclipse.cdt.ui.edit.text.c.source.quickMenu"; //$NON-NLS-1$
 //	
 //	private class RefactorQuickAccessAction extends CDTQuickMenuAction {
 //		public RefactorQuickAccessAction(CEditor editor) {
@@ -355,11 +355,8 @@ public class GenerateActionGroup extends ActionGroup {
 	 */
 	public void fillContextMenu(IMenuManager menu) {
 		super.fillContextMenu(menu);
-		String menuText= ActionMessages.getString("SourceMenu_label");  //$NON-NLS-1$
-//		if (fQuickAccessAction != null) {
-//			menuText= fQuickAccessAction.addShortcut(menuText); 
-//		}
-		IMenuManager subMenu= new MenuManager(menuText, MENU_ID); 
+		MenuManager subMenu= new MenuManager(ActionMessages.SourceMenu_label, MENU_ID);
+		subMenu.setActionDefinitionId(QUICK_MENU_ID); 
 		int added= 0;
 		if (isEditorOwner()) {
 			added= fillEditorSubMenu(subMenu);
