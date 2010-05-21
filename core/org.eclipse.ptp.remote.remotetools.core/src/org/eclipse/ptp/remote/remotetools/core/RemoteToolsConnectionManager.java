@@ -27,27 +27,41 @@ import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
-
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 	private final IRemoteServices fRemoteServices;
 	private final TargetTypeElement fRemoteHost;
 	private final Map<String, IRemoteConnection> fConnections = new HashMap<String, IRemoteConnection>();
 
+	/**
+	 * @since 4.0
+	 */
 	public RemoteToolsConnectionManager(IRemoteServices services) {
 		fRemoteServices = services;
 		fRemoteHost = RemoteToolsServices.getTargetTypeElement();
 		refreshConnections();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java
+	 * .lang.String)
 	 */
 	public IRemoteConnection getConnection(String name) {
 		refreshConnections();
 		return fConnections.get(name);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java.net.URI)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java
+	 * .net.URI)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	public IRemoteConnection getConnection(URI uri) {
 		String connName = RemoteToolsFileSystem.getConnectionNameFor(uri);
@@ -57,16 +71,23 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
 	public IRemoteConnection[] getConnections() {
 		refreshConnections();
 		return fConnections.values().toArray(new IRemoteConnection[fConnections.size()]);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java.lang.String, java.util.Map)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java
+	 * .lang.String, java.util.Map)
 	 */
 	public IRemoteConnection newConnection(String name, Map<String, String> attributes) throws RemoteConnectionException {
 		String id = EnvironmentPlugin.getDefault().getEnvironmentUniqueID();
@@ -75,23 +96,28 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		return createConnection(element);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection
+	 * (org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public void removeConnection(IRemoteConnection conn) {
 		fConnections.remove(conn);
 	}
-	
+
 	/**
 	 * Create a connection using information from the target element.
 	 * 
-	 * @param element target element
+	 * @param element
+	 *            target element
 	 * @return new remote tools connection
 	 * @throws RemoteConnectionException
 	 */
 	private IRemoteConnection createConnection(ITargetElement element) throws RemoteConnectionException {
-		String address = (String) element.getAttributes().get(ConfigFactory.ATTR_CONNECTION_ADDRESS);
-		String user = (String) element.getAttributes().get(ConfigFactory.ATTR_LOGIN_USERNAME);
+		String address = element.getAttributes().get(ConfigFactory.ATTR_CONNECTION_ADDRESS);
+		String user = element.getAttributes().get(ConfigFactory.ATTR_LOGIN_USERNAME);
 		if (address == null) {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnectionManager_1);
 		}
@@ -100,23 +126,22 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager {
 		}
 		try {
 			RemoteToolsConnection conn = new RemoteToolsConnection(element.getName(), address, user, element, fRemoteServices);
-			((PTPTargetControl)element.getControl()).setConnection(conn);
+			((PTPTargetControl) element.getControl()).setConnection(conn);
 			return conn;
 		} catch (CoreException e) {
 			throw new RemoteConnectionException(e.getMessage());
 		}
 	}
-	
-	
+
 	/**
-	 * Refresh the list of fConnections that we know about. Deals with connection that are added or deleted
-	 * by another entity.
+	 * Refresh the list of fConnections that we know about. Deals with
+	 * connection that are added or deleted by another entity.
 	 */
 	private void refreshConnections() {
 		if (fRemoteHost != null) {
 			Map<String, IRemoteConnection> newConns = new HashMap<String, IRemoteConnection>();
 			for (Object obj : fRemoteHost.getElements()) {
-				ITargetElement element = (ITargetElement)obj;
+				ITargetElement element = (ITargetElement) obj;
 				IRemoteConnection conn = fConnections.get(element.getName());
 				if (conn == null) {
 					try {
