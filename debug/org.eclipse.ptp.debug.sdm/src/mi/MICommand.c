@@ -40,7 +40,14 @@ MICommandNew(char *command, int class)
 	cmd->expected_class = class;
 	cmd->output = MIOutputNew();
 	cmd->callback = NULL;
+	cmd->timeout = 0;
 	return cmd;
+}
+
+void
+MICommandSetTimeout(MICommand *cmd, int timeout)
+{
+	cmd->timeout = timeout;
 }
 
 void

@@ -231,6 +231,9 @@ MISessionSetGDBPath(MISession *sess, char *path)
 	sess->gdb_path = strdup(path);
 }
 
+/*
+ * Send command to debugger.
+ */
 int
 MISessionSendCommand(MISession *sess, MICommand *cmd)
 {
@@ -363,8 +366,9 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 	char *		str;
 	MIOutput *	output;
 	
-	if (sess->pid == -1)
+	if (sess->pid == -1) {
 		return;
+	}
 		
 	if (sess->in_fd != -1
 		&& !EmptyList(sess->send_queue)
@@ -451,8 +455,6 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 					sess->command->callback(output->rr, sess->command->cb_data);
 				}
 				sess->command->completed = 1;
-			}
-			if (sess->command->completed) {
 				sess->command = NULL;
 			}
 		} else {
@@ -473,10 +475,13 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
     }
 }
 
+/*
+ * Check if the current command has completed.
+ */
 int
 MISessionCommandCompleted(MISession *sess)
 {
-	return sess->command == NULL;
+	return (sess->command == NULL);
 }
 
 /*
@@ -679,8 +684,21 @@ MISessionProgress(MISession *sess)
 	/*
 	 * Return if there is nothing to do
 	 */
-	if (n == 0 && EmptyList(sess->send_queue)) {
-		return 0;
+	if (n == 0) {
+		if (sess->command != NULL && !sess->command->completed) {
+			if (sess->command->timeout != 0) {
+				sess->command->timeout -= (sess->select_timeout.tv_sec * 1000 + sess->select_timeout.tv_usec / 1000);
+				if (sess->command->timeout <= 0) {
+					sess->command->timeout = -1;
+					sess->command->completed = 1;
+					sess->command = NULL;
+					return 0;
+				}
+			}
+		}
+		if (EmptyList(sess->send_queue)) {
+			return 0;
+		}
 	}
 	
 
