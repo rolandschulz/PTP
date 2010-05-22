@@ -35,19 +35,21 @@ struct MICommand {
 	MIOutput *		output;									/* result from completed command */
 	void			(*callback)(MIResultRecord *, void *);	/* command completed callback */
 	void *			cb_data;								/* callback data */
+	long			timeout;								/* timeout to wait for response (ms) */
 };
 typedef struct MICommand	MICommand;
 
-extern MICommand *MICommandNew(char *, int);
-extern void MICommandFree(MICommand *cmd);
-extern void MICommandAddOption(MICommand *cmd, char *opt, char *arg);
-extern int MICommandCompleted(MICommand *cmd);
-extern int MICommandResultOK(MICommand *cmd);
-extern MIResultRecord *MICommandResult(MICommand *cmd);
-extern int MICommandResultClass(MICommand *cmd);
-extern char *MICommandResultErrorMessage(MICommand *cmd);
-extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *, void *), void *data);
-extern char *MICommandToString(MICommand *cmd);
+extern MICommand *		MICommandNew(char *, int);
+extern void				MICommandSetTimeout(MICommand *cmd, int timeout);
+extern void				MICommandFree(MICommand *cmd);
+extern void				MICommandAddOption(MICommand *cmd, char *opt, char *arg);
+extern int				MICommandCompleted(MICommand *cmd);
+extern int				MICommandResultOK(MICommand *cmd);
+extern MIResultRecord *	MICommandResult(MICommand *cmd);
+extern int				MICommandResultClass(MICommand *cmd);
+extern char *			MICommandResultErrorMessage(MICommand *cmd);
+extern void				MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *, void *), void *data);
+extern char *			MICommandToString(MICommand *cmd);
 
 /*
  * -gdb-* commands
