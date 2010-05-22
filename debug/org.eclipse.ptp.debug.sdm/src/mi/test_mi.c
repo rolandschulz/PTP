@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
 	MIBreakpoint *bpt;
 	
 	sess = MISessionNew();
-	if (MISessionStartLocal(sess, "/Volumes/Home/greg/x") < 0) {
+	MISessionSetDebug(1);
+	if (MISessionStartLocal(sess, "test_mi") < 0) {
 		fprintf(stderr, "%s", MIGetErrorStr());
 		return 1;
 	}
