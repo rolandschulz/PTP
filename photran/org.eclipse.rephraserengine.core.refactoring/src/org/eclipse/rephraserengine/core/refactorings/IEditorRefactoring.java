@@ -37,6 +37,7 @@ public interface IEditorRefactoring extends IRefactoring
 {
     /**
      * This method should be invoked immediately after the constructor is called.
+     * 
      * @param file the file currently open in the editor (non-<code>null</code>)
      * @param selection the current selection in the editor (non-<code>null</code>)
      */

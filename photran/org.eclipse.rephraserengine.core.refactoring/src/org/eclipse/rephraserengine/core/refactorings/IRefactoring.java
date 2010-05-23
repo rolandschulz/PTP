@@ -28,6 +28,10 @@ public interface IRefactoring
      * All important words should be capitalized, for example, "Extract Method", "Convert Member
      * Type to Top Level", etc.
      * <p>
+     * This name will be shown in the title bar of the refactoring wizard dialog and in the
+     * Edit &gt; Undo menu item.  It may also be used as the refactoring's label in the Refactor
+     * menu (if it is not assigned a different label in <tt>plugin.xml</tt>).
+     * <p>
      * This method is also required by the Eclipse LTK <code>Refactoring</code> class.
      *
      * @return the refactoring's human-readable name (non-<code>null</code>)
