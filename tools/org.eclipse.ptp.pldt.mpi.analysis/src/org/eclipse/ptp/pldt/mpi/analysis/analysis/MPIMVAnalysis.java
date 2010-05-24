@@ -30,7 +30,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IControlFlowGraph;
 
 /**
- * 
+ * MPI Multi-Valued analysis
  * @author zhangyua
  *
  */
@@ -373,7 +373,7 @@ public class MPIMVAnalysis{
 		
 		public void run(){
 			if(stmt_ != null){
-				value = UseDefMVMapping(stmt_);
+				value = useDefMVMapping(stmt_);
 			}
 			else if(expr_ != null){
 				List<String> defset = new ArrayList<String>();
@@ -384,7 +384,9 @@ public class MPIMVAnalysis{
 		public boolean isMV(){return value;}
 		public List<String> getMVList() {return MVvar_;}
 		
-		private boolean UseDefMVMapping(IASTStatement stmt){
+		/** Returns true if statement is multi_valued.
+		 */
+		private boolean useDefMVMapping(IASTStatement stmt){
 			if(stmt instanceof IASTDeclarationStatement){
 				boolean value = false;
 				IASTDeclarationStatement declStmt = (IASTDeclarationStatement)stmt;
@@ -417,6 +419,13 @@ public class MPIMVAnalysis{
 			return false;
 		}
 		
+		/**
+		 * Returns true if multi-valued?   //BRT
+		 * @param init
+		 * @return
+		 */
+		//BRT make sure this gets called, but will it be with these args?
+		///		not in a tree walk; perhaps with args gleaned from fn call
 		private boolean handleInitializer(IASTInitializer init){
 			if(init instanceof IASTInitializerExpression){
 				IASTInitializerExpression initE = (IASTInitializerExpression)init;
@@ -424,7 +433,7 @@ public class MPIMVAnalysis{
 				List<String> mvlist = new ArrayList<String>();
 				return useDefMVMapping(expr, rhs, null, mvlist);
 			}
-			else if(init instanceof IASTInitializerList){
+			else if(init instanceof IASTInitializerList){//BRT
 				IASTInitializerList initList = (IASTInitializerList)init;
 				IASTInitializer[] list = initList.getInitializers();
 				boolean listvalue = false;
@@ -438,7 +447,11 @@ public class MPIMVAnalysis{
 		
 		
 		/** Return true if "expr" is multi_valued.
-		 * "set" contains all defined variables in "expr" through assignment
+		 *  
+		 * @param expr  expression to determine if multi-valued
+		 * @param side  LHS or RHS
+		 * @param func
+		 * @param set contains all defined variables in "expr" through assignment
 		 */
 		private boolean useDefMVMapping(IASTExpression expr, int side, 
 				IASTFunctionCallExpression func, List<String> set){
@@ -530,7 +543,7 @@ public class MPIMVAnalysis{
 				return v1 | v2 | v3;
 			}
 			else if(expr instanceof IASTExpressionList){// BRT IASTExpressionList no longer in AST; see below
-				IASTExpressionList exprList = (IASTExpressionList)expr;
+				IASTExpressionList exprList = (IASTExpressionList)expr;//But this *DOES* get called. 3-deep recursive call of useDevMVMapping
 				IASTExpression[] exprs = exprList.getExpressions();
 				boolean[] newContext_ = new boolean[exprs.length];
 				for(int i = 0; i<exprs.length; i++){
@@ -539,7 +552,7 @@ public class MPIMVAnalysis{
 					Util.addAll(set, l1);
 				}
 				if(func != null) 
-					exprListMVContext_.push(newContext_);
+					exprListMVContext_.push(newContext_);//BRT note this is NOT a field! local var only
 				return v1;
 			}
 			else if(expr instanceof IASTFieldReference){
@@ -551,10 +564,12 @@ public class MPIMVAnalysis{
 			else if(expr instanceof IASTFunctionCallExpression){
 				IASTFunctionCallExpression funcE = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcE.getFunctionNameExpression();
-				String signature = funcname.getRawSignature();
-				IASTExpression parameter = funcE.getParameterExpression();
-				MPICallGraphNode n = (MPICallGraphNode)cg_.getNode(currentNode_.getFileName(), signature);
-				if(n != null){
+				String signature = funcname.getRawSignature();				
+				IASTExpression parameter = funcE.getParameterExpression();// BRT this might still work!!
+				// BRT try to replace above deprecated fn with:
+				IASTInitializerClause[] newParameterList=funcE.getArguments();
+				MPICallGraphNode cgNode = (MPICallGraphNode)cg_.getNode(currentNode_.getFileName(), signature);
+				if(cgNode != null){ // BRT always null on tiny.c.  ??
 					/* 1. Determine whether each parameter is MV or SV
 					 * 2. Refer to the MVsummary, find the set of MV variables 
 					 * according to the parameter MV context, and find out 
@@ -568,58 +583,39 @@ public class MPIMVAnalysis{
 						// But since we get it from a method call 
 						// IASTFunctionCallExpression.getParameterExpression()  this probably still
 						// works ok here.
-						if(parameter instanceof IASTExpressionList){ // >1 parameter  
-							boolean[] paramContext = (boolean[])exprListMVContext_.pop();
-							for(int i=0; i<paramContext.length; i++){
-								if(paramContext[i]){
-									String param = getFormalParamName(n, i);
-									if(param != null){
-										List<String> mvlist = n.getMVSummary().get(param);
-										Util.addAll(MVvar_, mvlist);
-										if(mvlist.contains(n.getFuncName())){ //return MV value
-											MVvar_.remove(n.getFuncName());
-											returnval = true;
-										}
-									}
-								}
-							}
-						} else { // single parameter
-							String param = getFormalParamName(n, 0);
-							if(param != null){
-								List<String> mvlist = n.getMVSummary().get(param);
-								Util.addAll(MVvar_, mvlist);
-								if(mvlist.contains(n.getFuncName())){ //return MV value
-									MVvar_.remove(n.getFuncName());
-									returnval = true;
-								}
-							}
-						}
+						returnval=oldParameterUse(parameter, cgNode, returnval);
+
+						// == end context old way
+						
+						//=== new way
+						//returnval = newParameterUse(side, set, v1, l1, funcE, newParameterList, cgNode, returnval);
+						//=== end new way		   
 					}
-					for(Iterator<String> i = n.getGlobalUse().iterator(); i.hasNext();){
+					for(Iterator<String> i = cgNode.getGlobalUse().iterator(); i.hasNext();){
 						String guse = i.next();
 						if(context_.contains(guse)){
-							List<String> mvlist = n.getMVSummary().get(guse);
+							List<String> mvlist = cgNode.getMVSummary().get(guse);
 							Util.addAll(MVvar_, mvlist);
-							if(mvlist.contains(n.getFuncName())){ //return MV value
-								MVvar_.remove(n.getFuncName());
+							if(mvlist.contains(cgNode.getFuncName())){ //return MV value
+								MVvar_.remove(cgNode.getFuncName());
 								returnval = true;
 							}
 						}
 					}
-					if(n.getMVSummary().size() == 1){//no parameter, no global use
-						List<String> mvlist = n.getMVSummary().get(n.getFuncName());
-						if(mvlist.size() == 1 && mvlist.contains(n.getFuncName()))
+					if(cgNode.getMVSummary().size() == 1){//no parameter, no global use
+						List<String> mvlist = cgNode.getMVSummary().get(cgNode.getFuncName());
+						if(mvlist.size() == 1 && mvlist.contains(cgNode.getFuncName()))
 							returnval = true;
 						else
 							returnval = false;
 					}
 					return returnval;
-				}
+				}// end if cgNode!=null
 				else{ 
 					if(parameter != null){
 						v1 = useDefMVMapping(parameter, side, funcE, l1);
-						if(parameter instanceof IASTExpressionList)
-							exprListMVContext_.pop();
+						if(parameter instanceof IASTExpressionList)  
+							exprListMVContext_.pop();  
 						Util.addAll(set, l1);
 						return v1;
 					}
@@ -684,6 +680,90 @@ public class MPIMVAnalysis{
 			else{
 			}
 			return false;
+		}
+
+		/**
+		 * @param side
+		 * @param set
+		 * @param v1
+		 * @param l1
+		 * @param funcE
+		 * @param newParameterList
+		 * @param n
+		 * @param returnval
+		 * @return
+		 */
+		private boolean newParameterUse(int side, List<String> set, boolean v1, List<String> l1,
+				IASTFunctionCallExpression funcE, IASTInitializerClause[] newParameterList, MPICallGraphNode n,
+				boolean returnval) {
+			if(newParameterList!=null) {
+				
+				//boolean[] newContext = new boolean[parameter2.length];
+				boolean context;
+				for (int i = 0; i < newParameterList.length; i++) {
+					IASTInitializerClause ic = newParameterList[i];
+					if(ic instanceof IASTExpression) { // BRT?? is it??
+						String rawSig=ic.getRawSignature();// for debug purposes
+						IASTExpression iexpr=(IASTExpression)ic;
+						v1=v1|useDefMVMapping(iexpr, side, funcE, l1);
+						context=v1;
+						Util.addAll(set,l1);  // BRT ?????
+						
+						//--- put this inside this loop, don't need another loop
+						if(context){
+							String param = getFormalParamName(n, i);
+							if(param != null){
+								List<String> mvlist = n.getMVSummary().get(param);
+								Util.addAll(MVvar_, mvlist);
+								if(mvlist.contains(n.getFuncName())){ //return MV value
+									MVvar_.remove(n.getFuncName());
+									returnval = true;
+								}
+							}
+						}
+						//---
+					}
+					//omit exprListMVContext_.push(newContext);
+				}
+
+			}
+			return returnval;
+		}
+
+		/**
+		 * @param parameter
+		 * @param cgNode
+		 * @param returnval
+		 * @return
+		 */
+		private boolean oldParameterUse(IASTExpression parameter, MPICallGraphNode cgNode, boolean returnval) {
+			if(parameter instanceof IASTExpressionList){ // >1 parameter   
+				boolean[] paramContext = (boolean[])exprListMVContext_.pop();
+				for(int i=0; i<paramContext.length; i++){
+					if(paramContext[i]){
+						String param = getFormalParamName(cgNode, i);
+						if(param != null){
+							List<String> mvlist = cgNode.getMVSummary().get(param);
+							Util.addAll(MVvar_, mvlist);
+							if(mvlist.contains(cgNode.getFuncName())){ //return MV value
+								MVvar_.remove(cgNode.getFuncName());
+								returnval = true;
+							}
+						}
+					}
+				}
+			} else { // single parameter
+				String param = getFormalParamName(cgNode, 0);
+				if(param != null){
+					List<String> mvlist = cgNode.getMVSummary().get(param);
+					Util.addAll(MVvar_, mvlist);
+					if(mvlist.contains(cgNode.getFuncName())){ //return MV value
+						MVvar_.remove(cgNode.getFuncName());
+						returnval = true;
+					}
+				}
+			}
+			return returnval;
 		}
 	}
 	
@@ -899,11 +979,11 @@ public class MPIMVAnalysis{
 	}
 	
 	
-	/** Work list contains two kinds of blocks:
-	 * (1) where MPI_Comm_rank() is directly or indirectly called; 
+	/** Work list contains two kinds of blocks:<br>
+	 * (1) where MPI_Comm_rank() is directly or indirectly called; <br>
 	 * (2) the entry block of a function that has some MV real parameters;
-	 * 
-	 * (1) is marked in SeedsCollector and collected in WorkListCollector 
+	 * <p>
+	 * (1) is marked in SeedsCollector and collected in WorkListCollector <br>
 	 * (2) is collected in the slicing function. 
 	 */
 	class WorkListCollector extends ASTVisitor{	
@@ -1028,11 +1108,13 @@ public class MPIMVAnalysis{
 					inRankFunc = false;
 				}
 				params_=null; // BRT ???? do we do this here since no more IASTExpressionList below?
+				paramsOLD=null;
 				// BRT do we need to do paramsOLD=null instead?
-				// BRT IASTFunctionCallExpr is one level higher in the AST than the old IASTExpressionList was
+				// BRTnext IASTFunctionCallExpr is one level higher in the AST than the old IASTExpressionList was
+
 			}
 			else if(expr instanceof IASTExpressionList){
-				paramsOLD = null;
+				paramsOLD = null;// BRT will never reach here, IASTExpressionLlist no longer in AST tree
 			}
 			return PROCESS_CONTINUE;
 		}
@@ -1254,7 +1336,7 @@ public class MPIMVAnalysis{
 			IControlFlowGraph cfg = node.getCFG();
 			for(IBlock b = cfg.getEntry(); b != null; b = b.topNext()){
 				MPIBlock block = (MPIBlock)b;
-				// BRT System.out.println("expMVAnalysis(): Block " + block.getID());
+				//System.out.println("expMVAnalysis(): Block " + block.getID());
 				ExprMVAnalyzer EA = new ExprMVAnalyzer(block.getContent(), block.getMVvar(), block);
 				//                                                         ^^^ BRT isEmpty 
 				EA.run();
