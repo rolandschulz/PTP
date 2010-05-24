@@ -167,10 +167,10 @@ public class MPIBlock extends Block{
 	public List<String> getOldMVvar() {return oldMVvar_;}
 	public void setOldMVvar(List<String> list) {oldMVvar_ = list;}
 	
-	private static int countMV=0;  // BRT for debugging
+	//private static int countMV=0;  // BRT for debugging
 	public void setMV(boolean val){
-		 countMV++;
-		 System.out.println("setMV: "+val+"   "+countMV+" blockID: "+getID()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		 //countMV++;
+		 //System.out.println("setMV: "+val+"   "+countMV+" blockID: "+getID()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		 mv = val;
 		}
 	public boolean getMV(){return mv;}

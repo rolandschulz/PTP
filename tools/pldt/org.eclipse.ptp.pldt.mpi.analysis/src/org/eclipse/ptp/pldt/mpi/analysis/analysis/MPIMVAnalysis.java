@@ -1336,7 +1336,7 @@ public class MPIMVAnalysis{
 			IControlFlowGraph cfg = node.getCFG();
 			for(IBlock b = cfg.getEntry(); b != null; b = b.topNext()){
 				MPIBlock block = (MPIBlock)b;
-				System.out.println("expMVAnalysis(): Block " + block.getID()); //$NON-NLS-1$
+				//System.out.println("expMVAnalysis(): Block " + block.getID()); //$NON-NLS-1$
 				ExprMVAnalyzer EA = new ExprMVAnalyzer(block.getContent(), block.getMVvar(), block);
 				//                                                         ^^^ BRT isEmpty 
 				EA.run();
