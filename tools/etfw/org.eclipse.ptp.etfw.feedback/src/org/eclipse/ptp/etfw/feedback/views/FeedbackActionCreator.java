@@ -24,7 +24,7 @@ import org.eclipse.ptp.etfw.feedback.Activator;
  * @since 1.1
  */
 public class FeedbackActionCreator {
-	private final boolean traceOn = true;
+	private final boolean traceOn = false;
 	private static final String ATTR_NAME = "name";
 	private static final String ATTR_CLASSNAME = "class";
 	private static final String ATTR_ICON = "icon";
