@@ -20,8 +20,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
-import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Classification;
+import org.eclipse.photran.internal.core.intrinsics.IntrinsicProcDescription;
+import org.eclipse.photran.internal.core.intrinsics.Intrinsics;
 import org.eclipse.photran.internal.core.model.FortranElement;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.swt.graphics.Image;
@@ -143,11 +144,19 @@ class FortranCompletionProposalComputer
     private void addIntrinsicProposals(TreeSet<FortranCompletionProposal> proposals)
         throws BadLocationException
     {
-        for (String canonicalizedId : Intrinsics.intrinsics)
+        for (IntrinsicProcDescription proc : Intrinsics.getAllIntrinsicProcedures())
+        {
+            String canonicalizedId = PhotranVPG.canonicalizeIdentifier(proc.genericName);
             if (canonicalizedId.startsWith(prefix) && canonicalizedId.endsWith(suffix))
-                proposals.add(createProposal(canonicalizedId,
-                                             "Intrinsic",
-                                             null));
+            {
+                proposals.add(createProposal(proc.genericName.toLowerCase(), proc.description));
+
+                for (String proposal : proc.getAllForms())
+                {
+                    proposals.add(createProposal(proposal.toLowerCase()));
+                }
+            }
+        }
     }
 
     private HashMap<Classification, Image> imageCache = new HashMap<Classification, Image>(); 
@@ -195,6 +204,16 @@ class FortranCompletionProposalComputer
         }
     }
 
+    private FortranCompletionProposal createProposal(String identifier)
+    {
+        return createProposal(identifier, null, null);
+    }
+
+    private FortranCompletionProposal createProposal(String identifier, String description)
+    {
+        return createProposal(identifier, description, null);
+    }
+
     private FortranCompletionProposal createProposal(String identifier, String description, Image image)
     {
         return new FortranCompletionProposal(
@@ -204,9 +223,17 @@ class FortranCompletionProposalComputer
                                    replLen,
                                    identifier.length(),
                                    image,
-                                   identifier + " - " + description,
+                                   displayString(identifier, description),
                                    null,
                                    null));
+    }
+
+    private String displayString(String identifier, String description)
+    {
+        if (description == null)
+            return identifier;
+        else
+            return identifier + " - " + description;
     }
     
     /**

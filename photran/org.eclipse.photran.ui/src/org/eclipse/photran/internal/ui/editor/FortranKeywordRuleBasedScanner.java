@@ -27,6 +27,8 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.photran.internal.core.FortranCorePlugin;
+import org.eclipse.photran.internal.core.intrinsics.IntrinsicProcDescription;
+import org.eclipse.photran.internal.core.intrinsics.Intrinsics;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.preferences.FortranRGBPreference;
 import org.eclipse.swt.SWT;
@@ -94,126 +96,6 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
     //private static String[] fgTextualOperators = { ".AND.", ".EQ.", ".EQV.", ".FALSE.", ".GE.", ".GT.", ".LE.", ".LT.", ".NE.", ".NEQV.", ".NOT.", ".OR.", ".TRUE." };
     private static String[] fgTextualOperators = { "AND", "EQ", "EQV", "FALSE", "GE", "GT", "LE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                                                    "LT", "NE", "NEQV", "NOT", "OR", "TRUE" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-
-    private static String[] fgIntrinsics =
-    {
-         // From Metcalf and Reid, "Fortran 90/95 Explained", Chapter 8
-         // Functions
-         "associated", //$NON-NLS-1$
-         "present", //$NON-NLS-1$
-         "kind", //$NON-NLS-1$
-         "abs", //$NON-NLS-1$
-         "aimag", //$NON-NLS-1$
-         "aint", //$NON-NLS-1$
-         "anint", //$NON-NLS-1$
-         "ceiling", //$NON-NLS-1$
-         "cmplx", //$NON-NLS-1$
-         "floor", //$NON-NLS-1$
-         "int", //$NON-NLS-1$
-         "nint", //$NON-NLS-1$
-         "real", //$NON-NLS-1$
-         "conjg", //$NON-NLS-1$
-         "dim", //$NON-NLS-1$
-         "max", //$NON-NLS-1$
-         "min", //$NON-NLS-1$
-         "mod", //$NON-NLS-1$
-         "modulo", //$NON-NLS-1$
-         "sign", //$NON-NLS-1$
-         "acos", //$NON-NLS-1$
-         "asin", //$NON-NLS-1$
-         "atan", //$NON-NLS-1$
-         "atan2", //$NON-NLS-1$
-         "cos", //$NON-NLS-1$
-         "cosh", //$NON-NLS-1$
-         "exp", //$NON-NLS-1$
-         "log", //$NON-NLS-1$
-         "log10", //$NON-NLS-1$
-         "sin", //$NON-NLS-1$
-         "sinh", //$NON-NLS-1$
-         "sqrt", //$NON-NLS-1$
-         "tan", //$NON-NLS-1$
-         "tanh", //$NON-NLS-1$
-         "achar", //$NON-NLS-1$
-         "char", //$NON-NLS-1$
-         "iachar", //$NON-NLS-1$
-         "ichar", //$NON-NLS-1$
-         "lge", //$NON-NLS-1$
-         "lgt", //$NON-NLS-1$
-         "lle", //$NON-NLS-1$
-         "llt", //$NON-NLS-1$
-         "adjustl", //$NON-NLS-1$
-         "adjustr", //$NON-NLS-1$
-         "index", //$NON-NLS-1$
-         "len_trim", //$NON-NLS-1$
-         "scan", //$NON-NLS-1$
-         "verify", //$NON-NLS-1$
-         "logical", //$NON-NLS-1$
-         "len", //$NON-NLS-1$
-         "repeat", //$NON-NLS-1$
-         "trim", //$NON-NLS-1$
-         "digits", //$NON-NLS-1$
-         "epsilon", //$NON-NLS-1$
-         "huge", //$NON-NLS-1$
-         "maxexponent", //$NON-NLS-1$
-         "minexponent", //$NON-NLS-1$
-         "precision", //$NON-NLS-1$
-         "radix", //$NON-NLS-1$
-         "range", //$NON-NLS-1$
-         "tiny", //$NON-NLS-1$
-         "exponent", //$NON-NLS-1$
-         "fraction", //$NON-NLS-1$
-         "nearest", //$NON-NLS-1$
-         "rrspacing", //$NON-NLS-1$
-         "scale", //$NON-NLS-1$
-         "set_exponent", //$NON-NLS-1$
-         "spacing", //$NON-NLS-1$
-         "selected_int_kind", //$NON-NLS-1$
-         "selected_real_kind", //$NON-NLS-1$
-         "bit_size", //$NON-NLS-1$
-         "btest", //$NON-NLS-1$
-         "iand", //$NON-NLS-1$
-         "ibclr", //$NON-NLS-1$
-         "ibits", //$NON-NLS-1$
-         "ibset", //$NON-NLS-1$
-         "ieor", //$NON-NLS-1$
-         "ior", //$NON-NLS-1$
-         "ishft", //$NON-NLS-1$
-         "ishftc", //$NON-NLS-1$
-         "not", //$NON-NLS-1$
-         "dot_product", //$NON-NLS-1$
-         "matmul", //$NON-NLS-1$
-         "all", //$NON-NLS-1$
-         "any", //$NON-NLS-1$
-         "count", //$NON-NLS-1$
-         "maxval", //$NON-NLS-1$
-         "minval", //$NON-NLS-1$
-         "product", //$NON-NLS-1$
-         "sum", //$NON-NLS-1$
-         "allocated", //$NON-NLS-1$
-         "lbound", //$NON-NLS-1$
-         "shape", //$NON-NLS-1$
-         "size", //$NON-NLS-1$
-         "ubound", //$NON-NLS-1$
-         "merge", //$NON-NLS-1$
-         "pack", //$NON-NLS-1$
-         "unpack", //$NON-NLS-1$
-         "reshape", //$NON-NLS-1$
-         "spread", //$NON-NLS-1$
-         "cshift", //$NON-NLS-1$
-         "eoshift", //$NON-NLS-1$
-         "transpose", //$NON-NLS-1$
-         "maxloc", //$NON-NLS-1$
-         "minloc", //$NON-NLS-1$
-         "null", //$NON-NLS-1$
-
-         // Subroutines
-         "mvbits", //$NON-NLS-1$
-         "date_and_time", //$NON-NLS-1$
-         "system_clock", //$NON-NLS-1$
-         "cpu_time", //$NON-NLS-1$
-         "random_number", //$NON-NLS-1$
-         "random_seed" //$NON-NLS-1$
-    };
 
     private static String[] fgTypes = { "REAL", "INTEGER", "CHARACTER", "LOGICAL", "COMPLEX" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
@@ -304,8 +186,8 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
         for (int i = 0; i < fgTextualOperators.length; i++)
             wordRule.addWord(fgTextualOperators[i], colorKeywords);
 
-        for (int i = 0; i < fgIntrinsics.length; i++)
-            salesRule.addIdentifier(fgIntrinsics[i], colorIntrinsics);
+        for (IntrinsicProcDescription proc : Intrinsics.getAllIntrinsicProcedures())
+            salesRule.addIdentifier(proc.genericName, colorIntrinsics);
         for (int i = 0; i < fgPreprocessor.length; i++)
             salesRule.addWord(fgPreprocessor[i], colorKeywords);
         for (int i = 0; i < fgTypes.length; i++)

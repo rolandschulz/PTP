@@ -154,7 +154,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                     for (int i = fBuffer.length() - 1; i >= 0; i--)
                         scanner.unread();
 
-                return fIdentifiers.containsKey(buffer) ? (IToken)fIdentifiers.get(buffer) : fDefaultToken;
+                for (String key : fIdentifiers.keySet())
+                    if (buffer.equalsIgnoreCase(key))
+                        return fIdentifiers.get(key);
+                return fDefaultToken;
         }
 
         scanner.unread();

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
-import org.eclipse.photran.internal.core.analysis.binding.Intrinsics;
+import org.eclipse.photran.internal.core.analysis.binding.Intrinsic;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
@@ -123,7 +123,7 @@ public abstract class DefinitionMap<T>
             int index = qualifiedName.indexOf(':');
             if (index < 0)
             {
-                Definition intrinsic = Intrinsics.resolveIntrinsic(token);
+                Definition intrinsic = Intrinsic.resolve(token);
                 if (intrinsic != null)
                     return map(intrinsic.getCanonicalizedName(), intrinsic);
                 else

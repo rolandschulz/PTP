@@ -9,6 +9,7 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Export-Package: org.eclipse.photran.internal.core,
  org.eclipse.photran.internal.core.errorparsers,
+ org.eclipse.photran.internal.core.intrinsics,
  org.eclipse.photran.internal.core.preferences,
  org.eclipse.photran.internal.core.properties,
  org.eclipse.photran.internal.core.sourceform

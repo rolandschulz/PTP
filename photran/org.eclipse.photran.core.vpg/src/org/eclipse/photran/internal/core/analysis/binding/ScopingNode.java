@@ -703,7 +703,7 @@ public abstract class ScopingNode extends ASTNode
 
 	private boolean manuallyResolveIntrinsic(Token identifier, BindingResolutionCallback bindings)
 	{
-    	Definition def = Intrinsics.resolveIntrinsic(identifier);
+    	Definition def = Intrinsic.resolve(identifier);
 		if (def == null) return false;
 
 		((PhotranVPGBuilder)PhotranVPG.getInstance()).setDefinitionFor(identifier.getTokenRef(), def);

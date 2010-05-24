@@ -1,0 +1,175 @@
+ABS	(A)	Absolute value function.
+ACHAR	(I [, KIND])	Converts an ASCII code value to a character.
+ACOS	(X)	Arccosine (inverse cosine) function.
+ACOSH	(X)	Inverse hyperbolic cosine function.
+ADJUSTL	(STRING)	Rotates a string to remove leading blanks.
+ADJUSTR	(STRING)	Rotates a string to remove trailing blanks.
+AIMAG	(Z)	Returns the imaginary part of a complex number.
+AINT	(A [, KIND])	Converts A to a whole number by truncating toward 0.
+ALL	(MASK [, DIM])	Reduces a logical array using the AND operation.
+ALLOCATED	(ARRAY) or (SCALAR)	Queries the allocation status of a variable.
+ANINT	(A [, KIND])	Nearest whole number function.
+ANY	(MASK [, DIM])	Reduces a logical array using the OR operation.
+ASIN	(X)	Arcsine (inverse sine) function.
+ASINH	(X)	Inverse hyperbolic sine function.
+ASSOCIATED	(POINTER [, TARGET])	Queries the association status of a pointer.
+ATAN	(X) or (Y, X)	Arctangent (inverse tangent) function.
+ATAN2	(Y, X)	Arctangent (inverse tangent) function.
+ATANH	(X)	Inverse hyperbolic tangent function.
+ATOMIC DEFINE	(ATOM, VALUE)	Defines a variable atomically.
+ATOMIC REF	(VALUE, ATOM)	References a variable atomically.
+BESSEL J0	(X)	Bessel function of the 1st kind (order 0).
+BESSEL J1	(X)	Bessel function of the 1st kind (order 1).
+BESSEL JN	(N, X)	Bessel function of the 1st kind (order N).
+BESSEL JN	(N1, N2, X)	Bessel functions of the 1st kind.
+BESSEL Y0	(X)	Bessel function of the 2nd kind (order 0).
+BESSEL Y1	(X)	Bessel function of the 2nd kind (order 1).
+BESSEL YN	(N, X)	Bessel function of the 2nd kind (order N).
+BESSEL YN	(N1, N2, X)	Bessel functions of the 2nd kind.
+BGE	(I, J)	Bitwise greater than or equal to.
+BGT	(I, J)	Bitwise greater than.
+BLE	(I, J)	Bitwise less than or equal to.
+BLT	(I, J)	Bitwise less than.
+BIT SIZE	(I)	Returns the number of bits in the integer model.
+BTEST	(I, POS)	Tests a single bit in an integer.
+CEILING	(A [, KIND])	Returns the least integer greater than or equal to A.
+CHAR	(I [, KIND])	Converts a code value to a character.
+CMPLX	(X [, Y, KIND])	Converts to complex type.
+COMMAND ARGUMENT COUNT	( )	Returns the number of command arguments.
+CONJG	(Z)	Returns the conjugate of a complex number.
+COS	(X)	Cosine function.
+COSH	(X)	Hyperbolic cosine function.
+COUNT	(MASK [, DIM, KIND])	Reduces a logical array by counting true values.
+CPU TIME	(TIME)	Returns the processor time.
+CSHIFT	(ARRAY, SHIFT [, DIM])	Circular shift function.
+DATE AND TIME	([DATE, TIME, ZONE, VALUES])	Returns the date and time.
+DBLE	(A)	Converts to double precision real.
+DIGITS	(X)	Returns the number of significant digits in the numeric model.
+DIM	(X, Y)	Maximum of X - Y and zero.
+DOT PRODUCT	(VECTOR A, VECTOR B)	Returns the dot product of two vectors.
+DPROD	(X, Y)	Returns the double precision real product.
+DSHIFTL	(I, J, SHIFT)	Combined left shift.
+DSHIFTR	(I, J, SHIFT)	Combined right shift.
+EOSHIFT	(ARRAY, SHIFT [, BOUNDARY, DIM])	End-off shift function.
+EPSILON	(X)	Model number that is small compared to 1.
+ERF	(X)	Error function.
+ERFC	(X)	Complementary error function.
+ERFC SCALED	(X)	Scaled complementary error function.
+EXECUTE COMMAND LINE	(COMMAND [, WAIT, EXITSTAT, CMDSTAT, CMDMSG])	Executes a command line.
+EXP	(X)	Exponential function.
+EXPONENT	(X)	Returns the exponent of floating-point number.
+EXTENDS TYPE OF	(A, MOLD)	Queries a dynamic type for extension.
+FINDLOC	(ARRAY, VALUE, DIM [, MASK, KIND, BACK]) or (ARRAY, VALUE [, MASK, KIND, BACK])	Returns the location(s) of a specified value.
+FLOOR	(A [, KIND])	Returns the greatest integer less than or equal to A.
+FRACTION	(X)	Returns the fractional part of number.
+GAMMA	(X)	Gamma function.
+GET COMMAND	([COMMAND, LENGTH, STATUS])	Queries the program invocation command.
+GET COMMAND ARGUMENT	(NUMBER [, VALUE, LENGTH, STATUS])	Queries arguments to the program invocation command.
+GET ENVIRONMENT VARIABLE	(NAME [, VALUE, LENGTH, STATUS, TRIM NAME])	Queries an environment variable.
+HUGE	(X)	Returns the largest model number.
+HYPOT	(X, Y)	Euclidean distance function.
+IACHAR	(C [, KIND])	Returns the ASCII code value for a character.
+IALL	(ARRAY, DIM [, MASK]) or (ARRAY [, MASK])	Reduces an array using the bitwise AND operation.
+IAND	(I, J)	Bitwise AND.
+IANY	(ARRAY, DIM [, MASK]) or (ARRAY [, MASK])	Reduce an array using the bitwise OR operation.
+IBCLR	(I, POS)	Returns I with bit POS replaced by zero.
+IBITS	(I, POS, LEN)	Returns the specified sequence of bits.
+IBSET	(I, POS)	Returns I with bit POS replaced by one.
+ICHAR	(C [, KIND])	Returns the code value for a character.
+IEOR	(I, J)	Bitwise exclusive OR.
+IMAGE INDEX	(COARRAY, SUB)	Converts cosubscripts to an image index.
+INDEX	(STRING, SUBSTRING [, BACK, KIND])	Searches for a substring.
+INT	(A [, KIND])	Converts to integer type.
+IOR	(I, J)	Bitwise inclusive OR.
+IPARITY	(ARRAY, DIM [, MASK]) or (ARRAY [, MASK])	Reduces an array with the bitwise exclusive OR operation.
+ISHFT	(I, SHIFT)	Logical shift.
+ISHFTC	(I, SHIFT [, SIZE])	Circular shift of the rightmost bits.
+IS CONTIGUOUS	(ARRAY)	Tests the contiguity of an array.
+IS IOSTAT END	(I)	Tests an IOSTAT value for end-of-file.
+IS IOSTAT EOR	(I)	Tests an IOSTAT value for end-of-record.
+KIND	(X)	Returns the value of the kind type parameter of X.
+LBOUND	(ARRAY [, DIM, KIND])	Returns the lower bound(s) of an array.
+LCOBOUND	(COARRAY [, DIM, KIND])	Returns the lower cobound(s) of a coarray.
+LEADZ	(I)	Returns the number of leading zero bits.
+LEN	(STRING [, KIND])	Returns the length of a character entity.
+LEN TRIM	(STRING [, KIND])	Returns the length without trailing blanks.
+LGE	(STRING A, STRING B)	ASCII greater than or equal function.
+LGT	(STRING A, STRING B)	ASCII greater than function.
+LLE	(STRING A, STRING B)	ASCII less than or equal function.
+LLT	(STRING A, STRING B)	ASCII less than function.
+LOG	(X)	Natural logarithm.
+LOG GAMMA	(X)	Logarithm of the absolute value of the gamma function.
+LOG10	(X)	Common logarithm.
+LOGICAL	(L [, KIND])	Converts between kinds of logical.
+MASKL	(I [, KIND])	Left justified mask.
+MASKR	(I [, KIND])	Right justified mask.
+MATMUL	(MATRIX A, MATRIX B)	Matrix multiplication function.
+MAX	(A1, A2 [, A3, ...])	Maximum value function.
+MAXEXPONENT	(X)	Returns the maximum exponent of a real model.
+MAXLOC	(ARRAY, DIM [, MASK, KIND, BACK]) or (ARRAY [, MASK, KIND, BACK])	Returns the location(s) of the maximum value in an array.
+MAXVAL	(ARRAY, DIM [, MASK]) or (ARRAY [, MASK])	Returns the maximum value(s) of array.
+MERGE	(TSOURCE, FSOURCE, MASK)	Chooses between two expression values.
+MERGE BITS	(I, J, MASK)	Merges bits under the given mask.
+MIN	(A1, A2 [, A3, ...])	Minimum value function.
+MINEXPONENT	(X)	Returns the minimum exponent of a real model.
+MINLOC	(ARRAY, DIM [, MASK, KIND, BACK]) or (ARRAY [, MASK, KIND, BACK])	Returns the location(s) of the minimum value in an array.
+MINVAL	(ARRAY, DIM [, MASK]) or (ARRAY [, MASK])	Returns the minimum value(s) of array.
+MOD	(A, P)	Remainder function.
+MODULO	(A, P)	Modulo function.
+MOVE ALLOC	(FROM, TO)	Relocates an allocation.
+MVBITS	(FROM, FROMPOS, LEN, TO, TOPOS)	Copies a sequence of bits.
+NEAREST	(X, S)	Adjacent machine number function.
+NEW LINE	(A)	Returns the newline character.
+NINT	(A [, KIND])	Nearest integer function.
+NOT	(I)	Bitwise complement.
+NORM2	(X [, DIM])	Returns the L2 norm of an array.
+NULL	([MOLD])	Returns a disassociated pointer or unallocated allocatable entity.
+NUM IMAGES	( )	Returns the number of images.
+PACK	(ARRAY, MASK [, VECTOR])	Packs an array into a vector.
+PARITY	(MASK [, DIM])	Reduces an array using the .NEQV. operation.
+POPCNT	(I)	Returns the number of one bits.
+POPPAR	(I)	Returns the parity expressed as 0 or 1.
+PRECISION	(X)	Returns the decimal precision of a real model.
+PRESENT	(A)	Queries the presence of an optional argument.
+PRODUCT	(ARRAY, DIM [, MASK]) or (ARRAY [, MASK])	Reduces an array by multiplication.
+RADIX	(X)	Returns the base of a numeric model.
+RANDOM NUMBER	(HARVEST)	Generates pseudorandom number(s).
+RANDOM SEED	([SIZE, PUT, GET])	Restarts or queries the pseudorandom number generator.
+RANGE	(X)	Returns the decimal exponent range of a numeric model.
+REAL	(A [, KIND])	Converts to real type.
+REPEAT	(STRING, NCOPIES)	Repeatedly concatenates a string.
+RESHAPE	(SOURCE, SHAPE [, PAD, ORDER])	Constructs an array of an arbitrary shape.
+RRSPACING	(X)	Returns the reciprocal of relative spacing of model numbers.
+SAME TYPE AS	(A, B)	Queries dynamic types for equality.
+SCALE	(X, I)	Scales a real number by a power of the base.
+SCAN	(STRING, SET [, BACK, KIND])	Searches for any one of a set of characters.
+SELECTED CHAR KIND	(NAME)	Selects a character kind.
+SELECTED INT KIND	(R)	Selects an integer kind.
+SELECTED REAL KIND	([P, R, RADIX])	Selects a real kind.
+SET EXPONENT	(X, I)	Sets floating-point exponent.
+SHAPE	(SOURCE [, KIND])	Returns the shape of an array or a scalar.
+SHIFTA	(I, SHIFT)	Right shift with fill.
+SHIFTL	(I, SHIFT)	Left shift.
+SHIFTR	(I, SHIFT)	Right shift.
+SIGN	(A, B)	Returns the magnitude of A with the sign of B.
+SIN	(X)	Sine function.
+SINH	(X)	Hyperbolic sine function.
+SIZE	(ARRAY [, DIM, KIND])	Returns the size of an array (or a single extent of an array).
+SPACING	(X)	Spacing of model numbers.
+SPREAD	(SOURCE, DIM, NCOPIES)	Forms a higher-rank array by replication.
+SQRT	(X)	Square root function.
+STORAGE SIZE	(A [, KIND])	Returns the storage size in bits.
+SUM	(ARRAY, DIM [, MASK]) or (ARRAY [, MASK])	Reduces an array by addition.
+SYSTEM CLOCK	([COUNT, COUNT RATE, COUNT MAX])	Queries the system clock.
+TAN	(X)	Tangent function.
+TANH	(X)	Hyperbolic tangent function.
+THIS IMAGE	( ) or (COARRAY [, DIM])	THIS_IMAGE() returns the index of the invoking image; THIS_IMAGE(COARRAY [, DIM]) returns the cosubscript(s) for this image.
+TINY	(X)	Returns the smallest positive model number.
+TRAILZ	(I)	Returns the number of trailing zero bits.
+TRANSFER	(SOURCE, MOLD [, SIZE])	Transfers physical representation.
+TRANSPOSE	(MATRIX)	Transposes an array of rank two.
+TRIM	(STRING)	Returns the string without trailing blanks.
+UBOUND	(ARRAY [, DIM, KIND])	Returns the upper bound(s) of an array.
+UCOBOUND	(COARRAY [, DIM, KIND])	Returns the upper cobound(s) of a coarray.
+UNPACK	(VECTOR, MASK, FIELD)	Unpacks a vector into an array.
+VERIFY	(STRING, SET [, BACK, KIND])	Searches for a character not in a given set.
