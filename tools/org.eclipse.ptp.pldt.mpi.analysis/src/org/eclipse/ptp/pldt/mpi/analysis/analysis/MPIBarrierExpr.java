@@ -570,7 +570,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 				sk.push(be);
 			}
 		}
-		else if(expr instanceof IASTExpressionList){
+		else if(expr instanceof IASTExpressionList){// BRT this will not get executed!!
 			IASTExpressionList exprList = (IASTExpressionList)expr;
 			IASTExpression[] exps = exprList.getExpressions();
 			if(exps.length == 0) return PROCESS_CONTINUE;
