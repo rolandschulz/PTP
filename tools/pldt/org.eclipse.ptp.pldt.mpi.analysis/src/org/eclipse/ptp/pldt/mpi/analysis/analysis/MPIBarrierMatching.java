@@ -76,6 +76,7 @@ public class MPIBarrierMatching {
 	 * <br>if false, no popup occurs. Useful for running under JUnit test, with no user interaction.
 	 * Note that reportErrors is also used to make sure only a single error is reported -
 	 * the popup warning, if shown, is only shown once per analysis.
+	 * @since 4.0
 	 */
 	public void run(boolean reportErrors){
 		for(ICallGraphNode n = cg_.botEntry(); n != null; n = n.botNext()){
