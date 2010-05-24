@@ -269,6 +269,32 @@ public class WorkbenchSelectionInfo
         
         return doc.get();
     }
+
+    /**
+     * Returns a list of all of the resources in the current workbench selection.
+     * <p>
+     * If the user has selected one or more resources (i.e., files, folder, or projects, usually
+     * selected in the Project Explorer view), then this list will include all of those resources
+     * that are acceptable to the resource filter passed to the <code>WorkbenchSelectionInfo</code>
+     * constructor.
+     * <p>
+     * If the selection includes projects or folders, the {@link IResource} objects for the projects
+     * or folders themselves will be returned. To traverse these recursively and retrieve the files
+     * in them, use {@link #getAllFilesInSelectedResources()} instead.
+     * <p>
+     * If the user has selected text in a text editor, and the active editor in the workbench is
+     * editing a document based on an {@link IFile}, and that file was accepted by the resource
+     * filter passed to the <code>WorkbenchSelectionInfo</code> constructor, then this list contains
+     * only one file: the file in the active editor.
+     * 
+     * @see #WorkbenchSelectionInfo(IResourceFilter)
+     * 
+     * @since 2.0
+     */
+    public List<IResource> getSelectedResources()
+    {
+        return selectedResources;
+    }
     
     /**
      * Returns a list of all acceptable files in the current workbench selection.
