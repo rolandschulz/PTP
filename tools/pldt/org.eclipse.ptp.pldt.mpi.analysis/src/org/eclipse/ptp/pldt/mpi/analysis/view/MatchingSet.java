@@ -40,7 +40,7 @@ public class MatchingSet {
 			wsResource.deleteMarkers(IDs.matchingSetMarkerID, false, depth);
 
         } catch (CoreException e) {
-            System.out.println("RM: exception deleting markers.");
+            System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
             e.printStackTrace();
         }
 		
@@ -54,7 +54,7 @@ public class MatchingSet {
 				BarrierInfo barrier = (BarrierInfo)ii.next();
 				count ++;
 				int parentID = count;
-				String name = "Barrier " + (barrier.getID()-4) + " (" + barrier.getMatchingSet().size() + ")";
+				String name = "Barrier " + (barrier.getID()-4) + " (" + barrier.getMatchingSet().size() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// create a marker for each parent(barrier)
 				ScanReturn sr = new ScanReturn();
 	        	SourceInfo sourceInfo = barrier.getSourceInfo();
@@ -62,7 +62,7 @@ public class MatchingSet {
 	        	int line = sourceInfo.getStartingLine();
 	        	String fn = barrier.getEnclosingFunc();
 	        	ArtifactWithParent a = new ArtifactWithParent(filename, line, 1, fn,
-	        			"Artifact Call", sourceInfo, 0, parentID, name, barrier.getID()-4);
+	        			"Artifact Call", sourceInfo, 0, parentID, name, barrier.getID()-4); //$NON-NLS-1$
 	        	sr.addArtifact(a);
 	        	visitor.visitFile(barrier.getResource(), sr.getArtifactList());
 				
@@ -70,13 +70,13 @@ public class MatchingSet {
 					BarrierInfo matchedBar = (BarrierInfo)i.next();
 					count ++;
 					int myID = count;
-					name = "Barrier " + (matchedBar.getID()-4);
+					name = "Barrier " + (matchedBar.getID()-4); //$NON-NLS-1$
 					sr = new ScanReturn();
 		        	sourceInfo = matchedBar.getSourceInfo();
 		        	filename = matchedBar.getFileName();
 		        	line = sourceInfo.getStartingLine();
 		        	fn = matchedBar.getEnclosingFunc();
-		        	a = new ArtifactWithParent(filename, line, 1, fn,"Artifact Call",
+		        	a = new ArtifactWithParent(filename, line, 1, fn,"Artifact Call", //$NON-NLS-1$
 		        			sourceInfo, parentID, myID, name, matchedBar.getID()-4);
 		        	sr.addArtifact(a);
 		        	visitor.visitFile(matchedBar.getResource(), sr.getArtifactList());

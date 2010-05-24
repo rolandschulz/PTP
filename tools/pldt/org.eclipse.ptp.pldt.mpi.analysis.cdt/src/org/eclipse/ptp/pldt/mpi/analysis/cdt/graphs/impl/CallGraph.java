@@ -186,7 +186,7 @@ public class CallGraph implements ICallGraph {
 		Hashtable<ICallGraphNode,List<ICallGraphNode>> recursions = 
 			new Hashtable<ICallGraphNode,List<ICallGraphNode>>();
 		for(ICallGraphNode node = botEntry_; node != null; node = node.botNext()){
-			ICallGraphNode pi = (ICallGraphNode)node.getAttr("pi");
+			ICallGraphNode pi = (ICallGraphNode)node.getAttr("pi"); //$NON-NLS-1$
 			if(pi != null){
 				if(recursions.containsKey(pi)){
 					List<ICallGraphNode> list = recursions.get(pi);
@@ -222,24 +222,24 @@ public class CallGraph implements ICallGraph {
 	protected void DFS(){
 		for(Iterator<ICallGraphNode> i = nodes_.iterator(); i.hasNext();){
 			ICallGraphNode node = i.next();
-			node.setAttr("color", new Integer(0));
-			node.removeAttr("pi");
+			node.setAttr("color", new Integer(0)); //$NON-NLS-1$
+			node.removeAttr("pi"); //$NON-NLS-1$
 		}
 		for(Iterator<ICallGraphNode> i = nodes_.iterator(); i.hasNext();){
 			ICallGraphNode node = i.next();
-			int color = ((Integer)node.getAttr("color")).intValue();
+			int color = ((Integer)node.getAttr("color")).intValue(); //$NON-NLS-1$
 			if(color == 0)
 				DFSVisit(node);
 		}
 	}
 	
 	protected void DFSVisit(ICallGraphNode node){
-		node.setAttr("color", new Integer(1));
+		node.setAttr("color", new Integer(1)); //$NON-NLS-1$
 		for(Iterator<ICallGraphNode> i = node.getCallees().iterator(); i.hasNext();){
 			ICallGraphNode callee = i.next();
-			int color = ((Integer)callee.getAttr("color")).intValue();
+			int color = ((Integer)callee.getAttr("color")).intValue(); //$NON-NLS-1$
 			if(color == 0){ //white
-				callee.setAttr("pi", node);
+				callee.setAttr("pi", node); //$NON-NLS-1$
 				DFSVisit(callee);
 			}
 		}
@@ -249,8 +249,8 @@ public class CallGraph implements ICallGraph {
 	protected void RV_DFS(){
 		for(Iterator<ICallGraphNode> i = nodes_.iterator(); i.hasNext();){
 			ICallGraphNode node = i.next();
-			node.setAttr("color", new Integer(0));
-			node.removeAttr("pi");
+			node.setAttr("color", new Integer(0)); //$NON-NLS-1$
+			node.removeAttr("pi"); //$NON-NLS-1$
 		}
 		
 		ICallGraphNode n = null;
@@ -261,7 +261,7 @@ public class CallGraph implements ICallGraph {
 			n.setBotNext(m);
 			if(m != null) m.setTopNext(n);
 			m = n;
-			int color = ((Integer)n.getAttr("color")).intValue();
+			int color = ((Integer)n.getAttr("color")).intValue(); //$NON-NLS-1$
 			if(color == 0){
 				RV_DFSVisit(n);
 			}
@@ -269,23 +269,23 @@ public class CallGraph implements ICallGraph {
 		botEntry_ = m;
 		
 		for(n = botEntry_; n != null; n = n.botNext()){
-			ICallGraphNode pred = (ICallGraphNode)n.getAttr("pi");
+			ICallGraphNode pred = (ICallGraphNode)n.getAttr("pi"); //$NON-NLS-1$
 			ICallGraphNode temp = null;
 			while(pred != null){
 				temp = pred;
-				pred = (ICallGraphNode)pred.getAttr("pi");
+				pred = (ICallGraphNode)pred.getAttr("pi"); //$NON-NLS-1$
 			}
-			if(temp != null) n.setAttr("pi", temp);
+			if(temp != null) n.setAttr("pi", temp); //$NON-NLS-1$
 		}
 	}
 	
 	protected void RV_DFSVisit(ICallGraphNode node){
-		node.setAttr("color", new Integer(1));
+		node.setAttr("color", new Integer(1)); //$NON-NLS-1$
 		for(Iterator<ICallGraphNode> i = node.getCallers().iterator(); i.hasNext();){
 			ICallGraphNode caller = i.next();
-			int color = ((Integer)caller.getAttr("color")).intValue();
+			int color = ((Integer)caller.getAttr("color")).intValue(); //$NON-NLS-1$
 			if(color == 0){ //white
-				caller.setAttr("pi", node);
+				caller.setAttr("pi", node); //$NON-NLS-1$
 				RV_DFSVisit(caller);
 			}
 		}
@@ -297,13 +297,13 @@ public class CallGraph implements ICallGraph {
 	public void print(){
 		for(Iterator<ICallGraphNode> i=nodes_.iterator(); i.hasNext();){
 			ICallGraphNode node = i.next();
-			System.out.print(node.getFuncName() + " calls: ");
+			System.out.print(node.getFuncName() + " calls: "); //$NON-NLS-1$
 			for(Iterator<ICallGraphNode> ii = node.getCallees().iterator(); ii.hasNext();){
 				ICallGraphNode callee = ii.next();
-				System.out.println(callee.getFuncName() + ", ");
+				System.out.println(callee.getFuncName() + ", "); //$NON-NLS-1$
 			}
-			System.out.println("");
-			System.out.println("");
+			System.out.println(""); //$NON-NLS-1$
+			System.out.println(""); //$NON-NLS-1$
 		}
 	}
 }

@@ -13,6 +13,7 @@ package org.eclipse.ptp.pldt.mpi.analysis.view;
 
 import org.eclipse.ptp.pldt.mpi.analysis.Activator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
 /**
  * View to show list of barrier errors [new view architecture]
@@ -21,7 +22,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 public class MPIErrorView extends SimpleTreeTableMarkerView {
 	public MPIErrorView() {
 
-		super(Activator.getDefault(), "FunctionName", "Matching Set Artifacts", "IndexNum",
+		super(Activator.getDefault(), "FunctionName", Messages.MPIErrorView_matchingSetArtifacts, "IndexNum", //$NON-NLS-1$ //$NON-NLS-3$
 				IDs.errorMarkerID/* common needs:, IDs.parentIDAttr*/);
 	}
 

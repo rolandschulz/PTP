@@ -27,7 +27,11 @@ import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTSimpleDeclaration;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 
@@ -60,12 +64,43 @@ public class ResourceCollector extends ASTVisitor {
 	public void run(){
 		this.shouldVisitDeclarations = true;
 		this.shouldVisitTranslationUnit = true;
+		System.out.println("ResourceCollector.run()  file: "+file_+"  exists? "+file_.exists()); //$NON-NLS-1$ //$NON-NLS-2$
 		IASTTranslationUnit ast_ = null;
 		try {
             ast_ = CDOM.getInstance().getASTService().getTranslationUnit(file_,
                     CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
         } catch (IASTServiceProvider.UnsupportedDialectException e) {
         }
+        System.out.println("     initial ast construction: ast_="+ast_); //$NON-NLS-1$
+        boolean temp=true;
+        
+        if(temp && ast_==null) {
+        	// newer way to get ast
+        	if(file_ instanceof IAdaptable) {
+        		ICElement ce = (ICElement) file_.getAdapter(ICElement.class);
+        		System.out.println("     ICElement: ="+ce); //$NON-NLS-1$
+        		if(ce instanceof ITranslationUnit) {
+        			ITranslationUnit cetu=(ITranslationUnit)ce;
+        			IASTTranslationUnit ast;
+					try {
+						ast = cetu.getAST();
+						System.out.println("ast: "+ast); //$NON-NLS-1$
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+        			
+        		}
+        		ITranslationUnit tu=(ITranslationUnit)file_.getAdapter(ITranslationUnit.class);
+        		try {
+					ast_=tu.getAST();
+				} catch (CoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        }
+        System.out.println("     ast_="+ast_); //$NON-NLS-1$
         depth = 0;
         ast_.accept(this);
 	}
@@ -76,7 +111,7 @@ public class ResourceCollector extends ASTVisitor {
 	public int visit(IASTDeclaration declaration) {
 		String filename = declaration.getContainingFilename();
 		// if(!filename.endsWith(".c") || !filename.endsWith(".C"))
-		if (filename.endsWith(".h"))
+		if (filename.endsWith(".h")) //$NON-NLS-1$
 			return PROCESS_SKIP;
 
 		if (declaration instanceof IASTFunctionDefinition) {
@@ -120,7 +155,7 @@ public class ResourceCollector extends ASTVisitor {
 	{
 		String filename = declaration.getContainingFilename();
 		//if(!filename.endsWith(".c") || !filename.endsWith(".C"))
-		if(filename.endsWith(".h"))
+		if(filename.endsWith(".h")) //$NON-NLS-1$
 			return PROCESS_SKIP;
 		
 		if (declaration instanceof IASTFunctionDefinition) {

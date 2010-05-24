@@ -70,7 +70,7 @@ public class BarrierTable {
 	public int isBarrier(IASTFunctionCallExpression funcE){
 		IASTExpression funcname = funcE.getFunctionNameExpression();
 		String signature = funcname.getRawSignature();
-		if(!signature.equals("MPI_Barrier")) return -1;
+		if(!signature.equals("MPI_Barrier")) return -1; //$NON-NLS-1$
 		for(Enumeration e = table_.elements(); e.hasMoreElements();){
 			ArrayList list = (ArrayList)e.nextElement();
 			for(Iterator i = list.iterator(); i.hasNext();){
@@ -159,7 +159,7 @@ public class BarrierTable {
 				IASTUnaryExpression commExpr = (IASTUnaryExpression) parameter;
 				IASTExpression commOp=commExpr.getOperand();
 				if (commOp instanceof IASTUnaryExpression) {  
-					if(dbg_barrier)System.out.println("setComm(): communicator is IASTUnaryExpression");
+					if(dbg_barrier)System.out.println("setComm(): communicator is IASTUnaryExpression"); //$NON-NLS-1$
 					//IASTUnaryExpression commOprd = (IASTUnaryExpression) commOp;
 					if (commOp instanceof IASTLiteralExpression) {//Yuan says windows
 						if(dbg_barrier)System.out.println();
@@ -174,13 +174,13 @@ public class BarrierTable {
 						
 						if(commOp instanceof IASTUnaryExpression) {// Mac OSX Openmpi < 1.3 (/usr/include/mpi.h) // 4/14/10: got here OMPI 1.3.3
 							IASTUnaryExpression iastUnaryExpression = (IASTUnaryExpression) commOp;
-							if(dbg_barrier)System.out.println("bdbg: communicator is IASTUnaryExpression");
+							if(dbg_barrier)System.out.println("bdbg: communicator is IASTUnaryExpression"); //$NON-NLS-1$
 							comm_= iastUnaryExpression.getRawSignature();
 							
 						} else {
 							// last resort: use a unique name, but it won't
 							// match anything??
-							comm_ = "COMM_" + commCounter;
+							comm_ = "COMM_" + commCounter; //$NON-NLS-1$
 							commCounter++;
 						}
 					}
@@ -190,7 +190,7 @@ public class BarrierTable {
 						comm_ = iastCastExpression.getRawSignature();
 					}
 					else{
-						comm_ = "COMM_" + commCounter;
+						comm_ = "COMM_" + commCounter; //$NON-NLS-1$
 						commCounter++;
 					}
 					
@@ -212,10 +212,10 @@ public class BarrierTable {
 				comm_=iastLiteralExpression.getRawSignature();
 			}
 			else {
-				comm_ = "COMM_" + commCounter;
+				comm_ = "COMM_" + commCounter; //$NON-NLS-1$
 				commCounter++;
 			}
-			if(dbg_barrier)System.out.println("setComm(): communicator: "+comm_);
+			if(dbg_barrier)System.out.println("setComm(): communicator: "+comm_); //$NON-NLS-1$
 		}
 	
 		

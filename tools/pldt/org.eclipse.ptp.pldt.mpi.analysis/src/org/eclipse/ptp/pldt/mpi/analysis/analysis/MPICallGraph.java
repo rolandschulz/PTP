@@ -46,7 +46,7 @@ public class MPICallGraph extends CallGraph{
 		FunctionMarker fm = new FunctionMarker();
 		fm.run();
 		checkBarrierRelatedCycles();
-		if(traceOn)System.out.println((btable_.commCounter + 1) + " communicators ");
+		if(traceOn)System.out.println((btable_.commCounter + 1) + " communicators "); //$NON-NLS-1$
 	}	
 	
 	class FunctionPointerChecker extends ASTVisitor{
@@ -83,8 +83,8 @@ public class MPICallGraph extends CallGraph{
 					ICallGraphNode node = getNode(currentFunc_.getFileName(), name);
 					if(node != null){
 						funcPointer = true;
-						System.out.println("Function Pointer " + name + " in " + 
-								currentFunc_.getFuncName() + "(" + currentFunc_.getFileName() + ")");
+						System.out.println("Function Pointer " + name + " in " +  //$NON-NLS-1$ //$NON-NLS-2$
+								currentFunc_.getFuncName() + "(" + currentFunc_.getFileName() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			}
@@ -127,14 +127,14 @@ public class MPICallGraph extends CallGraph{
 				IASTFunctionCallExpression funcExpr = (IASTFunctionCallExpression)expression;
 				IASTExpression funcname = funcExpr.getFunctionNameExpression();
 				String signature = funcname.getRawSignature();
-				if(signature.equals("MPI_Barrier")){
+				if(signature.equals("MPI_Barrier")){ //$NON-NLS-1$
 					count ++;
 					BarrierInfo newbar = btable_.addBarrier(funcExpr, count, 
 							currentNode_.getResource(), currentNode_.getFuncName());
 					currentNode_.setBarrierRelated(true);
 					currentNode_.getAllBarriers().add(newbar);
 				}
-				else if(signature.equals("MPI_Init")){
+				else if(signature.equals("MPI_Init")){ //$NON-NLS-1$
 					currentNode_.mpiInit = true;
 				}
 			}
@@ -204,7 +204,7 @@ public class MPICallGraph extends CallGraph{
 					}
 				}
 			}
-			if(traceOn)System.out.println(marked + " out of " + total + " functions are marked");
+			if(traceOn)System.out.println(marked + " out of " + total + " functions are marked"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 	
@@ -221,10 +221,10 @@ public class MPICallGraph extends CallGraph{
 				}
 			}
 			if(!barrierRelated) continue;
-			String errorMsg = new String("Barrier related recursive function calls on: ");
+			String errorMsg = new String("Barrier related recursive function calls on: "); //$NON-NLS-1$
 			for(Iterator<ICallGraphNode> ii = cycle.iterator(); ii.hasNext();){
 				ICallGraphNode func = ii.next();
-				errorMsg = errorMsg + func.getFuncName() + "(" + func.getFileName() + "), ";
+				errorMsg = errorMsg + func.getFuncName() + "(" + func.getFileName() + "), "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			System.out.println(errorMsg);
 		}

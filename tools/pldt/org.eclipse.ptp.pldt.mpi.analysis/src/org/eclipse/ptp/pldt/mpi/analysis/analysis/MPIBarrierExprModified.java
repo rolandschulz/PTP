@@ -143,12 +143,12 @@ public class MPIBarrierExprModified extends ASTVisitor {
 				String comm = e.nextElement();
 				Stack<BarrierExpression> sk = stacks_.get(comm);
 				BarrierExpression be = sk.pop();
-				if(traceOn)System.out.println(currentNode_.getFuncName() + "(" + comm + "): " + be.prettyPrinter());
-				if(traceOn)System.out.println(" ");
+				if(traceOn)System.out.println(currentNode_.getFuncName() + "(" + comm + "): " + be.prettyPrinter()); //$NON-NLS-1$ //$NON-NLS-2$
+				if(traceOn)System.out.println(" "); //$NON-NLS-1$
 				currentNode_.setBarrierExpr(comm, be);
 			}
 		}
-		if(traceOn)System.out.println("Total number of nodes: " + BarrierExpression.count_node);
+		if(traceOn)System.out.println("Total number of nodes: " + BarrierExpression.count_node); //$NON-NLS-1$
 	}
 	
 	public int visit(IASTStatement stmt){
@@ -762,7 +762,7 @@ public class MPIBarrierExprModified extends ASTVisitor {
 			}
 			if(!barrierRelated) continue;
 			if(cycle.size() > 1){
-				System.out.println("Multi-Function barrier related cycles");
+				System.out.println("Multi-Function barrier related cycles"); //$NON-NLS-1$
 				return;
 			}
 			currentNode_ = (MPICallGraphNode)cycle.get(0);
@@ -770,7 +770,7 @@ public class MPIBarrierExprModified extends ASTVisitor {
 				String comm = e.nextElement();
 				BarrierExpression BE = currentNode_.getBarrierExpr().get(comm);
 				if(recursion(BE) == recursionError){
-					System.out.println("Recursion Error in " + comm);
+					System.out.println("Recursion Error in " + comm); //$NON-NLS-1$
 				}
 			}
 			

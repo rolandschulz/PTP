@@ -201,18 +201,18 @@ public class BarrierExpression {
 	
 	public String prettyPrinter(){
 		if(op_ != null && op_.operator == BarrierExpressionOP.op_concat){
-			return operand1_.prettyPrinter() + "." + operand2_.prettyPrinter();
+			return operand1_.prettyPrinter() + "." + operand2_.prettyPrinter(); //$NON-NLS-1$
 		} else if(op_ != null && op_.operator == BarrierExpressionOP.op_repeat){
-			return "(" + operand1_.prettyPrinter() + ")*";
+			return "(" + operand1_.prettyPrinter() + ")*"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if(op_ != null && op_.operator == BarrierExpressionOP.op_branch){
-			return "((" + operand1_.prettyPrinter() + ") | (" + operand2_.prettyPrinter() + "))";
+			return "((" + operand1_.prettyPrinter() + ") | (" + operand2_.prettyPrinter() + "))"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else if(type == BE_ID){
 			Integer i = new Integer(barrierID);
 			return i.toString();
 		} else if(type == BE_func){
 			return funcName_;
 		} else if(type == BE_bot){
-			return "(\\bot)";
+			return "(\\bot)"; //$NON-NLS-1$
 		}
 		return null;
 	}

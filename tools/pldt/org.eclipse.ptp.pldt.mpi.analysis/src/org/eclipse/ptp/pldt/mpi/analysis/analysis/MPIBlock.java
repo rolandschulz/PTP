@@ -167,10 +167,10 @@ public class MPIBlock extends Block{
 	public List<String> getOldMVvar() {return oldMVvar_;}
 	public void setOldMVvar(List<String> list) {oldMVvar_ = list;}
 	
-	//private static int countMV=0;  // BRT for debugging
+	private static int countMV=0;  // BRT for debugging
 	public void setMV(boolean val){
-		 //countMV++;
-		 //System.out.println("setMV: "+val+"   "+countMV+" blockID: "+getID());
+		 countMV++;
+		 System.out.println("setMV: "+val+"   "+countMV+" blockID: "+getID()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		 mv = val;
 		}
 	public boolean getMV(){return mv;}
@@ -178,39 +178,39 @@ public class MPIBlock extends Block{
 	public void print(){
 		super.print();
 		
-		System.out.print("joins to: ");
+		System.out.print("joins to: "); //$NON-NLS-1$
 		for(Iterator<IBlock> i = joinBlocks_.iterator(); i.hasNext();){
-			System.out.print(i.next().getID() + ", ");
+			System.out.print(i.next().getID() + ", "); //$NON-NLS-1$
 		}
-		System.out.println(" ");
+		System.out.println(" "); //$NON-NLS-1$
 		
-		System.out.print(" use = ");
+		System.out.print(" use = "); //$NON-NLS-1$
 		for(Iterator<String> i = use_.iterator(); i.hasNext();){
-			System.out.print(i.next() + ", ");
+			System.out.print(i.next() + ", "); //$NON-NLS-1$
 		}
-		System.out.print(" def = ");
+		System.out.print(" def = "); //$NON-NLS-1$
 		for(Iterator<String> i = def_.iterator(); i.hasNext();){
-			System.out.print(i.next() + ", ");
+			System.out.print(i.next() + ", "); //$NON-NLS-1$
 		}
-		System.out.println(" ");
+		System.out.println(" "); //$NON-NLS-1$
 
-		System.out.println("Flow dependence: ");
+		System.out.println("Flow dependence: "); //$NON-NLS-1$
 		for(Enumeration<String> e = duSucc_.keys(); e.hasMoreElements();){
 			String var = e.nextElement();
 			List<IBlock> list = duSucc_.get(var);
 			if(list.isEmpty()) continue;
-			System.out.print(var + " to: ");
+			System.out.print(var + " to: "); //$NON-NLS-1$
 			for(Iterator<IBlock> i = list.iterator(); i.hasNext();){
-				System.out.print(i.next().getID() + ", ");
+				System.out.print(i.next().getID() + ", "); //$NON-NLS-1$
 			}
-			System.out.println(" ");
+			System.out.println(" "); //$NON-NLS-1$
 		}
-		System.out.println(" ");
+		System.out.println(" "); //$NON-NLS-1$
 		
-		if(mv) System.out.println("------ Multi-valued ------");
-		else System.out.println("------ Single-valued ------");
-		System.out.println(" ");
-		System.out.println(" ");
+		if(mv) System.out.println("------ Multi-valued ------"); //$NON-NLS-1$
+		else System.out.println("------ Single-valued ------"); //$NON-NLS-1$
+		System.out.println(" "); //$NON-NLS-1$
+		System.out.println(" "); //$NON-NLS-1$
 	}
 	
 	/** reset the block ID counter */
@@ -223,37 +223,37 @@ public class MPIBlock extends Block{
 		super.print();
 		StringBuffer buf = new StringBuffer();
 		
-		buf.append("joins to: ");
+		buf.append("joins to: "); //$NON-NLS-1$
 		for(Iterator<IBlock> i = joinBlocks_.iterator(); i.hasNext();){
-			buf.append(i.next().getID() + ", ");
+			buf.append(i.next().getID() + ", "); //$NON-NLS-1$
 		}
-		buf.append(" \n");
+		buf.append(" \n"); //$NON-NLS-1$
 		
-		buf.append(" use = ");
+		buf.append(" use = "); //$NON-NLS-1$
 		for(Iterator<String> i = use_.iterator(); i.hasNext();){
-			buf.append(i.next() + ", ");
+			buf.append(i.next() + ", "); //$NON-NLS-1$
 		}
-		buf.append(" def = ");
+		buf.append(" def = "); //$NON-NLS-1$
 		for(Iterator<String> i = def_.iterator(); i.hasNext();){
-			buf.append(i.next() + ", ");
+			buf.append(i.next() + ", "); //$NON-NLS-1$
 		}
-		buf.append(" \n");
+		buf.append(" \n"); //$NON-NLS-1$
 	
-		buf.append("Flow dependence: \n");
+		buf.append("Flow dependence: \n"); //$NON-NLS-1$
 		for(Enumeration<String> e = duSucc_.keys(); e.hasMoreElements();){
 			String var = e.nextElement();
 			List<IBlock> list = duSucc_.get(var);
 			if(list.isEmpty()) continue;
-			buf.append(var + " to: ");
+			buf.append(var + " to: "); //$NON-NLS-1$
 			for(Iterator<IBlock> i = list.iterator(); i.hasNext();){
-				buf.append(i.next().getID() + ", ");
+				buf.append(i.next().getID() + ", "); //$NON-NLS-1$
 			}
-			buf.append(" \n");
+			buf.append(" \n"); //$NON-NLS-1$
 		}
-		buf.append(" \n");
+		buf.append(" \n"); //$NON-NLS-1$
 		
-		if(mv) buf.append("------ Multi-valued ------\n");
-		else buf.append("------ Single-valued ------\n");
+		if(mv) buf.append("------ Multi-valued ------\n"); //$NON-NLS-1$
+		else buf.append("------ Single-valued ------\n"); //$NON-NLS-1$
 		return buf.toString();
 	}
 }

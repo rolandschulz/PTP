@@ -45,8 +45,8 @@ public class MPIResourceCollector extends ResourceCollector{
 	 * extra optional test that derived class can do
 	 */
 	protected boolean doQuickOptionalTest(String var){
-		boolean result = var.startsWith("MPI_") || var.startsWith("PMPI_") ||
-			var.startsWith("MPIO_") || var.startsWith("PMPIO_");
+		boolean result = var.startsWith("MPI_") || var.startsWith("PMPI_") || //$NON-NLS-1$ //$NON-NLS-2$
+			var.startsWith("MPIO_") || var.startsWith("PMPIO_"); //$NON-NLS-1$ //$NON-NLS-2$
 		return result;
 	 }
 	 protected void doOtherDeclaratorStuff(IASTDeclarator declarator) {

@@ -30,6 +30,7 @@ import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIResourceCollector;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
 
 /**
@@ -54,8 +55,8 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 		getSelection(event);
 		AnalysisDropdownHandler.setLastHandledAnalysis(this,selection);
 		if ((selection == null) || selection.isEmpty()) {
-			MessageDialog.openWarning(null, "No files selected for analysis.",
-							"Please select a source file  or container (folder or project) to analyze.");
+			MessageDialog.openWarning(null, Messages.RunAnalyseMPIAnalysiscommandHandler_noFilesSelectedForAnalysis,
+							Messages.RunAnalyseMPIAnalysiscommandHandler_pleaseSelect);
 			return null;
 		} else {
 			final boolean reportErrors=true;
@@ -90,7 +91,7 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 			if (obj instanceof IAdaptable) {
 				final IResource res = (IResource) ((IAdaptable) obj).getAdapter(IResource.class);
 				if (traceOn)
-					System.out.println("resourceCollector on " + res.getName());
+					System.out.println("resourceCollector on " + res.getName()); //$NON-NLS-1$
 				// FIXME put this in a runnable to batch resource changes?
 				if (res != null) {
 					resourceCollector(res);
@@ -124,9 +125,9 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 			}
 			IFile file = (IFile) resource;
 			String filename = file.getName();
-			if(filename.endsWith(".c")){
+			if(filename.endsWith(".c")){ //$NON-NLS-1$
 				if (traceOn)
-					System.out.println("resourceCollector on c file: " + file.getName());
+					System.out.println("resourceCollector on c file: " + file.getName()); //$NON-NLS-1$
 				MPIResourceCollector rc = new MPIResourceCollector(callGraph_, file); // BRT
 																						// why
 																						// 'new'
@@ -141,7 +142,7 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 				IResource[] mems = container.members();
 				for (int i = 0; i < mems.length; i++) {
 					if (traceOn)
-						System.out.println("descend to " + mems[i].getName());
+						System.out.println("descend to " + mems[i].getName()); //$NON-NLS-1$
 					boolean err = resourceCollector(mems[i]);
 					foundError = foundError || err;
 				}
@@ -149,14 +150,14 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 				e.printStackTrace();
 			}
 		} else {
-			String name = "";
+			String name = ""; //$NON-NLS-1$
 			if (resource instanceof IResource) {
 				IResource res = resource;
 				// name=res.getName(); // simple filename only, no path info
 				IPath path = res.getProjectRelativePath();
 				name = path.toString();
 			}
-			System.out.println("Cancelled by User, aborting analysis on subsequent files... " + name);
+			System.out.println("Cancelled by User, aborting analysis on subsequent files... " + name); //$NON-NLS-1$
 		}
 
 		return foundError;

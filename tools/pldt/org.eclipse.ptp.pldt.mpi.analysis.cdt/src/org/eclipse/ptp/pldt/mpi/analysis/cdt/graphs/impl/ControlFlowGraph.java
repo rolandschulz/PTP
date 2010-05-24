@@ -216,7 +216,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 		public int visit(IASTStatement stmt){
 			if(stmt instanceof IASTBreakStatement){
 				/** A break statement flows to a block with exit_join_type */
-				if(traceOn) System.out.println("BreakStatement");
+				if(traceOn) System.out.println("BreakStatement"); //$NON-NLS-1$
 				IBlock block = getBlock(stmt);
 				IASTNode parent = stmt.getParent();
 				while(true){
@@ -240,7 +240,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				 * condition block or the previous case statement, and 
 				 * flows to the first statement in the case(default) body.
 				 */
-				if(traceOn) System.out.println("CaseStatement / DefaultStatement");
+				if(traceOn) System.out.println("CaseStatement / DefaultStatement"); //$NON-NLS-1$
 				IASTNode parent = stmt.getParent();
 				while(true){
 					if(parent instanceof IASTSwitchStatement) break;
@@ -258,7 +258,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 			} 
 			else if(stmt instanceof IASTContinueStatement){
 				/** A continue statement flows to the continue_join_type block */
-				if(traceOn) System.out.println("ContinueStatement");
+				if(traceOn) System.out.println("ContinueStatement"); //$NON-NLS-1$
 				IBlock block = getBlock(stmt);
 				IASTNode parent = stmt.getParent();
 				while(true){
@@ -281,7 +281,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				 * declaration statement. In the latter case, the flow
 				 * relation is already calculated and therefore nothing
 				 * is done here. */
-				if(traceOn) System.out.println("DeclarationStatement");
+				if(traceOn) System.out.println("DeclarationStatement"); //$NON-NLS-1$
 				IASTNode parent = stmt.getParent();
 				if(parent instanceof IASTForStatement){
 					IASTForStatement forStmt = (IASTForStatement)parent;
@@ -300,7 +300,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				 * (4) the exit_join_type block flows to the next statement after
 				 * this do loop
 				 */
-				if(traceOn) System.out.println("DoStatement");
+				if(traceOn) System.out.println("DoStatement"); //$NON-NLS-1$
 				IASTDoStatement doStmt = (IASTDoStatement)stmt;
 				IBlock cond = getBlock(doStmt.getCondition(), stmt);
 				if(doStmt.getBody() == null){
@@ -321,7 +321,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				 * loop, do nothing here. If this statement contains an
 				 * "exit" function call, it flows to the exit block of the
 				 * current function */
-				if(traceOn) System.out.println("ExpressionSatement");
+				if(traceOn) System.out.println("ExpressionSatement"); //$NON-NLS-1$
 				IASTNode parent = stmt.getParent();
 				if(parent instanceof IASTForStatement){
 					IASTForStatement forStmt = (IASTForStatement)parent;
@@ -346,7 +346,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				 * body and the block with exit_join_type. The continue_join_type
 				 * block flows to the iterator, and the iterator flows to the
 				 * condition block */
-				if(traceOn) System.out.println("ForStatement");
+				if(traceOn) System.out.println("ForStatement"); //$NON-NLS-1$
 				IASTForStatement forStmt = (IASTForStatement)stmt;
 				IASTStatement initStmt = forStmt.getInitializerStatement();
 				IBlock init = getBlock(initStmt);
@@ -383,11 +383,11 @@ public class ControlFlowGraph implements IControlFlowGraph {
 			} 
 			else if(stmt instanceof IASTGotoStatement){
 				/** Goto statement flows to the corresponding label statement */
-				if(traceOn) System.out.println("GotoStatement");
+				if(traceOn) System.out.println("GotoStatement"); //$NON-NLS-1$
 				IASTGotoStatement gotoStmt = (IASTGotoStatement)stmt;
 				IBlock label = getBlock(gotoStmt.getName(), gotoStmt, Block.label_type);
 				if(label == null){
-					System.out.println("Null Label Error");
+					System.out.println("Null Label Error"); //$NON-NLS-1$
 				}
 				IBlock block = getBlock(gotoStmt);
 				ControlFlowEdge(block, label);
@@ -396,7 +396,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				/** The if condition block flows to the first block of the 
 				 * then(else) clause if it is not empty, the exit_join_type
 				 * block otherwise */
-				if(traceOn) System.out.println("IfStatement");
+				if(traceOn) System.out.println("IfStatement"); //$NON-NLS-1$
 				IASTIfStatement ifStmt = (IASTIfStatement)stmt;
 				IBlock condb = getBlock(ifStmt.getConditionExpression(), stmt);
 				IBlock join = getBlock(null, stmt, Block.exit_join_type);
@@ -420,7 +420,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				/** If there is a nested statement, the label statement flows
 				 * to the first block of the nested statement
 				 */
-				if(traceOn) System.out.println("LabelStatement");
+				if(traceOn) System.out.println("LabelStatement"); //$NON-NLS-1$
 				IASTLabelStatement label = (IASTLabelStatement)stmt;
 				IBlock block = getBlock(label.getName(), stmt, Block.label_type);
 				if(label.getNestedStatement() == null){
@@ -432,7 +432,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				}
 			} 
 			else if(stmt instanceof IASTNullStatement){
-				if(traceOn) System.out.println("NullStatement");
+				if(traceOn) System.out.println("NullStatement"); //$NON-NLS-1$
 				IASTNode parent = stmt.getParent();
 				if(parent instanceof IASTForStatement){
 					IASTForStatement forStmt = (IASTForStatement)parent;
@@ -444,14 +444,14 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				ControlFlowEdge(block, next);
 			}
 			else if(stmt instanceof IASTProblemStatement){
-				if(traceOn) System.out.println("ProblemStatement");
+				if(traceOn) System.out.println("ProblemStatement"); //$NON-NLS-1$
 				IBlock block = getBlock(stmt);
 				IBlock next = nextBlock(stmt);
 				ControlFlowEdge(block, next);
 			}
 			else if(stmt instanceof IASTReturnStatement){
 				/* The return statement flows to the exit block */
-				if(traceOn) System.out.println("ReturnStatement");
+				if(traceOn) System.out.println("ReturnStatement"); //$NON-NLS-1$
 				IASTReturnStatement rtStmt = (IASTReturnStatement)stmt;
 				IBlock rv = getBlock(rtStmt.getReturnValue(), stmt);
 				ControlFlowEdge(rv, exit_);
@@ -460,7 +460,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				/** The exit_join block of a switch statement flows to the
 				 * first block of the next statement
 				 */
-				if(traceOn) System.out.println("SwitchStatement");
+				if(traceOn) System.out.println("SwitchStatement"); //$NON-NLS-1$
 				IBlock join = getBlock(null, stmt, Block.exit_join_type);
 				IBlock next = nextBlock(stmt);
 				ControlFlowEdge(join, next);
@@ -470,7 +470,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				 * statement in the loop body and the exit_join block. 
 				 * The condition_join block flows to the condition block.
 				 */
-				if(traceOn) System.out.println("WhileStatement");
+				if(traceOn) System.out.println("WhileStatement"); //$NON-NLS-1$
 				IASTWhileStatement whStmt = (IASTWhileStatement)stmt;
 				IBlock cond = getBlock(whStmt.getCondition(), stmt);
 				IBlock continuejoin = getBlock(null, stmt, Block.continue_join_type);
@@ -637,7 +637,7 @@ public class ControlFlowGraph implements IControlFlowGraph {
 				IASTFunctionCallExpression funcExpr = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcExpr.getFunctionNameExpression();
 				String signature = funcname.getRawSignature();
-				if(signature.equals("exit")){
+				if(signature.equals("exit")){ //$NON-NLS-1$
 					exitBlock = true;
 				}
 				return PROCESS_SKIP;
@@ -770,12 +770,12 @@ public class ControlFlowGraph implements IControlFlowGraph {
 		all.add(exit_);
 		for(Iterator<IBlock> i = all.iterator(); i.hasNext();){
 			IBlock block = i.next();
-			block.setAttr("color", new Integer(0));
+			block.setAttr("color", new Integer(0)); //$NON-NLS-1$
 		}
 		order = new Stack<IBlock>();
 		for(Iterator<IBlock> i = all.iterator(); i.hasNext();){
 			IBlock block = (IBlock)i.next();
-			int color = ((Integer)block.getAttr("color")).intValue();
+			int color = ((Integer)block.getAttr("color")).intValue(); //$NON-NLS-1$
 			if(color == 0)
 				DFSVisit(block);
 		}
@@ -790,11 +790,11 @@ public class ControlFlowGraph implements IControlFlowGraph {
 	}
 	
 	protected void DFSVisit(IBlock block){
-		block.setAttr("color", new Integer(1)); //gray
+		block.setAttr("color", new Integer(1)); //gray //$NON-NLS-1$
 		for(Iterator<IBlock> i = block.getSuccs().iterator(); i.hasNext();){
 			IBlock succ = i.next();
 			if(isBackEdgeSucc(block, succ)) continue;
-			int color = ((Integer)succ.getAttr("color")).intValue();
+			int color = ((Integer)succ.getAttr("color")).intValue(); //$NON-NLS-1$
 			if(color == 0) //white
 				DFSVisit(succ);
 		}

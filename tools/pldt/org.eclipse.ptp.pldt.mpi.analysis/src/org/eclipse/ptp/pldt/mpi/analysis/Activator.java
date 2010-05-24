@@ -12,6 +12,7 @@
 package org.eclipse.ptp.pldt.mpi.analysis;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -21,7 +22,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.mpi.analysis";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.pldt.mpi.analysis"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

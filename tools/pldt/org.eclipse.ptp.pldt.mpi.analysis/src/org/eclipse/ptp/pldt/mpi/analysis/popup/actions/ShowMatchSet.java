@@ -30,13 +30,13 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.pldt.common.ScanReturn;
-import org.eclipse.ptp.pldt.common.util.SourceInfo;
 import org.eclipse.ptp.pldt.common.util.Utility;
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable;
-import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierAnalysisResults;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
+import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierAnalysisResults;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 import org.eclipse.ptp.pldt.mpi.analysis.view.MPIArtifactMarkingVisitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -60,10 +60,10 @@ public class ShowMatchSet extends ActionDelegate
 	private static final boolean traceOn=false;
 
 	
-	protected static final String TITLE = "Show Match Set";
+	protected static final String TITLE = Messages.ShowMatchSet_showMatchSet;
 	
 	public ShowMatchSet(){
-		if(traceOn)System.out.println("ShowMatchSet() constructed...");
+		if(traceOn)System.out.println("ShowMatchSet() constructed..."); //$NON-NLS-1$
 	}
 
     public void setActiveEditor(IAction action, IEditorPart targetEditor){
@@ -82,7 +82,7 @@ public class ShowMatchSet extends ActionDelegate
             showMatchSet(selection);
         }
         else 
-            showMessage(TITLE, "No selections made");
+            showMessage(TITLE, Messages.ShowMatchSet_noSelectionsMade);
     }
     
     protected void showMessage(String title, String message){
@@ -99,7 +99,7 @@ public class ShowMatchSet extends ActionDelegate
     
     protected void showMatchSet(TextSelection selection){
         if (selection.getOffset()==0 && selection.getLength()==0) {
-            showMessage(TITLE, "No selections made");
+            showMessage(TITLE, Messages.ShowMatchSet_noSelectionsMande);
             return;
         }
         
@@ -110,13 +110,13 @@ public class ShowMatchSet extends ActionDelegate
 			wsResource.deleteMarkers(IDs.matchingSetMarkerID, false, depth);
 
         } catch (CoreException e) {
-            System.out.println("RM: exception deleting markers.");
+            System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
             e.printStackTrace();
         }
         
         results_ = MPIBarrierAnalysisResults.getAnalysisResults();
         if (results_ == null) {
-            showMessage(TITLE, "No Barrier Analysis has been performed");
+            showMessage(TITLE, Messages.ShowMatchSet_noBarrierAnalysisHasBeenPerformed);
             return;
         }
         IEditorInput ieu = editor_.getEditorInput();
@@ -131,7 +131,7 @@ public class ShowMatchSet extends ActionDelegate
 
         BarrierInfo barrier = findSelectedBarrier(fileName, selection.getOffset());
         if(barrier == null){
-        	showMessage(TITLE, "Please select a barrier");
+        	showMessage(TITLE, Messages.ShowMatchSet_PleaseSelectABarrier);
         	return;
         }
         
@@ -143,23 +143,24 @@ public class ShowMatchSet extends ActionDelegate
 		
         /* Display all matched barriers */
  		// create the markers for all the matched barriers
- 		String parentName="BarrierSetName"; // change to something that makes sense
+ 		String parentName="BarrierSetName"; // change to something that makes sense //$NON-NLS-1$
         for(Iterator i = barrier.getMatchingSet().iterator(); i.hasNext();){
         	BarrierInfo matchedBar = (BarrierInfo)i.next();
-        	showNode(matchedBar.getFunc().getFunctionNameExpression(), "org.eclipse.ptp.pldt.mpi.analysis.matchset");
+        	showNode(matchedBar.getFunc().getFunctionNameExpression(), "org.eclipse.ptp.pldt.mpi.analysis.matchset"); //$NON-NLS-1$
             ScanReturn sr = new ScanReturn();
-            
-        	SourceInfo sourceInfo = matchedBar.getSourceInfo();
+            /*
+        	SourceInfo sourceInfo = matchedBar.getSourceInfo();	
         	int col=1;
         	String filename=matchedBar.getFileName();
         	int line=sourceInfo.getStartingLine();
         	String fn=matchedBar.getEnclosingFunc();
+        	*/
         	//ArtifactWithParent a = new ArtifactWithParent(filename, line, col, fn,"Artifact Call",sourceInfo,parentName);
         	//sr.addArtifact(a);
         	visitor.visitFile(matchedBar.getResource(), sr.getArtifactList());
         }
         // Done creating markers, now show the view
-        ViewActivater.activateView(IDs.matchingSetViewID);
+        ViewActivator.activateView(IDs.matchingSetViewID);
     }
     
     protected BarrierInfo findSelectedBarrier(String filename, int offset){
@@ -185,7 +186,7 @@ public class ShowMatchSet extends ActionDelegate
         for(Iterator ai=am.getAnnotationIterator(); ai.hasNext();) { ais.add(ai.next()); }
         for(Iterator it=ais.iterator(); it.hasNext();) {
             Annotation a = (Annotation)it.next();
-            if (a.getType().equals("org.eclipse.ptp.pldt.mpi.analysis.matchset")) {
+            if (a.getType().equals("org.eclipse.ptp.pldt.mpi.analysis.matchset")) { //$NON-NLS-1$
                 am.removeAnnotation(a);
             }
         }
@@ -199,7 +200,7 @@ public class ShowMatchSet extends ActionDelegate
         IAnnotationModel am = editor_.getDocumentProvider().getAnnotationModel(editor_.getEditorInput());
         
         // We need to add an annotation type to the annotation painter (see SourceViewerDecorationSupport)
-        Annotation a = new Annotation(markerType, true, "Hi");
+        Annotation a = new Annotation(markerType, true, "Hi"); //$NON-NLS-1$
         int end = l.high_-l.low_+1;
         Position   p = new Position(l.low_, end);
         am.addAnnotation(a, p);

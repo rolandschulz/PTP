@@ -93,7 +93,7 @@ public class GotoEliminator{
 				IASTGotoStatement gotoS = (IASTGotoStatement)gotoList_.remove();
 				IASTLabelStatement label = findLabel(gotoS);
 				if(label == null){
-					System.out.println("Empty goto label!");
+					System.out.println("Empty goto label!"); //$NON-NLS-1$
 					continue;
 				}
 				
@@ -127,7 +127,7 @@ public class GotoEliminator{
 		for(ListIterator li = labelList_.listIterator(); li.hasNext();){
 			IASTLabelStatement label = (IASTLabelStatement)li.next();
 			IASTName labelname = label.getName();
-			String labelvar = "goto_" + labelname.toString();
+			String labelvar = "goto_" + labelname.toString(); //$NON-NLS-1$
 			createDeclaration(labelvar);
 			setLabelVariable(labelvar, label);
 		}
@@ -138,7 +138,7 @@ public class GotoEliminator{
 			IASTGotoStatement gotoS = (IASTGotoStatement)li.next();
 			if(!(gotoS.getParent() instanceof IASTIfStatement)){
 				IASTLiteralExpression condE = new CASTLiteralExpression();
-				condE.setValue("true");
+				condE.setValue("true"); //$NON-NLS-1$
 				
 				IASTIfStatement ifS = new CASTIfStatement();
 				ifS.setConditionExpression(condE);
@@ -173,7 +173,7 @@ public class GotoEliminator{
 	    IASTName name = new CASTName(var.toCharArray());
 	    declarators[0].setName(name);
 	    IASTLiteralExpression init = new CASTLiteralExpression();
-	    init.setValue("0");
+	    init.setValue("0"); //$NON-NLS-1$
 	    IASTInitializerExpression initE = new CASTInitializerExpression();
 	    initE.setExpression(init);
 	    declarators[0].setInitializer(initE);
@@ -203,7 +203,7 @@ public class GotoEliminator{
 		name.setParent(id);
 
 		IASTLiteralExpression value = new CASTLiteralExpression();
-		value.setValue("0");
+		value.setValue("0"); //$NON-NLS-1$
 
 		IASTBinaryExpression biE = new CASTBinaryExpression();
 		biE.setOperand1(id);
@@ -313,7 +313,7 @@ public class GotoEliminator{
 	
 	/* TODO: check the order of replace and parent setting */	
 	private void moveOutward(IASTGotoStatement gotoS){
-		String labelname = "goto_" + gotoS.getName().toString();
+		String labelname = "goto_" + gotoS.getName().toString(); //$NON-NLS-1$
 		IASTNode parent = gotoS.getParent().getParent();
 		IASTNode body = gotoS.getParent();
 		IASTIfStatement gotoIfStmt = (IASTIfStatement)body;
@@ -454,7 +454,7 @@ public class GotoEliminator{
 	
 	private void moveInward(IASTGotoStatement gotoS){
 		IASTIfStatement gotoIfStmt = (IASTIfStatement)gotoS.getParent();
-		String labelname = "goto_" + gotoS.getName().toString();
+		String labelname = "goto_" + gotoS.getName().toString(); //$NON-NLS-1$
 		IASTLabelStatement label = findLabel(gotoS);
 		IASTStatement enclosingStmt = null;
 		IASTStatement clause = null;
@@ -740,7 +740,7 @@ public class GotoEliminator{
 				stmts[i].setParent(ifThenBody);
 			}
 			
-			String switchvar = "t_switch_" + switch_count;
+			String switchvar = "t_switch_" + switch_count; //$NON-NLS-1$
 			switch_count ++;
 			createDeclaration(switchvar); /* TODO: fix type information */
 			IASTName switchCondAssignName = new CASTName(switchvar.toCharArray());
@@ -832,7 +832,7 @@ public class GotoEliminator{
 	
 	private void lifting(IASTGotoStatement gotoS){
 		IASTIfStatement gotoIfStmt = (IASTIfStatement)gotoS.getParent();
-		String labelname = "goto_" + gotoS.getName().toString();
+		String labelname = "goto_" + gotoS.getName().toString(); //$NON-NLS-1$
 		IASTLabelStatement label = findLabel(gotoS);
 		IASTStatement enclosingStmt = null;
 
@@ -1203,9 +1203,9 @@ public class GotoEliminator{
 			IASTStatement body = node_.getFuncDef().getBody();
 			body.accept(this);
 			if(gotoMet == -1 || labelMet == -1){
-				System.out.println("Goto or label not found!");
+				System.out.println("Goto or label not found!"); //$NON-NLS-1$
 			} else if(gotoMet > 1 || labelMet > 1){
-				System.out.println("Multiple gotos and labels are met!");
+				System.out.println("Multiple gotos and labels are met!"); //$NON-NLS-1$
 			}
 			return gotoMet < labelMet;
 		}

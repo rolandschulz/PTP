@@ -67,7 +67,7 @@ public class GraphCreator {
 	public ICallGraph initCallGraph(IResource resource, ICallGraph callGraph) {
 		boolean foundError = resourceCollector(resource, callGraph);
 		if(foundError) {
-			System.out.println("Error occurred during call graph creation.");
+			System.out.println("Error occurred during call graph creation."); //$NON-NLS-1$
 		}
 		return callGraph;
 	}
@@ -108,7 +108,7 @@ public class GraphCreator {
 		if (resource instanceof IFile) {
 			IFile file = (IFile) resource;
 			String filename = file.getName();
-			if (filename.endsWith(".c")) {
+			if (filename.endsWith(".c")) { //$NON-NLS-1$
 				ResourceCollector rc = new ResourceCollector(callGraph, file);
 				rc.run();
 			}
@@ -127,14 +127,14 @@ public class GraphCreator {
 			}
 		} else {
 			// ?????
-			String name = "";
+			String name = ""; //$NON-NLS-1$
 			if (resource instanceof IResource) {
 				IResource res = (IResource) resource;
 				// name=res.getName(); // simple filename only, no path info
 				IPath path = res.getProjectRelativePath();
 				name = path.toString();
 			}
-			System.out.println("Cancelled by User, aborting analysis on subsequent files... "
+			System.out.println("Cancelled by User, aborting analysis on subsequent files... " //$NON-NLS-1$
 							+ name);
 		}
 
@@ -145,48 +145,48 @@ public class GraphCreator {
 	 * @param cg the call graph to print
 	 */
 	public void showCallGraph(ICallGraph cg) {
-		System.out.println("Show call graph");
+		System.out.println("Show call graph"); //$NON-NLS-1$
 		List<ICallGraphNode> nodes = cg.getAllNodes();
 		for (Iterator<ICallGraphNode> iterator = nodes.iterator(); iterator.hasNext();) {
 			ICallGraphNode cgNode =  iterator.next();
-			printCGNode(cgNode, "");
+			printCGNode(cgNode, ""); //$NON-NLS-1$
 			//System.out.println("  callers: ==>");
 	
 			for (Iterator<ICallGraphNode> iterator2 = cgNode.getCallers().iterator(); iterator2.hasNext();) {
 				ICallGraphNode caller = iterator2.next();
-				printCGNode(caller,"    caller: ");			
+				printCGNode(caller,"    caller: ");			 //$NON-NLS-1$
 			}
 			//System.out.println("  <== callees:");
 			for (Iterator<ICallGraphNode> iterator3 = cgNode.getCallees().iterator(); iterator3.hasNext();) {
 				ICallGraphNode callee =  iterator3.next();
-				printCGNode(callee,"    callee: ");
+				printCGNode(callee,"    callee: "); //$NON-NLS-1$
 				
 			}
-			System.out.println(" ");
+			System.out.println(" "); //$NON-NLS-1$
 			
 		}
 		List<List<ICallGraphNode>>cycles = cg.getCycles();
-		System.out.println("Recursive cycles:");
+		System.out.println("Recursive cycles:"); //$NON-NLS-1$
 		for (List<ICallGraphNode> cycle : cycles) {
-			System.out.println("Cycle: ");
+			System.out.println("Cycle: "); //$NON-NLS-1$
 			for (Iterator<ICallGraphNode> iterator = cycle.iterator(); iterator.hasNext();) {
 				ICallGraphNode fn =  iterator.next();
-				System.out.print(" "+fn.getFuncName());
+				System.out.print(" "+fn.getFuncName()); //$NON-NLS-1$
 				
 			}
-			System.out.println(" \n");
+			System.out.println(" \n"); //$NON-NLS-1$
 		}
 		List<String> vars= cg.getEnv();
-		System.out.println("Global variables:");
+		System.out.println("Global variables:"); //$NON-NLS-1$
 		for (Iterator<String> varit= vars.iterator(); varit.hasNext();) {
 			String var = varit.next();
-			System.out.println("Global var: "+var);
+			System.out.println("Global var: "+var); //$NON-NLS-1$
 			
 		}
 		
 	}
 	public void printCGNode(ICallGraphNode cgNode, String prefix) {
-		System.out.println(prefix+" "+cgNode.getFuncName()+" in "+cgNode.getFileName());
+		System.out.println(prefix+" "+cgNode.getFuncName()+" in "+cgNode.getFileName()); //$NON-NLS-1$ //$NON-NLS-2$
 		cgNode.getCFG();
 	}
 }

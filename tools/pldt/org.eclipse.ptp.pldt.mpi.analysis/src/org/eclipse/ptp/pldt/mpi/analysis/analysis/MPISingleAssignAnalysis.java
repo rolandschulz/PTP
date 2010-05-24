@@ -50,7 +50,7 @@ public class MPISingleAssignAnalysis {
 			
 			for(Enumeration<String> e = currentNode_.getSAVar().keys(); e.hasMoreElements();){
 				String var = e.nextElement();
-				if(traceOn)System.out.println(var + " is defined " + currentNode_.getSAVar().get(var).intValue() + " times");
+				if(traceOn)System.out.println(var + " is defined " + currentNode_.getSAVar().get(var).intValue() + " times"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -192,7 +192,7 @@ public class MPISingleAssignAnalysis {
 					}
 				}
 				else if(init instanceof ICASTDesignatedInitializer){
-					System.out.println("ICASTDesignatedInitializer found !");
+					System.out.println("ICASTDesignatedInitializer found !"); //$NON-NLS-1$
 				}
 			}
 		}
@@ -411,8 +411,8 @@ public class MPISingleAssignAnalysis {
 				IASTFunctionCallExpression funcE = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcE.getFunctionNameExpression();
 				String signature = funcname.getRawSignature();
-				if(signature.equals("malloc") || signature.equals("calloc") ||
-						signature.equals("realloc"))
+				if(signature.equals("malloc") || signature.equals("calloc") || //$NON-NLS-1$ //$NON-NLS-2$
+						signature.equals("realloc")) //$NON-NLS-1$
 					return true;
 				IASTExpression paramE = funcE.getParameterExpression();
 				if(paramE == null) return false;
@@ -442,7 +442,7 @@ public class MPISingleAssignAnalysis {
 				IASTIdExpression id = (IASTIdExpression)expr;
 				IASTName name = id.getName();
 				String var = name.toString();
-				if(var.startsWith("MPI_")) return false;
+				if(var.startsWith("MPI_")) return false; //$NON-NLS-1$
 				int fnum = 0;
 				if(func != null){
 					fnum = getParamAssignNum(func, index);
