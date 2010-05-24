@@ -14,6 +14,7 @@ package org.eclipse.ptp.pldt.mpi.analysis.view;
 //import org.eclipse.ptp.pldt.common.views.SimpleTableView;
 import org.eclipse.ptp.pldt.mpi.analysis.Activator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
  /**
   * View to show list of barriers 
   * 
@@ -26,8 +27,8 @@ import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 public class MPIBarrierView extends SimpleTableBarrierView {//original
 	public MPIBarrierView() {
 
-		super(Activator.getDefault(), "Function", "Barrier Artifacts",
-				"IndexNo", IDs.barrierMarkerID);
+		super(Activator.getDefault(), Messages.MPIBarrierView_function, Messages.MPIBarrierView_barrierArtifacts,
+				Messages.MPIBarrierView_indexNo, IDs.barrierMarkerID);
 	}
 
 }

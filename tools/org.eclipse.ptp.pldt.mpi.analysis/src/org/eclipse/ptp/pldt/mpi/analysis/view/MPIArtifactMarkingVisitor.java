@@ -37,10 +37,10 @@ public class MPIArtifactMarkingVisitor extends ArtifactMarkingVisitor{
     public boolean visitFile(IResource resource, Artifact[] artifacts)
     {
         try {
-            if(traceOn) System.out.println("ArtifactMarkingVisitor.visitFile: " + resource.getName());
+            if(traceOn) System.out.println("ArtifactMarkingVisitor.visitFile: " + resource.getName()); //$NON-NLS-1$
             //removeMarkers(resource, this.markerID_);
             int numArtifacts=artifactManager_.getArtifacts().length;
-            if(traceOn)System.out.println("numArtifacts: "+numArtifacts);
+            if(traceOn)System.out.println("numArtifacts: "+numArtifacts); //$NON-NLS-1$
             
             String fn = resource.getProjectRelativePath().toString();
 
@@ -64,7 +64,7 @@ public class MPIArtifactMarkingVisitor extends ArtifactMarkingVisitor{
 	 */
 	protected void createArtifactMarker(IResource resource, Artifact artifact, String fn) throws CoreException
 	{
-	    if (traceOn) System.out.println("Artifact desc=" + artifact.getShortName() + "  fn=" + fn);
+	    if (traceOn) System.out.println("Artifact desc=" + artifact.getShortName() + "  fn=" + fn); //$NON-NLS-1$ //$NON-NLS-2$
 	    Map attrs = createCommonMarkerAttrs(resource, artifact, fn);
 	    // message attribute will be used for hover over editor location
 	    attrs.put(IMarker.MESSAGE, artifact.getShortName());
@@ -80,8 +80,8 @@ public class MPIArtifactMarkingVisitor extends ArtifactMarkingVisitor{
 	    // create the marker all at once, so get ONLY a single resourceChange event.
 	    MarkerUtilities.createMarker(resource, attrs, this.markerID_);  // 154
 	    if (traceOn)
-	        System.out.println("marker created: for " + fn + " - " + artifact.getShortName() + " line "
-	                + artifact.getLine() + " start " + artifact.getSourceInfo().getStart() + " end "
+	        System.out.println("marker created: for " + fn + " - " + artifact.getShortName() + " line " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	                + artifact.getLine() + " start " + artifact.getSourceInfo().getStart() + " end " //$NON-NLS-1$ //$NON-NLS-2$
 	                + artifact.getSourceInfo().getEnd());
 	    
 	    artifactManager_.addArtifactToHash(artifact);

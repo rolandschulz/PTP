@@ -63,8 +63,8 @@ public class MPIMVAnalysis{
 			for(IBlock b = cfg.getEntry(); b != null; b = b.topNext()){
 				MPIBlock block = (MPIBlock)b;
 				if(block.getMV() && (block.withBreak || block.withContinue))
-					System.out.println("************  Multi-valued branch with Break/Continue in " + 
-							node.getFuncName() + "(" + node.getFileName() + ")");
+					System.out.println("************  Multi-valued branch with Break/Continue in " +  //$NON-NLS-1$
+							node.getFuncName() + "(" + node.getFileName() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -83,7 +83,7 @@ public class MPIMVAnalysis{
 				IASTParameterDeclaration[] params = sfunc.getParameters();
 				for(int i = 0; i < params.length; i++){
 					IASTName param = params[i].getDeclarator().getName();
-					if(param.toString().equals("")) continue; //void parameter
+					if(param.toString().equals("")) continue; //void parameter //$NON-NLS-1$
 					node.getParamMV().put(param.toString(), new Boolean(false));
 					node.getMVSummary().put(param.toString(), new ArrayList<String>());
 				}
@@ -627,7 +627,7 @@ public class MPIMVAnalysis{
 				IASTIdExpression id = (IASTIdExpression)expr;
 				IASTName name = id.getName();
 				String var = name.toString();
-				if(var.startsWith("MPI_")) return false;
+				if(var.startsWith("MPI_")) return false; //$NON-NLS-1$
 				if(side == rhs){
 					if(func != null){ //function parameter
 						IASTExpression funcname = func.getFunctionNameExpression();
@@ -970,7 +970,7 @@ public class MPIMVAnalysis{
 				IASTFunctionCallExpression funcExpr = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcExpr.getFunctionNameExpression();
 				String signature = funcname.getRawSignature();
-				if(signature.equals("MPI_Comm_rank")){
+				if(signature.equals("MPI_Comm_rank")){ //$NON-NLS-1$
 					currentFunc_.setSeed(true);
 				} 
 			}
@@ -1022,7 +1022,7 @@ public class MPIMVAnalysis{
 				IASTFunctionCallExpression funcExpr = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcExpr.getFunctionNameExpression();
 				String signature = funcname.getRawSignature();
-				if(signature.equals("MPI_Comm_rank")){
+				if(signature.equals("MPI_Comm_rank")){ //$NON-NLS-1$
 					inRankFunc = true;
 				} else {
 					MPICallGraphNode n = (MPICallGraphNode)cg_.getNode(currentNode_.getFileName(), signature);
@@ -1056,7 +1056,7 @@ public class MPIMVAnalysis{
 						//else 
 							if(parent instanceof IASTFunctionCallExpression) break;
 						else{
-							if(traceOn)System.out.println("MMVA: me=parent, parent=parent.getParent()");
+							if(traceOn)System.out.println("MMVA: me=parent, parent=parent.getParent()"); //$NON-NLS-1$
 							me = parent;
 							parent = parent.getParent();
 						}
@@ -1070,7 +1070,7 @@ public class MPIMVAnalysis{
 					if(params_!=null) {
 					IASTInitializerClause cl = params_[0];
 					if(cl instanceof IASTIdExpression) {
-						System.out.println("IASTInitializerClause is IASTIdExpression");
+						System.out.println("IASTInitializerClause is IASTIdExpression"); //$NON-NLS-1$
 					}
 					}
 					
@@ -1104,7 +1104,7 @@ public class MPIMVAnalysis{
 				IASTFunctionCallExpression funcExpr = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcExpr.getFunctionNameExpression();
 				String signature = funcname.getRawSignature();
-				if(signature.equals("MPI_Comm_rank")){
+				if(signature.equals("MPI_Comm_rank")){ //$NON-NLS-1$
 					inRankFunc = false;
 				}
 				params_=null; // BRT ???? do we do this here since no more IASTExpressionList below?
@@ -1143,7 +1143,7 @@ public class MPIMVAnalysis{
 				IASTFunctionCallExpression funcE = (IASTFunctionCallExpression)expr;
 				IASTExpression funcname = funcE.getFunctionNameExpression();
 				String signature = funcname.getRawSignature();
-				if(signature.equals("MPI_Bcast")){
+				if(signature.equals("MPI_Bcast")){ //$NON-NLS-1$
 					IASTExpression paramE = funcE.getParameterExpression();
 					IASTExpression[] params = ((IASTExpressionList)paramE).getExpressions();
 					IASTExpression dataE = params[0];
@@ -1336,7 +1336,7 @@ public class MPIMVAnalysis{
 			IControlFlowGraph cfg = node.getCFG();
 			for(IBlock b = cfg.getEntry(); b != null; b = b.topNext()){
 				MPIBlock block = (MPIBlock)b;
-				//System.out.println("expMVAnalysis(): Block " + block.getID());
+				System.out.println("expMVAnalysis(): Block " + block.getID()); //$NON-NLS-1$
 				ExprMVAnalyzer EA = new ExprMVAnalyzer(block.getContent(), block.getMVvar(), block);
 				//                                                         ^^^ BRT isEmpty 
 				EA.run();

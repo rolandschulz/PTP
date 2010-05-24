@@ -23,7 +23,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IControlFlowGraph;
 
 /**
- * Calculate the DUchain -- data dependence
+ * Calculate the DUchain -- data dependence (definition-use chain)
  * 
  * @author Yuan Zhang
  * @since 4.0
@@ -50,7 +50,7 @@ public class MPIDUChain {
 		ud.run();
 		MPISSA ssa = new MPISSA(cg_);
 		ssa.run();
-		DUChain();
+		duChain();
 	}
 
 	/**
@@ -120,8 +120,6 @@ public class MPIDUChain {
 	}
 
 	/**
-	 * Construct the DUchain
-	 * 
 	 * @since 4.0
 	 */
 	protected void flowDependence() {
@@ -143,13 +141,16 @@ public class MPIDUChain {
 		}
 	}
 
-	protected void DUChain() {
+	/**
+	 * Construct the definition-use chain
+	 * 
+	 * @since 4.0
+	 */
+	protected void duChain() {
 		for (ICallGraphNode n = cg_.botEntry(); n != null; n = n.botNext()) {
 			MPICallGraphNode node = (MPICallGraphNode) n;
 			if (!node.marked)
 				continue;
-			if (node.getFuncName().equals("Moc_KWayFM"))
-				System.out.println("MPIDUChain.DUChain(): Moc_KWayFM " + node.getFuncName());
 			cfg_ = node.getCFG();
 			defTable_ = node.getDefTable();
 			genKillSet();

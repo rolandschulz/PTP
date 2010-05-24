@@ -42,6 +42,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraph;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.IControlFlowGraph;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 import org.eclipse.ptp.pldt.mpi.analysis.popup.actions.ShowMatchSet;
 
 public class MPIBarrierMatching {
@@ -96,10 +97,10 @@ public class MPIBarrierMatching {
 					// Only the first one, if at all
 					if (reportErrors) {
 						reportErrors=false; // don't report any more
-						String errorMsg = "Found barrier synchronization error(s)!";
+						String errorMsg = Messages.MPIBarrierMatching_foundBarrierSyncError;
 						MessageDialog.openInformation(ShowMatchSet
 								.getStandardDisplay().getActiveShell(),
-								"MPI Barrier Analysis", errorMsg);
+								Messages.MPIBarrierMatching_mpiBarrierAnalysis, errorMsg);
 					}
 					
 				}
@@ -108,7 +109,7 @@ public class MPIBarrierMatching {
 		}
 		//symmMatches();
 		if(traceOn)printMatches();
-		if(traceOn)System.out.println("mv = " + mv + ", sv = " + sv);
+		if(traceOn)System.out.println("mv = " + mv + ", sv = " + sv); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	protected void fixedLength(BarrierExpression BE){
@@ -208,7 +209,7 @@ public class MPIBarrierMatching {
 		error = true;
 		
 		IASTStatement stmt = BE.getOP().getStatement();
-		if(traceOn)System.out.println("Barrier mismatching found in " + stmt);
+		if(traceOn)System.out.println("Barrier mismatching found in " + stmt); //$NON-NLS-1$
 		IASTExpression cond = null;
 		
 		if(stmt instanceof IASTIfStatement)
@@ -222,7 +223,7 @@ public class MPIBarrierMatching {
 		else if(stmt instanceof IASTSwitchStatement)
 			cond = ((IASTSwitchStatement)stmt).getControllerExpression();
 		else{
-			System.out.println("Barrier Expression doesn't have valid condition");
+			System.out.println("Barrier Expression doesn't have valid condition"); //$NON-NLS-1$
 			return;
 		}
 		
@@ -243,11 +244,11 @@ public class MPIBarrierMatching {
 			IMarker m = currentFunc_.getResource().createMarker(IDs.errorMarkerID);
 			//IMarker m = currentFunc_.getResource().createMarker(IDs.errorMarkerID);
 			m.setAttribute(IMarker.LINE_NUMBER, line);
-			m.setAttribute(IMarker.MESSAGE, "Barrier Synchronization Error");
+			m.setAttribute(IMarker.MESSAGE, Messages.MPIBarrierMatching_barrierSyncError);
 			m.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
 			m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 		}catch(CoreException e){
-			System.out.println("RM: exception creating markers.");
+			System.out.println("RM: exception creating markers."); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 
@@ -272,7 +273,7 @@ public class MPIBarrierMatching {
 				if(differentLength(path1, path2))
 					break;
 				if(!changed && !first){
-					System.out.println("We cannot find the counter example!");
+					System.out.println("We cannot find the counter example!"); //$NON-NLS-1$
 				}
 				if(first) first = true;
 				path1 = new ArrayList<PathNode>();
@@ -281,20 +282,20 @@ public class MPIBarrierMatching {
 			err.setPath1(path1);
 			err.setPath2(path2);
 			
-			if(traceOn)System.out.println("Path 1: ");
+			if(traceOn)System.out.println("Path 1: "); //$NON-NLS-1$
 			for(Iterator<PathNode> i=path1.iterator(); i.hasNext();){
 				PathNode pn = i.next();
 				pn.print();
-				if(traceOn)System.out.print(", ");
+				if(traceOn)System.out.print(", "); //$NON-NLS-1$
 			}
-			if(traceOn)System.out.println(" ");
-			if(traceOn)System.out.println("Path 2: ");
+			if(traceOn)System.out.println(" "); //$NON-NLS-1$
+			if(traceOn)System.out.println("Path 2: "); //$NON-NLS-1$
 			for(Iterator<PathNode> i=path2.iterator(); i.hasNext();){
 				PathNode pn = i.next();
 				pn.print();
-				if(traceOn)System.out.print(", ");
+				if(traceOn)System.out.print(", "); //$NON-NLS-1$
 			}
-			if(traceOn)System.out.println(" ");
+			if(traceOn)System.out.println(" "); //$NON-NLS-1$
 		}
 		else if(op.getOperator() == BarrierExpressionOP.op_repeat){
 			List<PathNode> path1 = new ArrayList<PathNode>();
@@ -305,13 +306,13 @@ public class MPIBarrierMatching {
 			}
 			err.setPath1(path1);
 			
-			if(traceOn)System.out.println("Path: ");
+			if(traceOn)System.out.println("Path: "); //$NON-NLS-1$
 			for(Iterator<PathNode> i=path1.iterator(); i.hasNext();){
 				PathNode pn = i.next();
 				pn.print();
-				if(traceOn)System.out.print(", ");
+				if(traceOn)System.out.print(", "); //$NON-NLS-1$
 			}
-			if(traceOn)System.out.println(" ");
+			if(traceOn)System.out.println(" "); //$NON-NLS-1$
 		}
 	}
 	
@@ -425,7 +426,7 @@ public class MPIBarrierMatching {
 		public void print(){
 			if(traceOn)System.out.print(barrier_.getID());
 			if(repeat)
-				if(traceOn)System.out.print("(*)");
+				if(traceOn)System.out.print("(*)"); //$NON-NLS-1$
 		}
 	}
 	
@@ -494,11 +495,11 @@ public class MPIBarrierMatching {
 				if (traceOn) {
 					if (node instanceof CASTCompoundStatement) {
 						CASTCompoundStatement cstmt = (CASTCompoundStatement) node;
-						System.out.println("Compound stmt: " + cstmt.getRawSignature());
+						System.out.println("Compound stmt: " + cstmt.getRawSignature()); //$NON-NLS-1$
 						IASTNodeLocation[] locs = cstmt.getNodeLocations();
 						for (int i = 0; i < locs.length; i++) {
 							IASTNodeLocation loc = locs[i];
-							System.out.println("  subnode: " + loc.toString());
+							System.out.println("  subnode: " + loc.toString()); //$NON-NLS-1$
 						}
 					}
 					
@@ -664,10 +665,10 @@ public class MPIBarrierMatching {
 		BarrierExpression T2 = BE2;
 		int direction = dir;
 		while(true){
-			if(traceOn)System.out.println("match: "+T1.prettyPrinter());
-			if(traceOn)System.out.println("       "+T2.prettyPrinter());
-			if(direction == down) {if(traceOn)System.out.println("       down");}
-			else {if(traceOn)System.out.println("       up");}
+			if(traceOn)System.out.println("match: "+T1.prettyPrinter()); //$NON-NLS-1$
+			if(traceOn)System.out.println("       "+T2.prettyPrinter()); //$NON-NLS-1$
+			if(direction == down) {if(traceOn)System.out.println("       down");} //$NON-NLS-1$
+			else {if(traceOn)System.out.println("       up");} //$NON-NLS-1$
 			
 			if(direction == down && !pairVisited(T1, T2))
 				addVisitedPair(T1, T2);
@@ -689,7 +690,7 @@ public class MPIBarrierMatching {
 				String funcName = T1.getFuncName();
 				MPICallGraphNode fnode = (MPICallGraphNode)cg_.getNode(currentFunc_.getFileName(), funcName);
 				if(fnode == null || !fnode.barrierRelated()){
-					System.out.println("Error in call graph");
+					System.out.println("Error in call graph"); //$NON-NLS-1$
 				}
 				BarrierExpression fBE = (BarrierExpression)fnode.getBarrierExpr().get(currentComm_);
 				lstack_.push(T1);
@@ -698,7 +699,7 @@ public class MPIBarrierMatching {
 				String funcName = T2.getFuncName();
 				MPICallGraphNode fnode = (MPICallGraphNode)cg_.getNode(currentFunc_.getFileName(), funcName);
 				if(fnode == null || !fnode.barrierRelated()){
-					System.out.println("Error in call graph");
+					System.out.println("Error in call graph"); //$NON-NLS-1$
 				}
 				BarrierExpression fBE = (BarrierExpression)fnode.getBarrierExpr().get(currentComm_);
 				sstack_.push(T2);
@@ -747,8 +748,8 @@ public class MPIBarrierMatching {
 				//rule 6
 				T2 = T2.getParent();
 			} else{
-				System.out.println("cannot find rules for " + T1.prettyPrinter() 
-					+ " and " + T2.prettyPrinter() + " and direction = " + direction);
+				System.out.println("cannot find rules for " + T1.prettyPrinter()  //$NON-NLS-1$
+					+ " and " + T2.prettyPrinter() + " and direction = " + direction); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -796,12 +797,12 @@ public class MPIBarrierMatching {
 			List<BarrierInfo> list = e.nextElement();
 			for(Iterator<BarrierInfo> i = list.iterator(); i.hasNext();){
 				BarrierInfo bar = i.next();
-				if(traceOn)System.out.println("bar = " + bar.getID());
+				if(traceOn)System.out.println("bar = " + bar.getID()); //$NON-NLS-1$
 				for(Iterator<BarrierInfo> ii = bar.getMatchingSet().iterator(); ii.hasNext();){
 					BarrierInfo matchedBar = ii.next();
-					if(traceOn)System.out.println("matchedBar = " + matchedBar.getID());
+					if(traceOn)System.out.println("matchedBar = " + matchedBar.getID()); //$NON-NLS-1$
 					if(!matchedBar.getMatchingSet().contains(bar)){
-						if(traceOn)System.out.println("bar = " + bar.getID() + ", matchedBar = " + matchedBar.getID());
+						if(traceOn)System.out.println("bar = " + bar.getID() + ", matchedBar = " + matchedBar.getID()); //$NON-NLS-1$ //$NON-NLS-2$
 						matchedBar.getMatchingSet().add(bar);
 					}
 				}
@@ -814,13 +815,13 @@ public class MPIBarrierMatching {
 			List<BarrierInfo> list = e.nextElement();
 			for(Iterator<BarrierInfo> i = list.iterator(); i.hasNext();){
 				BarrierInfo bar = i.next();
-				if(traceOn)System.out.print("Barrier " + bar.getID() + " matches to : ");
+				if(traceOn)System.out.print("Barrier " + bar.getID() + " matches to : "); //$NON-NLS-1$ //$NON-NLS-2$
 				for(Iterator<BarrierInfo> ii = bar.getMatchingSet().iterator(); ii.hasNext();){
 					BarrierInfo matchedBar = ii.next();
-					if(traceOn)System.out.print(matchedBar.getID() + ", ");
+					if(traceOn)System.out.print(matchedBar.getID() + ", "); //$NON-NLS-1$
 				}
 			}		
-			if(traceOn)System.out.println(" ");
+			if(traceOn)System.out.println(" "); //$NON-NLS-1$
 		}
 	}
 }

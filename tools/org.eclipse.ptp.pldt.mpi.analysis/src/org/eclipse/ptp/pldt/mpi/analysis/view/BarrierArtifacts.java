@@ -44,7 +44,7 @@ public class BarrierArtifacts {
 			wsResource.deleteMarkers(markerID, false, depth);
 
         } catch (CoreException e) {
-            System.out.println("RM: exception deleting markers.");
+            System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
             e.printStackTrace();
         }
         
@@ -57,7 +57,7 @@ public class BarrierArtifacts {
 				SourceInfo sourceInfo = bar.getSourceInfo();
 				ArtifactWithParent awp = new ArtifactWithParent(node.getFileName(), 
 						sourceInfo.getStartingLine(), 1, node.getFuncName(), 
-						"Artifact Call", sourceInfo, 0, 0, "",
+						"Artifact Call", sourceInfo, 0, 0, "", //$NON-NLS-1$ //$NON-NLS-2$
 						bar.getID()-4);
 				scanReturn_.addArtifact(awp);
 			}

@@ -14,6 +14,7 @@ package org.eclipse.ptp.pldt.mpi.analysis.view;
 //import org.eclipse.ptp.pldt.common.views.SimpleTreeTableMarkerView;
 import org.eclipse.ptp.pldt.mpi.analysis.Activator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
 
 /**
@@ -24,7 +25,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 public class MPIBarrierMatchingSetView extends SimpleTreeTableMarkerView {
 	public MPIBarrierMatchingSetView() {
 
-		super(Activator.getDefault(), "FunctionName", "Matching Set Artifacts", 
-				"IndexNum", IDs.matchingSetMarkerID /*,  common ver needs:"parent"*/ );
+		super(Activator.getDefault(), "FunctionName", Messages.MPIBarrierMatchingSetView_matchingSetArtifacts,  //$NON-NLS-1$
+				Messages.MPIBarrierMatchingSetView_indexNum, IDs.matchingSetMarkerID /*,  common ver needs:"parent"*/ );
 	}
 }

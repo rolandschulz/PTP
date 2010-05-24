@@ -20,11 +20,12 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.mpi.analysis.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.BarrierTable.BarrierInfo;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierMatching.ErrorMessage;
 import org.eclipse.ptp.pldt.mpi.analysis.analysis.MPIBarrierMatching.PathNode;
+import org.eclipse.ptp.pldt.mpi.analysis.messages.Messages;
 
 /**
  * For the list of ErrorMessage objects given to this class,
@@ -52,7 +53,7 @@ public class ShowErrors {
 			wsResource.deleteMarkers(IDs.errorMarkerID, false, depth);
 
         } catch (CoreException e) {
-            System.out.println("RM: exception deleting markers.");
+            System.out.println("RM: exception deleting markers."); //$NON-NLS-1$
             e.printStackTrace();
         }
 		
@@ -76,7 +77,7 @@ public class ShowErrors {
 			SourceInfo sourceInfo = err.getSourceInfo();
 			ArtifactWithParent ea = new ArtifactWithParent(fileName, 
 					sourceInfo.getStartingLine(), 1, 
-					funcName, "Erroneous Condition", sourceInfo, 0, condID, "Error", 0);
+					funcName, "Erroneous Condition", sourceInfo, 0, condID, "Error", 0); //$NON-NLS-1$ //$NON-NLS-2$
 			sr.addArtifact(ea);
         	visitor.visitFile(err.getResource(), sr.getArtifactList());
         	
@@ -86,14 +87,14 @@ public class ShowErrors {
         	String path1name = (String)null;
         	if(err.getLength1() == -1){
         		if(err.getPath2() != null)
-        			path1name = "Path 1 (dynamic number of barriers)";
+        			path1name = Messages.ShowErrors_path1DynamicNumberOfBarriers;
         		else
-        			path1name = "Loop (dynamic number of barriers)";
+        			path1name = Messages.ShowErrors_loopDynamicNumberOfBarriers;
         	} else {
-        		path1name = "Path 1 (" + err.getLength1() + " barrier(s))";
+        		path1name = Messages.ShowErrors_path1 + err.getLength1() + Messages.ShowErrors_barriers;
         	}
         	sr = new ScanReturn();
-        	ea = new ArtifactWithParent("", 0, 0, "", "Counter Example",
+        	ea = new ArtifactWithParent("", 0, 0, "", Messages.ShowErrors_counterExample, //$NON-NLS-1$ //$NON-NLS-2$
         			err.getPath1SourceInfo(), condID, path1ID, path1name, 0);
         	sr.addArtifact(ea);
         	
@@ -103,11 +104,11 @@ public class ShowErrors {
 	    		path2ID = counter;
 	           	String path2name = (String)null;
 	        	if(err.getLength2() == -1){
-	        		path2name = "Path 2 (dynamic number of barriers)";
+	        		path2name = Messages.ShowErrors_path2dynamicNumberOfBarriers;
 	        	} else {
-	        		path2name = "Path 2 (" + err.getLength2() + " barrier(s))";
+	        		path2name = Messages.ShowErrors_path2 + err.getLength2() + Messages.ShowErrors_barriers;
 	        	}
-	    		ea = new ArtifactWithParent("", 0, 0, "", "Counter Example",
+	    		ea = new ArtifactWithParent("", 0, 0, "", "Counter Example", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	    				err.getPath2SourceInfo(), condID, path2ID, path2name, 0);
 	    		sr.addArtifact(ea);
 	        	}
@@ -126,12 +127,12 @@ public class ShowErrors {
 	        	// BRT Note! This is where the barrier matching set labels are.
 	        	// Consider changing the parent node to "Barrier Set"
 	        	if(pn.isRepeat())
-	        		barrierName = "Barrier " + (barrier.getID() -4) + "(*)";
+	        		barrierName = Messages.ShowErrors_barrier_ + (barrier.getID() -4) + "(*)"; //$NON-NLS-2$ //$NON-NLS-1$
 	        	else
-	        		barrierName = "Barrier " + (barrier.getID() -4);
+	        		barrierName = Messages.ShowErrors_barrier_ + (barrier.getID() -4);
 	        	ArtifactWithParent a = new ArtifactWithParent(fileName,
 	        			sourceInfo.getStartingLine(), 1, funcName, 
-	        			"Barrier", sourceInfo, path1ID, counter, barrierName, 
+	        			Messages.ShowErrors_barrier, sourceInfo, path1ID, counter, barrierName, 
 	        			barrier.getID()-4);
 	        	sr.addArtifact(a);
 	        	visitor.visitFile(barrier.getResource(), sr.getArtifactList());
@@ -148,12 +149,12 @@ public class ShowErrors {
 	        	funcName = barrier.getEnclosingFunc();
 	        	String barrierName = (String)null;
 	        	if(pn.isRepeat())
-	        		barrierName = "Barrier " + (barrier.getID() -4) + "(*)";
+	        		barrierName = Messages.ShowErrors_barrier_ + (barrier.getID() -4) + "(*)"; //$NON-NLS-2$ //$NON-NLS-1$
 	        	else
-	        		barrierName = "Barrier " + (barrier.getID() -4);
+	        		barrierName = Messages.ShowErrors_barrier_ + (barrier.getID() -4);
 	        	ArtifactWithParent a = new ArtifactWithParent(fileName,
 	        			sourceInfo.getStartingLine(), 1, funcName,
-	        			"Barrier", sourceInfo, path2ID, counter, barrierName,
+	        			Messages.ShowErrors_barrier, sourceInfo, path2ID, counter, barrierName,
 	        			barrier.getID()-4);
 	        	sr.addArtifact(a);
 	        	visitor.visitFile(barrier.getResource(), sr.getArtifactList());
@@ -161,9 +162,9 @@ public class ShowErrors {
 		}
 
         // Done creating markers, now show the views
-        ViewActivater.activateView(IDs.matchingSetViewID);
+        ViewActivator.activateView(IDs.matchingSetViewID);
         if(errors_.size()>0) {
-        	ViewActivater.activateView(IDs.errorViewID);
+        	ViewActivator.activateView(IDs.errorViewID);
         	foundErrors=true;
         }
         return foundErrors;

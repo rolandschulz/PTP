@@ -18,26 +18,26 @@ package org.eclipse.ptp.pldt.mpi.analysis;
  *
  */
 public class IDs {
-	public static final String barrierMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierMarker";
+	public static final String barrierMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierMarker"; //$NON-NLS-1$
 
 	/**
 	 * The marker id for barrier matching sets
 	 */
-	public static final String matchingSetMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierMatchingSetMarker";
+	public static final String matchingSetMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.mpiBarrierMatchingSetMarker"; //$NON-NLS-1$
 	
-    public static final String matchingSetViewID="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierMatchingSetTableView";
-    public static final String errorViewID =     "org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView";
-    public static final String barrierViewID="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierTableView";
+    public static final String matchingSetViewID="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierMatchingSetTableView"; //$NON-NLS-1$
+    public static final String errorViewID =     "org.eclipse.ptp.pldt.mpi.analysis.view.MPIErrorView"; //$NON-NLS-1$
+    public static final String barrierViewID="org.eclipse.ptp.pldt.mpi.analysis.view.MPIBarrierTableView"; //$NON-NLS-1$
     
     /* For error counter examples */
-    public static final String errorMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.errorMarker";
+    public static final String errorMarkerID = "org.eclipse.ptp.pldt.mpi.analysis.errorMarker"; //$NON-NLS-1$
 	/**
 	 * The marker attribute name for a parent node.
 	 * All markers with the same parent value may be considered children of the same parent.
 	 *  
 	 */
-    public static final String parentIDAttr = "parentID";
-    public static final String myIDAttr = "myID";
-    public static final String myNameAttr = "myName";
-    public static final String myIndexAttr = "myIndex";   
+    public static final String parentIDAttr = "parentID"; //$NON-NLS-1$
+    public static final String myIDAttr = "myID"; //$NON-NLS-1$
+    public static final String myNameAttr = "myName"; //$NON-NLS-1$
+    public static final String myIndexAttr = "myIndex";    //$NON-NLS-1$
 }

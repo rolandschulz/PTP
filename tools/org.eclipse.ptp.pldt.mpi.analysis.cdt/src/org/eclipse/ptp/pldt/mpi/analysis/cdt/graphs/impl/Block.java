@@ -225,23 +225,23 @@ public class Block implements IBlock {
 	}
 	public String toString(){
 		StringBuffer buf = new StringBuffer();
-		buf.append("Block " + id + ": ");
+		buf.append("Block " + id + ": "); //$NON-NLS-1$ //$NON-NLS-2$
 		IASTNode content = getContent();
 		if(content != null) {
 			String type=content.toString(); // a.b.c.Name@abcd
 			type = type.substring(type.lastIndexOf('.')+1);  // Name@abcd
 			type=type.substring(0,type.indexOf('@'));
-			buf.append("  "+type+"  "+content.getRawSignature()+"\n");
+			buf.append("  "+type+"  "+content.getRawSignature()+"\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		else {
-			buf.append("  Empty block");
-			buf.append("\n");
+			buf.append("  Empty block"); //$NON-NLS-1$
+			buf.append("\n"); //$NON-NLS-1$
 		}
-		buf.append("  flows to: ");
+		buf.append("  flows to: "); //$NON-NLS-1$
 		for(Iterator<IBlock> i = succs_.iterator(); i.hasNext();){
-			buf.append(i.next().getID() + ", ");
+			buf.append(i.next().getID() + ", "); //$NON-NLS-1$
 		}
-		buf.append(" \n");
+		buf.append(" \n"); //$NON-NLS-1$
 		/*
 		System.out.print("Dominator: ");
 		for(Iterator i = DOM_.iterator(); i.hasNext();){

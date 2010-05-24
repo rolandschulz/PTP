@@ -168,7 +168,7 @@ public class MPIControlFlowGraph extends ControlFlowGraph{
 		
 		public int visit(IASTStatement stmt){
 			if(stmt instanceof IASTBreakStatement){
-				if(traceOn) System.out.println("BreakStatement");
+				if(traceOn) System.out.println("BreakStatement"); //$NON-NLS-1$
 				IASTNode parent = stmt.getParent();
 				List<IASTIfStatement> branches = new ArrayList<IASTIfStatement>();
 				while(true){
@@ -216,7 +216,7 @@ public class MPIControlFlowGraph extends ControlFlowGraph{
 			} 
 			else if(stmt instanceof IASTCaseStatement || 
 					stmt instanceof IASTDefaultStatement){
-				if(traceOn) System.out.println("CaseStatement or DefaultStatement");
+				if(traceOn) System.out.println("CaseStatement or DefaultStatement"); //$NON-NLS-1$
 				IASTNode parent = stmt.getParent();
 				while(true){
 					if(parent instanceof IASTSwitchStatement) break;
@@ -232,7 +232,7 @@ public class MPIControlFlowGraph extends ControlFlowGraph{
 				}
 			} 
 			else if(stmt instanceof IASTContinueStatement){
-				if(traceOn) System.out.println("ContinueStatement");
+				if(traceOn) System.out.println("ContinueStatement"); //$NON-NLS-1$
 				IASTNode parent = stmt.getParent();
 				List<IASTIfStatement> branches = new ArrayList<IASTIfStatement>();
 				while(true){
@@ -259,7 +259,7 @@ public class MPIControlFlowGraph extends ControlFlowGraph{
 				}
 			} 
 			else if(stmt instanceof IASTDoStatement){
-				if(traceOn) System.out.println("DoStatement");
+				if(traceOn) System.out.println("DoStatement"); //$NON-NLS-1$
 				IASTDoStatement doStmt = (IASTDoStatement)stmt;
 				MPIBlock cond = (MPIBlock)getBlock(doStmt.getCondition(), stmt);
 				if(doStmt.getBody() != null){
@@ -268,27 +268,27 @@ public class MPIControlFlowGraph extends ControlFlowGraph{
 				}
 			} 
 			else if(stmt instanceof IASTForStatement){
-				if(traceOn) System.out.println("ForStatement");
+				if(traceOn) System.out.println("ForStatement"); //$NON-NLS-1$
 				IASTForStatement forStmt = (IASTForStatement)stmt;
 				MPIBlock cond = (MPIBlock)getBlock(forStmt.getConditionExpression(), stmt);
 				PhiEdge(cond, cond);
 				
 			} 
 			else if(stmt instanceof IASTIfStatement){
-				if(traceOn) System.out.println("IfStatement");
+				if(traceOn) System.out.println("IfStatement"); //$NON-NLS-1$
 				IASTIfStatement ifStmt = (IASTIfStatement)stmt;
 				MPIBlock condb = (MPIBlock)getBlock(ifStmt.getConditionExpression(), stmt);
 				MPIBlock join = (MPIBlock)getBlock(null, stmt, Block.exit_join_type);
 				PhiEdge(condb, join);
 			} 
 			else if(stmt instanceof IASTReturnStatement){
-				if(traceOn) System.out.println("ReturnStatement");
+				if(traceOn) System.out.println("ReturnStatement"); //$NON-NLS-1$
 				IASTReturnStatement rtStmt = (IASTReturnStatement)stmt;
 				MPIBlock rv = (MPIBlock)getBlock(rtStmt.getReturnValue(), stmt);
 				returnBlocks_.add(rv);
 			} 
 			else if(stmt instanceof IASTWhileStatement){
-				if(traceOn) System.out.println("WhileStatement");
+				if(traceOn) System.out.println("WhileStatement"); //$NON-NLS-1$
 				IASTWhileStatement whStmt = (IASTWhileStatement)stmt;
 				MPIBlock cond = (MPIBlock)getBlock(whStmt.getCondition(), stmt);
 				PhiEdge(cond, cond);

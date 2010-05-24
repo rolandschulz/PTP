@@ -177,7 +177,7 @@ public class UseDefBuilder extends ASTVisitor{
 				}
 			}
 			else if(init instanceof ICASTDesignatedInitializer){
-				System.out.println("ICASTDesignatedInitializer found !");
+				System.out.println("ICASTDesignatedInitializer found !"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -299,7 +299,7 @@ public class UseDefBuilder extends ASTVisitor{
 			IASTIdExpression id = (IASTIdExpression)expr;
 			IASTName name = id.getName();
 			String var = name.toString();
-			if(var.startsWith("MPI_")) return;
+			if(var.startsWith("MPI_")) return; //$NON-NLS-1$
 			if(side == rhs){
 				if(!use_.contains(var)) 
 					use_.add(var);

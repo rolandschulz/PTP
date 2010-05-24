@@ -95,8 +95,8 @@ public class MPISSA {
 					if(df.hasAlready < iterCount){
 						if(df.getCond() == null && df != cfg_.getExit()){ 
 							//no associated condition?
-							System.out.println("Error: phi Node has no condition!" + 
-									currentFunc_.getFuncName() + " Block " + df.getID());
+							System.out.println("Error: phi Node has no condition!" +  //$NON-NLS-1$
+									currentFunc_.getFuncName() + " Block " + df.getID()); //$NON-NLS-1$
 							//return;
 						}
 						df.setPhi();
@@ -131,7 +131,7 @@ public class MPISSA {
 	protected void updateDefTable(IBlock block, String var){
 		List<IBlock> list = defTable_.get(var);
 		if(list == null){
-			System.out.print("Error in SSA!");
+			System.out.print("Error in SSA!"); //$NON-NLS-1$
 			return;
 		}
 		if(!list.contains(block))
