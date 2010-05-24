@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="parser" name="%extension-point.name" schema="schema/feedback.exsd"/>
-   <extension-point id="action" name="Feedback Action" schema="schema/action.exsd"/>
+   <extension-point id="action" name="%extension-point.name.0" schema="schema/action.exsd"/>
 
    <extension
          point="org.eclipse.help.contexts">
