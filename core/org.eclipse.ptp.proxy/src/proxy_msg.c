@@ -39,6 +39,7 @@ extern int digittoint(int c);
 
 #define ARG_SIZE	100
 
+static int proxy_flow_control = 0;
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 /*
@@ -435,3 +436,19 @@ proxy_process_msgs(List *msg_list, void (*callback)(proxy_msg *, void *), void *
 	}
 }
 
+/*
+ * Set flag indicating if proxy flow control is active
+ */
+void
+proxy_set_flow_control(int flag)
+{
+        proxy_flow_control = flag;
+}
+
+/*
+ * Return flag indicating if proxy flow control is active
+ */
+int proxy_flow_control_active()
+{
+	return proxy_flow_control;
+}
