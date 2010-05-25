@@ -34,7 +34,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.CModelUtil;
@@ -56,7 +56,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 		IIndex index= CCorePlugin.getIndexManager().getIndex(projects);
 		index.acquireReadLock();
 		try {
-			String path = FileSystemUtilityManager.getDefault().getPathFromURI(callee.getLocationURI());
+			String path = EFSExtensionManager.getDefault().getPathFromURI(callee.getLocationURI());
 			IBinding calleeBinding= IndexQueries.elementToBinding(index, callee, path);
 			findCalledBy(index, calleeBinding, callee.getCProject(), result);
 			return result;
@@ -127,7 +127,7 @@ public class LocalCallHierarchyService extends AbstractCallHierarchyService {
 				try {
 					final LocalCProjectFactory projectFactory = new LocalCProjectFactory();
 					if (needToFindDefinition(input)) {
-						String path = FileSystemUtilityManager.getDefault().getPathFromURI(input.getLocationURI());
+						String path = EFSExtensionManager.getDefault().getPathFromURI(input.getLocationURI());
 						IBinding binding= IndexQueries.elementToBinding(index, input, path);
 						if (binding != null) {
 							ICElement[] result= IndexQueries.findAllDefinitions(index, binding, null, project, projectFactory);

@@ -30,7 +30,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IParent;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.parser.ParserMessages;
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -590,7 +590,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 	
 	protected String convertURIToRemotePath(URI locationURI) {
-		String path = FileSystemUtilityManager.getDefault().getPathFromURI(locationURI);
+		String path = EFSExtensionManager.getDefault().getPathFromURI(locationURI);
 		return path;
 	}
 
@@ -659,7 +659,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	
 	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart, int selectionLength, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.9"), 100); //$NON-NLS-1$
-		String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] {scope, unit, path, selectedText, selectionStart, selectionLength}, monitor);
 		if(result == null)
 			return OpenDeclarationResult.failureUnexpectedError();
@@ -672,7 +672,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 
 	public CalledByResult getCallers(Scope scope, ICElement subject, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.5") + subject, 100); //$NON-NLS-1$
-    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(subject.getLocationURI());
+    	String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLERS, new Object[] { scope, getHostName(), subject, path }, null);
 		if (result == null) {
 			return new CalledByResult();
@@ -685,7 +685,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	 */
 	public CallsToResult getCallees(Scope scope, ICElement subject, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.6") + subject, 100); //$NON-NLS-1$
-    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(subject.getLocationURI());
+    	String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLS, new Object[] { scope, getHostName(), subject, path }, null);
 		if (result == null) {
 			return new CallsToResult();
@@ -698,7 +698,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	 */
 	public ICElement[] getCHDefinitions(Scope scope, ICElement subject, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
-    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(subject.getLocationURI());
+    	String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, new Object[] { scope, getHostName(), subject, path }, null);
 		if (result == null) {
 			return new ICElement[0];
@@ -708,7 +708,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	
 	public ICElement[] getCHDefinitions(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength, IProgressMonitor monitor) {
     	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + unit, 100); //$NON-NLS-1$
-    	String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+    	String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, new Object[] { scope, getHostName(), unit, path, selectionStart, selectionLength }, null);
 		if (result == null) {
 			return new ICElement[0];
@@ -729,7 +729,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	@SuppressWarnings("unchecked")
 	public List<Proposal> computeCompletionProposals(Scope scope, RemoteContentAssistInvocationContext context, ITranslationUnit unit) {
 		checkAllProjects(new NullProgressMonitor());
-		String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
 		DataStore dataStore = getDataStore(null);
 	    if (dataStore == null)
 	    {
@@ -793,7 +793,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 	
 	public THGraph computeTypeGraph(Scope scope, ICElement input, IProgressMonitor monitor) {
-		String path = FileSystemUtilityManager.getDefault().getPathFromURI(input.getLocationURI());
+		String path = EFSExtensionManager.getDefault().getPathFromURI(input.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH, new Object[] { scope, getHostName(), input, path }, monitor);
 		if (result == null) {
 			return new THGraph();
@@ -802,7 +802,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 	
 	public ICElement[] findTypeHierarchyInput(Scope scope, ICElement memberInput) {
-		String path = FileSystemUtilityManager.getDefault().getPathFromURI(memberInput.getLocationURI());
+		String path = EFSExtensionManager.getDefault().getPathFromURI(memberInput.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT1, new Object[] { scope, getHostName(), memberInput, path }, null);
 		if (result == null) {
 			return new ICElement[] { null, null };
@@ -811,7 +811,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 	}
 	
 	public ICElement[] findTypeHierarchyInput(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength) {
-		String path = FileSystemUtilityManager.getDefault().getPathFromURI(unit.getLocationURI());
+		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getHostName(), unit, path, new Integer(selectionStart), new Integer(selectionLength)}, null);
 		if (result == null) {
 			return new ICElement[] { null, null };

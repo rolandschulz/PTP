@@ -18,7 +18,7 @@ import org.eclipse.cdt.make.core.scannerconfig.IExternalScannerInfoProvider;
 import org.eclipse.cdt.make.core.scannerconfig.IScannerConfigBuilderInfo2;
 import org.eclipse.cdt.managedbuilder.xlc.ui.XLCUIPlugin;
 import org.eclipse.cdt.managedbuilder.xlc.ui.preferences.PreferenceConstants;
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -82,7 +82,7 @@ public class RemoteXLCSpecsRunSIProvider extends RemoteSpecsRunSIProvider implem
 			return null;
 		}
 		
-		String specsFilePath = FileSystemUtilityManager.getDefault().getPathFromURI(specsFilestore.toURI());
+		String specsFilePath = EFSExtensionManager.getDefault().getPathFromURI(specsFilestore.toURI());
 		args = args.replace(SPECS_FILE_PATH_VAR, specsFilePath);
 		
 		List<String> command = new ArrayList<String>();
