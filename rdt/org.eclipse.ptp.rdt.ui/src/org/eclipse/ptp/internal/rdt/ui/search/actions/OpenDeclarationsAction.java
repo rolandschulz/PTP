@@ -38,7 +38,7 @@ import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.text.CWordFinder;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -178,7 +178,7 @@ public class OpenDeclarationsAction extends SelectionParseAction {
 	 * Replaces the path portion of the given URI.
 	 */
 	private URI replacePath(URI u, String path) {
-		return FileSystemUtilityManager.getDefault().replacePath(u, path);
+		return EFSExtensionManager.getDefault().createNewURIFromPath(u, path);
 	}
 	
 	

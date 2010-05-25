@@ -14,7 +14,7 @@ package org.eclipse.ptp.internal.rdt.core.model;
 import java.io.Serializable;
 import java.net.URI;
 
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.resources.IProject;
 
 /**
@@ -59,7 +59,7 @@ public class Scope implements Serializable {
 	 * @throws NullPointerException if project is null
 	 */
 	public Scope(IProject project) {
-		FileSystemUtilityManager fsUtilityManager = FileSystemUtilityManager.getDefault();
+		EFSExtensionManager fsUtilityManager = EFSExtensionManager.getDefault();
 		URI locationURI = project.getLocationURI();
 		
 		fName = project.getName();
@@ -67,7 +67,7 @@ public class Scope implements Serializable {
 		fMappedPath = fsUtilityManager.getMappedPath(locationURI);
 		fRootPath = fsUtilityManager.getPathFromURI(locationURI);
 		
-		URI managedURI = fsUtilityManager.getManagedURI(locationURI); 
+		URI managedURI = fsUtilityManager.getLinkedURI(locationURI); 
 		fHost = managedURI == null ? locationURI.getHost() : managedURI.getHost();
 	}
 	
