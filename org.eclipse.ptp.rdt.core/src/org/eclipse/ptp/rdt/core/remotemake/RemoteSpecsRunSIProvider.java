@@ -24,7 +24,7 @@ import org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerConfigUtil
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.macros.BuildMacroException;
 import org.eclipse.cdt.managedbuilder.macros.IBuildMacroProvider;
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -89,7 +89,7 @@ public class RemoteSpecsRunSIProvider extends RemoteRunSIProvider {
 			return null;
 		}
 
-		String specsFilePath = FileSystemUtilityManager.getDefault().getPathFromURI(specsFilestore.toURI());
+		String specsFilePath = EFSExtensionManager.getDefault().getPathFromURI(specsFilestore.toURI());
 		args = args.replace(SPECS_FILE_PATH_VAR, specsFilePath);
 
 		List<String> command = new ArrayList<String>();
@@ -210,15 +210,13 @@ public class RemoteSpecsRunSIProvider extends RemoteRunSIProvider {
 				} catch (RemoteConnectionException e) {
 					RDTLog.logError(e);
 				}
-
-			// get the CWD
-			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, ""); //$NON-NLS-1$
-			IFileStore workingDir = processBuilder.directory();
-
-			// TODO: this will have to change when the filesystem utility stuff
-			// is checked in
-			IPath path = new Path(FileSystemUtilityManager.getDefault().getPathFromURI(workingDir.toURI()));
-			return path;
+			
+		// get the CWD
+		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, ""); //$NON-NLS-1$
+		IFileStore workingDir = processBuilder.directory();
+		
+		IPath path = new Path(EFSExtensionManager.getDefault().getPathFromURI(workingDir.toURI()));
+		return path;
 		}
 		return null;
 	}

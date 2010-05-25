@@ -43,7 +43,7 @@ import org.eclipse.cdt.core.parser.IncludeFileContentProvider;
 import org.eclipse.cdt.internal.core.index.IndexBasedFileContentProvider;
 import org.eclipse.cdt.internal.core.model.IBufferFactory;
 import org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver;
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,6 +54,10 @@ import org.eclipse.ptp.internal.rdt.core.miners.CDTMiner;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteLanguageMapper;
 import org.eclipse.ptp.rdt.core.IConfigurableLanguage;
 
+/**
+ * @author crecoskie
+ *
+ */
 public class TranslationUnit extends Parent implements ITranslationUnit {
 	private static final long serialVersionUID = 1L;
 
@@ -103,7 +107,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		else {
 			// we are adapting a local TU to a remote TU
 			// we need to get a hold of the managed URI
-			URI managedURI = FileSystemUtilityManager.getDefault().getManagedURI(element.getLocationURI());
+			URI managedURI = EFSExtensionManager.getDefault().getLinkedURI(element.getLocationURI());
 			setManagedLocation(managedURI);
 		}
 		
@@ -115,7 +119,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		else {
 			// we are adapting a local TU to a remote TU
 			// we need to get a hold of the mapped path
-			String remotePath = FileSystemUtilityManager.getDefault().getPathFromURI(element.getLocationURI());
+			String remotePath = EFSExtensionManager.getDefault().getPathFromURI(element.getLocationURI());
 			setRemotePath(remotePath);
 		}
 		
@@ -207,7 +211,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			return null;
 		}
 		
-		FileContent fileContent= FileContent.create(this);
+		FileContent fileContent= FileContent.create(getPathForASTFileLocation(), getContents());
 		if (fileContent != null) {
 			ILanguage language= getLanguage();
 			if (language != null) {
@@ -277,7 +281,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 			return null;
 		}
 		
-		FileContent fileContent= FileContent.create(this);
+		FileContent fileContent= FileContent.create(getPathForASTFileLocation(), getContents());
 		
 		ILanguage language= getLanguage();
 		if (language != null) {
@@ -585,7 +589,13 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		return true;
 	}
 
-	public String getPathForFileContent() {
-		return getRemotePath();
+
+	private String getPathForASTFileLocation() {
+		String pathString = getRemotePath();
+		if(pathString == null) {
+			pathString = getLocation().toOSString();
+		}
+		
+		return pathString;	
 	}
 }

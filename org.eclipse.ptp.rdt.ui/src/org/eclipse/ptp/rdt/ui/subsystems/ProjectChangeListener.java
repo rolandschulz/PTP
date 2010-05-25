@@ -12,7 +12,7 @@ package org.eclipse.ptp.rdt.ui.subsystems;
 
 import java.net.URI;
 
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
