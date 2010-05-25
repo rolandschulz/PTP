@@ -128,11 +128,7 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 			if(filename.endsWith(".c")){ //$NON-NLS-1$
 				if (traceOn)
 					System.out.println("resourceCollector on c file: " + file.getName()); //$NON-NLS-1$
-				MPIResourceCollector rc = new MPIResourceCollector(callGraph_, file); // BRT
-																						// why
-																						// 'new'
-																						// each
-																						// time?
+				MPIResourceCollector rc = new MPIResourceCollector(callGraph_, file); // BRT why  'new'  each time?
 				rc.run();
 			}
 			return true;
