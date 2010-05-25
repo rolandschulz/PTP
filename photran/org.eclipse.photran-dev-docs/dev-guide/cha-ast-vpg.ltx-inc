@@ -30,15 +30,15 @@ Clicking on a \texttt{Token} in the Outline view will move the cursor
 to that construct's position in the source file.
 
 Figure~\ref{fig:simple_fortran_ast} is an example of this display.
-(It is explained further in Section~{sec:asts}.)
+(It is explained further in Section~\ref{sec:asts}.)
 
 \subsection{Visually Resolving Bindings}
 
 Each use of an identifier in a Fortran program corresponds to a declaration.
 For example, the use of the variable \textit{count} in \texttt{print *, count}
-might correspond to a declaration like \texttt{integer :: count}.  We say that
-the use of the identifier is \textit{bound} to its declaration, and determining
-the declaration that corresponds to a particular use is called \textit{resolving}
+might correspond to a declaration like \texttt{integer~::~count}.  We say that
+the use of the identifier is \textbf{bound} to its declaration, and determining
+the declaration that corresponds to a particular use is called \textbf{resolving}
 the name binding.
 
 To visualize what declaration a particular variable use is bound to,
@@ -53,7 +53,7 @@ in a different file, an editor will be opened on that file.
 
 Every declaration in a Fortran program exists in a particular \textit{lexical
 scope.}  For example, if a subroutine definition includes a variable declaration
-like \texttt{integer :: i}, then that variable is only visible within the subroutine,
+like \texttt{integer~::~i}, then that variable is only visible within the subroutine,
 and that subroutine is its \textit{enclosing scope.}
 In the AST, the subroutine is represented by a \textit{ASTSubroutineSubprogramNode},
 a class which inherits from \textit{ScopingNode}, and it would an the ancestor of the
@@ -111,15 +111,14 @@ generates the AST shown in Figure~\ref{fig:simple_fortran_ast}.
 		\label{fig:simple_fortran_ast}
 \end{image}
 
-Fortunately, it is not necessary to know every specification in the grammar. For
+Fortunately, it is not necessary to know every construct in the grammar. For
 most refactoring and program analysis tasks, it is sufficient to rely on the
 information that the VPG provides (e.g., \textit{Definition} objects) and
-to construct a Visitor to visit \emph{only} the nodes of interest and
+to construct a Visitor to visit only the nodes of interest and
 ``collect'' the information that is required.
-
 To get a sense of what AST nodes are involved in the particular task you want to
 accomplish, we recommend enabling AST visualization (described above), writing
-some sample programs that exercise the relevant parts of the Fortran gramar, and
+some sample programs that exercise the relevant parts of the Fortran grammar, and
 then observing the AST that is displayed.
 
 \subsection{AST Structure for DO-Loops}
@@ -376,6 +375,14 @@ consider structuring their contributions as descendants of
 \texttt{FortranEditorActionDelegate}. However, if that
 approach is not feasible, then they should consider using
 \texttt{VPGSchedulingRule} before resorting to locking the entire workspace.
+
+\section{Common Tasks}
+
+In the org.eclipse.photran.internal.core.refactoring package, there is a class
+called \textit{\_AST\_VPG\_HOWTO} which contains several small ``snippets''
+illustrating how to perform common tasks with the AST/VPG.  This includes how
+to traverse the AST using a visitor, how to find nodes of a particular type,
+how to find all of the references to a particular name, etc.
 
 
 

@@ -198,19 +198,17 @@ to build the hierarchy.
 }
 
 \shabox{The CDT model should \textbf{not} be confused with the Abstract Syntax
-Tree (AST) model that is discussed in Section~\ref{sec:ast_structure}. They are
+Tree (AST) that is discussed in Chapter~\ref{cha:ast-vpg}. They are
 \textbf{not} identical. It is helpful to think of the CDT model as containing a
-\emph{partial/simplified view} of the AST model to represent the
-high-level/organizational elements in the source code (program units, subprogram
-declarations, etc.) \textbf{in addition} to a model of the current workspace
+\emph{partial/simplified view} of a program's structure (representing only the
+high-level/organizational elements in the source code: program units, subprogram
+declarations, etc.) \textbf{as well as} a model of the current workspace
 resources (Fortran projects, Fortran source files, binary executables). In
 other words, the CDT model knows about the resources and the organizational
 units in the source code. The AST,
-on the other hand, completely models \emph{everything} in the source file (but
-nothing about the resources), including low-level elements that the user is
-unlikely to be interested in knowing about (assignment nodes, variable
-declarations). While low-level, these elements are useful for refactoring and 
-program analysis.}
+on the other hand, completely models \emph{everything} in a single source ilfe---including
+low-level elements like individual statements and expressions---but knows
+nothing about projects, folders, etc.}
 
 By conforming to the CDT model, Photran is able to reuse various UI
 elements for \emph{free}. For instance, the Outline View for Photran is managed
