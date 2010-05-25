@@ -34,7 +34,7 @@ import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.cdt.utils.PathUtil;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -269,7 +269,7 @@ public class OpenIncludeAction extends
 			public String getText(Object element) {
 				if (element instanceof URI) {
 					URI uri= (URI)element;
-					String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(uri);
+					String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
 					IPath path = new Path(pathString);
 					return path.lastSegment() + " - "  + path.toString(); //$NON-NLS-1$
 				}

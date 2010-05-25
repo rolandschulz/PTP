@@ -12,7 +12,7 @@ package org.eclipse.ptp.rdt.ui.serviceproviders;
 
 import java.net.URI;
 
-import org.eclipse.cdt.utils.FileSystemUtilityManager;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -60,7 +60,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		if (homeDir != null) {
 			IFileStore homeStore = remoteServices.getFileManager(connection).getResource(homeDir);
 			URI uri = homeStore.toURI();
-			String pathString = FileSystemUtilityManager.getDefault().getPathFromURI(uri);
+			String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
 			IPath path = new Path(pathString);
 			path = path.append(RSEUtils.DEFAULT_CONFIG_DIR_NAME);
 			return path.toString();
