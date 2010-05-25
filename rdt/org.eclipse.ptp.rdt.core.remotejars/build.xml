@@ -43,16 +43,16 @@
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
-	<property name="cdtCoreVersion" value="5.2.0.201005211239"/>
+	<property name="cdtCoreVersion" value="5.2.0.201005241228"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 	
-	<property name="cdtLRParserVersion" value="5.1.0.201005211239"/>
+	<property name="cdtLRParserVersion" value="5.1.0.201005241228"/>
 	<property name="cdtLRParserJar" value="org.eclipse.cdt.core.lrparser_${cdtLRParserVersion}.jar"/>
 	
-	<property name="cdtUPCParserVersion" value="5.1.0.201005211239"/>
+	<property name="cdtUPCParserVersion" value="5.1.0.201005241228"/>
 	<property name="cdtUPCParserJar" value="org.eclipse.cdt.core.parser.upc_${cdtUPCParserVersion}.jar"/>
 	
-	<property name="cdtLRParserXLCVersion" value="1.0.0.201005211239"/>
+	<property name="cdtLRParserXLCVersion" value="1.0.0.201005241228"/>
 	<property name="cdtLRParserXLCJar" value="org.eclipse.cdt.core.lrparser.xlc_${cdtLRParserXLCVersion}.jar"/>
 	
 	<property name="rdtXLCPropertiesPath" value="${basedir}/../org.eclipse.ptp.rdt.xlc/properties"/>
@@ -67,8 +67,8 @@
 	
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
-	<property name="rseVersion" value="S-3.2RC1-201005200134"/>
-	<property name="dStoreBaseName" value="rseserver-3.2RC1"/>
+	<property name="rseVersion" value="S-3.2RC2-201005240701"/>
+	<property name="dStoreBaseName" value="rseserver-3.2RC2"/>
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
