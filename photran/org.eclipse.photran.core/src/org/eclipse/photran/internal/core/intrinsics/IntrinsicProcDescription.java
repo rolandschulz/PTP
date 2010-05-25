@@ -54,8 +54,19 @@ public final class IntrinsicProcDescription implements Comparable<IntrinsicProcD
     
     public String toString()
     {
-        return "! (Intrinsic Procedure) " + description + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-             + "! Usage: " + genericName + args + "\n";               //$NON-NLS-1$ //$NON-NLS-2$
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("! "); sb.append(description); sb.append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("!\n"); //$NON-NLS-1$
+        sb.append("! Usage: "); sb.append(genericName); sb.append(args); sb.append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+//        for (String form : getAllForms())
+//        {
+//            sb.append("!     "); sb.append(form); sb.append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+//        }
+        sb.append("!\n"); //$NON-NLS-1$
+        sb.append("INTRINSIC "); sb.append(genericName); sb.append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        return sb.toString();
     }
 
     /**

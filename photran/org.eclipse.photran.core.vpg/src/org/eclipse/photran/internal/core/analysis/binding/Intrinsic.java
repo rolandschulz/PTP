@@ -50,6 +50,18 @@ public class Intrinsic extends Definition
 //            return false;
 //        }
 
+    @Override
+    public String describe()
+    {
+        String canonicalizedName = PhotranVPG.canonicalizeIdentifier(declaredName);
+        
+        IntrinsicProcDescription proc = Intrinsics.get(canonicalizedName);
+        if (proc == null)
+            return "";
+        else
+            return proc.toString();
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // BINDING RESOLUTION
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

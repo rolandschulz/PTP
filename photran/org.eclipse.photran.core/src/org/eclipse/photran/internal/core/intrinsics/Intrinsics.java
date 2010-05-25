@@ -32,7 +32,18 @@ public class Intrinsics
     private Intrinsics() {;}
     
     private static TreeSet<IntrinsicProcDescription> intrinsicProcedures = null;
-    
+
+    public static IntrinsicProcDescription get(String identifier)
+    {
+        String target = identifier.toUpperCase();
+        
+        for (IntrinsicProcDescription proc : intrinsicProcedures)
+            if (proc.genericName.toUpperCase().equals(target))
+                return proc;
+        
+        return null;
+    }
+
     public static TreeSet<IntrinsicProcDescription> getAllIntrinsicProcedures()
     {
         if (intrinsicProcedures == null) loadData();
