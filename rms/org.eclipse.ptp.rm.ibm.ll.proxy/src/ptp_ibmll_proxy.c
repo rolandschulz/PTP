@@ -94,6 +94,12 @@ static int command_cancel_job(int gui_transmission_id, int nargs, char *args[]);
 static int command_terminate(int gui_transmission_id, int nargs, char *args[]);
 static int command_start_events(int gui_transmission_id, int nargs, char *args[]);
 static int command_halt_events(int gui_transmission_id, int nargs, char *args[]);
+static int command_suspend_events(int gui_transmission_id, int nargs, char *args[]);
+static int command_resume_events(int gui_transmission_id, int nargs, char *args[]);
+static int command_set_filters(int gui_transmission_id, int nargs, char *args[]);
+static int command_clear_filters(int gui_transmission_id, int nargs, char *args[]);
+static int command_get_attributes(int gui_transmission_id, int nargs, char *args[]);
+static int command_query_attributes(int gui_transmission_id, int nargs, char *args[]);
 static void print_message_args(int nargs, char *args[]);
 static void print_message(int type, const char *, ...); /* INFO, TRACE & WARNING to stdout, ERROR & FATAL to stderr */
 #define INFO_MESSAGE 0
@@ -269,7 +275,13 @@ static proxy_cmd ibmll_cmds[] = {
   command_start_events,
   command_halt_events,
   command_submit_job,
-  command_cancel_job
+  command_cancel_job,
+  command_suspend_events,
+  command_resume_events,
+  command_set_filters,
+  command_clear_filters,
+  command_get_attributes,
+  command_query_attributes
 };
 static proxy_commands command_tab = {
   0, sizeof(ibmll_cmds) / sizeof(proxy_cmd), ibmll_cmds
@@ -1075,6 +1087,36 @@ int command_terminate(int gui_transmission_id, int nargs, char *args[])
   pthread_mutex_unlock(&master_lock);
 }
 
+
+int command_suspend_events(int gui_transmission_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int command_resume_events(int gui_transmission_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int command_set_filters(int gui_transmission_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int command_clear_filters(int gui_transmission_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int command_get_attributes(int gui_transmission_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int command_query_attributes(int gui_transmission_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
 
 /************************************************************************* 
  * Service thread - Loop while allowed to monitor LoadLeveler for nodes  * 

@@ -232,6 +232,12 @@ static int PE_terminate_job(int trans_id, int nargs, char *args[]);
 static int PE_quit(int trans_id, int nargs, char *args[]);
 static int PE_start_events(int trans_id, int nargs, char *args[]);
 static int PE_halt_events(int trans_id, int nargs, char *args[]);
+static int PE_suspend_events(int trans_id, int nargs, char *args[]);
+static int PE_resume_events(int trans_id, int nargs, char *args[]);
+static int PE_set_filters(int trans_id, int nargs, char *args[]);
+static int PE_clear_filters(int trans_id, int nargs, char *args[]);
+static int PE_get_attributes(int trans_id, int nargs, char *args[]);
+static int PE_query_attributes(int trans_id, int nargs, char *args[]);
 static int shutdown_proxy(void);
 static void job_enqueue(jobinfo *, pid_t);
 static void post_error(int trans_id, int type, char *msg);
@@ -516,7 +522,8 @@ static void run_get_time(char *msg, struct timeval *base_time);
  * Be careful when adding or deleting commands
  */
 static proxy_cmd cmds[] = { PE_quit, PE_start_daemon, PE_define_model, PE_start_events, PE_halt_events, PE_submit_job,
-        PE_terminate_job };
+        PE_terminate_job, PE_suspend_events, PE_resume_events, PE_set_filters, PE_clear_filters,
+	PE_get_attributes, PE_query_attributes };
 static proxy_commands command_tab = { 0, sizeof cmds / sizeof(proxy_cmd), cmds };
 
 static char *mp_infolevel_labels[] = { "Error", "Warning", "Informational", "Diagnostic", "Diagnostic level 4",
@@ -530,47 +537,47 @@ static string_launch_attr string_launch_attrs[] = {
 /*
  * Attributes needed in both basic and advanced mode
  */
-{ "PE_STDIN_PATH", ATTR_ALWAYS_ALLOWED, "Stdin Path", "Specify path for stdin input file", "" }, { "PE_STDOUT_PATH",
-        ATTR_ALWAYS_ALLOWED, "Stdout Path", "Specify path for stdout output file", "" }, { "PE_STDERR_PATH",
-        ATTR_ALWAYS_ALLOWED, "Stderr Path", "Specify path for stderr output file", "" },
+{ "PE_STDIN_PATH", ATTR_ALWAYS_ALLOWED, "Stdin Path:", "Specify path for stdin input file", "" }, { "PE_STDOUT_PATH",
+        ATTR_ALWAYS_ALLOWED, "Stdout Path:", "Specify path for stdout output file", "" }, { "PE_STDERR_PATH",
+        ATTR_ALWAYS_ALLOWED, "Stderr Path:", "Specify path for stderr output file", "" },
 /*
  * I/O Related attributes
  */
-{ "MP_IONODEFILE", ATTR_ALWAYS_ALLOWED, "MPI I/O Node List",
+{ "MP_IONODEFILE", ATTR_ALWAYS_ALLOWED, "MPI I/O Node List:",
         "Specify file listing nodes performing parallel I/O (MP_IONODEFILE)", "" },
 /*
  * Diagnostic related attributes
  */
-{ "MP_PMDLOG_DIR", ATTR_ALWAYS_ALLOWED, "PMD Log Directory",
+{ "MP_PMDLOG_DIR", ATTR_ALWAYS_ALLOWED, "PMD Log Directory:",
         "Specify directory where PMD log is generated (MP_PMDLOG_DIR)", "" }, { "MP_PRIORITY_LOG_DIR", ATTR_FOR_AIX
-        | ATTR_FOR_ALL_PROXY, "Priority Log Directory",
+        | ATTR_FOR_ALL_PROXY, "Priority Log Directory:",
         "Specify directory containing co-scheduler log (MP_PRIORITY_LOG_DIR)", "/tmp" }, { "MP_PRIORITY_LOG_NAME",
-        ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Priority Log Name",
+        ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Priority Log Name:",
         "Specify name of co-scheduler log (MP_PRIORITY_LOG_NAME)", "pmadjpri.log" },
 /*
  * Debug related attributes
  */
-{ "MP_COREDIR", ATTR_ALWAYS_ALLOWED, "Corefile Directory",
+{ "MP_COREDIR", ATTR_ALWAYS_ALLOWED, "Corefile Directory:",
         "Specify directory for application's core files (MP_COREDIR)", "" }, { "MP_DEBUG_INITIAL_STOP", ATTR_FOR_AIX
-        | ATTR_FOR_ALL_PROXY, "Initial Breakpoint",
+        | ATTR_FOR_ALL_PROXY, "Initial Breakpoint:",
         "Initial breakpoint when debugging an application (MP_DEBUG_INITIAL_STOP)", "" }, { "MP_PROFDIR",
-        ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY, "GMON Directory",
+        ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY, "GMON Directory:",
         "Directory containing GMON profiling data files (GMON_PROFDIR)", "" },
 /*
  * System resource related  attributes
  */
-{ "MP_PRIORITY", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Dispatch Priority Class",
+{ "MP_PRIORITY", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Dispatch Priority Class:",
         "Specify priority class or high/low priority values (MP_PRIORITY)", "" },
 /*
  * Node allocation related attributes
  */
-{ "MP_CMDFILE", ATTR_ALWAYS_ALLOWED, "Command File", "Specify script to load nodes in partition (MP_CMDFILE)", "" }, {
-        "MP_HOSTFILE", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Host List File",
+{ "MP_CMDFILE", ATTR_ALWAYS_ALLOWED, "Command File:", "Specify script to load nodes in partition (MP_CMDFILE)", "" }, {
+        "MP_HOSTFILE", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Host List File:",
         "Specify name of host list file for node allocation (MP_HOSTFILE)", "" }, { "MP_REMOTEDIR", ATTR_FOR_AIX
         | ATTR_FOR_ALL_PROXY, "Specify name of script echoing current directory (MP_REMOTEDIR)", "" }, { "MP_LLFILE",
-        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Job Command File",
+        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Job Command File:",
         "Specify path of a LoadLeveler job command file used for node allocation (MP_LLFILE)", "" }, { "MP_RMPOOL",
-        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Resource Pool",
+        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Resource Pool:",
         "Name or number of resource pool to use for node allocation (MP_RMPOOL)", "" },
 /*
  * Performance related attributes
@@ -578,26 +585,26 @@ static string_launch_attr string_launch_attrs[] = {
 /*
  * Miscellaneous attributes
  */
-{ "MP_EUILIBPATH", ATTR_ALWAYS_ALLOWED, "Library Path",
+{ "MP_EUILIBPATH", ATTR_ALWAYS_ALLOWED, "Library Path:",
         "Specify path to message passing and communications libraries (MP_EUILIBPATH)", "" },
-        { "MP_CKPTFILE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Checkpoint File Name",
+        { "MP_CKPTFILE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Checkpoint File Name:",
                 "Base name of the chcekpoint file (MP_CKPTFILE)", "" }, { "MP_CKPTDIR", ATTR_FOR_AIX
-                | ATTR_FOR_ALL_PROXY, "Checkpoint Directory",
+                | ATTR_FOR_ALL_PROXY, "Checkpoint Directory:",
                 "Directory where the checkpoint file will reside (MP_CHPTDIR)", "" },
 
         /*
          * Alternate resource manager attributes
          */
-        { "MP_RMLIB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_STANDALONE, "Resource Manager Library",
+        { "MP_RMLIB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_STANDALONE, "Resource Manager Library:",
                 "Specify alternate resource manager library", "" }, /*
          * Other attributes
          */
-        { "PE_ENV_SCRIPT", ATTR_ALWAYS_ALLOWED, "Environment Setup Script", "Specify if using basic or advanced mode",
-                "" }, { "PE_ADVANCED_MODE", ATTR_ALWAYS_ALLOWED, "Advanced Mode",
+        { "PE_ENV_SCRIPT", ATTR_ALWAYS_ALLOWED, "Environment Setup Script:", "Specify if using basic or advanced mode",
+                "" }, { "PE_ADVANCED_MODE", ATTR_ALWAYS_ALLOWED, "Advanced Mode:",
                 "Specify name of PE environment variable setup script", "no" }, { "MP_SAVE_LLFILE", ATTR_FOR_ALL_OS
-                | ATTR_FOR_PE_WITH_LL, "Save Job Command File",
+                | ATTR_FOR_PE_WITH_LL, "Save Job Command File:",
                 "Specify path of generated LoadLeveler job command file (MP_SAVE_LLFILE)", "" }, { "MP_SAVEHOSTFILE",
-                ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Save Hostlist File",
+                ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Save Hostlist File:",
                 "Specify path of generated host list file (MP_SAVEHOSTFILE)", "" } };
 
 static enum_launch_attr
@@ -605,44 +612,44 @@ static enum_launch_attr
                 /*
                  * I/O tab related attributes
                  */
-                { "MP_DEVTYPE", ATTR_ALWAYS_ALLOWED, "Device Type Class",
+                { "MP_DEVTYPE", ATTR_ALWAYS_ALLOWED, "Device Type Class:",
                         "Specify that Infiniband interconnect is to be used (MP_DEVTYPE)", "", "|ib" },
-                { "MP_LABELIO", ATTR_ALWAYS_ALLOWED, "Label I/O",
+                { "MP_LABELIO", ATTR_ALWAYS_ALLOWED, "Label I/O:",
                         "Specify if application output is labeled by task id (MP_LABELIO)", "no", "yes|no" },
-                { "MP_IO_ERRLOG", ATTR_ALWAYS_ALLOWED, "Create I/O Error Log",
+                { "MP_IO_ERRLOG", ATTR_ALWAYS_ALLOWED, "Create I/O Error Log:",
                         "Specify if I/O error logging is enabled (MP_IO_ERRLOG)", "no", "yes|no" },
-                { "PE_SPLIT_STDOUT", ATTR_ALWAYS_ALLOWED, "Split STDOUT by Task",
+                { "PE_SPLIT_STDOUT", ATTR_ALWAYS_ALLOWED, "Split STDOUT by Task:",
                         "Specify if stdio output is split by task", "no", "yes|no" },
-                { "MP_STDINMODE", ATTR_ALWAYS_ALLOWED, "STDIN Mode",
+                { "MP_STDINMODE", ATTR_ALWAYS_ALLOWED, "STDIN Mode:",
                         "Specify how application's stdin is managed (MP_STDINMODE)", "all", "all|none" },
-                { "MP_STDOUTMODE", ATTR_ALWAYS_ALLOWED, "STDOUT Mode",
+                { "MP_STDOUTMODE", ATTR_ALWAYS_ALLOWED, "STDOUT Mode:",
                         "Specify how application's stdio output is handled (MP_STDOUTMODE)", "unordered",
                         "ordered|unordered" },
                 /*
                  * Diagnostic tab related attributes
                  */
-                { "MP_PMDLOG", ATTR_ALWAYS_ALLOWED, "Create PMD Log", "Specify if PE diagnostic messages are logged",
+                { "MP_PMDLOG", ATTR_ALWAYS_ALLOWED, "Create PMD Log:", "Specify if PE diagnostic messages are logged",
                         "no", "yes|no" },
-                { "MP_PRINTENV", ATTR_ALWAYS_ALLOWED, "Print Environment",
+                { "MP_PRINTENV", ATTR_ALWAYS_ALLOWED, "Print Environment:",
                         "Specify if PE environment variables are printed (MP_PRINTENV)", "no", "yes|no" },
-                { "MP_PRIORITY_LOG", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Log Co-scheduler Messages",
+                { "MP_PRIORITY_LOG", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Log Co-scheduler Messages:",
                         "Specify if messages are logged to co-scheduler log (MP_PRIORITY_LOG)", "yes", "yes|no" },
-                { "MP_INFOLEVEL", ATTR_ALWAYS_ALLOWED, "Message Level",
+                { "MP_INFOLEVEL", ATTR_ALWAYS_ALLOWED, "Message Level:",
                         "Specify level of PE message reporting (MP_INFOLEVEL)", "Warning",
                         "Error|Warning|Informational|Diagnostic|Diagnostic level 4|Diagnostic level 5|Diagnostic level 6" },
-                { "MP_LAPI_TRACE_LEVEL", ATTR_ALWAYS_ALLOWED, "LAPI Trace Level",
+                { "MP_LAPI_TRACE_LEVEL", ATTR_ALWAYS_ALLOWED, "LAPI Trace Level:",
                         "Specify level of LAPI trace (MP_LAPI_TRACE_LEVEL)", "0", "0|1|2|3|4|5" }, { "MP_STATISTICS",
-                        ATTR_ALWAYS_ALLOWED, "MPI Statistics",
+                        ATTR_ALWAYS_ALLOWED, "MPI Statistics:",
                         "Obtain communication statistics for user space jobs (MP_STATISTICS)", "no", "yes|no|print" },
 
                 /*
                  * Debug tab related attributes
                  */
-                { "MP_DEBUG_NOTIMEOUT", ATTR_ALWAYS_ALLOWED, "Suppress Timeout",
+                { "MP_DEBUG_NOTIMEOUT", ATTR_ALWAYS_ALLOWED, "Suppress Timeout:",
                         "Specify if debugger can attach without causing application timeout (MP_DEBUG_NOTIMEOUT)",
                         "no", "yes|no" }, { "MP_COREFILE_SIGTERM", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
-                        "Corefile on SIGTERM", "Specify if corefile generated on SIGTERM (MP_COREFILE_SIGTERM)", "no",
-                        "yes|no" }, { "MP_EUIDEVELOP", ATTR_ALWAYS_ALLOWED, "MPI Parameter Checking",
+                        "Corefile on SIGTERM:", "Specify if corefile generated on SIGTERM (MP_COREFILE_SIGTERM)", "no",
+                        "yes|no" }, { "MP_EUIDEVELOP", ATTR_ALWAYS_ALLOWED, "MPI Parameter Checking:",
                         "Specify level of MPI parameter checking (MP_EUIDEVELOP)", "no", "yes|no|debug|minimum" }, {
                         "MP_COREFILE_FORMAT", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
                         "Specify core file format or name of lightweight core file (MP_COREFILE_FORMAT)", "standard",
@@ -650,113 +657,113 @@ static enum_launch_attr
                 /*
                  * System tab related attributes
                  */
-                { "MP_ADAPTER_USE", ATTR_ALWAYS_ALLOWED, "Exclusive Adapter Use",
+                { "MP_ADAPTER_USE", ATTR_ALWAYS_ALLOWED, "Exclusive Adapter Use:",
                         "Specify how node's adapter should be used (MP_ADAPTER_USE)", "shared", "dedicated|shared" }, {
-                        "MP_CPU_USE", ATTR_ALWAYS_ALLOWED, "Exclusive CPU Use",
+                        "MP_CPU_USE", ATTR_ALWAYS_ALLOWED, "Exclusive CPU Use:",
                         "Specify how node's CPU should be used (MP_CPU_USE)", "multiple", "multiple|unique" }, {
-                        "MP_EUIDEVICE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Adapter",
+                        "MP_EUIDEVICE", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Adapter:",
                         "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
                         "en0|fi0|tr0|sn_all|sn_single|ml0" }, { "MP_EUIDEVICE", ATTR_FOR_LINUX | ATTR_FOR_ALL_PROXY,
-                        "Adapter", "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
+                        "Adapter:", "Specify adapter to use for message passing (MP_EUIDEVICE)", "",
                         "ethx|sn_all|sn_single" },
-                { "MP_EUILIB", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Communications Subsystem",
+                { "MP_EUILIB", ATTR_FOR_ALL_OS | ATTR_FOR_ALL_PROXY, "Communications Subsystem:",
                         "Communications susbsystem to be used (MP_EUILIB)", "ip", "ip|us" }, { "MP_INSTANCES",
-                        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Window or IP Instances",
+                        ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Window or IP Instances:",
                         "Number of user space windows or IP addresses to assign (MP_INSTANCES)", "", "|max" }, {
-                        "MP_RETRY", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval",
+                        "MP_RETRY", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Interval:",
                         "Period in seconds between node allocation retries (MP_RETRY)", "0", "|wait" },
                 /*
                  * Node tab related attributes
                  */
-                { "MP_PGMMODEL", ATTR_ALWAYS_ALLOWED, "Programming Model", "Specify programming model (MP_PGMMODEL)",
+                { "MP_PGMMODEL", ATTR_ALWAYS_ALLOWED, "Programming Model:", "Specify programming model (MP_PGMMODEL)",
                         "spmd", "spmd|mpmd" },
                 /*
                  * Performance tab related attributes
                  */
-                { "MP_CC_SCRATCH_BUF", ATTR_ALWAYS_ALLOWED, "Fastest Collectives",
+                { "MP_CC_SCRATCH_BUF", ATTR_ALWAYS_ALLOWED, "Fastest Collectives:",
                         "Specify if fastest collective algorithm is used (MP_CC_SCRATCH_BUF)", "yes", "yes|no" }, {
-                        "MP_CSS_INTERRUPT", ATTR_ALWAYS_ALLOWED, "Packets Generate Interrupts",
+                        "MP_CSS_INTERRUPT", ATTR_ALWAYS_ALLOWED, "Packets Generate Interrupts:",
                         "Specify if arriving packets generate interrupts (MP_CSS_INTERRUPT)", "no", "yes|no" }, {
-                        "MP_PRIORITY_NTP", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Coscheduler disables NTP",
+                        "MP_PRIORITY_NTP", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY, "Coscheduler disables NTP:",
                         "Specify if PE co-scheduler turns NTP off (MP_PRIORITY_NTP)", "no", "yes|no" }, {
-                        "MP_SHARED_MEMORY", ATTR_ALWAYS_ALLOWED, "Use Shared Memory",
+                        "MP_SHARED_MEMORY", ATTR_ALWAYS_ALLOWED, "Use Shared Memory:",
                         "Specify is shared memory used for communication (MP_SHARED_MEMORY)", "yes", "yes|no" }, {
-                        "MP_SINGLE_THREAD", ATTR_ALWAYS_ALLOWED, "Single MPI Thread",
+                        "MP_SINGLE_THREAD", ATTR_ALWAYS_ALLOWED, "Single MPI Thread:",
                         "Specify if application has single thread with MPI calls (MP_SINGLE_THREAD)", "no", "yes|no" },
-                { "MP_WAIT_MODE", ATTR_ALWAYS_ALLOWED, "Wait Mode",
+                { "MP_WAIT_MODE", ATTR_ALWAYS_ALLOWED, "Wait Mode:",
                         "Specify thread behavior when waiting for messages (MP_WAIT_MODE)", "poll",
                         "nopoll|poll|sleep|yield" }, { "MP_TASK_AFFINITY", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
-                        "Task Affinity", "Specify task affinity constraints (MP_TASK_AFFINITY)", "", "|SNI|-1" }, {
-                        "MP_NEWJOB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Maintain Partition",
+                        "Task Affinity:", "Specify task affinity constraints (MP_TASK_AFFINITY)", "", "|SNI|-1" }, {
+                        "MP_NEWJOB", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Maintain Partition:",
                         "Maintain LoadLeveler parttition for multiple job steps (MP_NEWJOB)", "no", "yes|no" }, {
-                        "MP_USE_BULK_XFER", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Use Bulk Transfer",
+                        "MP_USE_BULK_XFER", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Use Bulk Transfer:",
                         "Exploit high performance switch data transfer (MP_USE_BULK_XFER)", "no", "yes|no" },
                 /*
                  * Miscellaneous tab related attributes
                  */
-                { "MP_HINTS_FILTERED", ATTR_ALWAYS_ALLOWED, "Hints Filtered",
+                { "MP_HINTS_FILTERED", ATTR_ALWAYS_ALLOWED, "Hints Filtered:",
                         "Specify if MPI info objects reject hints (MP_HINTS_FILTERED)", "yes", "yes|no" }, {
-                        "MP_CLOCK_SOURCE", ATTR_ALWAYS_ALLOWED, "Clock Source",
+                        "MP_CLOCK_SOURCE", ATTR_ALWAYS_ALLOWED, "Clock Source:",
                         "Specify if high performance switch clock is time source (MP_CLOCK_SOURCE)", "", "|OS" }, {
-                        "MP_MSG_API", ATTR_ALWAYS_ALLOWED, "Message Passing API",
+                        "MP_MSG_API", ATTR_ALWAYS_ALLOWED, "Message Passing API:",
                         "Specify message passing API used by application (MP_MSG_API)", "MPI",
                         "MPI|LAPI|MPI_LAPI|MPI,LAPI" }, { "MP_TLP_REQUIRED", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
-                        "Large Page Check",
+                        "Large Page Check:",
                         "Specify if PE checks if application was compiled with large pages (MP_TLP_REQUIRED)", "none",
                         "none|warn|kill" }, { "MP_CKPTDIR_PER_TASK", ATTR_FOR_AIX | ATTR_FOR_ALL_PROXY,
-                        "Checkpoint Directory Per Task",
+                        "Checkpoint Directory Per Task:",
                         "Specify if separate checkpoint directory per task (MP_CKPTDIR_PER_TASK)", "no" } };
 
 int_launch_attr int_attrs[] = {
 /*
  * I/O tab related attributes
  */
-{ "MP_IO_BUFFER_SIZE", ATTR_ALWAYS_ALLOWED, "MPI I/O Buffer Size",
+{ "MP_IO_BUFFER_SIZE", ATTR_ALWAYS_ALLOWED, "MPI I/O Buffer Size:",
         "Specify default buffer size for MPI-IO (MPI_IO_BUFFER_SIZE)", 8192, 1, 0x8000000 },
 /*
  * Node tab related attributes
  */
-{ "MP_PROCS", ATTR_ALWAYS_ALLOWED, "Number of Tasks", "Specify number of program tasks (MP_PROCS)", 1, 1, INT_MAX }, {
-        "MP_NODES", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Number of Nodes", "Number of nodes to allocate (MP_NODES)",
-        1, 1, INT_MAX }, { "MP_TASKS_PER_NODE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Tasks per Node",
+{ "MP_PROCS", ATTR_ALWAYS_ALLOWED, "Number of Tasks:", "Specify number of program tasks (MP_PROCS)", 1, 1, INT_MAX }, {
+        "MP_NODES", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Number of Nodes:", "Number of nodes to allocate (MP_NODES)",
+        1, 1, INT_MAX }, { "MP_TASKS_PER_NODE", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Tasks per Node:",
         "Number of tasks to assign to a node (MP_TASKS_PER_NODE)", 1, 1, INT_MAX },
 
-{ "MP_RETRY_COUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count",
+{ "MP_RETRY_COUNT", ATTR_FOR_ALL_OS | ATTR_FOR_PE_WITH_LL, "Node Retry Count:",
         "Number of times to retry node allocation (MP_RETRYCOUNT)", 1, 1, INT_MAX }, { "MP_RETRY_INT", ATTR_FOR_ALL_OS
-        | ATTR_FOR_PE_WITH_LL, "Node Retry Interval", "Interval to retry node allocation (MP_RETRY_INTERVAL)", 1, 1,
+        | ATTR_FOR_PE_WITH_LL, "Node Retry Interval:", "Interval to retry node allocation (MP_RETRY_INTERVAL)", 1, 1,
         INT_MAX },
 /*
  * Performance tab related attributes
  */
-{ "MP_ACK_THRESH", ATTR_ALWAYS_ALLOWED, "Acknowledgment Threshold",
+{ "MP_ACK_THRESH", ATTR_ALWAYS_ALLOWED, "Acknowledgment Threshold:",
         "Specify packet acknowledgment threshhold (MP_ACK_THRESH)", 30, 1, 31 }, { "MP_EAGER_LIMIT",
-        ATTR_ALWAYS_ALLOWED, "Eager Limit", "Specify rendezvous protocol message size threshold (MP_EAGER_LIMIT)",
-        0x10000, 1, INT_MAX }, { "MP_MSG_ENVELOPE_BUF", ATTR_ALWAYS_ALLOWED, "Envelope Buffer Size",
+        ATTR_ALWAYS_ALLOWED, "Eager Limit:", "Specify rendezvous protocol message size threshold (MP_EAGER_LIMIT)",
+        0x10000, 1, INT_MAX }, { "MP_MSG_ENVELOPE_BUF", ATTR_ALWAYS_ALLOWED, "Envelope Buffer Size:",
         "Specify size of message envelope buffer (MP_MSG_ENVELOPE_BUF)", 0x800000, 1000001, INT_MAX }, {
-        "MP_POLLING_INTERVAL", ATTR_ALWAYS_ALLOWED, "MPI Polling Interval",
+        "MP_POLLING_INTERVAL", ATTR_ALWAYS_ALLOWED, "MPI Polling Interval:",
         "Specify PE polling interval (MP_POLLING_INTERVAL)", 400000, 1, INT_MAX }, { "PE_RDMA_COUNT",
-        ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks", "Specify number of rCxt blocks (MP_RDMA_COUNT)", 0, 0, INT_MAX },
-        { "PE_RDMA_COUNT_2", ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks",
+        ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks:", "Specify number of rCxt blocks (MP_RDMA_COUNT)", 0, 0, INT_MAX },
+        { "PE_RDMA_COUNT_2", ATTR_ALWAYS_ALLOWED, "Number of rCtx Blocks:",
                 "Specify number of rCxt blocks (MP_RDMA_COUNT)", 0, 0, INT_MAX }, { "MP_RETRANSMIT_INTERVAL",
-                ATTR_ALWAYS_ALLOWED, "MPI Retransmit Interval",
+                ATTR_ALWAYS_ALLOWED, "MPI Retransmit Interval:",
                 "Specify interval to check if retransmit neeeded (MP_RETRANSMIT_INTERVAL)", 10000, 1000, INT_MAX }, {
-                "MP_REXMIT_BUF_CNT", ATTR_ALWAYS_ALLOWED, "Retransmit Buffers",
+                "MP_REXMIT_BUF_CNT", ATTR_ALWAYS_ALLOWED, "Retransmit Buffers:",
                 "Specify number of retransmit buffers per task (MP_REXMIT_BUF_CNT)", 128, 1, INT_MAX }, {
-                "MP_REXMIT_BUF_SIZE", ATTR_ALWAYS_ALLOWED, "Maximum LAPI Buffered Message",
+                "MP_REXMIT_BUF_SIZE", ATTR_ALWAYS_ALLOWED, "Maximum LAPI Buffered Message:",
                 "Specify maximum LAPI buffer size (MP_REXMIT_BUF_SIZE)", 65568, 1, INT_MAX },
-        { "MP_UDP_PACKET_SIZE", ATTR_ALWAYS_ALLOWED, "UDP Packet Size", "Specify UDP packet size (MP_UDP_PACKET_SIZE)",
-                1, 1, INT_MAX }, { "PE_BUFFER_MEM", ATTR_ALWAYS_ALLOWED, "Buffer Memory",
+        { "MP_UDP_PACKET_SIZE", ATTR_ALWAYS_ALLOWED, "UDP Packet Size:", "Specify UDP packet size (MP_UDP_PACKET_SIZE)",
+                1, 1, INT_MAX }, { "PE_BUFFER_MEM", ATTR_ALWAYS_ALLOWED, "Buffer Memory:",
                 "Specify size of preallocated early arrival buffer (MP_BUFFER_MEM)", 0x4000000, 0, INT_MAX }, {
-                "MP_BULK_MIN_MSG_SIZE", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Minimum Bulk Message Size",
+                "MP_BULK_MIN_MSG_SIZE", ATTR_FOR_AIX | ATTR_FOR_PE_WITH_LL, "Minimum Bulk Message Size:",
                 "Minimum message size to use bulk transfer path (MP_BULK_MIN_MSG_SIZE)", 153600, 0, INT_MAX },
         /*
          * Miscellaneous tab related attributes
          */
-        { "MP_THREAD_STACKSIZE", ATTR_ALWAYS_ALLOWED, "Additional MPI Thread Stack Size",
+        { "MP_THREAD_STACKSIZE", ATTR_ALWAYS_ALLOWED, "Additional MPI Thread Stack Size:",
                 "Specify additional stack size for MPI service thread (MP_THREAD_STACKSIZE)", 0, 0, INT_MAX }, {
-                "MP_PULSE", ATTR_ALWAYS_ALLOWED, "Pulse Interval",
+                "MP_PULSE", ATTR_ALWAYS_ALLOWED, "Pulse Interval:",
                 "Specify interval PE checks remote modes (MP_PULSE)", 600, 0, INT_MAX }, { "MP_TIMEOUT",
-                ATTR_ALWAYS_ALLOWED, "Connection Timeout",
+                ATTR_ALWAYS_ALLOWED, "Connection Timeout:",
                 "Specify timeout limit for connecting to remote nodes (MP_TIMEOUT)", 150, 1, INT_MAX },
         /*
          * Additional integer attributes used only for validation of attribute
@@ -1590,6 +1597,36 @@ int PE_quit(int trans_id, int nargs, char *args[])
     return PTP_PROXY_RES_OK;
 }
 
+int PE_suspend_events(int trans_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int PE_resume_events(int trans_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int PE_set_filters(int trans_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int PE_clear_filters(int trans_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int PE_get_attributes(int trans_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
+int PE_query_attributes(int trans_id, int nargs, char *args[])
+{
+    return PTP_PROXY_RES_OK;
+}
+
 /*************************************************************************/
 /*                                                                       */
 /* Job support routines.                                                 */
@@ -1976,7 +2013,7 @@ startup_monitor(void *job_ident)
                 print_message(ERROR_MESSAGE, "Node %s not found in node list\n", taskp->hostname);
             }
             else {
-                sprintf(procid_str, "%d", taskp[i].proxy_taskid);
+                sprintf(procid_str, "%d", i);
                 AddToList(taskid_list, strdup(procid_str));
                 sprintf(procname, "task_%d", i);
                 proxy_add_process(msg, procid_str, procname, PTP_PROC_STATE_STARTING, 3);
@@ -4359,7 +4396,8 @@ sendTaskRemoveEvent(int gui_transmission_id, JobObject * job_object, TaskObject 
     print_message(TRACE_MESSAGE, ">>> %s entered. line=%d.\n", __FUNCTION__, __LINE__);
     memset(proxy_generated_task_id_string, '\0', sizeof(proxy_generated_task_id_string));
     sprintf(proxy_generated_task_id_string, "%d", task_object->proxy_generated_task_id);
-    msg = proxy_remove_process_event(gui_transmission_id, proxy_generated_task_id_string);
+    msg = proxy_remove_process_event(gui_transmission_id,
+         job_object->gui_assigned_job_id, proxy_generated_task_id_string);
     enqueue_event(msg);
     print_message(TRACE_MESSAGE, "<<< %s returning. line=%d.\n", __FUNCTION__, __LINE__);
     return 0;
