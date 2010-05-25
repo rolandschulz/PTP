@@ -33,7 +33,7 @@ import org.eclipse.ptp.pldt.mpi.analysis.cdt.graphs.ICallGraphNode;
 public class MPIBarrierExpr extends ASTVisitor {
 	protected BarrierTable bTable_;
 	protected ICallGraph cg_;
-	/* One stack for each communicator */
+	/** One stack for each communicator */
 	protected Hashtable<String,Stack<BarrierExpression>> stacks_; 
 	
 	protected MPICallGraphNode currentNode_;
@@ -518,7 +518,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 		return BE;
 	}
 	
-	/*
+	/**
 	 * An expression which doesn't have any "expression" 
 	 * field is a terminal. 
 	 */
@@ -570,7 +570,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 				sk.push(be);
 			}
 		}
-		else if(expr instanceof IASTExpressionList){// BRT this will not get executed!!
+		else if(expr instanceof IASTExpressionList){// BRT this will not get executed!!  should it be hit ONLY for fn arg exprList? or not? can we do this elsewhere e.g. functionCallExpr?
 			IASTExpressionList exprList = (IASTExpressionList)expr;
 			IASTExpression[] exps = exprList.getExpressions();
 			if(exps.length == 0) return PROCESS_CONTINUE;
@@ -615,6 +615,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 				String comm = bTable_.getComm(id);
 				for(Enumeration<String> e = stacks_.keys(); e.hasMoreElements();){
 					String commkey = e.nextElement();
+					// get the BarrierExpressions for this communicator
 					Stack<BarrierExpression> sk = stacks_.get(commkey);
 					if(parameter != null) sk.pop(); //parameter 
 					sk.pop(); //functionName
@@ -653,7 +654,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 					}
 				}
 			}
-		}
+		} // end IASTFunctionCallExpression
 		else if(expr instanceof IASTIdExpression){ //terminal
 			//System.out.println(((IASTIdExpression)expr).getName().toString());
 			for(Enumeration<Stack<BarrierExpression>> e = stacks_.elements(); e.hasMoreElements();){
@@ -691,7 +692,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 		}
 		*/
 		return PROCESS_CONTINUE;
-	}
+	} // end leave()
 
 	class CaseBarrierExpr{
 		protected BarrierExpression BE;

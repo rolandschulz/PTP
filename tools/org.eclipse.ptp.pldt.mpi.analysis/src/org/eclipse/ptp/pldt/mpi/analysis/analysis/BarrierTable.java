@@ -63,9 +63,9 @@ public class BarrierTable {
 		return bar;
 	}
 	
-	/*
-	 * @return: barrier ID if it is a barrier; -1 otherwise
-	 * BRT barrier ids may not match with OpenMPI 1.3.3 headers?? see setComm()
+	/**
+	 * @return barrier ID if it is a barrier; -1 otherwise
+	 * <br>BRT barrier ids may not match with OpenMPI 1.3.3 headers?? see setComm()
 	 */ 
 	public int isBarrier(IASTFunctionCallExpression funcE){
 		IASTExpression funcname = funcE.getFunctionNameExpression();
