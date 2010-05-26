@@ -232,6 +232,11 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
         System.out.println(exe);
         String output2 = Spawner.run(project.getLocation().toFile(), exe);
         //System.out.println(output2);
+        
+        // Wait a few milliseconds for the file lock on a.exe to be released
+        // Otherwise Windows 7 + Cygwin may give a "Device or resource busy"
+        // error when we compile to a.exe in the next test case
+        Thread.sleep(250); // 1/4 of a second seems to be sufficient
 
         return output + "\n" + output2;
     }
