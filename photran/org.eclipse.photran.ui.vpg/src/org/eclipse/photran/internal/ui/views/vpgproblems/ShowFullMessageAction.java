@@ -14,16 +14,18 @@ import java.util.Iterator;
 
 import org.eclipse.cdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISharedImages;
@@ -38,7 +40,8 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * 
  * @author Esfar Huq
  * @author Rui Wang
- * 
+ */
+/* Esfar/Rui: 
  * Modified the method run()
  *  1) Added title bar to "Details" dialog 
  *  2) "Details" dialog wraps
@@ -46,10 +49,6 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  */
 public class ShowFullMessageAction extends SelectionDispatchAction
 {
-
-    /**
-     * @param site
-     */
     public ShowFullMessageAction(IWorkbenchSite site)
     {
         super(site);
@@ -70,48 +69,47 @@ public class ShowFullMessageAction extends SelectionDispatchAction
         return ImageDescriptor.createFromImage(img);
     }
 
-    //TODO: Make shell content automatically resize when the shell is re-sized
-    protected void run(IMarker marker)
+    protected void run(final IMarker marker)
     {
-        Display disp = getSite().getShell().getDisplay();
-        final Shell shell = new Shell(disp);
-        shell.setText("Event Details");
-        shell.setSize(500, 300);
-        
-        GridLayout gridLayout = new GridLayout(1, false);
-        GridData gridData = new GridData();
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.grabExcessVerticalSpace = true;
-
-        gridData.verticalAlignment = SWT.FILL;
-        shell.setLayout(gridLayout);
-        shell.setLayoutData(gridData);
-
-        Text message = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-        message.setLayoutData(gridData);
-        message.setText(MarkerUtilities.getMessage(marker));
-       
-
-        Button close = new Button(shell, SWT.PUSH);
-        close.setText("Close");
-        close.setFocus();
-        close.addSelectionListener(new SelectionAdapter()
-            {
-                public void widgetSelected(SelectionEvent e)
-                {
-                    shell.close();
-                }
-            });
-
-        message.pack();
-        shell.open();
-
-        while(!shell.isDisposed())
+        Dialog dialog = new Dialog(getSite().getShell())
         {
-            if(!disp.readAndDispatch())
-                disp.sleep();
-        }
-        shell.dispose();
+            @Override
+            protected void configureShell(Shell shell)
+            {
+                super.configureShell(shell);
+                shell.setText("Event Details");
+                shell.setSize(500, 300);
+            }
+
+            @Override
+            protected Control createDialogArea(Composite parent)
+            {
+                Composite dialogArea = (Composite)super.createDialogArea(parent);
+
+                Text message = new Text(dialogArea, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY);
+                message.setText(MarkerUtilities.getMessage(marker));
+                message.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+                dialogArea.layout();
+                return dialogArea;
+            }
+
+            @Override
+            protected void createButtonsForButtonBar(Composite parent)
+            {
+                Button close = createButton(parent,
+                                            IDialogConstants.CLOSE_ID,
+                                            IDialogConstants.CLOSE_LABEL,
+                                            true);
+                close.addSelectionListener(new SelectionListener()
+                {
+                    public void widgetSelected(SelectionEvent e)        { close(); }
+                    public void widgetDefaultSelected(SelectionEvent e) { close(); }
+                });
+                close.setFocus();
+            }
+        };
+        
+        dialog.open();
     }
 
     /* (non-Javadoc)

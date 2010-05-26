@@ -65,7 +65,8 @@ public class WorkbenchSelectionInfo
     private ITextSelection selectionInEditor;
 
     /**
-     * Default constructor; uses a {@link DefaultResourceFilter}.
+     * Default constructor; uses a {@link DefaultResourceFilter} and tracks the selection in the
+     * active workbench window.
      *
      * @see #WorkbenchSelectionInfo(IResourceFilter)
      */
@@ -75,13 +76,43 @@ public class WorkbenchSelectionInfo
     }
 
     /**
-     * Constructor.
+     * Constructor; uses the given resource filter and tracks the selection in the active workbench
+     * window.
      *
      * @param resourceFilter the resource filter that will be used to determine what resources are
      *                       included in the results of {@link #getAllFilesInSelectedResources()}
      *                       and {@link #getFileInEditor()}
      */
     public WorkbenchSelectionInfo(IResourceFilter resourceFilter)
+    {
+        this(resourceFilter, Workbench.getInstance().getActiveWorkbenchWindow());
+    }
+
+    /**
+     * Constructor; uses a {@link DefaultResourceFilter} and tracks the selection in the active
+     * workbench window.
+     *
+     * @see #WorkbenchSelectionInfo(IResourceFilter)
+     *
+     * @since 2.0
+     */
+    public WorkbenchSelectionInfo(IWorkbenchWindow workbenchWindow)
+    {
+        this(new DefaultResourceFilter(), workbenchWindow);
+    }
+
+    /**
+     * Constructor; uses the given resource filter and tracks the selection in the given workbench
+     * window.
+     *
+     * @param resourceFilter  the resource filter that will be used to determine what resources are
+     *                        included in the results of {@link #getAllFilesInSelectedResources()}
+     *                        and {@link #getFileInEditor()}
+     * @param workbenchWindow the workbench window whose selection will be tracked
+     *
+     * @since 2.0
+     */
+    public WorkbenchSelectionInfo(IResourceFilter resourceFilter, IWorkbenchWindow workbenchWindow)
     {
         this.resourceFilter = resourceFilter;
 
@@ -91,10 +122,9 @@ public class WorkbenchSelectionInfo
         fileInEditor = null;
         selectionInEditor = null;
 
-        IWorkbenchWindow activeWindow = Workbench.getInstance().getActiveWorkbenchWindow();
-        if (activeWindow == null) return;
+        if (workbenchWindow == null) return;
 
-        selection = activeWindow.getSelectionService().getSelection();
+        selection = workbenchWindow.getSelectionService().getSelection();
 
         if (selection instanceof IStructuredSelection)
         {
@@ -102,7 +132,7 @@ public class WorkbenchSelectionInfo
             allFilesInSelectedResources = findAllFilesIn(selectedResources);
         }
 
-        IWorkbenchPage activePage = activeWindow.getActivePage();
+        IWorkbenchPage activePage = workbenchWindow.getActivePage();
         if (activePage == null) return;
 
         activeEditor = activePage.getActiveEditor();

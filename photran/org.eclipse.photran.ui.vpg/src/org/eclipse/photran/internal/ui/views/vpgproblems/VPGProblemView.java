@@ -8,9 +8,9 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -62,49 +62,44 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * Code or samples provided therein are provided without warranty of any kind.
  *
  * @author Timofey Yuvashev
- * 
- * @author Esfar Huq
- * @author Rui Wang
- * 
- * Replaced call to setSorter() to setComparator() in method createPartControl()
+ * @author Esfar Huq, Rui Wang - Replaced setSorter() with setComparator(); added add'l filtering
+ * @author Jeff Overbey - Refactoring/cleanup
  */
+
 public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 {
     static enum VPGViewColumn
     {
+        // Column    Label         Width (in pixels)
         DESCRIPTION("Description", 44),
-        RESOURCE("Resource", 10),
-        PATH("Path", 20);
+        RESOURCE   ("Resource",    10),
+        PATH       ("Path",        20);
         
         public final String name;
         public final int width;
         
-        private VPGViewColumn(String name, int width)
+        private VPGViewColumn(String name, int widthInPixels)
         {
             this.name = name;
-            this.width = width;
+            this.width = widthInPixels;
         }
     }
     
     private static RecreateMarkers markersTask = null;
     
-    private TableViewer tableViewer             = null;
-    private TableSorter tableSorter             = null;
-    private Clipboard clipboard                 = null;
-    private CopyMarkedFileAction copyAction     = null;
-    private OpenMarkedFileAction openAction     = null;
-    private ShowFullMessageAction showAction    = null;
-    //private RemoveMarkerAction remAction        = null;
+    private TableViewer tableViewer          = null;
+    private TableSorter tableSorter          = null;
+    private Clipboard clipboard              = null;
+    private CopyMarkedFileAction copyAction  = null;
+    private OpenMarkedFileAction openAction  = null;
+    private ShowFullMessageAction showAction = null;
 
-    //private VPGViewFilterAction infosMarkerFilterAction     = null;
-    private VPGViewFilterAction warningsMarkerFilterAction  = null;
-    private VPGViewFilterAction errorsMarkerFilterAction    = null;
+    private ErrorWarningFilterAction warningsFilterAction = null;
+    private ErrorWarningFilterAction errorsFilterAction   = null;
+    private SelectedResourceFilterAction selectionFilterAction      = null;
 
-    //TODO: Depending on how we will handle updates to markers, we might need a
-    // way to update this array. Currently, it is populated as Workbench's start-time
-    // and remains unchaged since then
-    public static int[] MARKER_COUNT = {0,0,0};  //Number of Infos, Warnings and Errors respectively
-
+    public int[] markerCount = {0,0,0};  //Number of Warnings and Errors respectively
+    
     @Override
     public void createPartControl(Composite parent)
     {
@@ -130,7 +125,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         createToolbarButtons();
         initEvents();
     }
-
+    
     private void createTableViewer(Composite parent)
     {
         tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
@@ -170,25 +165,22 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         }
         
         @Override public IStatus runInWorkspace(final IProgressMonitor monitor)
-        {
-            final List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
-            
+        {   
             getDisplay().syncExec(new Runnable()
             {
                 public void run()
                 {
+                    final List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+                    
                     Table t = tableViewer.getTable();
+                    
                     t.removeAll();
                     t.update();
+                
                     tableViewer.setInput(markers);
                     countMarkers(markers);
-                    if (warningsMarkerFilterAction != null && errorsMarkerFilterAction != null)
-                    {
-                        String warnStr = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_WARNING]) + " Warnings";
-                        String errStr  = String.valueOf(MARKER_COUNT[IMarker.SEVERITY_ERROR]) + " Errors";
-                        warningsMarkerFilterAction.setText(warnStr);
-                        errorsMarkerFilterAction.setText(errStr);
-                    }
+                   
+                    setErrorWarningFilterButtonText();
                 }
             });
             
@@ -197,6 +189,29 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         }
     }
 
+    void setErrorWarningFilterButtonText()
+    {
+        if (warningsFilterAction != null && errorsFilterAction != null)
+        {
+            //only print out counts when looking at an unfiltered view
+            if(!selectionFilterAction.isChecked())
+            {
+                warningsFilterAction.setText(String.valueOf(markerCount[IMarker.SEVERITY_WARNING]) + " Warnings");
+                errorsFilterAction.setText(String.valueOf(markerCount[IMarker.SEVERITY_ERROR]) + " Errors");
+            }
+            else //FILTERED
+            {
+                warningsFilterAction.setText("Warnings");
+                errorsFilterAction.setText("Errors");
+            }
+        }
+    }
+    
+    TableViewer getTableViewer()
+    {
+        return tableViewer;
+    }
+    
     private void setTableGridData()
     {
         GridData tableData = new GridData();
@@ -209,9 +224,9 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 
     private void resetMarkerCount()
     {
-        for(int i = 0; i < MARKER_COUNT.length; ++i)
+        for(int i = 0; i < markerCount.length; ++i)
         {
-            MARKER_COUNT[i] = 0;
+            markerCount[i] = 0;
         }
     }
     
@@ -219,62 +234,39 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     {
         //Get all the markers in the workspace
         //IMarker[] markers = ResourcesPlugin.getWorkspace().getRoot().findMarkers(null, true, IResource.DEPTH_INFINITE);
-        resetMarkerCount();;
-        
-        //HACK
+        resetMarkerCount();      
+     
         for(IMarker marker : markers)
         {
             int sev = MarkerUtilities.getSeverity(marker);
 
-            if(sev == IMarker.SEVERITY_ERROR    ||
-               sev == IMarker.SEVERITY_WARNING  ||
-               sev == IMarker.SEVERITY_INFO)
-                MARKER_COUNT[sev]++;
+            if(sev == IMarker.SEVERITY_ERROR || sev == IMarker.SEVERITY_WARNING)
+                markerCount[sev]++;
         }
     }
 
-    private void createActions()
+    public void createActions()
     {
         copyAction = new CopyMarkedFileAction(this, "Copy");
         openAction = new OpenMarkedFileAction(getSite());
         showAction = new ShowFullMessageAction(getSite());
-        //remAction  = new RemoveMarkerAction(getSite());
 
-        //int sevInfo = IMarker.SEVERITY_INFO;
-        int sevWarn = IMarker.SEVERITY_WARNING;
-        int sevErr  = IMarker.SEVERITY_ERROR;
+        warningsFilterAction = new ErrorWarningFilterAction(tableViewer, IMarker.SEVERITY_WARNING);
 
-        // Copy list to avoid ConcurrentModificationException
-        List<IMarker> markers = new ArrayList<IMarker>(PhotranVPG.getInstance().recomputeErrorLogMarkers());
-        countMarkers(markers);
+        errorsFilterAction = new ErrorWarningFilterAction(tableViewer, IMarker.SEVERITY_ERROR);
 
-        //String infoStr = String.valueOf(MARKER_COUNT[sevInfo]) + " Infos";
-        String warnStr = String.valueOf(MARKER_COUNT[sevWarn]) + " Warnings";
-        String errStr  = String.valueOf(MARKER_COUNT[sevErr]) + " Errors";
-
-        /*infosMarkerFilterAction     = new VPGViewFilterAction(tableViewer,
-                                                              infoStr,
-                                                              sevInfo);*/
-
-        warningsMarkerFilterAction  = new VPGViewFilterAction(tableViewer,
-                                                              warnStr,
-                                                              sevWarn);
-
-        errorsMarkerFilterAction    = new VPGViewFilterAction(tableViewer,
-                                                              errStr,
-                                                              sevErr);
+        selectionFilterAction = new SelectedResourceFilterAction(this);
     }
 
     private void addActionsToToolbar()
     {
         IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
-        toolBarManager.add(errorsMarkerFilterAction);
-        toolBarManager.add(warningsMarkerFilterAction);
-        //toolBarManager.add(infosMarkerFilterAction);
+        toolBarManager.add(errorsFilterAction);
+        toolBarManager.add(warningsFilterAction);
+        toolBarManager.add(selectionFilterAction);
         toolBarManager.add(openAction);
         toolBarManager.add(copyAction);
-        //toolBarManager.add(remAction);
         toolBarManager.add(new Separator());
         toolBarManager.add(showAction);
     }
@@ -288,7 +280,6 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
                 boolean isEnabled = !e.getSelection().isEmpty();
                 openAction.setEnabled(isEnabled);
                 copyAction.setEnabled(isEnabled);
-                //remAction.setEnabled(isEnabled);
                 showAction.setEnabled(isEnabled);
             }
         });
@@ -300,9 +291,8 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 
         openAction.setEnabled(false);
         copyAction.setEnabled(false);
-        //remAction.setEnabled(false);
         showAction.setEnabled(false);
-
+        
         addActionsToToolbar();
         addTableViewerSelectionChangeListener();
     }
