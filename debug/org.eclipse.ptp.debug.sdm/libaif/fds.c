@@ -1902,7 +1902,7 @@ FDSAddFieldToAggregate(char *fds, AIFAccess acc, char *name, char *type)
 	char *	end;
 	char *  rest;
 
-	if ( FDSAggregateFieldByName(fds, name, &nfmt) == 0 )
+	if (FDSAggregateFieldByName(fds, name, &nfmt) == 0)
 	{
 		SetAIFError(AIFERR_BADARG, NULL);
 		_aif_free(nfmt);
@@ -1976,6 +1976,7 @@ FDSAddFieldToAggregate(char *fds, AIFAccess acc, char *name, char *type)
 			/* fall through */
 
 		case AIF_ACCESS_PUBLIC:
+		case AIF_ACCESS_UNKNOWN:
 			break;
 	}
 
