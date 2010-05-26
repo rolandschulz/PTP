@@ -216,7 +216,11 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 					String ch_k = varId + "." + ch_n; //$NON-NLS-1$
 					IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(),
 							getStackDepth(), ch_k);
-					v.setAIF(AIFFactory.newAIF(fieldTypes[i], ((IAIFValueAggregate) value).getFieldValue(fieldNames[i])));
+					IAIFValue val = AIFFactory.UNKNOWNVALUE;
+					if (value instanceof IAIFValueAggregate) {
+						val = ((IAIFValueAggregate) value).getFieldValue(fieldNames[i]);
+					}
+					v.setAIF(AIFFactory.newAIF(fieldTypes[i], val));
 					children[i] = v;
 				}
 			} else if (type instanceof IAIFTypeUnion) {
@@ -230,7 +234,11 @@ public abstract class Variable extends VariableDescriptor implements IPDIVariabl
 					String ch_k = varId + "." + ch_n; //$NON-NLS-1$
 					IPDIVariable v = createVariable(session, getTasks(), fThread, fStackFrame, ch_n, ch_fn, getPosition(),
 							getStackDepth(), ch_k);
-					v.setAIF(AIFFactory.newAIF(fieldTypes[i], ((IAIFValueUnion) value).getFieldValue(fieldNames[i])));
+					IAIFValue val = AIFFactory.UNKNOWNVALUE;
+					if (value instanceof IAIFValueUnion) {
+						val = ((IAIFValueUnion) value).getFieldValue(fieldNames[i]);
+					}
+					v.setAIF(AIFFactory.newAIF(fieldTypes[i], val));
 					children[i] = v;
 				}
 			} else {
