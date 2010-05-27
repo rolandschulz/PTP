@@ -69,7 +69,7 @@ public class CModelBuilder2Tests extends TestCase {
 		assertVariable(children[0], "variable", "double", false, false, false);
 		assertVariable(children[1], "staticVariable", "int", true, false, false);
 		assertVariable(children[2], "constVariable", "const long", false, true, false);
-		assertVariable(children[3], "volatileVariable", "volatile short", false, false, true);
+		assertVariable(children[3], "volatileVariable", "short", false, false, true); //see bug 274490
 		assertVariable(children[4], ICElement.C_VARIABLE_DECLARATION, "externVariable", "int", false, false, false);
 	}
 
@@ -215,9 +215,9 @@ public class CModelBuilder2Tests extends TestCase {
 		IStructure structure = (IStructure) children[0];
 		ICElement[] classChildren = structure.getChildren();
 		assertEquals(3, classChildren.length);
-		assertConstructor(classChildren[0], ICElement.C_METHOD_DECLARATION, "C", ASTAccessVisibility.PROTECTED, true, true, new String[0], "virtual");
-		assertConstructor(classChildren[1], ICElement.C_METHOD_DECLARATION, "C", ASTAccessVisibility.PROTECTED, true, false, new String[] { "int" }, "virtual");
-		assertDestructor(classChildren[2], ICElement.C_METHOD_DECLARATION, "~C", ASTAccessVisibility.PUBLIC, true, false, "virtual");
+		assertConstructor(classChildren[0], ICElement.C_METHOD_DECLARATION, "C", ASTAccessVisibility.PROTECTED, true, true, new String[0], "");  //see bug 274490
+		assertConstructor(classChildren[1], ICElement.C_METHOD_DECLARATION, "C", ASTAccessVisibility.PROTECTED, true, false, new String[] { "int" }, "");  //see bug 274490
+		assertDestructor(classChildren[2], ICElement.C_METHOD_DECLARATION, "~C", ASTAccessVisibility.PUBLIC, true, false, "");  //see bug 274490
 	}
 	
 	public void testPureVirtualDestructor() throws Exception {
@@ -230,7 +230,7 @@ public class CModelBuilder2Tests extends TestCase {
 		IStructure structure = (IStructure) children[0];
 		ICElement[] classChildren = structure.getChildren();
 		assertEquals(1, classChildren.length);
-		assertDestructor(classChildren[0], ICElement.C_METHOD_DECLARATION, "~C", ASTAccessVisibility.PUBLIC, true, true, "virtual");
+		assertDestructor(classChildren[0], ICElement.C_METHOD_DECLARATION, "~C", ASTAccessVisibility.PUBLIC, true, true, "");  //see bug 274490
 	}
 
 	public void testStruct() throws Exception {
@@ -275,8 +275,8 @@ public class CModelBuilder2Tests extends TestCase {
 		assertField(classChildren[2], "publicField", "float", ASTAccessVisibility.PUBLIC, false, false, false, false);
 		assertField(classChildren[3], "staticField", "short", ASTAccessVisibility.PUBLIC, true, false, false, false);
 		assertField(classChildren[4], "constField", "const double", ASTAccessVisibility.PUBLIC, false, true, false, false);
-		assertField(classChildren[5], "volatileField", "volatile int", ASTAccessVisibility.PUBLIC, false, false, true, false);
-		assertField(classChildren[6], "constVolatileField", "const volatile long", ASTAccessVisibility.PUBLIC, false, true, true, false);
+		assertField(classChildren[5], "volatileField", "int", ASTAccessVisibility.PUBLIC, false, false, true, false);  //see bug 274490
+		assertField(classChildren[6], "constVolatileField", "const long", ASTAccessVisibility.PUBLIC, false, true, true, false);  //see bug 274490
 		assertField(classChildren[7], "mutableField", "long", ASTAccessVisibility.PUBLIC, false, false, false, true);
 	}
 

@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    IBM Corporation - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.ptp.internal.rdt.core.includebrowser;
 
 import java.io.Serializable;
@@ -7,7 +18,6 @@ import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.index.IIndexInclude;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.internal.rdt.core.miners.RemoteIndexFileLocation;
 
 public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 {
@@ -51,7 +61,7 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 		{
 			
 			if (converter != null)
-				includedByLocation = converter.fromInternalFormat(include.getIncludedByLocation().getURI().toString());
+				includedByLocation = converter.fromInternalFormat(include.getIncludedByLocation().getURI().getPath());
 			
 			//includedByLocation = new RemoteIndexFileLocation(include.getIncludedByLocation()); 
 		}
@@ -59,7 +69,7 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 		{
 			
 			if (converter != null)
-				includesLocation = converter.fromInternalFormat(include.getIncludesLocation().getURI().toString());
+				includesLocation = converter.fromInternalFormat(include.getIncludesLocation().getURI().getPath());
 			
 			//includesLocation = new RemoteIndexFileLocation(include.getIncludesLocation());
 		}

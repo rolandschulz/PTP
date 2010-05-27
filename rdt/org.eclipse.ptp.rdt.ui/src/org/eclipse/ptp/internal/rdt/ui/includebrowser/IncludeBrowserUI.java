@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
 
 import org.eclipse.cdt.core.index.IIndexFileLocation;
-import org.eclipse.cdt.core.index.IIndexInclude;
 import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
@@ -34,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.ui.IWorkbenchPage;
@@ -81,7 +81,7 @@ public class IncludeBrowserUI {
 			
 			IIncludeBrowserService service = new IncludeBrowserServiceFactory().getIncludeBrowserService(project);
 			
-			IIndexInclude include= service.findInclude(input, null);
+			IIndexIncludeValue include= service.findInclude(input, null);
 			if (include != null) {
 				IIndexFileLocation loc= include.getIncludesLocation();
 				if (loc != null) {
@@ -114,5 +114,35 @@ public class IncludeBrowserUI {
 		return false;
 	}
 	
-	
+//	private static ITranslationUnit findTranslationUnitForLocation(IIndexFileLocation ifl, ICProject preferredProject) throws CModelException {
+//		String fullPath= ifl.getFullPath();
+//		if (fullPath != null) {
+//			IResource file= ResourcesPlugin.getWorkspace().getRoot().findMember(fullPath);
+//			if (file instanceof IFile) {
+//				return CoreModelUtil.findTranslationUnit((IFile) file);
+//			}
+//			return null;
+//		}
+//		URI location= ifl.getURI();
+//		if (location != null) { 
+//			CoreModel coreModel = CoreModel.getDefault();
+//			ITranslationUnit tu= null;
+//			if (preferredProject != null) {
+//				tu= coreModel.createTranslationUnitFrom(preferredProject, location);
+//			}
+//			if (tu == null) {
+//				ICProject[] projects= coreModel.getCModel().getCProjects();
+//				for (int i = 0; i < projects.length && tu == null; i++) {
+//					ICProject project = projects[i];
+//					if (!project.equals(preferredProject)) {
+//						tu= coreModel.createTranslationUnitFrom(project, location);
+//					}
+//				}
+//			}
+//			return tu;
+//		}
+//		return null;
+//	}	
+//	
+//	
 }

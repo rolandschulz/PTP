@@ -10,6 +10,15 @@
  *     Markus Schorn (Wind River Systems)
  *     IBM Corporation
  *******************************************************************************/
+/*
+ * This class is loosely based on CModelBuilder2 
+ */
+
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.core/model
+ * Class: org.eclipse.cdt.internal.core.model.CModelBuilder2
+ * Version: 1.48
+ */
 
 package org.eclipse.ptp.internal.rdt.core.model;
 
@@ -108,13 +117,14 @@ public class ModelBuilder {
 		// includes
 		final IInclude[] includeDirectives = remoteTU.getIncludes();
 		for (IInclude includeDirective : includeDirectives) {
-			createInclusion(fTranslationUnit, includeDirective, includeDirectives);
+			createInclusion(fTranslationUnit, includeDirective);
 		}		
 		// macros
 		final List<ICElement> macros = remoteTU.getChildrenOfType(CElement.C_MACRO);
-		Iterator<ICElement> iterator = macros.iterator();
-		while (iterator.hasNext()) {
-			createMacro(fTranslationUnit, (IMacro)iterator.next());
+//		Iterator<ICElement> iterator = macros.iterator();
+		for (ICElement macro : macros) {
+//		while (iterator.hasNext()) {
+			createMacro(fTranslationUnit, (IMacro)macro);
 		}
 		
 		//everything else
@@ -307,6 +317,8 @@ public class ModelBuilder {
 			
 			newElement.setTypeName(remoteField.getTypeName());
 			newElement.setVisibility(remoteField.getVisibility());
+			newElement.setConst(remoteField.isConst());
+			newElement.setVolatile(remoteField.isVolatile());
 			element= newElement;
 		} else {
 			switch(remoteChild.getElementType()) {
@@ -327,11 +339,11 @@ public class ModelBuilder {
 			setIndex(element);
 		
 			element.setTypeName(remoteChild.getTypeName());
+			element.setConst(remoteChild.isConst());
+			element.setVolatile(remoteChild.isVolatile());
 		}
 		
 		element.setActive(remoteChild.isActive());
-		element.setConst(remoteChild.isConst());
-		element.setVolatile(remoteChild.isVolatile());
 		element.setStatic(remoteChild.isStatic());
 		
 		// add to parent
@@ -610,12 +622,12 @@ public class ModelBuilder {
 		return element;
 	}
 
-	private Include createInclusion(Parent parent,
-			IInclude inclusion, IInclude[] allIncludes) throws CModelException  {
+	private Include createInclusion(Parent parent, IInclude inclusion) throws CModelException  {
 		// create element
 		String name = inclusion.getElementName();
 		Include element= new Include(parent, name, inclusion.isStandard());
 		element.setFullPathName(inclusion.getFullFileName());
+		setIndex(element);
 		element.setActive(inclusion.isActive());
 		element.setResolved(inclusion.isResolved());
 		// if there is a duplicate include, also set the index

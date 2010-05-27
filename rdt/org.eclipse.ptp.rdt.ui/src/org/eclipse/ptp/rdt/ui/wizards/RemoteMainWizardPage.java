@@ -434,7 +434,7 @@ public class RemoteMainWizardPage extends NewRemoteProjectCreationPage implement
 			if (ed.isCategory()) {
 				if (categorySelectedLabel == null) {
 					categorySelectedLabel = new Label(right, SWT.WRAP);
-					categorySelectedLabel.setText(UIMessages.getString("RemoteMainWizardPage.1")); //$NON-NLS-1$
+					categorySelectedLabel.setText(UIMessages.getString("CDTMainWizardPage.1"));  //$NON-NLS-1$
 					right.layout();
 				}
 				categorySelectedLabel.setVisible(true);
