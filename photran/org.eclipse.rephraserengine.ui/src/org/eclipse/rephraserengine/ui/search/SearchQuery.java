@@ -75,7 +75,7 @@ public abstract class SearchQuery<T extends AbstractTextSearchResult> implements
         if (count == 1)
             return description + Messages.bind(Messages.SearchQuery_OneMatch, scopeDesc);
         else
-            return description + Messages.bind(Messages.SearchQuery_nMatches, scopeDesc);
+            return description + Messages.bind(Messages.SearchQuery_nMatches, count, scopeDesc);
     }
 
     public boolean canRerun()
