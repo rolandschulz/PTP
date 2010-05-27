@@ -86,7 +86,7 @@ public class CppHelper {
     public CppHelper(IResource infoProvider, String filename, Reader in) throws IOException {
         //NOTE: it is important that the CodeReader gets an ABSOLUTE file path
         if (filename == null) 
-            filename = "";
+            filename = ""; //$NON-NLS-1$
         
         IScannerInfo scanInfo = new ScannerInfo();
         if(infoProvider != null)
@@ -185,7 +185,7 @@ public class CppHelper {
         }
         
         if(ignoreCarriageReturnAncestors) {
-        	if(t.getType() == Lexer.tNEWLINE && lastParent.getImage().equals("\r\n")
+        	if(t.getType() == Lexer.tNEWLINE && lastParent.getImage().equals("\r\n") //$NON-NLS-1$
         		&& Arrays.equals(t.getCharPrecedingWhiteSpace(), lastParent.getCharPrecedingWhiteSpace()))
         	{
         		return t;
@@ -221,7 +221,7 @@ public class CppHelper {
     /**@param t - token to get image of
      * @return the image of the token (without white-space)*/
     public static String getImage(IToken t) {
-    	if(t.getType() == Lexer.tNEWLINE) return "\n";
+    	if(t.getType() == Lexer.tNEWLINE) return "\n"; //$NON-NLS-1$
     	else return t.getImage();
     }
     
@@ -286,7 +286,7 @@ public class CppHelper {
             }
             appendNeatString(buffer, t.getCharPrecedingWhiteSpace());
             buffer.append(spaceSeparator);
-            if(t.getType() == Lexer.tNEWLINE) buffer.append("\\n");
+            if(t.getType() == Lexer.tNEWLINE) buffer.append("\\n"); //$NON-NLS-1$
             else appendNeatString(buffer, t.getCharImage());
             
             t = t.getParent();
@@ -343,8 +343,8 @@ public class CppHelper {
     private static void appendNeatString(StringBuffer buffer, char[] chars) {
         for(int i = 0; i < chars.length; i++) {
             switch(chars[i]) {
-            case('\n'): buffer.append("\\n"); break;
-            case('\r'): buffer.append("\\r"); break;
+            case('\n'): buffer.append("\\n"); break; //$NON-NLS-1$
+            case('\r'): buffer.append("\\r"); break; //$NON-NLS-1$
             default: buffer.append(chars[i]); break;
             }
         }

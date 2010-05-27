@@ -42,7 +42,7 @@ public class IncludeMap {
 	public void setStreamOffset(int newStreamOffset) {
 		int distance = newStreamOffset - streamOffset;
 		if(distance < 0) throw new IllegalArgumentException(
-				"newStreamOffset must be >= the previous stream offset");
+				"newStreamOffset must be >= the previous stream offset"); //$NON-NLS-1$
 		streamOffset = newStreamOffset;
 
 		if(curToken == null) return;

@@ -6,14 +6,14 @@
    <!--====================================-->
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
-            label="C Preprocessor Actions"
-            description="C Preprocessor Actions"
+            label="%actionSet.label"
+            description="%actionSet.description"
             visible="false"
             id="org.eclipse.photran.ui.vpg.preprocessor.c.CPPActionSet">
          <action
                class="org.eclipse.photran.internal.ui.actions.DisplayPreprocessedSource"
                id="org.eclipse.photran.ui.DisplaySymbolTableAction"
-               label="&amp;Display Preprocessed Source"
+               label="%action.label"
                menubarPath="file/additions"/>
       </actionSet>
    </extension>

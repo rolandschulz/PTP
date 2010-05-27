@@ -179,9 +179,9 @@ public class ProducerMap {
 	 */
 	public void setMarkA(int newMarkA) {
 		if(newMarkA < markA) throw new IllegalArgumentException(
-				"newMarkA must be >= markA");
+				"newMarkA must be >= markA"); //$NON-NLS-1$
 		if(newMarkA > finalOffset) throw new IllegalArgumentException(
-				"newMarkA must be <= the final offset");
+				"newMarkA must be <= the final offset"); //$NON-NLS-1$
 		
 		while(true) {
 			int offset = mapping[indexPreA].offset;
@@ -207,9 +207,9 @@ public class ProducerMap {
 	 */
 	public void setMarkB(int newMarkB) {
 		if(newMarkB < markB) throw new IllegalArgumentException(
-				"newMarkB must be >= markB");
+				"newMarkB must be >= markB"); //$NON-NLS-1$
 		if(newMarkB > finalOffset) throw new IllegalArgumentException(
-				"newMarkB must be <= the final offset");
+				"newMarkB must be <= the final offset"); //$NON-NLS-1$
 		
 		boolean wasEqual = false;
 		while(true) {
@@ -249,14 +249,14 @@ public class ProducerMap {
 	 */
 	public String expandWhite(String image) {
 		if(image.length() != markB-markA) throw new IllegalArgumentException(
-				"the length of image must equal markB-markA");
+				"the length of image must equal markB-markA"); //$NON-NLS-1$
 		
 		if(indexPreA == indexPostB) return null;
 		if(indexPreA + 1 == indexPostB) {
 			if(mapping[indexPreA].string == null) return null;
 			if(mapping[indexPreA].offset == markA && mapping[indexPostB].offset == markB)
 				return mapping[indexPreA].string;
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		
 		//at this point, indexPreA and indexPostB are at least 2 apart
@@ -310,7 +310,7 @@ public class ProducerMap {
 	 */
 	public String expandNormal(String image) {
 		if(image.length() != markB-markA) throw new IllegalArgumentException(
-				"the length of image must equal markB-markA");
+				"the length of image must equal markB-markA"); //$NON-NLS-1$
 		
 		int index = indexPreA;
 		int endIndex = indexPostB;
@@ -373,7 +373,7 @@ public class ProducerMap {
 	 */
 	public boolean isBreakAfterMarkB(int endOffset) {
 		if(endOffset < markB) throw new IllegalArgumentException(
-				"endOffset must be >= markB");
+				"endOffset must be >= markB"); //$NON-NLS-1$
 		
 		if(mapping[indexPostB].offset <= endOffset) return true;
 		if(mapping[indexPostB-1].string == null) return true;

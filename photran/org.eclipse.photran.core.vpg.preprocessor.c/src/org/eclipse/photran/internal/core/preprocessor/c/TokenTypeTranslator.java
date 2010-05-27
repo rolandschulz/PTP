@@ -34,7 +34,7 @@ public class TokenTypeTranslator
     public static String typeToString(int type) {
     	if(typeMap == null) initialize();
         String str = typeMap.get(type);
-        if(str == null) return "unknown";
+        if(str == null) return "unknown"; //$NON-NLS-1$
         else return str;
     }
     

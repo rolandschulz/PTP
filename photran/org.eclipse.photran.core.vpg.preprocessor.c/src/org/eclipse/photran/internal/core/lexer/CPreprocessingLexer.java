@@ -66,7 +66,7 @@ public abstract class CPreprocessingLexer implements ILexer
         this.includeMap = cpp.getIncludeMap();
 
         if (accumulateWhitetext == false)
-            throw new IllegalArgumentException("C preprocessor can only be used if accumulateWhitetext is true");
+            throw new IllegalArgumentException("C preprocessor can only be used if accumulateWhitetext is true"); //$NON-NLS-1$
     }
 
     protected abstract ILexer createDelegateLexer(
@@ -126,7 +126,7 @@ public abstract class CPreprocessingLexer implements ILexer
     				appendedWhite = whiteAfter.substring(newLength);
     				whiteAfter = whiteAfter.substring(0, newLength);
     			}
-    			else appendedWhite = "";
+    			else appendedWhite = ""; //$NON-NLS-1$
 
     			producerMap.setMarkA(whiteStartOffset);
     			producerMap.setMarkB(whiteEndOffset);

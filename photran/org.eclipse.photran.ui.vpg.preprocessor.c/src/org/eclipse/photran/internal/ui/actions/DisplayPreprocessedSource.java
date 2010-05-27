@@ -45,8 +45,8 @@ public class DisplayPreprocessedSource extends FortranEditorActionDelegate
             Reader cppIn = new CPreprocessingReader(getFortranEditor().getIFile(), null, in);
             
             File tempFile = File.createTempFile(
-            	"tmp",
-            	isFixedForm ? ".f" : ".f90");
+            	"tmp", //$NON-NLS-1$
+            	isFixedForm ? ".f" : ".f90"); //$NON-NLS-1$ //$NON-NLS-2$
             tempFile.deleteOnExit();
             PrintStream out =
             	new PrintStream(
@@ -66,7 +66,7 @@ public class DisplayPreprocessedSource extends FortranEditorActionDelegate
         {
         	String message = e.getMessage();
         	if (message == null) message = e.getClass().getName();
-        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message);
+        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message); //$NON-NLS-1$
         }
     }
 }

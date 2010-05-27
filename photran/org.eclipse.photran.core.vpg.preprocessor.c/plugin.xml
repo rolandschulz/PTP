@@ -7,7 +7,7 @@
   <extension point="org.eclipse.photran.core.sourceForms">
       <source-form
           id="cppFreeForm"
-          name="Free Form - C Preprocessed"
+          name="%source-form.name"
           class="org.eclipse.photran.internal.core.lexer.sourceform.CPreprocessedFreeSourceForm"
           priority="high"
           defaultForFilenameExtensions="F90,F95,F03,F08" />
