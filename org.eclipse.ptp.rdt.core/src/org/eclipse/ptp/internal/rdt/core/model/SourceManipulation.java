@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,5 +127,16 @@ public abstract class SourceManipulation extends Parent implements ISourceManipu
 
 	public void setIndex(int i) {
 		fIndex= (short) i;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.rdt.core.model.CElement#getElementInfo()
+	 */
+	@Override
+	public CElementInfo getElementInfo() {
+		if (fInfo == null) {
+			fInfo = new SourceManipulationInfo(this);
+		}
+		return fInfo;
 	}
 }

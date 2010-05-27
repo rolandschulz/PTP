@@ -180,7 +180,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.107
+	 * Version: 1.109
 	 */
 	private IncludeFileContentProvider getIncludeFileContentProvider(int style, IIndex index, int linkageID) {
 		final ASTFilePathResolver pathResolver = new RemoteIndexerInputAdapter();
@@ -271,7 +271,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.102
+	 * Version: 1.109
 	 */
 	public IASTCompletionNode getCompletionNode(IIndex index, int style, int offset) throws CoreException {
 		checkState();
@@ -373,9 +373,19 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		}
 	}
 
-	public IPath getLocation() {
-		// TODO Auto-generated method stub
-		return null;
+	public IPath getLocation() {	
+		URI uri = null;
+		
+		if(fManagedLocation != null)
+			uri = fManagedLocation;
+		else
+			uri = fLocation;
+		
+		if(uri == null)
+			return null;
+		
+		String filePath = fRemotePath != null ? fRemotePath : uri.getPath();
+		return new Path(filePath);		
 	}
 
 	public INamespace getNamespace(String name) {

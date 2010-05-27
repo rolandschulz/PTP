@@ -67,7 +67,16 @@ public class RemoteScannerInfo implements IScannerInfo, Serializable {
 	}
 
 	public String[] getIncludePaths() {
-		return includePaths.toArray(new String[includePaths.size()]);
+		String[] paths = includePaths.toArray(new String[includePaths.size()]);
+		
+		//paths were changed by DescriptionScannerInfoProvider.getValues() (on Windows client at least), 
+		//need to change it back for
+		//CPreprocessor to pick up include paths correctly for remote include paths
+		for (int i = 0; i < paths.length; i++) {
+			paths[i] = paths[i].replace('\\', '/');
+		}
+		
+		return paths;
 	}
 	
 	@Override

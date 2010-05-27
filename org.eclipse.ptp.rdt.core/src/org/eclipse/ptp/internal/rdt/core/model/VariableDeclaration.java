@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,23 +47,23 @@ public class VariableDeclaration extends SourceManipulation implements IVariable
 		fIsStatic = binding.isStatic();
 	}
 
-	public String getTypeName() throws CModelException {
+	public String getTypeName() {
 		return fTypeName;
 	}
 
-	public void setTypeName(String type) throws CModelException {
+	public void setTypeName(String type) {
 		fTypeName = type;
 	}
 
-	public boolean isConst() throws CModelException {
+	public boolean isConst() {
 		return fIsConst;
 	}
 
-	public boolean isStatic() throws CModelException {
+	public boolean isStatic() {
 		return fIsStatic;
 	}
 
-	public boolean isVolatile() throws CModelException {
+	public boolean isVolatile() {
 		return fIsVolatile;
 	}
 
@@ -77,6 +77,18 @@ public class VariableDeclaration extends SourceManipulation implements IVariable
 
 	public void setStatic(boolean isStatic) {
 		fIsStatic = isStatic;
+	}
+	
+	public VariableInfo getVariableInfo(){
+		if (fInfo == null) {
+			fInfo = new VariableInfo(this);
+		}
+		return (VariableInfo) fInfo;
+	}
+	
+	@Override
+	public CElementInfo getElementInfo() {
+		return getVariableInfo();
 	}
 
 }
