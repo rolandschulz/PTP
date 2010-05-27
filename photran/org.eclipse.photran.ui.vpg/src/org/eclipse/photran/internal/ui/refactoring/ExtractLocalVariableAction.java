@@ -65,7 +65,7 @@ public class ExtractLocalVariableAction
             this.extractRefactoring = r;
         }
 
-        protected void doAddUserInputPages()
+        @Override protected void doAddUserInputPages()
         {
             addPage(new UserInputWizardPage(extractRefactoring.getName())
             {

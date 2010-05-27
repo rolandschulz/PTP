@@ -80,7 +80,7 @@ public class DeclarationView extends ViewPart
      * This is a callback that will allow us
      * to create the viewer and initialize it.
      */
-    public void createPartControl(Composite parent)
+    @Override public void createPartControl(Composite parent)
     {
         this.viewer = createFortranSourceViewer(parent);
 
@@ -150,7 +150,7 @@ public class DeclarationView extends ViewPart
     /**
      * Passing the focus request to the viewer's control.
      */
-    public void setFocus()
+    @Override public void setFocus()
     {
         viewer.getControl().setFocus();
     }

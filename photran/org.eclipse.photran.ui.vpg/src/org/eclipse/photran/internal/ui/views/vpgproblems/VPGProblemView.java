@@ -351,7 +351,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
             this.viewer = viewer;
         }
 
-        public void widgetSelected(SelectionEvent e)
+        @Override public void widgetSelected(SelectionEvent e)
         {
             tableSorter.setColumn(col.ordinal());
             int dir = viewer.getTable().getSortDirection();
@@ -375,7 +375,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 
     private final class DoubleClickListener extends MouseAdapter
     {
-        public void mouseDoubleClick(MouseEvent dblClick)
+        @Override public void mouseDoubleClick(MouseEvent dblClick)
         {
             Table t = (Table)dblClick.getSource();
             for (TableItem item : t.getSelection())

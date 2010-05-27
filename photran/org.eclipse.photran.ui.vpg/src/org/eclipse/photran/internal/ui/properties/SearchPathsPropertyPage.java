@@ -49,7 +49,7 @@ public class SearchPathsPropertyPage extends FortranPropertyPage
     /**
      * @see PreferencePage#createContents(Composite)
      */
-    protected Control createContents(Composite parent)
+    @Override protected Control createContents(Composite parent)
     {
         IProject proj = (IProject)getElement();
         properties = new SearchPathProperties(proj);
@@ -155,7 +155,7 @@ public class SearchPathsPropertyPage extends FortranPropertyPage
         return composite;
     }
 
-    public void performDefaults()
+    @Override public void performDefaults()
     {
         enableVPG.loadDefault();
         enableDeclView.loadDefault();

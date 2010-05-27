@@ -54,7 +54,7 @@ public class SelectedResourceFilterAction extends Action implements ISelectionLi
         vpgView.getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(this);
     }
     
-    public void run()
+    @Override public void run()
     {
         vpgView.setErrorWarningFilterButtonText();
         refreshTableViewer();

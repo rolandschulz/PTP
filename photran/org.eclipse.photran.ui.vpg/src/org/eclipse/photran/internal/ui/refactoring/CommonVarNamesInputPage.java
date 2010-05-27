@@ -40,7 +40,7 @@ public class CommonVarNamesInputPage extends CustomUserInputPage<CommonVarNamesR
     protected ArrayList<String> newNames;
 
     /* auto-generated method */
-    public void createControl(Composite parent)
+    @Override public void createControl(Composite parent)
     {
         oldNames = getRefactoring().getOldVarNames();
         newNames = getRefactoring().getNewVarNames();

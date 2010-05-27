@@ -246,7 +246,8 @@ class ASTInclusionStatement extends ASTPreprocessorNode implements IASTPreproces
 		return fPath;
 	}
 
-	public boolean isActive() {
+	@Override
+    public boolean isActive() {
 		return fIsActive;
 	}
 

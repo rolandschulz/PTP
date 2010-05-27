@@ -34,7 +34,7 @@ public class AddOnlyToUseStmtInputPage extends CustomUserInputPage<AddOnlyToUseS
     protected ArrayList<Button> checkList;
     protected Button check;
 
-    public void createControl(Composite parent)
+    @Override public void createControl(Composite parent)
     {
         entities = getRefactoring().getModuleEntityList();
         newOnlyList = getRefactoring().getNewOnlyList();

@@ -50,7 +50,7 @@ public class OpenMarkedFileAction extends SelectionDispatchAction
     }
 
     @SuppressWarnings("deprecation")
-    public ImageDescriptor getImageDescriptor()
+    @Override public ImageDescriptor getImageDescriptor()
     {
         Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_FORWARD_HOVER);
         return ImageDescriptor.createFromImage(img);

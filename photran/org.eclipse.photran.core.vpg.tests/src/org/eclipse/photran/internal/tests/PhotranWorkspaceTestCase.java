@@ -122,6 +122,7 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
 		initProject();
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
         if( project == null || !project.exists() )
             return;

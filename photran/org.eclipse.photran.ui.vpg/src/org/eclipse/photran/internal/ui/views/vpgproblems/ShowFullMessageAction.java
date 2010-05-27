@@ -63,7 +63,7 @@ public class ShowFullMessageAction extends SelectionDispatchAction
         setToolTipText(toolTipText);
     }
 
-    public ImageDescriptor getImageDescriptor()
+    @Override public ImageDescriptor getImageDescriptor()
     {
         Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
         return ImageDescriptor.createFromImage(img);

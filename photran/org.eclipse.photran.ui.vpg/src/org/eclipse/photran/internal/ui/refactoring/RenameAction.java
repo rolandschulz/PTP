@@ -68,7 +68,7 @@ public class RenameAction
             this.renameRefactoring = r;
         }
 
-        protected void doAddUserInputPages()
+        @Override protected void doAddUserInputPages()
         {
             addPage(new UserInputWizardPage(renameRefactoring.getName())
             {

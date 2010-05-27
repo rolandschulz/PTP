@@ -47,7 +47,7 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
 
 	// Copied from FortranEditorActionDelegate, but has VPG scheduling rule
 	
-    public final void run(IAction action)
+    @Override public final void run(IAction action)
     {
         if (this.window != null)
         {

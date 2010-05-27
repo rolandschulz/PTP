@@ -92,7 +92,7 @@ public class EncapsulateVariableFailTestCase extends EncapsulateVariableTestCase
             assertTrue(status.hasError());
     }
 
-    public void test() throws Exception
+    @Override public void test() throws Exception
     {
         if(myFailFilenames == null)
             return;

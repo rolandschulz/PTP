@@ -115,7 +115,7 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
     {
         FILE
         {
-            public boolean filterOut(PhotranTokenRef tokenRef, IFile file)
+            @Override public boolean filterOut(PhotranTokenRef tokenRef, IFile file)
             {
                 return !tokenRef.getFile().equals(file);
             }
@@ -123,7 +123,7 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
         
         PROJECT
         {
-            public boolean filterOut(PhotranTokenRef tokenRef, IFile file)
+            @Override public boolean filterOut(PhotranTokenRef tokenRef, IFile file)
             {
                 return !tokenRef.getFile().getProject().equals(file.getProject());
             }
@@ -131,7 +131,7 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
         
         WORKSPACE
         {
-            public boolean filterOut(PhotranTokenRef tokenRef, IFile file)
+            @Override public boolean filterOut(PhotranTokenRef tokenRef, IFile file)
             {
                 return false;
             }

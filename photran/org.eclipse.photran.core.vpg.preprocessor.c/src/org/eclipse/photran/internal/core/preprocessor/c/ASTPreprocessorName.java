@@ -93,6 +93,7 @@ class ASTPreprocessorName extends ASTPreprocessorNode implements IASTName {
 	}
 
     @Deprecated
+    @Override
     //method added to conform with CDT interface
 	public IASTName copy() {
 		// TODO Auto-generated method stub

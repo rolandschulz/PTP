@@ -49,7 +49,7 @@ public class RemoveMarkerAction extends SelectionDispatchAction
         // TODO Auto-generated constructor stub
     }
     
-    public ImageDescriptor getImageDescriptor()
+    @Override public ImageDescriptor getImageDescriptor()
     {
         Image img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE);
         return ImageDescriptor.createFromImage(img);

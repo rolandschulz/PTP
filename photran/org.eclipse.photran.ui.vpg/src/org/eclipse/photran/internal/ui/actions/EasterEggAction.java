@@ -59,7 +59,7 @@ public class EasterEggAction
             this.transformation = r;
         }
 
-        protected void doAddUserInputPages()
+        @Override protected void doAddUserInputPages()
         {
         	addPage(new UserInputWizardPage(transformation.getName())
             {
