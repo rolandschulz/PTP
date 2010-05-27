@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBViewPart
- * Version: 1.25
+ * Version: 1.30
  */
 
 package org.eclipse.ptp.internal.rdt.ui.includebrowser;
@@ -26,6 +26,7 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.CoreModelUtil;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -37,7 +38,6 @@ import org.eclipse.cdt.internal.ui.includebrowser.IBMessages;
 import org.eclipse.cdt.internal.ui.includebrowser.IBNode;
 import org.eclipse.cdt.internal.ui.includebrowser.IBWorkingSetFilter;
 import org.eclipse.cdt.internal.ui.navigator.OpenCElementAction;
-import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.internal.ui.viewsupport.EditorOpener;
 import org.eclipse.cdt.internal.ui.viewsupport.ExtendedTreeViewer;
@@ -63,6 +63,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -75,8 +76,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
-import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
+import org.eclipse.ptp.internal.rdt.ui.RDTHelpContextIds;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.swt.SWT;
@@ -98,6 +98,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.OpenFileAction;
@@ -119,11 +120,14 @@ public class IBViewPart extends ViewPart
         implements IShowInSource, IShowInTarget, IShowInTargetList {
 
 	private static final int MAX_HISTORY_SIZE = 10;
-    private static final String TRUE = String.valueOf(true);
+    private static final String TRUE = "true"; //$NON-NLS-1$
+    private static final String FALSE = "false"; //$NON-NLS-1$
     private static final String KEY_WORKING_SET_FILTER = "workingSetFilter"; //$NON-NLS-1$
     private static final String KEY_FILTER_SYSTEM = "systemFilter"; //$NON-NLS-1$
     private static final String KEY_FILTER_INACTIVE = "inactiveFilter"; //$NON-NLS-1$
     private static final String KEY_INPUT_PATH= "inputPath"; //$NON-NLS-1$
+    private static final String KEY_INCLUDED_BY = "includedBy"; //$NON-NLS-1$
+	private static final String KEY_SHOW_FOLDERS = "showFolders"; //$NON-NLS-1$
     
     private IMemento fMemento;
     private boolean fShowsMessage;
@@ -228,16 +232,27 @@ public class IBViewPart extends ViewPart
 				{
 					if (!IncludeBrowserUI.isIndexed(input, monitor)) 
 					{
-						final String msg = IndexUI
-								.getFileNotIndexedMessage(input);
-						display.asyncExec(new Runnable() {
-							public void run() {
-								if (fTreeViewer.getInput() == input) {
-									setMessage(msg);
-									fTreeViewer.setInput(null);
+						// Bug 306879: Try to find an alternative translation unit for the file by the location.
+//						final ITranslationUnit alt= CoreModelUtil.findTranslationUnitForLocation(input.getLocation(), input.getCProject());
+//						if (alt != null && IncludeBrowserUI.isIndexed(alt, monitor)) {
+//							display.asyncExec(new Runnable() {
+//								public void run() {
+//									if (fTreeViewer.getInput() == input) {
+//										setInput(alt);
+//									}
+//								}
+//							});
+//						} else {
+							final String msg = IndexUI.getFileNotIndexedMessage(input);
+							display.asyncExec(new Runnable() {
+								public void run() {
+									if (fTreeViewer.getInput() == input) {
+										setMessage(msg);
+										fTreeViewer.setInput(null);
+									}
 								}
-							}
-						});
+							});
+//						}
 					}
 					return Status.OK_STATUS;
 				} 
@@ -282,10 +297,12 @@ public class IBViewPart extends ViewPart
     	if (ctxService != null) {
     		fContextActivation= ctxService.activateContext(CUIPlugin.CVIEWS_SCOPE);
     	}
+    	PlatformUI.getWorkbench().getHelpSystem().setHelp(fPagebook, RDTHelpContextIds.REMOTE_INCLUDE_BROWSER);
     }
 	
 	@Override
 	public void dispose() {
+		putDialogSettings();
 		if (fContextActivation != null) {
 			IContextService ctxService = (IContextService)getSite().getService(IContextService.class);
 	    	if (ctxService != null) {
@@ -298,23 +315,19 @@ public class IBViewPart extends ViewPart
 	}
 	
     private void initializeActionStates() {
-        boolean includedBy= true;
-        boolean filterSystem= false;
-        boolean filterInactive= false;
-        
-        if (fMemento != null) {
-            filterSystem= TRUE.equals(fMemento.getString(KEY_FILTER_SYSTEM));
-            filterInactive= TRUE.equals(fMemento.getString(KEY_FILTER_INACTIVE));
-        }
-        
+    	IDialogSettings ds= getDialogSettings();
+
+        boolean includedBy= !FALSE.equals(ds.get(KEY_INCLUDED_BY));
         fIncludedByAction.setChecked(includedBy);
         fIncludesToAction.setChecked(!includedBy);
         fContentProvider.setComputeIncludedBy(includedBy);
         
-        fFilterInactiveAction.setChecked(filterInactive);
+        fFilterInactiveAction.setChecked(TRUE.equals(ds.get(KEY_FILTER_INACTIVE)));
         fFilterInactiveAction.run();
-        fFilterSystemAction.setChecked(filterSystem);
+        fFilterSystemAction.setChecked(TRUE.equals(ds.get(KEY_FILTER_SYSTEM)));
         fFilterSystemAction.run();
+        fShowFolderInLabelsAction.setChecked(TRUE.equals((ds.get(KEY_SHOW_FOLDERS))));
+        fShowFolderInLabelsAction.run();
         updateSorter();
     }
     
@@ -352,20 +365,39 @@ public class IBViewPart extends ViewPart
 
     @Override
 	public void saveState(IMemento memento) {
-        if (fWorkingSetFilter != null) {
-            fWorkingSetFilter.getUI().saveState(memento, KEY_WORKING_SET_FILTER);
-        }
-        memento.putString(KEY_FILTER_INACTIVE, String.valueOf(fFilterInactiveAction.isChecked()));
-        memento.putString(KEY_FILTER_SYSTEM, String.valueOf(fFilterSystemAction.isChecked()));
-        ITranslationUnit input= getInput();
-        if (input != null) {
-            IPath path= input.getPath();
-            if (path != null) {
-                memento.putString(KEY_INPUT_PATH, path.toPortableString());
+    	putDialogSettings();
+    	if (memento != null) {
+    		if (fWorkingSetFilter != null) {
+    			fWorkingSetFilter.getUI().saveState(memento, KEY_WORKING_SET_FILTER);
+    		}
+            ITranslationUnit input= getInput();
+            if (input != null) {
+                IPath path= input.getPath();
+                if (path != null) {
+                    memento.putString(KEY_INPUT_PATH, path.toPortableString());
+                }
             }
-        }
+    	}
         super.saveState(memento);
     }
+    
+    private void putDialogSettings() {
+    	IDialogSettings ds= getDialogSettings();
+        ds.put(KEY_FILTER_INACTIVE, String.valueOf(fFilterInactiveAction.isChecked()));
+        ds.put(KEY_FILTER_SYSTEM, String.valueOf(fFilterSystemAction.isChecked()));
+        ds.put(KEY_INCLUDED_BY, String.valueOf(fIncludedByAction.isChecked()));
+        ds.put(KEY_SHOW_FOLDERS, String.valueOf(fShowFolderInLabelsAction.isChecked()));
+    }
+    
+	private IDialogSettings getDialogSettings() {
+		IDialogSettings ds= CUIPlugin.getDefault().getDialogSettings();
+		final String name = IBViewPart.class.getName();
+		IDialogSettings result= ds.getSection(name);
+		if (result == null) {
+			result= ds.addNewSection(name);
+		}
+		return result;
+	}
 
     private void createContextMenu() {
         MenuManager manager = new MenuManager();
@@ -847,7 +879,7 @@ public class IBViewPart extends ViewPart
     public String[] getShowInTargetIds() {
         return new String[] {
         		ProjectExplorer.VIEW_ID, 
-        		IPageLayout.ID_RES_NAV
+        		IPageLayout.ID_PROJECT_EXPLORER
         };
     }
 
