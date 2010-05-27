@@ -26,6 +26,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
@@ -54,22 +56,34 @@ import org.eclipse.rephraserengine.testing.junit3.GeneralTestSuiteFromMarkers;
  * fourth fields may also be a line and column number; then, the selection passed to the refactoring
  * will extend from the first line/column to the second line/column.
  * <p>
- * At least one other field will follow the line and column information.  For most refactorings,
- * this will be either &quot;true&quot; or &quot;false&quot;, indicating whether the refactoring
- * should succeed or fail (i.e., &quot;false&quot; indicates that a precondition check is expected
- * to fail).  However, some other refactorings will use these fields to pass additional arguments
- * to the refactoring (e.g., the name of a local variable to extract).  If additional arguments are
- * expected, the subclass must override
- * {@link #configureRefactoring(VPGResourceRefactoring, IFile, TextSelection, String[])} to process
- * them.
+ * The line and column numbers may be followed by an arbitrary number of fields that contain data
+ * specific to the refactoring being invoked.  Many refactorings don't require any additional data;
+ * the Extract Local Variable test suite uses one field for the new variable declaration; the Add
+ * ONLY to USE Statement test suite uses these fields to list the module entities to add; etc.
+ * <p>
+ * The final field must be either &quot;pass&quot;, &quot;pass&quot;fail-initial&quot;pass&quot;,
+ * or &quot;pass&quot;fail-final&quot;pass&quot;, indicating whether the refactoring should succeed,
+ * fail its initial precondition check, or fail its final precondition check.
+ * <p>
+ * If the refactoring is expected to succeed, the Fortran program will be compiled and run before
+ * and after the refactoring in order to ensure that the refactoring actually preserved behavior.
  *
  * @author Jeff Overbey
  */
 public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResourceRefactoring<IFortranAST, Token, PhotranVPG>>
               extends GeneralTestSuiteFromMarkers
 {
+    /** Text of the last marker field when a refactoring is pass all precondition checks */
+    private static final String PASS = "pass";
+    /** Text of the last marker field when a refactoring is expected to fail initial precondition check */
+    private static final String FAIL_INITIAL = "fail-initial";
+    /** Text of the last marker field when a refactoring is expected to fail final precondition check */
+    private static final String FAIL_FINAL = "fail-final";
+
+    /** The marker to search for */
     protected static final String MARKER = "!<<<<<";
 
+    /** Filter that determines which files will be imported into the runtime workspace */
     protected static final FilenameFilter FORTRAN_FILE_FILTER = new FilenameFilter()
     {
         public boolean accept(File dir, String filename)
@@ -80,7 +94,10 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
         }
     };
     
+    /** The activator class that will be used to load test files from the source tree */
     protected Plugin activator;
+    
+    /** The refactoring under test */
     protected Class<R> refactoringClass;
 
     protected PhotranRefactoringTestSuiteFromMarkers(Plugin activator, String descriptionPrefix, String directory, Class<R> clazz) throws Exception
@@ -127,7 +144,15 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
         else
             throw new IllegalStateException();
         
-        return true;
+        if (lastMarkerField(markerText).equals(PASS)
+                || lastMarkerField(markerText).equals(FAIL_FINAL)
+                || lastMarkerField(markerText).equals("true")
+                || lastMarkerField(markerText).equals("false"))
+            return true;
+        else if (lastMarkerField(markerText).equals(FAIL_INITIAL))
+            return false;
+        else
+            throw new IllegalStateException();
     }
 
     /**
@@ -141,28 +166,17 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
      */
     protected boolean configureRefactoring(R refactoring, IFile file, TextSelection selection, String[] markerText)
     {
-        if (markerText.length >= 3 && isBoolean(markerText[2]))
-        {
-            // Marker has the form !<<<<<line,col,shouldSucceed
-            return Boolean.parseBoolean(markerText[2]);
-        }
-        else if (markerText.length >= 5 && isBoolean(markerText[4]))
-        {
-            // Marker has the form !<<<<<fromLine,fromCol,toLine,toCol,shouldSucceed
-            return Boolean.parseBoolean(markerText[4]);
-        }
-        else
-        {
+        if (lastMarkerField(markerText).equals(PASS) || lastMarkerField(markerText).equals("true"))
             return true;
-        }
+        else if (lastMarkerField(markerText).equals(FAIL_FINAL) || lastMarkerField(markerText).equals("false"))
+            return false;
+        else
+            throw new IllegalStateException();
     }
 
-    /**
-     * @return true iff string is either &quot;true&quot; or &quot;false&quot;
-     */
-    private boolean isBoolean(String string)
+    private String lastMarkerField(String[] markerText)
     {
-        return string.equals("true") || string.equals("false");
+        return markerText[markerText.length-1];
     }
 
     public class IndividualRefactoringTestCase extends PhotranWorkspaceTestCase
@@ -186,7 +200,6 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
         public void test() throws Exception
         {
             IFile fileContainingMarker = importFiles();
-            String before = compileAndRunFortranProgram();
             R refactoring = createRefactoring();
 
             String[] markerFields = parseMarker();
@@ -200,6 +213,8 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
 
             if (!status.hasFatalError())
             {
+                String before = compileAndRunFortranProgram();
+                
                 status = checkFinalConditions(refactoring,
                     configureRefactoring(refactoring, fileContainingMarker, selection, markerFields));
     
@@ -236,7 +251,7 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
             return markerStrings;
         }
 
-        private TextSelection determineSelection(String[] markerStrings)
+        private TextSelection determineSelection(String[] markerStrings) throws IOException, CoreException
         {
             assertTrue(markerStrings.length >= 2);
             int fromLine = Integer.parseInt(markerStrings[0]);
@@ -250,8 +265,13 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
                 int toOffset = getLineColOffset(fileContainingMarker.getName(), new LineCol(toLine, toCol));
                 length = toOffset - fromOffset;
             }
-            TextSelection selection = new TextSelection(fromOffset, length);
+            TextSelection selection = new TextSelection(createDocument(),  fromOffset, length);
             return selection;
+        }
+
+        private IDocument createDocument() throws IOException, CoreException
+        {
+            return new Document(readWorkspaceFile(fileContainingMarker.getName()));
         }
 
         private void appendFilenameToDescription(String[] markerStrings)
@@ -291,15 +311,23 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
 
         private void compareAgainstResultFile() throws IOException, URISyntaxException, CoreException
         {
-            if (new File(fileContainingMarker.getPath() + ".result").exists())
+            for (String filename : files.keySet())
             {
-                for (String filename : files.keySet())
+                if (resultFileFor(filename).exists())
                 {
-                    assertEquals(
-                        readTestFile(activator, fileContainingMarker.getParent(), filename + ".result").replaceAll("\\r", ""), // expected result
-                        readWorkspaceFile(filename).replaceAll("\\r", ""));               // actual refactored file
+                    String expected = readTestFile(activator, fileContainingMarker.getParent(), filename + ".result").replaceAll("\\r", "");
+                    String actual = readWorkspaceFile(filename).replaceAll("\\r", "");
+                    assertEquals(expected, actual);               // actual refactored file
                 }
             }
+        }
+
+        private File resultFileFor(String filename)
+        {
+            return new File(fileContainingMarker.getParent()
+                + File.separator
+                + filename
+                +  ".result");
         }
 
         /**
