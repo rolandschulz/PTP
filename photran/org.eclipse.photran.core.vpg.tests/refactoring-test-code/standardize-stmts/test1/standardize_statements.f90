@@ -1,4 +1,4 @@
-program standardize_statements !<<<<<1,1,true
+program standardize_statements !<<<<<1,1,pass
     implicit none
     real x,y,z !first declare some reals
     integer t,q,p,r !then add integer declaration

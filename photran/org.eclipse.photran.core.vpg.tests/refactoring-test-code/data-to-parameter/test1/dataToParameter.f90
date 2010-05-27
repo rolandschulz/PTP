@@ -1,4 +1,4 @@
-program dataToParameter !<<<<<1,1,true
+program dataToParameter !<<<<<1,1,pass
 	implicit none
 	real :: x, y, z
 	integer :: a, b, c !A comment

@@ -42,24 +42,14 @@ public class ExtractLocalVariableTestSuite
     }
 
     @Override
-    protected boolean initializeRefactoring(ExtractLocalVariableRefactoring refactoring,
-                                            IFile file,
-                                            TextSelection selection,
-                                            String[] markerText)
-    {
-        super.initializeRefactoring(refactoring, file, selection, markerText);
-        return !file.getName().contains("FAILINITIAL");
-    }
-
-    @Override
     protected boolean configureRefactoring(ExtractLocalVariableRefactoring refactoring,
                                            IFile file,
                                            TextSelection selection,
                                            String[] markerText)
     {
-        String newName = markerText[4];
-        boolean shouldSucceed = Boolean.parseBoolean(markerText[5]);
+        boolean shouldSucceed = super.configureRefactoring(refactoring, file, selection, markerText);
 
+        String newName = markerText[4];
         refactoring.setDecl(newName);
 
         return shouldSucceed;

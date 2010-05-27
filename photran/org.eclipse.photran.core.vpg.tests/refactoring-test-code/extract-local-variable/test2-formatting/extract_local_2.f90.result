@@ -5,5 +5,5 @@ program extract_local
     count = size(numbers,1)
     print *, sum(numbers)    &
                   /          &
-             count !<<<<< 6, 14, 6, 29, integer :: count, true
+             count !<<<<< 6, 14, 6, 29, integer :: count, pass
 end program

@@ -1,4 +1,4 @@
-program unused_variables !<<<<<1,1,true
+program unused_variables !<<<<<1,1,pass
     implicit none
     integer x,y,z !Integers are declared
     real :: a,b,c !Reals are declared

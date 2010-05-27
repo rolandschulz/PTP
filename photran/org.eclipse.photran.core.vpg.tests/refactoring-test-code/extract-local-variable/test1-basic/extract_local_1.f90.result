@@ -3,5 +3,5 @@ program extract_local
     integer :: var
     print *, "This is a test"
     var = 4*5
-    print *, 3+var+6 !<<<<< 4, 16, 4, 19, integer :: var, true
+    print *, 3+var+6 !<<<<< 4, 16, 4, 19, integer :: var, pass
 end program

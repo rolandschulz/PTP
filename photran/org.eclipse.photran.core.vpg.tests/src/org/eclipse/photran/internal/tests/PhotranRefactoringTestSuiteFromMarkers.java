@@ -144,10 +144,7 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
         else
             throw new IllegalStateException();
         
-        if (lastMarkerField(markerText).equals(PASS)
-                || lastMarkerField(markerText).equals(FAIL_FINAL)
-                || lastMarkerField(markerText).equals("true")
-                || lastMarkerField(markerText).equals("false"))
+        if (lastMarkerField(markerText).equals(PASS) || lastMarkerField(markerText).equals(FAIL_FINAL))
             return true;
         else if (lastMarkerField(markerText).equals(FAIL_INITIAL))
             return false;
@@ -166,9 +163,9 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
      */
     protected boolean configureRefactoring(R refactoring, IFile file, TextSelection selection, String[] markerText)
     {
-        if (lastMarkerField(markerText).equals(PASS) || lastMarkerField(markerText).equals("true"))
+        if (lastMarkerField(markerText).equals(PASS))
             return true;
-        else if (lastMarkerField(markerText).equals(FAIL_FINAL) || lastMarkerField(markerText).equals("false"))
+        else if (lastMarkerField(markerText).equals(FAIL_FINAL))
             return false;
         else
             throw new IllegalStateException();

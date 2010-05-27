@@ -1,4 +1,4 @@
-program standardize_statements !<<<<<1,1,true
+program standardize_statements !<<<<<1,1,pass
     implicit none
     real, dimension(1:10) :: vector
     real, dimension(1:10) :: vector2
