@@ -52,7 +52,7 @@ MIListAdd(MIList *l, void *v)
 {
 	ListElement *	e;
 
-	if ( l == (List *)NULL)
+	if ( l == (MIList *)NULL)
 		return;
 
 	e = malloc(sizeof(ListElement));
@@ -74,7 +74,7 @@ MIListAddFirst(MIList *l, void *v)
 	ListElement *	e;
 	ListElement *	ep;
 
-	if (l == (List *)NULL)
+	if (l == (MIList *)NULL)
 		return;
 
 	e = malloc(sizeof(ListElement));
@@ -106,7 +106,7 @@ MIListInsertBefore(MIList *l, void *val, void *new_val)
 	ListElement **	e;
 	ListElement *	ne;
 
-	if (l == (List *)NULL) {
+	if (l == (MIList *)NULL) {
 		return;
 	}
 	
@@ -139,9 +139,9 @@ MIListAppend(MIList *dst, MIList *src)
 {
 	void *	e;
 
-	SetList(src);
+	MIListSet(src);
 
-	while ( (e = GetListElement(src)) != (void *)NULL) {
+	while ( (e = MIListGet(src)) != (void *)NULL) {
 		MIListAdd(dst, e);
 	}
 }
@@ -300,7 +300,6 @@ MIListGetFirst(MIList *l)
 	void *	val;
 	
 	if ( l == (MIList *)NULL || l->l_head == (ListElement *) NULL) {
-		THREAD_UNLOCK(list);
 		return (void *)NULL;
 	}
 

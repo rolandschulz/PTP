@@ -27,12 +27,12 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "MIList.h"
 #include "MIResult.h"
 #include "MIValue.h"
 #include "MIOOBRecord.h"
+#include "MISignalInfo.h"
 #include "CLIOutput.h"
-
-#include "signalinfo.h"
 
 static int
 getBoolean(char* value)
@@ -44,24 +44,24 @@ getBoolean(char* value)
 }
 
 void
-CLIGetSigHandleList(MICommand *cmd, List** signals)
+CLIGetSigHandleList(MICommand *cmd, MIList** signals)
 {
-	List *oobs;
+	MIList *oobs;
 	MIOOBRecord *oob;
+	MISignalInfo *sig;
 	char *text = NULL;
-
-	const char* delims[] = { " ", "\\" };
-	char *token, *pch;
+	char *token;
+	char *pch;
 	int i;
+	const char* delims[] = { " ", "\\" };
 
-	signalinfo *sig;
-	*signals = NewList();
+	*signals = MIListNew();
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
 		return;
 
 	oobs = cmd->output->oobs;
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+	for (MIListSet(oobs); (oob = (MIOOBRecord *)MIListGet(oobs)) != NULL; ) {
 		text = oob->cstring;
 		if (*text == '\0' || *text == '\\') {
 			continue;
@@ -73,7 +73,7 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 			if (pch == NULL) {
 				continue;
 			}
-			sig = NewSignalInfo();
+			sig = MISignalInfoNew();
 			for (i=0; pch != NULL; i++,pch=strstr(token, delims[1])) {
 				if (*pch == '\0') {
 					break;
@@ -88,7 +88,6 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 					pch += 2;
 				}
 
-//printf("---token(%d): %s\n", i, strdup(token));
 				switch(i) {
 					case 0:
 						sig->name = strdup(token);
@@ -110,7 +109,7 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 			}
 			free(token);
 			free(pch);
-			AddToList(*signals, (void *)sig);
+			MIListAdd(*signals, (void *)sig);
 		}
 	}
 }
@@ -118,7 +117,7 @@ CLIGetSigHandleList(MICommand *cmd, List** signals)
 double
 CLIGetGDBVersion(MICommand *cmd)
 {
-	List *			oobs;
+	MIList *		oobs;
 	MIOOBRecord *	oob;
 	char *			text;
 
@@ -131,7 +130,7 @@ CLIGetGDBVersion(MICommand *cmd)
 	}
 
 	oobs = cmd->output->oobs;
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+	for (MIListSet(oobs); (oob = (MIOOBRecord *)MIListGet(oobs)) != NULL; ) {
 		text = oob->cstring;
 		if (*text == '\0') {
 			continue;
@@ -170,7 +169,7 @@ CLIGetGDBVersion(MICommand *cmd)
 char *
 CLIGetPTypeInfo(MICommand *cmd)
 {
-	List *			oobs;
+	MIList *		oobs;
 	MIOOBRecord *	oob;
 	char *			text = NULL;
 	char *			p = NULL;
@@ -179,7 +178,7 @@ CLIGetPTypeInfo(MICommand *cmd)
 		return NULL;
 
 	oobs = cmd->output->oobs;
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+	for (MIListSet(oobs); (oob = (MIOOBRecord *)MIListGet(oobs)) != NULL; ) {
 		text = oob->cstring;
 		if (*text == '\0') {
 			continue;
@@ -218,7 +217,7 @@ CLIInfoThreadsInfoNew(void)
 CLIInfoThreadsInfo *
 CLIGetInfoThreadsInfo(MICommand *cmd)
 {
-	List *					oobs;
+	MIList *				oobs;
 	MIOOBRecord *			oob;
 	CLIInfoThreadsInfo *	info = CLIInfoThreadsInfoNew();
 	char * 					text = NULL;
@@ -233,8 +232,8 @@ CLIGetInfoThreadsInfo(MICommand *cmd)
 	}
 
 	oobs = cmd->output->oobs;
-	info->thread_ids = NewList();
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+	info->thread_ids = MIListNew();
+	for (MIListSet(oobs); (oob = (MIOOBRecord *)MIListGet(oobs)) != NULL; ) {
 		text = oob->cstring;
 
 		if (*text == '\0') {
@@ -252,12 +251,12 @@ CLIGetInfoThreadsInfo(MICommand *cmd)
 		}
 		if (isdigit(*text)) {
 			if (info->thread_ids == NULL)
-				info->thread_ids = NewList();
+				info->thread_ids = MIListNew();
 
 			id = strchr(text, ' ');
 			if (id != NULL) {
 				*id = '\0';
-				AddToList(info->thread_ids, (void *)strdup(text));
+				MIListAdd(info->thread_ids, (void *)strdup(text));
 			}
 		}
 	}
@@ -305,7 +304,7 @@ MIGetInfoProcInfo(MICommand *cmd)
 		return info;
 
 	rr = cmd->output->rr;
-	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+	for (MIListSet(rr->results); (result = (MIResult *)MIListGet(rr->results)) != NULL; ) {
 		value = result->value;
 		if (value->type == MIValueTypeConst) {
 			str = value->cstring;
@@ -322,7 +321,7 @@ CLIInfoProcInfo *
 MIGetInfoProcInfo(MICommand *cmd)
 {
 	int					len;
-	List *				oobs;
+	MIList *			oobs;
 	MIOOBRecord *		oob;
 	char *				text = NULL;
 	CLIInfoProcInfo *	info = CLIInfoProcInfoNew();
@@ -331,7 +330,7 @@ MIGetInfoProcInfo(MICommand *cmd)
 		return info;
 
 	oobs = cmd->output->oobs;
-	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+	for (MIListSet(oobs); (oob = (MIOOBRecord *)MIListGet(oobs)) != NULL; ) {
 		text = oob->cstring;
 		if (*text == '\0') {
 			continue;

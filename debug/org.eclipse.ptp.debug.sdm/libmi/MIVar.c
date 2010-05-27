@@ -84,7 +84,7 @@ MIVarChangeFree(MIVarChange *varchange) {
 }
 
 MIVar *
-MIVarParse(List *results)
+MIVarParse(MIList *results)
 {
 	MIValue *	value;
 	MIResult *	result;
@@ -128,7 +128,7 @@ MIGetVarCreateInfo(MICommand *cmd)
  * See PR 81019
  */
 static void
-parseChildren(MIValue *val, List **res)
+parseChildren(MIValue *val, MIList **res)
 {
 	MIValue *	value;
 	MIResult *	result;
@@ -141,7 +141,7 @@ parseChildren(MIValue *val, List **res)
 				value = result->value;
 				if (value->type == MIValueTypeTuple) {
 					if (children == NULL) {
-						children = NewList();
+						children = MIListNew();
 					}
 					MIListAdd(children, MIVarParse(value->results));
 				}
@@ -178,7 +178,7 @@ MIGetVarListChildrenInfo(MICommand *cmd, MIVar *var)
 	}
 
 	if (children != NULL) {
-		num = SizeOfList(children);
+		num = MIListSize(children);
 		if (var->numchild != num) {
 			var->numchild = num;
 		}
@@ -239,7 +239,7 @@ MIGetDataEvaluateExpressionInfo(MICommand *cmd)
 }
 
 void
-MIGetVarUpdateParseValue(MIValue* tuple, List* varchanges)
+MIGetVarUpdateParseValue(MIValue* tuple, MIList* varchanges)
 {
 	MIResult * result;
 	char * str = NULL;
@@ -281,7 +281,7 @@ MIGetVarUpdateParseValue(MIValue* tuple, List* varchanges)
 }
 
 void
-MIGetVarUpdateParser(MIValue* miVal, List *varchanges)
+MIGetVarUpdateParser(MIValue* miVal, MIList *varchanges)
 {
 	MIValue* value;
 	MIResult* result;
@@ -289,7 +289,7 @@ MIGetVarUpdateParser(MIValue* miVal, List *varchanges)
 	if (miVal->type == MIValueTypeTuple) {
 		MIGetVarUpdateParseValue(miVal, varchanges);
 	} else if (miVal->type == MIValueTypeList) {
-		if (EmptyList(miVal->values)) {
+		if (MIListIsEmpty(miVal->values)) {
 			for (MIListSet(miVal->results); (result = (MIResult *)MIListGet(miVal->results)) != NULL;) {
 				MIGetVarUpdateParser(result->value, varchanges);
 			}
@@ -302,11 +302,12 @@ MIGetVarUpdateParser(MIValue* miVal, List *varchanges)
 }
 
 void
-MIGetVarUpdateInfo(MICommand *cmd, List** varchanges)
+MIGetVarUpdateInfo(MICommand *cmd, MIList** varchanges)
 {
-	MIResult *		result;
+	MIResult *			result;
 	MIResultRecord *	rr;
-	*varchanges = NewList();
+
+	*varchanges = MIListNew();
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->rr == NULL)
 		return;

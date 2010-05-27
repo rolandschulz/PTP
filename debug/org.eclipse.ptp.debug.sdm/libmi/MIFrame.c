@@ -60,7 +60,7 @@ MIFrameFree(MIFrame *frame)
 	if (frame->file != NULL)
 		free(frame->file);
 	if (frame->args != NULL)
-		DestroyList(frame->args, MIArgFree);
+		MIListFree(frame->args, MIArgFree);
 	free(frame);
 }
 
@@ -113,7 +113,7 @@ MIFrameParse(MIValue *tuple)
 	return frame;
 }
 
-List *
+MIList *
 MIGetStackListFramesInfo(MICommand *cmd)
 {
 	MIValue *			val;
@@ -136,7 +136,7 @@ MIGetStackListFramesInfo(MICommand *cmd)
 						frameVal = result->value;
 						if (frameVal->type == MIValueTypeTuple) {
 							if (frames == NULL)
-								frames = NewList();
+								frames = MIListNew();
 							MIListAdd(frames, MIFrameParse(frameVal));
 						}
 					}
@@ -161,7 +161,7 @@ MIFrameInfoParse(MIList *results)
 			val = result->value;
 			if (val->type == MIValueTypeTuple) {
 				if (frames == NULL)
-					frames = NewList();
+					frames = MIListNew();
 				MIListAdd(frames, (void *)MIFrameParse(val));
 			}
 		}
@@ -171,7 +171,7 @@ MIFrameInfoParse(MIList *results)
 	return frames;
 }
 
-List *
+MIList *
 MIGetFrameInfo(MICommand *cmd)
 {
 	MIResultRecord *	rr;

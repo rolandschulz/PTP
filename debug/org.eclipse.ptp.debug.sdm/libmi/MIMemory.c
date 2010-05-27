@@ -49,7 +49,7 @@ MIMemoryFree(MIMemory *memory)
 	if (memory->ascii != NULL)
 		free(memory->ascii);
 	if (memory->data != NULL)
-		DestroyList(memory->data, free);
+		MIListFree(memory->data, free);
 	free(memory);
 }
 
@@ -60,7 +60,7 @@ MIMemoryParse(MIValue *tuple)
 	char *		var;
 	MIValue *	value;
 	MIResult *	result;
-	List *		results = tuple->results;
+	MIList *	results = tuple->results;
 	MIMemory *	memory = MIMemoryNew();
 	
 	for (MIListSet(results); (result = (MIResult *)MIListGet(results)) != NULL;) {
@@ -87,7 +87,7 @@ MIMemoryParse(MIValue *tuple)
 MIList *
 MIMemoryDataParse(MIValue* miValue)
 {
-	MIList *	data = NewList();
+	MIList *	data = MIListNew();
 	MIList *	values = miValue->values;
 	MIValue * 	value;
 	
@@ -117,7 +117,7 @@ MIDataReadMemoryInfoFree(MIDataReadMemoryInfo *memoryInfo)
 	if (memoryInfo->addr != NULL)
 		free(memoryInfo->addr);
 	if (memoryInfo->memories != NULL)
-		DestroyList(memoryInfo->memories, MIMemoryFree);
+		MIListFree(memoryInfo->memories, MIMemoryFree);
 	free(memoryInfo);
 }
 
@@ -167,10 +167,10 @@ MIGetDataReadMemoryInfo(MICommand *cmd)
 	return info;
 }
 
-List *
+MIList *
 MIGetMemoryList(MIValue *miValue)
 {
-	MIList *	memories = NewList();
+	MIList *	memories = MIListNew();
 	MIList *	values = miValue->values;
 	MIValue *	value;
 	

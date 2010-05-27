@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 {
 	MISession *sess;
 	MICommand *cmd;
-	List *bpts;
+	MIList *bpts;
 	MIBreakpoint *bpt;
 	
 	sess = MISessionNew();
@@ -77,7 +77,7 @@ printf("break command\n");
 		fprintf(stderr, "command failed\n");
 	bpts = MIBreakpointGetBreakInsertInfo(cmd);
 	if (bpts != NULL)
-		for (SetList(bpts); (bpt = (MIBreakpoint *)GetListElement(bpts)) != NULL; )
+		for (MIListSet(bpts); (bpt = (MIBreakpoint *)MIListGet(bpts)) != NULL; )
 			printf("bpt id = %d\n", bpt->number);
 	MICommandFree(cmd);
 printf("quit command\n");		

@@ -22,6 +22,7 @@ libmi_a_SOURCES =			CLICommand.c \
 							MIResult.c \
 							MIResultRecord.c \
 							MISession.c \
+							MISignalInfo.c \
 							MIStackCommand.c \
 							MIString.c \
 							MIThread.c \

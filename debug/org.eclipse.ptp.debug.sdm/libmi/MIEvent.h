@@ -20,7 +20,7 @@
 #ifndef _MIEVENT_H_
 #define _MIEVENT_H_
 
-#include "list.h"
+#include "MIList.h"
 #include "MIFrame.h"
 
 #define MIEventClassStopped			1
