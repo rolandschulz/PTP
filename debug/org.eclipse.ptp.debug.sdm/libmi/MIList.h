@@ -23,18 +23,18 @@
 struct MIList
 {
 	int						l_nel;
-	struct ListElement *	l_head;
-	struct ListElement *	l_scan;
-	struct ListElement **	l_tail;
+	struct MIListElement *	l_head;
+	struct MIListElement *	l_scan;
+	struct MIListElement **	l_tail;
 };
 typedef struct MIList	MIList;
 
-struct ListElement
+struct MIListElement
 {
 	void *					l_value;
-	struct ListElement *	l_next;
+	struct MIListElement *	l_next;
 };
-typedef struct ListElement	ListElement;
+typedef struct MIListElement	MIListElement;
 
 extern MIList *	MIListNew(void);
 extern void		MIListAdd(MIList *, void *);

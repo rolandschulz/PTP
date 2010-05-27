@@ -382,7 +382,7 @@ static List *
 GetChangedVariables()
 {
 	MICommand *cmd;
-	List *changes;
+	MIList *changes;
 	List *changedVars;
 	MIVarChange *var;
 
@@ -398,7 +398,7 @@ GetChangedVariables()
 	MICommandFree(cmd);
 
 	changedVars = NewList();
-	for (SetList(changes); (var = (MIVarChange *)GetListElement(changes)) != NULL;) {
+	for (MIListSet(changes); (var = (MIVarChange *)MIListGet(changes)) != NULL;) {
 		if (var->in_scope == 1) {
 			AddToList(changedVars, (void *)strdup(var->name));
 		}
@@ -406,7 +406,7 @@ GetChangedVariables()
 			DeleteMIVar(var->name);
 		}
 	}
-	DestroyList(changes, MIVarChangeFree);
+	MIListFree(changes, MIVarChangeFree);
 	return changedVars;
 }
 
@@ -517,7 +517,7 @@ AsyncStop(void *data)
 		} else {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_SIGNAL;
-			e->dbg_event_u.suspend_event.ev_u.sig = NewSignalInfo();
+			e->dbg_event_u.suspend_event.ev_u.sig = MISignalInfoNew();
 			e->dbg_event_u.suspend_event.ev_u.sig->name = strdup(evt->sigName);
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
@@ -530,7 +530,7 @@ AsyncStop(void *data)
 	case MIEventTypeInferiorSignalExit:
 		e = NewDbgEvent(DBGEV_EXIT);
 		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_SIGNAL;
-		e->dbg_event_u.exit_event.ev_u.sig = NewSignalInfo();
+		e->dbg_event_u.exit_event.ev_u.sig = MISignalInfoNew();
 		e->dbg_event_u.exit_event.ev_u.sig->name = strdup(evt->sigName);
 		e->dbg_event_u.exit_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 		//RemoveAllMaps();
@@ -818,7 +818,7 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	dbg_event *		e;
 	MIBreakpoint *	bpt;
 	MICommand *		cmd;
-	List *			bpts;
+	MIList *		bpts;
 	breakpoint *	bp;
 
 	if (condition != NULL && strlen(condition) == 0)
@@ -841,15 +841,15 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 		return DBGRES_ERR;
 	}
 
-	SetList(bpts);
-	bpt = (MIBreakpoint *)GetListElement(bpts);
+	MIListSet(bpts);
+	bpt = (MIBreakpoint *)MIListGet(bpts);
 
 	AddBPMap(bpt->number, bpid, isTemp);
 
 	//if the type is temporary, no need to send bpt set event
 	if (isTemp) {
 		SaveEvent(NewDbgEvent(DBGEV_OK));
-		DestroyList(bpts, MIBreakpointFree);
+		MIListFree(bpts, MIBreakpointFree);
 		return DBGRES_OK;
 	}
 
@@ -872,7 +872,7 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 	e->dbg_event_u.bpset_event.bp = bp;
 	SaveEvent(e);
 
-	DestroyList(bpts, MIBreakpointFree);
+	MIListFree(bpts, MIBreakpointFree);
 	return DBGRES_OK;
 }
 
@@ -1043,7 +1043,7 @@ GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char *condition,
 	dbg_event *		e;
 	MIBreakpoint *	bpt;
 	MICommand *		cmd;
-	List *			bpts;
+	MIList *		bpts;
 	breakpoint *	bp;
 
 	if (condition != NULL && strlen(condition) == 0)
@@ -1066,8 +1066,8 @@ GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char *condition,
 		return DBGRES_ERR;
 	}
 
-	SetList(bpts);
-	bpt = (MIBreakpoint *)GetListElement(bpts);
+	MIListSet(bpts);
+	bpt = (MIBreakpoint *)MIListGet(bpts);
 
 	AddBPMap(bpt->number, bpid, 0); //0 is not temp??
 
@@ -1089,7 +1089,7 @@ GDBMIWatchpoint(int bpid, char *expr, int isAccess, int isRead, char *condition,
 	e->dbg_event_u.bpset_event.bp = bp;
 	SaveEvent(e);
 
-	DestroyList(bpts, MIBreakpointFree);
+	MIListFree(bpts, MIBreakpointFree);
 
 	return DBGRES_OK;
 }
@@ -1269,25 +1269,22 @@ GDBMISetCurrentStackframe(int level)
 static int
 GetStackframes(int current, int low, int high, List **flist)
 {
-	List *		frames;
-	MIFrame *	f;
-	MICommand *	cmd;
+	MIList *		frames;
+	MIFrame *		f;
+	MICommand *		cmd;
 	stackframe *	s;
 
 	//checking gdb version
 	if (current) {
 		if (GDB_Version > 6.3) {
 			cmd = MIStackInfoFrame();
-		}
-		else {
+		} else {
 			cmd = CLIFrame();
 		}
-	}
-	else {
+	} else {
 		if (low == 0 && high == 0) {
 			cmd = MIStackListAllFrames();
-		}
-		else {
+		} else {
 			cmd = MIStackListFrames(low, high);
 		}
 	}
@@ -1314,11 +1311,11 @@ GetStackframes(int current, int low, int high, List **flist)
 	}
 
 	*flist = NewList();
-	for (SetList(frames); (f = (MIFrame *)GetListElement(frames)) != NULL; ) {
+	for (MIListSet(frames); (f = (MIFrame *)MIListGet(frames)) != NULL; ) {
 		s = ConvertMIFrameToStackframe(f);
 		AddToList(*flist, (void *)s);
 	}
-	DestroyList(frames, MIFrameFree);
+	MIListFree(frames, MIFrameFree);
 	return DBGRES_OK;
 }
 
@@ -1352,7 +1349,7 @@ GDBMIGetLocalVariables(void)
 	dbg_event *	e;
 	MICommand *	cmd;
 	MIArg *		arg;
-	List *		args;
+	MIList *	args;
 
 	CHECK_SESSION();
 
@@ -1373,11 +1370,11 @@ GDBMIGetLocalVariables(void)
 	e = NewDbgEvent(DBGEV_VARS);
 	e->dbg_event_u.list = NewList();
 
-	for (SetList(args); (arg = (MIArg *)GetListElement(args)) != NULL; ) {
+	for (MIListSet(args); (arg = (MIArg *)MIListGet(args)) != NULL; ) {
 		AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
 	}
 
-	DestroyList(args, MIArgFree);
+	MIListFree(args, MIArgFree);
 
 	SaveEvent(e);
 
@@ -1432,7 +1429,7 @@ GDBMIListArguments(int low, int high)
 	MICommand *	cmd;
 	MIArg *		arg;
 	MIFrame *	frame;
-	List *		frames;
+	MIList *	frames;
 
 	CHECK_SESSION();
 
@@ -1458,18 +1455,19 @@ GDBMIListArguments(int low, int high)
  	 * one anyway...
  	 * ****** If frame is more than one, no arg needs *****
  	 */
-	SetList(frames);
-	if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
+	MIListSet(frames);
+	if ((frame = (MIFrame *)MIListGet(frames)) != NULL) {
 #if GDB_BUG_2188
 		if (!CurrentFrame(frame->level, "main")) {
 #endif /* GDB_BUG_2188 */
-			for (SetList(frame->args); (arg = (MIArg *)GetListElement(frame->args)) != NULL; )
+			for (MIListSet(frame->args); (arg = (MIArg *)MIListGet(frame->args)) != NULL; ) {
 				AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
+			}
 #if GDB_BUG_2188
 		}
 #endif /* GDB_BUG_2188 */
 	}
-	DestroyList(frames, MIFrameFree);
+	MIListFree(frames, MIFrameFree);
 	SaveEvent(e);
 
 	return DBGRES_OK;
@@ -1510,9 +1508,9 @@ GDBMIQuit(void)
 static int
 GDBMIGetInfoThread(void)
 {
-	MICommand *	cmd;
-	dbg_event *	e;
-	char *		tid;
+	MICommand *				cmd;
+	dbg_event *				e;
+	char *					tid;
 	CLIInfoThreadsInfo *	info;
 
 	CHECK_SESSION();
@@ -1531,11 +1529,11 @@ GDBMIGetInfoThread(void)
 	e = NewDbgEvent(DBGEV_THREADS);
 	e->dbg_event_u.threads_event.thread_id = info->current_thread_id;
 	e->dbg_event_u.threads_event.list = NewList();
-	for (SetList(info->thread_ids); (tid = (char *)GetListElement(info->thread_ids)) != NULL;) {
+	for (MIListSet(info->thread_ids); (tid = (char *)MIListGet(info->thread_ids)) != NULL;) {
 		AddToList(e->dbg_event_u.threads_event.list, (void *)strdup(tid));
 	}
 
-	DestroyList(info->thread_ids, free);
+	MIListFree(info->thread_ids, free);
 	free(info);
 	SaveEvent(e);
 
@@ -1630,7 +1628,7 @@ GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int 
 		meminfo->totalBytes = info->totalBytes;
 		if (info->memories != NULL ) {
 			meminfo->memories = NewList();
-			for (SetList(info->memories); (mem = (MIMemory *)GetListElement(info->memories)) != NULL;) {
+			for (MIListSet(info->memories); (mem = (MIMemory *)MIListGet(info->memories)) != NULL;) {
 				m = NewMemory();
 				if (mem->addr != NULL) {
 					m->addr = strdup(mem->addr);
@@ -1641,7 +1639,7 @@ GDBMIDataReadMemory(long offset, char* address, char* format, int wordSize, int 
 				if (mem->data != NULL) {
 					char* d;
 					m->data = NewList();
-					for (SetList(mem->data); (d = (char *)GetListElement(mem->data)) != NULL;) {
+					for (MIListSet(mem->data); (d = (char *)MIListGet(mem->data)) != NULL;) {
 						AddToList(m->data, (void *) strdup(d));
 					}
 				}
@@ -1681,9 +1679,10 @@ GDBMIDataWriteMemory(long offset, char* address, char* format, int wordSize, cha
 static int
 GDBCLIListSignals(char* name)
 {
-	MICommand *	cmd;
-	List *signals;
-	dbg_event *	e;
+	MICommand *		cmd;
+	MIList *		signals;
+	MISignalInfo *	sig;
+	dbg_event *		e;
 
 	CHECK_SESSION();
 
@@ -1698,8 +1697,12 @@ GDBCLIListSignals(char* name)
 	MICommandFree(cmd);
 
 	e = NewDbgEvent(DBGEV_SIGNALS);
-	e->dbg_event_u.list = signals;
+	e->dbg_event_u.list = NewList();
+	for (MIListSet(signals); ((sig = (MISignalInfo *)MIListGet(signals)) != NULL); ) {
+		AddToList(e->dbg_event_u.list, sig);
+	}
 	SaveEvent(e);
+	MIListFree(signals, MISignalInfoFree);
 
 	return DBGRES_OK;
 }
