@@ -28,7 +28,7 @@ public final class FortranStringPreference extends FortranPreference
         this.defaultValue = defaultValue;
     }
 
-    public void setDefault()
+    @Override public void setDefault()
     {
         getPreferenceStore().setDefault(getName(), defaultValue);
     }

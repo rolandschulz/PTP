@@ -67,7 +67,7 @@ public class WorkspacePathEditor extends ListEditor
      * Method declared on ListEditor.
      * Creates a new path element by means of a directory dialog.
      */
-    protected String getNewInputObject()
+    @Override protected String getNewInputObject()
     {
         ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), project, false, dirChooserLabelText);
         if (dialog.open() == ContainerSelectionDialog.OK)

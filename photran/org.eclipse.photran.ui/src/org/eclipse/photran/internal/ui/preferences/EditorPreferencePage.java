@@ -24,7 +24,7 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
 {
     private final int MAX_FIXED_FILE_FORMAT_OFFSET = 999;
 
-    protected void createFieldEditors()
+    @Override protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.ENABLE_FREE_FORM_FOLDING.getName(),
                                         Messages.EditorPreferencePage_EnableFolding,

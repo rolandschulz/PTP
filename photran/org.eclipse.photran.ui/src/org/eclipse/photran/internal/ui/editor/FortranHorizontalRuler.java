@@ -159,7 +159,7 @@ public class FortranHorizontalRuler extends Composite {
 
         fFocusAdapter = new FocusAdapter() {
 
-            public void focusGained(FocusEvent e) {
+            @Override public void focusGained(FocusEvent e) {
                 if (!fStyledText.isDisposed()) {
                     redraw();
                 }
@@ -188,7 +188,7 @@ public class FortranHorizontalRuler extends Composite {
         fStyledText.addVerifyKeyListener(fVerifyKeyListener);
 
         fSelectionAdapter = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override public void widgetSelected(SelectionEvent e) {
                 if (!fStyledText.isDisposed()) {
                     redraw();
                 }
@@ -198,13 +198,13 @@ public class FortranHorizontalRuler extends Composite {
         fStyledText.getHorizontalBar().addSelectionListener(fSelectionAdapter);
 
         fMouseAdapter = new MouseAdapter() {
-            public void mouseDoubleClick(MouseEvent e) {
+            @Override public void mouseDoubleClick(MouseEvent e) {
                 if (!fStyledText.isDisposed()) {
                     redraw();
                 }
             }
 
-            public void mouseDown(MouseEvent e) {
+            @Override public void mouseDown(MouseEvent e) {
                 if (!fStyledText.isDisposed()) {
                     redraw();
                 }
@@ -398,7 +398,7 @@ public class FortranHorizontalRuler extends Composite {
     /**
      * @see org.eclipse.swt.widgets.Widget#dispose()
      */
-    public void dispose() {
+    @Override public void dispose() {
         fSourceViewer.getSelectionProvider().removeSelectionChangedListener(
                 fSelectionChangedListener);
         removePaintListener(fPaintListener);

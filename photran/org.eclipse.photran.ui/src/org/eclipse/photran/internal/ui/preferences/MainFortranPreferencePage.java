@@ -30,7 +30,7 @@ public class MainFortranPreferencePage extends AbstractFortranPreferencePage
         FortranPreferences.ENABLE_VPG_LOGGING.setDefault();
     }
 
-    protected void createFieldEditors()
+    @Override protected void createFieldEditors()
     {
         addField(new BooleanFieldEditor(FortranPreferences.SHOW_PARSE_TREE.getName(),
                                         Messages.MainFortranPreferencePage_0,

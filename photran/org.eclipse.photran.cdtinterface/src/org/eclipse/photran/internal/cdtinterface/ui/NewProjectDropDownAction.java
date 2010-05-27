@@ -30,6 +30,7 @@ public class NewProjectDropDownAction extends AbstractWizardDropDownAction
             .setHelp(this, ICHelpContextIds.OPEN_PROJECT_WIZARD_ACTION);
     }
 
+    @Override
     protected IAction[] getWizardActions()
     {
         return FortranWizardRegistry.getProjectWizardActions();

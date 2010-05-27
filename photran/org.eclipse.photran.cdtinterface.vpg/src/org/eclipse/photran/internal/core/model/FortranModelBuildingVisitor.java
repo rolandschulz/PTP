@@ -165,13 +165,13 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         return element;
     }
 
-    public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
+    @Override public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
     {
         addToModelNoChildren(setPos(configureElement(new FortranElement.ErrorNode(getCurrentParent(), "Erroneous program unit - " + describeError(node)), node.getErrorToken()), node, true)); //$NON-NLS-1$
         addToModelNoChildren(configureElement(new FortranElement.ErrorNode(getErrorElement(), describeError(node)), node.getErrorToken()));
     }
 
-    public void visitASTErrorConstructNode(ASTErrorConstructNode node)
+    @Override public void visitASTErrorConstructNode(ASTErrorConstructNode node)
     {
         addToModelNoChildren(setPos(configureElement(new FortranElement.ErrorNode(getCurrentParent(), "Unrecognized statement or construct - " + describeError(node)), node.getErrorToken()), node, true)); //$NON-NLS-1$
         addToModelNoChildren(configureElement(new FortranElement.ErrorNode(getErrorElement(), describeError(node)), node.getErrorToken()));
@@ -191,7 +191,7 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         return sb.toString();
     }
 
-    public void visitASTMainProgramNode(ASTMainProgramNode node)
+    @Override public void visitASTMainProgramNode(ASTMainProgramNode node)
     {
         Token token = node.getProgramStmt() == null
             ? null
@@ -199,37 +199,37 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         addToModel(node, setPos(configureElement(new FortranElement.MainProgram(getCurrentParent()), token), node));
     }
 
-    public void visitASTModuleNode(ASTModuleNode node)
+    @Override public void visitASTModuleNode(ASTModuleNode node)
     {
         Token token = node.getModuleStmt().getModuleName().getModuleName();
         addToModel(node, setPos(configureElement(new FortranElement.Module(getCurrentParent()), token), node));
     }
 
-    public void visitASTSubmoduleNode(ASTSubmoduleNode node)
+    @Override public void visitASTSubmoduleNode(ASTSubmoduleNode node)
     {
         Token token = node.getSubmoduleStmt().getSubmoduleName().getModuleName();
         addToModel(node, setPos(configureElement(new FortranElement.Submodule(getCurrentParent()), token), node));
     }
 
-    public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node)
+    @Override public void visitASTFunctionSubprogramNode(ASTFunctionSubprogramNode node)
     {
         Token token = node.getFunctionStmt().getFunctionName().getFunctionName();
         addToModel(node, setPos(configureElement(new FortranElement.Function(getCurrentParent()), token), node));
     }
 
-    public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
+    @Override public void visitASTSubroutineSubprogramNode(ASTSubroutineSubprogramNode node)
     {
         Token token = node.getSubroutineStmt().getSubroutineName().getSubroutineName();
         addToModel(node, setPos(configureElement(new FortranElement.Subroutine(getCurrentParent()), token), node));
     }
 
-    public void visitASTSpecificBindingNode(ASTSpecificBindingNode node)
+    @Override public void visitASTSpecificBindingNode(ASTSpecificBindingNode node)
     {
         Token token = node.getBindingName();
         addToModel(node, setPos(configureElement(new FortranElement.Subroutine(getCurrentParent()), token), node));
     }
 
-    public void visitASTGenericBindingNode(ASTGenericBindingNode node)
+    @Override public void visitASTGenericBindingNode(ASTGenericBindingNode node)
     {
         Token token;
         if (node.getGenericName() != null)
@@ -249,7 +249,7 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         addToModel(node, setPos(configureElement(new FortranElement.Subroutine(getCurrentParent()), token), node));
     }
 
-    public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node)
+    @Override public void visitASTBlockDataSubprogramNode(ASTBlockDataSubprogramNode node)
     {
         Token token = node.getBlockDataStmt().getBlockDataName() == null
             ? null
@@ -257,26 +257,26 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         addToModel(node, setPos(configureElement(new FortranElement.BlockData(getCurrentParent()), token), node));
     }
 
-    public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node)
+    @Override public void visitASTDerivedTypeDefNode(ASTDerivedTypeDefNode node)
     {
         Token token = node.getDerivedTypeStmt().getTypeName();
         addToModel(node, setPos(configureElement(new FortranElement.DerivedType(getCurrentParent()), token), node));
     }
 
-    public void visitASTDataComponentDefStmtNode(ASTDataComponentDefStmtNode node)
+    @Override public void visitASTDataComponentDefStmtNode(ASTDataComponentDefStmtNode node)
     {
         for (ASTComponentDeclNode decl : node.getComponentDeclList())
             addToModelNoChildren(setPos(configureElement(new FortranElement.Variable(getCurrentParent()), decl.getComponentName().getComponentName()), node));
     }
 
-    public void visitASTExternalStmtNode(ASTExternalStmtNode node)
+    @Override public void visitASTExternalStmtNode(ASTExternalStmtNode node)
     {
         IASTListNode<ASTExternalNameListNode> list = node.getExternalNameList();
         for (int i = 0; i < list.size(); i++)
             addToModel(node, setPos(configureElement(new FortranElement.Subprogram(getCurrentParent()), list.get(i).getExternalName()), node));
     }
 
-    public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
+    @Override public void visitASTInterfaceBlockNode(ASTInterfaceBlockNode node)
     {
         Token token = node.getInterfaceStmt().getGenericName() == null
             ? node.getInterfaceStmt().getInterfaceToken()
@@ -284,7 +284,7 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         addToModel(node, setPos(configureElement(new FortranElement.Subprogram(getCurrentParent()), token), node));
     }
 
-    public void visitASTInterfaceBodyNode(ASTInterfaceBodyNode node)
+    @Override public void visitASTInterfaceBodyNode(ASTInterfaceBodyNode node)
     {
         if (node.getFunctionStmt() != null)
         {
@@ -298,21 +298,21 @@ public final class FortranModelBuildingVisitor extends GenericASTVisitor
         }
     }
 
-    public void visitASTModuleProcedureStmtNode(ASTModuleProcedureStmtNode node)
+    @Override public void visitASTModuleProcedureStmtNode(ASTModuleProcedureStmtNode node)
     {
         IASTListNode<ASTProcedureNameListNode> list = node.getProcedureNameList();
         for (int i = 0; i < list.size(); i++)
             addToModel(node, setPos(configureElement(new FortranElement.Subprogram(getCurrentParent()), list.get(i).getProcedureName()), node));
     }
 
-    public void visitASTIntrinsicStmtNode(ASTIntrinsicStmtNode node)
+    @Override public void visitASTIntrinsicStmtNode(ASTIntrinsicStmtNode node)
     {
         IASTListNode<ASTIntrinsicListNode> list = node.getIntrinsicList();
         for (int i = 0; i < list.size(); i++)
             addToModel(node, setPos(configureElement(new FortranElement.Variable(getCurrentParent()), list.get(i).getIntrinsicProcedureName()), node));
     }
 
-    public void visitASTStmtFunctionStmtNode(ASTStmtFunctionStmtNode node)
+    @Override public void visitASTStmtFunctionStmtNode(ASTStmtFunctionStmtNode node)
     {
         addToModel(node, setPos(configureElement(new FortranElement.Variable(getCurrentParent()), node.getName().getName()), node));
     }

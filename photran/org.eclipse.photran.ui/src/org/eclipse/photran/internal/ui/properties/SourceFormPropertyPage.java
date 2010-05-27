@@ -96,7 +96,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         return composite;
     }
 
-    public void performDefaults()
+    @Override public void performDefaults()
     {
         sourceForms.loadDefault();
     }

@@ -276,7 +276,7 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 			 * <code>ILabelProvider</code> method returns the element's <code>toString</code>
 			 * string. Subclasses may override.
 			 */
-			public String getText(Object element) {
+		    @Override public String getText(Object element) {
 				if (element == null) {
 					return ""; //$NON-NLS-1$
 				} else if (element instanceof ICDebugConfiguration) {
@@ -352,7 +352,7 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 	 */
 	protected IBinary chooseBinary(List binList, String mode) {
 		ILabelProvider programLabelProvider = new CElementLabelProvider() {
-			public String getText(Object element) {
+			@Override public String getText(Object element) {
 				if (element instanceof IBinary) {
 					IBinary bin = (IBinary)element;
 					StringBuffer name = new StringBuffer();
@@ -364,7 +364,7 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut2 {
 		};
 
 		ILabelProvider qualifierLabelProvider = new CElementLabelProvider() {
-			public String getText(Object element) {
+		    @Override public String getText(Object element) {
 				if (element instanceof IBinary) {
 					IBinary bin = (IBinary)element;
 					StringBuffer name = new StringBuffer();

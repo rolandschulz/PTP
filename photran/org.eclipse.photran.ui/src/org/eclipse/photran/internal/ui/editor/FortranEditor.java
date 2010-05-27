@@ -155,7 +155,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     // JFace Text Overrides
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected void doSetInput(IEditorInput input) throws CoreException
+    @Override protected void doSetInput(IEditorInput input) throws CoreException
     {
         super.doSetInput(input);
 
@@ -168,7 +168,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
             checkForContentTypeMismatch((FileEditorInput)input);
     }
 
-    public void createPartControl(Composite parent)
+    @Override public void createPartControl(Composite parent)
     {
         super.createPartControl(parent);
 
@@ -202,11 +202,8 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     // Context Menu Contribution
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @see org.eclipse.ui.texteditor.AbstractTextEditor#editorContextMenuAboutToShow(org.eclipse.jface.action.IMenuManager)
-     */
-    //@Override
-    public void editorContextMenuAboutToShow(IMenuManager menu)
+    // see org.eclipse.ui.texteditor.AbstractTextEditor#editorContextMenuAboutToShow(org.eclipse.jface.action.IMenuManager)
+    @Override public void editorContextMenuAboutToShow(IMenuManager menu)
     {
         super.editorContextMenuAboutToShow(menu);
         
@@ -235,7 +232,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     //protected Annotation[] oldAnnotations;
     protected ProjectionAnnotationModel annotationModel;
 
-    protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles)
+    @Override protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles)
     {
         //fAnnotationAccess = createAnnotationAccess();
         //fOverviewRuler = createOverviewRuler(getSharedColors());
@@ -374,7 +371,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     // Ctrl+/ Block Commenting Support
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected void initializeKeyBindingScopes()
+    @Override protected void initializeKeyBindingScopes()
     {
         setKeyBindingScopes(new String[] { "org.eclipse.ui.textEditorScope", FORTRAN_EDITOR_CONTEXT_ID }); //$NON-NLS-1$
     }
@@ -468,7 +465,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
      * Returns true if the event will require us to perform a damage and repair
      * e.g. a color preference change
      */
-    protected boolean affectsTextPresentation(PropertyChangeEvent event)
+    @Override protected boolean affectsTextPresentation(PropertyChangeEvent event)
     {
         return FortranPreferences.respondToPreferenceChange(event.getProperty())
                || super.affectsTextPresentation(event);
@@ -533,7 +530,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
          * Returns a list of the possible partitions' content types.
          * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
          */
-        public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+        @Override public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
         {
             return PARTITION_TYPES;
         }
@@ -542,7 +539,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
          * Sets up rules for syntax highlighting.
          * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
          */
-        public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+        @Override public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
         {
             if (reconciler == null)
             {

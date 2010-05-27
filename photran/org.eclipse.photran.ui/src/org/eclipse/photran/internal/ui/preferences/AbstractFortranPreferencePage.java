@@ -44,13 +44,13 @@ public abstract class AbstractFortranPreferencePage
     {
     }
 
-    protected void addField(FieldEditor editor)
+    @Override protected void addField(FieldEditor editor)
     {
         super.addField(editor);
         editor.setPreferenceStore(this.getPreferenceStore());
     }
 
-    public boolean performOk()
+    @Override public boolean performOk()
     {
         if (!super.performOk()) return false;
         FortranPreferences.savePreferenceStore();

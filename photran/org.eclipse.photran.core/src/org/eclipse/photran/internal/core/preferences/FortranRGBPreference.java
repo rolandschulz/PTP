@@ -32,7 +32,7 @@ public final class FortranRGBPreference extends FortranPreference
         this.defaultValue = defaultValue;
     }
 
-    public final void setDefault()
+    @Override public final void setDefault()
     {
         getPreferenceStore().setDefault(getName(), StringConverter.asString(defaultValue));
     }

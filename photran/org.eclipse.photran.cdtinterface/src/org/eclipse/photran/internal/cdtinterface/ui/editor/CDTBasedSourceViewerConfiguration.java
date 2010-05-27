@@ -53,6 +53,7 @@ public abstract class CDTBasedSourceViewerConfiguration extends SourceViewerConf
      *     The event should usually be issued from the
      *     ReconcileWorkingCopyOperation.
      */
+    @Override
     public IReconciler getReconciler(ISourceViewer sourceViewer)
     {
         if (editor != null)

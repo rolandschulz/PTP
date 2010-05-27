@@ -48,7 +48,7 @@ public class FortranBooleanFieldEditor extends BooleanFieldEditor
             myCheckBox = new Button(parent, SWT.CHECK | SWT.LEFT);
             myCheckBox.setFont(parent.getFont());
             myCheckBox.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+                @Override public void widgetSelected(SelectionEvent e) {
                     boolean isSelected = myCheckBox.getSelection();
                     valueChanged(!isSelected, isSelected);
                 }

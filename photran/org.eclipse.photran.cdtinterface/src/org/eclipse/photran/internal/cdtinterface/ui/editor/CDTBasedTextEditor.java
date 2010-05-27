@@ -92,6 +92,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
     // Actions (use CDT resource bundle)
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
+    @Override
     protected void createActions()
     {
         super.createActions();
@@ -144,6 +145,7 @@ public abstract class CDTBasedTextEditor extends TextEditor implements ISelectio
     /**
      * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
      */
+    @Override
     public Object getAdapter(Class required) {
         if (IContentOutlinePage.class.equals(required)) {
             return getOutlinePage();

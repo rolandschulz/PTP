@@ -101,7 +101,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
      * @param token the token to be returned if the word has been found, may not be
      *            <code>null</code>
      */
-    public void addWord(String word, IToken token)
+    @Override public void addWord(String word, IToken token)
     {
         Assert.isNotNull(word);
         Assert.isNotNull(token);
@@ -127,7 +127,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
     /*
      * @see IRule#evaluate(ICharacterScanner)
      */
-    public IToken evaluate(ICharacterScanner scanner)
+    @Override public IToken evaluate(ICharacterScanner scanner)
     {
         int c = scanner.read();
         if (c != ICharacterScanner.EOF && fDetector.isWordStart((char)c))

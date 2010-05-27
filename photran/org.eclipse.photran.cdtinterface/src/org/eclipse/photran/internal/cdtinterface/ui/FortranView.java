@@ -26,6 +26,7 @@ public class FortranView extends CView
 {
     public static final String FORTRAN_VIEW_ID = "org.eclipse.photran.ui.FortranView"; //$NON-NLS-1$
     
+    @Override
     protected CUILabelProvider createLabelProvider()
     {
         return new FViewLabelProvider(

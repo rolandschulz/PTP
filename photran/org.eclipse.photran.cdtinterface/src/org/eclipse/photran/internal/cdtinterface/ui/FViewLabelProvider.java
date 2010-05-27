@@ -39,6 +39,7 @@ public class FViewLabelProvider extends CViewLabelProvider
     // This is something of a hack. Originally I tried using AdapterFactory objects and
     // WorkspaceAdapters, but they never seemed to work. This works, but it's not particularly
     // elegant and the image only shows up in the Fortran navigator.
+    @Override
     public Image getImage(Object element)
     {
         if (isFortranFile(element))
@@ -66,6 +67,7 @@ public class FViewLabelProvider extends CViewLabelProvider
         return fortranFileImage;
     }
 
+    @Override
     public void dispose()
     {
         if (fortranFileImage != null)

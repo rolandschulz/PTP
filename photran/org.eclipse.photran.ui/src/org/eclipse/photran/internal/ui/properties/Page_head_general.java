@@ -21,7 +21,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class Page_head_general extends PropertyPage
 {
-    protected Control createContents(Composite parent)
+    @Override protected Control createContents(Composite parent)
     {
         noDefaultAndApplyButton();
         return parent;

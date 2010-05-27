@@ -39,6 +39,7 @@ public class NewSourceFileCreationWizard extends AbstractFileCreationWizard
         setWindowTitle(Messages.NewSourceFileCreationWizard_WindowTitle);
     }
 
+    @Override
     public void addPages()
     {
         super.addPages();
@@ -50,6 +51,7 @@ public class NewSourceFileCreationWizard extends AbstractFileCreationWizard
 
     public static class FortranSourceFileCreationWizardPage extends NewSourceFileCreationWizardPage
     {
+        @Override
         protected Template[] getApplicableTemplates()
         {
             return StubUtility.getFileTemplatesForContentTypes(

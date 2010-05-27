@@ -238,7 +238,7 @@ public class FortranBlockCommentActionDelegate extends FortranEditorActionDelega
         /*
          * @see org.eclipse.jface.text.DocumentEvent#getOffset()
          */
-        public int getOffset()
+        @Override public int getOffset()
         {
             return fPosition.getOffset();
         }

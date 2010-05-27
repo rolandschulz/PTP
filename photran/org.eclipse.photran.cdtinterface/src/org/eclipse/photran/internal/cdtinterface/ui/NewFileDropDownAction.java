@@ -27,6 +27,7 @@ public class NewFileDropDownAction extends AbstractWizardDropDownAction
         // WorkbenchHelp.setHelp(this, ICHelpContextIds.OPEN_FILE_WIZARD_ACTION);
     }
 
+    @Override
     protected IAction[] getWizardActions()
     {
         return FortranWizardRegistry.getFileWizardActions();

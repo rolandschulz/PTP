@@ -39,12 +39,12 @@ public final class IntrinsicProcDescription implements Comparable<IntrinsicProcD
         return this.genericName.compareTo(that.genericName);
     }
 
-    public int hashCode()
+    @Override public int hashCode()
     {
         return this.genericName.hashCode();
     }
     
-    public boolean equals(Object that)
+    @Override public boolean equals(Object that)
     {
         if (that == null || !this.getClass().equals(that.getClass()))
             return false;
@@ -52,7 +52,7 @@ public final class IntrinsicProcDescription implements Comparable<IntrinsicProcD
             return ((IntrinsicProcDescription)that).genericName.equals(this.genericName);
     }
     
-    public String toString()
+    @Override public String toString()
     {
         StringBuilder sb = new StringBuilder();
         

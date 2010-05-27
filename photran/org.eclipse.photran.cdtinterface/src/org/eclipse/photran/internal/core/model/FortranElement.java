@@ -61,6 +61,7 @@ public abstract class FortranElement extends SourceManipulation
         super(parent, "", NO_TYPE); //$NON-NLS-1$
     }
 
+    @Override
     public Object getAdapter(Class required)
     {
         if (ImageDescriptor.class.equals(required))
@@ -109,7 +110,7 @@ public abstract class FortranElement extends SourceManipulation
             setElementName(name);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return getImageDescriptorForIcon("unknown.gif"); //$NON-NLS-1$
         }
@@ -127,7 +128,7 @@ public abstract class FortranElement extends SourceManipulation
             setElementName(name);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return getImageDescriptorForIcon("skullface.gif"); //$NON-NLS-1$
         }
@@ -143,7 +144,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -164,7 +165,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -185,7 +186,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -206,7 +207,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -227,7 +228,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -248,7 +249,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -270,7 +271,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -291,7 +292,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -312,7 +313,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }
@@ -333,7 +334,7 @@ public abstract class FortranElement extends SourceManipulation
             super(parent);
         }
 
-        public ImageDescriptor getBaseImageDescriptor()
+        @Override public ImageDescriptor getBaseImageDescriptor()
         {
             return imageDescriptor();
         }

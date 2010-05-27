@@ -36,7 +36,7 @@ public class CDTFortranPreferencePage extends AbstractFortranPreferencePage
         FortranPreferences.PREFERRED_DOM_PARSER.setDefault();
     }
 
-    protected void createFieldEditors()
+    @Override protected void createFieldEditors()
     {
         String[][] modelBuilders = listModelBuilders();
         if (modelBuilders != null)

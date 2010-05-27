@@ -45,6 +45,7 @@ public class FortranProjectWizard extends CDTCommonProjectWizard
         super(Messages.FortranProjectWizard_Title, Messages.FortranProjectWizard_Description);
     }
 
+    @Override
     public String[] getNatures()
     {
         return new String[] { FProjectNature.F_NATURE_ID, CProjectNature.C_NATURE_ID };
@@ -85,6 +86,7 @@ public class FortranProjectWizard extends CDTCommonProjectWizard
      * class.  Among other things, it sets the Photran nature first in the project's nature list.
      * This ensures that the project will be displayed as a Fortran project in the Photran navigator.
      */
+    @Override
     protected boolean setCreated() throws CoreException
     {
         ICProjectDescriptionManager mngr = CoreModel.getDefault().getProjectDescriptionManager();

@@ -44,7 +44,7 @@ public class FortranIntegerPreference extends FortranPreference
         this.lowerLimit = lowerLimit;
     }
 
-    public void setDefault()
+    @Override public void setDefault()
     {
         getPreferenceStore().setDefault(getName(), defaultValue);
     }

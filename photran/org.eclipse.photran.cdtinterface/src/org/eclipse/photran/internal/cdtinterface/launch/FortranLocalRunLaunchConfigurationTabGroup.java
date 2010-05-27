@@ -26,7 +26,7 @@ public class FortranLocalRunLaunchConfigurationTabGroup extends AbstractLaunchCo
     /*@Override*/ public void createTabs(ILaunchConfigurationDialog dialog, String mode)  {
         ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
             new CMainTab(true) {
-                /*@Override*/ protected void createExeFileGroup(Composite parent, int colSpan) {
+                @Override protected void createExeFileGroup(Composite parent, int colSpan) {
                     super.createExeFileGroup(parent, colSpan);
                     fProgLabel.setText(LaunchMessages.getString("FortranTabGroup.LaunchLabel")); //$NON-NLS-1$
                 }
