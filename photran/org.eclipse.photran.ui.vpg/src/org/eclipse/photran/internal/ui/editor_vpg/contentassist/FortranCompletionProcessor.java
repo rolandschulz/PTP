@@ -45,7 +45,7 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
         String contentAssistEnabledProperty = new SearchPathProperties().getProperty(
             editor.getIFile(),
             SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME);
-        if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true"))
+        if (contentAssistEnabledProperty != null && contentAssistEnabledProperty.equals("true")) //$NON-NLS-1$
         {
             final Color LIGHT_YELLOW = new Color(null, new RGB(255, 255, 191));
             
@@ -93,7 +93,7 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
         }
         catch (Exception e)
         {
-            errorMessage = e.getClass().getName() + " - " + e.getMessage();
+            errorMessage = e.getClass().getName() + " - " + e.getMessage(); //$NON-NLS-1$
             return null;
         }
     }
@@ -134,7 +134,7 @@ public class FortranCompletionProcessor implements IContentAssistProcessor
          * Therefore, populate the list of completion proposals based on
          * the *preceding* scope.
          */
-        while (scopeName.equals("") && line >= 0)
+        while (scopeName.equals("") && line >= 0) //$NON-NLS-1$
             scopeName = scopes.get(--line);
         return scopeName;
     }

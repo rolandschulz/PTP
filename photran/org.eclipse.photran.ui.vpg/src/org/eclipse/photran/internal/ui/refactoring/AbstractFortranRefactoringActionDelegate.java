@@ -77,10 +77,10 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         else
         {
             throw new IllegalStateException(
-                "refactoringClass " +
+                "refactoringClass " + //$NON-NLS-1$
                 refactoringClass.getName() +
-                " passed to AbstractFortranRefactoringActionDelegate constructor " +
-                " is not an instance of IResourceRefactoring or IEditorRefactoring");
+                " passed to AbstractFortranRefactoringActionDelegate constructor " + //$NON-NLS-1$
+                " is not an instance of IResourceRefactoring or IEditorRefactoring"); //$NON-NLS-1$
         }
     }
 
@@ -141,9 +141,8 @@ public abstract class AbstractFortranRefactoringActionDelegate extends FortranEd
         {
             if (getFortranEditor().getIFile() == null)
             {
-                MessageDialog.openError(getFortranEditor().getShell(), "Error",
-                    "The file in the editor cannot be refactored.\n\nFortran files can only be refactored if they " +
-                    "are located inside a Fortran project in your workspace.");
+                MessageDialog.openError(getFortranEditor().getShell(), Messages.AbstractFortranRefactoringActionDelegate_ErrorTitle,
+                    Messages.AbstractFortranRefactoringActionDelegate_FileInEditorCannotBeRefactored);
             }
             else
             {

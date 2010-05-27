@@ -86,10 +86,10 @@ class FortranCompletionProposalComputer
 
     public ICompletionProposal[] compute() throws BadLocationException
     {
-        PhotranVPG.getInstance().debug("FortranCompletionProposalComputer#compute()", null);
-        PhotranVPG.getInstance().debug("    Scope: " + scope, null);
+        PhotranVPG.getInstance().debug("FortranCompletionProposalComputer#compute()", null); //$NON-NLS-1$
+        PhotranVPG.getInstance().debug("    Scope: " + scope, null); //$NON-NLS-1$
         if (defs != null && defs.get(scope) != null)
-            PhotranVPG.getInstance().debug("    Definitions in scope: " + defs.get(scope).size(), null);
+            PhotranVPG.getInstance().debug("    Definitions in scope: " + defs.get(scope).size(), null); //$NON-NLS-1$
         
         TreeSet<FortranCompletionProposal> proposals1 = new TreeSet<FortranCompletionProposal>();
         addProposalsFromDefs(proposals1);
@@ -233,7 +233,7 @@ class FortranCompletionProposalComputer
         if (description == null)
             return identifier;
         else
-            return identifier + " - " + description;
+            return identifier + " - " + description; //$NON-NLS-1$
     }
     
     /**

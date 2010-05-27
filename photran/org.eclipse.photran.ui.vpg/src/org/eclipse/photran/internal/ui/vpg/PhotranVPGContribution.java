@@ -22,7 +22,7 @@ import org.eclipse.rephraserengine.ui.IEclipseVPGFactory;
  */
 public class PhotranVPGContribution implements IEclipseVPGFactory
 {
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public EclipseVPG getVPG()
     {
         return PhotranVPG.getInstance();

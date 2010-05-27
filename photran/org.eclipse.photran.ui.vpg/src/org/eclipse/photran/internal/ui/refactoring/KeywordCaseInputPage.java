@@ -41,10 +41,10 @@ public class KeywordCaseInputPage extends CustomUserInputPage<KeywordCaseRefacto
 
         Composite group = top;
         Label instr = new Label(group, SWT.NONE);
-        instr.setText("Change keywords to:");
+        instr.setText(Messages.KeywordCaseInputPage_ChangeKeywordsToLabel);
 
         radioLowerCase = new Button(group, SWT.RADIO);
-        radioLowerCase.setText("Lower Case");
+        radioLowerCase.setText(Messages.KeywordCaseInputPage_LowerCaseLabel);
         radioLowerCase.setSelection(true);
         radioLowerCase.addSelectionListener(new SelectionListener()
         {
@@ -61,10 +61,9 @@ public class KeywordCaseInputPage extends CustomUserInputPage<KeywordCaseRefacto
         });
 
         radioUpperCase = new Button(group, SWT.RADIO);
-        radioUpperCase.setText("Upper Case");
+        radioUpperCase.setText(Messages.KeywordCaseInputPage_UpperCaseLabel);
 
         Label lbl = new Label(group, SWT.NONE);
-        lbl.setText("Click OK to change the case of all keywords in the selected files. " +
-            "To see what changes will be made, click Preview.");
+        lbl.setText(Messages.KeywordCaseInputPage_ClickOKMessage);
     }
 }

@@ -42,11 +42,11 @@ public class SelectedResourceFilterAction extends Action implements ISelectionLi
     
     public SelectedResourceFilterAction(VPGProblemView vpgView)
     {
-        super("Filter by Selection", AS_CHECK_BOX);
+        super(Messages.SelectedResourceFilterAction_FilterBySelection, AS_CHECK_BOX);
         
         this.vpgView = vpgView;
         
-        setToolTipText("Displays only problems that occur in the files/projects that are currently selected (e.g., in the Fortran Projects view or in the active editor)");
+        setToolTipText(Messages.SelectedResourceFilterAction_FilterBySelectionTooltip);
         setChecked(false);
         
         vpgView.getTableViewer().addFilter(new MarkerResourceFilter());

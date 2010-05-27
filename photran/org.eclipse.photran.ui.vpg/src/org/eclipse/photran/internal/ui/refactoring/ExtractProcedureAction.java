@@ -81,10 +81,10 @@ public class ExtractProcedureAction
 
                     Composite group = top;
                     Label lbl = new Label(group, SWT.NONE);
-                    lbl.setText("Extract selected code to a subroutine named ");
+                    lbl.setText(Messages.ExtractProcedureAction_SubroutineNameLabel);
 
                     newNameField = new Text(group, SWT.BORDER);
-                    newNameField.setText("");
+                    newNameField.setText(""); //$NON-NLS-1$
                     newNameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
                     newNameField.selectAll();
                     newNameField.addModifyListener(new ModifyListener()

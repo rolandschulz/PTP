@@ -82,7 +82,7 @@ public class ExtractLocalVariableAction
                     twoCol.horizontalSpan = 2;
 
                     Label lbl = new Label(group, SWT.NONE);
-                    lbl.setText("Declaration:");
+                    lbl.setText(Messages.ExtractLocalVariableAction_DeclarationLabel);
 
                     declField = new Text(group, SWT.BORDER);
                     declField.setText(extractRefactoring.getDecl());
@@ -99,8 +99,8 @@ public class ExtractLocalVariableAction
                     // Call once for sure, just in case the user doesn't modify the text
                     extractRefactoring.setDecl(declField.getText());
 
-                    int offset = declField.getText().indexOf(":: ");
-                    if (offset < 0) offset = 0; else offset = offset + ":: ".length();
+                    int offset = declField.getText().indexOf(":: "); //$NON-NLS-1$
+                    if (offset < 0) offset = 0; else offset = offset + ":: ".length(); //$NON-NLS-1$
                     declField.setSelection(offset, declField.getText().length());
                     declField.setFocus();
                 }

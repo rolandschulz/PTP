@@ -36,15 +36,15 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  */
 public class CopyMarkedFileAction extends Action
 {
-    private static final String SEPARATOR = " ";
+    private static final String SEPARATOR = " "; //$NON-NLS-1$
     
     VPGProblemView myView = null;
     /**
      * @param site
      */
-    public CopyMarkedFileAction(VPGProblemView view, String text)
+    public CopyMarkedFileAction(VPGProblemView view)
     {
-        super(text);
+        super(Messages.CopyMarkedFileAction_Copy);
         myView = view;
     }
     
@@ -71,7 +71,7 @@ public class CopyMarkedFileAction extends Action
     protected String asText(ISelection sel)
     {
         IStructuredSelection selection = (IStructuredSelection)sel;
-        String result = "";
+        String result = ""; //$NON-NLS-1$
         for (Iterator<?> iter= selection.iterator(); iter.hasNext();) 
         {
             Object element= iter.next();
@@ -79,7 +79,7 @@ public class CopyMarkedFileAction extends Action
             {
                 IMarker marker = (IMarker)element;
                 result = result.concat(asText(marker));
-                result = result.concat("\n");
+                result = result.concat("\n"); //$NON-NLS-1$
             }
         }
         return result;
@@ -89,10 +89,10 @@ public class CopyMarkedFileAction extends Action
     // get the message associated with the marker
     protected String asText(IMarker marker)
     {
-        String markerMsg    = "Description: " + MarkerUtilities.getMessage(marker);
-        String markerRes    = "Resource: " + marker.getResource().getName().toString();
-        String markerPath   = "Path: " + marker.getResource().getProjectRelativePath().toString();
-        String markerLoc    = "Location: line " + String.valueOf(MarkerUtilities.getLineNumber(marker));
+        String markerMsg    = Messages.CopyMarkedFileAction_DescriptionLabel + MarkerUtilities.getMessage(marker);
+        String markerRes    = Messages.CopyMarkedFileAction_ResourceLabel + marker.getResource().getName().toString();
+        String markerPath   = Messages.CopyMarkedFileAction_PathLabel + marker.getResource().getProjectRelativePath().toString();
+        String markerLoc    = Messages.CopyMarkedFileAction_LocationLineLabel + String.valueOf(MarkerUtilities.getLineNumber(marker));
         
         String result = markerMsg  + SEPARATOR +
                         markerRes  + SEPARATOR +

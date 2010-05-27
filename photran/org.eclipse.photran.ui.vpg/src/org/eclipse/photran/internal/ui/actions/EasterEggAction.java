@@ -72,7 +72,7 @@ public class EasterEggAction
                     top.setLayout(new GridLayout(1, false));
 
                     Label lbl = new Label(top, SWT.NONE);
-                    lbl.setText("Congratulations!  You found an Easter Egg.");
+                    lbl.setText("Congratulations!  You found an Easter Egg."); //$NON-NLS-1$
                 }
             });
         }

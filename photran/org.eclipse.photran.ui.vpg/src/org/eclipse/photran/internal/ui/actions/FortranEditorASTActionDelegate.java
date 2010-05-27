@@ -70,7 +70,7 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
             catch (InvocationTargetException e)
             {
                 e.printStackTrace();
-                MessageDialog.openError(fEditor.getShell(), "Unhandled Exception", e.getMessage());
+                MessageDialog.openError(fEditor.getShell(), Messages.FortranEditorASTActionDelegate_UnhandledExceptionTitle, e.getMessage());
             }
             catch (InterruptedException e)
             {
@@ -90,7 +90,7 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
 //                                                                   ModuleLoaderCallback.IGNORE,
 //                                                                   editor.isFixedForm(),
 //                                                                   progressMonitor);
-        if (ast == null) throw new Exception("Unable to parse file in editor");
+        if (ast == null) throw new Exception(Messages.FortranEditorASTActionDelegate_UnableToParseFileInEditor);
         return ast;
     }
 
@@ -115,10 +115,10 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
         dlg.setBlockOnOpen(true);
         dlg.setHelpAvailable(false);
         dlg.setIgnoreCase(true);
-        dlg.setMessage("Select a declaration to open (? = any character, * = any string):");
+        dlg.setMessage(Messages.FortranEditorASTActionDelegate_SelectADeclarationToOpen);
         dlg.setMultipleSelection(false);
         dlg.setSize(100, 10);
-        dlg.setTitle("Multiple Declarations Found");
+        dlg.setTitle(Messages.FortranEditorASTActionDelegate_MultipleDeclarationsFoundTitle);
         dlg.setElements(defs.toArray());
         dlg.open();
         if (dlg.getResult() != null)
@@ -133,14 +133,22 @@ public abstract class FortranEditorASTActionDelegate extends FortranEditorAction
         {
 			final IDocument document = getFortranEditor().getDocumentProvider().getDocument(getFortranEditor().getEditorInput());
 			
-			return def.getCanonicalizedName()
-				+ " - "
-				+ def.describeClassification()
-				+ (def.isSubprogramArgument() ? " (Subprogram Argument)" : "")
-				+ " - Line "
-				+ (document.getLineOfOffset(def.getTokenRef().findToken().getFileOffset()) + 1)
-				+ " - "
-				+ def.getTokenRef().getFilename();
+			Object[] args = new Object[]
+			{
+			    def.getCanonicalizedName(),
+			    def.describeClassification(),
+			    (document.getLineOfOffset(def.getTokenRef().findToken().getFileOffset()) + 1),
+			    def.getTokenRef().getFilename()
+			};
+			
+			if (def.isSubprogramArgument())
+			    return Messages.bind(
+			        Messages.FortranEditorASTActionDelegate_DeclDescriptionSubprogramArgument,
+			        args);
+			else
+			    return Messages.bind(
+			        Messages.FortranEditorASTActionDelegate_DeclDescriptionOther,
+			        args);
 		}
         catch (Throwable e)
         {

@@ -79,8 +79,8 @@ public class VPGProblemLabelProvider implements ITableLabelProvider
     {
         int lineNum = MarkerUtilities.getLineNumber(marker);
         if(lineNum >= 0)
-            return "line " + String.valueOf(lineNum);
-        return "";
+            return Messages.bind(Messages.VPGProblemLabelProvider_LineN, lineNum);
+        return ""; //$NON-NLS-1$
     }
 
     private static String getFirstMessageSentense(IMarker marker)

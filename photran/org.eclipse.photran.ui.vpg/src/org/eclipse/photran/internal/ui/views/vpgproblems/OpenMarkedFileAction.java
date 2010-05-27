@@ -45,8 +45,8 @@ public class OpenMarkedFileAction extends SelectionDispatchAction
     public OpenMarkedFileAction(IWorkbenchSite site)
     {
         super(site);
-        setText("Go to");
-        setToolTipText("Go to the line in file");
+        setText(Messages.OpenMarkedFileAction_GoTo);
+        setToolTipText(Messages.OpenMarkedFileAction_GoToTooltip);
     }
 
     @SuppressWarnings("deprecation")

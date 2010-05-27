@@ -53,10 +53,10 @@ public class CommonVarNamesInputPage extends CustomUserInputPage<CommonVarNamesR
         Composite group = top;
 
         Label headerLeft = new Label(group, SWT.NONE);
-        headerLeft.setText("Original Name");
+        headerLeft.setText(Messages.CommonVarNamesInputPage_OriginalNameLabel);
 
         Label headerRight = new Label(group, SWT.NONE);
-        headerRight.setText("New Name");
+        headerRight.setText(Messages.CommonVarNamesInputPage_NewNameLabel);
 
         for(int i=0; i<getRefactoring().getNumCommonVars(); i++)
         {

@@ -170,7 +170,7 @@ public abstract class DefinitionMap<T>
     {
         class GetScopeVisitor extends ASTVisitor
         {
-            private String name = "";
+            private String name = ""; //$NON-NLS-1$
             
             @Override public void visitASTMainProgramNode(ASTMainProgramNode node)
             {
@@ -216,6 +216,6 @@ public abstract class DefinitionMap<T>
         
         GetScopeVisitor visitor = new GetScopeVisitor();
         node.accept(visitor);
-        return node.getClass().getName() + "/" + visitor.name.toLowerCase() + ":";
+        return node.getClass().getName() + "/" + visitor.name.toLowerCase() + ":"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

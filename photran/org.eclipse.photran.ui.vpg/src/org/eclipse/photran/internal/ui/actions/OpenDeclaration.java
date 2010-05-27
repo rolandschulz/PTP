@@ -62,8 +62,8 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
         }
         else
         {
-            MessageDialog.openError(shell, "Error",
-                "Please enable analysis and refactoring in the project properties.");
+            MessageDialog.openError(shell, Messages.OpenDeclaration_ErrorTitle,
+                Messages.OpenDeclaration_AnalysisRefactoringNotEnabled);
         }
     }
     
@@ -132,7 +132,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
                 public void run()
                 {
                     if (def == null)
-                        MessageDialog.openError(shell, "Error", "Unable to locate declaration");
+                        MessageDialog.openError(shell, Messages.OpenDeclaration_ErrorTitle, Messages.OpenDeclaration_UnableToLocateDeclaration);
                     else
                         openEditorOn(def);
                 }
@@ -147,7 +147,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
             {
                 IMarker marker = def.createMarker();
                 if (marker == null)
-                    MessageDialog.openError(shell, "Error (" + def.getTokenRef() + ")", "Unable to create marker");
+                    MessageDialog.openError(shell, Messages.bind(Messages.OpenDeclaration_ErrorX, def.getTokenRef()), Messages.OpenDeclaration_UnableToCreateMarker);
                 else
                     IDE.openEditor(page, marker, true);
             }
@@ -155,7 +155,7 @@ public class OpenDeclaration extends FortranEditorASTActionDelegate
             {
                 String message = e.getMessage();
                 if (message == null) message = e.getClass().getName();
-                MessageDialog.openError(shell, "Error", message);
+                MessageDialog.openError(shell, Messages.OpenDeclaration_ErrorTitle, message);
             }
         }
     }

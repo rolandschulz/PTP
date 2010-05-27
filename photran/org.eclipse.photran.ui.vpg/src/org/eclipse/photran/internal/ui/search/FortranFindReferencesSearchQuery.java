@@ -56,9 +56,11 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
     public String getLabel()
     {
         int count = ((AbstractTextSearchResult)getSearchResult()).getMatchCount();
-        return "'" + getDef().getCanonicalizedName() + "' - " + count
-            + (count == 1 ? " match in " : " matches in ")
-            + searchScope;
+        String description = "'" + getDef().getCanonicalizedName() + "' - "; //$NON-NLS-1$ //$NON-NLS-2$
+        if (count == 1)
+            return description + Messages.bind(Messages.FortranFindReferencesSearchQuery_OneMatch, searchScope);
+        else
+            return description + Messages.bind(Messages.FortranFindReferencesSearchQuery_nMatches, count, searchScope);
     }
 
     public ISearchResult getSearchResult()
@@ -88,7 +90,7 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
         }
 
-        return new Status(IStatus.OK, Activator.PLUGIN_ID, "Search Successful");
+        return new Status(IStatus.OK, Activator.PLUGIN_ID, Messages.FortranFindReferencesSearchQuery_SearchSuccessful);
     }
 
     private void filterAndAddSearchResult(PhotranTokenRef ref)

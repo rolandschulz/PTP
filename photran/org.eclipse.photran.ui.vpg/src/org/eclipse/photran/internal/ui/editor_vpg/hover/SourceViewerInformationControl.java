@@ -186,7 +186,7 @@ public class SourceViewerInformationControl implements IInformationControl, IInf
         });
                
         fDocument = new Document();
-        fDocument.set("");
+        fDocument.set(""); //$NON-NLS-1$
         fViewer.setDocument(fDocument);
         IDocumentPartitioner partitioner = new FastPartitioner(new RuleBasedPartitionScanner(), FortranEditor.PARTITION_TYPES);
         partitioner.connect(fDocument);

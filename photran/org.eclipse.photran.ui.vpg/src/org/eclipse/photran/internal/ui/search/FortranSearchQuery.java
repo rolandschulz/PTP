@@ -218,13 +218,13 @@ public class FortranSearchQuery extends SearchQuery<SearchResult>
      */
     @Override protected void runAdditionalSearchPass(int passNum, IProgressMonitor pm)
     {
-        pm.beginTask("Adding references", matchesToAddLater.size());
+        pm.beginTask(Messages.FortranSearchQuery_AddingReferences, matchesToAddLater.size());
         
         String lastFilename = null;
         for (PhotranTokenRef tokenRef : matchesToAddLater) {
             if (!tokenRef.getFilename().equals(lastFilename)) {
                 lastFilename = tokenRef.getFilename();
-                pm.subTask("Adding references in " + lastFilename.substring(lastFilename.lastIndexOf('/')+1));
+                pm.subTask(Messages.bind(Messages.FortranSearchQuery_AddingReferencesIn, lastFilename.substring(lastFilename.lastIndexOf('/')+1)));
             }
             pm.worked(1);
             
@@ -267,11 +267,10 @@ public class FortranSearchQuery extends SearchQuery<SearchResult>
 
                     MessageDialog.openWarning(
                         Workbench.getInstance().getActiveWorkbenchWindow().getShell(),
-                        "Warning",
-                        "References in the following projects have been excluded from the search" +
-                        " results because Fortran analysis/refactoring is disabled:\n\n" + projects +
-                        "\nPlease enable Fortran analysis/refactoring for these projects if you wish" +
-                        " for their references to show in search results.");
+                        Messages.FortranSearchQuery_WarningTitle,
+                        Messages.bind(
+                            Messages.FortranSearchQuery_AnalysisRefactoringDisabled,
+                            projects));
                 }
             });
         }

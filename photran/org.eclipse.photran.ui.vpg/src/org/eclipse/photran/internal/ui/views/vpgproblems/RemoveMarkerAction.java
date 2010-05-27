@@ -36,9 +36,8 @@ public class RemoveMarkerAction extends SelectionDispatchAction
     public RemoveMarkerAction(IWorkbenchSite site)
     {
         super(site);
-        setText("Delete");
-        setToolTipText("Delete selected marker(s) from list");
-        // TODO Auto-generated constructor stub
+        setText(Messages.RemoveMarkerAction_Delete);
+        setToolTipText(Messages.RemoveMarkerAction_DeleteTooltip);
     }
     
     public RemoveMarkerAction(IWorkbenchSite site, String text, String toolTipText)

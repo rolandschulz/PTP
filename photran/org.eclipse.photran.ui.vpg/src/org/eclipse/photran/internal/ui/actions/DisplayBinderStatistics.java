@@ -23,7 +23,7 @@ import org.eclipse.rephraserengine.ui.actions.VPGOutputWindowAction;
  */
 public class DisplayBinderStatistics extends VPGOutputWindowAction
 {
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     protected void writeOutput(EclipseVPG vpg, PrintStream ps)
     {

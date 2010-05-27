@@ -26,14 +26,14 @@ import org.eclipse.ui.actions.ActionFactory;
  */
 public class VPGProblemContextMenu extends MenuManager
 {
-    public VPGProblemContextMenu(IViewSite site, String title)
+    public VPGProblemContextMenu(IViewSite site)
     {
-        super(title);
+        super(Messages.VPGProblemContextMenu_Problems);
         
         OpenMarkedFileAction openAct = new OpenMarkedFileAction(site);
         add(openAct);
         
-        CopyMarkedFileAction copyAct = new CopyMarkedFileAction((VPGProblemView)site.getPart(), "Copy");
+        CopyMarkedFileAction copyAct = new CopyMarkedFileAction((VPGProblemView)site.getPart());
         add(copyAct);
         
        /* RemoveMarkerAction remAct = new RemoveMarkerAction(site);

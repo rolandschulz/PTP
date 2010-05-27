@@ -135,7 +135,7 @@ public class DeclarationView extends ViewPart
         viewer.refresh();
     }
 
-    private static Pattern blankLine = Pattern.compile("(([ \\t]*[\\r\\n]+)+)[^\\00]*");
+    private static Pattern blankLine = Pattern.compile("(([ \\t]*[\\r\\n]+)+)[^\\00]*"); //$NON-NLS-1$
     private String trimBlankLines(String str)
     {
         Matcher m = blankLine.matcher(str);
@@ -193,7 +193,7 @@ public class DeclarationView extends ViewPart
             String declViewEnabledProperty = new SearchPathProperties().getProperty(
                 editor.getIFile(),
                 SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME);
-            if (declViewEnabledProperty != null && declViewEnabledProperty.equals("true"))
+            if (declViewEnabledProperty != null && declViewEnabledProperty.equals("true")) //$NON-NLS-1$
             {
                 addCaretMovementListenerTo(editor);
                 FortranEditorTasks tasks = FortranEditorTasks.instance(editor);
@@ -271,7 +271,7 @@ public class DeclarationView extends ViewPart
      */
     private void stopObserving(FortranEditor editor)
     {
-        update("");
+        update(""); //$NON-NLS-1$
         if (editor != null)
             removeCaretMovementListenerFrom(editor);
     }
@@ -306,7 +306,7 @@ public class DeclarationView extends ViewPart
             activeDefinitions.put(file.getFullPath().toPortableString(), newDefMap);
         }
 
-        PhotranVPG.getInstance().debug("        Decl view IEditorVPGTask handler:\t" + (System.currentTimeMillis()-start) + " ms", PhotranVPG.getFilenameForIFile(file));
+        PhotranVPG.getInstance().debug("        Decl view IEditorVPGTask handler:\t" + (System.currentTimeMillis()-start) + " ms", PhotranVPG.getFilenameForIFile(file)); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -324,7 +324,7 @@ public class DeclarationView extends ViewPart
             activeAST.put(path, ast);
             activeTokenList.put(path, tokenList);
             
-            PhotranVPG.getInstance().debug("        Decl view IEditorASTTask handler:\t" + (System.currentTimeMillis()-start) + " ms", null);
+            PhotranVPG.getInstance().debug("        Decl view IEditorASTTask handler:\t" + (System.currentTimeMillis()-start) + " ms", null); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return true;
     }
@@ -343,12 +343,12 @@ public class DeclarationView extends ViewPart
         {
             String description = defMap.lookup((TextSelection)event.getSelection(), tokenList);
             update(description == null
-                ? ""
+                ? "" //$NON-NLS-1$
                 : description);
         }
         else
         {
-            update("");
+            update(""); //$NON-NLS-1$
         }
     }
 }

@@ -49,29 +49,29 @@ public class FortranSearchPage extends SearchPage implements ISearchPage
         }
     }
     
-    public static final String EXTENSION_ID = "org.eclipse.photran.ui.vpgSearchPage";
+    public static final String EXTENSION_ID = "org.eclipse.photran.ui.vpgSearchPage"; //$NON-NLS-1$
     
     // Dialog store id constants
-    @Override protected String PAGE_NAME() { return "VPGSearchPage"; }
+    @Override protected String PAGE_NAME() { return "VPGSearchPage"; } //$NON-NLS-1$
 
     @Override protected List<Pair<String, Integer>> searchFor()
     {
         List<Pair<String, Integer>> searchFor = new ArrayList<Pair<String, Integer>>(6);
-        searchFor.add(Pair.of("Common block", FortranSearchQuery.FIND_COMMON_BLOCK));
-        searchFor.add(Pair.of("Function", FortranSearchQuery.FIND_FUNCTION));
-        searchFor.add(Pair.of("Subroutine", FortranSearchQuery.FIND_SUBROUTINE));
-        searchFor.add(Pair.of("Module", FortranSearchQuery.FIND_MODULE));
-        searchFor.add(Pair.of("Variable", FortranSearchQuery.FIND_VARIABLE));
-        searchFor.add(Pair.of("Program", FortranSearchQuery.FIND_PROGRAM));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_CommonBlock, FortranSearchQuery.FIND_COMMON_BLOCK));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_Function, FortranSearchQuery.FIND_FUNCTION));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_Subroutine, FortranSearchQuery.FIND_SUBROUTINE));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_Module, FortranSearchQuery.FIND_MODULE));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_Variable, FortranSearchQuery.FIND_VARIABLE));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_Program, FortranSearchQuery.FIND_PROGRAM));
         return searchFor;
     }
 
     @Override protected List<Pair<String, Integer>> limitTo()
     {
         List<Pair<String, Integer>> searchFor = new ArrayList<Pair<String, Integer>>(3);
-        searchFor.add(Pair.of("All occurrences", FortranSearchQuery.FIND_ALL_OCCURANCES));
-        searchFor.add(Pair.of("Declarations", FortranSearchQuery.FIND_DECLARATIONS));
-        searchFor.add(Pair.of("References", FortranSearchQuery.FIND_REFERENCES));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_AllOccurrences, FortranSearchQuery.FIND_ALL_OCCURANCES));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_Declarations, FortranSearchQuery.FIND_DECLARATIONS));
+        searchFor.add(Pair.of(Messages.FortranSearchPage_References, FortranSearchQuery.FIND_REFERENCES));
         return searchFor;
     }
 

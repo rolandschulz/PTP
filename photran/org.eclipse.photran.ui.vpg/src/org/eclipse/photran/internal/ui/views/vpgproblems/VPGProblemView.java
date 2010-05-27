@@ -71,9 +71,9 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     static enum VPGViewColumn
     {
         // Column    Label         Width (in pixels)
-        DESCRIPTION("Description", 44),
-        RESOURCE   ("Resource",    10),
-        PATH       ("Path",        20);
+        DESCRIPTION(Messages.VPGProblemView_DescriptionColumnHeader, 44),
+        RESOURCE   (Messages.VPGProblemView_ResourceColumnHeader,    10),
+        PATH       (Messages.VPGProblemView_PathColumnHeader,        20);
         
         public final String name;
         public final int width;
@@ -137,7 +137,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 
     private MenuManager createMenuManager()
     {
-        MenuManager manager = new VPGProblemContextMenu(getViewSite(), "Problems View Menu");
+        MenuManager manager = new VPGProblemContextMenu(getViewSite());
         tableViewer.getTable().setMenu(manager.createContextMenu(tableViewer.getTable()));
         return manager;
     }
@@ -161,7 +161,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     {
         private RecreateMarkers()
         {
-            super("Updating Fortran Analysis/Refactoring Problems view");
+            super(Messages.VPGProblemView_UpdatingProblemsViewMessage);
         }
         
         @Override public IStatus runInWorkspace(final IProgressMonitor monitor)
@@ -196,13 +196,13 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
             //only print out counts when looking at an unfiltered view
             if(!selectionFilterAction.isChecked())
             {
-                warningsFilterAction.setText(String.valueOf(markerCount[IMarker.SEVERITY_WARNING]) + " Warnings");
-                errorsFilterAction.setText(String.valueOf(markerCount[IMarker.SEVERITY_ERROR]) + " Errors");
+                warningsFilterAction.setText(Messages.bind(Messages.VPGProblemView_nWarnings, markerCount[IMarker.SEVERITY_WARNING]));
+                errorsFilterAction.setText(Messages.bind(Messages.VPGProblemView_nErrors, markerCount[IMarker.SEVERITY_ERROR]));
             }
             else //FILTERED
             {
-                warningsFilterAction.setText("Warnings");
-                errorsFilterAction.setText("Errors");
+                warningsFilterAction.setText(Messages.VPGProblemView_Warnings);
+                errorsFilterAction.setText(Messages.VPGProblemView_Errors);
             }
         }
     }
@@ -247,7 +247,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 
     public void createActions()
     {
-        copyAction = new CopyMarkedFileAction(this, "Copy");
+        copyAction = new CopyMarkedFileAction(this);
         openAction = new OpenMarkedFileAction(getSite());
         showAction = new ShowFullMessageAction(getSite());
 

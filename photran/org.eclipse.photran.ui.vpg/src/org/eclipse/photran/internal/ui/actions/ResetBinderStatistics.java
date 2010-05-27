@@ -22,7 +22,7 @@ import org.eclipse.rephraserengine.ui.actions.VPGWindowActionDelegate;
  */
 public class ResetBinderStatistics extends VPGWindowActionDelegate
 {
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     @Override
     protected void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {

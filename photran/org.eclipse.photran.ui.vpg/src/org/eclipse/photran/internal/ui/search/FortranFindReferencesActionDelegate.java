@@ -60,7 +60,7 @@ public abstract class FortranFindReferencesActionDelegate extends FortranEditorA
         try
         {
             if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(getFortranEditor().getIFile()))
-                throw new Exception("Please enable analysis and refactoring in the project properties.");
+                throw new Exception(Messages.FortranFindReferencesActionDelegate_PleaseEnableAnalysisAndRefactoring);
             
         	//progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
 
@@ -68,11 +68,11 @@ public abstract class FortranFindReferencesActionDelegate extends FortranEditorA
         	
             Token token = findEnclosingToken(getAST(), getFortranEditor().getSelection());
             if (token == null || token.getTerminal() != Terminal.T_IDENT)
-            	throw new Exception("Please select an identifier.");
+            	throw new Exception(Messages.FortranFindReferencesActionDelegate_PleaseSelectAnIdentifier);
 
 			List<Definition> defs = token.resolveBinding();            
 			if (defs.isEmpty())
-				throw new Exception("No definition could be found for the selected token.");
+				throw new Exception(Messages.FortranFindReferencesActionDelegate_DefinitionCouldNotBeFound);
 
             Definition selectedDef =
                 defs.size() > 1 ? openSelectionDialog(defs)
@@ -86,7 +86,7 @@ public abstract class FortranFindReferencesActionDelegate extends FortranEditorA
         {
         	String message = e.getMessage();
         	if (message == null) message = e.getClass().getName();
-        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message);
+        	MessageDialog.openError(getFortranEditor().getShell(), Messages.FortranFindReferencesActionDelegate_ErrorTitle, message);
         }
         finally
         {

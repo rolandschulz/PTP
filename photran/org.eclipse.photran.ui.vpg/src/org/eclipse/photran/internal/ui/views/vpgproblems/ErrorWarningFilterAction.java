@@ -43,8 +43,8 @@ public class ErrorWarningFilterAction extends Action
     {
         switch (severity)
         {
-            case IMarker.SEVERITY_ERROR:   return "Errors";
-            case IMarker.SEVERITY_WARNING: return "Warnings";
+            case IMarker.SEVERITY_ERROR:   return Messages.ErrorWarningFilterAction_Errors;
+            case IMarker.SEVERITY_WARNING: return Messages.ErrorWarningFilterAction_Warnings;
             default: throw new IllegalStateException();
         }
     }

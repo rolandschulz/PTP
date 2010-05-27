@@ -85,7 +85,10 @@ public class RenameAction
 
                     Composite group = top;
                     Label lbl = new Label(group, SWT.NONE);
-                    lbl.setText("Rename " + renameRefactoring.getOldNameOfIdentifier() + " to ");
+                    lbl.setText(
+                        Messages.bind(
+                            Messages.RenameAction_RenameAtoB,
+                            renameRefactoring.getOldNameOfIdentifier()));
 
                     newNameField = new Text(group, SWT.BORDER);
                     newNameField.setText(renameRefactoring.getOldNameOfIdentifier());
@@ -101,10 +104,10 @@ public class RenameAction
                     // Call once for sure, just in case the user doesn't modify the text
                     renameRefactoring.setNewNameForIdentifier(newNameField.getText());
 
-                    new Label(group, SWT.NONE).setText("");
+                    new Label(group, SWT.NONE).setText(""); //$NON-NLS-1$
 
                     shouldBindInterfacesAndExternals = new Button(group, SWT.CHECK);
-                    shouldBindInterfacesAndExternals.setText("Match external subprograms with interfaces and external declarations");
+                    shouldBindInterfacesAndExternals.setText(Messages.RenameAction_MatchExternalSubprograms);
                     shouldBindInterfacesAndExternals.setSelection(true);
                     shouldBindInterfacesAndExternals.addSelectionListener(new SelectionListener()
                     {

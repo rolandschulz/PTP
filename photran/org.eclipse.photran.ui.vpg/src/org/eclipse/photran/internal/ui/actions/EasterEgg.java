@@ -55,22 +55,21 @@ public class EasterEgg extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Easter Egg";
+        return "Easter Egg"; //$NON-NLS-1$
     }
 
     @Override
     protected void doCheckInitialConditions(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         if (!canRunEasterEgg())
-            status.addFatalError("The selected operation is not available."); // Bogus but common error message
+            status.addFatalError("The selected operation is not available."); // Bogus but common error message //$NON-NLS-1$
     }
 
-    @SuppressWarnings("unchecked")
     private boolean canRunEasterEgg()
     {
         if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(fileInEditor)) return false;
 
-        Token token = this.findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
+        Token token = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (token == null) return false;
 
         printStmt = token.findNearestAncestor(ASTPrintStmtNode.class);
@@ -94,8 +93,8 @@ public class EasterEgg extends FortranEditorRefactoring
     private String removeQuotes(String string)
     {
         string = string.substring(1, string.length()-1);
-        string = string.replaceAll("''", "'");
-        string = string.replaceAll("\"\"", "\"");
+        string = string.replaceAll("''", "'"); //$NON-NLS-1$ //$NON-NLS-2$
+        string = string.replaceAll("\"\"", "\""); //$NON-NLS-1$ //$NON-NLS-2$
         return string;
     }
 
@@ -104,7 +103,7 @@ public class EasterEgg extends FortranEditorRefactoring
     {
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     protected void doCreateChange(IProgressMonitor pm) throws CoreException, OperationCanceledException
     {
@@ -115,7 +114,7 @@ public class EasterEgg extends FortranEditorRefactoring
             {
                 newStmts[i] = (ASTPrintStmtNode)printStmt.clone();
                 ASTStringConstNode stringConst = (ASTStringConstNode)newStmts[i].getOutputItemList().getSingleExpr();
-                stringConst.getStringConst().setText("\"" + rasterize(i, string) + "\"");
+                stringConst.getStringConst().setText("\"" + rasterize(i, string) + "\""); //$NON-NLS-1$ //$NON-NLS-2$
 
                 if (i != 0)
                     removeAllWhitetextExceptIndentation(newStmts[i].findFirstToken());
@@ -146,13 +145,13 @@ public class EasterEgg extends FortranEditorRefactoring
     private static String[] font = new String[]
     {
     //12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678 12345678",
-     "           AAAA   BBBBBBB    CCCCC  DDDDDD   EEEEEEEE FFFFFFFF   GGGGG  HH    HH IIIIIIII      JJJ KK    KK LL       MM    MM NNN   NN   OOOO   PPPPPPP    QQQQ   RRRRRRR   SSSSSSS TTTTTTTT UU    UU VV    VV WW    WW XX    XX YY    YY ZZZZZZZZ    11     222222   333333       444 55555555   6666   77777777  888888    9999     0000               !!      ????   ",
-     "          AA  AA  BB    BB  CC    C DD   DD  EE       FF        GG    G HH    HH    II          JJ KK   KK  LL       MMM  MMM NNNN  NN  OO  OO  PP    PP  QQ  QQ  RR    RR SS          TT    UU    UU VV    VV WW    WW  XX  XX   YY  YY       ZZ   1111    22    22 33    33     4444 55        66           77  88    88 99   99   00  00             !!!!    ??  ??  ",
-     "         AA    AA BB    BB CC       DD    DD EE       FF       GG       HH    HH    II          JJ KK  KK   LL       MM MM MM NN NN NN OO    OO PP    PP QQ    QQ RR    RR SS          TT    UU    UU VV    VV WW    WW   XXXX     YYYY       ZZ      11         22        33    44 44 55 555   66           77   88    88 99   999 00    00            !!!!        ??  ",
-     "         AAAAAAAA BBBBBB   CC       DD    DD EEEEE    FFFFF    GG  GGGG HHHHHHHH    II          JJ KKKK     LL       MM MM MM NN NN NN OO    OO PPPPPPP  QQ    QQ RRRRRRR   SSSSSS     TT    UU    UU VV    VV WW WW WW    XX       YY       ZZ       11      222       333     44  44 555   55 66 6666     77     888888   9999 99 00    00             !!       ??    ",
-     "         AA    AA BB    BB CC       DD    DD EE       FF       GG    GG HH    HH    II    JJ    JJ KK  KK   LL       MM    MM NN NN NN OO    OO PP       QQ  Q QQ RR  RR         SS    TT    UU    UU  VV  VV  WW WW WW   XXXX      YY      ZZ        11     22            33  4444444       55 666   66   77     88    88       99 00    00             !!       ??    ",
-     "         AA    AA BB    BB  CC    C DD   DD  EE       FF        GG   GG HH    HH    II    JJ    JJ KK   KK  LL       MM    MM NN  NNNN  OO  OO  PP        QQ  QQ  RR   RR        SS    TT    UU    UU   VVVV   WWW  WWW  XX  XX     YY     ZZ         11    22       33    33       44 5     55  66   66  77      88    88      99   00  00  ...                        ",
-     "         AA    AA BBBBBBB    CCCCC  DDDDDD   EEEEEEEE FF         GGGGG  HH    HH IIIIIIII  JJJJJ   KK    KK LLLLLLLL MM    MM NN   NNN   OOOO   PP         QQQQ Q RR    RR SSSSSSS     TT     UUUUUU     VV    WW    WW XX    XX    YY    ZZZZZZZZ 11111111 22222222  333333        44  555555    6666   77        888888    9999     0000   ...         !!       ??    ",
+     "           AAAA   BBBBBBB    CCCCC  DDDDDD   EEEEEEEE FFFFFFFF   GGGGG  HH    HH IIIIIIII      JJJ KK    KK LL       MM    MM NNN   NN   OOOO   PPPPPPP    QQQQ   RRRRRRR   SSSSSSS TTTTTTTT UU    UU VV    VV WW    WW XX    XX YY    YY ZZZZZZZZ    11     222222   333333       444 55555555   6666   77777777  888888    9999     0000               !!      ????   ", //$NON-NLS-1$
+     "          AA  AA  BB    BB  CC    C DD   DD  EE       FF        GG    G HH    HH    II          JJ KK   KK  LL       MMM  MMM NNNN  NN  OO  OO  PP    PP  QQ  QQ  RR    RR SS          TT    UU    UU VV    VV WW    WW  XX  XX   YY  YY       ZZ   1111    22    22 33    33     4444 55        66           77  88    88 99   99   00  00             !!!!    ??  ??  ", //$NON-NLS-1$
+     "         AA    AA BB    BB CC       DD    DD EE       FF       GG       HH    HH    II          JJ KK  KK   LL       MM MM MM NN NN NN OO    OO PP    PP QQ    QQ RR    RR SS          TT    UU    UU VV    VV WW    WW   XXXX     YYYY       ZZ      11         22        33    44 44 55 555   66           77   88    88 99   999 00    00            !!!!        ??  ", //$NON-NLS-1$
+     "         AAAAAAAA BBBBBB   CC       DD    DD EEEEE    FFFFF    GG  GGGG HHHHHHHH    II          JJ KKKK     LL       MM MM MM NN NN NN OO    OO PPPPPPP  QQ    QQ RRRRRRR   SSSSSS     TT    UU    UU VV    VV WW WW WW    XX       YY       ZZ       11      222       333     44  44 555   55 66 6666     77     888888   9999 99 00    00             !!       ??    ", //$NON-NLS-1$
+     "         AA    AA BB    BB CC       DD    DD EE       FF       GG    GG HH    HH    II    JJ    JJ KK  KK   LL       MM    MM NN NN NN OO    OO PP       QQ  Q QQ RR  RR         SS    TT    UU    UU  VV  VV  WW WW WW   XXXX      YY      ZZ        11     22            33  4444444       55 666   66   77     88    88       99 00    00             !!       ??    ", //$NON-NLS-1$
+     "         AA    AA BB    BB  CC    C DD   DD  EE       FF        GG   GG HH    HH    II    JJ    JJ KK   KK  LL       MM    MM NN  NNNN  OO  OO  PP        QQ  QQ  RR   RR        SS    TT    UU    UU   VVVV   WWW  WWW  XX  XX     YY     ZZ         11    22       33    33       44 5     55  66   66  77      88    88      99   00  00  ...                        ", //$NON-NLS-1$
+     "         AA    AA BBBBBBB    CCCCC  DDDDDD   EEEEEEEE FF         GGGGG  HH    HH IIIIIIII  JJJJJ   KK    KK LLLLLLLL MM    MM NN   NNN   OOOO   PP         QQQQ Q RR    RR SSSSSSS     TT     UUUUUU     VV    WW    WW XX    XX    YY    ZZZZZZZZ 11111111 22222222  333333        44  555555    6666   77        888888    9999     0000   ...         !!       ??    ", //$NON-NLS-1$
     };
 
     private static int index(char ch)

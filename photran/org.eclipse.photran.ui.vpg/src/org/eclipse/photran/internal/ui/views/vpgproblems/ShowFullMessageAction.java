@@ -37,7 +37,6 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * Action to display the entire message for a marker in a separate dialog.
  *
  * @author Timofey Yuvashev
- * 
  * @author Esfar Huq
  * @author Rui Wang
  */
@@ -52,8 +51,8 @@ public class ShowFullMessageAction extends SelectionDispatchAction
     public ShowFullMessageAction(IWorkbenchSite site)
     {
         super(site);
-        setText("Event Details");
-        setToolTipText("Show the entire message for selected event(s)");
+        setText(Messages.ShowFullMessageAction_EventDetails);
+        setToolTipText(Messages.ShowFullMessageAction_ShowDetailsTooltip);
     }
 
     public ShowFullMessageAction(IWorkbenchSite site, String text, String toolTipText)
@@ -77,7 +76,7 @@ public class ShowFullMessageAction extends SelectionDispatchAction
             protected void configureShell(Shell shell)
             {
                 super.configureShell(shell);
-                shell.setText("Event Details");
+                shell.setText(Messages.ShowFullMessageAction_EventDetails);
                 shell.setSize(500, 300);
             }
 

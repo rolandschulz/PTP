@@ -48,7 +48,7 @@ public class AddOnlyToUseStmtInputPage extends CustomUserInputPage<AddOnlyToUseS
         Composite group = top;
 
         Label lbl = new Label(group, SWT.NONE);
-        lbl.setText("Select the module entities to add to the ONLY clause.");
+        lbl.setText(Messages.AddOnlyToUseStmtInputPage_SelectModuleEntitiesLabel);
 
         for(int i=0; i<getRefactoring().getNumEntitiesInModule(); i++)
         {
@@ -91,7 +91,6 @@ public class AddOnlyToUseStmtInputPage extends CustomUserInputPage<AddOnlyToUseS
         }
 
         Label instruct = new Label(top, SWT.NONE);
-        instruct.setText("Click OK to add the ONLY clause to the selected USE statement." +
-                "To see what changes will be made, click Preview.");
+        instruct.setText(Messages.AddOnlyToUseStmtInputPage_ClickOKMessage);
     }
 }

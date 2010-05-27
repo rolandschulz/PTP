@@ -36,12 +36,12 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask(Messages.DisplaySymbolTable_WaitingForBackgroundWorkToComplete, IProgressMonitor.UNKNOWN);
 
             File temp = UIUtil.createTempFile();
             final PrintStream ps = UIUtil.createPrintStream(temp);
 
-            ps.println("SYMBOL TABLE - Derived from Virtual Program Graph");
+            ps.println("SYMBOL TABLE - Derived from Virtual Program Graph"); //$NON-NLS-1$
 
         	getAST().accept(new GenericASTVisitor()
         	{
@@ -66,7 +66,7 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
 					}
 					catch (Exception e)
 					{
-						println("EXCEPTION: " + e.getClass().getName() + ": " + e.getMessage());
+						println("EXCEPTION: " + e.getClass().getName() + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 						e.printStackTrace(ps);
 					}
 
@@ -80,19 +80,19 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
 					PhotranTokenRef representativeToken = scope.getRepresentativeToken();
 
 					if (representativeToken.getOffset() < 0)
-						print("(Global Scope)");
+						print("(Global Scope)"); //$NON-NLS-1$
 					else
-						print("Scope: " + representativeToken.getText());
+						print("Scope: " + representativeToken.getText()); //$NON-NLS-1$
 
-					if (scope.isInternal()) ps.print(" (Internal Subprogram)");
+					if (scope.isInternal()) ps.print(" (Internal Subprogram)"); //$NON-NLS-1$
 
-					if (scope.isDefaultVisibilityPrivate()) ps.print(" - Default Visibility is PRIVATE");
+					if (scope.isDefaultVisibilityPrivate()) ps.print(" - Default Visibility is PRIVATE"); //$NON-NLS-1$
 
 					ImplicitSpec implicitSpec = scope.getImplicitSpec();
 					if (implicitSpec == null)
-						ps.print(" - Implicit None");
+						ps.print(" - Implicit None"); //$NON-NLS-1$
 					else
-						ps.print(" - " + implicitSpec.toString());
+						ps.print(" - " + implicitSpec.toString()); //$NON-NLS-1$
 
 					ps.println();
 				}
@@ -112,13 +112,13 @@ public class DisplaySymbolTable extends FortranEditorASTActionDelegate
         	});
 
             ps.close();
-            UIUtil.openHtmlViewerOn("Symbol Table", temp);
+            UIUtil.openHtmlViewerOn("Symbol Table", temp); //$NON-NLS-1$
         }
         catch (Exception e)
         {
         	String message = e.getMessage();
         	if (message == null) message = e.getClass().getName();
-        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message);
+        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message); //$NON-NLS-1$
         }
         finally
         {

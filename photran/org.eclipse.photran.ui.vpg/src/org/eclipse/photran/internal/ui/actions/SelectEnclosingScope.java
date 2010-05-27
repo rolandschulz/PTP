@@ -30,18 +30,18 @@ public class SelectEnclosingScope extends FortranEditorASTActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask(Messages.SelectEnclosingScope_WaitingForBackgroundWorkToComplete, IProgressMonitor.UNKNOWN);
         	
-            progressMonitor.subTask("Parsing...");
+            progressMonitor.subTask(Messages.SelectEnclosingScope_Parsing);
             Token token = findEnclosingToken(getAST(), getFortranEditor().getSelection());
-            if (token == null) throw new Exception("Please select a keyword or an identifier.");
+            if (token == null) throw new Exception(Messages.SelectEnclosingScope_PleaseSelectAKeywordOrIdentifier);
 
 
             ScopingNode scope = token.getEnclosingScope();
-            if (scope == null) throw new Exception("No enclosing scope.");
+            if (scope == null) throw new Exception(Messages.SelectEnclosingScope_NoEnclosingScope);
             
             IMarker marker = scope.createMarker();
-            if (marker == null) throw new Exception("No tokens in scope.");
+            if (marker == null) throw new Exception(Messages.SelectEnclosingScope_NoTokensInScope);
             
         	IDE.openEditor(getFortranEditor().getEditorSite().getPage(), marker, true);
         }
@@ -49,7 +49,7 @@ public class SelectEnclosingScope extends FortranEditorASTActionDelegate
         {
         	String message = e.getMessage();
         	if (message == null) message = e.getClass().getName();
-        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message);
+        	MessageDialog.openError(getFortranEditor().getShell(), Messages.SelectEnclosingScope_ErrorTitle, message);
         }
         finally
         {

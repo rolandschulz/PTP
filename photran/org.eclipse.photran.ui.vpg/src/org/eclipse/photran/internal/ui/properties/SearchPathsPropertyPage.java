@@ -70,14 +70,11 @@ public class SearchPathsPropertyPage extends FortranPropertyPage
         
         
         Label l = new Label(composite, SWT.WRAP);
-        l.setText("To enable Open Declaration, Find All References, the Fortran Declaration\n"
-                  + "view, content assist, and refactoring in Fortran programs, check the\n"
-                  + "following box.  A program database (index) will be updated every time\n"
-                  + "a Fortran file is created or saved.");
+        l.setText(Messages.SearchPathsPropertyPage_EnableButtonsDescription);
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         enableVPG = new FortranBooleanFieldEditor(SearchPathProperties.ENABLE_VPG_PROPERTY_NAME, 
-                                                  "Enable Fortran analysis/refactoring", 
+                                                  Messages.SearchPathsPropertyPage_EnableAnalysisRefactoring, 
                                                   composite)
         {
             @Override protected void valueChanged(boolean oldValue, boolean newValue)
@@ -98,21 +95,21 @@ public class SearchPathsPropertyPage extends FortranPropertyPage
                                      String.valueOf(enableVPG.getBooleanValue()));
 
         enableDeclView = new FortranBooleanFieldEditor(SearchPathProperties.ENABLE_DECL_VIEW_PROPERTY_NAME, 
-                                                "Enable Fortran Declaration view", 
+                                                Messages.SearchPathsPropertyPage_EnableDeclarationView, 
                                                 composite);
      
         enableDeclView.setPreferenceStore(scopedStore);
         enableDeclView.load();
 
         enableContentAssist = new FortranBooleanFieldEditor(SearchPathProperties.ENABLE_CONTENT_ASSIST_PROPERTY_NAME, 
-                                                     "Enable Fortran content assist (Ctrl+Space)", 
+                                                     Messages.SearchPathsPropertyPage_EnableContentAssist, 
                                                      composite);
       
         enableContentAssist.setPreferenceStore(scopedStore);
         enableContentAssist.load();
         
         enableHoverTip = new FortranBooleanFieldEditor(SearchPathProperties.ENABLE_HOVER_TIP_PROPERTY_NAME, 
-                                                "Enable Fortran Hover tips", 
+                                                Messages.SearchPathsPropertyPage_EnableHoverTips, 
                                                 composite);
        
         enableHoverTip.setPreferenceStore(scopedStore);
@@ -129,24 +126,21 @@ public class SearchPathsPropertyPage extends FortranPropertyPage
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
 
         l = new Label(composite, SWT.WRAP);
-        l.setText("The following specify the paths searched for modules\n"
-                  + "and INCLUDE files during analysis and refactoring.\n"
-                  + "These MAY BE DIFFERENT from the settings used by\n"
-                  + "your compiler to build your project.");
+        l.setText(Messages.SearchPathsPropertyPage_PathsDescription);
         l.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         modulePathEditor = new WorkspacePathEditor((IProject)getElement(),
                                              SearchPathProperties.MODULE_PATHS_PROPERTY_NAME,
-                                             "Folders to be searched for &modules, in order of preference:",
-                                             "Select a folder to be searched for Fortran modules:",
+                                             Messages.SearchPathsPropertyPage_FoldersToBeSearchedForModules,
+                                             Messages.SearchPathsPropertyPage_SelectAFolderToBeSearchedForModules,
                                              composite);
         modulePathEditor.setPreferenceStore(scopedStore);
         modulePathEditor.load();
 
         includePathEditor = new WorkspacePathEditor((IProject)getElement(),
                                                     SearchPathProperties.INCLUDE_PATHS_PROPERTY_NAME,
-                                             "Folders to be searched for &INCLUDE files, in order of preference:",
-                                             "Select a folder to be searched for INCLUDE files:",
+                                             Messages.SearchPathsPropertyPage_FoldersToBeSearchedForIncludes,
+                                             Messages.SearchPathsPropertyPage_SelectAFolderToBeSearchedForIncludes,
                                              composite);
         
         includePathEditor.setPreferenceStore(scopedStore);
@@ -182,9 +176,9 @@ public class SearchPathsPropertyPage extends FortranPropertyPage
         {
             FortranUIPlugin.log(e);
             MessageDialog.openError(getShell(),
-                "Error Saving Project Properties",
-                "The project properties could not be saved.\n" +
-                e.getClass().getName() + ": " +
+                Messages.SearchPathsPropertyPage_ErrorSavingProperties,
+                Messages.SearchPathsPropertyPage_PropertiesCouldNotBeSaved +
+                "\n" + e.getClass().getName() + ": " + //$NON-NLS-1$ //$NON-NLS-2$
                 e.getMessage());
         }
         

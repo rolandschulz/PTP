@@ -28,13 +28,13 @@ public class FindAllDeclarationsInScope extends FortranEditorASTActionDelegate
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask(Messages.FindAllDeclarationsInScope_WaitingForBackgroundWorkToComplete, IProgressMonitor.UNKNOWN);
 
             Token token = findEnclosingToken(getAST(), getFortranEditor().getSelection());
-            if (token == null) throw new Exception("Please select a token.");
+            if (token == null) throw new Exception(Messages.FindAllDeclarationsInScope_PleaseSelectAToken);
 
             ScopingNode scope = token.getEnclosingScope();
-            if (scope == null) throw new Exception("No enclosing scope.");
+            if (scope == null) throw new Exception(Messages.FindAllDeclarationsInScope_NoEnclosingScope);
 
             openSelectionDialog(scope.getAllDefinitions());
         }
@@ -42,7 +42,7 @@ public class FindAllDeclarationsInScope extends FortranEditorASTActionDelegate
         {
         	String message = e.getMessage();
         	if (message == null) message = e.getClass().getName();
-        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message);
+        	MessageDialog.openError(getFortranEditor().getShell(), Messages.FindAllDeclarationsInScope_ErrorTitle, message);
         }
         finally
         {

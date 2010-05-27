@@ -130,7 +130,7 @@ public class FortranEditorTasks
 
             String vpgEnabledProperty = new SearchPathProperties().getProperty(editor.getIFile(),
                                                  SearchPathProperties.ENABLE_VPG_PROPERTY_NAME);
-            if (vpgEnabledProperty != null && vpgEnabledProperty.equals("true"))
+            if (vpgEnabledProperty != null && vpgEnabledProperty.equals("true")) //$NON-NLS-1$
             {
                 runASTTasks();
                 if (runVPGTasks) runVPGTasks();
@@ -165,7 +165,7 @@ public class FortranEditorTasks
         {
             private DispatchASTTasksJob()
             {
-                super("Updating Fortran editor with new parse information");
+                super(Messages.FortranEditorTasks_UpdatingFortranEditorWithNewParseInfo);
             }
 
             private ISourceForm determineSourceForm()
@@ -191,7 +191,7 @@ public class FortranEditorTasks
                 {
                     if (editor.getDocumentProvider() != null)
                     {
-                                                debug("DispatchASTTasksJob#parseThenRunASTTasks():");
+                                                debug("DispatchASTTasksJob#parseThenRunASTTasks():"); //$NON-NLS-1$
 
                         String editorContents = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
                         
@@ -201,10 +201,10 @@ public class FortranEditorTasks
                                                                             editor.getIFile(),
                                                                             editor.getIFile().getName(),
                                                                             sourceForm);
-                                                debug("    createLexer:\t" + (System.currentTimeMillis()-start) + " ms");
+                                                debug("    createLexer:\t" + (System.currentTimeMillis()-start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
                                                 start = System.currentTimeMillis();
                         ASTExecutableProgramNode astRootNode = parser.parse(lexer);
-                                                debug("    parse:\t" + (System.currentTimeMillis()-start) + " ms");
+                                                debug("    parse:\t" + (System.currentTimeMillis()-start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
                         if (astRootNode == null) return;
 
                         HashSet<IFortranEditorASTTask> tasksToRemove = new HashSet<IFortranEditorASTTask>();
@@ -216,15 +216,15 @@ public class FortranEditorTasks
                                                 long start2 = System.currentTimeMillis();
                                 if (!task.handle(astRootNode, lexer.getTokenList(), defMap))
                                     tasksToRemove.add(task);
-                                                debug("        Task " + task.getClass().getSimpleName() + ":\t" + (System.currentTimeMillis()-start2) + " ms");
+                                                debug("        Task " + task.getClass().getSimpleName() + ":\t" + (System.currentTimeMillis()-start2) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             }
-                                                debug("    Total Running Tasks:\t" + (System.currentTimeMillis()-start) + " ms");
+                                                debug("    Total Running Tasks:\t" + (System.currentTimeMillis()-start) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
                         }
                         FortranEditorTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                     }
                 }
                 catch (SyntaxException e) { /* Ignore syntax errors */ }
-                catch (Throwable e) { FortranUIPlugin.log("Error running AST tasks", e); }
+                catch (Throwable e) { FortranUIPlugin.log(Messages.FortranEditorTasks_ErrorRunningASTTasks, e); }
             }
 
             private void debug(String string)
@@ -237,7 +237,7 @@ public class FortranEditorTasks
         {
             private UpdateVPGJob()
             {
-                super("Updating Fortran editor with new analysis information");
+                super(Messages.FortranEditorTasks_UpdatingFortranEditorWithNewAnalysisInfo);
             }
 
             @Override

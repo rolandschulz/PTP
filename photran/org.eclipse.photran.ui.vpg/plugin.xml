@@ -91,22 +91,22 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            name="Fortran Refactoring Commands"
+            name="%category.name"
             id="org.eclipse.photran.ui.RefactoringCategory">
       </category>
 
       <command
-            name="Rename..."
+            name="%command.name"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.RenameRefactoringCommand">
       </command>
       <command
-            name="Extract Procedure..."
+            name="%command.name.0"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand">
       </command>
       <command
-            name="Extract Local Variable..."
+            name="%command.name.1"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand">
       </command>
@@ -138,23 +138,23 @@
    <!-- 3. Add the command to Photran's Refactoring action set -->
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
-            label="Fortran Refactorings"
-            description="Fortran Refactorings"
+            label="%actionSet.label"
+            description="%actionSet.description"
             visible="false"
             id="org.eclipse.photran.ui.RefactoringActionSet">
 
          <action
-               label="Re&amp;name..."
+               label="%action.label"
                definitionId="org.eclipse.photran.ui.RenameRefactoringCommand"
                class="org.eclipse.photran.internal.ui.refactoring.RenameAction"
                id="org.eclipse.photran.ui.RenameRefactoringAction"/>
          <action
-               label="E&amp;xtract Procedure..."
+               label="%action.label.0"
                definitionId="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand"
                class="org.eclipse.photran.internal.ui.refactoring.ExtractProcedureAction"
                id="org.eclipse.photran.ui.ExtractProcedureRefactoringAction"/>
          <action
-               label="Extract &amp;Local Variable..."
+               label="%action.label.1"
                definitionId="org.eclipse.photran.ui.ExtractLocalVariableRefactoringCommand"
                class="org.eclipse.photran.internal.ui.refactoring.ExtractLocalVariableAction"
                id="org.eclipse.photran.ui.ExtractLocalVariableRefactoringAction"/>
@@ -183,7 +183,7 @@
       <page
             objectClass="org.eclipse.core.resources.IProject"
             adaptable="true"
-            name="Analysis/Refactoring"
+            name="%page.name"
             class="org.eclipse.photran.internal.ui.properties.SearchPathsPropertyPage"
             id="org.eclipse.photran.ui.SearchPathsPropertyPage"
             category="org.eclipse.photran.ui.newui.Page_head_general">
@@ -216,15 +216,15 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            name="Navigation"
-            description="Navigation"
+            name="%category.name.0"
+            description="%category.description"
             id="org.eclipse.photran.ui.NavigationCategory">
       </category>
       <command
             categoryId="org.eclipse.photran.ui.NavigationCategory"
-            description="Open Declaration"
+            description="%command.description"
             id="org.eclipse.photran.ui.OpenDeclarationCommand"
-            name="Open Declaration">
+            name="%command.name.2">
       </command>
    </extension>
    <extension
@@ -244,12 +244,12 @@
    </extension>
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
-            label="Fortran Analysis Actions"
-            description="Fortran Analysis Actions"
+            label="%actionSet.label.0"
+            description="%actionSet.description.0"
             visible="false"
             id="org.eclipse.photran.ui.AnalysisActionSet">
          <action
-               label="&amp;Open Declaration"
+               label="%action.label.2"
                definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
                class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
                menubarPath="navigate/additions"
@@ -270,7 +270,7 @@
             class="org.eclipse.photran.internal.ui.actions.OpenDeclaration"
             definitionId="org.eclipse.photran.ui.OpenDeclarationCommand"
             id="org.eclipse.photran.ui.OpenDeclarationMenuAction"
-            label="&amp;Open Declaration"
+            label="%action.label.3"
             menubarPath="group.open"/>
      </viewerContribution>
    </extension>
@@ -280,14 +280,14 @@
    <!--====================================-->
    <extension
       id="vpgSearchPage"
-      name="vpg search name"
+      name="%extension.name"
       point="org.eclipse.search.searchPages">
      <page
         canSearchEnclosingProjects="true"
         class="org.eclipse.photran.internal.ui.search.FortranSearchPage"
         icon="icons/full/obj16/fsearch_obj.gif"
         id="org.eclipse.photran.ui.vpgSearchPage"
-        label="Fortran Search"
+        label="%page.label"
         showScopeSection="true"
         sizeHint="460, 160"/>
    </extension>
@@ -296,25 +296,25 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            name="Fortran Search"
-            description="Fortran Search"
+            name="%category.name.1"
+            description="%category.description.0"
             id="org.eclipse.photran.ui.SearchCategory">
       </category>
       <command
             categoryId="org.eclipse.photran.ui.SearchCategory"
-            description="Searches the workspace for all references to a Fortran identifier"
+            description="%command.description.0"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
-            name="Find All References in Workspace" />
+            name="%command.name.3" />
       <command
             categoryId="org.eclipse.photran.ui.SearchCategory"
-            description="Searches the project for all references to a Fortran identifier"
+            description="%command.description.1"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
-            name="Find All References in Project" />
+            name="%command.name.4" />
       <command
             categoryId="org.eclipse.photran.ui.SearchCategory"
-            description="Searches the file for all references to a Fortran identifier"
+            description="%command.description.2"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
-            name="Find All References in File" />
+            name="%command.name.5" />
    </extension>
    <!-- 2. Optionally associate the command with an accelerator key -->
    <extension
@@ -331,13 +331,13 @@
    <!-- 3. Add the command to an action set -->
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
-            label="Fortran Search Actions"
-            description="Fortran Search Actions"
+            label="%actionSet.label.1"
+            description="%actionSet.description.1"
             visible="false"
             id="org.eclipse.photran.ui.SearchActionSet">
          <menu
                id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
-               label="R&amp;eferences"
+               label="%menu.label"
                path="org.eclipse.search.menu/occurencesActionsGroup"><!-- See plugin.xml for org.eclipse.search -->
            <separator
                name="FindAllReferencesGroup">
@@ -348,7 +348,7 @@
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileAction"
-            label="File"
+            label="%action.label.4"
             menubarPath="org.eclipse.search.menu/org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
          </action>
          <action
@@ -356,7 +356,7 @@
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectAction"
-            label="Project"
+            label="%action.label.5"
             menubarPath="org.eclipse.search.menu/org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
          </action>
          <action
@@ -364,14 +364,14 @@
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceAction"
-            label="Workspace"
+            label="%action.label.6"
             menubarPath="org.eclipse.search.menu/org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
          </action>
          <action
                class="org.eclipse.photran.internal.ui.search.FortranSearchPage$OpenAction"
                icon="icons/full/obj16/fsearch_obj.gif"
                id="org.eclipse.photran.ui.vpg.actions.OpenFortranSearchPage"
-               label="F&amp;ortran..."
+               label="%action.label.7"
                menubarPath="org.eclipse.search.menu/dialogGroup">
          </action>
       </actionSet>
@@ -396,7 +396,7 @@
          targetID="#FortranEditorContextMenu">
       <menu
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu"
-            label="Re&amp;ferences"
+            label="%menu.label.0"
             path="group.find"><!-- See ITextEditorActionConstants - was originally group.search according to IContextMenuConstants -->
          <separator
                name="FindAllReferencesGroup">
@@ -407,7 +407,7 @@
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesFileCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesFileAction"
-            label="File"
+            label="%action.label.8"
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
       <action
@@ -415,7 +415,7 @@
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesProjectAction"
-            label="Project"
+            label="%action.label.9"
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
       <action
@@ -423,7 +423,7 @@
             definitionId="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceCommand"
             icon="icons/full/obj16/search_ref_obj.gif"
             id="org.eclipse.photran.ui.vpg.FortranFindReferencesWorkspaceAction"
-            label="Workspace"
+            label="%action.label.10"
             menubarPath="org.eclipse.photran.ui.vpg.FortranFindReferencesMenu/FindAllReferencesGroup">
       </action>
      </viewerContribution>
@@ -451,19 +451,19 @@
    <!--     menu.                                                                         -->
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
-            label="Fortran Debug Actions"
-            description="Fortran Debug Actions"
+            label="%actionSet.label.2"
+            description="%actionSet.description.2"
             visible="false"
             id="org.eclipse.photran.ui.DebugActionSet">
          <menu
-               label="Refac&amp;tor"
+               label="%menu.label.1"
                path="edit"
                id="org.eclipse.jdt.ui.refactoring.menu">
             <separator name="scriptGroup"/>
          </menu>
 
          <menu
-               label="(&amp;Debugging)"
+               label="%menu.label.2"
                path="org.eclipse.jdt.ui.refactoring.menu/scriptGroup"
                id="debugging">
             <separator name="debugging"/>
@@ -472,45 +472,45 @@
             <separator name="vpgdb"/>
          </menu>
          <action
-               label="Find Matching &amp;Interface Declarations"
+               label="%action.label.11"
                class="org.eclipse.photran.internal.ui.actions.FindMatchingInterfaceDeclarations"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugginginterfaces"
                id="org.eclipse.photran.ui.FindMatchingInterfaceDeclarationsAction"/>
          <action
-               label="Resolve &amp;Interface Binding"
+               label="%action.label.12"
                class="org.eclipse.photran.internal.ui.actions.ResolveInterfaceBinding"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugginginterfaces"
                id="org.eclipse.photran.ui.ResolveInterfaceBindingAction"/>
          <!-- -->
          <action
-               label="Select &amp;Enclosing Scope"
+               label="%action.label.13"
                class="org.eclipse.photran.internal.ui.actions.SelectEnclosingScope"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"
                id="org.eclipse.photran.ui.FindEnclosingScopeAction"/>
          <action
-               label="&amp;Find All Declarations in Scope"
+               label="%action.label.14"
                class="org.eclipse.photran.internal.ui.actions.FindAllDeclarationsInScope"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"
                id="org.eclipse.photran.ui.FindAllDeclarationsInScopeAction"/>
          <action
                class="org.eclipse.photran.internal.ui.actions.DisplaySymbolTable"
                id="org.eclipse.photran.ui.DisplaySymbolTableAction"
-               label="Display Symbol &amp;Table for Current File"
+               label="%action.label.15"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"/>
          <!-- -->
          <action
                class="org.eclipse.photran.internal.ui.actions.ResetBinderStatistics"
                id="org.eclipse.photran.ui.ResetBinderStatisticsAction"
-               label="&amp;Reset Binder Statistics"
+               label="%action.label.16"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
          <action
                class="org.eclipse.photran.internal.ui.actions.DisplayBinderStatistics"
                id="org.eclipse.photran.ui.DisplayBinderStatisticsAction"
-               label="Display Binder &amp;Statistics"
+               label="%action.label.17"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
          <!-- -->
          <action
-               label=""
+               label="%action.label.18"
                definitionId="org.eclipse.photran.ui.EasterEggCommand"
                class="org.eclipse.photran.internal.ui.actions.EasterEggAction"
                id="org.eclipse.photran.ui.EasterEggAction"/>
@@ -519,7 +519,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            name="Easter Egg"
+            name="%command.name.6"
             categoryId="org.eclipse.photran.ui.RefactoringCategory"
             id="org.eclipse.photran.ui.EasterEggCommand">
       </command>
@@ -559,7 +559,7 @@
    <extension point="org.eclipse.ui.views">
       <category
             id="org.eclipse.photran.ui.views"
-            name="Fortran Views">
+            name="%category.name.2">
       </category>
       
       <!-- Declaration View -->
@@ -568,7 +568,7 @@
             class="org.eclipse.photran.internal.ui.views.declaration.DeclarationView"
             icon="icons/full/eview16/source.gif"
             id="org.eclipse.photran.ui.DeclarationView"
-            name="Fortran Declaration">
+            name="%view.name">
       </view>
 
       <!-- Analysis/Refactoring Problems View -->
@@ -577,7 +577,7 @@
             class="org.eclipse.photran.internal.ui.views.vpgproblems.VPGProblemView"
             icon="icons/full/eview16/problems_view.gif"
             id="org.eclipse.photran.ui.VPGProblemView"
-            name="Fortran Analysis/Refactoring Problems">
+            name="%view.name.0">
       </view>
    </extension>
 

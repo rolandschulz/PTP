@@ -72,7 +72,7 @@ public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
         if (editor == null) return;
 
         hoverTipEnabled = new SearchPathProperties().getProperty(editor.getIFile(), 
-            SearchPathProperties.ENABLE_HOVER_TIP_PROPERTY_NAME).equals("true");
+            SearchPathProperties.ENABLE_HOVER_TIP_PROPERTY_NAME).equals("true"); //$NON-NLS-1$
 
         
         FortranEditorTasks instance = FortranEditorTasks.instance(editor);
@@ -84,7 +84,7 @@ public class FortranDeclarationHover implements ITextHover, ITextHoverExtension
      */
     public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion)
     {
-        String str = "";
+        String str = ""; //$NON-NLS-1$
         if (activeTokenList != null && activeDefinitionMap != null)
         {
             try

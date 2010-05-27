@@ -29,13 +29,13 @@ public class FindMatchingInterfaceDeclarations extends FortranEditorASTActionDel
     {
         try
         {
-        	progressMonitor.beginTask("Waiting for background work to complete (Photran indexer)", IProgressMonitor.UNKNOWN);
+        	progressMonitor.beginTask(Messages.FindMatchingInterfaceDeclarations_WaitingForBackgroundWorkToComplete, IProgressMonitor.UNKNOWN);
 
             Token token = findEnclosingToken(getAST(), getFortranEditor().getSelection());
-            if (token == null) throw new Exception("Please select a token.");
+            if (token == null) throw new Exception(Messages.FindMatchingInterfaceDeclarations_PleaseSelectAToken);
 
             Definition def = PhotranVPG.getInstance().getDefinitionFor(token.getTokenRef());
-            if (def == null) throw new Exception("Please select the identifier in a subprogram declaration.");
+            if (def == null) throw new Exception(Messages.FindMatchingInterfaceDeclarations_PleaseSelectIdentifierInASubprogram);
 
             openSelectionDialog(def.findMatchingDeclarationsInInterfaces());
         }
@@ -43,7 +43,7 @@ public class FindMatchingInterfaceDeclarations extends FortranEditorASTActionDel
         {
         	String message = e.getMessage();
         	if (message == null) message = e.getClass().getName();
-        	MessageDialog.openError(getFortranEditor().getShell(), "Error", message);
+        	MessageDialog.openError(getFortranEditor().getShell(), Messages.FindMatchingInterfaceDeclarations_ErrorTitle, message);
         }
         finally
         {
