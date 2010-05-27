@@ -12,7 +12,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.core/model
  * Class: org.eclipse.cdt.internal.core.model.ext.CElementHandle
- * Version: 1.10
+ * Version: 1.13
  */
 
 package org.eclipse.ptp.internal.rdt.core.model;
@@ -150,7 +150,7 @@ public abstract class CElement implements ICElement, Serializable, IHasManagedLo
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
@@ -160,6 +160,10 @@ public abstract class CElement implements ICElement, Serializable, IHasManagedLo
 			fInfo = new CElementInfo(this);
 		}
 		return fInfo;
+	}
+	
+	public CElementInfo createElementInfo() {
+		return getElementInfo();
 	}
 
 	protected List<ICElement> internalGetChildren() {
@@ -171,7 +175,7 @@ public abstract class CElement implements ICElement, Serializable, IHasManagedLo
 		String[] parameterTypes= new String[params.length];
 		for (int i = 0; i < params.length; i++) {
 			IParameter param = params[i];
-			parameterTypes[i]= ASTTypeUtil.getType(param.getType());
+			parameterTypes[i]= ASTTypeUtil.getType(param.getType(), false);
 		}
 		if (parameterTypes.length == 1 && parameterTypes[0].equals("void")) { //$NON-NLS-1$
 			return EMPTY_STRING_ARRAY;
@@ -296,5 +300,13 @@ public abstract class CElement implements ICElement, Serializable, IHasManagedLo
 	public void setRemotePath(String location) {
 		fRemotePath = location;
 		
+	}
+	
+	public boolean isActive() {
+		return true;
+	}
+
+	public int getIndex() {
+		return 0;
 	}
 }

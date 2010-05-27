@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,16 @@ public class Template implements ITemplate, Serializable {
 
 	private String[] fParameterTypes;
 	private String fSignature;
+	protected String fName;
 	protected String[] fTemplateArgs;
+	
+	public Template() {
+		fName = ""; //$NON-NLS-1$
+	}
+		
+	public Template(String name) {
+		fName = name;
+	}
 
 	public int getNumberOfTemplateParameters() {
 		return fParameterTypes == null ? 0 : fParameterTypes.length;
@@ -47,6 +56,24 @@ public class Template implements ITemplate, Serializable {
 	}
 
 	public String getTemplateSignature() throws CModelException {
+		if (fSignature == null || fSignature.length() == 0) {
+			StringBuffer sig = new StringBuffer(fName);
+			if(getNumberOfTemplateParameters() > 0){
+				sig.append("<"); //$NON-NLS-1$
+				String[] paramTypes = getTemplateParameterTypes();
+				int i = 0;
+				sig.append(paramTypes[i++]);
+				while (i < paramTypes.length){
+					sig.append(", "); //$NON-NLS-1$
+					sig.append(paramTypes[i++]);
+				}
+				sig.append(">"); //$NON-NLS-1$
+			}
+			else{
+				sig.append("<>"); //$NON-NLS-1$
+			}
+			fSignature = sig.toString();
+		}
 		return fSignature;
 	}
 

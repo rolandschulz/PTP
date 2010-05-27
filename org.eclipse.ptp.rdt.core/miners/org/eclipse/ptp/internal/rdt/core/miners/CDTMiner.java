@@ -553,8 +553,11 @@ public class CDTMiner extends Miner {
 			try 
 			{
 				String scopeName = getString(theCommand, 1);
-				String hostName = getString(theCommand, 2);
-				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
+				String scheme = getString(theCommand, 2);
+				String rootPath = getString(theCommand, 3);
+				String mappedPath = getString(theCommand, 4);
+				String hostName = getString(theCommand, 5);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 6));
 				
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Finding includes for location " + location, _dataStore); //$NON-NLS-1$
 				
@@ -574,8 +577,11 @@ public class CDTMiner extends Miner {
 			try 
 			{
 				String scopeName = getString(theCommand, 1);
-				String hostName = getString(theCommand, 2);
-				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
+				String scheme = getString(theCommand, 2);
+				String rootPath = getString(theCommand, 3);
+				String mappedPath = getString(theCommand, 4);
+				String hostName = getString(theCommand, 5);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 6));
 				
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Finding includes for location " + location, _dataStore); //$NON-NLS-1$
 				
@@ -595,10 +601,13 @@ public class CDTMiner extends Miner {
 			try 
 			{
 				String scopeName = getString(theCommand, 1);
-				String hostName = getString(theCommand, 2);
-				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
-				String includeName = getString(theCommand, 4);
-				int offset = getInteger(theCommand, 5);
+				String scheme = getString(theCommand, 2);
+				String rootPath = getString(theCommand, 3);
+				String mappedPath = getString(theCommand, 4);
+				String hostName = getString(theCommand, 5);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 6));
+				String includeName = getString(theCommand, 7);
+				int offset = getInteger(theCommand, 8);
 				
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Finding include for location " + location, _dataStore); //$NON-NLS-1$
 				
@@ -618,8 +627,11 @@ public class CDTMiner extends Miner {
 			try 
 			{
 				String scopeName = getString(theCommand, 1);
-				String hostName = getString(theCommand, 2);
-				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 3));
+				String scheme = getString(theCommand, 2);
+				String rootPath = getString(theCommand, 3);
+				String mappedPath = getString(theCommand, 4);
+				String hostName = getString(theCommand, 5);
+				IIndexFileLocation location = (IIndexFileLocation) Serializer.deserialize(getString(theCommand, 6));
 				
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Finding if location is indexed: " + location, _dataStore); //$NON-NLS-1$
 				
@@ -639,9 +651,8 @@ public class CDTMiner extends Miner {
 			try 
 			{
 				ITranslationUnit workingCopy = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 1));
-				String path = getString(theCommand, 2);
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Model Builder: building working copy: " + workingCopy.getElementName() + "...", _dataStore); //$NON-NLS-1$ //$NON-NLS-2$
-				handleGetModel(workingCopy, path, status);
+				handleGetModel(workingCopy, status);
 
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Finished building model.", _dataStore); //$NON-NLS-1$
 				
@@ -674,7 +685,7 @@ public class CDTMiner extends Miner {
 	 * @param unit
 	 * @param status
 	 */
-	protected void handleGetModel(ITranslationUnit unit, String path, DataElement status) {
+	protected void handleGetModel(ITranslationUnit unit, DataElement status) {
 		try {
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Get model started", _dataStore); //$NON-NLS-1$
 			
@@ -821,6 +832,7 @@ public class CDTMiner extends Miner {
 	{
 		try 
 		{
+			String scheme = location.getURI().getScheme();
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
 			index.acquireReadLock();
@@ -862,7 +874,7 @@ public class CDTMiner extends Miner {
 						
 						if (best != null)
 						{
-							includeToReturn = new IndexIncludeValue(best);
+							includeToReturn = new IndexIncludeValue(best, getLocationConverter(scheme, hostName));
 							break;
 						}
 					}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,13 @@
  *
  * Contributors:
  *     IBM Corp. - Rational Software - initial implementation
+ *     Sergey Prigogin (Google)
  *******************************************************************************/
 
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.FindAction
- * Version: 1.38
+ * Version: 1.39
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
@@ -22,8 +23,12 @@ import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
+import org.eclipse.cdt.internal.ui.text.CWordFinder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rdt.core.model.Scope;
@@ -63,6 +68,11 @@ public abstract class FindAction extends SelectionParseAction {
 			while (element != null && !(element instanceof ITranslationUnit))
 				element = element.getParent();
 			if (element != null) {
+				if (selNode.getLength() == 0) {
+					IDocument document= fEditor.getDocumentProvider().getDocument(fEditor.getEditorInput());
+					IRegion reg= CWordFinder.findWord(document, selNode.getOffset());
+					selNode = new TextSelection(document, reg.getOffset(), reg.getLength());
+				}
 				searchJob = createQuery(element, selNode);
 			}
 		} 
