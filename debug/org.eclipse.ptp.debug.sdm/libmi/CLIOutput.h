@@ -25,12 +25,12 @@
 #ifndef _CLISIGHANDLE_H_
 #define _CLISIGHANDLE_H_
 
-#include "list.h"
+#include "MIList.h"
 #include "MICommand.h"
 
 struct CLIInfoThreadsInfo {
 	int current_thread_id;
-	List * thread_ids;
+	MIList * thread_ids;
 };
 typedef struct CLIInfoThreadsInfo CLIInfoThreadsInfo;
 
@@ -42,7 +42,7 @@ struct CLIInfoProcInfo {
 };
 typedef struct CLIInfoProcInfo CLIInfoProcInfo;
 
-extern void CLIGetSigHandleList(MICommand *cmd, List **signals);
+extern void CLIGetSigHandleList(MICommand *cmd, MIList **signals);
 extern double CLIGetGDBVersion(MICommand *cmd);
 extern char *CLIGetPTypeInfo(MICommand *cmd);
 extern CLIInfoThreadsInfo *CLIInfoThreadsInfoNew(void);

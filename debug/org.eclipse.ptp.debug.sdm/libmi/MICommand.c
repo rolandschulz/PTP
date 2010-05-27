@@ -137,7 +137,7 @@ MICommandResultErrorMessage(MICommand *cmd)
 	if (MICommandResultClass(cmd) != MIResultRecordERROR)
 		return NULL;
 
-	for (SetList(cmd->output->rr->results); (r = (MIResult *)GetListElement(cmd->output->rr->results)) != NULL;) {
+	for (MIListSet(cmd->output->rr->results); (r = (MIResult *)MIListGet(cmd->output->rr->results)) != NULL;) {
 		if (r->value != NULL) {
 			s = MIValueToString(r->value);
 			res = strdup(MIStringToCString(s));

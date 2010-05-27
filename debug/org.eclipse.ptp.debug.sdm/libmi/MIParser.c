@@ -158,9 +158,9 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 				MIOOBRecord *oob = processMIOOBRecord(token, id);
 				if (oob != NULL) {
 					if (mi->oobs == NULL) {
-						mi->oobs = NewList();
+						mi->oobs = MIListNew();
 					}
-					AddToList(mi->oobs, (void *)oob);
+					MIListAdd(mi->oobs, (void *)oob);
 				}
 			}
 		}
@@ -198,7 +198,7 @@ processMIResultRecord(char *buffer, int id)
 	// Results are separated by commas.
 	if (*buffer != '\0' && *buffer == ',') {
 		buffer++;
-		List *res = processMIResults(&buffer);
+		MIList *res = processMIResults(&buffer);
 		rr->results = res;
 	}
 	return rr;
@@ -240,7 +240,7 @@ processMIOOBRecord(char *buffer, int id)
 			oob->class = strdup(buffer);
 			buffer += strlen(buffer);
 		}
-		List *res = processMIResults(&buffer);
+		MIList *res = processMIResults(&buffer);
 		oob->results = res;
 	} else if (c == '~' || c == '@' || c == '&') {
 		// Consume the first char
@@ -275,10 +275,10 @@ processMIOOBRecord(char *buffer, int id)
  * Assuming that the usual leading comma was consumed.
  * Extract the MI Result comma seperated responses.
  */
-static List * 
+static MIList *
 processMIResults(char **buffer)
 {
-	List *		aList = MIListNew();
+	MIList *	aList = MIListNew();
 	MIResult *	result = processMIResult(buffer);
 
 	if (result != NULL) {
@@ -357,7 +357,7 @@ processMITuple(char **buffer)
 {
 	MIValue *tuple = NewMITuple();
 #ifdef __APPLE__
-	List *values = MIListNew();
+	MIList *values = MIListNew();
 	MIValue *value;
 	MIResult *result;
 #endif /* __APPLE__ */
@@ -373,7 +373,7 @@ processMITuple(char **buffer)
 			result = processMIResult(buffer);
 			if (result != NULL) {
 				if (results == NULL) {
-					results = NewList();
+					results = MIListNew();
 				}				
 				MIListAdd(results, (void *)result);
 			}
@@ -403,8 +403,8 @@ static MIValue *
 processMIList(char **buffer)
 {
 	MIValue *list = NewMIList();
-	MIList *valueList = NewList();
-	MIList *resultList = NewList();
+	MIList *valueList = MIListNew();
+	MIList *resultList = MIListNew();
 	MIValue *value;
 	MIResult *result;
 	// catch closing ']'

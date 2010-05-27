@@ -154,7 +154,7 @@ MIBreakpointParse(MIValue *tuple)
 	return bp;
 }
 
-List *
+MIList *
 MIBreakpointGetBreakInsertInfo(MICommand *cmd)
 {
 	char *				var;
@@ -202,7 +202,7 @@ MIBreakpointGetBreakInsertInfo(MICommand *cmd)
 		}
 		if (bpt != NULL) {
 			if (breakpoints == NULL)
-				breakpoints = NewList();
+				breakpoints = MIListNew();
 
 			MIListAdd(breakpoints, (void *)bpt);
 		}

@@ -30,21 +30,21 @@
 #include "MIValue.h"
 
 struct MIMemory {
-	char *addr;
-	char *ascii;
-	List *data;
+	char *		addr;
+	char *		ascii;
+	MIList *	data;
 };
 typedef struct MIMemory	MIMemory;
 
 struct MIDataReadMemoryInfo {
-	char *addr;
-	long nextRow;
-	long prevRow;
-	long nextPage;
-	long prevPage;
-	long numBytes;
-	long totalBytes;
-	List *memories;
+	char *		addr;
+	long 		nextRow;
+	long		prevRow;
+	long 		nextPage;
+	long 		prevPage;
+	long 		numBytes;
+	long 		totalBytes;
+	MIList *	memories;
 };
 typedef struct MIDataReadMemoryInfo	MIDataReadMemoryInfo;
 

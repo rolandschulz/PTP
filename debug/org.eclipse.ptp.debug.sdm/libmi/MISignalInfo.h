@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California.
+ * Copyright (c) 2005, 2010 The Regents of the University of California and others.
  * This material was produced under U.S. Government contract W-7405-ENG-36
  * for Los Alamos National Laboratory, which is operated by the University
  * of California for the U.S. Department of Energy. The U.S. Government has
@@ -13,40 +13,22 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * LA-CC 04-115
  ******************************************************************************/
  
- /*
-  * Based on the QNX Java implementation of the MI interface
-  */
+#ifndef _MISIGNALINFO_H_
+#define _MISIGNALINFO_H_
 
-#ifndef _MIFRAME_H_
-#define _MIFRAME_H_
-
-#include "MICommand.h"
-#include "MIValue.h"
-
-
-struct MIFrame {
-	int			level;
-	char *		addr;
-	char *		func;
-	char *		file;
-	int			line;
-	MIList *	args;
+struct MISignalInfo {
+	char *name;
+	int stop;
+	int print;
+	int pass;
+	char *desc;
 };
-typedef struct MIFrame	MIFrame;
+typedef struct MISignalInfo MISignalInfo;
 
-extern MIFrame *MIFrameNew(void);
-extern void MIFrameFree(MIFrame *f);
-extern MIFrame *MIFrameParse(MIValue *tuple);
-extern MIList *MIGetStackListFramesInfo(MICommand *cmd);
-extern MIList *MIGetFrameInfo(MICommand *cmd);
-extern MIList *MIGetStackListLocalsInfo(MICommand *cmd);
-extern MIList *MIGetStackListArgumentsInfo(MICommand *cmd);
-extern MIString *MIFrameToString(MIFrame *f);
-extern int MIGetStackInfoDepth(MICommand *cmd);
-
-#endif /* _MIFRAME_H_ */
-
+extern MISignalInfo *MISignalInfoNew(void);
+extern void MISignalInfoFree(MISignalInfo *);
+#endif /*_MISIGNALINFO_H_*/

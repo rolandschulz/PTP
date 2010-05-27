@@ -62,10 +62,11 @@ am_libmi_a_OBJECTS = libmi_a-CLICommand.$(OBJEXT) \
 	libmi_a-MIOOBRecord.$(OBJEXT) libmi_a-MIOutput.$(OBJEXT) \
 	libmi_a-MIParser.$(OBJEXT) libmi_a-MIPty.$(OBJEXT) \
 	libmi_a-MIResult.$(OBJEXT) libmi_a-MIResultRecord.$(OBJEXT) \
-	libmi_a-MISession.$(OBJEXT) libmi_a-MIStackCommand.$(OBJEXT) \
-	libmi_a-MIString.$(OBJEXT) libmi_a-MIThread.$(OBJEXT) \
-	libmi_a-MIThreadCommand.$(OBJEXT) libmi_a-MIValue.$(OBJEXT) \
-	libmi_a-MIVar.$(OBJEXT) libmi_a-MIVarCommand.$(OBJEXT)
+	libmi_a-MISession.$(OBJEXT) libmi_a-MISignalInfo.$(OBJEXT) \
+	libmi_a-MIStackCommand.$(OBJEXT) libmi_a-MIString.$(OBJEXT) \
+	libmi_a-MIThread.$(OBJEXT) libmi_a-MIThreadCommand.$(OBJEXT) \
+	libmi_a-MIValue.$(OBJEXT) libmi_a-MIVar.$(OBJEXT) \
+	libmi_a-MIVarCommand.$(OBJEXT)
 libmi_a_OBJECTS = $(am_libmi_a_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_mi_OBJECTS = test_mi-test_mi.$(OBJEXT)
@@ -202,6 +203,7 @@ libmi_a_SOURCES = CLICommand.c \
 							MIResult.c \
 							MIResultRecord.c \
 							MISession.c \
+							MISignalInfo.c \
 							MIStackCommand.c \
 							MIString.c \
 							MIThread.c \
@@ -311,6 +313,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIResult.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIResultRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MISession.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MISignalInfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIStackCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIString.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIThread.Po@am__quote@
@@ -627,6 +630,20 @@ libmi_a-MISession.obj: MISession.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='MISession.c' object='libmi_a-MISession.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MISession.obj `if test -f 'MISession.c'; then $(CYGPATH_W) 'MISession.c'; else $(CYGPATH_W) '$(srcdir)/MISession.c'; fi`
+
+libmi_a-MISignalInfo.o: MISignalInfo.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MISignalInfo.o -MD -MP -MF $(DEPDIR)/libmi_a-MISignalInfo.Tpo -c -o libmi_a-MISignalInfo.o `test -f 'MISignalInfo.c' || echo '$(srcdir)/'`MISignalInfo.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmi_a-MISignalInfo.Tpo $(DEPDIR)/libmi_a-MISignalInfo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='MISignalInfo.c' object='libmi_a-MISignalInfo.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MISignalInfo.o `test -f 'MISignalInfo.c' || echo '$(srcdir)/'`MISignalInfo.c
+
+libmi_a-MISignalInfo.obj: MISignalInfo.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MISignalInfo.obj -MD -MP -MF $(DEPDIR)/libmi_a-MISignalInfo.Tpo -c -o libmi_a-MISignalInfo.obj `if test -f 'MISignalInfo.c'; then $(CYGPATH_W) 'MISignalInfo.c'; else $(CYGPATH_W) '$(srcdir)/MISignalInfo.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmi_a-MISignalInfo.Tpo $(DEPDIR)/libmi_a-MISignalInfo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='MISignalInfo.c' object='libmi_a-MISignalInfo.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MISignalInfo.obj `if test -f 'MISignalInfo.c'; then $(CYGPATH_W) 'MISignalInfo.c'; else $(CYGPATH_W) '$(srcdir)/MISignalInfo.c'; fi`
 
 libmi_a-MIStackCommand.o: MIStackCommand.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MIStackCommand.o -MD -MP -MF $(DEPDIR)/libmi_a-MIStackCommand.Tpo -c -o libmi_a-MIStackCommand.o `test -f 'MIStackCommand.c' || echo '$(srcdir)/'`MIStackCommand.c

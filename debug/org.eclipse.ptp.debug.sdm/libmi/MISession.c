@@ -376,7 +376,7 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		&& (wfds == NULL || FD_ISSET(sess->in_fd, wfds))
 	)
 	{	
-		sess->command = (MICommand *)RemoveFirst(sess->send_queue);
+		sess->command = (MICommand *)MIListRemoveFirst(sess->send_queue);
 
 #ifdef __gnu_linux__
 		/*

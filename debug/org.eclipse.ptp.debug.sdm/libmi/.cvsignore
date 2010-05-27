@@ -1,1 +1,6 @@
 autom4te.cache
+config.h
+Makefile
+stamp-h1
+test_mi
+.deps
