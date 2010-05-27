@@ -1,0 +1,64 @@
+dnl
+dnl Copyright (c) 1996-2001 by Guardsoft Pty Ltd.
+dnl
+dnl All rights reserved. This program and the accompanying materials
+dnl are made available under the terms of the Eclipse Public License v1.0
+dnl which accompanies this distribution, and is available at
+dnl http://www.eclipse.org/legal/epl-v10.html
+dnl
+
+AC_PREREQ(2.50)
+
+AC_INIT(libmi, 1.0.0)
+AM_INIT_AUTOMAKE
+AC_CONFIG_HEADER(config.h)
+
+dnl Checks for programs.
+AM_PROG_CC_C_O
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(strings.h sys/time.h unistd.h)
+
+os=`uname -s`
+if test "x$os" = "xAIX" ; then
+        CFLAGS="$CFLAGS -qinfo=gen -qcpluscmt"
+else
+        CFLAGS="$CFLAGS -Wall"
+fi
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+dnl Checks for library functions.
+AC_FUNC_MEMCMP
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(strdup)
+
+AH_VERBATIM([DEBUG],
+[#define DEBUG
+#ifdef DEBUG
+extern int debug_level;
+extern void debug_printf(int, char *, ...);
+#define DEBUG_LEVEL_NONE		0x00
+#define DEBUG_LEVEL_ALL			0xff
+#define DEBUG_LEVEL_STARTUP		0x01
+#define DEBUG_LEVEL_MESSAGES	0x02
+#define DEBUG_LEVEL_ROUTING		0x04
+#define DEBUG_LEVEL_SERVER		0x08
+#define DEBUG_LEVEL_BACKEND		0x10
+#define DEBUG_LEVEL_PROTOCOL	0x20
+#define TEST_DEBUG_LEVEL(level)			((debug_level&(level))==(level))
+#define DEBUG_PRINTF(level,format,...)	debug_printf((level),(format),__VA_ARGS__)
+#define DEBUG_PRINTS(level,str)			debug_printf((level),"%s",(str))
+#else /* DEBUG */
+#define DEBUG_PRINTF(level,format,...)
+#define DEBUG_PRINTS(level,str)
+#endif /* DEBUG */])
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

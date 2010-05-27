@@ -1,0 +1,162 @@
+$Log: CHANGES,v $
+Revision 1.1  2005/09/20 19:09:34  gwatson
+AIF library
+
+Revision 1.12  2002/08/29 17:57:08  greg
+Donny made the following changes:
+
+	More comment on FDSEnumConstByName
+	A new function : FDSEnumConstByValue (changes in fds.c and fds.h)
+	Now, printing an enum will print the string
+	New test files: testaif.c and testaif.h
+
+Revision 1.11  2002/07/22 22:32:03  greg
+Greg made the following changes:
+
+	Fixed some minor bugs.
+	Added applypatch and fixed createpatch scripts.
+	Updated patches to support GDB 5.2
+	Updated documentation.
+	Updated licence to GNU.
+
+Revision 1.10  2002/07/04 17:28:33  greg
+Greg/Donny made the following changes:
+
+	Fixed support for unsigned integers.
+
+Revision 1.9  2002/07/02 20:42:47  greg
+Greg made the following changes:
+
+	Added support for MacOS X.
+	Updated copyright notices in source files.
+
+Revision 1.8  2002/05/18 06:11:04  greg
+Donny made the following changes:
+	1. New test for AIFDiff() in testaif.c
+	2. A modification for the "non-null with null" comparison in calc.c
+	   and cmp.c
+	3. Some additions in aif-valprint.c, a partial support for
+	   TYPE_CODE_FUNC, and also a change in TYPE_CODE_VOID.
+	4. A change in AIF_FUNCTION and also a new function in fds.c
+	   that support the changes in aif-valprint.c
+CVe: ----------------------------------------------------------------------
+
+Revision 1.8  2002/05/18 06:11:04  greg
+Donny made the following changes:
+	1. New test for AIFDiff() in testaif.c
+	2. A modification for the "non-null with null" comparison in calc.c
+	   and cmp.c
+	3. Some additions in aif-valprint.c, a partial support for
+	   TYPE_CODE_FUNC, and also a change in TYPE_CODE_VOID.
+	4. A change in AIF_FUNCTION and also a new function in fds.c
+	   that support the changes in aif-valprint.c
+CVe: ----------------------------------------------------------------------
+
+Thu May 16 15:26:36 EST 2002 greg
+	Donny made some changes to struct/class code in conv.c.
+Mon Apr 29 11:16:26 EST 2002 greg
+	Donny added new functionality to support circular lists.
+	I fixed a bug in _aif_array_ref().
+Mon Apr 15 09:40:18 EST 2002 greg
+	Donny made the following changes:
+		fixed bugs in _aif_string_to_str - wrong arguments
+		fixed a bug in _aif_enum_to_str - must be advanced until the end
+		fixed bug in _aif_enum_to_str - wrong way of doing it
+		fixed a bug in AIF_STRUCT in _aif_unary_op - 
+			_aif_unary_op changes the fds
+		add AIF_ENUM in _fds_advance(), _fds_count_bytes(),
+			_aif_binary_op(), _aif_unary_op()
+		new tests in testaif.c
+Wed Apr 10 15:37:08 EST 2002 greg
+	Donny made the following changes:
+		fixed memset bug in BoolToAIF().
+		merged AIF*ToStr() and AIFPrint*() routines.
+Thu Mar 21 12:23:47 EST 2002 greg
+	Donny made the following changes:
+		updated INTERNAL
+		changed FDS_ID, so now:
+			{|aa=is4;;;} for anonymous struct
+			{id|aa=is4;;;} for non-anonymous struct
+		changed AIFPrint() so that it doesn't print the FDS_ID
+		clean up the _aif_diff() & _aif_binary_op()
+			note: there is still 'case AIF_BOOLEAN' in 
+			_aif_binary_op() for AND & OR operations
+		depth argument in AIFPrint(), AIFCompare() & AIFDiff()
+			( depth == 0 ---> all )
+		changed testaif.c to reflect the changes
+Mon Mar  4 13:49:45 EST 2002 greg
+	Donny fixed a number of bugs in fds.c:
+		call to START_STRUCT() in _data_len_public() incorrect
+		FDSAddFieldToClass() needs to check for named struct, also
+			pointers not handled properly
+		wrong argument used in AIFAddFieldToStruct()
+		strncmp() in FDSStructFieldByName()
+		FDSTypeCompare() returns wrong value
+		wrong argument to _field_attribute() in FDSStructFieldByName()
+	Donny fixed arguments to testAscii() in testaif.c
+
+Wed Feb 27 18:48:42 EST 2002 greg
+	Added Donny's changes to support new data types:
+		boolean
+		enumerated types
+		unions
+		classes
+	Fixed a bug in TypeToFDS() - missing va_start().
+	Removed log messages as they were getting too messy.
+
+Tue Aug 22 14:11:19 EST 2000 rfinkel
+	cleaned up code
+		added file internal.doc to explain the data structures
+		added file internal.h for prototypes of internal routines
+		removed unused variables
+		added "const" to many prototypes to enforce readonly status
+	fixed bugs
+		_aif_int_to_str invoked _aif_div_int with a bad parameters.
+		_aif_compare of two arrays called _aif_compare with bad params.
+	collapsed _field_type and _field_name into _field_attribute; changed
+		from static to dynamic allocation of type and name return
+		fields because types can be embedded within types.
+	added routines to the API for pointers
+		AIF *PointerToAIF(const AIF *);
+		AIF *AIFNull(); /* return null value */
+		void AIFPrintPointer(FILE *, AIF *);
+		enhanced routines in cmp.c to handle pointers
+	added routines to the API for structs
+		AIF *EmptyStructToAIF(const char *);
+		int  AIFAddFieldToStruct(AIF *, char*, AIF *);
+		void AIFPrintStruct(FILE *, AIF *);
+		enhanced routines in fds.c for nested structs
+		enhanced routines in cmp.c to handle structs
+	added routines to the API for names (for circular structures)
+		AIF *NameAIF(const AIF *, const char *);
+		AIF *ReferenceAIF(const char *);
+		AIF *CanonicalAIF(const AIF *);
+		enhanced routines in cmp.c to handle names
+
+Fri Feb  9 09:51:44 EST 2001 rfinkel
+	Reorganized the meaning of the fds and its associated data to conform with
+		the output of gdb with the new "set print aif on" option.
+		Added code for a string type.
+	added routines to API
+		AIF *FromAscii(const char *, const char *);
+	modified the comparison, arithmetic, and dump/print routines to advance
+		file and data pointers so that data length is no longer passed in.  In
+		this way we can handle data of indeterminate length, such as linked
+		lists.
+	precision
+		internal representation of integers is now long long int to increase
+			range.
+		_aif_to_double() can now handle f16 format; changed all callers to
+			understand that, although with possible loss of precision.
+	algorithm
+		_aif_add_int and the like now convert to native types, do arithmetic,
+			then convert back to AIF; they used to simulate arithmetic by
+			bit manipulation on the AIF_DATA.  If necessary, we can simulate
+			longer precision by splitting into short-precision chunks.
+		similarly, type conversions now go through native types.
+	cleaned up code
+		added "const" to more prototypes to enforce readonly status.
+		regularized the order of parameters and their formal names.
+		added some formal names to prototypes as external documention.
+		After I have modified/checked a routine, I put a comment
+			at the closing brace naming the routine.

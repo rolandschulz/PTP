@@ -1,0 +1,7 @@
+*.bak
+*~
+CVS
+.#*
+.*.swp
+dist
+libaif.spec
