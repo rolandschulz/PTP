@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,22 +15,20 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.search.actions.SelectionParseAction
- * Version: 1.35
+ * Version: 1.39
  */
 
 package org.eclipse.ptp.internal.rdt.ui.search.actions;
 
 import java.text.MessageFormat;
 
-import org.eclipse.cdt.core.dom.IName;
-import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
 import org.eclipse.cdt.internal.ui.util.StatusLineHandler;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -84,31 +82,10 @@ public class SelectionParseAction extends Action {
 	
     protected ITextSelection getSelectedStringFromEditor() {
         ISelection selection = getSelection();
-        if( selection == null || !(selection instanceof ITextSelection) ) 
+        if(!(selection instanceof ITextSelection) ) 
              return null;
 
         return (ITextSelection)selection;
-    }
-    
-    /**
-     * Open the editor on the given name.
-     * 
-     * @param name
-     */
-    protected void open(IName name) throws CoreException {
-		clearStatusLine();
-
-    	IASTFileLocation fileloc = name.getFileLocation();
-    	if (fileloc == null) {
-    		reportSymbolLookupFailure(new String(name.toCharArray()));
-    		return;
-    	}
-    	
-		IPath path = new Path(fileloc.getFileName());
-    	int currentOffset = fileloc.getNodeOffset();
-    	int currentLength = fileloc.getNodeLength();
-    	
-		open(path, currentOffset, currentLength);
     }
 
 	protected void open(IPath path, int currentOffset, int currentLength) throws CoreException {
@@ -121,12 +98,24 @@ public class SelectionParseAction extends Action {
 		} else {
 			reportSourceFileOpenFailure(path);
 		}
+	}	
+
+	protected void open(ITranslationUnit tu, int currentOffset, int currentLength) throws CoreException {
+		clearStatusLine();
+
+		IEditorPart editor = EditorUtility.openInEditor(tu, true);
+		if (editor instanceof ITextEditor) {
+			ITextEditor textEditor = (ITextEditor) editor;
+			textEditor.selectAndReveal(currentOffset, currentLength);
+		} else {
+			reportSourceFileOpenFailure(tu.getPath());
+		}
 	}
     
     protected void reportSourceFileOpenFailure(IPath path) {
     	showStatusLineMessage(MessageFormat.format(
     			CSearchMessages.SelectionParseAction_FileOpenFailure_format, 
-    			path.toOSString()));
+    			new Object[] { path.toOSString()}));
     }
     
     protected void reportSelectionMatchFailure() {
@@ -136,13 +125,13 @@ public class SelectionParseAction extends Action {
     protected void reportSymbolLookupFailure(String symbol) {
     	showStatusLineMessage(MessageFormat.format(
     			CSearchMessages.SelectionParseAction_SymbolNotFoundInIndex_format, 
-    			symbol));
+    			new Object[] { symbol}));
     }
     
     protected void reportIncludeLookupFailure(String filename) {
     	showStatusLineMessage(MessageFormat.format(
     			CSearchMessages.SelectionParseAction_IncludeNotFound_format, 
-    			filename));
+    			new Object[] { filename}));
     }
 
 }

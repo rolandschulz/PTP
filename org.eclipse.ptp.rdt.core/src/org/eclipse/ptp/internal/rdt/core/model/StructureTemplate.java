@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,19 @@
  * Contributors:
  *    IBM Corporation - Initial API and implementation
  *******************************************************************************/ 
-
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.core/model
+ * Class: org.eclipse.cdt.internal.core.model.ext.StructureTemplateHandle
+ * Version: 1.5
+ */
 package org.eclipse.ptp.internal.rdt.core.model;
 
+import org.eclipse.cdt.core.dom.ast.ASTTypeUtil;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.ICompositeType;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassTemplate;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassTemplatePartialSpecialization;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateArgument;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateDefinition;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateParameter;
 import org.eclipse.cdt.core.model.CModelException;
@@ -34,6 +42,29 @@ public class StructureTemplate extends Structure implements IStructureTemplate {
 		fTemplate = new Template();
 		fTemplate.setTemplateParameterTypes(element.getTemplateParameterTypes());
 	}
+	
+	public StructureTemplate(Parent parent, ICPPClassTemplate classTemplate) throws DOMException {
+		super(parent, classTemplate);
+		fTemplate= new Template(classTemplate.getName());
+		ICPPTemplateParameter[] tpars = classTemplate.getTemplateParameters();
+		String[] args= new String[tpars.length];
+		for (int i = 0; i < args.length; i++) {
+			args[i]= tpars[i].getName();
+		}
+		fTemplate.setTemplateInfo(null, args);
+	}
+
+	public StructureTemplate(Parent parent, ICPPClassTemplatePartialSpecialization classTemplate) throws DOMException {
+		super(parent, classTemplate);
+		fTemplate= new Template(classTemplate.getName());
+		ICPPTemplateArgument[] targs = classTemplate.getTemplateArguments();
+		String[] args= new String[targs.length];
+		for (int i = 0; i < args.length; i++) {
+			args[i]= ASTTypeUtil.getArgumentString(targs[i], false);
+		}
+		fTemplate.setTemplateInfo(null, args);
+	}
+
 
 	public StructureTemplate(Parent parent, ICompositeType binding, ICPPTemplateDefinition template) throws DOMException {
 		super(parent, adaptASTType(binding), binding);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,11 +18,16 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.IStructureDeclaration;
 
+/**
+ * @author vkong
+ *
+ */
 public class StructureDeclaration extends SourceManipulation implements IStructureDeclaration {
 	private static final long serialVersionUID = 1L;
 
 	protected boolean fIsStatic;
 	protected boolean fIsVolatile;
+	protected boolean fIsConst;
 	protected String fTypeName;
 
 	public StructureDeclaration(Parent parent, String className, int kind) {
@@ -34,6 +39,7 @@ public class StructureDeclaration extends SourceManipulation implements IStructu
 		fTypeName = element.getTypeName();
 		fIsStatic = element.isStatic();
 		fIsVolatile = element.isVolatile();
+		fIsConst = element.isConst();
 	}
 
 	public StructureDeclaration(Parent parent, int type, ICompositeType binding) {
@@ -59,7 +65,7 @@ public class StructureDeclaration extends SourceManipulation implements IStructu
 		return fTypeName;
 	}
 
-	public boolean isClass() throws CModelException {
+	public boolean isClass(){
 		switch (getElementType()) {
 		case ICElement.C_CLASS:
 		case ICElement.C_CLASS_DECLARATION:
@@ -71,7 +77,7 @@ public class StructureDeclaration extends SourceManipulation implements IStructu
 		}
 	}
 
-	public boolean isStruct() throws CModelException {
+	public boolean isStruct() {
 		switch (getElementType()) {
 		case ICElement.C_STRUCT:
 		case ICElement.C_STRUCT_DECLARATION:
@@ -83,7 +89,7 @@ public class StructureDeclaration extends SourceManipulation implements IStructu
 		}
 	}
 
-	public boolean isUnion() throws CModelException {
+	public boolean isUnion() {
 		switch (getElementType()) {
 		case ICElement.C_UNION:
 		case ICElement.C_UNION_DECLARATION:
@@ -95,21 +101,44 @@ public class StructureDeclaration extends SourceManipulation implements IStructu
 		}
 	}
 
-	public boolean isConst() throws CModelException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isConst() {
+		return fIsConst;
+	}
+	
+	public void setConst(boolean isConst) {
+		fIsConst = isConst;
 	}
 
-	public boolean isStatic() throws CModelException {
+	public boolean isStatic(){
 		return fIsStatic;
 	}
+	
+	public void setStatic(boolean isStatic) {
+		fIsStatic = isStatic;
+	}
 
-	public boolean isVolatile() throws CModelException {
+	public boolean isVolatile(){
 		return fIsVolatile;
+	}
+	
+	public void setVolatile(boolean isVolatile) {
+		fIsVolatile = isVolatile;
 	}
 
 	public void setTypeName(String type) {
 		fTypeName = type;
+	}
+	
+	public StructureInfo getStructureInfo(){
+		if (fInfo == null) {
+			fInfo = new StructureInfo(this);
+		}
+		return (StructureInfo) fInfo;
+	}
+	
+	@Override
+	public StructureInfo getElementInfo() {
+		return getStructureInfo();
 	}
 
 }

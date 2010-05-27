@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,26 @@ public class FieldInfo extends SourceManipulationInfo {
 
 	public void setVisibility(ASTAccessVisibility currentVisibility) {
 		((Field) fParent).setVisibility(currentVisibility);
+	}
+	
+	protected void setTypeName(String type){
+		((Field) fParent).setTypeName(type);
+	}	
+
+	protected void setConst(boolean isConst){
+		((Field) fParent).setConst(isConst);
+	}
+
+	protected void setVolatile(boolean isVolatile){
+		((Field) fParent).setVolatile(isVolatile);
+	}
+
+	public void setStatic(boolean isStatic) {
+		((Field) fParent).setStatic(isStatic);
+	}
+
+	protected void setMutable(boolean mutable){
+		((Field) fParent).setMutable(mutable);
 	}
 
 }

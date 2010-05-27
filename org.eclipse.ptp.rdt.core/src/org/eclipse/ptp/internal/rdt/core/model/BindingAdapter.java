@@ -12,13 +12,13 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.core/model
  * Class: org.eclipse.cdt.internal.core.model.ext.CElementHandleFactory
- * Version: 1.11
+ * Version: 1.16
  */
 
 package org.eclipse.ptp.internal.rdt.core.model;
 
-import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.DOMException;
+import org.eclipse.cdt.core.dom.ast.EScopeKind;
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.dom.ast.ICompositeType;
 import org.eclipse.cdt.core.dom.ast.IEnumeration;
@@ -29,17 +29,15 @@ import org.eclipse.cdt.core.dom.ast.IParameter;
 import org.eclipse.cdt.core.dom.ast.IScope;
 import org.eclipse.cdt.core.dom.ast.ITypedef;
 import org.eclipse.cdt.core.dom.ast.IVariable;
-import org.eclipse.cdt.core.dom.ast.c.ICCompositeTypeScope;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPBlockScope;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassScope;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassSpecialization;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassTemplate;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassTemplatePartialSpecialization;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassType;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPEnumeration;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPFunctionTemplate;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPMethod;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPNamespace;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPNamespaceScope;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateDefinition;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateScope;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
@@ -62,7 +60,7 @@ public class BindingAdapter {
 	 * @throws DOMException
 	 */
 	public static ICElement adaptBinding(ITranslationUnit unit, IBinding binding, int offset, int length, boolean definition) throws CModelException, DOMException {
-		Parent parent = adapt(unit, binding.getScope());
+		Parent parent = adaptParent(unit, binding);
 		if(parent == null)
 			return null;
 		
@@ -84,6 +82,10 @@ public class BindingAdapter {
 				element = definition 
 					? new FunctionTemplate(parent, (IFunction) binding, (ICPPTemplateDefinition) binding)
 					: new FunctionTemplateDeclaration(parent, (IFunction) binding, (ICPPTemplateDefinition) binding);
+			} else if (binding instanceof ICPPFunctionTemplate) {
+				element= definition 
+				? new FunctionTemplate(parent, (IFunction) binding, (ICPPFunctionTemplate) binding)
+				: new FunctionTemplateDeclaration(parent, (IFunction) binding, (ICPPFunctionTemplate) binding);
 			} else {
 				element = definition 
 					? new Function(parent, (IFunction) binding)
@@ -106,12 +108,7 @@ public class BindingAdapter {
 			element = new Enumerator(parent, (IEnumerator) binding);
 		}
 		else if (binding instanceof ICompositeType) {
-			if (binding instanceof ICPPClassTemplate) {
-				element = new StructureTemplate(parent, (ICompositeType) binding, (ICPPTemplateDefinition) binding);
-			}
-			else {
-				element = new Structure(parent, (ICompositeType) binding);
-			}
+			element= createHandleForComposite(parent, (ICompositeType) binding);
 		}
 		else if (binding instanceof ICPPNamespace) {
 			element = new Namespace(parent, (ICPPNamespace) binding);
@@ -130,8 +127,8 @@ public class BindingAdapter {
 				}
 				
 				if(unit instanceof IHasRemotePath) {
-					IHasRemotePath hasRemotePath = (IHasRemotePath) element;
-					element.setRemotePath(hasRemotePath.getRemotePath());
+					IHasRemotePath hml = (IHasRemotePath) element;
+					element.setRemotePath(hml.getRemotePath());
 				}
 				element.setPath(unit.getPath());
 			}
@@ -146,7 +143,7 @@ public class BindingAdapter {
 		return element;
 	}
 	
-	private static Parent adapt(ITranslationUnit tu, IScope scope) throws DOMException {
+	private static Parent adaptParent(ITranslationUnit tu, IBinding binding) throws DOMException {
 		Parent parent;
 		if (tu instanceof TranslationUnit) {
 			parent = (Parent) tu;
@@ -158,48 +155,67 @@ public class BindingAdapter {
 			parent = new TranslationUnit(null, tu);
 		}
 		
-		if (scope == null) {
-			return parent;
-		}
 		
-		IName scopeName= scope.getScopeName();
-		if (scopeName == null) {
-			if (scope.getParent() == null) {
-				return parent;
-			} 
-			if (scope instanceof ICPPTemplateScope) {
-				return adapt(tu, scope.getParent());
+		IBinding parentBinding= binding.getOwner();
+		if (parentBinding == null) {
+			IScope scope= binding.getScope();
+			if (scope != null && scope.getKind() == EScopeKind.eLocal) {
+				return null;
 			}
-			return null; // unnamed namespace
+			return parent;
+		}		
+		
+		if (parentBinding instanceof IEnumeration) {
+			Parent grandParent= adaptParent(tu, parentBinding);
+			if (parentBinding instanceof ICPPEnumeration && parentBinding.getNameCharArray().length > 0) {
+				if (grandParent != null) {
+					return new Enumeration(grandParent, (ICPPEnumeration) parentBinding);
+				}
+			} else {
+				return grandParent;
+			}
 		}
 
-		Parent parentElement= adapt(tu, scope.getParent());
-		if (parentElement == null) {
-			return null;
+		if (parentBinding instanceof ICPPNamespace) {
+			char[] scopeName= parentBinding.getNameCharArray();
+			// skip unnamed namespace
+			if (scopeName.length == 0) {
+				return adaptParent(tu, parentBinding);
+			} 
+			Parent grandParent= adaptParent(tu, parentBinding);
+			if (grandParent == null) 
+				return null;
+			return new Namespace(grandParent, (ICPPNamespace) parentBinding);
+		} 
+		
+		if (parentBinding instanceof ICompositeType) {
+			Parent grandParent= adaptParent(tu, parentBinding);
+			if (grandParent != null) {
+				return createHandleForComposite(grandParent, (ICompositeType) parentBinding);
+			}
 		}
-
-		Parent element;
-		if (scope instanceof ICPPClassScope) {
-			ICPPClassType type= ((ICPPClassScope) scope).getClassType();
-			element= new Structure(parentElement, type);
-		}
-		else if (scope instanceof ICCompositeTypeScope) {
-			ICompositeType type= ((ICCompositeTypeScope) scope).getCompositeType();
-			element= new Structure(parentElement, type);
-		}
-		else if (scope instanceof ICPPBlockScope) {
-			return null;
-		}
-		else if (scope instanceof ICPPNamespaceScope) {
-			element= new Namespace(parentElement, new String(scopeName.getSimpleID()));
-		} else {
-			element = parentElement;
-		}
-		return element;
+		return null;
 	}
 
 	public static ICElement adaptBinding(ITranslationUnit parent, IBinding binding, boolean definition) throws CModelException, DOMException {
 		return adaptBinding(parent, binding, -1, -1, definition);
 	}
-
+	
+	private static SourceManipulation createHandleForComposite(Parent parent, ICompositeType classBinding)
+			throws DOMException {
+		if (classBinding instanceof ICPPClassTemplatePartialSpecialization) {
+			return new StructureTemplate(parent, (ICPPClassTemplatePartialSpecialization) classBinding);
+		}
+		if (classBinding instanceof ICPPClassTemplate) {
+			return new StructureTemplate(parent, (ICPPClassTemplate) classBinding);
+		}
+		if (classBinding instanceof ICPPClassSpecialization) {
+			ICPPClassSpecialization spec= (ICPPClassSpecialization) classBinding;
+			ICPPClassType orig= spec.getSpecializedBinding();
+			if (orig instanceof ICPPClassTemplate) {
+				return new StructureTemplate(parent, (ICPPClassSpecialization) classBinding, (ICPPClassTemplate) orig);
+			}
+		}
+		return new Structure(parent, classBinding);
+	}
 }

@@ -17,17 +17,16 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map;
 
-import org.eclipse.cdt.core.dom.ICodeReaderFactory;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.model.ILanguage;
-import org.eclipse.cdt.core.parser.CodeReader;
 import org.eclipse.cdt.core.parser.DefaultLogService;
-import org.eclipse.cdt.core.parser.ICodeReaderCache;
+import org.eclipse.cdt.core.parser.FileContent;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.core.parser.IScannerInfo;
+import org.eclipse.cdt.core.parser.IncludeFileContentProvider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
@@ -37,7 +36,7 @@ import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 @SuppressWarnings("restriction")
 public class ModelUtil {
 	public static IASTTranslationUnit buildAST(ILanguage language, String name, String code) throws CoreException {
-		CodeReader reader = new CodeReader(name, code.toCharArray());
+		FileContent content = FileContent.create(name, code.toCharArray());
 		IScannerInfo scanInfo = new IScannerInfo() {
 			public Map<String, String> getDefinedSymbols() {
 				return Collections.emptyMap();
@@ -47,26 +46,10 @@ public class ModelUtil {
 				return new String[0];
 			}
 		};
-		ICodeReaderFactory fileCreator = new ICodeReaderFactory() {
-			public CodeReader createCodeReaderForInclusion(String path) {
-				return null;
-			}
-
-			public CodeReader createCodeReaderForTranslationUnit(String path) {
-				return null;
-			}
-
-			public ICodeReaderCache getCodeReaderCache() {
-				return null;
-			}
-
-			public int getUniqueIdentifier() {
-				return 0;
-			}
-		};
+		IncludeFileContentProvider fileCreator = IncludeFileContentProvider.getEmptyFilesProvider();
 		IIndex index = null;
 		IParserLogService log = new DefaultLogService();
-		return language.getASTTranslationUnit(reader, scanInfo, fileCreator, index, log);
+		return language.getASTTranslationUnit(content, scanInfo, fileCreator, index, 0, log);
 	}
 	
 	public static TranslationUnit buildModel(ILanguage language, String name, String code) throws CoreException, DOMException, URISyntaxException {
@@ -86,7 +69,7 @@ public class ModelUtil {
 	}
 
 	public static IASTCompletionNode findCompletionNode(ILanguage language, String name, String code, int offset) throws CoreException {
-		CodeReader reader = new CodeReader(name, code.toCharArray());
+		FileContent reader = FileContent.create(name, code.toCharArray());
 		IScannerInfo scanInfo = new IScannerInfo() {
 			public Map<String, String> getDefinedSymbols() {
 				return Collections.emptyMap();
@@ -96,23 +79,7 @@ public class ModelUtil {
 				return new String[0];
 			}
 		};
-		ICodeReaderFactory fileCreator = new ICodeReaderFactory() {
-			public CodeReader createCodeReaderForInclusion(String path) {
-				return null;
-			}
-
-			public CodeReader createCodeReaderForTranslationUnit(String path) {
-				return null;
-			}
-
-			public ICodeReaderCache getCodeReaderCache() {
-				return null;
-			}
-
-			public int getUniqueIdentifier() {
-				return 0;
-			}
-		};
+		IncludeFileContentProvider fileCreator = IncludeFileContentProvider.getEmptyFilesProvider();
 		IIndex index = null;
 		IParserLogService log = new DefaultLogService();
 		return language.getCompletionNode(reader, scanInfo, fileCreator, index, log, offset);

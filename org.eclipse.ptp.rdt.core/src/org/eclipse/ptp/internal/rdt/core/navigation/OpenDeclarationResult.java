@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ package org.eclipse.ptp.internal.rdt.core.navigation;
 import java.io.Serializable;
 
 import org.eclipse.cdt.core.dom.IName;
+import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.model.ICElement;
 
 /**
@@ -33,7 +34,11 @@ public class OpenDeclarationResult implements Serializable {
 		/** The result is an array of ICElement */
 		RESULT_C_ELEMENTS,
 		/** */
-		RESULT_INCLUDE_PATH,
+		RESULT_INCLUDE_PATH,		
+		/** The result is an IName */
+		RESULT_NAME, 		
+		/** The result is an array of IName */
+		RESULT_LOCATION, 
 		
 		/** Could not find the symbol */
 		FAILURE_SYMBOL_LOOKUP,
@@ -60,6 +65,14 @@ public class OpenDeclarationResult implements Serializable {
 	
 	public static OpenDeclarationResult resultIncludePath(String path) {
 		return new OpenDeclarationResult(ResultType.RESULT_INCLUDE_PATH, path);
+	}
+	
+	public static OpenDeclarationResult resultName(IName name) {
+		return new OpenDeclarationResult(ResultType.RESULT_NAME, name);
+	}
+	
+	public static OpenDeclarationResult resultLocation(IASTFileLocation location) {
+		return new OpenDeclarationResult(ResultType.RESULT_LOCATION, location);
 	}
 	
 	public static OpenDeclarationResult failureSymbolLookup(String symbolName) {
