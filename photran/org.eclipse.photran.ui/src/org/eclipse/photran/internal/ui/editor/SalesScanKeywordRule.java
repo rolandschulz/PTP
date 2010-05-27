@@ -377,9 +377,10 @@ public class SalesScanKeywordRule extends WordRule implements IRule
         {
             for (pos = start; pos < length; pos++)
             {
-                if (Character.isLetterOrDigit(line.charAt(pos)))
+                char ch = line.charAt(pos);
+                if (Character.isLetterOrDigit(ch) || ch == '_')
                     continue;
-                else if (line.charAt(pos) == ':')
+                else if (ch == ':')
                     return pos+1;
                 else
                     return start;
