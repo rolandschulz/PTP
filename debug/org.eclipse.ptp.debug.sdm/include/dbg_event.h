@@ -22,10 +22,11 @@
 
 #include <aif.h>
 
+#include "MISignalInfo.h"
+
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "memoryinfo.h"
-#include "signalinfo.h"
 #include "bitset.h"
 #include "list.h"
 #include "proxy_msg.h"
@@ -64,7 +65,7 @@ struct dbg_suspend_event {
 
 	union {
 		int				bpid;	/* DBGEV_SUSPEND_BPHIT */
-		signalinfo *	sig;	/* DBGEV_SUSPEND_SIGNAL */
+		MISignalInfo *	sig;	/* DBGEV_SUSPEND_SIGNAL */
 	} ev_u;
 
 	int				thread_id;
@@ -80,7 +81,7 @@ struct dbg_exit_event {
 
 	union {
 		int				exit_status;	/* DBGEV_EXIT_NORMAL */
-		signalinfo *	sig;			/* DBGEV_EXIT_SIGNAL */
+		MISignalInfo *	sig;			/* DBGEV_EXIT_SIGNAL */
 	} ev_u;
 };
 typedef struct dbg_exit_event	dbg_exit_event;

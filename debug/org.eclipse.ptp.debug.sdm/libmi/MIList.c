@@ -36,7 +36,7 @@ MIListNew(void)
 
 	l = (MIList *)malloc(sizeof(MIList));
 
-	l->l_head = (ListElement *)NULL;
+	l->l_head = (MIListElement *)NULL;
 	l->l_tail = &l->l_head;
 	l->l_nel = 0;
 	l->l_scan = NULL;
@@ -50,15 +50,15 @@ MIListNew(void)
 void		
 MIListAdd(MIList *l, void *v)
 {
-	ListElement *	e;
+	MIListElement *	e;
 
 	if ( l == (MIList *)NULL)
 		return;
 
-	e = malloc(sizeof(ListElement));
+	e = malloc(sizeof(MIListElement));
 
 	e->l_value = v;
-	e->l_next = (ListElement *)NULL;
+	e->l_next = (MIListElement *)NULL;
 	
 	*(l->l_tail) = e;
 	l->l_tail = &e->l_next;
@@ -71,13 +71,13 @@ MIListAdd(MIList *l, void *v)
 void		
 MIListAddFirst(MIList *l, void *v)
 {
-	ListElement *	e;
-	ListElement *	ep;
+	MIListElement *	e;
+	MIListElement *	ep;
 
 	if (l == (MIList *)NULL)
 		return;
 
-	e = malloc(sizeof(ListElement));
+	e = malloc(sizeof(MIListElement));
 
 	e->l_value = v;
 	e->l_next = l->l_head;
@@ -87,9 +87,9 @@ MIListAddFirst(MIList *l, void *v)
 	*/
 	if
 	(
-		(ep = l->l_head) != (ListElement *)NULL 
+		(ep = l->l_head) != (MIListElement *)NULL
 		&&
-		ep->l_next == (ListElement *)NULL 
+		ep->l_next == (MIListElement *)NULL
 	)
 		l->l_tail = &ep->l_next;
 
@@ -103,8 +103,8 @@ MIListAddFirst(MIList *l, void *v)
 void
 MIListInsertBefore(MIList *l, void *val, void *new_val)
 {
-	ListElement **	e;
-	ListElement *	ne;
+	MIListElement **	e;
+	MIListElement *		ne;
 
 	if (l == (MIList *)NULL) {
 		return;
@@ -113,7 +113,7 @@ MIListInsertBefore(MIList *l, void *val, void *new_val)
 	/*
 	 * Find the element corresponding to val
 	 */
-	for (e = &l->l_head ; *e != (ListElement *)NULL ; e = &(*e)->l_next) {
+	for (e = &l->l_head ; *e != (MIListElement *)NULL ; e = &(*e)->l_next) {
 		if ((*e)->l_value == val) {
 			break;
 		}
@@ -123,7 +123,7 @@ MIListInsertBefore(MIList *l, void *val, void *new_val)
 		return;
 	}
 
-	ne = malloc(sizeof(ListElement));
+	ne = malloc(sizeof(MIListElement));
 
 	ne->l_value = new_val;
 	ne->l_next = *e;
@@ -152,14 +152,14 @@ MIListAppend(MIList *dst, MIList *src)
 void		
 MIListRemove(MIList *l, void *v)
 {
-	ListElement *	e;
-	ListElement *	ep;
+	MIListElement *	e;
+	MIListElement *	ep;
 
 	if ( l == (MIList *)NULL || l->l_nel == 0 ) {
 		return;
 	}
 
-	for ( ep = e = l->l_head ; e != (ListElement *)NULL ; )
+	for ( ep = e = l->l_head ; e != (MIListElement *)NULL ; )
 	{
 		if ( e->l_value != v )
 		{
@@ -176,14 +176,14 @@ MIListRemove(MIList *l, void *v)
 		{
 			l->l_head = e->l_next;
 
-			if ( e->l_next == (ListElement *)NULL )
+			if ( e->l_next == (MIListElement *)NULL )
 				l->l_tail = &l->l_head;
 		}
 		else
 		{
 			ep->l_next = e->l_next;
 
-			if ( e->l_next == (ListElement *)NULL )
+			if ( e->l_next == (MIListElement *)NULL )
 				l->l_tail = &ep->l_next;
 		}
 
@@ -201,9 +201,9 @@ MIListRemove(MIList *l, void *v)
 void *
 MIListRemoveFirst(MIList *l)
 {
-	void *		v;
-	ListElement *	e;
-	ListElement *	ep;
+	void *			v;
+	MIListElement *	e;
+	MIListElement *	ep;
 
 
 	if ( l == (MIList *)NULL || l->l_nel == 0 ) {
@@ -217,7 +217,7 @@ MIListRemoveFirst(MIList *l)
 
 	l->l_head = e->l_next;
 
-	if ( e->l_next == (ListElement *)NULL )
+	if ( e->l_next == (MIListElement *)NULL )
 		l->l_tail = &l->l_head;
 
 	v = e->l_value;
@@ -235,15 +235,15 @@ MIListRemoveFirst(MIList *l)
 void		
 MIListFree(MIList *l, void (*destroy)())
 {
-	ListElement *	ep;
-	ListElement *	en;
+	MIListElement *	ep;
+	MIListElement *	en;
 
 	if ( l == (MIList *)NULL )
 		return;
 
 	ep = l->l_head;
 
-	while ( ep != (ListElement *)NULL )
+	while ( ep != (MIListElement *)NULL )
 	{
 		en = ep->l_next;
 
@@ -277,9 +277,9 @@ void *
 MIListGet(MIList *l)
 {
 	void *			val;
-	ListElement *	le;
+	MIListElement *	le;
 
-	if ( l == (MIList *)NULL || l->l_scan == (ListElement *)NULL ) {
+	if ( l == (MIList *)NULL || l->l_scan == (MIListElement *)NULL ) {
 		return (void *)NULL;
 	}
 
@@ -299,7 +299,7 @@ MIListGetFirst(MIList *l)
 {
 	void *	val;
 	
-	if ( l == (MIList *)NULL || l->l_head == (ListElement *) NULL) {
+	if ( l == (MIList *)NULL || l->l_head == (MIListElement *) NULL) {
 		return (void *)NULL;
 	}
 
@@ -323,13 +323,13 @@ MIListIsEmpty(MIList *l)
 int
 MIListTest(MIList *l, void *v)
 {
-	ListElement *	e;
+	MIListElement *	e;
 
 	if ( l == (MIList *)NULL ) {
 		return 0;
 	}
 
-	for ( e = l->l_head ; e != (ListElement *)NULL ; e = e->l_next ) {
+	for ( e = l->l_head ; e != (MIListElement *)NULL ; e = e->l_next ) {
 		if ( e->l_value == v ) {
 			return 1;
 		}

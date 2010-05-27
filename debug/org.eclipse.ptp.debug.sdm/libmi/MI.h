@@ -20,6 +20,7 @@
 #ifndef _MI_H_
 #define _MI_H_
 
+#include "MIList.h"
 #include "MIValue.h"
 #include "MIResult.h"
 #include "MISession.h"
@@ -31,6 +32,7 @@
 #include "MIArg.h"
 #include "MIError.h"
 #include "MIMemory.h"
+#include "MISignalInfo.h"
 #include "CLIOutput.h"
 
 #endif /* _MI_H_ */
