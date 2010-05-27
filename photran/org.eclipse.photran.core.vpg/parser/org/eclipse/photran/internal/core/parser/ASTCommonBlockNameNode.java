@@ -42,6 +42,7 @@ public class ASTCommonBlockNameNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCommonBlockNameNode(this);

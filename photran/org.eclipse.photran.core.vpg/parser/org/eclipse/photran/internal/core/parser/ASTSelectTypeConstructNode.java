@@ -68,6 +68,7 @@ public class ASTSelectTypeConstructNode extends ASTNode implements IExecutableCo
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSelectTypeConstructNode(this);

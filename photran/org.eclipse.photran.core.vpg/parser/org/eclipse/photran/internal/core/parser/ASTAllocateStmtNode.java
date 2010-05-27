@@ -74,6 +74,7 @@ public class ASTAllocateStmtNode extends ASTNodeWithErrorRecoverySymbols impleme
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAllocateStmtNode(this);

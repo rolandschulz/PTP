@@ -68,6 +68,7 @@ public class ASTAssociateConstructNode extends ASTNode implements IExecutableCon
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAssociateConstructNode(this);

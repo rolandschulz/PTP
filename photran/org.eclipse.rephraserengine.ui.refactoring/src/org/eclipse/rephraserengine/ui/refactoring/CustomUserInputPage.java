@@ -57,7 +57,7 @@ public abstract class CustomUserInputPage<R extends Refactoring> extends UserInp
      *
      * @return the refactoring on which this wizard will operate (non-<code>null</code>)
      */
-    public final R getRefactoring()
+    @Override public final R getRefactoring()
     {
         if (refactoring == null)
             throw new IllegalStateException(

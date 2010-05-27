@@ -57,6 +57,7 @@ public class ASTEquivalenceStmtNode extends ASTNode implements ISpecificationStm
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEquivalenceStmtNode(this);

@@ -28,20 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTFormatsepNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFormatsepNode
     org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFormatsepNode
-
-    public boolean colonFormatSep()
-    {
-        return this.colonFormatSep != null;
-    }
-
-    public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.colonFormatSep = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFormatsepNode
 
     public boolean slashFormatSep()
     {
@@ -55,6 +43,19 @@ public class ASTFormatsepNode extends ASTNode
     }
 
 
+    public boolean colonFormatSep()
+    {
+        return this.colonFormatSep != null;
+    }
+
+    public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.colonFormatSep = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFormatsepNode(this);
@@ -70,8 +71,8 @@ public class ASTFormatsepNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.colonFormatSep;
-        case 1:  return this.slashFormatSep;
+        case 0:  return this.slashFormatSep;
+        case 1:  return this.colonFormatSep;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -80,8 +81,8 @@ public class ASTFormatsepNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

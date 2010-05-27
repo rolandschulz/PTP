@@ -42,6 +42,7 @@ public class ASTVariableNameNode extends ASTNode implements IBindEntity
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTVariableNameNode(this);

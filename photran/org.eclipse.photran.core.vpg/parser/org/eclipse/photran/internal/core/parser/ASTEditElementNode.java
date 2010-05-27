@@ -96,6 +96,7 @@ public class ASTEditElementNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEditElementNode(this);

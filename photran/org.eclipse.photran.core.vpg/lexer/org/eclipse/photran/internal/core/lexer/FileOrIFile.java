@@ -87,6 +87,7 @@ public class FileOrIFile
      * @see #getIFile()
      * @see #getJavaFile()
      */
+    @Override
     public String toString()
     {
         if (this.ifile != null)
@@ -97,6 +98,7 @@ public class FileOrIFile
             return "?";
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (o == null || !o.getClass().equals(this.getClass())) return false;
@@ -116,6 +118,7 @@ public class FileOrIFile
             return a.equals(b);
     }
     
+    @Override
     public int hashCode()
     {
         return 13*hashCode(this.ifile) + hashCode(this.javaFile);

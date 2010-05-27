@@ -69,6 +69,7 @@ public class ASTNamelistStmtNode extends ASTNode implements ISpecificationStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTNamelistStmtNode(this);

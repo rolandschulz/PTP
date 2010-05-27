@@ -59,6 +59,7 @@ public class ASTFormatStmtNode extends ASTNodeWithErrorRecoverySymbols implement
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFormatStmtNode(this);

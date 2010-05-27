@@ -43,6 +43,7 @@ public class ASTObjectNameListNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTObjectNameListNode(this);

@@ -58,6 +58,7 @@ public class ASTAssumedSizeSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAssumedSizeSpecNode(this);

@@ -72,6 +72,7 @@ public class ASTEntryStmtNode extends ASTNode implements IBlockDataBodyConstruct
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEntryStmtNode(this);

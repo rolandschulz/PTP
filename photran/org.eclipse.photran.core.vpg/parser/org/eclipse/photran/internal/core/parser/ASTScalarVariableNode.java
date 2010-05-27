@@ -83,6 +83,7 @@ public class ASTScalarVariableNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTScalarVariableNode(this);

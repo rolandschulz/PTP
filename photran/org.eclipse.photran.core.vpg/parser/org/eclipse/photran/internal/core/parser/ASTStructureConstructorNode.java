@@ -72,6 +72,7 @@ public class ASTStructureConstructorNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTStructureConstructorNode(this);

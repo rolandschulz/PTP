@@ -32,6 +32,7 @@ public class ASTGoToKwNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTGo; // in ASTGoToKwNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTTo; // in ASTGoToKwNode
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTGoToKwNode(this);

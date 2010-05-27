@@ -82,6 +82,7 @@ public class ASTImplicitStmtNode extends ASTNode implements ISpecificationPartCo
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTImplicitStmtNode(this);

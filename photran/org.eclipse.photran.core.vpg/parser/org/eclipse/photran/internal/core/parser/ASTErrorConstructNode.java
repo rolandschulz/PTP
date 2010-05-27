@@ -29,6 +29,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTErrorConstructNode extends ASTNodeWithErrorRecoverySymbols implements IBodyConstruct
 {
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTErrorConstructNode(this);

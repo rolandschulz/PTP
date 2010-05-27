@@ -68,6 +68,7 @@ public class ASTBodyPlusInternalsNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTBodyPlusInternalsNode(this);

@@ -74,6 +74,7 @@ public class ASTIfThenStmtNode extends ASTNodeWithErrorRecoverySymbols implement
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTIfThenStmtNode(this);

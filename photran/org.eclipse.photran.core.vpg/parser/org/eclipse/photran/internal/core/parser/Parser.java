@@ -44,7 +44,7 @@ public class Parser
         to view debugging information */
     public OutputStream DEBUG = new OutputStream() { @Override public void write(int b) {} };
 
-    protected static final int NUM_STATES = 3223;
+    protected static final int NUM_STATES = 3222;
     protected static final int NUM_PRODUCTIONS = 1546;
     protected static final int NUM_TERMINALS = 246;
     protected static final int NUM_NONTERMINALS = 493;
@@ -2639,7 +2639,7 @@ public class Parser
         public static final Production SELECT_TYPE_CONSTRUCT_1043 = new Production(Nonterminal.SELECT_TYPE_CONSTRUCT, 2, "<SelectTypeConstruct> ::= <SelectTypeStmt> <EndSelectTypeStmt>");
         public static final Production SELECT_TYPE_BODY_1044 = new Production(Nonterminal.SELECT_TYPE_BODY, 2, "<SelectTypeBody> ::= <TypeGuardStmt> <TypeGuardBlock>");
         public static final Production SELECT_TYPE_BODY_1045 = new Production(Nonterminal.SELECT_TYPE_BODY, 3, "<SelectTypeBody> ::= <SelectTypeBody> <TypeGuardStmt> <TypeGuardBlock>");
-        public static final Production TYPE_GUARD_BLOCK_1046 = new Production(Nonterminal.TYPE_GUARD_BLOCK, 1, "<TypeGuardBlock> ::= <ExecutionPartConstruct>");
+        public static final Production TYPE_GUARD_BLOCK_1046 = new Production(Nonterminal.TYPE_GUARD_BLOCK, 0, "<TypeGuardBlock> ::= (empty)");
         public static final Production TYPE_GUARD_BLOCK_1047 = new Production(Nonterminal.TYPE_GUARD_BLOCK, 2, "<TypeGuardBlock> ::= <TypeGuardBlock> <ExecutionPartConstruct>");
         public static final Production SELECT_TYPE_STMT_1048 = new Production(Nonterminal.SELECT_TYPE_STMT, 11, "<SelectTypeStmt> ::= <LblDef> <Name> T_COLON T_SELECT T_TYPE T_LPAREN T_IDENT T_EQGREATERTHAN <Selector> T_RPAREN T_EOS");
         public static final Production SELECT_TYPE_STMT_1049 = new Production(Nonterminal.SELECT_TYPE_STMT, 9, "<SelectTypeStmt> ::= <LblDef> <Name> T_COLON T_SELECT T_TYPE T_LPAREN <Selector> T_RPAREN T_EOS");

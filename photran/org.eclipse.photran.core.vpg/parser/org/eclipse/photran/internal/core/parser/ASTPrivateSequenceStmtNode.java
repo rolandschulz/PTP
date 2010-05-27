@@ -94,6 +94,7 @@ public class ASTPrivateSequenceStmtNode extends ASTNode implements IDerivedTypeB
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPrivateSequenceStmtNode(this);

@@ -138,6 +138,7 @@ public class ASTCPrimaryNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCPrimaryNode(this);

@@ -56,6 +56,7 @@ public class ASTPositionSpecListNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPositionSpecListNode(this);

@@ -114,6 +114,7 @@ public class ASTUseStmtNode extends ASTNode implements ISpecificationPartConstru
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTUseStmtNode(this);

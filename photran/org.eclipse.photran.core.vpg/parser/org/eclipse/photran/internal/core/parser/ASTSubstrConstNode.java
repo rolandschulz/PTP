@@ -55,6 +55,7 @@ public class ASTSubstrConstNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSubstrConstNode(this);

@@ -72,6 +72,7 @@ public class ASTSubmoduleStmtNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSubmoduleStmtNode(this);

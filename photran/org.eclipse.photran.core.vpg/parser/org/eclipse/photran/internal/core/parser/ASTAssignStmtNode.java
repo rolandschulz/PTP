@@ -71,6 +71,7 @@ public class ASTAssignStmtNode extends ASTNode implements IActionStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAssignStmtNode(this);

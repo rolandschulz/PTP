@@ -125,12 +125,12 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
     // VPG DATABASE METHODS
     ////////////////////////////////////////////////////////////////////////////
 
-    public void flush()
+    @Override public void flush()
     {
         db.flush();
     }
 
-    public void close()
+    @Override public void close()
     {
         db.close();
     }
@@ -142,7 +142,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         annotationCache.clear();
     }
 
-    public void clearDatabase()
+    @Override public void clearDatabase()
     {
         clearCache();
         db.clearDatabase();
@@ -218,35 +218,35 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
 
     // DEPENDENCIES ////////////////////////////////////////////////////////////
 
-    public void ensure(VPGDependency<A, T, R> dependency)
+    @Override public void ensure(VPGDependency<A, T, R> dependency)
     {
         db.ensure(dependency);
     }
 
-    public void delete(VPGDependency<A, T, R> dependency)
+    @Override public void delete(VPGDependency<A, T, R> dependency)
     {
         db.delete(dependency);
     }
 
-    public Iterable<String> getOutgoingDependenciesFrom(String filename)
+    @Override public Iterable<String> getOutgoingDependenciesFrom(String filename)
     {
         return db.getOutgoingDependenciesFrom(filename);
     }
 
-    public Iterable<String> getIncomingDependenciesTo(String filename)
+    @Override public Iterable<String> getIncomingDependenciesTo(String filename)
     {
         return db.getIncomingDependenciesTo(filename);
     }
 
     // EDGES ///////////////////////////////////////////////////////////////////
 
-    public void ensure(VPGEdge<A, T, R> edge)
+    @Override public void ensure(VPGEdge<A, T, R> edge)
     {
         removeFromCache(edge);
         db.ensure(edge);
     }
 
-    public void delete(VPGEdge<A, T, R> edge)
+    @Override public void delete(VPGEdge<A, T, R> edge)
     {
         removeFromCache(edge);
         db.delete(edge);
@@ -263,7 +263,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         return db.getAllEdgesFor(filename);
     }
 
-    public Iterable<? extends VPGEdge<A, T, R>> getOutgoingEdgesFrom(R tokenRef, int edgeType)
+    @Override public Iterable<? extends VPGEdge<A, T, R>> getOutgoingEdgesFrom(R tokenRef, int edgeType)
     {
         CacheKey key = new CacheKey(tokenRef, edgeType);
         if (outgoingEdgeCache.containsKey(key))
@@ -280,7 +280,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         }
     }
 
-    public Iterable<? extends VPGEdge<A, T, R>> getIncomingEdgesTo(R tokenRef, int edgeType)
+    @Override public Iterable<? extends VPGEdge<A, T, R>> getIncomingEdgesTo(R tokenRef, int edgeType)
     {
         CacheKey key = new CacheKey(tokenRef, edgeType);
         if (incomingEdgeCache.containsKey(key))
@@ -351,13 +351,13 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
 
     // ANNOTATIONS /////////////////////////////////////////////////////////////
 
-    public void setAnnotation(R token, int annotationID, Serializable annotation)
+    @Override public void setAnnotation(R token, int annotationID, Serializable annotation)
     {
         removeFromCache(token, annotationID);
         db.setAnnotation(token, annotationID, annotation);
     }
 
-    public void deleteAnnotation(R token, int annotationID)
+    @Override public void deleteAnnotation(R token, int annotationID)
     {
         removeFromCache(token, annotationID);
         db.deleteAnnotation(token, annotationID);
@@ -368,7 +368,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         annotationCache.remove(new CacheKey(token, annotationID));
     }
 
-    public Serializable getAnnotation(R tokenRef, int annotationID)
+    @Override public Serializable getAnnotation(R tokenRef, int annotationID)
     {
         CacheKey key = new CacheKey(tokenRef, annotationID);
         if (annotationCache.containsKey(key))
@@ -402,14 +402,14 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
 
     // UTILITY METHODS /////////////////////////////////////////////////////////
 
-    public void printOn(PrintStream out)
+    @Override public void printOn(PrintStream out)
     {
         printStatisticsOn(out);
         out.println();
         db.printOn(out);
     }
 
-    public void printStatisticsOn(PrintStream out)
+    @Override public void printStatisticsOn(PrintStream out)
     {
         out.println("Database Cache Statistics:");
 
@@ -434,7 +434,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
 //      out.println("    Annotation Cache: " + annotationCache.size() + " entries (max " + maxAnnotationCacheEntries + ")");
     }
 
-    public void resetStatistics()
+    @Override public void resetStatistics()
     {
         edgeHits = edgeMisses = annotationHits = annotationMisses = totalEdgeListBuildTime = totalDeserializationTime = 0;
     }

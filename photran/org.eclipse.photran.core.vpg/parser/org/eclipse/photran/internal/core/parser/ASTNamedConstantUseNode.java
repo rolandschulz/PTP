@@ -42,6 +42,7 @@ public class ASTNamedConstantUseNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTNamedConstantUseNode(this);

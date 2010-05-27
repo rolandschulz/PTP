@@ -122,6 +122,7 @@ public class ASTPointerFieldNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPointerFieldNode(this);

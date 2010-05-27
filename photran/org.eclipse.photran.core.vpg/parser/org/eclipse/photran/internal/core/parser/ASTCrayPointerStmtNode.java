@@ -57,6 +57,7 @@ public class ASTCrayPointerStmtNode extends ASTNode implements ISpecificationStm
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCrayPointerStmtNode(this);

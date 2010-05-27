@@ -68,6 +68,7 @@ public class ASTEnumDefNode extends ASTNode implements IDeclarationConstruct
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEnumDefNode(this);

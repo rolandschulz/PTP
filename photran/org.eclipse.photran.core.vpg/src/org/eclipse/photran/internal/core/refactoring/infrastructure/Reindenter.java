@@ -329,7 +329,7 @@ public class Reindenter
             //System.out.println("Removing [" + removeIndent + "] and adding [" + addIndent + "]");
         }
 
-        protected void updateIndentation(Token firstTokenOnLine)
+        @Override protected void updateIndentation(Token firstTokenOnLine)
         {
             String whiteBeforeFirstTok = firstTokenOnLine.getWhiteBefore();
             String currentIndentation = getIndentation(firstTokenOnLine);
@@ -366,7 +366,7 @@ public class Reindenter
             this.addIndent = getIndentation(firstTokenOnFirstLineToAdjust);
         }
 
-        protected void updateIndentation(Token firstTokenOnLine)
+        @Override protected void updateIndentation(Token firstTokenOnLine)
         {
             String whiteBeforeFirstTok = firstTokenOnLine.getWhiteBefore();
             String currentIndentation = getIndentation(firstTokenOnLine);

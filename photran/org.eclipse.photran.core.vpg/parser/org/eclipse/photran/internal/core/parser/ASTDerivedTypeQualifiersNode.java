@@ -58,6 +58,7 @@ public class ASTDerivedTypeQualifiersNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDerivedTypeQualifiersNode(this);

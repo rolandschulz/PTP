@@ -75,6 +75,7 @@ public class ASTSelectCaseStmtNode extends ASTNodeWithErrorRecoverySymbols imple
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSelectCaseStmtNode(this);

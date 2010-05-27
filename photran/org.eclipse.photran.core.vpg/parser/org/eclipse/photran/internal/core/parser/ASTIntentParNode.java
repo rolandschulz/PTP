@@ -42,6 +42,7 @@ public class ASTIntentParNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTIntentParNode(this);

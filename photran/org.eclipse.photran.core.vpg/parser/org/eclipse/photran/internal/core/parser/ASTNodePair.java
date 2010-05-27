@@ -59,22 +59,22 @@ public class ASTNodePair<T extends IASTNode, U extends IASTNode> extends ASTNode
     // Source Manipulation
     ///////////////////////////////////////////////////////////////////////////
 
-    public void replaceChild(IASTNode node, IASTNode withNode)
+    @Override public void replaceChild(IASTNode node, IASTNode withNode)
     {
         throw new UnsupportedOperationException();
     }
 
-    public void removeFromTree()
+    @Override public void removeFromTree()
     {
         throw new UnsupportedOperationException();
     }
 
-    public void replaceWith(IASTNode newNode)
+    @Override public void replaceWith(IASTNode newNode)
     {
         throw new UnsupportedOperationException();
     }
 
-    public void replaceWith(String literalString)
+    @Override public void replaceWith(String literalString)
     {
         throw new UnsupportedOperationException();
     }

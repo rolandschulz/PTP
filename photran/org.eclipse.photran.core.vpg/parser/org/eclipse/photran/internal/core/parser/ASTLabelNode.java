@@ -42,6 +42,7 @@ public class ASTLabelNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTLabelNode(this);

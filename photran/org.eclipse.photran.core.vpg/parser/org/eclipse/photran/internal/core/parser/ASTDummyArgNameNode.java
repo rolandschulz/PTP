@@ -42,6 +42,7 @@ public class ASTDummyArgNameNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDummyArgNameNode(this);

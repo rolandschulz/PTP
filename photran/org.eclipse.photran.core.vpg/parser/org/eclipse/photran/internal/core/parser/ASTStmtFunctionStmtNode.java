@@ -85,6 +85,7 @@ public class ASTStmtFunctionStmtNode extends ASTNode implements IObsoleteActionS
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTStmtFunctionStmtNode(this);

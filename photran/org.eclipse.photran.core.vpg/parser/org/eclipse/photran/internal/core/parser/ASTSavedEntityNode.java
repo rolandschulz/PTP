@@ -57,6 +57,7 @@ public class ASTSavedEntityNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSavedEntityNode(this);

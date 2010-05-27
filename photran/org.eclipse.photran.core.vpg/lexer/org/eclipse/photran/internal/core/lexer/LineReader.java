@@ -192,7 +192,7 @@ public final class LineReader extends SingleCharReader implements CharSequence
     // INPUTSTREAM IMPLEMENTATION
     ///////////////////////////////////////////////////////////////////////////
 
-    public int read() throws IOException
+    @Override public int read() throws IOException
     {
         ensureLineLoaded();
         int result = peek();
@@ -252,14 +252,13 @@ public final class LineReader extends SingleCharReader implements CharSequence
             return new SubSequence(start+subseqStart, start+subseqEnd);
         }
         
-        public String toString()
+        @Override public String toString()
         {
             return String.valueOf(currentLine, start, end-start);
         }
     }
 
-    @Override
-    public void close() throws IOException
+    @Override public void close() throws IOException
     {
         in.close();
     }

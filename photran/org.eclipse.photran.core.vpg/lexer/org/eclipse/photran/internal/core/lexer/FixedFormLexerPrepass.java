@@ -570,7 +570,8 @@ class PreLexerLine {
 	    return this.lineText;
 	}
 
-	public String toString() {
+	@Override
+    public String toString() {
 		return "Line "+linePos+": "+lineText; 
 	}
 }
@@ -646,12 +647,13 @@ class PositionInFile
                 other.endOffset == this.endOffset);
     }
     
-    //Override
+    @Override
     public int hashCode()
     {
         return this.endOffset;
     }
     
+    @Override
     public boolean equals(Object obj)
     {
         return ((PositionInFile)obj).endOffset == this.endOffset;

@@ -76,7 +76,7 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         if (endDoStmt != null) endDoStmt.setParent(this);
     }
 
-    public void accept(IASTVisitor visitor)
+    @Override public void accept(IASTVisitor visitor)
     {
         if (visitor instanceof IASTVisitorWithLoops)
             ((IASTVisitorWithLoops)visitor).visitASTProperLoopConstructNode(this);

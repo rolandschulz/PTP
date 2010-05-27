@@ -42,6 +42,7 @@ public class ASTLblRefNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTLblRefNode(this);

@@ -95,6 +95,7 @@ public class ASTInterfaceStmtNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTInterfaceStmtNode(this);

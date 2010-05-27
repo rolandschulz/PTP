@@ -1050,7 +1050,7 @@ public class FreeFormLexerPhase2 implements ILexer
             rules = new Rule[] { rule1, rule2 };
         }
         
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             for (int i = 0; i < rules.length; i++)
                 if (rules[i].appliesToTokenAt(tokenPos))
@@ -1068,7 +1068,7 @@ public class FreeFormLexerPhase2 implements ILexer
             rules = new Rule[] { rule1, rule2 };
         }
         
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             for (int i = 0; i < rules.length; i++)
                 if (!rules[i].appliesToTokenAt(tokenPos))
@@ -1087,7 +1087,7 @@ public class FreeFormLexerPhase2 implements ILexer
      */
     private final class MustBePartOfTypeDecl extends Rule
     {
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             int declKeywordsStartAt = -1;
             int declIdentifierPos = -1;
@@ -1137,7 +1137,7 @@ public class FreeFormLexerPhase2 implements ILexer
             this.tokenTerminal = tokenTerminal;
         }
 
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             return (new MustBePartOfTypeDecl().appliesToTokenAt(tokenPos))
                 || (new StmtMustStartWith(tokenTerminal).appliesToTokenAt(tokenPos));
@@ -1165,7 +1165,7 @@ public class FreeFormLexerPhase2 implements ILexer
             firstTokenPriorId = tokenTerminal2;
         }
 
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             return matchToken(tokenPos-2, secondTokenPriorId)
                 && matchToken(tokenPos-1, firstTokenPriorId);
@@ -1204,7 +1204,7 @@ public class FreeFormLexerPhase2 implements ILexer
             possibility4 = tokenTerminal4;
         }
 
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             return matchToken(tokenPos-1, possibility1)
                 || matchToken(tokenPos-1, possibility2)
@@ -1261,7 +1261,7 @@ public class FreeFormLexerPhase2 implements ILexer
             thirdTokenAfterId = tokenTerminal3;
         }
 
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             return matchToken(tokenPos+1, firstTokenAfterId)
                 && matchToken(tokenPos+2, secondTokenAfterId)
@@ -1283,7 +1283,7 @@ public class FreeFormLexerPhase2 implements ILexer
             this.tokenTerminal = tokenTerminal;
         }
 
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             return (matchToken(firstTokenPos, tokenTerminal)
                     || matchToken(tokenFollowingParentheticalPos, tokenTerminal))
@@ -1346,7 +1346,7 @@ public class FreeFormLexerPhase2 implements ILexer
             possibilities[7] = tokenTerminal8;
         }
 
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             if (!retainAsKeyword[firstTokenPos]) return false;
 
@@ -1373,7 +1373,7 @@ public class FreeFormLexerPhase2 implements ILexer
             this.depth = depth;
         }
 
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             return parenDepth[tokenPos] == depth;
         }
@@ -1393,7 +1393,7 @@ public class FreeFormLexerPhase2 implements ILexer
      */
     private final class MustBeInSpecList extends Rule
     {
-        public boolean appliesToTokenAt(int tokenPos)
+        @Override public boolean appliesToTokenAt(int tokenPos)
         {
             IToken t = (IToken)tokenStream.elementAt(firstTokenPos);
             int specListStartsAt = firstTokenPos + 1;

@@ -81,6 +81,7 @@ public class ASTFormatEditNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFormatEditNode(this);

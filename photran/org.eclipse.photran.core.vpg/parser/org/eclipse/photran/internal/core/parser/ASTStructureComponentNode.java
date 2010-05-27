@@ -55,6 +55,7 @@ public class ASTStructureComponentNode extends ASTNode implements IDataIDoObject
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTStructureComponentNode(this);

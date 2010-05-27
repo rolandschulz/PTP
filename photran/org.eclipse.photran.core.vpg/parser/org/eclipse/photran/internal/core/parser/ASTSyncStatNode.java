@@ -56,6 +56,7 @@ public class ASTSyncStatNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSyncStatNode(this);

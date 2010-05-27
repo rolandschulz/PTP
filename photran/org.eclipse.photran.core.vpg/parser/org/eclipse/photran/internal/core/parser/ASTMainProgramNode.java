@@ -94,6 +94,7 @@ public class ASTMainProgramNode extends ScopingNode implements IProgramUnit
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTMainProgramNode(this);

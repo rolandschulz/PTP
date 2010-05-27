@@ -45,6 +45,7 @@ public class ASTKindSelectorNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTKindSelectorNode(this);

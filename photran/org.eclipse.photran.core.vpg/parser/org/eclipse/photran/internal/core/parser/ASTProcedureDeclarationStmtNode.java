@@ -88,6 +88,7 @@ public class ASTProcedureDeclarationStmtNode extends ASTNode implements IDeclara
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTProcedureDeclarationStmtNode(this);

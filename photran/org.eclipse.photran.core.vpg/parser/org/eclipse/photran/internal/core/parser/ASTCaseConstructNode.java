@@ -68,6 +68,7 @@ public class ASTCaseConstructNode extends ASTNode implements IExecutableConstruc
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCaseConstructNode(this);

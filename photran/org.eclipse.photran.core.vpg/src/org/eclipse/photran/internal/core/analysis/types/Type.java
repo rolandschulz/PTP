@@ -37,7 +37,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
 
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
 
-    public abstract String toString();
+	@Override public abstract String toString();
     
     public abstract String getThreeLetterTypeSerializationCode();
     
@@ -101,7 +101,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
     
     public static Type INTEGER = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "integer";
         }
@@ -111,7 +111,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "int"; 
         }
         
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifInteger(this);
         }
@@ -131,7 +131,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
 
     public static Type REAL = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "real";
         }
@@ -141,7 +141,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "rea"; 
         }
         
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifReal(this);
         }
@@ -161,7 +161,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
 
     public static Type DOUBLEPRECISION = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "double precision";
         }
@@ -171,7 +171,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "dbl"; 
         }
         
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifDoublePrecision(this);
         }
@@ -191,7 +191,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
 
     public static Type COMPLEX = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "complex";
         }
@@ -201,7 +201,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "cpx"; 
         }
 
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifComplex(this);
         }
@@ -221,7 +221,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
 
     public static Type LOGICAL = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "logical";
         }
@@ -231,7 +231,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "log"; 
         }
 
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifLogical(this);
         }
@@ -239,7 +239,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
 
     public static Type CHARACTER = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "character";
         }
@@ -249,7 +249,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "chr"; 
         }
 
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifCharacter(this);
         }
@@ -267,7 +267,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
      */
     public static Type UNKNOWN = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "(unknown)";
         }
@@ -277,7 +277,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "unk"; 
         }
 
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifUnknown(this);
         }
@@ -288,7 +288,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
      */
     public static Type VOID = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "(unclassified)";
         }
@@ -298,7 +298,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "voi"; 
         }
 
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifUnclassified(this);
         }
@@ -309,7 +309,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
      */
     public static Type TYPE_ERROR = new PrimitiveType()
     {
-        public String toString()
+        @Override public String toString()
         {
             return "(type error)";
         }
@@ -319,7 +319,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
            return "err"; 
         }
 
-        public <T> T processUsing(TypeProcessor<T> p)
+        @Override public <T> T processUsing(TypeProcessor<T> p)
         {
             return p.ifError(this);
         }
@@ -367,7 +367,6 @@ public abstract class Type implements IPhotranSerializable, Serializable
         setThreeLetterSerializationCode(FunctionType.class);
     }
     
-    @SuppressWarnings("rawtypes")
     public static Type readFrom(InputStream in) throws IOException
     {
         String code = PhotranVPGSerializer.deserialize(in);

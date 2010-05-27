@@ -55,6 +55,7 @@ public class ASTSelectTypeBodyNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSelectTypeBodyNode(this);

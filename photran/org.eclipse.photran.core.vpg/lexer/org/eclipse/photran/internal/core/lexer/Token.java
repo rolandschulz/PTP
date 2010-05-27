@@ -419,6 +419,7 @@ public class Token implements IToken, IASTNode
         ASTNodeUtil.replaceWith(this, string);
     }
     
+    @Override
     public Object clone()
     {
         return new Token(this);
@@ -522,7 +523,7 @@ public class Token implements IToken, IASTNode
     		return tokenRef;
     	}
     	
-        public List<PhotranTokenRef> manuallyResolveBinding()
+    	@Override public List<PhotranTokenRef> manuallyResolveBinding()
         {
         	return scope.manuallyResolve(this);
         }

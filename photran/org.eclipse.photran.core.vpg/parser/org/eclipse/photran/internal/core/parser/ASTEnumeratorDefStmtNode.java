@@ -59,6 +59,7 @@ public class ASTEnumeratorDefStmtNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEnumeratorDefStmtNode(this);

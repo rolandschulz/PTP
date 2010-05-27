@@ -68,6 +68,7 @@ public class ASTCriticalConstructNode extends ASTNode implements IExecutableCons
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCriticalConstructNode(this);

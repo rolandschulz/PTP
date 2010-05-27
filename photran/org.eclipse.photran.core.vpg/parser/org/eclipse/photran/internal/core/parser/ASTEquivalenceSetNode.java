@@ -58,6 +58,7 @@ public class ASTEquivalenceSetNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEquivalenceSetNode(this);

@@ -55,6 +55,7 @@ public class ASTAllocateObjectNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAllocateObjectNode(this);

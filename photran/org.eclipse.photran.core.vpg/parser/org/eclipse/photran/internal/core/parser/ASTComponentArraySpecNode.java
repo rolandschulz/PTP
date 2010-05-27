@@ -55,6 +55,7 @@ public class ASTComponentArraySpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTComponentArraySpecNode(this);

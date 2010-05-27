@@ -42,6 +42,7 @@ public class ASTGenericNameNode extends ASTNode implements IAccessId
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTGenericNameNode(this);

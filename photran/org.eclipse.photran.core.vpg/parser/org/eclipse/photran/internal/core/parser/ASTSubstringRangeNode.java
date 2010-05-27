@@ -44,6 +44,7 @@ public class ASTSubstringRangeNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSubstringRangeNode(this);

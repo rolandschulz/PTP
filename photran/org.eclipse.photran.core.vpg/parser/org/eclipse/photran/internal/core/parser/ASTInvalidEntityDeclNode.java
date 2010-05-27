@@ -84,6 +84,7 @@ public class ASTInvalidEntityDeclNode extends ASTNodeWithErrorRecoverySymbols
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTInvalidEntityDeclNode(this);

@@ -62,6 +62,7 @@ public class ASTEndBlockDataStmtNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEndBlockDataStmtNode(this);

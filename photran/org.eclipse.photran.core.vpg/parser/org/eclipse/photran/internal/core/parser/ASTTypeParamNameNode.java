@@ -42,6 +42,7 @@ public class ASTTypeParamNameNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTTypeParamNameNode(this);

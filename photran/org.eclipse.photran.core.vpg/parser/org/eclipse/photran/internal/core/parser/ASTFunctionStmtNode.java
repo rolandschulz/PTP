@@ -121,6 +121,7 @@ public class ASTFunctionStmtNode extends ASTNodeWithErrorRecoverySymbols impleme
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFunctionStmtNode(this);

@@ -55,6 +55,7 @@ public class ASTAccessSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAccessSpecNode(this);

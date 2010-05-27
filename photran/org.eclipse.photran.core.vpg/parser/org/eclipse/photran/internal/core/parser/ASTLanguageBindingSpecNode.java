@@ -73,6 +73,7 @@ public class ASTLanguageBindingSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTLanguageBindingSpecNode(this);

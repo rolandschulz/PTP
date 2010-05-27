@@ -29,6 +29,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTErrorProgramUnitNode extends ASTNodeWithErrorRecoverySymbols implements IProgramUnit
 {
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTErrorProgramUnitNode(this);

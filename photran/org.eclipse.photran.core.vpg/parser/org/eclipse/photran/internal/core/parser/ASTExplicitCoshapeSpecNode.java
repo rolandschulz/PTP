@@ -58,6 +58,7 @@ public class ASTExplicitCoshapeSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTExplicitCoshapeSpecNode(this);

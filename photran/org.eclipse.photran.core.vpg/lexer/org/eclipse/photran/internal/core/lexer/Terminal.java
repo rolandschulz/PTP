@@ -278,7 +278,7 @@ public final class Terminal
         this.description = description;
     }
 
-    public String toString()
+    @Override public String toString()
     {
         return description;
     }

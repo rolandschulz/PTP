@@ -132,7 +132,7 @@ public class ArraySpec implements IPhotranSerializable
         return dimensions.size();
     }
 
-    public String toString()
+    @Override public String toString()
     {
         StringBuffer sb = new StringBuffer();
         sb.append("(");

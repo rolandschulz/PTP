@@ -42,6 +42,7 @@ public class ASTUpperBoundNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTUpperBoundNode(this);

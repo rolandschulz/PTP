@@ -55,6 +55,7 @@ public class ASTSelectCaseRangeNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSelectCaseRangeNode(this);

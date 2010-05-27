@@ -81,21 +81,25 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         }
     }
 
+    @Override
     public String describeEdgeType(int edgeType)
     {
         return super.describeEdgeType(edgeType);
     }
 
+    @Override
     public String describeAnnotationType(int annotationType)
     {
         return super.describeAnnotationType(annotationType);
     }
 
+    @Override
     public String describeToken(String filename, int offset, int length)
     {
         return super.describeToken(filename, offset, length);
     }
 
+    @Override
     public void clearDatabase()
     {
         super.db.clearDatabase();

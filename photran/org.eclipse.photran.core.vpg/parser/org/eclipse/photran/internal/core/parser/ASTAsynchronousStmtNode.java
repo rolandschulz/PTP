@@ -59,6 +59,7 @@ public class ASTAsynchronousStmtNode extends ASTNode implements ISpecificationSt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAsynchronousStmtNode(this);

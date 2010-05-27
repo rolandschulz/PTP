@@ -96,6 +96,7 @@ public class ASTVariableNode extends ASTNode implements IDataStmtObject, IInputI
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTVariableNode(this);

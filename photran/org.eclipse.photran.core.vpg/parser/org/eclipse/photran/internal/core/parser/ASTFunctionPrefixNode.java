@@ -43,6 +43,7 @@ public class ASTFunctionPrefixNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFunctionPrefixNode(this);

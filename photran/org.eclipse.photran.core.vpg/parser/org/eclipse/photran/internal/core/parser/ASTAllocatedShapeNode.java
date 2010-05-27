@@ -71,6 +71,7 @@ public class ASTAllocatedShapeNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAllocatedShapeNode(this);

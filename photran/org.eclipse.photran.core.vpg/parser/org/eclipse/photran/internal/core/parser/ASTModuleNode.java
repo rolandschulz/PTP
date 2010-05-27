@@ -68,6 +68,7 @@ public class ASTModuleNode extends ScopingNode implements IProgramUnit
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTModuleNode(this);

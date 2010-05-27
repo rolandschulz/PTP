@@ -56,6 +56,7 @@ public class ASTConnectSpecListNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTConnectSpecListNode(this);

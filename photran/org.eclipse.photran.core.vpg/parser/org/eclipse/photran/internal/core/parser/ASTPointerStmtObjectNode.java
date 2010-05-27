@@ -57,6 +57,7 @@ public class ASTPointerStmtObjectNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPointerStmtObjectNode(this);

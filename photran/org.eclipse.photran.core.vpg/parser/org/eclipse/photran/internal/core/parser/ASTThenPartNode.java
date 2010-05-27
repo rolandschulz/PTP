@@ -81,6 +81,7 @@ public class ASTThenPartNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTThenPartNode(this);

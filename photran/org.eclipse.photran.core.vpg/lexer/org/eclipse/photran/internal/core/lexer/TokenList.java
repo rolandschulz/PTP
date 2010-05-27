@@ -32,7 +32,7 @@ public final class TokenList extends org.eclipse.rephraserengine.core.util.Token
     	this();
     	ast.accept(new ASTVisitorWithLoops()
     	{
-			public void visitToken(Token token)
+    	    @Override public void visitToken(Token token)
 			{
 				add(token);
 			}

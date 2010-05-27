@@ -94,6 +94,7 @@ public class ASTInterfaceBodyNode extends ASTNode implements IInterfaceSpecifica
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTInterfaceBodyNode(this);

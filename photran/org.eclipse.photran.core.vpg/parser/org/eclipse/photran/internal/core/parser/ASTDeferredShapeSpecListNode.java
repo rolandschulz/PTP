@@ -31,6 +31,7 @@ public class ASTDeferredShapeSpecListNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTDeferredShapeSpecListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTDeferredShapeSpecListNode
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDeferredShapeSpecListNode(this);

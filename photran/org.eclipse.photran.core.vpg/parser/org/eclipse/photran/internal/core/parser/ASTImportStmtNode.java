@@ -59,6 +59,7 @@ public class ASTImportStmtNode extends ASTNode implements ISpecificationPartCons
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTImportStmtNode(this);

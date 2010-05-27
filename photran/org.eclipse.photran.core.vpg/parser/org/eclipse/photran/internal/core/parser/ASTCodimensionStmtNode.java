@@ -59,6 +59,7 @@ public class ASTCodimensionStmtNode extends ASTNode implements ISpecificationStm
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCodimensionStmtNode(this);

@@ -73,6 +73,7 @@ public class ASTLockStmtNode extends ASTNode implements IActionStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTLockStmtNode(this);

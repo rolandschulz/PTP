@@ -100,6 +100,7 @@ public class ASTGenericBindingNode extends ASTNode implements IProcBindingStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTGenericBindingNode(this);

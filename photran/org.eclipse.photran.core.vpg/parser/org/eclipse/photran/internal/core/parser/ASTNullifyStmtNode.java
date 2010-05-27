@@ -59,6 +59,7 @@ public class ASTNullifyStmtNode extends ASTNode implements IActionStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTNullifyStmtNode(this);

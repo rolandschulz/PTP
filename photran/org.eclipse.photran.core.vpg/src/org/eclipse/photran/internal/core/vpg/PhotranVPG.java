@@ -366,13 +366,13 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         {
             private ASTNodeWithErrorRecoverySymbols firstError = null;
             
-            public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
+            @Override public void visitASTErrorProgramUnitNode(ASTErrorProgramUnitNode node)
             {
                 if (firstError == null)
                     firstError = node;
             }
 
-            public void visitASTErrorConstructNode(ASTErrorConstructNode node)
+            @Override public void visitASTErrorConstructNode(ASTErrorConstructNode node)
             {
                 if (firstError == null)
                     firstError = node;

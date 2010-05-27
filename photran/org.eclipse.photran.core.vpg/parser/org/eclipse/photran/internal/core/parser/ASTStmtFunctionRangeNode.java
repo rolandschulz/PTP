@@ -59,6 +59,7 @@ public class ASTStmtFunctionRangeNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTStmtFunctionRangeNode(this);

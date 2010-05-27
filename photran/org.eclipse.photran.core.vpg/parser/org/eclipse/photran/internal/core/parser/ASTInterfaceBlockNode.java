@@ -68,6 +68,7 @@ public class ASTInterfaceBlockNode extends ScopingNode implements IDeclarationCo
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTInterfaceBlockNode(this);

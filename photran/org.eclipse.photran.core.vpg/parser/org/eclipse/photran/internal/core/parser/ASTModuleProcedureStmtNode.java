@@ -58,6 +58,7 @@ public class ASTModuleProcedureStmtNode extends ASTNode implements IInterfaceSpe
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTModuleProcedureStmtNode(this);

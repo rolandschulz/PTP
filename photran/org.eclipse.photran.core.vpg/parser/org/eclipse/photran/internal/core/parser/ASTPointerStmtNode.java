@@ -59,6 +59,7 @@ public class ASTPointerStmtNode extends ASTNode implements ISpecificationStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTPointerStmtNode(this);

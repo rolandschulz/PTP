@@ -55,6 +55,7 @@ public class ASTUnitIdentifierNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTUnitIdentifierNode(this);

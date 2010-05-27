@@ -51,7 +51,7 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
         this.lastDirective = null;
     }
 
-    public Token yylex() throws IOException, LexerException
+    @Override public Token yylex() throws IOException, LexerException
     {
         Token token = (Token)super.yylex();
         
@@ -130,7 +130,7 @@ public class PreprocessingFreeFormLexerPhase1 extends FreeFormLexerPhase1
         token.setWhiteBefore(whiteBefore.substring(charsToTrim));
     }
 
-    public void yypushback(int number)
+    @Override public void yypushback(int number)
     {
         throw new UnsupportedOperationException();
     }

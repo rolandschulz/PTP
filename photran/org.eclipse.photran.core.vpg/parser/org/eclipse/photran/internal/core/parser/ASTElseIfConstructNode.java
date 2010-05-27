@@ -94,6 +94,7 @@ public class ASTElseIfConstructNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTElseIfConstructNode(this);

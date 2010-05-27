@@ -94,6 +94,7 @@ public class ASTDerivedTypeDefNode extends ScopingNode implements IDeclarationCo
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDerivedTypeDefNode(this);

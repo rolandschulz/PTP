@@ -68,6 +68,7 @@ public class ASTTypeBoundProcedurePartNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTTypeBoundProcedurePartNode(this);

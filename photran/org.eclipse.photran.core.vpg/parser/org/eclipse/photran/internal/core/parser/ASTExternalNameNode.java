@@ -42,6 +42,7 @@ public class ASTExternalNameNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTExternalNameNode(this);

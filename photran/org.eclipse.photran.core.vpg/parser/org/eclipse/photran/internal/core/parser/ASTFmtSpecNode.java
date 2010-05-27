@@ -29,21 +29,9 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTFmtSpecNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTFmtSpecNode
-    org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFmtSpecNode
     org.eclipse.photran.internal.core.lexer.Token colonFormatSep; // in ASTFmtSpecNode
+    org.eclipse.photran.internal.core.lexer.Token slashFormatSep; // in ASTFmtSpecNode
     ASTFormatEditNode formatEdit; // in ASTFmtSpecNode
-
-    public boolean slashFormatSep()
-    {
-        return this.slashFormatSep != null;
-    }
-
-    public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.slashFormatSep = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
 
     public boolean colonFormatSep()
     {
@@ -53,6 +41,18 @@ public class ASTFmtSpecNode extends ASTNode
     public void setColonFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.colonFormatSep = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean slashFormatSep()
+    {
+        return this.slashFormatSep != null;
+    }
+
+    public void setSlashFormatSep(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.slashFormatSep = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -69,6 +69,7 @@ public class ASTFmtSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFmtSpecNode(this);
@@ -85,8 +86,8 @@ public class ASTFmtSpecNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTComma;
-        case 1:  return this.slashFormatSep;
-        case 2:  return this.colonFormatSep;
+        case 1:  return this.colonFormatSep;
+        case 2:  return this.slashFormatSep;
         case 3:  return this.formatEdit;
         default: throw new IllegalArgumentException("Invalid index");
         }
@@ -97,8 +98,8 @@ public class ASTFmtSpecNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.colonFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.slashFormatSep = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.formatEdit = (ASTFormatEditNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }

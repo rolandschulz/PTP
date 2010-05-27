@@ -2337,7 +2337,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # F03 copy of "block"
 (list):<TypeGuardBlock> ::=
-  |                  <ExecutionPartConstruct>
+  |                  (empty)
   | <TypeGuardBlock> <ExecutionPartConstruct>
 
 # F03 R822 -- modeled after SelectCaseStmt to prevent conflicts

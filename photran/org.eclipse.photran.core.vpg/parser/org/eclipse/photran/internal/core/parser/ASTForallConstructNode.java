@@ -68,6 +68,7 @@ public class ASTForallConstructNode extends ASTNode implements IBodyConstruct, I
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTForallConstructNode(this);

@@ -130,6 +130,7 @@ public class ASTEntityDeclNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEntityDeclNode(this);

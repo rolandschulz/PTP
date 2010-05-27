@@ -46,6 +46,7 @@ public class ASTArrayConstructorNode extends ASTNode implements IExpr
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTArrayConstructorNode(this);

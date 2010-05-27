@@ -55,6 +55,7 @@ public class ASTImageSetNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTImageSetNode(this);

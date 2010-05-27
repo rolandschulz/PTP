@@ -43,6 +43,7 @@ public class ASTAssumedShapeSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAssumedShapeSpecNode(this);

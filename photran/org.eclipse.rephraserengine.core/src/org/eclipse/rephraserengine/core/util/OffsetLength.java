@@ -122,7 +122,7 @@ public final class OffsetLength
     }
 
     /** @return true iff both the offset and length are equal to those of the supplied <code>OffsetLength</code> */
-    public boolean equals(Object o)
+    @Override public boolean equals(Object o)
     {
         if (o == null || !this.getClass().equals(o.getClass())) return false;
 
@@ -130,7 +130,7 @@ public final class OffsetLength
         return this.offset == other.offset && this.length == other.length;
     }
 
-    public int hashCode()
+    @Override public int hashCode()
     {
         return 19 * offset + length;
     }
@@ -151,7 +151,7 @@ public final class OffsetLength
     // toString
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public String toString()
+    @Override public String toString()
     {
         return "offset " + offset + ", length " + length;
     }

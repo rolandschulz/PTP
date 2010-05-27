@@ -55,6 +55,7 @@ public class ASTCoarraySpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCoarraySpecNode(this);

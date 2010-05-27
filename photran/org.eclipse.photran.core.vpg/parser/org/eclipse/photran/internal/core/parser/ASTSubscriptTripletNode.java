@@ -70,6 +70,7 @@ public class ASTSubscriptTripletNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSubscriptTripletNode(this);

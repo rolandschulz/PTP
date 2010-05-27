@@ -88,6 +88,7 @@ public class ASTProcComponentDefStmtNode extends ASTNode implements IComponentDe
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTProcComponentDefStmtNode(this);

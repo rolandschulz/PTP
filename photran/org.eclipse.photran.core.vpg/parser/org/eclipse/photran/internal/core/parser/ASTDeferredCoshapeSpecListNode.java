@@ -31,6 +31,7 @@ public class ASTDeferredCoshapeSpecListNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTDeferredCoshapeSpecListNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTColon; // in ASTDeferredCoshapeSpecListNode
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDeferredCoshapeSpecListNode(this);

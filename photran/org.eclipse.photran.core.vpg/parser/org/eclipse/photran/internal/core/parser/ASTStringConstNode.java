@@ -55,6 +55,7 @@ public class ASTStringConstNode extends ASTNode implements IExpr, ISelector
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTStringConstNode(this);

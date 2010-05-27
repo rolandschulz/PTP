@@ -85,6 +85,7 @@ public class ASTAllStopStmtNode extends ASTNode implements IActionStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAllStopStmtNode(this);

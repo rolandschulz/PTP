@@ -99,6 +99,7 @@ public class ASTCloseSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCloseSpecNode(this);

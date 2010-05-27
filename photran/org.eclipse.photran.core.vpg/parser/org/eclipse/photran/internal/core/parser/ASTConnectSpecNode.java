@@ -309,6 +309,7 @@ public class ASTConnectSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTConnectSpecNode(this);

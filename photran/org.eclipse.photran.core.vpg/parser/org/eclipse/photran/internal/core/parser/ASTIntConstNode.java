@@ -69,6 +69,7 @@ public class ASTIntConstNode extends ASTNode implements IExpr, ISelector, IUnsig
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTIntConstNode(this);

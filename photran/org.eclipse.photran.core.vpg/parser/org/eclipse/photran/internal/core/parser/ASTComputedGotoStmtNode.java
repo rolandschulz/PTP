@@ -75,6 +75,7 @@ public class ASTComputedGotoStmtNode extends ASTNode implements IObsoleteActionS
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTComputedGotoStmtNode(this);

@@ -57,6 +57,7 @@ public class ASTCodimensionDeclNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTCodimensionDeclNode(this);

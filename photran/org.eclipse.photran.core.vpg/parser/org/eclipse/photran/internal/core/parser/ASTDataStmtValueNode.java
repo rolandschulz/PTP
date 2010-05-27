@@ -33,8 +33,8 @@ public class ASTDataStmtValueNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token isNull; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTDataStmtValueNode
-    ASTConstantNode constant; // in ASTDataStmtValueNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTDataStmtValueNode
+    ASTConstantNode constant; // in ASTDataStmtValueNode
 
     public ASTNamedConstantUseNode getNamedConstKind()
     {
@@ -84,6 +84,7 @@ public class ASTDataStmtValueNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDataStmtValueNode(this);
@@ -104,8 +105,8 @@ public class ASTDataStmtValueNode extends ASTNode
         case 2:  return this.hiddenTAsterisk;
         case 3:  return this.isNull;
         case 4:  return this.hiddenTLparen;
-        case 5:  return this.constant;
-        case 6:  return this.hiddenTRparen;
+        case 5:  return this.hiddenTRparen;
+        case 6:  return this.constant;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -119,8 +120,8 @@ public class ASTDataStmtValueNode extends ASTNode
         case 2:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.isNull = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.constant = (ASTConstantNode)value; if (value != null) value.setParent(this); return;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.constant = (ASTConstantNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

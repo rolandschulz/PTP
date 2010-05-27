@@ -68,6 +68,7 @@ public class ASTSubmoduleNode extends ScopingNode implements IProgramUnit
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSubmoduleNode(this);

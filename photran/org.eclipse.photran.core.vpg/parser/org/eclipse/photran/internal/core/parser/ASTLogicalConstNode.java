@@ -82,6 +82,7 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTLogicalConstNode(this);

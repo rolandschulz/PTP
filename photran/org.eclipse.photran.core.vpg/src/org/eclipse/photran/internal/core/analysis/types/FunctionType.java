@@ -37,12 +37,12 @@ public class FunctionType extends Type
         this.name = name.toLowerCase();
     }
 
-    public String toString()
+    @Override public String toString()
     {
         return "function(" + name + "): " + argumentTypes + " -> " + returnType;
     }
 
-    public <T> T processUsing(TypeProcessor<T> p)
+    @Override public <T> T processUsing(TypeProcessor<T> p)
     {
         return p.ifFunctionType(name, this);
     }

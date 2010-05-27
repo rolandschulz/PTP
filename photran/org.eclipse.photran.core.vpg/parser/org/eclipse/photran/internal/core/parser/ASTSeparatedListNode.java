@@ -70,7 +70,7 @@ public class ASTSeparatedListNode<T extends IASTNode> extends AbstractList<T> im
         if (entry != null) entry.setParent(this);
     }
 
-    public T remove(int index)
+    @Override public T remove(int index)
     {
         Token separator = this.separators.remove(index);
         T result = this.entries.remove(index);

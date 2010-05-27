@@ -34,12 +34,12 @@ public class SearchLabelProvider extends LabelProvider
         this.wrappedProvider = new WorkbenchLabelProvider();
     }
 
-    public Image getImage(Object element)
+    @Override public Image getImage(Object element)
     {
         return wrappedProvider.getImage(element);
     }
 
-    public String getText(Object element)
+    @Override public String getText(Object element)
     {
         String text = wrappedProvider.getText(element);
         int count = getMatchCount(element);

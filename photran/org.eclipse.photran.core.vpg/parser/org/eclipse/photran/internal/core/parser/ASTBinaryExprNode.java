@@ -68,6 +68,7 @@ public class ASTBinaryExprNode extends ASTNode implements IExpr, ISelector
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTBinaryExprNode(this);

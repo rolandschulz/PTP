@@ -88,6 +88,7 @@ public class ASTSelectTypeStmtNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSelectTypeStmtNode(this);

@@ -59,6 +59,7 @@ public class ASTFinalBindingNode extends ASTNode implements IProcBindingStmt
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFinalBindingNode(this);

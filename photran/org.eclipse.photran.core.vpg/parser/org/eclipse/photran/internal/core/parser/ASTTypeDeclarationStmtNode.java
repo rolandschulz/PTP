@@ -84,6 +84,7 @@ public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationC
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTTypeDeclarationStmtNode(this);

@@ -33,8 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 @SuppressWarnings("restriction")
 public class PostTransformationStatusContextViewer extends TextStatusContextViewer
 {
-
-    public void createControl(Composite parent)
+    @Override public void createControl(Composite parent)
     {
         super.createControl(parent);
         getSourceViewer().configure(new SourceViewerConfiguration());
@@ -52,7 +51,7 @@ public class PostTransformationStatusContextViewer extends TextStatusContextView
             setInput(document, new Region(0, 0));
     }
 
-    protected SourceViewer createSourceViewer(Composite parent)
+    @Override protected SourceViewer createSourceViewer(Composite parent)
     {
         return new SourceViewer(parent, null,
             SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);

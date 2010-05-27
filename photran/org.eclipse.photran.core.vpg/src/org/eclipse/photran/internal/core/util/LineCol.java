@@ -77,7 +77,7 @@ public final class LineCol
     // toString
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public String toString()
+    @Override public String toString()
     {
         return toString(line, col);
     }

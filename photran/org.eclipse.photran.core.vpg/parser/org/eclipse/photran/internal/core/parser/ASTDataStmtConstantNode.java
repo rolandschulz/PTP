@@ -57,6 +57,7 @@ public class ASTDataStmtConstantNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDataStmtConstantNode(this);

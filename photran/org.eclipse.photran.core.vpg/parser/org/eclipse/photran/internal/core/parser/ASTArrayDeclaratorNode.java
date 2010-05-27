@@ -57,6 +57,7 @@ public class ASTArrayDeclaratorNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTArrayDeclaratorNode(this);

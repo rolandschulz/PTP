@@ -55,6 +55,7 @@ public class ASTFunctionInterfaceRangeNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTFunctionInterfaceRangeNode(this);

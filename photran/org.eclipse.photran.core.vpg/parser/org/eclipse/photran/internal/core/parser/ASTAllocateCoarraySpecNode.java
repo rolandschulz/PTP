@@ -70,6 +70,7 @@ public class ASTAllocateCoarraySpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTAllocateCoarraySpecNode(this);

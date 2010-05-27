@@ -94,6 +94,7 @@ public class ASTSeparateModuleSubprogramNode extends ScopingNode implements IMod
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTSeparateModuleSubprogramNode(this);

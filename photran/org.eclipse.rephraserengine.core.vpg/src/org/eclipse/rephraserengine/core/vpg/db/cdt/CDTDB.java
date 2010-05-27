@@ -123,7 +123,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
     }
 
-    public void flush()
+    @Override public void flush()
     {
         try
         {
@@ -135,7 +135,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
     }
 
-    public void close()
+    @Override public void close()
     {
         try
         {
@@ -148,7 +148,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
     }
 
-    public void clearDatabase()
+    @Override public void clearDatabase()
     {
         getVPG().log.clear();
 
@@ -754,7 +754,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 
     ////////////////////////////////////////////////////////////////////////////
 
-    public void printOn(PrintStream out)
+    @Override public void printOn(PrintStream out)
     {
         try
         {
@@ -794,13 +794,12 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
     }
 
-    public void printStatisticsOn(PrintStream out)
+    @Override public void printStatisticsOn(PrintStream out)
     {
         out.println("(No statistics available)");
     }
 
-
-    public void resetStatistics()
+    @Override public void resetStatistics()
     {
         // Nothing to do
     }

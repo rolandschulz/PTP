@@ -86,7 +86,7 @@ public class Dimension implements IPhotranSerializable
         return out.toString();
     }
 
-    public String toString()
+    @Override public String toString()
     {
         StringBuffer sb = new StringBuffer();
         if (lboundAsString != null)

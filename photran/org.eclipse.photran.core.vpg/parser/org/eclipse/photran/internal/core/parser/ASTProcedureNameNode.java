@@ -42,6 +42,7 @@ public class ASTProcedureNameNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTProcedureNameNode(this);

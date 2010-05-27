@@ -28,20 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTTypeParamAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isKind; // in ASTTypeParamAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isLen; // in ASTTypeParamAttrSpecNode
-
-    public boolean isKind()
-    {
-        return this.isKind != null;
-    }
-
-    public void setIsKind(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isKind = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token isKind; // in ASTTypeParamAttrSpecNode
 
     public boolean isLen()
     {
@@ -55,6 +43,19 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     }
 
 
+    public boolean isKind()
+    {
+        return this.isKind != null;
+    }
+
+    public void setIsKind(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isKind = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTTypeParamAttrSpecNode(this);
@@ -70,8 +71,8 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isKind;
-        case 1:  return this.isLen;
+        case 0:  return this.isLen;
+        case 1:  return this.isKind;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -80,8 +81,8 @@ public class ASTTypeParamAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isLen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isLen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

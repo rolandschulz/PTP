@@ -58,6 +58,7 @@ public class ASTProcDeclNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTProcDeclNode(this);

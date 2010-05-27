@@ -85,6 +85,7 @@ public class ASTDataComponentDefStmtNode extends ASTNode implements IComponentDe
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDataComponentDefStmtNode(this);

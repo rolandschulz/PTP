@@ -57,6 +57,7 @@ public class ASTDerivedTypeSpecNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTDerivedTypeSpecNode(this);

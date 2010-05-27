@@ -30,6 +30,7 @@ public class ASTEmptyProgramNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEmptyProgramNode
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTEmptyProgramNode(this);

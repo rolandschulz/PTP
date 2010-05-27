@@ -270,14 +270,14 @@ public final class RefactorMenu extends CompoundContributionItem
             this.selectedFiles = selectedFiles;
         }
 
-        public void fill(Menu parent, int index)
+        @Override public void fill(Menu parent, int index)
         {
             MenuItem menuItem = new MenuItem(parent, SWT.NONE, index);
             menuItem.setText(label);
             menuItem.addSelectionListener(new SelectionAdapter()
             {
                 @SuppressWarnings("unchecked")
-                public void widgetSelected(SelectionEvent e)
+                @Override public void widgetSelected(SelectionEvent e)
                 {
                     refactoring.initialize(selectedFiles);
                     new RefactoringAction(refactoring, customInputPage).run();
@@ -309,14 +309,14 @@ public final class RefactorMenu extends CompoundContributionItem
             this.textSelection = textSelection;
         }
 
-        public void fill(Menu parent, int index)
+        @Override public void fill(Menu parent, int index)
         {
             MenuItem menuItem = new MenuItem(parent, SWT.NONE, index);
             menuItem.setText(label);
             menuItem.addSelectionListener(new SelectionAdapter()
             {
                 @SuppressWarnings("unchecked")
-                public void widgetSelected(SelectionEvent e)
+                @Override public void widgetSelected(SelectionEvent e)
                 {
                     refactoring.initialize(fileInEditor, textSelection);
                     new RefactoringAction(refactoring, customInputPage).run();
@@ -327,7 +327,7 @@ public final class RefactorMenu extends CompoundContributionItem
 
     private static class SeparatorContributionItem extends ContributionItem
     {
-        public void fill(Menu parent, int index)
+        @Override public void fill(Menu parent, int index)
         {
             new MenuItem(parent, SWT.SEPARATOR, index);
         }
@@ -335,7 +335,7 @@ public final class RefactorMenu extends CompoundContributionItem
 
     private static class EmptyMenuContributionItem extends ContributionItem
     {
-        public void fill(Menu parent, int index)
+        @Override public void fill(Menu parent, int index)
         {
             MenuItem item = new MenuItem(parent, SWT.NONE, index);
             item.setText("(No refactorings available)");

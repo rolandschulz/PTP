@@ -43,6 +43,7 @@ public class ASTVariableCommaNode extends ASTNode
     }
 
 
+    @Override
     public void accept(IASTVisitor visitor)
     {
         visitor.visitASTVariableCommaNode(this);
