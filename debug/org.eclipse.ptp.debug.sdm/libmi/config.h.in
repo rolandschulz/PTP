@@ -1,0 +1,84 @@
+/* config.h.in.  Generated from configure.in by autoheader.  */
+
+#define DEBUG
+#ifdef DEBUG
+extern int debug_level;
+extern void debug_printf(int, char *, ...);
+#define DEBUG_LEVEL_NONE		0x00
+#define DEBUG_LEVEL_ALL			0xff
+#define DEBUG_LEVEL_STARTUP		0x01
+#define DEBUG_LEVEL_MESSAGES	0x02
+#define DEBUG_LEVEL_ROUTING		0x04
+#define DEBUG_LEVEL_SERVER		0x08
+#define DEBUG_LEVEL_BACKEND		0x10
+#define DEBUG_LEVEL_PROTOCOL	0x20
+#define TEST_DEBUG_LEVEL(level)			((debug_level&(level))==(level))
+#define DEBUG_PRINTF(level,format,...)	debug_printf((level),(format),__VA_ARGS__)
+#define DEBUG_PRINTS(level,str)			debug_printf((level),"%s",(str))
+#else /* DEBUG */
+#define DEBUG_PRINTF(level,format,...)
+#define DEBUG_PRINTS(level,str)
+#endif /* DEBUG */
+
+/* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
+#undef HAVE_DOPRNT
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `vprintf' function. */
+#undef HAVE_VPRINTF
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
+#undef TM_IN_SYS_TIME
