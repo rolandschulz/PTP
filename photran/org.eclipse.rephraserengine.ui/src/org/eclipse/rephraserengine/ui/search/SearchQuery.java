@@ -70,10 +70,12 @@ public abstract class SearchQuery<T extends AbstractTextSearchResult> implements
 
     public String getLabel()
     {
+        String description = "'" + patternDescription + "' - "; //$NON-NLS-1$ //$NON-NLS-2$
         int count = result.getMatchCount();
-        return "'" + patternDescription + "' - " + count
-            + (count == 1 ? " match in " : " matches in ")
-            + scopeDesc;
+        if (count == 1)
+            return description + Messages.bind(Messages.SearchQuery_OneMatch, scopeDesc);
+        else
+            return description + Messages.bind(Messages.SearchQuery_nMatches, scopeDesc);
     }
 
     public boolean canRerun()
@@ -120,7 +122,9 @@ public abstract class SearchQuery<T extends AbstractTextSearchResult> implements
         int numResources = countResources();
         int numPasses = numPasses();
 
-        monitor.beginTask("Searching for " + patternDescription + " in " + scopeDesc, numResources*numPasses);
+        monitor.beginTask(
+            Messages.bind(Messages.SearchQuery_SearchingFor, patternDescription, scopeDesc),
+            numResources*numPasses);
 
         SearchResourceVisitor visitor = new SearchResourceVisitor(monitor);
         for (IResource resource : scope)
@@ -206,7 +210,7 @@ public abstract class SearchQuery<T extends AbstractTextSearchResult> implements
 
             if (resource instanceof IFile)
             {
-                monitor.subTask("Searching " + resource.getName());
+                monitor.subTask(Messages.bind(Messages.SearchQuery_Searching, resource.getName()));
                 search((IFile)resource);
                 return false;
             }

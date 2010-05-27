@@ -65,9 +65,9 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     protected VPG<A, T, R, ? extends VPGDB<A, T, R, L>, L> getVPG()
     {
         if (vpg == null)
-            throw new IllegalStateException("This VPG database has not been "
-                + "assigned to a VPG.  Construct a VPGDB object, and then "
-                + "pass it to the VPG or EclipseVPG constructor.");
+            throw new IllegalStateException("This VPG database has not been " //$NON-NLS-1$
+                + "assigned to a VPG.  Construct a VPGDB object, and then " //$NON-NLS-1$
+                + "pass it to the VPG or EclipseVPG constructor."); //$NON-NLS-1$
         else
             return vpg;
     }
@@ -243,17 +243,18 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 
     protected String describeEdgeType(int edgeType)
     {
-        return "Edge of type " + edgeType;
+        return Messages.bind(Messages.VPGDB_EdgeOfType, edgeType);
     }
 
     protected String describeAnnotationType(int annotationType)
     {
-        return "Annotation of type " + annotationType;
+        return Messages.bind(Messages.VPGDB_AnnotationOfType, annotationType);
     }
 
     protected String describeToken(String filename, int offset, int length)
     {
-        return filename + ", offset " + offset + ", length " + length;
+        return Messages.bind(Messages.VPGDB_FilenameOffsetLength,
+                             new Object[] { filename, offset, length });
     }
 
     ////////////////////////////////////////////////////////////////////////////

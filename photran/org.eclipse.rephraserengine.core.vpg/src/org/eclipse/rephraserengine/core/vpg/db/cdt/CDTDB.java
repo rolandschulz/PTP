@@ -74,12 +74,12 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 
         try
         {
-            lock = new File(file.getPath() + ".lock");
+            lock = new File(file.getPath() + ".lock"); //$NON-NLS-1$
             db = new InternalCDTDB(file);
         }
         catch (CoreException e)
         {
-            throw new Error("Unable to create VPG database " + file.getName(), e);
+            throw new Error("Unable to create VPG database " + file.getName(), e); //$NON-NLS-1$
         }
     }
 
@@ -131,7 +131,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            throw new Error("Unable to flush VPG database to disk", e);
+            throw new Error("Unable to flush VPG database to disk", e); //$NON-NLS-1$
         }
     }
 
@@ -144,7 +144,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
         catch (CoreException e)
         {
-            throw new Error("Unable to close VPG database", e);
+            throw new Error("Unable to close VPG database", e); //$NON-NLS-1$
         }
     }
 
@@ -186,7 +186,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     
     private static File copyFile(File orig) throws IOException
     {
-        File tempFile = File.createTempFile("rephraser-tmp", "db");
+        File tempFile = File.createTempFile("rephraser-tmp", "db"); //$NON-NLS-1$ //$NON-NLS-2$
         FileChannel from = new FileInputStream(orig).getChannel();
         FileChannel to = new FileOutputStream(tempFile).getChannel();
         to.transferFrom(from, 0, from.size());
@@ -758,25 +758,25 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     {
         try
         {
-            out.println("MODIFICATION STAMPS:");
+            out.println("MODIFICATION STAMPS:"); //$NON-NLS-1$
             out.println();
             out.println(db.files.toString());
 
             out.println();
             out.println();
-            out.println("DEPENDENCIES:");
+            out.println("DEPENDENCIES:"); //$NON-NLS-1$
             out.println();
             out.println(db.dependencies.toString());
 
             out.println();
             out.println();
-            out.println("EDGES:");
+            out.println("EDGES:"); //$NON-NLS-1$
             out.println();
             out.println(db.edges.toString());
 
             out.println();
             out.println();
-            out.println("ANNOTATIONS:");
+            out.println("ANNOTATIONS:"); //$NON-NLS-1$
             out.println();
             try
             {
@@ -796,7 +796,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
 
     @Override public void printStatisticsOn(PrintStream out)
     {
-        out.println("(No statistics available)");
+        out.println("(No statistics available)"); //$NON-NLS-1$
     }
 
     @Override public void resetStatistics()

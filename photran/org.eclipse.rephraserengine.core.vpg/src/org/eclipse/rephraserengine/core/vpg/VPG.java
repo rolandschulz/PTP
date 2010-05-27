@@ -206,7 +206,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
         for (int i = 0; i < files.size(); i++)
         {
             if (monitor.isCanceled()) throw new OperationCanceledException();
-            monitor.subTask("Sorting files according to dependencies - enqueuing dependents (" + i + " of " + files.size() + ")");
+            monitor.subTask(Messages.bind(Messages.VPG_SortingFilesEnqueuingDependents, i, files.size()));
 
             enqueueNewDependents(files.get(i), files);
         }
@@ -236,7 +236,8 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
             private void dfsVisit(String u)
             {
                 if (monitor.isCanceled()) throw new OperationCanceledException();
-                monitor.subTask("Sorting files according to dependencies - sorting dependents of " + u + " (" + time + " of " + files.size() + ")");
+                monitor.subTask(Messages.bind(Messages.VPG_SortingFilesSortingDependents,
+                                              new Object[] { u, time, files.size() }));
 
                 color.put(u, GRAY);
                 time++;
@@ -255,7 +256,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 
     protected void processingDependent(String filename, String dependentFilename)
     {
-        debug("- Processing dependent file " + dependentFilename, filename);
+        debug(Messages.VPG_ProcessingDependentFile + dependentFilename, filename);
     }
 
     protected void enqueueNewDependents(String filename,
@@ -467,7 +468,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
         files = sortFilesAccordingToDependencies(files, pm);
 
         pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-        pm.beginTask("Post-transform analysis:", files.size());
+        pm.beginTask(Messages.VPG_PostTransformAnalysis, files.size());
         for (String thisFile : files)
         {
             pm.subTask(lastSegmentOfFilename(thisFile));
@@ -487,7 +488,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 
     public static String lastSegmentOfFilename(String filename)
     {
-        if (filename == null) return "";
+        if (filename == null) return ""; //$NON-NLS-1$
 
         int lastSlash = filename.lastIndexOf('/');
         int lastBackslash = filename.lastIndexOf('\\');
@@ -546,11 +547,11 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 
     public String describeEdgeType(int edgeType)
     {
-        return "Edge of type " + edgeType;
+        return Messages.bind(Messages.VPG_EdgeOfType, edgeType);
     }
 
     public String describeAnnotationType(int annotationType)
     {
-        return "Annotation of type " + annotationType;
+        return Messages.bind(Messages.VPG_AnnotationOfType, annotationType);
     }
 }

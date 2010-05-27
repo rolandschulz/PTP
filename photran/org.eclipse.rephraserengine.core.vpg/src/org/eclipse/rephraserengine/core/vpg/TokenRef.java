@@ -89,7 +89,7 @@ public class TokenRef<T> implements Serializable
 
     @Override public String toString()
     {
-        return "(Offset " + offset + ", length " + length + " in " + filename + ")";
+        return "(Offset " + offset + ", length " + length + " in " + filename + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override public boolean equals(Object other)

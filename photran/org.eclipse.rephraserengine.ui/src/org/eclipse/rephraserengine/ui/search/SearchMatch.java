@@ -56,7 +56,7 @@ public class SearchMatch extends Match
     public String toString()
     {
         return this.getElement().toString() +
-            ", offset " + this.getOffset() +
-            ", length " + this.getLength();
+            ", offset " + this.getOffset() + //$NON-NLS-1$
+            ", length " + this.getLength(); //$NON-NLS-1$
     }
 }

@@ -107,6 +107,6 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
 
 	@Override public String toString()
 	{
-		return "Edge of type " + type + " from " + source + " to " + sink;
+		return "Edge of type " + type + " from " + source + " to " + sink; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

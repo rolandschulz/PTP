@@ -104,8 +104,8 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
 
         Assert.isNotNull(diskDatabase);
         Assert.isTrue(diskDatabase != this);
-        Assert.isTrue(maxEdgeCacheEntries > 0, "maxEdgeCacheEntries must be a positive integer");
-        Assert.isTrue(maxAnnotationCacheEntries > 0, "maxAnnotationCacheEntries must be a positive integer");
+        Assert.isTrue(maxEdgeCacheEntries > 0, "maxEdgeCacheEntries must be a positive integer"); //$NON-NLS-1$
+        Assert.isTrue(maxAnnotationCacheEntries > 0, "maxAnnotationCacheEntries must be a positive integer"); //$NON-NLS-1$
 
         this.db = diskDatabase;
         this.maxEdgeCacheEntries = maxEdgeCacheEntries;
@@ -411,21 +411,21 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
 
     @Override public void printStatisticsOn(PrintStream out)
     {
-        out.println("Database Cache Statistics:");
+        out.println("Database Cache Statistics:"); //$NON-NLS-1$
 
         long edgeTotal = edgeHits + edgeMisses;
         float edgeHitRatio = edgeTotal == 0 ? 0 : ((float)edgeHits) / edgeTotal * 100;
-        out.println("    Edge Cache Hit Ratio:        " + edgeHits + "/" + edgeTotal + " (" + (long)Math.round(edgeHitRatio) + "%)");
+        out.println("    Edge Cache Hit Ratio:        " + edgeHits + "/" + edgeTotal + " (" + (long)Math.round(edgeHitRatio) + "%)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         long annotationTotal = annotationHits + annotationMisses;
         float annotationHitRatio = annotationTotal == 0 ? 0 : ((float)annotationHits) / annotationTotal * 100;
-        out.println("    Annotation Cache Hit Ratio: " + annotationHits + "/" + annotationTotal + " (" + (long)Math.round(annotationHitRatio) + "%)");
+        out.println("    Annotation Cache Hit Ratio: " + annotationHits + "/" + annotationTotal + " (" + (long)Math.round(annotationHitRatio) + "%)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         if (edgeMisses > 0)
-            out.println("    Average edge list build time: " + (totalEdgeListBuildTime/edgeMisses) + " ms");
+            out.println("    Average edge list build time: " + (totalEdgeListBuildTime/edgeMisses) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 
         if (annotationMisses > 0)
-            out.println("    Average annotation deserialization time: " + (totalDeserializationTime/annotationMisses) + " ms");
+            out.println("    Average annotation deserialization time: " + (totalDeserializationTime/annotationMisses) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 
 //      out.println();
 //      out.println("Cache Sizes:");

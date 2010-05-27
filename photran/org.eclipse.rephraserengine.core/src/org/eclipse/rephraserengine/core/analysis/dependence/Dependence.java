@@ -24,9 +24,9 @@ public class Dependence
 {
     public static enum Type
     {
-        FLOW_DEPENDENCE("Flow dependence"),
-        ANTI_DEPENDENCE("Anti-dependence"),
-        OUTPUT_DEPENDENCE("Output dependence");
+        FLOW_DEPENDENCE(Messages.Dependence_Flow),
+        ANTI_DEPENDENCE(Messages.Dependence_Anti),
+        OUTPUT_DEPENDENCE(Messages.Dependence_Output);
 
         private String description;
 
@@ -81,6 +81,8 @@ public class Dependence
 
     @Override public String toString()
     {
-        return type + " from " + from + " to " + to;
+        //return type + " from " + from + " to " + to;
+        return Messages.bind(Messages.Dependence_Description,
+                             new Object[] { type, from, to });
     }
 }

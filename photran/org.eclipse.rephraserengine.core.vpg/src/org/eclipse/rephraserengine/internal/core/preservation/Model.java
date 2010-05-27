@@ -138,13 +138,13 @@ public final class Model
         this.name = name;
         this.vpg = vpg;
 
-        pm.subTask("Preparing to compute " + name);
+        pm.subTask(Messages.Model_PreparingToCompute + name);
         this.files = vpg.sortFilesAccordingToDependencies(new ArrayList<String>(filenames), new NullProgressMonitor());
 
         this.filesWithNoEdges = new TreeSet<String>();
         
         pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-        pm.beginTask("Computing " + name + ":", files.size());
+        pm.beginTask(Messages.bind(Messages.Model_Computing, name), files.size());
         this.edges = new TreeSet<Entry>();
         for (String thisFile : files)
         {
@@ -187,7 +187,7 @@ public final class Model
     public void inormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
         pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-        pm.beginTask("Normalizing " + name, edges.size());
+        pm.beginTask(Messages.bind(Messages.Model_Normalizing, name), edges.size());
 
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
@@ -210,7 +210,7 @@ public final class Model
     public void dnormalize(PrimitiveOpList primitiveOps, Set<PreservationRule> preserveEdgeTypes, IProgressMonitor pm)
     {
         pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-        pm.beginTask("Normalizing " + name, edges.size());
+        pm.beginTask(Messages.bind(Messages.Model_Normalizing, name), edges.size());
 
         TreeSet<Entry> revisedList = new TreeSet<Entry>();
 
@@ -233,7 +233,8 @@ public final class Model
     public ModelDiff compareAgainst(Model that, IProgressMonitor pm)
     {
         pm = new SubProgressMonitor(pm, 0, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-        pm.beginTask("Differencing " + this.name + " and " + that.name,
+        pm.beginTask(
+            Messages.bind(Messages.Model_Differencing, this.name, that.name),
             this.edges.size() + that.edges.size());
 
         ModelDiff diff = new ModelDiff();
@@ -319,7 +320,7 @@ public final class Model
         StringBuilder sb = new StringBuilder();
 
         sb.append(edges.size());
-        sb.append(" edges\n\n");
+        sb.append(" edges\n\n"); //$NON-NLS-1$
 
         Set<Integer> edgeTypes = new TreeSet<Integer>();
         for (Entry entry : edges)
@@ -337,50 +338,50 @@ public final class Model
                         sb.append(':');
                     }
                     sb.append('[');
-                    sb.append(String.format("%5d", entry.source.lb));
-                    sb.append(", ");
-                    sb.append(String.format("%5d", entry.source.ub));
-                    sb.append(")  ===(");
+                    sb.append(String.format("%5d", entry.source.lb)); //$NON-NLS-1$
+                    sb.append(", "); //$NON-NLS-1$
+                    sb.append(String.format("%5d", entry.source.ub)); //$NON-NLS-1$
+                    sb.append(")  ===("); //$NON-NLS-1$
                     sb.append(entry.edgeType);
-                    sb.append(")==>  ");
+                    sb.append(")==>  "); //$NON-NLS-1$
                     if (!entry.sinkFilename.equals(filename))
                     {
                         sb.append(entry.sinkFilename);
                         sb.append(':');
                     }
                     sb.append('[');
-                    sb.append(String.format("%5d", entry.sink.lb));
-                    sb.append(", ");
-                    sb.append(String.format("%5d", entry.sink.ub));
-                    sb.append(")");
+                    sb.append(String.format("%5d", entry.sink.lb)); //$NON-NLS-1$
+                    sb.append(", "); //$NON-NLS-1$
+                    sb.append(String.format("%5d", entry.sink.ub)); //$NON-NLS-1$
+                    sb.append(")"); //$NON-NLS-1$
         
                     if (fileContents != null)
                     {
-                        sb.append("           [");
+                        sb.append("           ["); //$NON-NLS-1$
                         if (!entry.sourceFilename.equals(filename))
                             sb.append('?');
                         else if (entry.source.lb >= 0 && entry.source.ub >= entry.source.lb)
                             sb.append(extractText(fileContents, entry.source));
-                        sb.append("]");
+                        sb.append("]"); //$NON-NLS-1$
                         if (lineMap != null)
                         {
-                            sb.append(" (Line ");
+                            sb.append(" (Line "); //$NON-NLS-1$
                             sb.append(getLine(entry.source.lb, lineMap));
-                            sb.append(")");
+                            sb.append(")"); //$NON-NLS-1$
                         }
-                        sb.append("  ===(");
+                        sb.append("  ===("); //$NON-NLS-1$
                         sb.append(vpg.describeEdgeType(entry.edgeType));
-                        sb.append(")==>  [");
+                        sb.append(")==>  ["); //$NON-NLS-1$
                         if (!entry.sinkFilename.equals(filename))
                             sb.append('?');
                         else if (entry.sink.lb >= 0 && entry.sink.ub >= entry.sink.lb)
                             sb.append(extractText(fileContents, entry.sink));
-                        sb.append("]");
+                        sb.append("]"); //$NON-NLS-1$
                         if (lineMap != null)
                         {
-                            sb.append(" (Line ");
+                            sb.append(" (Line "); //$NON-NLS-1$
                             sb.append(getLine(entry.sink.lb, lineMap));
-                            sb.append(")");
+                            sb.append(")"); //$NON-NLS-1$
                         }
                     }
     
@@ -394,11 +395,11 @@ public final class Model
     private String extractText(String fileContents, Interval interval)
     {
         String result = fileContents.substring(interval.lb, interval.ub);
-        result = result.replace("\t", "\\t");
-        result = result.replace("\r", "\\r");
-        result = result.replace("\n", "\\n");
+        result = result.replace("\t", "\\t"); //$NON-NLS-1$ //$NON-NLS-2$
+        result = result.replace("\r", "\\r"); //$NON-NLS-1$ //$NON-NLS-2$
+        result = result.replace("\n", "\\n"); //$NON-NLS-1$ //$NON-NLS-2$
         if (result.length() > 17)
-            result = result.substring(0, 18) + "...";
+            result = result.substring(0, 18) + "..."; //$NON-NLS-1$
         return result;
     }
 

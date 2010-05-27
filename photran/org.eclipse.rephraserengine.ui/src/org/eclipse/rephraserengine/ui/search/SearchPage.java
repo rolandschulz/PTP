@@ -66,9 +66,9 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
     // Dialog store id constants
     /** @return a string used as a key to store dialog settings; should be unique per search page */
     protected abstract String PAGE_NAME();
-    private final static String STORE_PREVIOUS_PATTERNS = "previousPatterns";
-    private final static String STORE_REGEX_SEARCH = "regexSearch";
-    private final static String STORE_SEARCH_FLAGS = "searchFlags";
+    private final static String STORE_PREVIOUS_PATTERNS = "previousPatterns"; //$NON-NLS-1$
+    private final static String STORE_REGEX_SEARCH = "regexSearch"; //$NON-NLS-1$
+    private final static String STORE_SEARCH_FLAGS = "searchFlags"; //$NON-NLS-1$
 
     private Combo patternCombo;
     private String[] previousPatterns;
@@ -85,7 +85,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
     private ISearchPageContainer pageContainer;
 
     private Label patternLabel;
-    private final String globPatternString = "(* = any string, ? = any character)";
+    private final String globPatternString = Messages.SearchPage_AnyStringAnyCharLabel;
     
     /**
      * This method receives the workbench selection as an argument and returns the corresponding
@@ -133,8 +133,8 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
         catch (PatternSyntaxException e)
         {
             errorBox = new MessageBox(this.getShell(), SWT.ICON_ERROR | SWT.OK);
-            errorBox.setText("Invalid Search Pattern");
-            errorBox.setMessage("The search pattern entered is invalid:\n" + e.getMessage());
+            errorBox.setText(Messages.SearchPage_InvalidSearchPatternTitle);
+            errorBox.setMessage(Messages.SearchPage_SearchPatternIsInvalid + e.getMessage());
             errorBox.open();
             return false;
         }
@@ -176,19 +176,19 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
             char c = patternStr.charAt(i);
             switch (c) {
             case '*':
-                buff.append(".*");
+                buff.append(".*"); //$NON-NLS-1$
                 break;
             case '?':
-                buff.append(".");
+                buff.append("."); //$NON-NLS-1$
                 break;
             case '$':
-                buff.append("\\$");
+                buff.append("\\$"); //$NON-NLS-1$
                 break;
             default:
-                if (!Character.toString(c).matches("[0-9a-zA-Z._]")) {
-                    throw new PatternSyntaxException("Illegal character in pattern string", patternStr, i+1);
+                if (!Character.toString(c).matches("[0-9a-zA-Z._]")) { //$NON-NLS-1$
+                    throw new PatternSyntaxException(Messages.SearchPage_IllegalCharacterInPatternString, patternStr, i+1);
                 }
-                buff.append("" + c);
+                buff.append(Messages.SearchPage_11 + c);
             }
         }
         return buff.toString();
@@ -211,7 +211,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
         switch (getContainer().getSelectedScope())
         {
             case ISearchPageContainer.SELECTED_PROJECTS_SCOPE:
-                scopeDescription = "enclosing projects";
+                scopeDescription = Messages.SearchPage_ScopeDescription_EnclosingProjects;
                 if (structuredSelection != null)
                 {
                     for (Iterator< ? > i = structuredSelection.iterator(); i.hasNext();)
@@ -231,7 +231,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
                 break;
                 
             case ISearchPageContainer.SELECTION_SCOPE:
-                scopeDescription = "selected resources";
+                scopeDescription = Messages.SearchPage_ScopeDescription_SelectedResources;
                 if (structuredSelection != null)
                 {
                     for (Iterator< ? > i = structuredSelection.iterator(); i.hasNext();)
@@ -247,7 +247,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
                 
             case ISearchPageContainer.WORKING_SET_SCOPE:
                 IWorkingSet[] workingSets = getContainer().getSelectedWorkingSets();
-                scopeDescription = "Working Set - " + toString(workingSets); // CSearchUtil.toString(workingSets);
+                scopeDescription = Messages.SearchPage_ScopeDescription_WorkingSet + toString(workingSets); // CSearchUtil.toString(workingSets);
                 for (int i = 0; i < workingSets.length; ++i)
                 {
                     IAdaptable[] wsElements = workingSets[i].getElements();
@@ -265,7 +265,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
             case ISearchPageContainer.WORKSPACE_SCOPE:
             default:
                 scope.add(ResourcesPlugin.getWorkspace().getRoot());
-                scopeDescription = "Workspace";
+                scopeDescription = Messages.SearchPage_ScopeDescription_Workspace;
                 break;
         }
         return scopeDescription;
@@ -334,7 +334,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
         gd.horizontalSpan = 2;
 
         Label label = new Label(result, SWT.LEFT);
-        label.setText("Search pattern:");
+        label.setText(Messages.SearchPage_SearchPatternLabel);
         label.setLayoutData(gd);
 
         // Pattern combo
@@ -350,7 +350,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
         
         gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
         regexButton = new Button(result, SWT.CHECK);
-        regexButton.setText("Regular e&xpression");
+        regexButton.setText(Messages.SearchPage_RegularExpressionLabel);
         gd = new GridData();
         regexButton.setLayoutData(gd);
         regexButton.addSelectionListener(new SelectionAdapter()
@@ -386,7 +386,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
         prepareToCreateSearchAndLimitButtons(groupsComposite);
         
         Group group = new Group(groupsComposite, SWT.NONE);
-        group.setText("Search for");
+        group.setText(Messages.SearchPage_SearchForLabel);
         layout = new GridLayout();
         layout.numColumns = 2;
         group.setLayout(layout);
@@ -395,7 +395,7 @@ public abstract class SearchPage extends DialogPage implements ISearchPage
         addSelectionListener(createSearchForButtons(group));
 
         group = new Group(groupsComposite, SWT.NONE);
-        group.setText("Limit to");
+        group.setText(Messages.SearchPage_LimitToLabel);
         layout = new GridLayout();
         layout.numColumns = 1;
         group.setLayout(layout);

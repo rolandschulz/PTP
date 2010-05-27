@@ -22,7 +22,7 @@ public abstract class VPGEditorRefactoring<A, T, V extends EclipseVPG<A, T, ? ex
 
     public void initialize(IFile file, ITextSelection selection)
     {
-        if (file == null) throw new IllegalArgumentException("file argument cannot be null");
+        if (file == null) throw new IllegalArgumentException("file argument cannot be null"); //$NON-NLS-1$
 
         this.fileInEditor = file;
         this.selectedRegionInEditor = selection;
@@ -44,6 +44,6 @@ public abstract class VPGEditorRefactoring<A, T, V extends EclipseVPG<A, T, ? ex
         this.astOfFileInEditor = vpg.acquireTransientAST(fileInEditor);
         logVPGErrors(status, fileInEditor);
         if (astOfFileInEditor == null)
-            fail("The file in the editor cannot be parsed.");
+            fail(Messages.VPGEditorRefactoring_FileInTheEditorCannotBeParsed);
     }
 }

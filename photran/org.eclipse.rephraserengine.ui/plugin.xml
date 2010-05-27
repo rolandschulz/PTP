@@ -22,7 +22,7 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=navigate">
         <menu
            id="org.eclipse.search.menu"
-           label="Se&amp;arch">
+           label="%menu.label">
            <!--groupMarker name="dialogGroup"/-->           <!-- to be used by clients      -->
            <separator name="dialogGroup"/> <!-- to be used by clients      -->
            <separator name="fileSearchContextMenuActionsGroup"/> <!-- to be used by clients      -->

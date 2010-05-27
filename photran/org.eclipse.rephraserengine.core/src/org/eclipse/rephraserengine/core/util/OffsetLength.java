@@ -153,6 +153,6 @@ public final class OffsetLength
 
     @Override public String toString()
     {
-        return "offset " + offset + ", length " + length;
+        return "offset " + offset + ", length " + length; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

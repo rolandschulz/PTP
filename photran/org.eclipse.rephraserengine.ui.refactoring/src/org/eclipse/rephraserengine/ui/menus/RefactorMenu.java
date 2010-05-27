@@ -61,7 +61,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 @SuppressWarnings("restriction")
 public final class RefactorMenu extends CompoundContributionItem
 {
-    private static final String REFACTORING_EXTENSION_POINT_ID = "org.eclipse.rephraserengine.ui.refactoring.refactorings";
+    private static final String REFACTORING_EXTENSION_POINT_ID = "org.eclipse.rephraserengine.ui.refactoring.refactorings"; //$NON-NLS-1$
 
     private WorkbenchSelectionInfo selection;
 
@@ -118,27 +118,27 @@ public final class RefactorMenu extends CompoundContributionItem
     private void processConfigElt(IConfigurationElement elt, LinkedList<IContributionItem> result)
         throws CoreException
     {
-        if (elt.getName().equals("resourceFilter"))
+        if (elt.getName().equals("resourceFilter")) //$NON-NLS-1$
         {
-            IResourceFilter resourceFilter = (IResourceFilter)elt.createExecutableExtension("class");
+            IResourceFilter resourceFilter = (IResourceFilter)elt.createExecutableExtension("class"); //$NON-NLS-1$
             selection = new WorkbenchSelectionInfo(resourceFilter); // since resourceFilter changed
         }
-        else if (elt.getName().equals("group"))
+        else if (elt.getName().equals("group")) //$NON-NLS-1$
         {
             if (!result.isEmpty() && !(result.getLast() instanceof SeparatorContributionItem))
                 result.add(new SeparatorContributionItem());
 
             result.addAll(loadRefactoringsFrom(elt.getChildren()));
         }
-        else if (elt.getName().equals("resourceRefactoring"))
+        else if (elt.getName().equals("resourceRefactoring")) //$NON-NLS-1$
         {
             addResourceRefactoring(elt, result);
         }
-        else if (elt.getName().equals("editorRefactoring"))
+        else if (elt.getName().equals("editorRefactoring")) //$NON-NLS-1$
         {
             addEditorRefactoring(elt, result);
         }
-        else if (elt.getName().equals("command"))
+        else if (elt.getName().equals("command")) //$NON-NLS-1$
         {
             addCommand(elt, result);
         }
@@ -150,16 +150,16 @@ public final class RefactorMenu extends CompoundContributionItem
     {
         if (selection.someFilesAreSelected())
         {
-            if (elt.getAttribute("class") != null && environmentOK(elt))
+            if (elt.getAttribute("class") != null && environmentOK(elt)) //$NON-NLS-1$
             {
                 try
                 {
-                    IResourceRefactoring refactoring = (IResourceRefactoring)elt.createExecutableExtension("class");
-                    String label = elt.getAttribute("label");
+                    IResourceRefactoring refactoring = (IResourceRefactoring)elt.createExecutableExtension("class"); //$NON-NLS-1$
+                    String label = elt.getAttribute("label"); //$NON-NLS-1$
                     CustomUserInputPage customInputPage =
-                        elt.getAttribute("inputPage") == null
+                        elt.getAttribute("inputPage") == null //$NON-NLS-1$
                         ? null
-                        : (CustomUserInputPage)elt.createExecutableExtension("inputPage");
+                        : (CustomUserInputPage)elt.createExecutableExtension("inputPage"); //$NON-NLS-1$
                     result.add(new ResourceRefactoringContributionItem(
                         refactoring,
                         label,
@@ -171,9 +171,9 @@ public final class RefactorMenu extends CompoundContributionItem
                     t.printStackTrace();
                 }
             }
-            else if (elt.getAttribute("command") != null)
+            else if (elt.getAttribute("command") != null) //$NON-NLS-1$
             {
-                result.add(commandContribution(elt.getAttribute("command")));
+                result.add(commandContribution(elt.getAttribute("command"))); //$NON-NLS-1$
             }
         }
     }
@@ -184,16 +184,16 @@ public final class RefactorMenu extends CompoundContributionItem
     {
         if (selection.editingAnIFile() && selection.isTextSelectedInEditor())
         {
-            if (elt.getAttribute("class") != null && environmentOK(elt))
+            if (elt.getAttribute("class") != null && environmentOK(elt)) //$NON-NLS-1$
             {
                 try
                 {
-                    IEditorRefactoring refactoring = (IEditorRefactoring)elt.createExecutableExtension("class");
-                    String label = elt.getAttribute("label");
+                    IEditorRefactoring refactoring = (IEditorRefactoring)elt.createExecutableExtension("class"); //$NON-NLS-1$
+                    String label = elt.getAttribute("label"); //$NON-NLS-1$
                     CustomUserInputPage customInputPage =
-                        elt.getAttribute("inputPage") == null
+                        elt.getAttribute("inputPage") == null //$NON-NLS-1$
                         ? null
-                        : (CustomUserInputPage)elt.createExecutableExtension("inputPage");
+                        : (CustomUserInputPage)elt.createExecutableExtension("inputPage"); //$NON-NLS-1$
                     result.add(new EditorRefactoringContributionItem(
                         refactoring,
                         label,
@@ -206,24 +206,24 @@ public final class RefactorMenu extends CompoundContributionItem
                     t.printStackTrace();
                 }
             }
-            else if (elt.getAttribute("command") != null)
+            else if (elt.getAttribute("command") != null) //$NON-NLS-1$
             {
-                result.add(commandContribution(elt.getAttribute("command")));
+                result.add(commandContribution(elt.getAttribute("command"))); //$NON-NLS-1$
             }
         }
     }
 
     private boolean environmentOK(IConfigurationElement elt)
     {
-        if (elt.getAttribute("require_env") != null)
-            return System.getenv(elt.getAttribute("require_env")) != null;
+        if (elt.getAttribute("require_env") != null) //$NON-NLS-1$
+            return System.getenv(elt.getAttribute("require_env")) != null; //$NON-NLS-1$
         else
             return true;
     }
 
     private void addCommand(IConfigurationElement elt, LinkedList<IContributionItem> result)
     {
-        result.add(commandContribution(elt.getAttribute("id")));
+        result.add(commandContribution(elt.getAttribute("id"))); //$NON-NLS-1$
     }
 
     @SuppressWarnings("deprecation")
@@ -265,7 +265,7 @@ public final class RefactorMenu extends CompoundContributionItem
             List<IFile> selectedFiles)
         {
             this.refactoring = refactoring;
-            this.label = label != null ? label : refactoring.getName() + "...";
+            this.label = label != null ? label : refactoring.getName() + "..."; //$NON-NLS-1$
             this.customInputPage = customInputPage;
             this.selectedFiles = selectedFiles;
         }
@@ -303,7 +303,7 @@ public final class RefactorMenu extends CompoundContributionItem
             ITextSelection textSelection)
         {
             this.refactoring = refactoring;
-            this.label = label != null ? label : refactoring.getName() + "...";
+            this.label = label != null ? label : refactoring.getName() + "..."; //$NON-NLS-1$
             this.customInputPage = customInputPage;
             this.fileInEditor = fileInEditor;
             this.textSelection = textSelection;
@@ -338,7 +338,7 @@ public final class RefactorMenu extends CompoundContributionItem
         @Override public void fill(Menu parent, int index)
         {
             MenuItem item = new MenuItem(parent, SWT.NONE, index);
-            item.setText("(No refactorings available)");
+            item.setText(Messages.RefactorMenu_NoRefactoringsAvailable);
             item.setEnabled(false);
         }
     };

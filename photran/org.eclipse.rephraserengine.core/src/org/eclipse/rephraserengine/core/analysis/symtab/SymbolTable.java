@@ -325,29 +325,29 @@ public class SymbolTable<N, S>
 
         for (N namespace : entries.keySet())
         {
-            sb.append(namespace.toString().toUpperCase() + " NAMESPACE:\n");
+            sb.append(namespace.toString().toUpperCase() + " NAMESPACE:\n"); //$NON-NLS-1$
 
             for (String name : entries.getAllEntriesFor(namespace).keySet())
-                sb.append("    " + name + " -> " + entries.getEntry(namespace, name) + "\n");
+                sb.append("    " + name + " -> " + entries.getEntry(namespace, name) + "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-            sb.append("\n");
+            sb.append("\n"); //$NON-NLS-1$
         }
 
         if (!namedScopes.isEmpty())
         {
-            sb.append("This symbol table contains the following named scopes:\n");
+            sb.append("This symbol table contains the following named scopes:\n"); //$NON-NLS-1$
 
             for (String name : namedScopes.keySet())
             {
-                sb.append("    ");
+                sb.append("    "); //$NON-NLS-1$
                 sb.append(name);
-                sb.append("\n");
+                sb.append("\n"); //$NON-NLS-1$
             }
         }
 
         if (parent != null)
         {
-            sb.append("\n\n==================== PARENT ====================\n");
+            sb.append("\n\n==================== PARENT ====================\n"); //$NON-NLS-1$
             sb.append(parent.toString());
         }
 

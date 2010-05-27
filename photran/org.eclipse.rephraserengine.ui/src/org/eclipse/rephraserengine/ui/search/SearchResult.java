@@ -79,7 +79,7 @@ public class SearchResult
 
     public String getTooltip()
     {
-        return "Search Result";
+        return Messages.SearchResult_SearchResultTooltip;
     }
 
     /* IFileMatchAdapter Implementation */

@@ -48,17 +48,17 @@ public class DisplayModelAction extends VPGOutputWindowAction
                         new BufferedReader(new InputStreamReader(info.getFileInEditor().getContents(true), info.getFileInEditor().getCharset())));
                     ps.println(filename);
                     ps.println();
-                    Model model = new Model("edge model", new NullProgressMonitor(), 0, vpg, filename);
+                    Model model = new Model("edge model", new NullProgressMonitor(), 0, vpg, filename); //$NON-NLS-1$
                     ps.print(model.toString(filename, fileContents, lineMap));
                     return;
                 }
             }
 
-            ps.print("Please open in the file in the editor before invoking this action.");
+            ps.print(Messages.DisplayModelAction_EditorMustBeOpen);
         }
         catch (Exception e)
         {
-            ps.print("An error occurred:\n");
+            ps.print(Messages.DisplayModelAction_AnErrorOccurred + "\n"); //$NON-NLS-1$
             e.printStackTrace(ps);
         }
     }

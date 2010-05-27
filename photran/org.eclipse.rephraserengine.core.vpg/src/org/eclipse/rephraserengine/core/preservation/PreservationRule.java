@@ -79,14 +79,14 @@ public final class PreservationRule
     @Override public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("Preserve ");
+        sb.append("Preserve "); //$NON-NLS-1$
         if (preserveIncoming && preserveOutgoing)
-            sb.append("all");
+            sb.append("all"); //$NON-NLS-1$
         else if (preserveIncoming)
-            sb.append("incoming");
+            sb.append("incoming"); //$NON-NLS-1$
         else if (preserveOutgoing)
-            sb.append("outgoing");
-        sb.append(" edges of type ");
+            sb.append("outgoing"); //$NON-NLS-1$
+        sb.append(" edges of type "); //$NON-NLS-1$
         sb.append(edgeTypeToPreserve);
         return sb.toString();
     }

@@ -22,8 +22,8 @@ public abstract class VPGResourceRefactoring<A, T, V extends EclipseVPG<A, T, ? 
 
     public void initialize(List<IFile> files)
     {
-        if (files == null) throw new IllegalArgumentException("files argument cannot be null");
-        if (files.isEmpty()) throw new IllegalArgumentException("files argument cannot be empty");
+        if (files == null) throw new IllegalArgumentException("files argument cannot be null"); //$NON-NLS-1$
+        if (files.isEmpty()) throw new IllegalArgumentException("files argument cannot be empty"); //$NON-NLS-1$
         
         // Copy the list to ensure it is mutable
         this.selectedFiles = new LinkedList<IFile>();

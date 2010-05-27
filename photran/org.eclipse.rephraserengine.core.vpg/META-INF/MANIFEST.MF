@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Rephraser Engine Core VPG Plug-in
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.rephraserengine.core.vpg
 Bundle-Version: 2.0.0.qualifier
-Bundle-Vendor: Eclipse.org - Photran
+Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.rephraserengine.core.preservation,
  org.eclipse.rephraserengine.core.vpg,
  org.eclipse.rephraserengine.core.vpg.db.caching,

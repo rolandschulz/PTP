@@ -45,9 +45,9 @@ public abstract class TokenList<T> implements Iterable<T>
         
         if (result.length != size)
             throw new IllegalStateException(
-                "TokenList#createTokenArray is not implemented correctly.  It was " +
-                "asked to create an array of length " + size + ", but it created " +
-                "an array of length " + result.length + " instead.");
+                "TokenList#createTokenArray is not implemented correctly.  It was " + //$NON-NLS-1$
+                "asked to create an array of length " + size + ", but it created " + //$NON-NLS-1$ //$NON-NLS-2$
+                "an array of length " + result.length + " instead."); //$NON-NLS-1$ //$NON-NLS-2$
         
         return result;
     }
@@ -72,7 +72,7 @@ public abstract class TokenList<T> implements Iterable<T>
     
     public void add(int index, T token)
     {
-        if (index < 0 || index > size) throw new IllegalArgumentException("Invalid index " + index);
+        if (index < 0 || index > size) throw new IllegalArgumentException("Invalid index " + index); //$NON-NLS-1$
         
         ensureCapacity();
         for (int i = size; i >= index; i--)
@@ -89,7 +89,7 @@ public abstract class TokenList<T> implements Iterable<T>
     
     public boolean remove(int index)
     {
-        if (index < 0 || index >= size) throw new IllegalArgumentException("Invalid index " + index);
+        if (index < 0 || index >= size) throw new IllegalArgumentException("Invalid index " + index); //$NON-NLS-1$
         
         for (int i = index + 1; i < size; i++)
             array[i-1] = array[i];
@@ -99,7 +99,7 @@ public abstract class TokenList<T> implements Iterable<T>
     
     public T get(int index)
     {
-        if (index < 0 || index >= size) throw new IllegalArgumentException("Invalid index " + index);
+        if (index < 0 || index >= size) throw new IllegalArgumentException("Invalid index " + index); //$NON-NLS-1$
 
         return array[index];
     }

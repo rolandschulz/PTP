@@ -44,10 +44,10 @@ public class GeneralizedGCDTest implements IDependenceTester
         int[] c = new int[2*n];
         c[0] = b[0] - a[0];
 
-        System.out.println("Solving\n" + coeffs + " * t =\n" + Arrays.toString(c));
+        System.out.println("Solving\n" + coeffs + " * t =\n" + Arrays.toString(c)); //$NON-NLS-1$ //$NON-NLS-2$
 
         IntVector sol = coeffs.solve(c);
-        System.out.println("    t =\n" + (sol == null ? "null" : sol));
+        System.out.println("    t =\n" + (sol == null ? "null" : sol)); //$NON-NLS-1$ //$NON-NLS-2$
 
         return sol != null && !sol.isZero() ? Result.POSSIBLE_DEPENDENCE : Result.NO_DEPENDENCE;
     }
@@ -84,7 +84,7 @@ public class GeneralizedGCDTest implements IDependenceTester
 
        public static IntMatrix create(int rows, int cols, int... vals)
        {
-           if (vals.length != rows*cols) throw new IllegalArgumentException("Wrong number of values");
+           if (vals.length != rows*cols) throw new IllegalArgumentException("Wrong number of values"); //$NON-NLS-1$
 
            IntMatrix result = zero(rows, cols);
            int i = 0;
@@ -142,8 +142,8 @@ public class GeneralizedGCDTest implements IDependenceTester
 
        protected void check(int row, int col)
        {
-           if (row < 1 || row > rows) throw new IllegalArgumentException("Invalid row " + row);
-           if (col < 1 || col > cols) throw new IllegalArgumentException("Invalid column " + col);
+           if (row < 1 || row > rows) throw new IllegalArgumentException("Invalid row " + row); //$NON-NLS-1$
+           if (col < 1 || col > cols) throw new IllegalArgumentException("Invalid column " + col); //$NON-NLS-1$
        }
 
        /**
@@ -169,7 +169,7 @@ public class GeneralizedGCDTest implements IDependenceTester
            {
                for (int col = 1; col <= cols; col++)
                {
-                   sb.append(String.format("%5d", get(row, col)));
+                   sb.append(String.format("%5d", get(row, col))); //$NON-NLS-1$
                }
                sb.append('\n');
            }
@@ -178,7 +178,7 @@ public class GeneralizedGCDTest implements IDependenceTester
 
        public boolean equalsUnwrapped(int... vals)
        {
-           if (vals.length != rows * cols) throw new IllegalArgumentException("Wrong length array");
+           if (vals.length != rows * cols) throw new IllegalArgumentException("Wrong length array"); //$NON-NLS-1$
 
            int i = 0;
            for (int row = 1; row <= rows; row++)
@@ -346,7 +346,7 @@ public class GeneralizedGCDTest implements IDependenceTester
 
            @Override public String toString()
            {
-               return "A =\n" + a + "\n\nD =\n" + d + "\n\nU =\n" + u;
+               return "A =\n" + a + "\n\nD =\n" + d + "\n\nU =\n" + u; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
            }
        }
 
@@ -487,7 +487,7 @@ public class GeneralizedGCDTest implements IDependenceTester
 
        protected void check(int element)
        {
-           if (element < 1 || element > data.length) throw new IllegalArgumentException("Invalid element " + element);
+           if (element < 1 || element > data.length) throw new IllegalArgumentException("Invalid element " + element); //$NON-NLS-1$
        }
 
        /**
@@ -503,7 +503,7 @@ public class GeneralizedGCDTest implements IDependenceTester
            StringBuilder sb = new StringBuilder();
            for (int row = 1; row <= size(); row++)
            {
-               sb.append(String.format("%5d", get(row)));
+               sb.append(String.format("%5d", get(row))); //$NON-NLS-1$
                sb.append('\n');
            }
            return sb.toString();
@@ -511,7 +511,7 @@ public class GeneralizedGCDTest implements IDependenceTester
 
        public boolean equalsUnwrapped(int... vals)
        {
-           if (vals.length != data.length) throw new IllegalArgumentException("Wrong length array");
+           if (vals.length != data.length) throw new IllegalArgumentException("Wrong length array"); //$NON-NLS-1$
 
            return Arrays.equals(vals, data);
        }

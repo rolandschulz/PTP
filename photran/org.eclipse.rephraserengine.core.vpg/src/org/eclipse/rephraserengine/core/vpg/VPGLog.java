@@ -111,9 +111,9 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
     protected VPG<?, T, R, ? extends VPGDB<?, T, R, ?>, ? extends VPGLog<T, R>> getVPG()
     {
         if (vpg == null)
-            throw new IllegalStateException("This VPG database has not been "
-                + "assigned to a VPG.  Construct a VPGDB object, and then "
-                + "pass it to the VPG or EclipseVPG constructor.");
+            throw new IllegalStateException("This VPG database has not been " //$NON-NLS-1$
+                + "assigned to a VPG.  Construct a VPGDB object, and then " //$NON-NLS-1$
+                + "pass it to the VPG or EclipseVPG constructor."); //$NON-NLS-1$
         else
             return vpg;
     }
@@ -211,9 +211,9 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(e.getClass().getName());
-		sb.append(": ");
+		sb.append(": "); //$NON-NLS-1$
 		sb.append(e.getMessage());
-		sb.append("\n");
+		sb.append("\n"); //$NON-NLS-1$
 		ByteArrayOutputStream bs = new ByteArrayOutputStream();
 		e.printStackTrace(new PrintStream(bs));
 		sb.append(bs);
@@ -288,19 +288,16 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
         {
             Entry entry = log.get(i);
 
-	        out.print(entry.isError() ? "ERROR:   " : "Warning: ");
+	        out.print(entry.isError() ? Messages.VPGLog_ErrorLabel : Messages.VPGLog_WarningLabel);
 	        out.println(entry.getMessage());
 
 	        R t = entry.getTokenRef();
 	        if (t != null)
 	        {
-	            out.print("         (");
-	            out.print(t.getFilename());
-                out.print(", offset ");
-                out.print(t.getOffset());
-                out.print(", length ");
-                out.print(t.getLength());
-                out.println(")");
+	            out.print(
+	                Messages.bind(
+	                    Messages.VPGLog_FilenameOffsetLength,
+	                    new Object[] { t.getFilename(), t.getOffset(), t.getLength() }));
 	        }
 	    }
 	}
@@ -345,9 +342,9 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
     // Persistence Support
     ////////////////////////////////////////////////////////////////////////////////
 
-    private static final String EOL = System.getProperty("line.separator");
+    private static final String EOL = System.getProperty("line.separator"); //$NON-NLS-1$
 
-    private static final String EOL_ESCAPE = "&EOL;";
+    private static final String EOL_ESCAPE = "&EOL;"; //$NON-NLS-1$
     
     /**
      * @since 2.0
@@ -365,7 +362,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
         try
         {
             R tokenRef = null;
-            String message = "";
+            String message = ""; //$NON-NLS-1$
             for (int i = 0; i < log.size(); i++)
             {
                 Entry entry = log.get(i);
@@ -377,8 +374,8 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                 if (tokenRef == null)
                     output.write(EOL);
                 else
-                    output.write(tokenRef.getFilename() + "," +
-                        Integer.toString(tokenRef.getOffset()) + "," +
+                    output.write(tokenRef.getFilename() + "," + //$NON-NLS-1$
+                        Integer.toString(tokenRef.getOffset()) + "," + //$NON-NLS-1$
                         Integer.toString(tokenRef.getLength()) +
                         EOL);
                 
@@ -415,7 +412,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
             boolean isWarning = false;
             R tokenRef = null;
             String[] tokenRefString = null;
-            String message = "";
+            String message = ""; //$NON-NLS-1$
             
             clear();
             
@@ -425,13 +422,13 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                 
                 //read tokenRef values
                 line = bRead.readLine();
-                if (line.trim().equals(""))
+                if (line.trim().equals("")) //$NON-NLS-1$
                 {
                     tokenRef = null;
                 }
                 else
                 {
-                    tokenRefString = line.split("\\,");
+                    tokenRefString = line.split("\\,"); //$NON-NLS-1$
                     tokenRef = vpg.createTokenRef(
                         tokenRefString[0],
                         Integer.parseInt(tokenRefString[1]),
@@ -441,7 +438,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                 //read message
                 line = bRead.readLine();
                 message = line;
-                message.replaceAll("&EOL;", EOL);
+                message.replaceAll("&EOL;", EOL); //$NON-NLS-1$
                 
                 log.add(new Entry(isWarning, message, tokenRef));
             }

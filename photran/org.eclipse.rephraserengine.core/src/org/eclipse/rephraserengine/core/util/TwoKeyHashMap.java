@@ -118,7 +118,7 @@ public final class TwoKeyHashMap<RowType, ColType, CellType> implements Iterable
     @Override public String toString()
     {
         StringBuffer sb = new StringBuffer();
-        sb.append("{");
+        sb.append("{"); //$NON-NLS-1$
         for (RowType r : table.keySet())
         {
             HashMap<ColType, CellType> thisRow = table.get(r);
@@ -126,17 +126,17 @@ public final class TwoKeyHashMap<RowType, ColType, CellType> implements Iterable
             {
                 for (ColType c : thisRow.keySet())
                 {
-                    sb.append("   ");
-                    sb.append("(");
+                    sb.append("   "); //$NON-NLS-1$
+                    sb.append("("); //$NON-NLS-1$
                     sb.append(r);
-                    sb.append(", ");
+                    sb.append(", "); //$NON-NLS-1$
                     sb.append(c);
-                    sb.append(") ==> ");
+                    sb.append(") ==> "); //$NON-NLS-1$
                     sb.append(thisRow.get(c));
                 }
             }
         }
-        sb.append("   }");
+        sb.append("   }"); //$NON-NLS-1$
         return sb.toString();
     }
 

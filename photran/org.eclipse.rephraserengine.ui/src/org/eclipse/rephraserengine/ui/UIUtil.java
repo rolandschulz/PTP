@@ -46,7 +46,7 @@ public final class UIUtil
 
     public static File createTempFile() throws IOException
     {
-        File tempFile = File.createTempFile("rephraser-tmp", ".txt");
+        File tempFile = File.createTempFile("rephraser-tmp", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
         tempFile.deleteOnExit();
         return tempFile;
     }
@@ -69,8 +69,8 @@ public final class UIUtil
         catch (IOException e)
         {
             MessageDialog.openError(determineActiveShell(),
-                                    "Error",
-                                    "Unable to create temporary file.\n\n" + e.getMessage());
+                                    Messages.UIUtil_ErrorTitle,
+                                    Messages.UIUtil_UnableToCreateTempFile + "\n\n" + e.getMessage()); //$NON-NLS-1$
         }
     }
 
@@ -94,8 +94,8 @@ public final class UIUtil
                         public void run()
                         {
                             MessageDialog.openError(determineActiveShell(),
-                                                    "Error",
-                                                    "Unable to open Web browser.\n\n" + e.getMessage());
+                                                    Messages.UIUtil_ErrorTitle,
+                                                    Messages.UIUtil_UnableToOpenWebBrowser + "\n\n" + e.getMessage()); //$NON-NLS-1$
                         }
                     });
                 }
@@ -116,14 +116,14 @@ public final class UIUtil
     public static void displayErrorDialog(String message)
     {
         MessageDialog.openError(determineActiveShell(),
-                                "Error",
+                                Messages.UIUtil_ErrorTitle,
                                 message);
     }
 
     public static void displayInfoDialog(String message)
     {
         MessageDialog.openInformation(determineActiveShell(),
-                                      "Note",
+                                      Messages.UIUtil_NoteTitle,
                                       message);
     }
 
@@ -219,9 +219,8 @@ public final class UIUtil
         if (shouldPrompt)
         {
             userSelection = MessageDialog.openConfirm(null,
-                "Save Files Before Refactoring",
-                "Some file(s) currently being edited have unsaved changes; these must be saved " +
-                "before the refactoring can proceed.\n\nDo you want to save these changes?");
+                Messages.UIUtil_SaveFileTitle,
+                Messages.UIUtil_FilesBeingEditedHaveUnsavedChanges);
         }
 
         return userSelection;

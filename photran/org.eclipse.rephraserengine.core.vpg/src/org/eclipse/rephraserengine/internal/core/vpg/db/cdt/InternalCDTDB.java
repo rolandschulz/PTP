@@ -311,9 +311,9 @@ public class InternalCDTDB
                     public boolean visit(int record) throws CoreException
                     {
                         sb.append(getFilename(record).getChars());
-                        sb.append(" (");
+                        sb.append(" ("); //$NON-NLS-1$
                         sb.append(record);
-                        sb.append(")\n");
+                        sb.append(")\n"); //$NON-NLS-1$
                         return true;
                     }
 
@@ -634,11 +634,11 @@ public class InternalCDTDB
                     public boolean visit(int record) throws CoreException
                     {
                         sb.append(files.getFilename(getDependentFileRecordPtr(record)).getChars());
-                        sb.append(" depends on ");
+                        sb.append(" depends on "); //$NON-NLS-1$
                         sb.append(files.getFilename(getDependsOnFileRecordPtr(record)).getChars());
-                        sb.append(" (");
+                        sb.append(" ("); //$NON-NLS-1$
                         sb.append(record);
-                        sb.append(")\n");
+                        sb.append(")\n"); //$NON-NLS-1$
                         return true;
                     }
 
@@ -1005,23 +1005,23 @@ public class InternalCDTDB
 
                     public boolean visit(int record) throws CoreException
                     {
-                        sb.append("Edge of type ");
+                        sb.append("Edge of type "); //$NON-NLS-1$
                         sb.append(getEdgeType(record));
-                        sb.append(" from ");
+                        sb.append(" from "); //$NON-NLS-1$
                         sb.append(files.getFilename(getFromFileRecordPtr(record)).getChars());
-                        sb.append(", offset ");
+                        sb.append(", offset "); //$NON-NLS-1$
                         sb.append(getFromOffset(record));
-                        sb.append(", length ");
+                        sb.append(", length "); //$NON-NLS-1$
                         sb.append(getFromLength(record));
-                        sb.append(" to ");
+                        sb.append(" to "); //$NON-NLS-1$
                         sb.append(files.getFilename(getToFileRecordPtr(record)).getChars());
-                        sb.append(", offset ");
+                        sb.append(", offset "); //$NON-NLS-1$
                         sb.append(getToOffset(record));
-                        sb.append(", length ");
+                        sb.append(", length "); //$NON-NLS-1$
                         sb.append(getToLength(record));
-                        sb.append(" (");
+                        sb.append(" ("); //$NON-NLS-1$
                         sb.append(record);
-                        sb.append(")\n");
+                        sb.append(")\n"); //$NON-NLS-1$
                         return true;
                     }
 
@@ -1132,7 +1132,7 @@ public class InternalCDTDB
                     }
                     catch (CoreException e)
                     {
-                        throw new IOException("Internal error reading serialized object from database: " + e.getMessage());
+                        throw new IOException("Internal error reading serialized object from database: " + e.getMessage()); //$NON-NLS-1$
                     }
                 }
             };
@@ -1297,17 +1297,17 @@ public class InternalCDTDB
 
                     public boolean visit(int record) throws CoreException
                     {
-                        sb.append("Annotation of type ");
+                        sb.append("Annotation of type "); //$NON-NLS-1$
                         sb.append(getAnnotationType(record));
-                        sb.append(" on ");
+                        sb.append(" on "); //$NON-NLS-1$
                         sb.append(files.getFilename(getFileRecordPtr(record)).getChars());
-                        sb.append(", offset ");
+                        sb.append(", offset "); //$NON-NLS-1$
                         sb.append(getOffset(record));
-                        sb.append(", length ");
+                        sb.append(", length "); //$NON-NLS-1$
                         sb.append(getLength(record));
-                        sb.append(" (");
+                        sb.append(" ("); //$NON-NLS-1$
                         sb.append(record);
-                        sb.append(")\n");
+                        sb.append(")\n"); //$NON-NLS-1$
                         return true;
                     }
 
@@ -1341,7 +1341,7 @@ public class InternalCDTDB
 
         public IntVector(int initialCapacity)
         {
-            if (initialCapacity < 0) throw new IllegalArgumentException("Initial capacity must be a positive integer (not " + initialCapacity + ")");
+            if (initialCapacity < 0) throw new IllegalArgumentException("Initial capacity must be a positive integer (not " + initialCapacity + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
             this.array = new int[initialCapacity];
             this.size = 0;
@@ -1395,13 +1395,13 @@ public class InternalCDTDB
         @Override public String toString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("[");
+            sb.append("["); //$NON-NLS-1$
             for (int i = 0; i < this.size; i++)
             {
-                if (i > 0) sb.append(", ");
+                if (i > 0) sb.append(", "); //$NON-NLS-1$
                 sb.append(this.array[i]);
             }
-            sb.append("]");
+            sb.append("]"); //$NON-NLS-1$
             return sb.toString();
         }
     }

@@ -30,7 +30,7 @@ public abstract class VPGOutputWindowAction extends VPGWindowActionDelegate
     @Override
     protected final void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {
-        progressMonitor.beginTask("Preparing text for display; please wait...",
+        progressMonitor.beginTask(Messages.VPGOutputWindowAction_PreparingTextForDisplay,
             IProgressMonitor.UNKNOWN);
 
         File temp = UIUtil.createTempFile();
@@ -38,7 +38,7 @@ public abstract class VPGOutputWindowAction extends VPGWindowActionDelegate
         writeOutput(vpg, ps);
         ps.close();
 
-        UIUtil.openHtmlViewerOn("", temp);
+        UIUtil.openHtmlViewerOn("", temp); //$NON-NLS-1$
 
         progressMonitor.done();
     }

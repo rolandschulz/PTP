@@ -5,7 +5,7 @@
    <!--=============================-->
    <!-- Refactoring Extension Point -->
    <!--=============================-->
-   <extension-point id="refactorings" name="Refactorings" schema="schema/refactorings.exsd" />
+   <extension-point id="refactorings" name="%extension-point.name" schema="schema/refactorings.exsd" />
 
    <!--===============-->
    <!-- Refactor Menu -->
@@ -20,7 +20,7 @@
          <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
               http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
          <menu
-               label="Refac&amp;tor"
+               label="%menu.label"
                id="org.eclipse.jdt.ui.refactoring.menu">
             <dynamic
                   class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"
@@ -36,7 +36,7 @@
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?after=group.reorganize">
          <menu
-               label="Refac&amp;tor"
+               label="%menu.label.0"
                id="org.eclipse.jdt.ui.refactoring.menu">
             <dynamic
                   class="org.eclipse.rephraserengine.ui.menus.RefactorMenu"

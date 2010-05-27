@@ -26,7 +26,7 @@ public class ClearDBAction extends VPGWindowActionDelegate
     @Override
     protected void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {
-        progressMonitor.beginTask("Clearing and rebuilding database", IProgressMonitor.UNKNOWN);
+        progressMonitor.beginTask(Messages.ClearDBAction_ClearingAndRebuildingDatabase, IProgressMonitor.UNKNOWN);
 
         vpg.db.clearDatabase();
         vpg.queueJobToEnsureVPGIsUpToDate();

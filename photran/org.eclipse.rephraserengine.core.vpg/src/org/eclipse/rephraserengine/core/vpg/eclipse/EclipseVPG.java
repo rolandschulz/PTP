@@ -109,7 +109,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         {
             try
             {
-                monitor.beginTask("Indexing", IProgressMonitor.UNKNOWN);
+                monitor.beginTask(Messages.EclipseVPG_Indexing, IProgressMonitor.UNKNOWN);
                 return ensureVPGIsUpToDate(monitor);
             }
             finally
@@ -140,7 +140,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
 
     private void collectFilesToIndex(WorkspaceSyncResourceVisitor visitor, IProgressMonitor monitor) throws CoreException
     {
-        monitor.subTask("Searching for workspace modifications...");
+        monitor.subTask(Messages.EclipseVPG_SearchingForWorkspaceModifications);
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         workspaceRoot.accept(visitor); // Collect list of files to index
     }
@@ -180,7 +180,11 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
             {
                 if (monitor.isCanceled()) throw new OperationCanceledException();
 
-                monitor.subTask(filename + " (calculating dependencies - file " + (++completed) + " of " + total + ")");
+                monitor.subTask(
+                    filename + " " + //$NON-NLS-1$
+                    Messages.bind(Messages.EclipseVPG_CalculatingDependencies,
+                                  ++completed,
+                                  total));
                 calculateDependenciesIfNotUpToDate(filename);
             }
         }
@@ -195,7 +199,10 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
                 if (monitor.isCanceled()) throw new OperationCanceledException();
 
                 if (shouldListFileInIndexerProgressMessages(filename))
-                    monitor.subTask(filename + " (" + (++completed) + " of " + total + ")");
+                    monitor.subTask(filename + " " + //$NON-NLS-1$
+                        Messages.bind(Messages.EclipseVPG_XofY,
+                                      ++completed,
+                                      total));
 
                 indexIfNotUpToDate(filename);
             }
@@ -250,10 +257,10 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
         {
             try
             {
-                monitor.beginTask("Indexing", IProgressMonitor.UNKNOWN);
+                monitor.beginTask(Messages.EclipseVPG_Indexing, IProgressMonitor.UNKNOWN);
                 // Re-index or delete entries for files when they are added/changed or deleted, respectively
                 VPGResourceDeltaVisitor visitor = new VPGResourceDeltaVisitor();
-                monitor.subTask("Searching for workspace modifications...");
+                monitor.subTask(Messages.EclipseVPG_SearchingForWorkspaceModifications);
                 delta.accept(visitor); // Collect files to index
                 visitor.calculateDependencies(monitor);
                 visitor.index(monitor);
@@ -301,13 +308,13 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
                 switch (delta.getKind())
                 {
                 case IResourceDelta.ADDED:
-                    debug("Resource Delta: Add", filename);
+                    debug("Resource Delta: Add", filename); //$NON-NLS-1$
                     files.add(filename);
                     forceReindex.put(filename, true); // Was false
                     break;
 
                 case IResourceDelta.CHANGED:
-                    debug("Resource Delta: Change", filename);
+                    debug("Resource Delta: Change", filename); //$NON-NLS-1$
                     if ((delta.getFlags() & (IResourceDelta.CONTENT|IResourceDelta.REPLACED)) != 0)
                     {
                         files.add(filename);
@@ -316,7 +323,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
                     break;
 
                 case IResourceDelta.REMOVED:
-                    debug("Resource Delta: Remove", filename);
+                    debug("Resource Delta: Remove", filename); //$NON-NLS-1$
                     log.clearEntriesFor(filename);
                     db.deleteAllEntriesFor(filename);
                     break;
@@ -337,7 +344,10 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
             {
                 if (monitor.isCanceled()) throw new OperationCanceledException();
 
-                monitor.subTask(filename + " (" + (++completed) + " of " + total + ")");
+                monitor.subTask(filename + " " + //$NON-NLS-1$
+                    Messages.bind(Messages.EclipseVPG_XofY,
+                        ++completed,
+                        total));
                 Boolean force = forceReindex.get(filename);
                 if (force == null || force)
                     forceRecomputationOfDependencies(filename);
@@ -355,7 +365,10 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
                 if (monitor.isCanceled()) throw new OperationCanceledException();
 
                 if (shouldListFileInIndexerProgressMessages(filename))
-                    monitor.subTask(filename + " (" + (++completed) + " of " + total + ")");
+                    monitor.subTask(filename + " " + //$NON-NLS-1$
+                        Messages.bind(Messages.EclipseVPG_XofY,
+                            ++completed,
+                            total));
 
                 Boolean force = forceReindex.get(filename);
                 if (force == null || force)
@@ -373,12 +386,12 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     {
         if (db.isOutOfDate(filename))
         {
-            debug("Indexing", filename);
+            debug(Messages.EclipseVPG_Indexing, filename);
             forceRecomputationOfDependencies(filename);
         }
         else
         {
-            debug("Index is up to date", filename);
+            debug(Messages.EclipseVPG_IndexIsUpToDate, filename);
         }
     }
 
@@ -389,12 +402,12 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
     {
         if (db.isOutOfDate(filename))
         {
-            debug("Indexing", filename);
+            debug(Messages.EclipseVPG_Indexing, filename);
             forceRecomputationOfEdgesAndAnnotations(filename);
         }
         else
         {
-            debug("Index is up to date", filename);
+            debug(Messages.EclipseVPG_IndexIsUpToDate, filename);
         }
     }
 

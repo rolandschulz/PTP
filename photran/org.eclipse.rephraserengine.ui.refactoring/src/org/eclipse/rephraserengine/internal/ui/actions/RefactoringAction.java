@@ -103,9 +103,9 @@ public class RefactoringAction<T extends Refactoring>
     {
         if (!(refactoring instanceof Refactoring))
         {
-            UIUtil.displayErrorDialog("ERROR: " + refactoring.getClass().getName() +
-                " is not a subclass of org.eclipse.ltk.core.refactoring.Refactoring." +
-                " A custom Action must be provided.");
+            UIUtil.displayErrorDialog("ERROR: " + refactoring.getClass().getName() + //$NON-NLS-1$
+                " is not a subclass of org.eclipse.ltk.core.refactoring.Refactoring." + //$NON-NLS-1$
+                " A custom Action must be provided."); //$NON-NLS-1$
             return;
         }
 
@@ -120,7 +120,7 @@ public class RefactoringAction<T extends Refactoring>
             e.printStackTrace();
             MessageDialog.openError(
                     activeShell,
-                    "Unhandled Exception",
+                    Messages.RefactoringAction_UnhandledExceptionTitle,
                     e.getMessage());
         }
         catch (InterruptedException e)
@@ -208,10 +208,9 @@ public class RefactoringAction<T extends Refactoring>
 
             Label lbl = new Label(top, SWT.NONE);
             lbl.setText(
-                "Click OK to run the " +
-                refactoring.getName() +
-                " refactoring.\n" +
-                "To see what changes will be made, click Preview.");
+                Messages.bind(
+                    Messages.RefactoringAction_ClickOKToRunTheRefactoring,
+                    refactoring.getName()));
         }
     }
 
@@ -263,9 +262,9 @@ public class RefactoringAction<T extends Refactoring>
                 || !method.getParameterTypes()[0].equals(parameterType))
             {
                 throw new IllegalArgumentException(
-                    "The method " + method.getName() + " may not have the @UserInput " +
-                    "annotation unless it has the following signature:\n" +
-                    "    void " + method.getName() + "(" + parameterType.getSimpleName() + ")");
+                    "The method " + method.getName() + " may not have the @UserInput " + //$NON-NLS-1$ //$NON-NLS-2$
+                    "annotation unless it has the following signature:\n" + //$NON-NLS-1$
+                    "    void " + method.getName() + "(" + parameterType.getSimpleName() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
         }
 
@@ -273,18 +272,18 @@ public class RefactoringAction<T extends Refactoring>
         {
             try
             {
-                if (defaultValueMethod != null && !defaultValueMethod.equals(""))
+                if (defaultValueMethod != null && !defaultValueMethod.equals("")) //$NON-NLS-1$
                 {
                     Method getter = refactoring.getClass().getMethod(defaultValueMethod);
                     String result = getter.invoke(refactoring).toString();
-                    return result == null ? "" : result;
+                    return result == null ? "" : result; //$NON-NLS-1$
                 }
-                else return "";
+                else return ""; //$NON-NLS-1$
             }
             catch (Throwable e)
             {
                 e.printStackTrace();
-                return "";
+                return ""; //$NON-NLS-1$
             }
         }
 
@@ -323,7 +322,7 @@ public class RefactoringAction<T extends Refactoring>
 
         private void addCheckBoxField(Composite group, String label, boolean defaultValue, final Method method)
         {
-            new Label(group, SWT.NONE).setText("");
+            new Label(group, SWT.NONE).setText(""); //$NON-NLS-1$
 
             final Button button = new Button(group, SWT.CHECK);
             button.setText(label);

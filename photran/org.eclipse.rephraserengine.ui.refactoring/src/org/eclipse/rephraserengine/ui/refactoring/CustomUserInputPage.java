@@ -35,7 +35,7 @@ public abstract class CustomUserInputPage<R extends Refactoring> extends UserInp
 
     public CustomUserInputPage()
     {
-        super("Refactoring");
+        super(Messages.CustomUserInputPage_RefactoringTitle);
     }
 
     /**
@@ -47,7 +47,7 @@ public abstract class CustomUserInputPage<R extends Refactoring> extends UserInp
     {
         if (refactoring == null)
             throw new IllegalArgumentException(
-                "CustomUserInputPage#setRefactoring(R refactoring): refactoring may not be null");
+                "CustomUserInputPage#setRefactoring(R refactoring): refactoring may not be null"); //$NON-NLS-1$
 
         this.refactoring = refactoring;
     }
@@ -61,8 +61,8 @@ public abstract class CustomUserInputPage<R extends Refactoring> extends UserInp
     {
         if (refactoring == null)
             throw new IllegalStateException(
-                "CustomUserInputPage#getRefactoring() may not be invoked until " +
-                "CustomUserInputPage#setRefactoring(R) has been invoked");
+                "CustomUserInputPage#getRefactoring() may not be invoked until " + //$NON-NLS-1$
+                "CustomUserInputPage#setRefactoring(R) has been invoked"); //$NON-NLS-1$
 
         return refactoring;
     }

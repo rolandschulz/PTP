@@ -25,7 +25,7 @@ public abstract class VPGPreservationBasedEditorRefactoring<A, T, V extends Ecli
     {
         try
         {
-            pm.beginTask("Checking final preconditions", 40);
+            pm.beginTask(Messages.VPGPreservationBasedEditorRefactoring_CheckingFinalPreconditions, 40);
 
             // If the user used the Back button in the refactoring wizard dialog,
             // the AST pointed to by astOfFileInEditor may have been released, so we

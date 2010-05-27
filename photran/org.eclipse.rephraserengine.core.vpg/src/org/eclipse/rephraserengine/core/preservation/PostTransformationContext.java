@@ -46,7 +46,7 @@ public class PostTransformationContext extends RefactoringStatusContext
 
     public String getFileContents()
     {
-        return newContents == null ? "" : newContents;
+        return newContents == null ? "" : newContents; //$NON-NLS-1$
     }
 
     public IRegion getTextRegion()

@@ -5,21 +5,21 @@
    <!--===============================-->
    <!-- VPG Extension Point -->
    <!--===============================-->
-   <extension-point id="vpg" name="VPG" schema="schema/vpg.exsd" />
+   <extension-point id="vpg" name="%extension-point.name" schema="schema/vpg.exsd" />
 
    <!--=======================================-->
    <!-- Debugging Actions in Refactoring Menu -->
    <!--=======================================-->
    <extension point="org.eclipse.ui.actionSets">
       <actionSet
-            label="Refactoring Debugging Actions"
-            description="Refactoring Debugging Actions"
+            label="%actionSet.label"
+            description="%actionSet.description"
             visible="false"
             id="org.eclipse.rephraserengine.ui.DebugActionSet">
          <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
               http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
          <menu
-               label="Refac&amp;tor"
+               label="%menu.label"
                path="edit"
                id="org.eclipse.jdt.ui.refactoring.menu">
                                                           <!-- JAVA REFACTORINGS IN THIS GROUP: -->
@@ -35,7 +35,7 @@
          </menu>
 
          <menu
-               label="(&amp;Debugging)"
+               label="%menu.label.0"
                path="org.eclipse.jdt.ui.refactoring.menu/scriptGroup"
                id="debugging">
             <separator name="debugging"/>
@@ -46,39 +46,39 @@
          <action
                class="org.eclipse.rephraserengine.internal.ui.actions.DisplayVPGErrorLogAction"
                id="org.eclipse.rephraserengine.ui.DisplayVPGErrorLogAction"
-               label="Display &amp;Error/Warning Log"
+               label="%action.label"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"/>
          <!-- -->
          <action
                class="org.eclipse.rephraserengine.internal.ui.actions.ResetDBStatisticsAction"
                id="org.eclipse.rephraserengine.ui.ResetVPGStatisticsAction"
-               label="&amp;Reset Database Statistics"
+               label="%action.label.0"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
          <action
                class="org.eclipse.rephraserengine.internal.ui.actions.DisplayDBStatisticsAction"
                id="org.eclipse.rephraserengine.ui.DisplayVPGStatisticsAction"
-               label="Display Database &amp;Statistics"
+               label="%action.label.1"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgstats"/>
          <!-- -->
          <action
                class="org.eclipse.rephraserengine.internal.ui.actions.ClearDBAction"
                id="org.eclipse.rephraserengine.ui.ClearVPGDatabaseAction"
-               label="Clear and Rebuild Database"
+               label="%action.label.2"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
          <action
                class="org.eclipse.rephraserengine.internal.ui.actions.EnsureDBUpToDateAction"
                id="org.eclipse.rephraserengine.ui.RefreshVPGDatabaseAction"
-               label="Ensure Database is Up-to-Date"
+               label="%action.label.3"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
          <action
                class="org.eclipse.rephraserengine.internal.ui.actions.DisplayModelAction"
                id="org.eclipse.rephraserengine.ui.DisplayVPGModelAction"
-               label="Display Edge Model of Current File"
+               label="%action.label.4"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
          <action
                class="org.eclipse.rephraserengine.internal.ui.actions.DisplayDBAction"
                id="org.eclipse.rephraserengine.ui.DisplayVPGDatabaseAction"
-               label="Display Database"
+               label="%action.label.5"
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/vpgdb"/>
       </actionSet>
    </extension>

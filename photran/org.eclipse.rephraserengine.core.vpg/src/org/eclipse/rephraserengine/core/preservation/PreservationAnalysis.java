@@ -102,10 +102,10 @@ public final class PreservationAnalysis
         for (PreservationRule type : edgeTypes)
             this.preserveEdgeTypes.add(type);
 
-        progressMonitor.subTask("Please wait; switching database to hypothetical mode");
+        progressMonitor.subTask(Messages.PreservationAnalysis_EnteringHypotheticalMode);
         ensureDatabaseIsInHypotheticalMode();
 
-        this.initialModel = new Model("initial model", progressMonitor, ticks, vpg, filenames);
+        this.initialModel = new Model("initial model", progressMonitor, ticks, vpg, filenames); //$NON-NLS-1$
     }
 
     private static List<String> getFilenames(Collection<IFile> files)
@@ -136,7 +136,7 @@ public final class PreservationAnalysis
         String filename = EclipseVPG.getFilenameForIFile(file);
         OffsetLength offsetLength = (OffsetLength)adapterManager.getAdapter(node, OffsetLength.class);
         if (offsetLength == null)
-            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName());
+            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName()); //$NON-NLS-1$
 
         Alpha alpha = PrimitiveOp.alpha(
             filename,
@@ -152,7 +152,7 @@ public final class PreservationAnalysis
         String filename = EclipseVPG.getFilenameForIFile(file);
         OffsetLength offsetLength = (OffsetLength)adapterManager.getAdapter(node, OffsetLength.class);
         if (offsetLength == null)
-            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName());
+            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName()); //$NON-NLS-1$
 
         Epsilon epsilon = PrimitiveOp.epsilon(
             filename,
@@ -167,7 +167,7 @@ public final class PreservationAnalysis
         String filename = EclipseVPG.getFilenameForIFile(file);
         OffsetLength offsetLength = (OffsetLength)adapterManager.getAdapter(node, OffsetLength.class);
         if (offsetLength == null)
-            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName());
+            throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName()); //$NON-NLS-1$
 
         Rho rho = PrimitiveOp.rho(
             filename,
@@ -187,22 +187,22 @@ public final class PreservationAnalysis
         RefactoringStatus status,
         IProgressMonitor progressMonitor, int ticks)
     {
-        printDebug("INITIAL MODEL", initialModel);
-        printDebug("NORMALIZING RELATIVE TO", primitiveOps);
+        printDebug("INITIAL MODEL", initialModel); //$NON-NLS-1$
+        printDebug("NORMALIZING RELATIVE TO", primitiveOps); //$NON-NLS-1$
 
         initialModel.inormalize(primitiveOps, preserveEdgeTypes, progressMonitor);
-        printDebug("NORMALIZED INITIAL MODEL", initialModel);
+        printDebug("NORMALIZED INITIAL MODEL", initialModel); //$NON-NLS-1$
 
-        printDebug("File ordering:", initialModel.getFiles());
+        printDebug("File ordering:", initialModel.getFiles()); //$NON-NLS-1$
         Model derivativeModel = new Model(
-            "derivative model",
+            "derivative model", //$NON-NLS-1$
             progressMonitor, ticks+3,
             vpg,
             initialModel.getFiles());
-        printDebug("DERIVATIVE MODEL", derivativeModel);
+        printDebug("DERIVATIVE MODEL", derivativeModel); //$NON-NLS-1$
 
         derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes, progressMonitor);
-        printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel);
+        printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel); //$NON-NLS-1$
 
         ModelDiff diff = initialModel.compareAgainst(derivativeModel, progressMonitor);
 
@@ -215,7 +215,7 @@ public final class PreservationAnalysis
     {
         try
         {
-            progressMonitor.subTask("Switching database out of hypothetical mode");
+            progressMonitor.subTask(Messages.PreservationAnalysis_ExitingHypotheticalMode);
             vpg.db.leaveHypotheticalMode();
         }
         catch (IOException e)
@@ -228,7 +228,7 @@ public final class PreservationAnalysis
     {
         System.out.println();
         System.out.println();
-        System.out.print(string); System.out.println(":");
+        System.out.print(string); System.out.println(":"); //$NON-NLS-1$
         System.out.println(object.toString());
     }
 
@@ -241,12 +241,11 @@ public final class PreservationAnalysis
             @Override
             public void processAllEdgesDeleted(Set<String> filesWithAllEdgesDeleted)
             {
-                String msg = "The following files will not compile if the transformation "
-                    + "is completed:";
+                String msg = Messages.PreservationAnalysis_TheFollowingFilesWillNotCompile;
                 status.addError(msg);
 
                 for (String filename : filesWithAllEdgesDeleted)
-                    status.addError("    " + filename,
+                    status.addError("    " + filename, //$NON-NLS-1$
                         new FileStatusContext(EclipseVPG.getIFileForFilename(filename), null));
             }
             
@@ -272,19 +271,20 @@ public final class PreservationAnalysis
             @Override
             public void processEdgeAdded(EdgeAdded addition)
             {
-                String msg = "Completing this transformation will introduce an unexpected "
-                    + vpg.describeEdgeType(addition.edgeType).toLowerCase()
-                    + " (" + addition + ")"
-                    ;
+                String msg =
+                    Messages.bind(
+                        Messages.PreservationAnalysis_TransformationWillIntroduce,
+                        vpg.describeEdgeType(addition.edgeType).toLowerCase(),
+                        addition);
                 status.addError(msg);
 
-                status.addError("    from here (click to view)",
+                status.addError(Messages.PreservationAnalysis_FromHere,
                     new PostTransformationContext(
                         addition.getFileContainingSourceRegion(),
                         getCode(addition.getFileContainingSourceRegion(), modifiedSourceCode),
                         addition.getSourceRegion()));
 
-                status.addError("    to here (click to view)",
+                status.addError(Messages.PreservationAnalysis_ToHere,
                     new PostTransformationContext(
                         addition.getFileContainingSinkRegion(),
                         getCode(addition.getFileContainingSinkRegion(), modifiedSourceCode),
@@ -294,19 +294,19 @@ public final class PreservationAnalysis
             @Override
             public void processEdgeDeleted(EdgeDeleted deletion)
             {
-                String msg = "Completing this transformation will cause an existing "
-                    + vpg.describeEdgeType(deletion.edgeType).toLowerCase()
-                    + " to be eliminated"
-                    + " (" + deletion + ")"
-                    ;
+                String msg =
+                    Messages.bind(
+                        Messages.PreservationAnalysis_TransformationWillEliminate,
+                        vpg.describeEdgeType(deletion.edgeType).toLowerCase(),
+                        deletion);
                 status.addError(msg);
 
-                status.addError("    from here (click to view)",
+                status.addError(Messages.PreservationAnalysis_FromHere,
                     new FileStatusContext(
                         deletion.getFileContainingSourceRegion(),
                         deletion.getSourceRegion()));
 
-                status.addError("    to here (click to view)",
+                status.addError(Messages.PreservationAnalysis_ToHere,
                     new FileStatusContext(
                         deletion.getFileContainingSinkRegion(),
                         deletion.getSinkRegion()));
@@ -315,28 +315,29 @@ public final class PreservationAnalysis
             @Override
             public void processEdgeSinkChanged(EdgeSinkChanged change)
             {
-                String msg = "Completing this transformation will cause an existing "
-                    + vpg.describeEdgeType(change.edgeType).toLowerCase()
-                    + " to change"
-                    + " (" + change + ")"
-                    ;
+                String msg =
+                    Messages.bind(
+                        Messages.PreservationAnalysis_TransformationWillChange,
+                        vpg.describeEdgeType(change.edgeType).toLowerCase(),
+                        change);
                 status.addError(msg);
 
-                status.addError("    The "
-                    + vpg.describeEdgeType(change.edgeType).toLowerCase()
-                    + " from here (click to view)",
+                status.addError(
+                    Messages.bind(
+                        Messages.PreservationAnalysis_EdgeWillChange,
+                        vpg.describeEdgeType(change.edgeType).toLowerCase()),
                     new PostTransformationContext(
                         change.getFileContainingSourceRegion(),
                         getCode(change.getFileContainingSourceRegion(), modifiedSourceCode),
                         change.getSourceRegion()));
 
-                status.addError("    to here (click to view)",
+                status.addError(Messages.PreservationAnalysis_ToHere,
                     new PostTransformationContext(
                         change.getFileContainingSinkRegion(),
                         getCode(change.getFileContainingSinkRegion(), modifiedSourceCode),
                         change.getSinkRegion()));
 
-                status.addError("    will instead point here (click to view)",
+                status.addError(Messages.PreservationAnalysis_WillPointHereInstead,
                     new PostTransformationContext(
                         change.getFileContainingNewSinkRegion(),
                         getCode(change.getFileContainingNewSinkRegion(), modifiedSourceCode),

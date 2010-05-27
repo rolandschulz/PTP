@@ -26,7 +26,7 @@ public class EnsureDBUpToDateAction extends VPGWindowActionDelegate
     @Override
     protected void run(EclipseVPG vpg, IProgressMonitor progressMonitor) throws Exception
     {
-        progressMonitor.beginTask("Refreshing database", IProgressMonitor.UNKNOWN);
+        progressMonitor.beginTask(Messages.EnsureDBUpToDateAction_RefreshingDatabase, IProgressMonitor.UNKNOWN);
         vpg.queueJobToEnsureVPGIsUpToDate();
         progressMonitor.done();
     }

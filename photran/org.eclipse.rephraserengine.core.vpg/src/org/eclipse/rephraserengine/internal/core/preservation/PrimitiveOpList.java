@@ -104,9 +104,9 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
     {
         for (PrimitiveOp existingOp : list)
             if (opToAdd.iaff().overlaps(existingOp.iaff()))
-                throw new IllegalArgumentException("Cannot add operation "
+                throw new IllegalArgumentException("Cannot add operation " //$NON-NLS-1$
                     + opToAdd
-                    + " because it overlaps "
+                    + " because it overlaps " //$NON-NLS-1$
                     + existingOp);
 
         list.add(opToAdd);

@@ -57,7 +57,7 @@ public abstract class VPGWindowActionDelegate
            implements IWorkbenchWindowActionDelegate,
                       IRunnableWithProgress
 {
-    private static final String VPG_EXTENSION_POINT_ID = "org.eclipse.rephraserengine.ui.vpg.vpg";
+    private static final String VPG_EXTENSION_POINT_ID = Messages.VPGWindowActionDelegate_0;
 
     private EclipseVPG vpg = null;
 
@@ -85,8 +85,8 @@ public abstract class VPGWindowActionDelegate
         {
             MessageDialog.openError(
                     activeShell,
-                    "Error",
-                    "None of the available refactoring engines have made their program databases (VPGs) available to this action.");
+                    Messages.VPGWindowActionDelegate_ErrorTitle,
+                    Messages.VPGWindowActionDelegate_NoVPGsAvailable);
         }
         else
         {
@@ -111,7 +111,7 @@ public abstract class VPGWindowActionDelegate
             e.printStackTrace();
             MessageDialog.openError(
                     activeShell,
-                    "Unhandled Exception",
+                    Messages.VPGWindowActionDelegate_UnhandledExceptionTitle,
                     e.getMessage());
         }
         catch (InterruptedException e)
@@ -144,7 +144,7 @@ public abstract class VPGWindowActionDelegate
 //                        "FYI",
 //                        "You chose " + configs[index].getAttribute("name"));
 
-                IEclipseVPGFactory factory = (IEclipseVPGFactory)configs[index].createExecutableExtension("class");
+                IEclipseVPGFactory factory = (IEclipseVPGFactory)configs[index].createExecutableExtension("class"); //$NON-NLS-1$
                 return factory.getVPG();
             }
         }
@@ -167,14 +167,14 @@ public abstract class VPGWindowActionDelegate
     {
         Map<Integer, String> vpgs = new TreeMap<Integer, String>();
         for (int i = 0; i < configs.length; i++)
-            vpgs.put(i, configs[i].getAttribute("name"));
+            vpgs.put(i, configs[i].getAttribute("name")); //$NON-NLS-1$
 
         ListDialog dlg = new ListDialog(activeShell);
         dlg.setInput(vpgs);
-        dlg.setTitle("Select VPG");
+        dlg.setTitle(Messages.VPGWindowActionDelegate_SelectVPGTitle);
         dlg.setContentProvider(new ArrayPairContentProvider());
         dlg.setLabelProvider(new ArrayPairLabelProvider());
-        dlg.setMessage("Please select which refactoring engine's database to use.");
+        dlg.setMessage(Messages.VPGWindowActionDelegate_SelectDatabaseToUse);
         dlg.setBlockOnOpen(true);
         if (dlg.open() == ListDialog.OK
                 && dlg.getResult() != null

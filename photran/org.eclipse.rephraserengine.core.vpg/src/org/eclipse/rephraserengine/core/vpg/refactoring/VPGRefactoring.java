@@ -39,7 +39,7 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
     ///////////////////////////////////////////////////////////////////////////
 
     /** The OS-dependent end-of-line sequence (\n or \r\n) */
-    protected static final String EOL = System.getProperty("line.separator");
+    protected static final String EOL = System.getProperty("line.separator"); //$NON-NLS-1$
 
     ///////////////////////////////////////////////////////////////////////////
     // Fields
@@ -59,7 +59,7 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
         
         RefactoringStatus status = new RefactoringStatus();
 
-        pm.beginTask("Ensuring index is up-to-date", IProgressMonitor.UNKNOWN);
+        pm.beginTask(Messages.VPGRefactoring_EnsuringIndexIsUpToDate, IProgressMonitor.UNKNOWN);
         vpg.ensureVPGIsUpToDate(pm);
         pm.done();
 
@@ -165,15 +165,15 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
     protected static class ForwardingProgressMonitor implements IProgressMonitor
     {
         private IProgressMonitor pm;
-        private String prefix = "";
+        private String prefix = ""; //$NON-NLS-1$
 
         public ForwardingProgressMonitor(IProgressMonitor pm)
         {
             this.pm = pm;
         }
 
-        public void beginTask(String name, int totalWork) { pm.beginTask(name, totalWork); pm.setTaskName(name); prefix = name + " - "; }
-        public void done() { prefix = ""; pm.setTaskName(""); pm.done(); }
+        public void beginTask(String name, int totalWork) { pm.beginTask(name, totalWork); pm.setTaskName(name); prefix = name + " - "; } //$NON-NLS-1$
+        public void done() { prefix = ""; pm.setTaskName(""); pm.done(); } //$NON-NLS-1$ //$NON-NLS-2$
         public void internalWorked(double work) { pm.internalWorked(work); }
         public boolean isCanceled() { return pm.isCanceled(); }
         public void setCanceled(boolean value) { pm.setCanceled(value); }
@@ -254,7 +254,7 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
     protected void addChangeFromModifiedAST(IFile file, IProgressMonitor pm) {
         try {
             A ast = vpg.acquireTransientAST(file);
-            TextFileChange changeThisFile = new TextFileChange(getName() + " - "
+            TextFileChange changeThisFile = new TextFileChange(getName() + " - " //$NON-NLS-1$
                     + file.getFullPath().toOSString(), file);
             changeThisFile.initializeValidationData(pm);
             changeThisFile.setEdit(new ReplaceEdit(0, getSizeOf(file), getSourceCodeFromAST(ast)));
@@ -284,9 +284,9 @@ public abstract class VPGRefactoring<A, T, V extends EclipseVPG<A, T, ? extends 
     protected void checkIfFileIsAccessibleAndWritable(IFile file) throws PreconditionFailure
     {
         if (!file.isAccessible())
-            fail("The file in the editor (" + file.getName() + ") is not accessible.");
+            fail(Messages.bind(Messages.VPGRefactoring_FileInTheEditorIsNotAccessible, file.getName()));
 
         if (file.isReadOnly())
-            fail("The file in the editor (" + file.getName() + ") is read-only.");
+            fail(Messages.bind(Messages.VPGRefactoring_FileInTheEditorIsReadOnly, file.getName()));
     }
 }

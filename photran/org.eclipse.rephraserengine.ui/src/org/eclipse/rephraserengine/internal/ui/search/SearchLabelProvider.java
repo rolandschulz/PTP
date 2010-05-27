@@ -43,8 +43,12 @@ public class SearchLabelProvider extends LabelProvider
     {
         String text = wrappedProvider.getText(element);
         int count = getMatchCount(element);
-        if (count == 0) { return text; }
-        return text + " (" + count + (count == 1 ? " match)" : " matches)");
+        switch (count)
+        {
+            case 0:  return text;
+            case 1:  return Messages.SearchLabelProvider_OneMatch;
+            default: return Messages.bind(Messages.SearchLabelProvider_nMatches, count);
+        }
     }
 
     protected int getMatchCount(Object element)

@@ -31,6 +31,7 @@ public class DefaultResourceFilter implements IResourceFilter
     
     public String getError(IResource resource)
     {
-        return "The resource (" + resource.getName() + ") is not accessible.";
+        return Messages.bind(Messages.DefaultResourceFilter_ResourceIsNotAccessible,
+                             resource.getName());
     }
 }

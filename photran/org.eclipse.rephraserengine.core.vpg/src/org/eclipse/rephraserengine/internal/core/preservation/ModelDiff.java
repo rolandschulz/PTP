@@ -108,7 +108,7 @@ public final class ModelDiff
 
         @Override public String toString()
         {
-            return sourceFilename + ":" + source + " -> " + sinkFilename + ":" + sink;
+            return sourceFilename + ":" + source + " -> " + sinkFilename + ":" + sink; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 
@@ -186,19 +186,19 @@ public final class ModelDiff
         {
             return
                 sourceFilename +
-                ":" +
+                ":" + //$NON-NLS-1$
                 source +
-                " -> " +
+                " -> " + //$NON-NLS-1$
                 sinkFilename +
-                ":" +
+                ":" + //$NON-NLS-1$
                 sink +
-                " will become " +
+                " will become " + //$NON-NLS-1$
                 sourceFilename +
-                ":" +
+                ":" + //$NON-NLS-1$
                 source +
-                " -> " +
+                " -> " + //$NON-NLS-1$
                 newSinkFilename +
-                ":" +
+                ":" + //$NON-NLS-1$
                 newSink;
         }
 

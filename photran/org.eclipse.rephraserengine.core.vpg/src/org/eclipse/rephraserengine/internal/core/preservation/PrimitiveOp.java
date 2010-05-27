@@ -96,7 +96,7 @@ public abstract class PrimitiveOp
             super(filename);
 
             if (j.lb != k.lb)
-                throw new IllegalArgumentException("Rho-operation has mismatched lower bounds");
+                throw new IllegalArgumentException("Rho-operation has mismatched lower bounds"); //$NON-NLS-1$
 
             this.j = j;
             this.k = k;
@@ -124,7 +124,7 @@ public abstract class PrimitiveOp
 
         @Override public String toString()
         {
-            return filename + ":" + "rho<" + j + ", " + k + ">";
+            return filename + ":" + "rho<" + j + ", " + k + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
 
         @Override public int hashCode()
