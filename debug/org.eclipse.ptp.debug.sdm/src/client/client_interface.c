@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "sdm.h"
 #include "dbg.h"
 #include "dbg_proxy.h"
 #include "session.h"
@@ -38,54 +39,110 @@
 #define CLIENT_TIMEOUT	50000
 #define SERVER_TIMEOUT	50000
 
-static void session_event_handler(void *, void *);
+static sdm_idset		tmp_idset;
+static bitset *			tmp_bitset;
 
-static proxy_clnt_helper_funcs clnt_helper_funcs = {
-	session_event_handler,
-	NULL
-};
-
-static void
-session_event_handler(void *event, void *data)
+sdm_idset
+bitset_to_idset(bitset *b)
 {
+	int bit;
+
+	sdm_set_clear(tmp_idset);
+
+	for (bit = 0; bit < bitset_size(b); bit++) {
+		if (bitset_test(b, bit)) {
+			sdm_set_add_element(tmp_idset, bit);
+		}
+	}
+
+	return tmp_idset;
+}
+
+bitset *
+idset_to_bitset(sdm_idset ids)
+{
+	sdm_id		id;
+
+	bitset_clear(tmp_bitset);
+
+	for (id = sdm_set_first(ids); !sdm_set_done(ids); id = sdm_set_next(ids)) {
+		bitset_set(tmp_bitset, id);
+	}
+
+	return tmp_bitset;
+}
+
+static int
+session_event_handler(sdm_message msg, void *data)
+{
+	int			len;
+	char *		buf;
 	dbg_event *	ev;
-	proxy_msg *	msg = (proxy_msg *)event;
+	proxy_msg *	pmsg;
 	session *	s = (session *)data;
-	
-	if (DbgDeserializeEvent(msg->msg_id, msg->num_args, msg->args, &ev) < 0)
-		return;
-	
-	if (s->sess_event_handler != NULL)
-		s->sess_event_handler(ev, s->sess_event_data);
+
+	sdm_message_get_payload(msg, &buf, &len);
+
+	if (proxy_deserialize_msg(buf, len, &pmsg) < 0) {
+ 		fprintf(stderr, "could not deserialize message");
+ 	 	sdm_message_free(msg);
+ 	 	return -1;
+	}
+
+	if (DbgDeserializeEvent(pmsg->msg_id, pmsg->arg_size, pmsg->args, &ev) < 0) {
+ 		fprintf(stderr, "bad conversion to debug event");
+ 	 	sdm_message_free(msg);
+ 	 	return -1;
+	}
+
+	if (s->sess_event_handler != NULL) {
+ 		s->sess_event_handler(ev, s->sess_event_data);
+	}
+
+ 	sdm_message_free(msg);
+
+ 	return 0;
+}
+
+static int
+send_command(bitset *procs, int timeout, char *cmd, int len, void *cbdata)
+{
+	sdm_message 	msg;
+	sdm_idset		dest = bitset_to_idset(procs);
+
+	msg = sdm_message_new(cmd, len);
+	sdm_aggregate_set_value(sdm_message_get_aggregate(msg), SDM_AGGREGATE_TIMEOUT, timeout);
+	sdm_set_union(sdm_message_get_destination(msg), dest);
+
+	sdm_aggregate_message(msg, SDM_AGGREGATE_DOWNSTREAM);
+
+	sdm_message_set_send_callback(msg, sdm_message_free);
+	sdm_message_send(msg);
+
+	return 0;
 }
 
 /*
  * Session initialization
  */
 int
-DbgInit(session **sess, char *name, char *attr, ...)
+DbgInit(session **sess, int argc, char *argv[])
 {
-	va_list			ap;
-	int				res;
 	session *		s;
-	struct timeval	tv = {0, CLIENT_TIMEOUT};
 	
-	s = (session *)malloc(sizeof(session));
+	*sess = s = (session *)malloc(sizeof(session));
 	
-	clnt_helper_funcs.eventdata = (void *)s;
-	
-	va_start(ap, attr);
-	res = proxy_clnt_init(name, &tv, &clnt_helper_funcs, &s->sess_proxy, attr, ap);
-	va_end(ap);
-	
-	if (res < 0) {
-		free(s);
+	tmp_idset = sdm_set_new();
+	tmp_bitset = bitset_new(s->sess_procs);
+
+	if (sdm_init(argc, argv) < 0) {
 		return -1;
 	}
-	
-	s->sess_event_handler = NULL;
-	*sess = s;
-	
+
+	s->sess_procs = sdm_route_get_size() - 1;
+
+	sdm_aggregate_set_completion_callback(session_event_handler, (void *)s);
+
 	return 0;
 }
 
@@ -104,17 +161,29 @@ DbgCreate(session *s)
 int
 DbgStartSession(session *s, char *dir, char *prog, char *args)
 {
+	int			res;
+	int			len;
+	char *		buf;
+	bitset *	procs = bitset_new(s->sess_procs);
 	proxy_msg *	msg = new_proxy_msg(DBG_STARTSESSION_CMD, 0);
-	
+
+	proxy_msg_add_int(msg, SERVER_TIMEOUT);
 	proxy_msg_add_string(msg, dir);
 	proxy_msg_add_string(msg, prog);
 	proxy_msg_add_string(msg, args);
-	
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
-	
+	proxy_serialize_msg(msg, &buf, &len);
+
+	/*
+	 * Create a bitset containing all processes
+	 */
+	bitset_invert(procs);
+
+	res = send_command(procs, DBG_EV_WAITALL, buf, len, NULL);
+
 	free_proxy_msg(msg);
+	bitset_free(procs);
 	
-	return 0;
+	return res;
 }
 
 /*
@@ -123,18 +192,22 @@ DbgStartSession(session *s, char *dir, char *prog, char *args)
 int 
 DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line)
 {
+	int			res;
+	int			len;
+	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_SETLINEBREAKPOINT_CMD, 0);
 
-	proxy_msg_add_bitset(msg, set);
 	proxy_msg_add_int(msg, bpid);
 	proxy_msg_add_string(msg, file);
 	proxy_msg_add_int(msg, line);
 
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
-	
+	proxy_serialize_msg(msg, &buf, &len);
+
+	res = send_command(set, DBG_EV_WAITALL, buf, len, NULL);
+
 	free_proxy_msg(msg);
 	
-	return 0;
+	return res;
 }
 
 int 
@@ -256,31 +329,37 @@ DbgSetWatchpoint(session *s, bitset *set, int bpid, char *expr, int access, int 
 int 
 DbgGo(session *s, bitset *set)
 {
+	int			res;
+	int			len;
+	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_GO_CMD, 0);
 
-	proxy_msg_add_bitset(msg, set);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
-	
+	res = send_command(set, DBG_EV_WAITSOME, buf, len, NULL);
+
 	free_proxy_msg(msg);
 	
-	return 0;
+	return res;
 }
 
 int 
 DbgStep(session *s, bitset *set, int count, int type)
 {
+	int			res;
+	int			len;
+	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_STEP_CMD, 0);
 	
-	proxy_msg_add_bitset(msg, set);
 	proxy_msg_add_int(msg, count);
 	proxy_msg_add_int(msg, type);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
+	res = send_command(set, DBG_EV_WAITSOME, buf, len, NULL);
 	
 	free_proxy_msg(msg);
 	
-	return 0;
+	return res;
 }
 
 int 
@@ -316,15 +395,16 @@ DbgSuspend(session *s, bitset *set)
 int 
 DbgListStackframes(session *s, bitset *set, int low, int depth)
 {
+	int			res;
+	int			len;
+	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_LISTSTACKFRAMES_CMD, 0);
 	
-	proxy_msg_add_bitset(msg, set);
 	proxy_msg_add_int(msg, low);
 	proxy_msg_add_int(msg, depth);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
-	
-	free_proxy_msg(msg);
+	res = send_command(set, DBG_EV_WAITALL, buf, len, NULL);
 	
 	return 0;
 }
@@ -350,16 +430,19 @@ DbgSetCurrentStackframe(session *s, bitset *set, int level)
 int 
 DbgEvaluateExpression(session *s, bitset *set, char *exp)
 {
+	int			res;
+	int			len;
+	char *		buf;
 	proxy_msg *	msg = new_proxy_msg(DBG_EVALUATEEXPRESSION_CMD, 0);
 
-	proxy_msg_add_bitset(msg, set);
 	proxy_msg_add_string(msg, exp);
+	proxy_serialize_msg(msg, &buf, &len);
 
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
+	res = send_command(set, DBG_EV_WAITSOME, buf, len, NULL);
 	
 	free_proxy_msg(msg);
 	
-	return 0;
+	return res;
 }
 
 int 
@@ -537,14 +620,22 @@ DbgCLIHandle(session *s, bitset *set, char *arg)
 int
 DbgQuit(session *s)
 {
+	int			res;
+	int			len;
+	char *		buf;
+	bitset *	procs = bitset_new(s->sess_procs);
 	proxy_msg *	msg = new_proxy_msg(DBG_QUIT_CMD, 0);
 
-	proxy_clnt_queue_msg(s->sess_proxy, msg);
-	
-	free_proxy_msg(msg);
-	
-	return 0;
+	proxy_serialize_msg(msg, &buf, &len);
 
+	bitset_invert(procs);
+
+	res = send_command(procs, DBG_EV_WAITALL, buf, len, NULL);
+
+	free_proxy_msg(msg);
+	bitset_free(procs);
+
+	return res;
 }
 
 int
@@ -586,7 +677,7 @@ DbgDeletePartialExpression(session *s, bitset *set, char *arg)
 int
 DbgProgress(session *s)
 {
-	return proxy_clnt_progress(s->sess_proxy);
+	return sdm_progress();
 }
 
 void
@@ -594,8 +685,6 @@ DbgRegisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *),
 {
 	s->sess_event_handler = event_callback;
 	s->sess_event_data = data;
-	RegisterEventHandler(PTP_PROXY_EVENT_HANDLER, session_event_handler, (void *)s);
-	//s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, session_event_handler, (void *)s);
 }
 
 /**
@@ -605,7 +694,6 @@ void
 DbgUnregisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *))
 {
 	s->sess_event_handler = NULL;
-	UnregisterEventHandler(PTP_PROXY_EVENT_HANDLER, session_event_handler);
 }
 
 /**

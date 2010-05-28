@@ -38,7 +38,7 @@
 /*
  * Session control
  */
-int 	DbgInit(session **, char *, char *, ...);
+int 	DbgInit(session **, int, char *[]);
 int		DbgConnect(session *);
 int		DbgCreate(session *);
 void 	DbgRegisterEventHandler(session *, void (*)(dbg_event *, void *), void *);
