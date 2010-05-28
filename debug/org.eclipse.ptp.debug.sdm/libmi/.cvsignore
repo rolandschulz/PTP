@@ -4,3 +4,4 @@ Makefile
 stamp-h1
 test_mi
 .deps
+config.status
