@@ -13,7 +13,7 @@
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.includebrowser.IBContentProvider
- * Version: 1.15
+ * Version: 1.16
  */
 
 /* -- ST-Origin --

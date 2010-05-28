@@ -180,7 +180,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.109
+	 * Version: 1.110
 	 */
 	private IncludeFileContentProvider getIncludeFileContentProvider(int style, IIndex index, int linkageID) {
 		final ASTFilePathResolver pathResolver = new RemoteIndexerInputAdapter();
@@ -271,7 +271,7 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 	/* -- ST-Origin --
 	 * Source folder: org.eclipse.cdt.core/model
 	 * Class: org.eclipse.cdt.internal.core.model.TranslationUnit
-	 * Version: 1.109
+	 * Version: 1.110
 	 */
 	public IASTCompletionNode getCompletionNode(IIndex index, int style, int offset) throws CoreException {
 		checkState();
@@ -286,8 +286,14 @@ public class TranslationUnit extends Parent implements ITranslationUnit {
 		ILanguage language= getLanguage();
 		if (language != null) {
 			IncludeFileContentProvider crf= getIncludeFileContentProvider(style, index, language.getLinkageID());
-			IParserLogService log = new DefaultLogService();
-			return language.getCompletionNode(fileContent, scanInfo, crf, index, log, offset);
+			IASTCompletionNode result = language.getCompletionNode(fileContent, scanInfo, crf, index, new DefaultLogService(), offset);
+			if (result != null) {
+				final IASTTranslationUnit ast = result.getTranslationUnit();
+				if (ast != null) {
+					ast.setIsHeaderUnit(!isSourceUnit());
+				}
+			}
+			return result;
 		}
 		return null;
 	}
