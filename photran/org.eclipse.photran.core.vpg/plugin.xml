@@ -8,7 +8,7 @@
 
    <!-- Markers for displaying the VPG error/warning log -->
    <extension point="org.eclipse.core.resources.markers"
-       name="VPG Log Marker"
+       name="%extension.name"
        id="org.eclipse.photran.core.vpg.errorOrWarningMarker">
        <super type="org.eclipse.core.resources.textmarker"/>
        <attribute name="resource"/>
@@ -16,12 +16,12 @@
        <persistent value="false"/>
    </extension>
    <extension point="org.eclipse.core.resources.markers"
-       name="VPG Warning Marker"
+       name="%extension.name.0"
        id="org.eclipse.photran.core.vpg.warningMarker">
        <super type="org.eclipse.photran.core.vpg.errorOrWarningMarker"/>
    </extension>
    <extension point="org.eclipse.core.resources.markers"
-       name="VPG Error Marker"
+       name="%extension.name.1"
        id="org.eclipse.photran.core.vpg.errorMarker">
        <super type="org.eclipse.photran.core.vpg.errorOrWarningMarker"/>
    </extension>
@@ -40,19 +40,19 @@
   <extension point="org.eclipse.photran.core.sourceForms">
       <source-form
           id="unpreprocessedFreeForm"
-          name="Free Form - INCLUDE lines ignored"
+          name="%source-form.name"
           class="org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFreeSourceForm"
           priority="default"
           defaultForFilenameExtensions="f90,f95,f03,f08,F90,F95,F03,F08" />
       <source-form
           id="unpreprocessedFixedForm"
-          name="Fixed Form - INCLUDE lines ignored"
+          name="%source-form.name.0"
           class="org.eclipse.photran.internal.core.lexer.sourceform.UnpreprocessedFixedSourceForm"
           priority="low"
           defaultForFilenameExtensions="f,for,ftn,fix,f77,fpp,F,FOR,FTN,FIX,F77,FPP" />
       <source-form
           id="freeForm"
-          name="Free Form"
+          name="%source-form.name.1"
           class="org.eclipse.photran.internal.core.lexer.sourceform.FreeSourceForm"
           priority="medium"
           defaultForFilenameExtensions="f90,f95,f03,f08,F90,F95,F03,F08" />

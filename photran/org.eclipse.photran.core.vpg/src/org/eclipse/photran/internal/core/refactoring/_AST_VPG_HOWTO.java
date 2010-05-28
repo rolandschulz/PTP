@@ -39,7 +39,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 // 1. This Java code actually gets compiled.  Examples in a PDF file don't.
 // 2. When Eclipse renames classes and methods, it also updates links in JavaDoc.  It does not
 //    refactor examples in a PDF file.
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public class _AST_VPG_HOWTO
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////

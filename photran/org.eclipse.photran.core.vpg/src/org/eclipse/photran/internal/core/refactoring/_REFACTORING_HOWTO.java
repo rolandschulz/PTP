@@ -26,6 +26,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResou
  * Photran Developer's Guide.
  */
 
+@SuppressWarnings("all")
 class SampleResourceRefactoring extends FortranResourceRefactoring
 {
     @Override
@@ -88,6 +89,7 @@ class SampleResourceRefactoring extends FortranResourceRefactoring
     }
 }
 
+@SuppressWarnings("all")
 class SampleEditorRefactoring extends FortranEditorRefactoring
 {
     @Override
