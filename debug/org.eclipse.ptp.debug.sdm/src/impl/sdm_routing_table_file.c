@@ -12,7 +12,7 @@
 #include "sdm.h"
 
 static char * MPIRankVars[] = {
-	"OMPI_MCA_orte_ess_vpid", 		/* Open MPI 1.3 */
+	"OMPI_MCA_orte_ess_vpid", 		/* Open MPI 1.3+ */
 	"OMPI_MCA_ns_nds_vpid", 		/* Open MPI 1.2 */
 	"PMI_RANK", 					/* MPICH2 */
 	"MP_CHILD",						/* IBM PE */
@@ -226,28 +226,6 @@ read_routing_table_entry(FILE *routing_file, routing_table_entry *entry)
 	return 0;
 }
 
-/*
- * Read the routing table to the passed structure.
- */
-/*int read_routing_table(FILE *routing_file, int num_entries, struct routing_tbl_struct *table)
-{
-	int i, rv;
-
-	// Get the file size from the beginning of the file
-
-
-	for(i=0; i < num_entries; i++) {
-		rv = fscanf(routing_file, "%255s;%255s;%d\n",
-				table[i].nodeID, table[i].hostname,
-				&(table[i].port));
-
-		// Error reading file
-		if(ferror(routing_file))
-			return -1;
-	}
-
-}*/
-
 /**
  * Get the number of lines from the header of the file
  * It will set the file pointer to just after the header of the file
@@ -352,29 +330,3 @@ wait_for_routing_file(char *filename, FILE **routing_file, int *route_size, unsi
 
 	return -2;
 }
-
-
-/*int main(int argc, char *argv[])
-{
-	int rv, i;
-
-	FILE * routing_file = fopen("routing_file", "r");
-
-	struct routing_tbl_struct * route_tbl;
-	int num_lines;
-
-	// Allocs structure size based on the file size
-	if((num_lines = line_count(routing_file)) <= 0)
-		return -1;
-
-	route_tbl = (struct routing_tbl_struct *)malloc(sizeof(struct routing_tbl_struct) * num_lines);
-
-	// Read entries to the structure
-	rv = read_routing_table(routing_file, num_lines, route_tbl);
-
-	if(rv <= 0)
-		return -1;
-
-	//
-
-}*/

@@ -26,10 +26,10 @@
 #include "bitset.h"
 #include "itimer.h"
 
-int 			completed;
+int 		completed;
 int			fatal;
-bitset *		procs_outstanding = NULL;
-bitset *		sess_procs = NULL;
+bitset *	procs_outstanding = NULL;
+bitset *	sess_procs = NULL;
 
 void
 event_callback(dbg_event *e, void *data)
