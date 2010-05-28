@@ -34,8 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 bin_PROGRAMS = sdm$(EXEEXT)
-noinst_PROGRAMS = test_proxy$(EXEEXT) test_proxy_rev$(EXEEXT) \
-	test_mi$(EXEEXT)
+noinst_PROGRAMS = test_proxy$(EXEEXT) test_proxy_rev$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -69,38 +68,18 @@ am_libdbgutils_a_OBJECTS = src/utils/libdbgutils_a-error.$(OBJEXT) \
 	src/utils/libdbgutils_a-event.$(OBJEXT) \
 	src/utils/libdbgutils_a-itimer.$(OBJEXT) \
 	src/utils/libdbgutils_a-memoryinfo.$(OBJEXT) \
-	src/utils/libdbgutils_a-signalinfo.$(OBJEXT) \
 	src/utils/libdbgutils_a-debug.$(OBJEXT)
 libdbgutils_a_OBJECTS = $(am_libdbgutils_a_OBJECTS)
-libmi_a_AR = $(AR) $(ARFLAGS)
-libmi_a_LIBADD =
-am_libmi_a_OBJECTS = src/mi/libmi_a-MIParser.$(OBJEXT) \
-	src/mi/libmi_a-MIOOBRecord.$(OBJEXT) \
-	src/mi/libmi_a-MIOutput.$(OBJEXT) \
-	src/mi/libmi_a-MIResult.$(OBJEXT) \
-	src/mi/libmi_a-MIResultRecord.$(OBJEXT) \
-	src/mi/libmi_a-MIValue.$(OBJEXT) \
-	src/mi/libmi_a-MIString.$(OBJEXT) \
-	src/mi/libmi_a-MIBreakpoint.$(OBJEXT) \
-	src/mi/libmi_a-MIFrame.$(OBJEXT) \
-	src/mi/libmi_a-MIThread.$(OBJEXT) \
-	src/mi/libmi_a-MIArg.$(OBJEXT) src/mi/libmi_a-MIVar.$(OBJEXT) \
-	src/mi/libmi_a-MIEvent.$(OBJEXT) \
-	src/mi/libmi_a-MICommand.$(OBJEXT) \
-	src/mi/libmi_a-MIGDBCommand.$(OBJEXT) \
-	src/mi/libmi_a-MIExecCommand.$(OBJEXT) \
-	src/mi/libmi_a-MIBreakCommand.$(OBJEXT) \
-	src/mi/libmi_a-MIStackCommand.$(OBJEXT) \
-	src/mi/libmi_a-MIVarCommand.$(OBJEXT) \
-	src/mi/libmi_a-MIError.$(OBJEXT) \
-	src/mi/libmi_a-MISession.$(OBJEXT) \
-	src/mi/libmi_a-MIThreadCommand.$(OBJEXT) \
-	src/mi/libmi_a-MIMemory.$(OBJEXT) \
-	src/mi/libmi_a-MIMemoryCommand.$(OBJEXT) \
-	src/mi/libmi_a-CLICommand.$(OBJEXT) \
-	src/mi/libmi_a-CLIOutput.$(OBJEXT) \
-	src/mi/libmi_a-MIPty.$(OBJEXT)
-libmi_a_OBJECTS = $(am_libmi_a_OBJECTS)
+libsdm_a_AR = $(AR) $(ARFLAGS)
+libsdm_a_LIBADD =
+am_libsdm_a_OBJECTS = src/impl/libsdm_a-sdm.$(OBJEXT) \
+	src/impl/libsdm_a-sdm_aggregate_hash.$(OBJEXT) \
+	src/impl/libsdm_a-sdm_hello_proto.$(OBJEXT) \
+	src/impl/libsdm_a-sdm_message_tcpip.$(OBJEXT) \
+	src/impl/libsdm_a-sdm_route_tree.$(OBJEXT) \
+	src/impl/libsdm_a-sdm_routing_table_file.$(OBJEXT) \
+	src/impl/libsdm_a-sdm_set_bitset.$(OBJEXT)
+libsdm_a_OBJECTS = $(am_libsdm_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
@@ -111,35 +90,25 @@ am_sdm_OBJECTS = src/master/sdm-startup.$(OBJEXT) \
 	src/server/sdm-server_cmds.$(OBJEXT) \
 	src/server/sdm-backend.$(OBJEXT) \
 	src/server/sdm-gdbmi_backend.$(OBJEXT) \
-	src/server/sdm-test_backend.$(OBJEXT) \
-	src/impl/sdm-sdm.$(OBJEXT) \
-	src/impl/sdm-sdm_aggregate_hash.$(OBJEXT) \
-	src/impl/sdm-sdm_hello_proto.$(OBJEXT) \
-	src/impl/sdm-sdm_message_tcpip.$(OBJEXT) \
-	src/impl/sdm-sdm_route_tree.$(OBJEXT) \
-	src/impl/sdm-sdm_routing_table_file.$(OBJEXT) \
-	src/impl/sdm-sdm_set_bitset.$(OBJEXT)
+	src/server/sdm-test_backend.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
-sdm_DEPENDENCIES = libdbgutils.a libmi.a libaif/libaif.a
+sdm_DEPENDENCIES = libsdm.a libdbgutils.a libmi/libmi.a \
+	libaif/libaif.a libmi/libmi.a
 sdm_LINK = $(CCLD) $(sdm_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
-am_test_mi_OBJECTS = src/mi/test_mi-test_mi.$(OBJEXT)
-test_mi_OBJECTS = $(am_test_mi_OBJECTS)
-test_mi_DEPENDENCIES = libmi.a
-test_mi_LINK = $(CCLD) $(test_mi_CFLAGS) $(CFLAGS) $(test_mi_LDFLAGS) \
-	$(LDFLAGS) -o $@
 am_test_proxy_OBJECTS = src/test/test_proxy-test_proxy.$(OBJEXT) \
 	src/test/test_proxy-test_proxy_clnt.$(OBJEXT)
 test_proxy_OBJECTS = $(am_test_proxy_OBJECTS)
-test_proxy_DEPENDENCIES = libdbgclnt.a libdbgutils.a libaif/libaif.a
+test_proxy_DEPENDENCIES = libsdm.a libdbgclnt.a libdbgutils.a \
+	libaif/libaif.a libmi/libmi.a
 test_proxy_LINK = $(CCLD) $(test_proxy_CFLAGS) $(CFLAGS) \
 	$(test_proxy_LDFLAGS) $(LDFLAGS) -o $@
 am_test_proxy_rev_OBJECTS =  \
 	src/test/test_proxy_rev-test_proxy_rev.$(OBJEXT) \
 	src/test/test_proxy_rev-test_proxy_clnt.$(OBJEXT)
 test_proxy_rev_OBJECTS = $(am_test_proxy_rev_OBJECTS)
-test_proxy_rev_DEPENDENCIES = libdbgclnt.a libdbgutils.a \
-	libaif/libaif.a
+test_proxy_rev_DEPENDENCIES = libsdm.a libdbgclnt.a libdbgutils.a \
+	libaif/libaif.a libmi/libmi.a
 test_proxy_rev_LINK = $(CCLD) $(test_proxy_rev_CFLAGS) $(CFLAGS) \
 	$(test_proxy_rev_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -150,11 +119,11 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libmi_a_SOURCES) $(sdm_SOURCES) $(test_mi_SOURCES) \
-	$(test_proxy_SOURCES) $(test_proxy_rev_SOURCES)
+	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(test_proxy_SOURCES) \
+	$(test_proxy_rev_SOURCES)
 DIST_SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libmi_a_SOURCES) $(sdm_SOURCES) $(test_mi_SOURCES) \
-	$(test_proxy_SOURCES) $(test_proxy_rev_SOURCES)
+	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(test_proxy_SOURCES) \
+	$(test_proxy_rev_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -271,7 +240,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = libaif
+SUBDIRS = libaif libmi
 sdm_SOURCES = src/master/startup.c\
 							src/master/master.c \
 							src/master/master_cmds.c \
@@ -279,8 +248,11 @@ sdm_SOURCES = src/master/startup.c\
 							src/server/server_cmds.c \
 							src/server/backend.c \
 							src/server/gdbmi_backend.c \
-							src/server/test_backend.c \
-							src/impl/sdm.c \
+							src/server/test_backend.c
+
+sdm_CFLAGS = -I./include -I./libaif -I./libmi  $(AM_CFLAGS)
+sdm_LDADD = libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+libsdm_a_SOURCES = src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_hello_proto.c \
 							src/impl/sdm_message_tcpip.c \
@@ -288,24 +260,19 @@ sdm_SOURCES = src/master/startup.c\
 							src/impl/sdm_routing_table_file.c \
 							src/impl/sdm_set_bitset.c
 
-sdm_CFLAGS = -I./include -I./libaif -I./src/mi $(AM_CFLAGS)
-sdm_LDADD = libdbgutils.a libmi.a libaif/libaif.a @SVR_LIBS@
+libsdm_a_CFLAGS = -I./include $(AM_CFLAGS)
 test_proxy_SOURCES = src/test/test_proxy.c \
 							src/test/test_proxy_clnt.c
 
-test_proxy_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
+test_proxy_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 test_proxy_LDFLAGS = -g
-test_proxy_LDADD = libdbgclnt.a libdbgutils.a libaif/libaif.a @CLNT_LIBS@
+test_proxy_LDADD = libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 test_proxy_rev_SOURCES = src/test/test_proxy_rev.c \
 							src/test/test_proxy_clnt.c
 
-test_proxy_rev_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
+test_proxy_rev_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 test_proxy_rev_LDFLAGS = -g
-test_proxy_rev_LDADD = libdbgclnt.a libdbgutils.a libaif/libaif.a @CLNT_LIBS@
-test_mi_SOURCES = src/mi/test_mi.c
-test_mi_CFLAGS = -I./include -I./src/mi $(AM_CFLAGS) -g
-test_mi_LDFLAGS = -g
-test_mi_LDADD = libmi.a
+test_proxy_rev_LDADD = libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 noinst_HEADERS = include/backend.h \
 							include/breakpoint.h \
 							include/dbg_master.h \
@@ -320,51 +287,20 @@ noinst_HEADERS = include/backend.h \
 							include/routing_table.h \
 							include/sdm.h \
 							include/session.h \
-							include/signalinfo.h \
 							include/stackframe.h
 
-noinst_LIBRARIES = libdbgclnt.a libdbgutils.a libmi.a
+noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
-libdbgclnt_a_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
+libdbgclnt_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES = src/utils/error.c \
 							src/utils/breakpoint.c \
 							src/utils/stackframe.c \
 							src/utils/event.c \
 							src/utils/itimer.c \
 							src/utils/memoryinfo.c \
-							src/utils/signalinfo.c \
 							src/utils/debug.c
 
-libdbgutils_a_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
-libmi_a_SOURCES = src/mi/MIParser.c \
-							src/mi/MIOOBRecord.c \
-							src/mi/MIOutput.c \
-							src/mi/MIResult.c \
-							src/mi/MIResultRecord.c \
-							src/mi/MIValue.c \
-							src/mi/MIString.c \
-							src/mi/MIBreakpoint.c \
-							src/mi/MIFrame.c \
-							src/mi/MIThread.c \
-							src/mi/MIArg.c \
-							src/mi/MIVar.c \
-							src/mi/MIEvent.c \
-							src/mi/MICommand.c \
-							src/mi/MIGDBCommand.c \
-							src/mi/MIExecCommand.c \
-							src/mi/MIBreakCommand.c \
-							src/mi/MIStackCommand.c \
-							src/mi/MIVarCommand.c \
-							src/mi/MIError.c \
-							src/mi/MISession.c \
-							src/mi/MIThreadCommand.c \
-							src/mi/MIMemory.c \
-							src/mi/MIMemoryCommand.c \
-							src/mi/CLICommand.c \
-							src/mi/CLIOutput.c \
-							src/mi/MIPty.c
-
-libmi_a_CFLAGS = -I./include $(AM_CFLAGS) -g
+libdbgutils_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -454,78 +390,36 @@ src/utils/libdbgutils_a-itimer.$(OBJEXT): src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libdbgutils_a-memoryinfo.$(OBJEXT):  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libdbgutils_a-signalinfo.$(OBJEXT):  \
-	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libdbgutils_a-debug.$(OBJEXT): src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 libdbgutils.a: $(libdbgutils_a_OBJECTS) $(libdbgutils_a_DEPENDENCIES) 
 	-rm -f libdbgutils.a
 	$(libdbgutils_a_AR) libdbgutils.a $(libdbgutils_a_OBJECTS) $(libdbgutils_a_LIBADD)
 	$(RANLIB) libdbgutils.a
-src/mi/$(am__dirstamp):
-	@$(MKDIR_P) src/mi
-	@: > src/mi/$(am__dirstamp)
-src/mi/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) src/mi/$(DEPDIR)
-	@: > src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIParser.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIOOBRecord.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIOutput.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIResult.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIResultRecord.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIValue.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIString.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIBreakpoint.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIFrame.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIThread.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIArg.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIVar.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIEvent.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MICommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIGDBCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIExecCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIBreakCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIStackCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIVarCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIError.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MISession.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIThreadCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIMemory.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIMemoryCommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-CLICommand.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-CLIOutput.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-src/mi/libmi_a-MIPty.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-libmi.a: $(libmi_a_OBJECTS) $(libmi_a_DEPENDENCIES) 
-	-rm -f libmi.a
-	$(libmi_a_AR) libmi.a $(libmi_a_OBJECTS) $(libmi_a_LIBADD)
-	$(RANLIB) libmi.a
+src/impl/$(am__dirstamp):
+	@$(MKDIR_P) src/impl
+	@: > src/impl/$(am__dirstamp)
+src/impl/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) src/impl/$(DEPDIR)
+	@: > src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/libsdm_a-sdm.$(OBJEXT): src/impl/$(am__dirstamp) \
+	src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/libsdm_a-sdm_aggregate_hash.$(OBJEXT):  \
+	src/impl/$(am__dirstamp) src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/libsdm_a-sdm_hello_proto.$(OBJEXT): src/impl/$(am__dirstamp) \
+	src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/libsdm_a-sdm_message_tcpip.$(OBJEXT):  \
+	src/impl/$(am__dirstamp) src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/libsdm_a-sdm_route_tree.$(OBJEXT): src/impl/$(am__dirstamp) \
+	src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/libsdm_a-sdm_routing_table_file.$(OBJEXT):  \
+	src/impl/$(am__dirstamp) src/impl/$(DEPDIR)/$(am__dirstamp)
+src/impl/libsdm_a-sdm_set_bitset.$(OBJEXT): src/impl/$(am__dirstamp) \
+	src/impl/$(DEPDIR)/$(am__dirstamp)
+libsdm.a: $(libsdm_a_OBJECTS) $(libsdm_a_DEPENDENCIES) 
+	-rm -f libsdm.a
+	$(libsdm_a_AR) libsdm.a $(libsdm_a_OBJECTS) $(libsdm_a_LIBADD)
+	$(RANLIB) libsdm.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -580,34 +474,9 @@ src/server/sdm-gdbmi_backend.$(OBJEXT): src/server/$(am__dirstamp) \
 	src/server/$(DEPDIR)/$(am__dirstamp)
 src/server/sdm-test_backend.$(OBJEXT): src/server/$(am__dirstamp) \
 	src/server/$(DEPDIR)/$(am__dirstamp)
-src/impl/$(am__dirstamp):
-	@$(MKDIR_P) src/impl
-	@: > src/impl/$(am__dirstamp)
-src/impl/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) src/impl/$(DEPDIR)
-	@: > src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm.$(OBJEXT): src/impl/$(am__dirstamp) \
-	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_aggregate_hash.$(OBJEXT): src/impl/$(am__dirstamp) \
-	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_hello_proto.$(OBJEXT): src/impl/$(am__dirstamp) \
-	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_message_tcpip.$(OBJEXT): src/impl/$(am__dirstamp) \
-	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_route_tree.$(OBJEXT): src/impl/$(am__dirstamp) \
-	src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_routing_table_file.$(OBJEXT):  \
-	src/impl/$(am__dirstamp) src/impl/$(DEPDIR)/$(am__dirstamp)
-src/impl/sdm-sdm_set_bitset.$(OBJEXT): src/impl/$(am__dirstamp) \
-	src/impl/$(DEPDIR)/$(am__dirstamp)
 sdm$(EXEEXT): $(sdm_OBJECTS) $(sdm_DEPENDENCIES) 
 	@rm -f sdm$(EXEEXT)
 	$(sdm_LINK) $(sdm_OBJECTS) $(sdm_LDADD) $(LIBS)
-src/mi/test_mi-test_mi.$(OBJEXT): src/mi/$(am__dirstamp) \
-	src/mi/$(DEPDIR)/$(am__dirstamp)
-test_mi$(EXEEXT): $(test_mi_OBJECTS) $(test_mi_DEPENDENCIES) 
-	@rm -f test_mi$(EXEEXT)
-	$(test_mi_LINK) $(test_mi_OBJECTS) $(test_mi_LDADD) $(LIBS)
 src/test/$(am__dirstamp):
 	@$(MKDIR_P) src/test
 	@: > src/test/$(am__dirstamp)
@@ -632,44 +501,16 @@ test_proxy_rev$(EXEEXT): $(test_proxy_rev_OBJECTS) $(test_proxy_rev_DEPENDENCIES
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f src/client/libdbgclnt_a-client_interface.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_aggregate_hash.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_hello_proto.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_message_tcpip.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_route_tree.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_routing_table_file.$(OBJEXT)
-	-rm -f src/impl/sdm-sdm_set_bitset.$(OBJEXT)
+	-rm -f src/impl/libsdm_a-sdm.$(OBJEXT)
+	-rm -f src/impl/libsdm_a-sdm_aggregate_hash.$(OBJEXT)
+	-rm -f src/impl/libsdm_a-sdm_hello_proto.$(OBJEXT)
+	-rm -f src/impl/libsdm_a-sdm_message_tcpip.$(OBJEXT)
+	-rm -f src/impl/libsdm_a-sdm_route_tree.$(OBJEXT)
+	-rm -f src/impl/libsdm_a-sdm_routing_table_file.$(OBJEXT)
+	-rm -f src/impl/libsdm_a-sdm_set_bitset.$(OBJEXT)
 	-rm -f src/master/sdm-master.$(OBJEXT)
 	-rm -f src/master/sdm-master_cmds.$(OBJEXT)
 	-rm -f src/master/sdm-startup.$(OBJEXT)
-	-rm -f src/mi/libmi_a-CLICommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-CLIOutput.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIArg.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIBreakCommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIBreakpoint.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MICommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIError.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIEvent.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIExecCommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIFrame.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIGDBCommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIMemory.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIMemoryCommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIOOBRecord.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIOutput.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIParser.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIPty.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIResult.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIResultRecord.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MISession.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIStackCommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIString.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIThread.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIThreadCommand.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIValue.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIVar.$(OBJEXT)
-	-rm -f src/mi/libmi_a-MIVarCommand.$(OBJEXT)
-	-rm -f src/mi/test_mi-test_mi.$(OBJEXT)
 	-rm -f src/server/sdm-backend.$(OBJEXT)
 	-rm -f src/server/sdm-gdbmi_backend.$(OBJEXT)
 	-rm -f src/server/sdm-server.$(OBJEXT)
@@ -685,51 +526,22 @@ mostlyclean-compile:
 	-rm -f src/utils/libdbgutils_a-event.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-itimer.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-memoryinfo.$(OBJEXT)
-	-rm -f src/utils/libdbgutils_a-signalinfo.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-stackframe.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/libdbgclnt_a-client_interface.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_route_tree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/libsdm_a-sdm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/libsdm_a-sdm_aggregate_hash.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/libsdm_a-sdm_hello_proto.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/libsdm_a-sdm_message_tcpip.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/libsdm_a-sdm_route_tree.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/libsdm_a-sdm_routing_table_file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/impl/$(DEPDIR)/libsdm_a-sdm_set_bitset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/master/$(DEPDIR)/sdm-master.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/master/$(DEPDIR)/sdm-master_cmds.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/master/$(DEPDIR)/sdm-startup.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLICommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-CLIOutput.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIArg.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIBreakCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIBreakpoint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MICommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIError.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIEvent.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIFrame.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIMemory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIOutput.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIPty.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIResult.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MISession.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIStackCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIString.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIThread.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIThreadCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIValue.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIVar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/test_mi-test_mi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-backend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-gdbmi_backend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-server.Po@am__quote@
@@ -745,7 +557,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-itimer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-signalinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-stackframe.Po@am__quote@
 
 .c.o:
@@ -862,20 +673,6 @@ src/utils/libdbgutils_a-memoryinfo.obj: src/utils/memoryinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-memoryinfo.obj `if test -f 'src/utils/memoryinfo.c'; then $(CYGPATH_W) 'src/utils/memoryinfo.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/memoryinfo.c'; fi`
 
-src/utils/libdbgutils_a-signalinfo.o: src/utils/signalinfo.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-signalinfo.o -MD -MP -MF src/utils/$(DEPDIR)/libdbgutils_a-signalinfo.Tpo -c -o src/utils/libdbgutils_a-signalinfo.o `test -f 'src/utils/signalinfo.c' || echo '$(srcdir)/'`src/utils/signalinfo.c
-@am__fastdepCC_TRUE@	mv -f src/utils/$(DEPDIR)/libdbgutils_a-signalinfo.Tpo src/utils/$(DEPDIR)/libdbgutils_a-signalinfo.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/signalinfo.c' object='src/utils/libdbgutils_a-signalinfo.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-signalinfo.o `test -f 'src/utils/signalinfo.c' || echo '$(srcdir)/'`src/utils/signalinfo.c
-
-src/utils/libdbgutils_a-signalinfo.obj: src/utils/signalinfo.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-signalinfo.obj -MD -MP -MF src/utils/$(DEPDIR)/libdbgutils_a-signalinfo.Tpo -c -o src/utils/libdbgutils_a-signalinfo.obj `if test -f 'src/utils/signalinfo.c'; then $(CYGPATH_W) 'src/utils/signalinfo.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/signalinfo.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/utils/$(DEPDIR)/libdbgutils_a-signalinfo.Tpo src/utils/$(DEPDIR)/libdbgutils_a-signalinfo.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/signalinfo.c' object='src/utils/libdbgutils_a-signalinfo.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-signalinfo.obj `if test -f 'src/utils/signalinfo.c'; then $(CYGPATH_W) 'src/utils/signalinfo.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/signalinfo.c'; fi`
-
 src/utils/libdbgutils_a-debug.o: src/utils/debug.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-debug.o -MD -MP -MF src/utils/$(DEPDIR)/libdbgutils_a-debug.Tpo -c -o src/utils/libdbgutils_a-debug.o `test -f 'src/utils/debug.c' || echo '$(srcdir)/'`src/utils/debug.c
 @am__fastdepCC_TRUE@	mv -f src/utils/$(DEPDIR)/libdbgutils_a-debug.Tpo src/utils/$(DEPDIR)/libdbgutils_a-debug.Po
@@ -890,383 +687,103 @@ src/utils/libdbgutils_a-debug.obj: src/utils/debug.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-debug.obj `if test -f 'src/utils/debug.c'; then $(CYGPATH_W) 'src/utils/debug.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/debug.c'; fi`
 
-src/mi/libmi_a-MIParser.o: src/mi/MIParser.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIParser.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIParser.Tpo -c -o src/mi/libmi_a-MIParser.o `test -f 'src/mi/MIParser.c' || echo '$(srcdir)/'`src/mi/MIParser.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIParser.Tpo src/mi/$(DEPDIR)/libmi_a-MIParser.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIParser.c' object='src/mi/libmi_a-MIParser.o' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm.o: src/impl/sdm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm.o -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm.Tpo -c -o src/impl/libsdm_a-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/libsdm_a-sdm.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIParser.o `test -f 'src/mi/MIParser.c' || echo '$(srcdir)/'`src/mi/MIParser.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c
 
-src/mi/libmi_a-MIParser.obj: src/mi/MIParser.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIParser.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIParser.Tpo -c -o src/mi/libmi_a-MIParser.obj `if test -f 'src/mi/MIParser.c'; then $(CYGPATH_W) 'src/mi/MIParser.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIParser.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIParser.Tpo src/mi/$(DEPDIR)/libmi_a-MIParser.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIParser.c' object='src/mi/libmi_a-MIParser.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm.obj: src/impl/sdm.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm.obj -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm.Tpo -c -o src/impl/libsdm_a-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/libsdm_a-sdm.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIParser.obj `if test -f 'src/mi/MIParser.c'; then $(CYGPATH_W) 'src/mi/MIParser.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIParser.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`
 
-src/mi/libmi_a-MIOOBRecord.o: src/mi/MIOOBRecord.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIOOBRecord.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Tpo -c -o src/mi/libmi_a-MIOOBRecord.o `test -f 'src/mi/MIOOBRecord.c' || echo '$(srcdir)/'`src/mi/MIOOBRecord.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Tpo src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIOOBRecord.c' object='src/mi/libmi_a-MIOOBRecord.o' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_aggregate_hash.o: src/impl/sdm_aggregate_hash.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_aggregate_hash.o -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_aggregate_hash.Tpo -c -o src/impl/libsdm_a-sdm_aggregate_hash.o `test -f 'src/impl/sdm_aggregate_hash.c' || echo '$(srcdir)/'`src/impl/sdm_aggregate_hash.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_aggregate_hash.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_aggregate_hash.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_aggregate_hash.c' object='src/impl/libsdm_a-sdm_aggregate_hash.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIOOBRecord.o `test -f 'src/mi/MIOOBRecord.c' || echo '$(srcdir)/'`src/mi/MIOOBRecord.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_aggregate_hash.o `test -f 'src/impl/sdm_aggregate_hash.c' || echo '$(srcdir)/'`src/impl/sdm_aggregate_hash.c
 
-src/mi/libmi_a-MIOOBRecord.obj: src/mi/MIOOBRecord.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIOOBRecord.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Tpo -c -o src/mi/libmi_a-MIOOBRecord.obj `if test -f 'src/mi/MIOOBRecord.c'; then $(CYGPATH_W) 'src/mi/MIOOBRecord.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIOOBRecord.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Tpo src/mi/$(DEPDIR)/libmi_a-MIOOBRecord.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIOOBRecord.c' object='src/mi/libmi_a-MIOOBRecord.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_aggregate_hash.obj: src/impl/sdm_aggregate_hash.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_aggregate_hash.obj -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_aggregate_hash.Tpo -c -o src/impl/libsdm_a-sdm_aggregate_hash.obj `if test -f 'src/impl/sdm_aggregate_hash.c'; then $(CYGPATH_W) 'src/impl/sdm_aggregate_hash.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_aggregate_hash.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_aggregate_hash.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_aggregate_hash.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_aggregate_hash.c' object='src/impl/libsdm_a-sdm_aggregate_hash.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIOOBRecord.obj `if test -f 'src/mi/MIOOBRecord.c'; then $(CYGPATH_W) 'src/mi/MIOOBRecord.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIOOBRecord.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_aggregate_hash.obj `if test -f 'src/impl/sdm_aggregate_hash.c'; then $(CYGPATH_W) 'src/impl/sdm_aggregate_hash.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_aggregate_hash.c'; fi`
 
-src/mi/libmi_a-MIOutput.o: src/mi/MIOutput.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIOutput.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIOutput.Tpo -c -o src/mi/libmi_a-MIOutput.o `test -f 'src/mi/MIOutput.c' || echo '$(srcdir)/'`src/mi/MIOutput.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIOutput.Tpo src/mi/$(DEPDIR)/libmi_a-MIOutput.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIOutput.c' object='src/mi/libmi_a-MIOutput.o' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_hello_proto.o: src/impl/sdm_hello_proto.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_hello_proto.o -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_hello_proto.Tpo -c -o src/impl/libsdm_a-sdm_hello_proto.o `test -f 'src/impl/sdm_hello_proto.c' || echo '$(srcdir)/'`src/impl/sdm_hello_proto.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_hello_proto.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_hello_proto.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_hello_proto.c' object='src/impl/libsdm_a-sdm_hello_proto.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIOutput.o `test -f 'src/mi/MIOutput.c' || echo '$(srcdir)/'`src/mi/MIOutput.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_hello_proto.o `test -f 'src/impl/sdm_hello_proto.c' || echo '$(srcdir)/'`src/impl/sdm_hello_proto.c
 
-src/mi/libmi_a-MIOutput.obj: src/mi/MIOutput.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIOutput.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIOutput.Tpo -c -o src/mi/libmi_a-MIOutput.obj `if test -f 'src/mi/MIOutput.c'; then $(CYGPATH_W) 'src/mi/MIOutput.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIOutput.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIOutput.Tpo src/mi/$(DEPDIR)/libmi_a-MIOutput.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIOutput.c' object='src/mi/libmi_a-MIOutput.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_hello_proto.obj: src/impl/sdm_hello_proto.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_hello_proto.obj -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_hello_proto.Tpo -c -o src/impl/libsdm_a-sdm_hello_proto.obj `if test -f 'src/impl/sdm_hello_proto.c'; then $(CYGPATH_W) 'src/impl/sdm_hello_proto.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_hello_proto.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_hello_proto.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_hello_proto.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_hello_proto.c' object='src/impl/libsdm_a-sdm_hello_proto.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIOutput.obj `if test -f 'src/mi/MIOutput.c'; then $(CYGPATH_W) 'src/mi/MIOutput.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIOutput.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_hello_proto.obj `if test -f 'src/impl/sdm_hello_proto.c'; then $(CYGPATH_W) 'src/impl/sdm_hello_proto.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_hello_proto.c'; fi`
 
-src/mi/libmi_a-MIResult.o: src/mi/MIResult.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIResult.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIResult.Tpo -c -o src/mi/libmi_a-MIResult.o `test -f 'src/mi/MIResult.c' || echo '$(srcdir)/'`src/mi/MIResult.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIResult.Tpo src/mi/$(DEPDIR)/libmi_a-MIResult.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIResult.c' object='src/mi/libmi_a-MIResult.o' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_message_tcpip.o: src/impl/sdm_message_tcpip.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_message_tcpip.o -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_message_tcpip.Tpo -c -o src/impl/libsdm_a-sdm_message_tcpip.o `test -f 'src/impl/sdm_message_tcpip.c' || echo '$(srcdir)/'`src/impl/sdm_message_tcpip.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_message_tcpip.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_message_tcpip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_tcpip.c' object='src/impl/libsdm_a-sdm_message_tcpip.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIResult.o `test -f 'src/mi/MIResult.c' || echo '$(srcdir)/'`src/mi/MIResult.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_message_tcpip.o `test -f 'src/impl/sdm_message_tcpip.c' || echo '$(srcdir)/'`src/impl/sdm_message_tcpip.c
 
-src/mi/libmi_a-MIResult.obj: src/mi/MIResult.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIResult.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIResult.Tpo -c -o src/mi/libmi_a-MIResult.obj `if test -f 'src/mi/MIResult.c'; then $(CYGPATH_W) 'src/mi/MIResult.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIResult.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIResult.Tpo src/mi/$(DEPDIR)/libmi_a-MIResult.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIResult.c' object='src/mi/libmi_a-MIResult.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_message_tcpip.obj: src/impl/sdm_message_tcpip.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_message_tcpip.obj -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_message_tcpip.Tpo -c -o src/impl/libsdm_a-sdm_message_tcpip.obj `if test -f 'src/impl/sdm_message_tcpip.c'; then $(CYGPATH_W) 'src/impl/sdm_message_tcpip.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_tcpip.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_message_tcpip.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_message_tcpip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_tcpip.c' object='src/impl/libsdm_a-sdm_message_tcpip.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIResult.obj `if test -f 'src/mi/MIResult.c'; then $(CYGPATH_W) 'src/mi/MIResult.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIResult.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_message_tcpip.obj `if test -f 'src/impl/sdm_message_tcpip.c'; then $(CYGPATH_W) 'src/impl/sdm_message_tcpip.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_tcpip.c'; fi`
 
-src/mi/libmi_a-MIResultRecord.o: src/mi/MIResultRecord.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIResultRecord.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Tpo -c -o src/mi/libmi_a-MIResultRecord.o `test -f 'src/mi/MIResultRecord.c' || echo '$(srcdir)/'`src/mi/MIResultRecord.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Tpo src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIResultRecord.c' object='src/mi/libmi_a-MIResultRecord.o' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_route_tree.o: src/impl/sdm_route_tree.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_route_tree.o -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_route_tree.Tpo -c -o src/impl/libsdm_a-sdm_route_tree.o `test -f 'src/impl/sdm_route_tree.c' || echo '$(srcdir)/'`src/impl/sdm_route_tree.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_route_tree.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_route_tree.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_tree.c' object='src/impl/libsdm_a-sdm_route_tree.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIResultRecord.o `test -f 'src/mi/MIResultRecord.c' || echo '$(srcdir)/'`src/mi/MIResultRecord.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_route_tree.o `test -f 'src/impl/sdm_route_tree.c' || echo '$(srcdir)/'`src/impl/sdm_route_tree.c
 
-src/mi/libmi_a-MIResultRecord.obj: src/mi/MIResultRecord.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIResultRecord.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Tpo -c -o src/mi/libmi_a-MIResultRecord.obj `if test -f 'src/mi/MIResultRecord.c'; then $(CYGPATH_W) 'src/mi/MIResultRecord.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIResultRecord.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Tpo src/mi/$(DEPDIR)/libmi_a-MIResultRecord.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIResultRecord.c' object='src/mi/libmi_a-MIResultRecord.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_route_tree.obj: src/impl/sdm_route_tree.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_route_tree.obj -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_route_tree.Tpo -c -o src/impl/libsdm_a-sdm_route_tree.obj `if test -f 'src/impl/sdm_route_tree.c'; then $(CYGPATH_W) 'src/impl/sdm_route_tree.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_tree.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_route_tree.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_route_tree.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_tree.c' object='src/impl/libsdm_a-sdm_route_tree.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIResultRecord.obj `if test -f 'src/mi/MIResultRecord.c'; then $(CYGPATH_W) 'src/mi/MIResultRecord.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIResultRecord.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_route_tree.obj `if test -f 'src/impl/sdm_route_tree.c'; then $(CYGPATH_W) 'src/impl/sdm_route_tree.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_tree.c'; fi`
 
-src/mi/libmi_a-MIValue.o: src/mi/MIValue.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIValue.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIValue.Tpo -c -o src/mi/libmi_a-MIValue.o `test -f 'src/mi/MIValue.c' || echo '$(srcdir)/'`src/mi/MIValue.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIValue.Tpo src/mi/$(DEPDIR)/libmi_a-MIValue.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIValue.c' object='src/mi/libmi_a-MIValue.o' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_routing_table_file.o: src/impl/sdm_routing_table_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_routing_table_file.o -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_routing_table_file.Tpo -c -o src/impl/libsdm_a-sdm_routing_table_file.o `test -f 'src/impl/sdm_routing_table_file.c' || echo '$(srcdir)/'`src/impl/sdm_routing_table_file.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_routing_table_file.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_routing_table_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routing_table_file.c' object='src/impl/libsdm_a-sdm_routing_table_file.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIValue.o `test -f 'src/mi/MIValue.c' || echo '$(srcdir)/'`src/mi/MIValue.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_routing_table_file.o `test -f 'src/impl/sdm_routing_table_file.c' || echo '$(srcdir)/'`src/impl/sdm_routing_table_file.c
 
-src/mi/libmi_a-MIValue.obj: src/mi/MIValue.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIValue.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIValue.Tpo -c -o src/mi/libmi_a-MIValue.obj `if test -f 'src/mi/MIValue.c'; then $(CYGPATH_W) 'src/mi/MIValue.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIValue.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIValue.Tpo src/mi/$(DEPDIR)/libmi_a-MIValue.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIValue.c' object='src/mi/libmi_a-MIValue.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_routing_table_file.obj: src/impl/sdm_routing_table_file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_routing_table_file.obj -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_routing_table_file.Tpo -c -o src/impl/libsdm_a-sdm_routing_table_file.obj `if test -f 'src/impl/sdm_routing_table_file.c'; then $(CYGPATH_W) 'src/impl/sdm_routing_table_file.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routing_table_file.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_routing_table_file.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_routing_table_file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routing_table_file.c' object='src/impl/libsdm_a-sdm_routing_table_file.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIValue.obj `if test -f 'src/mi/MIValue.c'; then $(CYGPATH_W) 'src/mi/MIValue.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIValue.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_routing_table_file.obj `if test -f 'src/impl/sdm_routing_table_file.c'; then $(CYGPATH_W) 'src/impl/sdm_routing_table_file.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routing_table_file.c'; fi`
 
-src/mi/libmi_a-MIString.o: src/mi/MIString.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIString.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIString.Tpo -c -o src/mi/libmi_a-MIString.o `test -f 'src/mi/MIString.c' || echo '$(srcdir)/'`src/mi/MIString.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIString.Tpo src/mi/$(DEPDIR)/libmi_a-MIString.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIString.c' object='src/mi/libmi_a-MIString.o' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_set_bitset.o: src/impl/sdm_set_bitset.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_set_bitset.o -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_set_bitset.Tpo -c -o src/impl/libsdm_a-sdm_set_bitset.o `test -f 'src/impl/sdm_set_bitset.c' || echo '$(srcdir)/'`src/impl/sdm_set_bitset.c
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_set_bitset.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_set_bitset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_set_bitset.c' object='src/impl/libsdm_a-sdm_set_bitset.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIString.o `test -f 'src/mi/MIString.c' || echo '$(srcdir)/'`src/mi/MIString.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_set_bitset.o `test -f 'src/impl/sdm_set_bitset.c' || echo '$(srcdir)/'`src/impl/sdm_set_bitset.c
 
-src/mi/libmi_a-MIString.obj: src/mi/MIString.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIString.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIString.Tpo -c -o src/mi/libmi_a-MIString.obj `if test -f 'src/mi/MIString.c'; then $(CYGPATH_W) 'src/mi/MIString.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIString.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIString.Tpo src/mi/$(DEPDIR)/libmi_a-MIString.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIString.c' object='src/mi/libmi_a-MIString.obj' libtool=no @AMDEPBACKSLASH@
+src/impl/libsdm_a-sdm_set_bitset.obj: src/impl/sdm_set_bitset.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -MT src/impl/libsdm_a-sdm_set_bitset.obj -MD -MP -MF src/impl/$(DEPDIR)/libsdm_a-sdm_set_bitset.Tpo -c -o src/impl/libsdm_a-sdm_set_bitset.obj `if test -f 'src/impl/sdm_set_bitset.c'; then $(CYGPATH_W) 'src/impl/sdm_set_bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_set_bitset.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/libsdm_a-sdm_set_bitset.Tpo src/impl/$(DEPDIR)/libsdm_a-sdm_set_bitset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_set_bitset.c' object='src/impl/libsdm_a-sdm_set_bitset.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIString.obj `if test -f 'src/mi/MIString.c'; then $(CYGPATH_W) 'src/mi/MIString.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIString.c'; fi`
-
-src/mi/libmi_a-MIBreakpoint.o: src/mi/MIBreakpoint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIBreakpoint.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIBreakpoint.Tpo -c -o src/mi/libmi_a-MIBreakpoint.o `test -f 'src/mi/MIBreakpoint.c' || echo '$(srcdir)/'`src/mi/MIBreakpoint.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIBreakpoint.Tpo src/mi/$(DEPDIR)/libmi_a-MIBreakpoint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIBreakpoint.c' object='src/mi/libmi_a-MIBreakpoint.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIBreakpoint.o `test -f 'src/mi/MIBreakpoint.c' || echo '$(srcdir)/'`src/mi/MIBreakpoint.c
-
-src/mi/libmi_a-MIBreakpoint.obj: src/mi/MIBreakpoint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIBreakpoint.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIBreakpoint.Tpo -c -o src/mi/libmi_a-MIBreakpoint.obj `if test -f 'src/mi/MIBreakpoint.c'; then $(CYGPATH_W) 'src/mi/MIBreakpoint.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIBreakpoint.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIBreakpoint.Tpo src/mi/$(DEPDIR)/libmi_a-MIBreakpoint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIBreakpoint.c' object='src/mi/libmi_a-MIBreakpoint.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIBreakpoint.obj `if test -f 'src/mi/MIBreakpoint.c'; then $(CYGPATH_W) 'src/mi/MIBreakpoint.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIBreakpoint.c'; fi`
-
-src/mi/libmi_a-MIFrame.o: src/mi/MIFrame.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIFrame.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIFrame.Tpo -c -o src/mi/libmi_a-MIFrame.o `test -f 'src/mi/MIFrame.c' || echo '$(srcdir)/'`src/mi/MIFrame.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIFrame.Tpo src/mi/$(DEPDIR)/libmi_a-MIFrame.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIFrame.c' object='src/mi/libmi_a-MIFrame.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIFrame.o `test -f 'src/mi/MIFrame.c' || echo '$(srcdir)/'`src/mi/MIFrame.c
-
-src/mi/libmi_a-MIFrame.obj: src/mi/MIFrame.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIFrame.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIFrame.Tpo -c -o src/mi/libmi_a-MIFrame.obj `if test -f 'src/mi/MIFrame.c'; then $(CYGPATH_W) 'src/mi/MIFrame.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIFrame.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIFrame.Tpo src/mi/$(DEPDIR)/libmi_a-MIFrame.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIFrame.c' object='src/mi/libmi_a-MIFrame.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIFrame.obj `if test -f 'src/mi/MIFrame.c'; then $(CYGPATH_W) 'src/mi/MIFrame.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIFrame.c'; fi`
-
-src/mi/libmi_a-MIThread.o: src/mi/MIThread.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIThread.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIThread.Tpo -c -o src/mi/libmi_a-MIThread.o `test -f 'src/mi/MIThread.c' || echo '$(srcdir)/'`src/mi/MIThread.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIThread.Tpo src/mi/$(DEPDIR)/libmi_a-MIThread.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIThread.c' object='src/mi/libmi_a-MIThread.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIThread.o `test -f 'src/mi/MIThread.c' || echo '$(srcdir)/'`src/mi/MIThread.c
-
-src/mi/libmi_a-MIThread.obj: src/mi/MIThread.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIThread.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIThread.Tpo -c -o src/mi/libmi_a-MIThread.obj `if test -f 'src/mi/MIThread.c'; then $(CYGPATH_W) 'src/mi/MIThread.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIThread.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIThread.Tpo src/mi/$(DEPDIR)/libmi_a-MIThread.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIThread.c' object='src/mi/libmi_a-MIThread.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIThread.obj `if test -f 'src/mi/MIThread.c'; then $(CYGPATH_W) 'src/mi/MIThread.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIThread.c'; fi`
-
-src/mi/libmi_a-MIArg.o: src/mi/MIArg.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIArg.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIArg.Tpo -c -o src/mi/libmi_a-MIArg.o `test -f 'src/mi/MIArg.c' || echo '$(srcdir)/'`src/mi/MIArg.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIArg.Tpo src/mi/$(DEPDIR)/libmi_a-MIArg.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIArg.c' object='src/mi/libmi_a-MIArg.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIArg.o `test -f 'src/mi/MIArg.c' || echo '$(srcdir)/'`src/mi/MIArg.c
-
-src/mi/libmi_a-MIArg.obj: src/mi/MIArg.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIArg.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIArg.Tpo -c -o src/mi/libmi_a-MIArg.obj `if test -f 'src/mi/MIArg.c'; then $(CYGPATH_W) 'src/mi/MIArg.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIArg.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIArg.Tpo src/mi/$(DEPDIR)/libmi_a-MIArg.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIArg.c' object='src/mi/libmi_a-MIArg.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIArg.obj `if test -f 'src/mi/MIArg.c'; then $(CYGPATH_W) 'src/mi/MIArg.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIArg.c'; fi`
-
-src/mi/libmi_a-MIVar.o: src/mi/MIVar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIVar.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIVar.Tpo -c -o src/mi/libmi_a-MIVar.o `test -f 'src/mi/MIVar.c' || echo '$(srcdir)/'`src/mi/MIVar.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIVar.Tpo src/mi/$(DEPDIR)/libmi_a-MIVar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIVar.c' object='src/mi/libmi_a-MIVar.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIVar.o `test -f 'src/mi/MIVar.c' || echo '$(srcdir)/'`src/mi/MIVar.c
-
-src/mi/libmi_a-MIVar.obj: src/mi/MIVar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIVar.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIVar.Tpo -c -o src/mi/libmi_a-MIVar.obj `if test -f 'src/mi/MIVar.c'; then $(CYGPATH_W) 'src/mi/MIVar.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIVar.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIVar.Tpo src/mi/$(DEPDIR)/libmi_a-MIVar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIVar.c' object='src/mi/libmi_a-MIVar.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIVar.obj `if test -f 'src/mi/MIVar.c'; then $(CYGPATH_W) 'src/mi/MIVar.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIVar.c'; fi`
-
-src/mi/libmi_a-MIEvent.o: src/mi/MIEvent.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIEvent.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIEvent.Tpo -c -o src/mi/libmi_a-MIEvent.o `test -f 'src/mi/MIEvent.c' || echo '$(srcdir)/'`src/mi/MIEvent.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIEvent.Tpo src/mi/$(DEPDIR)/libmi_a-MIEvent.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIEvent.c' object='src/mi/libmi_a-MIEvent.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIEvent.o `test -f 'src/mi/MIEvent.c' || echo '$(srcdir)/'`src/mi/MIEvent.c
-
-src/mi/libmi_a-MIEvent.obj: src/mi/MIEvent.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIEvent.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIEvent.Tpo -c -o src/mi/libmi_a-MIEvent.obj `if test -f 'src/mi/MIEvent.c'; then $(CYGPATH_W) 'src/mi/MIEvent.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIEvent.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIEvent.Tpo src/mi/$(DEPDIR)/libmi_a-MIEvent.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIEvent.c' object='src/mi/libmi_a-MIEvent.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIEvent.obj `if test -f 'src/mi/MIEvent.c'; then $(CYGPATH_W) 'src/mi/MIEvent.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIEvent.c'; fi`
-
-src/mi/libmi_a-MICommand.o: src/mi/MICommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MICommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MICommand.Tpo -c -o src/mi/libmi_a-MICommand.o `test -f 'src/mi/MICommand.c' || echo '$(srcdir)/'`src/mi/MICommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MICommand.Tpo src/mi/$(DEPDIR)/libmi_a-MICommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MICommand.c' object='src/mi/libmi_a-MICommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MICommand.o `test -f 'src/mi/MICommand.c' || echo '$(srcdir)/'`src/mi/MICommand.c
-
-src/mi/libmi_a-MICommand.obj: src/mi/MICommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MICommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MICommand.Tpo -c -o src/mi/libmi_a-MICommand.obj `if test -f 'src/mi/MICommand.c'; then $(CYGPATH_W) 'src/mi/MICommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MICommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MICommand.Tpo src/mi/$(DEPDIR)/libmi_a-MICommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MICommand.c' object='src/mi/libmi_a-MICommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MICommand.obj `if test -f 'src/mi/MICommand.c'; then $(CYGPATH_W) 'src/mi/MICommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MICommand.c'; fi`
-
-src/mi/libmi_a-MIGDBCommand.o: src/mi/MIGDBCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIGDBCommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Tpo -c -o src/mi/libmi_a-MIGDBCommand.o `test -f 'src/mi/MIGDBCommand.c' || echo '$(srcdir)/'`src/mi/MIGDBCommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIGDBCommand.c' object='src/mi/libmi_a-MIGDBCommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIGDBCommand.o `test -f 'src/mi/MIGDBCommand.c' || echo '$(srcdir)/'`src/mi/MIGDBCommand.c
-
-src/mi/libmi_a-MIGDBCommand.obj: src/mi/MIGDBCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIGDBCommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Tpo -c -o src/mi/libmi_a-MIGDBCommand.obj `if test -f 'src/mi/MIGDBCommand.c'; then $(CYGPATH_W) 'src/mi/MIGDBCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIGDBCommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIGDBCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIGDBCommand.c' object='src/mi/libmi_a-MIGDBCommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIGDBCommand.obj `if test -f 'src/mi/MIGDBCommand.c'; then $(CYGPATH_W) 'src/mi/MIGDBCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIGDBCommand.c'; fi`
-
-src/mi/libmi_a-MIExecCommand.o: src/mi/MIExecCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIExecCommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Tpo -c -o src/mi/libmi_a-MIExecCommand.o `test -f 'src/mi/MIExecCommand.c' || echo '$(srcdir)/'`src/mi/MIExecCommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIExecCommand.c' object='src/mi/libmi_a-MIExecCommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIExecCommand.o `test -f 'src/mi/MIExecCommand.c' || echo '$(srcdir)/'`src/mi/MIExecCommand.c
-
-src/mi/libmi_a-MIExecCommand.obj: src/mi/MIExecCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIExecCommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Tpo -c -o src/mi/libmi_a-MIExecCommand.obj `if test -f 'src/mi/MIExecCommand.c'; then $(CYGPATH_W) 'src/mi/MIExecCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIExecCommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIExecCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIExecCommand.c' object='src/mi/libmi_a-MIExecCommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIExecCommand.obj `if test -f 'src/mi/MIExecCommand.c'; then $(CYGPATH_W) 'src/mi/MIExecCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIExecCommand.c'; fi`
-
-src/mi/libmi_a-MIBreakCommand.o: src/mi/MIBreakCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIBreakCommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIBreakCommand.Tpo -c -o src/mi/libmi_a-MIBreakCommand.o `test -f 'src/mi/MIBreakCommand.c' || echo '$(srcdir)/'`src/mi/MIBreakCommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIBreakCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIBreakCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIBreakCommand.c' object='src/mi/libmi_a-MIBreakCommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIBreakCommand.o `test -f 'src/mi/MIBreakCommand.c' || echo '$(srcdir)/'`src/mi/MIBreakCommand.c
-
-src/mi/libmi_a-MIBreakCommand.obj: src/mi/MIBreakCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIBreakCommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIBreakCommand.Tpo -c -o src/mi/libmi_a-MIBreakCommand.obj `if test -f 'src/mi/MIBreakCommand.c'; then $(CYGPATH_W) 'src/mi/MIBreakCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIBreakCommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIBreakCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIBreakCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIBreakCommand.c' object='src/mi/libmi_a-MIBreakCommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIBreakCommand.obj `if test -f 'src/mi/MIBreakCommand.c'; then $(CYGPATH_W) 'src/mi/MIBreakCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIBreakCommand.c'; fi`
-
-src/mi/libmi_a-MIStackCommand.o: src/mi/MIStackCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIStackCommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIStackCommand.Tpo -c -o src/mi/libmi_a-MIStackCommand.o `test -f 'src/mi/MIStackCommand.c' || echo '$(srcdir)/'`src/mi/MIStackCommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIStackCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIStackCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIStackCommand.c' object='src/mi/libmi_a-MIStackCommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIStackCommand.o `test -f 'src/mi/MIStackCommand.c' || echo '$(srcdir)/'`src/mi/MIStackCommand.c
-
-src/mi/libmi_a-MIStackCommand.obj: src/mi/MIStackCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIStackCommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIStackCommand.Tpo -c -o src/mi/libmi_a-MIStackCommand.obj `if test -f 'src/mi/MIStackCommand.c'; then $(CYGPATH_W) 'src/mi/MIStackCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIStackCommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIStackCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIStackCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIStackCommand.c' object='src/mi/libmi_a-MIStackCommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIStackCommand.obj `if test -f 'src/mi/MIStackCommand.c'; then $(CYGPATH_W) 'src/mi/MIStackCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIStackCommand.c'; fi`
-
-src/mi/libmi_a-MIVarCommand.o: src/mi/MIVarCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIVarCommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Tpo -c -o src/mi/libmi_a-MIVarCommand.o `test -f 'src/mi/MIVarCommand.c' || echo '$(srcdir)/'`src/mi/MIVarCommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIVarCommand.c' object='src/mi/libmi_a-MIVarCommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIVarCommand.o `test -f 'src/mi/MIVarCommand.c' || echo '$(srcdir)/'`src/mi/MIVarCommand.c
-
-src/mi/libmi_a-MIVarCommand.obj: src/mi/MIVarCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIVarCommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Tpo -c -o src/mi/libmi_a-MIVarCommand.obj `if test -f 'src/mi/MIVarCommand.c'; then $(CYGPATH_W) 'src/mi/MIVarCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIVarCommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIVarCommand.c' object='src/mi/libmi_a-MIVarCommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIVarCommand.obj `if test -f 'src/mi/MIVarCommand.c'; then $(CYGPATH_W) 'src/mi/MIVarCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIVarCommand.c'; fi`
-
-src/mi/libmi_a-MIError.o: src/mi/MIError.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIError.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIError.Tpo -c -o src/mi/libmi_a-MIError.o `test -f 'src/mi/MIError.c' || echo '$(srcdir)/'`src/mi/MIError.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIError.Tpo src/mi/$(DEPDIR)/libmi_a-MIError.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIError.c' object='src/mi/libmi_a-MIError.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIError.o `test -f 'src/mi/MIError.c' || echo '$(srcdir)/'`src/mi/MIError.c
-
-src/mi/libmi_a-MIError.obj: src/mi/MIError.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIError.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIError.Tpo -c -o src/mi/libmi_a-MIError.obj `if test -f 'src/mi/MIError.c'; then $(CYGPATH_W) 'src/mi/MIError.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIError.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIError.Tpo src/mi/$(DEPDIR)/libmi_a-MIError.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIError.c' object='src/mi/libmi_a-MIError.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIError.obj `if test -f 'src/mi/MIError.c'; then $(CYGPATH_W) 'src/mi/MIError.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIError.c'; fi`
-
-src/mi/libmi_a-MISession.o: src/mi/MISession.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MISession.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MISession.Tpo -c -o src/mi/libmi_a-MISession.o `test -f 'src/mi/MISession.c' || echo '$(srcdir)/'`src/mi/MISession.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MISession.Tpo src/mi/$(DEPDIR)/libmi_a-MISession.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MISession.c' object='src/mi/libmi_a-MISession.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MISession.o `test -f 'src/mi/MISession.c' || echo '$(srcdir)/'`src/mi/MISession.c
-
-src/mi/libmi_a-MISession.obj: src/mi/MISession.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MISession.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MISession.Tpo -c -o src/mi/libmi_a-MISession.obj `if test -f 'src/mi/MISession.c'; then $(CYGPATH_W) 'src/mi/MISession.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MISession.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MISession.Tpo src/mi/$(DEPDIR)/libmi_a-MISession.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MISession.c' object='src/mi/libmi_a-MISession.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MISession.obj `if test -f 'src/mi/MISession.c'; then $(CYGPATH_W) 'src/mi/MISession.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MISession.c'; fi`
-
-src/mi/libmi_a-MIThreadCommand.o: src/mi/MIThreadCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIThreadCommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIThreadCommand.Tpo -c -o src/mi/libmi_a-MIThreadCommand.o `test -f 'src/mi/MIThreadCommand.c' || echo '$(srcdir)/'`src/mi/MIThreadCommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIThreadCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIThreadCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIThreadCommand.c' object='src/mi/libmi_a-MIThreadCommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIThreadCommand.o `test -f 'src/mi/MIThreadCommand.c' || echo '$(srcdir)/'`src/mi/MIThreadCommand.c
-
-src/mi/libmi_a-MIThreadCommand.obj: src/mi/MIThreadCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIThreadCommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIThreadCommand.Tpo -c -o src/mi/libmi_a-MIThreadCommand.obj `if test -f 'src/mi/MIThreadCommand.c'; then $(CYGPATH_W) 'src/mi/MIThreadCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIThreadCommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIThreadCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIThreadCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIThreadCommand.c' object='src/mi/libmi_a-MIThreadCommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIThreadCommand.obj `if test -f 'src/mi/MIThreadCommand.c'; then $(CYGPATH_W) 'src/mi/MIThreadCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIThreadCommand.c'; fi`
-
-src/mi/libmi_a-MIMemory.o: src/mi/MIMemory.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemory.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo -c -o src/mi/libmi_a-MIMemory.o `test -f 'src/mi/MIMemory.c' || echo '$(srcdir)/'`src/mi/MIMemory.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo src/mi/$(DEPDIR)/libmi_a-MIMemory.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemory.c' object='src/mi/libmi_a-MIMemory.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemory.o `test -f 'src/mi/MIMemory.c' || echo '$(srcdir)/'`src/mi/MIMemory.c
-
-src/mi/libmi_a-MIMemory.obj: src/mi/MIMemory.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemory.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo -c -o src/mi/libmi_a-MIMemory.obj `if test -f 'src/mi/MIMemory.c'; then $(CYGPATH_W) 'src/mi/MIMemory.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemory.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIMemory.Tpo src/mi/$(DEPDIR)/libmi_a-MIMemory.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemory.c' object='src/mi/libmi_a-MIMemory.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemory.obj `if test -f 'src/mi/MIMemory.c'; then $(CYGPATH_W) 'src/mi/MIMemory.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemory.c'; fi`
-
-src/mi/libmi_a-MIMemoryCommand.o: src/mi/MIMemoryCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemoryCommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo -c -o src/mi/libmi_a-MIMemoryCommand.o `test -f 'src/mi/MIMemoryCommand.c' || echo '$(srcdir)/'`src/mi/MIMemoryCommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemoryCommand.c' object='src/mi/libmi_a-MIMemoryCommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemoryCommand.o `test -f 'src/mi/MIMemoryCommand.c' || echo '$(srcdir)/'`src/mi/MIMemoryCommand.c
-
-src/mi/libmi_a-MIMemoryCommand.obj: src/mi/MIMemoryCommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIMemoryCommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo -c -o src/mi/libmi_a-MIMemoryCommand.obj `if test -f 'src/mi/MIMemoryCommand.c'; then $(CYGPATH_W) 'src/mi/MIMemoryCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemoryCommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Tpo src/mi/$(DEPDIR)/libmi_a-MIMemoryCommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIMemoryCommand.c' object='src/mi/libmi_a-MIMemoryCommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIMemoryCommand.obj `if test -f 'src/mi/MIMemoryCommand.c'; then $(CYGPATH_W) 'src/mi/MIMemoryCommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIMemoryCommand.c'; fi`
-
-src/mi/libmi_a-CLICommand.o: src/mi/CLICommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-CLICommand.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-CLICommand.Tpo -c -o src/mi/libmi_a-CLICommand.o `test -f 'src/mi/CLICommand.c' || echo '$(srcdir)/'`src/mi/CLICommand.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-CLICommand.Tpo src/mi/$(DEPDIR)/libmi_a-CLICommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/CLICommand.c' object='src/mi/libmi_a-CLICommand.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-CLICommand.o `test -f 'src/mi/CLICommand.c' || echo '$(srcdir)/'`src/mi/CLICommand.c
-
-src/mi/libmi_a-CLICommand.obj: src/mi/CLICommand.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-CLICommand.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-CLICommand.Tpo -c -o src/mi/libmi_a-CLICommand.obj `if test -f 'src/mi/CLICommand.c'; then $(CYGPATH_W) 'src/mi/CLICommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/CLICommand.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-CLICommand.Tpo src/mi/$(DEPDIR)/libmi_a-CLICommand.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/CLICommand.c' object='src/mi/libmi_a-CLICommand.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-CLICommand.obj `if test -f 'src/mi/CLICommand.c'; then $(CYGPATH_W) 'src/mi/CLICommand.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/CLICommand.c'; fi`
-
-src/mi/libmi_a-CLIOutput.o: src/mi/CLIOutput.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-CLIOutput.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-CLIOutput.Tpo -c -o src/mi/libmi_a-CLIOutput.o `test -f 'src/mi/CLIOutput.c' || echo '$(srcdir)/'`src/mi/CLIOutput.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-CLIOutput.Tpo src/mi/$(DEPDIR)/libmi_a-CLIOutput.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/CLIOutput.c' object='src/mi/libmi_a-CLIOutput.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-CLIOutput.o `test -f 'src/mi/CLIOutput.c' || echo '$(srcdir)/'`src/mi/CLIOutput.c
-
-src/mi/libmi_a-CLIOutput.obj: src/mi/CLIOutput.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-CLIOutput.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-CLIOutput.Tpo -c -o src/mi/libmi_a-CLIOutput.obj `if test -f 'src/mi/CLIOutput.c'; then $(CYGPATH_W) 'src/mi/CLIOutput.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/CLIOutput.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-CLIOutput.Tpo src/mi/$(DEPDIR)/libmi_a-CLIOutput.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/CLIOutput.c' object='src/mi/libmi_a-CLIOutput.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-CLIOutput.obj `if test -f 'src/mi/CLIOutput.c'; then $(CYGPATH_W) 'src/mi/CLIOutput.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/CLIOutput.c'; fi`
-
-src/mi/libmi_a-MIPty.o: src/mi/MIPty.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIPty.o -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo -c -o src/mi/libmi_a-MIPty.o `test -f 'src/mi/MIPty.c' || echo '$(srcdir)/'`src/mi/MIPty.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo src/mi/$(DEPDIR)/libmi_a-MIPty.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIPty.c' object='src/mi/libmi_a-MIPty.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIPty.o `test -f 'src/mi/MIPty.c' || echo '$(srcdir)/'`src/mi/MIPty.c
-
-src/mi/libmi_a-MIPty.obj: src/mi/MIPty.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIPty.obj -MD -MP -MF src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo -c -o src/mi/libmi_a-MIPty.obj `if test -f 'src/mi/MIPty.c'; then $(CYGPATH_W) 'src/mi/MIPty.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIPty.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/libmi_a-MIPty.Tpo src/mi/$(DEPDIR)/libmi_a-MIPty.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MIPty.c' object='src/mi/libmi_a-MIPty.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MIPty.obj `if test -f 'src/mi/MIPty.c'; then $(CYGPATH_W) 'src/mi/MIPty.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MIPty.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_set_bitset.obj `if test -f 'src/impl/sdm_set_bitset.c'; then $(CYGPATH_W) 'src/impl/sdm_set_bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_set_bitset.c'; fi`
 
 src/master/sdm-startup.o: src/master/startup.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/master/sdm-startup.o -MD -MP -MF src/master/$(DEPDIR)/sdm-startup.Tpo -c -o src/master/sdm-startup.o `test -f 'src/master/startup.c' || echo '$(srcdir)/'`src/master/startup.c
@@ -1379,118 +896,6 @@ src/server/sdm-test_backend.obj: src/server/test_backend.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/server/test_backend.c' object='src/server/sdm-test_backend.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/server/sdm-test_backend.obj `if test -f 'src/server/test_backend.c'; then $(CYGPATH_W) 'src/server/test_backend.c'; else $(CYGPATH_W) '$(srcdir)/src/server/test_backend.c'; fi`
-
-src/impl/sdm-sdm.o: src/impl/sdm.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm.Tpo -c -o src/impl/sdm-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm.Tpo src/impl/$(DEPDIR)/sdm-sdm.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/sdm-sdm.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm.o `test -f 'src/impl/sdm.c' || echo '$(srcdir)/'`src/impl/sdm.c
-
-src/impl/sdm-sdm.obj: src/impl/sdm.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm.Tpo -c -o src/impl/sdm-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm.Tpo src/impl/$(DEPDIR)/sdm-sdm.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm.c' object='src/impl/sdm-sdm.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm.obj `if test -f 'src/impl/sdm.c'; then $(CYGPATH_W) 'src/impl/sdm.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm.c'; fi`
-
-src/impl/sdm-sdm_aggregate_hash.o: src/impl/sdm_aggregate_hash.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_aggregate_hash.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo -c -o src/impl/sdm-sdm_aggregate_hash.o `test -f 'src/impl/sdm_aggregate_hash.c' || echo '$(srcdir)/'`src/impl/sdm_aggregate_hash.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_aggregate_hash.c' object='src/impl/sdm-sdm_aggregate_hash.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_aggregate_hash.o `test -f 'src/impl/sdm_aggregate_hash.c' || echo '$(srcdir)/'`src/impl/sdm_aggregate_hash.c
-
-src/impl/sdm-sdm_aggregate_hash.obj: src/impl/sdm_aggregate_hash.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_aggregate_hash.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo -c -o src/impl/sdm-sdm_aggregate_hash.obj `if test -f 'src/impl/sdm_aggregate_hash.c'; then $(CYGPATH_W) 'src/impl/sdm_aggregate_hash.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_aggregate_hash.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Tpo src/impl/$(DEPDIR)/sdm-sdm_aggregate_hash.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_aggregate_hash.c' object='src/impl/sdm-sdm_aggregate_hash.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_aggregate_hash.obj `if test -f 'src/impl/sdm_aggregate_hash.c'; then $(CYGPATH_W) 'src/impl/sdm_aggregate_hash.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_aggregate_hash.c'; fi`
-
-src/impl/sdm-sdm_hello_proto.o: src/impl/sdm_hello_proto.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_hello_proto.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Tpo -c -o src/impl/sdm-sdm_hello_proto.o `test -f 'src/impl/sdm_hello_proto.c' || echo '$(srcdir)/'`src/impl/sdm_hello_proto.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Tpo src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_hello_proto.c' object='src/impl/sdm-sdm_hello_proto.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_hello_proto.o `test -f 'src/impl/sdm_hello_proto.c' || echo '$(srcdir)/'`src/impl/sdm_hello_proto.c
-
-src/impl/sdm-sdm_hello_proto.obj: src/impl/sdm_hello_proto.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_hello_proto.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Tpo -c -o src/impl/sdm-sdm_hello_proto.obj `if test -f 'src/impl/sdm_hello_proto.c'; then $(CYGPATH_W) 'src/impl/sdm_hello_proto.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_hello_proto.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Tpo src/impl/$(DEPDIR)/sdm-sdm_hello_proto.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_hello_proto.c' object='src/impl/sdm-sdm_hello_proto.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_hello_proto.obj `if test -f 'src/impl/sdm_hello_proto.c'; then $(CYGPATH_W) 'src/impl/sdm_hello_proto.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_hello_proto.c'; fi`
-
-src/impl/sdm-sdm_message_tcpip.o: src/impl/sdm_message_tcpip.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_message_tcpip.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Tpo -c -o src/impl/sdm-sdm_message_tcpip.o `test -f 'src/impl/sdm_message_tcpip.c' || echo '$(srcdir)/'`src/impl/sdm_message_tcpip.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Tpo src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_tcpip.c' object='src/impl/sdm-sdm_message_tcpip.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_tcpip.o `test -f 'src/impl/sdm_message_tcpip.c' || echo '$(srcdir)/'`src/impl/sdm_message_tcpip.c
-
-src/impl/sdm-sdm_message_tcpip.obj: src/impl/sdm_message_tcpip.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_message_tcpip.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Tpo -c -o src/impl/sdm-sdm_message_tcpip.obj `if test -f 'src/impl/sdm_message_tcpip.c'; then $(CYGPATH_W) 'src/impl/sdm_message_tcpip.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_tcpip.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Tpo src/impl/$(DEPDIR)/sdm-sdm_message_tcpip.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_message_tcpip.c' object='src/impl/sdm-sdm_message_tcpip.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_message_tcpip.obj `if test -f 'src/impl/sdm_message_tcpip.c'; then $(CYGPATH_W) 'src/impl/sdm_message_tcpip.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_message_tcpip.c'; fi`
-
-src/impl/sdm-sdm_route_tree.o: src/impl/sdm_route_tree.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_tree.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo -c -o src/impl/sdm-sdm_route_tree.o `test -f 'src/impl/sdm_route_tree.c' || echo '$(srcdir)/'`src/impl/sdm_route_tree.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo src/impl/$(DEPDIR)/sdm-sdm_route_tree.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_tree.c' object='src/impl/sdm-sdm_route_tree.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_route_tree.o `test -f 'src/impl/sdm_route_tree.c' || echo '$(srcdir)/'`src/impl/sdm_route_tree.c
-
-src/impl/sdm-sdm_route_tree.obj: src/impl/sdm_route_tree.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_route_tree.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo -c -o src/impl/sdm-sdm_route_tree.obj `if test -f 'src/impl/sdm_route_tree.c'; then $(CYGPATH_W) 'src/impl/sdm_route_tree.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_tree.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_route_tree.Tpo src/impl/$(DEPDIR)/sdm-sdm_route_tree.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_route_tree.c' object='src/impl/sdm-sdm_route_tree.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_route_tree.obj `if test -f 'src/impl/sdm_route_tree.c'; then $(CYGPATH_W) 'src/impl/sdm_route_tree.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_route_tree.c'; fi`
-
-src/impl/sdm-sdm_routing_table_file.o: src/impl/sdm_routing_table_file.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_routing_table_file.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo -c -o src/impl/sdm-sdm_routing_table_file.o `test -f 'src/impl/sdm_routing_table_file.c' || echo '$(srcdir)/'`src/impl/sdm_routing_table_file.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routing_table_file.c' object='src/impl/sdm-sdm_routing_table_file.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_routing_table_file.o `test -f 'src/impl/sdm_routing_table_file.c' || echo '$(srcdir)/'`src/impl/sdm_routing_table_file.c
-
-src/impl/sdm-sdm_routing_table_file.obj: src/impl/sdm_routing_table_file.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_routing_table_file.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo -c -o src/impl/sdm-sdm_routing_table_file.obj `if test -f 'src/impl/sdm_routing_table_file.c'; then $(CYGPATH_W) 'src/impl/sdm_routing_table_file.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routing_table_file.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Tpo src/impl/$(DEPDIR)/sdm-sdm_routing_table_file.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_routing_table_file.c' object='src/impl/sdm-sdm_routing_table_file.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_routing_table_file.obj `if test -f 'src/impl/sdm_routing_table_file.c'; then $(CYGPATH_W) 'src/impl/sdm_routing_table_file.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_routing_table_file.c'; fi`
-
-src/impl/sdm-sdm_set_bitset.o: src/impl/sdm_set_bitset.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_set_bitset.o -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Tpo -c -o src/impl/sdm-sdm_set_bitset.o `test -f 'src/impl/sdm_set_bitset.c' || echo '$(srcdir)/'`src/impl/sdm_set_bitset.c
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Tpo src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_set_bitset.c' object='src/impl/sdm-sdm_set_bitset.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_set_bitset.o `test -f 'src/impl/sdm_set_bitset.c' || echo '$(srcdir)/'`src/impl/sdm_set_bitset.c
-
-src/impl/sdm-sdm_set_bitset.obj: src/impl/sdm_set_bitset.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/impl/sdm-sdm_set_bitset.obj -MD -MP -MF src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Tpo -c -o src/impl/sdm-sdm_set_bitset.obj `if test -f 'src/impl/sdm_set_bitset.c'; then $(CYGPATH_W) 'src/impl/sdm_set_bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_set_bitset.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Tpo src/impl/$(DEPDIR)/sdm-sdm_set_bitset.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_set_bitset.c' object='src/impl/sdm-sdm_set_bitset.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/impl/sdm-sdm_set_bitset.obj `if test -f 'src/impl/sdm_set_bitset.c'; then $(CYGPATH_W) 'src/impl/sdm_set_bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_set_bitset.c'; fi`
-
-src/mi/test_mi-test_mi.o: src/mi/test_mi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mi_CFLAGS) $(CFLAGS) -MT src/mi/test_mi-test_mi.o -MD -MP -MF src/mi/$(DEPDIR)/test_mi-test_mi.Tpo -c -o src/mi/test_mi-test_mi.o `test -f 'src/mi/test_mi.c' || echo '$(srcdir)/'`src/mi/test_mi.c
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/test_mi-test_mi.Tpo src/mi/$(DEPDIR)/test_mi-test_mi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/test_mi.c' object='src/mi/test_mi-test_mi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mi_CFLAGS) $(CFLAGS) -c -o src/mi/test_mi-test_mi.o `test -f 'src/mi/test_mi.c' || echo '$(srcdir)/'`src/mi/test_mi.c
-
-src/mi/test_mi-test_mi.obj: src/mi/test_mi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mi_CFLAGS) $(CFLAGS) -MT src/mi/test_mi-test_mi.obj -MD -MP -MF src/mi/$(DEPDIR)/test_mi-test_mi.Tpo -c -o src/mi/test_mi-test_mi.obj `if test -f 'src/mi/test_mi.c'; then $(CYGPATH_W) 'src/mi/test_mi.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/test_mi.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/mi/$(DEPDIR)/test_mi-test_mi.Tpo src/mi/$(DEPDIR)/test_mi-test_mi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/test_mi.c' object='src/mi/test_mi-test_mi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_mi_CFLAGS) $(CFLAGS) -c -o src/mi/test_mi-test_mi.obj `if test -f 'src/mi/test_mi.c'; then $(CYGPATH_W) 'src/mi/test_mi.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/test_mi.c'; fi`
 
 src/test/test_proxy-test_proxy.o: src/test/test_proxy.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -MT src/test/test_proxy-test_proxy.o -MD -MP -MF src/test/$(DEPDIR)/test_proxy-test_proxy.Tpo -c -o src/test/test_proxy-test_proxy.o `test -f 'src/test/test_proxy.c' || echo '$(srcdir)/'`src/test/test_proxy.c
@@ -1855,8 +1260,6 @@ distclean-generic:
 	-rm -f src/impl/$(am__dirstamp)
 	-rm -f src/master/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/master/$(am__dirstamp)
-	-rm -f src/mi/$(DEPDIR)/$(am__dirstamp)
-	-rm -f src/mi/$(am__dirstamp)
 	-rm -f src/server/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/server/$(am__dirstamp)
 	-rm -f src/test/$(DEPDIR)/$(am__dirstamp)
@@ -1874,7 +1277,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-noinstLIBRARIES \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/mi/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
+	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
@@ -1910,7 +1313,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/mi/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
+	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
