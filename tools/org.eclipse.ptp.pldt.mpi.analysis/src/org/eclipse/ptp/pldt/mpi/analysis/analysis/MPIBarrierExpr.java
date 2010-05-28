@@ -39,12 +39,12 @@ public class MPIBarrierExpr extends ASTVisitor {
 	protected MPICallGraphNode currentNode_;
 	private static final boolean traceOn=false;
 	
-	/* 
+	/**
 	 * switch statement may be nested 
 	 */
 	protected int depth = 0;
 	
-	/* 
+	/**
 	 * This field is used to recognize the associated case body. The idea is 
 	 * the case body should have the same parent with the "case" statement. 
 	 * One element in this stack is shared by all cases (and default) in one 
@@ -52,14 +52,15 @@ public class MPIBarrierExpr extends ASTVisitor {
 	 */
 	protected Stack<IASTNode> caseParent = null;
 	
-	/* 
+	/**
 	 * This field is used to record whether the current case has "break"
 	 * statement. Same as above, one element is shared by all cases and default 
 	 * in a switch statement.
 	 */
 	protected Stack<Boolean> withBreak = null;
 	
-	/* Each bucket in this hashtable is a List, hashed by communicator.
+	/**
+	 *  Each bucket in this hashtable is a List, hashed by communicator.
 	 * The List records the current barrier 
 	 * expression for each case statement in the current (nested)switch statement.
 	 * So: Hashtable(for each communicator) -->
@@ -463,7 +464,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 		return PROCESS_CONTINUE;
 	}
 	
-	/* 
+	/** 
 	 * If the current statement is a case body
 	 */
 	private void fixSwitch(String key, IASTStatement stmt, BarrierExpression BE){
@@ -504,7 +505,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 		if(init instanceof IASTInitializerExpression){
 			BE = (BarrierExpression)sk.pop();
 		}
-		else if(init instanceof IASTInitializerList){
+		else if(init instanceof IASTInitializerList){// BRT  !will this be encountered? 
 			IASTInitializerList list = (IASTInitializerList)init;
 			IASTInitializer[] inits = list.getInitializers();
 			for(int j = 0; j<inits.length; j++){
@@ -570,7 +571,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 				sk.push(be);
 			}
 		}
-		else if(expr instanceof IASTExpressionList){// BRT this will not get executed!!  should it be hit ONLY for fn arg exprList? or not? can we do this elsewhere e.g. functionCallExpr?
+		else if(expr instanceof IASTExpressionList){// BRT !this will not get executed!!  should it be hit ONLY for fn arg exprList? or not? can we do this elsewhere e.g. functionCallExpr?
 			IASTExpressionList exprList = (IASTExpressionList)expr;
 			IASTExpression[] exps = exprList.getExpressions();
 			if(exps.length == 0) return PROCESS_CONTINUE;
