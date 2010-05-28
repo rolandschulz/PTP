@@ -167,7 +167,7 @@ int
 do_test(session *s, char *dir, char *exe)
 {
 	bitset *		p1;
-	int			bpid = 54;
+	int				bpid = 54;
 	itimer *		t;
 	
 	t = itimer_new("debug");
@@ -254,3 +254,27 @@ do_test(session *s, char *dir, char *exe)
 	exit(0);
 }
 
+int
+main(int argc, char *argv[])
+{
+	session *	s;
+	char *		dir;
+	char *		exe;
+
+	if (argc < 2) {
+		fprintf(stderr, "usage: test_proxy_clnt exe [host]\n");
+		return 1;
+	}
+
+	dir = getcwd(NULL, 0);
+	exe = argv[1];
+
+	if (DbgInit(&s, argc, argv) < 0) {
+		fprintf(stderr, "DbgInit failed\n");
+		exit(1);
+	}
+
+	DbgRegisterEventHandler(s, event_callback, NULL);
+
+	return do_test(s, dir, exe);
+}

@@ -16,3 +16,4 @@ test_*
 config.status
 a.out.dSYM
 sdm_master
+sdm_test
