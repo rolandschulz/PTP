@@ -14,7 +14,7 @@ package org.eclipse.ptp.remotetools.core.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.remotetools.internal.ssh.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.remotetools.core.messages.messages"; //$NON-NLS-1$
 
 	static {
 		// initialize resource bundle
