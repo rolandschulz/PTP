@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 bin_PROGRAMS = sdm$(EXEEXT)
-noinst_PROGRAMS = test_proxy$(EXEEXT) test_proxy_rev$(EXEEXT)
+noinst_PROGRAMS = sdm_test$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -96,21 +96,12 @@ sdm_DEPENDENCIES = libsdm.a libdbgutils.a libmi/libmi.a \
 	libaif/libaif.a libmi/libmi.a
 sdm_LINK = $(CCLD) $(sdm_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
-am_test_proxy_OBJECTS = src/test/test_proxy-test_proxy.$(OBJEXT) \
-	src/test/test_proxy-test_proxy_clnt.$(OBJEXT)
-test_proxy_OBJECTS = $(am_test_proxy_OBJECTS)
-test_proxy_DEPENDENCIES = libsdm.a libdbgclnt.a libdbgutils.a \
+am_sdm_test_OBJECTS = src/test/sdm_test-sdm_test.$(OBJEXT)
+sdm_test_OBJECTS = $(am_sdm_test_OBJECTS)
+sdm_test_DEPENDENCIES = libsdm.a libdbgclnt.a libdbgutils.a \
 	libaif/libaif.a libmi/libmi.a
-test_proxy_LINK = $(CCLD) $(test_proxy_CFLAGS) $(CFLAGS) \
-	$(test_proxy_LDFLAGS) $(LDFLAGS) -o $@
-am_test_proxy_rev_OBJECTS =  \
-	src/test/test_proxy_rev-test_proxy_rev.$(OBJEXT) \
-	src/test/test_proxy_rev-test_proxy_clnt.$(OBJEXT)
-test_proxy_rev_OBJECTS = $(am_test_proxy_rev_OBJECTS)
-test_proxy_rev_DEPENDENCIES = libsdm.a libdbgclnt.a libdbgutils.a \
-	libaif/libaif.a libmi/libmi.a
-test_proxy_rev_LINK = $(CCLD) $(test_proxy_rev_CFLAGS) $(CFLAGS) \
-	$(test_proxy_rev_LDFLAGS) $(LDFLAGS) -o $@
+sdm_test_LINK = $(CCLD) $(sdm_test_CFLAGS) $(CFLAGS) \
+	$(sdm_test_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -119,11 +110,9 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(test_proxy_SOURCES) \
-	$(test_proxy_rev_SOURCES)
+	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(sdm_test_SOURCES)
 DIST_SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(test_proxy_SOURCES) \
-	$(test_proxy_rev_SOURCES)
+	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(sdm_test_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -261,18 +250,10 @@ libsdm_a_SOURCES = src/impl/sdm.c \
 							src/impl/sdm_set_bitset.c
 
 libsdm_a_CFLAGS = -I./include $(AM_CFLAGS)
-test_proxy_SOURCES = src/test/test_proxy.c \
-							src/test/test_proxy_clnt.c
-
-test_proxy_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
-test_proxy_LDFLAGS = -g
-test_proxy_LDADD = libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
-test_proxy_rev_SOURCES = src/test/test_proxy_rev.c \
-							src/test/test_proxy_clnt.c
-
-test_proxy_rev_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
-test_proxy_rev_LDFLAGS = -g
-test_proxy_rev_LDADD = libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
+sdm_test_SOURCES = src/test/sdm_test.c
+sdm_test_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
+sdm_test_LDFLAGS = -g
+sdm_test_LDADD = libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 noinst_HEADERS = include/backend.h \
 							include/breakpoint.h \
 							include/dbg_master.h \
@@ -483,20 +464,11 @@ src/test/$(am__dirstamp):
 src/test/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/test/$(DEPDIR)
 	@: > src/test/$(DEPDIR)/$(am__dirstamp)
-src/test/test_proxy-test_proxy.$(OBJEXT): src/test/$(am__dirstamp) \
+src/test/sdm_test-sdm_test.$(OBJEXT): src/test/$(am__dirstamp) \
 	src/test/$(DEPDIR)/$(am__dirstamp)
-src/test/test_proxy-test_proxy_clnt.$(OBJEXT):  \
-	src/test/$(am__dirstamp) src/test/$(DEPDIR)/$(am__dirstamp)
-test_proxy$(EXEEXT): $(test_proxy_OBJECTS) $(test_proxy_DEPENDENCIES) 
-	@rm -f test_proxy$(EXEEXT)
-	$(test_proxy_LINK) $(test_proxy_OBJECTS) $(test_proxy_LDADD) $(LIBS)
-src/test/test_proxy_rev-test_proxy_rev.$(OBJEXT):  \
-	src/test/$(am__dirstamp) src/test/$(DEPDIR)/$(am__dirstamp)
-src/test/test_proxy_rev-test_proxy_clnt.$(OBJEXT):  \
-	src/test/$(am__dirstamp) src/test/$(DEPDIR)/$(am__dirstamp)
-test_proxy_rev$(EXEEXT): $(test_proxy_rev_OBJECTS) $(test_proxy_rev_DEPENDENCIES) 
-	@rm -f test_proxy_rev$(EXEEXT)
-	$(test_proxy_rev_LINK) $(test_proxy_rev_OBJECTS) $(test_proxy_rev_LDADD) $(LIBS)
+sdm_test$(EXEEXT): $(sdm_test_OBJECTS) $(sdm_test_DEPENDENCIES) 
+	@rm -f sdm_test$(EXEEXT)
+	$(sdm_test_LINK) $(sdm_test_OBJECTS) $(sdm_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -516,10 +488,7 @@ mostlyclean-compile:
 	-rm -f src/server/sdm-server.$(OBJEXT)
 	-rm -f src/server/sdm-server_cmds.$(OBJEXT)
 	-rm -f src/server/sdm-test_backend.$(OBJEXT)
-	-rm -f src/test/test_proxy-test_proxy.$(OBJEXT)
-	-rm -f src/test/test_proxy-test_proxy_clnt.$(OBJEXT)
-	-rm -f src/test/test_proxy_rev-test_proxy_clnt.$(OBJEXT)
-	-rm -f src/test/test_proxy_rev-test_proxy_rev.$(OBJEXT)
+	-rm -f src/test/sdm_test-sdm_test.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-breakpoint.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-debug.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-error.$(OBJEXT)
@@ -547,10 +516,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-server_cmds.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-test_backend.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/test/$(DEPDIR)/test_proxy-test_proxy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/test/$(DEPDIR)/test_proxy-test_proxy_clnt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/test/$(DEPDIR)/test_proxy_rev-test_proxy_clnt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/test/$(DEPDIR)/test_proxy_rev-test_proxy_rev.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/test/$(DEPDIR)/sdm_test-sdm_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-breakpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-error.Po@am__quote@
@@ -897,61 +863,19 @@ src/server/sdm-test_backend.obj: src/server/test_backend.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/server/sdm-test_backend.obj `if test -f 'src/server/test_backend.c'; then $(CYGPATH_W) 'src/server/test_backend.c'; else $(CYGPATH_W) '$(srcdir)/src/server/test_backend.c'; fi`
 
-src/test/test_proxy-test_proxy.o: src/test/test_proxy.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -MT src/test/test_proxy-test_proxy.o -MD -MP -MF src/test/$(DEPDIR)/test_proxy-test_proxy.Tpo -c -o src/test/test_proxy-test_proxy.o `test -f 'src/test/test_proxy.c' || echo '$(srcdir)/'`src/test/test_proxy.c
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy-test_proxy.Tpo src/test/$(DEPDIR)/test_proxy-test_proxy.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy.c' object='src/test/test_proxy-test_proxy.o' libtool=no @AMDEPBACKSLASH@
+src/test/sdm_test-sdm_test.o: src/test/sdm_test.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_test_CFLAGS) $(CFLAGS) -MT src/test/sdm_test-sdm_test.o -MD -MP -MF src/test/$(DEPDIR)/sdm_test-sdm_test.Tpo -c -o src/test/sdm_test-sdm_test.o `test -f 'src/test/sdm_test.c' || echo '$(srcdir)/'`src/test/sdm_test.c
+@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/sdm_test-sdm_test.Tpo src/test/$(DEPDIR)/sdm_test-sdm_test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/sdm_test.c' object='src/test/sdm_test-sdm_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy-test_proxy.o `test -f 'src/test/test_proxy.c' || echo '$(srcdir)/'`src/test/test_proxy.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_test_CFLAGS) $(CFLAGS) -c -o src/test/sdm_test-sdm_test.o `test -f 'src/test/sdm_test.c' || echo '$(srcdir)/'`src/test/sdm_test.c
 
-src/test/test_proxy-test_proxy.obj: src/test/test_proxy.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -MT src/test/test_proxy-test_proxy.obj -MD -MP -MF src/test/$(DEPDIR)/test_proxy-test_proxy.Tpo -c -o src/test/test_proxy-test_proxy.obj `if test -f 'src/test/test_proxy.c'; then $(CYGPATH_W) 'src/test/test_proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy-test_proxy.Tpo src/test/$(DEPDIR)/test_proxy-test_proxy.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy.c' object='src/test/test_proxy-test_proxy.obj' libtool=no @AMDEPBACKSLASH@
+src/test/sdm_test-sdm_test.obj: src/test/sdm_test.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_test_CFLAGS) $(CFLAGS) -MT src/test/sdm_test-sdm_test.obj -MD -MP -MF src/test/$(DEPDIR)/sdm_test-sdm_test.Tpo -c -o src/test/sdm_test-sdm_test.obj `if test -f 'src/test/sdm_test.c'; then $(CYGPATH_W) 'src/test/sdm_test.c'; else $(CYGPATH_W) '$(srcdir)/src/test/sdm_test.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/sdm_test-sdm_test.Tpo src/test/$(DEPDIR)/sdm_test-sdm_test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/sdm_test.c' object='src/test/sdm_test-sdm_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy-test_proxy.obj `if test -f 'src/test/test_proxy.c'; then $(CYGPATH_W) 'src/test/test_proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy.c'; fi`
-
-src/test/test_proxy-test_proxy_clnt.o: src/test/test_proxy_clnt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -MT src/test/test_proxy-test_proxy_clnt.o -MD -MP -MF src/test/$(DEPDIR)/test_proxy-test_proxy_clnt.Tpo -c -o src/test/test_proxy-test_proxy_clnt.o `test -f 'src/test/test_proxy_clnt.c' || echo '$(srcdir)/'`src/test/test_proxy_clnt.c
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy-test_proxy_clnt.Tpo src/test/$(DEPDIR)/test_proxy-test_proxy_clnt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy_clnt.c' object='src/test/test_proxy-test_proxy_clnt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy-test_proxy_clnt.o `test -f 'src/test/test_proxy_clnt.c' || echo '$(srcdir)/'`src/test/test_proxy_clnt.c
-
-src/test/test_proxy-test_proxy_clnt.obj: src/test/test_proxy_clnt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -MT src/test/test_proxy-test_proxy_clnt.obj -MD -MP -MF src/test/$(DEPDIR)/test_proxy-test_proxy_clnt.Tpo -c -o src/test/test_proxy-test_proxy_clnt.obj `if test -f 'src/test/test_proxy_clnt.c'; then $(CYGPATH_W) 'src/test/test_proxy_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy_clnt.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy-test_proxy_clnt.Tpo src/test/$(DEPDIR)/test_proxy-test_proxy_clnt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy_clnt.c' object='src/test/test_proxy-test_proxy_clnt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy-test_proxy_clnt.obj `if test -f 'src/test/test_proxy_clnt.c'; then $(CYGPATH_W) 'src/test/test_proxy_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy_clnt.c'; fi`
-
-src/test/test_proxy_rev-test_proxy_rev.o: src/test/test_proxy_rev.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -MT src/test/test_proxy_rev-test_proxy_rev.o -MD -MP -MF src/test/$(DEPDIR)/test_proxy_rev-test_proxy_rev.Tpo -c -o src/test/test_proxy_rev-test_proxy_rev.o `test -f 'src/test/test_proxy_rev.c' || echo '$(srcdir)/'`src/test/test_proxy_rev.c
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy_rev-test_proxy_rev.Tpo src/test/$(DEPDIR)/test_proxy_rev-test_proxy_rev.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy_rev.c' object='src/test/test_proxy_rev-test_proxy_rev.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy_rev-test_proxy_rev.o `test -f 'src/test/test_proxy_rev.c' || echo '$(srcdir)/'`src/test/test_proxy_rev.c
-
-src/test/test_proxy_rev-test_proxy_rev.obj: src/test/test_proxy_rev.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -MT src/test/test_proxy_rev-test_proxy_rev.obj -MD -MP -MF src/test/$(DEPDIR)/test_proxy_rev-test_proxy_rev.Tpo -c -o src/test/test_proxy_rev-test_proxy_rev.obj `if test -f 'src/test/test_proxy_rev.c'; then $(CYGPATH_W) 'src/test/test_proxy_rev.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy_rev.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy_rev-test_proxy_rev.Tpo src/test/$(DEPDIR)/test_proxy_rev-test_proxy_rev.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy_rev.c' object='src/test/test_proxy_rev-test_proxy_rev.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy_rev-test_proxy_rev.obj `if test -f 'src/test/test_proxy_rev.c'; then $(CYGPATH_W) 'src/test/test_proxy_rev.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy_rev.c'; fi`
-
-src/test/test_proxy_rev-test_proxy_clnt.o: src/test/test_proxy_clnt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -MT src/test/test_proxy_rev-test_proxy_clnt.o -MD -MP -MF src/test/$(DEPDIR)/test_proxy_rev-test_proxy_clnt.Tpo -c -o src/test/test_proxy_rev-test_proxy_clnt.o `test -f 'src/test/test_proxy_clnt.c' || echo '$(srcdir)/'`src/test/test_proxy_clnt.c
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy_rev-test_proxy_clnt.Tpo src/test/$(DEPDIR)/test_proxy_rev-test_proxy_clnt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy_clnt.c' object='src/test/test_proxy_rev-test_proxy_clnt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy_rev-test_proxy_clnt.o `test -f 'src/test/test_proxy_clnt.c' || echo '$(srcdir)/'`src/test/test_proxy_clnt.c
-
-src/test/test_proxy_rev-test_proxy_clnt.obj: src/test/test_proxy_clnt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -MT src/test/test_proxy_rev-test_proxy_clnt.obj -MD -MP -MF src/test/$(DEPDIR)/test_proxy_rev-test_proxy_clnt.Tpo -c -o src/test/test_proxy_rev-test_proxy_clnt.obj `if test -f 'src/test/test_proxy_clnt.c'; then $(CYGPATH_W) 'src/test/test_proxy_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy_clnt.c'; fi`
-@am__fastdepCC_TRUE@	mv -f src/test/$(DEPDIR)/test_proxy_rev-test_proxy_clnt.Tpo src/test/$(DEPDIR)/test_proxy_rev-test_proxy_clnt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/test/test_proxy_clnt.c' object='src/test/test_proxy_rev-test_proxy_clnt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_proxy_rev_CFLAGS) $(CFLAGS) -c -o src/test/test_proxy_rev-test_proxy_clnt.obj `if test -f 'src/test/test_proxy_clnt.c'; then $(CYGPATH_W) 'src/test/test_proxy_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/test/test_proxy_clnt.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_test_CFLAGS) $(CFLAGS) -c -o src/test/sdm_test-sdm_test.obj `if test -f 'src/test/sdm_test.c'; then $(CYGPATH_W) 'src/test/sdm_test.c'; else $(CYGPATH_W) '$(srcdir)/src/test/sdm_test.c'; fi`
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.

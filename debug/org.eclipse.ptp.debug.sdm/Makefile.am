@@ -1,7 +1,7 @@
 SUBDIRS =					libaif libmi
 
 bin_PROGRAMS =				sdm
-noinst_PROGRAMS =			test_proxy test_proxy_rev
+noinst_PROGRAMS =			sdm_test
 
 sdm_SOURCES =				src/master/startup.c\
 							src/master/master.c \
@@ -24,17 +24,10 @@ libsdm_a_SOURCES =			src/impl/sdm.c \
 					
 libsdm_a_CFLAGS =			-I./include $(AM_CFLAGS)
 
-test_proxy_SOURCES =		src/test/test_proxy.c \
-							src/test/test_proxy_clnt.c
-test_proxy_CFLAGS =			-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
-test_proxy_LDFLAGS = 		-g
-test_proxy_LDADD =			libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
-
-test_proxy_rev_SOURCES =	src/test/test_proxy_rev.c \
-							src/test/test_proxy_clnt.c
-test_proxy_rev_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
-test_proxy_rev_LDFLAGS = 	-g
-test_proxy_rev_LDADD =		libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
+sdm_test_SOURCES =			src/test/sdm_test.c
+sdm_test_CFLAGS =			-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
+sdm_test_LDFLAGS = 			-g
+sdm_test_LDADD =			libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 
 noinst_HEADERS =			include/backend.h \
 							include/breakpoint.h \
