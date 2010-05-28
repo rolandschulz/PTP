@@ -355,14 +355,6 @@ TestSetCurrentStackframe(int level)
 	return DBGRES_OK;
 }
 
-static int
-GetStackframes(int current, int low, int high, List **flist)
-{
-	//pass flist pointer
-	//SendCommandWait(DebugSession, cmd);
-	return DBGRES_OK;
-}
-
 /*
 ** List current or all stack frames.
 */
