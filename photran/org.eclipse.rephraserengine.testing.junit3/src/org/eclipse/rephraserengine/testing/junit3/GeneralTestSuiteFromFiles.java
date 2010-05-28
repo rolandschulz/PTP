@@ -56,14 +56,14 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         
         File dir = new File(testDirectory);
         if (mustExist && !dir.exists())
-            throw new FileNotFoundException("Directory " + dir.getAbsolutePath() + " not found");
+            throw new FileNotFoundException(Messages.bind(Messages.GeneralTestSuiteFromFiles_DirectoryNotFound, dir.getAbsolutePath()));
 
         if (dir.exists())
         {
             processDirectory(dir, getFilesToSkip(dir));
     
             if (this.countTestCases() == 0)
-                throw new FileNotFoundException("No test files found in " + dir.getAbsolutePath());
+                throw new FileNotFoundException(Messages.bind(Messages.GeneralTestSuiteFromFiles_NoTestFilesFoundInDirectory, dir.getAbsolutePath()));
         }
     }
 
@@ -108,11 +108,13 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         if (!new File(dir).exists())
         {
             if (mustExist)
-                throw new Error("Unable to find directory " + dir + " (working directory is "
-                    + getWorkingDirectory() + ")");
+                throw new Error(
+                    Messages.bind(
+                        Messages.GeneralTestSuiteFromFiles_UnableToFindDirectory,
+                        dir,
+                        getWorkingDirectory()));
             else
-                message = "NOTE: Some optional test files are not present: directory " + dir
-                    + " does not exist";
+                message = Messages.bind(Messages.GeneralTestSuiteFromFiles_SomeOptionalTestFilesAreNotPresent, dir);
         }
 
         return message;
@@ -122,11 +124,11 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
     {
         try
         {
-            return new File(".").getCanonicalPath();
+            return new File(".").getCanonicalPath(); //$NON-NLS-1$
         }
         catch (IOException e)
         {
-            return "???";
+            return "???"; //$NON-NLS-1$
         }
     }
 
@@ -136,17 +138,17 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
 
         String rootDirectory = getRootDirectory();
         sb.append(rootDirectory);
-        if (!rootDirectory.equals("") && !rootDirectory.endsWith("/")) sb.append('/');
+        if (!rootDirectory.equals("") && !rootDirectory.endsWith("/")) sb.append('/'); //$NON-NLS-1$ //$NON-NLS-2$
 
         sb.append(directorySuffix);
-        if (!directorySuffix.endsWith("/")) sb.append('/');
+        if (!directorySuffix.endsWith("/")) sb.append('/'); //$NON-NLS-1$
 
         return sb.toString();
     }
 
     protected String getRootDirectory()
     {
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     protected Set<String> getFilesToSkip(File subdirectory)
@@ -165,7 +167,7 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
 
     protected String nameOfTextFileContainingFilesToSkip()
     {
-        return "FILES-TO-SKIP.txt";
+        return "FILES-TO-SKIP.txt"; //$NON-NLS-1$
     }
 
     protected Set<String> filesListedIn(File list)
@@ -178,7 +180,7 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
             for (String line = r.readLine(); line != null; line = r.readLine())
             {
                 line = line.trim();
-                if (!line.equals("")) result.add(line);
+                if (!line.equals("")) result.add(line); //$NON-NLS-1$
             }
 
             return result;
@@ -203,7 +205,7 @@ public abstract class GeneralTestSuiteFromFiles extends TestSuite
         {
             if (!shouldSkip(file, filenamesToSkip))
             {
-                TestSuite subSuite = new TestSuite(description + " " + describe(file));
+                TestSuite subSuite = new TestSuite(description + " " + describe(file)); //$NON-NLS-1$
                 subSuite.addTest(createTestFor(file));
                 addTest(subSuite);
             }

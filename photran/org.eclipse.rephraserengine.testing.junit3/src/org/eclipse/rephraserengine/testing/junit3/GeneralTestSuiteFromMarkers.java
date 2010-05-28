@@ -61,7 +61,7 @@ public abstract class GeneralTestSuiteFromMarkers extends TestSuite
         addTestsForFileOrDirectory(fileOrDirectory, filenameFilter);
 
         if (countTestCases() == 0)
-            throw new Exception("No markers of the form " + marker + " found in " + fileOrDirectory.getName());
+            throw new Exception(Messages.bind(Messages.GeneralTestSuiteFromMarkers_NoMarkersFound, marker, fileOrDirectory.getName()));
     }
 
     /**
@@ -90,9 +90,9 @@ public abstract class GeneralTestSuiteFromMarkers extends TestSuite
     private void addTestsForFileOrDirectory(File fileOrDirectory, FilenameFilter filenameFilter) throws Exception
     {
         if (!fileOrDirectory.exists())
-            throw new FileNotFoundException(fileOrDirectory.getAbsolutePath() + " not found");
+            throw new FileNotFoundException(Messages.bind(Messages.GeneralTestSuiteFromMarkers_FileNotFound, fileOrDirectory.getAbsolutePath()));
         if (!fileOrDirectory.canRead())
-            throw new IOException(fileOrDirectory.getAbsolutePath() + " cannot be read");
+            throw new IOException(Messages.bind(Messages.GeneralTestSuiteFromMarkers_FileCannotBeRead, fileOrDirectory.getAbsolutePath()));
 
         if (fileOrDirectory.isDirectory())
             for (File file : fileOrDirectory.listFiles(filenameFilter))
@@ -131,8 +131,7 @@ public abstract class GeneralTestSuiteFromMarkers extends TestSuite
 
         if (!fileOrDirectory.exists())
         {
-            message = "NOTE: Some optional test files are not present: directory " + fileOrDirectory
-                + " does not exist";
+            message = Messages.bind(Messages.GeneralTestSuiteFromMarkers_SomeOptionalTestFilesAreNotPresent, fileOrDirectory);
         }
 
         return message;

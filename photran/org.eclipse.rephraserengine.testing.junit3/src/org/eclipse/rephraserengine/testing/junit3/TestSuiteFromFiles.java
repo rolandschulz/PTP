@@ -60,7 +60,7 @@ public abstract class TestSuiteFromFiles extends GeneralTestSuiteFromFiles
 
         public SimpleFileTestCase(File file)
         {
-            super("test");
+            super("test"); //$NON-NLS-1$
             this.file = file;
         }
 

@@ -37,7 +37,7 @@ public abstract class TestSuiteFromMarkers extends GeneralTestSuiteFromMarkers
     @Override
     protected final Test createTestFor(File fileContainingMarker, int markerOffset, String markerText)
     {
-        TestSuite suite = new TestSuite(fileContainingMarker.getName() + " - " + markerText);
+        TestSuite suite = new TestSuite(fileContainingMarker.getName() + " - " + markerText); //$NON-NLS-1$
         suite.addTest(new SimpleFileTestCase(fileContainingMarker, markerOffset, markerText) {});
         return suite;
     }
@@ -50,7 +50,7 @@ public abstract class TestSuiteFromMarkers extends GeneralTestSuiteFromMarkers
 
         public SimpleFileTestCase(File fileContainingMarker, int markerOffset, String markerText)
         {
-            super("test");
+            super("test"); //$NON-NLS-1$
             this.fileContainingMarker = fileContainingMarker;
             this.markerOffset = markerOffset;
             this.markerText = markerText;
