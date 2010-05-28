@@ -109,7 +109,7 @@ extern int sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
 extern int sdm_aggregate_serialized_length(const sdm_aggregate a);
 extern int sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end);
 extern void sdm_aggregate_copy(const sdm_aggregate a1, const sdm_aggregate a2);
-extern void sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg));
+extern void sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg, void *data), void *data);
 extern void sdm_aggregate_set_value(const sdm_aggregate a, int type, ...);
 extern void sdm_aggregate_message(const sdm_message msg, unsigned int flags);
 extern void	sdm_aggregate_progress(void);

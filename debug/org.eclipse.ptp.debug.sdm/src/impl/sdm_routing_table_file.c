@@ -34,6 +34,9 @@ static FILE *	routing_file = NULL;
  * Initialize the routetable abstraction. The routetable will provide
  * the total number of processes and the ID to hostname mapping.
  *
+ * This operation blocks until the routing file is available, or the
+ * timeout expires (currently 1000 seconds).
+ *
  * @return 0 on success, -1 on failure
  */
 int

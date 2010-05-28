@@ -96,7 +96,7 @@ idset_to_bitset(sdm_idset ids)
  * call all registered event handlers.
  */
 static int
-dbg_master_cmd_completed(sdm_message msg)
+dbg_master_cmd_completed(sdm_message msg, void *data)
 {
 	int			len;
 	char *		buf;
@@ -153,7 +153,7 @@ DbgMasterInit(int num_svrs, int my_id, char *name, proxy_svr_helper_funcs *funcs
 	/*
 	 * Register callback
 	 */
-	sdm_aggregate_set_completion_callback(dbg_master_cmd_completed);
+	sdm_aggregate_set_completion_callback(dbg_master_cmd_completed, NULL);
 
 	/*
 	 * Create a bitset containing all processes

@@ -59,7 +59,8 @@ static void			start_timer(request *r);
 static int			check_timer(request *r);
 static void			disable_timer(request *r);
 static void			request_completed(request *req);
-static int	 		(*completion_callback)(const sdm_message msg);
+static int	 		(*completion_callback)(const sdm_message msg, void *data);
+static void	 		*completion_data;
 
 #define ELAPSED_TIME(t1, t2)	(((t1.tv_sec - t2.tv_sec) * 1000000) + (t1.tv_usec - t2.tv_usec))
 #define TIMER_RUNNING			0
@@ -107,9 +108,10 @@ sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end)
 }
 
 void
-sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg))
+sdm_aggregate_set_completion_callback(int (*callback)(const sdm_message msg, void *data), void *data)
 {
 	completion_callback = callback;
+	completion_data = data;
 }
 
 /*
@@ -325,7 +327,7 @@ request_completed(request *req)
 			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] request %d completed for #%x\n", sdm_route_get_id(),
 					req->id,
 					he->h_hval);
-			completion_callback(msg);
+			completion_callback(msg, completion_data);
 		}
 
 		HashRemove(req->replys, he->h_hval);
