@@ -15,6 +15,7 @@ package org.eclipse.photran.internal.core.lexer;
  *
  * @author Jeff Overbey
  */
+@SuppressWarnings("all") // all string literals are NON-NLS-1
 public final class Terminal
 {
     public static final Terminal SKIP = new Terminal("(skip)");

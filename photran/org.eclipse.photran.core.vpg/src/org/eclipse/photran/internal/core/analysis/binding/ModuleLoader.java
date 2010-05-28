@@ -130,7 +130,7 @@ public class ModuleLoader extends VisibilityCollector
 		this.moduleNameToken = useStmt.getName();
 		this.moduleName = PhotranVPG.canonicalizeIdentifier(moduleNameToken.getText());
 
-		progressMonitor.subTask("Loading module " + moduleName + "...");
+		progressMonitor.subTask(Messages.bind(Messages.ModuleLoader_LoadingModule, moduleName));
 
 		if (moduleExistsInFileContainingUseStmt())
 		    bindToSymbolsIn(fileContainingUseStmt);
@@ -165,16 +165,20 @@ public class ModuleLoader extends VisibilityCollector
         if (files.isEmpty())
         {
             if (!isIntrinsicModule())
-                vpg.log.logError("There are no files that export a module named " + moduleName, useStmt.getName().getTokenRef());
+                vpg.log.logError(
+                    Messages.bind(Messages.ModuleLoader_NoFilesExportAModuleNamed, moduleName),
+                    useStmt.getName().getTokenRef());
             return;
         }
 
         files = applyModulePaths(files);
         if (files.isEmpty())
         {
-            vpg.log.logError("The module " + moduleName + " could not be found in any of the"
-            			+ " folders in the module paths for this project.  However, it was found in a folder not in the"
-            			+ " module path.", useStmt.getName().getTokenRef());
+            vpg.log.logError(
+                Messages.bind(
+                    Messages.ModuleLoader_ModuleNotFoundInModulePathsButFoundElsewhere,
+                    moduleName),
+                useStmt.getName().getTokenRef());
             return;
         }
 
@@ -188,7 +192,7 @@ public class ModuleLoader extends VisibilityCollector
     private boolean isIntrinsicModule()
     {
         // Fortran 2003
-        return moduleName.equals("iso_c_binding");
+        return moduleName.equals("iso_c_binding"); //$NON-NLS-1$
     }
 
 	private List<IFile> applyModulePaths(List<IFile> files)
@@ -253,7 +257,7 @@ public class ModuleLoader extends VisibilityCollector
         List<Definition> moduleSymtab = vpg.getModuleSymbolTable(moduleName);
         if (moduleSymtab == null) // Just in case
         {
-            vpg.log.logError("Module " + moduleName + " not found in " + file.getFullPath().toOSString());
+            vpg.log.logError(Messages.bind(Messages.ModuleLoader_ModuleNotFoundInFile, moduleName, file.getFullPath().toOSString()));
         }
         else
         {

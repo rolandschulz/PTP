@@ -128,8 +128,8 @@ public /*was package-private*/ class PerfectLoopNest
     public String getIndexVariable(int i)
     {
         if (i <= 0 || i > getNumberOfLoops())
-            throw new IllegalArgumentException("Cannot retrieve index variable for loop " + i +
-                                               " in a " + getNumberOfLoops() + "-loop nest");
+            throw new IllegalArgumentException("Cannot retrieve index variable for loop " + i + //$NON-NLS-1$
+                                               " in a " + getNumberOfLoops() + "-loop nest"); //$NON-NLS-1$ //$NON-NLS-2$
 
         ASTProperLoopConstructNode targetLoop = loopNest.get(i-1);
         if (targetLoop.isDoWhileLoop())
@@ -163,13 +163,13 @@ public /*was package-private*/ class PerfectLoopNest
     private int[] coefficients(VariableReference var)
     {
         if (var.indices.length > 1)
-            throw new DependenceTestFailure("Only single subscripts are currently supported");
+            throw new DependenceTestFailure(Messages.PerfectLoopNest_OnlySingleSubscriptsAreCurrentlySupported);
 
         LinearFunction fn = var.indices[0];
 
         int targetLoop = loopWithIndexVariable(fn.variable);
         if (targetLoop == 0)
-            throw new DependenceTestFailure("Linear function of non-index variable");
+            throw new DependenceTestFailure(Messages.PerfectLoopNest_LinearFunctionOfNonIndexVariable);
 
         int[] result = new int[n+1];
         result[0] = fn.y_intercept;

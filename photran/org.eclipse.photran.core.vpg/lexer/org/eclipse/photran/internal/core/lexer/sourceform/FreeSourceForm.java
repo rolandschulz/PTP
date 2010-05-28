@@ -28,8 +28,6 @@ import org.eclipse.photran.internal.core.sourceform.ISourceForm;
  */
 public class FreeSourceForm implements ISourceForm
 {
-    public static final String DESCRIPTION = "Free Form";
-
     private IncludeLoaderCallback callback = null;
     
     @SuppressWarnings("unchecked")

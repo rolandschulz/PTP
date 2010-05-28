@@ -55,12 +55,12 @@ public abstract class FortranEditorRefactoring
     @Override
     public final void initialize(List<IFile> files)
     {
-        throw new IllegalArgumentException("#initialize(List) cannot be invoked on VPGEditorRefactoring");
+        throw new IllegalArgumentException("#initialize(List) cannot be invoked on VPGEditorRefactoring"); //$NON-NLS-1$
     }
 
     public void initialize(IFile file, ITextSelection selection)
     {
-        if (file == null) throw new IllegalArgumentException("file argument cannot be null");
+        if (file == null) throw new IllegalArgumentException("file argument cannot be null"); //$NON-NLS-1$
 
         super.initialize(Collections.<IFile>singletonList(file));
         this.fileInEditor = file;
@@ -83,7 +83,7 @@ public abstract class FortranEditorRefactoring
         this.astOfFileInEditor = vpg.acquireTransientAST(fileInEditor);
         logVPGErrors(status, fileInEditor);
         if (astOfFileInEditor == null)
-            fail("The file in the editor cannot be parsed.");
+            fail(Messages.FortranEditorRefactoring_FileInEditorCannotBeParsed);
     }
     
     // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
@@ -92,6 +92,6 @@ public abstract class FortranEditorRefactoring
     protected void ensureProjectHasRefactoringEnabled(RefactoringStatus status) throws PreconditionFailure
     {
         if (!PhotranVPG.getInstance().doesProjectHaveRefactoringEnabled(fileInEditor))
-            fail("Please enable analysis and refactoring in the project properties.");
+            fail(Messages.FortranEditorRefactoring_AnalysisRefactoringNotEnabled);
     }
 }

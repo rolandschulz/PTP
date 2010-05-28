@@ -28,7 +28,7 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
         {
             this(FortranCorePlugin.inTestingMode()
                  ? createTempFile()
-                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran60vpg2");
+                 : Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() + "photran60vpg2"); //$NON-NLS-1$
         }
 
         private PhotranCDTDB(String filename)
@@ -36,14 +36,14 @@ public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef,
             super(filename);
 
             if (FortranPreferences.ENABLE_VPG_LOGGING.getValue())
-                System.out.println("Using Photran VPG database " + filename);
+                System.out.println("Using Photran VPG database " + filename); //$NON-NLS-1$
         }
 
         private static String createTempFile()
         {
             try
             {
-                File f = File.createTempFile("vpg", null);
+                File f = File.createTempFile("vpg", null); //$NON-NLS-1$
                 f.deleteOnExit();
                 return f.getAbsolutePath();
             }

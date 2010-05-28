@@ -27,12 +27,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class SearchPathProperties extends AbstractProperties
 {
-    public static final String ENABLE_VPG_PROPERTY_NAME = "EnableVPG";
-    public static final String ENABLE_DECL_VIEW_PROPERTY_NAME = "EnableDeclView";
-    public static final String ENABLE_CONTENT_ASSIST_PROPERTY_NAME = "EnableContentAssist";
-    public static final String ENABLE_HOVER_TIP_PROPERTY_NAME = "EnableHoverTip";
-    public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths";
-    public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths";
+    public static final String ENABLE_VPG_PROPERTY_NAME = "EnableVPG"; //$NON-NLS-1$
+    public static final String ENABLE_DECL_VIEW_PROPERTY_NAME = "EnableDeclView"; //$NON-NLS-1$
+    public static final String ENABLE_CONTENT_ASSIST_PROPERTY_NAME = "EnableContentAssist"; //$NON-NLS-1$
+    public static final String ENABLE_HOVER_TIP_PROPERTY_NAME = "EnableHoverTip"; //$NON-NLS-1$
+    public static final String MODULE_PATHS_PROPERTY_NAME = "FortranModulePaths"; //$NON-NLS-1$
+    public static final String INCLUDE_PATHS_PROPERTY_NAME = "FortranIncludePaths"; //$NON-NLS-1$
     
     public SearchPathProperties()
     {
@@ -60,10 +60,10 @@ public class SearchPathProperties extends AbstractProperties
 
         if (propertyName.equals(ENABLE_DECL_VIEW_PROPERTY_NAME)
                 || propertyName.equals(ENABLE_CONTENT_ASSIST_PROPERTY_NAME))
-            return result.equals("true") && getProperty(project, ENABLE_VPG_PROPERTY_NAME).equals("true")
-                   ? "true"
-                   : "";
+            return result.equals("true") && getProperty(project, ENABLE_VPG_PROPERTY_NAME).equals("true") //$NON-NLS-1$ //$NON-NLS-2$
+                   ? "true" //$NON-NLS-1$
+                   : ""; //$NON-NLS-1$
         else
-            return result == null ? "" : result;
+            return result == null ? "" : result; //$NON-NLS-1$
     }
 }

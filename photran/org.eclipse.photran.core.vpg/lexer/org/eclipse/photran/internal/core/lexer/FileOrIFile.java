@@ -95,7 +95,7 @@ public class FileOrIFile
         else if (this.javaFile != null)
             return this.javaFile.getAbsolutePath();
         else
-            return "?";
+            return "?"; //$NON-NLS-1$
     }
 
     @Override

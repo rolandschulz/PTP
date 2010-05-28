@@ -36,7 +36,7 @@ public class ImplicitSpec implements IPhotranSerializable
 
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
     
-	private String toString = "Implicit Enabled - Default Implicit Spec: real (a-h), integer (i-n), real (o-z)";
+	private String toString = "Implicit Enabled - Default Implicit Spec: real (a-h), integer (i-n), real (o-z)"; //$NON-NLS-1$
     private Type[] typeMap = { Type.REAL,    // A
                                Type.REAL,    // B
                                Type.REAL,    // C
@@ -78,7 +78,7 @@ public class ImplicitSpec implements IPhotranSerializable
      */
     public ImplicitSpec(IASTListNode<ASTImplicitSpecNode> implicitSpecList)
     {
-    	toString = "Implicit Enabled -" + getSourceCodeFromASTNode(implicitSpecList);
+    	toString = "Implicit Enabled -" + getSourceCodeFromASTNode(implicitSpecList); //$NON-NLS-1$
     	
         implicitSpecList.accept(new ASTVisitor()
         {
@@ -99,9 +99,9 @@ public class ImplicitSpec implements IPhotranSerializable
                 // Range = [a-zA-Z](-[a-zA-Z])?
                 // xImpl = "(" [ \t]* {Range} ([ \t]* "," [ \t]* {Range})* ")"
                 
-                String rangeList = txImpl.getText().replaceAll("[ \t]", "");
+                String rangeList = txImpl.getText().replaceAll("[ \t]", ""); //$NON-NLS-1$ //$NON-NLS-2$
                 rangeList = rangeList.substring(1, rangeList.length()-1); // Trim commas
-                String[] ranges = rangeList.split(",");
+                String[] ranges = rangeList.split(","); //$NON-NLS-1$
                 
                 for (String range : ranges)
                     setRangeToType(range, type);
@@ -132,7 +132,7 @@ public class ImplicitSpec implements IPhotranSerializable
      */
     public void setType(char letter, Type type)
     {
-        if (!Character.isLetter(letter)) throw new Error("Non-letter passed to setType");
+        if (!Character.isLetter(letter)) throw new Error("Non-letter passed to setType"); //$NON-NLS-1$
         letter = Character.toUpperCase(letter);
         typeMap[letter - 'A'] = type;
     }

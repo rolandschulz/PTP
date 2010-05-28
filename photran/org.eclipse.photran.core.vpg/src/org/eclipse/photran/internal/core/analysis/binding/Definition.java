@@ -93,7 +93,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         RENAMED_MODULE_ENTITY, // subprogram name after rename
         SUBROUTINE,
         SELECT,
-        VARIABLE_DECLARATION { @Override public String toString() { return "Local variable"; } },
+        VARIABLE_DECLARATION { @Override public String toString() { return "Local variable"; } }, //$NON-NLS-1$
         WHERE,
         ENUMERATOR, // F03
         IMPLICIT_EXTERNAL_SUBPROGRAM,
@@ -101,7 +101,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 
         @Override public String toString()
         {
-        	String name = super.toString().replaceAll("_", " ");
+        	String name = super.toString().replaceAll("_", " "); //$NON-NLS-1$ //$NON-NLS-2$
         	return name.charAt(0) + name.substring(1).toLowerCase();
         }
     }
@@ -117,7 +117,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 
         @Override public String toString()
         {
-        	String name = super.toString().replaceAll("_", " ");
+        	String name = super.toString().replaceAll("_", " "); //$NON-NLS-1$ //$NON-NLS-2$
         	return name.charAt(0) + name.substring(1).toLowerCase();
         }
     }
@@ -335,7 +335,7 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 
         if (!type.equals(Type.VOID))
         {
-        	result.append(" - ");
+        	result.append(" - "); //$NON-NLS-1$
         	result.append(type);
         	if (arraySpec != null) result.append(arraySpec);
         }
@@ -853,14 +853,14 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
     @Override public String toString()
     {
         return canonicalizedName
-        	+ " - "
+        	+ " - " //$NON-NLS-1$
         	+ classification
-        	+ (subprogramArgument ? " (Subprogram Argument)" : "")
-        	+ " ("
+        	+ (subprogramArgument ? " (Subprogram Argument)" : "") //$NON-NLS-1$ //$NON-NLS-2$
+        	+ " (" //$NON-NLS-1$
         	+ tokenRef.getFilename()
-        	+ ", offset "
+        	+ ", offset " //$NON-NLS-1$
         	+ tokenRef.getOffset()
-        	+ ")";
+        	+ ")"; //$NON-NLS-1$
     }
 
 
@@ -913,13 +913,13 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
 
     public String describe()
     {
-        String commentsBefore = "\n", name = getCanonicalizedName(), commentsAfter = "";
+        String commentsBefore = "\n", name = getCanonicalizedName(), commentsAfter = ""; //$NON-NLS-1$ //$NON-NLS-2$
         boolean isScopingUnit = false;
 
         Token tok = tokenRef.findTokenOrReturnNull();
         if (tok != null)
         {
-            if (!name.equals("(anonymous)"))
+            if (!name.equals("(anonymous)")) //$NON-NLS-1$
                 name = tok.getText();
 
             ScopingNode localScope = tok.getLocalScope();
@@ -947,15 +947,15 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             }
         }
 
-        return commentsBefore + describe(name) + "\n" + commentsAfter;
+        return commentsBefore + describe(name) + "\n" + commentsAfter; //$NON-NLS-1$
     }
 
     private boolean startsWithBlankLine(String string)
     {
-        while (string.startsWith(" ") || string.startsWith("\t"))
+        while (string.startsWith(" ") || string.startsWith("\t")) //$NON-NLS-1$ //$NON-NLS-2$
             string = string.substring(1);
 
-        return string.startsWith("\r") || string.startsWith("\n");
+        return string.startsWith("\r") || string.startsWith("\n"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private Token findFirstTokenAfter(final Token target, ScopingNode localScope)
@@ -995,52 +995,52 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
         switch (classification)
         {
         case VARIABLE_DECLARATION:
-            sb.append("! "); sb.append(describeClassification()); sb.append('\n');
+            sb.append("! "); sb.append(describeClassification()); sb.append('\n'); //$NON-NLS-1$
             sb.append(describeType());
-            sb.append(":: ");
+            sb.append(":: "); //$NON-NLS-1$
             sb.append(name);
             break;
 
         case IMPLICIT_LOCAL_VARIABLE:
-            sb.append("! "); sb.append(describeClassification()); sb.append('\n');
+            sb.append("! "); sb.append(describeClassification()); sb.append('\n'); //$NON-NLS-1$
             sb.append(describeType());
-            sb.append(":: ");
+            sb.append(":: "); //$NON-NLS-1$
             sb.append(name);
             break;
 
         case SUBROUTINE:
-            sb.append("subroutine ");
+            sb.append("subroutine "); //$NON-NLS-1$
             sb.append(name);
             //TODO: describeParameters(def.getType());
             break;
 
         case FUNCTION:
             //TODO: describeReturnType(def.getType());
-            sb.append("function ");
+            sb.append("function "); //$NON-NLS-1$
             sb.append(name);
             //TODO: describeParameters(def.getType());
             break;
 
         case INTERFACE:
-            sb.append("interface ");
+            sb.append("interface "); //$NON-NLS-1$
             sb.append(name);
             // TODO: Describe contents
             break;
 
         case MODULE:
-            sb.append("module ");
+            sb.append("module "); //$NON-NLS-1$
             sb.append(name);
             // TODO: Describe contents
             break;
 
         case DERIVED_TYPE:
-            sb.append("type :: ");
+            sb.append("type :: "); //$NON-NLS-1$
             sb.append(name);
             // TODO: Describe contents
             break;
 
         default:
-            sb.append("! "); sb.append(describeClassification()); sb.append('\n');
+            sb.append("! "); sb.append(describeClassification()); sb.append('\n'); //$NON-NLS-1$
             sb.append(name);
         }
 
@@ -1054,63 +1054,63 @@ public class Definition implements IPhotranSerializable, Comparable<Definition>
             @Override
             public String ifCharacter(Type type)
             {
-                return "character ";
+                return "character "; //$NON-NLS-1$
             }
 
             @Override
             public String ifComplex(Type type)
             {
-                return "complex ";
+                return "complex "; //$NON-NLS-1$
             }
 
             @Override
             public String ifDerivedType(String derivedTypeName,
                                         DerivedType type)
             {
-                return "type(" + derivedTypeName + ") ";
+                return "type(" + derivedTypeName + ") "; //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             @Override
             public String ifDoublePrecision(Type type)
             {
-                return "double precision ";
+                return "double precision "; //$NON-NLS-1$
             }
 
             @Override
             public String ifFunctionType(String name,
                                          FunctionType functionType)
             {
-                return "function ";
+                return "function "; //$NON-NLS-1$
             }
 
             @Override
             public String ifInteger(Type type)
             {
-                return "integer ";
+                return "integer "; //$NON-NLS-1$
             }
 
             @Override
             public String ifLogical(Type type)
             {
-                return "logical ";
+                return "logical "; //$NON-NLS-1$
             }
 
             @Override
             public String ifReal(Type type)
             {
-                return "real ";
+                return "real "; //$NON-NLS-1$
             }
 
             @Override
             public String ifUnclassified(Type type)
             {
-                return "";
+                return ""; //$NON-NLS-1$
             }
 
             @Override
             public String ifUnknown(Type type)
             {
-                return "";
+                return ""; //$NON-NLS-1$
             }
         });
     }

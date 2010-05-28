@@ -35,7 +35,7 @@ public class DerivedType extends Type
 
     @Override public String toString()
     {
-        return "type(" + name + ")";
+        return "type(" + name + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
    
     @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -60,12 +60,12 @@ public class DerivedType extends Type
     
     public static String getStaticThreeLetterTypeSerializationCode()
     {
-        return "dtv";
+        return "dtv"; //$NON-NLS-1$
     }
     
     @Override public String getThreeLetterTypeSerializationCode()
     {
-        return "dtv";
+        return "dtv"; //$NON-NLS-1$
     }
 
     @Override void finishWriteTo(OutputStream out) throws IOException

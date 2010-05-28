@@ -67,7 +67,7 @@ public final class LineAppendingReader extends SingleCharReader
 
     private static class EOLReader extends SingleCharReader
     {
-        private static final byte[] EOL = System.getProperty("line.separator").getBytes();
+        private static final byte[] EOL = System.getProperty("line.separator").getBytes(); //$NON-NLS-1$
         private int eolByte = 0;
 
         @Override

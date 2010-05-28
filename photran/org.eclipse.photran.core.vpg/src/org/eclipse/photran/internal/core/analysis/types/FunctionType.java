@@ -39,7 +39,7 @@ public class FunctionType extends Type
 
     @Override public String toString()
     {
-        return "function(" + name + "): " + argumentTypes + " -> " + returnType;
+        return "function(" + name + "): " + argumentTypes + " -> " + returnType; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -64,12 +64,12 @@ public class FunctionType extends Type
     
     public static String getStaticThreeLetterTypeSerializationCode()
     {
-        return "fun";
+        return "fun"; //$NON-NLS-1$
     }
     
     @Override public String getThreeLetterTypeSerializationCode()
     {
-        return "fun";
+        return "fun"; //$NON-NLS-1$
     }
 
 //    private String name;

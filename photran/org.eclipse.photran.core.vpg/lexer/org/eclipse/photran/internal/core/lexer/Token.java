@@ -49,17 +49,17 @@ public class Token implements IToken, IASTNode
     /**
      * Whitespace and whitetext appearing before this token that should be associated with this token
      */
-    protected String whiteBefore = "";
+    protected String whiteBefore = ""; //$NON-NLS-1$
 
     /**
      * The token text
      */
-    protected String text = "";
+    protected String text = ""; //$NON-NLS-1$
 
     /**
      * Whitespace and whitetext appearing after this token that should be associated with this token, not the next
      */
-    protected String whiteAfter = "";
+    protected String whiteAfter = ""; //$NON-NLS-1$
     
     ///////////////////////////////////////////////////////////////////////////
     // Additional Fields - Not updated when refactoring
@@ -87,9 +87,9 @@ public class Token implements IToken, IASTNode
     public Token(Terminal terminal, String whiteBefore, String tokenText, String whiteAfter)
     {
         this.terminal    = terminal;
-        this.whiteBefore = whiteBefore == null ? "" : whiteBefore;
-        this.text        = tokenText   == null ? "" : tokenText;
-        this.whiteAfter  = whiteAfter  == null ? "" : whiteAfter;
+        this.whiteBefore = whiteBefore == null ? "" : whiteBefore; //$NON-NLS-1$
+        this.text        = tokenText   == null ? "" : tokenText; //$NON-NLS-1$
+        this.whiteAfter  = whiteAfter  == null ? "" : whiteAfter; //$NON-NLS-1$
     }
     
     public Token(Terminal terminal, String tokenText)
@@ -136,7 +136,7 @@ public class Token implements IToken, IASTNode
     /**
      * Sets the token text
      */
-    public void setText(String value) { text = value == null ? "" : value; }
+    public void setText(String value) { text = value == null ? "" : value; } //$NON-NLS-1$
 
     /**
      * Returns whitespace and whitetext appearing before this token that should be associated with this token
@@ -146,7 +146,7 @@ public class Token implements IToken, IASTNode
     /**
      * Sets whitespace and whitetext appearing before this token that should be associated with this token
      */
-    public void setWhiteBefore(String value) { whiteBefore = value == null ? "" : value; }
+    public void setWhiteBefore(String value) { whiteBefore = value == null ? "" : value; } //$NON-NLS-1$
 
     /**
      * Returns whitespace and whitetext appearing after this token that should be associated with this token, not the next
@@ -156,7 +156,7 @@ public class Token implements IToken, IASTNode
     /**
      * Sets whitespace and whitetext appearing after this token that should be associated with this token, not the next
      */
-    public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; }
+    public void setWhiteAfter(String value) { whiteAfter = value == null ? "" : value; } //$NON-NLS-1$
 
     public IPreprocessorReplacement getPreprocessorDirective()
     {
@@ -268,7 +268,7 @@ public class Token implements IToken, IASTNode
     ///////////////////////////////////////////////////////////////////////////
 
     private static final Pattern ompComment = Pattern.compile(
-        "([Cc*!][ \\t]*\\$[Oo][Mm][Pp][ \\t]*)([^\\r\\n]*\\r?\\n)");
+        "([Cc*!][ \\t]*\\$[Oo][Mm][Pp][ \\t]*)([^\\r\\n]*\\r?\\n)"); //$NON-NLS-1$
 
     /**
      * Returns a list of {@link Token}s representing OpenMP directives in the comments preceding
@@ -298,7 +298,7 @@ public class Token implements IToken, IASTNode
             token.setTerminal(Terminal.SKIP);
             String prefix = m.group(1);
             String directive = m.group(2).trim();
-            String suffix = directive.length() >= m.group(2).length() ? ""  : m.group(2).substring(directive.length());
+            String suffix = directive.length() >= m.group(2).length() ? ""  : m.group(2).substring(directive.length()); //$NON-NLS-1$
             token.setWhiteBefore(prefix);
             token.setText(directive);
             token.setWhiteAfter(suffix);
@@ -434,7 +434,7 @@ public class Token implements IToken, IASTNode
     /**
      * Returns a string describing the token
      */
-    public String getDescription() { return terminal.toString() + ": \"" + text + "\""; }
+    public String getDescription() { return terminal.toString() + ": \"" + text + "\""; } //$NON-NLS-1$ //$NON-NLS-2$
     
     ///////////////////////////////////////////////////////////////////////////
     // Source Code Reproduction
@@ -464,7 +464,7 @@ public class Token implements IToken, IASTNode
     
     @Override public String toString()
     {
-        return terminal + ": " + text.replace("\n", "\\n").replace("\r", "\\r");
+        return terminal + ": " + text.replace("\n", "\\n").replace("\r", "\\r"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
     }
     
     ///////////////////////////////////////////////////////////////////////////
@@ -542,7 +542,7 @@ public class Token implements IToken, IASTNode
             
             public FakeTokenRef(String text)
             {
-                this(new PhotranTokenRef("", -1, -1), text);
+                this(new PhotranTokenRef("", -1, -1), text); //$NON-NLS-1$
             }
         	
         	@Override public String getText()

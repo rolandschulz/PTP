@@ -32,14 +32,16 @@ public class SyntaxException extends Exception
     
     public SyntaxException(Token lookahead, String expectedTerminals)
     {
-        super("Syntax error: Unexpected "
-            + lookahead.getTerminal().toString()
-            + " ("
-            + lookahead.getPhysicalFile() + ", "
-            + "line " + lookahead.getLine()
-            + ", column " + lookahead.getCol()
-            + ").  Expected one of the following: "
-            + expectedTerminals);
+        super(
+            Messages.bind(
+                Messages.SyntaxException_Message,
+                new Object[] {
+                    lookahead.getTerminal().toString(),
+                    lookahead.getPhysicalFile(),
+                    lookahead.getLine(),
+                    lookahead.getCol(),
+                    expectedTerminals
+                }));
         
         this.lookahead = lookahead;
     }

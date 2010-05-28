@@ -270,7 +270,7 @@ public class Reindenter
 
         private String reindentComment(String line)
         {
-            if (line.trim().equals("")) return line;
+            if (line.trim().equals("")) return line; //$NON-NLS-1$
             
             int endIndex = 0;
             while (endIndex < line.length() && (line.charAt(endIndex) == ' ' || line.charAt(endIndex) == '\t'))
@@ -323,7 +323,7 @@ public class Reindenter
                 if (firstTokenOnLineAboveReindentedRegion != null && !startsIndentedRegion(firstTokenOnLineAboveReindentedRegion))
                     this.addIndent = getIndentation(firstTokenOnLineAboveReindentedRegion);
                 else
-                    this.addIndent = addIndent + "    ";
+                    this.addIndent = addIndent + "    "; //$NON-NLS-1$
             }
             
             //System.out.println("Removing [" + removeIndent + "] and adding [" + addIndent + "]");
@@ -377,8 +377,8 @@ public class Reindenter
             this.removeIndent = currentIndentation;
             this.addIndent = indentationOfPreviousLine;
             if (startsIndentedRegion(firstTokenOnPreviousLine))
-                this.addIndent += "    ";
-            else if (endsIndentedRegion(firstTokenOnLine) && this.addIndent.endsWith("    "))
+                this.addIndent += "    "; //$NON-NLS-1$
+            else if (endsIndentedRegion(firstTokenOnLine) && this.addIndent.endsWith("    ")) //$NON-NLS-1$
                 this.addIndent = this.addIndent.substring(0, this.addIndent.length()-4);
 
             firstTokenOnLine.setWhiteBefore(reindentedComments(comments) + newIndentation(currentIndentation));
@@ -391,8 +391,8 @@ public class Reindenter
 
 	private String getIndentation(Token token)
 	{
-		String indent = token == null ? "" : token.getWhiteBefore();
-        if (indent == null) indent = "";
+		String indent = token == null ? "" : token.getWhiteBefore(); //$NON-NLS-1$
+        if (indent == null) indent = ""; //$NON-NLS-1$
         int lastCR = indent.lastIndexOf('\n');
         if (lastCR >= 0) indent = indent.substring(lastCR + 1);
 		return indent;

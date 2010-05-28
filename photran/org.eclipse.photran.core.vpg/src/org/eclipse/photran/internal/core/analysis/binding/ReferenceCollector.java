@@ -978,7 +978,7 @@ class ReferenceCollector extends BindingCollector
             if (waitSpec.getKeyword() != null)
             {
                 String keyword = waitSpec.getKeyword().getText().toLowerCase();
-                if (keyword.equals("id") || keyword.equals("iomsg") || keyword.equals("iostat"))
+                if (keyword.equals("id") || keyword.equals("iomsg") || keyword.equals("iostat")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 {
                     Token variable = waitSpec.getExpr().findFirstToken();
                     if (variable != null && variable.getTerminal() == Terminal.T_IDENT)

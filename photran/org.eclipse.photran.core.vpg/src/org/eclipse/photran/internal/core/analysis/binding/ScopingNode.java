@@ -257,7 +257,7 @@ public abstract class ScopingNode extends ASTNode
             if (result == null)
             {
                 Token firstToken = findFirstToken();
-                if (firstToken == null) throw new Error("Empty file");
+                if (firstToken == null) throw new Error(Messages.ScopingNode_EmptyFile);
                 cachedRepresentataiveToken = new PhotranTokenRef(firstToken.getLogicalFile(), -1, 0);
             }
             else
@@ -908,7 +908,7 @@ public abstract class ScopingNode extends ASTNode
     {
         Token nameToken = getNameToken();
         if (nameToken == null)
-            return "(anonymous)";
+            return Messages.ScopingNode_Anonymous;
         else
             return nameToken.getText();
     }

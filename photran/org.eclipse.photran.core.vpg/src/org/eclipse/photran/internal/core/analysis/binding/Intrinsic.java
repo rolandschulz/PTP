@@ -57,7 +57,7 @@ public class Intrinsic extends Definition
         
         IntrinsicProcDescription proc = Intrinsics.get(canonicalizedName);
         if (proc == null)
-            return "";
+            return ""; //$NON-NLS-1$
         else
             return proc.toString();
     }

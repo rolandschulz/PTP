@@ -29,6 +29,6 @@ public class PhotranVPGLog extends EclipseVPGLog<Token, PhotranTokenRef>
     {
         return new File(
             Activator.getDefault().getStateLocation().addTrailingSeparator().toOSString() +
-            "photran60vpg-log.txt");
+            "photran60vpg-log.txt"); //$NON-NLS-1$
     }
 }

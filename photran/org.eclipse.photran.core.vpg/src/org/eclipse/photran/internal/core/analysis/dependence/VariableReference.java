@@ -72,9 +72,9 @@ public /*was package-private*/ class VariableReference implements IVariableRefer
         {
             try
             {
-                int    m = slope == null || slope.equals("") ? 1 : Integer.parseInt(slope);
+                int    m = slope == null || slope.equals("") ? 1 : Integer.parseInt(slope); //$NON-NLS-1$
                 String x = variable == null ? null : PhotranVPG.canonicalizeIdentifier(variable);
-                int    b = y_intercept == null || y_intercept.equals("") ? 0 : Integer.parseInt(y_intercept);
+                int    b = y_intercept == null || y_intercept.equals("") ? 0 : Integer.parseInt(y_intercept); //$NON-NLS-1$
                 return new LinearFunction(
                     m,
                     x,
@@ -110,25 +110,25 @@ public /*was package-private*/ class VariableReference implements IVariableRefer
          */
         //                                            123                        4                      5
         //                                              ===m===         *        ==x==         +        ==b==
-        private static Pattern mxb = Pattern.compile("((-?(\\d+)[ \t]*\\*[ \t]*)?(\\w+)[ \t]*\\+[ \t]*)?(\\d+)");
+        private static Pattern mxb = Pattern.compile("((-?(\\d+)[ \t]*\\*[ \t]*)?(\\w+)[ \t]*\\+[ \t]*)?(\\d+)"); //$NON-NLS-1$
         //                                             12                        3
         //                                              ===m===         *        ==x==
-        private static Pattern mx  = Pattern.compile( "((-?\\d+)[ \t]*\\*[ \t]*)?(\\w+)");
+        private static Pattern mx  = Pattern.compile( "((-?\\d+)[ \t]*\\*[ \t]*)?(\\w+)"); //$NON-NLS-1$
         //                                            1                    23                        4
         //                                            ==b==         +       ===m===         *        ==x==
-        private static Pattern bmx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*((-?\\d+)[ \t]*\\*[ \t]*)?(\\w+)");
+        private static Pattern bmx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*((-?\\d+)[ \t]*\\*[ \t]*)?(\\w+)"); //$NON-NLS-1$
         //                                                    1     2               3
         //                                            -       ==x==          +      ==b==
-        private static Pattern nxb = Pattern.compile("-[ \\t]*(\\w+)([ \t]*\\+[ \t]*(\\d+))?");
+        private static Pattern nxb = Pattern.compile("-[ \\t]*(\\w+)([ \t]*\\+[ \t]*(\\d+))?"); //$NON-NLS-1$
         //                                            1                           2
         //                                            ==b==         +      -      ==x==
-        private static Pattern bnx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*-[ \t]*(\\w+)");
+        private static Pattern bnx = Pattern.compile("(\\d+)[ \t]*\\+[ \t]*-[ \t]*(\\w+)"); //$NON-NLS-1$
 
         /** Factory method */
         public static LinearFunction fromNode(IASTNode node)
         {
             String str = node.toString().trim();
-            if (str.startsWith(",")) str = str.substring(1);
+            if (str.startsWith(",")) str = str.substring(1); //$NON-NLS-1$
             str = str.trim();
 
             Matcher m;
@@ -143,10 +143,10 @@ public /*was package-private*/ class VariableReference implements IVariableRefer
             if (m.matches()) return LinearFunction.from(m.group(3), m.group(4), m.group(1));
 
             m = nxb.matcher(str);
-            if (m.matches()) return LinearFunction.from("-1", m.group(1), m.group(3));
+            if (m.matches()) return LinearFunction.from("-1", m.group(1), m.group(3)); //$NON-NLS-1$
 
             m = bnx.matcher(str);
-            if (m.matches()) return LinearFunction.from("-1", m.group(2), m.group(1));
+            if (m.matches()) return LinearFunction.from("-1", m.group(2), m.group(1)); //$NON-NLS-1$
 
             return null;
         }
@@ -156,7 +156,7 @@ public /*was package-private*/ class VariableReference implements IVariableRefer
             if (variable == null)
                 return Integer.toString(y_intercept);
             else
-                return slope + "*" + variable + "+" + y_intercept;
+                return slope + "*" + variable + "+" + y_intercept; //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -235,10 +235,10 @@ public /*was package-private*/ class VariableReference implements IVariableRefer
         sb.append(variable);
         if (indices != null)
         {
-            sb.append("(");
+            sb.append("("); //$NON-NLS-1$
             for (int i = 0; i < indices.length; i++)
-                sb.append((i > 0 ? ", " : "") + indices[i]);
-            sb.append(")");
+                sb.append((i > 0 ? ", " : "") + indices[i]); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append(")"); //$NON-NLS-1$
         }
         return sb.toString();
     }

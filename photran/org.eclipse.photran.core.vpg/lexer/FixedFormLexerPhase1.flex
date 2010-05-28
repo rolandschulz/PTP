@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 import java.io.Reader;
 import org.eclipse.core.resources.IFile;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 %%
 
 %class FixedFormLexerPhase1

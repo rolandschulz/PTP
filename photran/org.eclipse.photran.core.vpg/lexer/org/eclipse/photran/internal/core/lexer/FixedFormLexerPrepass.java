@@ -51,7 +51,7 @@ class FixedFormLexerPrepass {
 	private HashMap<PositionInFile, String> whiteSpaceMapping = new HashMap<PositionInFile, String>();	
 	//Used to accumulate whitespace between lines (multi-line comments, etc) because
 	// the string is processed on per-line basis
-	private String prevWhiteSpace = "";
+	private String prevWhiteSpace = ""; //$NON-NLS-1$
 	
 	private int EOFLinePos=0;
 	private int EOFColPos=0;
@@ -98,7 +98,7 @@ class FixedFormLexerPrepass {
 	        String res = strBuilder.substring(offset, offset+length);
 	        return res;
 	    }
-	    return "";
+	    return ""; //$NON-NLS-1$
 	}
 	
 	public String getTokenText(int offset)
@@ -108,7 +108,7 @@ class FixedFormLexerPrepass {
 	        String res = strBuilder.substring(offset);
 	        return res;
 	    }
-	    return "";
+	    return ""; //$NON-NLS-1$
 	}
 	
 	public String getTrailingWhitespace()
@@ -233,7 +233,7 @@ class FixedFormLexerPrepass {
 	    int offsetBefore = lastOffset;
 	    
 	    if(colBefore < 0 || offsetBefore < 0)
-	        return "";
+	        return ""; //$NON-NLS-1$
 	    
 	    //Create a positionInFile object, with line,col and offset set to the END of the potential whitespace
 	    PositionInFile posInFile = new PositionInFile(ln, colBefore, offsetBefore, false);
@@ -248,14 +248,14 @@ class FixedFormLexerPrepass {
 	        }
 	    }*/
 	    if(result==null)
-	        return "";
+	        return ""; //$NON-NLS-1$
 	    
 	    return result;
 	}
 	
 	private int extractWhitespace(PreLexerLine line, int startPos)
 	{
-	    String whiteAgg = "";
+	    String whiteAgg = ""; //$NON-NLS-1$
 	    int charPos = startPos;
 	    int startWhitespace = -1;
 	    int length = line.length();
@@ -314,7 +314,7 @@ class FixedFormLexerPrepass {
     	                                                  line.offset+charPos);
     	    String combinedWhite = prevWhiteSpace.concat(whiteAgg);
             whiteSpaceMapping.put(posInFile, combinedWhite);
-            prevWhiteSpace = "";
+            prevWhiteSpace = ""; //$NON-NLS-1$
             
             //If we moved into the comments, return -1 since we gobbled those up
             if(charPos >= FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue())
@@ -447,7 +447,7 @@ class FixedFormLexerPrepass {
 			} 
 			else 
 			{ //undefined state
-				throw new RuntimeException("Undefined state in FixedFormPreLexer");
+				throw new RuntimeException("Undefined state in FixedFormPreLexer"); //$NON-NLS-1$
 			}
 		}
 		return -1; //end of line reached
@@ -539,10 +539,10 @@ class PreLexerLine {
 				lineText.charAt(0)=='$') type=COMMENT;
 
 //check for f90-style comment
-		else if (trimmedText.startsWith("!")) type=COMMENT;
+		else if (trimmedText.startsWith("!")) type=COMMENT; //$NON-NLS-1$
 
 //check for cpp-dirctive
-		else if (trimmedText.startsWith("#")) type=CPPDIRECTIVE;
+		else if (trimmedText.startsWith("#")) type=CPPDIRECTIVE; //$NON-NLS-1$
 		
 //check if line is empty up to COLWIDTH
 		else if (lineText.length()>FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue() && lineText.substring(0,FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue()).trim().length()==0) type=COMMENT;
@@ -572,7 +572,7 @@ class PreLexerLine {
 
 	@Override
     public String toString() {
-		return "Line "+linePos+": "+lineText; 
+		return "Line "+linePos+": "+lineText;  //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
 
@@ -690,7 +690,7 @@ class OffsetLineReader {
 		sBuf.setLength(0);
 		while(true) {
 			if (charBuf=='\n') {
-			    if (fileEOL == null) fileEOL = "\n";
+			    if (fileEOL == null) fileEOL = "\n"; //$NON-NLS-1$
 				charBuf=getNextChar();
 				lineNumber++;
 				break;
@@ -698,12 +698,12 @@ class OffsetLineReader {
 				charBuf=getNextChar();
 				if (charBuf=='\n')
 			    {
-                    if (fileEOL == null) fileEOL = "\r\n";
+                    if (fileEOL == null) fileEOL = "\r\n"; //$NON-NLS-1$
 				    charBuf=getNextChar();
 			    }
 				else
 				{
-				    if (fileEOL == null) fileEOL = "\r";
+				    if (fileEOL == null) fileEOL = "\r"; //$NON-NLS-1$
 				}
 				lineNumber++;
 				break;

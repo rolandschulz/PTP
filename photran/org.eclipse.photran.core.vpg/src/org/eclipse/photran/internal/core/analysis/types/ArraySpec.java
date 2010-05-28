@@ -60,7 +60,7 @@ public class ArraySpec implements IPhotranSerializable
         else if (spec.getDeferredShapeSpecList() != null)
             parseDeferredShapeArray(spec.getDeferredShapeSpecList());
         else
-            throw new Error("Unexpected entity in <ArraySpec>");
+            throw new Error("Unexpected entity in <ArraySpec>"); //$NON-NLS-1$
     }
 
     //    # R514
@@ -135,13 +135,13 @@ public class ArraySpec implements IPhotranSerializable
     @Override public String toString()
     {
         StringBuffer sb = new StringBuffer();
-        sb.append("(");
+        sb.append("("); //$NON-NLS-1$
         for (int i = 0; i < dimensions.size(); i++)
         {
-            if (i > 0) sb.append(",");
+            if (i > 0) sb.append(","); //$NON-NLS-1$
             sb.append(dimensions.get(i).toString());
         }
-        sb.append(")");
+        sb.append(")"); //$NON-NLS-1$
         return sb.toString();
     }
     

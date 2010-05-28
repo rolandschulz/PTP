@@ -26,7 +26,7 @@ public final class LineCol
 
     public static String toString(int line, int col)
     {
-        return "line " + line + ", column " + col;
+        return Messages.bind(Messages.LineCol_Description, line, col);
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -63,7 +63,7 @@ public class IncludeLoaderCallback
         }
         catch (CoreException e)
         {
-        	throw new FileNotFoundException(fileToInclude + " - " + e.getMessage());
+        	throw new FileNotFoundException(fileToInclude + " - " + e.getMessage()); //$NON-NLS-1$
         }
     }
     

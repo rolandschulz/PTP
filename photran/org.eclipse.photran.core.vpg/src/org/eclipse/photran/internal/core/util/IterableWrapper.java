@@ -36,7 +36,7 @@ public class IterableWrapper<T> implements Iterable<T>
     {
         try
         {
-            this.iterator = (Iterator<T>)o.getClass().getMethod("iterator").invoke(o);
+            this.iterator = (Iterator<T>)o.getClass().getMethod("iterator").invoke(o); //$NON-NLS-1$
         }
         catch (Exception e)
         {

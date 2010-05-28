@@ -74,7 +74,7 @@ public final class FortranPreprocessor extends SingleCharReader
         }
     }
     
-	private static final Pattern INCLUDE_LINE = Pattern.compile("[ \t]*[Ii][Nn][Cc][Ll][Uu][Dd][Ee][ \t]+[\"']([^\r\n\"]*)[\"'][ \t]*(![^\r\n]*)?[\r\n]*");
+	private static final Pattern INCLUDE_LINE = Pattern.compile("[ \t]*[Ii][Nn][Cc][Ll][Uu][Dd][Ee][ \t]+[\"']([^\r\n\"]*)[\"'][ \t]*(![^\r\n]*)?[\r\n]*"); //$NON-NLS-1$
     private static final int INCLUDE_LINE_CAPTURING_GROUP_OF_FILENAME = 1;
     
     private IncludeLoaderCallback callback;
@@ -235,12 +235,11 @@ public final class FortranPreprocessor extends SingleCharReader
         catch (FileNotFoundException e)
         {
             callback.logError(
-                "Unable to locate INCLUDE file \""
-        	    + fileToInclude + "\""
-        	    //+ " (working directory: "
-                //+ new File(".").getCanonicalPath()
-                //+ ")"
-                , topLevelFile, offset);
+                Messages.bind(
+                    Messages.FortranPreprocessor_UnableToLocateIncludeFile,
+                    fileToInclude),
+                topLevelFile,
+                offset);
             return null;
         }
     }

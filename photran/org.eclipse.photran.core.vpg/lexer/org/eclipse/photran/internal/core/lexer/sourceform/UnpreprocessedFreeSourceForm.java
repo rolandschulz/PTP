@@ -27,8 +27,6 @@ import org.eclipse.photran.internal.core.sourceform.ISourceForm;
  */
 public class UnpreprocessedFreeSourceForm implements ISourceForm
 {
-    public static final String DESCRIPTION = "Free Form";
-
     @SuppressWarnings("unchecked")
     public ILexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
     {

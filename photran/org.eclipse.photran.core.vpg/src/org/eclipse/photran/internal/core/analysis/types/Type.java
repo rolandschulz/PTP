@@ -86,9 +86,9 @@ public abstract class Type implements IPhotranSerializable, Serializable
         else if (node.isCharacter())
             return Type.CHARACTER;
         else if (node.isDerivedType())
-            return node.getTypeName() == null ? new DerivedType("") : new DerivedType(node.getTypeName().getText());
+            return node.getTypeName() == null ? new DerivedType("") : new DerivedType(node.getTypeName().getText()); //$NON-NLS-1$
         else
-            throw new Error("Unexpected case parsing <TypeSpec> node");
+            throw new Error("Unexpected case parsing <TypeSpec> node"); //$NON-NLS-1$
     }
 
     private static abstract class PrimitiveType extends Type
@@ -103,12 +103,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "integer";
+            return "integer"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "int"; 
+           return "int";  //$NON-NLS-1$
         }
         
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -133,12 +133,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "real";
+            return "real"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "rea"; 
+           return "rea";  //$NON-NLS-1$
         }
         
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -163,12 +163,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "double precision";
+            return "double precision"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "dbl"; 
+           return "dbl";  //$NON-NLS-1$
         }
         
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -193,12 +193,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "complex";
+            return "complex"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "cpx"; 
+           return "cpx";  //$NON-NLS-1$
         }
 
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -223,12 +223,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "logical";
+            return "logical"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "log"; 
+           return "log";  //$NON-NLS-1$
         }
 
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -241,12 +241,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "character";
+            return "character"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "chr"; 
+           return "chr";  //$NON-NLS-1$
         }
 
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -269,12 +269,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "(unknown)";
+            return "(unknown)"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "unk"; 
+           return "unk";  //$NON-NLS-1$
         }
 
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -290,12 +290,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "(unclassified)";
+            return "(unclassified)"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "voi"; 
+           return "voi";  //$NON-NLS-1$
         }
 
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -311,12 +311,12 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         @Override public String toString()
         {
-            return "(type error)";
+            return "(type error)"; //$NON-NLS-1$
         }
         
         @Override public String getThreeLetterTypeSerializationCode()
         {
-           return "err"; 
+           return "err";  //$NON-NLS-1$
         }
 
         @Override public <T> T processUsing(TypeProcessor<T> p)
@@ -340,15 +340,15 @@ public abstract class Type implements IPhotranSerializable, Serializable
     
     private static void setThreeLetterSerializationCode(Class<? extends Type> typeClass)
     {
-        threeLetterTypeSerializationCodes.put((String)invokeStatic("getStaticThreeLetterTypeSerializationCode", typeClass, new Class<?>[0]), typeClass);
+        threeLetterTypeSerializationCodes.put((String)invokeStatic("getStaticThreeLetterTypeSerializationCode", typeClass, new Class<?>[0]), typeClass); //$NON-NLS-1$
     }
 
     private static void checkCode(String code)
     {
         if (code == null || code.length() != 3)
-            throw new IllegalArgumentException("Invalid three-letter code for Type serialization: " + code);
+            throw new IllegalArgumentException("Invalid three-letter code for Type serialization: " + code); //$NON-NLS-1$
         else if (threeLetterTypeSerializationCodes.containsKey(code))
-            throw new IllegalArgumentException("Duplicate three-letter code for Type serialization: " + code);
+            throw new IllegalArgumentException("Duplicate three-letter code for Type serialization: " + code); //$NON-NLS-1$
     }
 
     static
@@ -371,13 +371,13 @@ public abstract class Type implements IPhotranSerializable, Serializable
     {
         String code = PhotranVPGSerializer.deserialize(in);
         if (!threeLetterTypeSerializationCodes.containsKey(code))
-            throw new IOException("Unrecognized type code: " + code);
+            throw new IOException("Unrecognized type code: " + code); //$NON-NLS-1$
         
         Object o = threeLetterTypeSerializationCodes.get(code);
         if (o instanceof Type)
             return (Type)o;
         else if (o instanceof Class)
-            return invokeStatic("finishReadFrom", (Class<?>)o, new Class<?>[] { InputStream.class }, in);
+            return invokeStatic("finishReadFrom", (Class<?>)o, new Class<?>[] { InputStream.class }, in); //$NON-NLS-1$
         else
             throw new IOException();
     }
@@ -403,7 +403,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
         }
         catch (Exception e)
         {
-            throw new Error(e.getClass().getSimpleName() + ": " + e.getMessage());
+            throw new Error(e.getClass().getSimpleName() + ": " + e.getMessage()); //$NON-NLS-1$
         }
     }
 }

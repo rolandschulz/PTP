@@ -24,7 +24,7 @@ import org.eclipse.photran.internal.core.parser.IASTNode;
  */
 public class SourcePrinter
 {
-    private static final String EOL = System.getProperty("line.separator");
+    private static final String EOL = System.getProperty("line.separator"); //$NON-NLS-1$
     
     private SourcePrinter() {;}
     

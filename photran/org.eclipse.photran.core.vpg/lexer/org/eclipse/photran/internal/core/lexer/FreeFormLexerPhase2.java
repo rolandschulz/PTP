@@ -1030,7 +1030,7 @@ public class FreeFormLexerPhase2 implements ILexer
     private void applyRulesTo(Terminal tokenTerminal)
     {
         if (rules.containsKey(tokenTerminal))
-            throw new Error("Multiple rule lists specified for token " + tokenTerminal);
+            throw new Error("Multiple rule lists specified for token " + tokenTerminal); //$NON-NLS-1$
         rules.put(tokenTerminal, ruleList);
     }
 
@@ -1220,22 +1220,22 @@ public class FreeFormLexerPhase2 implements ILexer
      * the token being investigated.  The wildcard ANY_DEFINED_OPERATOR can
      * also be used.
      */
-    private final Terminal ANY_TOKEN = new Terminal("any token");
+    private final Terminal ANY_TOKEN = new Terminal("any token"); //$NON-NLS-1$
 
     /**
      * Wildcard referring to any defined operator (obviously)
      */
-    private final Terminal ANY_DEFINED_OPERATOR = new Terminal("any defined operator");
+    private final Terminal ANY_DEFINED_OPERATOR = new Terminal("any defined operator"); //$NON-NLS-1$
 
     /**
      * This is used when we need a reasonable default in some places...
      */
-    private final Terminal ALWAYS_RETURN_TRUE = new Terminal("always return true");
+    private final Terminal ALWAYS_RETURN_TRUE = new Terminal("always return true"); //$NON-NLS-1$
 
     /**
      * This is used when we need a reasonable default in some places...
      */
-    private final Terminal ALWAYS_RETURN_FALSE = new Terminal("always return false");
+    private final Terminal ALWAYS_RETURN_FALSE = new Terminal("always return false"); //$NON-NLS-1$
 
     private final class MustBeFollowedBy extends Rule
     {
@@ -1494,8 +1494,8 @@ public class FreeFormLexerPhase2 implements ILexer
         else if (targetTerminal == ANY_DEFINED_OPERATOR)
             return actualToken != null
             &&(
-                    ( actualToken.getText().startsWith(".")
-                            && actualToken.getText().endsWith(".") )
+                    ( actualToken.getText().startsWith(".") //$NON-NLS-1$
+                            && actualToken.getText().endsWith(".") ) //$NON-NLS-1$
 
                     ||(
                             actualToken.getTerminal() == Terminal.T_SLASHSLASH||
@@ -1572,14 +1572,14 @@ public class FreeFormLexerPhase2 implements ILexer
             //int numCharsRemoved = t.getTokenText().length() - textWithoutEquals.length();
 
             //if (afterT != null && afterT.getTerminal() == Terminal.T_EQUALS && afterT.getStartCol() == t.getEndCol()+1)
-            if (afterT != null && afterT.getTerminal() == Terminal.T_EQUALS && t.getWhiteAfter().equals("") && afterT.getWhiteBefore().equals(""))
+            if (afterT != null && afterT.getTerminal() == Terminal.T_EQUALS && t.getWhiteAfter().equals("") && afterT.getWhiteBefore().equals("")) //$NON-NLS-1$ //$NON-NLS-2$
             {
                 // split "xyz=" "=" into "xyz" "=="
                 afterT.setTerminal(Terminal.T_EQEQ);
                 //afterT.setStartCol(afterT.getStartCol()-1);
                 //afterT.setOffset(afterT.getOffset()-1);
                 //afterT.setLength(afterT.getLength()+1);
-                afterT.setText("==");
+                afterT.setText("=="); //$NON-NLS-1$
 
                 t.setText(tokenText);
                 t.setWhiteAfter(whiteAfter);
@@ -1589,7 +1589,7 @@ public class FreeFormLexerPhase2 implements ILexer
             else
             {
                 // split "xyz=" into "xyz" "="
-                IToken eq = new Token(Terminal.T_EQUALS, "=");
+                IToken eq = new Token(Terminal.T_EQUALS, "="); //$NON-NLS-1$
                 //eq.setTerminal(Terminal.T_EQUALS);
                 //eq.setFilename(t.getFilename());
                 //eq.setStartLine(t.getEndLine());
@@ -1629,13 +1629,13 @@ public class FreeFormLexerPhase2 implements ILexer
 
             // t is the "integer*3" token: split it
             IToken t = (IToken)tokenStream.elementAt(i);
-            int starPos = t.getText().indexOf("*");
+            int starPos = t.getText().indexOf("*"); //$NON-NLS-1$
             String textBeforeStar = t.getText().substring(0, starPos);
             String textAfterStar = t.getText().substring(starPos+1, t.getText().length());
             //int numCharsRemoved = t.getTokenText().length() - textAfterStar.length() - 1;
 
             // split "integer*3" into "integer" "*" "3"
-            IToken star = new Token(Terminal.T_ASTERISK, "*");
+            IToken star = new Token(Terminal.T_ASTERISK, "*"); //$NON-NLS-1$
             //star.setTerminal(Terminal.T_ASTERISK);
             //star.setFilename(t.getFilename());
             //star.setStartLine(t.getEndLine());
@@ -1684,9 +1684,9 @@ public class FreeFormLexerPhase2 implements ILexer
 
     /* ----- UTILITY FUNCTIONS ----------------------------------------------*/
 
-    private Pattern idPattern = Pattern.compile("[A-Za-z][A-Za-z0-9_]*([ \t]*=)?");
-    private Pattern starredTypePattern = Pattern.compile("[A-Za-z]+\\*[0-9]+");
-    private Pattern iconPattern = Pattern.compile("[0-9]+|[0-9]+(E|e)[0-9]+\\.[0-9]+");
+    private Pattern idPattern = Pattern.compile("[A-Za-z][A-Za-z0-9_]*([ \t]*=)?"); //$NON-NLS-1$
+    private Pattern starredTypePattern = Pattern.compile("[A-Za-z]+\\*[0-9]+"); //$NON-NLS-1$
+    private Pattern iconPattern = Pattern.compile("[0-9]+|[0-9]+(E|e)[0-9]+\\.[0-9]+"); //$NON-NLS-1$
 
     /**
      * @param t
@@ -1792,8 +1792,8 @@ public class FreeFormLexerPhase2 implements ILexer
       for (int i = 0; i < tokenStream.size(); i++)
       {
         IToken t = (IToken)tokenStream.elementAt(i);
-        s.print(t.getText().replaceAll("\\n", "<end of line>"));
-        s.print(" ");
+        s.print(t.getText().replaceAll("\\n", "<end of line>")); //$NON-NLS-1$ //$NON-NLS-2$
+        s.print(" "); //$NON-NLS-1$
       }
       s.println();
     }
@@ -1804,13 +1804,13 @@ public class FreeFormLexerPhase2 implements ILexer
       {
         IToken t = (IToken)tokenStream.elementAt(i);
         s.print(t.getTerminal());
-        s.print("(" + t.getText().replaceAll("\\n", "\\\\n") + ")");
+        s.print("(" + t.getText().replaceAll("\\n", "\\\\n") + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         //THESE DON'T WORK: The stream gets bigger than the arrays if tokens
         //                  are split, so these will be inaccurate and may
         //                  cause array bounds exceptions
         //s.print(", " + parenDepth[i]);
         //s.print("," + retainAsKeyword[i]);
-        s.print("   ");
+        s.print("   "); //$NON-NLS-1$
       }
       s.println();
     }

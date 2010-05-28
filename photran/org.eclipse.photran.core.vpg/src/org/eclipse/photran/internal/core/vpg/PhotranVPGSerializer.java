@@ -54,7 +54,7 @@ public class PhotranVPGSerializer
 
     protected static IOException readFailure()
     {
-        return new IOException("VPG annotation corrupted; read failed");
+        return new IOException(Messages.PhotranVPGSerializer_AnnotationCorrupted);
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ public class PhotranVPGSerializer
                 case CLASS_DIMENSION:    return (T)Dimension.readFrom(in);
                 case CLASS_IMPLICITSPEC: return (T)ImplicitSpec.readFrom(in);
 
-                default:                 throw new Error("Unknown class code in deserialization: " + Integer.toString(code));
+                default:                 throw new Error("Unknown class code in deserialization: " + Integer.toString(code)); //$NON-NLS-1$
             }
         }
         catch (IOException e)
@@ -245,6 +245,6 @@ public class PhotranVPGSerializer
         else if (object instanceof IPhotranSerializable)
             serialize((IPhotranSerializable)object, out);
         else
-            throw new IllegalArgumentException("Cannot serialize " + object.getClass().getSimpleName());
+            throw new IllegalArgumentException("Cannot serialize " + object.getClass().getSimpleName()); //$NON-NLS-1$
     }
 }

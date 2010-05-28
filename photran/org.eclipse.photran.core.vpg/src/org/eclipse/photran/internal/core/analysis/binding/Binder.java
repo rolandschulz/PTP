@@ -33,7 +33,7 @@ public class Binder
         // Name-binding analysis                    Logging/timing
         // =======================================  ===========================================================
         PhotranVPG vpg = PhotranVPG.getInstance();  String filename = file.getName();
-                                                    StringBuilder sb = new StringBuilder("  - Binder#bind: ");
+                                                    StringBuilder sb = new StringBuilder("  - Binder#bind: "); //$NON-NLS-1$
         
                                                     long start = System.currentTimeMillis();
         ast.accept(new ImplicitSpecCollector());    logTime(start, ImplicitSpecCollector.class, filename);
@@ -54,7 +54,7 @@ public class Binder
         vpg.enableDefinitionCaching();
         ast.accept(new ReferenceCollector());
         vpg.disableDefinitionCaching();             logTime(start, ReferenceCollector.class, filename);
-                                                    vpg.debug(sb.toString(), "");
+                                                    vpg.debug(sb.toString(), ""); //$NON-NLS-1$
     }
 
     private static void logTime(long start, Class<?> clazz, String filename)
@@ -93,17 +93,17 @@ public class Binder
 
     public static void printStatisticsOn(PrintStream ps)
     {
-        ps.println("Name Binding Analysis Statistics:");
+        ps.println("Name Binding Analysis Statistics:"); //$NON-NLS-1$
         
         ps.println();
-        ps.println("    Average Times:");
+        ps.println("    Average Times:"); //$NON-NLS-1$
         for (Class<?> clazz : avgTimes.keySet())
-            ps.println("        " + clazz.getSimpleName() + ": " + avgTimes.get(clazz) + " ms");
+            ps.println("        " + clazz.getSimpleName() + ": " + avgTimes.get(clazz) + " ms"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         ps.println();
-        ps.println("    Maximum Times:");
+        ps.println("    Maximum Times:"); //$NON-NLS-1$
         for (Class<?> clazz : maxTimes.keySet())
-            ps.println("        " + clazz.getSimpleName() + ": " + maxTimes.get(clazz) + " ms (" + maxFiles.get(clazz) + ")");
+            ps.println("        " + clazz.getSimpleName() + ": " + maxTimes.get(clazz) + " ms (" + maxFiles.get(clazz) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     public static void resetStatistics()

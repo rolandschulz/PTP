@@ -26,8 +26,6 @@ import org.eclipse.photran.internal.core.sourceform.ISourceForm;
  */
 public class UnpreprocessedFixedSourceForm implements ISourceForm
 {
-    public static final String DESCRIPTION = "Fixed Form";
-    
     @SuppressWarnings("unchecked")
     public ILexer createLexer(Reader in, IFile file, String filename, boolean accumulateWhitetext) throws IOException
     {

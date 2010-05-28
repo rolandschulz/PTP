@@ -56,7 +56,7 @@ public class LoopDependences
     private LoopDependences collect()
     {
         if (loopNest.containsDoWhileLoops())
-            throw new DependenceTestFailure("The loop nest contains a do-while loop");
+            throw new DependenceTestFailure(Messages.LoopDependences_LoopNestContainsADoWhileLoop);
 
         collectReadsAndWrites();
         collectDependences();
@@ -76,7 +76,7 @@ public class LoopDependences
         @Override public void visitASTAssignmentStmtNode(ASTAssignmentStmtNode node)
         {
             if (node.getDerivedTypeComponentRef() != null)
-                throw new DependenceTestFailure("The loop contains an assignment to a derived type component");
+                throw new DependenceTestFailure(Messages.LoopDependences_LoopContainsAnAssignmentToADerivedTypeComponent);
 
             varRefs.addAll(VariableReference.fromRHS(node));
             varRefs.add(VariableReference.fromLHS(node));
@@ -87,7 +87,7 @@ public class LoopDependences
         @Override public void visitIExecutionPartConstruct(IExecutionPartConstruct node)
         {
             if (node != lastNodeSuccessfullyHandled)
-                throw new DependenceTestFailure("The loop contains an " + node.getClass().getSimpleName());
+                throw new DependenceTestFailure(Messages.bind(Messages.LoopDependences_LoopContains, node.getClass().getSimpleName()));
         }
     }
 
@@ -157,13 +157,13 @@ public class LoopDependences
     @Override public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("Reads: ");
+        sb.append("Reads: "); //$NON-NLS-1$
         sb.append(getReads());
-        sb.append("\nWrites: ");
+        sb.append("\nWrites: "); //$NON-NLS-1$
         sb.append(getWrites());
-        sb.append("\n\nDependences:");
+        sb.append("\n\nDependences:"); //$NON-NLS-1$
         for (Dependence dep : dependences)
-            sb.append("\n    " + dep);
+            sb.append("\n    " + dep); //$NON-NLS-1$
         return sb.toString();
     }
 }

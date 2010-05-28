@@ -92,7 +92,7 @@ public class Dimension implements IPhotranSerializable
         if (lboundAsString != null)
         {
             sb.append(lboundAsString);
-            sb.append(":");
+            sb.append(":"); //$NON-NLS-1$
         }
         sb.append(uboundAsString);
         return sb.toString();

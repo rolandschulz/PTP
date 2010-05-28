@@ -59,27 +59,27 @@ public class PhotranVPGBuilder extends PhotranVPG
 
     public void markFileAsExportingSubprogram(IFile file, String subprogramName)
     {
-        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "subprogram:" + canonicalizeIdentifier(subprogramName), getFilenameForIFile(file)));
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "subprogram:" + canonicalizeIdentifier(subprogramName), getFilenameForIFile(file))); //$NON-NLS-1$
     }
 
     public void markFileAsImportingSubprogram(IFile file, String subprogramName)
     {
-        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "subprogram:" + canonicalizeIdentifier(subprogramName)));
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "subprogram:" + canonicalizeIdentifier(subprogramName))); //$NON-NLS-1$
     }
 
     public void markFileAsExportingModule(IFile file, String moduleName)
     {
-        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file)));
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, "module:" + canonicalizeIdentifier(moduleName), getFilenameForIFile(file))); //$NON-NLS-1$
     }
 
 	public void markFileAsImportingModule(IFile file, String moduleName)
 	{
-	    db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "module:" + canonicalizeIdentifier(moduleName)));
+	    db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "module:" + canonicalizeIdentifier(moduleName))); //$NON-NLS-1$
 	}
 
     public void markFileAsUsingCommonBlock(IFile file, String commonBlockName)
     {
-        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "common:" + canonicalizeIdentifier(commonBlockName)));
+        db.ensure(new VPGDependency<IFortranAST, Token, PhotranTokenRef>(this, getFilenameForIFile(file), "common:" + canonicalizeIdentifier(commonBlockName))); //$NON-NLS-1$
     }
 
 	public void setDefinitionFor(PhotranTokenRef tokenRef, Definition definition)
@@ -135,7 +135,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     {
         clearModuleSymbolTableEntries(moduleNameToken);
 
-        String filename = "module:" + canonicalizeIdentifier(moduleNameToken.getText());
+        String filename = "module:" + canonicalizeIdentifier(moduleNameToken.getText()); //$NON-NLS-1$
         PhotranTokenRef tokenRef = createTokenRef(filename, 0, 0);
         db.setAnnotation(tokenRef, MODULE_TOKENREF_ANNOTATION_TYPE, moduleNameToken.getTokenRef());
 
@@ -159,7 +159,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         int entries = countModuleSymbolTableEntries(canonicalizedModuleName);
         if (entries > 0)
         {
-            String filename = "module:" + canonicalizedModuleName;
+            String filename = "module:" + canonicalizedModuleName; //$NON-NLS-1$
 
             for (int i = 0; i < entries; i++)
             {
@@ -175,7 +175,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     @Override
     public boolean isVirtualFile(String filename)
     {
-        return filename.startsWith("module:") || filename.startsWith("common:") || filename.startsWith("subprogram:");
+        return filename.startsWith("module:") || filename.startsWith("common:") || filename.startsWith("subprogram:"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override public PhotranTokenRef createTokenRef(String filename, int offset, int length)
@@ -194,7 +194,7 @@ public class PhotranVPGBuilder extends PhotranVPG
             IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(getIFileForFilename(filename), sourceForm);
             long start = System.currentTimeMillis();
             calculateDependencies(filename, lexer);
-            debug("  - Elapsed time in calculateDependencies: " + (System.currentTimeMillis()-start) + " ms", filename);
+            debug("  - Elapsed time in calculateDependencies: " + (System.currentTimeMillis()-start) + " ms", filename); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (Exception e)
         {
@@ -294,7 +294,7 @@ public class PhotranVPGBuilder extends PhotranVPG
 
         IFortranAST ast = acquireTransientAST(filename);
         if (ast == null)
-            throw new IllegalArgumentException(filename + " returned null AST");
+            throw new IllegalArgumentException(filename + " returned null AST"); //$NON-NLS-1$
         
         try
         {
@@ -337,7 +337,7 @@ public class PhotranVPGBuilder extends PhotranVPG
                 long start = System.currentTimeMillis();
                 ASTExecutableProgramNode ast = parser.parse(lexer);
                 checkForErrors(ast, filename);
-                debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename);
+                debug("  - Elapsed time in Parser#parse: " + (System.currentTimeMillis()-start) + " ms", filename); //$NON-NLS-1$ //$NON-NLS-2$
                 return new FortranAST(file, ast, lexer.getTokenList());
             }
             catch (SyntaxException e)
@@ -345,11 +345,15 @@ public class PhotranVPGBuilder extends PhotranVPG
                 if (e.getFile() != null && e.getFile().getIFile() != null)
                 {
                     log.clearEntriesFor(PhotranVPG.getFilenameForIFile(e.getFile().getIFile()));
-                    log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                    log.logError(
+                        Messages.bind(
+                            Messages.PhotranVPGBuilder_ErrorParsingFileMessage,
+                            filename,
+                            e.getMessage()),
                         new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
                 }
                 else
-                    logError(file, "Error parsing " + filename, e);
+                    logError(file, Messages.bind(Messages.PhotranVPGBuilder_ErrorParsingFile, filename), e);
                 return null;
             }
             catch (LexerException e)
@@ -357,11 +361,15 @@ public class PhotranVPGBuilder extends PhotranVPG
                 if (e.getFile() != null && e.getFile().getIFile() != null)
                 {
                     log.clearEntriesFor(PhotranVPG.getFilenameForIFile(e.getFile().getIFile()));
-                    log.logError("Error parsing " + filename + ": " + e.getMessage(),
+                    log.logError(
+                        Messages.bind(
+                            Messages.PhotranVPGBuilder_ErrorParsingFileMessage,
+                            filename,
+                            e.getMessage()),
                         new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
                 }
                 else
-                    logError(file, "Error parsing " + filename, e);
+                    logError(file, Messages.bind(Messages.PhotranVPGBuilder_ErrorParsingFile, filename), e);
                 return null;
             }
     //        catch (CoreException e)
@@ -376,7 +384,7 @@ public class PhotranVPGBuilder extends PhotranVPG
     //        }
             catch (Throwable e)
             {
-                logError(file, "Error parsing " + filename, e);
+                logError(file, Messages.bind(Messages.PhotranVPGBuilder_ErrorParsingFile, filename), e);
                 return null;
             }
         }
@@ -400,8 +408,11 @@ public class PhotranVPGBuilder extends PhotranVPG
         {
             PhotranTokenRef errorTokenRef = getErrorTokenRef(filename, firstError.getErrorToken());
             log.clearEntriesFor(filename);
-            log.logError(filename + " contains syntax errors and may not be refactored correctly.",
-                         errorTokenRef);
+            log.logError(
+                Messages.bind(
+                    Messages.PhotranVPGBuilder_FileContainsSyntaxErrors,
+                    filename),
+                errorTokenRef);
         }
     }
 
@@ -426,11 +437,11 @@ public class PhotranVPGBuilder extends PhotranVPG
     {
         StringBuilder sb = new StringBuilder();
         sb.append(message);
-        sb.append(": ");
+        sb.append(": "); //$NON-NLS-1$
         sb.append(e.getMessage());
         sb.append('\n');
         sb.append(e.getClass().getName());
-        sb.append(":\n");
+        sb.append(":\n"); //$NON-NLS-1$
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         e.printStackTrace(new PrintStream(bs));
         sb.append(bs);
@@ -454,7 +465,7 @@ public class PhotranVPGBuilder extends PhotranVPG
 
         long start = System.currentTimeMillis();
         Binder.bind(ast, getIFileForFilename(filename));
-        debug("  - Elapsed time in Binder#bind: " + (System.currentTimeMillis()-start) + " ms", filename);
+        debug("  - Elapsed time in Binder#bind: " + (System.currentTimeMillis()-start) + " ms", filename); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public static boolean isEmpty(ASTExecutableProgramNode ast)

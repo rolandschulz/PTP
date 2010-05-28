@@ -74,7 +74,7 @@ public abstract class FortranResourceRefactoring
     implements IResourceRefactoring
 {
     // TEMPORARY -- So we can continue working on fixed form refactoring while effectively disabling it in the public 6.0 release
-    public static final boolean FIXED_FORM_REFACTORING_ENABLED = System.getenv("ENABLE_FIXED_FORM_REFACTORING") != null;
+    public static final boolean FIXED_FORM_REFACTORING_ENABLED = System.getenv("ENABLE_FIXED_FORM_REFACTORING") != null; //$NON-NLS-1$
     
     @Override
     protected final PhotranVPG getVPG()
@@ -93,8 +93,7 @@ public abstract class FortranResourceRefactoring
             {
                 if (org.eclipse.photran.internal.core.sourceform.SourceForm.isFixedForm(file))
                 {
-                    status.addWarning("Indentation and line length is NOT checked when refactoring FIXED form files. " +
-                        "Use at your own risk.");
+                    status.addWarning(Messages.FortranResourceRefactoring_IndentationAndLineLengthAreNotChecked);
                     return;
                 }
             }
@@ -119,14 +118,12 @@ public abstract class FortranResourceRefactoring
             {
                 if (f.getProject() == null)
                 {
-                    status.addWarning("The file " + f.getName() + " cannot be refactored because " +
-                        "it is not inside a Fortran project.");
+                    status.addWarning(Messages.bind(Messages.FortranResourceRefactoring_FileIsNotInAFortranProject, f.getName()));
                     filesToBeRemoved.add(f);
                 }
                 else
                 {
-                    status.addWarning("Please enable analysis and refactoring in the project " +
-                        "properties for " + f.getProject().getName() + ".");
+                    status.addWarning(Messages.bind(Messages.FortranResourceRefactoring_AnalysisRefactoringNotEnabled, f.getProject().getName()));
                     filesToBeRemoved.add(f);
                 }
             }
@@ -145,7 +142,7 @@ public abstract class FortranResourceRefactoring
         {
             if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.sourceform.SourceForm.isFixedForm(file))
             {
-                status.addError("The fixed form file " + file.getName() + " will not be refactored.");
+                status.addError(Messages.bind(Messages.FortranResourceRefactoring_FixedFormFileWillNotBeRefactored, file.getName()));
                 filesToRemove.add(file);
             }
         }
@@ -161,7 +158,7 @@ public abstract class FortranResourceRefactoring
         {
             if (!filesToRemove.contains(file) && org.eclipse.photran.internal.core.sourceform.SourceForm.isCPreprocessed(file))
             {
-                status.addError("The C-preprocessed file " + file.getName() + " will not be refactored.");
+                status.addError(Messages.bind(Messages.FortranResourceRefactoring_CPreprocessedFileWillNotBeRefactored, file.getName()));
                 filesToRemove.add(file);
             }
         }
@@ -252,7 +249,7 @@ public abstract class FortranResourceRefactoring
      */
     protected static IExpr parseLiteralExpression(String string)
     {
-        return ((ASTAssignmentStmtNode)parseLiteralStatement("x = " + string)).getRhs();
+        return ((ASTAssignmentStmtNode)parseLiteralStatement("x = " + string)).getRhs(); //$NON-NLS-1$
     }
 
     /**
@@ -262,14 +259,14 @@ public abstract class FortranResourceRefactoring
      */
     protected static IASTListNode<IBodyConstruct> parseLiteralStatementSequence(String string)
     {
-        string = "program p\n" + string + "\nend program";
+        string = "program p\n" + string + "\nend program"; //$NON-NLS-1$ //$NON-NLS-2$
         return ((ASTMainProgramNode)parseLiteralProgramUnit(string)).getBody();
     }
 
     /** @return a CONTAINS statement */
     protected static ASTContainsStmtNode createContainsStmt()
     {
-        String string = "program p\ncontains\nsubroutine s\nend subroutine\nend program";
+        String string = "program p\ncontains\nsubroutine s\nend subroutine\nend program"; //$NON-NLS-1$
         return ((ASTMainProgramNode)parseLiteralProgramUnit(string)).getContainsStmt();
     }
 
@@ -284,7 +281,7 @@ public abstract class FortranResourceRefactoring
         try
         {
             IAccumulatingLexer lexer = new ASTLexerFactory().createLexer(
-                new StringReader(string), null, "(none)");
+                new StringReader(string), null, "(none)"); //$NON-NLS-1$
             Parser parser = new Parser();
 
             FortranAST ast = new FortranAST(null, parser.parse(lexer), lexer.getTokenList());
@@ -300,12 +297,12 @@ public abstract class FortranResourceRefactoring
 
     protected static String describeToken(Token token)
     {
-        return "\"" + token.getText() + "\" " + describeTokenPos(token);
+        return "\"" + token.getText() + "\" " + describeTokenPos(token); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     protected static String describeTokenPos(Token token)
     {
-        return "(line " + token.getLine() + ", column " + token.getCol() + ")";
+        return Messages.bind(Messages.FortranResourceRefactoring_LineColumn, token.getLine(), token.getCol());
     }
 
     // TEXT<->TREE MAPPING ////////////////////////////////////////////////////
@@ -548,7 +545,7 @@ public abstract class FortranResourceRefactoring
                 endIndex = i;
         }
         if (startIndex < 0 || endIndex < 0 || endIndex < startIndex)
-            throw new Error("INTERNAL ERROR: Unable to locate selected statements in IASTListNode");
+            throw new Error("INTERNAL ERROR: Unable to locate selected statements in IASTListNode"); //$NON-NLS-1$
 
         return new StatementSequence(
             listContainingStmts.findNearestAncestor(ScopingNode.class),
@@ -641,7 +638,7 @@ public abstract class FortranResourceRefactoring
 
     protected static boolean isValidIdentifier(String name)
     {
-        return Pattern.matches("[A-Za-z$][A-Za-z0-9$_]*", name);
+        return Pattern.matches("[A-Za-z$][A-Za-z0-9$_]*", name); //$NON-NLS-1$
     }
 
     protected static boolean isBoundIdentifier(Token t)
@@ -838,7 +835,7 @@ public abstract class FortranResourceRefactoring
 
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck))
             {
-                pm.subTask("Checking for conflicting definitions in " + importingScope.describe());
+                pm.subTask(Messages.bind(Messages.FortranResourceRefactoring_CheckingForConflictingDefinitionsIn, importingScope.describe()));
                 findAllPotentiallyConflictingDefinitionsInScope(conflicts, importingScope, true);
             }
 
@@ -923,7 +920,7 @@ public abstract class FortranResourceRefactoring
                 // TODO: Does not consider rename or only lists (need to tell if this SPECIFIC definition will be imported)
                 for (ScopingNode importingScope : scopeOfDefinitionToCheck.findImportingScopes())
                 {
-                    pm.subTask("Checking for references to " + newName + " in " + importingScope.describe());
+                    pm.subTask(Messages.bind(Messages.FortranResourceRefactoring_CheckingForReferencesTo, newName, importingScope.describe()));
                     shadowedDefinitions.addAll(importingScope.manuallyResolve(token));
                 }
 
@@ -940,7 +937,7 @@ public abstract class FortranResourceRefactoring
 
         private void checkIfReferenceBindingWillChange(IConflictingBindingCallback callback, PhotranTokenRef ref, boolean shouldReferenceRenamedDefinition)
         {
-            pm.subTask("Checking for binding conflicts in " + PhotranVPG.lastSegmentOfFilename(ref.getFilename()));
+            pm.subTask(Messages.bind(Messages.FortranResourceRefactoring_CheckingForBindingConflictsIn, PhotranVPG.lastSegmentOfFilename(ref.getFilename())));
 
             Token reference = ref.findToken();
 
@@ -987,7 +984,7 @@ public abstract class FortranResourceRefactoring
 
             for (ScopingNode importingScope : scopeItselfAndAllScopesThatImport(scopeOfDefinitionToCheck))
             {
-                pm.subTask("Checking for subprogram binding conflicts in " + importingScope.describe());
+                pm.subTask(Messages.bind(Messages.FortranResourceRefactoring_CheckingForSubprogramBindingConflictsIn, importingScope.describe()));
 
                 importingScope.accept(new GenericASTVisitor()
                 {

@@ -67,7 +67,7 @@ public class FixedFormLexerPhase2 implements ILexer
                 {
                     FixedFormReplacement ffr = (FixedFormReplacement)ppr;
                     String replStr = ffr.toString();
-                    replStr = replStr.replaceAll("=", "");
+                    replStr = replStr.replaceAll("=", ""); //$NON-NLS-1$ //$NON-NLS-2$
                     ffr.setReplacementText(replStr);
                 }
             }
