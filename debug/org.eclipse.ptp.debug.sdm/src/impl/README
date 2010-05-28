@@ -1,0 +1,18 @@
+The SDM currently uses a routing file to determine the mapping between a hostname/port and 
+an index. Each SDM server process obtains its index via an environment variable that is supplied
+by the launcher (usually an MPI runtime system). The server then uses its index position to
+determine its parent and connects to the hostname/port obtained from the routing file.
+
+The format of the routing file is:
+
+number_of_entries
+index hostname port
+...
+
+where:
+
+number_of_entries	- the number of mapping entries in the file (one less than the number
+					  of lines in the file
+index				- the index of this entry (0 .. N-1) where N is the number of servers
+hostname 			- fully qualified host name or IP address of node
+port 				- port number this server will be listening on
