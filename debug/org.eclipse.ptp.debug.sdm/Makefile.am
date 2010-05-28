@@ -10,8 +10,11 @@ sdm_SOURCES =				src/master/startup.c\
 							src/server/server_cmds.c \
 							src/server/backend.c \
 							src/server/gdbmi_backend.c \
-							src/server/test_backend.c \
-							src/impl/sdm.c \
+							src/server/test_backend.c
+sdm_CFLAGS =				-I./include -I./libaif -I./libmi  $(AM_CFLAGS)
+sdm_LDADD =					libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+							
+libsdm_a_SOURCES =			src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_hello_proto.c \
 							src/impl/sdm_message_tcpip.c \
@@ -19,20 +22,19 @@ sdm_SOURCES =				src/master/startup.c\
 							src/impl/sdm_routing_table_file.c \
 							src/impl/sdm_set_bitset.c
 					
-sdm_CFLAGS =				-I./include -I./libaif -I./libmi  $(AM_CFLAGS)
-sdm_LDADD =					libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+libsdm_a_CFLAGS =			-I./include $(AM_CFLAGS)
 
 test_proxy_SOURCES =		src/test/test_proxy.c \
 							src/test/test_proxy_clnt.c
 test_proxy_CFLAGS =			-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 test_proxy_LDFLAGS = 		-g
-test_proxy_LDADD =			libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
+test_proxy_LDADD =			libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 
 test_proxy_rev_SOURCES =	src/test/test_proxy_rev.c \
 							src/test/test_proxy_clnt.c
 test_proxy_rev_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 test_proxy_rev_LDFLAGS = 	-g
-test_proxy_rev_LDADD =		libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
+test_proxy_rev_LDADD =		libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 
 noinst_HEADERS =			include/backend.h \
 							include/breakpoint.h \
@@ -50,7 +52,7 @@ noinst_HEADERS =			include/backend.h \
 							include/session.h \
 							include/stackframe.h
 
-noinst_LIBRARIES =			libdbgclnt.a libdbgutils.a
+noinst_LIBRARIES =			libsdm.a libdbgclnt.a libdbgutils.a
 
 libdbgclnt_a_SOURCES =		src/client/client_interface.c 
 libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
