@@ -17,7 +17,7 @@ import org.eclipse.osgi.util.NLS;
  * 
  * @author Jeff Overbey (via Eclipse's Externalize Strings wizard)
  */
-public class Messages extends NLS
+class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.photran.internal.cdtinterface.ui.messages"; //$NON-NLS-1$
 

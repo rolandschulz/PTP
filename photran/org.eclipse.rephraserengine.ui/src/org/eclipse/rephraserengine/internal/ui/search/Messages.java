@@ -13,16 +13,17 @@ package org.eclipse.rephraserengine.internal.ui.search;
 import org.eclipse.osgi.util.NLS;
 
 /**
+ * Externalized strings.
  * 
- * @author joverbey
+ * @author Jeff Overbey
  */
-public class Messages extends NLS
+class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.rephraserengine.internal.ui.search.messages"; //$NON-NLS-1$
 
     public static String SearchLabelProvider_nMatches;
-
     public static String SearchLabelProvider_OneMatch;
+
     static
     {
         // initialize resource bundle
