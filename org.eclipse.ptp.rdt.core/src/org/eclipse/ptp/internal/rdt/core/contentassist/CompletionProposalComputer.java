@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 QNX Software Systems and others.
+ * Copyright (c) 2007, 2010 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,13 @@
  *    Markus Schorn (Wind River Systems)
  *    Anton Leherbauer (Wind River Systems)
  *    IBM Corporation
+ *    Sergey Prigogin (Google)
  *******************************************************************************/
 
 /* -- ST-Origin --
  * Source folder: org.eclipse.cdt.ui/src
  * Class: org.eclipse.cdt.internal.ui.text.contentassist.DOMCompletionProposalComputer
- * Version: 1.19
+ * Version: 1.27
  */
 
 package org.eclipse.ptp.internal.rdt.core.contentassist;
@@ -63,9 +64,16 @@ import org.eclipse.cdt.core.dom.ast.cpp.ICPPNamespace;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPUsingDeclaration;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.parser.util.CharArrayUtils;
+import org.eclipse.cdt.internal.core.dom.parser.c.CBuiltinParameter;
+import org.eclipse.cdt.internal.core.dom.parser.c.CBuiltinVariable;
+import org.eclipse.cdt.internal.core.dom.parser.c.CImplicitFunction;
+import org.eclipse.cdt.internal.core.dom.parser.c.CImplicitTypedef;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPBuiltinParameter;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPBuiltinVariable;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitFunction;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitMethod;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPImplicitTypedef;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.semantics.AccessContext;
 
 /**
  * Searches the DOM (both the AST and the index) for completion proposals.
@@ -92,12 +100,12 @@ public class CompletionProposalComputer {
 			boolean handleMacros= false;
 			IASTName[] names = completionNode.getNames();
 
-			for (int i = 0; i < names.length; ++i) {
-				if (names[i].getTranslationUnit() == null)
+			for (IASTName name : names) {
+				if (name.getTranslationUnit() == null)
 					// The node isn't properly hooked up, must have backtracked out of this node
 					continue;
 				
-				IASTCompletionContext astContext = names[i].getCompletionContext();
+				IASTCompletionContext astContext = name.getCompletionContext();
 				if (astContext == null) {
 					continue;
 				} else if (astContext instanceof IASTIdExpression
@@ -107,11 +115,15 @@ public class CompletionProposalComputer {
 				}
 				
 				IBinding[] bindings = astContext.findBindings(
-						names[i], !context.isContextInformationStyle());
+						name, !context.isContextInformationStyle());
 				
-				if (bindings != null)
-					for (int j = 0; j < bindings.length; ++j)
-						handleBinding(bindings[j], context, prefix, astContext, proposals);
+				if (bindings != null) {
+					AccessContext accessibilityContext = new AccessContext(name);
+					for (IBinding binding : bindings) {
+						if (accessibilityContext.isAccessible(binding))
+							handleBinding(binding, context, prefix, astContext, proposals);
+					}
+				}
 			}
 
 			if (handleMacros)
@@ -157,12 +169,13 @@ public class CompletionProposalComputer {
 			StringBuilder args = new StringBuilder();
 
 			IASTFunctionStyleMacroParameter[] params = functionMacro.getParameters();
-			if (params != null)
+			if (params != null) {
 				for (int i = 0; i < params.length; ++i) {
 					if (i > 0)
 						args.append(", "); //$NON-NLS-1$
 					args.append(params[i].getParameter());
 				}
+			}
 			String argString = args.toString();
 			
 			StringBuilder descStringBuff = new StringBuilder(repStringBuff.toString());
@@ -173,9 +186,13 @@ public class CompletionProposalComputer {
 			String repString = repStringBuff.toString();
 			String descString = descStringBuff.toString();
 			
-			Proposal proposal = createProposal(repString, descString, type, baseRelevance + RelevanceConstants.MACRO_TYPE_RELEVANCE, context);
+			Proposal proposal = createProposal(repString, descString, prefix.length(), type, baseRelevance + RelevanceConstants.MACRO_TYPE_RELEVANCE, context);
 			if (!context.isContextInformationStyle()) {
-				proposal.setCursorPosition(repString.length() - 1);
+				if (argString.length() > 0) {
+					proposal.setCursorPosition(repString.length() - 1);
+				} else {
+					proposal.setCursorPosition(repString.length());
+				}
 			}
 			
 			if (argString.length() > 0) {
@@ -186,7 +203,7 @@ public class CompletionProposalComputer {
 			
 			proposals.add(proposal);
 		} else
-			proposals.add(createProposal(macroName, macroName, type, baseRelevance + RelevanceConstants.MACRO_TYPE_RELEVANCE, context));
+			proposals.add(createProposal(macroName, macroName, prefix.length(), type, baseRelevance + RelevanceConstants.MACRO_TYPE_RELEVANCE, context));
 	}
 	
 	protected void handleBinding(IBinding binding,
@@ -194,7 +211,13 @@ public class CompletionProposalComputer {
 			String prefix,
 			IASTCompletionContext astContext, List<Proposal> proposals) {
 		if ((binding instanceof CPPImplicitFunction
-				|| binding instanceof CPPImplicitTypedef)
+				|| binding instanceof CPPImplicitTypedef
+				|| binding instanceof CPPBuiltinVariable
+				|| binding instanceof CPPBuiltinParameter
+				|| binding instanceof CImplicitFunction
+				|| binding instanceof CImplicitTypedef
+				|| binding instanceof CBuiltinVariable
+				|| binding instanceof CBuiltinParameter)
 				&& !(binding instanceof CPPImplicitMethod)) {
 			return;
 		}
@@ -271,8 +294,9 @@ public class CompletionProposalComputer {
 		repStringBuff.append(function.getName());
 		repStringBuff.append('(');
 		
-		StringBuilder dispargs = new StringBuilder(); // for the displayString
-        StringBuilder idargs = new StringBuilder();   // for the idString
+		StringBuilder dispargs = new StringBuilder(); // for the dispargString
+        StringBuilder idargs = new StringBuilder();   // for the idargString
+        boolean hasArgs = true;
 		String returnTypeStr = null;
 		try {
 			IParameter[] params = function.getParameters();
@@ -311,12 +335,13 @@ public class CompletionProposalComputer {
 				if (returnType != null)
 					returnTypeStr = ASTTypeUtil.getType(returnType, false);
 			}
+			hasArgs = ASTTypeUtil.functionTakesParameters(function);
 		} catch (DOMException e) {
 		}
         
         String dispargString = dispargs.toString();
         String idargString = idargs.toString();
-		
+        String contextDispargString = hasArgs ? dispargString : null;
         StringBuilder dispStringBuff = new StringBuilder(repStringBuff.toString());
 		dispStringBuff.append(dispargString);
         dispStringBuff.append(')');
@@ -335,13 +360,14 @@ public class CompletionProposalComputer {
         String repString = repStringBuff.toString();
 
         final int relevance = function instanceof ICPPMethod ? RelevanceConstants.METHOD_TYPE_RELEVANCE : RelevanceConstants.FUNCTION_TYPE_RELEVANCE;
-        Proposal proposal = createProposal(repString, dispString, idString, type, baseRelevance + relevance, context);
+        Proposal proposal = createProposal(repString, dispString, idString, context.getCompletionNode().getLength(), type, baseRelevance + relevance, context);
 		if (!context.isContextInformationStyle()) {
-			proposal.setCursorPosition(repString.length() - 1);
+			int cursorPosition = hasArgs ? (repString.length() - 1) : repString.length();
+			proposal.setCursorPosition(cursorPosition);
 		}
 		
-		if (dispargString.length() > 0) {
-			RemoteProposalContextInformation info = new RemoteProposalContextInformation(type, dispString, dispargString);
+		if (contextDispargString != null) {
+			RemoteProposalContextInformation info = new RemoteProposalContextInformation(type, dispString, contextDispargString);
 			info.setContextInformationPosition(context.getContextInformationOffset());
 			proposal.setContextInformation(info);
 		}
@@ -379,7 +405,7 @@ public class CompletionProposalComputer {
 			: isField(variable) 
 				? RelevanceConstants.FIELD_TYPE_RELEVANCE
 				: RelevanceConstants.VARIABLE_TYPE_RELEVANCE;
-		Proposal proposal = createProposal(repString, dispString, idString, type, baseRelevance + relevance, context);
+		Proposal proposal = createProposal(repString, dispString, idString, context.getCompletionNode().getLength(), type, baseRelevance + relevance, context);
 		proposals.add(proposal);
 	}
 	
@@ -435,16 +461,22 @@ public class CompletionProposalComputer {
 		proposals.add(createProposal(repString, namespace.getName(), getElementType(namespace), baseRelevance + RelevanceConstants.NAMESPACE_TYPE_RELEVANCE, cContext));
 	}
 	
-	private Proposal createProposal(String repString, String dispString, CompletionType type, int relevance, RemoteContentAssistInvocationContext context) {
-		return createProposal(repString, dispString, null, type, relevance, context);
+	private Proposal createProposal(String repString, String dispString, CompletionType type,
+			int relevance, RemoteContentAssistInvocationContext context) {
+		return createProposal(repString, dispString, null, context.getCompletionNode().getLength(), type,
+				relevance, context);
 	}
 	
-	private Proposal createProposal(String repString, String dispString, String idString, CompletionType type, int relevance, RemoteContentAssistInvocationContext context) {
+	private Proposal createProposal(String repString, String dispString, int prefixLength, CompletionType type, int relevance, RemoteContentAssistInvocationContext context) {
+		return createProposal(repString, dispString, null, prefixLength, type, relevance, context);
+	}
+	
+	private Proposal createProposal(String repString, String dispString, String idString, int prefixLength, CompletionType type, int relevance, RemoteContentAssistInvocationContext context) {
 		int parseOffset = context.getParseOffset();
 		int invocationOffset = context.getInvocationOffset();
 		boolean doReplacement = !context.isContextInformationStyle();
 		
-		int repLength = doReplacement ? context.getCompletionNode().getLength() : 0;
+		int repLength = doReplacement ? prefixLength : 0;
 		int repOffset = doReplacement ? parseOffset - repLength : invocationOffset;
 		repString = doReplacement ? repString : ""; //$NON-NLS-1$
 		
