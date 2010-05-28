@@ -114,7 +114,8 @@ deliver_callback(const sdm_message msg)
  * Just forward aggregated message to parent.
  */
 static int
-aggregate_callback(sdm_message msg) {
+aggregate_callback(sdm_message msg, void *data)
+{
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] Enter aggregate_callback\n", sdm_route_get_id());
 
 	sdm_message_set_send_callback(msg, sdm_message_free);
@@ -159,7 +160,7 @@ server(dbg_backend *dbgr)
 	backend = dbgr;
 
 	sdm_message_set_deliver_callback(deliver_callback);
-	sdm_aggregate_set_completion_callback(aggregate_callback);
+	sdm_aggregate_set_completion_callback(aggregate_callback, NULL);
 
 	svr_init(dbgr, event_callback);
 
