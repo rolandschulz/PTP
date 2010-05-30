@@ -70,7 +70,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @since 4.0
 	 */
 	public void logError(String message) {
-		getLog().log(new Status(Status.ERROR, "org.eclipse.ptp.rm.ibm.ll.ui", message));
+		getLog().log(new Status(Status.ERROR, "org.eclipse.ptp.rm.ibm.ll.ui", message)); //$NON-NLS-1$
 	}
 
 }

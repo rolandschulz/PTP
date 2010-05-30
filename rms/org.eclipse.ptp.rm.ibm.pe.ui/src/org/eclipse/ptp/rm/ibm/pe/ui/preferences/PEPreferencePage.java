@@ -132,9 +132,9 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	optionsGroup = new Group((Composite) preferencePane, SWT.SHADOW_ETCHED_IN);
 	layout = new GridLayout(2, true);
 	optionsGroup.setLayout(layout);
-	optionsGroup.setText(Messages.getString("PEDialogs.GroupLabel"));
+	optionsGroup.setText(Messages.getString("PEDialogs.GroupLabel")); //$NON-NLS-1$
 	loadLevelerLabel = new Label(optionsGroup, SWT.NONE);
-	loadLevelerLabel.setText(Messages.getString("PEDialogs.LoadLevelerOptionLabel"));
+	loadLevelerLabel.setText(Messages.getString("PEDialogs.LoadLevelerOptionLabel")); //$NON-NLS-1$
 	loadLevelerOption = new Button(optionsGroup, SWT.CHECK);
 	preferenceValue = preferences.getString(PEPreferenceConstants.LOAD_LEVELER_OPTION);
 	if (preferenceValue.equals(PEPreferenceConstants.OPTION_YES)) {
@@ -142,7 +142,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	}
 
 	llModeLabel = new Label(optionsGroup, SWT.NONE);
-	llModeLabel.setText(Messages.getString("PEDialogs.LLRunMode"));
+	llModeLabel.setText(Messages.getString("PEDialogs.LLRunMode")); //$NON-NLS-1$
 	llModeGroup = new Group(optionsGroup, SWT.SHADOW_ETCHED_IN);
 	layout = new GridLayout(2, true);
 	llModeGroup.setLayout(layout);
@@ -150,25 +150,25 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	gd.grabExcessHorizontalSpace = true;
 	llModeGroup.setLayoutData(gd);
 	llModeLocal = new Button(llModeGroup, SWT.RADIO);
-	llModeLocal.setText(Messages.getString("PEDialogs.llModeLocal"));
+	llModeLocal.setText(Messages.getString("PEDialogs.llModeLocal")); //$NON-NLS-1$
 	llModeMulticluster = new Button(llModeGroup, SWT.RADIO);
-	llModeMulticluster.setText(Messages.getString("PEDialogs.llModeMulticluster"));
+	llModeMulticluster.setText(Messages.getString("PEDialogs.llModeMulticluster")); //$NON-NLS-1$
 	llModeDefault = new Button(llModeGroup, SWT.RADIO);
-	llModeDefault.setText(Messages.getString("PEDialogs.llModeDefault"));
+	llModeDefault.setText(Messages.getString("PEDialogs.llModeDefault")); //$NON-NLS-1$
 	llModeDefault.setSelection(false);
 	llModeLocal.setSelection(false);
 	llModeMulticluster.setSelection(false);
 	preferenceValue = preferences.getString(PEPreferenceConstants.LOAD_LEVELER_MODE);
-	if (preferenceValue.equals("y")) {
+	if (preferenceValue.equals("y")) { //$NON-NLS-1$
 	    llModeMulticluster.setSelection(true);
-	} else if (preferenceValue.equals("n")) {
+	} else if (preferenceValue.equals("n")) { //$NON-NLS-1$
 	    llModeLocal.setSelection(true);
 	} else {
 	    llModeDefault.setSelection(true);
 	}
 
 	nodePollMinLabel = new Label(optionsGroup, SWT.NONE);
-	nodePollMinLabel.setText(Messages.getString("PEDialogs.minNodePollInterval"));
+	nodePollMinLabel.setText(Messages.getString("PEDialogs.minNodePollInterval")); //$NON-NLS-1$
 	nodePollMinInterval = new Text(optionsGroup, SWT.NONE);
 	gd = new GridData(GridData.FILL_HORIZONTAL);
 	gd.grabExcessHorizontalSpace = true;
@@ -177,7 +177,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	nodePollMinInterval.setText(preferenceValue);
 
 	nodePollMaxLabel = new Label(optionsGroup, SWT.NONE);
-	nodePollMaxLabel.setText(Messages.getString("PEDialogs.maxNodePollInterval"));
+	nodePollMaxLabel.setText(Messages.getString("PEDialogs.maxNodePollInterval")); //$NON-NLS-1$
 	nodePollMaxInterval = new Text(optionsGroup, SWT.NONE);
 	gd = new GridData(GridData.FILL_HORIZONTAL);
 	gd.grabExcessHorizontalSpace = true;
@@ -186,7 +186,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	nodePollMaxInterval.setText(preferenceValue);
 
 	jobPollLabel = new Label(optionsGroup, SWT.NONE);
-	jobPollLabel.setText(Messages.getString("PEDialogs.jobPollInterval"));
+	jobPollLabel.setText(Messages.getString("PEDialogs.jobPollInterval")); //$NON-NLS-1$
 	jobPollInterval = new Text(optionsGroup, SWT.NONE);
 	gd = new GridData(GridData.FILL_HORIZONTAL);
 	gd.grabExcessHorizontalSpace = true;
@@ -195,7 +195,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	jobPollInterval.setText(preferenceValue);
 
 	libOverrideLabel = new Label(optionsGroup, SWT.NONE);
-	libOverrideLabel.setText(Messages.getString("PEDialogs.libOverrideLabel"));
+	libOverrideLabel.setText(Messages.getString("PEDialogs.libOverrideLabel")); //$NON-NLS-1$
 
 	llOverrideBox = new Composite(optionsGroup, SWT.NONE);
 	gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -211,7 +211,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	gd.grabExcessHorizontalSpace = true;
 	libOverridePath.setLayoutData(gd);
 	libOverrideBrowse = new Button(llOverrideBox, SWT.PUSH);
-	libOverrideBrowse.setText(Messages.getString("PEDialogs.browse"));
+	libOverrideBrowse.setText(Messages.getString("PEDialogs.browse")); //$NON-NLS-1$
 	gd = new GridData(GridData.FILL_HORIZONTAL);
 	gd.grabExcessHorizontalSpace = false;
 	libOverrideBrowse.setLayoutData(gd);
@@ -219,14 +219,14 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 	libOverridePath.setText(preferenceValue);
 
 	runMiniproxyLabel = new Label(optionsGroup, SWT.NONE);
-	runMiniproxyLabel.setText(Messages.getString("PEDialogs.MiniproxyLabel"));
+	runMiniproxyLabel.setText(Messages.getString("PEDialogs.MiniproxyLabel")); //$NON-NLS-1$
 	runMiniproxy = new Button(optionsGroup, SWT.CHECK);
 	preferenceValue = preferences.getString(PEPreferenceConstants.RUN_MINIPROXY);
 	if (preferenceValue.equals(PEPreferenceConstants.OPTION_YES)) {
 	    runMiniproxy.setSelection(true);
 	}
 	traceLabel = new Label(optionsGroup, SWT.NONE);
-	traceLabel.setText(Messages.getString("PEDialogs.TraceLevelLabel"));
+	traceLabel.setText(Messages.getString("PEDialogs.TraceLevelLabel")); //$NON-NLS-1$
 	traceOptions = new Combo(optionsGroup, SWT.READ_ONLY);
 	traceOptions.add(PEPreferenceConstants.TRACE_NOTHING);
 	traceOptions.add(PEPreferenceConstants.TRACE_FUNCTION);
@@ -284,11 +284,11 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 
 		preferences.setValue(PEPreferenceConstants.LOAD_LEVELER_OPTION, PEPreferenceConstants.OPTION_YES);
 		if (llModeDefault.getSelection()) {
-		    widgetValue = "d";
+		    widgetValue = "d"; //$NON-NLS-1$
 		} else if (llModeLocal.getSelection()) {
-		    widgetValue = "n";
+		    widgetValue = "n"; //$NON-NLS-1$
 		} else {
-		    widgetValue = "y";
+		    widgetValue = "y"; //$NON-NLS-1$
 		}
 		preferences.setValue(PEPreferenceConstants.LOAD_LEVELER_MODE, widgetValue);
 		widgetValue = nodePollMinInterval.getText().trim();
@@ -297,7 +297,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 			interval = Integer.valueOf(widgetValue);
 		    }
 		    catch (NumberFormatException e) {
-			setErrorMessage(Messages.getString("PEDialogs.invalidMinPollInterval"));
+			setErrorMessage(Messages.getString("PEDialogs.invalidMinPollInterval")); //$NON-NLS-1$
 			return;
 		    }
 		}
@@ -308,7 +308,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 			interval = Integer.valueOf(widgetValue);
 		    }
 		    catch (NumberFormatException e) {
-			setErrorMessage(Messages.getString("PEDialogs.invalidMaxPollInterval"));
+			setErrorMessage(Messages.getString("PEDialogs.invalidMaxPollInterval")); //$NON-NLS-1$
 			return;
 		    }
 		}
@@ -319,7 +319,7 @@ public class PEPreferencePage extends AbstractRemoteRMPreferencePage
 			interval = Integer.valueOf(widgetValue);
 		    }
 		    catch (NumberFormatException e) {
-			setErrorMessage(Messages.getString("PEDialogs.invalidJobPollInterval"));
+			setErrorMessage(Messages.getString("PEDialogs.invalidJobPollInterval")); //$NON-NLS-1$
 			return;
 		    }
 		}

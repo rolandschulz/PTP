@@ -86,10 +86,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	private class EventMonitor implements ModifyListener, SelectionListener {
 		public EventMonitor() {
-			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-					+ ":EventMonitor entered.");
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":EventMonitor returning.");
+			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+					+ ":EventMonitor entered."); //$NON-NLS-1$
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":EventMonitor returning."); //$NON-NLS-1$
 		}
 
 		/**
@@ -97,8 +97,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		 * text field modified.
 		 */
 		public void modifyText(ModifyEvent e) {
-			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-					+ ":modifyText entered.");
+			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+					+ ":modifyText entered."); //$NON-NLS-1$
 			// Text and Combo widgets send ModifyEvents any time their text
 			// value is modified, including
 			// when the value is modified by a setText() call. The only time
@@ -112,15 +112,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				validateAllFields();
 			}
 
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":modifyText returning.");
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":modifyText returning."); //$NON-NLS-1$
 		}
 
 		public void widgetDefaultSelected(SelectionEvent e) {
-			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-					+ ":widgetDefaultSelected entered.");
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":widgetDefaultSelected returning.");
+			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+					+ ":widgetDefaultSelected entered."); //$NON-NLS-1$
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":widgetDefaultSelected returning."); //$NON-NLS-1$
 		}
 
 		/**
@@ -129,8 +129,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		public void widgetSelected(SelectionEvent e) {
 			Object widgetData;
 
-			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-					+ ":widgetSelected entered.");
+			print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+					+ ":widgetSelected entered."); //$NON-NLS-1$
 			// Determine which button was clicked based on the data value stored
 			// in that button object
 			// and handle processing for that button.
@@ -147,37 +147,37 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				switch (((Integer) widgetData).intValue()) {
 				case LL_PTP_JOB_COMMAND_FILE_SELECTOR:
 					getInputFile(llJobCommandFile,
-							"File.llJobCommandFileTitle",
-							"llJobCommandFilePath");
+							"File.llJobCommandFileTitle", //$NON-NLS-1$
+							"llJobCommandFilePath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR:
 					getInputFile(llJobCommandFileTemplate,
-							"File.llJobCommandFileTemplateTitle",
-							"llJobCommandFileTemplatePath");
+							"File.llJobCommandFileTemplateTitle", //$NON-NLS-1$
+							"llJobCommandFileTemplatePath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_STDERR_SELECTOR:
-					getInputFile(llError, "File.stderrSelectorTitle",
-							"llStderrPath");
+					getInputFile(llError, "File.stderrSelectorTitle", //$NON-NLS-1$
+							"llStderrPath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_STDOUT_SELECTOR:
-					getInputFile(llOutput, "File.stdoutSelectorTitle",
-							"llStdoutPath");
+					getInputFile(llOutput, "File.stdoutSelectorTitle", //$NON-NLS-1$
+							"llStdoutPath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_STDIN_SELECTOR:
-					getInputFile(llInput, "File.stdinSelectorTitle",
-							"llStdinPath");
+					getInputFile(llInput, "File.stdinSelectorTitle", //$NON-NLS-1$
+							"llStdinPath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_EXECUTABLE_SELECTOR:
-					getInputFile(llExecutable, "File.executableSelectorTitle",
-							"llExecutablePath");
+					getInputFile(llExecutable, "File.executableSelectorTitle", //$NON-NLS-1$
+							"llExecutablePath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_INITIALDIR_SELECTOR:
-					getDirectory(llInitialDir, "File.initialDirSelectorTitle",
-							"llInitialDirPath");
+					getDirectory(llInitialDir, "File.initialDirSelectorTitle", //$NON-NLS-1$
+							"llInitialDirPath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_SHELL_SELECTOR:
-					getInputFile(llShell, "File.shellSelectorTitle",
-							"llShellPath");
+					getInputFile(llShell, "File.shellSelectorTitle", //$NON-NLS-1$
+							"llShellPath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_SUBMIT_MODE_RADIOBOX:
 					setLaunchPanelMode();
@@ -189,8 +189,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				}
 
 			}
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":widgetSelected returning.");
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":widgetSelected returning."); //$NON-NLS-1$
 		}
 	}
 	/**
@@ -208,7 +208,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		@SuppressWarnings("unused")
 		private ValidationException() {
 			throw new IllegalAccessError(
-					"ValidationException default constructor should not be called");
+					Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.32")); //$NON-NLS-1$
 		}
 
 		/**
@@ -239,44 +239,44 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * The following constants define the names of all attributes which may be
 	 * known by the IBMLL proxy.
 	 */
-	private static final String LL_PTP_JOB_COMMAND_FILE = "LL_PTP_JOB_COMMAND_FILE";
-	private static final String LL_PTP_JOB_COMMAND_FILE_TEMPLATE = "LL_PTP_JOB_COMMAND_FILE_TEMPLATE";
-	private static final String LL_PTP_SUBMIT_MODE = "LL_PTP_SUBMIT_MODE";
-	private static final String LL_PTP_CLASS = "LL_PTP_CLASS";
-	private static final String LL_PTP_COMMENT = "LL_PTP_COMMENT";
-	private static final String LL_PTP_ERROR = "LL_PTP_ERROR";
-	private static final String LL_PTP_INPUT = "LL_PTP_INPUT";
-	private static final String LL_PTP_OUTPUT = "LL_PTP_OUTPUT";
-	private static final String LL_PTP_INITIALDIR = "LL_PTP_INITIALDIR";
-	private static final String LL_PTP_JOB_NAME = "LL_PTP_JOB_NAME";
-	private static final String LL_PTP_JOB_TYPE = "LL_PTP_JOB_TYPE";
-	private static final String LL_PTP_NETWORK_MPI = "LL_PTP_NETWORK_MPI";
-	private static final String LL_PTP_NETWORK_LAPI = "LL_PTP_NETWORK_LAPI";
-	private static final String LL_PTP_NETWORK_MPI_LAPI = "LL_PTP_NETWORK_MPI_LAPI";
-	private static final String LL_PTP_REQUIREMENTS = "LL_PTP_REQUIREMENTS";
-	private static final String LL_PTP_RESOURCES = "LL_PTP_RESOURCES";
-	private static final String LL_PTP_SHELL = "LL_PTP_SHELL";
-	private static final String LL_PTP_TASK_GEOMETRY = "LL_PTP_TASK_GEOMETRY";
-	private static final String LL_PTP_BULK_XFER = "LL_PTP_BULK_XFER";
-	private static final String LL_PTP_LARGE_PAGE = "LL_PTP_LARGE_PAGE";
-	private static final String LL_PTP_NODE_MIN = "LL_PTP_NODE_MIN";
-	private static final String LL_PTP_NODE_MAX = "LL_PTP_NODE_MAX";
-	private static final String LL_PTP_BLOCKING = "LL_PTP_BLOCKING";
-	private static final String LL_PTP_TOTAL_TASKS = "LL_PTP_TOTAL_TASKS";
-	private static final String LL_PTP_WALLCLOCK_HARD = "LL_PTP_WALLCLOCK_HARD";
-	private static final String LL_PTP_WALLCLOCK_SOFT = "LL_PTP_WALLCLOCK_SOFT";
-	private static final String LL_PTP_TASKS_PER_NODE = "LL_PTP_TASKS_PER_NODE";
-	private static final String LL_PTP_EXECUTABLE = "LL_PTP_EXECUTABLE";
+	private static final String LL_PTP_JOB_COMMAND_FILE = "LL_PTP_JOB_COMMAND_FILE"; //$NON-NLS-1$
+	private static final String LL_PTP_JOB_COMMAND_FILE_TEMPLATE = "LL_PTP_JOB_COMMAND_FILE_TEMPLATE"; //$NON-NLS-1$
+	private static final String LL_PTP_SUBMIT_MODE = "LL_PTP_SUBMIT_MODE"; //$NON-NLS-1$
+	private static final String LL_PTP_CLASS = "LL_PTP_CLASS"; //$NON-NLS-1$
+	private static final String LL_PTP_COMMENT = "LL_PTP_COMMENT"; //$NON-NLS-1$
+	private static final String LL_PTP_ERROR = "LL_PTP_ERROR"; //$NON-NLS-1$
+	private static final String LL_PTP_INPUT = "LL_PTP_INPUT"; //$NON-NLS-1$
+	private static final String LL_PTP_OUTPUT = "LL_PTP_OUTPUT"; //$NON-NLS-1$
+	private static final String LL_PTP_INITIALDIR = "LL_PTP_INITIALDIR"; //$NON-NLS-1$
+	private static final String LL_PTP_JOB_NAME = "LL_PTP_JOB_NAME"; //$NON-NLS-1$
+	private static final String LL_PTP_JOB_TYPE = "LL_PTP_JOB_TYPE"; //$NON-NLS-1$
+	private static final String LL_PTP_NETWORK_MPI = "LL_PTP_NETWORK_MPI"; //$NON-NLS-1$
+	private static final String LL_PTP_NETWORK_LAPI = "LL_PTP_NETWORK_LAPI"; //$NON-NLS-1$
+	private static final String LL_PTP_NETWORK_MPI_LAPI = "LL_PTP_NETWORK_MPI_LAPI"; //$NON-NLS-1$
+	private static final String LL_PTP_REQUIREMENTS = "LL_PTP_REQUIREMENTS"; //$NON-NLS-1$
+	private static final String LL_PTP_RESOURCES = "LL_PTP_RESOURCES"; //$NON-NLS-1$
+	private static final String LL_PTP_SHELL = "LL_PTP_SHELL"; //$NON-NLS-1$
+	private static final String LL_PTP_TASK_GEOMETRY = "LL_PTP_TASK_GEOMETRY"; //$NON-NLS-1$
+	private static final String LL_PTP_BULK_XFER = "LL_PTP_BULK_XFER"; //$NON-NLS-1$
+	private static final String LL_PTP_LARGE_PAGE = "LL_PTP_LARGE_PAGE"; //$NON-NLS-1$
+	private static final String LL_PTP_NODE_MIN = "LL_PTP_NODE_MIN"; //$NON-NLS-1$
+	private static final String LL_PTP_NODE_MAX = "LL_PTP_NODE_MAX"; //$NON-NLS-1$
+	private static final String LL_PTP_BLOCKING = "LL_PTP_BLOCKING"; //$NON-NLS-1$
+	private static final String LL_PTP_TOTAL_TASKS = "LL_PTP_TOTAL_TASKS"; //$NON-NLS-1$
+	private static final String LL_PTP_WALLCLOCK_HARD = "LL_PTP_WALLCLOCK_HARD"; //$NON-NLS-1$
+	private static final String LL_PTP_WALLCLOCK_SOFT = "LL_PTP_WALLCLOCK_SOFT"; //$NON-NLS-1$
+	private static final String LL_PTP_TASKS_PER_NODE = "LL_PTP_TASKS_PER_NODE"; //$NON-NLS-1$
+	private static final String LL_PTP_EXECUTABLE = "LL_PTP_EXECUTABLE"; //$NON-NLS-1$
 
-	private static final String LL_PTP_ENVIRONMENT = "LL_PTP_ENVIRONMENT";
-	private static final String LL_PTP_MAX_INT = "LL_PTP_MAX_INT";
+	private static final String LL_PTP_ENVIRONMENT = "LL_PTP_ENVIRONMENT"; //$NON-NLS-1$
+	private static final String LL_PTP_MAX_INT = "LL_PTP_MAX_INT"; //$NON-NLS-1$
 
 	/*
 	 * End of attribute name list.
 	 */
-	private static final String ENABLE_STATE = "ENABLE_STATE";
+	private static final String ENABLE_STATE = "ENABLE_STATE"; //$NON-NLS-1$
 	private static final RMLaunchValidation success = new RMLaunchValidation(
-			true, "");
+			true, ""); //$NON-NLS-1$
 	private static final int LL_PTP_JOB_COMMAND_FILE_SELECTOR = 18;
 	private static final int LL_PTP_SUBMIT_MODE_RADIOBOX = 100;
 	private static final int LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR = 19;
@@ -372,8 +372,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	Preferences myPreferences = null;
 
 	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManager rm) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":IBMLLRMLaunchConfigurationDynamicTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":IBMLLRMLaunchConfigurationDynamicTab entered."); //$NON-NLS-1$
 		myPreferences = IBMLLPreferenceManager.getPreferences();
 
 		if ((myPreferences
@@ -422,8 +422,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			state_fatal = 0;
 		}
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":IBMLLRMLaunchConfigurationDynamicTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":IBMLLRMLaunchConfigurationDynamicTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -447,40 +447,40 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		StringAttribute attr;
 		StringAttributeDefinition attrDef;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":addAttribute entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":addAttribute entered."); //$NON-NLS-1$
 		if (rm.getAttributeDefinition(attrName) != null) {
 			try {
-				attrValue = config.getAttribute(attrName, "");
+				attrValue = config.getAttribute(attrName, ""); //$NON-NLS-1$
 			} catch (CoreException e) {
-				attrValue = "";
+				attrValue = ""; //$NON-NLS-1$
 			}
 
 			defaultValue = getAttrDefaultValue(rm, attrName);
 
 			if ((attrValue.trim().length() > 0)
 					&& ((!attrValue.equals(defaultValue))
-							|| (attrName.equals("LL_PTP_JOB_TYPE"))
+							|| (attrName.equals("LL_PTP_JOB_TYPE")) //$NON-NLS-1$
 							|| (attrName
-									.equals("LL_PTP_JOB_COMMAND_FILE_TEMPLATE"))
-							|| (attrName.equals("LL_PTP_SUBMIT_MODE"))
-							|| (attrName.equals("LL_PTP_CLASS"))
-							|| (attrName.equals("LL_PTP_INPUT"))
-							|| (attrName.equals("LL_PTP_OUTPUT"))
-							|| (attrName.equals("LL_PTP_ERROR"))
-							|| (attrName.equals("LL_PTP_ENVIRONMENT"))
-							|| (attrName.equals("LL_PTP_JOB_TYPE")) || (attrName
-							.equals("LL_PTP_JOB_COMMAND_FILE")))) {
-				attrDef = new StringAttributeDefinition(attrName, "", "",
-						false, "");
+									.equals("LL_PTP_JOB_COMMAND_FILE_TEMPLATE")) //$NON-NLS-1$
+							|| (attrName.equals("LL_PTP_SUBMIT_MODE")) //$NON-NLS-1$
+							|| (attrName.equals("LL_PTP_CLASS")) //$NON-NLS-1$
+							|| (attrName.equals("LL_PTP_INPUT")) //$NON-NLS-1$
+							|| (attrName.equals("LL_PTP_OUTPUT")) //$NON-NLS-1$
+							|| (attrName.equals("LL_PTP_ERROR")) //$NON-NLS-1$
+							|| (attrName.equals("LL_PTP_ENVIRONMENT")) //$NON-NLS-1$
+							|| (attrName.equals("LL_PTP_JOB_TYPE")) || (attrName //$NON-NLS-1$
+							.equals("LL_PTP_JOB_COMMAND_FILE")))) { //$NON-NLS-1$
+				attrDef = new StringAttributeDefinition(attrName, "", "", //$NON-NLS-1$ //$NON-NLS-2$
+						false, ""); //$NON-NLS-1$
 				attr = new StringAttribute(attrDef, attrValue);
 				attrs.add(attr);
 			}
 
 		}
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":addAttribute returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":addAttribute returning."); //$NON-NLS-1$
 	}
 
 	/*
@@ -493,15 +493,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm,
 			IPQueue queue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":canSave entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":canSave entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":canSave returning.");
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":canSave returning."); //$NON-NLS-1$
 			return success;
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":canSave returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":canSave returning."); //$NON-NLS-1$
 		return new RMLaunchValidation(false, errorMessage);
 	}
 
@@ -515,8 +515,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * widget is not null before accessing the widget object.
 	 */
 	private void clearAllWidgets() {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":clearAllWidgets entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":clearAllWidgets entered."); //$NON-NLS-1$
 		llComment = null;
 		llJobName = null;
 		llJobType = null;
@@ -544,8 +544,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		llTasksPerNode = null;
 		llTotalTasks = null;
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":clearAllWidgets returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":clearAllWidgets returning."); //$NON-NLS-1$
 
 	}
 
@@ -566,8 +566,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		BooleanRowWidget widget;
 		StringSetAttributeDefinition attrDef;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createBooleanOption entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createBooleanOption entered."); //$NON-NLS-1$
 		widget = null;
 		attrDef = (StringSetAttributeDefinition) rm.getAttributeDefinition(id);
 		if (attrDef != null) {
@@ -577,8 +577,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			widget.addSelectionListener(eventMonitor);
 			activeWidgets.add(widget);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createBooleanOption returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createBooleanOption returning."); //$NON-NLS-1$
 		return widget;
 	}
 
@@ -601,8 +601,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		CheckboxRowWidget widget;
 		StringAttributeDefinition attrDef;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createCheckbox entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createCheckbox entered."); //$NON-NLS-1$
 		widget = null;
 		attrDef = (StringAttributeDefinition) rm.getAttributeDefinition(id);
 		if (attrDef != null) {
@@ -610,8 +610,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			widget.setValidationRequired();
 			activeWidgets.add(widget);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createCheckbox returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createCheckbox returning."); //$NON-NLS-1$
 		return widget;
 	}
 
@@ -633,8 +633,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createCombobox entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createCombobox entered."); //$NON-NLS-1$
 		widget = null;
 		attr = rm.getAttributeDefinition(id);
 		if (attr != null) {
@@ -643,8 +643,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			widget.addSelectionListener(eventMonitor);
 			activeWidgets.add(widget);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createCombobox returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createCombobox returning."); //$NON-NLS-1$
 		return widget;
 	}
 
@@ -661,8 +661,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	public void createControl(Composite parent, IResourceManager rm,
 			IPQueue queue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createControl entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createControl entered."); //$NON-NLS-1$
 		IIBMLLResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 
@@ -689,8 +689,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		createRuntimeTab(rm);
 		createNodesNetworkTab(rm);
 		createLimitsTab(rm);
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createControl returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createControl returning."); //$NON-NLS-1$
 		currentRM = rm;
 	}
 
@@ -715,8 +715,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		IAttributeDefinition<?, ?, ?> attr1;
 		IAttributeDefinition<?, ?, ?> attr2;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createDualField entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createDualField entered."); //$NON-NLS-1$
 		widget = null;
 		attr1 = rm.getAttributeDefinition(id1);
 		attr2 = rm.getAttributeDefinition(id2);
@@ -726,8 +726,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			widget.setValidationRequired();
 			activeWidgets.add(widget);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createDualField returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createDualField returning."); //$NON-NLS-1$
 		return widget;
 	}
 
@@ -749,8 +749,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createEditableCombobox entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createEditableCombobox entered."); //$NON-NLS-1$
 		widget = null;
 		attr = rm.getAttributeDefinition(id);
 		if (attr != null) {
@@ -760,8 +760,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			widget.addModifyListener(eventMonitor);
 			activeWidgets.add(widget);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createEditableCombobox returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createEditableCombobox returning."); //$NON-NLS-1$
 		return widget;
 	}
 
@@ -790,8 +790,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		FileSelectorRowWidget widget;
 		StringAttributeDefinition attr;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createFileSelector entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createFileSelector entered."); //$NON-NLS-1$
 		widget = null;
 		attr = (StringAttributeDefinition) rm.getAttributeDefinition(id);
 		if (attr != null) {
@@ -802,8 +802,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			widget.addSelectionListener(eventMonitor);
 			activeWidgets.add(widget);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createFileSelector returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createFileSelector returning."); //$NON-NLS-1$
 		return widget;
 	}
 
@@ -816,20 +816,20 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void createGeneralTab(IResourceManager rm) {
 		TabItem tab;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createGeneralTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createGeneralTab entered."); //$NON-NLS-1$
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		generalTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(generalTabPane);
-		tab.setText(Messages.getString("GeneralTab.title"));
+		tab.setText(Messages.getString("GeneralTab.title")); //$NON-NLS-1$
 		generalTabPane.setLayout(createTabPaneLayout());
 		llComment = createTextWidget(generalTabPane, rm, LL_PTP_COMMENT);
 		llJobName = createTextWidget(generalTabPane, rm, LL_PTP_JOB_NAME);
 		llJobType = createCombobox(generalTabPane, rm, LL_PTP_JOB_TYPE,
 				LL_PTP_JOB_TYPE_SELECTOR);
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createGeneralTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createGeneralTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -842,20 +842,20 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void createLimitsTab(IResourceManager rm) {
 		TabItem tab;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createLimitsTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createLimitsTab entered."); //$NON-NLS-1$
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		limitsTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(limitsTabPane);
-		tab.setText(Messages.getString("LimitsTab.title"));
+		tab.setText(Messages.getString("LimitsTab.title")); //$NON-NLS-1$
 		limitsTabPane.setLayout(createTabPaneLayout());
 		llWallClockLimitHard = createTextWidget(limitsTabPane, rm,
 				LL_PTP_WALLCLOCK_HARD);
 		llWallClockLimitSoft = createTextWidget(limitsTabPane, rm,
 				LL_PTP_WALLCLOCK_SOFT);
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createLimitsTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createLimitsTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -888,8 +888,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 					LL_PTP_JOB_COMMAND_FILE_TEMPLATE,
 					LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createModeBox returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createModeBox returning."); //$NON-NLS-1$
 
 	}
 
@@ -902,12 +902,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void createNodesNetworkTab(IResourceManager rm) {
 		TabItem tab;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createNodesNetworkTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createNodesNetworkTab entered."); //$NON-NLS-1$
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		nodesNetworkTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(nodesNetworkTabPane);
-		tab.setText(Messages.getString("NodesNetworkTab.title"));
+		tab.setText(Messages.getString("NodesNetworkTab.title")); //$NON-NLS-1$
 		nodesNetworkTabPane.setLayout(createTabPaneLayout());
 		llBlocking = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_BLOCKING);
 		llBulkxfer = createCombobox(nodesNetworkTabPane, rm, LL_PTP_BULK_XFER,
@@ -927,8 +927,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		llTotalTasks = createTextWidget(nodesNetworkTabPane, rm,
 				LL_PTP_TOTAL_TASKS);
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createNodesNetworkTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createNodesNetworkTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -940,12 +940,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void createRuntimeTab(IResourceManager rm) {
 		TabItem tab;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createRuntimeTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createRuntimeTab entered."); //$NON-NLS-1$
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		runtimeTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(runtimeTabPane);
-		tab.setText(Messages.getString("RuntimeTab.title"));
+		tab.setText(Messages.getString("RuntimeTab.title")); //$NON-NLS-1$
 		runtimeTabPane.setLayout(createTabPaneLayout());
 		llError = createFileSelector(runtimeTabPane, rm, LL_PTP_ERROR,
 				LL_PTP_STDERR_SELECTOR);
@@ -961,8 +961,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		llShell = createFileSelector(runtimeTabPane, rm, LL_PTP_SHELL,
 				LL_PTP_SHELL_SELECTOR);
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createRuntimeTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createRuntimeTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -974,19 +974,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void createSchedulingBasicTab(IResourceManager rm) {
 		TabItem tab;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createSchedulingBasicTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createSchedulingBasicTab entered."); //$NON-NLS-1$
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		schedulingBasicTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(schedulingBasicTabPane);
-		tab.setText(Messages.getString("SchedulingBasicTab.title"));
+		tab.setText(Messages.getString("SchedulingBasicTab.title")); //$NON-NLS-1$
 		schedulingBasicTabPane.setLayout(createTabPaneLayout());
 		llClass = createTextWidget(schedulingBasicTabPane, rm, LL_PTP_CLASS);
 		llLargePage = createCombobox(schedulingBasicTabPane, rm,
 				LL_PTP_LARGE_PAGE, 0);
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createSchedulingBasicTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createSchedulingBasicTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -998,18 +998,18 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void createSchedulingRequirementsTab(IResourceManager rm) {
 		TabItem tab;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createSchedulingRequirementsTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createSchedulingRequirementsTab entered."); //$NON-NLS-1$
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		schedulingRequirementsTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(schedulingRequirementsTabPane);
-		tab.setText(Messages.getString("SchedulingRequirementsTab.title"));
+		tab.setText(Messages.getString("SchedulingRequirementsTab.title")); //$NON-NLS-1$
 		schedulingRequirementsTabPane.setLayout(createTabPaneLayout());
 		llRequirements = createTextWidget(schedulingRequirementsTabPane, rm,
 				LL_PTP_REQUIREMENTS);
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createSchedulingRequirementsTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createSchedulingRequirementsTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1021,18 +1021,18 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void createSchedulingResourcesTab(IResourceManager rm) {
 		TabItem tab;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createSchedulingResourcesTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createSchedulingResourcesTab entered."); //$NON-NLS-1$
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		schedulingResourcesTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(schedulingResourcesTabPane);
-		tab.setText(Messages.getString("SchedulingResourcesTab.title"));
+		tab.setText(Messages.getString("SchedulingResourcesTab.title")); //$NON-NLS-1$
 		schedulingResourcesTabPane.setLayout(createTabPaneLayout());
 		llResources = createTextWidget(schedulingResourcesTabPane, rm,
 				LL_PTP_RESOURCES);
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createSchedulingResourcesTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createSchedulingResourcesTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1043,14 +1043,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private Layout createTabPaneLayout() {
 		GridLayout layout;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createTabPaneLayout entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createTabPaneLayout entered."); //$NON-NLS-1$
 		layout = new GridLayout(4, false);
 		layout.marginWidth = 4;
 		layout.horizontalSpacing = 8;
 		layout.verticalSpacing = 4;
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createTabPaneLayout returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createTabPaneLayout returning."); //$NON-NLS-1$
 		return layout;
 	}
 
@@ -1072,8 +1072,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		TextRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":createTextWidget entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createTextWidget entered."); //$NON-NLS-1$
 		widget = null;
 		attr = rm.getAttributeDefinition(id);
 		if (attr != null) {
@@ -1082,8 +1082,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			widget.setValidationRequired();
 			activeWidgets.add(widget);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":createTextWidget returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":createTextWidget returning."); //$NON-NLS-1$
 		return widget;
 	}
 
@@ -1100,8 +1100,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void disableTabPaneWidget(Control widget) {
 		Control children[];
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":disableTabPaneWidget entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":disableTabPaneWidget entered."); //$NON-NLS-1$
 		// For any Composite widget, recursively call this method for each child
 		// of the Composite. This must be
 		// done before disabling the Composite since disabling the Composite
@@ -1116,8 +1116,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		// Remember the current state of the widget, then disable it.
 		widget.setData(ENABLE_STATE, Boolean.valueOf(widget.isEnabled()));
 		widget.setEnabled(false);
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":disableTabPaneWidget returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":disableTabPaneWidget returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1131,8 +1131,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		Boolean state;
 		boolean enableFlag;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":enableTabPaneWidgetState entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":enableTabPaneWidgetState entered."); //$NON-NLS-1$
 		// Enable the widget.
 		widget.setEnabled(true);
 		// Recursively call this method to handle children of a Composite
@@ -1145,8 +1145,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				enableTabPaneWidgetState(children[i]);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":enableTabPaneWidgetState returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":enableTabPaneWidgetState returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1162,23 +1162,23 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private String getAttrDefaultValue(IResourceManager rm, String attrName) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getAttrDefaultValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttrDefaultValue entered."); //$NON-NLS-1$
 		attrDef = rm.getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrDefaultValue returning.");
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":getAttrDefaultValue returning."); //$NON-NLS-1$
 				return attrDef.create().getValueAsString();
 			} catch (IllegalValueException e) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrDefaultValue returning.");
-				return "";
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":getAttrDefaultValue returning."); //$NON-NLS-1$
+				return ""; //$NON-NLS-1$
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getAttrDefaultValue returning.");
-		return "";
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttrDefaultValue returning."); //$NON-NLS-1$
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -1200,8 +1200,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		Vector<StringAttribute> attrs;
 		StringAttribute attrArray[];
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getAttributes entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttributes entered."); //$NON-NLS-1$
 		attrs = new Vector<StringAttribute>();
 		attrArray = new StringAttribute[0];
 
@@ -1215,12 +1215,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		i = attrNames.iterator();
 		while (i.hasNext()) {
 			name = i.next();
-			if (name.startsWith("LL_PTP_")) {
+			if (name.startsWith("LL_PTP_")) { //$NON-NLS-1$
 				addAttribute(rm, configuration, attrs, name);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getAttributes returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttributes returning."); //$NON-NLS-1$
 		return attrs.toArray(attrArray);
 	}
 
@@ -1243,14 +1243,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		String value;
 		IAttributeDefinition<?, ?, ?> rmAttrDef;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getAttrInitialValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttrInitialValue entered."); //$NON-NLS-1$
 		try {
-			value = config.getAttribute(attrName, "_no_value_");
+			value = config.getAttribute(attrName, "_no_value_"); //$NON-NLS-1$
 		} catch (CoreException e) {
-			value = "_no_value_";
+			value = "_no_value_"; //$NON-NLS-1$
 		}
-		if (value.equals("_no_value_")) {
+		if (value.equals("_no_value_")) { //$NON-NLS-1$
 			// Get the default attribute value, where that default may be the
 			// value
 			// specified by the user as an override to the LL default value.
@@ -1275,34 +1275,34 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				intVal = Long.valueOf(value);
 				if (intVal != 0) {
 					if ((intVal % GBYTE) == 0) {
-						print_message(TRACE_MESSAGE, "<<< "
+						print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
 								+ this.getClass().getName()
-								+ ":getAttrInitialValue returning.");
-						return String.valueOf(intVal / GBYTE) + "G";
+								+ ":getAttrInitialValue returning."); //$NON-NLS-1$
+						return String.valueOf(intVal / GBYTE) + "G"; //$NON-NLS-1$
 					} else {
 						if ((intVal % MBYTE) == 0) {
-							print_message(TRACE_MESSAGE, "<<< "
+							print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
 									+ this.getClass().getName()
-									+ ":getAttrInitialValue returning.");
-							return String.valueOf(intVal / MBYTE) + "M";
+									+ ":getAttrInitialValue returning."); //$NON-NLS-1$
+							return String.valueOf(intVal / MBYTE) + "M"; //$NON-NLS-1$
 						} else {
 							if ((intVal % KBYTE) == 0) {
-								print_message(TRACE_MESSAGE, "<<< "
+								print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
 										+ this.getClass().getName()
-										+ ":getAttrInitialValue returning.");
-								return String.valueOf(intVal / KBYTE) + "K";
+										+ ":getAttrInitialValue returning."); //$NON-NLS-1$
+								return String.valueOf(intVal / KBYTE) + "K"; //$NON-NLS-1$
 							}
 						}
 					}
 				}
 			} catch (NumberFormatException e) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrInitialValue returning.");
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":getAttrInitialValue returning."); //$NON-NLS-1$
 				return value;
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getAttrInitialValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttrInitialValue returning."); //$NON-NLS-1$
 		return value;
 	}
 
@@ -1325,14 +1325,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		IAttributeDefinition<?, ?, ?> attrDef;
 		String localDefaultEnv;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getAttrLocalDefaultValue entered.");
-		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttrLocalDefaultValue entered."); //$NON-NLS-1$
+		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_"); //$NON-NLS-1$ //$NON-NLS-2$
 		attrDef = rm.getAttributeDefinition(localDefaultEnv);
 		if (attrDef != null) {
 			try {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrLocalDefaultValue returning.");
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":getAttrLocalDefaultValue returning."); //$NON-NLS-1$
 				return attrDef.create().getValueAsString();
 			} catch (IllegalValueException e) {
 			}
@@ -1340,18 +1340,18 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		attrDef = rm.getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrLocalDefaultValue returning.");
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":getAttrLocalDefaultValue returning."); //$NON-NLS-1$
 				return attrDef.create().getValueAsString();
 			} catch (IllegalValueException e) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getAttrLocalDefaultValue returning.");
-				return "";
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":getAttrLocalDefaultValue returning."); //$NON-NLS-1$
+				return ""; //$NON-NLS-1$
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getAttrLocalDefaultValue returning.");
-		return "";
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getAttrLocalDefaultValue returning."); //$NON-NLS-1$
+		return ""; //$NON-NLS-1$
 	}
 
 	/*
@@ -1362,10 +1362,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * #getControl()
 	 */
 	public Control getControl() {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getControl entered.");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getControl returning.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getControl entered."); //$NON-NLS-1$
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getControl returning."); //$NON-NLS-1$
 		return mainPanel;
 	}
 
@@ -1385,8 +1385,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			String pathAttrID) {
 		String selectedFile = null;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getDirectory entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getDirectory entered."); //$NON-NLS-1$
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
@@ -1399,15 +1399,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 			parentDir = new File(selectedFile).getParent();
 			if (parentDir == null) {
-				saveFileDialogPath(pathAttrID, "/");
+				saveFileDialogPath(pathAttrID, "/"); //$NON-NLS-1$
 			} else {
 				saveFileDialogPath(pathAttrID, parentDir);
 			}
 			selector.setPath(selectedFile);
 			selector.setFocus();
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getDirectory returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getDirectory returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1420,18 +1420,18 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private String getFileDialogPath(String attrName) {
 		String dir;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getFileDialogPath entered.");
-		dir = "/";
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getFileDialogPath entered."); //$NON-NLS-1$
+		dir = "/"; //$NON-NLS-1$
 		if (currentLaunchConfig != null) {
 			try {
-				dir = currentLaunchConfig.getAttribute(attrName, "/");
+				dir = currentLaunchConfig.getAttribute(attrName, "/"); //$NON-NLS-1$
 			} catch (CoreException e) {
-				dir = "/";
+				dir = "/"; //$NON-NLS-1$
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getFileDialogPath returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getFileDialogPath returning."); //$NON-NLS-1$
 		return dir;
 	}
 
@@ -1450,8 +1450,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	protected void getInputFile(FileSelectorRowWidget selector, String titleID,
 			String pathAttrID) {
 		String selectedFile = null;
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getInputFile entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getInputFile entered."); //$NON-NLS-1$
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
@@ -1463,8 +1463,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			selector.setPath(selectedFile);
 			selector.setFocus();
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getInputFile returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getInputFile returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1480,19 +1480,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		int len;
 		char suffix;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getIntegerValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getIntegerValue entered."); //$NON-NLS-1$
 		testValue = 0;
 		len = value.length();
 		if (len == 0) {
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":getIntegerValue returning.");
-			return "";
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":getIntegerValue returning."); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
 		} else {
 			suffix = value.charAt(len - 1);
 			if (Character.isDigit(suffix)) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":getIntegerValue returning.");
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":getIntegerValue returning."); //$NON-NLS-1$
 				return value;
 			} else {
 				if (len >= 2) {
@@ -1504,15 +1504,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 					} else if ((suffix == 'K') || (suffix == 'k')) {
 						testValue = testValue * KBYTE;
 					} else {
-						print_message(TRACE_MESSAGE, "<<< "
+						print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
 								+ this.getClass().getName()
-								+ ":getIntegerValue returning.");
-						return "";
+								+ ":getIntegerValue returning."); //$NON-NLS-1$
+						return ""; //$NON-NLS-1$
 					}
 				}
 			}
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":getIntegerValue returning.");
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":getIntegerValue returning."); //$NON-NLS-1$
 			return String.valueOf(testValue);
 		}
 	}
@@ -1533,8 +1533,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			String titleID, String pathAttrID) {
 		String selectedFile = null;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":getOutputFile entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getOutputFile entered."); //$NON-NLS-1$
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
@@ -1546,8 +1546,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			selector.setPath(selectedFile);
 			selector.setFocus();
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":getOutputFile returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":getOutputFile returning."); //$NON-NLS-1$
 	}
 
 	/*
@@ -1562,15 +1562,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation initializeFrom(Control control,
 			IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":initializeFrom entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":initializeFrom entered."); //$NON-NLS-1$
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
 			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
 		}
 		setInitialValues(configuration, rm);
 		setInitialWidgetState();
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":initializeFrom returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":initializeFrom returning."); //$NON-NLS-1$
 		return success;
 	}
 
@@ -1584,15 +1584,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration configuration,
 			IResourceManager rm, IPQueue queue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":isValid entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":isValid entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
-			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-					+ ":isValid returning.");
+			print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+					+ ":isValid returning."); //$NON-NLS-1$
 			return success;
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":isValid returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":isValid returning."); //$NON-NLS-1$
 		return new RMLaunchValidation(false, errorMessage);
 	}
 
@@ -1612,24 +1612,24 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		@SuppressWarnings("unused")
 		StringSetAttribute attr;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":isValidListSelection entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":isValidListSelection entered."); //$NON-NLS-1$
 		attrDef = (StringSetAttributeDefinition) currentRM
 				.getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				attr = attrDef.create(widget.getValue());
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":isValidListSelection returning.");
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":isValidListSelection returning."); //$NON-NLS-1$
 				return true;
 			} catch (IllegalValueException e) {
-				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-						+ ":isValidListSelection returning.");
+				print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+						+ ":isValidListSelection returning."); //$NON-NLS-1$
 				return false;
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":isValidListSelection returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":isValidListSelection returning."); //$NON-NLS-1$
 		return true;
 	}
 
@@ -1672,13 +1672,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation performApply(
 			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
 			IPQueue queue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":performApply entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":performApply entered."); //$NON-NLS-1$
 		currentLaunchConfig = configuration;
 		saveConfigurationData(configuration, rm);
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":performApply returning.");
-		return new RMLaunchValidation(true, "");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":performApply returning."); //$NON-NLS-1$
+		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -1689,32 +1689,32 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		switch (type) {
 		case INFO_MESSAGE:
 			if (state_info == 1) {
-				System.out.println("Info: " + message);
+				System.out.println(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.285") + message); //$NON-NLS-1$
 			}
 			break;
 		case TRACE_MESSAGE:
 			if (state_trace == 1) {
-				System.out.println("Trace: " + message);
+				System.out.println(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.286") + message); //$NON-NLS-1$
 			}
 			break;
 		case WARNING_MESSAGE:
 			if (state_warning == 1) {
-				System.out.println("Warning: " + message);
+				System.out.println(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.287") + message); //$NON-NLS-1$
 			}
 			break;
 		case ARGS_MESSAGE:
 			if (state_args == 1) {
-				System.out.println("Args: " + message);
+				System.out.println(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.288") + message); //$NON-NLS-1$
 			}
 			break;
 		case ERROR_MESSAGE:
 			if (state_error == 1) {
-				System.err.println("Error: " + message);
+				System.err.println(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.289") + message); //$NON-NLS-1$
 			}
 			break;
 		case FATAL_MESSAGE:
 			if (state_fatal == 1) {
-				System.err.println("Fatal " + message);
+				System.err.println(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.290") + message); //$NON-NLS-1$
 			}
 			break;
 		default:
@@ -1734,8 +1734,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		Boolean state;
 		boolean enableFlag;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":restoreTabPaneWidgetState entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":restoreTabPaneWidgetState entered."); //$NON-NLS-1$
 		// Get widget's previous enable/disable state. If there is no saved
 		// state, such as when initially
 		// creating the parallel tab in basic mode, then enable the widget.
@@ -1756,8 +1756,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				restoreTabPaneWidgetState(children[i]);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":restoreTabPaneWidgetState returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":restoreTabPaneWidgetState returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1770,8 +1770,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		Object widget;
 		Iterator<Object> i;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":saveConfigurationData entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":saveConfigurationData entered."); //$NON-NLS-1$
 		i = activeWidgets.iterator();
 		while (i.hasNext()) {
 			widget = i.next();
@@ -1786,7 +1786,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			} else if (widget instanceof CheckboxRowWidget) {
 				setConfigAttr(config, (String) ((CheckboxRowWidget) widget)
 						.getData(WidgetAttributes.ATTR_NAME),
-						(CheckboxRowWidget) widget, "yes", "no");
+						(CheckboxRowWidget) widget, "yes", "no"); //$NON-NLS-1$ //$NON-NLS-2$
 			} else if (widget instanceof BooleanRowWidget) {
 				setConfigAttr(config, (String) ((BooleanRowWidget) widget)
 						.getData(), (BooleanRowWidget) widget);
@@ -1799,8 +1799,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 						.getData2(), (DualFieldRowWidget) widget);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":saveConfigurationData returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":saveConfigurationData returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1812,13 +1812,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Directory path
 	 */
 	private void saveFileDialogPath(String attrName, String path) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":saveFileDialogPath entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":saveFileDialogPath entered."); //$NON-NLS-1$
 		if (currentLaunchConfig != null) {
 			currentLaunchConfig.setAttribute(attrName, path);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":saveFileDialogPath returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":saveFileDialogPath returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1839,8 +1839,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			IResourceManager rm, String attr, TextRowWidget control) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
 			String attrValue;
 
@@ -1858,19 +1858,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				// in the launch configuration
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr returning."); //$NON-NLS-1$
 	}
 
 	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
 			String attr, BooleanRowWidget control) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
 			config.setAttribute(attr, control.getValue());
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1889,14 +1889,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
 			String attr, CheckboxRowWidget control, String trueVal,
 			String falseVal) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
 			config.setAttribute(attr, (control.getSelection() ? trueVal
 					: falseVal));
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1912,13 +1912,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
 			String attr, ComboRowWidget control) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
 			config.setAttribute(attr, control.getValue());
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1934,13 +1934,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
 			String attr, FileSelectorRowWidget control) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
 			config.setAttribute(attr, control.getValue());
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -1956,8 +1956,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
 			String attr1, String attr2, DualFieldRowWidget control) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setConfigAttr entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
 			String value[];
 
@@ -1965,8 +1965,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			config.setAttribute(attr1, value[0].trim());
 			config.setAttribute(attr2, value[1].trim());
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setConfigAttr returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setConfigAttr returning."); //$NON-NLS-1$
 	}
 
 	/*
@@ -1982,8 +1982,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setDefaults entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setDefaults entered."); //$NON-NLS-1$
 		currentLaunchConfig = config;
 		rmAttrs = rm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
@@ -1994,8 +1994,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			}
 		}
 		// setDefaultValues(config, rm);
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setDefaults returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setDefaults returning."); //$NON-NLS-1$
 		return success;
 	}
 
@@ -2070,8 +2070,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		Object widget;
 		Iterator<Object> i;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setInitialValues entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setInitialValues entered."); //$NON-NLS-1$
 		// All Text and Combo widgets have ModifyListeners registered on them in
 		// order to invoke field validation
 		// when contents of the widget's text field change. The ModifyListener
@@ -2116,7 +2116,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			} else if (widget instanceof CheckboxRowWidget) {
 				setValue((CheckboxRowWidget) widget, getAttrInitialValue(
 						config, rm, ((CheckboxRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)), "yes");
+								.getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
 			}
 
 		}
@@ -2130,8 +2130,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		// longer be valid.
 		validateAllFields();
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setInitialValues returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setInitialValues returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2140,11 +2140,11 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * only necessary to disable widgets.
 	 */
 	private void setInitialWidgetState() {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setInitialWidgetState entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setInitialWidgetState entered."); //$NON-NLS-1$
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setInitialWidgetState returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setInitialWidgetState returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2153,10 +2153,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * basic mode, where the user chooses LL options from a tabbed dialog panel.
 	 */
 	protected void setLaunchPanelMode() {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setLaunchPanelMode entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setLaunchPanelMode entered."); //$NON-NLS-1$
 		if (llSubmitMode != null) {
-			if (llSubmitMode.getValue().equals("Advanced")) {
+			if (llSubmitMode.getValue().equals("Advanced")) { //$NON-NLS-1$
 				if (llJobCommandFile != null) {
 					llJobCommandFile.setEnabled(true);
 				}
@@ -2174,19 +2174,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				enableTabPaneWidgetState(tabbedPane);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setLaunchPanelMode returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setLaunchPanelMode returning."); //$NON-NLS-1$
 
 	}
 
 	private void setValue(BooleanRowWidget option, String checkValue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue entered."); //$NON-NLS-1$
 		if (option != null) {
 			option.setValue(checkValue);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2202,8 +2202,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	private void setValue(CheckboxRowWidget checkbox, String attrValue,
 			String checkValue) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue entered."); //$NON-NLS-1$
 		if (checkbox != null) {
 			if (attrValue.equals(checkValue)) {
 				checkbox.setSelection(true);
@@ -2211,8 +2211,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				checkbox.setSelection(false);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2225,13 +2225,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            The value to be set
 	 */
 	private void setValue(ComboRowWidget widget, String value) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue entered."); //$NON-NLS-1$
 		if (widget != null) {
 			widget.setValue(value);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2247,13 +2247,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	private void setValue(DualFieldRowWidget widget, String value1,
 			String value2) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue entered."); //$NON-NLS-1$
 		if (widget != null) {
 			widget.setValue(value1, value2);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2265,13 +2265,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Pathname
 	 */
 	private void setValue(FileSelectorRowWidget selector, String path) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue entered."); //$NON-NLS-1$
 		if (selector != null) {
 			selector.setPath(path);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2284,13 +2284,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            The value to be set
 	 */
 	private void setValue(TextRowWidget widget, String value) {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":setValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue entered."); //$NON-NLS-1$
 		if (widget != null) {
 			widget.setValue(value);
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":setValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":setValue returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2323,15 +2323,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		// Validation of valid dependencies between fields should be performed
 		// as a second step after all fields have
 		// been individually validated for correct values.
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateAllFields entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateAllFields entered."); //$NON-NLS-1$
 		try {
 			if (llSubmitMode != null
-					&& llSubmitMode.getValue().equals("Advanced")) {
-				validateInputPath(llJobCommandFile, "Invalid.llJobCommandFile");
+					&& llSubmitMode.getValue().equals("Advanced")) { //$NON-NLS-1$
+				validateInputPath(llJobCommandFile, "Invalid.llJobCommandFile"); //$NON-NLS-1$
 			} else {
 				validateInputPath(llJobCommandFileTemplate,
-						"Invalid.llJobCommandFileTemplate");
+						"Invalid.llJobCommandFileTemplate"); //$NON-NLS-1$
 				validateGeneralTab();
 				validateSchedulingBasicTab();
 				validateSchedulingRequirementsTab();
@@ -2346,8 +2346,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			allFieldsValid = false;
 		}
 		fireContentsChanged();
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateAllFields returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateAllFields returning."); //$NON-NLS-1$
 	}
 
 	private void validateAlphaNumeric(String value, String errorID)
@@ -2355,32 +2355,32 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		int i;
 		String stripped = value.trim();
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateAlphaNumeric entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateAlphaNumeric entered."); //$NON-NLS-1$
 		for (i = 0; i < stripped.length(); i++) {
-			if (stripped.matches("[a-zA-Z_0-9]*") == false) {
+			if (stripped.matches("[a-zA-Z_0-9]*") == false) { //$NON-NLS-1$
 				throw new ValidationException(Messages.getString(errorID));
 			}
 		}
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateAlphaNumeric returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateAlphaNumeric returning."); //$NON-NLS-1$
 	}
 
 	private void validateAlphaNumeric(TextRowWidget control, String errorID)
 			throws ValidationException {
 		String value;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateAlphaNumeric entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateAlphaNumeric entered."); //$NON-NLS-1$
 		if (control != null) {
 			value = control.getValue();
 			if (value.length() > 0) {
 				validateAlphaNumeric(value, errorID);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateAlphaNumeric returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateAlphaNumeric returning."); //$NON-NLS-1$
 	}
 
 	private void validateClockValue(String value, String errorID)
@@ -2388,32 +2388,32 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		int i;
 		String stripped = value.trim();
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateClockValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateClockValue entered."); //$NON-NLS-1$
 		for (i = 0; i < stripped.length(); i++) {
-			if (stripped.matches("[0-9]+(:[0-9]+){0,2}") == false) {
+			if (stripped.matches("[0-9]+(:[0-9]+){0,2}") == false) { //$NON-NLS-1$
 				throw new ValidationException(Messages.getString(errorID));
 			}
 		}
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateClockValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateClockValue returning."); //$NON-NLS-1$
 	}
 
 	private void validateClockValue(TextRowWidget control, String errorID)
 			throws ValidationException {
 		String value;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateClockValue entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateClockValue entered."); //$NON-NLS-1$
 		if (control != null) {
 			value = control.getValue();
 			if (value.length() > 0) {
 				validateClockValue(value, errorID);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateClockValue returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateClockValue returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2496,11 +2496,11 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateGeneralTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateGeneralTab entered.");
-		validateAlphaNumeric(llJobName, "Invalid.llJobName");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateGeneralTab returning.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateGeneralTab entered."); //$NON-NLS-1$
+		validateAlphaNumeric(llJobName, "Invalid.llJobName"); //$NON-NLS-1$
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateGeneralTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2568,13 +2568,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateLimitsTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateLimitsTab entered.");
-		validateClockValue(llWallClockLimitHard, "Invalid.llWallClockLimitHard");
-		validateClockValue(llWallClockLimitSoft, "Invalid.llWallClockLimitSoft");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateLimitsTab entered."); //$NON-NLS-1$
+		validateClockValue(llWallClockLimitHard, "Invalid.llWallClockLimitHard"); //$NON-NLS-1$
+		validateClockValue(llWallClockLimitSoft, "Invalid.llWallClockLimitSoft"); //$NON-NLS-1$
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateLimitsTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateLimitsTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2596,8 +2596,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		@SuppressWarnings("unused")
 		BigIntegerAttribute attr;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateLongNumericRange entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateLongNumericRange entered."); //$NON-NLS-1$
 		attrDef = (BigIntegerAttributeDefinition) currentRM
 				.getAttributeDefinition(attrName);
 		try {
@@ -2605,8 +2605,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		} catch (IllegalValueException e) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateLongNumericRange returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateLongNumericRange returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2617,23 +2617,23 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 */
 	private void validateNodesNetworkTab() throws ValidationException {
 
-		String tpn = "";
-		String tpn_default = "";
-		String tt = "";
-		String tt_default = "";
-		String jt = "";
-		String jt_default = "";
-		String nm = "";
-		String nm_default = "";
-		String nmx = "";
-		String nmx_default = "";
-		String b = "";
-		String b_default = "";
-		String tg = "";
-		String tg_default = "";
+		String tpn = ""; //$NON-NLS-1$
+		String tpn_default = ""; //$NON-NLS-1$
+		String tt = ""; //$NON-NLS-1$
+		String tt_default = ""; //$NON-NLS-1$
+		String jt = ""; //$NON-NLS-1$
+		String jt_default = ""; //$NON-NLS-1$
+		String nm = ""; //$NON-NLS-1$
+		String nm_default = ""; //$NON-NLS-1$
+		String nmx = ""; //$NON-NLS-1$
+		String nmx_default = ""; //$NON-NLS-1$
+		String b = ""; //$NON-NLS-1$
+		String b_default = ""; //$NON-NLS-1$
+		String tg = ""; //$NON-NLS-1$
+		String tg_default = ""; //$NON-NLS-1$
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateNodesNetworkTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNodesNetworkTab entered."); //$NON-NLS-1$
 		if (llTaskGeometry != null) {
 			tg = llTaskGeometry.getValue();
 			if (tg.length() > 0) {
@@ -2686,45 +2686,45 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		if ((tpn.equals(tpn_default) == false)
 				&& (tt.equals(tt_default) == false)) {
 			throw new ValidationException(Messages
-					.getString("Invalid.llTasksPerNode_llTotalTasks"));
+					.getString("Invalid.llTasksPerNode_llTotalTasks")); //$NON-NLS-1$
 		}
 
 		if ((tg.equals(tg_default) == false)
-				&& (jt.equalsIgnoreCase("Parallel") == false)) {
+				&& (jt.equalsIgnoreCase("Parallel") == false)) { //$NON-NLS-1$
 			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llJobType"));
+					.getString("Invalid.llTaskGeometry_llJobType")); //$NON-NLS-1$
 		}
 
 		if ((tg.equals(tg_default) == false)
 				&& (tpn.equals(tpn_default) == false)) {
 			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llTasksPerNode"));
+					.getString("Invalid.llTaskGeometry_llTasksPerNode")); //$NON-NLS-1$
 		}
 
 		if ((tg.equals(tg_default) == false)
 				&& (tt.equals(tt_default) == false)) {
 			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llTotalTasks"));
+					.getString("Invalid.llTaskGeometry_llTotalTasks")); //$NON-NLS-1$
 		}
 
 		if ((tg.equals(tg_default) == false)
 				&& (nm.equals(nm_default) == false)) {
 			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llNodeMin"));
+					.getString("Invalid.llTaskGeometry_llNodeMin")); //$NON-NLS-1$
 		}
 
 		if ((tg.equals(tg_default) == false)
 				&& (nmx.equals(nmx_default) == false)) {
 			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llNodeMax"));
+					.getString("Invalid.llTaskGeometry_llNodeMax")); //$NON-NLS-1$
 		}
 
 		if ((tg.equals(tg_default) == false) && (b.equals(b_default) == false)) {
 			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llBlocking"));
+					.getString("Invalid.llTaskGeometry_llBlocking")); //$NON-NLS-1$
 		}
 
-		validatePositiveOrUnlimitedNumeric(llBlocking, "Invalid.llBlocking");
+		validatePositiveOrUnlimitedNumeric(llBlocking, "Invalid.llBlocking"); //$NON-NLS-1$
 
 		// no checks will be performed on the following widgets at this time
 		// llNetwork_mpi = createTextWidget(nodesNetworkTabPane, rm,
@@ -2741,13 +2741,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		// llTaskGeometry = createTextWidget(nodesNetworkTabPane, rm,
 		// LL_PTP_TASK_GEOMETRY);
 
-		validateNumericMinMax(llNodeMin, LL_PTP_NODE_MIN, "Invalid.llNodeMin",
-				llNodeMax, LL_PTP_NODE_MAX, "Invalid.llNodeMax");
-		validatePositiveNumeric(llTasksPerNode, "Invalid.llTasksPerNode");
-		validatePositiveNumeric(llTotalTasks, "Invalid.llTotalTasks");
+		validateNumericMinMax(llNodeMin, LL_PTP_NODE_MIN, "Invalid.llNodeMin", //$NON-NLS-1$
+				llNodeMax, LL_PTP_NODE_MAX, "Invalid.llNodeMax"); //$NON-NLS-1$
+		validatePositiveNumeric(llTasksPerNode, "Invalid.llTasksPerNode"); //$NON-NLS-1$
+		validatePositiveNumeric(llTotalTasks, "Invalid.llTotalTasks"); //$NON-NLS-1$
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateNodesNetworkTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNodesNetworkTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2773,11 +2773,11 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void validateNumericMinMax(TextRowWidget controlMin,
 			String attrNameMin, String errorIDMin, TextRowWidget controlMax,
 			String attrNameMax, String errorIDMax) throws ValidationException {
-		String strMin = "", strMax = "";
+		String strMin = "", strMax = ""; //$NON-NLS-1$ //$NON-NLS-2$
 		int iMin = 0, iMax = 0;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateNumericMinMax entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericMinMax entered."); //$NON-NLS-1$
 
 		if (controlMin != null) {
 			strMin = controlMin.getValue();
@@ -2794,12 +2794,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		if ((strMin.length() > 0) && (strMax.length() > 0)) {
 			if (iMin > iMax) {
 				throw new ValidationException(Messages
-						.getString("Invalid.llNodeMinMax"));
+						.getString("Invalid.llNodeMinMax")); //$NON-NLS-1$
 			}
 		}
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateNumericMinMax returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericMinMax returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2821,8 +2821,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		@SuppressWarnings("unused")
 		IntegerAttribute attr;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateNumericRange entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange entered."); //$NON-NLS-1$
 		attrDef = (IntegerAttributeDefinition) currentRM
 				.getAttributeDefinition(attrName);
 		try {
@@ -2830,8 +2830,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		} catch (IllegalValueException e) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateNumericRange returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2852,8 +2852,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			int highLimit, String errorID) throws ValidationException {
 		int n;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateNumericRange entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange entered."); //$NON-NLS-1$
 		try {
 			n = Integer.valueOf(value);
 			if ((n < lowLimit) || (n > highLimit)) {
@@ -2862,8 +2862,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		} catch (NumberFormatException e) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateNumericRange returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2885,8 +2885,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		int len;
 		char suffix;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateNumericRange entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange entered."); //$NON-NLS-1$
 		len = value.length();
 		suffix = value.charAt(len - 1);
 		if (Character.isDigit(suffix)) {
@@ -2912,8 +2912,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			}
 		}
 		validateNumericRange(testValue, attrName, errorID);
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateNumericRange returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2933,16 +2933,16 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			String errorID) throws ValidationException {
 		String value;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateNumericRange entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange entered."); //$NON-NLS-1$
 		if (control != null) {
 			value = control.getValue();
 			if (value.length() > 0) {
 				validateNumericRange(value, attrName, errorID);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateNumericRange returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateNumericRange returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -2977,8 +2977,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			throws ValidationException {
 		int n = 0;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validatePositiveNumeric entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveNumeric entered."); //$NON-NLS-1$
 		try {
 			n = Integer.valueOf(value);
 			if ((n < 0) || (n > Integer.MAX_VALUE)) {
@@ -2988,8 +2988,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			throw new ValidationException(Messages.getString(errorID));
 		}
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validatePositiveNumeric returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveNumeric returning."); //$NON-NLS-1$
 		return n;
 	}
 
@@ -2997,24 +2997,24 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			throws ValidationException {
 		String value;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validatePositiveNumeric entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveNumeric entered."); //$NON-NLS-1$
 		if (control != null) {
 			value = control.getValue();
 			if (value.length() > 0) {
 				validatePositiveNumeric(value, errorID);
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validatePositiveNumeric returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveNumeric returning."); //$NON-NLS-1$
 	}
 
 	private void validatePositiveOrUnlimitedNumeric(String value, String errorID)
 			throws ValidationException {
 		int n;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveOrUnlimitedNumeric entered."); //$NON-NLS-1$
 		try {
 			n = Integer.valueOf(value);
 			if ((n < 1) || (n > Integer.MAX_VALUE)) {
@@ -3024,19 +3024,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			throw new ValidationException(Messages.getString(errorID));
 		}
 
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveOrUnlimitedNumeric returning."); //$NON-NLS-1$
 	}
 
 	private void validatePositiveOrUnlimitedNumeric(TextRowWidget control,
 			String errorID) throws ValidationException {
 		String value;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveOrUnlimitedNumeric entered."); //$NON-NLS-1$
 		if (control != null) {
 			value = control.getValue();
-			if (value.trim().equalsIgnoreCase("unlimited")) {
+			if (value.trim().equalsIgnoreCase("unlimited")) { //$NON-NLS-1$
 				// nothing to do - unlimited is valid value
 			} else {
 				if (value.length() > 0) {
@@ -3044,8 +3044,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				}
 			}
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validatePositiveOrUnlimitedNumeric returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validatePositiveOrUnlimitedNumeric returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -3056,31 +3056,31 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	private void validateRuntimeTab() throws ValidationException {
 		String s;
 
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateRuntimeTab entered.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateRuntimeTab entered."); //$NON-NLS-1$
 		s = llError.getValue().trim();
 		if (s.length() > 0) {
-			validateOutputPath(s, "Invalid.stderr");
+			validateOutputPath(s, "Invalid.stderr"); //$NON-NLS-1$
 		}
 		s = llOutput.getValue().trim();
 		if (s.length() > 0) {
-			validateOutputPath(s, "Invalid.stdout");
+			validateOutputPath(s, "Invalid.stdout"); //$NON-NLS-1$
 		}
 		s = llInput.getValue().trim();
 		if (s.length() > 0) {
-			validateInputPath(s, "Invalid.stdin");
+			validateInputPath(s, "Invalid.stdin"); //$NON-NLS-1$
 		}
 		s = llExecutable.getValue().trim();
 		if (s.length() > 0) {
-			validateInputPath(s, "Invalid.executable");
+			validateInputPath(s, "Invalid.executable"); //$NON-NLS-1$
 		}
-		validateDirectory(llInitialDir, "Invalid.initialDir");
+		validateDirectory(llInitialDir, "Invalid.initialDir"); //$NON-NLS-1$
 		s = llShell.getValue().trim();
 		if (s.length() > 0) {
-			validateInputPath(s, "Invalid.shell");
+			validateInputPath(s, "Invalid.shell"); //$NON-NLS-1$
 		}
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateRuntimeTab returning.");
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateRuntimeTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -3090,11 +3090,11 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateSchedulingBasicTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateSchedulingBasicTab entered.");
-		validateAlphaNumeric(llClass, "Invalid.llClass");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateSchedulingBasicTab returning.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateSchedulingBasicTab entered."); //$NON-NLS-1$
+		validateAlphaNumeric(llClass, "Invalid.llClass"); //$NON-NLS-1$
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateSchedulingBasicTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -3104,10 +3104,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateSchedulingRequirementsTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateSchedulingRequirementsTab entered.");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateSchedulingRequirementsTab returning.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateSchedulingRequirementsTab entered."); //$NON-NLS-1$
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateSchedulingRequirementsTab returning."); //$NON-NLS-1$
 	}
 
 	/**
@@ -3117,9 +3117,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateSchedulingResourcesTab() throws ValidationException {
-		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName()
-				+ ":validateSchedulingResourcesTab entered.");
-		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName()
-				+ ":validateSchedulingResourcesTab returning.");
+		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateSchedulingResourcesTab entered."); //$NON-NLS-1$
+		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
+				+ ":validateSchedulingResourcesTab returning."); //$NON-NLS-1$
 	}
 }

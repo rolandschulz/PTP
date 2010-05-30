@@ -51,9 +51,9 @@ public class FileSelectorRowWidget implements ValidationState
 	public void modifyText(ModifyEvent e)
 	{
 	    if (widget.getPath().equals(defaultValue)) {
-		nonDefaultMarker.setText(" ");
+		nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	    } else {
-		nonDefaultMarker.setText("*");
+		nonDefaultMarker.setText("*"); //$NON-NLS-1$
 	    }
 	}
     }
@@ -89,7 +89,7 @@ public class FileSelectorRowWidget implements ValidationState
 	    gd.grabExcessHorizontalSpace = true;
 	    path.setLayoutData(gd);
 	    browseButton = new Button(parent, SWT.PUSH);
-	    browseButton.setText(Messages.getString("FileSelector.BrowseButton"));
+	    browseButton.setText(Messages.getString("FileSelector.BrowseButton")); //$NON-NLS-1$
 	    browseButton.setData(WidgetAttributes.BUTTON_ID, new Integer(selectorID));
 	    gd = new GridData(GridData.FILL_HORIZONTAL);
 	    gd.grabExcessHorizontalSpace = false;
@@ -198,7 +198,7 @@ public class FileSelectorRowWidget implements ValidationState
 	label = new Label(parent, SWT.NONE);
 	label.setText(Messages.getString(attr.getName()));
 	nonDefaultMarker = new Label(parent, SWT.NONE);
-	nonDefaultMarker.setText(" ");
+	nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	gridData = new GridData(GridData.FILL_HORIZONTAL);
 	gridData.grabExcessHorizontalSpace = false;
 	label.setLayoutData(gridData);
@@ -208,7 +208,7 @@ public class FileSelectorRowWidget implements ValidationState
 	    defaultValue = attr.create().getValueAsString();
 	}
 	catch (IllegalValueException e) {
-	    defaultValue = "";
+	    defaultValue = ""; //$NON-NLS-1$
 	}
 	eventMonitor = new EventMonitor();
 	widget.addModifyListener(eventMonitor);

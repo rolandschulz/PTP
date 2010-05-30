@@ -94,7 +94,7 @@ public class ComboRowWidget implements ValidationState {
 		label.setText(Messages.getString(attrDef.getName()));
 		label.setLayoutData(gridData);
 		nonDefaultMarker = new Label(parent, SWT.NONE);
-		nonDefaultMarker.setText(" ");
+		nonDefaultMarker.setText(" "); //$NON-NLS-1$
 		if (readOnly) {
 			widget = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 		} else {
@@ -119,7 +119,7 @@ public class ComboRowWidget implements ValidationState {
 		try {
 			defaultValue = attrDef.create().getValueAsString();
 		} catch (IllegalValueException e) {
-			defaultValue = "";
+			defaultValue = ""; //$NON-NLS-1$
 		}
 		eventMonitor = new EventMonitor();
 		widget.addModifyListener(eventMonitor);
@@ -196,9 +196,9 @@ public class ComboRowWidget implements ValidationState {
 
 		value = widget.getText().trim();
 		if ((value.length() == 0) || (value.equals(defaultValue))) {
-			nonDefaultMarker.setText(" ");
+			nonDefaultMarker.setText(" "); //$NON-NLS-1$
 		} else {
-			nonDefaultMarker.setText("*");
+			nonDefaultMarker.setText("*"); //$NON-NLS-1$
 		}
 	}
 

@@ -9,6 +9,6 @@ package org.eclipse.ptp.rm.ibm.pe.ui.widgets;
 
 public interface WidgetAttributes
 {
-    public static final String ATTR_NAME = "ATTR_NAME";
-    public static final String BUTTON_ID = "BUTTON_ID";
+    public static final String ATTR_NAME = "ATTR_NAME"; //$NON-NLS-1$
+    public static final String BUTTON_ID = "BUTTON_ID"; //$NON-NLS-1$
 }

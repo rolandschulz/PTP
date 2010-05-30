@@ -99,96 +99,96 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * corresponding PE environment variables. Names starting with PE_*
 	 * represent additional attributes used internally by the PE proxy.
 	 */
-	private static final String MP_ACK_THRESH = "MP_ACK_THRESH";
-	private static final String MP_ADAPTER_USE = "MP_ADAPTER_USE";
-	private static final String MP_BULK_MIN_MSG_SIZE = "MP_BULK_MIN_MSG_SIZE";
-	private static final String MP_CC_SCRATCH_BUF = "MP_CC_SCRATCH_BUF";
-	private static final String MP_CLOCK_SOURCE = "MP_CLOCK_SOURCE";
-	private static final String MP_CKPTDIR = "MP_CKPTDIR";
-	private static final String MP_CKPTDIR_PERTASK = "MP_CKPTDIR_PERTASK";
-	private static final String MP_CKPTFILE = "MP_CKPTFILE";
-	private static final String MP_CMDFILE = "MP_CMDFILE";
-	private static final String MP_COREDIR = "MP_COREDIR";
-	private static final String MP_COREFILE_FORMAT = "MP_COREFILE_FORMAT";
-	private static final String MP_COREFILE_SIGTERM = "MP_COREFILE_SIGTERM";
-	private static final String MP_CPU_USE = "MP_CPU_USE";
-	private static final String MP_CSS_INTERRUPT = "MP_CSS_INTERRUPT";
-	private static final String MP_DEBUG_INITIAL_STOP = "MP_DEBUG_INITIAL_STOP";
-	private static final String MP_DEBUG_NOTIMEOUT = "MP_DEBUG_NOTIMEOUT";
-	private static final String MP_DEVTYPE = "MP_DEVTYPE";
-	private static final String MP_EAGER_LIMIT = "MP_EAGER_LIMIT";
-	private static final String MP_EUIDEVELOP = "MP_EUIDEVELOP";
-	private static final String MP_EUIDEVICE = "MP_EUIDEVICE";
-	private static final String MP_EUILIB = "MP_EUILIB";
-	private static final String MP_EUILIBPATH = "MP_EUILIBPATH";
-	private static final String MP_HINTS_FILTERED = "MP_HINTS_FILTERED";
-	private static final String MP_HOSTFILE = "MP_HOSTFILE";
-	private static final String MP_INFOLEVEL = "MP_INFOLEVEL";
-	private static final String MP_INSTANCES = "MP_INSTANCES";
-	private static final String MP_IO_BUFFER_SIZE = "MP_IO_BUFFER_SIZE";
-	private static final String MP_IO_ERRLOG = "MP_IO_ERRLOG";
-	private static final String MP_IONODEFILE = "MP_IONODEFILE";
-	private static final String MP_LABELIO = "MP_LABELIO";
-	private static final String MP_LAPI_TRACE_LEVEL = "MP_LAPI_TRACE_LEVEL";
-	private static final String MP_LLFILE = "MP_LLFILE";
-	private static final String MP_MSG_API = "MP_MSG_API";
-	private static final String MP_MSG_ENVELOPE_BUF = "MP_MSG_ENVELOPE_BUF";
-	private static final String MP_NEWJOB = "MP_NEWJOB";
-	private static final String MP_NODES = "MP_NODES";
-	private static final String MP_PGMMODEL = "MP_PGMMODEL";
-	private static final String MP_PMDLOG = "MP_PMDLOG";
-	private static final String MP_PMDLOG_DIR = "MP_PMDLOG_DIR";
-	private static final String MP_POLLING_INTERVAL = "MP_POLLING_INTERVAL";
-	private static final String MP_PRINTENV = "MP_PRINTENV";
-	private static final String MP_PRIORITY = "MP_PRIORITY";
-	private static final String MP_PRIORITY_LOG = "MP_PRIORITY_LOG";
-	private static final String MP_PRIORITY_LOG_DIR = "MP_PRIORITY_LOG_DIR";
-	private static final String MP_PRIORITY_LOG_NAME = "MP_PRIORITY_LOG_NAME";
-	private static final String MP_PRIORITY_NTP = "MP_PRIORITY_NTP";
-	private static final String MP_PROCS = "MP_PROCS";
-	private static final String MP_PROFDIR = "MP_PROFDIR";
-	private static final String MP_PULSE = "MP_PULSE";
-	private static final String MP_REMOTEDIR = "MP_REMOTEDIR";
-	private static final String MP_RETRANSMIT_INTERVAL = "MP_RETRANSMIT_INTERVAL";
-	private static final String MP_RETRY = "MP_RETRY";
-	private static final String MP_RETRY_COUNT = "MP_RETRY_COUNT";
-	private static final String MP_REXMIT_BUF_CNT = "MP_REXMIT_BUF_CNT";
-	private static final String MP_REXMIT_BUF_SIZE = "MP_REXMIT_BUF_SIZE";
-	private static final String MP_RMLIB = "MP_RMLIB";
-	private static final String MP_RMPOOL = "MP_RMPOOL";
-	private static final String MP_SAVE_LLFILE = "MP_SAVE_LLFILE";
-	private static final String MP_SAVEHOSTFILE = "MP_SAVEHOSTFILE";
-	private static final String MP_SHARED_MEMORY = "MP_SHARED_MEMORY";
-	private static final String MP_SINGLE_THREAD = "MP_SINGLE_THREAD";
-	private static final String MP_STATISTICS = "MP_STATISTICS";
-	private static final String MP_STDINMODE = "MP_STDINMODE";
-	private static final String MP_STDOUTMODE = "MP_STDOUTMODE";
-	private static final String MP_TASK_AFFINITY = "MP_TASK_AFFINITY";
-	private static final String MP_TASKS_PER_NODE = "MP_TASKS_PER_NODE";
-	private static final String MP_THREAD_STACKSIZE = "MP_THREAD_STACKSIZE";
-	private static final String MP_TIMEOUT = "MP_TIMEOUT";
-	private static final String MP_TLP_REQUIRED = "MP_TLP_REQUIRED";
-	private static final String MP_UDP_PACKET_SIZE = "MP_UDP_PACKET_SIZE";
-	private static final String MP_USE_BULK_XFER = "MP_USE_BULK_XFER";
-	private static final String MP_WAIT_MODE = "MP_WAIT_MODE";
-	private static final String PE_ADVANCED_MODE = "PE_ADVANCED_MODE";
-	private static final String PE_BUFFER_MEM = "PE_BUFFER_MEM";
-	private static final String PE_BUFFER_MEM_MAX = "PE_BUFFER_MEM_MAX";
-	private static final String PE_ENV_SCRIPT = "PE_ENV_SCRIPT";
-	private static final String PE_RDMA_COUNT = "PE_RDMA_COUNT";
-	private static final String PE_RDMA_COUNT_2 = "PE_RDMA_COUNT_2";
-	private static final String PE_SPLIT_STDOUT = "PE_SPLIT_STDOUT";
-	private static final String PE_STDERR_PATH = "PE_STDERR_PATH";
-	private static final String PE_STDIN_PATH = "PE_STDIN_PATH";
-	private static final String PE_STDOUT_PATH = "PE_STDOUT_PATH";
-	private static final String MP_INSTANCES_INT = "MP_INSTANCES_INT";
-	private static final String MP_RETRY_INT = "MP_RETRY_INT";
+	private static final String MP_ACK_THRESH = "MP_ACK_THRESH"; //$NON-NLS-1$
+	private static final String MP_ADAPTER_USE = "MP_ADAPTER_USE"; //$NON-NLS-1$
+	private static final String MP_BULK_MIN_MSG_SIZE = "MP_BULK_MIN_MSG_SIZE"; //$NON-NLS-1$
+	private static final String MP_CC_SCRATCH_BUF = "MP_CC_SCRATCH_BUF"; //$NON-NLS-1$
+	private static final String MP_CLOCK_SOURCE = "MP_CLOCK_SOURCE"; //$NON-NLS-1$
+	private static final String MP_CKPTDIR = "MP_CKPTDIR"; //$NON-NLS-1$
+	private static final String MP_CKPTDIR_PERTASK = "MP_CKPTDIR_PERTASK"; //$NON-NLS-1$
+	private static final String MP_CKPTFILE = "MP_CKPTFILE"; //$NON-NLS-1$
+	private static final String MP_CMDFILE = "MP_CMDFILE"; //$NON-NLS-1$
+	private static final String MP_COREDIR = "MP_COREDIR"; //$NON-NLS-1$
+	private static final String MP_COREFILE_FORMAT = "MP_COREFILE_FORMAT"; //$NON-NLS-1$
+	private static final String MP_COREFILE_SIGTERM = "MP_COREFILE_SIGTERM"; //$NON-NLS-1$
+	private static final String MP_CPU_USE = "MP_CPU_USE"; //$NON-NLS-1$
+	private static final String MP_CSS_INTERRUPT = "MP_CSS_INTERRUPT"; //$NON-NLS-1$
+	private static final String MP_DEBUG_INITIAL_STOP = "MP_DEBUG_INITIAL_STOP"; //$NON-NLS-1$
+	private static final String MP_DEBUG_NOTIMEOUT = "MP_DEBUG_NOTIMEOUT"; //$NON-NLS-1$
+	private static final String MP_DEVTYPE = "MP_DEVTYPE"; //$NON-NLS-1$
+	private static final String MP_EAGER_LIMIT = "MP_EAGER_LIMIT"; //$NON-NLS-1$
+	private static final String MP_EUIDEVELOP = "MP_EUIDEVELOP"; //$NON-NLS-1$
+	private static final String MP_EUIDEVICE = "MP_EUIDEVICE"; //$NON-NLS-1$
+	private static final String MP_EUILIB = "MP_EUILIB"; //$NON-NLS-1$
+	private static final String MP_EUILIBPATH = "MP_EUILIBPATH"; //$NON-NLS-1$
+	private static final String MP_HINTS_FILTERED = "MP_HINTS_FILTERED"; //$NON-NLS-1$
+	private static final String MP_HOSTFILE = "MP_HOSTFILE"; //$NON-NLS-1$
+	private static final String MP_INFOLEVEL = "MP_INFOLEVEL"; //$NON-NLS-1$
+	private static final String MP_INSTANCES = "MP_INSTANCES"; //$NON-NLS-1$
+	private static final String MP_IO_BUFFER_SIZE = "MP_IO_BUFFER_SIZE"; //$NON-NLS-1$
+	private static final String MP_IO_ERRLOG = "MP_IO_ERRLOG"; //$NON-NLS-1$
+	private static final String MP_IONODEFILE = "MP_IONODEFILE"; //$NON-NLS-1$
+	private static final String MP_LABELIO = "MP_LABELIO"; //$NON-NLS-1$
+	private static final String MP_LAPI_TRACE_LEVEL = "MP_LAPI_TRACE_LEVEL"; //$NON-NLS-1$
+	private static final String MP_LLFILE = "MP_LLFILE"; //$NON-NLS-1$
+	private static final String MP_MSG_API = "MP_MSG_API"; //$NON-NLS-1$
+	private static final String MP_MSG_ENVELOPE_BUF = "MP_MSG_ENVELOPE_BUF"; //$NON-NLS-1$
+	private static final String MP_NEWJOB = "MP_NEWJOB"; //$NON-NLS-1$
+	private static final String MP_NODES = "MP_NODES"; //$NON-NLS-1$
+	private static final String MP_PGMMODEL = "MP_PGMMODEL"; //$NON-NLS-1$
+	private static final String MP_PMDLOG = "MP_PMDLOG"; //$NON-NLS-1$
+	private static final String MP_PMDLOG_DIR = "MP_PMDLOG_DIR"; //$NON-NLS-1$
+	private static final String MP_POLLING_INTERVAL = "MP_POLLING_INTERVAL"; //$NON-NLS-1$
+	private static final String MP_PRINTENV = "MP_PRINTENV"; //$NON-NLS-1$
+	private static final String MP_PRIORITY = "MP_PRIORITY"; //$NON-NLS-1$
+	private static final String MP_PRIORITY_LOG = "MP_PRIORITY_LOG"; //$NON-NLS-1$
+	private static final String MP_PRIORITY_LOG_DIR = "MP_PRIORITY_LOG_DIR"; //$NON-NLS-1$
+	private static final String MP_PRIORITY_LOG_NAME = "MP_PRIORITY_LOG_NAME"; //$NON-NLS-1$
+	private static final String MP_PRIORITY_NTP = "MP_PRIORITY_NTP"; //$NON-NLS-1$
+	private static final String MP_PROCS = "MP_PROCS"; //$NON-NLS-1$
+	private static final String MP_PROFDIR = "MP_PROFDIR"; //$NON-NLS-1$
+	private static final String MP_PULSE = "MP_PULSE"; //$NON-NLS-1$
+	private static final String MP_REMOTEDIR = "MP_REMOTEDIR"; //$NON-NLS-1$
+	private static final String MP_RETRANSMIT_INTERVAL = "MP_RETRANSMIT_INTERVAL"; //$NON-NLS-1$
+	private static final String MP_RETRY = "MP_RETRY"; //$NON-NLS-1$
+	private static final String MP_RETRY_COUNT = "MP_RETRY_COUNT"; //$NON-NLS-1$
+	private static final String MP_REXMIT_BUF_CNT = "MP_REXMIT_BUF_CNT"; //$NON-NLS-1$
+	private static final String MP_REXMIT_BUF_SIZE = "MP_REXMIT_BUF_SIZE"; //$NON-NLS-1$
+	private static final String MP_RMLIB = "MP_RMLIB"; //$NON-NLS-1$
+	private static final String MP_RMPOOL = "MP_RMPOOL"; //$NON-NLS-1$
+	private static final String MP_SAVE_LLFILE = "MP_SAVE_LLFILE"; //$NON-NLS-1$
+	private static final String MP_SAVEHOSTFILE = "MP_SAVEHOSTFILE"; //$NON-NLS-1$
+	private static final String MP_SHARED_MEMORY = "MP_SHARED_MEMORY"; //$NON-NLS-1$
+	private static final String MP_SINGLE_THREAD = "MP_SINGLE_THREAD"; //$NON-NLS-1$
+	private static final String MP_STATISTICS = "MP_STATISTICS"; //$NON-NLS-1$
+	private static final String MP_STDINMODE = "MP_STDINMODE"; //$NON-NLS-1$
+	private static final String MP_STDOUTMODE = "MP_STDOUTMODE"; //$NON-NLS-1$
+	private static final String MP_TASK_AFFINITY = "MP_TASK_AFFINITY"; //$NON-NLS-1$
+	private static final String MP_TASKS_PER_NODE = "MP_TASKS_PER_NODE"; //$NON-NLS-1$
+	private static final String MP_THREAD_STACKSIZE = "MP_THREAD_STACKSIZE"; //$NON-NLS-1$
+	private static final String MP_TIMEOUT = "MP_TIMEOUT"; //$NON-NLS-1$
+	private static final String MP_TLP_REQUIRED = "MP_TLP_REQUIRED"; //$NON-NLS-1$
+	private static final String MP_UDP_PACKET_SIZE = "MP_UDP_PACKET_SIZE"; //$NON-NLS-1$
+	private static final String MP_USE_BULK_XFER = "MP_USE_BULK_XFER"; //$NON-NLS-1$
+	private static final String MP_WAIT_MODE = "MP_WAIT_MODE"; //$NON-NLS-1$
+	private static final String PE_ADVANCED_MODE = "PE_ADVANCED_MODE"; //$NON-NLS-1$
+	private static final String PE_BUFFER_MEM = "PE_BUFFER_MEM"; //$NON-NLS-1$
+	private static final String PE_BUFFER_MEM_MAX = "PE_BUFFER_MEM_MAX"; //$NON-NLS-1$
+	private static final String PE_ENV_SCRIPT = "PE_ENV_SCRIPT"; //$NON-NLS-1$
+	private static final String PE_RDMA_COUNT = "PE_RDMA_COUNT"; //$NON-NLS-1$
+	private static final String PE_RDMA_COUNT_2 = "PE_RDMA_COUNT_2"; //$NON-NLS-1$
+	private static final String PE_SPLIT_STDOUT = "PE_SPLIT_STDOUT"; //$NON-NLS-1$
+	private static final String PE_STDERR_PATH = "PE_STDERR_PATH"; //$NON-NLS-1$
+	private static final String PE_STDIN_PATH = "PE_STDIN_PATH"; //$NON-NLS-1$
+	private static final String PE_STDOUT_PATH = "PE_STDOUT_PATH"; //$NON-NLS-1$
+	private static final String MP_INSTANCES_INT = "MP_INSTANCES_INT"; //$NON-NLS-1$
+	private static final String MP_RETRY_INT = "MP_RETRY_INT"; //$NON-NLS-1$
 	/*
 	 * End of attribute name list.
 	 */
-	private static final String ENABLE_STATE = "ENABLE_STATE";
+	private static final String ENABLE_STATE = "ENABLE_STATE"; //$NON-NLS-1$
 	private static final RMLaunchValidation success = new RMLaunchValidation(
-			true, "");
+			true, ""); //$NON-NLS-1$
 	private static final int MP_IONODEFILE_SELECTOR = 1;
 	private static final int PE_STDIN_PATH_SELECTOR = 2;
 	private static final int PE_STDOUT_PATH_SELECTOR = 3;
@@ -218,53 +218,53 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * ascending order. MP_FENCE and MP_NOARGLIST must not appear in this list
 	 * since they are allowed to be used to control command line parsing.
 	 */
-	private static final String PEEnvVars[] = { "MP_ACK_THRESH",
-			"MP_ADAPTER_USE", "MP_BUFFER_MEM", "MP_BUFFER_MEM_MAX",
-			"MP_BULK_MIN_MSG_SIZE", "MP_CC_SCRATCH_BUF", "MP_CKPTDIR",
-			"MP_CKPTDIR_PERTASK", "MP_CKPTFILE", "MP_CLOCK_SOURCE",
-			"MP_CMDFILE", "MP_COREDIR", "MP_COREFILE_FORMAT",
-			"MP_COREFILE_SIGTERM", "MP_CPU_USE", "MP_CSS_INTERRUPT",
-			"MP_DEBUG_INITIAL_STOP", "MP_DEBUG_NOTIMEOUT", "MP_DEVTYPE",
-			"MP_EAGER_LIMIT", "MP_EUIDEVELOP", "MP_EUIDEVICE", "MP_EUILIB",
-			"MP_EUILIBPATH", "MP_HINTS_FILTERED", "MP_HOSTFILE",
-			"MP_INFOLEVEL", "MP_INSTANCES", "MP_INSTANCES_INT",
-			"MP_IO_BUFFER_SIZE", "MP_IO_ERRLOG", "MP_IONODEFILE", "MP_LABELIO",
-			"MP_LAPI_TRACE_LEVEL", "MP_LLFILE", "MP_MSG_API",
-			"MP_MSG_ENVELOPE_BUF", "MP_NEWJOB", "MP_NODES", "MP_PGMMODEL",
-			"MP_PMDLOG", "MP_PMDLOG_DIR", "MP_POLLING_INTERVAL", "MP_PRINTENV",
-			"MP_PRIORITY", "MP_PRIORITY_LOG", "MP_PRIORITY_LOG_DIR",
-			"MP_PRIORITY_LOG_NAME", "MP_PRIORITY_NTP", "MP_PROCS",
-			"MP_PROFDIR", "MP_PULSE", "MP_RDMA_COUNT", "MP_REMOTEDIR",
-			"MP_RETRANSMIT_INTERVAL", "MP_RETRY", "MP_RETRY_COUNT",
-			"MP_RETRY_INT", "MP_REXMIT_BUF_CNT", "MP_REXMIT_BUF_SIZE",
-			"MP_RMLIB", "MP_RMPOOL", "MP_SAVEHOSTFILE", "MP_SAVE_LLFILE",
-			"MP_SHARED_MEMORY", "MP_SINGLE_THREAD", "MP_STATISTICS",
-			"MP_STDINMODE", "MP_STDOUTMODE", "MP_TASK_AFFINITY",
-			"MP_TASKS_PER_NODE", "MP_THREAD_STACKSIZE", "MP_TIMEOUT",
-			"MP_TLP_REQUIRED", "MP_UDP_PACKET_SIZE", "MP_USE_BULK_XFER",
-			"MP_WAIT_MODE" };
+	private static final String PEEnvVars[] = { "MP_ACK_THRESH", //$NON-NLS-1$
+			"MP_ADAPTER_USE", "MP_BUFFER_MEM", "MP_BUFFER_MEM_MAX", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_BULK_MIN_MSG_SIZE", "MP_CC_SCRATCH_BUF", "MP_CKPTDIR", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_CKPTDIR_PERTASK", "MP_CKPTFILE", "MP_CLOCK_SOURCE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_CMDFILE", "MP_COREDIR", "MP_COREFILE_FORMAT", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_COREFILE_SIGTERM", "MP_CPU_USE", "MP_CSS_INTERRUPT", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_DEBUG_INITIAL_STOP", "MP_DEBUG_NOTIMEOUT", "MP_DEVTYPE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_EAGER_LIMIT", "MP_EUIDEVELOP", "MP_EUIDEVICE", "MP_EUILIB", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"MP_EUILIBPATH", "MP_HINTS_FILTERED", "MP_HOSTFILE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_INFOLEVEL", "MP_INSTANCES", "MP_INSTANCES_INT", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_IO_BUFFER_SIZE", "MP_IO_ERRLOG", "MP_IONODEFILE", "MP_LABELIO", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"MP_LAPI_TRACE_LEVEL", "MP_LLFILE", "MP_MSG_API", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_MSG_ENVELOPE_BUF", "MP_NEWJOB", "MP_NODES", "MP_PGMMODEL", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"MP_PMDLOG", "MP_PMDLOG_DIR", "MP_POLLING_INTERVAL", "MP_PRINTENV", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"MP_PRIORITY", "MP_PRIORITY_LOG", "MP_PRIORITY_LOG_DIR", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_PRIORITY_LOG_NAME", "MP_PRIORITY_NTP", "MP_PROCS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_PROFDIR", "MP_PULSE", "MP_RDMA_COUNT", "MP_REMOTEDIR", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"MP_RETRANSMIT_INTERVAL", "MP_RETRY", "MP_RETRY_COUNT", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_RETRY_INT", "MP_REXMIT_BUF_CNT", "MP_REXMIT_BUF_SIZE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_RMLIB", "MP_RMPOOL", "MP_SAVEHOSTFILE", "MP_SAVE_LLFILE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"MP_SHARED_MEMORY", "MP_SINGLE_THREAD", "MP_STATISTICS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_STDINMODE", "MP_STDOUTMODE", "MP_TASK_AFFINITY", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_TASKS_PER_NODE", "MP_THREAD_STACKSIZE", "MP_TIMEOUT", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_TLP_REQUIRED", "MP_UDP_PACKET_SIZE", "MP_USE_BULK_XFER", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"MP_WAIT_MODE" }; //$NON-NLS-1$
 	/*
 	 * List of valid Parallel Environment options. This list must be kept in
 	 * sorted ascending order.
 	 */
-	private static final String PEOptions[] = { "-ack_thresh", "-adapter_use",
-			"-buffer_mem", "-bulk_min_msg_size", "-cc_scratch_buf",
-			"-clock_source", "-cmdfile", "-coredir", "-corefile_format",
-			"-corefile_sigterm", "-cpu_use", "-css_interrupt",
-			"-debug_notimeout", "-devtype", "-eager_limit", "-euidevelop",
-			"-euidevice", "-euilib", "-euilibpath", "-hfile",
-			"-hints_filtered", "-hostfile", "-ilevel", "-infolevel",
-			"-instances", "-io_buffer_size", "-io_errlog", "-ionodefile",
-			"-labelio", "-llfile", "-msg_api", "-msg_envelope_buf", "-newjob",
-			"-nodes", "-pgmmodel", "-pmdlog", "-pmdlog_dir",
-			"-polling_interval", "-printenv", "-priority_log",
-			"-priority_log_dir", "-priority_log_name", "-priority_ntp",
-			"-procs", "-profdir", "-pulse", "-rdma_count", "-resd",
-			"-retransmit_interval", "-retry", "-retrycount", "-rexmit_buf_cnt",
-			"-rmpool", "-savehostfile", "-save_llfile", "-shared_memory",
-			"-single_thread", "-statistics", "-stdinmode", "-stdoutmode",
-			"-task_affinity", "-tasks_per_node", "-thread_stacksize",
-			"-tlp_required", "-udp_packet_size", "-use_bulk_xfer", "-wait_mode" };
+	private static final String PEOptions[] = { "-ack_thresh", "-adapter_use", //$NON-NLS-1$ //$NON-NLS-2$
+			"-buffer_mem", "-bulk_min_msg_size", "-cc_scratch_buf", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"-clock_source", "-cmdfile", "-coredir", "-corefile_format", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-corefile_sigterm", "-cpu_use", "-css_interrupt", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"-debug_notimeout", "-devtype", "-eager_limit", "-euidevelop", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-euidevice", "-euilib", "-euilibpath", "-hfile", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-hints_filtered", "-hostfile", "-ilevel", "-infolevel", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-instances", "-io_buffer_size", "-io_errlog", "-ionodefile", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-labelio", "-llfile", "-msg_api", "-msg_envelope_buf", "-newjob", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			"-nodes", "-pgmmodel", "-pmdlog", "-pmdlog_dir", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-polling_interval", "-printenv", "-priority_log", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"-priority_log_dir", "-priority_log_name", "-priority_ntp", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"-procs", "-profdir", "-pulse", "-rdma_count", "-resd", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			"-retransmit_interval", "-retry", "-retrycount", "-rexmit_buf_cnt", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-rmpool", "-savehostfile", "-save_llfile", "-shared_memory", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-single_thread", "-statistics", "-stdinmode", "-stdoutmode", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"-task_affinity", "-tasks_per_node", "-thread_stacksize", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"-tlp_required", "-udp_packet_size", "-use_bulk_xfer", "-wait_mode" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 	private boolean ignoreModifyEvents = false;
 	private EventMonitor eventMonitor;
@@ -443,7 +443,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		@SuppressWarnings("unused")
 		private ValidationException() {
 			throw new IllegalAccessError(
-					"ValidationException default constructor should not be called");
+					Messages.getString("PERMLaunchConfigurationDynamicTab.230")); //$NON-NLS-1$
 		}
 
 		/**
@@ -492,79 +492,79 @@ public class PERMLaunchConfigurationDynamicTab extends
 			} else {
 				switch (((Integer) widgetData).intValue()) {
 				case MP_IONODEFILE_SELECTOR:
-					getInputFile(mpIONodeFile, "File.mpIONodeFileTitle",
-							"mpIONodeFilePath");
+					getInputFile(mpIONodeFile, "File.mpIONodeFileTitle", //$NON-NLS-1$
+							"mpIONodeFilePath"); //$NON-NLS-1$
 					break;
 				case PE_STDIN_PATH_SELECTOR:
-					getInputFile(peStdinPath, "File.peStdinPathTitle",
-							"peStdinPath");
+					getInputFile(peStdinPath, "File.peStdinPathTitle", //$NON-NLS-1$
+							"peStdinPath"); //$NON-NLS-1$
 					break;
 				case PE_STDOUT_PATH_SELECTOR:
-					getOutputFile(peStdoutPath, "File.peStdoutPathTitle",
-							"peStdoutPath");
+					getOutputFile(peStdoutPath, "File.peStdoutPathTitle", //$NON-NLS-1$
+							"peStdoutPath"); //$NON-NLS-1$
 					break;
 				case PE_STDERR_PATH_SELECTOR:
-					getOutputFile(peStderrPath, "File.peStderrPathTitle",
-							"peStderrPath");
+					getOutputFile(peStderrPath, "File.peStderrPathTitle", //$NON-NLS-1$
+							"peStderrPath"); //$NON-NLS-1$
 					break;
 				case MP_COREDIR_SELECTOR:
-					getDirectory(mpCoreDir, "File.mpCoredirTitle",
-							"mpCoredirPath");
+					getDirectory(mpCoreDir, "File.mpCoredirTitle", //$NON-NLS-1$
+							"mpCoredirPath"); //$NON-NLS-1$
 					break;
 				case MP_CMDFILE_SELECTOR:
-					getInputFile(mpCmdFile, "File.mpCmdfileTitle",
-							"mpCmdfilePath");
+					getInputFile(mpCmdFile, "File.mpCmdfileTitle", //$NON-NLS-1$
+							"mpCmdfilePath"); //$NON-NLS-1$
 					break;
 				case MP_HOSTFILE_SELECTOR:
-					getInputFile(mpHostFile, "File.mpHostfileTitle",
-							"mpHostfilePath");
+					getInputFile(mpHostFile, "File.mpHostfileTitle", //$NON-NLS-1$
+							"mpHostfilePath"); //$NON-NLS-1$
 					break;
 				case MP_REMOTEDIR_SELECTOR:
-					getInputFile(mpRemoteDir, "File.mpRemotedirTitle",
-							"mpRemotedirPath");
+					getInputFile(mpRemoteDir, "File.mpRemotedirTitle", //$NON-NLS-1$
+							"mpRemotedirPath"); //$NON-NLS-1$
 					break;
 				case MP_LLFILE_SELECTOR:
-					getInputFile(mpLLFile, "File.mpLLFileTitle", "mpLLFilePath");
+					getInputFile(mpLLFile, "File.mpLLFileTitle", "mpLLFilePath"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				case MP_EUILIBPATH_SELECTOR:
-					getInputFile(mpEuiLibPath, "File.mpEuilibPathTitle",
-							"mpEuilibPathPath");
+					getInputFile(mpEuiLibPath, "File.mpEuilibPathTitle", //$NON-NLS-1$
+							"mpEuilibPathPath"); //$NON-NLS-1$
 					break;
 				case MP_SAVE_LLFILE_SELECTOR:
-					getOutputFile(mpSaveLLFile, "File.mpSaveLLFileTitle",
-							"mpSaveLLFilePath");
+					getOutputFile(mpSaveLLFile, "File.mpSaveLLFileTitle", //$NON-NLS-1$
+							"mpSaveLLFilePath"); //$NON-NLS-1$
 					break;
 				case MP_SAVEHOSTFILE_SELECTOR:
-					getOutputFile(mpSaveHostFile, "File.mpSaveHostFileTitle",
-							"mpSaveHostFilePath");
+					getOutputFile(mpSaveHostFile, "File.mpSaveHostFileTitle", //$NON-NLS-1$
+							"mpSaveHostFilePath"); //$NON-NLS-1$
 					break;
 				case MP_RMLIB_SELECTOR:
-					getInputFile(mpRMLib, "File.peRMLibTitle", "mpRMLibPath");
+					getInputFile(mpRMLib, "File.peRMLibTitle", "mpRMLibPath"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				case PE_ENV_SCRIPT_SELECTOR:
-					getInputFile(peEnvScript, "File.peEnvScriptTitle",
-							"peEnvScriptPath");
+					getInputFile(peEnvScript, "File.peEnvScriptTitle", //$NON-NLS-1$
+							"peEnvScriptPath"); //$NON-NLS-1$
 					break;
 				case MP_PROFDIR_SELECTOR:
-					getDirectory(mpProfDir, "File.mpProfDirTitle",
-							"mpProfDirPath");
+					getDirectory(mpProfDir, "File.mpProfDirTitle", //$NON-NLS-1$
+							"mpProfDirPath"); //$NON-NLS-1$
 					break;
 				case MP_PRIORITY_LOG_DIR_SELECTOR:
 					getDirectory(mpPriorityLogDir,
-							"File.mpPriorityLogDirTitle",
-							"mpPriorityLogDirPath");
+							"File.mpPriorityLogDirTitle", //$NON-NLS-1$
+							"mpPriorityLogDirPath"); //$NON-NLS-1$
 					break;
 				case MP_CKPTDIR_SELECTOR:
-					getDirectory(mpCkptDir, "File.mpCkptDirTitle",
-							"mpCkptDirPath");
+					getDirectory(mpCkptDir, "File.mpCkptDirTitle", //$NON-NLS-1$
+							"mpCkptDirPath"); //$NON-NLS-1$
 					break;
 				case MP_CKPTFILE_SELECTOR:
-					getOutputFile(mpCkptFile, "File.mpCkptFileTitle",
-							"mpCkptFilePath");
+					getOutputFile(mpCkptFile, "File.mpCkptFileTitle", //$NON-NLS-1$
+							"mpCkptFilePath"); //$NON-NLS-1$
 					break;
 				case MP_PMDLOG_DIR_SELECTOR:
-					getDirectory(mpPmdLogDir, "File.mpPMDLogDirTitle",
-							"mpPMDLogDirPath");
+					getDirectory(mpPmdLogDir, "File.mpPMDLogDirTitle", //$NON-NLS-1$
+							"mpPMDLogDirPath"); //$NON-NLS-1$
 					break;
 				case PE_ADVANCED_MODE_CHECKBOX:
 					setLaunchPanelMode();
@@ -631,12 +631,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 	private String getFileDialogPath(String attrName) {
 		String dir;
 
-		dir = "/";
+		dir = "/"; //$NON-NLS-1$
 		if (currentLaunchConfig != null) {
 			try {
-				dir = currentLaunchConfig.getAttribute(attrName, "/");
+				dir = currentLaunchConfig.getAttribute(attrName, "/"); //$NON-NLS-1$
 			} catch (CoreException e) {
-				dir = "/";
+				dir = "/"; //$NON-NLS-1$
 			}
 		}
 		return dir;
@@ -744,7 +744,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 			parentDir = new File(selectedFile).getParent();
 			if (parentDir == null) {
-				saveFileDialogPath(pathAttrID, "/");
+				saveFileDialogPath(pathAttrID, "/"); //$NON-NLS-1$
 			} else {
 				saveFileDialogPath(pathAttrID, parentDir);
 			}
@@ -1258,7 +1258,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * mpMsgApi
 	 */
 	private void setMsgApiDependentsState() {
-		if (mpMsgApi.getValue().equals("MPI,LAPI")) {
+		if (mpMsgApi.getValue().equals("MPI,LAPI")) { //$NON-NLS-1$
 			if (peRDMACount != null) {
 				peRDMACount.setEnabled(true);
 			}
@@ -1275,7 +1275,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 */
 	private void setRetryDependentsState() {
 		if (mpRetryCount != null) {
-			if (mpRetry.getValue().equals("wait")) {
+			if (mpRetry.getValue().equals("wait")) { //$NON-NLS-1$
 				mpRetryCount.setEnabled(true);
 			} else {
 				mpRetryCount.setEnabled(false);
@@ -1294,7 +1294,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		} else {
 			enableState = true;
 		}
-		if ((mpMsgApi != null) && (!mpMsgApi.getValue().equals("MPI,LAPI"))) {
+		if ((mpMsgApi != null) && (!mpMsgApi.getValue().equals("MPI,LAPI"))) { //$NON-NLS-1$
 			if (peRDMACount != null) {
 				peRDMACount.setEnabled(enableState);
 			}
@@ -1371,7 +1371,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		tasksTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(tasksTabPane);
-		tab.setText(Messages.getString("TasksTab.title"));
+		tab.setText(Messages.getString("TasksTab.title")); //$NON-NLS-1$
 		tasksTabPane.setLayout(createTabPaneLayout());
 		mpHostFile = createFileSelector(tasksTabPane, rm, MP_HOSTFILE,
 				MP_HOSTFILE_SELECTOR);
@@ -1392,7 +1392,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		ioTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(ioTabPane);
-		tab.setText(Messages.getString("IOTab.title"));
+		tab.setText(Messages.getString("IOTab.title")); //$NON-NLS-1$
 		ioTabPane.setLayout(createTabPaneLayout());
 		mpStdinMode = createEditableCombobox(ioTabPane, rm, MP_STDINMODE);
 		mpStdoutMode = createEditableCombobox(ioTabPane, rm, MP_STDOUTMODE);
@@ -1412,7 +1412,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		diagTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(diagTabPane);
-		tab.setText(Messages.getString("DIAGTab.title"));
+		tab.setText(Messages.getString("DIAGTab.title")); //$NON-NLS-1$
 		diagTabPane.setLayout(createTabPaneLayout());
 		mpPmdLogDir = createFileSelector(diagTabPane, rm, MP_PMDLOG_DIR,
 				MP_PMDLOG_DIR_SELECTOR);
@@ -1435,7 +1435,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		debugTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(debugTabPane);
-		tab.setText(Messages.getString("DEBUGTab.title"));
+		tab.setText(Messages.getString("DEBUGTab.title")); //$NON-NLS-1$
 		debugTabPane.setLayout(createTabPaneLayout());
 		mpEuiDevelop = createCombobox(debugTabPane, rm, MP_EUIDEVELOP);
 		mpCorefileFormat = createEditableCombobox(debugTabPane, rm,
@@ -1464,7 +1464,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		systemTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(systemTabPane);
-		tab.setText(Messages.getString("SYSTab.title"));
+		tab.setText(Messages.getString("SYSTab.title")); //$NON-NLS-1$
 		systemTabPane.setLayout(createTabPaneLayout());
 		mpEuiDevice = createCombobox(systemTabPane, rm, MP_EUIDEVICE);
 		mpEuiLib = createCombobox(systemTabPane, rm, MP_EUILIB);
@@ -1485,7 +1485,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		nodeTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(nodeTabPane);
-		tab.setText(Messages.getString("NODETab.title"));
+		tab.setText(Messages.getString("NODETab.title")); //$NON-NLS-1$
 		nodeTabPane.setLayout(createTabPaneLayout());
 		mpCmdFile = createFileSelector(nodeTabPane, rm, MP_CMDFILE,
 				MP_CMDFILE_SELECTOR);
@@ -1516,7 +1516,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		performanceTab1Pane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(performanceTab1Pane);
-		tab.setText(Messages.getString("PERFTab1.title"));
+		tab.setText(Messages.getString("PERFTab1.title")); //$NON-NLS-1$
 		performanceTab1Pane.setLayout(createTabPaneLayout());
 		mpAckThresh = createTextWidget(performanceTab1Pane, rm, MP_ACK_THRESH);
 		mpPollingInterval = createTextWidget(performanceTab1Pane, rm,
@@ -1551,7 +1551,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		performanceTab2Pane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(performanceTab2Pane);
-		tab.setText(Messages.getString("PERFTab2.title"));
+		tab.setText(Messages.getString("PERFTab2.title")); //$NON-NLS-1$
 		performanceTab2Pane.setLayout(createTabPaneLayout());
 		peBufferMem = createDualField(performanceTab2Pane, rm, PE_BUFFER_MEM,
 				PE_BUFFER_MEM_MAX);
@@ -1584,7 +1584,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		miscTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(miscTabPane);
-		tab.setText(Messages.getString("MISCTab.title"));
+		tab.setText(Messages.getString("MISCTab.title")); //$NON-NLS-1$
 		miscTabPane.setLayout(createTabPaneLayout());
 		mpClockSource = createCombobox(miscTabPane, rm, MP_CLOCK_SOURCE);
 		mpMsgApi = createCombobox(miscTabPane, rm, MP_MSG_API);
@@ -1631,7 +1631,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab = new TabItem(tabbedPane, SWT.NONE);
 		alternateRMTabPane = new Composite(tabbedPane, SWT.NONE);
 		tab.setControl(alternateRMTabPane);
-		tab.setText(Messages.getString("RMTab.title"));
+		tab.setText(Messages.getString("RMTab.title")); //$NON-NLS-1$
 		alternateRMTabPane.setLayout(createTabPaneLayout());
 		mpRMLib = createFileSelector(alternateRMTabPane, rm, MP_RMLIB,
 				MP_RMLIB_SELECTOR);
@@ -1768,16 +1768,16 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 		if (rm.getAttributeDefinition(attrName) != null) {
 			try {
-				attrValue = config.getAttribute(attrName, "");
+				attrValue = config.getAttribute(attrName, ""); //$NON-NLS-1$
 			} catch (CoreException e) {
-				attrValue = "";
+				attrValue = ""; //$NON-NLS-1$
 			}
 			defaultValue = getAttrDefaultValue(rm, attrName);
 			// Don't add attribute if it has default value or if it is blank.
 			// This reduces number of attributes sent in run command.
 			if ((attrValue.length() > 0) && (!attrValue.equals(defaultValue))) {
-				attrDef = new StringAttributeDefinition(attrName, "", "",
-						false, "");
+				attrDef = new StringAttributeDefinition(attrName, "", "", //$NON-NLS-1$ //$NON-NLS-2$
+						false, ""); //$NON-NLS-1$
 				attr = new StringAttribute(attrDef, attrValue);
 				attrs.add(attr);
 			}
@@ -1805,11 +1805,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 		attrs = new Vector<StringAttribute>();
 		attrArray = new StringAttribute[0];
-		if (configuration.getAttribute(PE_ADVANCED_MODE, "").equals("yes")) {
+		if (configuration.getAttribute(PE_ADVANCED_MODE, "").equals("yes")) { //$NON-NLS-1$ //$NON-NLS-2$
 			BufferedReader rdr;
 			String setupScriptPath;
 
-			setupScriptPath = configuration.getAttribute(PE_ENV_SCRIPT, "");
+			setupScriptPath = configuration.getAttribute(PE_ENV_SCRIPT, ""); //$NON-NLS-1$
 			try {
 				String envData;
 
@@ -1817,15 +1817,15 @@ public class PERMLaunchConfigurationDynamicTab extends
 				envData = rdr.readLine();
 				while (envData != null) {
 					envData = envData.trim();
-					if (envData.startsWith("MP_")) {
+					if (envData.startsWith("MP_")) { //$NON-NLS-1$
 						String tokens[];
 						StringAttributeDefinition attrDef;
 						StringAttribute attr;
 
-						tokens = envData.split("=");
+						tokens = envData.split("="); //$NON-NLS-1$
 						if (tokens.length == 2) {
 							attrDef = new StringAttributeDefinition(tokens[0],
-									"", "", false, "");
+									"", "", false, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							attr = new StringAttribute(attrDef, tokens[1]);
 							attrs.add(attr);
 						}
@@ -1833,11 +1833,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 					envData = rdr.readLine();
 				}
 			} catch (FileNotFoundException e) {
-				System.out.println("PE Environment setup file "
-						+ setupScriptPath + " not found.");
+				System.out.println(Messages.getString("PERMLaunchConfigurationDynamicTab.299") //$NON-NLS-1$
+						+ setupScriptPath + Messages.getString("PERMLaunchConfigurationDynamicTab.300")); //$NON-NLS-1$
 			} catch (IOException e) {
-				System.out.println("Error reading PE environment setup file "
-						+ setupScriptPath + ": " + e.getMessage());
+				System.out.println(Messages.getString("PERMLaunchConfigurationDynamicTab.301") //$NON-NLS-1$
+						+ setupScriptPath + ": " + e.getMessage()); //$NON-NLS-1$
 			}
 		} else {
 			Map<String, StringAttribute> allAttrs;
@@ -1850,8 +1850,8 @@ public class PERMLaunchConfigurationDynamicTab extends
 			i = attrNames.iterator();
 			while (i.hasNext()) {
 				name = i.next();
-				if ((name.startsWith("MP_"))
-						|| ((name.startsWith("PE_")) && (!name
+				if ((name.startsWith("MP_")) //$NON-NLS-1$
+						|| ((name.startsWith("PE_")) && (!name //$NON-NLS-1$
 								.equals(PE_ENV_SCRIPT)))) {
 					addAttribute(rm, configuration, attrs, name);
 				}
@@ -1890,7 +1890,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		IAttributeDefinition<?, ?, ?> attrDef;
 		String localDefaultEnv;
 
-		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_");
+		localDefaultEnv = attrName.replaceFirst("^MP_", "EN_"); //$NON-NLS-1$ //$NON-NLS-2$
 		attrDef = rm.getAttributeDefinition(localDefaultEnv);
 		if (attrDef != null) {
 			try {
@@ -1903,10 +1903,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 			try {
 				return attrDef.create().getValueAsString();
 			} catch (IllegalValueException e) {
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -1927,10 +1927,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 			try {
 				return attrDef.create().getValueAsString();
 			} catch (IllegalValueException e) {
-				return "";
+				return ""; //$NON-NLS-1$
 			}
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -1953,11 +1953,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 		IAttributeDefinition<?, ?, ?> rmAttrDef;
 
 		try {
-			value = config.getAttribute(attrName, "_no_value_");
+			value = config.getAttribute(attrName, "_no_value_"); //$NON-NLS-1$
 		} catch (CoreException e) {
-			value = "_no_value_";
+			value = "_no_value_"; //$NON-NLS-1$
 		}
-		if (value.equals("_no_value_")) {
+		if (value.equals("_no_value_")) { //$NON-NLS-1$
 			// Get the default attribute value, where that default may be the
 			// value
 			// specified by the user as an override to the PE default value.
@@ -1982,13 +1982,13 @@ public class PERMLaunchConfigurationDynamicTab extends
 				intVal = Long.valueOf(value);
 				if (intVal != 0) {
 					if ((intVal % GBYTE) == 0) {
-						return String.valueOf(intVal / GBYTE) + "G";
+						return String.valueOf(intVal / GBYTE) + "G"; //$NON-NLS-1$
 					} else {
 						if ((intVal % MBYTE) == 0) {
-							return String.valueOf(intVal / MBYTE) + "M";
+							return String.valueOf(intVal / MBYTE) + "M"; //$NON-NLS-1$
 						} else {
 							if ((intVal % KBYTE) == 0) {
-								return String.valueOf(intVal / KBYTE) + "K";
+								return String.valueOf(intVal / KBYTE) + "K"; //$NON-NLS-1$
 							}
 						}
 					}
@@ -2148,7 +2148,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 			} else if (widget instanceof CheckboxRowWidget) {
 				setValue((CheckboxRowWidget) widget, getAttrInitialValue(
 						config, rm, ((CheckboxRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)), "yes");
+								.getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
 			}
 
 		}
@@ -2192,7 +2192,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		if (mpPriorityLogName != null) {
 			mpPriorityLogName.setEnabled(enableState);
 		}
-		if ((mpRetry != null) && (mpRetry.getValue().equals("wait"))) {
+		if ((mpRetry != null) && (mpRetry.getValue().equals("wait"))) { //$NON-NLS-1$
 			if (mpRetryCount != null) {
 				mpRetryCount.setEnabled(false);
 			}
@@ -2225,10 +2225,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 			if (def != null) {
 				defaultValue = def.create().getValueAsString();
 			} else {
-				defaultValue = "";
+				defaultValue = ""; //$NON-NLS-1$
 			}
 		} catch (IllegalValueException e) {
-			defaultValue = "";
+			defaultValue = ""; //$NON-NLS-1$
 		}
 		return defaultValue;
 	}
@@ -2276,27 +2276,27 @@ public class PERMLaunchConfigurationDynamicTab extends
 			try {
 				Iterator<String> iter;
 				environment = configuration.getAttribute(
-						"org.eclipse.debug.core.environmentVariables",
+						"org.eclipse.debug.core.environmentVariables", //$NON-NLS-1$
 						new HashMap<String, String>());
 				iter = environment.keySet().iterator();
 				while (iter.hasNext()) {
 					if (Arrays.binarySearch(PEEnvVars, iter.next()) >= 0) {
 						return new RMLaunchValidation(false, Messages
-								.getString("Invalid.disallowedEnvVar"));
+								.getString("Invalid.disallowedEnvVar")); //$NON-NLS-1$
 					}
 				}
 				// If MP_NOARGLIST or MP_FENCE environment variables are set
 				// then handle parsing
 				// of command line options accordingly.
-				noPEArgs = environment.get("MP_NOARGLIST");
-				if ((noPEArgs == null) || (noPEArgs.equalsIgnoreCase("no"))) {
-					optionsFence = environment.get("MP_FENCE");
+				noPEArgs = environment.get("MP_NOARGLIST"); //$NON-NLS-1$
+				if ((noPEArgs == null) || (noPEArgs.equalsIgnoreCase("no"))) { //$NON-NLS-1$
+					optionsFence = environment.get("MP_FENCE"); //$NON-NLS-1$
 					if (optionsFence == null) {
-						optionsFence = "";
+						optionsFence = ""; //$NON-NLS-1$
 					}
 					commandOptions = configuration.getAttribute(
-							"org.eclipse.ptp.launch.ARGUMENT_ATTR", "");
-					tokenizedOptions = new StringTokenizer(commandOptions, " ");
+							"org.eclipse.ptp.launch.ARGUMENT_ATTR", ""); //$NON-NLS-1$ //$NON-NLS-2$
+					tokenizedOptions = new StringTokenizer(commandOptions, " "); //$NON-NLS-1$
 					while (tokenizedOptions.hasMoreTokens()) {
 						String option;
 
@@ -2306,7 +2306,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 						}
 						if (Arrays.binarySearch(PEOptions, option) >= 0) {
 							return new RMLaunchValidation(false, Messages
-									.getString("Invalid.disallowedOption"));
+									.getString("Invalid.disallowedOption")); //$NON-NLS-1$
 						}
 					}
 				}
@@ -2468,7 +2468,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 				} else if (widget instanceof CheckboxRowWidget) {
 					setConfigAttr(config, (String) ((CheckboxRowWidget) widget)
 							.getData(WidgetAttributes.ATTR_NAME),
-							(CheckboxRowWidget) widget, "yes", "no");
+							(CheckboxRowWidget) widget, "yes", "no"); //$NON-NLS-1$ //$NON-NLS-2$
 				} else if (widget instanceof BooleanRowWidget) {
 					setConfigAttr(config, (String) ((BooleanRowWidget) widget)
 							.getData(), (BooleanRowWidget) widget);
@@ -2500,7 +2500,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 			IPQueue queue) {
 		currentLaunchConfig = configuration;
 		saveConfigurationData(configuration, rm);
-		return new RMLaunchValidation(true, "");
+		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	}
 
 	/*
@@ -2561,7 +2561,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		// been individually validated for correct values.
 		try {
 			if (peAdvancedMode != null && peAdvancedMode.getSelection()) {
-				validateInputPath(peEnvScript, "Invalid.peEnvScript");
+				validateInputPath(peEnvScript, "Invalid.peEnvScript"); //$NON-NLS-1$
 				validateRedirectBox();
 			} else {
 				validateRedirectBox();
@@ -2636,9 +2636,9 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateRedirectBox() throws ValidationException {
-		validateInputPath(peStdinPath, "Invalid.peStdinPath");
-		validateOutputPath(peStdoutPath, "Invalid.peStdoutPath");
-		validateOutputPath(peStderrPath, "Invalid.peStderrPath");
+		validateInputPath(peStdinPath, "Invalid.peStdinPath"); //$NON-NLS-1$
+		validateOutputPath(peStdoutPath, "Invalid.peStdoutPath"); //$NON-NLS-1$
+		validateOutputPath(peStderrPath, "Invalid.peStderrPath"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2647,11 +2647,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateTasksTab() throws ValidationException {
-		validateInputPath(mpHostFile, "Invalid.mpHostFile");
-		validateNumericRange(mpProcs, MP_PROCS, "Invalid.mpProcs");
-		validateNumericRange(mpNodes, MP_NODES, "Invalid.mpNodes");
+		validateInputPath(mpHostFile, "Invalid.mpHostFile"); //$NON-NLS-1$
+		validateNumericRange(mpProcs, MP_PROCS, "Invalid.mpProcs"); //$NON-NLS-1$
+		validateNumericRange(mpNodes, MP_NODES, "Invalid.mpNodes"); //$NON-NLS-1$
 		validateNumericRange(mpTasksPerNode, MP_TASKS_PER_NODE,
-				"Invalid.mpTasksPerNode");
+				"Invalid.mpTasksPerNode"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2682,8 +2682,8 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 */
 	private void validateDebugTab() throws ValidationException {
 		validateCorefileFormat();
-		validateDirectory(mpCoreDir, "Invalid.mpCoreDir");
-		validateDirectory(mpProfDir, "Invalid.mpProfDir");
+		validateDirectory(mpCoreDir, "Invalid.mpCoreDir"); //$NON-NLS-1$
+		validateDirectory(mpProfDir, "Invalid.mpProfDir"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2704,13 +2704,13 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 */
 	private void validateNodeTab() throws ValidationException {
 		validateNumericRange(mpTasksPerNode, MP_TASKS_PER_NODE,
-				"Invalid.mpTasksPerNode");
-		validateInputPath(mpRemoteDir, "Invalid.mpRemoteDir");
-		validateInputPath(mpCmdFile, "Invalid.mpCmdFile");
-		validateInputPath(mpLLFile, "Invalid.mpLLFile");
+				"Invalid.mpTasksPerNode"); //$NON-NLS-1$
+		validateInputPath(mpRemoteDir, "Invalid.mpRemoteDir"); //$NON-NLS-1$
+		validateInputPath(mpCmdFile, "Invalid.mpCmdFile"); //$NON-NLS-1$
+		validateInputPath(mpLLFile, "Invalid.mpLLFile"); //$NON-NLS-1$
 		validateRetry();
 		validateNumericRange(mpRetryCount, MP_RETRY_COUNT,
-				"Invalid.mpRetryCount");
+				"Invalid.mpRetryCount"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2720,14 +2720,14 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validatePerformanceTab1() throws ValidationException {
-		validateNumericRange(mpAckThresh, MP_ACK_THRESH, "Invalid.mpAckThresh");
+		validateNumericRange(mpAckThresh, MP_ACK_THRESH, "Invalid.mpAckThresh"); //$NON-NLS-1$
 		validateNumericRange(mpPollingInterval, MP_POLLING_INTERVAL,
-				"Invalid.mpPollingInterval");
+				"Invalid.mpPollingInterval"); //$NON-NLS-1$
 		validateRDMACount();
 		validateNumericRange(mpUDPPacketSize, MP_UDP_PACKET_SIZE,
-				"Invalid.mpUDPPacketSize");
+				"Invalid.mpUDPPacketSize"); //$NON-NLS-1$
 		validateNumericRange(mpBulkMinMsgSize, MP_BULK_MIN_MSG_SIZE,
-				"Invalid.mpBulkMinMsgSize");
+				"Invalid.mpBulkMinMsgSize"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2739,15 +2739,15 @@ public class PERMLaunchConfigurationDynamicTab extends
 	private void validatePerformanceTab2() throws ValidationException {
 		validateBufferMem();
 		validateNumericRange(mpMsgEnvelopeBuf, MP_MSG_ENVELOPE_BUF,
-				"Invalid.mpMsgEnvelopeBuf");
+				"Invalid.mpMsgEnvelopeBuf"); //$NON-NLS-1$
 		validateNumericRange(mpEagerLimit, MP_EAGER_LIMIT,
-				"Invalid.mpEagerLimit");
+				"Invalid.mpEagerLimit"); //$NON-NLS-1$
 		validateNumericRange(mpRetransmitInterval, MP_RETRANSMIT_INTERVAL,
-				"Invalid.mpRetransmitInterval");
+				"Invalid.mpRetransmitInterval"); //$NON-NLS-1$
 		validateNumericRange(mpRexmitBufCnt, MP_REXMIT_BUF_CNT,
-				"Invalid.mpRexmitBufCnt");
+				"Invalid.mpRexmitBufCnt"); //$NON-NLS-1$
 		validateNumericRange(mpRexmitBufSize, MP_REXMIT_BUF_SIZE,
-				"Invalid.mpRexmitBufSize");
+				"Invalid.mpRexmitBufSize"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2757,7 +2757,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateRMTab() throws ValidationException {
-		validateInputPath(mpRMLib, "Invalid.mpRMLib");
+		validateInputPath(mpRMLib, "Invalid.mpRMLib"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2767,17 +2767,17 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateMiscTab() throws ValidationException {
-		validateInputPath(mpEuiLibPath, "Invalid.mpEuiLibPath");
-		validateNumericRange(mpPulse, MP_PULSE, "Invalid.mpPulse");
+		validateInputPath(mpEuiLibPath, "Invalid.mpEuiLibPath"); //$NON-NLS-1$
+		validateNumericRange(mpPulse, MP_PULSE, "Invalid.mpPulse"); //$NON-NLS-1$
 		validateNumericRange(mpThreadStackSize, MP_THREAD_STACKSIZE,
-				"Invalid.mpThreadStackSize");
-		validateNumericRange(mpTimeout, MP_TIMEOUT, "Invalid.mpTimeout");
+				"Invalid.mpThreadStackSize"); //$NON-NLS-1$
+		validateNumericRange(mpTimeout, MP_TIMEOUT, "Invalid.mpTimeout"); //$NON-NLS-1$
 		validateNumericRange(mpIOBufferSize, MP_IO_BUFFER_SIZE,
-				"Invalid.mpIOBufferSize");
-		validateOutputPath(mpSaveLLFile, "Invalid.mpSaveLLFile");
-		validateOutputPath(mpSaveHostFile, "Invalid.mpSaveHostFile");
-		validateDirectory(mpPriorityLogDir, "Invalid.mpPriorityLogDir");
-		validateInputPath(mpIONodeFile, "Invalid.mpIONodeFile");
+				"Invalid.mpIOBufferSize"); //$NON-NLS-1$
+		validateOutputPath(mpSaveLLFile, "Invalid.mpSaveLLFile"); //$NON-NLS-1$
+		validateOutputPath(mpSaveHostFile, "Invalid.mpSaveHostFile"); //$NON-NLS-1$
+		validateDirectory(mpPriorityLogDir, "Invalid.mpPriorityLogDir"); //$NON-NLS-1$
+		validateInputPath(mpIONodeFile, "Invalid.mpIONodeFile"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2959,10 +2959,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 				numProcs = Integer.valueOf(mpProcs.getValue());
 			} catch (NumberFormatException e) {
 				throw new ValidationException(Messages
-						.getString("Invalid.mpStdinMode"));
+						.getString("Invalid.mpStdinMode")); //$NON-NLS-1$
 			}
 			validateNumericRange(widgetValue, 0, numProcs,
-					"Invalid.mpStdinMode");
+					"Invalid.mpStdinMode"); //$NON-NLS-1$
 		}
 	}
 
@@ -2987,10 +2987,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 				numProcs = Integer.valueOf(mpProcs.getValue());
 			} catch (NumberFormatException e) {
 				throw new ValidationException(Messages
-						.getString("Invalid.mpStdoutMode"));
+						.getString("Invalid.mpStdoutMode")); //$NON-NLS-1$
 			}
 			validateNumericRange(widgetValue, 0, numProcs - 1,
-					"Invalid.mpStdoutMode");
+					"Invalid.mpStdoutMode"); //$NON-NLS-1$
 		}
 	}
 
@@ -3007,7 +3007,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 				if (isValidListSelection(mpCorefileFormat, MP_COREFILE_FORMAT)) {
 					return;
 				}
-				validateOutputPath(widgetValue, "Invalid.mpCorefileFormat");
+				validateOutputPath(widgetValue, "Invalid.mpCorefileFormat"); //$NON-NLS-1$
 				mpCorefileFormat.resetValidationState();
 			} catch (ValidationException e) {
 				mpCorefileFormat.setFieldInError();
@@ -3033,7 +3033,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 				return;
 			}
 			validateNumericRange(widgetValue, MP_INSTANCES_INT,
-					"Invalid.mpInstances");
+					"Invalid.mpInstances"); //$NON-NLS-1$
 		}
 	}
 
@@ -3053,7 +3053,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 			if (isValidListSelection(mpRetry, MP_RETRY)) {
 				return;
 			}
-			validateNumericRange(widgetValue, MP_RETRY_INT, "Invalid.mpRetry");
+			validateNumericRange(widgetValue, MP_RETRY_INT, "Invalid.mpRetry"); //$NON-NLS-1$
 		}
 	}
 
@@ -3069,15 +3069,15 @@ public class PERMLaunchConfigurationDynamicTab extends
 			widgetValue = peRDMACount.getValue();
 			if ((widgetValue[0].length() == 0) && (widgetValue[1].length() > 0)) {
 				throw new ValidationException(Messages
-						.getString("Invalid.peRDMACountPair"));
+						.getString("Invalid.peRDMACountPair")); //$NON-NLS-1$
 			}
 			if (widgetValue[0].length() > 0) {
 				validateNumericRange(widgetValue[0], PE_BUFFER_MEM,
-						"Invalid.peRDMACount");
+						"Invalid.peRDMACount"); //$NON-NLS-1$
 			}
 			if (widgetValue[1].length() > 0) {
 				validateLongNumericRange(widgetValue[1], PE_BUFFER_MEM_MAX,
-						"Invalid.peRDMACount");
+						"Invalid.peRDMACount"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -3096,11 +3096,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 			try {
 				if (widgetValue[0].length() > 0) {
 					validateNumericRange(widgetValue[0], PE_BUFFER_MEM,
-							"Invalid.peBufferMem");
+							"Invalid.peBufferMem"); //$NON-NLS-1$
 				}
 				if (widgetValue[1].length() > 0) {
 					validateLongNumericRange(widgetValue[1], PE_BUFFER_MEM_MAX,
-							"Invalid.peBufferMem2");
+							"Invalid.peBufferMem2"); //$NON-NLS-1$
 				}
 				peBufferMem.resetValidationState();
 			} catch (ValidationException e) {
@@ -3215,7 +3215,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		testValue = 0;
 		len = value.length();
 		if (len == 0) {
-			return "";
+			return ""; //$NON-NLS-1$
 		} else {
 			suffix = value.charAt(len - 1);
 			if (Character.isDigit(suffix)) {
@@ -3230,7 +3230,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 					} else if ((suffix == 'K') || (suffix == 'k')) {
 						testValue = testValue * KBYTE;
 					} else {
-						return "";
+						return ""; //$NON-NLS-1$
 					}
 				}
 			}

@@ -51,9 +51,9 @@ public class TextRowWidget implements ValidationState
 	    
 	    value = widget.getText().trim();
 	    if ((value.length () == 0) || (value.equals(defaultValue))) {
-		nonDefaultMarker.setText(" ");
+		nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	    } else {
-		nonDefaultMarker.setText("*");
+		nonDefaultMarker.setText("*"); //$NON-NLS-1$
 	    }
 	}
     }
@@ -75,7 +75,7 @@ public class TextRowWidget implements ValidationState
 	label.setText(attrDef.getName());
 	label.setLayoutData(gridData);
 	nonDefaultMarker = new Label(parent, SWT.NONE);
-	nonDefaultMarker.setText("*");
+	nonDefaultMarker.setText("*"); //$NON-NLS-1$
 	widget = new Text(parent, SWT.SINGLE | SWT.BORDER);
 	//TODO drw widget.setToolTipText(Messages.getString(attrDef.getDescription()));
 	widget.setToolTipText(attrDef.getDescription());
@@ -88,7 +88,7 @@ public class TextRowWidget implements ValidationState
 	    defaultValue = attrDef.create().getValueAsString();
 	}
 	catch (IllegalValueException e) {
-	    defaultValue = "";
+	    defaultValue = ""; //$NON-NLS-1$
 	}
 	eventMonitor = new EventMonitor();
 	widget.addModifyListener(eventMonitor);
