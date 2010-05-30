@@ -223,6 +223,9 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 			defaultMpiIncludePath = temp;
 			setCurrentMpiIncludePath(defaultMpiIncludePath);
 		}
+		else {
+			defaultMpiLibPath="";// must be non-null to set in text fields
+		}
 			
 		setCurrentMpiCompileCommand(defaultMpiBuildCommand);
 	}
@@ -423,7 +426,9 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		gd.widthHint=SIZING_TEXT_FIELD_WIDTH;
 		gd.horizontalSpan=2;
 		libNameField.setLayoutData(gd);
-		libNameField.setText(defaultMpiLibName);
+		if(defaultMpiLibName!=null) {
+			libNameField.setText(defaultMpiLibName);
+		}
 		libNameField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentMpiLibName(libNameField.getText());
@@ -443,11 +448,14 @@ public abstract class MPIProjectWizardPage extends AbstractProjectWizardPage {
 		gd2.widthHint=SIZING_TEXT_FIELD_WIDTH;
 		gd2.horizontalSpan=2;
 		libPathField.setLayoutData(gd2);
-		libPathField.setText(defaultMpiLibPath);
+		if (defaultMpiLibPath != null) {
+			libPathField.setText(defaultMpiLibPath);// what if null? https://bugs.eclipse.org/bugs/show_bug.cgi?id=314927
+		}
 		libPathField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setCurrentMpiLibPath(libPathField.getText());
-				if(traceOn)System.out.println("libPathField.modifyText(): " + currentLibPath); //$NON-NLS-1$
+				if (traceOn)
+					System.out.println("libPathField.modifyText(): " + currentLibPath); //$NON-NLS-1$
 			}
 		});
 		
