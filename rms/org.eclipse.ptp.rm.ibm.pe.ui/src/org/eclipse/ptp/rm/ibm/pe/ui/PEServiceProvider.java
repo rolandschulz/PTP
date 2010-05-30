@@ -139,7 +139,7 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	 */
 	public String getSuspendProxy()
 	{
-		return getString(TAG_SUSPEND_PROXY, "n");
+		return getString(TAG_SUSPEND_PROXY, "n"); //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)

@@ -167,7 +167,7 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 					}
 					else {
 						setErrorMessage(Messages
-								.getString("Invalid.llLibraryPath"));
+								.getString("Invalid.llLibraryPath")); //$NON-NLS-1$
 						setValid(false);
 					}
 				}
@@ -183,7 +183,7 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 					}
 					else {
 						setErrorMessage(Messages
-								.getString("Invalid.llJobCommandFileTemplate"));
+								.getString("Invalid.llJobCommandFileTemplate")); //$NON-NLS-1$
 						setValid(false);
 					}
 				}
@@ -242,10 +242,10 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyLibraryGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL,
 				5));
 		proxyLibraryGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyLibraryGroupLabel"));
+				.getString("IBMLLPrefWizPage.proxyLibraryGroupLabel")); //$NON-NLS-1$
 
 		new Label(proxyLibraryGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyLibraryLabel"));
+				.getString("IBMLLPrefWizPage.proxyLibraryLabel")); //$NON-NLS-1$
 
 		proxyLibraryTextWidget = new Text(proxyLibraryGroup, SWT.SINGLE
 				| SWT.BORDER);
@@ -257,11 +257,11 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 				.setText(preferences
 						.getString(IBMLLPreferenceConstants.PROXY_LOADLEVELER_LIBRARY_PATH));
 		proxyLibraryTextWidget.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyLibraryToolTip"));
+				.getString("IBMLLPrefWizPage.proxyLibraryToolTip")); //$NON-NLS-1$
 
 		 libraryBrowseButton =
 		 SWTUtil.createPushButton(proxyLibraryGroup, Messages
-		 .getString("IBMLLPrefWizPage.browseButton"),
+		 .getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
 		 null);
 		 libraryBrowseButton.addSelectionListener(libraryListener);
 
@@ -271,13 +271,13 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyOptionsGroup = new Group((Composite) preferencePane, SWT.NONE);
 		proxyOptionsGroup.setLayout(new RowLayout());
 		proxyOptionsGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyOptionsGroupLabel"));
+				.getString("IBMLLPrefWizPage.proxyOptionsGroupLabel")); //$NON-NLS-1$
 
 		proxyTraceMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyTraceMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyTraceMessageLabel"));
+				.getString("IBMLLPrefWizPage.ProxyTraceMessageLabel")); //$NON-NLS-1$
 		proxyTraceMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyTraceMessageToolTip"));
+				.getString("IBMLLPrefWizPage.ProxyTraceMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.PROXY_TRACE_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -287,9 +287,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		proxyInfoMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyInfoMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyInfoMessageLabel"));
+				.getString("IBMLLPrefWizPage.ProxyInfoMessageLabel")); //$NON-NLS-1$
 		proxyInfoMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyInfoMessageToolTip"));
+				.getString("IBMLLPrefWizPage.ProxyInfoMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.PROXY_INFO_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -299,9 +299,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		proxyWarningMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyWarningMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyWarningMessageLabel"));
+				.getString("IBMLLPrefWizPage.ProxyWarningMessageLabel")); //$NON-NLS-1$
 		proxyWarningMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyWarningMessageToolTip"));
+				.getString("IBMLLPrefWizPage.ProxyWarningMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.PROXY_WARNING_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -311,9 +311,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		proxyErrorMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyErrorMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyErrorMessageLabel"));
+				.getString("IBMLLPrefWizPage.ProxyErrorMessageLabel")); //$NON-NLS-1$
 		proxyErrorMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyErrorMessageToolTip"));
+				.getString("IBMLLPrefWizPage.ProxyErrorMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.PROXY_ERROR_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -323,9 +323,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		proxyFatalMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyFatalMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyFatalMessageLabel"));
+				.getString("IBMLLPrefWizPage.ProxyFatalMessageLabel")); //$NON-NLS-1$
 		proxyFatalMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyFatalMessageToolTip"));
+				.getString("IBMLLPrefWizPage.ProxyFatalMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.PROXY_FATAL_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -335,9 +335,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		proxyArgsMessageButton = new Button(proxyOptionsGroup, SWT.CHECK);
 		proxyArgsMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyArgsMessageLabel"));
+				.getString("IBMLLPrefWizPage.ProxyArgsMessageLabel")); //$NON-NLS-1$
 		proxyArgsMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyArgsMessageToolTip"));
+				.getString("IBMLLPrefWizPage.ProxyArgsMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.PROXY_ARGS_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -351,13 +351,13 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyDebugGroup = new Group((Composite) preferencePane, SWT.NONE);
 		proxyDebugGroup.setLayout(new RowLayout());
 		proxyDebugGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyDebugGroupLabel"));
+				.getString("IBMLLPrefWizPage.proxyDebugGroupLabel")); //$NON-NLS-1$
 
 		proxyDebugLoopButton = new Button(proxyDebugGroup, SWT.CHECK);
 		proxyDebugLoopButton.setText(Messages
-				.getString("IBMLLPrefWizPage.ProxyDebugLoopLabel"));
+				.getString("IBMLLPrefWizPage.ProxyDebugLoopLabel")); //$NON-NLS-1$
 		proxyDebugLoopButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.ProxyDebugLoopToolTip"));
+				.getString("IBMLLPrefWizPage.ProxyDebugLoopToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.PROXY_DEBUG_LOOP);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -371,13 +371,13 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		guiOptionsGroup = new Group((Composite) preferencePane, SWT.NONE);
 		guiOptionsGroup.setLayout(new RowLayout());
 		guiOptionsGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.guiOptionsGroupLabel"));
+				.getString("IBMLLPrefWizPage.guiOptionsGroupLabel")); //$NON-NLS-1$
 
 		guiTraceMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiTraceMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiTraceMessageLabel"));
+				.getString("IBMLLPrefWizPage.GuiTraceMessageLabel")); //$NON-NLS-1$
 		guiTraceMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiTraceMessageToolTip"));
+				.getString("IBMLLPrefWizPage.GuiTraceMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.GUI_TRACE_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -387,9 +387,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		guiInfoMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiInfoMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiInfoMessageLabel"));
+				.getString("IBMLLPrefWizPage.GuiInfoMessageLabel")); //$NON-NLS-1$
 		guiInfoMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiInfoMessageToolTip"));
+				.getString("IBMLLPrefWizPage.GuiInfoMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.GUI_INFO_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -399,9 +399,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		guiWarningMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiWarningMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiWarningMessageLabel"));
+				.getString("IBMLLPrefWizPage.GuiWarningMessageLabel")); //$NON-NLS-1$
 		guiWarningMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiWarningMessageToolTip"));
+				.getString("IBMLLPrefWizPage.GuiWarningMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.GUI_WARNING_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -411,9 +411,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		guiErrorMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiErrorMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiErrorMessageLabel"));
+				.getString("IBMLLPrefWizPage.GuiErrorMessageLabel")); //$NON-NLS-1$
 		guiErrorMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiErrorMessageToolTip"));
+				.getString("IBMLLPrefWizPage.GuiErrorMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.GUI_ERROR_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -423,9 +423,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		guiFatalMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiFatalMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiFatalMessageLabel"));
+				.getString("IBMLLPrefWizPage.GuiFatalMessageLabel")); //$NON-NLS-1$
 		guiFatalMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiFatalMessageToolTip"));
+				.getString("IBMLLPrefWizPage.GuiFatalMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.GUI_FATAL_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -435,9 +435,9 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 
 		guiArgsMessageButton = new Button(guiOptionsGroup, SWT.CHECK);
 		guiArgsMessageButton.setText(Messages
-				.getString("IBMLLPrefWizPage.GuiArgsMessageLabel"));
+				.getString("IBMLLPrefWizPage.GuiArgsMessageLabel")); //$NON-NLS-1$
 		guiArgsMessageButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.GuiArgsMessageToolTip"));
+				.getString("IBMLLPrefWizPage.GuiArgsMessageToolTip")); //$NON-NLS-1$
 		preferenceValue = preferences
 				.getString(IBMLLPreferenceConstants.GUI_ARGS_MESSAGE);
 		if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -451,13 +451,13 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyMulticlusterGroup = new Group((Composite) preferencePane, SWT.NONE);
 		proxyMulticlusterGroup.setLayout(new RowLayout());
 		proxyMulticlusterGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyMulticlusterGroupLabel"));
+				.getString("IBMLLPrefWizPage.proxyMulticlusterGroupLabel")); //$NON-NLS-1$
 
 		proxyLLDefaultRadioButton = new Button(proxyMulticlusterGroup,
 				SWT.RADIO);
 		proxyLLDefaultRadioButton
 				.setText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultLabel"));
+						.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultLabel")); //$NON-NLS-1$
 		preferenceValue = preferences.getString(IBMLLPreferenceConstants.PROXY_DEFAULT_MULTICLUSTER);
         if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
         	proxyLLDefaultRadioButton.setSelection(true);
@@ -466,13 +466,13 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		// proxyLLDefaultRadioButton.addSelectionListener(radioSelected);
 		proxyLLDefaultRadioButton
 				.setToolTipText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultToolTip"));
+						.getString("IBMLLPrefWizPage.proxyMulticlusterDefaultToolTip")); //$NON-NLS-1$
 
 		proxyForceLocalRadioButton = new Button(proxyMulticlusterGroup,
 				SWT.RADIO);
 		proxyForceLocalRadioButton
 				.setText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalLabel"));
+						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalLabel")); //$NON-NLS-1$
 		preferenceValue = preferences.getString(IBMLLPreferenceConstants.PROXY_FORCE_LOCAL);
         if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
         	proxyForceLocalRadioButton.setSelection(true);
@@ -481,13 +481,13 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		// proxyForceLocalRadioButton.addSelectionListener(radioSelected);
 		proxyForceLocalRadioButton
 				.setToolTipText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalToolTip"));
+						.getString("IBMLLPrefWizPage.proxyMulticlusterForceLocalToolTip")); //$NON-NLS-1$
 
 		proxyForceMulticlusterRadioButton = new Button(proxyMulticlusterGroup,
 				SWT.RADIO);
 		proxyForceMulticlusterRadioButton
 				.setText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterLabel"));
+						.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterLabel")); //$NON-NLS-1$
 		preferenceValue = preferences.getString(IBMLLPreferenceConstants.PROXY_FORCE_MULTICLUSTER);
         if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
         	proxyForceMulticlusterRadioButton.setSelection(true);
@@ -496,7 +496,7 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		// proxyForceMulticlusterRadioButton.addSelectionListener(radioSelected);
 		proxyForceMulticlusterRadioButton
 				.setToolTipText(Messages
-						.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip"));
+						.getString("IBMLLPrefWizPage.proxyMulticlusterForceMulticlusterToolTip")); //$NON-NLS-1$
 
 		// *********************************************************************
 		// Template name group
@@ -506,10 +506,10 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyTemplateGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL,
 				5));
 		proxyTemplateGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateGroupLabel"));
+				.getString("IBMLLPrefWizPage.proxyTemplateGroupLabel")); //$NON-NLS-1$
 
 		new Label(proxyTemplateGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateLabel"));
+				.getString("IBMLLPrefWizPage.proxyTemplateLabel")); //$NON-NLS-1$
 
 		proxyTemplateTextWidget = new Text(proxyTemplateGroup, SWT.SINGLE
 				| SWT.BORDER);
@@ -521,11 +521,11 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 				.setText(preferences
 						.getString(IBMLLPreferenceConstants.PROXY_LOADLEVELER_TEMPLATE_FILE));
 		proxyTemplateTextWidget.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateToolTip"));
+				.getString("IBMLLPrefWizPage.proxyTemplateToolTip")); //$NON-NLS-1$
 
 		 templateBrowseButton =
 		 SWTUtil.createPushButton(proxyTemplateGroup,
-		 Messages.getString("IBMLLPrefWizPage.browseButton"),
+		 Messages.getString("IBMLLPrefWizPage.browseButton"), //$NON-NLS-1$
 		 null);
 		 templateBrowseButton.addSelectionListener(templateListener);
 
@@ -537,12 +537,12 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyTemplateOptionsGroup.setLayout(new RowLayout());
 		proxyTemplateOptionsGroup
 				.setText(Messages
-						.getString("IBMLLPrefWizPage.proxyTemplateOptionsGroupLabel"));
+						.getString("IBMLLPrefWizPage.proxyTemplateOptionsGroupLabel")); //$NON-NLS-1$
 
 		proxyTemplateNeverRadioButton = new Button(proxyTemplateOptionsGroup,
 				SWT.RADIO);
 		proxyTemplateNeverRadioButton.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateNeverLabel"));
+				.getString("IBMLLPrefWizPage.proxyTemplateNeverLabel")); //$NON-NLS-1$
 		proxyTemplateNeverRadioButton.setData(new Integer(SWT.IMAGE_BMP));
 		preferenceValue = preferences.getString(IBMLLPreferenceConstants.PROXY_WRITE_TEMPLATE_NEVER);
         if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
@@ -550,12 +550,12 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
         }
 		// proxyTemplateNeverRadioButton.addSelectionListener(radioSelected);
 		proxyTemplateNeverRadioButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateNeverToolTip"));
+				.getString("IBMLLPrefWizPage.proxyTemplateNeverToolTip")); //$NON-NLS-1$
 
 		proxyTemplateAlwaysRadioButton = new Button(proxyTemplateOptionsGroup,
 				SWT.RADIO);
 		proxyTemplateAlwaysRadioButton.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateAlwaysLabel"));
+				.getString("IBMLLPrefWizPage.proxyTemplateAlwaysLabel")); //$NON-NLS-1$
 		preferenceValue = preferences.getString(IBMLLPreferenceConstants.PROXY_WRITE_TEMPLATE_ALWAYS);
         if (preferenceValue.equals(IBMLLPreferenceConstants.LL_YES)) {
         	proxyTemplateAlwaysRadioButton.setSelection(true);
@@ -563,7 +563,7 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyTemplateAlwaysRadioButton.setData(new Integer(SWT.IMAGE_BMP));
 		// proxyTemplateAlwaysRadioButton.addSelectionListener(radioSelected);
 		proxyTemplateAlwaysRadioButton.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyTemplateAlwaysToolTip"));
+				.getString("IBMLLPrefWizPage.proxyTemplateAlwaysToolTip")); //$NON-NLS-1$
 
 		// *********************************************************************
 		// Polling options group
@@ -571,10 +571,10 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyPollingGroup = new Group((Composite) preferencePane, SWT.NONE);
 		proxyPollingGroup.setLayout(new RowLayout());
 		proxyPollingGroup.setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingGroupLabel"));
+				.getString("IBMLLPrefWizPage.proxyPollingGroupLabel")); //$NON-NLS-1$
 
 		new Label(proxyPollingGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMinLabel"));
+				.getString("IBMLLPrefWizPage.proxyPollingNodeMinLabel")); //$NON-NLS-1$
 
 		proxyPollingNodeMin = new Spinner(proxyPollingGroup, SWT.READ_ONLY);
 		proxyPollingNodeMin.setIncrement(10);
@@ -583,11 +583,11 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyPollingNodeMin.setPageIncrement(50);
 		proxyPollingNodeMin.setSelection(preferences.getInt(IBMLLPreferenceConstants.PROXY_MIN_NODE_POLLING));
 		proxyPollingNodeMin.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMinToolTip"));
+				.getString("IBMLLPrefWizPage.proxyPollingNodeMinToolTip")); //$NON-NLS-1$
 		proxyPollingNodeMin.addModifyListener(eventMonitor);
 
 		new Label(proxyPollingGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMaxLabel"));
+				.getString("IBMLLPrefWizPage.proxyPollingNodeMaxLabel")); //$NON-NLS-1$
 
 		proxyPollingNodeMax = new Spinner(proxyPollingGroup, SWT.READ_ONLY);
 		proxyPollingNodeMax.setIncrement(10);
@@ -596,11 +596,11 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyPollingNodeMax.setPageIncrement(50);
 		proxyPollingNodeMax.setSelection(preferences.getInt(IBMLLPreferenceConstants.PROXY_MAX_NODE_POLLING));
 		proxyPollingNodeMax.setToolTipText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingNodeMaxToolTip"));
+				.getString("IBMLLPrefWizPage.proxyPollingNodeMaxToolTip")); //$NON-NLS-1$
 		proxyPollingNodeMax.addModifyListener(eventMonitor);
 
 		new Label(proxyPollingGroup, SWT.NONE).setText(Messages
-				.getString("IBMLLPrefWizPage.proxyPollingJobLabel"));
+				.getString("IBMLLPrefWizPage.proxyPollingJobLabel")); //$NON-NLS-1$
 
 		proxyPollingJob = new Spinner(proxyPollingGroup, SWT.READ_ONLY);
 		proxyPollingJob.setIncrement(10);
@@ -608,7 +608,7 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 		proxyPollingJob.setMaximum(300);
 		proxyPollingJob.setPageIncrement(50);
 		proxyPollingJob.setSelection(preferences.getInt(IBMLLPreferenceConstants.PROXY_JOB_POLLING));
-		proxyPollingJob.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyPollingJobToolTip"));
+		proxyPollingJob.setToolTipText(Messages.getString("IBMLLPrefWizPage.proxyPollingJobToolTip")); //$NON-NLS-1$
 		proxyPollingJob.addModifyListener(eventMonitor);
 
 		return preferencePane;
@@ -862,7 +862,7 @@ public class IBMLLPreferencePage extends AbstractRemoteRMPreferencePage {
 	
 	protected String getFieldContent(String text) 
 	{
-		if (text.trim().length() == 0 || text.equals(""))
+		if (text.trim().length() == 0 || text.equals("")) //$NON-NLS-1$
 			return null;
 
 		return text;

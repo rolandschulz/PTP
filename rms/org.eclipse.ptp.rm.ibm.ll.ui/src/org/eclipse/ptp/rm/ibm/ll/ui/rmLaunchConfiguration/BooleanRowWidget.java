@@ -56,9 +56,9 @@ public class BooleanRowWidget implements ValidationState {
 
 			selectedButton = (Button) e.getSource();
 			if (selectedButton.getText().equals(defaultValue)) {
-				nonDefaultMarker.setText(" ");
+				nonDefaultMarker.setText(" "); //$NON-NLS-1$
 			} else {
-				nonDefaultMarker.setText("*");
+				nonDefaultMarker.setText("*"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -82,7 +82,7 @@ public class BooleanRowWidget implements ValidationState {
 			GridLayout layout;
 
 			if (labels.size() != 2) {
-				throw new IllegalArgumentException("BooleanOption requires two labels");
+				throw new IllegalArgumentException(Messages.getString("BooleanRowWidget_2")); //$NON-NLS-1$
 			}
 			group = new Composite(parent, SWT.NONE);
 			layout = new GridLayout(2, true);
@@ -226,7 +226,7 @@ public class BooleanRowWidget implements ValidationState {
 		label.setText(Messages.getString(attrDef.getName()));
 		label.setLayoutData(gridData);
 		nonDefaultMarker = new Label(parent, SWT.NONE);
-		nonDefaultMarker.setText(" ");
+		nonDefaultMarker.setText(" "); //$NON-NLS-1$
 		widget = new BooleanOption(parent, attrDef.getValues(), button_id);
 		widget.setToolTipText(Messages.getString(attrDef.getDescription()));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -237,7 +237,7 @@ public class BooleanRowWidget implements ValidationState {
 		try {
 			defaultValue = attrDef.create().getValueAsString();
 		} catch (IllegalValueException e) {
-			defaultValue = "";
+			defaultValue = ""; //$NON-NLS-1$
 		}
 		eventMonitor = new EventMonitor();
 		widget.addSelectionListener(eventMonitor);

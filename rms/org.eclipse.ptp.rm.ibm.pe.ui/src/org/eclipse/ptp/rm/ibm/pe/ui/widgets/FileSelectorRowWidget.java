@@ -9,6 +9,7 @@ package org.eclipse.ptp.rm.ibm.pe.ui.widgets;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
+import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 //TODO drw import org.eclipse.ptp.ibmll.ui.internal.ui.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -50,9 +51,9 @@ public class FileSelectorRowWidget implements ValidationState
 	public void modifyText(ModifyEvent e)
 	{
 	    if (widget.getPath().equals(defaultValue)) {
-		nonDefaultMarker.setText(" ");
+		nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	    } else {
-		nonDefaultMarker.setText("*");
+		nonDefaultMarker.setText("*"); //$NON-NLS-1$
 	    }
 	}
     }
@@ -89,7 +90,7 @@ public class FileSelectorRowWidget implements ValidationState
 	    path.setLayoutData(gd);
 	    browseButton = new Button(parent, SWT.PUSH);
 	    //TODO drw browseButton.setText(Messages.getString("FileSelector.BrowseButton"));
-	    browseButton.setText("Browse");
+	    browseButton.setText(Messages.getString("FileSelectorRowWidget_2")); //$NON-NLS-1$
 	    browseButton.setData(WidgetAttributes.BUTTON_ID, new Integer(selectorID));
 	    gd = new GridData(GridData.FILL_HORIZONTAL);
 	    gd.grabExcessHorizontalSpace = false;
@@ -199,7 +200,7 @@ public class FileSelectorRowWidget implements ValidationState
 	//TODO drw label.setText(Messages.getString(attr.getName()));
 	label.setText(attr.getName());
 	nonDefaultMarker = new Label(parent, SWT.NONE);
-	nonDefaultMarker.setText(" ");
+	nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	gridData = new GridData(GridData.FILL_HORIZONTAL);
 	gridData.grabExcessHorizontalSpace = false;
 	label.setLayoutData(gridData);
@@ -210,7 +211,7 @@ public class FileSelectorRowWidget implements ValidationState
 	    defaultValue = attr.create().getValueAsString();
 	}
 	catch (IllegalValueException e) {
-	    defaultValue = "";
+	    defaultValue = ""; //$NON-NLS-1$
 	}
 	eventMonitor = new EventMonitor();
 	widget.addModifyListener(eventMonitor);

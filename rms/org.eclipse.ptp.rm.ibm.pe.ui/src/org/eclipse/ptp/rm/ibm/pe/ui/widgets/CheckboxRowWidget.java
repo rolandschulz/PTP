@@ -43,17 +43,17 @@ public class CheckboxRowWidget implements ValidationState
 	//TODO drw label.setText(Messages.getString(def.getName()));
 	label.setText(def.getName());
 	nonDefaultMarker = new Label(parent, SWT.NONE);
-	nonDefaultMarker.setText(" ");
+	nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	widget = new Button(parent, SWT.CHECK);
 	//TODO drw widget.setToolTipText(Messages.getString(def.getDescription()));
 	widget.setToolTipText(def.getDescription());
-	widget.setText("");
+	widget.setText(""); //$NON-NLS-1$
 	gridData = new GridData(GridData.FILL_HORIZONTAL);
 	gridData.grabExcessHorizontalSpace = true;
 	widget.setLayoutData(gridData);
 	widget.setData(WidgetAttributes.ATTR_NAME, id);
 	fill = new Label(parent, SWT.NONE);
-	fill.setText("");
+	fill.setText(""); //$NON-NLS-1$
 	gridData = new GridData(GridData.FILL_HORIZONTAL);
 	gridData.grabExcessHorizontalSpace = false;
 	fill.setLayoutData(gridData);

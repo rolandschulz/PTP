@@ -54,9 +54,9 @@ public class DualFieldRowWidget implements ValidationState
 
 	    value = widget.getText();
 	    if ((value[0].equals(defaultValue[0])) && (value[1].equals(defaultValue[1]))) {
-		nonDefaultMarker.setText(" ");
+		nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	    } else {
-		nonDefaultMarker.setText("*");
+		nonDefaultMarker.setText("*"); //$NON-NLS-1$
 	    }
 	}
 
@@ -246,7 +246,7 @@ public class DualFieldRowWidget implements ValidationState
 	label.setText(attr1.getName());
 	label.setLayoutData(gridData);
 	nonDefaultMarker = new Label(parent, SWT.NONE);
-	nonDefaultMarker.setText(" ");
+	nonDefaultMarker.setText(" "); //$NON-NLS-1$
 	widget = new DualField(parent);
 	//TODO drw widget.setToolTipText(Messages.getString(attr1.getDescription()), Messages.getString(attr2.getDescription()));
 	widget.setToolTipText(attr1.getDescription(), attr2.getDescription());
@@ -262,8 +262,8 @@ public class DualFieldRowWidget implements ValidationState
 	    defaultValue[1] = attr2.create().getValueAsString();
 	}
 	catch (IllegalValueException e) {
-	    defaultValue[0] = "";
-	    defaultValue[1] = "";
+	    defaultValue[0] = ""; //$NON-NLS-1$
+	    defaultValue[1] = ""; //$NON-NLS-1$
 	    ;
 	}
 	eventMonitor = new EventMonitor();
