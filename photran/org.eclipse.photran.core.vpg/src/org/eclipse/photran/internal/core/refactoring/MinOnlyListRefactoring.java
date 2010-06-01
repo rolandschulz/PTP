@@ -35,6 +35,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 /**
  *
  * @author Kurt Hendle
+ * @author Jeff Overbey - Externalized strings
  */
 public class MinOnlyListRefactoring extends FortranEditorRefactoring
 {
@@ -63,8 +64,8 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
         ensureProjectHasRefactoringEnabled(status);
 
         moduleName = this.selectedRegionInEditor.getText();
-        if(moduleName == null || moduleName.equals(""))
-            fail("No module name selected.");
+        if(moduleName == null || moduleName.equals("")) //$NON-NLS-1$
+            fail(Messages.MinOnlyListRefactoring_NoModuleNameSelected);
 
         findUseStmtNode();
         checkIfModuleExistsInProject();
@@ -78,11 +79,11 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
       //get the use statement node in case we need to add to the only list
         Token token = findEnclosingToken();
         if(token == null)
-            fail("Please select the name of the module in the USE statement.");
+            fail(Messages.MinOnlyListRefactoring_PleaseSelectModuleNameInUSEStatement);
 
         useNode = token.findNearestAncestor(ASTUseStmtNode.class);
         if(useNode == null)
-            fail("Use statement node could not be found.");
+            fail(Messages.MinOnlyListRefactoring_USEStatementNotFound);
     }
 
     //same as AddOnlyToUseStmtRefactoring.java
@@ -92,13 +93,13 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
         filesContainingModule = vpg.findFilesThatExportModule(moduleName);
 
         if(filesContainingModule.isEmpty() || filesContainingModule == null)
-            fail("No files in this project contain the module - " + moduleName);
+            fail(Messages.bind(Messages.MinOnlyListRefactoring_NoFilesContainModuleNamed, moduleName));
         else if(filesContainingModule.size() > 1)
             filterFileList();
 
        //check again after the filtering happens
         if(filesContainingModule.isEmpty() || filesContainingModule == null)
-            fail("No files in this project contain the module - " + moduleName);
+            fail(Messages.bind(Messages.MinOnlyListRefactoring_NoFilesContainModuleNamed, moduleName));
     }
 
     //same method used in CommonVarNamesRefactoring.java
@@ -106,7 +107,7 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
     {
         IProject projectInEditor = this.fileInEditor.getProject();  //current project
 
-        if(projectInEditor == null) fail("Project does not exist!");
+        if(projectInEditor == null) fail(Messages.MinOnlyListRefactoring_ProjectDoesNotExist);
 
         //filter out files not in the project
         int i = 0;
@@ -125,7 +126,7 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
     {
         Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selectedToken == null)
-            fail("Please select a module name.");
+            fail(Messages.MinOnlyListRefactoring_PleaseSelectModuleName);
         return selectedToken;
     }
 
@@ -135,22 +136,21 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
         //get module declaration and check if it has declared entities
         PhotranTokenRef moduleTokenRef = vpg.getModuleTokenRef(moduleName);
         if(moduleTokenRef == null)
-            fail("No module with name " + moduleName + "found.");
+            fail(Messages.bind(Messages.MinOnlyListRefactoring_ModuleNotFoundWithName, moduleName));
 
         Token moduleToken = moduleTokenRef.findTokenOrReturnNull();
         if(moduleToken == null){
-            fail("Module token could not be found.");
+            fail(Messages.MinOnlyListRefactoring_ModuleTokenNotFound);
         }
 
         ASTModuleNode moduleNode = moduleToken.findNearestAncestor(ASTModuleNode.class);
         if(moduleNode == null)
-            fail("Module Node could not be found.");
+            fail(Messages.MinOnlyListRefactoring_ModuleNodeNotFound);
 
         moduleEntityDefs = moduleNode.getAllPublicDefinitions();
         if(moduleEntityDefs.isEmpty())
         {
-            fail("Module contains no declared entities. No ONLY clause is necessary." +
-                "Please remove the ONLY clause from USE statement.");
+            fail(Messages.MinOnlyListRefactoring_ModuleIsEmpty);
         }
         else
         {
@@ -160,7 +160,7 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
     }
 
     //nearly the same as AddOnlyToUseStmtRefactoring.java
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private void readExistingOnlyList()
     {
         ASTSeparatedListNode existingOnlys = (ASTSeparatedListNode)useNode.getOnlyList();
@@ -217,25 +217,25 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
         //
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private void removeOnlyList(IProgressMonitor pm, IFortranAST ast)
     {
         if(ast == null) return;
 
-        ASTUseStmtNode newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " +
-            useNode.getName().getText() + System.getProperty("line.separator"));
+        ASTUseStmtNode newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " + //$NON-NLS-1$
+            useNode.getName().getText() + System.getProperty("line.separator")); //$NON-NLS-1$
 
         ASTListNode body = (ASTListNode)useNode.getParent();
         body.replaceChild(useNode, newStmtNode);
         Reindenter.reindent(newStmtNode, ast);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private void createAndAddMinOnlyList(IProgressMonitor pm, IFortranAST ast)
     {
         if(ast == null) return;
 
-        String list = "";
+        String list = ""; //$NON-NLS-1$
         String name;
         int counter = 0;
 
@@ -246,20 +246,20 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
             //add the new name for this renamed variable if necessary
             if(!moduleEntityNames.contains(name))
             {
-                list += name + " => ";
+                list += name + " => "; //$NON-NLS-1$
                 counter++;
                 name = onlyNamesToKeep.get(counter); //update name
             }
 
             list += name;
             if(counter < onlyNamesToKeep.size()-1)
-                list += ", ";
+                list += ", "; //$NON-NLS-1$
             counter++;
         }
 
         //construct the new USE node and replace the old one in the ast
-        ASTUseStmtNode newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " +
-            useNode.getName().getText()+", only: " + list + System.getProperty("line.separator"));
+        ASTUseStmtNode newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " + //$NON-NLS-1$
+            useNode.getName().getText()+", only: " + list + System.getProperty("line.separator")); //$NON-NLS-1$ //$NON-NLS-2$
 
         ASTListNode body = (ASTListNode)useNode.getParent();
         body.replaceChild(useNode, newStmtNode);
@@ -272,7 +272,7 @@ public class MinOnlyListRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Minimize ONLY List";
+        return Messages.MinOnlyListRefactoring_Name;
     }
 
     private final class OnlyTokenVisitor extends GenericASTVisitor

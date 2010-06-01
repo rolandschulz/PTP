@@ -59,10 +59,10 @@ import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
 {
     /** The OS-dependent end-of-line sequence (\n or \r\n) */
-    private static final String EOL = System.getProperty("line.separator");
+    private static final String EOL = System.getProperty("line.separator"); //$NON-NLS-1$
 
-    private static final String SELECT_SUBPROGRAM_WARNING = "Please select a subroutine or a function (place the cursor in its statement).";
-    private static final String SELECT_NON_INTERFACE_SUBPROGRAM_WARNING = "The subroutine's or the function's statement should not be the interface declaration.";
+    private static final String SELECT_SUBPROGRAM_WARNING = Messages.MoveSavedToCommonBlockRefactoring_PleaseSelectSubprogram;
+    private static final String SELECT_NON_INTERFACE_SUBPROGRAM_WARNING = Messages.MoveSavedToCommonBlockRefactoring_PleaseSelectSubprogramNotInINTERFACE;
 
     private String subprogramName = null;
     private ScopingNode subprogramNode = null;
@@ -72,7 +72,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Move Saved Variables to COMMON Block";
+        return Messages.MoveSavedToCommonBlockRefactoring_Name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
 
         ScopingNode enclosingScope = subprogramNode.getEnclosingScope();
         if (!(enclosingScope instanceof ASTMainProgramNode)){
-            fail("The current implementation handles only subprograms that are in the CONTAINS section of the PROGRAM.");
+            fail(Messages.MoveSavedToCommonBlockRefactoring_OnlyInternalSubprogramsSupported);
         }
         mainProgramNode = (ASTMainProgramNode) enclosingScope;
     }
@@ -156,7 +156,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
                 if (globalTypeDeclarationString != null){
                     globalVariableDeclarations.append(EOL).append(globalTypeDeclarationString).append(EOL);
                     //Should be the new name already
-                    commonBlockVariables.append(definition.getTokenRef().findToken().getText()).append(",");
+                    commonBlockVariables.append(definition.getTokenRef().findToken().getText()).append(","); //$NON-NLS-1$
                 }
             }
             if (globalVariableDeclarations.length() > 0){
@@ -174,7 +174,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
     private void createGlobalCommonBlock(StringBuffer globalVariableDeclarations, StringBuffer commonBlockVariables){
         String commonBlockName = generateUniqueCommonBlockName();
         //Create COMMON spec, removing trailing comma from the sequence of variables
-        String commonBlock = EOL + "COMMON /" + commonBlockName + "/ " +
+        String commonBlock = EOL + "COMMON /" + commonBlockName + "/ " + //$NON-NLS-1$ //$NON-NLS-2$
                              commonBlockVariables.toString().substring(0, commonBlockVariables.length() - 1) + EOL;
         globalVariableDeclarations.append(commonBlock);
 
@@ -189,12 +189,12 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
     }
 
     private String generateUniqueCommonBlockName(){
-        String commonBlockName = subprogramName + "_common1";
+        String commonBlockName = subprogramName + "_common1"; //$NON-NLS-1$
         int counter = 1;
         //Give it a Token to keep happy FakeToken creation
         while (isConflictingOrShadowing(mainProgramNode.findFirstToken(), commonBlockName)){
             counter++;
-            commonBlockName = subprogramName + "_common" + counter;
+            commonBlockName = subprogramName + "_common" + counter; //$NON-NLS-1$
         }
         return commonBlockName;
     }
@@ -202,7 +202,10 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
     private Definition getUniqueDefinitionOrFail(Token variableName) throws PreconditionFailure{
         List<Definition> variableDefinitions = variableName.resolveBinding();
         if (variableDefinitions.size() > 1 || variableDefinitions.size() == 0){
-            fail("Absent or ambiguous definition for variable \"" + variableName.getText() + "\".");
+            fail(
+                Messages.bind(
+                    Messages.MoveSavedToCommonBlockRefactoring_AbsentOrAmbiguousDefinition,
+                    variableName.getText()));
         }
         return variableDefinitions.get(0);
     }
@@ -310,7 +313,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
 
         processSpecifications(newVariableName, variableDefinition, result, usedSpecs);
 
-        result.append(" :: ").append(newVariableName).append(variableInitAndArraySpec);
+        result.append(" :: ").append(newVariableName).append(variableInitAndArraySpec); //$NON-NLS-1$
         return result.toString();
     }
 
@@ -320,12 +323,15 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
         ASTTypeDeclarationStmtNode typeDeclaration = definitionToken.findNearestAncestor(ASTTypeDeclarationStmtNode.class);
         if (typeDeclaration == null){
             //The type of the variable is not specified
-            result.append("TYPE(UNKNOWN)");
+            result.append("TYPE(UNKNOWN)"); //$NON-NLS-1$
         }else{
             ASTTypeSpecNode typeSpecNode = typeDeclaration.getTypeSpec();
             if (typeSpecNode == null){
                 //Why could this happen?
-                fail("Could not find type specification node for variable \"" + variableDefinition.getCanonicalizedName() + "\".");
+                fail(
+                    Messages.bind(
+                        Messages.MoveSavedToCommonBlockRefactoring_CouldNotFindTypeSpecificationNode,
+                        variableDefinition.getCanonicalizedName()));
             }
             result.append(SourcePrinter.getSourceCodeFromASTNode(typeSpecNode).trim().toUpperCase());
 
@@ -344,7 +350,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
                             return null;
                         }
                         String spec = SourcePrinter.getSourceCodeFromASTNode(attrSpecNode).trim().toUpperCase();
-                        result.append(", ").append(spec);
+                        result.append(", ").append(spec); //$NON-NLS-1$
                         usedSpecs.add(spec);
                     }
                 }
@@ -359,7 +365,10 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
         ASTEntityDeclNode declarationNode = definitionToken.findNearestAncestor(ASTEntityDeclNode.class);
         if (declarationNode == null){
             //really this should not happen
-            fail("Could not find declaration node for variable \"" + variableDefinition.getCanonicalizedName() + "\".");
+            fail(
+                Messages.bind(
+                    Messages.MoveSavedToCommonBlockRefactoring_CouldNotFindDeclarationNode,
+                    variableDefinition.getCanonicalizedName()));
         }
         ASTInitializationNode initializationNode = declarationNode.getInitialization();
         if (initializationNode != null){
@@ -368,7 +377,7 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
         }
         ASTArraySpecNode arraySpecNode= declarationNode.getArraySpec();
         if (arraySpecNode != null){
-            returnString.append("(").append(SourcePrinter.getSourceCodeFromASTNode(arraySpecNode).trim()).append(")");
+            returnString.append("(").append(SourcePrinter.getSourceCodeFromASTNode(arraySpecNode).trim()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return returnString.toString();
     }
@@ -388,15 +397,18 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
                     ASTArraySpecNode arraySpec = null;
                     if (arrayDeclaratorNode == null || (arraySpec = arrayDeclaratorNode.getArraySpec()) == null ){
                         //really this should not happen
-                        fail("Could not find array declaration for DIMENSION specification of variable \"" + variableDefinition.getCanonicalizedName() + "\".");
+                        fail(
+                            Messages.bind(
+                                Messages.MoveSavedToCommonBlockRefactoring_CouldNotFindArrayDeclaration,
+                                variableDefinition.getCanonicalizedName()));
                     }
-                    result.append(", DIMENSION(").append(SourcePrinter.getSourceCodeFromASTNode(arraySpec)).append(")");
+                    result.append(", DIMENSION(").append(SourcePrinter.getSourceCodeFromASTNode(arraySpec)).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
                 //Filter out COMMON and SAVE specs (although SAVE was removed from the tree, the references were not updated yet)
                 }else if (!(enclosingSpecStmt instanceof ASTSaveStmtNode) && !(enclosingSpecStmt instanceof ASTCommonStmtNode)){
                     //For all other specs the keyword is enough (again, INTENT should not appear here)
                     String spec = enclosingSpecStmt.findFirstToken().getText().trim().toUpperCase();
                     if (!usedSpecs.contains(spec)){
-                        result.append(", ").append(spec);
+                        result.append(", ").append(spec); //$NON-NLS-1$
                         usedSpecs.add(spec);
                     }
                 }
@@ -406,11 +418,11 @@ public class MoveSavedToCommonBlockRefactoring extends FortranEditorRefactoring
 
     private String generateUniqueVariableNameAndUpdateDefinition(Definition variableDefinition){
         Token definitionToken = variableDefinition.getTokenRef().findToken();
-        String newVariableName = variableDefinition.getCanonicalizedName() + "_xxx1";
+        String newVariableName = variableDefinition.getCanonicalizedName() + "_xxx1"; //$NON-NLS-1$
         int counter = 1;
         while (isConflictingOrShadowing(definitionToken, newVariableName)){
             counter++;
-            newVariableName = variableDefinition.getCanonicalizedName() + "_xxx" + counter;
+            newVariableName = variableDefinition.getCanonicalizedName() + "_xxx" + counter; //$NON-NLS-1$
         }
         definitionToken.setText(newVariableName);
         return newVariableName;

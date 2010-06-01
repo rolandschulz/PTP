@@ -42,10 +42,11 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 
-
 /**
+ * Refactoring to add an ONLY clause to a USE statement.
  *
  * @author Kurt Hendle
+ * @author Jeff Overbey - externalized strings
  */
 public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
 {
@@ -67,7 +68,8 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
 
     private Set<PhotranTokenRef> allReferences = null;
 
-    public AddOnlyToUseStmtRefactoring() {
+    public AddOnlyToUseStmtRefactoring()
+    {
     }
 
     public AddOnlyToUseStmtRefactoring(IFile file, ITextSelection selection)
@@ -138,8 +140,8 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
         ensureProjectHasRefactoringEnabled(status);
 
         moduleName = this.selectedRegionInEditor.getText();
-        if(moduleName == null || moduleName.equals(""))
-            fail("No module name selected.");
+        if(moduleName == null || moduleName.equals("")) //$NON-NLS-1$
+            fail(Messages.AddOnlyToUseStmtRefactoring_NoModuleNameSelected);
 
         findUseStmtNode();
         checkIfModuleExistsInProject();
@@ -153,11 +155,11 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
       //get the use statement node in case we need to add to the only list
         Token token = findEnclosingToken();
         if(token == null)
-            fail("Please select the name of the module in the USE statement.");
+            fail(Messages.AddOnlyToUseStmtRefactoring_SelectModuleName);
 
         useNode = token.findNearestAncestor(ASTUseStmtNode.class);
         if(useNode == null)
-            fail("Please select the name of the module in the USE statement.");
+            fail(Messages.AddOnlyToUseStmtRefactoring_SelectModuleName);
     }
 
     private void checkIfModuleExistsInProject() throws PreconditionFailure
@@ -167,22 +169,22 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
         filesContainingModule = vpg.findFilesThatExportModule(moduleName);
 
         if(filesContainingModule.isEmpty() || filesContainingModule == null)
-            fail("No files in this project contain the module - " + moduleName);
+            fail(Messages.bind(Messages.AddOnlyToUseStmtRefactoring_NoFilesContainModule, moduleName));
         else if(filesContainingModule.size() > 1)
             filterFileList();
 
        //check again after the filtering happens
         if(filesContainingModule.isEmpty() || filesContainingModule == null)
-            fail("No files in this project contain the module - " + moduleName);
+            fail(Messages.bind(Messages.AddOnlyToUseStmtRefactoring_NoFilesContainModule, moduleName));
 
         if(filesContainingModule.size() > 1)
-            fail("Multiple definitions of module " + moduleName + " exist in project.");
+            fail(Messages.bind(Messages.AddOnlyToUseStmtRefactoring_MultipleDefinitionsOfModule, moduleName));
     }
 
     //same method used in CommonVarNamesRefactoring.java
     private void filterFileList() throws PreconditionFailure
     {
-        if(projectInEditor == null) fail("Project does not exist!");
+        if(projectInEditor == null) fail(Messages.AddOnlyToUseStmtRefactoring_ProjectDoesNotExist);
 
         //filter out files not in the project
         int i = 0;
@@ -201,7 +203,7 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
     {
         Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selectedToken == null)
-            fail("Please select a module name.");
+            fail(Messages.AddOnlyToUseStmtRefactoring_PleaseSelectModuleName);
         return selectedToken;
     }
 
@@ -220,19 +222,19 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
         //get module declaration and check if it has declared entities
         PhotranTokenRef moduleTokenRef = vpg.getModuleTokenRef(moduleName);
         if(moduleTokenRef == null)
-            fail("No module with name " + moduleName + "found.");
+            fail(Messages.bind(Messages.AddOnlyToUseStmtRefactoring_NoModuleNamed, moduleName));
 
         Token moduleToken = moduleTokenRef.findTokenOrReturnNull();
         if(moduleToken == null)
-            fail("Module token could not be found.");
+            fail(Messages.AddOnlyToUseStmtRefactoring_ModuleTokenNotFound);
 
         ASTModuleNode moduleNode = moduleToken.findNearestAncestor(ASTModuleNode.class);
         if(moduleNode == null)
-            fail("Module Node could not be found.");
+            fail(Messages.AddOnlyToUseStmtRefactoring_ModuleNodeNodeFound);
 
         moduleEntities = moduleNode.getAllPublicDefinitions();
         if(moduleEntities.isEmpty())
-            fail("Module contains no declared entities. No ONLY statement necessary.");
+            fail(Messages.AddOnlyToUseStmtRefactoring_NoDeclarationsInModule);
         else
         {
             for(int i=0; i<moduleEntities.size(); i++)
@@ -240,9 +242,9 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void readExistingOnlyList()
     {
+        @SuppressWarnings("rawtypes")
         ASTSeparatedListNode existingOnlys = (ASTSeparatedListNode)useNode.getOnlyList();
         if(existingOnlys != null)
         {
@@ -287,22 +289,22 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
     protected void doCheckFinalConditions(RefactoringStatus status, IProgressMonitor pm)
         throws PreconditionFailure
     {
-        pm.beginTask("Analyzing", IProgressMonitor.UNKNOWN);
+        pm.beginTask(Messages.AddOnlyToUseStmtRefactoring_Analyzing, IProgressMonitor.UNKNOWN);
 
         if(useNode == null)
-            fail("No module name in a USE statement is selected.");
+            fail(Messages.AddOnlyToUseStmtRefactoring_ModuleNameInUseStmtNotSelected);
 
-        pm.subTask("Parsing " + fileInEditor.getName());
+        pm.subTask(Messages.AddOnlyToUseStmtRefactoring_Parsing + fileInEditor.getName());
         IFortranAST ast = vpg.acquirePermanentAST(fileInEditor);
         if(ast == null) return;
 
-        pm.subTask("Checking for conflicts after addition");
+        pm.subTask(Messages.AddOnlyToUseStmtRefactoring_CheckingForConflicts);
         checkConflictingBindings(ast, pm, status);  //find conflicts
 
-        pm.subTask("Inserting USE statement");
+        pm.subTask(Messages.AddOnlyToUseStmtRefactoring_InsertingUseStmt);
         createAndInsertUseStmt(ast);
 
-        pm.subTask("Creating change object");
+        pm.subTask(Messages.AddOnlyToUseStmtRefactoring_CreatingChangeObject);
         addChangeFromModifiedAST(fileInEditor, pm);
         vpg.releaseAST(fileInEditor);
 
@@ -316,7 +318,7 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
      */
     private void checkConflictingBindings(IFortranAST ast, IProgressMonitor pm, RefactoringStatus status)
     {
-        pm.subTask("Finding references");
+        pm.subTask(Messages.AddOnlyToUseStmtRefactoring_FindingReferences);
         allReferences = findModuleEntityRefs(ast);
         //removeOriginalModuleRefs(); //possibly not needed - working without
 
@@ -376,33 +378,33 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void createAndInsertUseStmt(IFortranAST ast)
     {
       //create the new only selection
-        String newOnlyAdditions = " ";
+        String newOnlyAdditions = " "; //$NON-NLS-1$
         Collection<String> varNames = new TreeSet<String>(entitiesToAdd.values()); // JO -- Sort names
-        Iterator iter = varNames.iterator();
+        Iterator<String> iter = varNames.iterator();
         int counter = 0;
 
         while(iter.hasNext())
         {
             newOnlyAdditions += iter.next();
             if(counter < varNames.size()-1)
-                newOnlyAdditions += ", ";
+                newOnlyAdditions += ", "; //$NON-NLS-1$
             counter++;
         }
 
         //construct the new USE node and replace the old one in the ast
         ASTUseStmtNode newStmtNode;
         if(entitiesToAdd.size() > 0)// && entitiesToAdd.size() < moduleEntities.size())
-            newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " +
-                useNode.getName().getText()+", only:" + newOnlyAdditions
-                + System.getProperty("line.separator"));
+            newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " + //$NON-NLS-1$
+                useNode.getName().getText()+", only:" + newOnlyAdditions //$NON-NLS-1$
+                + System.getProperty("line.separator")); //$NON-NLS-1$
         else
-            newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " +
-                useNode.getName().getText() + System.getProperty("line.separator"));
+            newStmtNode = (ASTUseStmtNode)parseLiteralStatement("use " + //$NON-NLS-1$
+                useNode.getName().getText() + System.getProperty("line.separator")); //$NON-NLS-1$
 
+        @SuppressWarnings("rawtypes")
         ASTListNode body = (ASTListNode)useNode.getParent();
         body.replaceChild(useNode, newStmtNode);
         Reindenter.reindent(newStmtNode, ast);
@@ -414,7 +416,7 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Add ONLY Clause to USE Statement";
+        return Messages.AddOnlyToUseStmtRefactoring_Name;
     }
 
 
@@ -455,7 +457,11 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
                 IFile file = conflict.tokenRef.getFile();
                 if(!filesContainingModule.contains(file) && file.getProject().equals(projectInEditor))
                 {
-                    String msg = "The name \"" + conflict.name + "\" conflicts with " + vpg.getDefinitionFor(conflict.tokenRef);
+                    String msg =
+                        Messages.bind(
+                            Messages.AddOnlyToUseStmtRefactoring_NameConflicts,
+                            conflict.name,
+                            vpg.getDefinitionFor(conflict.tokenRef));
                     RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
                     status.addError(msg, context);
                 }
@@ -470,7 +476,10 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
                 IFile file = conflict.tokenRef.getFile();
                 if(!filesContainingModule.contains(file) && file.getProject().equals(projectInEditor))
                 {
-                    String msg = "The name \"" + conflict.name + "\" might conflict with the name of an invoked subprogram";
+                    String msg =
+                        Messages.bind(
+                            Messages.AddOnlyToUseStmtRefactoring_NameMightConflict,
+                            conflict.name);
                     RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
                     status.addWarning(msg, context);
                 }
@@ -483,10 +492,15 @@ public class AddOnlyToUseStmtRefactoring extends FortranEditorRefactoring
             if(entitiesInProgram.contains(newName))
             {
                 // The entity with the new name will shadow the definition to which this binding resolves
-                status.addError("Adding \"" + newName + "\" to ONLY list"
-                        + " would change the meaning of \"" + reference.getText() + "\" on line " + reference.getLine()
-                        + " in " + reference.getTokenRef().getFilename(),
-                        createContext(reference)); // Highlight problematic reference
+                status.addError(
+                    Messages.bind(
+                        Messages.AddOnlyToUseStmtRefactoring_AddingWouldChangeMeaningOf,
+                        new Object[] {
+                            newName,
+                            reference.getText(),
+                            reference.getLine(),
+                            reference.getTokenRef().getFilename() }),
+                    createContext(reference)); // Highlight problematic reference
             }
         }
     }

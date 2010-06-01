@@ -43,7 +43,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
     @Override
     public String getName()
     {
-        return "Rename";
+        return Messages.RenameRefactoring_Name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
 	{
 		Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selectedToken == null || !isIdentifier(selectedToken))
-            fail("Please select an identifier to rename.");
+            fail(Messages.RenameRefactoring_PleaseSelectAnIdentifier);
 		return selectedToken;
 	}
 
@@ -97,9 +97,9 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
 		List<Definition> declarations = findEnclosingToken().resolveBinding();
 
         if (declarations.size() == 0)
-        	fail("No declaration was found for " + oldName);
+        	fail(Messages.bind(Messages.RenameRefactoring_NoDeclarationFoundFor, oldName));
         else if (declarations.size() > 1)
-        	fail("Multiple declarations were found for " + oldName);
+        	fail(Messages.bind(Messages.RenameRefactoring_MultipleDeclarationsFoundFor, oldName));
 
         return declarations.get(0);
 	}
@@ -107,11 +107,11 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
 	private void checkIfDefinitionCanBeRenamed() throws PreconditionFailure
 	{
 		if (definitionToRename.isSubprogramArgument())
-        	fail("Subprogram arguments cannot be renamed.");
+        	fail(Messages.RenameRefactoring_CannotRenameSubprogramArgs);
 
 		// F03
 		if (definitionToRename.isTypeBoundProcedure() && !definitionToRename.isRenamedTypeBoundProcedure())
-		    fail("Type-bound procedures cannot be renamed.");
+		    fail(Messages.RenameRefactoring_CannotRenameTypeBoundProcedures);
 
         if (!definitionToRename.isLocalVariable()
                && !definitionToRename.isSubprogram()
@@ -125,17 +125,18 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
                && !definitionToRename.isCommon()
                && !definitionToRename.isBlockData())
         {
-               fail("The " + definitionToRename.describeClassification() + " " + oldName + " cannot be renamed.  "
-                    + "Only local variables, subprograms and interfaces, derived types, main programs, namelists, "
-            		+ "common blocks, and block data subprograms can be renamed.  Derived type components and subprogram "
-            		+ "arguments cannot be renamed.");
+               fail(
+                   Messages.bind(
+                       Messages.RenameRefactoring_CannotRename,
+                       definitionToRename.describeClassification(),
+                       oldName));
         }
 
         if (definitionToRename.isIntrinsic())
-               fail(oldName + " cannot be renamed: It is an intrinsic procedure.");
+               fail(Messages.bind(Messages.RenameRefactoring_CannotRenameIntrinsicProcedure, oldName));
 
         if (isPreprocessed(definitionToRename.getTokenRef().findToken()))
-               fail(oldName + " cannot be renamed: It is declared in an INCLUDE file.");
+               fail(Messages.bind(Messages.RenameRefactoring_CannotRenameInINCLUDEFile, oldName));
 	}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -149,10 +150,14 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         assert newName != null;
         assert allReferences == null;
 
-        if (newName.equals(oldName)) fail("The new name (" + newName + ") is exactly the same as the old name!");
+        if (newName.equals(oldName))
+            fail(
+                Messages.bind(
+                    Messages.RenameRefactoring_NewNameIsExactlyTheSame,
+                    newName));
         // OK if capitalization is different
 
-        if (!isValidIdentifier(newName)) fail(newName + " is not a valid identifier");
+        if (!isValidIdentifier(newName)) fail(Messages.bind(Messages.RenameRefactoring_InvalidIdentifier, newName));
 
         allReferences = definitionToRename.findAllReferences(shouldBindInterfacesAndExternals);
         removeFixedFormReferences(status);
@@ -177,7 +182,11 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         {
             Conflict conflict = conflictingDef.get(0);
 
-            String msg = "The name \"" + conflict.name + "\" conflicts with " + vpg.getDefinitionFor(conflict.tokenRef);
+            String msg =
+                Messages.bind(
+                    Messages.RenameRefactoring_NameConflicts,
+                    conflict.name,
+                    vpg.getDefinitionFor(conflict.tokenRef));
             RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
             status.addError(msg, context);
         }
@@ -186,7 +195,10 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         {
             Conflict conflict = conflictingDef.get(0);
 
-            String msg = "The name \"" + conflict.name + "\" might conflict with the name of an invoked subprogram";
+            String msg =
+                Messages.bind(
+                    Messages.RenameRefactoring_NameMightConflict,
+                    conflict.name);
             RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
             status.addWarning(msg, context);
         }
@@ -194,10 +206,15 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         public void addReferenceWillChangeError(String newName, Token reference)
         {
             // The entity with the new name will shadow the definition to which this binding resolves
-            status.addError("Changing the name to \"" + newName + "\""
-                        + " would change the meaning of \"" + reference.getText() + "\" on line " + reference.getLine()
-                        + " in " + reference.getTokenRef().getFilename(),
-                        createContext(reference)); // Highlight problematic reference
+            status.addError(
+                Messages.bind(
+                    Messages.RenameRefactoring_ChangingNameWouldChangeMeaning,
+                    new Object[] {
+                        newName,
+                        reference.getText(),
+                        reference.getLine(),
+                        reference.getTokenRef().getFilename() }),
+                createContext(reference)); // Highlight problematic reference
         }
     }
 
@@ -224,7 +241,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
             else if (SourceForm.isFixedForm(file))
             {
                 fixedFormFiles.add(file);
-                status.addError("The fixed form file " + file.getName() + " will not be refactored.");
+                status.addError(Messages.bind(Messages.RenameRefactoring_FixedFormFileWillNotBeRefactored, file.getName()));
                 referencesToRemove.add(reference);
             }
             else
@@ -257,7 +274,10 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
             else if (SourceForm.isCPreprocessed(file))
             {
                 cppFiles.add(file);
-                status.addError("The C-preprocessed file " + file.getName() + " will not be refactored.");
+                status.addError(
+                    Messages.bind(
+                        Messages.RenameRefactoring_CPreprocessedFileWillNotBeRefactored,
+                        file.getName()));
                 referencesToRemove.add(reference);
             }
             else
@@ -273,17 +293,24 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
     {
         for (PhotranTokenRef ref : allReferences)
         {
-            pm.subTask("Checking if references in " + ref.getFilename() + " can be renamed");
+            pm.subTask(Messages.bind(Messages.RenameRefactoring_StatusCheckingIfReferencesInFileCanBeRenamed, ref.getFilename()));
 
             Token reference = ref.findToken();
 
             if (reference.resolveBinding().size() > 1)
-                fail(oldName + " cannot be renamed: " + describeToken(reference) + " is an ambiguous reference "
-                     + " (it refers to " + oldName + " but may refer to another entity as well).");
+                fail(
+                    Messages.bind(
+                        Messages.RenameRefactoring_CannotRenameAmbiguous, new Object[] {
+                        oldName,
+                        describeToken(reference),
+                        oldName }));
 
             if (isPreprocessed(reference))
-                fail(oldName + " cannot be renamed: It would require modifying an INCLUDE file "
-                     + " (" + describeToken(reference) + ").");
+                fail(
+                    Messages.bind(
+                        Messages.RenameRefactoring_CannotRenameUsedInINCLUDEFile,
+                        oldName,
+                        describeToken(reference)));
         }
     }
 
@@ -303,7 +330,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
         assert newName != null;
 
         Set<IFile> filesToChange = determineFilesToChange();
-        pm.beginTask("Renaming", filesToChange.size());
+        pm.beginTask(Messages.RenameRefactoring_StatusRenaming, filesToChange.size());
 
         try
         {
@@ -334,7 +361,7 @@ public class RenameRefactoring extends FortranEditorRefactoring implements IRena
     {
         try
         {
-            pm.subTask("Modifying " + file.getName());
+            pm.subTask(Messages.bind(Messages.RenameRefactoring_StatusModifyingFile, file.getName()));
             pm.worked(1);
 
             vpg.acquirePermanentAST(file);

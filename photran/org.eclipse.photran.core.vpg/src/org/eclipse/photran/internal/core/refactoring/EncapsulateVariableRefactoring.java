@@ -64,6 +64,7 @@ import org.eclipse.rephraserengine.core.refactorings.UserInputString;
  * @author Tim Yuvashev
  * @author Jeff Overbey
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
 {
     private PhotranTokenRef selectedReference = null;
@@ -76,8 +77,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     private boolean wereMethodsCreated = false;
     private boolean replaceAccessesInDeclaringModule = false;
 
-    public static final String AMBIGUOUS_DEF = "Could not find definition for this identifier, "+
-                                                "or its definition was ambiguous.";
+    public static final String AMBIGUOUS_DEF = Messages.EncapsulateVariableRefactoring_NoUniqueDefinition;
 
     ///////////////////////////////////////////////////////////
     ///             Public methods                         ///
@@ -85,20 +85,20 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     public String getDefaultGetterName()
     {
         String capitalizedIdentName = getCapitalizedIdentName();
-        return "get"+capitalizedIdentName;
+        return "get"+capitalizedIdentName; //$NON-NLS-1$
     }
 
     public String getDefaultSetterName()
     {
         String capitalizedIdentName = getCapitalizedIdentName();
-        return "set"+capitalizedIdentName;
+        return "set"+capitalizedIdentName; //$NON-NLS-1$
     }
 
     @UserInputString(label="Getter method name ", defaultValueMethod="getDefaultGetterName")
     public void setGetterName(String gName)
     {
-        String parens = gName.length() < 2 ? "" : gName.substring(gName.length()-2, gName.length());
-        if(parens.equalsIgnoreCase("()"))
+        String parens = gName.length() < 2 ? "" : gName.substring(gName.length()-2, gName.length()); //$NON-NLS-1$
+        if(parens.equalsIgnoreCase("()")) //$NON-NLS-1$
             getterName = gName.substring(0, gName.length()-2);
         else
             getterName = gName;
@@ -107,8 +107,8 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     @UserInputString(label="Setter method name ", defaultValueMethod="getDefaultSetterName")
     public void setSetterName(String sName)
     {
-        String parens = sName.length() < 2 ? "" : sName.substring(sName.length()-2, sName.length());
-        if(parens.equalsIgnoreCase("()"))
+        String parens = sName.length() < 2 ? "" : sName.substring(sName.length()-2, sName.length()); //$NON-NLS-1$
+        if(parens.equalsIgnoreCase("()")) //$NON-NLS-1$
             setterName = sName.substring(0, sName.length()-2);
         else
             setterName = sName;
@@ -138,7 +138,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Encapsulate Variable";
+        return Messages.EncapsulateVariableRefactoring_Name;
     }
 
 
@@ -152,12 +152,12 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         ensureProjectHasRefactoringEnabled(status);
         Token t = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if(t == null)
-            fail("Could not find token based on selection.");
+            fail(Messages.EncapsulateVariableRefactoring_CouldNotFindToken);
 
         selectedReference = t.getTokenRef();
         Terminal term = t.getTerminal();
         if(term == null || term != Terminal.T_IDENT)
-            fail("Please select an identifier to encapsulate");
+            fail(Messages.EncapsulateVariableRefactoring_PleaseSelectAnIdentifier);
 
         selectedTokenDef = findUnambiguousDeclaration(t);
         if(selectedTokenDef == null)
@@ -173,16 +173,15 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     {
         if(!isDefinedInModule(def) ||
                 !def.getClassification().equals(Classification.VARIABLE_DECLARATION))
-            fail("The selected entity is not a variable.  " +
-                 "Please select a variable defined in a module to encapsulate.");
+            fail(Messages.EncapsulateVariableRefactoring_VariableNotSelected);
         if(def.isParameter())
-            fail("Variables with the PARAMETER attribute cannot be encapsulated.");
+            fail(Messages.EncapsulateVariableRefactoring_CannotEncapsulatePARAMETER);
         if(def.isArray())
-            fail("Arrays cannot be encapsulated.");
+            fail(Messages.EncapsulateVariableRefactoring_CannotEncapsulateArrays);
         if(def.isPointer())
-            fail("Pointers cannot be encapsulated.");
+            fail(Messages.EncapsulateVariableRefactoring_CannotEncapsulatePointers);
         if(def.isTarget())
-            fail("Variables with the TARGET attribute cannot be encapsulated.");
+            fail(Messages.EncapsulateVariableRefactoring_CannotEncapsulateTARGET);
     }
 
     protected boolean isDefinedInModule(Definition def)
@@ -204,9 +203,10 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     {
         if (SourceForm.isFixedForm(file) && !FIXED_FORM_REFACTORING_ENABLED)
         {
-            fail("Fixed form files cannot currently be refactored. " +
-                    "File " + file.getName() + " is in fixed form and "+
-                    " contains a reference to the variable you want to encapsulate");
+            fail(
+                Messages.bind(
+                    Messages.EncapsulateVariableRefactoring_CannotRefactorFixedFormFile,
+                    file.getName()));
         }
     }
 
@@ -243,7 +243,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
                     {
                         Token t = ref.findTokenOrReturnNull();
                         if(t == null)
-                            fail("Could not find a token associated with the variable reference.");
+                            fail(Messages.EncapsulateVariableRefactoring_CouldNotFindTokenForVarRef);
 
                         if(!isUsedAsArgument)
                             detectIfUsedAsArgument(t, status);
@@ -283,7 +283,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     {
         Token varDefTok = selectedTokenDef.getTokenRef().findTokenOrReturnNull();
         if(varDefTok == null)
-            fail("Could not find a token corresponding to the variable definition");
+            fail(Messages.EncapsulateVariableRefactoring_CouldNotFindTokenForVarDef);
         return varDefTok;
     }
 
@@ -298,11 +298,10 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
                                   //instance was found
             {
                 String message =
-                    "!!!WARNING!!!" + EOL +
-                    "Variable you want to encapsulate is used as an argument in a function." + EOL +
-                    "Encapsulating this variable might change the expected behavior of that function." + EOL +
-                    "Proceed at your own disgression." + EOL +
-                    "File: "+t.getPhysicalFile()+" line: "+t.getLine()+EOL;
+                    Messages.bind(
+                        Messages.EncapsulateVariableRefactoring_WarningFunctionArgument,
+                        t.getPhysicalFile(),
+                        t.getLine());
 
                 RefactoringStatusContext context = createContext(t.getTokenRef()); // Highlights problematic definition in file
                 status.addWarning(message, context);
@@ -333,10 +332,11 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         }
         else //Neither written nor read (i.e. Access declaration (private,public))
         {
-            String message = "!!!WARNING!!!" + EOL +
-                             "The following reference to the selected variable will not be changed" + EOL +
-                             "since it is neither written nor read: " + t.getPhysicalFile() +
-                             " line " + t.getLine();
+            String message =
+                Messages.bind(
+                    Messages.EncapsulateVariableRefactoring_WarningWillNotChangeReference,
+                    t.getPhysicalFile(),
+                    t.getLine());
             RefactoringStatusContext context = createContext(t.getTokenRef());
             status.addWarning(message, context);
         }
@@ -354,8 +354,8 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     {
         checkIfCanEncapsulateWithGetter(t);
 
-        IExpr newExpr = parseLiteralExpression(getGetterName() + "()");
-        newExpr.findFirstToken().setWhiteBefore("");
+        IExpr newExpr = parseLiteralExpression(getGetterName() + "()"); //$NON-NLS-1$
+        newExpr.findFirstToken().setWhiteBefore(""); //$NON-NLS-1$
         IExpr oldExpr = t.findNearestAncestor(IExpr.class);
         oldExpr.replaceWith(newExpr);
         //newExpr.setParent(oldExpr.getParent());
@@ -366,14 +366,14 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         IExpr expr = t.findNearestAncestor(IExpr.class);
         if(expr == null)
         {
-            fail("Currently can only encapsulate variables that appear as "+
-                "expressions. This variable is used as a non-expression in " +
-                t.getPhysicalFile() + " line " + t.getLine());
+            fail(
+                Messages.bind(
+                    Messages.EncapsulateVariableRefactoring_NotAnExpression,
+                    t.getPhysicalFile(),
+                    t.getLine()));
         }
     }
 
-
-    @SuppressWarnings("unchecked")
     protected void setGetterAndSetter() throws PreconditionFailure
     {
         Token varDefTok = declarationToken();
@@ -387,7 +387,6 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     }
 
     //TODO: Possibly re-factor this function (too long?)
-    @SuppressWarnings("unchecked")
     protected void addPrivateStatement(Token varDefTok, IASTListNode lst) throws PreconditionFailure
     {
         ASTTypeDeclarationStmtNode typeDec = varDefTok.findNearestAncestor(ASTTypeDeclarationStmtNode.class);
@@ -401,7 +400,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
                 {
                     ASTTypeDeclarationStmtNode newDeclNode = removePublicDeclarationIfNeeded(varDefTok, possibleTypeDec, lst);
                     ASTAccessStmtNode newAccessNode =
-                        (ASTAccessStmtNode)parseLiteralStatement("private :: " + varDefTok.getText() + EOL);
+                        (ASTAccessStmtNode)parseLiteralStatement("private :: " + varDefTok.getText() + EOL); //$NON-NLS-1$
 
                     newAccessNode.setParent(lst);
 
@@ -424,7 +423,6 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected ASTTypeDeclarationStmtNode removePublicDeclarationIfNeeded(
                 Token varDefTok,
                 ASTTypeDeclarationStmtNode declNode,
@@ -486,7 +484,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
 
         //String rhsString = oldAssignNode.getRhs().toString().trim();
 
-        String setterString = "call " + getSetterName() + "()";
+        String setterString = "call " + getSetterName() + "()"; //$NON-NLS-1$ //$NON-NLS-2$
         ASTCallStmtNode newCallNode = (ASTCallStmtNode)parseLiteralStatement(setterString);
         newCallNode.findFirstToken().setWhiteBefore(whiteBeforeOld);
 
@@ -502,7 +500,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     {
         ASTSubroutineArgNode args = new ASTSubroutineArgNode();
         Token tok = oldAssignNode.getRhs().findFirstToken();
-        tok.setWhiteBefore("");
+        tok.setWhiteBefore(""); //$NON-NLS-1$
 
         args.setExpr(oldAssignNode.getRhs());
         oldAssignNode.getRhs().setParent(args);
@@ -515,7 +513,6 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         return sepList;
     }
 
-    @SuppressWarnings("unchecked")
     protected int findOrCreateContainsIndex(IASTListNode lst)
     {
         boolean isFound = false;
@@ -538,7 +535,6 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         return i;
     }
 
-    @SuppressWarnings("unchecked")
     protected void addGetterFunction(Definition def, IASTListNode lst)
     {
         int index = findOrCreateContainsIndex(lst);
@@ -550,7 +546,6 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
             Strategy.SHIFT_ENTIRE_BLOCK);
     }
 
-    @SuppressWarnings("unchecked")
     protected void addSetterFunction(Definition def, IASTListNode lst)
     {
         int index = findOrCreateContainsIndex(lst);
@@ -565,10 +560,10 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     protected ASTFunctionSubprogramNode createGetterFunction(Definition def)
     {
         String type = def.getType().toString();
-        String getterFunction = type + " function " + getGetterName() + "()" + EOL +
-                                "    implicit none" + EOL +
-                                "    " + getGetterName() + " = " + def.getTokenRef().getText() +EOL +
-                                "end function" + EOL;
+        String getterFunction = type + " function " + getGetterName() + "()" + EOL + //$NON-NLS-1$ //$NON-NLS-2$
+                                "    implicit none" + EOL + //$NON-NLS-1$
+                                "    " + getGetterName() + " = " + def.getTokenRef().getText() +EOL + //$NON-NLS-1$ //$NON-NLS-2$
+                                "end function" + EOL; //$NON-NLS-1$
         ASTFunctionSubprogramNode newFunNode = (ASTFunctionSubprogramNode)parseLiteralProgramUnit(getterFunction);
         return newFunNode;
     }
@@ -576,17 +571,16 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
     protected ASTSubroutineSubprogramNode createSetterFunction(Definition def)
     {
         String type = def.getType().toString();
-        String valueName = "value";
-        String setterFunction = "subroutine " + getSetterName() + "(" + valueName + ")" + EOL +
-                                "    implicit none" + EOL +
-                                "    " + type + ", intent(in) :: " + valueName + EOL +
-                                "    " + def.getTokenRef().getText() +" = " + valueName + EOL +
-                                "end subroutine" + EOL;
+        String valueName = "value"; //$NON-NLS-1$
+        String setterFunction = "subroutine " + getSetterName() + "(" + valueName + ")" + EOL + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                "    implicit none" + EOL + //$NON-NLS-1$
+                                "    " + type + ", intent(in) :: " + valueName + EOL + //$NON-NLS-1$ //$NON-NLS-2$
+                                "    " + def.getTokenRef().getText() +" = " + valueName + EOL + //$NON-NLS-1$ //$NON-NLS-2$
+                                "end subroutine" + EOL; //$NON-NLS-1$
         ASTSubroutineSubprogramNode newSubNode = (ASTSubroutineSubprogramNode)parseLiteralProgramUnit(setterFunction);
         return newSubNode;
     }
 
-    @SuppressWarnings("unchecked")
     protected boolean containsPublicInDecl(IASTListNode lst)
     {
         for(int i = 0; i < lst.size(); i++)
@@ -603,7 +597,7 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
 
     protected ASTTypeDeclarationStmtNode createNewDeclaration(Token varDefTok, ASTTypeSpecNode typeSpec)
     {
-        String newDecl = findUnambiguousDeclaration(varDefTok).getType().toString() + " :: " + varDefTok.getText();
+        String newDecl = findUnambiguousDeclaration(varDefTok).getType().toString() + " :: " + varDefTok.getText(); //$NON-NLS-1$
         ASTTypeDeclarationStmtNode declNode = (ASTTypeDeclarationStmtNode)parseLiteralStatement(newDecl);
         return declNode;
     }
@@ -616,7 +610,6 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         return newDeclNode;
     }
 
-    @SuppressWarnings("unchecked")
     protected ASTTypeDeclarationStmtNode removeAndRedeclare(Token varDefTok, ASTTypeDeclarationStmtNode oldDeclNode)
     {
         ASTTypeDeclarationStmtNode newDeclNode = createNewDeclaration(varDefTok, oldDeclNode.getTypeSpec());
@@ -635,7 +628,6 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         return newDeclNode;
     }
 
-    @SuppressWarnings("unchecked")
     protected ASTTypeDeclarationStmtNode redeclareVariable(Token varDefTok, ASTTypeDeclarationStmtNode declNode)
     {
         IASTListNode declList = declNode.getEntityDeclList();
@@ -694,7 +686,11 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         {
             for(Conflict conflict : conflictingDef)
             {
-                String msg = "The name \"" + conflict.name + "\" conflicts with " + vpg.getDefinitionFor(conflict.tokenRef);
+                String msg =
+                    Messages.bind(
+                        Messages.EncapsulateVariableRefactoring_NameConflicts,
+                        conflict.name,
+                        vpg.getDefinitionFor(conflict.tokenRef));
                 RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
                 status.addError(msg, context);
             }
@@ -704,7 +700,10 @@ public class EncapsulateVariableRefactoring extends FortranEditorRefactoring
         {
             for(Conflict conflict : conflictingDef)
             {
-                String msg = "The name \"" + conflict.name + "\" might conflict with the name of an invoked subprogram";
+                String msg =
+                    Messages.bind(
+                        Messages.EncapsulateVariableRefactoring_NameMightConflict,
+                        conflict.name);
                 RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
                 status.addWarning(msg, context);
             }

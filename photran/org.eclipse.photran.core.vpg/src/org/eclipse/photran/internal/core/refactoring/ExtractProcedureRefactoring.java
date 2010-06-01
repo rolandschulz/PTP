@@ -69,7 +69,7 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Extract Procedure";
+        return Messages.ExtractProcedureRefactoring_Name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -95,44 +95,49 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
         // Ensure that partial loops won't be extracted
         LoopReplacer.replaceAllLoopsIn(this.astOfFileInEditor.getRoot());
 
-    	selection = this.findEnclosingStatementSequence(this.astOfFileInEditor, this.selectedRegionInEditor);
+    	selection = findEnclosingStatementSequence(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selection == null || selection.selectedStmts.isEmpty())
-            fail("Please select a sequence of contiguous statements to extract.");
+            fail(Messages.ExtractProcedureRefactoring_PleaseSelectContiguousStatements);
 
         if (selection.enclosingScope == null)
-            fail("INTERNAL ERROR: Unable to locate enclosing scope");
+            fail("INTERNAL ERROR: Unable to locate enclosing scope"); //$NON-NLS-1$
 
         if (!selection.enclosingScope.isSubprogram() && !selection.enclosingScope.isMainProgram())
-            fail("Statements can only be extracted from inside a subprogram or main program.");
+            fail(Messages.ExtractProcedureRefactoring_CanOnlyExtractFromSubprogramOrMainProgram);
 
         for (IASTNode stmt : selection.selectedStmts)
             if (!(stmt instanceof IBodyConstruct))
-                fail("The statement \"" + stmt.toString().trim() + "\" cannot be extracted");
+                fail(
+                    Messages.bind(
+                        Messages.ExtractProcedureRefactoring_StatementCannotBeExtracted,
+                        stmt.toString().trim()));
 
         checkForLabels(status);
 
         for (IASTNode stmt : selection.selectedStmts)
             if (!(stmt instanceof IExecutionPartConstruct))
-                fail("Only executable statements can be extracted; the statement \"" + stmt.toString().trim() + "\" cannot");
+                fail(
+                    Messages.bind(
+                        Messages.ExtractProcedureRefactoring_OnlyExecutableStatementsCanBeExtracted,
+                        stmt.toString().trim()));
 
         determineParameters();
 
         for (Definition param : localVarsToPassInAsParams)
             if (param.isPointer())
-                fail("The selected statements cannot be extracted because doing so would require passing a pointer variable as a parameter");
+                fail(Messages.ExtractProcedureRefactoring_ExtractionWouldRequirePointerParameter);
     }
 
     private void checkForLabels(RefactoringStatus status)
     {
-        Pattern numericLabel = Pattern.compile("[0-9]+");
+        Pattern numericLabel = Pattern.compile("[0-9]+"); //$NON-NLS-1$
 
         for (IASTNode stmt : selection.enclosingScope.getBody())
         {
             if (numericLabel.matcher(stmt.findFirstToken().getText()).matches())
             {
-                status.addWarning("This procedure contains labels; the extracted " +
-                    "subprogram may not be correct if the selected statements reference " +
-                    "a label outside the extracted statements.",
+                status.addWarning(
+                    Messages.ExtractProcedureRefactoring_ProcedureContainsLabels,
                     createContext(stmt.findFirstToken().getTokenRef()));
                 return;
             }
@@ -296,7 +301,7 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
     private void checkIfSubprogramNameIsValid() throws PreconditionFailure
     {
         if (!isValidIdentifier(newName))
-            fail(newName + " is not a valid identifier");
+            fail(Messages.bind(Messages.ExtractProcedureRefactoring_InvalidIdentifier, newName));
     }
 
     private void checkIfSubprogramNameWillConflict(RefactoringStatus status)
@@ -305,7 +310,7 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
 
         ScopingNode outerScope = enclosingSubprogram.findNearestAncestor(ScopingNode.class);
         if (outerScope == null)
-            throw new Error("INTERNAL ERROR: No outer scope");
+            throw new Error("INTERNAL ERROR: No outer scope"); //$NON-NLS-1$
 
         FakeToken newSubprogramName = new FakeToken(enclosingSubprogram.getNameToken(), newName);
         List<PhotranTokenRef> conflictingDefs = outerScope.manuallyResolveNoImplicits(newSubprogramName);
@@ -313,9 +318,15 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
         {
             PhotranTokenRef conflict = conflictingDefs.get(0);
             Token conflictToken = conflict.findToken();
-            status.addError("The name \"" + newName + "\""
-                + " conflicts with \"" + conflictToken.getText() + "\" on line " + conflictToken.getLine()
-                + " in " + conflict.getFilename(),
+            status.addError(
+                Messages.bind(
+                    Messages.ExtractProcedureRefactoring_NameConflicts,
+                    new Object[] {
+                        newName,
+                        conflictToken.getText(),
+                        conflictToken.getLine(),
+                        conflict.getFilename()
+                    }),
                 createContext(conflict)); // Highlight problematic declaration
         }
     }
@@ -348,17 +359,17 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("\n");
-        sb.append("subroutine ");
+        sb.append("\n"); //$NON-NLS-1$
+        sb.append("subroutine "); //$NON-NLS-1$
         sb.append(newName);
         sb.append(parameterList());
-        sb.append("\n");
+        sb.append("\n"); //$NON-NLS-1$
 
-        sb.append("    implicit none\n");
+        sb.append("    implicit none\n"); //$NON-NLS-1$
 
         sb.append(parameterDeclarations());
 
-        sb.append("end subroutine\n");
+        sb.append("end subroutine\n"); //$NON-NLS-1$
 
         ASTSubroutineSubprogramNode newSubroutine = (ASTSubroutineSubprogramNode)parseLiteralProgramUnit(sb.toString());
 
@@ -379,14 +390,14 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
             throw new IllegalStateException();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private ASTSubroutineSubprogramNode insertAfterEnclosingSubprogram(ASTSubroutineSubprogramNode newSubroutine)
     {
         ScopingNode enclosingSubprogram = selection.enclosingScope;
 
         IASTNode parent = enclosingSubprogram.getParent();
         if (!(parent instanceof IASTListNode))
-            throw new Error("INTERNAL ERROR: Subprogram parent is not IASTListNode");
+            throw new Error("INTERNAL ERROR: Subprogram parent is not IASTListNode"); //$NON-NLS-1$
 
         ((IASTListNode)parent).insertAfter(enclosingSubprogram, newSubroutine);
 
@@ -423,16 +434,16 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("(");
+        sb.append("("); //$NON-NLS-1$
 
         int i = 0;
         for (Definition var : localVarsToPassInAsParams)
         {
-            if (i++ > 0) sb.append(", ");
+            if (i++ > 0) sb.append(", "); //$NON-NLS-1$
             sb.append(var.getDeclaredName());
         }
 
-        sb.append(")");
+        sb.append(")"); //$NON-NLS-1$
 
         return sb.toString();
     }
@@ -443,9 +454,9 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
 
         for (Definition var : localVarsToPassInAsParams)
         {
-            sb.append("    ");
+            sb.append("    "); //$NON-NLS-1$
             sb.append(declarationOf(var));
-            sb.append("\n");
+            sb.append("\n"); //$NON-NLS-1$
         }
 
         return sb.toString();
@@ -457,13 +468,13 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
 
         sb.append(var.getType().toString());
 
-        if (var.isAllocatable()) sb.append(", allocatable");
-        if (var.isIntentIn() && !var.isIntentOut()) sb.append(", intent(in)");
-        if (!var.isIntentIn() && var.isIntentOut()) sb.append(", intent(out)");
-        if (var.isPointer()) sb.append(", pointer");
-        if (var.isTarget()) sb.append(", target");
+        if (var.isAllocatable()) sb.append(", allocatable"); //$NON-NLS-1$
+        if (var.isIntentIn() && !var.isIntentOut()) sb.append(", intent(in)"); //$NON-NLS-1$
+        if (!var.isIntentIn() && var.isIntentOut()) sb.append(", intent(out)"); //$NON-NLS-1$
+        if (var.isPointer()) sb.append(", pointer"); //$NON-NLS-1$
+        if (var.isTarget()) sb.append(", target"); //$NON-NLS-1$
 
-        sb.append(" :: ");
+        sb.append(" :: "); //$NON-NLS-1$
         sb.append(var.getDeclaredName());
 
         if (var.getArraySpec() != null)
@@ -472,14 +483,14 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
         return sb.toString();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void insertSubroutineCall()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("call ");
+        sb.append("call "); //$NON-NLS-1$
         sb.append(newName);
         sb.append(parameterList());
-        sb.append("\n");
+        sb.append("\n"); //$NON-NLS-1$
 
         IBodyConstruct callStmt = parseLiteralStatement(sb.toString());
         ((IASTListNode)selection.listContainingStmts).insertBefore(selection.firstStmt(), callStmt);
