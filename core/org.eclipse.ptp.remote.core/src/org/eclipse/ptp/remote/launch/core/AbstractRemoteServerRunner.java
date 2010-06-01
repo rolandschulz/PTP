@@ -206,9 +206,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		}
 		if (!fRemoteConnection.isOpen()) {
 			try {
-				fRemoteConnection.open(null);
+				fRemoteConnection.open(monitor);
 			} catch (RemoteConnectionException e) {
-				e.printStackTrace();
+				return false;
+			}
+			if (!fRemoteConnection.isOpen()) {
 				return false;
 			}
 		}
@@ -254,8 +256,15 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 */
 			IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 			IFileStore directory = fileManager.getResource(getWorkingDir());
-			if (!directory.fetchInfo(EFS.NONE, monitor).exists()) {
-				return null;
+			/*
+			 * Create the directory if it doesn't exist (has no effect if the
+			 * directory already exists). Also, check if a file of this name
+			 * exists and generate exception if it does.
+			 */
+			try {
+				directory.mkdir(EFS.NONE, monitor);
+			} catch (Exception e) {
+				throw new IOException(e.getMessage());
 			}
 			IFileStore server = directory.getChild(getPayload());
 			IFileInfo serverInfo = server.fetchInfo(EFS.NONE, monitor);
