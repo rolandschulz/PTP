@@ -46,16 +46,25 @@ public class NullBuildServiceProvider extends ServiceProvider implements IServic
 	}
 
 
+	/**
+	 * @since 2.0
+	 */
 	public String getConfigLocation() {
 		return null;
 	}
 
 
+	/**
+	 * @since 2.0
+	 */
 	public IRemoteConnection getConnection() {
 		return null;
 	}
 
 
+	/**
+	 * @since 2.0
+	 */
 	public IRemoteServices getRemoteServices() {
 		return null;
 	}
