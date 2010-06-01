@@ -13,8 +13,6 @@ package org.eclipse.photran.internal.ui.views.vpgproblems;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -30,15 +28,12 @@ import org.eclipse.jface.viewers.Viewer;
  *
  * @author Timofey Yuvashev
  */
-public class VPGProblemContentProvider implements IStructuredContentProvider,
-                                                  IResourceChangeListener
+public class VPGProblemContentProvider implements IStructuredContentProvider
 {
     private StructuredViewer viewer = null;
-    private List<IMarker> input     = null;
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-     */
+    private List<IMarker> input = null;
+
     @SuppressWarnings("unchecked")
     public Object[] getElements(Object element)
     {
@@ -46,49 +41,18 @@ public class VPGProblemContentProvider implements IStructuredContentProvider,
         return markers.toArray();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-     */
     public void dispose()
     {
-        if(this.input != null)
-        {
-            //input.removeResourceChangeListener(this);
-            input = null;
-        }
+        if (this.input != null) input = null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     public void inputChanged(Viewer v, Object oldInput, Object newInput)
     {
-        if(this.viewer == null)
-            this.viewer = (StructuredViewer)v;
+        if (this.viewer == null) this.viewer = (StructuredViewer)v;
 
-        if(this.input == null && newInput != null)
-        {
-            this.input = (List<IMarker>)newInput;
-            //ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-            //this.input.addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-        }
+        if (this.input == null && newInput != null) this.input = (List<IMarker>)newInput;
 
-        if(newInput == null && input != null)
-        {
-            //ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-            input = null;
-        }
-
+        if (newInput == null && input != null) input = null;
     }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
-     */
-    public void resourceChanged(IResourceChangeEvent arg0)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
 }

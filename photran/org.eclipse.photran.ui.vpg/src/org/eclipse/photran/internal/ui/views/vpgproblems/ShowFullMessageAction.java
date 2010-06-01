@@ -10,14 +10,10 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
-import java.util.Iterator;
-
-import org.eclipse.cdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -39,14 +35,16 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * @author Timofey Yuvashev
  * @author Esfar Huq
  * @author Rui Wang
+ * @author Jeff Overbey
  */
-/* Esfar/Rui: 
- * Modified the method run()
- *  1) Added title bar to "Details" dialog 
- *  2) "Details" dialog wraps
- *  3) Focus is shifted to "Close" key, so that dialog can be exited by hitting enter key
+/* Esfar/Rui:
+ *   Modified the method run()
+ *       1) Added title bar to "Details" dialog 
+ *       2) "Details" dialog wraps
+ *       3) Focus is shifted to "Close" key, so that dialog can be exited by hitting enter key
+ * Jeff - Converted to use Dialog instead of Shell
  */
-public class ShowFullMessageAction extends SelectionDispatchAction
+public class ShowFullMessageAction extends MarkerDispatchAction
 {
     public ShowFullMessageAction(IWorkbenchSite site)
     {
@@ -68,88 +66,56 @@ public class ShowFullMessageAction extends SelectionDispatchAction
         return ImageDescriptor.createFromImage(img);
     }
 
-    protected void run(final IMarker marker)
+    @Override protected void run(final IMarker marker)
     {
-        Dialog dialog = new Dialog(getSite().getShell())
+        new DetailsDialog(getSite().getShell(), marker).open();
+    }
+
+    private static final class DetailsDialog extends Dialog
+    {
+        private final IMarker marker;
+
+        private DetailsDialog(Shell parentShell, IMarker marker)
         {
-            @Override
-            protected void configureShell(Shell shell)
-            {
-                super.configureShell(shell);
-                shell.setText(Messages.ShowFullMessageAction_EventDetails);
-                shell.setSize(500, 300);
-            }
-
-            @Override
-            protected Control createDialogArea(Composite parent)
-            {
-                Composite dialogArea = (Composite)super.createDialogArea(parent);
-
-                Text message = new Text(dialogArea, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY);
-                message.setText(MarkerUtilities.getMessage(marker));
-                message.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-                dialogArea.layout();
-                return dialogArea;
-            }
-
-            @Override
-            protected void createButtonsForButtonBar(Composite parent)
-            {
-                Button close = createButton(parent,
-                                            IDialogConstants.CLOSE_ID,
-                                            IDialogConstants.CLOSE_LABEL,
-                                            true);
-                close.addSelectionListener(new SelectionListener()
-                {
-                    public void widgetSelected(SelectionEvent e)        { close(); }
-                    public void widgetDefaultSelected(SelectionEvent e) { close(); }
-                });
-                close.setFocus();
-            }
-        };
-        
-        dialog.open();
-    }
-
-    /* (non-Javadoc)
-     * Method declared on SelectionDispatchAction.
-     */
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        setEnabled(checkEnabled(selection));
-    }
-
-    //Only enables if the selected type is an IMarker
-    private boolean checkEnabled(IStructuredSelection selection) {
-        if (selection.isEmpty())
-            return false;
-        for (Iterator<?> iter= selection.iterator(); iter.hasNext();) {
-            Object element= iter.next();
-            if (element instanceof IMarker)
-                continue;
-            return false;
+            super(parentShell);
+            this.marker = marker;
         }
-        return true;
-    }
 
-    /* (non-Javadoc)
-     * Method declared on SelectionDispatchAction.
-     */
-    @Override
-    public void run(IStructuredSelection selection)
-    {
-        if (!checkEnabled(selection))
-            return;
-
-        for (Iterator<?> iter= selection.iterator(); iter.hasNext();)
+        @Override
+        protected void configureShell(Shell shell)
         {
-            Object element= iter.next();
-            if (element instanceof IMarker)
+            super.configureShell(shell);
+            shell.setText(Messages.ShowFullMessageAction_EventDetails);
+            shell.setSize(500, 300);
+        }
+
+        @Override
+        protected Control createDialogArea(Composite parent)
+        {
+            Composite dialogArea = (Composite)super.createDialogArea(parent);
+
+            Text message = new Text(
+                dialogArea,
+                SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.READ_ONLY);
+            message.setText(MarkerUtilities.getMessage(marker));
+            message.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            dialogArea.layout();
+            return dialogArea;
+        }
+
+        @Override
+        protected void createButtonsForButtonBar(Composite parent)
+        {
+            Button close = createButton(parent,
+                                        IDialogConstants.CLOSE_ID,
+                                        IDialogConstants.CLOSE_LABEL,
+                                        true);
+            close.addSelectionListener(new SelectionListener()
             {
-                IMarker marker = (IMarker)element;
-                run(marker);
-            }
+                public void widgetSelected(SelectionEvent e)        { close(); }
+                public void widgetDefaultSelected(SelectionEvent e) { close(); }
+            });
+            close.setFocus();
         }
     }
-
 }

@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.ui.views.vpgproblems;
 
-import java.util.Iterator;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -27,25 +25,19 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 /**
  * This class handles events where the user right-clicks and "Copy"-ies from table
  * 
- * @author tyuvash2
- * 
- * @author Esfar Huq
- * @author Rui Wang
- * 
- * Modified the asText() method, removing id and marker detail fields
+ * @author Tim Yuvashev
+ * @author Esfar Huq, Rui Wang - Modified the asText() method, removing id and marker detail fields
  */
 public class CopyMarkedFileAction extends Action
 {
     private static final String SEPARATOR = " "; //$NON-NLS-1$
     
-    VPGProblemView myView = null;
-    /**
-     * @param site
-     */
+    private VPGProblemView problemsView = null;
+
     public CopyMarkedFileAction(VPGProblemView view)
     {
         super(Messages.CopyMarkedFileAction_Copy);
-        myView = view;
+        problemsView = view;
     }
     
     @Override
@@ -55,38 +47,31 @@ public class CopyMarkedFileAction extends Action
         return ImageDescriptor.createFromImage(img);
     }
     
-    /* (non-Javadoc)
-     * Method declared on SelectionDispatchAction.
-     */
     @Override
     public void run() 
     {
-        ISelection sel = myView.getSite().getSelectionProvider().getSelection();
-        myView.getClipboard().setContents(
-            new Object[]{asText(sel)},
-            new Transfer[] {TextTransfer.getInstance()});            
+        ISelection sel = problemsView.getSite().getSelectionProvider().getSelection();
+        problemsView.getClipboard().setContents(
+            new Object[]   { asText(sel)                },
+            new Transfer[] { TextTransfer.getInstance() });
         
     }
     
     protected String asText(ISelection sel)
     {
-        IStructuredSelection selection = (IStructuredSelection)sel;
-        String result = ""; //$NON-NLS-1$
-        for (Iterator<?> iter= selection.iterator(); iter.hasNext();) 
+        StringBuilder sb = new StringBuilder();
+        for (Object element : ((IStructuredSelection)sel).toList())
         {
-            Object element= iter.next();
             if (element instanceof IMarker)
             {
                 IMarker marker = (IMarker)element;
-                result = result.concat(asText(marker));
-                result = result.concat("\n"); //$NON-NLS-1$
+                sb.append(asText(marker));
+                sb.append("\n"); //$NON-NLS-1$
             }
         }
-        return result;
+        return sb.toString();
     }
-        
-    //TODO: We can format the output for our Markers as we want. Currently this will only 
-    // get the message associated with the marker
+
     protected String asText(IMarker marker)
     {
         String markerMsg    = Messages.CopyMarkedFileAction_DescriptionLabel + MarkerUtilities.getMessage(marker);

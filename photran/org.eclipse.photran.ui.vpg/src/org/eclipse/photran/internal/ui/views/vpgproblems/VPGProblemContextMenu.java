@@ -52,11 +52,10 @@ public class VPGProblemContextMenu extends MenuManager
         //registerAction(remAct,  provider, sel);
         
         site.getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), copyAct);
-        
     }
     
-    private void registerAction(SelectionDispatchAction action, 
-                                ISelectionProvider provider, 
+    private void registerAction(SelectionDispatchAction action,
+                                ISelectionProvider provider,
                                 ISelection sel)
     {
         action.update(sel);

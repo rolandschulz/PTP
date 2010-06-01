@@ -1,5 +1,7 @@
 package org.eclipse.photran.internal.ui.vpg;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -47,4 +49,18 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+    public static void log(Throwable e)
+    {
+        log("Error", e); //$NON-NLS-1$
+    }
+
+    public static void log(String message, Throwable e)
+    {
+        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, e));
+    }
+
+    public static void log(IStatus status)
+    {
+        getDefault().getLog().log(status);
+    }
 }

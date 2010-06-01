@@ -26,7 +26,6 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * @author Rui Wang
  * @author Jeff Overbey
  */
-
 public class ErrorWarningFilterAction extends Action
 {
     private StructuredViewer viewer;

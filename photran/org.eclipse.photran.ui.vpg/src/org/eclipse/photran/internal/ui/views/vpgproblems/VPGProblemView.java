@@ -54,7 +54,8 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
  * Based on Eclipse JFace TableView Tutorial; thanks to Lars Vogel
  * for posting the tutorial
  * (http://www.vogella.de/articles/EclipseJFaceTable/aritcle.html)
- * Based on samples provided in Java Developer’s Guide to Eclipse,
+ * <p>
+ * Based on samples provided in The Java Developer’s Guide to Eclipse,
  * Chapter 18 (http://www.jdg2e.com/ch18.views/doc/index.htm and
  * http://www.jdg2e.com/jdg2e_CD_for_eclipse321/plug-in_development/examples/com.ibm.jdg2e.view.marker/src-marker/com/ibm/jdg2e/view/marker/MarkerView.java)
  * © Copyright International Business Machines Corporation, 2003, 2004, 2006.
@@ -70,7 +71,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 {
     static enum VPGViewColumn
     {
-        // Column    Label         Width (in pixels)
+        // Column   Label                                            Width (in pixels)
         DESCRIPTION(Messages.VPGProblemView_DescriptionColumnHeader, 44),
         RESOURCE   (Messages.VPGProblemView_ResourceColumnHeader,    10),
         PATH       (Messages.VPGProblemView_PathColumnHeader,        20);
@@ -112,7 +113,6 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
 
         getSite().setSelectionProvider(tableViewer);
 
-        //TODO: Change the default string
         MenuManager manager = createMenuManager();
 
         getSite().registerContextMenu(manager, tableViewer);
@@ -128,8 +128,9 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     
     private void createTableViewer(Composite parent)
     {
-        tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
-            | SWT.MULTI | SWT.FULL_SELECTION);
+        tableViewer = new TableViewer(
+            parent,
+            SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
 
         tableSorter = new TableSorter();
         tableViewer.setComparator(this.tableSorter);
@@ -196,8 +197,14 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
             //only print out counts when looking at an unfiltered view
             if(!selectionFilterAction.isChecked())
             {
-                warningsFilterAction.setText(Messages.bind(Messages.VPGProblemView_nWarnings, markerCount[IMarker.SEVERITY_WARNING]));
-                errorsFilterAction.setText(Messages.bind(Messages.VPGProblemView_nErrors, markerCount[IMarker.SEVERITY_ERROR]));
+                warningsFilterAction.setText(
+                    Messages.bind(
+                        Messages.VPGProblemView_nWarnings,
+                        markerCount[IMarker.SEVERITY_WARNING]));
+                errorsFilterAction.setText(
+                    Messages.bind(
+                        Messages.VPGProblemView_nErrors,
+                        markerCount[IMarker.SEVERITY_ERROR]));
             }
             else //FILTERED
             {
@@ -408,7 +415,6 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         tableViewer.getControl().setFocus();
     }
 
-    //TODO: Should we remove more stuff?
     @Override
     public void dispose()
     {
