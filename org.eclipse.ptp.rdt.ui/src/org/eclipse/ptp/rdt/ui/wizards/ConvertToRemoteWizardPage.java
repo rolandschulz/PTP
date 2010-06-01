@@ -64,12 +64,27 @@ import org.eclipse.ui.PlatformUI;
  */
 public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
     
+	/**
+	 * @since 2.0
+	 */
 	protected static final String WZ_TITLE = "WizardProjectConversion.title"; //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
 	protected static final String WZ_DESC = "WizardProjectConversion.description"; //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
     protected ServiceProviderConfigurationWidget fServiceModelWidget;
+	/**
+	 * @since 2.0
+	 */
     protected Group remoteServices;
 	
-    protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
+	/**
+	 * @since 2.0
+	 */
+   protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
 	
 	/**
 	 * Constructor for ConvertToRemoteWizardPage.
@@ -153,6 +168,9 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 		convertProject(project, monitor);
 	}
 	
+	/**
+	 * @since 2.0
+	 */
 	protected void convertProject(IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.getString("WizardProjectConversion.monitor.convertingToRemoteProject"), 3); //$NON-NLS-1$
 		try {
@@ -211,6 +229,9 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	}
 
 	
+	/**
+	 * @since 2.0
+	 */
 	protected IServiceConfiguration getConfig(IProject project) {
 		IServiceConfiguration config = projectConfigs.get(project);
 		IHost host = RSEUtils.getConnection(project.getLocationURI());
@@ -222,6 +243,9 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
 	}
 	
 	
+	/**
+	 * @since 2.0
+	 */
 	protected void changeProject(IProject project) {
 		IServiceConfiguration config = getConfig(project);
     	fServiceModelWidget.applyChangesToConfiguration();
@@ -229,6 +253,9 @@ public class ConvertToRemoteWizardPage extends ConvertProjectWizardPage {
     	remoteServices.setText(MessageFormat.format(Messages.getString("WizardProjectConversion.servicesTableForProjectLabel"), new Object[] {project.getName()}));  //$NON-NLS-1$
 	}
 	
+	/**
+	 * @since 2.0
+	 */
 	protected void configureServicesForRemoteProject(IProject project) {
 		ServiceModelManager.getInstance().addConfiguration(project, getConfig(project));
 	}

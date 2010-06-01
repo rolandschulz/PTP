@@ -100,6 +100,9 @@ public class SelectionParseAction extends Action {
 		}
 	}	
 
+	/**
+	 * @since 2.0
+	 */
 	protected void open(ITranslationUnit tu, int currentOffset, int currentLength) throws CoreException {
 		clearStatusLine();
 
