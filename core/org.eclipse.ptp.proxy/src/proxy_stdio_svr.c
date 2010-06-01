@@ -248,9 +248,11 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 	proxy_commands * 	cmd_tab = svr->svr_commands;
 	proxy_msg *			m;
 	proxy_cmd			cmd;
+	int			rc;
 
 	DEBUG_PRINT("SVR received <%s>\n", msg);
 
+	rc = 0;
 	if (proxy_deserialize_msg(msg, len, &m) < 0) {
 		proxy_msg *err = new_proxy_msg(0, PTP_PROXY_EV_MESSAGE);
 		proxy_msg_add_int(err, 3); /* 3 attributes */
@@ -260,8 +262,7 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 		asprintf(&err_str, "malformed command, len is %d", len);
 		proxy_msg_add_keyval_string(err, PTP_MSG_TEXT_ATTR, err_str);
 		free(err_str);
-		proxy_queue_msg(svr->svr_events, err);
-		return 0;
+		return proxy_queue_msg(svr->svr_events, err);
 	}
 
     idx = m->msg_id - cmd_tab->cmd_base;
@@ -280,12 +281,12 @@ proxy_stdio_svr_dispatch(proxy_svr *svr, char *msg, int len)
 		asprintf(&err_str, "malformed command, len is %d", len);
 		proxy_msg_add_keyval_string(err, PTP_MSG_TEXT_ATTR, err_str);
 		free(err_str);
-		proxy_queue_msg(svr->svr_events, err);
+		rc = proxy_queue_msg(svr->svr_events, err);
 	}
 
 	free_proxy_msg(m);
 
-	return 0;
+	return rc;
 }
 
 static int

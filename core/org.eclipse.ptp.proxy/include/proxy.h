@@ -131,12 +131,12 @@ extern int		proxy_svr_create(proxy_svr *, int);
 extern int		proxy_svr_connect(proxy_svr *, char *, int);
 extern int		proxy_svr_progress(proxy_svr *);
 extern void		proxy_svr_finish(proxy_svr *);
-extern void		proxy_svr_queue_msg(proxy_svr *, proxy_msg *);
+extern int		proxy_svr_queue_msg(proxy_svr *, proxy_msg *);
 
 extern int		proxy_clnt_init(char *, struct timeval *, proxy_clnt_helper_funcs *, proxy_clnt **, char *, va_list);
 extern int 		proxy_clnt_connect(proxy_clnt *);
 extern int 		proxy_clnt_create(proxy_clnt *);
 extern int 		proxy_clnt_progress(proxy_clnt *);
-extern void		proxy_clnt_queue_msg(proxy_clnt *, proxy_msg *);
+extern int		proxy_clnt_queue_msg(proxy_clnt *, proxy_msg *);
 
 #endif /* _PROXY_H_*/
