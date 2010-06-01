@@ -16,6 +16,7 @@ import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 
 /**
  * @author vkong
+ * @since 2.0
  *
  */
 public class SimpleASTFileLocation implements IASTFileLocation, Serializable {
