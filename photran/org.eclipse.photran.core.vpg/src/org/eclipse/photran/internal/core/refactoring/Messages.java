@@ -193,6 +193,119 @@ class Messages extends NLS
 
     public static String RenameRefactoring_StatusRenaming;
 
+    public static String CommonVarNamesRefactoring_Name;
+
+    public static String CommonVarNamesRefactoring_NameConflictsWith;
+
+    public static String CommonVarNamesRefactoring_NameMightConflictWithSubprogram;
+
+    public static String CommonVarNamesRefactoring_NoCommonBlockFoundWithName;
+
+    public static String CommonVarNamesRefactoring_NoFilesFoundContainingCommonBlock;
+
+    public static String CommonVarNamesRefactoring_ProjectDoesNotExist;
+
+    public static String CommonVarNamesRefactoring_SelectCommonBlockName;
+
+    public static String CommonVarNamesRefactoring_VariableTypesDiffer;
+    public static String DataToParameterRefactoring_EmptyDataListInNode;
+
+    public static String DataToParameterRefactoring_Name;
+
+    public static String DataToParameterRefactoring_RefactorNotConsideringVarAssignment;
+
+    public static String DataToParameterRefactoring_SelectedFileCannotBeParsed;
+    public static String ExtractLocalVariableRefactoring_DeclarationDoesNotDeclareSingleVar;
+
+    public static String ExtractLocalVariableRefactoring_DeclarationMustNotContainInitialization;
+
+    public static String ExtractLocalVariableRefactoring_EnterDeclarationForExtractedVar;
+
+    public static String ExtractLocalVariableRefactoring_ErrorSelectingPartOfExpression;
+
+    public static String ExtractLocalVariableRefactoring_ExpressionNotInExtractableStmt;
+
+    public static String ExtractLocalVariableRefactoring_ExpressionTypeNotBeAutoDetermined;
+
+    public static String ExtractLocalVariableRefactoring_ExtractionMayNotPreserveBehavior;
+
+    public static String ExtractLocalVariableRefactoring_InvalidTypeDeclStmt;
+
+    public static String ExtractLocalVariableRefactoring_Name;
+
+    public static String ExtractLocalVariableRefactoring_NameConflictsWith;
+
+    public static String ExtractLocalVariableRefactoring_NameMightConflictWithSubprogram;
+
+    public static String ExtractLocalVariableRefactoring_SelectExpressionToExtract;
+
+    public static String ExtractLocalVariableRefactoring_VarsExtractedOnlyFromActionStmt;
+
+    public static String ExtractLocalVariableRefactoring_VarsOnlyExtractedFromStmtsIn;
+
+    public static String InterchangeLoopsRefactoring_Name;
+
+    public static String InterchangeLoopsRefactoring_SelectTwoPerfNextedLoops;
+
+    public static String InterchangeLoopsRefactoring_UncheckedTransNotGuaranteedToPreserve;
+
+    public static String IntroImplicitNoneRefactoring_Name;
+
+    public static String IntroImplicitNoneRefactoring_SelectedFileCannotBeParsed;
+
+    public static String KeywordCaseRefactoring_Name;
+
+    public static String KeywordCaseRefactoring_SelectedFileCannotBeParsed;
+    public static String MakePrivateEntityPublicRefactoring_DoesNotSupportExternalEntities;
+
+    public static String MakePrivateEntityPublicRefactoring_DoesNotSupportInterfaceDeclarations;
+
+    public static String MakePrivateEntityPublicRefactoring_DoesNotSupportIntrinsicEntities;
+
+    public static String MakePrivateEntityPublicRefactoring_HighlightPrivateEntityName;
+
+    public static String MakePrivateEntityPublicRefactoring_Name;
+
+    public static String MakePrivateEntityPublicRefactoring_NoPrivateEntitySelected;
+
+    public static String MakePrivateEntityPublicRefactoring_PublicEntitySelectedSelectPrivate;
+
+    public static String MakePrivateEntityPublicRefactoring_SelectPrivateEntityName;
+    
+    public static String MoveCommonToModuleRefactoring_InvalidIdentifier;
+
+    public static String MoveCommonToModuleRefactoring_Name;
+
+    public static String MoveCommonToModuleRefactoring_SelectVarOrBlockInCommonStmt;
+    
+    public static String RemoveUnusedVariablesRefactoring_CouldNotCompleteOperation;
+
+    public static String RemoveUnusedVariablesRefactoring_DoesNotRemovedUnusedVarsWithDefsOnAnotherLine;
+
+    public static String RemoveUnusedVariablesRefactoring_Name;
+
+    public static String RemoveUnusedVariablesRefactoring_RefactorAgainToRemoveAllUnusedVars;
+
+    public static String RemoveUnusedVariablesRefactoring_Scope;
+
+    public static String RemoveUnusedVariablesRefactoring_SelectedFileCannotBeParsed;
+
+    public static String RemoveUnusedVariablesRefactoring_SelectedFilesCannotBeParsed;
+
+    public static String RemoveUnusedVariablesRefactoring_SelectedFilesMustBeImplicitNone;
+
+    public static String RemoveUnusedVariablesRefactoring_UnusedVarsRemovedFromFile;
+
+    public static String RemoveUnusedVariablesRefactoring_VariableUnusedAndWillBeRemoved;
+
+    public static String RepObsOpersRefactoring_Name;
+
+    public static String RepObsOpersRefactoring_SelectedFileCannotBeParsed;
+
+    public static String StandardizeStatementsRefactoring_Name;
+
+    public static String StandardizeStatementsRefactoring_SelectedFileCannotBeParsed;
+
     static
     {
         // initialize resource bundle

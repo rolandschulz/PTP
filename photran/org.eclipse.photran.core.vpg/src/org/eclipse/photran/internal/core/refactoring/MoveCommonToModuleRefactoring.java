@@ -49,10 +49,11 @@ import org.eclipse.rephraserengine.core.refactorings.UserInputString;
  * THIS REFACTORING IS INCOMPLETE.  IT *DOES NOT* WORK CORRECTLY YET.
  *
  * @author Jeff Overbey
+ * @author Ashley Kasza - externalized strings
  */
 public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
 {
-    private static final String CRLF = System.getProperty("line.separator");
+    private static final String CRLF = System.getProperty("line.separator"); //$NON-NLS-1$
 
     private ASTCommonBlockNode commonBlockToMove = null;
     private String nameOfCommonBlockToMove = null;
@@ -62,7 +63,7 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Move COMMON Block to Module";
+        return Messages.MoveCommonToModuleRefactoring_Name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
     {
         assert commonBlockToMove != null && nameOfCommonBlockToMove != null;
 
-        return nameOfCommonBlockToMove.equals("") ? "common" : nameOfCommonBlockToMove;
+        return nameOfCommonBlockToMove.equals("") ? "common" : nameOfCommonBlockToMove; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @UserInputString(label="Create a module named ", defaultValueMethod="getSuggestedNewModuleName")
@@ -107,11 +108,11 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
     {
         Token enclosingToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (enclosingToken == null)
-            fail("Please select a variable or block in a COMMON statement.");
+            fail(Messages.MoveCommonToModuleRefactoring_SelectVarOrBlockInCommonStmt);
 
         commonBlockToMove = enclosingToken.findNearestAncestor(ASTCommonBlockNode.class);
         if (commonBlockToMove == null)
-            fail("Please select a variable or block in a COMMON statement.");
+            fail(Messages.MoveCommonToModuleRefactoring_SelectVarOrBlockInCommonStmt);
     }
 
     private void determineEnclosingCommonBlockName()
@@ -125,7 +126,7 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
         if (commonBlockNameToken != null)
             return commonBlockNameToken.getCommonBlockName().getText();
         else
-            return "";
+            return ""; //$NON-NLS-1$
     }
 
     private void determineAffectedFiles() throws PreconditionFailure
@@ -145,7 +146,7 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
         assert commonBlockToMove != null && nameOfCommonBlockToMove != null && affectedFiles != null;
         assert newModuleName != null;
 
-        if (!isValidIdentifier(newModuleName)) fail(newModuleName + " is not a valid identifier");
+        if (!isValidIdentifier(newModuleName)) fail(Messages.bind(Messages.MoveCommonToModuleRefactoring_InvalidIdentifier, newModuleName));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -188,9 +189,9 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
     private ASTModuleNode createEmptyModule()
     {
         String moduleSource =
-            "module " + newModuleName + CRLF +
-            "    implicit none" + CRLF +
-            "end module " + newModuleName + CRLF;
+            "module " + newModuleName + CRLF + //$NON-NLS-1$
+            "    implicit none" + CRLF + //$NON-NLS-1$
+            "end module " + newModuleName + CRLF; //$NON-NLS-1$
         return (ASTModuleNode)parseLiteralProgramUnit(moduleSource);
     }
 
@@ -292,7 +293,7 @@ public class MoveCommonToModuleRefactoring extends FortranEditorRefactoring
     @SuppressWarnings("unchecked")
     private void addUseStmtAtBeginningOfScopeContaining(ASTCommonStmtNode enclosingCommonStmt, IFortranAST ast)
     {
-        ASTUseStmtNode useStmt = (ASTUseStmtNode)parseLiteralStatement("use " + newModuleName);
+        ASTUseStmtNode useStmt = (ASTUseStmtNode)parseLiteralStatement("use " + newModuleName); //$NON-NLS-1$
 
         ScopingNode enclosingScope = enclosingCommonStmt.findNearestAncestor(ScopingNode.class);
         ((IASTListNode<IASTNode>)enclosingScope.getBody()).add(0, useStmt);

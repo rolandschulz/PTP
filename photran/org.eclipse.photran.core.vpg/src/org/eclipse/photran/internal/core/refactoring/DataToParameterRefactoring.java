@@ -40,6 +40,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
  * @author Gustavo Rissetti
  * @author Timofey Yuvashev
  * @author Jeff Overbey
+ * @author Ashley Kasza - externalized strings
  **/
 public class DataToParameterRefactoring extends FortranResourceRefactoring
 {
@@ -48,7 +49,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
     @Override
     public String getName()
     {
-        return "Data To Parameter";
+        return Messages.DataToParameterRefactoring_Name;
     }
 
     @Override
@@ -69,7 +70,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
                 IFortranAST ast = vpg.acquirePermanentAST(file);
                 if (ast == null)
                 {
-                    status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
+                    status.addError(Messages.bind(Messages.DataToParameterRefactoring_SelectedFileCannotBeParsed, file.getName()));
                 }
                 else
                 {
@@ -91,8 +92,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
 
         if (changesWereMade)
         {
-            status.addWarning("This refactoring is NOT considering variable assignment that could happen as a result of passing "
-                + "a variable to a function/subroutine by reference.");
+            status.addWarning(Messages.DataToParameterRefactoring_RefactorNotConsideringVarAssignment);
             addChangeFromModifiedAST(file, pm);
         }
     }
@@ -151,7 +151,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
         private void convertDataStmt(ASTDataStmtNode node, List<String> assignedVars) throws PreconditionFailure
         {
             if (node.getDatalist() == null)
-                throw new PreconditionFailure("Data list of a node was empty. Refactoring failed");
+                throw new PreconditionFailure(Messages.DataToParameterRefactoring_EmptyDataListInNode);
 
             int size = node.getDatalist().size();
             for (ASTDatalistNode dataList : node.getDatalist())
@@ -189,23 +189,23 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
                 {
                     IASTNode comma = node;
                     String source_comma = SourcePrinter.getSourceCodeFromASTNode(comma);
-                    String[] source_comma_split = source_comma.split("\n");
+                    String[] source_comma_split = source_comma.split("\n"); //$NON-NLS-1$
                     // Find the Data statement.
                     String statement = source_comma_split[source_comma_split.length-1].trim();
                     String data = statement.substring(0, 4);
                     String list_data = statement.substring(4);                            
                     list_data = list_data.trim();
-                    if(list_data.startsWith(","))
+                    if(list_data.startsWith(",")) //$NON-NLS-1$
                     {
                         // Remove the comma that is left.
                         list_data = list_data.substring(1);
                         list_data = list_data.trim();
-                        String new_source = new String("");
+                        String new_source = new String(""); //$NON-NLS-1$
                         for(int i=0; i<source_comma_split.length-1; i++)
                         {
-                            new_source += source_comma_split[i] + "\n";
+                            new_source += source_comma_split[i] + "\n"; //$NON-NLS-1$
                         }
-                        new_source += data + " " + list_data;
+                        new_source += data + " " + list_data; //$NON-NLS-1$
                         // Create the new node and replaces the old.
                         IASTNode without_comma = parseLiteralStatement(new_source);
                         comma.replaceWith(without_comma);
@@ -298,11 +298,11 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
 
         private IASTNode createParameterStmt(int index, String parameterName)
         {
-            StringBuffer parameterStmt = new StringBuffer("parameter ( ");
-            parameterStmt.append(parameterName + " = ");
+            StringBuffer parameterStmt = new StringBuffer("parameter ( "); //$NON-NLS-1$
+            parameterStmt.append(parameterName + " = "); //$NON-NLS-1$
             String value = valueList.get(index).getConstant().toString().trim();
             parameterStmt.append(value);
-            parameterStmt.append(" )");
+            parameterStmt.append(" )"); //$NON-NLS-1$
             parameterStmt.append(trailingComments());
             return parseLiteralStatement(parameterStmt.toString());
         }
@@ -311,12 +311,12 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
         {
             // TODO: Use dataStmt.findLastToken().getWhiteBefore()?
             String source = SourcePrinter.getSourceCodeFromASTNode(dataStmt);
-            String[] sourceSplit = source.split("\n");
+            String[] sourceSplit = source.split("\n"); //$NON-NLS-1$
             String lastLine = sourceSplit[sourceSplit.length-1];
             for (int index_comment = 0; index_comment < lastLine.length(); index_comment++)
                 if (lastLine.charAt(index_comment) == '!')
-                    return " " + lastLine.substring(index_comment);
-            return "";
+                    return " " + lastLine.substring(index_comment); //$NON-NLS-1$
+            return ""; //$NON-NLS-1$
         }
 
         private int removeASTEntries(int numDataLists)
@@ -346,10 +346,10 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
         private String leadingComments()
         {
             String source = SourcePrinter.getSourceCodeFromASTNode(dataStmt);
-            String[] sourceSplit = source.split("\n");
-            String commentsBeforeLine = "";
+            String[] sourceSplit = source.split("\n"); //$NON-NLS-1$
+            String commentsBeforeLine = ""; //$NON-NLS-1$
             for (int i = 0; i < sourceSplit.length - 1; i++)
-                commentsBeforeLine += sourceSplit[i]+"\n";
+                commentsBeforeLine += sourceSplit[i]+"\n"; //$NON-NLS-1$
             return commentsBeforeLine;
         }
 
@@ -359,7 +359,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
             //A bit of a hack... This adds a white space before each remaining element in the data section.
             //It is needed to prevent "clumping together" of the key-word "data" and the following variables
             for (IDataStmtObject n : objectList)
-                n.findFirstToken().setWhiteBefore(" ");
+                n.findFirstToken().setWhiteBefore(" "); //$NON-NLS-1$
 
             valueList.removeAll(valuesToDelete);
             

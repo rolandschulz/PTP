@@ -31,6 +31,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResou
  * @author Gustavo Rissetti
  * @author Timofey Yuvashev
  * @author Jeff Overbey
+ * @author Ashley Kasza - externalized strings
  **/
 /*
  * TODO - JO - Can we avoid running multiple times?
@@ -41,7 +42,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
     @Override
     public String getName()
     {
-        return "Remove Unused Local Variables";
+        return Messages.RemoveUnusedVariablesRefactoring_Name;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
                 IFortranAST ast = vpg.acquirePermanentAST(file);
                 if(ast == null)
                 {
-                    status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
+                    status.addError(Messages.bind(Messages.RemoveUnusedVariablesRefactoring_SelectedFileCannotBeParsed, file.getName()));
                 }
                 else
                 {
@@ -91,9 +92,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
         for (ScopingNode scope : ast.getRoot().getAllContainedScopes())
             if (!(scope instanceof ASTExecutableProgramNode))
                 if (!scope.isImplicitNone())
-                    fail("All of the selected files must be IMPLICIT NONE. Please use the "
-                        + "Introduce Implict None refactoring first to introduce IMPLICIT "
-                        + "NONE statements in the file "+file.getName()+".");
+                    fail(Messages.bind(Messages.RemoveUnusedVariablesRefactoring_SelectedFilesMustBeImplicitNone, file.getName()));
     }
 
     @Override
@@ -105,7 +104,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
                 IFortranAST ast = vpg.acquirePermanentAST(file);
                 if(ast == null)
                 {
-                    status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
+                    status.addError(Messages.bind(Messages.RemoveUnusedVariablesRefactoring_SelectedFilesCannotBeParsed, file.getName()));
                 }
                 else
                 {
@@ -131,19 +130,19 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
         if (hasChanged)
         {
             addChangeFromModifiedAST(file, pm);
-            status.addInfo("After clicking 'Continue', do the same refactoring again to make sure that all unused variables are removed from file " + file.getName()+"!");
-            status.addWarning("This refactoring does not remove unused variables when their dimentions are specified on another line. I.e. real a /n/n dimention a(10) will not be removed.");
+            status.addInfo(Messages.bind(Messages.RemoveUnusedVariablesRefactoring_RefactorAgainToRemoveAllUnusedVars, file.getName()));
+            status.addWarning(Messages.RemoveUnusedVariablesRefactoring_DoesNotRemovedUnusedVarsWithDefsOnAnotherLine);
         }
         else
         {
-            status.addInfo("All unused variables have been removed from file " + file.getName()+"!");
+            status.addInfo(Messages.bind(Messages.RemoveUnusedVariablesRefactoring_UnusedVarsRemovedFromFile, file.getName()));
         }
     }
 
     private boolean removedUnusedVariablesFromScope(ScopingNode scope)
         throws PreconditionFailure
     {
-        assert debug("Scope: " + scope.getClass().getName());
+        assert debug(Messages.bind(Messages.RemoveUnusedVariablesRefactoring_Scope, scope.getClass().getName()));
         
         boolean hasChanged = false;
         
@@ -161,14 +160,14 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
 
     private void removeVariableDeclFor(Definition def) throws PreconditionFailure
     {
-        assert debug("The variable [" + def.getDeclaredName() + "] was not used and will be removed.");
+        assert debug(Messages.bind(Messages.RemoveUnusedVariablesRefactoring_VariableUnusedAndWillBeRemoved, def.getDeclaredName()));
         
         ASTTypeDeclarationStmtNode declarationNode = getTypeDeclarationStmtNode(def.getTokenRef().findToken().getParent());
         
         IASTListNode<ASTEntityDeclNode> entityDeclList = declarationNode.getEntityDeclList();
         if (entityDeclList.size() == 1)
         {
-            declarationNode.replaceWith("\n");
+            declarationNode.replaceWith("\n"); //$NON-NLS-1$
         }
         else
         {
@@ -190,7 +189,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
             {
                 if (!entityDeclList.remove(decl))
                 {
-                    fail("Sorry, could not complete the operation.");
+                    fail(Messages.RemoveUnusedVariablesRefactoring_CouldNotCompleteOperation);
                 }                                    
                 break;
             }
@@ -198,7 +197,7 @@ public class RemoveUnusedVariablesRefactoring extends FortranResourceRefactoring
         
         //Add a whitespace so that variable names and keywords don't clump together
         //i.e. "integer x,y" doesn't become "integerx,y"
-        entityDeclList.findFirstToken().setWhiteBefore(" ");
+        entityDeclList.findFirstToken().setWhiteBefore(" "); //$NON-NLS-1$
     }
 
     private ASTTypeDeclarationStmtNode getTypeDeclarationStmtNode(IASTNode node)

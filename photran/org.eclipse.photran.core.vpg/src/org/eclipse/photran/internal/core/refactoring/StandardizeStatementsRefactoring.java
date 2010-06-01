@@ -38,13 +38,14 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinte
  * @author Gustavo Rissetti
  * @author Timofey Yuvashev
  * @author Jeff Overbey
+ * @author Ashley Kasza - externalized strings
  **/
 public class StandardizeStatementsRefactoring extends FortranResourceRefactoring{
 
     @Override
     public String getName()
     {
-        return "Standardize Statements";
+        return Messages.StandardizeStatementsRefactoring_Name;
     }
 
     @Override
@@ -65,7 +66,7 @@ public class StandardizeStatementsRefactoring extends FortranResourceRefactoring
                 IFortranAST ast = vpg.acquirePermanentAST(file);
                 if (ast == null)
                 {
-                    status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
+                    status.addError(Messages.bind(Messages.StandardizeStatementsRefactoring_SelectedFileCannotBeParsed, file.getName()));
                 }
                 makeChangesTo(file, ast, status, pm);
                 vpg.releaseAST(file);
@@ -154,7 +155,7 @@ public class StandardizeStatementsRefactoring extends FortranResourceRefactoring
     {
         ASTTypeSpecNode typeNode = new ASTTypeSpecNode();
         String type = typeDeclStmt.getTypeSpec().toString().trim();
-        String[] typeWithoutComments = type.split("\n");
+        String[] typeWithoutComments = type.split("\n"); //$NON-NLS-1$
         type = typeWithoutComments[typeWithoutComments.length - 1].trim();
         typeNode.setIsInteger(new Token(Terminal.T_INTEGER, type));
         return typeNode;
@@ -164,12 +165,12 @@ public class StandardizeStatementsRefactoring extends FortranResourceRefactoring
     {
         String source = SourcePrinter.getSourceCodeFromASTNode(newStmt);
         int position_type = newStmt.getTypeSpec().toString().length();
-        String twoPoints = "";
+        String twoPoints = ""; //$NON-NLS-1$
         String source_1 = source.substring(0, position_type);
         String source_2 = source.substring(position_type,source.length());
         if (!containsColonColon(source_2)) 
         {
-            twoPoints = " :: ";
+            twoPoints = " :: "; //$NON-NLS-1$
         }
         // New statement, with the two points (::).
         source = source_1+twoPoints+source_2.trim();

@@ -39,6 +39,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  * program, modules, subroutines, etc.
  *
  * @author Kurt Hendle
+ * @author Ashley Kasza - externalized strings
  */
 public class CommonVarNamesRefactoring extends FortranEditorRefactoring
 {
@@ -57,7 +58,7 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Make COMMON Variable Names Consistent";
+        return Messages.CommonVarNamesRefactoring_Name;
     }
 
     public int getNumCommonVars()
@@ -92,12 +93,12 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
 
         commonBlockNode = token.findNearestAncestor(ASTCommonBlockNode.class);
         if(commonBlockNode == null)
-            fail("No COMMON block found with name '" + commonBlockName +"'.");
+            fail(Messages.bind(Messages.CommonVarNamesRefactoring_NoCommonBlockFoundWithName, commonBlockName));
 
         //find all files in the project containing the block
         filesContainingCommonBlock = PhotranVPG.getInstance().findFilesThatUseCommonBlock(commonBlockName);
         if(filesContainingCommonBlock.isEmpty())
-            fail("No files found containing the specified COMMON block."); //should never execute
+            fail(Messages.CommonVarNamesRefactoring_NoFilesFoundContainingCommonBlock); //should never execute
         else
             filterCommonBlockFileList();
 
@@ -112,7 +113,7 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
     {
         Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selectedToken == null)
-            fail("Please select a COMMON block name (highlight the name, excluding /'s)");
+            fail(Messages.CommonVarNamesRefactoring_SelectCommonBlockName);
         return selectedToken;
     }
 
@@ -120,7 +121,7 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
     {
         IProject projectInEditor = this.fileInEditor.getProject();  //current project
 
-        if(projectInEditor == null) fail("Project does not exist!");
+        if(projectInEditor == null) fail(Messages.CommonVarNamesRefactoring_ProjectDoesNotExist);
 
         //filter out files not in the project
         int i = 0;
@@ -147,8 +148,8 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
             varName = PhotranVPG.canonicalizeIdentifier(iter.next().getVariableName().getText());
             oldNames.add(varName);
 
-            varName = varName.replaceAll("_common", "");
-            newName = varName.concat("_common");
+            varName = varName.replaceAll("_common", ""); //$NON-NLS-1$ //$NON-NLS-2$
+            newName = varName.concat("_common"); //$NON-NLS-1$
             newNames.add(newName);
 
             oldVarNames.put(varName, varNameNumber);
@@ -267,10 +268,10 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
         @Override public void visitASTCommonBlockNode(ASTCommonBlockNode node)
         {
             //make sure we aren't looking for null name
-            if(node.getName() == null && !commonBlockName.equals(""))
+            if(node.getName() == null && !commonBlockName.equals("")) //$NON-NLS-1$
                 return;
 
-            if((node.getName() == null && commonBlockName.equals("")) ||
+            if((node.getName() == null && commonBlockName.equals("")) || //$NON-NLS-1$
                 commonBlockName.equalsIgnoreCase(node.getName().getCommonBlockName().getText()))
             {
                 checkConflictingBindings(node, pm, status);
@@ -339,8 +340,7 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
                     changedAST = true;
                 }
                 else
-                    throw new TypeError("Variable types differ in different uses of the specified" +
-                        " COMMON block. Refactoring will not proceed.");
+                    throw new TypeError(Messages.CommonVarNamesRefactoring_VariableTypesDiffer);
             }
         }
     }
@@ -356,7 +356,7 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
         {
             Conflict conflict = conflictingDef.get(0);
 
-            String msg = "The name \"" + conflict.name + "\" conflicts with " + vpg.getDefinitionFor(conflict.tokenRef);
+            String msg = Messages.bind(Messages.CommonVarNamesRefactoring_NameConflictsWith, conflict.name, vpg.getDefinitionFor(conflict.tokenRef));
             RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
             status.addError(msg, context);
         }
@@ -365,7 +365,7 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
         {
             Conflict conflict = conflictingDef.get(0);
 
-            String msg = "The name \"" + conflict.name + "\" might conflict with the name of an invoked subprogram";
+            String msg = Messages.bind(Messages.CommonVarNamesRefactoring_NameMightConflictWithSubprogram, conflict.name);
             RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
             status.addWarning(msg, context);
         }

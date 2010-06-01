@@ -39,7 +39,9 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 /**
  *
  * @author Kurt Hendle
+ * @author Ashley Kasza - externalized strings
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
 {
     //used by all forms
@@ -51,7 +53,7 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
     private ASTGenericNameNode identifierNode = null;
     //access statement in declaration attributes
     private String selectedVarType;
-    private String varSpecAttrs = "";
+    private String varSpecAttrs = ""; //$NON-NLS-1$
     private ASTTypeDeclarationStmtNode declarationStmtNode = null;
     private ASTEntityDeclNode entDeclNode = null;
     private ASTObjectNameNode identNameNode = null;
@@ -66,7 +68,7 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Make Private Entity Public";
+        return Messages.MakePrivateEntityPublicRefactoring_Name;
     }
 
     @Override
@@ -80,8 +82,8 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         checkForUnsupportedType(token);
 
         identName = this.selectedRegionInEditor.getText();
-        if(identName.equals(""))
-            fail("Please select a private entity name.");
+        if(identName.equals("")) //$NON-NLS-1$
+            fail(Messages.MakePrivateEntityPublicRefactoring_SelectPrivateEntityName);
 
         //see if any of the supported type of nodes exist and get their info
         accessNode = token.findNearestAncestor(ASTAccessStmtNode.class);
@@ -101,10 +103,10 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
             checkForFunctionStmtNode(token);
 
         if(accessNodeSpec == null)
-            fail("No private entities selected.");
+            fail(Messages.MakePrivateEntityPublicRefactoring_NoPrivateEntitySelected);
 
         if(accessNodeSpec.isPublic())
-            fail("Public entity is selected. Please select a Private entity.");
+            fail(Messages.MakePrivateEntityPublicRefactoring_PublicEntitySelectedSelectPrivate);
     }
 
     //modified from RenameRefactoring.java
@@ -112,7 +114,7 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
     {
         Token selectedToken = findEnclosingToken(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selectedToken == null)
-            fail("Please select a private entity name (highlight the entity name)");
+            fail(Messages.MakePrivateEntityPublicRefactoring_HighlightPrivateEntityName);
         return selectedToken;
     }
 
@@ -125,11 +127,11 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         ASTInterfaceBlockNode interfaceNode = token.findNearestAncestor(ASTInterfaceBlockNode.class);
 
         if(intrinsic != null)
-            fail("Refactoring does not support Intrinsic entities.");
+            fail(Messages.MakePrivateEntityPublicRefactoring_DoesNotSupportIntrinsicEntities);
         else if(external != null)
-            fail("Refactoring does not support External entities.");
+            fail(Messages.MakePrivateEntityPublicRefactoring_DoesNotSupportExternalEntities);
         else if(interfaceNode != null)
-            fail("Refactoring does not support Interface declarations.");
+            fail(Messages.MakePrivateEntityPublicRefactoring_DoesNotSupportInterfaceDeclarations);
     }
 
     //parses information from a declaration statement
@@ -148,9 +150,9 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
             for(ASTAttrSpecSeqNode attrNode : declarationStmtNode.getAttrSpecSeq())
             {
                 ASTAttrSpecNode specNode = attrNode.getAttrSpec();
-                if(!specNode.toString().trim().equals("private"))
+                if(!specNode.toString().trim().equals("private")) //$NON-NLS-1$
                 {
-                    varSpecAttrs += ",";
+                    varSpecAttrs += ","; //$NON-NLS-1$
                     varSpecAttrs += specNode.toString();
                 }
 
@@ -189,7 +191,6 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void checkIfEntireProgramPriv(Token token)
     {
         ASTListNode progBody = null;
@@ -254,7 +255,7 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         }
         else
         {   //simply switch private to public
-            Token newToken = new Token(Terminal.T_PUBLIC, "public");
+            Token newToken = new Token(Terminal.T_PUBLIC, "public"); //$NON-NLS-1$
             accessNodeSpec.setIsPrivate(null);
             accessNodeSpec.setIsPublic(newToken);
 
@@ -265,15 +266,14 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void handleDeclarationSubroutineOrFunction(IFortranAST ast)
     {
         if(declarationStmtNode != null)
         {
             ASTTypeDeclarationStmtNode newStmtNode =
-                (ASTTypeDeclarationStmtNode) parseLiteralStatement(selectedVarType + ", public" +
-                    varSpecAttrs + " :: " + identNameNode.getObjectName().getText() +
-                    System.getProperty("line.separator"));
+                (ASTTypeDeclarationStmtNode) parseLiteralStatement(selectedVarType + ", public" + //$NON-NLS-1$
+                    varSpecAttrs + " :: " + identNameNode.getObjectName().getText() + //$NON-NLS-1$
+                    System.getProperty("line.separator")); //$NON-NLS-1$
 
             ASTListNode body = (ASTListNode)declarationStmtNode.getParent();
             body.replaceChild(declarationStmtNode, newStmtNode);
@@ -281,8 +281,8 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         }
         else if(subroutineNode != null || functionNode != null)
         {
-            ASTAccessStmtNode newStmtNode = (ASTAccessStmtNode)parseLiteralStatement("public " +
-                identName + System.getProperty("line.separator"));
+            ASTAccessStmtNode newStmtNode = (ASTAccessStmtNode)parseLiteralStatement("public " + //$NON-NLS-1$
+                identName + System.getProperty("line.separator")); //$NON-NLS-1$
 
             ASTListNode body = (ASTListNode)lonePrivateNode.getParent();
             body.insertAfter(lonePrivateNode, newStmtNode);
@@ -290,14 +290,13 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void createPublicNode(IFortranAST ast)
     {
         if(accessNode != null)
         {
             //make a new public ASTAccessStmtNode
-            ASTAccessStmtNode newStmtNode = (ASTAccessStmtNode)parseLiteralStatement("public " +
-                identifierNode.getGenericName().getText()+System.getProperty("line.separator"));
+            ASTAccessStmtNode newStmtNode = (ASTAccessStmtNode)parseLiteralStatement("public " + //$NON-NLS-1$
+                identifierNode.getGenericName().getText()+System.getProperty("line.separator")); //$NON-NLS-1$
 
             //insert the public node into the program body in AST
             ASTListNode body = (ASTListNode)accessNode.getParent();
@@ -307,9 +306,9 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         else
         {
             ASTTypeDeclarationStmtNode newStmtNode =
-                (ASTTypeDeclarationStmtNode) parseLiteralStatement(selectedVarType + ", public" +
-                    varSpecAttrs + " :: " + identNameNode.getObjectName().getText() +
-                    System.getProperty("line.separator"));
+                (ASTTypeDeclarationStmtNode) parseLiteralStatement(selectedVarType + ", public" + //$NON-NLS-1$
+                    varSpecAttrs + " :: " + identNameNode.getObjectName().getText() + //$NON-NLS-1$
+                    System.getProperty("line.separator")); //$NON-NLS-1$
 
             ASTListNode body = (ASTListNode)declarationStmtNode.getParent();
             body.insertAfter(declarationStmtNode, newStmtNode);
@@ -317,7 +316,6 @@ public class MakePrivateEntityPublicRefactoring extends FortranEditorRefactoring
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void removeIdentifierFromPrivateList()
     {
         if(accessNode != null)

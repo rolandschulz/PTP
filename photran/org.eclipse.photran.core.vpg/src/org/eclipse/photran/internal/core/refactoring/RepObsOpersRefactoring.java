@@ -28,13 +28,14 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResou
  *
  * @author Bruno B. Boniati
  * @author Jeff Overbey
+ * @author Ashley Kasza - externalized strings
  */
 public class RepObsOpersRefactoring extends FortranResourceRefactoring
 {
     @Override
     public String getName()
     {
-        return "Replace Obsolete Operators";
+        return Messages.RepObsOpersRefactoring_Name;
     }
 
     @Override
@@ -54,7 +55,7 @@ public class RepObsOpersRefactoring extends FortranResourceRefactoring
             {
                 IFortranAST ast = vpg.acquirePermanentAST(file);
                 if (ast == null)
-                    status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
+                    status.addError(Messages.bind(Messages.RepObsOpersRefactoring_SelectedFileCannotBeParsed, file.getName()));
                 makeChangesTo(file, ast, status, pm);
                 vpg.releaseAST(file);
             }
@@ -97,12 +98,12 @@ public class RepObsOpersRefactoring extends FortranResourceRefactoring
 
         private void replaceOperatorIn(ASTOperatorNode op)
         {
-            if (op.hasLtOp()) setText(op, "<");
-            if (op.hasLeOp()) setText(op, "<=");
-            if (op.hasEqOp()) setText(op, "==");
-            if (op.hasNeOp()) setText(op, "/=");
-            if (op.hasGtOp()) setText(op, ">");
-            if (op.hasGeOp()) setText(op, ">=");
+            if (op.hasLtOp()) setText(op, "<"); //$NON-NLS-1$
+            if (op.hasLeOp()) setText(op, "<="); //$NON-NLS-1$
+            if (op.hasEqOp()) setText(op, "=="); //$NON-NLS-1$
+            if (op.hasNeOp()) setText(op, "/="); //$NON-NLS-1$
+            if (op.hasGtOp()) setText(op, ">"); //$NON-NLS-1$
+            if (op.hasGeOp()) setText(op, ">="); //$NON-NLS-1$
         }
 
         private void setText(ASTOperatorNode op, String newText)

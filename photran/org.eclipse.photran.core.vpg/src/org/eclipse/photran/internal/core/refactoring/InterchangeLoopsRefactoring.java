@@ -28,6 +28,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.S
  * Interchanges two perfectly-nested DO-loops.
  *
  * @author Tim Yuvashev
+ * @author Ashley Kasza - externalized strings
  */
 public class InterchangeLoopsRefactoring extends FortranEditorRefactoring
 {
@@ -46,10 +47,9 @@ public class InterchangeLoopsRefactoring extends FortranEditorRefactoring
         outerLoop = findOuterLoop();
         innerLoop = findInnerLoop();
         if (outerLoop == null || innerLoop == null || outerLoop == innerLoop)
-            fail("Please select two perfectly-nested loops to refactor.");
+            fail(Messages.InterchangeLoopsRefactoring_SelectTwoPerfNextedLoops);
 
-        status.addWarning("WARNING: This is an UNCHECKED TRANSFORMATION and is NOT guaranteed to preserve behavior.  " +
-            "Proceed at your own risk.");
+        status.addWarning(Messages.InterchangeLoopsRefactoring_UncheckedTransNotGuaranteedToPreserve);
     }
 
     private ASTProperLoopConstructNode findOuterLoop()
@@ -127,6 +127,6 @@ public class InterchangeLoopsRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Interchange Loops (Unchecked)";
+        return Messages.InterchangeLoopsRefactoring_Name;
     }
 }

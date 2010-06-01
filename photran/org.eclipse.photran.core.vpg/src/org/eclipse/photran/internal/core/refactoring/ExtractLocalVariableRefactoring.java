@@ -44,6 +44,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
  * INCOMPLETE
  *
  * @author Jeff Overbey
+ * @author Ashley Kasza - externalized strings
  */
 public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
 {
@@ -64,7 +65,7 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
     @Override
     public String getName()
     {
-        return "Extract Local Variable";
+        return Messages.ExtractLocalVariableRefactoring_Name;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -97,36 +98,34 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
 
         IASTNode selection = findEnclosingNode(this.astOfFileInEditor, this.selectedRegionInEditor);
         if (selection == null || !(selection instanceof IExpr))
-            fail("Please select an expression to extract.");
+            fail(Messages.ExtractLocalVariableRefactoring_SelectExpressionToExtract);
 
         if (!nodeExactlyEnclosesRegion(selection, this.astOfFileInEditor, this.selectedRegionInEditor))
-            fail("You have selected part of an expression, but either (1) the part you have selected is not an " +
-                 "expression by itself, or (2) extracting that portion of the expression could change the " +
-                 "meaning of the larger expression, due to a change in associativity or precedence.");
+            fail(Messages.ExtractLocalVariableRefactoring_ErrorSelectingPartOfExpression);
 
         selectedExpr = (IExpr)selection;
 
         enclosingStmt = selectedExpr.findNearestAncestor(IActionStmt.class);
         if (enclosingStmt == null)
-            fail("Variables can only be extracted from action statements (e.g., assignments, print statements, etc.).");
+            fail(Messages.ExtractLocalVariableRefactoring_VarsExtractedOnlyFromActionStmt);
 
         if (!(enclosingStmt.getParent() instanceof IASTListNode)) // Should never happen since <ActionStmt> only under <Body>
-            fail("The selected expression is not located in a statement from which a variable can be extracted.");
+            fail(Messages.ExtractLocalVariableRefactoring_ExpressionNotInExtractableStmt);
         enclosingStmtList = (IASTListNode)enclosingStmt.getParent();
 
         enclosingScope = enclosingStmt.findNearestAncestor(ScopingNode.class);
         if (enclosingScope == null) // Should never happen since <ActionStmt> only under <Body>
-            fail("Variables can only be extracted from action statements inside functions, subroutines, and main programs.");
+            fail(Messages.ExtractLocalVariableRefactoring_VarsOnlyExtractedFromStmtsIn);
 
         Type exprType = TypeChecker.getTypeOf(selectedExpr);
         if (exprType == Type.TYPE_ERROR)
         {
-            status.addWarning("The type of the expression could not be determined automatically.");
-            decl = "real :: newName";
+            status.addWarning(Messages.ExtractLocalVariableRefactoring_ExpressionTypeNotBeAutoDetermined);
+            decl = "real :: newName"; //$NON-NLS-1$
         }
         else
         {
-            decl = exprType.toString() + " :: newName";
+            decl = exprType.toString() + " :: newName"; //$NON-NLS-1$
         }
     }
 
@@ -139,28 +138,27 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
     {
         assert decl != null;
 
-        status.addWarning("If any functions in the original or extracted expression have side effects, this " +
-                          "refactoring may not preserve behavior.");
+        status.addWarning(Messages.ExtractLocalVariableRefactoring_ExtractionMayNotPreserveBehavior);
 
         // Simple checks -- input validation
 
-        if (this.decl.trim().equals(""))
-            fail("Please enter a declaration for the extracted variable.");
+        if (this.decl.trim().equals("")) //$NON-NLS-1$
+            fail(Messages.ExtractLocalVariableRefactoring_EnterDeclarationForExtractedVar);
 
         IBodyConstruct decl = parseLiteralStatementNoFail(this.decl);
         if (decl == null || !(decl instanceof ASTTypeDeclarationStmtNode))
-            fail("The text entered (\"" + this.decl + "\") is not a valid type declaration statement.");
+            fail(Messages.bind(Messages.ExtractLocalVariableRefactoring_InvalidTypeDeclStmt, this.decl));
 
         declToInsert = (ASTTypeDeclarationStmtNode)decl;
 
         if (declToInsert.getEntityDeclList() == null
             || declToInsert.getEntityDeclList().size() != 1)
-            fail("The declaration entered does not declare a single variable.");
+            fail(Messages.ExtractLocalVariableRefactoring_DeclarationDoesNotDeclareSingleVar);
 
         name = declToInsert.getEntityDeclList().get(0).getObjectName().getObjectName().getText();
 
         if (declToInsert.getEntityDeclList().get(0).getInitialization() != null)
-            fail("The declaration must not contain an initialization.");
+            fail(Messages.ExtractLocalVariableRefactoring_DeclarationMustNotContainInitialization);
 
         // Complex checks -- require program analysis
 
@@ -199,7 +197,7 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
         {
             Conflict conflict = conflictingDef.get(0);
 
-            String msg = "The name \"" + conflict.name + "\" conflicts with " + vpg.getDefinitionFor(conflict.tokenRef);
+            String msg = Messages.bind(Messages.ExtractLocalVariableRefactoring_NameConflictsWith, conflict.name, vpg.getDefinitionFor(conflict.tokenRef));
             RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
             status.addError(msg, context);
         }
@@ -208,7 +206,7 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
         {
             Conflict conflict = conflictingDef.get(0);
 
-            String msg = "The name \"" + conflict.name + "\" might conflict with the name of an invoked subprogram";
+            String msg = Messages.bind(Messages.ExtractLocalVariableRefactoring_NameMightConflictWithSubprogram, conflict.name);
             RefactoringStatusContext context = createContext(conflict.tokenRef); // Highlights problematic definition
             status.addWarning(msg, context);
         }
@@ -282,9 +280,9 @@ public class ExtractLocalVariableRefactoring extends FortranEditorRefactoring
     private void insertAssignment()
     {
         IExpr expr = (IExpr)selectedExpr.clone();
-        expr.findFirstToken().setWhiteBefore("");
+        expr.findFirstToken().setWhiteBefore(""); //$NON-NLS-1$
         
-        ASTAssignmentStmtNode assignmentStmt = (ASTAssignmentStmtNode)parseLiteralStatement(name + " = " + expr);
+        ASTAssignmentStmtNode assignmentStmt = (ASTAssignmentStmtNode)parseLiteralStatement(name + " = " + expr); //$NON-NLS-1$
         enclosingStmtList.insertBefore(enclosingStmt, assignmentStmt);
         Reindenter.reindent(assignmentStmt, astOfFileInEditor);
     }

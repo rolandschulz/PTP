@@ -39,13 +39,14 @@ import org.eclipse.photran.internal.core.util.Notification;
  * implicitly-declared variables into a scope and all nested scopes (where needed).
  *
  * @author Jeff Overbey, Timofey Yuvashev
+ * @author Ashley Kasza - externalized strings
  */
 public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
 {
     @Override
     public String getName()
     {
-        return "Introduce Implicit None";
+        return Messages.IntroImplicitNoneRefactoring_Name;
     }
 
     /*
@@ -85,9 +86,7 @@ public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
                 if (tempAST == null)
                 {
                     status.addError(
-                        "One of the selected files ("
-                        + f.getName()
-                        + ") cannot be parsed.");
+                        Messages.bind(Messages.IntroImplicitNoneRefactoring_SelectedFileCannotBeParsed, f.getName()));
                 }
                 else
                 {
@@ -176,7 +175,7 @@ public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
             if (def != null && def.isImplicit()) definitions.add(def);
 
         StringBuilder newStmts = new StringBuilder();
-        newStmts.append("implicit none" + EOL);
+        newStmts.append("implicit none" + EOL); //$NON-NLS-1$
         for (Definition def : sort(definitions))
             newStmts.append(constructDeclaration(def));
         return parseLiteralStatementSequence(newStmts.toString());
@@ -209,8 +208,8 @@ public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
     private String constructDeclaration(final Definition def)
     {
         Type type = def.getType();
-        String typeString = type == null ? "type(unknown)" : type.toString(); // TODO
-        return typeString + " :: " + def.getCanonicalizedName() + EOL;
+        String typeString = type == null ? "type(unknown)" : type.toString(); // TODO //$NON-NLS-1$
+        return typeString + " :: " + def.getCanonicalizedName() + EOL; //$NON-NLS-1$
     }
 
     @Override

@@ -25,6 +25,7 @@ import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResou
  * Refactoring to unify case of all keywords in Fortran files.
  *
  * @author Kurt Hendle
+ * @author Ashley Kasza - externalized strings
  */
 public class KeywordCaseRefactoring extends FortranResourceRefactoring
 {
@@ -33,7 +34,7 @@ public class KeywordCaseRefactoring extends FortranResourceRefactoring
     @Override
     public String getName()
     {
-        return "Change Keyword Case";
+        return Messages.KeywordCaseRefactoring_Name;
     }
 
     public void setLowerCase(boolean value)
@@ -60,7 +61,7 @@ public class KeywordCaseRefactoring extends FortranResourceRefactoring
             {
                 IFortranAST ast = vpg.acquirePermanentAST(file);
                 if (ast == null)
-                    status.addError("One of the selected files (" + file.getName() +") cannot be parsed.");
+                    status.addError(Messages.bind(Messages.KeywordCaseRefactoring_SelectedFileCannotBeParsed, file.getName()));
                 makeChangesTo(file, ast, status, pm);
                 vpg.releaseAST(file);
             }
