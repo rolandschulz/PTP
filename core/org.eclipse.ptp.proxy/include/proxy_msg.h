@@ -65,7 +65,7 @@ extern void			proxy_msg_insert_bitset(proxy_msg *, bitset *, int);
 extern void			proxy_msg_add_list(proxy_msg *, List *, void (*)(proxy_msg *, void *));
 extern proxy_msg *	new_proxy_msg(int, int);
 extern void			free_proxy_msg(proxy_msg *);
-extern void			proxy_queue_msg(List *, proxy_msg *);
+extern int			proxy_queue_msg(List *, proxy_msg *);
 extern void 		proxy_process_msgs(List *, void (*)(proxy_msg*, void *), void *);
 extern void             proxy_set_flow_control(int flag);
 extern int              proxy_flow_control_active();

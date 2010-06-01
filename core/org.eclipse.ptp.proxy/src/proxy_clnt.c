@@ -93,9 +93,9 @@ proxy_clnt_progress(proxy_clnt *pc)
 	return PTP_PROXY_RES_ERR;
 }
 
-void
+int
 proxy_clnt_queue_msg(proxy_clnt *pc, proxy_msg *m)
 {
-	proxy_queue_msg(pc->clnt_events, m);
+	return proxy_queue_msg(pc->clnt_events, m);
 }
 

@@ -413,10 +413,11 @@ free_proxy_msg(proxy_msg *m)
 /*
  * Add message to list of messages waiting to be sent.
  */
-void
+int
 proxy_queue_msg(List *ev_list, proxy_msg *m)
 {
 	AddToList(ev_list, (void *)m);
+	return 0;
 }
 
 /*
@@ -430,9 +431,11 @@ proxy_process_msgs(List *msg_list, void (*callback)(proxy_msg *, void *), void *
 	if (msg_list == NULL)
 		return;
 
-	while ((m = (proxy_msg *)RemoveFirst(msg_list)) != NULL) {
-		callback(m, data);
-		free_proxy_msg(m);
+	if (! proxy_flow_control_active()) {
+		while ((m = (proxy_msg *)RemoveFirst(msg_list)) != NULL) {
+			callback(m, data);
+			free_proxy_msg(m);
+		}
 	}
 }
 

@@ -107,8 +107,8 @@ proxy_svr_finish(proxy_svr *ps)
 		ps->proxy->svr_funcs->finish(ps);
 }
 
-void
+int
 proxy_svr_queue_msg(proxy_svr *ps, proxy_msg *msg)
 {
-	proxy_queue_msg(ps->svr_events, msg);
+	return proxy_queue_msg(ps->svr_events, msg);
 }
