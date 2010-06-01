@@ -67,7 +67,7 @@
 	
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
-	<property name="rseVersion" value="S-3.6RC3-201005271700"/>
+	<property name="rseVersion" value="S-3.2RC3-201005310720"/>
 	<property name="dStoreBaseName" value="rseserver-3.2RC3"/>
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
