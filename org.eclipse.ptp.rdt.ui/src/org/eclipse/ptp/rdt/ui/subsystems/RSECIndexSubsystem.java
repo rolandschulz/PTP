@@ -98,6 +98,7 @@ import com.ibm.icu.text.MessageFormat;
  * with the RDT team.
  * 
  * @author crecoskie
+ * @since 2.0
  *
  */
 public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
