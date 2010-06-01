@@ -7,6 +7,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.server.dstore.core;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.dstore.core.client.ClientConnection;
 import org.eclipse.dstore.core.client.ConnectionStatus;
 import org.eclipse.dstore.core.model.DataStore;
@@ -47,10 +49,16 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected void doFinishServer() {
-		if (fDStoreConnection != null) {
-			fDStoreConnection.disconnect();
-			fDStoreConnection = null;
+	protected void doFinishServer(IProgressMonitor monitor) {
+		try {
+			if (fDStoreConnection != null) {
+				fDStoreConnection.disconnect();
+				fDStoreConnection = null;
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 
@@ -62,9 +70,15 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected boolean doRestartServer() {
-		fState = DStoreState.STARTING;
-		return true;
+	protected boolean doRestartServer(IProgressMonitor monitor) {
+		try {
+			fState = DStoreState.STARTING;
+			return true;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/*
@@ -75,29 +89,36 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected boolean doStartServer() {
-		int port;
+	protected boolean doStartServer(IProgressMonitor monitor) {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			port = getRemoteConnection().forwardLocalPort("localhost", fDStorePort, null); //$NON-NLS-1$
-		} catch (RemoteConnectionException e) {
-			if (DebugUtil.SERVER_TRACING) {
-				System.err.println(Messages.DStoreServer_1 + e.getLocalizedMessage());
+			int port;
+			try {
+				port = getRemoteConnection().forwardLocalPort("localhost", fDStorePort, subMon.newChild(10)); //$NON-NLS-1$
+			} catch (RemoteConnectionException e) {
+				if (DebugUtil.SERVER_TRACING) {
+					System.err.println(Messages.DStoreServer_1 + e.getLocalizedMessage());
+				}
+				return false;
 			}
-			return false;
+			fDStoreConnection.setHost("localhost"); //$NON-NLS-1$
+			fDStoreConnection.setPort(Integer.toString(port));
+			if (DebugUtil.SERVER_TRACING) {
+				System.out.println(Messages.DStoreServer_2);
+			}
+			ConnectionStatus status = fDStoreConnection.connect(null, 0);
+			DataStore dataStore = fDStoreConnection.getDataStore();
+			dataStore.showTicket(null);
+			dataStore.registerLocalClassLoader(getClass().getClassLoader());
+			if (DebugUtil.SERVER_TRACING) {
+				System.out.println(Messages.DStoreServer_3);
+			}
+			return status.isConnected();
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		fDStoreConnection.setHost("localhost"); //$NON-NLS-1$
-		fDStoreConnection.setPort(Integer.toString(port));
-		if (DebugUtil.SERVER_TRACING) {
-			System.out.println(Messages.DStoreServer_2);
-		}
-		ConnectionStatus status = fDStoreConnection.connect(null, 0);
-		DataStore dataStore = fDStoreConnection.getDataStore();
-		dataStore.showTicket(null);
-		dataStore.registerLocalClassLoader(getClass().getClassLoader());
-		if (DebugUtil.SERVER_TRACING) {
-			System.out.println(Messages.DStoreServer_3);
-		}
-		return status.isConnected();
 	}
 
 	/*
