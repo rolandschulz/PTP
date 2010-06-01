@@ -35,9 +35,11 @@ public class OpenDeclarationResult implements Serializable {
 		RESULT_C_ELEMENTS,
 		/** */
 		RESULT_INCLUDE_PATH,		
-		/** The result is an IName */
+		/** The result is an IName 
+		 * @since 2.0*/
 		RESULT_NAME, 		
-		/** The result is an array of IName */
+		/** The result is an array of IName 
+		 * @since 2.0*/
 		RESULT_LOCATION, 
 		
 		/** Could not find the symbol */
@@ -67,10 +69,16 @@ public class OpenDeclarationResult implements Serializable {
 		return new OpenDeclarationResult(ResultType.RESULT_INCLUDE_PATH, path);
 	}
 	
+	/**
+	 * @since 2.0
+	 */
 	public static OpenDeclarationResult resultName(IName name) {
 		return new OpenDeclarationResult(ResultType.RESULT_NAME, name);
 	}
 	
+	/**
+	 * @since 2.0
+	 */
 	public static OpenDeclarationResult resultLocation(IASTFileLocation location) {
 		return new OpenDeclarationResult(ResultType.RESULT_LOCATION, location);
 	}
