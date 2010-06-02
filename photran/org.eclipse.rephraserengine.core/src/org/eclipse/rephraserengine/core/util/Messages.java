@@ -15,9 +15,9 @@ import org.eclipse.osgi.util.NLS;
 /**
  * Externalized strings.
  * 
- * @author Jeff Overbey
+ * @since 2.0
  */
-class Messages extends NLS
+public class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.rephraserengine.core.util.messages"; //$NON-NLS-1$
 

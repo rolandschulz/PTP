@@ -13,11 +13,11 @@ package org.eclipse.rephraserengine.core.vpg.refactoring;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Externalized strings.
- * 
- * @author Jeff Overbey
+ * Externalized strings
+ * .
+ * @since 2.0
  */
-class Messages extends NLS
+public class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.rephraserengine.core.vpg.refactoring.messages"; //$NON-NLS-1$
 

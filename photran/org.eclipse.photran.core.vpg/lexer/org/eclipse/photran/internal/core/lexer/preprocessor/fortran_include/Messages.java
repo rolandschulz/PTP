@@ -13,8 +13,7 @@ package org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * 
- * @author joverbey
+ * Externalized strings.
  */
 public class Messages extends NLS
 {

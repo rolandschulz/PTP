@@ -35,10 +35,9 @@ import org.eclipse.swt.widgets.Label;
  * 
  * @see org.eclipse.photran.internal.core.properties.SearchPathProperties
  * @author Jeff Overbey
- * Modified by Jungyoon Lee, Kun Koh, Nam Kim, David Weiner
- * Modified by Timofey Yuvashev
+ * @author Jungyoon Lee, Kun Koh, Nam Kim, David Weiner
+ * @author Timofey Yuvashev
  */
-
 public class SearchPathsPropertyPage extends FortranPropertyPage
 {
     private FortranBooleanFieldEditor enableVPG, enableDeclView, enableContentAssist, enableHoverTip;
