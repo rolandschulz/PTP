@@ -1,4 +1,0 @@
-program test3
-    implicit none
-    integer,public :: var
-end program test3

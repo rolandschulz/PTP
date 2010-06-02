@@ -153,7 +153,9 @@ public class CommonVarNamesRefactoring extends FortranEditorRefactoring
             newNames.add(newName);
 
             oldVarNames.put(varName, varNameNumber);
-            newVarNames.put(varNameNumber, newName);
+            //only add new name if there is no existing alias
+            if (newVarNames.get(varNameNumber) == null)
+                newVarNames.put(varNameNumber, newName);
             varNameNumber++;
         }
     }

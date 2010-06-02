@@ -1,0 +1,21 @@
+program p !<<<<< 1, 9, pass
+	implicit none
+	integer :: hello
+	intrinsic flush
+	call s
+	call flush; stop
+contains
+	subroutine s
+		implicit none
+		real :: three
+		parameter (THREE = 3)
+		print *, THREE + 2 + 63 * twice(4)
+	end subroutine
+
+	integer function twice(n)
+		implicit none
+		integer :: n
+		intent(in) :: n
+		twice = 2 * n
+	end function
+end program

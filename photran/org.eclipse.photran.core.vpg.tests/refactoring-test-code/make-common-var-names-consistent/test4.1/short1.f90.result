@@ -1,0 +1,26 @@
+program common1
+  implicit none
+
+  common /block/ aaa, bbb, ccc !<<<<< 4, 11, 4, 16, aaa, bbb, ccc, pass
+  integer :: aaa
+  real :: bbb
+  double precision :: ccc
+
+  aaa = 5
+  bbb = 4.6
+  ccc = 2.345
+  print *, aaa, bbb, ccc
+
+  call helper
+  print *, aaa, bbb, ccc
+end program common1
+
+subroutine helper
+  implicit none
+  common /block/ aaa, bbb
+  integer :: aaa
+  real :: bbb
+  
+  aaa = 50
+  bbb = 40.6
+end subroutine helper

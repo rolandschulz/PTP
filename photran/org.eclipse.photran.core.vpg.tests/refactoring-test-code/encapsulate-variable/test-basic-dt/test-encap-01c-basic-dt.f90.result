@@ -1,0 +1,30 @@
+module mod
+  implicit none
+
+  type point
+    double precision x, y, z
+  end type
+
+  type(point) :: variable  !<<<<< 8, 18, 8, pass
+  private :: variable
+contains
+    subroutine setVariable(value)
+        implicit none
+        type(point), intent(in) :: value
+        variable = value
+    end subroutine
+
+    type(point) function getVariable()
+        implicit none
+        getVariable = variable
+    end function
+
+end module
+
+program encap1
+  use mod
+  implicit none
+  print *,getVariable()
+  call setVariable(point(1.0, 2.0, 3.0))
+  print *,getVariable()
+end program encap1

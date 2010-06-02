@@ -1,9 +1,0 @@
-program namesProv2
-    implicit none
-    common /names/ a, b, this_is_renamed
-    integer a, b, this_is_renamed
-
-    a = 2
-    b = 4
-    this_is_renamed = a + b
-end program namesProv2

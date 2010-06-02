@@ -1,5 +1,0 @@
-program test6
-    implicit none
-    integer, private, optional :: attrs
-    integer, public, optional :: blah
-end program test6

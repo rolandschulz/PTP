@@ -61,8 +61,8 @@ import org.eclipse.rephraserengine.testing.junit3.GeneralTestSuiteFromMarkers;
  * the Extract Local Variable test suite uses one field for the new variable declaration; the Add
  * ONLY to USE Statement test suite uses these fields to list the module entities to add; etc.
  * <p>
- * The final field must be either &quot;pass&quot;, &quot;pass&quot;fail-initial&quot;pass&quot;,
- * or &quot;pass&quot;fail-final&quot;pass&quot;, indicating whether the refactoring should succeed,
+ * The final field must be either &quot;pass&quot;, &quot;fail-initial&quot;,
+ * or &quot;fail-final&quot;, indicating whether the refactoring should succeed,
  * fail its initial precondition check, or fail its final precondition check.
  * <p>
  * If the refactoring is expected to succeed, the Fortran program will be compiled and run before
@@ -210,7 +210,7 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
 
             if (!status.hasFatalError())
             {
-                String before = compileAndRunFortranProgram();
+                String before = shouldCompile(fileContainingMarker) ? compileAndRunFortranProgram() : "";
                 
                 status = checkFinalConditions(refactoring,
                     configureRefactoring(refactoring, fileContainingMarker, selection, markerFields));
@@ -219,7 +219,7 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
                 {
                     performChange(refactoring);
                     
-                    if (!status.hasError())
+                    if (!status.hasError() && shouldCompile(fileContainingMarker))
                         assertEquals(before, compileAndRunFortranProgram());
                     compareAgainstResultFile();
                 }
@@ -366,5 +366,13 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
             project.refreshLocal(IResource.DEPTH_INFINITE, pm);
             PhotranVPG.getInstance().ensureVPGIsUpToDate(pm);
         }
+    }
+
+    /**
+     * @return true iff the Fortran program should be compiled and run
+     */
+    protected boolean shouldCompile(IFile fileContainingMarker)
+    {
+        return true;
     }
 }

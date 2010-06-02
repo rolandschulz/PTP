@@ -1,0 +1,25 @@
+module mod
+  implicit none
+  real :: variable !<<<<< 3, 11, 8, pass
+  private :: variable
+contains
+    subroutine setVariable(value)
+        implicit none
+        real, intent(in) :: value
+        variable = value
+    end subroutine
+
+    real function getVariable()
+        implicit none
+        getVariable = variable
+    end function
+
+end module
+
+program encap1
+  use mod
+  implicit none
+  print *,getVariable()
+  call setVariable(3.0)
+  print *,getVariable()
+end program encap1

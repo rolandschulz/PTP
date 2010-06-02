@@ -1,5 +1,0 @@
-! Taken from reindenter-test-code in org.eclipse.photran.core.vpg.tests
-PROGRAM program
-IMPLICIT NONE
-PRINT *, "Hello" !<<<<<START !<<<<<END
-END PROGRAM program

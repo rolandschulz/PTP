@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Photran VPG Failing Unit Tests
-Bundle-SymbolicName: org.eclipse.photran.core.vpg.tests.failing
+Bundle-SymbolicName: org.eclipse.photran.core.vpg.tests.failing;singleton:=true
 Bundle-Version: 6.0.0.qualifier
 Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.photran.core.vpg.tests,
@@ -13,5 +13,13 @@ Require-Bundle: org.eclipse.photran.core.vpg.tests,
  org.eclipse.cdt.core.tests,
  org.eclipse.jface,
  org.eclipse.search,
- org.eclipse.rephraserengine.testing.junit3
+ org.eclipse.rephraserengine.testing.junit3,
+ org.eclipse.core.resources,
+ org.eclipse.jface.text,
+ org.eclipse.rephraserengine.core.vpg,
+ org.eclipse.rephraserengine.core,
+ org.eclipse.rephraserengine.core.refactoring,
+ org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Activator: org.eclipse.photran.internal.tests.failing.Activator
+Bundle-ActivationPolicy: lazy

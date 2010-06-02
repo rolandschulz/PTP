@@ -1,4 +1,0 @@
-program test5
-    implicit none
-    integer,public, optional :: attrs
-end program test5

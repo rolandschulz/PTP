@@ -25,7 +25,7 @@ import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
  */
 public class TokenOffsetTests extends PhotranWorkspaceTestCase
 {
-    private static final String DIR = "refactoring-test-code/encapsulate-variable";
+    private static final String DIR = "refactoring-test-code/encapsulate-variable/test-basic-integer";
     private static final String FILE = "test-encap-01a-basic-integer.f90";
     
     private IFile file;

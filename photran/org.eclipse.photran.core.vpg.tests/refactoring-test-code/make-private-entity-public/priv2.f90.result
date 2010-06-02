@@ -1,7 +1,0 @@
-program priv2
-    implicit none
-    double precision f
-    real q
-    public f
-    public q
-end program priv2

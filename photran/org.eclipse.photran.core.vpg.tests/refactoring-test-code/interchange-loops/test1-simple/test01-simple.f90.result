@@ -1,0 +1,12 @@
+program main
+	integer :: i, j 
+	
+	
+	do i = 1, 10 !<<<<< 5, 5, 9, 11, pass
+	    do j = 1, 10
+	        print *, i+j
+	    end do
+	end do
+	
+
+end program main

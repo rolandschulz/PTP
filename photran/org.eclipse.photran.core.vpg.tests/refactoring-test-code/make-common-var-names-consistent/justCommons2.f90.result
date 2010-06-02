@@ -1,8 +1,0 @@
-program common1
-    common /block/ a_common, b_common, c_common, d_common, e_common, f_common, g_common, h_common, i_common, j_common, k_common, l_common, m_common, n_common, o_common, p_common, q_common, r_common, s_common, t_common, u_common, v_common, w_common, x_common, y_common, z_common, &
-                   a1_common, b1_common, c1_common, d1_common, e1_common, f1_common, g1_common, h1_common, i1_common, j1_common, k1_common, l1_common, m1_common, n1_common, o1_common, p1_common, q1_common, r1_common, s1_common, t1_common, u1_common, v1_common, w1_common, x1_common, y1_common, z1_common
-end program common1
-
-subroutine s_common
-    common /block/ a_common, b_common
-end subroutine

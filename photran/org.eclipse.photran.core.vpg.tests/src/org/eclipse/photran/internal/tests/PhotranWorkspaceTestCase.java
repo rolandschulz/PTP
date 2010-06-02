@@ -212,6 +212,9 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
 
         ArrayList<String> args = new ArrayList<String>(8);
         args.add(compiler);
+
+        args.add("-falign-functions");
+        
         args.add("-o");
         args.add(exe);
         if (filenamesOpt == null || filenamesOpt.length == 0)

@@ -1,0 +1,36 @@
+program p !<<<<< 1, 9, pass
+    implicit none
+    real :: a
+    real :: d
+    intrinsic flush
+    type t
+        integer n
+    end type
+    type(t) u
+
+    a = 1
+    d = 1
+    u = t(5)
+    call s
+    print *, a, d, u
+    call flush; stop
+contains
+  subroutine s
+    implicit none
+    integer :: b
+    integer :: c
+    real :: e
+    type(t) :: f
+    integer :: g
+    complex :: h
+
+    a = 3
+    b = 3
+    c = 3
+    d = 3.0
+    e = 3.0
+    f%n = 3
+    g = 3
+    h = (3, 4)
+  end subroutine
+end program

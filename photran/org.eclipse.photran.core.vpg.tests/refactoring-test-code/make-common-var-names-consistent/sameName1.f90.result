@@ -1,7 +1,0 @@
-program namesProv
-    implicit none
-    common /names/ a, b, this_is_renamed
-    integer :: a, b, this_is_renamed
-
-    print *, "Test the test case program with given names"
-end program namesProv

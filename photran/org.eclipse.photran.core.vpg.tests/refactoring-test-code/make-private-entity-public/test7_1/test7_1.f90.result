@@ -1,0 +1,12 @@
+module test7_1
+    implicit none
+    private
+    real :: r
+    integer five
+    real :: ok !<<<<< 6, 13, 6, 17, pass
+    real, public :: blah
+end module test7_1
+
+program p
+	use test7_1
+end program p

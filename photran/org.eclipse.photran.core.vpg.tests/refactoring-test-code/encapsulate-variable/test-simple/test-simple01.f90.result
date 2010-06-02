@@ -1,0 +1,19 @@
+program main
+    use module1
+    implicit none
+    integer :: blah
+    
+    blah =getI() + j + k !<<<<< 6, 12, 6, 13, pass
+    
+    call setI(blah + j)
+    
+    call mult(getI(),j,blah)
+    
+contains
+    subroutine mult(a,b,c)
+        integer, intent(in) :: a, b, c
+        integer :: temp
+        temp = a*b*c
+    end subroutine
+
+end program

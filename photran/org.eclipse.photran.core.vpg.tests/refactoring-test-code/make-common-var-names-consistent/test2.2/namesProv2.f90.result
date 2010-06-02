@@ -1,0 +1,9 @@
+program namesProv2
+    implicit none
+    common /names/ a_hello, b_hello, c_hello !<<<<< 3, 13, 3, 18, a_hello, b_hello, c_hello, pass
+    integer a_hello, b_hello, c_hello
+
+    a_hello = 2
+    b_hello = 4
+    c_hello = a_hello + b_hello
+end program namesProv2

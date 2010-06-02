@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.tests.vpg;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
