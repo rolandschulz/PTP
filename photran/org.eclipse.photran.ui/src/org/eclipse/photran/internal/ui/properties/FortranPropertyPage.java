@@ -53,8 +53,8 @@ public abstract class FortranPropertyPage extends PropertyPage
         {
             dialogShown = true;
             MessageDialog.openInformation(getShell(),
-                Messages.FortranPropertyPage_PreferencesChangedTitle,
-                Messages.FortranPropertyPage_NeedToCloseAndReOpenEditors);
+                UIMessages.FortranPropertyPage_PreferencesChangedTitle,
+                UIMessages.FortranPropertyPage_NeedToCloseAndReOpenEditors);
         }
         
         return result;

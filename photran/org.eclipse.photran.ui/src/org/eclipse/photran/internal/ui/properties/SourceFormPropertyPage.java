@@ -70,7 +70,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         // See org.eclipse.ui.internal.dialogs.ContentTypesPreferencePage
         // and org.eclipse.cdt.ui.dialogs.DocCommentOwnerBlock
         Link link= new Link(composite, SWT.NONE);
-        link.setText(Messages.SourceFormPropertyPage_LinkText);
+        link.setText(UIMessages.SourceFormPropertyPage_LinkText);
         link.setLayoutData(GridDataFactory.swtDefaults()
                                           .align(SWT.FILL, SWT.TOP)
                                           .grab(true,false)
@@ -87,7 +87,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         
         sourceForms = new FortranSourceFormEditor(
             SourceFormProperties.SOURCE_FORMS_PROPERTY_NAME,
-            Messages.SourceFormPropertyPage_SourceFormFilenameAssocsLabel, 
+            UIMessages.SourceFormPropertyPage_SourceFormFilenameAssocsLabel, 
             parent);
         
         sourceForms.setPreferenceStore(scopedStore);
@@ -113,8 +113,8 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         {
             FortranUIPlugin.log(e);
             MessageDialog.openError(getShell(),
-                Messages.SourceFormPropertyPage_ErrorTitle,
-                Messages.SourceFormPropertyPage_PropertiesCouldNotBeSaved +
+                UIMessages.SourceFormPropertyPage_ErrorTitle,
+                UIMessages.SourceFormPropertyPage_PropertiesCouldNotBeSaved +
                 e.getClass().getName() + ": " + //$NON-NLS-1$
                 e.getMessage());
         }
@@ -148,7 +148,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         }
         catch (CoreException e)
         {
-            FortranCorePlugin.log(Messages.SourceFormPropertyPage_ErrorTouchingProject, e);
+            FortranCorePlugin.log(UIMessages.SourceFormPropertyPage_ErrorTouchingProject, e);
         }
     }
 
@@ -160,7 +160,7 @@ public class SourceFormPropertyPage extends FortranPropertyPage
         }
         catch (CoreException e)
         {
-            FortranCorePlugin.log(Messages.SourceFormPropertyPage_ErrorTouchingFile, e);
+            FortranCorePlugin.log(UIMessages.SourceFormPropertyPage_ErrorTouchingFile, e);
         }
     }
 }

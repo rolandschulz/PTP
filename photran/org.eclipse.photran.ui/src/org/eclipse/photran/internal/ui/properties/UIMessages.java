@@ -15,9 +15,9 @@ import org.eclipse.osgi.util.NLS;
 /**
  * Externalized strings.
  */
-public class Messages extends NLS
+public class UIMessages extends NLS
 {
-    private static final String BUNDLE_NAME = "org.eclipse.photran.internal.ui.properties.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.photran.internal.ui.properties.uimessages"; //$NON-NLS-1$
 
     public static String FortranPropertyPage_NeedToCloseAndReOpenEditors;
 
@@ -47,10 +47,10 @@ public class Messages extends NLS
     static
     {
         // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+        NLS.initializeMessages(BUNDLE_NAME, UIMessages.class);
     }
 
-    private Messages()
+    private UIMessages()
     {
     }
 }

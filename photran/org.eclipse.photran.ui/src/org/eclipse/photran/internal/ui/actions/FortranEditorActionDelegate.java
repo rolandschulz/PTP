@@ -80,7 +80,7 @@ public abstract class FortranEditorActionDelegate
             catch (InvocationTargetException e)
             {
                 e.printStackTrace();
-                MessageDialog.openError(fEditor.getShell(), Messages.FortranEditorActionDelegate_UnhandledExceptionTitle, e.getMessage());
+                MessageDialog.openError(fEditor.getShell(), UIMessages.FortranEditorActionDelegate_UnhandledExceptionTitle, e.getMessage());
             }
             catch (InterruptedException e)
             {

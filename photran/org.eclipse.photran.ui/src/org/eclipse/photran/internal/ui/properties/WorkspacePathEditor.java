@@ -80,9 +80,9 @@ public class WorkspacePathEditor extends ListEditor
             // Remember the selection for the next time the dialog is opened
             IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(result);
             if (!resource.exists())
-                MessageDialog.openError(getShell(), Messages.WorkspacePathEditor_ErrorTitle, Messages.WorkspacePathEditor_ResourceDoesNotExist);
+                MessageDialog.openError(getShell(), UIMessages.WorkspacePathEditor_ErrorTitle, UIMessages.WorkspacePathEditor_ResourceDoesNotExist);
             else if (!(resource instanceof IContainer))
-                MessageDialog.openError(getShell(), Messages.WorkspacePathEditor_ErrorTitle, Messages.WorkspacePathEditor_ResourceIsNotAContainer);
+                MessageDialog.openError(getShell(), UIMessages.WorkspacePathEditor_ErrorTitle, UIMessages.WorkspacePathEditor_ResourceIsNotAContainer);
             else if (result != null)
                 return result.toOSString();
         }

@@ -117,7 +117,7 @@ public final class ShowReleaseNotes implements IStartup
                             IWorkbenchBrowserSupport.LOCATION_BAR
                                 | IWorkbenchBrowserSupport.NAVIGATION_BAR,
                             null,
-                            Messages.ShowReleaseNotes_WelcomeTitle,
+                            UIMessages.ShowReleaseNotes_WelcomeTitle,
                             null)
                         .openURL(new URL(getURL(lastVersion)));
                 }

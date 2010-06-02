@@ -8,25 +8,25 @@
  * Contributors:
  *    UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.ui.actions;
+package org.eclipse.photran.internal.ui.startup;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
  * Externalized strings.
  */
-public class Messages extends NLS
+public class UIMessages extends NLS
 {
-    private static final String BUNDLE_NAME = "org.eclipse.photran.internal.ui.actions.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.photran.internal.ui.startup.uimessages"; //$NON-NLS-1$
 
-    public static String FortranEditorActionDelegate_UnhandledExceptionTitle;
+    public static String ShowReleaseNotes_WelcomeTitle;
     static
     {
         // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+        NLS.initializeMessages(BUNDLE_NAME, UIMessages.class);
     }
 
-    private Messages()
+    private UIMessages()
     {
     }
 }
