@@ -31,6 +31,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IParent;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.parser.ParserMessages;
+import org.eclipse.cdt.utils.EFSExtensionManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -39,7 +40,6 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -178,6 +178,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 */
 	public List<Proposal> computeCompletionProposals(Scope scope, RemoteContentAssistInvocationContext context,
 			ITranslationUnit unit) {
+		checkAllProjects(new NullProgressMonitor());
+		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
 		DataStore dataStore = getDataStore();
 		if (dataStore == null) {
 			return Collections.emptyList();
@@ -203,6 +205,10 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
 		// translation unit
 		args.add(createSerializableElement(dataStore, unit));
+
+		// path to translation unit
+		dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, path);
+		args.add(dataElement);
 
 		// execute the command
 		DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
@@ -238,8 +244,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public THGraph computeTypeGraph(Scope scope, ICElement input, IProgressMonitor monitor) {
-		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH, new Object[] { scope, getBaseURI(), input },
-				monitor);
+		String path = EFSExtensionManager.getDefault().getPathFromURI(input.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_COMPUTE_TYPE_GRAPH,
+				new Object[] { scope, getHostName(), input, path }, monitor);
 		if (result == null) {
 			return new THGraph();
 		}
@@ -267,8 +274,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 */
 	public IIndexIncludeValue findInclude(Scope scope, IIndexFileLocation location, String name, int offset,
 			IProgressMonitor monitor) {
-		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDE, new Object[] { scope, getBaseURI(), location, name, offset },
-				monitor);
+		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDE,
+				new Object[] { scope, getHostName(), location, name, offset }, monitor);
 		if (result == null) {
 			return null;
 		}
@@ -286,7 +293,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IIndexIncludeValue[] findIncludedBy(Scope scope, IIndexFileLocation location, IProgressMonitor monitor) {
-		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDED_BY, new Object[] { scope, getBaseURI(), location }, monitor);
+		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDED_BY, new Object[] { scope, getHostName(), location }, monitor);
 		if (result == null) {
 			return new IIndexIncludeValue[0];
 		}
@@ -304,7 +311,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IIndexIncludeValue[] findIncludesTo(Scope scope, IIndexFileLocation location, IProgressMonitor monitor) {
-		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDES_TO, new Object[] { scope, getBaseURI(), location }, monitor);
+		Object result = sendRequest(CDTMiner.C_INCLUDES_FIND_INCLUDES_TO, new Object[] { scope, getHostName(), location }, monitor);
 		if (result == null) {
 			return new IIndexIncludeValue[0];
 		}
@@ -320,7 +327,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * org.eclipse.cdt.core.model.ICElement)
 	 */
 	public ICElement[] findTypeHierarchyInput(Scope scope, ICElement memberInput) {
-		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT1, new Object[] { scope, getBaseURI(), memberInput }, null);
+		String path = EFSExtensionManager.getDefault().getPathFromURI(memberInput.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT1,
+				new Object[] { scope, getHostName(), memberInput, path }, null);
 		if (result == null) {
 			return new ICElement[] { null, null };
 		}
@@ -335,7 +344,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * org.eclipse.cdt.core.model.ITranslationUnit, int, int)
 	 */
 	public ICElement[] findTypeHierarchyInput(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength) {
-		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getBaseURI(), unit,
+		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_TYPE_HIERARCHY_FIND_INPUT2, new Object[] { scope, getHostName(), unit,
 				new Integer(selectionStart), new Integer(selectionLength) }, null);
 		if (result == null) {
 			return new ICElement[] { null, null };
@@ -353,7 +363,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 */
 	public CallsToResult getCallees(Scope scope, ICElement subject, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.6") + subject, 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLS, new Object[] { scope, getBaseURI(), subject }, null);
+		String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLS, new Object[] { scope, getHostName(), subject, path }, null);
 		if (result == null) {
 			return new CallsToResult();
 		}
@@ -371,7 +382,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 */
 	public CalledByResult getCallers(Scope scope, ICElement subject, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.5") + subject, 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLERS, new Object[] { scope, getBaseURI(), subject }, null);
+		String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_CALLERS, new Object[] { scope, getHostName(), subject, path },
+				null);
 		if (result == null) {
 			return new CalledByResult();
 		}
@@ -388,8 +401,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 */
 	public ICElement[] getCHDefinitions(Scope scope, ICElement subject, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, new Object[] { scope, getBaseURI(),
-				subject }, null);
+		String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_ELEMENT, new Object[] { scope, getHostName(),
+				subject, path }, null);
 		if (result == null) {
 			return new ICElement[0];
 		}
@@ -407,8 +421,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	public ICElement[] getCHDefinitions(Scope scope, ITranslationUnit unit, int selectionStart, int selectionLength,
 			IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + unit, 100); //$NON-NLS-1$
+		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_DEFINITIONS_FROM_WORKING_COPY, new Object[] { scope,
-				getBaseURI(), unit, selectionStart, selectionLength }, null);
+				getHostName(), unit, path, selectionStart, selectionLength }, null);
 		if (result == null) {
 			return new ICElement[0];
 		}
@@ -460,6 +475,10 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			ArrayList<Object> args = new ArrayList<Object>();
 
 			args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getScheme()));
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getRootPath()));
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getMappedPath()));
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getHost()));
 
 			String serializedProvider = null;
 			try {
@@ -513,11 +532,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
 				for (int i = 0; i < status.getNestedSize(); i++) {
 					DataElement element = status.get(i);
-					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error
-																									// occurred
-																									// on
-																									// the
-																									// server
+					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) {
+						// Error occurred on the server
 						String message = element.getAttribute(DE.A_NAME) + ".  "; //$NON-NLS-1$
 						for (int j = 0; j < fErrorMessages.size(); j++) {
 							if (message.indexOf(fErrorMessages.get(j)) > 0) {
@@ -545,7 +561,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public boolean isIndexed(Scope scope, IIndexFileLocation location, IProgressMonitor monitor) {
-		Object result = sendRequest(CDTMiner.C_INCLUDES_IS_INDEXED, new Object[] { scope, getBaseURI(), location }, monitor);
+		Object result = sendRequest(CDTMiner.C_INCLUDES_IS_INDEXED, new Object[] { scope, getHostName(), location }, monitor);
 		if (result != null) {
 			return Boolean.parseBoolean(result.toString());
 		}
@@ -579,7 +595,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	public OpenDeclarationResult openDeclaration(Scope scope, ITranslationUnit unit, String selectedText, int selectionStart,
 			int selectionLength, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.9"), 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] { scope, unit, selectedText,
+		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] { scope, unit, path, selectedText,
 				selectionStart, selectionLength }, monitor);
 		if (result == null)
 			return OpenDeclarationResult.failureUnexpectedError();
@@ -611,6 +628,22 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 				// need to know the scope
 				DataElement scopeElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
 				args.add(scopeElement);
+
+				// scheme for scope
+				DataElement dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getScheme());
+				args.add(dataElement);
+
+				// host
+				DataElement hostElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getHost());
+				args.add(hostElement);
+
+				// root path for scope on server
+				DataElement rootPath = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getRootPath());
+				args.add(rootPath);
+
+				// mapped path for scope on local machine
+				DataElement mappedPath = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getMappedPath());
+				args.add(mappedPath);
 
 				// need to know where to find the pdom file for the scope
 				DataElement configElement = dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, configLocation);
@@ -662,6 +695,10 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			ArrayList<Object> args = new ArrayList<Object>();
 
 			args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getScheme()));
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getRootPath()));
+			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, scope.getMappedPath()));
+			args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, indexLocation));
 
 			String serializedProvider = null;
 			try {
@@ -671,7 +708,6 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			}
 
 			args.add(dataStore.createObject(null, CDTMiner.T_INDEX_SCANNER_INFO_PROVIDER, serializedProvider));
-			args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_CONFIG_LOCATION, indexLocation));
 
 			DataElement status = dataStore.command(queryCmd, args, result);
 
@@ -701,11 +737,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
 				for (int i = 0; i < status.getNestedSize(); i++) {
 					DataElement element = status.get(i);
-					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error
-																									// occurred
-																									// on
-																									// the
-																									// server
+					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) {
+						// Error occurred on the server
 						String message = element.getAttribute(DE.A_NAME) + ".  "; //$NON-NLS-1$
 						for (int j = 0; j < fErrorMessages.size(); j++) {
 							if (message.indexOf(fErrorMessages.get(j)) > 0) {
@@ -747,7 +780,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	@SuppressWarnings("unchecked")
 	public List<RemoteSearchMatch> runQuery(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
 		monitor.beginTask(Messages.getString("RSECIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY, new Object[] { scope, getBaseURI(), query }, null);
+		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY, new Object[] { scope, getHostName(), query }, null);
 		if (result == null) {
 			return Collections.emptyList();
 		}
@@ -942,9 +975,22 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
 		for (Object argument : arguments) {
 			if (argument instanceof Scope) {
-				DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, ((Scope) argument)
-						.getName());
+				DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR,
+						((Scope) argument).getName());
 				args.add(dataElement);
+
+				dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, ((Scope) argument).getScheme());
+				args.add(dataElement);
+
+				// root path for scope on server
+				DataElement rootPath = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR,
+						((Scope) argument).getRootPath());
+				args.add(rootPath);
+
+				// path mappings for scope
+				DataElement pathElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR,
+						((Scope) argument).getMappedPath());
+				args.add(pathElement);
 			} else if (argument instanceof String) {
 				DataElement dataElement = dataStore.createObject(null, CDTMiner.T_INDEX_STRING_DESCRIPTOR, (String) argument);
 				args.add(dataElement);
@@ -972,11 +1018,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			return null;
 		}
 
-		if (DataStoreResources.model_error.equals(element.getType())) { // Error
-																		// occurred
-																		// on
-																		// the
-																		// server
+		if (DataStoreResources.model_error.equals(element.getType())) {
+			// Error occurred on the server
 			RDTLog.logError(status.getValue()); // prints the server error stack
 												// trace to the log
 			return null;
@@ -1049,16 +1092,12 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	}
 
 	protected String convertURIToRemotePath(URI locationURI) {
-		return fProvider.getConnection().getRemoteServices().getFileManager(fProvider.getConnection()).toPath(locationURI)
-				.toString();
+		String path = EFSExtensionManager.getDefault().getPathFromURI(locationURI);
+		return path;
 	}
 
-	protected String getBaseURI() {
-		try {
-			return convertRemotePathToURI("/").toString(); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			throw new AssertionFailedException(e.getLocalizedMessage());
-		}
+	protected String getHostName() {
+		return fProvider.getConnectionName();
 	}
 
 	protected DataStore getDataStore() {
