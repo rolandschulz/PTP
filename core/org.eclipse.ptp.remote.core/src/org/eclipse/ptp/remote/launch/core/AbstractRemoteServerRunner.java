@@ -37,6 +37,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteVariableManager;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.ptp.remote.core.messages.Messages;
 import org.eclipse.ptp.remote.internal.core.DebugUtil;
 import org.osgi.framework.Bundle;
 
@@ -294,12 +295,14 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			}
 			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
 			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
+				subMon.subTask(Messages.AbstractRemoteServerRunner_0);
 				local.copy(server, EFS.OVERWRITE, subMon.newChild(70));
 			}
 
 			/*
 			 * Now launch the server.
 			 */
+			subMon.subTask(Messages.AbstractRemoteServerRunner_5);
 			String launchCmd = RemoteVariableManager.getInstance().performStringSubstitution(getLaunchCommand());
 			List<String> launchArgs = Arrays.asList(launchCmd.split(" ")); //$NON-NLS-1$
 			IRemoteProcessBuilder builder = conn.getRemoteServices().getProcessBuilder(conn, launchArgs);
@@ -390,7 +393,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 			if (fRemoteProcess == null) {
 				setServerState(ServerState.FINISHED);
-				return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, "failed to start server", null); //$NON-NLS-1$
+				return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, Messages.AbstractRemoteServerRunner_2, null);
 			}
 
 			final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
@@ -431,7 +434,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				}
 			}, "dstore server stderr").start(); //$NON-NLS-1$
 
-			subMon.worked(49);
+			subMon.worked(50);
+			subMon.subTask(Messages.AbstractRemoteServerRunner_1);
 
 			/*
 			 * Wait while running but not canceled.
@@ -460,7 +464,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			if (fRemoteProcess.exitValue() != 0) {
 				if (!subMon.isCanceled()) {
 					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, NLS.bind(
-							"Server finished with exit code {0}", fRemoteProcess.exitValue()))); //$NON-NLS-1$
+							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue())));
 				}
 			}
 			return subMon.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
@@ -469,7 +473,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			return e.getStatus();
 		} catch (IOException e) {
 			setServerState(ServerState.FINISHED);
-			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, "Failed to start server", e); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, Messages.AbstractRemoteServerRunner_4, e);
 		} finally {
 			synchronized (this) {
 				fRemoteProcess = null;
