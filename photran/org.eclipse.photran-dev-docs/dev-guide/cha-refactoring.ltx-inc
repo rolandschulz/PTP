@@ -263,8 +263,73 @@ method. This method returns a \textit{String} representing the source code of
 its parameter; it includes the user's comments, capitalization and whitespace.
 \fi
 
+\section{Testing a Refactoring}
 
+Writing JUnit tests for a refactoring is simple (starting with Photran 6 anyway).
+Any of the tests suites in the org.eclipse.photran.internal.tests.refactoring
+package can be used as examples.
 
-%\section{Testing a Refactoring}
-%
-%TODO
+Each refactoring has a corresponding test suite in that package.  The test suite
+is a class which inherits from \textit{PhotranRefactoringTestSuiteFromMarkers}.
+The test suite is constructed by importing files from a directory in the
+source tree, searching its \textit{markers} (comma-separated lines starting with
+\texttt{!$<<<<<$}), and adding one test case to the suite for each marker.
+
+Markers are expected to have one of the following forms:
+\begin{enumerate}
+\item \texttt{!$<<<<<$}) \textit{line, col, \dots}
+\item \texttt{!$<<<<<$}) \textit{fromLine, fromCol, toLine, toCol, \dots}
+\end{enumerate}
+
+That is, the first two fields in each marker are expected to be a line and column number; the
+text selection passed to the refactoring will be the offset of that line and column.  The third
+fourth fields may also be a line and column number; then, the selection passed to the refactoring
+will extend from the first line/column to the second line/column.
+
+The line and column numbers may be followed by an arbitrary number of fields that contain data
+specific to the refactoring being invoked.  Many refactorings don't require any additional data;
+the Extract Local Variable test suite uses one field for the new variable declaration; the Add
+ONLY to USE Statement test suite uses these fields to list the module entities to add; etc.
+
+The final field must be either \texttt{pass}, \texttt{fail-initial}, or
+\texttt{fail-final}, indicating whether the refactoring should succeed,
+ail its initial precondition check, or fail its final precondition check.
+If the refactoring is expected to succeed, the Fortran program will be compiled and run before
+and after the refactoring in order to ensure that the refactoring actually preserved behavior.
+
+To create a test suite for a new refactoring:
+
+\begin{enumerate}
+
+\item In the org.eclipse.photran.internal.tests.refactoring package,
+copy an existing test suite class, like DataToParameterTestSuite.java.
+
+\item Change the name of the Refactoring class in the list of type parameters and in the constructor.
+
+\item If your markers will contain information other than fromLine, fromCol, toLine, toCol, and pass/fail, override the \textit{configureRefactoring} method.
+See \textit{ExtractLocalVariableTestSuite} for an example.
+
+\item Inside the \textit{refactoring-test-code} folder, create a new subfolder named after your
+refactoring.  We will call this the \textit{base folder.}
+In the test suite class, change the string variable \texttt{DIR} to point to the
+base folder.
+
+\item Inside the base folder, create one or more subfolders.  Each subfolder will
+be imported into the runtime workspace as a single Eclipse project, so it may
+contain only one Fortran file, or it may contain several.
+The refactoring will be run according to the markers in its files.
+Remember, markers have the basic form
+\texttt{!$<<<<<$} \textit{startLine, startCol, endLine, endCol, result.}
+
+\item If there is only one marker anywhere in the subfolder, and it indicates that
+the refactoring should succeed, you may also create
+a \textit{.result} file.  For example, if the folder contains \textit{hello.f90},
+it may also contain \textit{hello.f90.result}.  This file should contain the
+\textit{exact text} the file is expected to have after the refactoring has been
+performed.  The \textit{.result} file will be compared character-by-character with
+the result of the refactoring, so spaces, tabs, and newlines \textit{do} matter;
+the test will fail even if a single space is incorrect.  (This is because
+a production refactoring tool must produce correctly-indented code and handle
+comments correctly, and this is an easy way to test for this.)
+
+\end{enumerate}
