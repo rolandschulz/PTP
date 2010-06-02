@@ -295,7 +295,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			}
 			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
 			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
-				subMon.subTask(Messages.AbstractRemoteServerRunner_0);
 				local.copy(server, EFS.OVERWRITE, subMon.newChild(70));
 			}
 
