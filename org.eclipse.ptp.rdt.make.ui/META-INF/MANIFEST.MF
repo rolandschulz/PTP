@@ -18,3 +18,5 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Bundle-Vendor: %Bundle-Vendor.0
+Export-Package: org.eclipse.ptp.rdt.make.internal.ui.editor,
+ org.eclipse.ptp.rdt.make.ui
