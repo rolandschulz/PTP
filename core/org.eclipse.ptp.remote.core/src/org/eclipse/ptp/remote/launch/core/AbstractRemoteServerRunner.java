@@ -253,8 +253,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				if (subMon.isCanceled()) {
 					terminateServer();
 				}
-				if (getServerState() != ServerState.RUNNING && !getResult().isOK()) {
-					throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_8, getResult().getMessage()));
+				if (getServerState() == ServerState.FINISHED) {
+					try {
+						join();
+					} catch (InterruptedException e) {
+						throw new IOException(e.getMessage());
+					}
+					if (getResult() != null) {
+						throw new IOException(getResult().getMessage());
+					}
+					throw new IOException(Messages.AbstractRemoteServerRunner_10);
 				}
 				subMon.setWorkRemaining(10);
 				if (!doStartServer(subMon.newChild(10))) {
@@ -304,7 +312,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				local = EFS.getStore(jarURL.toURI());
 			}
 			if (local == null) {
-				return null;
+				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_11,
+						new Object[] { getPayload(), fBundle.getSymbolicName() }));
 			}
 			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
 			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
@@ -403,22 +412,19 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				return Status.CANCEL_STATUS;
 			}
 
-			if (fRemoteProcess == null) {
-				setServerState(ServerState.FINISHED);
-				return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, Messages.AbstractRemoteServerRunner_2, null);
-			}
-
 			final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
 			new Thread(new Runnable() {
 				public void run() {
 					try {
-						String output;
-						while ((output = stdout.readLine()) != null) {
-							if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStdout(output)) {
-								setServerState(ServerState.RUNNING);
-							}
-							if (DebugUtil.SERVER_TRACING) {
-								System.out.println("SERVER: " + output); //$NON-NLS-1$
+						while (getServerState() != ServerState.FINISHED) {
+							String output = stdout.readLine();
+							if (output != null) {
+								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStdout(output)) {
+									setServerState(ServerState.RUNNING);
+								}
+								if (DebugUtil.SERVER_TRACING) {
+									System.out.println("SERVER: " + output); //$NON-NLS-1$
+								}
 							}
 						}
 					} catch (IOException e) {
@@ -431,13 +437,15 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			new Thread(new Runnable() {
 				public void run() {
 					try {
-						String output;
-						while ((output = stderr.readLine()) != null) {
-							if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
-								setServerState(ServerState.RUNNING);
-							}
-							if (DebugUtil.SERVER_TRACING) {
-								System.err.println("SERVER: " + output); //$NON-NLS-1$
+						while (getServerState() != ServerState.FINISHED) {
+							String output = stderr.readLine();
+							if (output != null) {
+								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
+									setServerState(ServerState.RUNNING);
+								}
+								if (DebugUtil.SERVER_TRACING) {
+									System.err.println("SERVER: " + output); //$NON-NLS-1$
+								}
 							}
 						}
 					} catch (IOException e) {
@@ -468,8 +476,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				// Do nothing
 			}
 
-			setServerState(ServerState.FINISHED);
-
 			/*
 			 * Check if process terminated successfully (if not canceled).
 			 */
@@ -481,16 +487,15 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			}
 			return subMon.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
 		} catch (CoreException e) {
-			setServerState(ServerState.FINISHED);
 			return e.getStatus();
 		} catch (IOException e) {
-			setServerState(ServerState.FINISHED);
-			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, Messages.AbstractRemoteServerRunner_4, e);
+			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, e.getMessage(), null);
 		} finally {
 			synchronized (this) {
 				fRemoteProcess = null;
 				doFinishServer(subMon.newChild(1));
 			}
+			setServerState(ServerState.FINISHED);
 			if (monitor != null) {
 				monitor.done();
 			}
