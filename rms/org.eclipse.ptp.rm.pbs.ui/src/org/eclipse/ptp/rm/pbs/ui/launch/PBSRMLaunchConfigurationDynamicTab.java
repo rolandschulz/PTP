@@ -153,13 +153,13 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		 */
 		@Override
 		protected void copyToFields() {
+			System.currentTimeMillis();
 			PBSBatchScriptTemplate template = templateManager.getCurrent();
 			if (template == null)
 				return;
 			AttributePlaceholder ap = null;
 			IAttribute<?, ?, ?> attr = null;
 			Object value = null;
-
 			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets
 					.entrySet().iterator(); i.hasNext();) {
 				Entry<Control, AttributePlaceholder> e = i.next();
@@ -321,6 +321,24 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		}
 
 		/*
+		 * (non-Javadoc) Overridden to stop proliferation of events when the
+		 * control is being rebuilt.
+		 * 
+		 * @see org.eclipse.ptp.rm.ui.launch.
+		 * RMLaunchConfigurationDynamicTabWidgetListener
+		 * #modifyText(org.eclipse.swt.events.ModifyEvent)
+		 */
+		@Override
+		public void modifyText(ModifyEvent e) {
+			e.getSource();
+			Object o = e.getSource();
+			if (!templateChangeListener.isEnabled())
+				if (valueWidgets.containsKey(o))
+					return;
+			super.modifyText(e);
+		}
+
+		/*
 		 * (non-Javadoc) Overridden to provide for opening of editors.
 		 * 
 		 * @see org.eclipse.ptp.rm.ui.launch.
@@ -438,7 +456,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	private static final String TAG_CURRENT_TEMPLATE = Messages.PBSRMLaunchConfigCurrentTemplate;
 
 	private Composite childControl;
-
 	private Composite control;
 	private PBSRMLaunchDataSource dataSource;
 	private Button editPostpended;
@@ -483,8 +500,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	 */
 	public void createControl(Composite parent, IResourceManager rm,
 			IPQueue queue) throws CoreException {
-		control = WidgetUtils.createAnonymousNonFillingGroup(parent, 1);
-		createControl();
+		control = WidgetUtils.createComposite(parent, 2);
+		populateControl();
 	}
 
 	/**
@@ -562,11 +579,11 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation performApply(
 			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
 			IPQueue queue) {
-		// should not be null
-		dataSource.currentConfigName = configuration.getName();
-		String oldRM = dataSource.lastRMId;
-		RMLaunchValidation rmv = super.performApply(configuration, rm, queue);
-		if (templateChangeListener.isEnabled())
+		RMLaunchValidation rmv = null;
+		if (templateChangeListener.isEnabled()) {
+			// should not be null
+			dataSource.currentConfigName = configuration.getName();
+			String oldRM = dataSource.lastRMId;
 			if (oldRM == null) {
 				PBSResourceManager pbsRM = (PBSResourceManager) rm;
 				IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) pbsRM
@@ -574,7 +591,11 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 				dataSource.defaultTemplate = rmConfig.getDefaultTemplateName();
 				dataSource.setCurrentTemplate(oldRM);
 				fireTemplateChange();
+				rmv = super.performApply(configuration, rm, queue);
 			}
+		}
+		if (rmv == null)
+			rmv = new RMLaunchValidation(true, null);
 		return rmv;
 	}
 
@@ -628,25 +649,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		if (listener == null)
 			listener = new PBSRMLaunchWidgetListener(this);
 		return listener;
-	}
-
-	/*
-	 * Nests child control which can be disposed when rebuild is called for.
-	 */
-	private void createControl() {
-		if (childControl != null) {
-			childControl.dispose();
-			valueWidgets.clear();
-		}
-		childControl = WidgetUtils.createAnonymousNonFillingGroup(control, 1);
-		createSelectionGroup(childControl);
-		PBSBatchScriptTemplate template = templateManager.getCurrent();
-		if (template != null) {
-			createOptionalGroup(childControl, template);
-			PBSRMLaunchConfigurationDynamicTabWizardPage wizardPage = new PBSRMLaunchConfigurationDynamicTabWizardPage(
-					valueWidgets, getListener(), template);
-			wizardPage.createControl(childControl);
-		}
 	}
 
 	/*
@@ -714,7 +716,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 					dataSource.copyToStorage();
 					ILaunchConfiguration c = get(dataSource.currentConfigName);
 					templateManager.loadTemplate(dataSource.currentTemplate, c);
-					createControl();
+					populateControl();
 					dataSource.loadFromStorage();
 					dataSource.copyToFields();
 				} catch (Throwable t) {
@@ -725,6 +727,25 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 				return Status.OK_STATUS;
 			}
 		}.schedule();
+	}
+
+	/*
+	 * Nests child control which can be disposed when rebuild is called for.
+	 */
+	private void populateControl() {
+		if (childControl != null) {
+			childControl.dispose();
+			valueWidgets.clear();
+		}
+		childControl = WidgetUtils.createComposite(control, 1);
+		createSelectionGroup(childControl);
+		PBSBatchScriptTemplate template = templateManager.getCurrent();
+		if (template != null) {
+			createOptionalGroup(childControl, template);
+			PBSRMLaunchConfigurationDynamicTabWizardPage wizardPage = new PBSRMLaunchConfigurationDynamicTabWizardPage(
+					valueWidgets, getListener(), template);
+			wizardPage.createControl(childControl);
+		}
 	}
 
 	/*
