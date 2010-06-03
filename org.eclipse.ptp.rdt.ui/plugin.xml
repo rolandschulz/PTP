@@ -100,7 +100,6 @@
          point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
       <wizardPage
             ID="org.eclipse.ptp.rdt.ui.serviceModelWizardPage"
-            operationClass="org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPageOperation"
             pageClass="org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPage">
          <nature
                natureID="org.eclipse.ptp.rdt.core.remoteNature">
