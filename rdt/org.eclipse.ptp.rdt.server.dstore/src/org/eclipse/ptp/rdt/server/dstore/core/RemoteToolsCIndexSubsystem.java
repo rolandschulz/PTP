@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.dstore.core.model.DE;
 import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
@@ -180,7 +181,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			ITranslationUnit unit) {
 		checkAllProjects(new NullProgressMonitor());
 		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(null);
 		if (dataStore == null) {
 			return Collections.emptyList();
 		}
@@ -461,11 +462,11 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			List<ICElement> changedElements, List<ICElement> deletedElements, IProgressMonitor monitor, RemoteIndexerTask task) {
 
 		removeProblems(scope);
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 		if (dataStore == null)
 			return Status.OK_STATUS;
 
-		DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
+		DataElement result = getDataStore(monitor).createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
 		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
 		int workCount = newElements.size() + changedElements.size();
 		monitor.beginTask("Incrementally Indexing...", workCount); //$NON-NLS-1$
@@ -612,7 +613,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IStatus registerScope(Scope scope, List<ICElement> elements, String configLocation, IProgressMonitor monitor) {
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 
 		if (dataStore != null) {
 
@@ -682,11 +683,11 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	public IStatus reindexScope(Scope scope, IRemoteIndexerInfoProvider provider, String indexLocation, IProgressMonitor monitor,
 			RemoteIndexerTask task) {
 		removeProblems(scope);
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 		if (dataStore == null)
 			return Status.OK_STATUS;
 
-		DataElement result = getDataStore().createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
+		DataElement result = getDataStore(monitor).createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
 		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
 		monitor.beginTask("Rebuilding indexing...", 100); //$NON-NLS-1$
 
@@ -819,7 +820,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(scope.getName());
 		fInitializedProjects.remove(project);
 
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 
 		if (dataStore != null) {
 
@@ -962,7 +963,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 *            treat the result as a raw string.
 	 */
 	private Object sendRequest(String requestType, Object[] arguments, IProgressMonitor monitor, boolean deserializeResult) {
-		DataStore dataStore = getDataStore();
+		DataStore dataStore = getDataStore(monitor);
 		if (dataStore == null)
 			return null;
 
@@ -1100,26 +1101,34 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		return fProvider.getConnectionName();
 	}
 
-	protected DataStore getDataStore() {
-		if (fDStoreServer == null) {
-			fDStoreServer = (DStoreServer) RemoteServerManager.getServer(DStoreServer.SERVER_ID, fProvider.getConnection());
-		}
-		fDStoreServer.setWorkDir(fProvider.getIndexLocation());
-		DataStore dataStore = fDStoreServer.getDataStore();
-		if (!dataStore.isConnected()) {
-			if (fDStoreServer.startServer(new NullProgressMonitor())) {
+	protected DataStore getDataStore(IProgressMonitor monitor) {
+		SubMonitor subMon = SubMonitor.convert(monitor, 10);
+		try {
+			if (fDStoreServer == null) {
+				fDStoreServer = (DStoreServer) RemoteServerManager.getServer(DStoreServer.SERVER_ID, fProvider.getConnection());
+			}
+			fDStoreServer.setWorkDir(fProvider.getIndexLocation());
+			DataStore dataStore = fDStoreServer.getDataStore();
+			if (!dataStore.isConnected()) {
+				try {
+					fDStoreServer.startServer(subMon.newChild(5));
+				} catch (IOException e) {
+					return null;
+				}
 				DataElement status = dataStore.activateMiner("org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"); //$NON-NLS-1$
 				StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
 				try {
-					smonitor.waitForUpdate(status, new NullProgressMonitor());
+					smonitor.waitForUpdate(status, subMon.newChild(5));
 				} catch (InterruptedException e) {
 					// Data store will be disconnected if error occurs
 				}
-				return dataStore;
 			}
-			return null;
+			return dataStore;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		return dataStore;
 	}
 
 	protected void removeProblems(Scope scope) {
