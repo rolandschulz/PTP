@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.ptp.etfw.tau.papiselect.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -56,44 +57,45 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
 
 /**
- * A heavily specialized implementation of SelectionDialog for displaying a list of 
- * PAPI performance counters which can be selected by the user, with mutually exclusive
- * counters being excluded as selections are made
+ * A heavily specialized implementation of SelectionDialog for displaying a list
+ * of PAPI performance counters which can be selected by the user, with mutually
+ * exclusive counters being excluded as selections are made
+ * 
  * @author wspear
- *
+ * 
  */
 public class PapiListSelectionDialog extends SelectionDialog {
 	/**
 	 * the root element to populate the viewer with
 	 */
-	private Object inputElement;
+	private final Object inputElement;
 
 	/**
 	 * providers for populating this dialog
-	 */ 
-	private ILabelProvider labelProvider;
+	 */
+	private final ILabelProvider labelProvider;
 
-	private IStructuredContentProvider contentProvider;
+	private final IStructuredContentProvider contentProvider;
 
 	/**
 	 * the visual selection widget group
-	 */ 
+	 */
 	CheckboxTableViewer listViewer;
 
-	private PapiSelect papiCon;
+	private final PapiSelect papiCon;
 
 	/**
 	 * Vertical sizing constant
-	 */ 
+	 */
 	private final static int SIZING_SELECTION_WIDGET_HEIGHT = 250;
 
 	/**
 	 * Horizontal sizing constant
-	 */ 
+	 */
 	private final static int SIZING_SELECTION_WIDGET_WIDTH = 300;
-	
-	public static final int PRESET=0;
-	public static final int NATIVE=1;
+
+	public static final int PRESET = 0;
+	public static final int NATIVE = 1;
 
 	/**
 	 * Creates a PAPI list selection dialog.
@@ -110,11 +112,10 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 *            the message to be displayed at the top of this dialog, or
 	 *            <code>null</code> to display a default message
 	 */
-	public PapiListSelectionDialog(Shell parentShell, String papiloc,
-			IStructuredContentProvider contentProvider,
+	public PapiListSelectionDialog(Shell parentShell, String papiloc, IStructuredContentProvider contentProvider,
 			ILabelProvider labelProvider, String message, int papiCountType) {
 		super(parentShell);
-		setTitle(Messages.getString("PapiListSelectionDialog.PapiCounters"));//WorkbenchMessages.ListSelection_title); //$NON-NLS-1$
+		setTitle(Messages.PapiListSelectionDialog_PapiCounters);// WorkbenchMessages.ListSelection_title);
 		papiCon = new PapiSelect(papiloc, papiCountType);
 		inputElement = papiCon.getAvail().toArray();
 		this.contentProvider = contentProvider;
@@ -123,7 +124,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		if (message != null) {
 			setMessage(message);
 		} else {
-			setMessage(Messages.getString("PapiListSelectionDialog.SelectPapiCounters"));//WorkbenchMessages.ListSelection_message); //$NON-NLS-1$
+			setMessage(Messages.PapiListSelectionDialog_SelectPapiCounters);// WorkbenchMessages.ListSelection_message);
 		}
 	}
 
@@ -138,20 +139,19 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 0;
 		layout.marginWidth = 0;
-		layout.horizontalSpacing = convertHorizontalDLUsToPixels(
-				IDialogConstants.HORIZONTAL_SPACING);
+		layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		buttonComposite.setLayout(layout);
-		buttonComposite.setLayoutData(new GridData(SWT.END, SWT.TOP, true,
-				false));
+		buttonComposite.setLayoutData(new GridData(SWT.END, SWT.TOP, true, false));
 
-		Button selectButton = createButton(buttonComposite,
-				IDialogConstants.SELECT_ALL_ID, Messages.getString("PapiListSelectionDialog.SelectAll"), false); //$NON-NLS-1$
+		Button selectButton = createButton(buttonComposite, IDialogConstants.SELECT_ALL_ID,
+				Messages.PapiListSelectionDialog_SelectAll, false);
 
 		SelectionListener listener = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Object[] masterlist = contentProvider.getElements(inputElement);
 				for (int i = 0; i < masterlist.length; i++) {
-					//System.out.println(masterlist[i]);
+					// System.out.println(masterlist[i]);
 					listViewer.setChecked(masterlist[i], true);
 					updateGrey(masterlist[i]);
 				}
@@ -159,10 +159,11 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		};
 		selectButton.addSelectionListener(listener);
 
-		Button deselectButton = createButton(buttonComposite,
-				IDialogConstants.DESELECT_ALL_ID, Messages.getString("PapiListSelectionDialog.DeselectAll"), false); //$NON-NLS-1$
+		Button deselectButton = createButton(buttonComposite, IDialogConstants.DESELECT_ALL_ID,
+				Messages.PapiListSelectionDialog_DeselectAll, false);
 
 		listener = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				listViewer.setAllChecked(false);
 				listViewer.setAllGrayed(false);
@@ -170,9 +171,10 @@ public class PapiListSelectionDialog extends SelectionDialog {
 		};
 		deselectButton.addSelectionListener(listener);
 
-		Button helpButton = createButton(buttonComposite,
-				IDialogConstants.HELP_ID, Messages.getString("PapiListSelectionDialog.CounterDescs"), false); //$NON-NLS-1$
+		Button helpButton = createButton(buttonComposite, IDialogConstants.HELP_ID, Messages.PapiListSelectionDialog_CounterDescs,
+				false);
 		listener = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				displayPapiDescs();
 			}
@@ -182,33 +184,32 @@ public class PapiListSelectionDialog extends SelectionDialog {
 
 	/**
 	 * Pops up a display showing names and functions of all listed PAPI counters
-	 *
+	 * 
 	 */
 	private void displayPapiDescs() {
 		// TODO Make this run with background active
 		Display thisDisplay = PlatformUI.getWorkbench().getDisplay();
 		Shell eDefShell = new Shell(thisDisplay.getActiveShell(), SWT.RESIZE);
-				eDefShell.setText(Messages.getString("PapiListSelectionDialog.CounterDescs")); //$NON-NLS-1$
-				eDefShell.setMinimumSize(200, 100);
-				eDefShell.setSize(400, 300);
-				eDefShell.setLayout(new FillLayout());
-				final Table table = new Table(eDefShell, SWT.BORDER);
-				table.setHeaderVisible(true);
-				TableColumn column1 = new TableColumn(table, SWT.NONE);
-				column1.setText(Messages.getString("PapiListSelectionDialog.Counter")); //$NON-NLS-1$
-				TableColumn column2 = new TableColumn(table, SWT.NONE);
-				column2.setText(Messages.getString("PapiListSelectionDialog.Definition")); //$NON-NLS-1$
-				TableItem item;
-				Vector<String> cNames = papiCon.getCounterNames();
-				Vector<String> cDefs = papiCon.getCounterDefs();
-				for (int i = 0; i < cNames.size(); i++) {
-					item = new TableItem(table, SWT.NONE);
-					item.setText(new String[] { cNames.get(i),
-							cDefs.get(i) });
-				}
-				column1.pack();
-				column2.pack();
-				eDefShell.open();
+		eDefShell.setText(Messages.PapiListSelectionDialog_CounterDescs);
+		eDefShell.setMinimumSize(200, 100);
+		eDefShell.setSize(400, 300);
+		eDefShell.setLayout(new FillLayout());
+		final Table table = new Table(eDefShell, SWT.BORDER);
+		table.setHeaderVisible(true);
+		TableColumn column1 = new TableColumn(table, SWT.NONE);
+		column1.setText(Messages.PapiListSelectionDialog_Counter);
+		TableColumn column2 = new TableColumn(table, SWT.NONE);
+		column2.setText(Messages.PapiListSelectionDialog_Definition);
+		TableItem item;
+		Vector<String> cNames = papiCon.getCounterNames();
+		Vector<String> cDefs = papiCon.getCounterDefs();
+		for (int i = 0; i < cNames.size(); i++) {
+			item = new TableItem(table, SWT.NONE);
+			item.setText(new String[] { cNames.get(i), cDefs.get(i) });
+		}
+		column1.pack();
+		column2.pack();
+		eDefShell.open();
 	}
 
 	/**
@@ -231,10 +232,10 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 * @see org.eclipse.jface.window.Window#configureShell(
 	 * org.eclipse.swt.widgets.Shell)
 	 */
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
-				PlatformUI.PLUGIN_ID + "."+"list_selection_dialog_context");//IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG); //$NON-NLS-1$ //$NON-NLS-2$
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, PlatformUI.PLUGIN_ID + "." + "list_selection_dialog_context");//IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -257,8 +258,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			if (listViewer.getChecked(element)) {
 				// Get the list of unchecked, un-gray elements that are excluded
 				// by the currently checked ones
-				LinkedHashSet<Object> allgrey = papiCon.getGrey(listViewer
-						.getCheckedElements(), listViewer.getGrayedElements());
+				LinkedHashSet<Object> allgrey = papiCon.getGrey(listViewer.getCheckedElements(), listViewer.getGrayedElements());
 				// Add the current gray elements to the new ones
 				allgrey.addAll(Arrays.asList(listViewer.getGrayedElements()));
 				listViewer.setGrayedElements(allgrey.toArray());
@@ -271,10 +271,8 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			}
 			// If a previously unchecked element is checked
 			else {
-				LinkedHashSet<Object> allgrey = new LinkedHashSet<Object>(Arrays
-						.asList(listViewer.getGrayedElements()));
-				LinkedHashSet<Object> maybegood = new LinkedHashSet<Object>(Arrays
-						.asList(listViewer.getCheckedElements()));
+				LinkedHashSet<Object> allgrey = new LinkedHashSet<Object>(Arrays.asList(listViewer.getGrayedElements()));
+				LinkedHashSet<Object> maybegood = new LinkedHashSet<Object>(Arrays.asList(listViewer.getCheckedElements()));
 				// This is all of the currently checked but not-grey elements
 				maybegood.removeAll(allgrey);
 				// allgrey is set to the elements excluded by the current
@@ -295,6 +293,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	/**
 	 * Creates the core UI of this dialog
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		// page group
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -355,6 +354,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 	 * <code>Dialog</code> method builds a list of the selected counters for
 	 * later retrieval by the client and closes this dialog.
 	 */
+	@Override
 	protected void okPressed() {
 
 		// Get the input children.
@@ -366,8 +366,7 @@ public class PapiListSelectionDialog extends SelectionDialog {
 			for (int i = 0; i < children.length; ++i) {
 				Object element = children[i];
 				// Return all checked but not grayed elements
-				if (listViewer.getChecked(element)
-						&& !listViewer.getGrayed(element)) {
+				if (listViewer.getChecked(element) && !listViewer.getGrayed(element)) {
 					list.add(element);
 				}
 			}

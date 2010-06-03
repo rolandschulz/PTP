@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
+import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.ToolPane;
 import org.eclipse.ptp.etfw.toolopts.ToolPaneListener;
@@ -60,127 +61,143 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListDialog;
 
 /**
- * Defines the tab of the performance-analysis launch configuration system where performance-analysis options are selected
+ * Defines the tab of the performance-analysis launch configuration system where
+ * performance-analysis options are selected
+ * 
  * @author wspear
- *
+ * 
  */
 public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants {
-	//private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+	// private static final IPreferenceStore pstore =
+	// Activator.getDefault().getPreferenceStore();
 	/**
-	 * Determines if the launch configuration associated with this tab has access to the PTP
+	 * Determines if the launch configuration associated with this tab has
+	 * access to the PTP
 	 */
-	protected boolean noPTP=false;
-	
-	protected final ExternalToolProcess[] tools=Activator.getTools();//null;
+	protected boolean noPTP = false;
+
+	protected final ExternalToolProcess[] tools = Activator.getTools();// null;
 
 	protected Combo toolTypes;
 
 	protected Button buildonlyCheck;
-	
+
 	protected Button analyzeonlyCheck;
-	
+
 	protected Button noParallelRun;
-	
+
 	protected Button addWorkflowB;
 	protected Button removeWorkflowB;
 
-	//protected Button nocleanCheck;
+	// protected Button nocleanCheck;
 
 	protected Button keepprofsCheck;
-	
+
 	protected final ToolPane[] panes = Activator.getToolPanes();
-	//protected Button relocateTools;
-	
+
+	// protected Button relocateTools;
+
 	/**
 	 * Listens for action in tool options panes
+	 * 
 	 * @author wspear
-	 *
+	 * 
 	 */
-	protected class OptionsPaneListener extends ToolPaneListener{
+	protected class OptionsPaneListener extends ToolPaneListener {
 		OptionsPaneListener(ToolPane tool) {
 			super(tool);
 		}
-		protected void localAction(){
+
+		@Override
+		protected void localAction() {
 			updateLaunchConfigurationDialog();
 		}
 	}
-	
+
 	/**
-	 * Sets weather or not it is possible to initiate a parallel launch from this tab
-	 * @param noPar Availability of the PTP to this tab's launch configuration delegate
+	 * Sets weather or not it is possible to initiate a parallel launch from
+	 * this tab
+	 * 
+	 * @param noPar
+	 *            Availability of the PTP to this tab's launch configuration
+	 *            delegate
 	 */
 	public ExternalToolSelectionTab(boolean noPar) {
-		noPTP=noPar;
-//		File tauToolXML=null;
-//		URL testURL=Activator.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
-//		try {
-//			tauToolXML = new File(new URI(FileLocator.toFileURL(testURL).toString().replaceAll(" ", "%20")));
-//		} catch (URISyntaxException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		ExternalToolProcess[] tauTool=null;
-//		ExternalToolProcess[] otherTools=null;
-//		if(tauToolXML!=null&&tauToolXML.canRead())
-//		{
-//			tauTool=ToolMaker.makeTools(tauToolXML);
-//		}
-//		
-//		File toolxml= new File(pstore.getString(XMLLOCID));
-//		if(!toolxml.canRead())
-//		{
-//			String epath=BuildLaunchUtils.checkToolEnvPath("eclipse");
-//			if(epath!=null)
-//			{
-//				toolxml=new File(epath);
-//				if(toolxml.canRead())
-//				{
-//					toolxml=new File(toolxml.getPath()+File.separator+"tool.xml");
-//					if(toolxml.canRead())
-//					{
-//						//tools=ToolMaker.makeTools(toolxml);
-//						pstore.setValue(XMLLOCID, toolxml.getPath());
-//					}
-//				}
-//			}
-//		}
-//		
-//		if(toolxml.canRead())
-//			otherTools=ToolMaker.makeTools(toolxml); //ExternalToolProcess.getSample();//new ExternalToolProcess[1];;
-//		tools=new ExternalToolProcess[1+otherTools.length];
-//		tools[0]=tauTool[0];
-//		for(int i=0;i<otherTools.length;i++)
-//		{
-//			tools[i+1]=otherTools[i];
-//		}
+		noPTP = noPar;
+		// File tauToolXML=null;
+		// URL
+		// testURL=Activator.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
+		// try {
+		// tauToolXML = new File(new
+		// URI(FileLocator.toFileURL(testURL).toString().replaceAll(" ",
+		// "%20")));
+		// } catch (URISyntaxException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// ExternalToolProcess[] tauTool=null;
+		// ExternalToolProcess[] otherTools=null;
+		// if(tauToolXML!=null&&tauToolXML.canRead())
+		// {
+		// tauTool=ToolMaker.makeTools(tauToolXML);
+		// }
+		//
+		// File toolxml= new File(pstore.getString(XMLLOCID));
+		// if(!toolxml.canRead())
+		// {
+		// String epath=BuildLaunchUtils.checkToolEnvPath("eclipse");
+		// if(epath!=null)
+		// {
+		// toolxml=new File(epath);
+		// if(toolxml.canRead())
+		// {
+		// toolxml=new File(toolxml.getPath()+File.separator+"tool.xml");
+		// if(toolxml.canRead())
+		// {
+		// //tools=ToolMaker.makeTools(toolxml);
+		// pstore.setValue(XMLLOCID, toolxml.getPath());
+		// }
+		// }
+		// }
+		// }
+		//
+		// if(toolxml.canRead())
+		// otherTools=ToolMaker.makeTools(toolxml);
+		// //ExternalToolProcess.getSample();//new ExternalToolProcess[1];;
+		// tools=new ExternalToolProcess[1+otherTools.length];
+		// tools[0]=tauTool[0];
+		// for(int i=0;i<otherTools.length;i++)
+		// {
+		// tools[i+1]=otherTools[i];
+		// }
 	}
 
 	/**
 	 * Listen for activity in the performance tool combo-box, or other options
+	 * 
 	 * @author wspear
-	 *
+	 * 
 	 */
-	protected class WidgetListener extends SelectionAdapter implements
-			ModifyListener, IPropertyChangeListener {
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 
 			Object source = e.getSource();
 
-			if(source.equals(addWorkflowB))
-			{
+			if (source.equals(addWorkflowB)) {
 				addWorkflow();
 			}
-			if(source.equals(removeWorkflowB)){
+			if (source.equals(removeWorkflowB)) {
 				removeWorkflow();
 			}
-//			if(source.equals(relocateTools))
-//			{
-//				BuildLaunchUtils.getAllToolPaths(tools, true);
-//			}
-			
+			// if(source.equals(relocateTools))
+			// {
+			// BuildLaunchUtils.getAllToolPaths(tools, true);
+			// }
+
 			updateLaunchConfigurationDialog();
 		}
 
@@ -194,73 +211,67 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		}
 	}
 
-	private void warnXMLChange(){
-		MessageDialog
-		.openInformation(
-				PlatformUI.getWorkbench()
-						.getDisplay()
-						.getActiveShell(),
-				Messages.ExternalToolSelectionTab_TAUWarning,
-				Messages.ExternalToolSelectionTab_ChancesNotEffectUntil);
+	private void warnXMLChange() {
+		MessageDialog.openInformation(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
+				Messages.ExternalToolSelectionTab_TAUWarning, Messages.ExternalToolSelectionTab_ChancesNotEffectUntil);
 	}
-	
-	private void addWorkflow(){
+
+	private void addWorkflow() {
 		FileDialog dialog = new FileDialog(getShell());
 
 		dialog.setText(Messages.ExternalToolSelectionTab_SelectToolDefXMLFile);
-		
-		String out=getFieldContent(dialog.open());
-		
-		if(out==null)
+
+		String out = getFieldContent(dialog.open());
+
+		if (out == null)
 			return;
-		
+
 		File test = new File(out);
-		if(!test.canRead()||!test.isFile())
-		{
+		if (!test.canRead() || !test.isFile()) {
 			return;
 		}
-			
+
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		String fiList=preferences.getString(XMLLOCID);
-		
+		String fiList = preferences.getString(XMLLOCID);
+
 		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
-		for(int i=0;i<x.length;i++){
+		for (int i = 0; i < x.length; i++) {
 			files.add(x[i]);
 		}
 		files.add(out);
-		
-		fiList=""; //$NON-NLS-1$
-		
+
+		fiList = ""; //$NON-NLS-1$
+
 		Iterator<String> fit = files.iterator();
-		
-		while(fit.hasNext()){
-			fiList+=fit.next();
-			if(fit.hasNext()){
-				fiList+=",,,"; //$NON-NLS-1$
+
+		while (fit.hasNext()) {
+			fiList += fit.next();
+			if (fit.hasNext()) {
+				fiList += ",,,"; //$NON-NLS-1$
 			}
 		}
-		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());
+		preferences.setValue(XMLLOCID, fiList);// XMLLoc.getText());
 		Activator.getDefault().refreshTools();
 		warnXMLChange();
-		
+
 	}
-	
-	private void removeWorkflow(){
+
+	private void removeWorkflow() {
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		String fiList=preferences.getString(XMLLOCID);
-		
+		String fiList = preferences.getString(XMLLOCID);
+
 		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
-		for(int i=0;i<x.length;i++){
+		for (int i = 0; i < x.length; i++) {
 			files.add(x[i]);
 		}
-		
-		ArrayContentProvider acp = new ArrayContentProvider(); 
-		//acp.getElements(x);
-		
+
+		ArrayContentProvider acp = new ArrayContentProvider();
+		// acp.getElements(x);
+
 		ListDialog ld = new ListDialog(getShell());
-		
+
 		ld.setContentProvider(acp);
 		ld.setBlockOnOpen(true);
 		ld.setLabelProvider(new LabelProvider());
@@ -268,35 +279,35 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		ld.setHelpAvailable(false);
 		ld.setTitle(Messages.ExternalToolSelectionTab_RemoveWorkflowFiles);
 		ld.open();
-		if(ld.getReturnCode()==Dialog.CANCEL)
-		{
+		if (ld.getReturnCode() == Dialog.CANCEL) {
 			return;
 		}
 		Object[] y = ld.getResult();
-		for(int i=0;i<y.length;i++){
-			files.remove((String)y[i]);
+		for (int i = 0; i < y.length; i++) {
+			files.remove(y[i]);
 		}
-		
-		fiList=""; //$NON-NLS-1$
-		
+
+		fiList = ""; //$NON-NLS-1$
+
 		Iterator<String> fit = files.iterator();
-		
-		while(fit.hasNext()){
-			fiList+=fit.next();
-			if(fit.hasNext()){
-				fiList+=",,,"; //$NON-NLS-1$
+
+		while (fit.hasNext()) {
+			fiList += fit.next();
+			if (fit.hasNext()) {
+				fiList += ",,,"; //$NON-NLS-1$
 			}
 		}
-		preferences.setValue(XMLLOCID,fiList);//XMLLoc.getText());
+		preferences.setValue(XMLLOCID, fiList);// XMLLoc.getText());
 		Activator.getDefault().refreshTools();
 		warnXMLChange();
 	}
-	
+
 	protected WidgetListener listener = new WidgetListener();
 
-	
 	/**
-	 * Generates the UI for the analyis tab, consisting of sub-tabs which may be dynamically generated
+	 * Generates the UI for the analyis tab, consisting of sub-tabs which may be
+	 * dynamically generated
+	 * 
 	 * @see ILaunchConfigurationTab#createControl(Composite)
 	 */
 	public void createControl(Composite parent) {
@@ -308,57 +319,53 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 		/*
 		 * 
-		 * Analysis Options:  TAU Makefile options and PAPI counter selection
-		 * 
-		 * */
+		 * Analysis Options: TAU Makefile options and PAPI counter selection
+		 */
 		TabItem toolTab = new TabItem(tabParent, SWT.NULL);
 		toolTab.setText(Messages.ExternalToolSelectionTab_ToolSelection);
 
-		ScrolledComposite scrollTool = new ScrolledComposite(tabParent,SWT.V_SCROLL);
-		
+		ScrolledComposite scrollTool = new ScrolledComposite(tabParent, SWT.V_SCROLL);
+
 		Composite toolComp = new Composite(scrollTool, SWT.NONE);
 		toolTab.setControl(scrollTool);
 
 		toolComp.setLayout(createGridLayout(1, false, 0, 0));
 		toolComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		
 
 		/*
 		 * The actual controls of AnaComp
-		 * */
+		 */
 		createVerticalSpacer(toolComp, 1);
 
 		Composite toolComboComp = new Composite(toolComp, SWT.NONE);
 		toolComboComp.setLayout(createGridLayout(2, false, 0, 0));
 		toolComboComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
+
 		Label makeLab = new Label(toolComboComp, 0);
 		makeLab.setText(Messages.ExternalToolSelectionTab_SelectTool);
-		
-		toolTypes=new Combo(toolComboComp, SWT.DROP_DOWN|SWT.READ_ONLY|SWT.BORDER);
+
+		toolTypes = new Combo(toolComboComp, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		toolTypes.addSelectionListener(listener);
-		addWorkflowB=new Button(toolComboComp, SWT.NONE);
+		addWorkflowB = new Button(toolComboComp, SWT.NONE);
 		addWorkflowB.setText(Messages.ExternalToolSelectionTab_AddWorkflowXMLFile);
 		addWorkflowB.addSelectionListener(listener);
-		removeWorkflowB=new Button(toolComboComp,SWT.NONE);
+		removeWorkflowB = new Button(toolComboComp, SWT.NONE);
 		removeWorkflowB.setText(Messages.ExternalToolSelectionTab_RemoveWorkflowXMLFile);
 		removeWorkflowB.addSelectionListener(listener);
 		createVerticalSpacer(toolComp, 1);
 
-		buildonlyCheck = createCheckButton(toolComp,
-				Messages.ExternalToolSelectionTab_BuildInstrumentedExecutable);
+		buildonlyCheck = createCheckButton(toolComp, Messages.ExternalToolSelectionTab_BuildInstrumentedExecutable);
 		buildonlyCheck.addSelectionListener(listener);
-		
-		
-		analyzeonlyCheck=createCheckButton(toolComp,Messages.ExternalToolSelectionTab_SelectExistingPerfData);
+
+		analyzeonlyCheck = createCheckButton(toolComp, Messages.ExternalToolSelectionTab_SelectExistingPerfData);
 		analyzeonlyCheck.addSelectionListener(listener);
-//		nocleanCheck = createCheckButton(toolComp,
-//				"Keep instrumented executable");
-//		nocleanCheck.addSelectionListener(listener);
+		// nocleanCheck = createCheckButton(toolComp,
+		// "Keep instrumented executable");
+		// nocleanCheck.addSelectionListener(listener);
 
 		toolComp.pack();
-		int toolCompHeight=toolComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-		
+		int toolCompHeight = toolComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+
 		scrollTool.setContent(toolComp);
 		scrollTool.setMinSize(400, toolCompHeight);
 		scrollTool.setExpandHorizontal(true);
@@ -367,76 +374,75 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		/*
 		 * Dynamic Panes
 		 */
-		
-		TabItem optionTab=null;
-		ScrolledComposite scrollOption=null;
-		Composite optionComp=null;
-		int optionCompHeight=400;
-		
-		if(panes!=null)
-		for(int i=0;i<panes.length;i++)
-		{
-			if(panes[i].virtual)
-				continue;
-			optionTab = new TabItem(tabParent, SWT.NULL);
-			optionTab.setText(panes[i].toolName);
 
-			scrollOption = new ScrolledComposite(tabParent,SWT.V_SCROLL);
+		TabItem optionTab = null;
+		ScrolledComposite scrollOption = null;
+		Composite optionComp = null;
+		int optionCompHeight = 400;
 
-			optionComp = new Composite(scrollOption, SWT.NONE);
-			optionTab.setControl(scrollOption);
+		if (panes != null)
+			for (int i = 0; i < panes.length; i++) {
+				if (panes[i].virtual)
+					continue;
+				optionTab = new TabItem(tabParent, SWT.NULL);
+				optionTab.setText(panes[i].toolName);
 
-			optionComp.setLayout(createGridLayout(1, false, 0, 0));
-			optionComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+				scrollOption = new ScrolledComposite(tabParent, SWT.V_SCROLL);
 
-			panes[i].makeToolPane(optionComp, new OptionsPaneListener(panes[i]));
+				optionComp = new Composite(scrollOption, SWT.NONE);
+				optionTab.setControl(scrollOption);
 
-			optionComp.pack();
-			optionCompHeight=optionComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+				optionComp.setLayout(createGridLayout(1, false, 0, 0));
+				optionComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-			scrollOption.setContent(optionComp);
-			scrollOption.setMinSize(400, optionCompHeight);
-			scrollOption.setExpandHorizontal(true);
-			scrollOption.setExpandVertical(true);
-		}
-		
-		
-//		for(int i=0;i<tools.length;i++)
-//		{
-//			if(tools[i].execUtils!=null&&tools[i].execUtils.length>0)  
-//			{
-//				for(int j=0;j<tools[i].execUtils.length;j++)
-//				{
-//					if(tools[i].execUtils[j].toolPanes!=null&&tools[i].execUtils[j].toolPanes.length>0)
-//					{
-//						for(int k=0;k<tools[i].execUtils[j].toolPanes.length;k++)
-//						{
-//							optionTab = new TabItem(tabParent, SWT.NULL);
-//							optionTab.setText(tools[i].execUtils[j].toolPanes[k].toolName);
-//
-//							scrollOption = new ScrolledComposite(tabParent,SWT.V_SCROLL);
-//
-//							optionComp = new Composite(scrollOption, SWT.NONE);
-//							optionTab.setControl(scrollOption);
-//
-//							optionComp.setLayout(createGridLayout(1, false, 0, 0));
-//							optionComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-//
-//
-//							tools[i].execUtils[j].toolPanes[k].makeToolPane(optionComp, new OptionsPaneListener(tools[i].execUtils[j].toolPanes[k]));
-//
-//							optionComp.pack();
-//							optionCompHeight=optionComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-//
-//							scrollOption.setContent(optionComp);
-//							scrollOption.setMinSize(400, optionCompHeight);
-//							scrollOption.setExpandHorizontal(true);
-//							scrollOption.setExpandVertical(true);
-//						}
-//					}
-//				}
-//			}
-//		}
+				panes[i].makeToolPane(optionComp, new OptionsPaneListener(panes[i]));
+
+				optionComp.pack();
+				optionCompHeight = optionComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+
+				scrollOption.setContent(optionComp);
+				scrollOption.setMinSize(400, optionCompHeight);
+				scrollOption.setExpandHorizontal(true);
+				scrollOption.setExpandVertical(true);
+			}
+
+		// for(int i=0;i<tools.length;i++)
+		// {
+		// if(tools[i].execUtils!=null&&tools[i].execUtils.length>0)
+		// {
+		// for(int j=0;j<tools[i].execUtils.length;j++)
+		// {
+		// if(tools[i].execUtils[j].toolPanes!=null&&tools[i].execUtils[j].toolPanes.length>0)
+		// {
+		// for(int k=0;k<tools[i].execUtils[j].toolPanes.length;k++)
+		// {
+		// optionTab = new TabItem(tabParent, SWT.NULL);
+		// optionTab.setText(tools[i].execUtils[j].toolPanes[k].toolName);
+		//
+		// scrollOption = new ScrolledComposite(tabParent,SWT.V_SCROLL);
+		//
+		// optionComp = new Composite(scrollOption, SWT.NONE);
+		// optionTab.setControl(scrollOption);
+		//
+		// optionComp.setLayout(createGridLayout(1, false, 0, 0));
+		// optionComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		//
+		//
+		// tools[i].execUtils[j].toolPanes[k].makeToolPane(optionComp, new
+		// OptionsPaneListener(tools[i].execUtils[j].toolPanes[k]));
+		//
+		// optionComp.pack();
+		// optionCompHeight=optionComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+		//
+		// scrollOption.setContent(optionComp);
+		// scrollOption.setMinSize(400, optionCompHeight);
+		// scrollOption.setExpandHorizontal(true);
+		// scrollOption.setExpandVertical(true);
+		// }
+		// }
+		// }
+		// }
+		// }
 
 	}
 
@@ -450,91 +456,85 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		if(panes!=null)
-		for(int i=0;i<panes.length;i++)
-		{
-			panes[i].setDefaults(configuration);
-		}
+		if (panes != null)
+			for (int i = 0; i < panes.length; i++) {
+				panes[i].setDefaults(configuration);
+			}
 	}
-	
 
-	
 	/**
 	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		toolTypes.removeAll();
-		//toolTypes.add("TAU");
-		
-		if(tools==null||tools.length==0)
-		{
+		// toolTypes.add("TAU");
+
+		if (tools == null || tools.length == 0) {
 			toolTypes.add(Messages.ExternalToolSelectionTab_SpecValidToolConfFile);
-			if(tools==null)
-			{
+			if (tools == null) {
 				toolTypes.select(0);
 				return;
 			}
 		}
-		
-		//BuildLaunchUtils.getAllToolPaths(tools, false);
-		
-//		Shell ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-//		Iterator eIt=null;
-//		Map.Entry me = null;
-		for(int i=0;i<tools.length;i++)
-		{
-//			eIt=tools[i].groupApp.entrySet().iterator();
-//			while(eIt.hasNext())
-//			{
-//				me=(Map.Entry)eIt.next();
-//				if(pstore.getString(TOOL_BIN_ID+"."+(String)me.getKey()).equals(""))
-//				{
-//					pstore.setValue(TOOL_BIN_ID+"."+(String)me.getKey(), BuildLaunchUtils.findToolBinPath((String)me.getValue(),null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
-//				}
-//			}
-//			
-//			for(int j=0;j<tools[i].groupApp.size();j++)
-//			{
-//				
-//				if(tools[i].groupApp.)
-//				{
-//					
-//				}
-//			}
-//				
-//			if(pstore.getString(TOOL_BIN_ID+"."+tools[i].toolID).equals(""))
-//			{
-//				pstore.setValue(TOOL_BIN_ID+"."+tools[i].toolID, BuildLaunchUtils.findToolBinPath(tools[i].compilerPathFinder,null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
-//			}
-			
+
+		// BuildLaunchUtils.getAllToolPaths(tools, false);
+
+		// Shell
+		// ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		// Iterator eIt=null;
+		// Map.Entry me = null;
+		for (int i = 0; i < tools.length; i++) {
+			// eIt=tools[i].groupApp.entrySet().iterator();
+			// while(eIt.hasNext())
+			// {
+			// me=(Map.Entry)eIt.next();
+			// if(pstore.getString(TOOL_BIN_ID+"."+(String)me.getKey()).equals(""))
+			// {
+			// pstore.setValue(TOOL_BIN_ID+"."+(String)me.getKey(),
+			// BuildLaunchUtils.findToolBinPath((String)me.getValue(),null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+			// }
+			// }
+			//
+			// for(int j=0;j<tools[i].groupApp.size();j++)
+			// {
+			//
+			// if(tools[i].groupApp.)
+			// {
+			//
+			// }
+			// }
+			//
+			// if(pstore.getString(TOOL_BIN_ID+"."+tools[i].toolID).equals(""))
+			// {
+			// pstore.setValue(TOOL_BIN_ID+"."+tools[i].toolID,
+			// BuildLaunchUtils.findToolBinPath(tools[i].compilerPathFinder,null,tools[i].toolName,ourshell));//findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+			// }
+
 			toolTypes.add(tools[i].toolName);
 		}
 		toolTypes.select(0);
 		try {
 			int toolDex;
 			toolDex = toolTypes.indexOf(configuration.getAttribute(SELECTED_TOOL, "")); //$NON-NLS-1$
-			if(toolDex>=0)
-			{
+			if (toolDex >= 0) {
 				toolTypes.select(toolDex);
-			}
-			else
-			{
+			} else {
 				toolTypes.select(0);
-				//This means the available tools have changed!
-				if(configuration.getAttribute(SELECTED_TOOL, "").equals("")) //$NON-NLS-1$ //$NON-NLS-2$
+				// This means the available tools have changed!
+				if (configuration.getAttribute(SELECTED_TOOL, "").equals("")) //$NON-NLS-1$ //$NON-NLS-2$
 					updateLaunchConfigurationDialog();
 			}
-			
+
 			buildonlyCheck.setSelection(configuration.getAttribute(BUILDONLY, false));
 			analyzeonlyCheck.setSelection(configuration.getAttribute(ANALYZEONLY, false));
-			//nocleanCheck.setSelection(configuration.getAttribute(NOCLEAN, false));
-			if(panes!=null)
-			for(int i=0;i<panes.length;i++)
-			{
-				panes[i].OptUpdate();
-				panes[i].initializePane(configuration);
-			}
-			
+			// nocleanCheck.setSelection(configuration.getAttribute(NOCLEAN,
+			// false));
+			if (panes != null)
+				for (int i = 0; i < panes.length; i++) {
+					panes[i].OptUpdate();
+					panes[i].initializePane(configuration);
+				}
+
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -542,85 +542,88 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 	}
 
-//	/**
-//	 * Takes the set of build/launch parameters for the selected performance tool and
-//	 * applies them to the current configuration
-//	 * @param tool
-//	 * @param configuration
-//	 */
-//	private void applyToolConfiguration(ExternalToolProcess tool, ILaunchConfigurationWorkingCopy configuration)
-//	{
-//		String binpath=pstore.getString(TOOL_BIN_ID+"."+tool.toolID)+File.separator;
-//		
-//		//Compilation phase attributes
-//		configuration.setAttribute(EXTOOL_RECOMPILE, tool.recompile);//TODO If this is false the rest of this section is moot
-//		configuration.setAttribute(CC_COMPILER, binpath+tool.ccCompiler);
-//		configuration.setAttribute(CXX_COMPILER, binpath+tool.cxxCompiler);
-//		configuration.setAttribute(F90_COMPILER, binpath+tool.f90Compiler);
-//		configuration.setAttribute(TOOLCONFNAME, tool.toolName);//TODO: We may want a more detailed build configuration tag
-//		configuration.setAttribute(COMPILER_REPLACE, tool.replaceCompiler);
-//		
-//		//Execution phase attributes
-//		configuration.setAttribute(USE_EXEC_UTIL, tool.prependExecution);
-//		configuration.setAttribute(EXEC_UTIL_LIST, tool.execUtils);//binpath+tool.prependWith);
-//		configuration.setAttribute(EXEC_UTIL_ARGS, tool.execUtilArgs);
-//		
-//		//Analysis phase attributes
-//		configuration.setAttribute(TOOL_LIST, tool.analysisCommands);//TODO: May need multiple binpath entries for multiple tools
-//		configuration.setAttribute(TOOL_ARGS, tool.analysisArgs);
-//	}
-	
+	// /**
+	// * Takes the set of build/launch parameters for the selected performance
+	// tool and
+	// * applies them to the current configuration
+	// * @param tool
+	// * @param configuration
+	// */
+	// private void applyToolConfiguration(ExternalToolProcess tool,
+	// ILaunchConfigurationWorkingCopy configuration)
+	// {
+	// String
+	// binpath=pstore.getString(TOOL_BIN_ID+"."+tool.toolID)+File.separator;
+	//
+	// //Compilation phase attributes
+	// configuration.setAttribute(EXTOOL_RECOMPILE, tool.recompile);//TODO If
+	// this is false the rest of this section is moot
+	// configuration.setAttribute(CC_COMPILER, binpath+tool.ccCompiler);
+	// configuration.setAttribute(CXX_COMPILER, binpath+tool.cxxCompiler);
+	// configuration.setAttribute(F90_COMPILER, binpath+tool.f90Compiler);
+	// configuration.setAttribute(TOOLCONFNAME, tool.toolName);//TODO: We may
+	// want a more detailed build configuration tag
+	// configuration.setAttribute(COMPILER_REPLACE, tool.replaceCompiler);
+	//
+	// //Execution phase attributes
+	// configuration.setAttribute(USE_EXEC_UTIL, tool.prependExecution);
+	// configuration.setAttribute(EXEC_UTIL_LIST,
+	// tool.execUtils);//binpath+tool.prependWith);
+	// configuration.setAttribute(EXEC_UTIL_ARGS, tool.execUtilArgs);
+	//
+	// //Analysis phase attributes
+	// configuration.setAttribute(TOOL_LIST, tool.analysisCommands);//TODO: May
+	// need multiple binpath entries for multiple tools
+	// configuration.setAttribute(TOOL_ARGS, tool.analysisArgs);
+	// }
+
 	/**
 	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 
-		String selectedtool=toolTypes.getItem(toolTypes.getSelectionIndex());
+		String selectedtool = toolTypes.getItem(toolTypes.getSelectionIndex());
 
 		configuration.setAttribute(SELECTED_TOOL, selectedtool);
-		
-//		if(toolTypes.getSelectionIndex()==0||tools==null||tools.length<1)
-//		{
-//			configuration.setAttribute(TAULAUNCH, true);
-//			//configuration.setAttribute(EXTOOL_RECOMPILE, true);
-//			//configuration.setAttribute(USE_EXEC_UTIL, false);
-//		}
-//		else
-		if(tools!=null&&tools.length>=1)
-		{
-			//BuildLaunchUtils.verifyRequestToolPath(tools[toolTypes.getSelectionIndex()],false);
-			/*In theory his is moot!*/
-//			if(toolTypes.getSelectionIndex()==0)
-//				configuration.setAttribute(TAULAUNCH, true);
-//			else
-//				configuration.setAttribute(TAULAUNCH, false);
+
+		// if(toolTypes.getSelectionIndex()==0||tools==null||tools.length<1)
+		// {
+		// configuration.setAttribute(TAULAUNCH, true);
+		// //configuration.setAttribute(EXTOOL_RECOMPILE, true);
+		// //configuration.setAttribute(USE_EXEC_UTIL, false);
+		// }
+		// else
+		if (tools != null && tools.length >= 1) {
+			// BuildLaunchUtils.verifyRequestToolPath(tools[toolTypes.getSelectionIndex()],false);
+			/* In theory his is moot! */
+			// if(toolTypes.getSelectionIndex()==0)
+			// configuration.setAttribute(TAULAUNCH, true);
+			// else
+			// configuration.setAttribute(TAULAUNCH, false);
 
 			configuration.setAttribute(USE_EXEC_UTIL, tools[toolTypes.getSelectionIndex()].prependExecution);
 			configuration.setAttribute(EXTOOL_RECOMPILE, tools[toolTypes.getSelectionIndex()].recompile);
-//			for(int i=0;i<tools.length;i++)
-//			{
-//				if(tools[i].toolName.equals(selectedtool))
-//				{
-//					applyToolConfiguration(tools[i],configuration);
-//					break;
-//				}
-//			}
+			// for(int i=0;i<tools.length;i++)
+			// {
+			// if(tools[i].toolName.equals(selectedtool))
+			// {
+			// applyToolConfiguration(tools[i],configuration);
+			// break;
+			// }
+			// }
 		}
 
-		configuration.setAttribute(BUILDONLY,
-				buildonlyCheck.getSelection());
-		
-		configuration.setAttribute(ANALYZEONLY,
-				analyzeonlyCheck.getSelection());
-		//configuration.setAttribute(NOCLEAN,nocleanCheck.getSelection());
-		if(panes!=null)
-		for(int i=0;i<panes.length;i++)
-		{
-			panes[i].performApply(configuration);
-			
-			configuration.setAttribute(panes[i].configID, panes[i].getOptionString());
-			configuration.setAttribute(panes[i].configVarID, panes[i].getVarMap());
-		}
+		configuration.setAttribute(BUILDONLY, buildonlyCheck.getSelection());
+
+		configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
+		// configuration.setAttribute(NOCLEAN,nocleanCheck.getSelection());
+		if (panes != null)
+			for (int i = 0; i < panes.length; i++) {
+				panes[i].performApply(configuration);
+
+				configuration.setAttribute(panes[i].configID, panes[i].getOptionString());
+				configuration.setAttribute(panes[i].configVarID, panes[i].getVarMap());
+			}
 	}
 
 	protected String getFieldContent(IntegerFieldEditor editorField) {
@@ -633,6 +636,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid
 	 * (org.eclipse.debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);
 		setMessage(null);
@@ -649,29 +653,31 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 	/**
 	 * @see ILaunchConfigurationTab#setLaunchConfigurationDialog
-	 * (ILaunchConfigurationDialog)
+	 *      (ILaunchConfigurationDialog)
 	 */
+	@Override
 	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
 		super.setLaunchConfigurationDialog(dialog);
 	}
 
-//	/**
-//	 * @see ILaunchConfigurationTab#getImage()
-//	 */
-//	public Image getImage() {
-//		return LaunchImages.getImage("org.eclipse.ptp.etfw.tau.core.tauLogo.gif");
-//	}
+	// /**
+	// * @see ILaunchConfigurationTab#getImage()
+	// */
+	// public Image getImage() {
+	// return
+	// LaunchImages.getImage("org.eclipse.ptp.etfw.tau.core.tauLogo.gif");
+	// }
 
 	/**
 	 * Produces a new GridLayout based on provided arguments
+	 * 
 	 * @param columns
 	 * @param isEqual
 	 * @param mh
 	 * @param mw
 	 * @return
 	 */
-	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
+	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -682,6 +688,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 	/**
 	 * Creates a new GridData based on provided style and space arguments
+	 * 
 	 * @param style
 	 * @param space
 	 * @return
@@ -699,6 +706,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 	/**
 	 * Treats empty strings as null
+	 * 
 	 * @param text
 	 * @return Contents of text, or null if text is the empty string
 	 */

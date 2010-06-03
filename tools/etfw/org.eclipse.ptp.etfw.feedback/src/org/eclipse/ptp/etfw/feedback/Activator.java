@@ -21,13 +21,13 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	/** The plug-in ID */
-	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.feedback";
+	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.feedback"; //$NON-NLS-1$
 
-	public static final String FEEDBACK_EXTENSION_ID = "parser";
+	public static final String FEEDBACK_EXTENSION_ID = "parser"; //$NON-NLS-1$
 	/**
-	 * @since 1.1
+	 * @since 2.0
 	 */
-	public static final String FEEDBACK_ACTION_EXTENSION_ID = "action";
+	public static final String FEEDBACK_ACTION_EXTENSION_ID = "action"; //$NON-NLS-1$
 
 	/** The shared instance */
 	private static Activator plugin;

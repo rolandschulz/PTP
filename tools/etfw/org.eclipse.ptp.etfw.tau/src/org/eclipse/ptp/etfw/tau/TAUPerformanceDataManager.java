@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
+import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
 import org.eclipse.swt.widgets.Display;

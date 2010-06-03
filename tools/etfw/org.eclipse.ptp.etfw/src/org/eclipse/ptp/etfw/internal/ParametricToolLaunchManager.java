@@ -24,9 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,47 +39,48 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
+import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
 
-public class ParametricToolLaunchManager{
+public class ParametricToolLaunchManager {
 
 	private static final String NUMBER_MPI_PROCS = "org.eclipse.ptp.rm.mpi.openmpi.ui.launchAttributes.numProcs";//"org.eclipse.ptp.rm.orte.ui.launchAttributes.numProcs"; //$NON-NLS-1$
-	                                                
 
-	//LaunchFactory lf = null;
-	//LaunchConfigurationDelegate paraDel = null;
-	
-//	/**
-//	 * inherited constructor
-//	 * 
-//	 * @param delegate
-//	 * @param appNameAtt
-//	 * @param projNameAtt
-//	 * @see org.eclipse.ptp.etfw.internal.ToolLaunchManager
-//	 */
-//	public ParametricToolLaunchManager(LaunchConfigurationDelegate delegate, LaunchFactory lf) {
-//		this.lf=lf;
-//		//this.paraDel=delegate;
-//		//super(delegate);
-//	}
+	// LaunchFactory lf = null;
+	// LaunchConfigurationDelegate paraDel = null;
 
-//	/**
-//	 * inherited constructor
-//	 * 
-//	 * @param delegate
-//	 * @param appNameAtt
-//	 * @param projNameAtt
-//	 * @param appPathAtt
-//	 * @see org.eclipse.ptp.etfw.internal.ToolLaunchManager
-//	 */
-//	public ParametricToolLaunchManager(
-//			LaunchConfigurationDelegate delegate, String appNameAtt,
-//			String projNameAtt, String appPathAtt) {
-//		super(delegate, appNameAtt, projNameAtt, appPathAtt);
-//	}
+	// /**
+	// * inherited constructor
+	// *
+	// * @param delegate
+	// * @param appNameAtt
+	// * @param projNameAtt
+	// * @see org.eclipse.ptp.etfw.internal.ToolLaunchManager
+	// */
+	// public ParametricToolLaunchManager(LaunchConfigurationDelegate delegate,
+	// LaunchFactory lf) {
+	// this.lf=lf;
+	// //this.paraDel=delegate;
+	// //super(delegate);
+	// }
+
+	// /**
+	// * inherited constructor
+	// *
+	// * @param delegate
+	// * @param appNameAtt
+	// * @param projNameAtt
+	// * @param appPathAtt
+	// * @see org.eclipse.ptp.etfw.internal.ToolLaunchManager
+	// */
+	// public ParametricToolLaunchManager(
+	// LaunchConfigurationDelegate delegate, String appNameAtt,
+	// String projNameAtt, String appPathAtt) {
+	// super(delegate, appNameAtt, projNameAtt, appPathAtt);
+	// }
 
 	/**
 	 * One object, two strings
@@ -176,8 +177,7 @@ public class ParametricToolLaunchManager{
 	 * @param b
 	 * @return
 	 */
-	static List<List<StringPair>> getListCombinations(List<String> a,
-			List<String> b) {
+	static List<List<StringPair>> getListCombinations(List<String> a, List<String> b) {
 
 		List<List<StringPair>> comCom = new ArrayList<List<StringPair>>();
 
@@ -192,8 +192,7 @@ public class ParametricToolLaunchManager{
 		return comCom;
 	}
 
-	static List<List<StringPair>> unifyCombos(
-			final List<List<StringPair>> combos, int curDex) {
+	static List<List<StringPair>> unifyCombos(final List<List<StringPair>> combos, int curDex) {
 
 		List<List<StringPair>> allCom = new ArrayList<List<StringPair>>();
 
@@ -221,8 +220,7 @@ public class ParametricToolLaunchManager{
 
 		for (int i = 0; i < combos.get(curDex).size(); i++) {
 			for (int j = 0; j < someCom.size(); j++) {
-				ArrayList<StringPair> jList = new ArrayList<StringPair>(someCom
-						.get(j));
+				ArrayList<StringPair> jList = new ArrayList<StringPair>(someCom.get(j));
 				jList.add(0, combos.get(curDex).get(i));
 				allCom.add(jList);
 			}
@@ -275,7 +273,6 @@ public class ParametricToolLaunchManager{
 		return allCom;
 	}
 
-	
 	/**
 	 * Given a string representing all desired values for the number of
 	 * processors, and 4 arrays of strings representing the desired values for
@@ -290,52 +287,51 @@ public class ParametricToolLaunchManager{
 	 * @param envVars
 	 * @return
 	 */
-	static List<RunParams> getWeakParams(String procs, List<String> argNames,
-			List<String> argVars, List<String> envNames, List<String> envVars) {
+	static List<RunParams> getWeakParams(String procs, List<String> argNames, List<String> argVars, List<String> envNames,
+			List<String> envVars) {
 		List<RunParams> params = new ArrayList<RunParams>();
 
 		List<String> numProcs = getComArgs(procs);
-		
-		//int i=0;
-		
-		
+
+		// int i=0;
+
 		/*
 		 * Get list combinations returns a list of one list of string pairs per
 		 * argument, unify combos transforms that
 		 */
 
-		//List<String> args = new ArrayList<String>();
+		// List<String> args = new ArrayList<String>();
 
-		//ArrayList<HashMap<String, String>> vars = new ArrayList<HashMap<String,String>>();
+		// ArrayList<HashMap<String, String>> vars = new
+		// ArrayList<HashMap<String,String>>();
 
-		for (int i=0;i<numProcs.size();i++) {
-			String num=numProcs.get(i);
-			String arg=null;
-			Map<String,String> var=null;
+		for (int i = 0; i < numProcs.size(); i++) {
+			String num = numProcs.get(i);
+			String arg = null;
+			Map<String, String> var = null;
 
-			for (int j=0;j<argNames.size();j++) {
-				if(arg==null){
-					arg=""; //$NON-NLS-1$
+			for (int j = 0; j < argNames.size(); j++) {
+				if (arg == null) {
+					arg = ""; //$NON-NLS-1$
 				}
-				List<String> av=getComArgs(argVars.get(j));
-				arg+=" "+argNames.get(j)+av.get(i); //$NON-NLS-1$
+				List<String> av = getComArgs(argVars.get(j));
+				arg += " " + argNames.get(j) + av.get(i); //$NON-NLS-1$
 
 			}
 
-			for (int j=0;j<envNames.size();j++) {
-				if(var==null){
-					var=new HashMap<String,String>();
+			for (int j = 0; j < envNames.size(); j++) {
+				if (var == null) {
+					var = new HashMap<String, String>();
 				}
-				List<String> ev=getComArgs(envVars.get(j));
-				var.put(envNames.get(j),ev.get(i));
+				List<String> ev = getComArgs(envVars.get(j));
+				var.put(envNames.get(j), ev.get(i));
 			}
 			params.add(new RunParams(Integer.parseInt(num), arg, var));
 		}
 
 		return params;
 	}
-	
-	
+
 	/**
 	 * Given a string representing all desired values for the number of
 	 * processors, and 4 arrays of strings representing the desired values for
@@ -350,50 +346,46 @@ public class ParametricToolLaunchManager{
 	 * @param envVars
 	 * @return
 	 */
-	static List<RunParams> getRunParams(String procs, List<String> argNames,
-			List<String> argVars,List<String> argBools, List<String> envNames, List<String> envVars,List<String> envBools) {
+	static List<RunParams> getRunParams(String procs, List<String> argNames, List<String> argVars, List<String> argBools,
+			List<String> envNames, List<String> envVars, List<String> envBools) {
 		List<RunParams> params = new ArrayList<RunParams>();
 
 		List<String> numProcs = getComArgs(procs);
 
-		List<StringPair> checkedArgs=new ArrayList<StringPair>();
-		
-		int i=0;
-		
-		while(i<argBools.size()){
-			if(argBools.get(i).equals("1")){ //$NON-NLS-1$
+		List<StringPair> checkedArgs = new ArrayList<StringPair>();
+
+		int i = 0;
+
+		while (i < argBools.size()) {
+			if (argBools.get(i).equals("1")) { //$NON-NLS-1$
 				argBools.remove(i);
-				checkedArgs.add(new StringPair(argNames.remove(i),argVars.remove(i)));
-			}
-			else{
+				checkedArgs.add(new StringPair(argNames.remove(i), argVars.remove(i)));
+			} else {
 				i++;
 			}
 		}
-		
-		List<StringPair> checkedVars=new ArrayList<StringPair>();
-		
-		i=0;
-		
-		while(i<envBools.size()){
-			if(envBools.get(i).equals("1")){ //$NON-NLS-1$
+
+		List<StringPair> checkedVars = new ArrayList<StringPair>();
+
+		i = 0;
+
+		while (i < envBools.size()) {
+			if (envBools.get(i).equals("1")) { //$NON-NLS-1$
 				envBools.remove(i);
-				checkedVars.add(new StringPair(envNames.remove(i),envVars.remove(i)));
-			}
-			else{
+				checkedVars.add(new StringPair(envNames.remove(i), envVars.remove(i)));
+			} else {
 				i++;
 			}
 		}
-		
+
 		/*
 		 * Get list combinations returns a list of one list of string pairs per
 		 * argument, unify combos transforms that
 		 */
 
-		List<String> args = getComboStrings(unifyCombos(getListCombinations(
-				argNames, argVars), 0));
+		List<String> args = getComboStrings(unifyCombos(getListCombinations(argNames, argVars), 0));
 
-		List<Map<String, String>> vars = getComboMaps(unifyCombos(
-				getListCombinations(envNames, envVars), 0));
+		List<Map<String, String>> vars = getComboMaps(unifyCombos(getListCombinations(envNames, envVars), 0));
 
 		if (args.size() == 0) {
 			args.add(null);
@@ -402,29 +394,29 @@ public class ParametricToolLaunchManager{
 			vars.add(null);
 		}
 
-		for (i=0;i<numProcs.size();i++) {
-			String num=numProcs.get(i);
+		for (i = 0; i < numProcs.size(); i++) {
+			String num = numProcs.get(i);
 			for (String arg : args) {
 				for (Map<String, String> var : vars) {
-					
-					if(checkedArgs.size()>0){
-						if(arg==null){
-							arg=""; //$NON-NLS-1$
+
+					if (checkedArgs.size() > 0) {
+						if (arg == null) {
+							arg = ""; //$NON-NLS-1$
 						}
-						for(StringPair sp:checkedArgs){
-							arg+=" "+sp.getFirst()+getComArgs(sp.getSecond()).get(i); //$NON-NLS-1$
-						}
-					}
-					
-					if(checkedVars.size()>0){
-						if(var==null){
-							var=new HashMap<String,String>();
-						}
-						for(StringPair sp:checkedVars){
-							var.put(sp.getFirst(),getComArgs(sp.getSecond()).get(i));
+						for (StringPair sp : checkedArgs) {
+							arg += " " + sp.getFirst() + getComArgs(sp.getSecond()).get(i); //$NON-NLS-1$
 						}
 					}
-					
+
+					if (checkedVars.size() > 0) {
+						if (var == null) {
+							var = new HashMap<String, String>();
+						}
+						for (StringPair sp : checkedVars) {
+							var.put(sp.getFirst(), getComArgs(sp.getSecond()).get(i));
+						}
+					}
+
 					params.add(new RunParams(Integer.parseInt(num), arg, var));
 				}
 			}
@@ -443,93 +435,89 @@ public class ParametricToolLaunchManager{
 	 */
 	static List<String> getComArgs(String combined) {
 		List<String> numProcesses = new ArrayList<String>();
-		if(combined==null){
+		if (combined == null) {
 			return numProcesses;
 		}
-		
+
 		StringTokenizer st = new StringTokenizer(combined, ","); //$NON-NLS-1$
-		
+
 		while (st.hasMoreTokens()) {
 			numProcesses.add(st.nextToken());
 		}
 		return numProcesses;
 	}
 
-	
-	public static String makeTauAtt(String name,String value){
-		String att="\n<tau:attribute>\n<tau:name>"+name+"</tau:name>\n<tau:value>"+value+"</tau:value>\n</tau:attribute>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public static String makeTauAtt(String name, String value) {
+		String att = "\n<tau:attribute>\n<tau:name>" + name + "</tau:name>\n<tau:value>" + value + "</tau:value>\n</tau:attribute>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return att;
 	}
-	
-	public static String mapToString(Map<String,String> map){
-		String out=""; //$NON-NLS-1$
-		
-		Iterator<Entry<String,String>> it = map.entrySet().iterator();
-		Entry<String,String> e;
-		while(it.hasNext()){
-			e=it.next();
-			out+=e.getKey()+"="+e.getValue(); //$NON-NLS-1$
-			if(it.hasNext()){
-				out+=", "; //$NON-NLS-1$
+
+	public static String mapToString(Map<String, String> map) {
+		String out = ""; //$NON-NLS-1$
+
+		Iterator<Entry<String, String>> it = map.entrySet().iterator();
+		Entry<String, String> e;
+		while (it.hasNext()) {
+			e = it.next();
+			out += e.getKey() + "=" + e.getValue(); //$NON-NLS-1$
+			if (it.hasNext()) {
+				out += ", "; //$NON-NLS-1$
 			}
 		}
-		
+
 		return out;
 	}
-	
-	public static String makeTauAtts(Map<String,String> map, String prefix){
-		String atts=""; //$NON-NLS-1$
-		
-		Iterator<Entry<String,String>> it = map.entrySet().iterator();
-		Entry<String,String> e;
-		while(it.hasNext()){
-			e=it.next();
-			atts+=makeTauAtt(prefix+e.getKey(),e.getValue());
+
+	public static String makeTauAtts(Map<String, String> map, String prefix) {
+		String atts = ""; //$NON-NLS-1$
+
+		Iterator<Entry<String, String>> it = map.entrySet().iterator();
+		Entry<String, String> e;
+		while (it.hasNext()) {
+			e = it.next();
+			atts += makeTauAtt(prefix + e.getKey(), e.getValue());
 		}
-		
+
 		return atts;
 	}
-	
-	public static String getTauMetadata(Map<String,String>build,RunParams par){
+
+	public static String getTauMetadata(Map<String, String> build, RunParams par) {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tau:metadata xmlns:tau=\"http://www.cs.uoregon.edu/research/tau\">\n<tau:CommonProfileAttributes>"; //$NON-NLS-1$
-		
-		if(build!=null)
-			xml+=makeTauAtts(build,"BUILD:"); //$NON-NLS-1$
-		
-		if(par.args!=null)
-			xml+=makeTauAtt("ApplicationArguments",par.args); //$NON-NLS-1$
-		
-		if(par.vars!=null)
-			xml+=makeTauAtts(par.vars, "ENV:"); //$NON-NLS-1$
-		
-		xml+="\n</tau:CommonProfileAttributes>\n</tau:metadata>"; //$NON-NLS-1$
-		
+
+		if (build != null)
+			xml += makeTauAtts(build, "BUILD:"); //$NON-NLS-1$
+
+		if (par.args != null)
+			xml += makeTauAtt("ApplicationArguments", par.args); //$NON-NLS-1$
+
+		if (par.vars != null)
+			xml += makeTauAtts(par.vars, "ENV:"); //$NON-NLS-1$
+
+		xml += "\n</tau:CommonProfileAttributes>\n</tau:metadata>"; //$NON-NLS-1$
+
 		return xml;
 	}
-	
-//private boolean finalRun=false;
-	
+
+	// private boolean finalRun=false;
+
 	/**
 	 * The number of runs that must complete before the last set
 	 */
-	//private int firstRuns=0;
-	//private int curRuns=0;
-	//private int topRun=-1;
-	
-	
+	// private int firstRuns=0;
+	// private int curRuns=0;
+	// private int topRun=-1;
 
-	
 	/**
 	 * The primary launch command of this launch configuration delegate. The
 	 * operations in this function are divided into three jobs: Building,
 	 * Running and Data collection
 	 */
-	public static void launch(ILaunchConfiguration configuration, LaunchConfigurationDelegate paraDel, ILaunchFactory lf, String mode,
-			ILaunch launchIn, IProgressMonitor monitor) throws CoreException // ,
-																				// TAULaunch
-																				// bLTool
+	public static void launch(ILaunchConfiguration configuration, LaunchConfigurationDelegate paraDel, ILaunchFactory lf,
+			String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException // ,
+																							// TAULaunch
+																							// bLTool
 	{
-		
+
 		/**
 		 * Keeps track of the configurations created for each run so they can be
 		 * deleted in sequence
@@ -541,20 +529,24 @@ public class ParametricToolLaunchManager{
 		 * scheduled in sequence
 		 */
 		final Queue<ToolStep> steps = new LinkedList<ToolStep>();
-		
+
 		/**
 		 * Manages job execution order
 		 */
 		JobChangeAdapter tauChange = new JobChangeAdapter() {
+			@Override
 			public void done(IJobChangeEvent event) {
 
 				// TODO: Add checks for successful compilation/execution
-//				if (event.getJob() instanceof PostlaunchTool)
-//				{
-//					curRuns++;//TODO: This is not the right place to increment this!
-//				}
-				//System.out.println("FR: "+firstRuns+" CR: "+curRuns);
-				if (event.getJob() instanceof PostlaunchTool){// && curRuns>=topRun) {
+				// if (event.getJob() instanceof PostlaunchTool)
+				// {
+				// curRuns++;//TODO: This is not the right place to increment
+				// this!
+				// }
+				// System.out.println("FR: "+firstRuns+" CR: "+curRuns);
+				if (event.getJob() instanceof PostlaunchTool) {// &&
+																// curRuns>=topRun)
+																// {
 					try {
 						configs.poll().delete();
 					} catch (CoreException e) {
@@ -570,14 +562,14 @@ public class ParametricToolLaunchManager{
 				}
 			}
 		};
-		
-		
-		ExternalToolProcess pproc = Activator.getTool(configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL, (String)null));
-		//paraDel=lcd;
-		//this.lf=lf;
+
+		ExternalToolProcess pproc = Activator.getTool(configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+				(String) null));
+		// paraDel=lcd;
+		// this.lf=lf;
 		// here is where the loop(s) for the parametric study should go - for
 		// runtime parameters, like #procs
-		String processorOptionString=null;
+		String processorOptionString = null;
 		List<String> argVars = null;
 		List<String> argNames = null;
 		List<String> argBools = null;
@@ -586,89 +578,81 @@ public class ParametricToolLaunchManager{
 		List<String> varBools = null;
 		String optLevStr = null;
 		boolean allCom = false;
-		boolean parallel=lf!=null&&lf.getType().equals(ILaunchFactory.PARALLEL);
-		
-		if(pproc.para!=null&&pproc.para.runParametric){
-			processorOptionString=pproc.para.mpiProcs;
-			argNames=pproc.para.argNames;
+		boolean parallel = lf != null && lf.getType().equals(ILaunchFactory.PARALLEL);
+
+		if (pproc.para != null && pproc.para.runParametric) {
+			processorOptionString = pproc.para.mpiProcs;
+			argNames = pproc.para.argNames;
 			argVars = pproc.para.argValues;
 			argBools = pproc.para.argWeakBools;
-			
+
 			varNames = pproc.para.varNames;
 			varVars = pproc.para.varValues;
 			varBools = pproc.para.varWeakBools;
-			
+
 			optLevStr = pproc.para.compileropt;
 			allCom = !pproc.para.weakScaling;
-		}
-		else
-		{
-			processorOptionString = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_NUM_PROCESSORS,"1");// "1,2";//,4,8"; //$NON-NLS-1$
+		} else {
+			processorOptionString = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_NUM_PROCESSORS, "1");// "1,2";//,4,8"; //$NON-NLS-1$
 			// TODO: validate this string first?
-			argNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_NAMES,(List) null);
-			argVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_VALUES,	(List) null);
-			argBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_BOOLS,	(List) null);
-		
-			varNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_NAMES,	(List) null);
-			varVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_VALUES,	(List) null);
-			varBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_BOOLS,	(List) null);
-			optLevStr = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_OPT_LEVELS,""); //$NON-NLS-1$
-			allCom=configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ALL_COMBO, false);
+			argNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_NAMES, (List) null);
+			argVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_VALUES, (List) null);
+			argBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_BOOLS, (List) null);
+
+			varNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_NAMES, (List) null);
+			varVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_VALUES, (List) null);
+			varBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_BOOLS, (List) null);
+			optLevStr = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_OPT_LEVELS, ""); //$NON-NLS-1$
+			allCom = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ALL_COMBO, false);
 		}
-		
-		String timestamp=BuildLaunchUtils.getNow();
-		
+
+		String timestamp = BuildLaunchUtils.getNow();
+
 		List<RunParams> params = null;
-		if(!parallel)
-		{
-			if(allCom){
-				processorOptionString="1"; //$NON-NLS-1$
-			}
-			else{
-			int min = -1;
-			
-			if(argVars!=null){
-			for(int i=0;i<argVars.size();i++){
-				int count=getComArgs(argVars.get(i)).size();
-				if(min==-1||min>count)
-					min=count;
-			}
-			}
-			if(varVars!=null){
-				for(int i=0;i<varVars.size();i++){
-					int count=getComArgs(varVars.get(i)).size();
-					if(min==-1||min>count)
-						min=count;
+		if (!parallel) {
+			if (allCom) {
+				processorOptionString = "1"; //$NON-NLS-1$
+			} else {
+				int min = -1;
+
+				if (argVars != null) {
+					for (int i = 0; i < argVars.size(); i++) {
+						int count = getComArgs(argVars.get(i)).size();
+						if (min == -1 || min > count)
+							min = count;
+					}
 				}
-			}
-			
-			if(min==-1)
-			{
-				min=0;
-			}
-			
-			String agg=""; //$NON-NLS-1$
-			for(int i =0;i<min;i++){
-				agg+="1"; //$NON-NLS-1$
-				if(i<min-1){
-					agg+=","; //$NON-NLS-1$
+				if (varVars != null) {
+					for (int i = 0; i < varVars.size(); i++) {
+						int count = getComArgs(varVars.get(i)).size();
+						if (min == -1 || min > count)
+							min = count;
+					}
 				}
-			}
-			if(agg.length()==0){
-				agg="1"; //$NON-NLS-1$
-			}
-			processorOptionString=agg;
+
+				if (min == -1) {
+					min = 0;
+				}
+
+				String agg = ""; //$NON-NLS-1$
+				for (int i = 0; i < min; i++) {
+					agg += "1"; //$NON-NLS-1$
+					if (i < min - 1) {
+						agg += ","; //$NON-NLS-1$
+					}
+				}
+				if (agg.length() == 0) {
+					agg = "1"; //$NON-NLS-1$
+				}
+				processorOptionString = agg;
 			}
 		}
-		if(!allCom){
-			params=getWeakParams(processorOptionString,
-					argNames, argVars, varNames, varVars);
+		if (!allCom) {
+			params = getWeakParams(processorOptionString, argNames, argVars, varNames, varVars);
+		} else {
+			params = getRunParams(processorOptionString, argNames, argVars, argBools, varNames, varVars, varBools);
 		}
-		else{
-			params=getRunParams(processorOptionString,
-				argNames, argVars, argBools, varNames, varVars, varBools);
-		}
-		
+
 		System.out.println(params.size());
 		for (RunParams param : params) {
 			System.out.println("Num Processors: " + param.numProcs); //$NON-NLS-1$
@@ -681,131 +665,131 @@ public class ParametricToolLaunchManager{
 				}
 		}
 
-		
+		List<String> optLevs = getComArgs(optLevStr);
 
-		List<String> optLevs=getComArgs(optLevStr);
-		
-		List<Map<String,String>> buildopts = new ArrayList<Map<String,String>>();
-		if(optLevs.size()==0){
+		List<Map<String, String>> buildopts = new ArrayList<Map<String, String>>();
+		if (optLevs.size() == 0) {
 			buildopts.add(null);
-		}
-		else
-		{
-			for(String s:optLevs){
-				String lev=null;
-				Map<String,String> hm=null;
-				switch(Integer.parseInt(s)){
-					case 0: lev= Messages.ParametricToolLaunchManager_OpNone;break;
-					case 1: lev= Messages.ParametricToolLaunchManager_Op1;break;
-					case 2: lev= Messages.ParametricToolLaunchManager_Op2;break;
-					case 3: lev= Messages.ParametricToolLaunchManager_Op3;break;
-					default: continue;
+		} else {
+			for (String s : optLevs) {
+				String lev = null;
+				Map<String, String> hm = null;
+				switch (Integer.parseInt(s)) {
+				case 0:
+					lev = Messages.ParametricToolLaunchManager_OpNone;
+					break;
+				case 1:
+					lev = Messages.ParametricToolLaunchManager_Op1;
+					break;
+				case 2:
+					lev = Messages.ParametricToolLaunchManager_Op2;
+					break;
+				case 3:
+					lev = Messages.ParametricToolLaunchManager_Op3;
+					break;
+				default:
+					continue;
 				}
-				if(lev!=null)
-				{
-					hm=new HashMap<String,String>();
+				if (lev != null) {
+					hm = new HashMap<String, String>();
 					hm.put(Messages.ParametricToolLaunchManager_OptimizationLevel, lev);
 					buildopts.add(hm);
 				}
 			}
 		}
-		
-		
-		
-//		{
-//			firstRuns=buildopts.size()-1*params.size();
-//		}
-		
-		
+
+		// {
+		// firstRuns=buildopts.size()-1*params.size();
+		// }
+
 		/*
-		 * TODO: Make this robust!  (Allow for or explicitly prohibit advanced tool combinations)
+		 * TODO: Make this robust! (Allow for or explicitly prohibit advanced
+		 * tool combinations)
 		 */
-		BuildTool bTool = pproc.getFirstBuilder(configuration);//.perfTools.get(0);
+		BuildTool bTool = pproc.getFirstBuilder(configuration);// .perfTools.get(0);
 		ExecTool eTool = pproc.getFirstRunner(configuration);
 		PostProcTool pTool = pproc.getFirstAnalyzer(configuration);
-		
-		int numruns=0;
+
+		int numruns = 0;
 		// here is where the outer loop for the parametric study should go - for
 		// build parameters, like optimization.
-		for (int bDex=0;bDex<buildopts.size();bDex++) {
+		for (int bDex = 0; bDex < buildopts.size(); bDex++) {
 
-			Map<String,String> optM =buildopts.get(bDex);
-			BuilderTool builder = new BuilderTool(configuration,bTool,optM);
+			Map<String, String> optM = buildopts.get(bDex);
+			BuilderTool builder = new BuilderTool(configuration, bTool, optM);
 
-//			if(optM!=null)
-//				builder.setBuildMods(optM);
+			// if(optM!=null)
+			// builder.setBuildMods(optM);
 			// builder.setSomeAtt(str);
-
 
 			steps.add(builder);
 			builder.addJobChangeListener(tauChange);
 
-			 //builder.schedule();
-			
-			 try {
-			 builder.join();
-			 } catch (InterruptedException ie) {
-			 ie.printStackTrace();
-			 }
+			// builder.schedule();
 
-			//int i = 0; 
-			for (int lDex=0;lDex< params.size();lDex++) {
-				
-//				if(bDex==buildopts.size()-1&&topRun==-1)
-//				{
-//					/*
-//					 * This should be the first run at which it is safe to start deleting build configurations.
-//					 */
-//					topRun=numruns;
-//				}
-				
-				RunParams param =params.get(lDex);
-				
-				
+			try {
+				builder.join();
+			} catch (InterruptedException ie) {
+				ie.printStackTrace();
+			}
+
+			// int i = 0;
+			for (int lDex = 0; lDex < params.size(); lDex++) {
+
+				// if(bDex==buildopts.size()-1&&topRun==-1)
+				// {
+				// /*
+				// * This should be the first run at which it is safe to start
+				// deleting build configurations.
+				// */
+				// topRun=numruns;
+				// }
+
+				RunParams param = params.get(lDex);
 
 				// get a working copy
 				ILaunchConfigurationWorkingCopy wc = configuration.copy(configuration.getName() + " ParameterSet_" + numruns); //$NON-NLS-1$
 				// TODO: need this constant!
-				if(parallel){
+				if (parallel) {
 					int numProcs = param.numProcs;
 
-					//System.out.println("doing " + numProcs + " processors...");
+					// System.out.println("doing " + numProcs +
+					// " processors...");
 					wc.setAttribute(NUMBER_MPI_PROCS, numProcs);
 				}
 
-				String argConfigTag=wc.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_ATTR_ARGUMENTS_TAG,""); //$NON-NLS-1$
-				
+				String argConfigTag = wc.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_ATTR_ARGUMENTS_TAG, ""); //$NON-NLS-1$
+
 				/* Set up application arguments for this run */
 				if (param.args != null) {
-					String arg = wc.getAttribute(argConfigTag,"");// ICDTLaunchConfigurationConstants.// ATTR_PROGRAM_ARGUMENTS //$NON-NLS-1$
+					String arg = wc.getAttribute(argConfigTag, "");// ICDTLaunchConfigurationConstants.// ATTR_PROGRAM_ARGUMENTS //$NON-NLS-1$
 					arg += " " + param.args; //$NON-NLS-1$
-					wc.setAttribute(argConfigTag,arg);
+					wc.setAttribute(argConfigTag, arg);
 				}
 
 				/* Set up environment variables for this run */
 				if (param.vars != null) {
 					Map<String, Object> envvars = null;
-					envvars = wc.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,(Map) null);
+					envvars = wc.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
 					if (envvars == null) {
 						envvars = new HashMap<String, Object>();
 					}
 					envvars.putAll(param.vars);
-					wc.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,envvars);
+					wc.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, envvars);
 				}
-				
-				
-				
+
 				/*
-				 * TAU Specific settings.  These will only be used by the TAU analysis phase.
-				 * TODO: Move tool specific settings out of the core plugin
-				 * */
-				wc.setAttribute(IToolLaunchConfigurationConstants.EXTOOL_XML_METADATA, getTauMetadata(optM,param));
-				
+				 * TAU Specific settings. These will only be used by the TAU
+				 * analysis phase. TODO: Move tool specific settings out of the
+				 * core plugin
+				 */
+				wc.setAttribute(IToolLaunchConfigurationConstants.EXTOOL_XML_METADATA, getTauMetadata(optM, param));
+
 				wc.setAttribute(IToolLaunchConfigurationConstants.EXTOOL_EXPERIMENT_APPEND, timestamp);
-				
-				/*The final analysis run should also launch perfexplorer*/
+
+				/* The final analysis run should also launch perfexplorer */
 				wc.setAttribute(IToolLaunchConfigurationConstants.EXTOOL_LAUNCH_PERFEX, false);
-				if(bDex==buildopts.size()-1&&lDex==params.size()-1){
+				if (bDex == buildopts.size() - 1 && lDex == params.size() - 1) {
 					wc.setAttribute(IToolLaunchConfigurationConstants.EXTOOL_LAUNCH_PERFEX, true);
 				}
 
@@ -815,37 +799,33 @@ public class ParametricToolLaunchManager{
 				/**
 				 * Execute the program specified in the build step
 				 */
-				
-				ILaunch launch=launchIn;
-				if(lf!=null)
-				{
+
+				ILaunch launch = launchIn;
+				if (lf != null) {
 					launch = lf.makeLaunch(tmpConfig, launchIn.getLaunchMode(), launchIn.getSourceLocator());// launchIn
 				}
-				
-																		// ;
 
-				final LauncherTool launcher = new LauncherTool(tmpConfig,eTool,	builder.getProgramPath(), paraDel, launch);
+				// ;
+
+				final LauncherTool launcher = new LauncherTool(tmpConfig, eTool, builder.getProgramPath(), paraDel, launch);
 				steps.add(launcher);
 				launcher.addJobChangeListener(tauChange);
-				
+
 				/**
 				 * Collect performance data from the execution handled in the
 				 * run step
 				 */
 
-				//if(pTool!=null){
-					PostlaunchTool analyzer = new PostlaunchTool(tmpConfig,pTool,builder.getOutputLocation());
-					steps.add(analyzer);
-					analyzer.addJobChangeListener(tauChange);
-				//}
+				// if(pTool!=null){
+				PostlaunchTool analyzer = new PostlaunchTool(tmpConfig, pTool, builder.getOutputLocation());
+				steps.add(analyzer);
+				analyzer.addJobChangeListener(tauChange);
+				// }
 
-				
-				
-				
 				numruns++;
 			} // end of inner loop for runtime parameters
 		}// done with build options
-		// Prime the scheduler sequence
+			// Prime the scheduler sequence
 		if (steps.size() > 0) {
 			steps.poll().schedule();
 		} else {

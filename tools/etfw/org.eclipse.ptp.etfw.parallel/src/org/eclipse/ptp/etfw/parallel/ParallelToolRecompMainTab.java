@@ -29,6 +29,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
+import org.eclipse.ptp.etfw.parallel.messages.Messages;
 import org.eclipse.ptp.launch.ui.ApplicationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -78,7 +79,7 @@ public class ParallelToolRecompMainTab extends ApplicationTab{
 		mainComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label appLabel = new Label(mainComp, SWT.NONE);
-		appLabel.setText(LaunchMessages.ParallelToolRecompMainTab_LangBuildConf);
+		appLabel.setText(Messages.ParallelToolRecompMainTab_LangBuildConf);
 		appLabel.setLayoutData(spanGridData(-1, 2));
 
 		buildConfCombo=new Combo(mainComp,SWT.DROP_DOWN | SWT.READ_ONLY
@@ -213,7 +214,7 @@ public class ParallelToolRecompMainTab extends ApplicationTab{
 		else{
 			name = getFieldContent(buildConfCombo.getText());
 			if (name == null) {
-				setErrorMessage(LaunchMessages.ParallelToolRecompMainTab_BuildConfNotSpeced);
+				setErrorMessage(Messages.ParallelToolRecompMainTab_BuildConfNotSpeced);
 				return false;
 			}
 		}

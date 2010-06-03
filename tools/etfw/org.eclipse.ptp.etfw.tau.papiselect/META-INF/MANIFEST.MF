@@ -6,7 +6,8 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.etfw.tau.papiselect,
  org.eclipse.ptp.etfw.tau.papiselect.papic
-Require-Bundle: org.eclipse.jface,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jface,
  org.eclipse.ui
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

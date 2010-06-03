@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.etfw.tau.Activator;
+import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.papiselect.PapiListSelectionDialog;
 import org.eclipse.ptp.etfw.tau.papiselect.papic.EventTreeDialog;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -33,15 +34,16 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.internal.Workbench;
 
 /**
- * Our sample action implements workbench action delegate.
- * The action proxy will be created by the workbench and
- * shown in the UI. When the user tries to use the action,
- * this delegate will be created and execution will be 
- * delegated to it.
+ * Our sample action implements workbench action delegate. The action proxy will
+ * be created by the workbench and shown in the UI. When the user tries to use
+ * the action, this delegate will be created and execution will be delegated to
+ * it.
+ * 
  * @see IWorkbenchWindowActionDelegate
  */
 public class TestPAPI {
 	private IWorkbenchWindow window;
+
 	/**
 	 * The constructor.
 	 */
@@ -49,122 +51,117 @@ public class TestPAPI {
 		window = Workbench.getInstance().getActiveWorkbenchWindow();
 	}
 
-	protected static final String papiLocationSelectionVar="ID.of.PAPI.bin.directory.location"; //$NON-NLS-1$
-	protected static final String papiCounterTypeVar="ID.of.PAPI.counter.type.selected"; //$NON-NLS-1$
-	
+	protected static final String papiLocationSelectionVar = "ID.of.PAPI.bin.directory.location"; //$NON-NLS-1$
+	protected static final String papiCounterTypeVar = "ID.of.PAPI.counter.type.selected"; //$NON-NLS-1$
+
 	/**
-	 * The action has been activated. The argument of the
-	 * method represents the 'real' action sitting
-	 * in the workbench UI.
+	 * The action has been activated. The argument of the method represents the
+	 * 'real' action sitting in the workbench UI.
+	 * 
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
-	public void run() {		
-		//try {
-			LabelProvider papilab = new LabelProvider();
-			ArrayContentProvider paprov = new ArrayContentProvider();
+	public void run() {
+		// try {
+		LabelProvider papilab = new LabelProvider();
+		ArrayContentProvider paprov = new ArrayContentProvider();
 
-			PAPISplash splash = new PAPISplash(window.getShell());
-			splash.open();
-			
-			int papiCountType = Activator.getDefault().getPreferenceStore().getInt(papiCounterTypeVar);
-			String papiLoc=Activator.getDefault().getPreferenceStore().getString(papiLocationSelectionVar);
-			
-			//System.out.println(papiLoc+" "+papiCountType);
-			
-			File pdir=new File(papiLoc);
-			if(!pdir.isDirectory()||!pdir.canRead()){
-				return;
-			}
-			File pcxi=new File(papiLoc+File.separator+"papi_xml_event_info"); //$NON-NLS-1$
-			
-			if(pcxi.canRead()&&pcxi.exists())//papiCountType==2)
-			{
-				EventTreeDialog treeD=new EventTreeDialog(window.getShell(),papiLoc);
-				
-				if(treeD.open()==Window.OK)
-				{
-					showCounters(treeD.getCommands().toArray());
-				}
-				return;
-			}
-			
-			PapiListSelectionDialog papidialog = new PapiListSelectionDialog(
-					window.getShell(), papiLoc, paprov, papilab,
-					Messages.TestPAPI_SelectPapiCounters, papiCountType);
-			papidialog.setTitle(Messages.TestPAPI_PapiCounters);
-			papidialog.setHelpAvailable(false);
-			
-			/*
-			 * The disabled code here shows how to initialize the selector with previously selected counters
-			 */
-//			if ((varmap != null) && (varmap.size() > 0)) {
-//				papidialog.setInitialSelections(varmap.values().toArray());
-//			}
+		PAPISplash splash = new PAPISplash(window.getShell());
+		splash.open();
 
-			if (papidialog.open() == Window.OK) {
-				Object[] selected = papidialog.getResult();
-				showCounters(selected);
-	
+		int papiCountType = Activator.getDefault().getPreferenceStore().getInt(papiCounterTypeVar);
+		String papiLoc = Activator.getDefault().getPreferenceStore().getString(papiLocationSelectionVar);
+
+		// System.out.println(papiLoc+" "+papiCountType);
+
+		File pdir = new File(papiLoc);
+		if (!pdir.isDirectory() || !pdir.canRead()) {
+			return;
+		}
+		File pcxi = new File(papiLoc + File.separator + "papi_xml_event_info"); //$NON-NLS-1$
+
+		if (pcxi.canRead() && pcxi.exists())// papiCountType==2)
+		{
+			EventTreeDialog treeD = new EventTreeDialog(window.getShell(), papiLoc);
+
+			if (treeD.open() == Window.OK) {
+				showCounters(treeD.getCommands().toArray());
 			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-		
-		
+			return;
+		}
+
+		PapiListSelectionDialog papidialog = new PapiListSelectionDialog(window.getShell(), papiLoc, paprov, papilab,
+				Messages.TestPAPI_SelectPapiCounters, papiCountType);
+		papidialog.setTitle(Messages.TestPAPI_PapiCounters);
+		papidialog.setHelpAvailable(false);
+
+		/*
+		 * The disabled code here shows how to initialize the selector with
+		 * previously selected counters
+		 */
+		// if ((varmap != null) && (varmap.size() > 0)) {
+		// papidialog.setInitialSelections(varmap.values().toArray());
+		// }
+
+		if (papidialog.open() == Window.OK) {
+			Object[] selected = papidialog.getResult();
+			showCounters(selected);
+
+		}
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+
 	}
 
-	private void showCounters(Object[] selected)
-	{
+	private void showCounters(Object[] selected) {
 		if ((selected != null) && (selected.length > 0)) {
-			String counters=""; //$NON-NLS-1$
-			for(int i=0;i<selected.length;i++)
-			{
-				counters+=selected[i]+"\n"; //$NON-NLS-1$
+			String counters = ""; //$NON-NLS-1$
+			for (int i = 0; i < selected.length; i++) {
+				counters += selected[i] + "\n"; //$NON-NLS-1$
 			}
-			
-			MessageDialog.openInformation(
-			window.getShell(),
-			Messages.TestPAPI_SelectedPapiCounters,
-			counters);
-			
-//			LinkedHashSet selset = new LinkedHashSet(Arrays
-//					.asList(selected));
-//
-//			varmap = new HashMap(selset.size());
-//			varmap.put("COUNTER1", "GET_TIME_OF_DAY");
-//			Iterator varit = selset.iterator();
-//			int counter = 2;
-//			while (varit.hasNext()) {
-//				varmap.put("COUNTER" + counter, varit.next());
-//				counter++;
-//			}
-//
-//		} else {
-//			varmap = null;
+
+			MessageDialog.openInformation(window.getShell(), Messages.TestPAPI_SelectedPapiCounters, counters);
+
+			// LinkedHashSet selset = new LinkedHashSet(Arrays
+			// .asList(selected));
+			//
+			// varmap = new HashMap(selset.size());
+			// varmap.put("COUNTER1", "GET_TIME_OF_DAY");
+			// Iterator varit = selset.iterator();
+			// int counter = 2;
+			// while (varit.hasNext()) {
+			// varmap.put("COUNTER" + counter, varit.next());
+			// counter++;
+			// }
+			//
+			// } else {
+			// varmap = null;
 		}
 	}
-	
+
 	/**
-	 * Selection in the workbench has been changed. We 
-	 * can change the state of the 'real' action here
-	 * if we want, but this can only happen after 
-	 * the delegate has been created.
+	 * Selection in the workbench has been changed. We can change the state of
+	 * the 'real' action here if we want, but this can only happen after the
+	 * delegate has been created.
+	 * 
 	 * @see IWorkbenchWindowActionDelegate#selectionChanged
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
 	/**
-	 * We can use this method to dispose of any system
-	 * resources we previously allocated.
+	 * We can use this method to dispose of any system resources we previously
+	 * allocated.
+	 * 
 	 * @see IWorkbenchWindowActionDelegate#dispose
 	 */
 	public void dispose() {
 	}
 
 	/**
-	 * We will cache window object in order to
-	 * be able to provide parent shell for the message dialog.
+	 * We will cache window object in order to be able to provide parent shell
+	 * for the message dialog.
+	 * 
 	 * @see IWorkbenchWindowActionDelegate#init
 	 */
 	public void init(IWorkbenchWindow window) {

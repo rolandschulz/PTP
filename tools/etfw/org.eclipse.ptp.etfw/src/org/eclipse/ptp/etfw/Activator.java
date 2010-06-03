@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
+import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
