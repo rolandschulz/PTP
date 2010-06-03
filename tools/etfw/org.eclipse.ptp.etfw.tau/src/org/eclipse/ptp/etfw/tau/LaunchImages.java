@@ -26,6 +26,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 //import org.eclipse.ptp.etfw.tau.core.TAULaunchPlugin;
 //import org.eclipse.ptp.etfw.tau.Activator;
+import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 
 /**

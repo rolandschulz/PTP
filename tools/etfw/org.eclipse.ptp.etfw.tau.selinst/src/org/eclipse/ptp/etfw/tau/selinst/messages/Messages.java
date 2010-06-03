@@ -1,9 +1,9 @@
-package org.eclipse.ptp.etfw.tau.selinst.popup.actions;
+package org.eclipse.ptp.etfw.tau.selinst.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.tau.selinst.popup.actions.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.tau.selinst.messages.messages"; //$NON-NLS-1$
 	public static String AtomicInstrument_EnterStaticValueOrVariable;
 	public static String AtomicInstrument_EnterUniqueName;
 	public static String AtomicInstrument_EnterValidDoubOrVar;

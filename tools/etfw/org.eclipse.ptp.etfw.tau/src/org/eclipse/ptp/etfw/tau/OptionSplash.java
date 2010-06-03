@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.tau.messages.Messages;
 
 /**
  * Launches a splash screen to prompt for global and tau-specific options for building/launching applications

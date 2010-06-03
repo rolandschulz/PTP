@@ -17,6 +17,7 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.tau;
 
+import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
 
 /**

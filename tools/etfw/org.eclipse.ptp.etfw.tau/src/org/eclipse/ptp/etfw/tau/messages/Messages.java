@@ -1,9 +1,9 @@
-package org.eclipse.ptp.etfw.tau;
+package org.eclipse.ptp.etfw.tau.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.tau.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.tau.messages.messages"; //$NON-NLS-1$
 	public static String ITAULaunchConfigurationConstants_NoDatabasesAvailable;
 	public static String LaunchImages_InternalErrorRegDefined;
 	public static String OptionSplash_AdjFollowingOpts;
@@ -80,6 +80,14 @@ public class Messages extends NLS {
 	public static String TAUPrefPage_AutoEclipseInternal;
 	public static String TAUPrefPage_CheckTauOptions;
 	public static String TAUPrefPage_TestPapi;
+	public static String PAPISplash_Browse;
+	public static String PAPISplash_NativeCounters;
+	public static String PAPISplash_PapiBin;
+	public static String PAPISplash_PresetCounters;
+	public static String PAPISplash_SelectPapiBin;
+	public static String TestPAPI_PapiCounters;
+	public static String TestPAPI_SelectedPapiCounters;
+	public static String TestPAPI_SelectPapiCounters;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

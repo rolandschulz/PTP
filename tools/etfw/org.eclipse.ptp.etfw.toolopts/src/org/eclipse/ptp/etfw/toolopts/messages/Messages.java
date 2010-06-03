@@ -1,9 +1,9 @@
-package org.eclipse.ptp.etfw.toolopts;
+package org.eclipse.ptp.etfw.toolopts.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.toolopts.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.toolopts.messages.messages"; //$NON-NLS-1$
 	public static String ToolMaker_AtLine;
 	public static String ToolMaker_Browse;
 	public static String ToolMaker_Column;

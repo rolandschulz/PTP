@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback;
+package org.eclipse.ptp.etfw.feedback.messages;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -16,10 +16,10 @@ import java.util.ResourceBundle;
 /**
  * 
  * @author beth tibbitts
- *
+ * 
  */
 public class Messages {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.feedback.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.feedback.messages.messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
