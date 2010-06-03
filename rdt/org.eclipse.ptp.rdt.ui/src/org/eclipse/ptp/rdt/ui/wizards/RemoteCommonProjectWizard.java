@@ -11,6 +11,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.wizards;
 
+import static org.eclipse.ptp.rdt.ui.wizards.ServiceModelWizardPage.CONFIG_PROPERTY;
+
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -19,11 +22,14 @@ import java.util.List;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.LanguageManager;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.wizards.ICDTCommonProjectWizard;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.newui.UIMessages;
 import org.eclipse.cdt.ui.wizards.CWizardHandler;
@@ -49,7 +55,11 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
+import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 import org.eclipse.ui.actions.WorkspaceModifyDelegatingOperation;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
@@ -201,6 +211,7 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 		// create project if it is not created yet
 		if (getProject(fMainPage.isCurrent(), true) == null)
 			return false;
+		
 		fMainPage.h_selected.postProcess(newProject, needsPost);
 		try {
 			setCreated();
@@ -261,9 +272,26 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 								try {
 									newProject = createIProject(lastProjectName, lastProjectLocation, new SubProgressMonitor(
 											fMonitor, 40));
-									if (newProject != null)
+									if (newProject != null) {
+
+										// setup the service model
+										IServiceConfiguration config = (IServiceConfiguration)getMBSProperty(CONFIG_PROPERTY);
+										
+										ServiceModelManager smm = ServiceModelManager.getInstance();
+										smm.addConfiguration(newProject, config);
+										
+										try {
+											smm.saveModelConfiguration();
+										} catch (IOException e) {
+											Activator.logError(e.toString(), e);
+										}
+										
 										fMainPage.h_selected.createProject(newProject, defaults, onFinish, new SubProgressMonitor(
 												fMonitor, 40));
+										
+										ICProject cProject = CModelManager.getDefault().getCModel().getCProject(newProject);
+										CCorePlugin.getIndexManager().setIndexerId(cProject, RemoteFastIndexer.ID);
+									}
 									fMonitor.worked(10);
 								} catch (CoreException e) {
 									CUIPlugin.log(e);
@@ -426,6 +454,10 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 			return extensions.toArray(new String[extensions.size()]);
 		}
 		return EMPTY_ARR;
+	}
+	
+	private static Object getMBSProperty(String propertyId) {
+		return MBSCustomPageManager.getPageProperty(ServiceModelWizardPage.SERVICE_MODEL_WIZARD_PAGE_ID, propertyId);
 	}
 
 }
