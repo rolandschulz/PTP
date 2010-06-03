@@ -10,7 +10,6 @@ package org.eclipse.ptp.remote.launch.core;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -110,6 +109,17 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Get the value of a variable that will be expended in the launch command
+	 * 
+	 * @param name
+	 *            variable name
+	 * @returns variable value
+	 */
+	public String getVariable(String name) {
+		return RemoteVariableManager.getInstance().getVariable(name);
+	}
+
+	/**
 	 * Get the working directory. This is the location of the payload.
 	 * 
 	 * @return working directory
@@ -177,6 +187,18 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Set the value of a variable that will be expended in the launch command
+	 * 
+	 * @param name
+	 *            variable name
+	 * @param value
+	 *            variable value
+	 */
+	public void setVariable(String name, String value) {
+		RemoteVariableManager.getInstance().setVariable(name, value);
+	}
+
+	/**
 	 * Set the working directory. This is the location of the payload on the
 	 * remote system.
 	 * 
@@ -194,53 +216,52 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * 
 	 * @param monitor
 	 *            progress monitor that can be used to cancel the launch
-	 * @return true for successful launch
+	 * @throws IOException
+	 *             if the launch fails
 	 */
-	public synchronized boolean startServer(IProgressMonitor monitor) {
+	public synchronized void startServer(IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			if (fRemoteConnection == null || fServerState == ServerState.RUNNING) {
-				return false;
-			}
-			if (fServerState == ServerState.FINISHED) {
-				if (!doRestartServer(subMon.newChild(10))) {
-					return false;
-				}
-				setServerState(ServerState.STARTING);
-			}
-			if (!fRemoteConnection.isOpen()) {
-				try {
-					fRemoteConnection.open(subMon.newChild(10));
-				} catch (RemoteConnectionException e) {
-					return false;
+			if (fRemoteConnection != null && fServerState != ServerState.RUNNING) {
+				if (fServerState == ServerState.FINISHED) {
+					if (!doRestartServer(subMon.newChild(10))) {
+						throw new IOException(Messages.AbstractRemoteServerRunner_6);
+					}
+					setServerState(ServerState.STARTING);
 				}
 				if (!fRemoteConnection.isOpen()) {
-					return false;
-				}
-			}
-			subMon.setWorkRemaining(90);
-			schedule();
-			while (!subMon.isCanceled() && getServerState() == ServerState.STARTING) {
-				try {
-					wait(100);
-				} catch (InterruptedException e) {
-					if (DebugUtil.SERVER_TRACING) {
-						System.err.println("SERVER RUNNER: InterruptedException " + e.getLocalizedMessage()); //$NON-NLS-1$
+					try {
+						fRemoteConnection.open(subMon.newChild(10));
+					} catch (RemoteConnectionException e) {
+						throw new IOException(e.getMessage());
+					}
+					if (!fRemoteConnection.isOpen()) {
+						throw new IOException(Messages.AbstractRemoteServerRunner_7);
 					}
 				}
-			}
-			if (subMon.isCanceled()) {
-				terminateServer();
-			}
-			subMon.setWorkRemaining(10);
-			if (fServerState == ServerState.RUNNING) {
+				subMon.setWorkRemaining(90);
+				schedule();
+				while (!subMon.isCanceled() && getServerState() == ServerState.STARTING) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+						if (DebugUtil.SERVER_TRACING) {
+							System.err.println("SERVER RUNNER: InterruptedException " + e.getLocalizedMessage()); //$NON-NLS-1$
+						}
+					}
+				}
+				if (subMon.isCanceled()) {
+					terminateServer();
+				}
+				if (getServerState() != ServerState.RUNNING && !getResult().isOK()) {
+					throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_8, getResult().getMessage()));
+				}
+				subMon.setWorkRemaining(10);
 				if (!doStartServer(subMon.newChild(10))) {
 					terminateServer();
-					return false;
+					throw new IOException(Messages.AbstractRemoteServerRunner_9);
 				}
-				return true;
 			}
-			return false;
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -273,22 +294,14 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 * directory already exists). Also, check if a file of this name
 			 * exists and generate exception if it does.
 			 */
-			try {
-				directory.mkdir(EFS.NONE, subMon.newChild(10));
-			} catch (Exception e) {
-				throw new IOException(e.getMessage());
-			}
+			directory.mkdir(EFS.NONE, subMon.newChild(10));
 			IFileStore server = directory.getChild(getPayload());
 			IFileInfo serverInfo = server.fetchInfo(EFS.NONE, subMon.newChild(10));
 			IFileStore local = null;
-			try {
-				URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
-				if (jarURL != null) {
-					jarURL = FileLocator.toFileURL(jarURL);
-					local = EFS.getStore(jarURL.toURI());
-				}
-			} catch (URISyntaxException e) {
-				throw new IOException(e.getMessage());
+			URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
+			if (jarURL != null) {
+				jarURL = FileLocator.toFileURL(jarURL);
+				local = EFS.getStore(jarURL.toURI());
 			}
 			if (local == null) {
 				return null;
@@ -308,7 +321,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			builder.directory(directory);
 			builder.environment().putAll(getEnv());
 			return builder.start();
-		} catch (CoreException e) {
+		} catch (Exception e) {
 			throw new IOException(e.getMessage());
 		} finally {
 			if (monitor != null) {
