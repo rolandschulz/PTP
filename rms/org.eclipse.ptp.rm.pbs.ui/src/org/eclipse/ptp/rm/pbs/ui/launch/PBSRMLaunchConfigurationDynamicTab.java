@@ -573,7 +573,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 						.getConfiguration();
 				dataSource.defaultTemplate = rmConfig.getDefaultTemplateName();
 				dataSource.setCurrentTemplate(oldRM);
-				templateChangeListener.fireTemplateChange();
+				fireTemplateChange();
 			}
 		return rmv;
 	}
