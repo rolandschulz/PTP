@@ -106,6 +106,15 @@ public class WidgetUtils {
 		return button;
 	}
 
+	public static Composite createComposite(Composite parent, int columns) {
+		GridLayout layout = new GridLayout();
+		layout.numColumns = columns;
+		layout.verticalSpacing = 1;
+		Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(layout);
+		return composite;
+	}
+
 	public static Group createFillingGroup(Composite parent, String text,
 			int columns, int colSpan, boolean verticalFill) {
 		GridData data = new GridData();
