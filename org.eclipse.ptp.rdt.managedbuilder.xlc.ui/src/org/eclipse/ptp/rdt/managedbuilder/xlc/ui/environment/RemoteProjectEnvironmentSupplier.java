@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.managedbuilder.xlc.ui;
+package org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment;
 
 import java.util.HashMap;
 import java.util.LinkedList;
