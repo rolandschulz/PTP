@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -58,6 +59,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * Furnishes the options for configuring the PBS launch/submission. <br>
@@ -184,22 +186,20 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 					value = attr.getValue();
 				if (value != null) {
 					String[] items = mpiCommand.getItems();
-					for (int i = 0; i < items.length; i++) {
+					for (int i = 0; i < items.length; i++)
 						if (items[i].equals(value)) {
 							mpiCommand.select(i);
 							break;
 						}
-					}
 				}
 			}
 
 			String[] items = templates.getItems();
-			for (int i = 0; i < items.length; i++) {
+			for (int i = 0; i < items.length; i++)
 				if (items[i].equals(currentTemplate)) {
 					templates.select(i);
 					break;
 				}
-			}
 		}
 
 		/*
@@ -415,33 +415,10 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		 * fireTemplateChange.
 		 */
 		@Override
-		public void modifyText(ModifyEvent e) {
-			if (isEnabled()) {
-				dataSource.currentTemplate = templates.getItem(templates
-						.getSelectionIndex());
-				fireTemplateChange();
-			}
-		}
-
-		/*
-		 * Saves the current template, loads a new one and reconfigures the
-		 * dynamic widgets on the basis of its placeholders.
-		 */
-		private void fireTemplateChange() {
-			try {
-				disable();
-				dataSource.copyFromFields();
-				dataSource.copyToStorage();
-				ILaunchConfiguration c = get(dataSource.currentConfigName);
-				templateManager.loadTemplate(dataSource.currentTemplate, c);
-				createControl();
-				dataSource.loadFromStorage();
-				dataSource.copyToFields();
-			} catch (Throwable t) {
-				t.printStackTrace();
-			} finally {
-				enable();
-			}
+		protected void doModifyText(ModifyEvent e) {
+			dataSource.currentTemplate = templates.getItem(templates
+					.getSelectionIndex());
+			fireTemplateChange();
 		}
 	}
 
@@ -461,6 +438,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	private static final String TAG_CURRENT_TEMPLATE = Messages.PBSRMLaunchConfigCurrentTemplate;
 
 	private Composite childControl;
+
 	private Composite control;
 	private PBSRMLaunchDataSource dataSource;
 	private Button editPostpended;
@@ -588,7 +566,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		dataSource.currentConfigName = configuration.getName();
 		String oldRM = dataSource.lastRMId;
 		RMLaunchValidation rmv = super.performApply(configuration, rm, queue);
-		if (templateChangeListener.isEnabled()) {
+		if (templateChangeListener.isEnabled())
 			if (oldRM == null) {
 				PBSResourceManager pbsRM = (PBSResourceManager) rm;
 				IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) pbsRM
@@ -597,7 +575,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 				dataSource.setCurrentTemplate(oldRM);
 				templateChangeListener.fireTemplateChange();
 			}
-		}
 		return rmv;
 	}
 
@@ -721,6 +698,33 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		viewScript = WidgetUtils.createButton(selection,
 				Messages.PBSRMLaunchConfigViewScript_title, null, SWT.PUSH, 1,
 				true, listener);
+	}
+
+	/*
+	 * Saves the current template, loads a new one and reconfigures the dynamic
+	 * widgets on the basis of its placeholders.
+	 */
+	private void fireTemplateChange() {
+		new UIJob("template change") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				try {
+					templateChangeListener.disable();
+					dataSource.copyFromFields();
+					dataSource.copyToStorage();
+					ILaunchConfiguration c = get(dataSource.currentConfigName);
+					templateManager.loadTemplate(dataSource.currentTemplate, c);
+					createControl();
+					dataSource.loadFromStorage();
+					dataSource.copyToFields();
+				} catch (Throwable t) {
+					t.printStackTrace();
+				} finally {
+					templateChangeListener.enable();
+				}
+				return Status.OK_STATUS;
+			}
+		}.schedule();
 	}
 
 	/*
