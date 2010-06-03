@@ -73,6 +73,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 * @return a representation of sourceObject that is assignable to the
 	 *         adapter type, or null if no such representation exists
 	 */
+	@SuppressWarnings("rawtypes")
 	public static Object getAdapter(Object sourceObject, Class adapterType) {
 		Assert.isNotNull(adapterType);
 		if (sourceObject == null) {
