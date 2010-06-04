@@ -22,5 +22,6 @@ public final class PBSResourceManagerConfigurationWizardPage extends
 		super(wizard, Messages.PBSResourceManagerConfigurationWizardPage_name);
 		setTitle(Messages.PBSResourceManagerConfigurationWizardPage_title);
 		setDescription(Messages.PBSResourceManagerConfigurationWizardPage_description);
+		proxyPathEnabled = false;
 	}
 }
