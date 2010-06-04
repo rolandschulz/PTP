@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
+Bundle-Name: %bundle_name
 Bundle-SymbolicName: org.eclipse.ptp.etfw.feedback;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.etfw.feedback.Activator
@@ -16,4 +16,5 @@ Export-Package: org.eclipse.ptp.etfw.feedback,
  org.eclipse.ptp.etfw.feedback.obj,
  org.eclipse.ptp.etfw.feedback.preferences,
  org.eclipse.ptp.etfw.feedback.views
-Bundle-Vendor: %Bundle-Provider
+Bundle-Vendor: %bundle_provider
+Bundle-Localization: plugin
