@@ -194,8 +194,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+								monitor.beginTask(Messages.ParallelLaunchConfigurationDelegate_5, 10);
 								SubMonitor subMon = SubMonitor.convert(monitor, 10);
-								subMon.subTask(Messages.ParallelLaunchConfigurationDelegate_5);
 								try {
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch,
 											project, execPath, subMon.newChild(2));
