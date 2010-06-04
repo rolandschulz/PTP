@@ -536,18 +536,24 @@ public class PDebugModel {
 	}
 
 	/**
+	 * Helper method to create a new debug session.
+	 * 
 	 * @param timeout
-	 * @param debugger
+	 *            timeout value for debug commands
 	 * @param launch
-	 * @param project
-	 * @param coreFile
-	 * @return
+	 *            debugger launch configuration
+	 * @param corefile
+	 *            path to core file (not used)
+	 * @param monitor
+	 *            progress monitor
+	 * @return new debug session
 	 * @throws CoreException
+	 * @since 4.0
 	 */
-	public IPSession createDebugSession(IPDebugger debugger, IPLaunch launch, IProject project, IPath coreFile)
-			throws CoreException {
+	public IPSession createDebugSession(IPDebugger debugger, IPLaunch launch, IProject project, IPath coreFile,
+			IProgressMonitor monitor) throws CoreException {
 		long timeout = PTPDebugCorePlugin.getDefault().getPluginPreferences().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
-		IPDISession pdiSession = debugger.createDebugSession(timeout, launch, coreFile);
+		IPDISession pdiSession = debugger.createDebugSession(timeout, launch, coreFile, monitor);
 		IPSession session = new PSession(pdiSession, launch, project);
 		sessionMgr.addSession(launch.getPJob(), session);
 		return session;
