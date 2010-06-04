@@ -33,10 +33,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
@@ -141,6 +141,9 @@ public class SDMDebugger implements IPDebugger {
 	 * org.eclipse.ptp.debug.core.launch.IPLaunch,
 	 * org.eclipse.core.runtime.IPath)
 	 */
+	/**
+	 * @since 4.0
+	 */
 	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IPath corefile, IProgressMonitor monitor)
 			throws CoreException {
 		if (fModelFactory == null) {
@@ -162,7 +165,7 @@ public class SDMDebugger implements IPDebugger {
 			/*
 			 * Writing the routing file actually starts the SDM servers.
 			 */
-			writeRoutingFile(launch);
+			writeRoutingFile(launch, monitor);
 
 			/*
 			 * Delay starting the master SDM (aka SDM client), to wait until SDM
@@ -428,38 +431,57 @@ public class SDMDebugger implements IPDebugger {
 	 *            launch configuration
 	 * @throws CoreException
 	 */
-	private void writeRoutingFile(IPLaunch launch) throws CoreException {
+	private void writeRoutingFile(IPLaunch launch, IProgressMonitor monitor) throws CoreException {
 		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_12);
-		IProgressMonitor monitor = new NullProgressMonitor();
-		OutputStream os = null;
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
-			os = fRoutingFileStore.openOutputStream(0, monitor);
-		} catch (CoreException e) {
-			throw newCoreException(e.getLocalizedMessage());
-		}
-		PrintWriter pw = new PrintWriter(os);
-		final IPJob pJob = launch.getPJob();
-		BitSet processJobRanks = pJob.getProcessJobRanks();
-		pw.format("%d\n", processJobRanks.cardinality()); //$NON-NLS-1$
-		int base = 50000;
-		int range = 10000;
-		Random random = new Random();
-		for (Integer processIndex : new BitSetIterable(processJobRanks)) {
-			String nodeId = pJob.getProcessNodeId(processIndex);
-			IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
-			if (node != null) {
+			OutputStream os = null;
+			try {
+				os = fRoutingFileStore.openOutputStream(0, subMon.newChild(10));
+			} catch (CoreException e) {
+				throw newCoreException(e.getLocalizedMessage());
+			}
+			subMon.subTask("Writing routing file...");
+			PrintWriter pw = new PrintWriter(os);
+			final IPJob pJob = launch.getPJob();
+			BitSet processJobRanks = pJob.getProcessJobRanks();
+			pw.format("%d\n", processJobRanks.cardinality()); //$NON-NLS-1$
+			int base = 50000;
+			int range = 10000;
+			Random random = new Random();
+			for (Integer processIndex : new BitSetIterable(processJobRanks)) {
+				String nodeId = pJob.getProcessNodeId(processIndex);
+				IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
+				if (node == null) {
+					subMon.subTask("Waiting for job information...");
+				}
+				while (node == null && !subMon.isCanceled()) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+						// ignore
+					}
+					node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
+				}
+				if (node == null) {
+					throw newCoreException(Messages.SDMDebugger_15);
+				}
 				String nodeName = node.getName();
 				int portNumber = base + random.nextInt(range);
 				pw.format("%s %s %d\n", processIndex, nodeName, portNumber); //$NON-NLS-1$
-			} else {
-				throw newCoreException(Messages.SDMDebugger_15);
+				subMon.setWorkRemaining(100);
+				subMon.worked(1);
 			}
-		}
-		pw.close();
-		try {
-			os.close();
-		} catch (IOException e) {
-			throw newCoreException(e.getLocalizedMessage());
+			pw.close();
+			try {
+				os.close();
+			} catch (IOException e) {
+				throw newCoreException(e.getLocalizedMessage());
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 

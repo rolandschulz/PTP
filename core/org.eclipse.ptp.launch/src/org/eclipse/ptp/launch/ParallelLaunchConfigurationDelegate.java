@@ -195,10 +195,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 								SubMonitor subMon = SubMonitor.convert(monitor, 10);
-								subMon.beginTask(Messages.ParallelLaunchConfigurationDelegate_5, 1);
+								subMon.subTask(Messages.ParallelLaunchConfigurationDelegate_5);
 								try {
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch,
-											project, execPath, subMon.newChild(5));
+											project, execPath, subMon.newChild(2));
 
 									String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition())
 											.getValueAsString();
@@ -209,7 +209,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 									List<String> args = job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition())
 											.getValue();
 
-									session.connectToDebugger(subMon.newChild(5), app, path, cwd,
+									session.connectToDebugger(subMon.newChild(8), app, path, cwd,
 											args.toArray(new String[args.size()]));
 								} catch (CoreException e) {
 									PTPDebugCorePlugin.getDebugModel().shutdownSession(job);

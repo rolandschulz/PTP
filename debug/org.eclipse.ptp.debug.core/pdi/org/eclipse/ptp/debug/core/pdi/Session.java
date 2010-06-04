@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
@@ -153,17 +154,24 @@ public class Session implements IPDISession {
 	 * java.lang.String, java.lang.String[])
 	 */
 	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String dir, String[] args) throws PDIException {
-		setStatus(CONNECTING);
-		if (!getDebugger().isConnected(monitor)) {
-			throw new PDIException(getTasks(), Messages.Session_0);
+		SubMonitor progress = SubMonitor.convert(monitor, total_tasks + 10);
+		try {
+			setStatus(CONNECTING);
+			if (!getDebugger().isConnected(progress.newChild(10))) {
+				throw new PDIException(getTasks(), Messages.Session_0);
+			}
+			getDebugger().register(eventManager);
+			progress.subTask(NLS.bind(Messages.Session_1, total_tasks));
+			IPDIStartDebuggerRequest request = getRequestFactory().getStartDebuggerRequest(getTasks(), app, path, dir, args);
+			eventRequestManager.addEventRequest(request);
+			request.waitUntilCompleted(null, progress.newChild(total_tasks));
+			setStatus(CONNECTED);
+			eventManager.fireEvent(getEventFactory().newStartedEvent(this, getTasks()));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		getDebugger().register(eventManager);
-		monitor.beginTask(NLS.bind(Messages.Session_1, total_tasks), total_tasks);
-		IPDIStartDebuggerRequest request = getRequestFactory().getStartDebuggerRequest(getTasks(), app, path, dir, args);
-		eventRequestManager.addEventRequest(request);
-		request.waitUntilCompleted(null, monitor);
-		setStatus(CONNECTED);
-		eventManager.fireEvent(getEventFactory().newStartedEvent(this, getTasks()));
 	}
 
 	/**
