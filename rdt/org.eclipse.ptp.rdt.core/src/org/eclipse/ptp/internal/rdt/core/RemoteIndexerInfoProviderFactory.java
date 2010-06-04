@@ -362,6 +362,13 @@ public class RemoteIndexerInfoProviderFactory {
 				definedSymbols.remove("__cplusplus"); //$NON-NLS-1$
 			}
 		}
+		
+		String[] includePaths = scanInfo.getIncludePaths();
+		for(String include : includePaths) {
+			// HACK: convert backslashes to slashes to compensate for CDT bug 315632
+			include = include.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
 		return scanInfo;
 	}
 	
