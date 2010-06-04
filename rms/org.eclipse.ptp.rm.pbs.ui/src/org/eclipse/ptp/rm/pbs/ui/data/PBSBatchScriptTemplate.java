@@ -655,7 +655,7 @@ public class PBSBatchScriptTemplate {
 		content = content.replaceAll("\\\\", "\\\\\\\\");
 		content = content.replaceAll(ConfigUtils.LINE_SEP, "\\\\n");
 		content = content.replaceAll("\\t", "\\\\t");
-		content = content.replaceAll("\\s", "\\\\s");
+		content = content.replaceAll(" ", "\\\\s");
 		return content;
 	}
 

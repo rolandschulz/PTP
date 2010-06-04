@@ -21,7 +21,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
@@ -74,7 +73,16 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				.get("port")); //$NON-NLS-1$
 	}
 
+	private static String normalize(String content) {
+		content = content.replaceAll("\\\\\\\\", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll("\\\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll("\\\\t", "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll("\\\\s", " "); //$NON-NLS-1$ //$NON-NLS-2$
+		return content;
+	}
+
 	private Controller nodeController;
+
 	private Controller queueController;
 
 	private Controller jobController;
@@ -85,6 +93,15 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		super(host, port, new ProxyRuntimeEventFactory());
 	}
 
+	// private boolean procDone(Process p) {
+	// try {
+	// int v = p.exitValue();
+	// return true;
+	// } catch (IllegalThreadStateException e) {
+	// return false;
+	// }
+	// }
+
 	private String getUser() {
 		if (debugReadFromFiles) {
 			user = debugUser;
@@ -93,8 +110,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			try {
 				Process p = Runtime.getRuntime().exec("whoami"); //$NON-NLS-1$
 				p.waitFor();
-				user = new BufferedReader(new InputStreamReader(p
-						.getInputStream())).readLine();
+				user = new BufferedReader(new InputStreamReader(
+						p.getInputStream())).readLine();
 			} catch (IOException e) {
 				// Auto-generated catch block
 				e.printStackTrace();
@@ -105,15 +122,6 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		}
 		return user;
 	}
-
-	// private boolean procDone(Process p) {
-	// try {
-	// int v = p.exitValue();
-	// return true;
-	// } catch (IllegalThreadStateException e) {
-	// return false;
-	// }
-	// }
 
 	/*
 	 * (non-Javadoc)
@@ -250,41 +258,37 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	@Override
 	protected void submitJob(int transID, String[] arguments) {
 
-		String template = "#!/bin/sh\n" + //$NON-NLS-1$
-				"#PBS -A @Account_Name@\n" //$NON-NLS-1$
-				+ "#PBS -l walltime=@Resource_List.walltime@,nodes=@Resource_List.nodes@\n" //$NON-NLS-1$
-				+ // "#PBS -d @workingDir@\n" + //not supported by all PBS
-					// version
-					// (e.g. abe)
-				"#PBS -N @Job_Name@\n" + //$NON-NLS-1$
-				"cd @workingDir@\n" + //$NON-NLS-1$
-				"mpiexec @execPath@/@execName@\n"; //$NON-NLS-1$
-
 		String jobSubId = null;
+		String script = null;
 		// Insert values into template and store special parameters
 		for (String argument : arguments) {
 			String[] keyValue = argument.split("=", 2); //$NON-NLS-1$
 			String key = keyValue[0];
 			String value = keyValue[1];
-			if (key.equals("jobSubId")) {
+			if (key.equals("jobSubId")) { //$NON-NLS-1$
 				jobSubId = value;
-			} else { // any other parameter is used for the template
-				Matcher m = Pattern.compile("@" + key + "@").matcher(template); //$NON-NLS-1$ //$NON-NLS-2$
-				if (m.find()) {
-					template = m.replaceAll(value);
-				} else {
-					System.out.println("Parameter " + key + " with value \""
-							+ value + "\" not used in template.");
-				}
-			}
+			} else if (key.equals("script")) { //$NON-NLS-1$ // any other parameter is used for the template
+				script = normalize(value);
+			} /*
+			 * else { System.out.println("Parameter " + key + " with value \""
+			 * //$NON-NLS-1$ //$NON-NLS-2$ + value +
+			 * "\" not used in template."); //$NON-NLS-1$ }
+			 */
+		}
+
+		if (jobSubId == null || script == null) {
+			System.err.println("missing arguments!");//$NON-NLS-1$
+			return;
 		}
 
 		// Write template into job-script as a temporary file
 		File tmp = null;
 		try {
 			tmp = File.createTempFile("job", "qsub"); //$NON-NLS-1$ //$NON-NLS-2$
+			//			System.out.println("script: "+tmp); //$NON-NLS-1$
+			// System.out.println(script);
 			BufferedWriter out = new BufferedWriter(new FileWriter(tmp));
-			out.write(template);
+			out.write(script);
 			out.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -298,7 +302,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			p.waitFor();
 
 			try {
-				System.out.println("submitJob: exit:" + p.exitValue()); //$NON-NLS-1$
+				//System.out.println("submitJob: exit:" + p.exitValue()); //$NON-NLS-1$
 				// Check that is was succesful
 				if (p.exitValue() == 0) {
 					sendEvent(getEventFactory().newOKEvent(transID));
@@ -372,8 +376,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			if (p.exitValue() == 0) {
 				sendEvent(getEventFactory().newOKEvent(transID));
 			} else {
-				BufferedReader err = new BufferedReader(new InputStreamReader(p
-						.getErrorStream()));
+				BufferedReader err = new BufferedReader(new InputStreamReader(
+						p.getErrorStream()));
 				String line, errMsg = ""; //$NON-NLS-1$
 				while ((line = err.readLine()) != null) {
 					errMsg += line;
