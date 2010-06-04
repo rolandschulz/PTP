@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -55,17 +56,24 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.WorkbenchException;
 
 /**
- * A launch configuration delegate for launching jobs via the
- * PTP resource manager mechanism.
+ * A launch configuration delegate for launching jobs via the PTP resource
+ * manager mechanism.
  */
 public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.
+	 * eclipse.debug.core.ILaunchConfiguration, java.lang.String,
+	 * org.eclipse.debug.core.ILaunch,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
+			throws CoreException {
 		if (!(launch instanceof IPLaunch)) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
 					Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
 		}
 		if (monitor == null) {
@@ -75,7 +83,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		monitor.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
 		if (monitor.isCanceled())
 			return;
-		
+
 		IPDebugger debugger = null;
 
 		monitor.worked(10);
@@ -87,17 +95,18 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		copyExecutable(configuration, monitor);
 		doPreLaunchSynchronization(configuration, monitor);
 
-		//switch perspective
+		// switch perspective
 		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 		try {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				// show ptp debug view
 				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-				monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_6); 
+				monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
 
 				/*
-				 * Create the debugger extension, then the connection point for the debug server.
-				 * The debug server is launched via the submitJob() command.
+				 * Create the debugger extension, then the connection point for
+				 * the debug server. The debug server is launched via the
+				 * submitJob() command.
 				 */
 
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
@@ -111,14 +120,14 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 
 			monitor.worked(10);
-			monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_7); 
+			monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_7);
 
-			submitJob(configuration, mode, (IPLaunch)launch, attrManager, debugger, monitor);
+			submitJob(configuration, mode, (IPLaunch) launch, attrManager, debugger, monitor);
 
 			monitor.worked(10);
 		} catch (CoreException e) {
 			if (debugger != null) {
-				debugger.cleanup((IPLaunch)launch);
+				debugger.cleanup((IPLaunch) launch);
 			}
 			if (e.getStatus().getCode() != IStatus.CANCEL)
 				throw e;
@@ -130,7 +139,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	/**
 	 * Terminate a job.
 	 * 
-	 * @param job job to terminate
+	 * @param job
+	 *            job to terminate
 	 */
 	private void terminateJob(final IPJob job) {
 		try {
@@ -142,8 +152,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#doCleanupLaunch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#
+	 * doCleanupLaunch(org.eclipse.debug.core.ILaunchConfiguration,
+	 * java.lang.String, org.eclipse.ptp.debug.core.launch.IPLaunch)
 	 */
 	@Override
 	protected void doCleanupLaunch(ILaunchConfiguration configuration, String mode, IPLaunch launch) {
@@ -158,8 +172,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate#doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate
+	 * #doCompleteJobLaunch(org.eclipse.ptp.core.elements.IPJob)
 	 */
 	@Override
 	protected void doCompleteJobLaunch(ILaunchConfiguration configuration, String mode, final IPLaunch launch,
@@ -176,19 +194,23 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-								if (monitor.isCanceled()) {
-									throw new InterruptedException(Messages.ParallelLaunchConfigurationDelegate_2); 
-								}
-								monitor.beginTask(Messages.ParallelLaunchConfigurationDelegate_5, 1); 
+								SubMonitor subMon = SubMonitor.convert(monitor, 10);
+								subMon.beginTask(Messages.ParallelLaunchConfigurationDelegate_5, 1);
 								try {
-									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch, project, execPath);
+									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch,
+											project, execPath, subMon.newChild(5));
 
-									String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()).getValueAsString();
-									String path = job.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()).getValueAsString();
-									String cwd = job.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValueAsString();
-									List<String> args = job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
+									String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition())
+											.getValueAsString();
+									String path = job.getAttribute(JobAttributes.getExecutablePathAttributeDefinition())
+											.getValueAsString();
+									String cwd = job.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition())
+											.getValueAsString();
+									List<String> args = job.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition())
+											.getValue();
 
-									session.connectToDebugger(monitor, app, path, cwd, args.toArray(new String[args.size()]));
+									session.connectToDebugger(subMon.newChild(5), app, path, cwd,
+											args.toArray(new String[args.size()]));
 								} catch (CoreException e) {
 									PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 									throw new InvocationTargetException(e, e.getLocalizedMessage());
@@ -210,7 +232,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				});
 			} catch (final CoreException e) {
 				/*
-				 * Completion of launch fails, then terminate the job and display error message.
+				 * Completion of launch fails, then terminate the job and
+				 * display error message.
 				 */
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
@@ -227,7 +250,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 	/**
 	 * Show the PTP Debug view
-	 *
+	 * 
 	 * @param viewID
 	 */
 	protected void showPTPDebugView(final String viewID) {
@@ -244,7 +267,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 						if (page != null) {
 							try {
 								page.showView(viewID, null, IWorkbenchPage.VIEW_CREATE);
-							} catch (PartInitException e) {}
+							} catch (PartInitException e) {
+							}
 						}
 					}
 				}
@@ -252,10 +276,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		}
 	}
 
-
 	/**
 	 * Used to force switching to the PTP Debug perspective
-	 *
+	 * 
 	 * @param perspectiveID
 	 */
 	protected void switchPerspective(final String perspectiveID) {
@@ -273,10 +296,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 							if (page != null) {
 								if (page.getPerspective().getId().equals(perspectiveID))
 									return;
-	
+
 								try {
 									window.getWorkbench().showPerspective(perspectiveID, window);
-								} catch (WorkbenchException e) { }
+								} catch (WorkbenchException e) {
+								}
 							}
 						}
 					}

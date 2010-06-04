@@ -36,35 +36,49 @@ import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
 public interface IPDebugger {
 	/**
-	 * Clean up the debug session. Does whatever is necessary to shut down any debugger activities
-	 * that were started as a result of calling initialize.
+	 * Clean up the debug session. Does whatever is necessary to shut down any
+	 * debugger activities that were started as a result of calling initialize.
 	 * 
-	 * @param launch debugger launch configuration
+	 * @param launch
+	 *            debugger launch configuration
 	 */
 	public void cleanup(IPLaunch launch);
 
 	/**
 	 * Create a new debugger session.
-	 *
+	 * 
 	 * @param timeout
-	 * @param launch debugger launch configuration
-	 * @param corefile path to core file (not used)
+	 *            timeout value for debug commands
+	 * @param launch
+	 *            debugger launch configuration
+	 * @param corefile
+	 *            path to core file (not used)
+	 * @param monitor
+	 *            progress monitor
 	 * @return new debug session
 	 * @throws CoreException
+	 * @since 4.0
 	 */
-	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile) throws CoreException;
+	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor)
+			throws CoreException;
 
 	/**
-	 * Initialize the debugger. This does whatever is necessary to get the debugger ready
-	 * to start debugging the user application. The debugger should add the required attributes to attrMgr
-	 * that need to be passed to the submitJob command to launch the application under debugger control.
-	 * The attrMgr argument can also supply attributes from a previously submitted job that may be used to 
-	 * initialize the debug session.
-	 *
-	 * @param configuration debugger launch configuration
-	 * @param attrMgr attribute manager containing attributes for launch
-	 * @param monitor progress monitor
-	 * @throws CoreException if the debugger cannot be initialized
+	 * Initialize the debugger. This does whatever is necessary to get the
+	 * debugger ready to start debugging the user application. The debugger
+	 * should add the required attributes to attrMgr that need to be passed to
+	 * the submitJob command to launch the application under debugger control.
+	 * The attrMgr argument can also supply attributes from a previously
+	 * submitted job that may be used to initialize the debug session.
+	 * 
+	 * @param configuration
+	 *            debugger launch configuration
+	 * @param attrMgr
+	 *            attribute manager containing attributes for launch
+	 * @param monitor
+	 *            progress monitor
+	 * @throws CoreException
+	 *             if the debugger cannot be initialized
 	 */
-	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException;
+	public void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+			throws CoreException;
 }

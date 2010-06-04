@@ -141,7 +141,8 @@ public class SDMDebugger implements IPDebugger {
 	 * org.eclipse.ptp.debug.core.launch.IPLaunch,
 	 * org.eclipse.core.runtime.IPath)
 	 */
-	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IPath corefile) throws CoreException {
+	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IPath corefile, IProgressMonitor monitor)
+			throws CoreException {
 		if (fModelFactory == null) {
 			fModelFactory = new SDMModelFactory();
 		}
