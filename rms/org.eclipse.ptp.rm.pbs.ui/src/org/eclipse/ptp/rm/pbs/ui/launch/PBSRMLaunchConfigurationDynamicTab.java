@@ -153,7 +153,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		 */
 		@Override
 		protected void copyToFields() {
-			System.currentTimeMillis();
 			PBSBatchScriptTemplate template = templateManager.getCurrent();
 			if (template == null)
 				return;
@@ -330,7 +329,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		 */
 		@Override
 		public void modifyText(ModifyEvent e) {
-			e.getSource();
 			Object o = e.getSource();
 			if (!templateChangeListener.isEnabled())
 				if (valueWidgets.containsKey(o))
@@ -579,7 +577,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation performApply(
 			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
 			IPQueue queue) {
-		RMLaunchValidation rmv = null;
 		if (templateChangeListener.isEnabled()) {
 			// should not be null
 			dataSource.currentConfigName = configuration.getName();
@@ -591,12 +588,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 				dataSource.defaultTemplate = rmConfig.getDefaultTemplateName();
 				dataSource.setCurrentTemplate(oldRM);
 				fireTemplateChange();
-				rmv = super.performApply(configuration, rm, queue);
 			}
 		}
-		if (rmv == null)
-			rmv = new RMLaunchValidation(true, null);
-		return rmv;
+		return super.performApply(configuration, rm, queue);
 	}
 
 	/*
