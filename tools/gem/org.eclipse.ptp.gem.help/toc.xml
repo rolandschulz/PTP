@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="PTP: Graphical Explorer for MPI Programs (GEM)" topic="html/toc.html">
+<toc label="PTP: Graphical Explorer of MPI Programs (GEM)" topic="html/toc.html">
     <topic label="Overview"  href="html/overview.html"/>
     <topic label="GEM Plug-in Prerequisites"  href="html/prereqs.html"/> 
     <topic label="GEM Plug-in Preferences"  href="html/preferences.html"/>
