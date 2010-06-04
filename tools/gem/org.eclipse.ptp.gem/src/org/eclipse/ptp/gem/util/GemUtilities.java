@@ -44,35 +44,54 @@ import org.eclipse.ui.PlatformUI;
 
 public class GemUtilities {
 
+	private static Process process;
+	private static String gemConsoleMessage = ""; //$NON-NLS-1$
+
+	// This thread exists to update SWT components belonging to the UI thread.
+	private final static Thread updateGemConsoleThread = new Thread() {
+		public void run() {
+			// Get a handle on the GEM Console
+			IViewPart ISPViewPart = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getActivePage().findView(
+							GemConsole.ID);
+			GemConsole ispCon = (GemConsole) ISPViewPart;
+			ispCon.write(gemConsoleMessage);
+			gemConsoleMessage = ""; //$NON-NLS-1$
+		}
+	};
+
 	/**
 	 * Executes the specified command process via the Runtime instance.
 	 * 
 	 * @param command The command to send to the Runtime instance.
 	 * @param verbose Outputs to GemConsole if true, silent otherwise.
-	 * @return int - 1 if everything went smoothly, -1 otherwise.
+	 * @return int 1 if everything went smoothly, -1 otherwise.
 	 */
 	public static int runCommand(String command) {
-
-		// Get a handle on the GEM Console
-		IViewPart gemViewPart = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage().findView(
-						GemConsole.ID);
-		GemConsole gemCon = (GemConsole) gemViewPart;
-
 		try {
-			Process p = Runtime.getRuntime().exec(command);
+			process = Runtime.getRuntime().exec(command);
 			String stdIn = ""; //$NON-NLS-1$
 			String stdInResult = ""; //$NON-NLS-1$
 			BufferedReader inReader = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
+					process.getInputStream()));
 
-			// read stdin for the command process
-			while ((stdIn = inReader.readLine()) != null) {
-				stdInResult += stdIn + "\n"; //$NON-NLS-1$
+			// Try breaks when the process is terminated prematurely
+			try {
+				// read the process input stream
+				while (process != null && (stdIn = inReader.readLine()) != null) {
+					stdInResult += stdIn + "\n"; //$NON-NLS-1$
+				}
+			} catch (Exception e) {
+				return -1;
 			}
-			gemCon.write(stdInResult);
+			gemConsoleMessage = stdInResult;
 
-			return 1;
+			if (process == null) {
+				return -1;
+			} else {
+				Display.getDefault().syncExec(updateGemConsoleThread);
+				return 1;
+			}
 		} catch (Exception e) {
 			String message = Messages.GemUtilities_0;
 			showExceptionDialog(message, e);
@@ -80,6 +99,16 @@ public class GemUtilities {
 			e.printStackTrace();
 		}
 		return -1;
+	}
+
+	/**
+	 * Kills the static Process object associated with this class.
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	public static void killProcess() {
+		process.destroy();
 	}
 
 	/**
@@ -346,7 +375,6 @@ public class GemUtilities {
 			return ""; //$NON-NLS-1$
 		}
 
-		// TODO this doesn't find .cpp files
 		sourceFilePath = scanner.nextLine();
 		sourceFilePath = sourceFilePath.substring(sourceFilePath.indexOf("/"), //$NON-NLS-1$
 				sourceFilePath.lastIndexOf(" ")); //$NON-NLS-1$
@@ -411,17 +439,17 @@ public class GemUtilities {
 				.getActiveWorkbenchWindow();
 		IViewPart gemViewPart = window.getActivePage().findView(GemAnalyzer.ID);
 		GemAnalyzer analyzer = (GemAnalyzer) gemViewPart;
-		analyzer.start(sourceFilePath, logFilePath, compile, runIsp);
+		analyzer.init(sourceFilePath, logFilePath, compile, runIsp);
 	}
 
 	/**
-	 * Given the absolute path of the source file, this returns where the log
-	 * file should be located.
+	 * Given the absolute path of the source file, this returns the name of the
+	 * log file and its fully qualified path.
 	 * 
 	 * @param location The location of the log file.
 	 * @return String The log file with absolute path.
 	 */
-	public static String getLogFile(String sourceFilePath) {
+	public static String getLogFilePathAndName(String sourceFilePath) {
 
 		// get the name of the file
 		String name = getFileName(sourceFilePath);

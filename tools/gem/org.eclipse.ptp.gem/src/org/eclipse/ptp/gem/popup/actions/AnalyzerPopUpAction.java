@@ -71,7 +71,7 @@ public class AnalyzerPopUpAction implements IObjectActionDelegate {
 			GemUtilities.saveLastFile(sourceFilePath);
 
 			// Check if the log file exists
-			String logFilePath = GemUtilities.getLogFile(sourceFilePath);
+			String logFilePath = GemUtilities.getLogFilePathAndName(sourceFilePath);
 
 			// Find the active page
 			IWorkbenchWindow window = PlatformUI.getWorkbench()

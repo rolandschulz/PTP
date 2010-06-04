@@ -129,9 +129,9 @@ public class GemAnalyzer extends ViewPart {
 	private Button browseCallsButton;
 	private Button browseLeaksButton;
 	private Button examineErrorsButton;
-	private Button endEarlyButton;
+	private Button terminateButton;
 	private Combo lockRanksComboList;
-	private Combo setRankComboList;
+	private Combo setNumProcsComboList;
 
 	// Groups that need to be accessed multiple times
 	private Group interleavingsGroup;
@@ -163,16 +163,19 @@ public class GemAnalyzer extends ViewPart {
 	private String globalSourceFilePath;
 	private String globalLogFilePath;
 	private boolean globalCompile;
-	private boolean globalRunIsp;
+	private boolean globalRunCommand;
 
 	// Threads
-	private Thread runISPasThread;
-	private Thread enableEndEarly;
+	private Thread commandThread;
+	private Thread analyzerUpdateThread;
+	private Thread clearAnalyzer;
+	private Thread disableTerminateButton;
 
 	// Misc
 	private Shell errShell;
 	private int leftLines;
 	private int rightLines;
+	private boolean aborted;
 
 	/**
 	 * Constructor.
@@ -183,6 +186,7 @@ public class GemAnalyzer extends ViewPart {
 		this.lockedRank = -1;
 		this.activeShells = new LinkedList<Shell>();
 		this.errorIndex = 1;
+		this.aborted = false;
 	}
 
 	/**
@@ -401,7 +405,7 @@ public class GemAnalyzer extends ViewPart {
 	public void updateDropDown() {
 		Integer nprocs = GemPlugin.getDefault().getPreferenceStore().getInt(
 				PreferenceConstants.GEM_PREF_NUMPROCS);
-		this.setRankComboList.setText(nprocs.toString());
+		this.setNumProcsComboList.setText(nprocs.toString());
 	}
 
 	/**
@@ -410,47 +414,94 @@ public class GemAnalyzer extends ViewPart {
 	 * 
 	 * @param sourceFilePath The fully qualified path to the source file.
 	 * @param logFilePath The fully qualified path to the log file.
-	 * @param compile Whether or not to run ispcc.
+	 * @param compile Whether or not to run a compile command.
 	 * @return void
 	 */
-	public void start(String sourceFilePath, String logFilePath,
-			boolean compile, boolean runIsp) {
+	public void init(String sourceFilePath, String logFilePath,
+			boolean compile, boolean runCommand) {
 		globalSourceFilePath = sourceFilePath;
 		globalLogFilePath = logFilePath;
 		globalCompile = compile;
-		globalRunIsp = runIsp;
+		globalRunCommand = runCommand;
 
-		runISPasThread = new Thread() {
+		commandThread = new Thread() {
 			public void run() {
 				// These need to be done by a Thread
-				if (globalCompile || globalRunIsp) {
+				if (globalCompile || globalRunCommand) {
 					generateLogFile(globalSourceFilePath, globalCompile);
 				}
+				Display.getDefault().syncExec(analyzerUpdateThread);
+			}
+		};
+
+		analyzerUpdateThread = new Thread() {
+			public void run() {
+				// If just aborted then don't fill the viewer with the half
+				// baked data
+				if (aborted) {
+					Display.getDefault().syncExec(disableTerminateButton);
+					Display.getDefault().syncExec(clearAnalyzer);
+					aborted = false;
+					return;
+				}
+
 				parseLogFile(globalLogFilePath);
 				globalSourceFilePath = GemUtilities
 						.getSourcePathFromLog(globalLogFilePath);
 
 				// if the log file contained no mpi calls
 				if (globalSourceFilePath.equals("")) { //$NON-NLS-1$
-					endEarlyButton.setEnabled(false);
+					Display.getDefault().syncExec(disableTerminateButton);
 					return;
 				}
 
 				parseSourceFile(globalSourceFilePath, globalSourceFilePath);
 				initTransitions(globalLogFilePath);
-				endEarlyButton.setEnabled(false);
+				Display.getDefault().syncExec(disableTerminateButton);
 			}
 		};
 
-		enableEndEarly = new Thread() {
+		clearAnalyzer = new Thread() {
 			public void run() {
-				endEarlyButton.setEnabled(true);
+				transitionsGroup.setText(Messages.GemAnalyzer_10 + " 0/0"); //$NON-NLS-1$
+				interleavingsGroup.setText(Messages.GemAnalyzer_11 + " 0/0"); //$NON-NLS-1$
+				firstTransitionButton.setEnabled(false);
+				previousTransitionButton.setEnabled(false);
+				nextTransitionButton.setEnabled(false);
+				lastTransitionButton.setEnabled(false);
+				firstInterleavingButton.setEnabled(false);
+				previousInterleavingButton.setEnabled(false);
+				nextInterleavingButton.setEnabled(false);
+				lastInterleavingButton.setEnabled(false);
+				deadlockInterleavingButton.setEnabled(false);
+				internalIssueOrderButton.setEnabled(false);
+				programOrderButton.setEnabled(false);
+				launchIspUIButton.setEnabled(false);
+				browseCallsButton.setEnabled(false);
+				browseLeaksButton.setEnabled(false);
+				examineErrorsButton.setEnabled(false);
+				terminateButton.setEnabled(false);
+				errorMessageLabel.setText(""); //$NON-NLS-1$
+				resourcLeakLabel.setText(""); //$NON-NLS-1$
+				transitions = null;
+				leftViewer.refresh();
+				rightViewer.refresh();
+				leftCodeWindowLabel.setText(""); //$NON-NLS-1$
+				rightCodeWindowLabel.setText(""); //$NON-NLS-1$
+				String[] items = new String[] { "" }; //$NON-NLS-1$
+				lockRanksComboList.setItems(items);
 			}
 		};
 
-		// syncExec blocks until next one starts
-		Display.getDefault().syncExec(enableEndEarly);
-		Display.getDefault().asyncExec(runISPasThread);
+		disableTerminateButton = new Thread() {
+			public void run() {
+				terminateButton.setEnabled(false);
+			}
+		};
+
+		// start things up now
+		terminateButton.setEnabled(true);
+		commandThread.start();
 	}
 
 	/**
@@ -1160,18 +1211,18 @@ public class GemAnalyzer extends ViewPart {
 	}
 
 	/*
-	 * Populates the set ranks combo-box with choices the user can use to set
-	 * the number of processes for the next analyzation.
+	 * Populates the num-procs combo-box with choices the user can use to set
+	 * the number of processes for the next analyzer run.
 	 */
-	private void setRankItems() {
+	private void setNumProcItems() {
 		final String[] ranks = new String[16];
 		for (int i = 1; i <= 16; i++) {
 			ranks[i - 1] = ((Integer) i).toString();
 		}
-		this.setRankComboList.setItems(ranks);
+		this.setNumProcsComboList.setItems(ranks);
 		Integer nprocs = GemPlugin.getDefault().getPreferenceStore().getInt(
 				PreferenceConstants.GEM_PREF_NUMPROCS);
-		this.setRankComboList.setText(nprocs.toString());
+		this.setNumProcsComboList.setText(nprocs.toString());
 	}
 
 	/*
@@ -1187,7 +1238,7 @@ public class GemAnalyzer extends ViewPart {
 		// Update labels and combo lists
 		setMessageLabelText();
 		setLockRankItems();
-		setRankItems();
+		setNumProcItems();
 
 		// Update global indices
 		this.leftIndex = 0;
@@ -1575,15 +1626,15 @@ public class GemAnalyzer extends ViewPart {
 		this.programOrderButton.setFont(buttonFont);
 
 		// Put the kill button to the right of step-order group
-		this.endEarlyButton = new Button(parent, SWT.PUSH);
-		this.endEarlyButton.setImage(endEarlyImage);
-		this.endEarlyButton.setToolTipText(Messages.GemAnalyzer_81);
-		this.endEarlyButton.setEnabled(false);
+		this.terminateButton = new Button(parent, SWT.PUSH);
+		this.terminateButton.setImage(endEarlyImage);
+		this.terminateButton.setToolTipText(Messages.GemAnalyzer_81);
+		this.terminateButton.setEnabled(false);
 		FormData endEarlyButtonFormData = new FormData();
 		endEarlyButtonFormData.bottom = new FormAttachment(100, -10);
 		endEarlyButtonFormData.left = new FormAttachment(this.stepOrderGroup,
 				15);
-		this.endEarlyButton.setLayoutData(endEarlyButtonFormData);
+		this.terminateButton.setLayoutData(endEarlyButtonFormData);
 	}
 
 	/*
@@ -1673,20 +1724,21 @@ public class GemAnalyzer extends ViewPart {
 		this.launchIspUIButton.setLayoutData(launchIspUIFormData);
 
 		// Set number of processes button
-		this.setRankComboList = new Combo(runtimeInfoGroup, SWT.DROP_DOWN);
-		Font setRankComboFont = setFontSize(this.setRankComboList.getFont(), 9);
-		this.setRankComboList.setFont(setRankComboFont);
+		this.setNumProcsComboList = new Combo(runtimeInfoGroup, SWT.DROP_DOWN);
+		Font setRankComboFont = setFontSize(
+				this.setNumProcsComboList.getFont(), 9);
+		this.setNumProcsComboList.setFont(setRankComboFont);
 		String[] items = new String[] {};
-		this.setRankComboList.setItems(items);
-		this.setRankComboList.setText(" "); //$NON-NLS-1$
-		this.setRankComboList.setToolTipText(Messages.GemAnalyzer_91);
+		this.setNumProcsComboList.setItems(items);
+		this.setNumProcsComboList.setText(" "); //$NON-NLS-1$
+		this.setNumProcsComboList.setToolTipText(Messages.GemAnalyzer_91);
 		FormData setRankFormData = new FormData();
 		setRankFormData.width = 50;
 		setRankFormData.right = new FormAttachment(this.launchIspUIButton, -5);
 		setRankFormData.bottom = new FormAttachment(100, -5);
-		this.setRankComboList.setLayoutData(setRankFormData);
-		this.setRankComboList.setEnabled(true);
-		setRankItems();
+		this.setNumProcsComboList.setLayoutData(setRankFormData);
+		this.setNumProcsComboList.setEnabled(true);
+		setNumProcItems();
 		updateDropDown();
 
 		// Font for the buttons
@@ -1695,7 +1747,7 @@ public class GemAnalyzer extends ViewPart {
 		this.browseCallsButton.setFont(buttonFont);
 		this.browseLeaksButton.setFont(buttonFont);
 		this.examineErrorsButton.setFont(buttonFont);
-		this.setRankComboList.setFont(buttonFont);
+		this.setNumProcsComboList.setFont(buttonFont);
 	}
 
 	/*
@@ -1982,13 +2034,13 @@ public class GemAnalyzer extends ViewPart {
 		});
 
 		// Selection listeners for runtime information group buttons
-		this.setRankComboList.addSelectionListener(new SelectionAdapter() {
+		this.setNumProcsComboList.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (setRankComboList.getText() == null) {
+				if (setNumProcsComboList.getText() == null) {
 					return;
 				} else {
-					String nprocsStr = setRankComboList.getItems()[setRankComboList
+					String nprocsStr = setNumProcsComboList.getItems()[setNumProcsComboList
 							.getSelectionIndex()];
 					int newNumProcs = Integer.parseInt(nprocsStr);
 
@@ -2053,10 +2105,12 @@ public class GemAnalyzer extends ViewPart {
 			}
 		});
 
-		this.endEarlyButton.addSelectionListener(new SelectionAdapter() {
+		this.terminateButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// TODO Add code to kill ISP here
+				GemUtilities.killProcess();
+				aborted = true;
+				Display.getDefault().syncExec(analyzerUpdateThread);
 			}
 		});
 	}

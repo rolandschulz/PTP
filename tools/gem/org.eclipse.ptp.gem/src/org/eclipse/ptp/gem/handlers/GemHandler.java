@@ -146,7 +146,7 @@ public class GemHandler extends AbstractHandler {
 				GemUtilities.logError(Messages.GemHandler_18, pie);
 			}
 
-			String logFilePath = GemUtilities.getLogFile(sourceFilePath);
+			String logFilePath = GemUtilities.getLogFilePathAndName(sourceFilePath);
 
 			// Open the Analyzer View
 			try {
