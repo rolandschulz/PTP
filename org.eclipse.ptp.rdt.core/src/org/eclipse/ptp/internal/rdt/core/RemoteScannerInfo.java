@@ -45,7 +45,14 @@ public class RemoteScannerInfo implements IScannerInfo, Serializable {
 	 */
 	public RemoteScannerInfo(IScannerInfo scannerInfo) {
 		symbols = new HashMap<String, String>(scannerInfo.getDefinedSymbols());
-		includePaths = new ArrayList<String>(Arrays.asList(scannerInfo.getIncludePaths()));
+		String[] includePathsArray = scannerInfo.getIncludePaths();
+		
+		for(int k = 0; k < includePathsArray.length; k++) {
+			// HACK: convert backslashes to slashes to compensate for CDT bug 315632
+			includePathsArray[k] = includePathsArray[k].replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		includePaths = new ArrayList<String>(Arrays.asList(includePathsArray));
 	}
 	
 	
@@ -57,8 +64,15 @@ public class RemoteScannerInfo implements IScannerInfo, Serializable {
 		this();
 		if(macroDefinitions != null)
 			symbols = macroDefinitions;
-		if(includes != null)
-			includePaths = includes;
+		if(includes != null) {
+			//includePaths = includes;
+			includePaths.clear();
+			
+			for(String includePath : includes) {
+				// HACK: convert backslashes to slashes to compensate for CDT bug 315632
+				includePaths.add(includePath.replaceAll("\\\\", "/")); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
 	}
 	
 
