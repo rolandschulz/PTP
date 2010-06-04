@@ -16,8 +16,7 @@ import java.util.ResourceBundle;
 public class Messages {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.proxy.messages.messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-			.getBundle(BUNDLE_NAME);
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	public static String AbstractProxyClient_0;
 	public static String AbstractProxyClient_1;
@@ -35,8 +34,6 @@ public class Messages {
 	public static String AbstractProxyRuntimeClient_8;
 	public static String AbstractProxyRuntimeClient_9;
 	public static String AbstractProxyRuntimeServer_0;
-	public static String AbstractProxyRuntimeServer_1;
-	public static String AbstractProxyRuntimeServer_2;
 	public static String ElementIDGenerator_0;
 	public static String ProxyPacket_0;
 	public static String ProxyPacket_1;
