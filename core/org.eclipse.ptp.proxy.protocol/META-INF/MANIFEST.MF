@@ -4,16 +4,16 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.proxy.protocol
 Bundle-Version: 4.0.0.qualifier
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.proxy.client;uses:="org.eclipse.ptp.proxy.event,org.eclipse.ptp.proxy.util",
+Export-Package: org.eclipse.ptp.proxy.client,
  org.eclipse.ptp.proxy.command,
  org.eclipse.ptp.proxy.debug.client,
  org.eclipse.ptp.proxy.debug.command,
  org.eclipse.ptp.proxy.debug.event,
- org.eclipse.ptp.proxy.event;uses:="org.eclipse.ptp.proxy.util,org.eclipse.ptp.proxy.command",
+ org.eclipse.ptp.proxy.event,
  org.eclipse.ptp.proxy.packet,
- org.eclipse.ptp.proxy.runtime.client;uses:="org.eclipse.ptp.proxy.event,org.eclipse.ptp.proxy.client,org.eclipse.ptp.proxy.runtime.event",
+ org.eclipse.ptp.proxy.runtime.client,
  org.eclipse.ptp.proxy.runtime.command,
- org.eclipse.ptp.proxy.runtime.event;uses:="org.eclipse.ptp.proxy.event,org.eclipse.ptp.proxy.util",
+ org.eclipse.ptp.proxy.runtime.event,
  org.eclipse.ptp.proxy.runtime.server,
  org.eclipse.ptp.proxy.server,
  org.eclipse.ptp.proxy.util
