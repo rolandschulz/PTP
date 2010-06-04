@@ -593,34 +593,32 @@ public class RemoteCHViewPart extends ViewPart {
 	private void openElement(CHNode node) {
 		if (node != null && !node.isMultiDef()) {
     		ICElement elem= node.getRepresentedDeclaration();
-    		if (elem != null) {
-    			try {
-    				CModel model = CModelManager.getDefault().getCModel();
-    				ICProject cproject = model.findCProject(elem.getCProject().getProject());
-    				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), cproject);
-    				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
-    					ISourceReference sr = (ISourceReference) elem;
-    					int offset = sr.getSourceRange().getIdStartPos();
-    					int length = sr.getSourceRange().getIdLength();
-    					
-    					if(offset >= 0 && length >= 0) {
-    						((ITextEditor)editor).selectAndReveal(offset, length);
-    					}
-    				} 
-    			} catch (PartInitException e) {
-    				CUIPlugin.log(e);
-    			} catch (CModelException e) {
-    				CUIPlugin.log(e);
-    			}
-    			
-//    			IWorkbenchPage page= getSite().getPage();
-//    			try {
-//					EditorOpener.open(page, elem);
-//				} catch (CModelException e) {
-//					CUIPlugin.log(e);
-//				}
-    		}
+    		openElement(elem);
     	}
+	}
+	
+	private void openElement(ICElement elem) {		
+		if (elem != null) {
+			try {
+				CModel model = CModelManager.getDefault().getCModel();
+				ICProject cproject = model.findCProject(elem.getCProject().getProject());
+				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), cproject);
+				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
+					ISourceReference sr = (ISourceReference) elem;
+					int offset = sr.getSourceRange().getIdStartPos();
+					int length = sr.getSourceRange().getIdLength();
+					
+					if(offset >= 0 && length >= 0) {
+						((ITextEditor)editor).selectAndReveal(offset, length);
+					}
+				} 
+			} catch (PartInitException e) {
+				CUIPlugin.log(e);
+			} catch (CModelException e) {
+				CUIPlugin.log(e);
+			}
+
+		}
 	}
 
     protected void onNextOrPrevious(boolean forward) {
@@ -783,14 +781,12 @@ public class RemoteCHViewPart extends ViewPart {
         			CHReferenceInfo ref= fNavigationNode.getReference(fNavigationDetail);
         			Region region= new Region(ref.getOffset(), ref.getLength());
         			//EditorOpener.open(page, file, region, timestamp);
-        			EditorOpener.openExternalFile(page, file.getLocationURI(), region, timestamp, file);
+        			CModel model = CModelManager.getDefault().getCModel();
+    				ICProject cproject = model.findCProject(file.getCProject().getProject());
+        			EditorOpener.openExternalFile(page, file.getLocationURI(), region, timestamp, cproject);
         		}
         		else {
-        			try {
-        				EditorOpener.open(page, fNavigationNode.getRepresentedDeclaration());
-        			} catch (CModelException e) {
-        				CUIPlugin.log(e);
-        			}
+        			openElement(fNavigationNode.getRepresentedDeclaration());
         		}
         	}
         }

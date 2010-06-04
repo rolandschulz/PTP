@@ -841,10 +841,10 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	}
 
 	private void openElement(ICElement elem) {
-		CModel model = CModelManager.getDefault().getCModel();
-		ICProject cproject = model.findCProject(elem.getCProject().getProject());
 		if (elem != null) {
 			try {
+				CModel model = CModelManager.getDefault().getCModel();
+				ICProject cproject = model.findCProject(elem.getCProject().getProject());
 				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), cproject);
 				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
 					ISourceReference sr = (ISourceReference) elem;
