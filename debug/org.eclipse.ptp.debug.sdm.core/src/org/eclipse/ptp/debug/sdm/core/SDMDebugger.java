@@ -441,7 +441,7 @@ public class SDMDebugger implements IPDebugger {
 			} catch (CoreException e) {
 				throw newCoreException(e.getLocalizedMessage());
 			}
-			subMon.subTask("Writing routing file...");
+			subMon.subTask(Messages.SDMDebugger_6);
 			PrintWriter pw = new PrintWriter(os);
 			final IPJob pJob = launch.getPJob();
 			BitSet processJobRanks = pJob.getProcessJobRanks();
@@ -453,11 +453,11 @@ public class SDMDebugger implements IPDebugger {
 				String nodeId = pJob.getProcessNodeId(processIndex);
 				IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
 				if (node == null) {
-					subMon.subTask("Waiting for job information...");
+					subMon.subTask(Messages.SDMDebugger_10);
 				}
 				while (node == null && !subMon.isCanceled()) {
 					try {
-						wait(100);
+						wait(3000);
 					} catch (InterruptedException e) {
 						// ignore
 					}

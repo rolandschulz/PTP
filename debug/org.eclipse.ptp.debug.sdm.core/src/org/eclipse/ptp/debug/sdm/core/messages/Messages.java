@@ -39,7 +39,6 @@ public class Messages extends NLS {
 	public static String PDIDebugger_20;
 	public static String PDIDebugger_21;
 	public static String PDIDebugger_22;
-	public static String PDIDebugger_23;
 	public static String PDIDebugger_24;
 	public static String PDIDebugger_25;
 	public static String PDIDebugger_26;
@@ -66,6 +65,8 @@ public class Messages extends NLS {
 	public static String ProxyDebugClient_1;
 	public static String SDMDebugger_0;
 	public static String SDMDebugger_1;
+
+	public static String SDMDebugger_10;
 	public static String SDMDebugger_2;
 	public static String SDMDebugger_3;
 	public static String SDMDebugger_4;
@@ -78,6 +79,8 @@ public class Messages extends NLS {
 	public static String SDMDebugger_13;
 	public static String SDMDebugger_14;
 	public static String SDMDebugger_15;
+
+	public static String SDMDebugger_6;
 	public static String SDMEvaluateExpressionRequest_0;
 	public static String SDMEvaluatePartialExpressionRequest_0;
 	public static String SDMEventManager_0;
