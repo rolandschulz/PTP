@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+ Copyright (c) 2010 IBM Corporation and others.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+ 
+ Contributors:
+   IBM - Initial API and implementation
+-->
+
+<!--
+ Script for generating the PBS server packages.  To be run with
+ PTP master build and not standalone.
+-->
+
+<project name="PBS Server" default="server.all" basedir=".">
+	<tstamp/>
+	<property name="serverBasename" value="${basedir}/pbs_proxy"/>
+	<property name="serverVersion" value="4.0.0"/>
+	<property name="downloads" value="${basedir}/downloads"/>
+	<property name="remoteServerTempDir" value="${basedir}/rdt-server"/>
+	
+	<!-- JDT VERSIONS MUST BE UPDATED FOR NEW JDT VERSION -->
+	<property name="jdtUIVersion" value="3.6.0.v20100527-1500"/>
+	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
+	
+	<target name="server.all" depends="jar.remote"/>
+	
+	<target name="build.jars" depends="server.all"/>
+    <target name="gather.bin.parts" depends="server.all"/>
+
+	<target name="compile.all">
+		<!--Compile rdt.core.remotejars and rdt.core.stubs-->
+		<mkdir dir="${basedir}/build"/>
+		<javac srcdir="src/org/eclipse/ptp/internal/rdt/core/jardesc"
+				destdir="${basedir}/build"
+				source="1.5"
+				target="1.5"
+	  	/>		
+	</target>
+	
+	<target name="clean" depends="clean.except.jars"/>
+	
+	<target name="clean.except.jars">
+		<delete dir="${remoteServerTempDir}"/>
+		<delete dir="${platformTempDir}"/>
+	</target>
+	
+	<target name="prepare.remote.jar">
+		<delete dir="${remoteServerTempDir}"/>
+		
+		<!-- Add the Jar-in-jar loader to the server -->
+		<unzip src="${basedir}/../../eclipse/plugins/${jdtUIJar}" dest="${downloads}">
+			<patternset>
+				<include name="jar-in-jar-loader.zip"/>	
+			</patternset>
+		</unzip>
+		<unzip src="${downloads}/jar-in-jar-loader.zip" dest="${remoteServerTempDir}"/>
+	</target>
+		
+	<target name="assemble.remote">
+		<!-- Copy over the RDT JARs and their dependencies -->
+		<copy todir="${remoteServerTempDir}" >
+			<fileset dir="${basedir}">
+				<include name="cdtminer.jar"/>
+				<include name="cdtmodel.jar"/>
+				<include name="cdtparser.jar"/>
+				<include name="stubs.jar"/>
+				<include name="lrparser.jar"/>
+				<include name="upcparser.jar"/>
+				<include name="xlcparser.jar"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${remoteServerTempDir}">
+			<fileset dir="${platformTempDir}/eclipse/plugins">
+				<include name="${coreRuntimeJar}"/>
+				<include name="${filesystemJar}"/>
+				<include name="${equinoxJar}"/>
+				<include name="${icuBaseJar}"/>
+			</fileset>
+		</copy>
+		
+		<touch file="${remoteServerTempDir}/rdtserver_version.dat"/>
+		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${ptpVersion}-${timestamp}</concat>
+	</target>
+	
+	<target name="jar.remote" depends="prepare.remote.jar">
+		<jar destfile="${serverBasename}.jar" basedir="${serverBasename}">
+			<manifest>
+				<attribute name="Rsrc-Class-Path" value="./"/>
+				<attribute name="Class-Path" value="."/>
+				<attribute name="Rsrc-Main-Class" value="org.eclipse.ptp.rm.pbs.jproxy.PBSProxyRuntimeServer"/>
+				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+			</manifest>
+		</jar>
+		
+		<copy file="${serverBasename}.jar" 
+			todir="${basedir}/../org.eclipse.ptp.rm.pbs.jproxy"/>
+				
+		<delete dir="${remoteServerTempDir}"/>
+	</target>
+	
+	<target name="all.remote">
+		<antcall target="jar.remote"/>
+	</target>
+</project>

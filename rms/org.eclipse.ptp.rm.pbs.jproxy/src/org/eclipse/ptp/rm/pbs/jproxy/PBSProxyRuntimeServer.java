@@ -19,11 +19,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
+import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer;
 import org.eclipse.ptp.proxy.runtime.server.ElementIDGenerator;
@@ -51,26 +53,55 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	private static final String debugUser = "xli"; //$NON-NLS-1$
 
 	public static void main(String[] args) {
-		System.err.println(PBSProxyRuntimeServer.class.getSimpleName());
-
-		// try {
-		// System.err.println("PBSProxyRuntimeServer sleeps...");
-		// Thread.currentThread().sleep(3000);
-		// System.err.println("PBSProxyRuntimeServer continues...");
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// };
-
-		for (String arg : args) {
-			System.out.println(arg);
-		}
-
 		Map<String, Object> params = parseArguments(args);
-		if (params == null) {
+		String host = (String) params.get("host"); //$NON-NLS-1$
+		if (host == null) {
+			System.err.println("host argument missing");
 			return;
 		}
-		new PBSProxyRuntimeServer((String) params.get("host"), (Integer) params //$NON-NLS-1$
-				.get("port")); //$NON-NLS-1$
+		int port = 0;
+		Integer portVal = ((Integer) params.get("port")); //$NON-NLS-1$
+		if (portVal == null) {
+			System.err.println("port argument missing");
+			return;
+		}
+		port = portVal.intValue();
+
+		PBSProxyRuntimeServer server = new PBSProxyRuntimeServer(host, port);
+
+		try {
+			server.connect();
+			System.out.println(PBSProxyRuntimeServer.class.getSimpleName() + " started");
+			server.start();
+		} catch (IOException e) {
+			System.err.println("Failed to start: " + e.getMessage());
+			return;
+		}
+	}
+
+	/**
+	 * @since 4.0
+	 */
+	protected static Map<String, Object> parseArguments(String args[]) {
+		Map<String, Object> argsMap = new HashMap<String, Object>();
+
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].startsWith("--port")) { //$NON-NLS-1$
+				try {
+					int port = new Integer(args[i].substring(7));
+					argsMap.put("port", port); //$NON-NLS-1$
+				} catch (NumberFormatException e) {
+					System.err.println(Messages.AbstractProxyRuntimeServer_0 + args[i + 1].substring(7));
+				}
+			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
+				String host = args[i].substring(7);
+				if (host != null) {
+					argsMap.put("host", host); //$NON-NLS-1$
+				}
+			}
+		}
+
+		return argsMap;
 	}
 
 	private static String normalize(String content) {
@@ -143,10 +174,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		int resourceManagerID = ElementIDGenerator.getInstance().getBaseID();
 
 		try {
-			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(
-					transID,
-					new String[] { Integer.toString(resourceManagerID),
-							"1", Integer.toString(dummyMachineID), //$NON-NLS-1$
+			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(transID,
+					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(dummyMachineID), //$NON-NLS-1$
 							"2", //$NON-NLS-1$
 							"machineState=UP", //$NON-NLS-1$
 							"name=PBSdummy" //$NON-NLS-1$
@@ -224,8 +253,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 						}
 						;
 					}
-					System.err.println(Messages
-							.getString("PBSProxyRuntimeServer.0")); //$NON-NLS-1$
+					System.err.println(Messages.getString("PBSProxyRuntimeServer.0")); //$NON-NLS-1$
 				}
 
 				// private String escape(String input, String what, String with)
@@ -308,8 +336,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					sendEvent(getEventFactory().newOKEvent(transID));
 				} else {
 					// if error get error messaes from stderr
-					BufferedReader err = new BufferedReader(
-							new InputStreamReader(p.getErrorStream()));
+					BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 					String line, errMsg = ""; //$NON-NLS-1$
 					while ((line = err.readLine()) != null) {
 						errMsg += line;
@@ -318,11 +345,14 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 							"errorCode=" + 0, //$NON-NLS-1$
 							// p.exitValue()
 							"errorMsg=" + errMsg }; //$NON-NLS-1$ 
-					sendEvent(getEventFactory()
-							.newProxyRuntimeSubmitJobErrorEvent(transID,
-									errArgs)); // TODO: document in wiki -
-												// following here
-												// proxy_event:proxy_submitjob_error_event
+					sendEvent(getEventFactory().newProxyRuntimeSubmitJobErrorEvent(transID, errArgs)); // TODO:
+																										// document
+																										// in
+																										// wiki
+																										// -
+																										// following
+																										// here
+																										// proxy_event:proxy_submitjob_error_event
 					System.out.println("submitJob: err: " + errMsg); //$NON-NLS-1$
 				}
 			} catch (IOException e1) { // sendEvent, readLine
@@ -330,12 +360,10 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			}
 
 		} catch (IOException e) { // exec
-			String errArgs[] = {
-					"jobSubId=" + jobSubId, "errorCode=" + 0, "errorMsg=" + e.getMessage() }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String errArgs[] = { "jobSubId=" + jobSubId, "errorCode=" + 0, "errorMsg=" + e.getMessage() }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			try {
 				System.out.println("SubmitJobError: " + e.getMessage()); //$NON-NLS-1$
-				sendEvent(getEventFactory().newProxyRuntimeSubmitJobErrorEvent(
-						transID, errArgs));
+				sendEvent(getEventFactory().newProxyRuntimeSubmitJobErrorEvent(transID, errArgs));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -367,8 +395,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		//
 		int id = Integer.parseInt(arguments[0].split("=")[1]); //$NON-NLS-1$
 		IElement job = jobController.currentElements.getElementByElementID(id);
-		System.out
-				.println(Messages.getString("PBSProxyRuntimeServer.25") + id + "," + job.getKey()); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println(Messages.getString("PBSProxyRuntimeServer.25") + id + "," + job.getKey()); //$NON-NLS-1$ //$NON-NLS-2$
 		String args[] = { "qdel", job.getKey() }; //$NON-NLS-1$
 		try {
 			Process p = Runtime.getRuntime().exec(args);
@@ -382,8 +409,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				while ((line = err.readLine()) != null) {
 					errMsg += line;
 				}
-				String errArgs[] = {
-						"errorCode=" + p.exitValue(), "errorMsg=" + errMsg }; //$NON-NLS-1$ //$NON-NLS-2$
+				String errArgs[] = { "errorCode=" + p.exitValue(), "errorMsg=" + errMsg }; //$NON-NLS-1$ //$NON-NLS-2$
 				sendEvent(getEventFactory().newErrorEvent(transID, errArgs));
 			}
 			System.out.println(p.exitValue());

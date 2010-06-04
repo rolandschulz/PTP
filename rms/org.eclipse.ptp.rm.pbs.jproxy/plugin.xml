@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+    <extension
+           point="org.eclipse.ptp.remote.core.remoteServer">
+        <remoteServer
+              class="org.eclipse.ptp.rm.pbs.jproxy.server.PBSProxyServerRunner"
+              id="org.eclipse.ptp.rm.pbs.PBSProxyServer"
+              launchCommand="java -Xms64m -Xmx128m -Xss2m -jar ${payload} ${args}"
+              name="%PBSProxyServer.name"
+              payload="pbs_proxy.jar">
+        </remoteServer>
+     </extension>
+</plugin>

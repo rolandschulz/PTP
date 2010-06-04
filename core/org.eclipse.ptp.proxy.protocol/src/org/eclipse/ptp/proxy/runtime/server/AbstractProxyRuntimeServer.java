@@ -14,15 +14,12 @@
 package org.eclipse.ptp.proxy.runtime.server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.command.IProxyCommandListener;
 import org.eclipse.ptp.proxy.command.IProxyQuitCommand;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
-import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
@@ -34,40 +31,6 @@ import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.server.AbstractProxyServer;
 
 public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer implements IProxyCommandListener {
-
-	/**
-	 * @since 4.0
-	 */
-	protected static Map<String, Object> parseArguments(String args[]) {
-		int port = -1;
-		String host = null;
-
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith("--port")) { //$NON-NLS-1$
-				try {
-					port = new Integer(args[i].substring(7));
-				} catch (NumberFormatException e) {
-					System.err.println(Messages.AbstractProxyRuntimeServer_0 + args[i + 1].substring(7));
-				}
-			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
-				host = args[i].substring(7);
-			}
-		}
-
-		if (port == -1) {
-			System.err.println(Messages.AbstractProxyRuntimeServer_1);
-			return null;
-		}
-		if (host == null) {
-			System.err.println(Messages.AbstractProxyRuntimeServer_2);
-			return null;
-		}
-
-		Map<String, Object> ret = new HashMap<String, Object>();
-		ret.put("port", port); //$NON-NLS-1$
-		ret.put("host", host); //$NON-NLS-1$
-		return ret;
-	}
 
 	/*
 	 * Event queue for incoming events.
@@ -103,14 +66,6 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 		super(host, port, new ProxyRuntimeCommandFactory());
 		fEventFactory = eventFactory;
 		addListener(this);
-
-		try {
-			connect();
-			start();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
 	}
 
 	/**
