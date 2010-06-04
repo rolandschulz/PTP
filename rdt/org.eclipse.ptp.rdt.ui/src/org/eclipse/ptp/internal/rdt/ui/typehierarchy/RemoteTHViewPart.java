@@ -31,6 +31,8 @@ import org.eclipse.cdt.core.model.IMethodDeclaration;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.util.CElementBaseLabels;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
+import org.eclipse.cdt.internal.core.model.CModel;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
@@ -839,9 +841,11 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 	}
 
 	private void openElement(ICElement elem) {
+		CModel model = CModelManager.getDefault().getCModel();
+		ICProject cproject = model.findCProject(elem.getCProject().getProject());
 		if (elem != null) {
 			try {
-				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), elem);
+				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), cproject);
 				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
 					ISourceReference sr = (ISourceReference) elem;
 					int offset = sr.getSourceRange().getIdStartPos();
