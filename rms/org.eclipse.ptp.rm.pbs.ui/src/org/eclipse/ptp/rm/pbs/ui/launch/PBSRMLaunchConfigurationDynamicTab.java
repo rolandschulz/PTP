@@ -577,10 +577,11 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	public RMLaunchValidation performApply(
 			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
 			IPQueue queue) {
-		if (templateChangeListener.isEnabled()) {
-			// should not be null
-			dataSource.currentConfigName = configuration.getName();
-			String oldRM = dataSource.lastRMId;
+		// should not be null
+		dataSource.currentConfigName = configuration.getName();
+		String oldRM = dataSource.lastRMId;
+		RMLaunchValidation rmv = super.performApply(configuration, rm, queue);
+		if (templateChangeListener.isEnabled())
 			if (oldRM == null) {
 				PBSResourceManager pbsRM = (PBSResourceManager) rm;
 				IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) pbsRM
@@ -589,8 +590,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 				dataSource.setCurrentTemplate(oldRM);
 				fireTemplateChange();
 			}
-		}
-		return super.performApply(configuration, rm, queue);
+		return rmv;
 	}
 
 	/*
