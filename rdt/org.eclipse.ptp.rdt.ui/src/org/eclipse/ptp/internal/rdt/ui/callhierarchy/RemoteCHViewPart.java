@@ -30,6 +30,8 @@ import org.eclipse.cdt.core.model.IMethod;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.util.CElementBaseLabels;
+import org.eclipse.cdt.internal.core.model.CModel;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.CPluginImages;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHMessages;
@@ -593,7 +595,9 @@ public class RemoteCHViewPart extends ViewPart {
     		ICElement elem= node.getRepresentedDeclaration();
     		if (elem != null) {
     			try {
-    				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), elem);
+    				CModel model = CModelManager.getDefault().getCModel();
+    				ICProject cproject = model.findCProject(elem.getCProject().getProject());
+    				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), cproject);
     				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
     					ISourceReference sr = (ISourceReference) elem;
     					int offset = sr.getSourceRange().getIdStartPos();
