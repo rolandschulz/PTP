@@ -20,6 +20,12 @@
             name="payload"
             readOnly="false">
       </variable>
+      <variable
+            description="args"
+            initialValue="&quot;&quot;"
+            name="args"
+            readOnly="false">
+      </variable>
    </extension>
 
 </plugin>
