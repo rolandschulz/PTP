@@ -805,25 +805,13 @@ public class FileTools implements IRemoteFileTools {
 	 */
 	public void removeDirectory(String dir, IProgressMonitor monitor) throws RemoteOperationException, RemoteConnectionException,
 			CancelException {
-		final SubMonitor subMon = SubMonitor.convert(monitor, 10);
 		try {
 			test();
 			validateRemotePath(dir);
 			IRemotePathTools pathTool = manager.getRemotePathTools();
-			final String path = pathTool.quote(dir, true);
-
 			try {
-				SftpCallable<Integer> c = new SftpCallable<Integer>() {
-					@Override
-					public Integer call() throws SftpException {
-						getChannel().rmdir(path);
-						return 0;
-					}
-				};
-				c.syncCmdInThread(Messages.FileTools_11, subMon.newChild(10));
-			} catch (IOException e) {
-				throw new RemoteOperationException(e);
-			} catch (SftpException e) {
+				executeCommand("rm -rf " + pathTool.quote(dir, true)); //$NON-NLS-1$
+			} catch (RemoteExecutionException e) {
 				throw new RemoteOperationException(e);
 			}
 		} finally {
