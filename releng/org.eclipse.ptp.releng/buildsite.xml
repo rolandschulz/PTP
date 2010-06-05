@@ -3,6 +3,9 @@
    <description url="http://download.eclipse.org/tools/ptp/updates/helios">
       Parallel Tools Platform Helios Update Site
    </description>
+   <feature url="features/org.eclipse.ptp_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp" version="4.0.0.@timeStamp@">
+      <category name="Parallel Tools Platform"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.core_4.0.0.@timeStamp@.jar" id="org.eclipse.ptp.core" version="4.0.0.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
