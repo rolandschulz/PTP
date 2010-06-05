@@ -227,8 +227,9 @@ public class RemoteResourceBrowser extends Dialog {
 			 */
 			String cwd = conn.getWorkingDirectory();
 			IPath initial = findInitialPath(cwd, fInitialPath);
-
-			setRoot(initial.toOSString());
+			
+			//TODO: not platform independent - needs IRemotePath 
+			setRoot(initial.toString());
 
 			fConnection = conn;
 			return true;
