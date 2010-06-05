@@ -19,7 +19,6 @@
 	<tstamp/>
 	<property name="serverBasename" value="${basedir}/pbs_proxy"/>
 	<property name="serverName" value="${serverBasename}.jar"/>
-	<property name="remoteServerTempDir" value="${basedir}/pbs_proxy"/>
 	
 	<!-- JDT VERSIONS MUST BE UPDATED FOR NEW JDT VERSION -->
 	<property name="jdtUIVersion" value="3.6.0.v20100527-1500"/>
@@ -28,16 +27,44 @@
 	<target name="server.all" depends="jar.remote"/>
 	
 	<target name="build.jars" depends="server.all"/>
+	
     <target name="gather.bin.parts" depends="server.all"/>
 
-	<target name="compile.all">
-		<javac srcdir="src/org/eclipse/ptp/rm/pbs/jproxy"
-				destdir="${serverBasename}"
-				source="1.5"
-				target="1.5"
-	  	/>		
-	</target>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src/">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
 	
+    <target name="build" depends="build-project"/>
+	
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src/"/>
+            <classpath refid="org.eclipse.ptp.core.classpath"/>
+        </javac>
+    </target>
+	
+    <target name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+	
+    <target name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+   </target>
+
 	<target name="clean">
 		<delete dir="${serverBasename}"/>
 		<delete file="${serverName}"/>
