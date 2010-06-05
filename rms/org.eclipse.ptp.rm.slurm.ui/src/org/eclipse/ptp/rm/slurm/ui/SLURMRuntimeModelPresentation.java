@@ -35,7 +35,9 @@ public class SLURMRuntimeModelPresentation implements IRuntimeModelPresentation 
 			IElement element = (IElement)object;
 			IPElement pElement = element.getPElement();
 			if (pElement instanceof PProcessUI) {
-				StringAttribute status = pElement.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+				PProcessUI process = (PProcessUI) pElement;
+				//StringAttribute status = pElement.getJob.getAttribute(ProcessAttributes.getStatusAttributeDefinition());
+				StringAttribute status = process.getJob().getAttribute(JobAttributes.getStatusAttributeDefinition());
 				if (status != null) {
 					if (element.isSelected()) {
 						return SLURMModelImages.procSelImages.get(status.getValue());
@@ -65,6 +67,7 @@ public class SLURMRuntimeModelPresentation implements IRuntimeModelPresentation 
 	 * @see org.eclipse.ptp.ui.IRuntimeModelPresentation#getText(java.lang.Object)
 	 */
 	public String getText(Object object) {
+/*		
 		IPElement element = null;
 		if (object instanceof IElement) {
 			element = ((IElement)object).getPElement();
@@ -77,6 +80,7 @@ public class SLURMRuntimeModelPresentation implements IRuntimeModelPresentation 
 				return status.getValue();
 			}
 		}
+*/		
 		return null;
 	}
 
