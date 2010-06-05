@@ -1160,12 +1160,12 @@ sendProcessStateChangeEvent(int trans_id, ptp_job *j, uint16_t slurm_state)
 		
 	get_proc_state_status(slurm_state, &state, &status);
 
-	//m = proxy_process_change_event(trans_id, rangeset_to_string(j->set), 2);
 	sprintf(jobid, "%d", j->ptp_jobid);
-	m = proxy_process_change_event(trans_id, jobid, rangeset_to_string(j->set), 2);
+	//m = proxy_process_change_event(trans_id, jobid, rangeset_to_string(j->set), 2);
+	m = proxy_process_change_event(trans_id, jobid, rangeset_to_string(j->set), 1);
 
 	proxy_add_string_attribute(m, PTP_PROC_STATE_ATTR, state);
-	proxy_add_string_attribute(m, PTP_PROC_STATUS_ATTR, status);
+	//proxy_add_string_attribute(m, PTP_PROC_STATUS_ATTR, status);
 
 	proxy_svr_queue_msg(slurm_proxy, m);
 }
