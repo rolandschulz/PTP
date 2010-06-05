@@ -61,10 +61,6 @@
 	<property name="lpgRuntimeVersion" value="1.1.0.v200803061910"/>
 	<property name="lpgRuntimeJar" value="net.sourceforge.lpg.lpgjavaruntime_${lpgRuntimeVersion}.jar"/>
 	
-	<!-- JDT VERSIONS MUST BE UPDATED FOR NEW JDT VERSION -->
-	<property name="jdtUIVersion" value="3.6.0.v20100527-1500"/>
-	<property name="jdtUIJar" value="org.eclipse.jdt.ui_${jdtUIVersion}.jar"/>
-	
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
 	<property name="rseVersion" value="S-3.2RC3-201005310720"/>
@@ -404,7 +400,10 @@
 		<concat destfile="${remoteServerTempDir}/minerFile.dat" append="true">org.eclipse.ptp.internal.rdt.core.miners.CDTMiner</concat>
 		
 		<!-- Add the Jar-in-jar loader to the server -->
-		<unzip src="${basedir}/../../eclipse/plugins/${jdtUIJar}" dest="${downloads}">
+		<unzip dest="${downloads}">
+			<fileset dir="${basedir}/../../eclipse/plugins">
+				<include name="org.eclipse.jdt.ui_*.jar"/>
+			</fileset>
 			<patternset>
 				<include name="jar-in-jar-loader.zip"/>	
 			</patternset>
