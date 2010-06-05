@@ -11,6 +11,7 @@
  *****************************************************************************/
 package org.eclipse.ptp.utils.ui.swt;
 
+import org.eclipse.ptp.utils.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
@@ -83,9 +84,9 @@ public class ToolKit {
 			String labelString, 
 			String valueString) {
 		Label label = new Label(parent,SWT.NONE);
-		label.setText(labelString + ":");
+		label.setText(labelString + ":"); //$NON-NLS-1$
 		Text text = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
-		if (valueString == null) valueString = "";
+		if (valueString == null) valueString = ""; //$NON-NLS-1$
 		text.setText(valueString);
 		text.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
 		return text;
@@ -159,7 +160,7 @@ public class ToolKit {
 		row.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		Label label = new Label(row, SWT.NONE);
-		label.setText(labelString + ":");
+		label.setText(labelString + ":"); //$NON-NLS-1$
 		
 		Text text = null;
 		if (numRows == 0) {
@@ -176,7 +177,7 @@ public class ToolKit {
 			layout.minimumWidth = SWT.DEFAULT;
 			text.setLayoutData(layout);
 		}
-		if (valueString == null) valueString = "";
+		if (valueString == null) valueString = ""; //$NON-NLS-1$
 		text.setText(valueString);
 
 		return text;
@@ -207,7 +208,7 @@ public class ToolKit {
 		item.setLayout(layout);
 		item.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Text text = new Text(item, SWT.SINGLE | SWT.BORDER);
-		if (valueString == null) valueString = "";
+		if (valueString == null) valueString = ""; //$NON-NLS-1$
 		text.setText(valueString);
 		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Button button = new Button(item, SWT.PUSH);

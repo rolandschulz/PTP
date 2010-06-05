@@ -11,6 +11,7 @@
  *****************************************************************************/
 package org.eclipse.ptp.utils.ui.swt;
 
+import org.eclipse.ptp.utils.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
