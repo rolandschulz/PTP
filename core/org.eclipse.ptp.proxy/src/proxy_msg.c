@@ -431,7 +431,7 @@ proxy_process_msgs(List *msg_list, void (*callback)(proxy_msg *, void *), void *
 	if (msg_list == NULL)
 		return;
 
-	if (! proxy_flow_control_active()) {
+	if (! proxy_get_flow_control()) {
 		while ((m = (proxy_msg *)RemoveFirst(msg_list)) != NULL) {
 			callback(m, data);
 			free_proxy_msg(m);
