@@ -72,11 +72,11 @@ public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements
 	// compare those three against the reqAttributes and give good error message
 	// if there are not in
 	static {
-		xmlTag_AttributeID_Map.put("job_id", JOB_NAME_ATTR_ID);
+		xmlTag_AttributeID_Map.put("job_id", JOB_NAME_ATTR_ID); //$NON-NLS-1$
 		// xmlTag_AttributeID_Map.put("job_name" , JOB_NAME_ATTR_ID );
-		xmlTag_AttributeID_Map.put("job_owner", "job_owner");
+		xmlTag_AttributeID_Map.put("job_owner", "job_owner"); //$NON-NLS-1$ //$NON-NLS-2$
 		// xmlTag_AttributeID_Map.put("job_state" , );
-		xmlTag_AttributeID_Map.put("queue", "queue");
+		xmlTag_AttributeID_Map.put("queue", "queue"); //$NON-NLS-1$ //$NON-NLS-2$
 		// xmlTag_AttributeID_Map.put("server" , );
 		// xmlTag_AttributeID_Map.put("account_name" , ACCOUNT_NAME_ATTR_ID );
 		// xmlTag_AttributeID_Map.put("checkpoint" , CHECKPOINT_ATTR_ID );
@@ -86,10 +86,10 @@ public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements
 		// xmlTag_AttributeID_Map.put("keep_files" , KEEP_FILES_ATTR_ID );
 		// xmlTag_AttributeID_Map.put("mail_points" , MAIL_POINTS_ATTR_ID );
 		// xmlTag_AttributeID_Map.put("output_path" , OUTPUT_PATH_ATTR_ID );
-		xmlTag_AttributeID_Map.put("rerunable", RERUNNABLE_ATTR_ID);
+		xmlTag_AttributeID_Map.put("rerunable", RERUNNABLE_ATTR_ID); //$NON-NLS-1$
 		// xmlTag_AttributeID_Map.put("submit_args" , );
 
-		xmlTag_AttributeID_Map.put("priority", PRIORITY_ATTR_ID);
+		xmlTag_AttributeID_Map.put("priority", PRIORITY_ATTR_ID); //$NON-NLS-1$
 		// xmlTag_AttributeID_Map.put("ctime" , );
 		// xmlTag_AttributeID_Map.put("mtime" , );
 		// xmlTag_AttributeID_Map.put("qtime" , );
@@ -98,7 +98,7 @@ public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements
 		// xmlTag_AttributeID_Map.put("nodect" , RES_NODECT_ATTR_ID );
 		// xmlTag_AttributeID_Map.put("nodes" , RES_NODES_ATTR_ID );
 		// xmlTag_AttributeID_Map.put("size" , );
-		xmlTag_AttributeID_Map.put("walltime", RES_WALLTIME_ATTR_ID);
+		xmlTag_AttributeID_Map.put("walltime", RES_WALLTIME_ATTR_ID); //$NON-NLS-1$
 	}
 
 	/*

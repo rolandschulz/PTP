@@ -16,7 +16,7 @@ public class PBSProxyServerRunner extends AbstractRemoteServerRunner {
 	private static final String SUCCESS_STRING = "PBSProxyRuntimeServer started"; //$NON-NLS-1$
 
 	public PBSProxyServerRunner() {
-		super("PBS Proxy Server");
+		super("PBS Proxy Server"); //$NON-NLS-1$
 	}
 
 	/*
