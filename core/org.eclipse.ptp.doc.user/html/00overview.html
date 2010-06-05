@@ -5,21 +5,31 @@
 </head>
 <body>
 <h1 id="top">PTP - Overview and Features</h1>
-<p><p>The Parallel Tools Platform (PTP) is a framework for integrating tools to aid the development of parallel applications into Eclipse. The PTP framework provides a range of services to support tools in four main areas:
+<p><p>The Parallel Tools Platform (PTP) extends Eclipse to enabled the development of parallel applications. It is primarily aimed at message passing codes, 
+such as those using MPI, but also provides support for Open MP and Unified Parallel C (UPC) programs. PTP also includes support for Fortran programs. 
+<p>
+PTP provides a range of tools and services to support 
+application development in the following four main areas:
 <ul>
 <li>Runtime tools that allow developers to monitor and control the execution of parallel applications
 <li>Debugging tools for locating runtime errors in parallel applications
 <li>Analysis tools that provide advanced editing, error checking, and programmer assistance for developing parallel applications
-<li>Performance tools for analyzing and optimizing the performance of parallel applications
+<li>A framework for the integration of additional tools, such as performance tools for analyzing and optimizing the performance of parallel applications
 </ul>
 
 <h2>Runtime Tools</h2>
 
-These tools aid the developer in launching and monitoring parallel applications on a range of local and remote systems. PTP provides a parallel model that represents the state of a (possibly remote) parallel system, and the applications running on that system. This model includes the notion of a <i>resource manager</i> which is used to control interaction with the target system. Developers can use the normal Eclipse launch configuration mechanism to specify the system-specifc attributes necessary to launch a parallel job, and monitor the status of the system and job using a number of different views.
+These tools aid the developer in launching and monitoring parallel applications on a range of local and remote systems. PTP provides a parallel model
+that represents the state of a (possibly remote) parallel system, and the applications running on that system. This model includes the notion of 
+a <i>resource manager</i> which is used to control interaction with the target system. Developers can use the normal Eclipse launch configuration 
+mechanism to specify the system-specifc attributes necessary to launch a parallel job, and monitor the status of the system and job using a number of 
+different views.
 
 <h2>Debugging Tools</h2>
 
-PTP provides an integrated parallel debugger that provides a range of basic debugging functions for locating errors in parallel applications. This includes the ability to set breakpoints and control program execution (single step, resume, etc.) across an arbitrary set of application processes. The developer can also drill down into individual process to obtain more detailed information about the process state, variable information, etc.
+PTP provides an integrated parallel debugger that provides a range of basic debugging functions for locating errors in parallel applications. 
+This includes the ability to set breakpoints and control program execution (single step, resume, etc.) across an arbitrary set of application 
+processes. The developer can also drill down into individual process to obtain more detailed information about the process state, variable information, etc.
 
 <h2>Analysis Tools</h2>
 
