@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
-import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer;
 import org.eclipse.ptp.proxy.runtime.server.ElementIDGenerator;
@@ -56,13 +55,13 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		Map<String, Object> params = parseArguments(args);
 		String host = (String) params.get("host"); //$NON-NLS-1$
 		if (host == null) {
-			System.err.println("host argument missing");
+			System.err.println(Messages.getString("PBSProxyRuntimeServer.1")); //$NON-NLS-1$
 			return;
 		}
 		int port = 0;
 		Integer portVal = ((Integer) params.get("port")); //$NON-NLS-1$
 		if (portVal == null) {
-			System.err.println("port argument missing");
+			System.err.println(Messages.getString("PBSProxyRuntimeServer.3")); //$NON-NLS-1$
 			return;
 		}
 		port = portVal.intValue();
@@ -71,10 +70,10 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
 		try {
 			server.connect();
-			System.out.println(PBSProxyRuntimeServer.class.getSimpleName() + " started");
+			System.out.println(PBSProxyRuntimeServer.class.getSimpleName() + Messages.getString("PBSProxyRuntimeServer.4")); //$NON-NLS-1$
 			server.start();
 		} catch (IOException e) {
-			System.err.println("Failed to start: " + e.getMessage());
+			System.err.println(Messages.getString("PBSProxyRuntimeServer.5") + e.getMessage()); //$NON-NLS-1$
 			return;
 		}
 	}
@@ -91,7 +90,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					int port = new Integer(args[i].substring(7));
 					argsMap.put("port", port); //$NON-NLS-1$
 				} catch (NumberFormatException e) {
-					System.err.println(Messages.AbstractProxyRuntimeServer_0 + args[i + 1].substring(7));
+					System.err.println(org.eclipse.ptp.proxy.messages.Messages.AbstractProxyRuntimeServer_0 + args[i + 1].substring(7));
 				}
 			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
 				String host = args[i].substring(7);
@@ -178,7 +177,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			Process p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$
 			p.waitFor();
 			String server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-			server = server.split(" ")[1];
+			server = server.split(" ")[1]; //$NON-NLS-1$
 			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(transID,
 					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(machineID), //$NON-NLS-1$
 							"2", //$NON-NLS-1$
