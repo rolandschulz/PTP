@@ -163,7 +163,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	@Override
 	protected void startEventThread(final int transID) {
 
-		int dummyMachineID = ElementIDGenerator.getInstance().getUniqueID();
+		int machineID = ElementIDGenerator.getInstance().getUniqueID();
 		System.out.println(Messages.getString("PBSProxyRuntimeServer.2")); //$NON-NLS-1$
 
 		// System.err.println(base_ID);
@@ -173,15 +173,23 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		// MACHINES
 		int resourceManagerID = ElementIDGenerator.getInstance().getBaseID();
 
+
 		try {
+			Process p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$
+			p.waitFor();
+			String server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
+			server = server.split(" ")[1];
 			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(transID,
-					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(dummyMachineID), //$NON-NLS-1$
+					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(machineID), //$NON-NLS-1$
 							"2", //$NON-NLS-1$
 							"machineState=UP", //$NON-NLS-1$
-							"name=PBSdummy" //$NON-NLS-1$
+							"name="+server //$NON-NLS-1$
 					}));
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		nodeController = new Controller("pbsnodes -x", // command //$NON-NLS-1$
@@ -194,7 +202,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 																		// whether
 																		// mandatory.
 				new NodeEventFactory(), new XMLReader(), // Parser
-				dummyMachineID // BaseID
+				machineID // BaseID
 		);
 
 		queueController = new Controller("qstat -Q -f -1", // command //$NON-NLS-1$
@@ -341,6 +349,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					while ((line = err.readLine()) != null) {
 						errMsg += line;
 					}
+					err.close();
 					String errArgs[] = { "jobSubId=" + jobSubId, //$NON-NLS-1$
 							"errorCode=" + 0, //$NON-NLS-1$
 							// p.exitValue()
@@ -409,6 +418,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				while ((line = err.readLine()) != null) {
 					errMsg += line;
 				}
+				err.close();
 				String errArgs[] = { "errorCode=" + p.exitValue(), "errorMsg=" + errMsg }; //$NON-NLS-1$ //$NON-NLS-2$
 				sendEvent(getEventFactory().newErrorEvent(transID, errArgs));
 			}
