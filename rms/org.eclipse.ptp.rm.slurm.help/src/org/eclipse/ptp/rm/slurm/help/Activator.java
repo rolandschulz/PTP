@@ -1,4 +1,4 @@
-package org.eclipse.ptp.rm.pbs.help;
+package org.eclipse.ptp.rm.slurm.help;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
