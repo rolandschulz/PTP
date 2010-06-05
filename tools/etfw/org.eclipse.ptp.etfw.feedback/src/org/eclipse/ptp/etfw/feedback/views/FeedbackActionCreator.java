@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009 IBM Corporation.
+ * Copyright (c) 2009,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,9 +25,9 @@ import org.eclipse.ptp.etfw.feedback.Activator;
  */
 public class FeedbackActionCreator {
 	private final boolean traceOn = false;
-	private static final String ATTR_NAME = "name";
-	private static final String ATTR_CLASSNAME = "class";
-	private static final String ATTR_ICON = "icon";
+	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
+	private static final String ATTR_CLASSNAME = "class"; //$NON-NLS-1$
+	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 
 	/**
 	 * Find the eclipse extension (if any) that specifies an optional feedback
@@ -49,7 +49,7 @@ public class FeedbackActionCreator {
 			IExtension extn = extensions[i];
 			String extLabel = extn.getLabel();
 			if (traceOn)
-				System.out.println("Found extension for " + extLabel + "  id=" + extn.getUniqueIdentifier());
+				System.out.println("Found extension for " + extLabel + "  id=" + extn.getUniqueIdentifier()); //$NON-NLS-1$ //$NON-NLS-2$
 			IConfigurationElement[] configElements = extensions[i].getConfigurationElements();
 			for (int j = 0; j < configElements.length; j++) {
 				IConfigurationElement ice = configElements[j];
@@ -59,11 +59,11 @@ public class FeedbackActionCreator {
 				// Could have multiple later??
 				if (traceOn)
 					System.out.println(ice.getAttributeNames());
-				String id = ice.getAttribute("id");// is this the plugin id? no
+				String id = ice.getAttribute("id");// is this the plugin id? no //$NON-NLS-1$
 				String className = ice.getAttribute(ATTR_CLASSNAME);
 				String name = ice.getAttribute(ATTR_NAME);
 				String icon = ice.getAttribute(ATTR_ICON);
-				String actionViewID = ice.getAttribute("viewID");
+				String actionViewID = ice.getAttribute("viewID"); //$NON-NLS-1$
 				if (actionViewID != null) {
 					// if available, viewID specifies that the action extension
 					// is only to be added
@@ -73,7 +73,7 @@ public class FeedbackActionCreator {
 				}
 				String[] ans = ice.getAttributeNames();
 				if (traceOn)
-					System.out.println("class=" + className + "   name=" + name);
+					System.out.println("class=" + className + "   name=" + name); //$NON-NLS-1$ //$NON-NLS-2$
 				// Determine if this action extension is for the view in the
 				// current plugin
 				String nsi = ice.getNamespaceIdentifier();// identifies which
@@ -90,7 +90,7 @@ public class FeedbackActionCreator {
 						return fa;
 					}
 				} catch (CoreException e) {
-					System.out.println("Failed to create class " + className);
+					System.out.println("Failed to create class " + className); //$NON-NLS-1$
 					e.printStackTrace();
 				}
 

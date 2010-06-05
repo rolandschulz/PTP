@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009 IBM Corporation.
+ * Copyright (c) 2009,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.etfw.feedback.Activator;
 import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
+import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
 
 
@@ -53,8 +54,8 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 	 * Use the ctor that allows an arbitrary number of extra columns.
 	 */
 	public FeedbackTreeTableMarkerView(Activator plugin, String markerID) {
-		super(plugin, "XForm", "XForms", attrNames,colNames,widths,
-				markerID, "parent",CREATE_PARENT_NODES);
+		super(plugin, "XForm", "XForms", attrNames,colNames,widths, //$NON-NLS-1$ //$NON-NLS-2$
+				markerID, "parent",CREATE_PARENT_NODES); //$NON-NLS-1$
 		preferenceStore = Activator.getDefault().getPreferenceStore();
 		maintainExpandCollapseState=preferenceStore.getBoolean(PreferenceConstants.P_MAINTAIN_EXPAND_COLLAPSE_STATE);
 
@@ -70,13 +71,13 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 		String filename = marker.getResource().getName();
 		String name=getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_NAME);
 		
-		infoBuffer.append("\nFile name: ").append(filename);
+		infoBuffer.append(Messages.FeedbackTreeTableMarkerView_fileName).append(filename);
 		
-		infoBuffer.append("\nLine number: ").append(getStrAttr(marker,IMarker.LINE_NUMBER));
-		infoBuffer.append("\nName: ").append(name);
+		infoBuffer.append(Messages.FeedbackTreeTableMarkerView_lineNumber).append(getStrAttr(marker,IMarker.LINE_NUMBER));
+		infoBuffer.append(Messages.FeedbackTreeTableMarkerView_name).append(name);
 		String parent=getStrAttr(marker, FeedbackIDs.FEEDBACK_ATTR_PARENT);
-		infoBuffer.append("\nParent (Item type): ").append(parent); 
-		infoBuffer.append("\nDescription: ").append(getStrAttr(marker,FeedbackIDs.FEEDBACK_ATTR_DESC));
+		infoBuffer.append(Messages.FeedbackTreeTableMarkerView_parentItemType).append(parent); 
+		infoBuffer.append(Messages.FeedbackTreeTableMarkerView_description).append(getStrAttr(marker,FeedbackIDs.FEEDBACK_ATTR_DESC));
 		return infoBuffer.toString();
 	}
 	public String getStrAttr(IMarker marker, String attrName) {
@@ -85,14 +86,14 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 		
 		return str;
 		}catch(CoreException e) {
-			System.out.println("Exception getting marker attr in CompilerXFormTreeTableView.getStrAttr() "+e.getMessage());  
-			return "*error*";
+			System.out.println("Exception getting marker attr in CompilerXFormTreeTableView.getStrAttr() "+e.getMessage());   //$NON-NLS-1$
+			return "*error*"; //$NON-NLS-1$
 		}
 		
 	}
 	public String removeSpaces(String s) {
-		  StringTokenizer st = new StringTokenizer(s," ",false);
-		  String t="";
+		  StringTokenizer st = new StringTokenizer(s," ",false); //$NON-NLS-1$
+		  String t=""; //$NON-NLS-1$
 		  while (st.hasMoreElements()) t += st.nextElement();
 		  return t;
 		  }
