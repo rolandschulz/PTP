@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
@@ -87,9 +88,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				fTargetControl.kill(monitor);
 			} catch (CoreException e) {
 			}
-
-			monitor.done();
 		}
+
+		monitor.done();
 	}
 
 	/**
@@ -155,37 +156,37 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (!isOpen()) {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		monitor.beginTask(Messages.RemoteToolsConnection_forwarding, 10);
-		/*
-		 * Start with a different port number, in case we're doing this all on
-		 * localhost.
-		 */
-		int localPort = fwdPort + 1;
-
-		/*
-		 * Try to find a free port on the remote machine. This take a while, so
-		 * allow it to be canceled. If we've tried all ports (which could take a
-		 * very long while) then bail out.
-		 */
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			while (!monitor.isCanceled()) {
+			progress.beginTask(Messages.RemoteToolsConnection_forwarding, 10);
+			/*
+			 * Start with a different port number, in case we're doing this all
+			 * on localhost.
+			 */
+			int localPort = fwdPort + 1;
+
+			/*
+			 * Try to find a free port on the remote machine. This take a while,
+			 * so allow it to be canceled. If we've tried all ports (which could
+			 * take a very long while) then bail out.
+			 */
+			while (!progress.isCanceled()) {
 				try {
 					forwardLocalPort(localPort, fwdAddress, fwdPort);
 				} catch (AddressInUseException e) {
 					if (++localPort == fwdPort) {
 						throw new UnableToForwardPortException(Messages.RemoteToolsConnection_remotePort);
 					}
-					monitor.worked(1);
+					progress.worked(1);
 				}
 				return localPort;
 			}
+			return -1;
 		} finally {
-			monitor.done();
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		return -1;
 	}
 
 	/*
@@ -220,37 +221,36 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (!isOpen()) {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		monitor.beginTask(Messages.RemoteToolsConnection_forwarding, 10);
-		/*
-		 * Start with a different port number, in case we're doing this all on
-		 * localhost.
-		 */
-		int remotePort = fwdPort + 1;
-		/*
-		 * Try to find a free port on the remote machine. This take a while, so
-		 * allow it to be canceled. If we've tried all ports (which could take a
-		 * very long while) then bail out.
-		 */
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			while (!monitor.isCanceled()) {
+			progress.beginTask(Messages.RemoteToolsConnection_forwarding, 10);
+			/*
+			 * Start with a different port number, in case we're doing this all
+			 * on localhost.
+			 */
+			int remotePort = fwdPort + 1;
+			/*
+			 * Try to find a free port on the remote machine. This take a while,
+			 * so allow it to be canceled. If we've tried all ports (which could
+			 * take a very long while) then bail out.
+			 */
+			while (!progress.isCanceled()) {
 				try {
 					forwardRemotePort(remotePort, fwdAddress, fwdPort);
 				} catch (AddressInUseException e) {
 					if (++remotePort == fwdPort) {
 						throw new UnableToForwardPortException(Messages.RemoteToolsConnection_remotePort);
 					}
-					monitor.worked(1);
+					progress.worked(1);
 				}
-				monitor.done();
 				return remotePort;
 			}
+			return -1;
 		} finally {
-			monitor.done();
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		return -1;
 	}
 
 	/*
@@ -417,18 +417,22 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open()
 	 */
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		if (fTargetControl.query() == ITargetStatus.STOPPED) {
-			monitor.beginTask(Messages.RemoteToolsConnection_open, 2);
-			try {
-				fTargetControl.create(monitor);
-			} catch (CoreException e) {
-				throw new RemoteConnectionException(e);
+		SubMonitor progress = SubMonitor.convert(monitor, 2);
+		try {
+			if (!isOpen()) {
+				progress.beginTask(Messages.RemoteToolsConnection_open, 2);
+				try {
+					fTargetControl.kill(progress.newChild(1));
+					fTargetControl.create(progress.newChild(1));
+				} catch (CoreException e) {
+					throw new RemoteConnectionException(e);
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
-		monitor.done();
 	}
 
 	/*
