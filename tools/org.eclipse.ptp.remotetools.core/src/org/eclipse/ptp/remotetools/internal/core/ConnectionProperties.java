@@ -24,9 +24,9 @@ public class ConnectionProperties {
 	private static final String ATTR_LONG_DUTY_CYCLE = "longDutyCycle"; //$NON-NLS-1$
 	private static final String ATTR_FAST_DUTY_CYCLE = "fastDutyCycle"; //$NON-NLS-1$
 	private static final String ATTR_INACTIVITY_THREASHOLD = "inactivityThreashold"; //$NON-NLS-1$
-	private static final String ATTR_DEFAULT_PORT = "defaultPort";
-	private static final String ATTR_DEFAULT_TIMEOUT = "defaultTimeout";
-	private static final String ATTR_INITIAL_DEFAULT_SESSION_LOAD = "initialDefaultSessionLoad";
+	private static final String ATTR_DEFAULT_PORT = "defaultPort"; //$NON-NLS-1$
+	private static final String ATTR_DEFAULT_TIMEOUT = "defaultTimeout"; //$NON-NLS-1$
+	private static final String ATTR_INITIAL_DEFAULT_SESSION_LOAD = "initialDefaultSessionLoad"; //$NON-NLS-1$
 	
 	public static boolean multipleConnection;
 	public static int maxChannelsPerConnection;

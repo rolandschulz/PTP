@@ -41,6 +41,7 @@ public class Messages extends NLS {
 	public static String Connection_ReleaseTunnel_FailedRemoveTunnel;
 	public static String Connection_ReleaseTunnel_PortNotAllocedForTunnel;
 	public static String Connection_SetCipherType_CipherNotSupported;
+	public static String ControlChannel_0;
 	public static String ControlChannel_Debug_ControlConnectionReceived;
 	public static String ControlChannel_Debug_ReceivedControlTerminalPath;
 	public static String ControlChannel_Debug_StartedWaitingControlTerminalPath;
@@ -134,6 +135,7 @@ public class Messages extends NLS {
 	public static String RemoteFileTools_ValidateRemotePath_NotValid;
 	public static String RemoteStatusTools_GetPasswdFields_NoUsernameInPasswdFile;
 	public static String RemoteFileTools_CreateDirectory_FileNameExists;
+	public static String RemotePortForwarding_0;
 	public static String ScriptExecution_StartExecution_FailedInitStreams;
 	public static String UploadExecution_StartExecution_FailedCreateUpload;
 }
