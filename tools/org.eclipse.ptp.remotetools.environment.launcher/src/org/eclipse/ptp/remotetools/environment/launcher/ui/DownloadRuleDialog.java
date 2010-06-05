@@ -436,7 +436,7 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 	}
 
 	private void handleaddFilesButtonEvent() {
-		InputDialog inputDialog = new InputDialog(getShell(), Messages.DownloadRuleDialog_AddFileDialog_Title, Messages.DownloadRuleDialog_AddFileDialog_Message, "", null); //$NON-NLS-3$ //$NON-NLS-1$
+		InputDialog inputDialog = new InputDialog(getShell(), Messages.DownloadRuleDialog_AddFileDialog_Title, Messages.DownloadRuleDialog_AddFileDialog_Message, "", null); //$NON-NLS-3$ //$NON-NLS-1$ //$NON-NLS-1$
 		inputDialog.setBlockOnOpen(true);
 		if (inputDialog.open() == Dialog.OK) {
 			ArrayList list = new ArrayList(Arrays.asList(fileList.getItems()));

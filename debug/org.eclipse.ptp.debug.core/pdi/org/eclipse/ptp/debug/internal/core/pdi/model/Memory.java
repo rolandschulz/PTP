@@ -88,7 +88,7 @@ public class Memory implements IPDIMemory {
 	 */
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(Messages.Memory_1 + addr + "\""); //$NON-NLS-2$ //$NON-NLS-1$
+		buffer.append(Messages.Memory_1 + addr + "\""); //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-1$
 		buffer.append(Messages.Memory_3);
 		for (int i = 0; i < data.length; i++) {
 			if (i != 0) {
@@ -98,7 +98,7 @@ public class Memory implements IPDIMemory {
 		}
 		buffer.append(']');
 		if (ascii.length() > 0) {
-			buffer.append(Messages.Memory_4 + ascii + "\""); //$NON-NLS-2$ //$NON-NLS-1$
+			buffer.append(Messages.Memory_4 + ascii + "\""); //$NON-NLS-2$ //$NON-NLS-1$ //$NON-NLS-1$
 		}
 		return buffer.toString();
 	}

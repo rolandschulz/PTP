@@ -20,6 +20,8 @@ package org.eclipse.ptp.debug.core.event;
 
 import java.util.EventObject;
 
+import org.eclipse.ptp.debug.core.messages.Messages;
+
 /**
  * @author Clement
  */
@@ -41,9 +43,9 @@ public final class PDebugEvent extends EventObject implements IPDebugEvent {
 	public PDebugEvent(Object eventSource, int kind, int detail, IPDebugInfo info) {
 		super(eventSource);
 		if ((kind & (RESUME | SUSPEND | CREATE | TERMINATE | CHANGE | ERROR | PROCESS_SPECIFIC)) == 0)
-			throw new IllegalArgumentException("Debug event illegal kind"); 
+			throw new IllegalArgumentException(Messages.PDebugEvent_0); 
 		if (kind != PROCESS_SPECIFIC && detail != UNSPECIFIED && (detail & (STEP_END | STEP_INTO | STEP_OVER | STEP_RETURN | BREAKPOINT | CLIENT_REQUEST |EVALUATION | EVALUATION_IMPLICIT | STATE | CONTENT | DEBUGGER | REGISTER | ERR_NORMAL | ERR_WARNING | ERR_FATAL)) == 0)
-			throw new IllegalArgumentException("Debug event illegal detail");
+			throw new IllegalArgumentException(Messages.PDebugEvent_1);
 		fKind= kind;
 		fDetail= detail;
 		fInfo = info;
@@ -64,77 +66,77 @@ public final class PDebugEvent extends EventObject implements IPDebugEvent {
 		return (getDetail() & (EVALUATION | EVALUATION_IMPLICIT)) > 0;
 	}	
 	public String toString() {
-		StringBuffer buf = new StringBuffer("DebugEvent[");
+		StringBuffer buf = new StringBuffer("DebugEvent["); //$NON-NLS-1$
 		if (getSource() != null) {
 			buf.append(getSource().toString());
 		} else {
-			buf.append("null");
+			buf.append("null"); //$NON-NLS-1$
 		}
-		buf.append(", ");
+		buf.append(", "); //$NON-NLS-1$
 		switch (getKind()) {
 			case CREATE:
-				buf.append("CREATE");
+				buf.append("CREATE"); //$NON-NLS-1$
 				break;
 			case TERMINATE:
-				buf.append("TERMINATE");
+				buf.append("TERMINATE"); //$NON-NLS-1$
 				break;
 			case RESUME:
-				buf.append("RESUME");
+				buf.append("RESUME"); //$NON-NLS-1$
 				break;
 			case SUSPEND:
-				buf.append("SUSPEND");
+				buf.append("SUSPEND"); //$NON-NLS-1$
 				break;				
 			case CHANGE:
-				buf.append("CHANGE");
+				buf.append("CHANGE"); //$NON-NLS-1$
 				break;
 			case UNSPECIFIED:
-				buf.append("UNSPECIFIED");
+				buf.append("UNSPECIFIED"); //$NON-NLS-1$
 				break;
 			case PROCESS_SPECIFIC:
-				buf.append("PROCESS_SPECIFIC");
+				buf.append("PROCESS_SPECIFIC"); //$NON-NLS-1$
 				break;
 		}
-		buf.append(", ");
+		buf.append(", "); //$NON-NLS-1$
 		switch (getDetail()) {
 			case BREAKPOINT:
-				buf.append("BREAKPOINT");
+				buf.append("BREAKPOINT"); //$NON-NLS-1$
 				break;
 			case CLIENT_REQUEST:
-				buf.append("CLIENT_REQUEST");
+				buf.append("CLIENT_REQUEST"); //$NON-NLS-1$
 				break;
 			case STEP_END:
-				buf.append("STEP_END");
+				buf.append("STEP_END"); //$NON-NLS-1$
 				break;
 			case STEP_INTO:
-				buf.append("STEP_INTO");
+				buf.append("STEP_INTO"); //$NON-NLS-1$
 				break;
 			case STEP_OVER:
-				buf.append("STEP_OVER");
+				buf.append("STEP_OVER"); //$NON-NLS-1$
 				break;
 			case STEP_RETURN:
-				buf.append("STEP_RETURN");
+				buf.append("STEP_RETURN"); //$NON-NLS-1$
 				break;
 			case EVALUATION:
-				buf.append("EVALUATION");
+				buf.append("EVALUATION"); //$NON-NLS-1$
 				break;
 			case EVALUATION_IMPLICIT:
-				buf.append("EVALUATION_IMPLICIT");
+				buf.append("EVALUATION_IMPLICIT"); //$NON-NLS-1$
 				break;								
 			case STATE:
-				buf.append("STATE");
+				buf.append("STATE"); //$NON-NLS-1$
 				break;			
 			case CONTENT:
-				buf.append("CONTENT");
+				buf.append("CONTENT"); //$NON-NLS-1$
 				break;					
 			case UNSPECIFIED:
-				buf.append("UNSPECIFIED");
+				buf.append("UNSPECIFIED"); //$NON-NLS-1$
 				break;
 			default:
 				// model specific
 				buf.append(getDetail());
 				break;
 		}
-		buf.append("]");
+		buf.append("]"); //$NON-NLS-1$
 		return buf.toString();
 	}
 }

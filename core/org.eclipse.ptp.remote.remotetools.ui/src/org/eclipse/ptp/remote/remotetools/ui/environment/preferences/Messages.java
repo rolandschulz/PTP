@@ -27,6 +27,6 @@ public class Messages {
 	public static String PreferencePage_Title;
 
 	static {
-		NLS.initializeMessages("org.eclipse.ptp.remote.remotetools.ui.environment.preferences.messages", Messages.class);
+		NLS.initializeMessages("org.eclipse.ptp.remote.remotetools.ui.environment.preferences.messages", Messages.class); //$NON-NLS-1$
 	}
 }

@@ -16,14 +16,15 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ptp.remotetools.environment.generichost.Activator;
 import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
+import org.eclipse.ptp.remotetools.environment.generichost.messages.Messages;
 import org.eclipse.ptp.remotetools.preferences.ui.AbstractBaseFieldEditorPreferencePage;
 import org.eclipse.ptp.remotetools.preferences.ui.LabelFieldEditor;
 import org.eclipse.ptp.remotetools.preferences.ui.SpacerFieldEditor;
 import org.eclipse.ui.IWorkbench;
 
-
 /**
  * Preference page for the remote target default values for new targets.
+ * 
  * @author Richard Maciel, Daniel Felix Ferber
  * @since 1.2.1
  */
@@ -34,15 +35,16 @@ public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
 
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		setPreferenceStore(store);
-		
+
 		// setDescription must be called here or it wont work
 		setDescription(Messages.PreferencePage_Description);
 	}
 
+	@Override
 	protected void createFieldEditors() {
 		// setTitle must be called here or it wont work
 		setTitle(Messages.PreferencePage_Title);
-		
+
 		addField(new LabelFieldEditor(Messages.PreferencePage_HeaderConnection, getFieldEditorParent()));
 
 		StringFieldEditor addrfield = new StringFieldEditor(ConfigFactory.ATTR_CONNECTION_ADDRESS,
@@ -61,13 +63,14 @@ public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
 		addField(userfield);
 
 		addField(new LabelFieldEditor(Messages.PreferencePage_HeaderLaunch, getFieldEditorParent()));
-		
+
 		StringFieldEditor systemWorkspaceDir = new StringFieldEditor(ConfigFactory.ATTR_SYSTEM_WORKSPACE,
 				Messages.PreferencePage_LabelSystemWorkspace, getFieldEditorParent());
 		systemWorkspaceDir.setEmptyStringAllowed(false);
 		addField(systemWorkspaceDir);
 	}
 
+	@Override
 	public void init(IWorkbench workbench) {
 	}
 
