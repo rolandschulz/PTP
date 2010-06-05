@@ -451,7 +451,7 @@ proxy_set_flow_control(int flag)
 /*
  * Return flag indicating if proxy flow control is active
  */
-int proxy_flow_control_active()
+int proxy_get_flow_control()
 {
 	return proxy_flow_control;
 }
