@@ -18,9 +18,8 @@
 <project name="PBS Server" default="server.all" basedir=".">
 	<tstamp/>
 	<property name="serverBasename" value="${basedir}/pbs_proxy"/>
-	<property name="serverVersion" value="4.0.0"/>
-	<property name="downloads" value="${basedir}/downloads"/>
-	<property name="remoteServerTempDir" value="${basedir}/rdt-server"/>
+	<property name="serverName" value="${serverBasename}.jar"/>
+	<property name="remoteServerTempDir" value="${basedir}/pbs_proxy"/>
 	
 	<!-- JDT VERSIONS MUST BE UPDATED FOR NEW JDT VERSION -->
 	<property name="jdtUIVersion" value="3.6.0.v20100527-1500"/>
@@ -32,78 +31,55 @@
     <target name="gather.bin.parts" depends="server.all"/>
 
 	<target name="compile.all">
-		<!--Compile rdt.core.remotejars and rdt.core.stubs-->
-		<mkdir dir="${basedir}/build"/>
-		<javac srcdir="src/org/eclipse/ptp/internal/rdt/core/jardesc"
-				destdir="${basedir}/build"
+		<javac srcdir="src/org/eclipse/ptp/rm/pbs/jproxy"
+				destdir="${serverBasename}"
 				source="1.5"
 				target="1.5"
 	  	/>		
 	</target>
 	
-	<target name="clean" depends="clean.except.jars"/>
-	
-	<target name="clean.except.jars">
-		<delete dir="${remoteServerTempDir}"/>
-		<delete dir="${platformTempDir}"/>
+	<target name="clean">
+		<delete dir="${serverBasename}"/>
+		<delete file="${serverName}"/>
 	</target>
 	
 	<target name="prepare.remote.jar">
-		<delete dir="${remoteServerTempDir}"/>
+		<delete dir="${serverBasename}"/>
 		
 		<!-- Add the Jar-in-jar loader to the server -->
-		<unzip src="${basedir}/../../eclipse/plugins/${jdtUIJar}" dest="${downloads}">
+		<unzip src="${basedir}/../../eclipse/plugins/${jdtUIJar}" dest="${basedir}">
 			<patternset>
 				<include name="jar-in-jar-loader.zip"/>	
 			</patternset>
 		</unzip>
-		<unzip src="${downloads}/jar-in-jar-loader.zip" dest="${remoteServerTempDir}"/>
+		<unzip src="jar-in-jar-loader.zip" dest="${serverBasename}"/>
+		<delete file="jar-in-jar-loader.zip"/>
 	</target>
 		
 	<target name="assemble.remote">
-		<!-- Copy over the RDT JARs and their dependencies -->
-		<copy todir="${remoteServerTempDir}" >
-			<fileset dir="${basedir}">
-				<include name="cdtminer.jar"/>
-				<include name="cdtmodel.jar"/>
-				<include name="cdtparser.jar"/>
-				<include name="stubs.jar"/>
-				<include name="lrparser.jar"/>
-				<include name="upcparser.jar"/>
-				<include name="xlcparser.jar"/>
+		<copy todir="${serverBasename}">
+			<fileset dir="${basedir}/../org.eclipse.ptp.utils.core">
+				<include name="utils_core.jar"/>
+			</fileset>
+			<fileset dir="${basedir}/../org.eclipse.ptp.proxy.protocol">
+				<include name="proxy_protocol.jar"/>
+			</fileset>
+			<fileset dir="${basedir}/../org.eclipse.ptp.rm.proxy.core">
+				<include name="rm_proxy_core.jar"/>
 			</fileset>
 		</copy>
-		
-		<copy todir="${remoteServerTempDir}">
-			<fileset dir="${platformTempDir}/eclipse/plugins">
-				<include name="${coreRuntimeJar}"/>
-				<include name="${filesystemJar}"/>
-				<include name="${equinoxJar}"/>
-				<include name="${icuBaseJar}"/>
-			</fileset>
-		</copy>
-		
-		<touch file="${remoteServerTempDir}/rdtserver_version.dat"/>
-		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${ptpVersion}-${timestamp}</concat>
 	</target>
 	
-	<target name="jar.remote" depends="prepare.remote.jar">
-		<jar destfile="${serverBasename}.jar" basedir="${serverBasename}">
+	<target name="jar.remote" depends="prepare.remote.jar, assemble.remote">
+		<jar destfile="${serverName}" basedir="${serverBasename}">
 			<manifest>
-				<attribute name="Rsrc-Class-Path" value="./"/>
+				<attribute name="Rsrc-Class-Path" value="."/>
 				<attribute name="Class-Path" value="."/>
 				<attribute name="Rsrc-Main-Class" value="org.eclipse.ptp.rm.pbs.jproxy.PBSProxyRuntimeServer"/>
 				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
 			</manifest>
 		</jar>
 		
-		<copy file="${serverBasename}.jar" 
-			todir="${basedir}/../org.eclipse.ptp.rm.pbs.jproxy"/>
-				
-		<delete dir="${remoteServerTempDir}"/>
-	</target>
-	
-	<target name="all.remote">
-		<antcall target="jar.remote"/>
+		<delete dir="${serverBasename}"/>
 	</target>
 </project>
