@@ -94,6 +94,7 @@
 			<fileset dir="${basedir}/../org.eclipse.ptp.rm.proxy.core">
 				<include name="rm_proxy_core.jar"/>
 			</fileset>
+			<fileset dir="bin"/>
 		</copy>
 	</target>
 	
