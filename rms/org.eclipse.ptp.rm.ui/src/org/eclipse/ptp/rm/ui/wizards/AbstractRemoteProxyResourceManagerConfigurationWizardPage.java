@@ -85,8 +85,7 @@ import org.eclipse.ui.progress.UIJob;
  * Abstract base class for wizard pages used to configure proxy resource
  * managers
  */
-public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
-		extends RMConfigurationWizardPage {
+public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage extends RMConfigurationWizardPage {
 
 	/**
 	 * Job to validate proxyPath. We use a job here so that the input is only
@@ -107,8 +106,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 		}
 	}
 
-	protected class WidgetListener extends SelectionAdapter implements
-			ModifyListener, IPropertyChangeListener {
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -270,13 +268,17 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 */
 	protected Combo localAddrCombo;
 
+	/**
+	 * @since 1.1
+	 */
 	protected boolean proxyPathEnabled = true;
+	/**
+	 * @since 1.1
+	 */
 	protected boolean proxyOptionsEnabled = true;
 
-	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(
-			IRMConfigurationWizard wizard, String title) {
+	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard, String title) {
 		super(wizard, title);
-
 		setPageComplete(false);
 		isValid = false;
 	}
@@ -308,8 +310,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	public void initializeLocalHostCombo() {
 		Set<String> addrs = new TreeSet<String>();
 		try {
-			Enumeration<NetworkInterface> netInterfaces = NetworkInterface
-					.getNetworkInterfaces();
+			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
 			while (netInterfaces.hasMoreElements()) {
 				NetworkInterface ni = netInterfaces.nextElement();
 				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
@@ -418,8 +419,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 * @param mw
 	 * @return the new grid layout
 	 */
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -437,11 +437,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 * @return the proxy options string
 	 */
 	protected String createOptionsDialog(Shell shell, String initialOptions) {
-		InputDialog dialog = new InputDialog(
-				shell,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15,
-				initialOptions, null);
+		InputDialog dialog = new InputDialog(shell, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, initialOptions, null);
 		if (dialog.open() == Dialog.OK)
 			return dialog.getValue();
 		return initialOptions;
@@ -458,8 +455,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 *            the string to identify radio button
 	 * @return the new radio button
 	 */
-	protected Button createRadioButton(Composite parent, String label,
-			String value, SelectionListener listener) {
+	protected Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
 		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
 		button.setData((null == value) ? label : value);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
@@ -475,8 +471,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 * Transfer current settings to text fields
 	 */
 	protected void defaultSetting() {
-		if (proxyPathEnabled)
+		if (proxyPathEnabled) {
 			proxyPathText.setText(proxyPath);
+		}
 	}
 
 	/**
@@ -526,32 +523,27 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 */
 	protected void handleNewRemoteConnectionSelected() {
 		if (uiConnectionManager != null)
-			handleRemoteServiceSelected(uiConnectionManager
-					.newConnection(getShell()));
+			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
 	}
 
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
 	protected void handlePathBrowseButtonSelected() {
-		if (!proxyPathEnabled)
+		if (!proxyPathEnabled) {
 			return;
+		}
 		if (connection != null) {
 			checkConnection();
 			if (connection.isOpen()) {
-				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin
-						.getDefault().getRemoteUIServices(remoteServices);
+				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 				if (remoteUIServices != null) {
-					IRemoteUIFileManager fileMgr = remoteUIServices
-							.getUIFileManager();
+					IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 					if (fileMgr != null) {
 						fileMgr.setConnection(connection);
 						String correctPath = proxyPathText.getText();
-						String selectedPath = fileMgr
-								.browseFile(
-										getShell(),
-										Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16,
-										correctPath, 0);
+						String selectedPath = fileMgr.browseFile(getShell(),
+								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16, correctPath, 0);
 						if (selectedPath != null)
 							proxyPathText.setText(selectedPath.toString());
 					}
@@ -572,19 +564,15 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 *            first item in the list.
 	 */
 	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
-		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault()
-				.getAllRemoteServices();
+		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		int selectionIndex = remoteCombo.getSelectionIndex();
-		if (allRemoteServices != null && allRemoteServices.length > 0
-				&& selectionIndex >= 0) {
+		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >= 0) {
 			remoteServices = allRemoteServices[selectionIndex];
 			connectionManager = remoteServices.getConnectionManager();
-			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault()
-					.getRemoteUIServices(remoteServices);
+			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 			if (remUIServices != null)
 				uiConnectionManager = remUIServices.getUIConnectionManager();
-			IRemoteConnection[] connections = connectionManager
-					.getConnections();
+			IRemoteConnection[] connections = connectionManager.getConnections();
 			Arrays.sort(connections, new Comparator<IRemoteConnection>() {
 				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
 					return c1.getName().compareToIgnoreCase(c2.getName());
@@ -620,8 +608,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 * routine when the default index is selected.
 	 */
 	protected void initializeRemoteServicesCombo() {
-		IRemoteServices[] allServices = PTPRemoteCorePlugin.getDefault()
-				.getAllRemoteServices();
+		IRemoteServices[] allServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
 		IRemoteServices defServices;
 		if (remoteServices != null)
 			defServices = remoteServices;
@@ -756,8 +743,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 * @since 1.1
 	 */
 	protected boolean validateProxyPath() {
-		if (!proxyPathEnabled)
+		if (!proxyPathEnabled) {
 			return true;
+		}
 		proxyPathIsValid = false;
 		final String path = proxyPathText.getText();
 		if (path != null)
@@ -765,19 +753,14 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 				checkConnection();
 				if (connection.isOpen())
 					if (remoteServices != null) {
-						final IRemoteFileManager fileMgr = remoteServices
-								.getFileManager(connection);
+						final IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
 						if (fileMgr != null) {
 							IRunnableWithProgress op = new IRunnableWithProgress() {
-								public void run(IProgressMonitor monitor)
-										throws InvocationTargetException,
-										InterruptedException {
+								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 									try {
-										IFileStore file = fileMgr
-												.getResource(path);
+										IFileStore file = fileMgr.getResource(path);
 										if (!monitor.isCanceled())
-											proxyPathIsValid = file.fetchInfo(
-													EFS.NONE, monitor).exists();
+											proxyPathIsValid = file.fetchInfo(EFS.NONE, monitor).exists();
 									} catch (CoreException e) {
 										throw new InvocationTargetException(e);
 									}
@@ -785,8 +768,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 
 							};
 							try {
-								ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-										getShell());
+								ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
 								dialog.setOpenOnRun(false);
 								dialog.run(true, true, op);
 							} catch (InvocationTargetException e) {
@@ -806,13 +788,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	private void checkConnection() {
 		if (!connection.isOpen()) {
 			IRunnableWithProgress op = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor)
-						throws InvocationTargetException, InterruptedException {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						connection.open(monitor);
 						if (monitor.isCanceled())
-							throw new InterruptedException(
-									Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_0);
+							throw new InterruptedException(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_0);
 					} catch (RemoteConnectionException e) {
 						throw new InvocationTargetException(e);
 					}
@@ -822,21 +802,13 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 			try {
 				new ProgressMonitorDialog(getShell()).run(true, true, op);
 			} catch (InvocationTargetException e) {
-				ErrorDialog
-						.openError(
-								getShell(),
-								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_1,
-								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2,
-								new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID,
-										e.getCause().getMessage()));
+				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_1,
+						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2, new Status(IStatus.ERROR,
+								RMUIPlugin.PLUGIN_ID, e.getCause().getMessage()));
 			} catch (InterruptedException e) {
-				ErrorDialog
-						.openError(
-								getShell(),
-								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3,
-								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2,
-								new Status(IStatus.ERROR, RMUIPlugin.PLUGIN_ID,
-										e.getMessage()));
+				ErrorDialog.openError(getShell(), Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_3,
+						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_2, new Status(IStatus.ERROR,
+								RMUIPlugin.PLUGIN_ID, e.getMessage()));
 			}
 		}
 	}
@@ -888,14 +860,10 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 		gd.horizontalSpan = 2;
 		connectionCombo.setLayoutData(gd);
 
-		newConnectionButton = SWTUtil
-				.createPushButton(
-						remoteComp,
-						Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_6,
-						null);
+		newConnectionButton = SWTUtil.createPushButton(remoteComp,
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_6, null);
 
 		if (proxyPathEnabled) {
-
 			/*
 			 * Proxy path
 			 */
@@ -913,11 +881,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 			proxyPathText.setLayoutData(gd);
 			proxyPathText.addModifyListener(listener);
 
-			browseButton = SWTUtil
-					.createPushButton(
-							remoteComp,
-							Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8,
-							null);
+			browseButton = SWTUtil.createPushButton(remoteComp,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_8, null);
 			browseButton.addSelectionListener(listener);
 
 		}
@@ -926,11 +891,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 			/*
 			 * Proxy options
 			 */
-			optionsButton = SWTUtil
-					.createPushButton(
-							remoteComp,
-							Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9,
-							null);
+			optionsButton = SWTUtil.createPushButton(remoteComp,
+					Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_9, null);
 			optionsButton.addSelectionListener(listener);
 
 		}
@@ -943,9 +905,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		mxGroup.setText(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_10);
 
-		noneButton = createRadioButton(
-				mxGroup,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11,
+		noneButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_11,
 				"mxGroup", listener); //$NON-NLS-1$
 		noneButton.addSelectionListener(listener);
 
@@ -972,9 +932,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 		gd.horizontalSpan = 1;
 		localAddrCombo.setLayoutData(gd);
 
-		portForwardingButton = createRadioButton(
-				mxGroup,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13,
+		portForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_13,
 				"mxGroup", listener); //$NON-NLS-1$
 		portForwardingButton.addSelectionListener(listener);
 
@@ -1012,8 +970,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 */
 	private void initContents() {
 		loading = true;
-		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard()
-				.getConfiguration();
+		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		defaultSetting();
@@ -1033,12 +990,10 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
-			remoteServices = PTPRemoteCorePlugin.getDefault()
-					.getRemoteServices(rmID);
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null)
-				connection = remoteServices.getConnectionManager()
-						.getConnection(conn);
+				connection = remoteServices.getConnectionManager().getConnection(conn);
 		}
 
 		int options = config.getOptions();
@@ -1101,7 +1056,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage
 	 * Store text fields
 	 */
 	private void store() {
-		if (proxyPathEnabled && proxyPathText != null)
+		if (proxyPathEnabled && proxyPathText != null) {
 			proxyPath = proxyPathText.getText();
+		}
 	}
 }
