@@ -92,5 +92,9 @@ public class SampleFeedbackItem implements IFeedbackItem {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	public Object getObject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
