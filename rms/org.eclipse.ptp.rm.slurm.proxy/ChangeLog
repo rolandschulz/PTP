@@ -1,10 +1,14 @@
+2010-06
+Changes included:
+(1) Support both stable release SLURM-2.1.x and SLURM-2.2.0 under development
+
 
 2010-05
 Release new version of PTP SLURM proxy 
 Major improvements are:
 (1) Reimplemented based on SLURM API completely.
 (2) Support SLURM-2.1 (and later) API. 
-	Previous versions of SLURM-1.x are not supported anymore.
+	Previous versions of SLURM-1.x are NOT supported anymore.
 (3) The topology information of parallel processes is obtained from slurm job step layout,
 	not from "srun" ELF image anymore.
 (4) Update job/process/node state in separate threads.

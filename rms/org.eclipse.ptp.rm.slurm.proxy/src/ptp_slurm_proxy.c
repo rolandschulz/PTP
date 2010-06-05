@@ -64,7 +64,16 @@
 #include "list.h"
 #include "args.h"
 #include "rangeset.h"
+
+#ifdef SLURM_VERSION_2_2
+#define List SLURM_List
+#endif
+
 #include "slurm/slurm.h"
+
+#ifdef SLURM_VERSION_2_2
+#undef List
+#endif
 #include "slurm/slurm_errno.h"
 #include "job_opt.h"
 
@@ -1536,7 +1545,7 @@ job_launch_internal(void * arg)
 	opt = (job_opt_t *)arg;
 
 	if (opt->debug)
-		delete_routing_file(opt->cwd); /*delete existing/old routing file*/
+		delete_routing_file(opt->cwd); /* delete existing routing file */
 
 	job_req = create_job_desc_msg_from_opts(opt);
 	if (job_req == NULL) {
@@ -1546,7 +1555,7 @@ job_launch_internal(void * arg)
 		goto done;
 	}
 	
-	if (slurm_allocate_resources(job_req, &job_resp)) { /*job allocation error*/
+	if (slurm_allocate_resources(job_req, &job_resp)) { /* job allocation error */
 		msg = slurm_strerror(slurm_get_errno());
 		debug_log(logfp, msg);
 		sendJobSubErrorEvent(opt->trans_id, opt->jobsubid, msg);
@@ -1640,9 +1649,16 @@ job_launch_internal(void * arg)
 	else 	
 		step_params.name = opt->exec_name;
 	step_params.job_id = tmp_resp->job_id;
-	//step_params.node_count = job_resp->node_cnt;
-	//step_params.node_list = job_resp->node_list;
+#ifdef SLURM_VERSION_2_2
+	step_params.min_nodes = tmp_resp->node_cnt;
+	if (opt->min_nodes && (opt->min_nodes < tmp_resp->node_cnt))
+		step_params.min_nodes = opt->min_nodes;
+	step_params.max_nodes = tmp_resp->node_cnt;
+	if (opt->max_nodes && (opt->max_nodes < tmp_resp->node_cnt))
+		step_params.max_nodes = opt->max_nodes;
+#else /* 2.1 */
 	step_params.node_count = tmp_resp->node_cnt;
+#endif
 	step_params.node_list = tmp_resp->node_list;
 	step_params.task_count = opt->nprocs;
 	step_params.time_limit = opt->tlimit;
@@ -2300,8 +2316,7 @@ opt_verify(job_opt_t * opt)
 		}	
 	}		
 	
-
-	/* verify partition request*/
+	/* verify partition request */
 	if (opt->partition == NULL){
 		opt->partition = get_default_partition();
 	} else {
@@ -2318,7 +2333,7 @@ opt_verify(job_opt_t * opt)
 		goto done;
 	}
 		
-	/* verify -N parameter*/
+	/* verify -N parameter */
 	if (opt->min_nodes <= 0 || opt->max_nodes < 0 || 
 		(opt->max_nodes && (opt->min_nodes > opt->max_nodes))) {
 		debug_log(logfp, "invalid number of nodes (-N %d-%d)\n", opt->min_nodes, opt->max_nodes);
@@ -2387,10 +2402,18 @@ get_default_partition()
 	
 	if (slurm_load_partitions((time_t)NULL, &part_info_msg, SHOW_ALL ) == SLURM_SUCCESS) {
 		for (i = 0; i < part_info_msg->record_count; i++) {
+		#ifdef SLURM_VERSION_2_2 /*2.2 or later*/
+			if (part_info_msg->partition_array[i].flags & PART_FLAG_DEFAULT) {
+				ptr = strdup(part_info_msg->partition_array[i].name);
+				break;
+			}		
+		#else /*2.1*/
 			if (part_info_msg->partition_array[i].default_part) {
 				ptr = strdup(part_info_msg->partition_array[i].name);
 				break;
 			}
+		#endif
+			
 		}
 		slurm_free_partition_info_msg(part_info_msg);
 	}
@@ -2650,7 +2673,6 @@ ns_update_internal(void * arg)
 	node_info_msg_t * nmsg_ptr = NULL;
 	uint16_t show_flags = SHOW_ALL;
 	bool init_flag = false;
-
 
 	init_timer(&ns_timer);
 	/*

@@ -79,10 +79,22 @@ AC_CHECK_HEADERS([slurm/slurm.h slurm/slurm_errno.h], [],
 	[AC_MSG_NOTICE([SLURM not installed, skipping...])
 	 AS_EXIT
 	])
+
 dnl
-dnl Check for types
+dnl Check SLURM versions
+dnl SLURM_VERSION_NUMBER is not defined before 2.1
 dnl
-AC_TYPE_SIGNAL
+
+SLURM_VERSION=""
+AC_CHECK_DECL([SLURM_VERSION_NUMBER],[SLURM_VERSION="2.2"],[],[#include "slurm/slurm.h"])
+if test x"$SLURM_VERSION" = x"2.2"; then
+	AC_DEFINE([SLURM_VERSION_2_2], [1], 
+				[Define to 1 if SLURM version is 2.2 or later])
+fi				
+
+dnl
+dnl Check for SLURM installation
+dnl
 
 AC_PATH_PROG(SRUN, [srun], no)
 if test "$ac_cv_path_SRUN" != no; then
@@ -91,6 +103,12 @@ else
 	AC_MSG_NOTICE([SLURM not installed, skipping...])
 	AS_EXIT
 fi
+
+dnl
+dnl Check for types
+dnl
+AC_TYPE_SIGNAL
+
 
 
 AC_CONFIG_HEADERS([config.h])

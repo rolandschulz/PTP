@@ -4749,6 +4749,128 @@ fi
 
 done
 
+
+
+SLURM_VERSION=""
+{ echo "$as_me:$LINENO: checking whether SLURM_VERSION_NUMBER is declared" >&5
+echo $ECHO_N "checking whether SLURM_VERSION_NUMBER is declared... $ECHO_C" >&6; }
+if test "${ac_cv_have_decl_SLURM_VERSION_NUMBER+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include "slurm/slurm.h"
+
+int
+main ()
+{
+#ifndef SLURM_VERSION_NUMBER
+  (void) SLURM_VERSION_NUMBER;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv_have_decl_SLURM_VERSION_NUMBER=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_have_decl_SLURM_VERSION_NUMBER=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_have_decl_SLURM_VERSION_NUMBER" >&5
+echo "${ECHO_T}$ac_cv_have_decl_SLURM_VERSION_NUMBER" >&6; }
+if test $ac_cv_have_decl_SLURM_VERSION_NUMBER = yes; then
+  SLURM_VERSION="2.2"
+fi
+
+if test x"$SLURM_VERSION" = x"2.2"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define SLURM_VERSION_2_2 1
+_ACEOF
+
+fi
+
+
+# Extract the first word of "srun", so it can be a program name with args.
+set dummy srun; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_SRUN+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $SRUN in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_SRUN="$SRUN" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_SRUN="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_SRUN" && ac_cv_path_SRUN="no"
+  ;;
+esac
+fi
+SRUN=$ac_cv_path_SRUN
+if test -n "$SRUN"; then
+  { echo "$as_me:$LINENO: result: $SRUN" >&5
+echo "${ECHO_T}$SRUN" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+if test "$ac_cv_path_SRUN" != no; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SRUN 1
+_ACEOF
+
+else
+	{ echo "$as_me:$LINENO: SLURM not installed, skipping..." >&5
+echo "$as_me: SLURM not installed, skipping..." >&6;}
+	{ (exit 1); exit 1; }
+fi
+
 { echo "$as_me:$LINENO: checking return type of signal handlers" >&5
 echo $ECHO_N "checking return type of signal handlers... $ECHO_C" >&6; }
 if test "${ac_cv_type_signal+set}" = set; then
@@ -4807,58 +4929,6 @@ _ACEOF
 
 
 
-# Extract the first word of "srun", so it can be a program name with args.
-set dummy srun; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_SRUN+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $SRUN in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_SRUN="$SRUN" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_SRUN="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_SRUN" && ac_cv_path_SRUN="no"
-  ;;
-esac
-fi
-SRUN=$ac_cv_path_SRUN
-if test -n "$SRUN"; then
-  { echo "$as_me:$LINENO: result: $SRUN" >&5
-echo "${ECHO_T}$SRUN" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-if test "$ac_cv_path_SRUN" != no; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_SRUN 1
-_ACEOF
-
-else
-	{ echo "$as_me:$LINENO: SLURM not installed, skipping..." >&5
-echo "$as_me: SLURM not installed, skipping..." >&6;}
-	{ (exit 1); exit 1; }
-fi
 
 
 ac_config_headers="$ac_config_headers config.h"
