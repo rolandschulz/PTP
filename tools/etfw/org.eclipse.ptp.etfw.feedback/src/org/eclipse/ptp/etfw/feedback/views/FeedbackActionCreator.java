@@ -21,7 +21,7 @@ import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
 import org.eclipse.ptp.etfw.feedback.Activator;
 
 /**
- * @since 1.1
+ * @since 2.0
  */
 public class FeedbackActionCreator {
 	private final boolean traceOn = false;
