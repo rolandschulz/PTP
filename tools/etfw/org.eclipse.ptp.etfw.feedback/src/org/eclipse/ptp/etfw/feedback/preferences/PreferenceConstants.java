@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009 IBM Corporation.
+ * Copyright (c) 2009,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,12 +15,12 @@ package org.eclipse.ptp.etfw.feedback.preferences;
  */
 public class PreferenceConstants {
 
-	public static final String P_PATH = "pathPreference";
+	public static final String P_PATH = "pathPreference"; //$NON-NLS-1$
 
-	public static final String P_MAINTAIN_EXPAND_COLLAPSE_STATE = "maintainExpandCollapseState";
+	public static final String P_MAINTAIN_EXPAND_COLLAPSE_STATE = "maintainExpandCollapseState"; //$NON-NLS-1$
 
-	public static final String P_CHOICE = "choicePreference";
+	public static final String P_CHOICE = "choicePreference"; //$NON-NLS-1$
 
-	public static final String P_STRING = "stringPreference";
+	public static final String P_STRING = "stringPreference"; //$NON-NLS-1$
 	
 }

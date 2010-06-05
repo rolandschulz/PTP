@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009 IBM Corporation.
+ * Copyright (c) 2009,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ptp.etfw.feedback.preferences;
 
 import org.eclipse.jface.preference.*;
 import org.eclipse.ptp.etfw.feedback.Activator;
+import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbench;
 
@@ -37,7 +38,7 @@ public class FeedbackPreferencePage
 	public FeedbackPreferencePage() {
 		super(GRID);
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		setDescription("Preferences for Feedback view ");
+		setDescription(Messages.FeedbackPreferencePage_preferencesForFeedbackView);
 	}
 	
 	/**
@@ -52,7 +53,7 @@ public class FeedbackPreferencePage
 		addField(
 			new BooleanFieldEditor(
 				PreferenceConstants.P_MAINTAIN_EXPAND_COLLAPSE_STATE,
-				"Maintain expand/collapse state",
+				Messages.FeedbackPreferencePage_maintainExpandCollapseState,
 				getFieldEditorParent()));
 /*
 		addField(new RadioGroupFieldEditor(

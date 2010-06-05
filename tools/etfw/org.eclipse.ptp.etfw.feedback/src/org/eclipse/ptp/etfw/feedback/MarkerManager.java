@@ -26,6 +26,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.w3c.dom.NamedNodeMap;
@@ -37,13 +38,13 @@ import org.w3c.dom.Node;
 public class MarkerManager {
 	private static final boolean traceOn=false;
 	
-	 String srcTempPathname="/Users/beth/ews/runtime-compiler-xform-test/MyHPCSTproject/src";
+	 String srcTempPathname="/Users/beth/ews/runtime-compiler-xform-test/MyHPCSTproject/src"; //$NON-NLS-1$
 	
 	static String path;
 	static String filename;
 	private static MarkerManager instance;
 	
-	private static final String SLASH=System.getProperty("file.separator");
+	private static final String SLASH=System.getProperty("file.separator"); //$NON-NLS-1$
 	
 
 	/**
@@ -54,7 +55,7 @@ public class MarkerManager {
 			try {
 				res.deleteMarkers(markerID, true, IResource.DEPTH_INFINITE);
 			} catch (CoreException e) {
-				System.out.println("Error deleting markers on "+res.getName());
+				System.out.println("Error deleting markers on "+res.getName()); //$NON-NLS-1$
 				e.printStackTrace();
 			}
 	}
@@ -74,10 +75,10 @@ public class MarkerManager {
 			String pathname = docpath.substring(0, indx);
 			indx = pathname.lastIndexOf(SLASH);
 			pathname = pathname.substring(0, indx);
-			pathname = pathname + SLASH + "src";
+			pathname = pathname + SLASH + "src"; //$NON-NLS-1$
 			return pathname;
 		} catch (Exception e) {
-			System.out.println("Exception parsing src path from " + docpath);
+			System.out.println("Exception parsing src path from " + docpath); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -95,8 +96,8 @@ public class MarkerManager {
 		// if so, translate
 		else {
 			// note there is a reported bug in string.replaceAll regarding double slashes
-			String otherSlash="/";
-			if(SLASH.equals(otherSlash))otherSlash="\\";
+			String otherSlash="/"; //$NON-NLS-1$
+			if(SLASH.equals(otherSlash))otherSlash="\\"; //$NON-NLS-1$
 			StringBuffer newf=new StringBuffer();
 			int len=filename.length();
 			try {
@@ -121,7 +122,7 @@ public class MarkerManager {
 
 	String getStrAttr(NamedNodeMap attribs, String attrName) {
 		Node node = attribs.getNamedItem(attrName);
-		if(node==null)return "";
+		if(node==null)return ""; //$NON-NLS-1$
 		String val=node.getNodeValue();
 		return val;
 	}
@@ -145,7 +146,7 @@ public class MarkerManager {
 		  value = Integer.parseInt(str);
 		}
 		catch(NumberFormatException e) {
-			System.out.println("NumberFormatException("+str+"): "+e.getMessage());
+			System.out.println("NumberFormatException("+str+"): "+e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 			value=0;
 			
 		}
@@ -200,7 +201,7 @@ public class MarkerManager {
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_FILENAME, filename);
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_PARENT, parentID);
 		//attrs.put(FeedbackIDs.FEEDBACK_ATTR_FUNCTION, function);
-		attrs.put(FeedbackIDs.FEEDBACK_ATTR_FUNCTION_CALLEE, "");   // set to blank, may be overridden if values are available
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_FUNCTION_CALLEE, "");   // set to blank, may be overridden if values are available //$NON-NLS-1$
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_PATHNAME, pathname);
         attrs.put(IMarker.LINE_NUMBER, new Integer(lineNo));
         
@@ -208,16 +209,16 @@ public class MarkerManager {
         //attrs.put(IMarker.CHAR_START, new Integer(ila.getColumn()));
         //attrs.put(IMarker.CHAR_END, new Integer(ila.getColumn()+5));// hack, what is end?
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_DESC,desc);
-		attrs.put(FeedbackIDs.FEEDBACK_ATTR_LOOP_ID,""); // filled in by (only) transform attempts
+		attrs.put(FeedbackIDs.FEEDBACK_ATTR_LOOP_ID,""); // filled in by (only) transform attempts //$NON-NLS-1$
 		return attrs;
 	}
 	 
 	public void createMarker(IResource resource, Map<String,Object>attrs, String markerID) {
 		try {
 			MarkerUtilities.createMarker(resource, attrs, markerID);
-			if(traceOn)System.out.println("  MarkerManager: Created marker for "+resource.getName()+" "+attrs.get(FeedbackIDs.FEEDBACK_ATTR_NAME)+" lineNo:"+attrs.get(IMarker.LINE_NUMBER)+" parentID="+attrs.get(FeedbackIDs.FEEDBACK_ATTR_PARENT));
+			if(traceOn)System.out.println("  MarkerManager: Created marker for "+resource.getName()+" "+attrs.get(FeedbackIDs.FEEDBACK_ATTR_NAME)+" lineNo:"+attrs.get(IMarker.LINE_NUMBER)+" parentID="+attrs.get(FeedbackIDs.FEEDBACK_ATTR_PARENT)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		} catch (CoreException e) {
-			System.out.println("Error creating Xform marker: "+e.getMessage());
+			System.out.println("Error creating Xform marker: "+e.getMessage()); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 	}
@@ -241,11 +242,11 @@ public class MarkerManager {
 		try {
 			removeMarkers(res1, markerID);
 		} catch (Exception e) {
-			System.out.println("Error deleting markers on file: "+res1);
+			System.out.println("Error deleting markers on file: "+res1); //$NON-NLS-1$
 			e.printStackTrace();
 		}
 		// for root nodes, may have no parent ID
-		String parentID="";
+		String parentID=""; //$NON-NLS-1$
 		IFeedbackItem temp=itemlist.get(0);
 		int count=0;
 		Map<String, Object> attrs;
@@ -259,8 +260,8 @@ public class MarkerManager {
 			String desc=item.getDescription(); 
 			String itemID=item.getID();
 			parentID=item.getParentID();
-			String pathname="";//srcTempPathname; // we assume it's fully qualified filename now
-			if(filename.contains(Path.SEPARATOR+"")) {
+			String pathname="";//srcTempPathname; // we assume it's fully qualified filename now //$NON-NLS-1$
+			if(filename.contains(Path.SEPARATOR+"")) { //$NON-NLS-1$
 				IPath path=new Path(filename);
 				pathname=path.removeLastSegments(1).toString();
 				filename=path.segment(path.segmentCount()-1);
@@ -274,10 +275,10 @@ public class MarkerManager {
 				for (Iterator iterator2 = kids.iterator(); iterator2.hasNext();) {
 					IFeedbackItem kid = (IFeedbackItem) iterator2.next();
 					String parentid=item.getID();
-					String namePrefix="";//"Bottleneck: ";  
+					String namePrefix="";//"Bottleneck: ";   //$NON-NLS-1$
 					String kname=kid.getName();
 					if(dbgTags)kname=namePrefix+kname;
-					if(dbgTags)kname+=" parent="+parentid;
+					if(dbgTags)kname+=" parent="+parentid; //$NON-NLS-1$
 					int uid=counter++; // need something unique
 					String uidStr=Integer.toString(uid);
 					// make file/location the same as parent
@@ -286,11 +287,11 @@ public class MarkerManager {
 					boolean gkids=kid.hasChildren();
 					// fixme make this recursive so level of hierarchy doesn't matter
 					if(gkids) {
-						if(traceOn)System.out.println("grandkids");
+						if(traceOn)System.out.println("grandkids"); //$NON-NLS-1$
 						List<IFeedbackItem> gkidItems=kid.getChildren();
 						for(Object gkid : gkidItems) {
 							IFeedbackItem gki = (IFeedbackItem) gkid;
-							String gkNamePrefix="Solution: "; //HACK
+							String gkNamePrefix=Messages.MarkerManager_solution; //HACK
 							attrs=createCommonMarkers(gki.getID(),gkNamePrefix+gki.getName(),uidStr,filename,srcTempPathname,lineNo,gki.getDescription());
 							createMarker(resource,attrs,markerID);
 						}
