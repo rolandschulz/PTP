@@ -938,8 +938,8 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 							try {
 								IServiceProvider nullProvider = (IServiceProvider) element.createExecutableExtension(ATTR_NULL_PROVIDER_CLASS);
 								if(nullProvider instanceof ServiceProvider) {
-									String providerId = service.getId() + ".nullProvider";
-									ServiceProviderDescriptor descriptor = new ServiceProviderDescriptor(providerId, "Null Provider", service.getId(), "0");
+									String providerId = service.getId() + ".nullProvider"; //$NON-NLS-1$
+									ServiceProviderDescriptor descriptor = new ServiceProviderDescriptor(providerId, Messages.ServiceModelManager_3, service.getId(), "0"); //$NON-NLS-2$
 									((ServiceProvider)nullProvider).setDescriptor(descriptor);
 								}
 								service.setNullServiceProvider(nullProvider);

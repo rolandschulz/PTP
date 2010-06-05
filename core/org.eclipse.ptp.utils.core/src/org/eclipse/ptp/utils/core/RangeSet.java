@@ -61,9 +61,9 @@ public class RangeSet implements Iterable<String> {
 
 	public RangeSet(String str) {
 		if (str != null) {
-			String[] ranges = str.split(",");
+			String[] ranges = str.split(","); //$NON-NLS-1$
 			for (String range : ranges) {
-				String[] vals = range.split("-");
+				String[] vals = range.split("-"); //$NON-NLS-1$
 				if (vals.length == 1) {
 					add(Integer.parseInt(vals[0]));
 				} else {
@@ -241,11 +241,11 @@ public class RangeSet implements Iterable<String> {
 
 	@Override
 	public String toString() {
-		String str = "";
+		String str = ""; //$NON-NLS-1$
 
 		for (int i = 0; i < rangeList.size(); i++) {
 			if (i > 0)
-				str += ",";
+				str += ","; //$NON-NLS-1$
 			str += rangeList.get(i).toString();
 		}
 

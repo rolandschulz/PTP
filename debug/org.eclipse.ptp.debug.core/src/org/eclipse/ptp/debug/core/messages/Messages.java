@@ -42,6 +42,10 @@ public class Messages extends NLS {
 	public static String PDebugElementState_10;
 	public static String PDebugElementState_11;
 	public static String PDebugElementState_12;
+
+	public static String PDebugEvent_0;
+
+	public static String PDebugEvent_1;
 	public static String PDebugModel_0;
 	public static String PDebugModel_1;
 	public static String PDebugModel_2;

@@ -61,9 +61,9 @@ public class Range implements Iterable<String> {
 	
 	public String toString() {
 		if (min == max)
-			return "" + min;
+			return "" + min; //$NON-NLS-1$
 		
-		return min + "-" + max;
+		return min + "-" + max; //$NON-NLS-1$
 	}
 
 	public Iterator<String> iterator() {

@@ -24,6 +24,7 @@ import org.eclipse.ptp.remotetools.environment.control.SSHTargetControl;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.extension.ITargetVariables;
 import org.eclipse.ptp.remotetools.environment.generichost.Activator;
+import org.eclipse.ptp.remotetools.environment.generichost.messages.Messages;
 
 /**
  * Controls an instance of a target created from the Environment.
