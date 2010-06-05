@@ -291,6 +291,18 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private IRemoteProcess launchServer(IRemoteConnection conn, IProgressMonitor monitor) throws IOException {
 		try {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
+			
+			if (!conn.isOpen()) {
+				try {
+					conn.open(subMon.newChild(10));
+				} catch (RemoteConnectionException e) {
+					throw new IOException(e.getMessage());
+				}
+				if (!conn.isOpen()) {
+					throw new IOException(Messages.AbstractRemoteServerRunner_7);
+				}
+			}
+			
 			/*
 			 * First check if the remote file exists or is a different size to
 			 * the local version and copy over if required.
