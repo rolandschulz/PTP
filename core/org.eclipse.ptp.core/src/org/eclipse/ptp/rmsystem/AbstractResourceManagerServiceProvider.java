@@ -390,7 +390,7 @@ public abstract class AbstractResourceManagerServiceProvider extends
 				.getConfigurations();
 
 		for (IServiceConfiguration config : configs)
-			if (null != config.getServiceProvider(fLaunchService))
+			if (this == config.getServiceProvider(fLaunchService))
 				config.setServiceProvider(fLaunchService, null);
 	}
 }
