@@ -511,7 +511,8 @@ public class PBSBatchScriptTemplate {
 					IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 					ConfigUtils.EMPTY_STRING);
 			if (!ConfigUtils.EMPTY_STRING.equals(exec)) {
-				wdir = new Path(exec).removeLastSegments(1).toOSString();
+				//TODO: not platform independent - needs IRemotePath 
+				wdir = new Path(exec).removeLastSegments(1).toString();  
 			}
 		}
 
@@ -602,6 +603,11 @@ public class PBSBatchScriptTemplate {
 	private String replaceWithValue(String name, String value, String script) {
 		Matcher m = Pattern.compile("@" + name + "@").matcher(script);
 		if (m.find()) {
+			System.out.println(value);
+			value = value.replaceAll("\\\\", "\\\\\\\\");  // \ -> \\
+			System.out.println(value);
+			value = value.replaceAll("\\$", "\\\\\\$");    // $ -> \$
+			System.out.println(value);
 			return m.replaceAll(value);
 		}
 		return script;
