@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.eclipse.ptp.remotetools.utils.messages.Messages;
+
 /**
  * A temporarily workaround to read lines of text.
  * In future, will be replaced by an IStreamListener that converts
@@ -57,17 +59,17 @@ public class TextStreamObserver extends Thread {
 	}
 	
 	void newLine(String line) {
-		log("Received: " + Integer.toString(line.length()) + " bytes");
+		log(Messages.TextStreamObserver_0 + Integer.toString(line.length()) + Messages.TextStreamObserver_1);
 		listener.newLine(line);
 	}
 
 	void streamClosed() {
-		log("Stream closed");
+		log(Messages.TextStreamObserver_2);
 		listener.streamClosed();
 	}
 	
 	void streamError(Exception e) {
-		log("Recovered from exception: " + e.getMessage());
+		log(Messages.TextStreamObserver_3 + e.getMessage());
 		listener.streamError(e);
 	}
 	

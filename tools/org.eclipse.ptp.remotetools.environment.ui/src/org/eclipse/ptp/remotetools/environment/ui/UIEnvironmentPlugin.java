@@ -66,7 +66,7 @@ public class UIEnvironmentPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.remotetools.environment", path);
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.remotetools.environment", path); //$NON-NLS-1$
 	}
 	
 	public DoubleClickHandlerManager getDoubleClickHandlerManager() {

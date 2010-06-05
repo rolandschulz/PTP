@@ -52,14 +52,14 @@ public class ProcessOutput {
 			return;
 		}
 
-		final StringBuilder prefix = new StringBuilder("[");
+		final StringBuilder prefix = new StringBuilder("["); //$NON-NLS-1$
 		for (Integer rank : new BitSetIterable(processJobRanks)) {
-			prefix.append(rank + ",");
+			prefix.append(rank + ","); //$NON-NLS-1$
 		}
 		prefix.deleteCharAt(prefix.length() - 1);
-		prefix.append("] ");
+		prefix.append("] "); //$NON-NLS-1$
 
-		final List<String> lines = Arrays.asList(output.split("\n"));
+		final List<String> lines = Arrays.asList(output.split("\n")); //$NON-NLS-1$
 		final StringBuilder prefixedOutput = new StringBuilder();
 
 		Iterator<String> lineIter = lines.iterator();
@@ -72,20 +72,20 @@ public class ProcessOutput {
 		if (!lastOutputEndedInLineFeed) {
 			if (previousOutputProcesses.equals(processJobRanks)) {
 				String firstLine = lineIter.next();
-				prefixedOutput.append(firstLine + "\n");
+				prefixedOutput.append(firstLine + "\n"); //$NON-NLS-1$
 			} else {
-				prefixedOutput.append("\n");
+				prefixedOutput.append("\n"); //$NON-NLS-1$
 			}
 		}
 
 		while (lineIter.hasNext()) {
 			String line = lineIter.next();
-			prefixedOutput.append(prefix.toString() + line + "\n");
+			prefixedOutput.append(prefix.toString() + line + "\n"); //$NON-NLS-1$
 		}
 
 		// if the output doesn't end with a linefeed
 		// delete the last linefeed of the prefixed output
-		if (!output.endsWith("\n")) {
+		if (!output.endsWith("\n")) { //$NON-NLS-1$
 			prefixedOutput.deleteCharAt(prefixedOutput.length() - 1);
 		}
 
@@ -94,7 +94,7 @@ public class ProcessOutput {
 
 		previousOutputProcesses.clear();
 		previousOutputProcesses.or(processJobRanks);
-		lastOutputEndedInLineFeed = output.endsWith("\n");
+		lastOutputEndedInLineFeed = output.endsWith("\n"); //$NON-NLS-1$
 	}
 
 	public void delete() {
@@ -103,15 +103,15 @@ public class ProcessOutput {
 
 	public String getSavedOutput(int jobRank) {
 		final String savedOutput = outputFile.getContents();
-		String[] jobLines = savedOutput.split("\n");
+		String[] jobLines = savedOutput.split("\n"); //$NON-NLS-1$
 
-		Pattern prefixPattern = Pattern.compile("^\\[([0-9]+,)*" + jobRank + "(,[0-9]+)*\\] (.*)");
+		Pattern prefixPattern = Pattern.compile("^\\[([0-9]+,)*" + jobRank + "(,[0-9]+)*\\] (.*)"); //$NON-NLS-1$ //$NON-NLS-2$
 		StringBuilder sb = new StringBuilder();
 		for (String jobLine : jobLines) {
 			Matcher matcher = prefixPattern.matcher(jobLine);
 			boolean matched = matcher.matches();
 			if (matched) {
-				sb.append(matcher.group(3) + "\n");
+				sb.append(matcher.group(3) + "\n"); //$NON-NLS-1$
 			}
 		}
 		return sb.toString();

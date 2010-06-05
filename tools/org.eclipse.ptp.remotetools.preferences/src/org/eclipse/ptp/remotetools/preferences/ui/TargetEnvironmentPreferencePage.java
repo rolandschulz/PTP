@@ -11,6 +11,8 @@
  */
 package org.eclipse.ptp.remotetools.preferences.ui;
 
+import org.eclipse.ptp.remotetools.preferences.messages.Messages;
+
 
 /**
  * 
@@ -21,7 +23,7 @@ public class TargetEnvironmentPreferencePage extends AbstractBasicPreferencePage
 	
 	public TargetEnvironmentPreferencePage() {
 		super();
-		setDescription("Target Environment Preferences");
+		setDescription(Messages.TargetEnvironmentPreferencePage_0);
 	}
 
 

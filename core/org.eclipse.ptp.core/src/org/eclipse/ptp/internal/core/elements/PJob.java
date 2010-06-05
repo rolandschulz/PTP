@@ -285,7 +285,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessName(int)
 	 */
 	public String getProcessName(int processJobRank) {
-		return getName() + "." + processJobRank;
+		return getName() + "." + processJobRank; //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

@@ -60,6 +60,7 @@ import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 import org.eclipse.ptp.remotetools.environment.extension.INode;
 import org.eclipse.ptp.remotetools.environment.ui.UIEnvironmentPlugin;
+import org.eclipse.ptp.remotetools.environment.ui.messages.Messages;
 import org.eclipse.ptp.remotetools.environment.wizard.EnvironmentWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -105,8 +106,8 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	
 	private List<Action> workloadControllers = new ArrayList<Action>();
 	// Set the table column property names
-	private final String ENVIRONMENT_CONTROL_NAME		= "Target Environment";
-	private final String ENVIRONMENT_CONTROL_STATUS		= "Status";
+	private final String ENVIRONMENT_CONTROL_NAME		= Messages.RemoteToolsEnvironmentView_0;
+	private final String ENVIRONMENT_CONTROL_STATUS		= Messages.RemoteToolsEnvironmentView_1;
 
 
 	// Set column names
@@ -217,7 +218,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		private Image viewIcon;
 
 		public String getColumnText(Object obj, int index) {
-			String result = "";
+			String result = ""; //$NON-NLS-1$
 			
 	        switch (index) {
 	            case 0:
@@ -233,16 +234,16 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	            		
 	            		switch (status) {
 							case ITargetElementStatus.STARTED:
-								result = "Started";
+								result = Messages.RemoteToolsEnvironmentView_3;
 								break;
 							case ITargetElementStatus.STOPPED:
-								result = "Stopped";
+								result = Messages.RemoteToolsEnvironmentView_4;
 								break;
 							case ITargetElementStatus.RESUMED:
-								result = "Running";
+								result = Messages.RemoteToolsEnvironmentView_5;
 								break;
 							case ITargetElementStatus.PAUSED:
-								result = "Paused";
+								result = Messages.RemoteToolsEnvironmentView_6;
 								break;
 	            		}
 	            			
@@ -265,11 +266,11 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		
 		public Image getImage(Object obj) {
 			if (TargetTypeElement.class.isAssignableFrom(obj.getClass())) {
-                URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/connect_create.gif");
+                URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/connect_create.gif"); //$NON-NLS-1$
                 ImageDescriptor imageMonitorDescriptor = ImageDescriptor.createFromURL(url);
                 viewIcon = imageMonitorDescriptor.createImage();
 			} else if (TargetElement.class.isAssignableFrom(obj.getClass())) {
-			    URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/monitor_obj.gif");
+			    URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/monitor_obj.gif"); //$NON-NLS-1$
                 ImageDescriptor imageMonitorDescriptor = ImageDescriptor.createFromURL(url);
                 viewIcon = imageMonitorDescriptor.createImage();
 			}
@@ -359,7 +360,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	}
 	
 	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
@@ -433,7 +434,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 		
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry
-				.getExtensionPoint("org.eclipse.ptp.remotetools.environment.ui.workloadController");
+				.getExtensionPoint("org.eclipse.ptp.remotetools.environment.ui.workloadController"); //$NON-NLS-1$
 		IExtension[] extensions = extensionPoint.getExtensions();
 
 		try {
@@ -443,8 +444,8 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 						.getConfigurationElements();
 				for (int j = 0; j < elements.length; j++) {
 				    IConfigurationElement element = elements[j];
-	                if ("controllerDelegate".equals(element.getName())) {
-	                    actions.add((Action) element.createExecutableExtension("class"));
+	                if ("controllerDelegate".equals(element.getName())) { //$NON-NLS-1$
+	                    actions.add((Action) element.createExecutableExtension("class")); //$NON-NLS-1$
 	                }
 				}
 			}
@@ -466,13 +467,13 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 
 	private void makeActions() {
 		
-		URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/run_exc.gif");
+		URL url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/run_exc.gif"); //$NON-NLS-1$
 	    ImageDescriptor imageRun = ImageDescriptor.createFromURL(url);
-	    url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/terminatedlaunch.gif");
+	    url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/terminatedlaunch.gif"); //$NON-NLS-1$
 	    ImageDescriptor imageStop = ImageDescriptor.createFromURL(url);
-	    url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/suspend.gif");
+	    url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/suspend.gif"); //$NON-NLS-1$
 	    ImageDescriptor imageSuspend = ImageDescriptor.createFromURL(url);
-	    url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/resume.gif");
+	    url = UIEnvironmentPlugin.getDefault().getBundle().getEntry("/icons/resume.gif"); //$NON-NLS-1$
 	    ImageDescriptor imageResume = ImageDescriptor.createFromURL(url);
 	    
 	    IWorkbenchPartSite site =  this.getSite();
@@ -519,7 +520,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				final Object obj = ((IStructuredSelection)selection).getFirstElement();
 				if (obj != null) {
 					if (TargetElement.class.isAssignableFrom(obj.getClass())) {
-						Job job = new Job("Start the  Environment") {
+						Job job = new Job(Messages.RemoteToolsEnvironmentView_17) {
 							protected IStatus run(IProgressMonitor monitor) {
 								
 								startAction.setEnabled(false);
@@ -546,11 +547,11 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 						return ;
 					}
 				}
-				showMessage("Please Select a Target Configuration first",viewer);
+				showMessage(Messages.RemoteToolsEnvironmentView_18,viewer);
 			}
 		};
-		startAction.setText("Create");
-		startAction.setToolTipText("Start the Environment");
+		startAction.setText(Messages.RemoteToolsEnvironmentView_19);
+		startAction.setToolTipText(Messages.RemoteToolsEnvironmentView_20);
 		startAction.setImageDescriptor(imageRun);
 		
 		stopAction = new Action() {
@@ -560,7 +561,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				final Object obj = ((IStructuredSelection)selection).getFirstElement();
 				if (obj != null) {
 					if (TargetElement.class.isAssignableFrom(obj.getClass())) {
-						Job job = new Job("Stop the  Environment") {
+						Job job = new Job(Messages.RemoteToolsEnvironmentView_21) {
 							protected IStatus run(IProgressMonitor monitor) {
 								
 								stopAction.setEnabled(false);
@@ -583,11 +584,11 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 						return ;
 					}
 				}
-				showMessage("Please Select a Target Configuration first",viewer);
+				showMessage(Messages.RemoteToolsEnvironmentView_22,viewer);
 			}
 		};
-		stopAction.setText("Kill");
-		stopAction.setToolTipText("Kill the Environment");
+		stopAction.setText(Messages.RemoteToolsEnvironmentView_23);
+		stopAction.setToolTipText(Messages.RemoteToolsEnvironmentView_24);
 		stopAction.setImageDescriptor(imageStop);
 		
 		//resume
@@ -599,7 +600,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				
 				if (obj != null) {
 					if (TargetElement.class.isAssignableFrom(obj.getClass())) {
-						Job job = new Job("Resume the  Environment") {
+						Job job = new Job(Messages.RemoteToolsEnvironmentView_25) {
 							protected IStatus run(IProgressMonitor monitor) {
 								
 								resumeAction.setEnabled(false);
@@ -624,11 +625,11 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 						return ;
 					}
 				}
-				showMessage("Please Select a Target Configuration first",viewer);
+				showMessage(Messages.RemoteToolsEnvironmentView_26,viewer);
 			}
 		};
-		resumeAction.setText("Resume");
-		resumeAction.setToolTipText("Resume");
+		resumeAction.setText(Messages.RemoteToolsEnvironmentView_27);
+		resumeAction.setToolTipText(Messages.RemoteToolsEnvironmentView_28);
 		resumeAction.setImageDescriptor(imageResume);
 		
 		//stop
@@ -640,7 +641,7 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				
 				if (obj != null) {
 					if (TargetElement.class.isAssignableFrom(obj.getClass())) {
-						Job job = new Job("Pause the  Environment") {
+						Job job = new Job(Messages.RemoteToolsEnvironmentView_29) {
 							protected IStatus run(IProgressMonitor monitor) {
 								
 								pauseAction.setEnabled(false);
@@ -665,11 +666,11 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 						return ;
 					}
 				}
-				showMessage("Please Select a Target Configuration first",viewer);
+				showMessage(Messages.RemoteToolsEnvironmentView_30,viewer);
 			}
 		};
-		pauseAction.setText("Pause");
-		pauseAction.setToolTipText("Pause");
+		pauseAction.setText(Messages.RemoteToolsEnvironmentView_31);
+		pauseAction.setToolTipText(Messages.RemoteToolsEnvironmentView_32);
 		pauseAction.setImageDescriptor(imageSuspend);
 		
 		// Create
@@ -689,8 +690,8 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				
 			}
 		};
-		createAction.setText("Create");
-		createAction.setToolTipText("Creates a new configuration");
+		createAction.setText(Messages.RemoteToolsEnvironmentView_33);
+		createAction.setToolTipText(Messages.RemoteToolsEnvironmentView_34);
 		
 		// Edit
 		editAction = new Action() {
@@ -708,8 +709,8 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				}
 			}
 		};
-		editAction.setText("Edit");
-		editAction.setToolTipText("Edits configuration");
+		editAction.setText(Messages.RemoteToolsEnvironmentView_35);
+		editAction.setToolTipText(Messages.RemoteToolsEnvironmentView_36);
 		
 		// Remove
 		removeAction = new Action() {
@@ -720,18 +721,18 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 				if (TargetElement.class.isAssignableFrom(obj.getClass())) {
 					ITargetElement confElement = (ITargetElement)obj;
 					if (confElement.getStatus() != ITargetElementStatus.STARTED) {
-						if (showConfirm("Do you really want to remove ?",viewer)) {
+						if (showConfirm(Messages.RemoteToolsEnvironmentView_37,viewer)) {
 							confElement.getType().removeElement(confElement);
 							refresh();
 						}
 					} else {
-						showMessage("Please stop this instance first !",viewer);
+						showMessage(Messages.RemoteToolsEnvironmentView_38,viewer);
 					}
 				}
 			}
 		};
-		removeAction.setText("Remove");
-		removeAction.setToolTipText("Removes configuration");
+		removeAction.setText(Messages.RemoteToolsEnvironmentView_39);
+		removeAction.setToolTipText(Messages.RemoteToolsEnvironmentView_40);
 		
 		doubleClickAction = new Action() {
 			public void run() {
@@ -790,14 +791,14 @@ public class RemoteToolsEnvironmentView extends ViewPart implements ISelectionCh
 	private void showMessage(String message,TreeViewer viewer) {
 		MessageDialog.openInformation(
 			viewer.getControl().getShell(),
-			"Environments",
+			Messages.RemoteToolsEnvironmentView_41,
 			message);
 	}
 
 	private boolean showConfirm(String message,TreeViewer viewer) {
 		return MessageDialog.openConfirm(
 			viewer.getControl().getShell(),
-			"Environments",
+			Messages.RemoteToolsEnvironmentView_42,
 			message);
 	}
 	

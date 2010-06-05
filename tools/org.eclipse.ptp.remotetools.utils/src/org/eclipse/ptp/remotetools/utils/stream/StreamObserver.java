@@ -16,6 +16,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.ptp.remotetools.utils.messages.Messages;
+
 /**
  * Connects an inputstream to a stream listener.
  * <p>
@@ -83,17 +85,17 @@ public class StreamObserver extends Thread {
 	}
 	
 	void streamClosed() {
-		log("Stream closed");
+		log(Messages.StreamObserver_0);
 		listener.streamClosed();
 	}
 	
 	void streamError(Exception e) {
-		log("Recovered from exception: " + e.getMessage());
+		log(Messages.StreamObserver_1 + e.getMessage());
 		listener.streamError(e);
 	}
 	
 	void newBytes(byte buffer[], int length) {
-		log("Received: " + Integer.toString(length) + " bytes");
+		log(Messages.StreamObserver_2 + Integer.toString(length) + Messages.StreamObserver_3);
 		listener.newBytes(buffer, length);		
 	}
 
@@ -102,7 +104,7 @@ public class StreamObserver extends Thread {
 	 */
 	public void run() {
 		byte buffer[] = new byte[250];
-		log("Started observing");
+		log(Messages.StreamObserver_4);
 		while (!killed) {
 			try {
 				int bytes = input.read(buffer);
@@ -139,6 +141,6 @@ public class StreamObserver extends Thread {
 				}
 			}
 		}
-		log("Finished observing");		
+		log(Messages.StreamObserver_5);		
 	}
 }
