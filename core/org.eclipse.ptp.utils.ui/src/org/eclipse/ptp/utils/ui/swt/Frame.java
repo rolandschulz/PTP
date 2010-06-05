@@ -11,6 +11,7 @@
  *****************************************************************************/
 package org.eclipse.ptp.utils.ui.swt;
 
+import org.eclipse.ptp.utils.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,8 +50,8 @@ public class Frame extends Composite {
 	private boolean isExpandedLayout;
 	
 	// Keep all possible button labels
-	private String expandButtonLabel = "More options";
-	private String shrinkButtonLabel = "Less options";
+	private String expandButtonLabel = Messages.Frame_0;
+	private String shrinkButtonLabel = Messages.Frame_1;
 	
 	private int  debugBitmask = SWT.None;//SWT.BORDER;
 

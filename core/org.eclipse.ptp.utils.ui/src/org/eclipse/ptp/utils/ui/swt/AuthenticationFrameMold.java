@@ -11,43 +11,45 @@
  *****************************************************************************/
 package org.eclipse.ptp.utils.ui.swt;
 
+import org.eclipse.ptp.utils.ui.messages.Messages;
+
 /**
  * @author Richard Maciel
- *
+ * 
  */
 public final class AuthenticationFrameMold {
-	
+
 	public static final int HAS_DESCRIPTION = 1 << 0;
 
 	public static final int SHOW_HOST_TYPE_RADIO_BUTTON = 1 << 1;
-	
+
 	int bitmask;
 
 	String description;
 	String title;
 
-	String labelLocalhost = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Option_localhost;
-	String labelRemoteHost=AuthenticationFrameMoldMessages.AuthenticationFrameMold_Option_Remotehost;
-	String labelShowAdvancedOptions = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Button_ShowAdvanced;
-	String labelHideAdvancedOptions = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Button_HideAdvanced;
-	String labelPassword = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Field_Password;
-	String labelUserName = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Field_User;
-	String labelIsPasswordBased = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Option_PasswordAuthentication;
-	String labelHostPort = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Field_Port;
-	String labelHostAddress = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Field_Host;
-	String labelTimeout = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Field_Timeout;
-	String labelPassphrase = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Field_Passphrase;
-	String labelPublicKeyPathButton = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Button_PrivateKeyPath;
-	String labelPrivateKeyPath = AuthenticationFrameMoldMessages.AuthenticationFrameMold_SelectionWindow_Label_PrivateKeyPath;
-	String labelPrivateKeyPathTitle = AuthenticationFrameMoldMessages.AuthenticationFrameMold_SelectionWindow_Title_PrivateKeyPath;
-	String labelIsPublicKeyBased = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Option_PublicKeyAuth;
-	String labelCipherType = AuthenticationFrameMoldMessages.AuthenticationFrameMold_Combo_CipherType;
-	
+	String labelLocalhost = Messages.AuthenticationFrameMold_Option_localhost;
+	String labelRemoteHost = Messages.AuthenticationFrameMold_Option_Remotehost;
+	String labelShowAdvancedOptions = Messages.AuthenticationFrameMold_Button_ShowAdvanced;
+	String labelHideAdvancedOptions = Messages.AuthenticationFrameMold_Button_HideAdvanced;
+	String labelPassword = Messages.AuthenticationFrameMold_Field_Password;
+	String labelUserName = Messages.AuthenticationFrameMold_Field_User;
+	String labelIsPasswordBased = Messages.AuthenticationFrameMold_Option_PasswordAuthentication;
+	String labelHostPort = Messages.AuthenticationFrameMold_Field_Port;
+	String labelHostAddress = Messages.AuthenticationFrameMold_Field_Host;
+	String labelTimeout = Messages.AuthenticationFrameMold_Field_Timeout;
+	String labelPassphrase = Messages.AuthenticationFrameMold_Field_Passphrase;
+	String labelPublicKeyPathButton = Messages.AuthenticationFrameMold_Button_PrivateKeyPath;
+	String labelPrivateKeyPath = Messages.AuthenticationFrameMold_SelectionWindow_Label_PrivateKeyPath;
+	String labelPrivateKeyPathTitle = Messages.AuthenticationFrameMold_SelectionWindow_Title_PrivateKeyPath;
+	String labelIsPublicKeyBased = Messages.AuthenticationFrameMold_Option_PublicKeyAuth;
+	String labelCipherType = Messages.AuthenticationFrameMold_Combo_CipherType;
+
 	public AuthenticationFrameMold(String title) {
 		this.bitmask = 0;
 		setTitle(title);
 	}
-	
+
 	public AuthenticationFrameMold(String title, String description) {
 		this.bitmask = 0;
 		setTitle(title);
@@ -81,11 +83,11 @@ public final class AuthenticationFrameMold {
 	public void setLabelLocalhost(String labelLocalhost) {
 		this.labelLocalhost = labelLocalhost;
 	}
-	
+
 	public void setLabelRemoteHost(String labelRemoteHost) {
 		this.labelRemoteHost = labelRemoteHost;
 	}
-	
+
 	public void setLabelHideAdvancedOptions(String labelHideAdvancedOptions) {
 		this.labelHideAdvancedOptions = labelHideAdvancedOptions;
 	}

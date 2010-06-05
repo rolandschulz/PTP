@@ -11,6 +11,8 @@
  *****************************************************************************/
 package org.eclipse.ptp.utils.ui.swt;
 
+import org.eclipse.ptp.utils.ui.messages.Messages;
+
 /**
  * Mold to a {@link FileGroup}. This isn't a derivated class
  * from {@link TextMold} because some of the its fields doesn't make sense
