@@ -97,7 +97,7 @@ public class PerfDMFView extends ViewPart {
 
 	ParaProfController ppc;
 
-	List<TreeTuple> databases;
+	List<TreeTuple> databases=null;
 	private TreeTuple database = null;
 
 	class TreeNode implements IAdaptable {
@@ -212,7 +212,11 @@ public class PerfDMFView extends ViewPart {
 	 * @return
 	 */
 	public String[] getDatabaseNames() {
-		String[] names = new String[databases.size()];
+		int nameSize=0;
+		if(databases!=null){
+			nameSize=databases.size();
+		}
+		String[] names = new String[nameSize];
 
 		for (int i = 0; i < names.length; i++) {
 			names[i] = databases.get(i).name;

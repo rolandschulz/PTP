@@ -51,6 +51,8 @@ public class ParaProfController {
 	private static final String EXPERIMENTS = "experiments"; //$NON-NLS-1$
 	private static final String TRIALS = "trials"; //$NON-NLS-1$
 
+	private boolean canRun=true;
+	
 	public static TreeTuple EMPTY;
 
 	public ParaProfController() {
@@ -70,7 +72,8 @@ public class ParaProfController {
 		String paraprof = BuildLaunchUtils.getToolPath("tau") + File.separator + "paraprof"; //$NON-NLS-1$ //$NON-NLS-2$
 		EMPTY = new TreeTuple("None", -1, -1, Level.DATABASE); //$NON-NLS-1$
 		File checkp = new File(paraprof);
-		if (!checkp.exists()) {
+		if (!checkp.exists()||!checkp.canExecute()) {
+			canRun=false;
 			return;
 		}
 
@@ -123,6 +126,10 @@ public class ParaProfController {
 	private List<TreeTuple> getInfo(String type, int dbid, int hid, Level level) {
 		List<TreeTuple> out = new ArrayList<TreeTuple>();
 
+		if(!canRun){
+			return out;
+		}
+		
 		String comBuf = "control list " + type; //$NON-NLS-1$
 		if (dbid > -1) {
 			comBuf += " " + dbid; //$NON-NLS-1$
@@ -190,6 +197,11 @@ public class ParaProfController {
 	}
 
 	private int issueCommand(String command) {
+		
+		if(!canRun){
+			return -1;
+		}
+		
 		if (stdout != null) {
 			stdout.println(command);
 			stdout.flush();
