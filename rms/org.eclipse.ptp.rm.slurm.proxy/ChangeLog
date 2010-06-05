@@ -1,7 +1,7 @@
-2010-06
+2010-06-05
 Changes included:
-(1) Support both stable release SLURM-2.1.x and SLURM-2.2.0 under development
-
+(1) Support both stable release SLURM-2.1.x and SLURM-2.2.0 under development.
+(2) Don't send processStatus attribute anymore.
 
 2010-05
 Release new version of PTP SLURM proxy 
