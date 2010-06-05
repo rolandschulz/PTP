@@ -4,6 +4,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.remotetools.environment.core.messages.messages"; //$NON-NLS-1$
+	public static String PoolingTargetControlEventProvider_0;
 	public static String SSHTargetControl_0;
 	public static String SSHTargetControl_1;
 	public static String SSHTargetControl_2;

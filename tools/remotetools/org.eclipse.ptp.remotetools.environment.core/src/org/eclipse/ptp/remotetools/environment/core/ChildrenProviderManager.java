@@ -30,7 +30,7 @@ import org.eclipse.ptp.utils.core.extensionpoints.ProcessExtensions;
  */
 public class ChildrenProviderManager {
 
-    private final static String EXT_PROVIDER_ID = "org.eclipse.ptp.remotetools.environment.core.childrenProvider";
+    private final static String EXT_PROVIDER_ID = "org.eclipse.ptp.remotetools.environment.core.childrenProvider"; //$NON-NLS-1$
 
     private List<IChildrenProvider> providers;
 

@@ -127,7 +127,7 @@ public class ControlChannel implements ILineStreamListener {
 		if (terminalPathMatcher.find()) {
 			synchronized (this) {
 				controlTerminalPath = terminalPathMatcher.group(1);
-				Debug.println2("Found control terminal path = " + controlTerminalPath);
+				Debug.println2(Messages.ControlChannel_0 + controlTerminalPath);
 				this.notifyAll();
 			}
 		}

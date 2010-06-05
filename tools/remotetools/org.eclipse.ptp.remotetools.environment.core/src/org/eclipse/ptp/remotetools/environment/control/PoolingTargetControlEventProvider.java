@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.ptp.remotetools.environment.control.ITargetControlEventListener;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControlEventProvider;
+import org.eclipse.ptp.remotetools.environment.core.messages.Messages;
 
 
 /**
@@ -37,7 +38,7 @@ public class PoolingTargetControlEventProvider  implements
 	class MonitorThread extends Thread {
 		
 		public MonitorThread() {
-			super("Target Control polling");
+			super(Messages.PoolingTargetControlEventProvider_0);
 		}
 		public void run() {
 			while (monitorThread == this)

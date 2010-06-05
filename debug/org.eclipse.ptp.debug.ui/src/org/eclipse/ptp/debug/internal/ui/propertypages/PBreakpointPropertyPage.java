@@ -59,7 +59,9 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
  */
 public class PBreakpointPropertyPage extends FieldEditorPreferencePage implements IWorkbenchPropertyPage {
 	class BreakpointIntegerFieldEditor extends IntegerFieldEditor {
-		/** Constructor
+		/**
+		 * Constructor
+		 * 
 		 * @param name
 		 * @param labelText
 		 * @param parent
@@ -68,9 +70,13 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			super(name, labelText, parent);
 			setErrorMessage(Messages.PBreakpointPropertyPage_0);
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.StringFieldEditor#checkState()
 		 */
+		@Override
 		protected boolean checkState() {
 			Text control = getTextControl();
 			if (!control.isEnabled()) {
@@ -79,24 +85,36 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			}
 			return super.checkState();
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#refreshValidState()
 		 */
+		@Override
 		protected void refreshValidState() {
 			super.refreshValidState();
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#doStore()
 		 */
+		@Override
 		protected void doStore() {
 			Text text = getTextControl();
 			if (text.isEnabled()) {
 				super.doStore();
 			}
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#clearErrorMessage()
 		 */
+		@Override
 		protected void clearErrorMessage() {
 			if (getPage() != null) {
 				String message = getPage().getErrorMessage();
@@ -110,8 +128,11 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			}
 		}
 	}
+
 	class BreakpointStringFieldEditor extends StringFieldEditor {
-		/** Constructor
+		/**
+		 * Constructor
+		 * 
 		 * @param name
 		 * @param labelText
 		 * @param parent
@@ -119,9 +140,13 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		public BreakpointStringFieldEditor(String name, String labelText, Composite parent) {
 			super(name, labelText, parent);
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.StringFieldEditor#checkState()
 		 */
+		@Override
 		protected boolean checkState() {
 			Text control = getTextControl();
 			if (!control.isEnabled()) {
@@ -130,24 +155,36 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			}
 			return super.checkState();
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#doStore()
 		 */
+		@Override
 		protected void doStore() {
 			Text text = getTextControl();
 			if (text.isEnabled()) {
 				super.doStore();
 			}
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#refreshValidState()
 		 */
+		@Override
 		protected void refreshValidState() {
 			super.refreshValidState();
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#clearErrorMessage()
 		 */
+		@Override
 		protected void clearErrorMessage() {
 			if (getPage() != null) {
 				String message = getPage().getErrorMessage();
@@ -161,14 +198,17 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			}
 		}
 	}
+
 	class LabelFieldEditor extends FieldEditor {
 		private Label titleLabel;
 		private Label valueLabel;
 		private Composite basicComposite;
-		private String value;
-		private String title;
+		private final String value;
+		private final String title;
 
-		/** Constructor
+		/**
+		 * Constructor
+		 * 
 		 * @param parent
 		 * @param title
 		 * @param value
@@ -178,15 +218,26 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			this.title = title;
 			this.createControl(parent);
 		}
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
 		 */
+		@Override
 		protected void adjustForNumColumns(int numColumns) {
 			((GridData) basicComposite.getLayoutData()).horizontalSpan = numColumns;
 		}
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite, int)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse
+		 * .swt.widgets.Composite, int)
 		 */
+		@Override
 		protected void doFillIntoGrid(Composite parent, int numColumns) {
 			basicComposite = new Composite(parent, SWT.NULL);
 			GridLayout layout = new GridLayout();
@@ -208,24 +259,43 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			gd = new GridData();
 			valueLabel.setLayoutData(gd);
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
 		 */
+		@Override
 		public int getNumberOfControls() {
 			return 1;
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#doLoad()
 		 */
-		protected void doLoad() {}
-		/* (non-Javadoc)
+		@Override
+		protected void doLoad() {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
 		 */
-		protected void doLoadDefault() {}
-		/* (non-Javadoc)
+		@Override
+		protected void doLoadDefault() {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.jface.preference.FieldEditor#doStore()
 		 */
-		protected void doStore() {}
+		@Override
+		protected void doStore() {
+		}
 	}
 
 	private BooleanFieldEditor enabled;
@@ -233,10 +303,11 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 	private Text ignoreCountTextControl;
 	private BreakpointIntegerFieldEditor ignoreCount;
 	private IAdaptable element;
-	private PBreakpointPreferenceStore pBreakpointPreferenceStore;
+	private final PBreakpointPreferenceStore pBreakpointPreferenceStore;
 	private UIDebugManager uiDebugManager = null;
 
-	/** Constructor
+	/**
+	 * Constructor
 	 * 
 	 */
 	public PBreakpointPropertyPage() {
@@ -245,9 +316,15 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		uiDebugManager = PTPDebugUIPlugin.getUIDebugManager();
 		pBreakpointPreferenceStore = new PBreakpointPreferenceStore();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors
+	 * ()
 	 */
+	@Override
 	protected void createFieldEditors() {
 		IPBreakpoint breakpoint = getBreakpoint();
 		try {
@@ -265,24 +342,29 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			store.setValue(PBreakpointPreferenceStore.IGNORE_COUNT, (ignoreCount >= 0) ? ignoreCount : 0);
 			createIgnoreCountEditor(getFieldEditorParent());
 		} catch (CoreException ce) {
-			PTPDebugUIPlugin.errorDialog(getShell(), Messages.PBreakpointPropertyPage_2, "", ce); //$NON-NLS-2$ //$NON-NLS-1$
+			PTPDebugUIPlugin.errorDialog(getShell(), Messages.PBreakpointPropertyPage_2, "", ce); //$NON-NLS-1$
 		}
 	}
-	/** Create type specific lable field editors
+
+	/**
+	 * Create type specific lable field editors
+	 * 
 	 * @param breakpoint
 	 * @throws CoreException
 	 */
 	private void createTypeSpecificLabelFieldEditors(IPBreakpoint breakpoint) throws CoreException {
 		if (breakpoint instanceof IPFunctionBreakpoint) {
 			IPFunctionBreakpoint funcBpt = (IPFunctionBreakpoint) breakpoint;
-			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_4, Messages.PBreakpointPropertyPage_5));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_4,
+					Messages.PBreakpointPropertyPage_5));
 			String function = funcBpt.getFunction();
 			if (function != null) {
 				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_6, function));
 			}
 		} else if (breakpoint instanceof IPAddressBreakpoint) {
 			IPAddressBreakpoint addrBpt = (IPAddressBreakpoint) breakpoint;
-			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_7, Messages.PBreakpointPropertyPage_8));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_7,
+					Messages.PBreakpointPropertyPage_8));
 			String address = addrBpt.getAddress();
 			if (address != null) {
 				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_9, address));
@@ -305,7 +387,8 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			}
 			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_16, expression));
 		} else if (breakpoint instanceof ILineBreakpoint) {
-			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_17, Messages.PBreakpointPropertyPage_18));
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_17,
+					Messages.PBreakpointPropertyPage_18));
 			String fileName = breakpoint.getSourceHandle();
 			if (fileName != null) {
 				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_19, fileName));
@@ -322,14 +405,15 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_21, jobName));
 		String set_id = breakpoint.getSetId();
 		addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_22, set_id));
-		//show total number of processes
+		// show total number of processes
 		if (!job_id.equals(IPBreakpoint.GLOBAL)) {
 			IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
-			IElementSet elementSet = (IElementSet)setManager.getElementByID(set_id);
-			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_23, String.valueOf(elementSet.size())));
+			IElementSet elementSet = (IElementSet) setManager.getElementByID(set_id);
+			addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_23,
+					String.valueOf(elementSet.size())));
 			String[] setNames = elementSet.getMatchSetIDs();
 			StringBuffer buffer = new StringBuffer();
-			for (int i=0; i<setNames.length; i++) {
+			for (int i = 0; i < setNames.length; i++) {
 				buffer.append(setNames[i]);
 				if (i < setNames.length - 1)
 					buffer.append(","); //$NON-NLS-1$
@@ -338,27 +422,38 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 				addField(createLabelEditor(getFieldEditorParent(), Messages.PBreakpointPropertyPage_25, buffer.toString()));
 		}
 	}
-	/** Create enabled field
+
+	/**
+	 * Create enabled field
+	 * 
 	 * @param parent
 	 */
 	protected void createEnabledField(Composite parent) {
 		enabled = new BooleanFieldEditor(PBreakpointPreferenceStore.ENABLED, Messages.PBreakpointPropertyPage_26, parent);
 		addField(enabled);
 	}
-	/** Create condition field
+
+	/**
+	 * Create condition field
+	 * 
 	 * @param parent
 	 */
 	protected void createConditionEditor(Composite parent) {
-		condition = new BreakpointStringFieldEditor(PBreakpointPreferenceStore.CONDITION, Messages.PBreakpointPropertyPage_27, parent);
+		condition = new BreakpointStringFieldEditor(PBreakpointPreferenceStore.CONDITION, Messages.PBreakpointPropertyPage_27,
+				parent);
 		condition.setEmptyStringAllowed(true);
 		condition.setErrorMessage(Messages.PBreakpointPropertyPage_28);
 		addField(condition);
 	}
-	/** Create ignore count field
+
+	/**
+	 * Create ignore count field
+	 * 
 	 * @param parent
 	 */
 	protected void createIgnoreCountEditor(Composite parent) {
-		ignoreCount = new BreakpointIntegerFieldEditor(PBreakpointPreferenceStore.IGNORE_COUNT, Messages.PBreakpointPropertyPage_29, parent);
+		ignoreCount = new BreakpointIntegerFieldEditor(PBreakpointPreferenceStore.IGNORE_COUNT,
+				Messages.PBreakpointPropertyPage_29, parent);
 		ignoreCount.setValidRange(0, Integer.MAX_VALUE);
 		ignoreCountTextControl = ignoreCount.getTextControl(parent);
 		try {
@@ -368,7 +463,10 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		}
 		addField(ignoreCount);
 	}
-	/** Create label field
+
+	/**
+	 * Create label field
+	 * 
 	 * @param parent
 	 * @param title
 	 * @param value
@@ -377,34 +475,53 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 	protected FieldEditor createLabelEditor(Composite parent, String title, String value) {
 		return new LabelFieldEditor(parent, title, value);
 	}
-	/** Get breakpoint
+
+	/**
+	 * Get breakpoint
+	 * 
 	 * @return
 	 */
 	protected IPBreakpoint getBreakpoint() {
 		IAdaptable element = getElement();
 		return (element instanceof IPBreakpoint) ? (IPBreakpoint) element : null;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPropertyPage#getElement()
 	 */
 	public IAdaptable getElement() {
 		return element;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPropertyPage#setElement(org.eclipse.core.runtime.IAdaptable)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPropertyPage#setElement(org.eclipse.core.runtime
+	 * .IAdaptable)
 	 */
 	public void setElement(IAdaptable element) {
 		this.element = element;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#getPreferenceStore()
 	 */
+	@Override
 	public IPreferenceStore getPreferenceStore() {
 		return pBreakpointPreferenceStore;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
+	@Override
 	public boolean performOk() {
 		final List<String> changedProperties = new ArrayList<String>(5);
 		getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
@@ -416,7 +533,10 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		setBreakpointProperties(changedProperties);
 		return result;
 	}
-	/** Set breakpoint properties
+
+	/**
+	 * Set breakpoint properties
+	 * 
 	 * @param changedProperties
 	 */
 	protected void setBreakpointProperties(final List<String> changedProperties) {
@@ -425,7 +545,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 				IPBreakpoint breakpoint = getBreakpoint();
 				Iterator<String> changed = changedProperties.iterator();
 				while (changed.hasNext()) {
-					String property = (String) changed.next();
+					String property = changed.next();
 					if (property.equals(PBreakpointPreferenceStore.ENABLED)) {
 						breakpoint.setEnabled(getPreferenceStore().getBoolean(PBreakpointPreferenceStore.ENABLED));
 					} else if (property.equals(PBreakpointPreferenceStore.IGNORE_COUNT)) {

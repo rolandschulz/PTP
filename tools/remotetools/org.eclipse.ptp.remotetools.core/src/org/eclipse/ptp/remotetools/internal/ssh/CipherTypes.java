@@ -90,7 +90,7 @@ public class CipherTypes {
 					e.printStackTrace();
 					//"Did not find " + "NAME_" + ciphField.getName() + " to match"
 					throw new RuntimeException(
-							NLS.bind(CipherTypesMessages.getString("CipherTypes.AttributeNameExceptionMsg2"), 
+							NLS.bind(CipherTypesMessages.getString("CipherTypes.AttributeNameExceptionMsg2"),  //$NON-NLS-1$
 									 ciphField.getName())); //$NON-NLS-1$
 				}
 				

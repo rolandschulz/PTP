@@ -159,6 +159,6 @@ public class EnvironmentPlugin extends Plugin {
 	}
 
 //	 Key that address the unique identifier of a given environment instance
-	public static final String ATTR_CORE_ENVIRONMENTID = "core-environmentid";
+	public static final String ATTR_CORE_ENVIRONMENTID = "core-environmentid"; //$NON-NLS-1$
 	
 }
