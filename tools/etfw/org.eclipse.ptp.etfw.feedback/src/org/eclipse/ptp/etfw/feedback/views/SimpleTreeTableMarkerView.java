@@ -103,18 +103,18 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	 * be created (optionally) so that the poor things won't be orphans. Value
 	 * can be changed in some constructors.
 	 */
-	protected String parentMarkerAttrib = "parent";
+	protected String parentMarkerAttrib = "parent"; //$NON-NLS-1$
 
 	private Tree tree; // keep so we can dispose of listeners in dispose()?
 
 	protected Action infoAction;
 	/**
-	 * @since 1.1
+	 * @since 2.0
 	 */
 	protected Action extensionAction; // possible addition by an plug-in
 										// extension
 	/**
-	 * @since 1.1
+	 * @since 2.0
 	 */
 	protected AbstractFeedbackAction feedbackAction;
 
@@ -1648,7 +1648,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 	/**
 	 * Make "show info" action to display artifact information
 	 * 
-	 * @since 1.1
+	 * @since 2.0
 	 */
 	protected void makeExtensionAction() {
 		FeedbackActionCreator creator = new FeedbackActionCreator();
