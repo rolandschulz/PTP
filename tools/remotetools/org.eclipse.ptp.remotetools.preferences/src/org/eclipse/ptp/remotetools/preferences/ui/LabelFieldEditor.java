@@ -27,7 +27,7 @@ public class LabelFieldEditor extends FieldEditor {
 	private Label label;
 
 	public LabelFieldEditor(String value, Composite parent) {
-		super("label", value, parent);
+		super("label", value, parent); //$NON-NLS-1$
 	}
 
 	protected void adjustForNumColumns(int numColumns) {

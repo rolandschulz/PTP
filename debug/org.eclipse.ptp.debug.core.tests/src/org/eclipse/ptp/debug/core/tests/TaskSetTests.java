@@ -21,20 +21,20 @@ public class TaskSetTests extends TestCase {
 		b.set(15, 22);
 		String str = b.toHexString().toUpperCase();
 
-		assertEquals(str, "00000000003F9FF8");
+		assertEquals(str, "00000000003F9FF8"); //$NON-NLS-1$
 
-		assertEquals(b.toString(), "{3-12,15-21}");
+		assertEquals(b.toString(), "{3-12,15-21}"); //$NON-NLS-1$
 	}
 
 	public void testFromString() {
-		String str = "06411eda";
+		String str = "06411eda"; //$NON-NLS-1$
 		TaskSet b = new TaskSet(28, str);
 
 		String res = b.toHexString();
 
 		assertEquals(str, res);
 
-		str = "07";
+		str = "07"; //$NON-NLS-1$
 		b = new TaskSet(3, str);
 		res = b.toHexString();
 

@@ -26,7 +26,7 @@ import org.eclipse.ptp.remotetools.preferences.PreferencesPlugin;
 public class PreferenceConstants {
 
 	//keys
-	public static final String TIMING_SPUBIN = "timing-spubin";
+	public static final String TIMING_SPUBIN = "timing-spubin"; //$NON-NLS-1$
 		
 	private IPreferenceStore preferences = null;
 	private static PreferenceConstants instance = null;
@@ -47,7 +47,7 @@ public class PreferenceConstants {
 	}
 	
 	public IPath getDefaultTIMING_SPUBIN() {
-		return new Path("spu_timing");
+		return new Path("spu_timing"); //$NON-NLS-1$
 	}
 	
 	public void setTIMING_SPUBIN(IPath value) {

@@ -265,7 +265,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			store.setValue(PBreakpointPreferenceStore.IGNORE_COUNT, (ignoreCount >= 0) ? ignoreCount : 0);
 			createIgnoreCountEditor(getFieldEditorParent());
 		} catch (CoreException ce) {
-			PTPDebugUIPlugin.errorDialog(getShell(), Messages.PBreakpointPropertyPage_2, "", ce); //$NON-NLS-2$
+			PTPDebugUIPlugin.errorDialog(getShell(), Messages.PBreakpointPropertyPage_2, "", ce); //$NON-NLS-2$ //$NON-NLS-1$
 		}
 	}
 	/** Create type specific lable field editors

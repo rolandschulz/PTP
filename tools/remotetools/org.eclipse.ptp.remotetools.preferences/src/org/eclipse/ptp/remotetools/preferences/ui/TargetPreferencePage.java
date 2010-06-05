@@ -11,6 +11,8 @@
  */
 package org.eclipse.ptp.remotetools.preferences.ui;
 
+import org.eclipse.ptp.remotetools.preferences.messages.Messages;
+
 
 /**
  * This class represents a preference page that
@@ -24,7 +26,7 @@ public class TargetPreferencePage
 
 	public TargetPreferencePage() {
 		super();
-		setDescription("Remote Tools preferences");
+		setDescription(Messages.TargetPreferencePage_0);
 	}
 	
 }

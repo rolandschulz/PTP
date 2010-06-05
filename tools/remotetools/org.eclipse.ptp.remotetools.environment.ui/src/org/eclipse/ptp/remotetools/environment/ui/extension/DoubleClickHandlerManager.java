@@ -30,7 +30,7 @@ import org.eclipse.ptp.remotetools.environment.extension.INode;
  */
 public class DoubleClickHandlerManager {
 
-    private final static String EXT_HANDLER_ID = "org.eclipse.ptp.remotetools.environment.ui.doubleClickHandler";
+    private final static String EXT_HANDLER_ID = "org.eclipse.ptp.remotetools.environment.ui.doubleClickHandler"; //$NON-NLS-1$
 
     private List<IDoubleClickHandler> handlers;
 
@@ -61,9 +61,9 @@ public class DoubleClickHandlerManager {
                 IConfigurationElement[] elements = extension
                         .getConfigurationElements();
                 IConfigurationElement element = elements[0];
-                if ("doubleClickHandler".equals(element.getName())) {
+                if ("doubleClickHandler".equals(element.getName())) { //$NON-NLS-1$
                     handlers.add((IDoubleClickHandler) element
-                            .createExecutableExtension("class"));
+                            .createExecutableExtension("class")); //$NON-NLS-1$
                 }
             }
         } catch (Exception e) {
