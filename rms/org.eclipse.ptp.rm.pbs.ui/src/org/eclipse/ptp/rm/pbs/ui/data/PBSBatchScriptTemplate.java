@@ -103,11 +103,9 @@ public class PBSBatchScriptTemplate {
 	 * @throws IllegalValueException
 	 */
 	public void configure() throws CoreException, IllegalValueException {
-		for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values()
-				.iterator(); i.hasNext();)
+		for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values().iterator(); i.hasNext();)
 			maybeSetValue(i.next());
-		for (Iterator<AttributePlaceholder> i = internalAttributes.values()
-				.iterator(); i.hasNext();)
+		for (Iterator<AttributePlaceholder> i = internalAttributes.values().iterator(); i.hasNext();)
 			maybeSetValue(i.next());
 	}
 
@@ -118,10 +116,8 @@ public class PBSBatchScriptTemplate {
 	 * @return
 	 * @throws IllegalValueException
 	 */
-	public IAttribute<?, ?, ?> createScriptAttribute()
-			throws IllegalValueException, CoreException {
-		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes
-				.getAttributeDefinitionMap();
+	public IAttribute<?, ?, ?> createScriptAttribute() throws IllegalValueException, CoreException {
+		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
 		IAttributeDefinition<?, ?, ?> def = defs.get(TAG_SCRIPT);
 		IAttribute<?, ?, ?> attr = def.create();
 		String value = denormalize(realize());
@@ -171,8 +167,7 @@ public class PBSBatchScriptTemplate {
 	 */
 	public void load(InputStream input) throws Throwable {
 		clearAll();
-		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes
-				.getAttributeDefinitionMap();
+		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
 		BufferedReader br = null;
 		String line = null;
 		AttributePlaceholder ap = null;
@@ -195,16 +190,13 @@ public class PBSBatchScriptTemplate {
 						pbsJobAttributes.put(ap.getName(), ap);
 						continue;
 					}
-				} else if (line.startsWith("#")) {
+				} else if (line.startsWith("#"))
 					continue;
-				}
 
 				if (processedExecLine) {
-					ap = handleInternalPlaceholder(line, PSTCMD_PLACEHOLDER,
-							defs);
-					if (ap != null) {
+					ap = handleInternalPlaceholder(line, PSTCMD_PLACEHOLDER, defs);
+					if (ap != null)
 						internalAttributes.put(TAG_PSTCMD, ap);
-					}
 					continue;
 				}
 				ap = handleInternalPlaceholder(line, PRECMD_PLACEHOLDER, defs);
@@ -213,16 +205,13 @@ public class PBSBatchScriptTemplate {
 					continue;
 				}
 				ap = handleInternalPlaceholder(line, MPICMD_PLACEHOLDER, defs);
-				if (ap != null) {
+				if (ap != null)
 					internalAttributes.put(TAG_MPICMD, ap);
-				}
 				ap = handleInternalPlaceholder(line, MPIOPT_PLACEHOLDER, defs);
-				if (ap != null) {
+				if (ap != null)
 					internalAttributes.put(TAG_MPIOPT, ap);
-				}
-				if (line.contains(EXECMD_PLACEHOLDER)) {
+				if (line.contains(EXECMD_PLACEHOLDER))
 					processedExecLine = true;
-				}
 			}
 			if (configuration != null)
 				configure();
@@ -253,37 +242,31 @@ public class PBSBatchScriptTemplate {
 			template = maybeReplaceArgs(template);
 		}
 
-		for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values()
-				.iterator(); i.hasNext();) {
+		for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values().iterator(); i.hasNext();) {
 			AttributePlaceholder ap = i.next();
 			String name = ap.getName();
 			if (TAG_EXPORT_ENV.equals(name)) {
-				if ((Boolean) ap.getAttribute().getValue()) {
-					template = replaceWithValue(name, ConfigUtils.EMPTY_STRING,
-							template);
-				} else {
+				if ((Boolean) ap.getAttribute().getValue())
+					template = replaceWithValue(name, ConfigUtils.EMPTY_STRING, template);
+				else
 					template = removeLine(name, template);
-				}
 				continue;
 			}
 			String value = ap.getAttribute().getValueAsString();
-			if (ConfigUtils.EMPTY_STRING.equals(value)) {
+			if (ConfigUtils.EMPTY_STRING.equals(value))
 				template = removeLine(name, template);
-			} else {
+			else
 				template = replaceWithValue(name, value, template);
-			}
 		}
 
-		for (Iterator<AttributePlaceholder> i = internalAttributes.values()
-				.iterator(); i.hasNext();) {
+		for (Iterator<AttributePlaceholder> i = internalAttributes.values().iterator(); i.hasNext();) {
 			AttributePlaceholder ap = i.next();
 			String name = ap.getName();
 			String value = ap.getAttribute().getValueAsString();
-			if (ConfigUtils.EMPTY_STRING.equals(value)) {
+			if (ConfigUtils.EMPTY_STRING.equals(value))
 				template = removePlaceholder(name, template);
-			} else {
+			else
 				template = replaceWithValue(name, value, template);
-			}
 		}
 
 		return template;
@@ -298,8 +281,7 @@ public class PBSBatchScriptTemplate {
 	 *            to which to save the values.
 	 */
 	public void saveValues(ILaunchConfigurationWorkingCopy config) {
-		for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values()
-				.iterator(); i.hasNext();) {
+		for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values().iterator(); i.hasNext();) {
 			AttributePlaceholder ap = i.next();
 			IAttribute<?, ?, ?> attr = ap.getAttribute();
 			if (attr == null)
@@ -314,8 +296,7 @@ public class PBSBatchScriptTemplate {
 				config.setAttribute(id, (String) value);
 		}
 
-		for (Iterator<AttributePlaceholder> i = internalAttributes.values()
-				.iterator(); i.hasNext();) {
+		for (Iterator<AttributePlaceholder> i = internalAttributes.values().iterator(); i.hasNext();) {
 			AttributePlaceholder ap = i.next();
 			IAttribute<?, ?, ?> attr = ap.getAttribute();
 			if (attr == null)
@@ -349,11 +330,9 @@ public class PBSBatchScriptTemplate {
 	public void setMPIAttributes(String command) throws IllegalValueException {
 		AttributePlaceholder mpiExec = internalAttributes.get(TAG_MPICMD);
 		AttributePlaceholder mpiOpt = internalAttributes.get(TAG_MPIOPT);
-		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes
-				.getAttributeDefinitionMap();
+		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
 		if (mpiExec == null) {
-			mpiExec = ConfigUtils.getAttributePlaceholder(TAG_MPICMD,
-					ConfigUtils.EMPTY_STRING,
+			mpiExec = ConfigUtils.getAttributePlaceholder(TAG_MPICMD, ConfigUtils.EMPTY_STRING,
 					Messages.PBSAttributeInternalExtension, defs);
 			if (mpiExec != null)
 				internalAttributes.put(TAG_MPICMD, mpiExec);
@@ -361,25 +340,23 @@ public class PBSBatchScriptTemplate {
 		mpiExec.getAttribute().setValueAsString(command);
 
 		if (mpiOpt == null) {
-			mpiOpt = ConfigUtils.getAttributePlaceholder(TAG_MPIOPT,
-					ConfigUtils.EMPTY_STRING,
+			mpiOpt = ConfigUtils.getAttributePlaceholder(TAG_MPIOPT, ConfigUtils.EMPTY_STRING,
 					Messages.PBSAttributeInternalExtension, defs);
 			if (mpiOpt != null)
 				internalAttributes.put(TAG_MPIOPT, mpiOpt);
 		}
 
 		String cores = null;
-		if (ConfigUtils.EMPTY_STRING.equals(command)) {
+		if (ConfigUtils.EMPTY_STRING.equals(command))
 			cores = ConfigUtils.EMPTY_STRING;
-		} else {
+		else {
 			AttributePlaceholder ap = pbsJobAttributes.get(TAG_NCPUS);
 			if (ap != null)
 				cores = ap.getAttribute().getValueAsString();
 			else {
 				ap = pbsJobAttributes.get(TAG_NODES);
 				if (ap != null)
-					cores = computeMPICoresFromNodesString(ap.getAttribute()
-							.getValueAsString());
+					cores = computeMPICoresFromNodesString(ap.getAttribute().getValueAsString());
 			}
 			cores = MPICORES_FLAG + " " + cores;
 		}
@@ -396,16 +373,14 @@ public class PBSBatchScriptTemplate {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private String captureEnvironment(String template) throws CoreException {
-		Map vars = configuration.getAttribute(
-				ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
+		Map vars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
 		if (vars == null || vars.isEmpty())
 			template = removeLine(TAG_ENV, template);
 		else {
 			StringBuffer sb = new StringBuffer();
 			for (Iterator<Entry> i = vars.entrySet().iterator(); i.hasNext();) {
 				Entry entry = i.next();
-				sb.append(Messages.BASH_EXPORT).append(" ").append(
-						entry.getKey()).append("=").append(entry.getValue())
+				sb.append(Messages.BASH_EXPORT).append(" ").append(entry.getKey()).append("=").append(entry.getValue())
 						.append(ConfigUtils.LINE_SEP);
 			}
 			template = replaceWithValue(TAG_ENV, sb.toString(), template);
@@ -426,16 +401,14 @@ public class PBSBatchScriptTemplate {
 	 * Creates the internal attribute placeholder, setting its tooltip to the
 	 * internal tag.
 	 */
-	private AttributePlaceholder handleInternalPlaceholder(String line,
-			String marker, Map<String, IAttributeDefinition<?, ?, ?>> defs)
-			throws IllegalValueException {
+	private AttributePlaceholder handleInternalPlaceholder(String line, String marker,
+			Map<String, IAttributeDefinition<?, ?, ?>> defs) throws IllegalValueException {
 		AttributePlaceholder ap = internalAttributes.get(marker);
 		if (ap != null)
 			return null;
 		if (line.contains(marker)) {
 			String name = marker.substring(1, marker.length() - 1);
-			ap = ConfigUtils.getAttributePlaceholder(name,
-					ConfigUtils.EMPTY_STRING, TAG_INTERNAL, defs);
+			ap = ConfigUtils.getAttributePlaceholder(name, ConfigUtils.EMPTY_STRING, TAG_INTERNAL, defs);
 		}
 		return ap;
 	}
@@ -444,12 +417,10 @@ public class PBSBatchScriptTemplate {
 	 * Creates the pbs job attribute placeholder. Sets tooltip for eventual
 	 * display (on the name label).
 	 */
-	private AttributePlaceholder handlePBSJobAttribute(String line,
-			Map<String, IAttributeDefinition<?, ?, ?>> defs)
+	private AttributePlaceholder handlePBSJobAttribute(String line, Map<String, IAttributeDefinition<?, ?, ?>> defs)
 			throws IllegalValueException, ParseException {
 		String name = extractPBSAttributeName(line);
-		return ConfigUtils.getAttributePlaceholder(name,
-				ConfigUtils.EMPTY_STRING, toolTips.getProperty(name), defs);
+		return ConfigUtils.getAttributePlaceholder(name, ConfigUtils.EMPTY_STRING, toolTips.getProperty(name), defs);
 	}
 
 	/*
@@ -458,8 +429,7 @@ public class PBSBatchScriptTemplate {
 	 */
 	private void loadToolTips() {
 		Bundle bundle = PBSUIPlugin.getDefault().getBundle();
-		URL url = FileLocator.find(bundle, new Path(
-				Messages.PBSBatchScriptTemplate_tooltips), null);
+		URL url = FileLocator.find(bundle, new Path(Messages.PBSBatchScriptTemplate_tooltips), null);
 		if (url == null)
 			return;
 		InputStream s = null;
@@ -485,9 +455,7 @@ public class PBSBatchScriptTemplate {
 		if (configuration == null)
 			return template;
 
-		String args = configuration.getAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS,
-				ConfigUtils.EMPTY_STRING);
+		String args = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, ConfigUtils.EMPTY_STRING);
 
 		if (ConfigUtils.EMPTY_STRING.equals(args))
 			return removePlaceholder(TAG_PRARGS, template);
@@ -501,19 +469,15 @@ public class PBSBatchScriptTemplate {
 	private String maybeReplaceChdir(String template) throws CoreException {
 		if (configuration == null)
 			return template;
-		String wdir = configuration.getAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY,
-				ConfigUtils.EMPTY_STRING);
+		String wdir = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, ConfigUtils.EMPTY_STRING);
 
 		// do what the launch manager does
 		if (ConfigUtils.EMPTY_STRING.equals(wdir)) {
-			String exec = configuration.getAttribute(
-					IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
+			String exec = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
 					ConfigUtils.EMPTY_STRING);
-			if (!ConfigUtils.EMPTY_STRING.equals(exec)) {
-				//TODO: not platform independent - needs IRemotePath 
-				wdir = new Path(exec).removeLastSegments(1).toString();  
-			}
+			if (!ConfigUtils.EMPTY_STRING.equals(exec))
+				// TODO: not platform independent - needs IRemotePath
+				wdir = new Path(exec).removeLastSegments(1).toString();
 		}
 
 		if (ConfigUtils.EMPTY_STRING.equals(wdir))
@@ -528,12 +492,9 @@ public class PBSBatchScriptTemplate {
 	private String maybeReplaceExec(String template) throws CoreException {
 		if (configuration == null)
 			return template;
-		String value = configuration.getAttribute(
-				IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-				ConfigUtils.EMPTY_STRING);
-		if (ConfigUtils.EMPTY_STRING.equals(value)) {
+		String value = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, ConfigUtils.EMPTY_STRING);
+		if (ConfigUtils.EMPTY_STRING.equals(value))
 			return removePlaceholder(TAG_EXECMD, template);
-		}
 		return replaceWithValue(TAG_EXECMD, value, template);
 	}
 
@@ -542,8 +503,7 @@ public class PBSBatchScriptTemplate {
 	 * passed in configuration. Currently accepts only three types: Boolean,
 	 * Integer and String.
 	 */
-	private void maybeSetValue(AttributePlaceholder ap) throws CoreException,
-			IllegalValueException {
+	private void maybeSetValue(AttributePlaceholder ap) throws CoreException, IllegalValueException {
 		if (configuration == null || ap == null)
 			return;
 		IAttribute<?, ?, ?> attr = ap.getAttribute();
@@ -556,11 +516,9 @@ public class PBSBatchScriptTemplate {
 			if (ConfigUtils.EMPTY_STRING.equals(value))
 				value = null;
 		} else if (attr instanceof BooleanAttribute)
-			value = configuration.getAttribute(id, new Boolean(ap
-					.getDefaultString()));
+			value = configuration.getAttribute(id, new Boolean(ap.getDefaultString()));
 		else if (attr instanceof IntegerAttribute)
-			value = configuration.getAttribute(id, new Integer(ap
-					.getDefaultString()));
+			value = configuration.getAttribute(id, new Integer(ap.getDefaultString()));
 		if (value != null)
 			attr.setValueAsString(value.toString());
 	}
@@ -571,12 +529,10 @@ public class PBSBatchScriptTemplate {
 	 */
 	private String removeLine(String name, String script) {
 		StringBuffer p = new StringBuffer();
-		p.append(ConfigUtils.LINE_SEP).append(".*@").append(name).append(".*@")
-				.append(ConfigUtils.LINE_SEP);
+		p.append(ConfigUtils.LINE_SEP).append(".*@").append(name).append(".*@").append(ConfigUtils.LINE_SEP);
 		Matcher m = Pattern.compile(p.toString()).matcher(script);
-		if (m.find()) {
+		if (m.find())
 			return m.replaceAll(ConfigUtils.LINE_SEP);
-		}
 		return script;
 	}
 
@@ -586,14 +542,12 @@ public class PBSBatchScriptTemplate {
 	private String removePlaceholder(String name, String script) {
 		name = "@" + name + "@ ";
 		Matcher m = Pattern.compile(name).matcher(script);
-		if (m.find()) {
+		if (m.find())
 			return m.replaceAll(ConfigUtils.EMPTY_STRING);
-		}
 		name = name.trim();
 		m = Pattern.compile(name).matcher(script);
-		if (m.find()) {
+		if (m.find())
 			return m.replaceAll(ConfigUtils.EMPTY_STRING);
-		}
 		return script;
 	}
 
@@ -603,11 +557,8 @@ public class PBSBatchScriptTemplate {
 	private String replaceWithValue(String name, String value, String script) {
 		Matcher m = Pattern.compile("@" + name + "@").matcher(script);
 		if (m.find()) {
-			System.out.println(value);
-			value = value.replaceAll("\\\\", "\\\\\\\\");  // \ -> \\
-			System.out.println(value);
-			value = value.replaceAll("\\$", "\\\\\\$");    // $ -> \$
-			System.out.println(value);
+			value = value.replaceAll("\\\\", "\\\\\\\\"); // \ -> \\
+			value = value.replaceAll("\\$", "\\\\\\$"); // $ -> \$
 			return m.replaceAll(value);
 		}
 		return script;
@@ -669,8 +620,7 @@ public class PBSBatchScriptTemplate {
 	 * Finds the PBS Job Attribute name from a line containing the corresponding
 	 * placeholder.
 	 */
-	private static String extractPBSAttributeName(String line)
-			throws ParseException {
+	private static String extractPBSAttributeName(String line) throws ParseException {
 		StringBuffer name = new StringBuffer();
 		boolean firstAt = false;
 		boolean lastAt = false;
@@ -691,8 +641,7 @@ public class PBSBatchScriptTemplate {
 		}
 
 		if (!firstAt || !lastAt)
-			throw new ParseException(line
-					+ Messages.PBSBatchScriptTemplate_parseError, 0);
+			throw new ParseException(line + Messages.PBSBatchScriptTemplate_parseError, 0);
 		return name.toString();
 	}
 }
