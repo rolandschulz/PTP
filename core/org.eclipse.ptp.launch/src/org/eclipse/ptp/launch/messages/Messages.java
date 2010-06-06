@@ -37,6 +37,8 @@ public class Messages extends NLS {
 	public static String ApplicationTab_12;
 	public static String ApplicationTab_13;
 
+	public static String ApplicationTab_14;
+
 	public static String ApplicationTab_Main;
 	public static String ApplicationTab_RM_Selection_Label;
 	public static String ApplicationTab_Project_Label;

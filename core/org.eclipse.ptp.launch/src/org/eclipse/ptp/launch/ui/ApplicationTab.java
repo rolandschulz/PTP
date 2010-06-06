@@ -511,22 +511,22 @@ public class ApplicationTab extends LaunchConfigurationTab {
 									appText.setText(path.toString());
 								}
 							} else {
-								setErrorMessage(Messages.ApplicationTab_8);
+								MessageDialog.openInformation(getShell(), Messages.ApplicationTab_14, Messages.ApplicationTab_8);
 							}
 						} else {
-							setErrorMessage(Messages.ApplicationTab_9);
+							MessageDialog.openInformation(getShell(), Messages.ApplicationTab_14, Messages.ApplicationTab_9);
 						}
 					} else {
-						setErrorMessage(Messages.ApplicationTab_10);
+						MessageDialog.openInformation(getShell(), Messages.ApplicationTab_14, Messages.ApplicationTab_10);
 					}
 				} else {
-					setErrorMessage(Messages.ApplicationTab_11);
+					MessageDialog.openInformation(getShell(), Messages.ApplicationTab_14, Messages.ApplicationTab_11);
 				}
 			} else {
-				setErrorMessage(Messages.ApplicationTab_12);
+				MessageDialog.openInformation(getShell(), Messages.ApplicationTab_14, Messages.ApplicationTab_12);
 			}
 		} else {
-			setErrorMessage(Messages.ApplicationTab_13);
+			MessageDialog.openInformation(getShell(), Messages.ApplicationTab_14, Messages.ApplicationTab_13);
 		}
 	}
 
