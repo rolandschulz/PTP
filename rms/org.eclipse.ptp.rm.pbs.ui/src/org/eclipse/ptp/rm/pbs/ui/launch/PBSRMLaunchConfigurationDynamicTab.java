@@ -70,16 +70,14 @@ import org.eclipse.ui.progress.UIJob;
  * 
  * @author arossi
  */
-public class PBSRMLaunchConfigurationDynamicTab extends
-		BaseRMLaunchConfigurationDynamicTab {
+public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
 	/*
 	 * (non-Javadoc) Provides communication between the template and the
 	 * underlying store (configuration) on the one hand, and the template and
 	 * the display widgets on the other. The extra fields are there to maintain
 	 * the correct options for rebuilding the controls.
 	 */
-	private class PBSRMLaunchDataSource extends
-			RMLaunchConfigurationDynamicTabDataSource {
+	private class PBSRMLaunchDataSource extends RMLaunchConfigurationDynamicTabDataSource {
 		private String currentConfigName;
 		private String currentRMId;
 		private String currentTemplate;
@@ -116,8 +114,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 			AttributePlaceholder ap = null;
 			Object value = null;
 
-			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets
-					.entrySet().iterator(); i.hasNext();) {
+			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets.entrySet().iterator(); i.hasNext();) {
 				Entry<Control, AttributePlaceholder> e = i.next();
 				Control c = e.getKey();
 				ap = e.getValue();
@@ -142,8 +139,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 				try {
 					template.setMPIAttributes((String) value);
 				} catch (IllegalValueException t) {
-					throw new ValidationException(t.getMessage() + ": "
-							+ t.getCause());
+					throw new ValidationException(t.getMessage() + ": " + t.getCause());
 				}
 			}
 		}
@@ -159,8 +155,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 			AttributePlaceholder ap = null;
 			IAttribute<?, ?, ?> attr = null;
 			Object value = null;
-			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets
-					.entrySet().iterator(); i.hasNext();) {
+			for (Iterator<Entry<Control, AttributePlaceholder>> i = valueWidgets.entrySet().iterator(); i.hasNext();) {
 				Entry<Control, AttributePlaceholder> e = i.next();
 				ap = e.getValue();
 				attr = ap.getAttribute();
@@ -216,13 +211,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 			PBSBatchScriptTemplate template = templateManager.getCurrent();
 			if (template != null)
 				template.saveValues(config);
-			try {
-				config.doSave();
-			} catch (CoreException t) {
-				t.printStackTrace();
-			} finally {
-				put(config);
-			}
 		}
 
 		/*
@@ -258,8 +246,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		 */
 		@Override
 		protected void validateLocal() throws ValidationException {
-			for (Iterator<Control> i = valueWidgets.keySet().iterator(); i
-					.hasNext();) {
+			for (Iterator<Control> i = valueWidgets.keySet().iterator(); i.hasNext();) {
 				Control c = i.next();
 				if (c instanceof Text) {
 					Text t = (Text) c;
@@ -269,18 +256,23 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 					/*
 					 * maybe restore default
 					 */
-					if (ConfigUtils.EMPTY_STRING.equals(value)
-							&& !ConfigUtils.EMPTY_STRING.equals(defaultString))
+					if (ConfigUtils.EMPTY_STRING.equals(value) && !ConfigUtils.EMPTY_STRING.equals(defaultString))
 						t.setText(defaultString);
 				} else if (c instanceof Combo) {
 					Combo cmb = (Combo) c;
 					String value = cmb.getText();
 					AttributePlaceholder ap = valueWidgets.get(c);
 					if (value.indexOf("?") >= 0)
-						throw new ValidationException(ap.getName() + ": "
-								+ Messages.PBSRMLaunchDataSource_ValueNotSet);
+						throw new ValidationException(ap.getName() + ": " + Messages.PBSRMLaunchDataSource_ValueNotSet);
 				}
 			}
+		}
+
+		private void setCurrentConfiguration() {
+			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
+			if (config == null)
+				return;
+			put(config);
 		}
 
 		/*
@@ -299,8 +291,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 				if (c == null)
 					currentTemplate = defaultTemplate;
 				else
-					currentTemplate = c.getAttribute(TAG_CURRENT_TEMPLATE,
-							defaultTemplate);
+					currentTemplate = c.getAttribute(TAG_CURRENT_TEMPLATE, defaultTemplate);
 			} catch (CoreException ce) {
 				ce.printStackTrace();
 			}
@@ -312,10 +303,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	 * template choice. Overridden methods support opening of dialog for editing
 	 * template.
 	 */
-	private class PBSRMLaunchWidgetListener extends
-			RMLaunchConfigurationDynamicTabWidgetListener {
-		public PBSRMLaunchWidgetListener(
-				BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+	private class PBSRMLaunchWidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
+		public PBSRMLaunchWidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
 
@@ -380,8 +369,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 					openEditor(ap, title);
 				else if (o == viewScript)
 					openReadOnly(template.realize());
-				else
-					super.widgetSelected(e);
+				// else
+				super.widgetSelected(e);
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -394,15 +383,13 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 			try {
 				IAttribute<?, ?, ?> attr = ap.getAttribute();
 				String attrval = attr.getValueAsString();
-				ScrollingEditableMessageDialog dialog = new ScrollingEditableMessageDialog(
-						control.getShell(), title, attrval);
+				ScrollingEditableMessageDialog dialog = new ScrollingEditableMessageDialog(control.getShell(), title, attrval);
 				if (dialog.open() == Window.CANCEL)
 					return;
 				attr.setValueAsString(dialog.getValue());
-				dataSource.copyToStorage();
+				// dataSource.copyToStorage();
 			} catch (Throwable t) {
-				WidgetUtils.errorMessage(control.getShell(), t,
-						Messages.PBSBatchScriptTemplateEditError_message,
+				WidgetUtils.errorMessage(control.getShell(), t, Messages.PBSBatchScriptTemplateEditError_message,
 						Messages.PBSBatchScriptTemplateEditError_title, false);
 			}
 		}
@@ -413,8 +400,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		 */
 		private void openReadOnly(String script) {
 			try {
-				new ScrollingEditableMessageDialog(control.getShell(),
-						Messages.PBSBatchScriptDislay, script, true).open();
+				new ScrollingEditableMessageDialog(control.getShell(), Messages.PBSBatchScriptDislay, script, true).open();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -432,8 +418,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		 */
 		@Override
 		protected void doModifyText(ModifyEvent e) {
-			dataSource.currentTemplate = templates.getItem(templates
-					.getSelectionIndex());
+			dataSource.currentTemplate = templates.getItem(templates.getSelectionIndex());
 			fireTemplateChange();
 		}
 	}
@@ -496,8 +481,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	 * The last panel is populated by a wizard page which adds widgets on the
 	 * basis of the PBS Job Attributes present in the template.
 	 */
-	public void createControl(Composite parent, IResourceManager rm,
-			IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = WidgetUtils.createComposite(parent, 2);
 		populateControl();
 	}
@@ -505,22 +489,18 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	/**
 	 * We send only the realized script as attribute.<br>
 	 */
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm,
-			IPQueue queue, ILaunchConfiguration configuration, String mode)
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
 
-		String current = configuration.getAttribute(TAG_CURRENT_TEMPLATE,
-				ConfigUtils.EMPTY_STRING);
+		String current = configuration.getAttribute(TAG_CURRENT_TEMPLATE, ConfigUtils.EMPTY_STRING);
 
-		PBSBatchScriptTemplate template = templateManager.loadTemplate(current,
-				configuration);
+		PBSBatchScriptTemplate template = templateManager.loadTemplate(current, configuration);
 		try {
 			template.configure();
 			attrs.add(templateManager.getCurrent().createScriptAttribute());
 		} catch (IllegalValueException t) {
-			IStatus status = new Status(Status.ERROR, PBSUIPlugin.PLUGIN_ID,
-					"getAttributes", t); //$NON-NLS-1$
+			IStatus status = new Status(Status.ERROR, PBSUIPlugin.PLUGIN_ID, "getAttributes", t); //$NON-NLS-1$
 			throw new CoreException(status);
 		}
 		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
@@ -574,9 +554,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	@Override
-	public RMLaunchValidation performApply(
-			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		// should not be null
 		dataSource.currentConfigName = configuration.getName();
 		String oldRM = dataSource.lastRMId;
@@ -584,12 +562,12 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 		if (templateChangeListener.isEnabled())
 			if (oldRM == null) {
 				PBSResourceManager pbsRM = (PBSResourceManager) rm;
-				IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) pbsRM
-						.getConfiguration();
+				IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) pbsRM.getConfiguration();
 				dataSource.defaultTemplate = rmConfig.getDefaultTemplateName();
 				dataSource.setCurrentTemplate(oldRM);
 				fireTemplateChange();
 			}
+		dataSource.setCurrentConfiguration();
 		return rmv;
 	}
 
@@ -602,9 +580,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	 * org.eclipse.ptp.core.elements.IResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(
-			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		return new RMLaunchValidation(true, null);
 	}
 
@@ -650,33 +626,27 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	 * command and buttons for editing optional sections, if these are present
 	 * in the template.
 	 */
-	private void createOptionalGroup(Composite parent,
-			PBSBatchScriptTemplate template) {
+	private void createOptionalGroup(Composite parent, PBSBatchScriptTemplate template) {
 		if (template == null)
 			return;
-		boolean[] nonNull = new boolean[] { null != template.getMpiCommand(),
-				null != template.getPrependedBashCommands(),
+		boolean[] nonNull = new boolean[] { null != template.getMpiCommand(), null != template.getPrependedBashCommands(),
 				null != template.getPostpendedBashCommands() };
 
 		if (!nonNull[0] && !nonNull[1] && !nonNull[2])
 			return;
 
-		Group options = WidgetUtils.createFillingGroup(parent,
-				Messages.PBSRMLaunchConfigGroup2_title, 3, 1, false);
+		Group options = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigGroup2_title, 3, 1, false);
 		options.setForeground(WidgetUtils.DKMG);
 
 		if (nonNull[0])
-			mpiCommand = WidgetUtils.createItemCombo(options,
-					Messages.PBSBatchScriptTemplateMPICommand, mpiChoices,
-					mpiChoices[0], null, true, listener, 2);
+			mpiCommand = WidgetUtils.createItemCombo(options, Messages.PBSBatchScriptTemplateMPICommand, mpiChoices, mpiChoices[0],
+					null, true, listener, 2);
 		if (nonNull[1])
-			editPrepended = WidgetUtils.createButton(options,
-					Messages.PBSBatchScriptTemplateEditPrepend_title, null,
-					SWT.PUSH, 1, false, listener);
+			editPrepended = WidgetUtils.createButton(options, Messages.PBSBatchScriptTemplateEditPrepend_title, null, SWT.PUSH, 1,
+					false, listener);
 		if (nonNull[2])
-			editPostpended = WidgetUtils.createButton(options,
-					Messages.PBSBatchScriptTemplateEditPostpend_title, null,
-					SWT.PUSH, 1, false, listener);
+			editPostpended = WidgetUtils.createButton(options, Messages.PBSBatchScriptTemplateEditPostpend_title, null, SWT.PUSH,
+					1, false, listener);
 	}
 
 	/*
@@ -684,16 +654,13 @@ public class PBSRMLaunchConfigurationDynamicTab extends
 	 * template and button for viewing the script.
 	 */
 	private void createSelectionGroup(Composite parent) {
-		Group selection = WidgetUtils.createFillingGroup(parent,
-				Messages.PBSRMLaunchConfigGroup1_title, 3, 3, true);
+		Group selection = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigGroup1_title, 3, 3, true);
 		selection.setForeground(WidgetUtils.DKMG);
-		templates = WidgetUtils.createItemCombo(selection, null,
-				templateManager.findAvailableTemplates(), null, null, true,
+		templates = WidgetUtils.createItemCombo(selection, null, templateManager.findAvailableTemplates(), null, null, true,
 				templateChangeListener, 2);
 		((GridData) templates.getLayoutData()).widthHint = 200;
-		viewScript = WidgetUtils.createButton(selection,
-				Messages.PBSRMLaunchConfigViewScript_title, null, SWT.PUSH, 1,
-				true, listener);
+		viewScript = WidgetUtils.createButton(selection, Messages.PBSRMLaunchConfigViewScript_title, null, SWT.PUSH, 1, true,
+				listener);
 	}
 
 	/*

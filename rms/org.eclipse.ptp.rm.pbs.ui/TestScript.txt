@@ -13,6 +13,8 @@ generate the widgets dynamically, but I have yet to discover what.  Any suggesti
 
 ----------------------------------------------------------------------------------------------------------
 
+NOTE:  After each change, be sure to select the "apply" button to save it.
+
 1.  CREATE THREE PBS Resource Managers (Parallel Runtime Perspective, Resource Managers View)
     For the purposes of this test, none actually need to be remote; just point them to the executable
     in the PBS Jproxy plugin.
@@ -56,18 +58,16 @@ generate the widgets dynamically, but I have yet to discover what.  Any suggesti
     This template should appear, but the values you set in the default_template should not have changed.
     
     Close and reopen.
-    You will notice that the values have stayed the same, but the template reverts to the default.  This
-    is because of the nature of the configuration mappings underlying the Resource Tab.  I decided it
-    easiest to maintain a static template mapping to a given RM.  Since the values do not need to be filled
-    in again when you switch templates, all the user needs to do is revert to that template.  One can always
-    change the default in the RM Edit Tab (as above).   
-
+    
+    The template is still full_template.  You have actually changed the 
+    the (default) template associated with this RM by reselecting here.
+    
     To demonstrate that the values are not attached to the RM, but to the Run Configuration:
 
     Open CONFIG_B.
     This should have the full_template, but with the B values.  
-    Select the default_template.  Again, the B values remain.  Close this configuration and reopen A.
-    The default_template will appear with A's values; etc.    
+    Select the default_template.  Again, the B values remain.  Close this configuration and reopen B.
+    The default_template will appear with B's values; etc.    
    
 6.  Now we will reset the Resource Manager associated with each of these Run Configurations.
     
@@ -78,19 +78,6 @@ generate the widgets dynamically, but I have yet to discover what.  Any suggesti
     Open CONFIG_B.
     Choose RM3.  The partial_template should appear with the B values.
     Close and reopen.  You should see RM3, the partial_template and B values.
-     
-    Open CONFIG_A.
-    Reopening A should show partial_template, RM1 and A values again, etc.
-
-    NOTE: A change in mapping of template to RM within a given Run Configuration is only valid for the duration
-    of a session, which corresponds to a single Resource Tab object.  When you close that session (by switching
-    to another Run Configuration), the default mapping is restored, as mentioned above.  Try this:
-
-    Open CONFIG_A.
-    This should be RM1 at this point.  Switch template to partial_template.  
-    Now choose RM2, whose template is full_template.  
-    Switching back to RM1 will restore partial_template, not default_template.
-    Close and reopen CONFIG_A.  You will now see RM1 with default_template.
 
 7.  Change values.
 
@@ -98,8 +85,6 @@ generate the widgets dynamically, but I have yet to discover what.  Any suggesti
     Change the MPI command to blank, and the Job to "A1".
     Close.  Reopen.  You should now see the new values.  
     Switch template.  Again, the new values should be there.
-    Switch to MP3, and back to RM1.
-    You should get the default_template, but with the new values.
 
 8.  Inspecting the batch script.  
 
@@ -115,7 +100,7 @@ generate the widgets dynamically, but I have yet to discover what.  Any suggesti
     The environment variables should appear just after the PBS directives as bash 'export' statements.
 
     If you use the full_template, you will see the "EDIT PREPENDED COMMANDS" and "EDIT POSTPENDED COMMANDS" 
-    buttons.  You may add arbitrary shell-script commands before or after the executable line with these.
+    buttons.  You may add arbitrary shell-script commands before or after the executable line with these.  
 
 9.  MPI -n computation.
 
@@ -123,17 +108,7 @@ generate the widgets dynamically, but I have yet to discover what.  Any suggesti
     the value of the mpirun/mpiexec -n argument.
      
     Try setting nodes=3:ppn=4 and see what happens (View Script).
-
-EXAMPLE COMMAND SENT TO THE PROXY (I've split this onto several lines for readability; it is all one line when issued):
-
-cmd: ProxyRuntimeSubmitJobCommand tid=1 launchedByPTP=true
-script=#!/bin/bash\n\n##########################################################
-###########\n##\sTemplate\sfor\sPBS\sBatch\sScript\sGenerated\sby\sPBS\sResource
-\sManager\n##\sLaunch\sTab\n##\n##\sThis\stemplate\shas\sonly\sa\sminimal\sset\s
-of\sattributes.\s\sSee\n##\sthe\sfull_template\sfor\sthe\scomplete\splaceholder
-\sset.\n#####################################################################\n
-\n#PBS\s-A\sA1\n#PBS\s-l\snodes=3:ppn=4\n#PBS\s-l\swalltime=00:30:00\n#PBS\s-N
-\sA1\nexport\sb=B\nexport\sa=A\n\ncd\s/u/ncsa/arossi\nmpiexec\s-n\s12\s/u/ncsa/
-arossi/TestProject\s-a\sfoo\sbar\n env=b=B env=a=A progArgs=-a progArgs=foo 
-progArgs=bar debugStopInMain=true jobSubId=JOB_12738065773731 workingDir=
-/u/ncsa/arossi execName=TestProject execPath=/u/ncsa/arossi queueId=33555837
+    
+    Be sure that only one of these two attributes is defined for the template; otherwise
+    you will have to ensure that both are correct (moreover, a given batch system
+    may or may not be set up to accept both as defined).
