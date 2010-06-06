@@ -576,6 +576,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 			try {
 				doShutdown();
 			} finally {
+				setState(ResourceManagerAttributes.State.STOPPED);
 				cleanUp();
 			}
 		}
