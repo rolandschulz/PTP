@@ -252,26 +252,27 @@ public class Connection implements IRemoteConnection {
 
 		fHostname = hostname;
 
-		if (port == 0) {
-			port = ConnectionProperties.defaultPort;
-		}
 		fPort = port;
-
-		if (cipherType == null) {
-			cipherType = CipherTypes.CIPHER_DEFAULT;
+		if (fPort == 0) {
+			fPort = ConnectionProperties.defaultPort;
 		}
+
 		fCipherType = cipherType;
-
-		if (timeout == 0) {
-			timeout = ConnectionProperties.defaultTimeout;
+		if (fCipherType == null) {
+			fCipherType = CipherTypes.CIPHER_DEFAULT;
 		}
+
 		fTimeout = timeout;
+		if (fTimeout == 0) {
+			fTimeout = ConnectionProperties.defaultTimeout;
+		}
 
 		/*
 		 * Create session.
 		 */
 		try {
 			defaultSession = jsch.createSession(fHostname, fPort, fUsername);
+			sshuserinfo.reset();
 			defaultSession.setUserInfo(sshuserinfo);
 			defaultSession.setServerAliveInterval(300000);
 			defaultSession.setServerAliveCountMax(6);
