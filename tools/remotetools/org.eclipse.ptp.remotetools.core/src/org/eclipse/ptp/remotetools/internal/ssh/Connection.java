@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jsch.core.IJSchService;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.AuthToken;
@@ -332,12 +331,10 @@ public class Connection implements IRemoteConnection {
 		}
 
 		/*
-		 * Create observer job and schedule it
+		 * Create observer thread and start it
 		 */
 		executionObserver = new ExecutionObserver(this);
-		executionObserver.setPriority(Job.DECORATE);
-		executionObserver.setSystem(true);
-		executionObserver.schedule();
+		executionObserver.start();
 
 		/*
 		 * The default session cannot be fully used for connection pool, since
