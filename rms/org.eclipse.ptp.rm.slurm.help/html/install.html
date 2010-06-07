@@ -10,15 +10,15 @@
 <body>
 <h1>SLURM Resource Manager for PTP</h1>
 <h2><a name=install></a>Installation</h2>
-<p>To use SLURM resource manager to manage resource allocation and to launch parallel job, 
-you will need to rebuild the SLURM proxy by following these steps after completing the PTP plugin installation procedures.</p>
+<p>To use the SLURM resource manager to manage resource allocation and to launch parallel jobs, 
+you will need to build the SLURM proxy by following these steps after completing the PTP plugin installation procedures.</p>
 <ol>
 <li>Make sure you have installed SLURM and that the slurm.h and slurm_errno.h include files exist on your system.
 They normally are located in the <b>include/slurm</b> directory within a SLURM installation. 
 The location where SLURM is installed is up to you or your system administrator.</li>
 <li>Make sure you have built PTP proxy and utils libraries successfully.  
 If not, cd to the org.eclipse.ptp.proxy/utils directory inside your plugins directory, 
-and run <b>configure</b> with default options firstly and then run <b>make</b> to build the necessary libraries.</li>
+and run <b>configure</b> with default options, and then run <b>make</b> to build the necessary libraries.</li>
 <li>cd to the org.eclipse.ptp.rm.slurm.proxy directory inside your plugins directory.</li>
 <li>Invoke the configure script in that directory with the <b>--with-slurm=xxx</b> flag, specifying the path to
 the include directory containing slurm/slurm.h (Use <b>configure --help</b> to see a complete list of configure script options)</li>
