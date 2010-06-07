@@ -9,17 +9,44 @@
 
 <body>
 <h1>SLURM Resource Manager for PTP</h1>
-Please enter your text here.
-
-<h1>Running SLURM Applications</h1>
 <h2><A name=introduction></A>Introduction</h2>
 <p>The SLURM Eclipse plug-in, part of the 
 <a href="PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">Parallel Tools Platform</a> (PTP),  
-allows you to run a parallel application using the Simple Linux Utility for Resource Management (SLURM) from within the PTP framework. 
+allows you to run a parallel application using the Simple Linux Utility for Resource Management (SLURM) from within the PTP framework.
+In addition to running applications, you can monitor their status, control their execution, and view their stdio
+output from within PTP. You can also debug a parallel application using the built in PTP parallel debugger. </p>
+<p>You can run and debug parallel applications either as local projects or as remote projects, using the remote development 
+environment support that is part of PTP.</p>
+<p>This plugin consists of two parts. The first is the Eclipse PTP plugin code which is responsible for the PTP views 
+presented to the user and the user's interaction with those views. The second part is a resource manager (proxy), which is
+responsible for communicating with the PTP PE plugin code, invoking the parallel application, and reporting application
+status to the PTP SLURM plugin.</p>
 
-<p>Table of Contents:
+<p>
+Table of Contents:
 <ul>
-<li><a href="maintopic.html">How to run SLURM jobs in PTP</a>
+<li><a href="require.html">Requirements</a>
+</ul>
+<ul>
+<li><a href="install.html">Installation</a>
+</ul>
+<ul>
+<li><a href="start.html">Getting Started</a>
+</ul>
+<ul>
+<li><a href="create_rms.html">Creating a Resource Manager</a>
+</ul>
+<ul>
+<li><a href="start_rms.html">Starting a Resource Manager</a>
+</ul>
+<ul>
+<li><a href="run_job.html">Running a Parallel Application</a>
+</ul>
+<ul>
+<li><a href="mon_job.html">Monitoring Application Execution</a>
+</ul>
+<ul>
+<li><a href="restrict.html">Restrictions</a>
 </ul>
 </body>
 </html>

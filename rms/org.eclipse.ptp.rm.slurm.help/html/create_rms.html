@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Creating a Resource Manager</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+
+<body>
+<h1>SLURM Resource Manager for PTP</h1>
+<h2><A name=createmanager></A>Creating a Resource Manager</h2>
+<p>Before launching a paralle job, you should create the resource manager for SLURM. To do this, right-click in the
+resource managers view and selecting <b>Add Resource Manager</b> from the menu. A resource manager wizard will be 
+displayed. Select <b>SLURM</b> from the list of resource manager types and click next. The next panel displayed configures
+the SLURM resource manager. Select the Remote service provider and proxy server location from the dropdown lists. You can
+also create a new proxy server location by clicking the <b>New</b> button in this pane. Specify the path to the proxy 
+server executable, or just accept the value filled in as default from the preferences panel. 
+In case of remote development, you should specify the <b>ip address</b> of the local machine (instead of localhost),
+to which the remote slurm proxy will connect.
+Uncheck the <b>Launch server 
+manually</b> and click next again. On the final page of the resource configuration manager wizard, either accept the 
+default resource manager name, or uncheck the checkbox and enter a name and description for the resource manager. 
+Then click finish to create the resource manager entry.</p>
+<p>The image below shows the series of SLURM proxy configuration panels of the resource manager wizard.</p>
+<p>Configure the resource manager.</P>
+<img src="images/slurm_proxy_config_1.png">
+<p>Name this occurance of the resource manager.</p>
+<img src="images/slurm_proxy_config_2.png">
+<p>You may have as many resource managers defined as you require for your system configuration.</p>
+
+<p><a href="toc.html">Back to Table of Contents</a>
+</body>
+</html>
