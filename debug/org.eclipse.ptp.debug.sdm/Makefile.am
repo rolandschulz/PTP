@@ -27,7 +27,7 @@ libsdm_a_CFLAGS =			-I./include $(AM_CFLAGS)
 sdm_test_SOURCES =			src/test/sdm_test.c
 sdm_test_CFLAGS =			-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 sdm_test_LDFLAGS = 			-g
-sdm_test_LDADD =			libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
+sdm_test_LDADD =			libdbgclnt.a libsdm.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 
 noinst_HEADERS =			include/backend.h \
 							include/breakpoint.h \
