@@ -669,6 +669,20 @@ public class ServiceModelManager extends PlatformObject implements IServiceModel
 		}
 	}
 	
+	/**
+	 * @since 2.0
+	 */
+	public void remap(IProject removedProject, IProject addedProject) {
+		if(removedProject == null || addedProject == null)
+			throw new NullPointerException();
+		
+		if(isConfigured(removedProject)) {
+			fProjectConfigurations.put(addedProject, fProjectConfigurations.remove(removedProject));
+			fActiveConfigurations.put(addedProject, fActiveConfigurations.remove(removedProject));
+			fProjectServices.put(addedProject, fProjectServices.remove(removedProject));
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.services.core.IServiceModelManager#remove(org.eclipse.core.resources.IProject)
 	 */
