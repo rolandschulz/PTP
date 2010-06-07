@@ -16,20 +16,18 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.jsch.core.IJSchService;
-import org.eclipse.ptp.remotetools.core.AuthToken;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
 import org.eclipse.ptp.remotetools.internal.ssh.CipherTypes;
 import org.eclipse.ptp.remotetools.internal.ssh.Connection;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
-
 /**
  * The main plug-in class to be used in the desktop.
  */
 public class RemotetoolsPlugin extends Plugin {
 
-	//The shared instance.
+	// The shared instance.
 	private static RemotetoolsPlugin plugin;
 	// ServiceTracker for IJschService
 	private ServiceTracker tracker;
@@ -44,15 +42,17 @@ public class RemotetoolsPlugin extends Plugin {
 	/**
 	 * This method is called upon plug-in activation
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-	    tracker = new ServiceTracker(getBundle().getBundleContext(), IJSchService.class.getName(), null);
-	    tracker.open();
+		tracker = new ServiceTracker(getBundle().getBundleContext(), IJSchService.class.getName(), null);
+		tracker.open();
 	}
 
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		plugin = null;
@@ -64,46 +64,26 @@ public class RemotetoolsPlugin extends Plugin {
 	public static RemotetoolsPlugin getDefault() {
 		return plugin;
 	}
-	
+
 	/**
 	 * Returns an instance of IJSchService from the OSGi Registry.
-	 * @return An instance of IJSchService, or <code>null</code> if no 
-	 * 		IJschService service is available.
+	 * 
+	 * @return An instance of IJSchService, or <code>null</code> if no
+	 *         IJschService service is available.
 	 */
-    public IJSchService getJSchService() {
-        return (IJSchService)tracker.getService();
-    }
-
-	/**
-	 * Returns an instance of {@link IRemoteConnection} using a ssh connection.
-	 */
-	public static IRemoteConnection createSSHConnection(AuthToken authToken, String hostname,
-			int port, String cipherType, int timeout)
-	{		
-		return new Connection(authToken, hostname, port, cipherType, timeout);
+	public IJSchService getJSchService() {
+		return (IJSchService) tracker.getService();
 	}
 
 	/**
 	 * Returns an instance of {@link IRemoteConnection} using a ssh connection.
+	 * 
+	 * @since 3.0
 	 */
-	public static IRemoteConnection createSSHConnection(AuthToken authToken, String hostname,
-			int port, String cipherType)
-	{		
-		return new Connection(authToken, hostname, port, cipherType);
-	}
-	
-	/**
-	 * Returns an instance of {@link IRemoteConnection} using a ssh connection.
-	 */
-	public static IRemoteConnection createSSHConnection(AuthToken authToken, String hostname)
-	{		
-		return new Connection(authToken, hostname);
+	public static IRemoteConnection createSSHConnection() {
+		return new Connection();
 	}
 
-	public static IRemoteConnection createSSHConnection(AuthToken authToken, String hostname, int port) {
-		return new Connection(authToken, hostname, port);
-	}
-	
 	/**
 	 * 3DES cipher type
 	 */
@@ -128,31 +108,10 @@ public class RemotetoolsPlugin extends Plugin {
 	 * Default cipher type
 	 */
 	public static final String CIPHER_DEFAULT = org.eclipse.ptp.remotetools.internal.ssh.CipherTypes.CIPHER_DEFAULT;
-	
+
 	public static Map getCipherTypesMap() {
 		HashMap map = new HashMap(CipherTypes.getCipherTypesMap());
-		
+
 		return map;
 	}
-	
-	/**
-	 * Returns an instance of {@link IRemoteConnection} using a ssh connection.
-	 *//*
-	public static IRemoteConnection createSSHConnection(String username, String password, String hostname,
-			int port, int timeout)
-	{		
-		return new Connection(username, password, hostname, port, timeout);
-	}
-
-	*//**
-	 * Returns an instance of {@link IRemoteConnection} using a ssh connection.
-	 *//*
-	public static IRemoteConnection createSSHConnection(String username, String password, String hostname)
-	{		
-		return new Connection(username, password, hostname);
-	}
-
-	public static IRemoteConnection createSSHConnection(String username, String password, String hostname, int port) {
-		return new Connection(username, password, hostname, port);
-	}*/
 }

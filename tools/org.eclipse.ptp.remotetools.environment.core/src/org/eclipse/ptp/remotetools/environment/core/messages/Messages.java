@@ -10,6 +10,7 @@ public class Messages extends NLS {
 	public static String SSHTargetControl_2;
 	public static String SSHTargetControl_3;
 	public static String SSHTargetControl_4;
+	public static String SSHTargetControl_5;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

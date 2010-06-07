@@ -33,10 +33,9 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
-
 /**
- * Standard implementation of <code>IRemoteJobController</code>.
- * Presumes a target environment that accepts SSH connections.
+ * Standard implementation of <code>IRemoteJobController</code>. Presumes a
+ * target environment that accepts SSH connections.
  * 
  * @see ITargetJobController
  * @author Daniel Felix Ferber
@@ -47,39 +46,43 @@ public abstract class SSHTargetControl implements ITargetControl {
 	/**
 	 * Set of jobs running on the remote target environment.
 	 */
-	private Map<ITargetJob, TargetControlledJob> remoteJobs = new HashMap<ITargetJob, TargetControlledJob>();
+	private final Map<ITargetJob, TargetControlledJob> remoteJobs = new HashMap<ITargetJob, TargetControlledJob>();
 
 	/**
 	 * A connection (using ssh) to the remote target environment.
 	 */
-	private IRemoteConnection remoteConnection;
-	
+	private IRemoteConnection remoteConnection = null;
+
 	/**
-	 * Listeners notified when jobs ared added/removed from the target environment.
+	 * Listeners notified when jobs ared added/removed from the target
+	 * environment.
 	 */
-	private Set<ITargetControlJobListener> jobListeners = new HashSet<ITargetControlJobListener>();
-	
+	private final Set<ITargetControlJobListener> jobListeners = new HashSet<ITargetControlJobListener>();
+
 	/**
 	 * Exception to terminate the environment.
 	 */
-	private CoreException pendingException =null;
-	
+	private CoreException pendingException = null;
+
 	/**
-	 * Return a map containing the available cipher types ids and their respective names
+	 * Return a map containing the available cipher types ids and their
+	 * respective names
+	 * 
 	 * @return a Map object containing cipher type ids and cipher type names
 	 */
 	public static Map getCipherTypesMap() {
 		// This method decouples the map from the RemotetoolsPlugin
 		// so its safe to use it on the interface of each environment
 		// that uses this plugin.
-		
+
 		HashMap cipherTypesMap = new HashMap(RemotetoolsPlugin.getCipherTypesMap());
-		
+
 		return cipherTypesMap;
 	}
-	
+
 	/**
 	 * A set of parameters used for authentication with SSH.
+	 * 
 	 * @author Daniel Felix Ferber
 	 * @since 1.2
 	 */
@@ -93,9 +96,10 @@ public abstract class SSHTargetControl implements ITargetControl {
 		public boolean isPasswdAuth;
 		public String cipherType;
 		public int timeout = 0;
-		
+
 		/**
-		 * Constructor for password based authentication and assuming timeout = 0
+		 * Constructor for password based authentication and assuming timeout =
+		 * 0
 		 * 
 		 * @param hostname
 		 * @param port
@@ -104,11 +108,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 		 */
 		public SSHParameters(String hostname, int port, String user, String password) {
 			this(hostname, port, user, password, RemotetoolsPlugin.CIPHER_DEFAULT, 0);
-			/*super();
-			this.hostname = hostname;
-			this.port = port; 
-			this.user = user;
-			this.password = password;*/
 		}
 
 		/**
@@ -118,7 +117,8 @@ public abstract class SSHTargetControl implements ITargetControl {
 		 * @param port
 		 * @param user
 		 * @param password
-		 * @param cipherType Choose among the supported ciphers
+		 * @param cipherType
+		 *            Choose among the supported ciphers
 		 * @param timeout
 		 */
 		public SSHParameters(String hostname, int port, String user, String password, String cipherType, int timeout) {
@@ -131,7 +131,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 			this.cipherType = cipherType;
 			isPasswdAuth = true;
 		}
-		
+
 		/**
 		 * Constructor for public/private key based authentication
 		 * 
@@ -139,11 +139,12 @@ public abstract class SSHTargetControl implements ITargetControl {
 		 * @param port
 		 * @param user
 		 * @param password
-		 * @param cipherType Choose among the supported ciphers
+		 * @param cipherType
+		 *            Choose among the supported ciphers
 		 * @param timeout
 		 */
-		public SSHParameters(String hostname, int port, String user, String keyPath, String passphrase, 
-				String cipherType, int timeout) {
+		public SSHParameters(String hostname, int port, String user, String keyPath, String passphrase, String cipherType,
+				int timeout) {
 			super();
 			this.hostname = hostname;
 			this.port = port;
@@ -154,9 +155,10 @@ public abstract class SSHTargetControl implements ITargetControl {
 			this.cipherType = cipherType;
 			isPasswdAuth = false;
 		}
-		
+
 		/**
-		 * Constructor for public/private key based authentication assuming timeout = 0
+		 * Constructor for public/private key based authentication assuming
+		 * timeout = 0
 		 * 
 		 * @param hostname
 		 * @param port
@@ -167,14 +169,16 @@ public abstract class SSHTargetControl implements ITargetControl {
 			this(hostname, port, user, keyPath, passphrase, RemotetoolsPlugin.CIPHER_DEFAULT, 0);
 		}
 	}
-	
+
 	/**
 	 * The parameters used by the connection to the remote target environment.
 	 */
 	SSHParameters sshParameters;
-	
+
 	/**
-	 * Facility method that raises a SimulatorException with the last error detected from and observing thread.
+	 * Facility method that raises a SimulatorException with the last error
+	 * detected from and observing thread.
+	 * 
 	 * @throws SimulatorException
 	 */
 	protected synchronized void throwPendingException() throws CoreException {
@@ -182,19 +186,18 @@ public abstract class SSHTargetControl implements ITargetControl {
 			throw pendingException;
 		}
 	}
-	
+
 	protected synchronized void notifyException(CoreException e) {
 		pendingException = e;
 	}
 
-	
 	/**
 	 * Add a new job listener.
 	 */
 	public synchronized void addJobListener(ITargetControlJobListener listener) {
 		jobListeners.add(listener);
 	}
-	
+
 	/**
 	 * Remove a job listener.
 	 */
@@ -203,10 +206,10 @@ public abstract class SSHTargetControl implements ITargetControl {
 	}
 
 	/**
-	 * Create a waiting job on the 
+	 * Create a waiting job on the
 	 */
 	public synchronized void startJob(ITargetJob job) throws CoreException {
-		if ((query() != ITargetStatus.PAUSED) &&(query() != ITargetStatus.RESUMED)) {
+		if ((query() != ITargetStatus.PAUSED) && (query() != ITargetStatus.RESUMED)) {
 			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, Messages.SSHTargetControl_0, null));
 		}
 		TargetControlledJob controlledJob = new TargetControlledJob(this, job);
@@ -236,7 +239,6 @@ public abstract class SSHTargetControl implements ITargetControl {
 		remoteJobs.remove(job);
 	}
 
-
 	/**
 	 * Returns the number of jobs running on the remote host.
 	 */
@@ -252,9 +254,11 @@ public abstract class SSHTargetControl implements ITargetControl {
 		remoteJobs.keySet().toArray(array);
 		return array;
 	}
-	
+
 	/**
-	 * Set the connection parameters to be used by {@link #create(IProgressMonitor)}.
+	 * Set the connection parameters to be used by
+	 * {@link #create(IProgressMonitor)}.
+	 * 
 	 * @param parameters
 	 */
 	protected synchronized void setConnectionParameters(SSHParameters parameters) {
@@ -263,7 +267,8 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	/**
 	 * Create the remote target environment by opening a SSH connection to it.
-	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)
+	 * First,
+	 * {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)
 	 * must be called.
 	 */
 	public boolean create(IProgressMonitor monitor) throws CoreException {
@@ -272,6 +277,10 @@ public abstract class SSHTargetControl implements ITargetControl {
 			if (monitor.isCanceled()) {
 				disconnect();
 				throw new CoreException(new Status(IStatus.CANCEL, getPluginId(), 0, Messages.SSHTargetControl_1, null));
+			}
+			if (remoteConnection != null) {
+				kill(monitor);
+				createRemoteExecutionManager().resetCancel();
 			}
 			connect(monitor);
 			if (monitor.isCanceled()) {
@@ -282,7 +291,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			String message = e.getMessage();
-			Throwable t =e.getCause();
+			Throwable t = e.getCause();
 			if (t != null) {
 				message += ": " + t.getMessage(); //$NON-NLS-1$
 			}
@@ -291,10 +300,12 @@ public abstract class SSHTargetControl implements ITargetControl {
 	}
 
 	/**
-	 * Create the SSH connection to the remote target environment.
-	 * First, {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)}
+	 * Create the SSH connection to the remote target environment. First,
+	 * {@link #setConnectionParameters(org.eclipse.ptp.remotetools.environment.control.SSHTargetControl.SSHParameters)}
 	 * must be called.
-	 * @param monitor progress monitor
+	 * 
+	 * @param monitor
+	 *            progress monitor
 	 * @throws RemoteConnectionException
 	 */
 	protected synchronized void connect(IProgressMonitor monitor) throws RemoteConnectionException {
@@ -303,78 +314,53 @@ public abstract class SSHTargetControl implements ITargetControl {
 		 * Try to connect, else undo the connection.
 		 */
 		AuthToken authToken;
-		if(sshParameters.isPasswdAuth) {
+		if (sshParameters.isPasswdAuth) {
 			authToken = new PasswdAuthToken(sshParameters.user, sshParameters.password);
 		} else {
-			authToken = new KeyAuthToken(sshParameters.user, new File(sshParameters.keyPath),
-										sshParameters.passphrase);
+			authToken = new KeyAuthToken(sshParameters.user, new File(sshParameters.keyPath), sshParameters.passphrase);
 		}
-		
+
+		if (remoteConnection == null) {
+			remoteConnection = RemotetoolsPlugin.createSSHConnection();
+		}
 		try {
-			if (sshParameters.timeout <= 0) {
-				remoteConnection = RemotetoolsPlugin.createSSHConnection(authToken, sshParameters.hostname, sshParameters.port, 
-						sshParameters.cipherType);
-			} else {
-				remoteConnection = RemotetoolsPlugin.createSSHConnection(authToken, sshParameters.hostname, sshParameters.port, 
-						sshParameters.cipherType, sshParameters.timeout);
-			}
-			remoteConnection.connect(monitor);
+			remoteConnection.connect(authToken, sshParameters.hostname, sshParameters.port, sshParameters.cipherType,
+					sshParameters.timeout, monitor);
 		} catch (RemoteConnectionException e) {
 			disconnect();
 			throw e;
 		}
 	}
-	
-	/**
-	 * Convert the value of the cipher from the SSHParameter to the value used in the RemoteTools
-	 * 
-	 * @param Constant value used by SSHParameters
-	 * @return Constant value used by RemoteTools
-	 */
-	/*public String convertCipherConstant(String sshParamCipherType) {
-		switch(sshParamCipherType) {
-		case SSHParameters.CIPHER_3DES:
-			return RemotetoolsPlugin.CipherTypes.CIPHER_3DES;
-		case SSHParameters.CIPHER_AES128:
-			return CipherTypes.CIPHER_AES128;
-		case SSHParameters.CIPHER_AES192:
-			return CipherTypes.CIPHER_AES192;
-		case SSHParameters.CIPHER_AES256:
-			return CipherTypes.CIPHER_AES256;
-		case SSHParameters.CIPHER_BLOWFISH:
-			return CipherTypes.CIPHER_BLOWFISH;
-		default:
-			return CipherTypes.CIPHER_DEFAULT;
-		}
-	}*/
 
 	/**
 	 * Returns the plugin ID.
+	 * 
 	 * @return
 	 */
-	protected abstract  String getPluginId();
+	protected abstract String getPluginId();
 
 	/**
-	 * Destroy the remote target environment, by closing the SSH connection to it.
+	 * Destroy the remote target environment, by closing the SSH connection to
+	 * it.
 	 */
 	public boolean kill(IProgressMonitor monitor) throws CoreException {
 		/*
-		 * Try to gracefully terminate all running jobs. Might this fail, then guarantee to disconnect.
+		 * Try to gracefully terminate all running jobs. Might this fail, then
+		 * guarantee to disconnect.
 		 */
 		try {
 			terminateJobs(monitor);
 		} finally {
 			disconnect();
 		}
-		remoteConnection = null;
 		return true;
 	}
 
 	public boolean executeRemoteCommand(IProgressMonitor monitor, String command, String[] args) throws CoreException {
 		if (remoteConnection == null) {
-			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), "Internal error: remote connection invalid", null)); //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), Messages.SSHTargetControl_5, null));
 		}
-		
+
 		for (int i = 0; i < args.length; i++) {
 			command += (" " + args[i]); //$NON-NLS-1$
 		}
@@ -385,28 +371,26 @@ public abstract class SSHTargetControl implements ITargetControl {
 			executionManager.close();
 			return true;
 		} catch (RemoteConnectionException e) {
-			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
-					Messages.SSHTargetControl_2, e));
+			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, Messages.SSHTargetControl_2, e));
 		} catch (CancelException e) {
-			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
-					Messages.SSHTargetControl_3, e));
+			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, Messages.SSHTargetControl_3, e));
 		} catch (RemoteExecutionException e) {
-			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
-					Messages.SSHTargetControl_4, e));
+			throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0, Messages.SSHTargetControl_4, e));
 		}
 	}
-	
+
 	/**
-	 * Informs how to connect to a socket that is being listened on the remote 
-	 * target environment. If necessary, create a tunnel that forwards the remote
-	 * port.
-	 * @return A {@link TargetSocket} object that encapsulates information
-	 * where to connect in order to connect to the remote tunnel.
+	 * Informs how to connect to a socket that is being listened on the remote
+	 * target environment. If necessary, create a tunnel that forwards the
+	 * remote port.
+	 * 
+	 * @return A {@link TargetSocket} object that encapsulates information where
+	 *         to connect in order to connect to the remote tunnel.
 	 */
 	public TargetSocket createTargetSocket(int port) throws CoreException {
 		/*
-		 * Dummy implementation that assumes that the remote port is mapped
-		 * to the same local port. 
+		 * Dummy implementation that assumes that the remote port is mapped to
+		 * the same local port.
 		 */
 		TargetSocket test = new TargetSocket();
 		test.host = "localhost"; //$NON-NLS-1$
@@ -416,21 +400,22 @@ public abstract class SSHTargetControl implements ITargetControl {
 
 	/**
 	 * Checks if the connection to the remote target environment is alive.
+	 * 
 	 * @return
 	 */
 	protected boolean isConnected() {
 		return (remoteConnection != null) && (remoteConnection.isConnected());
 	}
-	
+
 	protected synchronized void terminateJobs(IProgressMonitor monitor) {
 		/*
 		 * Issue each job to terminate gracefully.
 		 */
 		for (ITargetJob job : remoteJobs.keySet()) {
-			TargetControlledJob controlledJob = (TargetControlledJob) remoteJobs.get(job);
+			TargetControlledJob controlledJob = remoteJobs.get(job);
 			controlledJob.cancelExecution();
 		}
-		
+
 		/*
 		 * Wait until all jobs have terminated.
 		 */
@@ -459,20 +444,20 @@ public abstract class SSHTargetControl implements ITargetControl {
 		remoteJobs.clear();
 		if (remoteConnection != null) {
 			remoteConnection.disconnect();
-			remoteConnection = null;
 		}
 	}
 
 	/**
-	 * Create a remote execution manager that may be used to do operations on the remote target
-	 * environment.
+	 * Create a remote execution manager that may be used to do operations on
+	 * the remote target environment.
+	 * 
 	 * @return
 	 * @throws RemoteConnectionException
 	 */
 	protected IRemoteExecutionManager createRemoteExecutionManager() throws RemoteConnectionException {
 		return remoteConnection.createRemoteExecutionManager();
 	}
-	
+
 	public IRemoteConnection getConnection() {
 		Assert.isTrue(false, "this method is not supported"); //$NON-NLS-1$
 		return remoteConnection;

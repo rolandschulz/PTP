@@ -30,7 +30,6 @@ import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.internal.common.RemoteTunnel;
 
-
 /**
  * @author Richard Maciel
  */
@@ -44,41 +43,41 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	 * Remote executions created by this manager.
 	 */
 	Set<IRemoteOperation> executions = new HashSet<IRemoteOperation>();
-	
+
 	/**
 	 * Connection created the execution manager.
 	 */
-	protected Connection connection;
+	protected final Connection connection;
 
 	/**
 	 * The instance that provides execution facility methods.
 	 */
-	protected IRemoteExecutionTools executionTools;
+	protected IRemoteExecutionTools executionTools = null;
 
 	/**
 	 * The instance that provides file manipulation facility methods.
 	 */
-	protected IRemoteFileTools fileTools;
+	protected IRemoteFileTools fileTools = null;
 
 	/**
 	 * The instance that provides file transfer facility methods.
 	 */
-	protected IRemoteCopyTools copyTools;
-	
+	protected IRemoteCopyTools copyTools = null;
+
 	/**
 	 * The instance that provides the path converter tool.
 	 */
-	protected IRemotePathTools pathTools;
+	protected IRemotePathTools pathTools = null;
 
 	/**
 	 * The instance that provides the status tool.
 	 */
-	protected IRemoteStatusTools statusTools;
+	protected IRemoteStatusTools statusTools = null;
 
 	/**
 	 * The instance that provides the port forwarding.
 	 */
-	protected IRemotePortForwardingTools portForwardingTools;
+	protected IRemotePortForwardingTools portForwardingTools = null;
 
 	/**
 	 * Automatic-generated port attribute
@@ -88,63 +87,62 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	private static int autoActualPort = minPort;
 
 	/**
-	 * Cancel flag. If true, no more operations are allowed on the this execution manager.
+	 * Cancel flag. If true, no more operations are allowed on the this
+	 * execution manager.
 	 */
 	private boolean cancelFlag = false;
 
-	
 	/**
 	 * Method that updates and return a new port number
 	 */
 	private synchronized static int getNewPortNumber() {
-		if(autoActualPort == maxPort)
+		if (autoActualPort == maxPort)
 			autoActualPort = minPort;
-		
+
 		return autoActualPort++;
 	}
-	
+
 	/**
-	 * Class constructor. This method initializes control data and allocs a control terminal.
+	 * Class constructor. This method initializes control data and allocs a
+	 * control terminal.
 	 * 
-	 * @throws RemoteCommandException The manager could not be created.
+	 * @throws RemoteCommandException
+	 *             The manager could not be created.
 	 * 
 	 */
 	protected ExecutionManager(Connection connection) throws RemoteConnectionException {
 		this.connection = connection;
-		this.fileTools = new FileTools(this);
-		this.executionTools = new ExecutionTools(this);
-		this.copyTools = new CopyTools(this);
-		this.pathTools = new PathTools(this);
-		this.statusTools = new StatusTools(this);
-		this.portForwardingTools = null;
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.IRemoteExecutionManager#cancel()
 	 */
 	public synchronized void cancel() {
 		/*
-		 * Cancel all operations. Each operation implements its own
-		 * logic how to cancel. This simply broadcasts the cancel to
-		 * all running operations.
+		 * Cancel all operations. Each operation implements its own logic how to
+		 * cancel. This simply broadcasts the cancel to all running operations.
 		 */
 		for (IRemoteOperation operation : executions) {
 			operation.cancel();
 		}
 		cancelFlag = true;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#resetCancel()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#resetCancel()
 	 */
-	public synchronized void resetCancel() { 
+	public synchronized void resetCancel() {
 		cancelFlag = false;
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#close()
 	 */
 	public synchronized void close() {
@@ -165,9 +163,8 @@ public class ExecutionManager implements IRemoteExecutionManager {
 			} catch (RemoteConnectionException e) {
 			}
 		}
-		tunnels = null;
 		connection.getForwardingPool().disconnect(this);
-		
+
 		/*
 		 * Close all channels for remote executions.
 		 */
@@ -175,21 +172,8 @@ public class ExecutionManager implements IRemoteExecutionManager {
 			operation.close();
 		}
 		executions.clear();
-		executions = null;
-		
-		/*
-		 * Unregister execution manager (callback).
-		 */
-		connection.releaseExcutionManager(this);
-		
-		this.fileTools = null;
-		this.executionTools = null;
-		this.copyTools = null;
-		this.pathTools = null;
-		this.statusTools = null;
-
 	}
-	
+
 	/**
 	 * Get the connection used by the execution manager.
 	 */
@@ -199,47 +183,80 @@ public class ExecutionManager implements IRemoteExecutionManager {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getExecutionTools()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getExecutionTools
+	 * ()
 	 */
 	public IRemoteExecutionTools getExecutionTools() throws RemoteConnectionException {
+		if (executionTools == null) {
+			executionTools = new ExecutionTools(this);
+		}
 		return executionTools;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemoteFileTools()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemoteFileTools
+	 * ()
 	 */
 	public IRemoteFileTools getRemoteFileTools() throws RemoteConnectionException {
+		if (fileTools == null) {
+			fileTools = new FileTools(this);
+		}
 		return fileTools;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemoteCopyTools()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemoteCopyTools
+	 * ()
 	 */
 	public IRemoteCopyTools getRemoteCopyTools() throws RemoteConnectionException {
+		if (copyTools == null) {
+			copyTools = new CopyTools(this);
+		}
 		return copyTools;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemotePathTools()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemotePathTools
+	 * ()
 	 */
 	public IRemotePathTools getRemotePathTools() {
+		if (pathTools == null) {
+			pathTools = new PathTools(this);
+		}
 		return pathTools;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemoteStatusTools()
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#getRemoteStatusTools
+	 * ()
 	 */
 	public IRemoteStatusTools getRemoteStatusTools() throws RemoteConnectionException {
-		return statusTools ;
+		if (statusTools == null) {
+			statusTools = new StatusTools(this);
+		}
+		return statusTools;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#createTunnel(int, java.lang.String, int)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#createTunnel
+	 * (int, java.lang.String, int)
 	 */
 	public synchronized IRemoteTunnel createTunnel(int localPort, String addressOnRemoteHost, int portOnRemoteHost)
 			throws RemoteConnectionException, LocalPortBoundException, CancelException {
@@ -249,31 +266,36 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		tunnels.add(tunnel);
 		return tunnel;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#createTunnel(java.lang.String, int)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteExecutionManager#createTunnel
+	 * (java.lang.String, int)
 	 */
-	public synchronized IRemoteTunnel createTunnel(String addressOnRemoteHost, int portOnRemoteHost) 
-		throws RemoteConnectionException, LocalPortBoundException, CancelException {
-		// Generate a local port automatically, before calling the createTunnel method passing it as parameter.
+	public synchronized IRemoteTunnel createTunnel(String addressOnRemoteHost, int portOnRemoteHost)
+			throws RemoteConnectionException, LocalPortBoundException, CancelException {
+		// Generate a local port automatically, before calling the createTunnel
+		// method passing it as parameter.
 		test();
 		testCancel();
 		int storedPort = getNewPortNumber();
 		int newGeneratedPort = storedPort;
-		while(true) {
+		while (true) {
 			try {
 				IRemoteTunnel tunnel = createTunnel(newGeneratedPort, addressOnRemoteHost, portOnRemoteHost);
 				return tunnel;
-			} catch(LocalPortBoundException e) {
-				// If the new port generated is equal the port we stored before the loop, all ports are probably busy
+			} catch (LocalPortBoundException e) {
+				// If the new port generated is equal the port we stored before
+				// the loop, all ports are probably busy
 				// so, generate an exception.
 				newGeneratedPort = getNewPortNumber();
-				if(newGeneratedPort == storedPort)
+				if (newGeneratedPort == storedPort)
 					throw new LocalPortBoundException(Messages.ExecutionManager_CreateTunnel_AllLocalPortsBusy);
 			}
 		}
-		
+
 	}
 
 	public synchronized void releaseTunnel(IRemoteTunnel tunnel) throws RemoteConnectionException {
@@ -281,7 +303,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		connection.releaseTunnel((RemoteTunnel) tunnel);
 		tunnels.remove(tunnel);
 	}
-	
+
 	protected synchronized void registerOperation(IRemoteOperation operation) {
 		executions.add(operation);
 	}
@@ -292,24 +314,26 @@ public class ExecutionManager implements IRemoteExecutionManager {
 
 	/**
 	 * Throw an exception if the manager cannot execute commands.
-	 * @throws RemoteConnectionException The connection was lost.
-	 * @throws CancelException The manager is canceled.
+	 * 
+	 * @throws RemoteConnectionException
+	 *             The connection was lost.
+	 * @throws CancelException
+	 *             The manager is canceled.
 	 */
 	protected void test() throws RemoteConnectionException {
 		connection.test();
 	}
-	
+
 	protected void testCancel() throws CancelException {
 		if (cancelFlag) {
 			throw new CancelException();
 		}
 	}
 
-	public IRemotePortForwardingTools getPortForwardingTools()
-			throws RemoteConnectionException {
-		if (this.portForwardingTools == null) {
-			this.portForwardingTools = new PortForwardingTools(this);
+	public IRemotePortForwardingTools getPortForwardingTools() throws RemoteConnectionException {
+		if (portForwardingTools == null) {
+			portForwardingTools = new PortForwardingTools(this);
 		}
-		return this.portForwardingTools;
+		return portForwardingTools;
 	}
 }

@@ -422,7 +422,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			if (!isOpen()) {
 				progress.beginTask(Messages.RemoteToolsConnection_open, 2);
 				try {
-					fTargetControl.kill(progress.newChild(1));
 					fTargetControl.create(progress.newChild(1));
 				} catch (CoreException e) {
 					throw new RemoteConnectionException(e);
