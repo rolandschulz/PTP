@@ -29,32 +29,34 @@ the name of the project and the application program.</p>
 Fill in the Arguments tab with any application program arguments. Fill in the Environment tab with any environment variable
 settings required by the application.</p>
 
-<p>The <b>Resources</b> tab is the tab where invocation options unique to SLURM. 
+<p>The <b>Resources</b> tab is the tab where invocation options unique to SLURM are entered. 
 <p>
 <img src="images/slurm_run_application_2.png">
 
-<p>Make sure the correct resource manager be selected in the dropdown list.
+<p>Make sure the correct resource manager is selected in the dropdown list.
 The meaning of each field in the <b>Launch Attributes</b> is described as follows:
 
 <ul>
-<li>Number of Tasks(-n): Specifying the number of tasks in a parallel job (<b>MUST</b>).</li>
+<li>Number of Tasks(-n): Specifying the number of tasks in a parallel job (<b>REQUIRED</b>).</li>
 <li>Number of Nodes(-N): Specifying the minimum number of nodes required by a parallel job (<b>OPTIONAL</b>).
  By default, if not specified, the SLURM resource management system will allocate nodes according to the task number
  and its configuration.</li>
- <li>Partition(-p): Specifying the name of partition where job will launch (<b>OPTIONAL</b>). 
- If not specified, the SLURM resource management system will allocate job resource from the default partition according to its configuration.</li>
+ <li>Partition(-p): Specifying the name of the partition where the job will launch (<b>OPTIONAL</b>). 
+ If not specified, the SLURM resource management system will allocate job resources from the default partition according to its configuration.</li>
 <li>TimeLimit(-t): Specifying the time limit (in minutes) of the job (<b>OPTIONAL</b>).
- If not specified, the SLURM resource management system will set job time limit to the target partition's default time limit. 
- NOTE: if the run time of a job expires this time limit,  SLURM resource management system will KILL the job and release the nodes allocated to it. </li>
-<li>Requested NodeList(-w): Specifying the node list MUST be included for this job (<b>OPTIONAL</b>). 
+ If not specified, the SLURM resource management system will set the job time limit to the target partition's default time limit. 
+ NOTE: if the run time of a job exceeds this time limit,  SLURM resource management system will KILL the job and release the nodes allocated to it. </li>
+<li>Requested NodeList(-w): Specifying the list of nodes that MUST be included for this job (<b>OPTIONAL</b>). 
 If not specified, the SLURM resource management system will try to allocate IDLE nodes currently available to this job.
-If the required node(s) is not available by now, this job will be in PENDING state until the requested node is available.</li>
-<li>Excluded NodeList(-x): Specifying the node list MUST NOT be included for this job (<b>OPTIONAL</b>).</li>
+If the required node(s) are not available by now, this job will be in PENDING state until the requested node is available.</li>
+<li>Excluded NodeList(-x): Specifying the list of nodes that MUST NOT be included for this job (<b>OPTIONAL</b>).</li>
 </ul>
 
 
 <p>When <b>Run</b> is selected the job launch request is passed to the SLURM Resource manager proxy and then submitted 
-to SLURM resource management system for execution. When the job starts it will appear in the PTP view.</p>
+to the SLURM resource management system for execution. When the job starts it will appear in the PTP 
+<!--   ?? which view ?? guess: Jobs List View. -->
+Jobs List view.</p>
 <img src="images/slurm_run_application_3.png">
 
 <h3><a name=debugging></a>Debugging a Parallel Application</h3>
@@ -63,6 +65,10 @@ that you use for running your application. You can debug the application by clic
 in the Eclipse toolbar or by selecting <b>Debug Configurations</b> from the Eclipse run menu. Before you debug a parallel application 
 for the first time, you should make sure that you have properly configured the debugger by opening
 the run configuration and selecting the debug tab then making sure the debugger settings are correct.</p>
+<p>
+For more information on setting up the PTP Parallel Debugger launch, see
+<a href="PLUGINS_ROOT/org.eclipse.ptp.help/html/04pLaunchConfigDebug.html#debugger">Launching Parallel Programs for Debugging</a>.
+
 
 <p><a href="toc.html">Back to Table of Contents</a>
 </body>
