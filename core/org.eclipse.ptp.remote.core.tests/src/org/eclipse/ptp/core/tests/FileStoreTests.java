@@ -10,10 +10,11 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.tests.harness.CoreTest;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -21,7 +22,7 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
-public class FileStoreTests extends CoreTest {
+public class FileStoreTests extends TestCase {
 	private static final String CONNECTION_NAME = "test_connection";
 	private static final String USERNAME = "user";
 	private static final String PASSWORD = "password";
@@ -46,8 +47,8 @@ public class FileStoreTests extends CoreTest {
 		try {
 			store1 = EFS.getStore(path1Uri);
 			store2 = EFS.getStore(path2Uri);
-		} catch (CoreException e) {
-			fail("2.0", e);
+		} catch (Exception e) {
+			fail(e.getLocalizedMessage());
 		}
 		
 		for (int i = 0; i < 5; i++) {
@@ -55,7 +56,7 @@ public class FileStoreTests extends CoreTest {
 			try {
 				store1.mkdir(EFS.NONE, null);
 			} catch (CoreException e) {
-				fail("3.0", e);
+				e.getLocalizedMessage();
 			}
 			assertTrue(store1.fetchInfo().exists());
 			
@@ -67,7 +68,7 @@ public class FileStoreTests extends CoreTest {
 				buf.write(TEST_STRING);
 				buf.close();
 			} catch (Exception e) {
-				fail("4.0", e);
+				e.getLocalizedMessage();
 			}
 			assertTrue(store2.fetchInfo().exists());
 			
@@ -79,20 +80,20 @@ public class FileStoreTests extends CoreTest {
 				assertTrue(line.equals(TEST_STRING));
 				buf.close();
 			} catch (Exception e) {
-				fail("5.0", e);
+				e.getLocalizedMessage();
 			}
 	
 			try {
 				store2.delete(EFS.NONE, null);
 			} catch (CoreException e) {
-				fail("6.0", e);
+				e.getLocalizedMessage();
 			}
 			assertFalse(store2.fetchInfo().exists());
 	
 			try {
 				store1.delete(EFS.NONE, null);
 			} catch (CoreException e) {
-				fail("7.0", e);
+				e.getLocalizedMessage();
 			}
 			assertFalse(store1.fetchInfo().exists());
 		}
