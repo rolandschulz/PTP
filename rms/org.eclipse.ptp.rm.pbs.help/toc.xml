@@ -2,8 +2,7 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="PTP: Running PBS Jobs" topic="html/toc.html">
-	<topic label="Main Topic"  href="html/maintopic.html"> 
-		<topic label="Sub Topic" href="html/subtopic.html"/> 
+	<topic label="Main Topic"  href="html/PBSHelpPage.html"> 
 	</topic>
 	<topic label="Main Topic 2"/>
 </toc>
