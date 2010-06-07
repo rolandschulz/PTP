@@ -31,36 +31,37 @@ public class ControlChannel implements ILineStreamListener {
 	/*
 	 * Patterns recognized by the observer.
 	 */
-	final static String markerPID = "PID="; //$NON-NLS-1$
-	final static String markerPIID = "PIID="; //$NON-NLS-1$
-	final static String markerSSH = "SSH_TTY="; //$NON-NLS-1$
-	final Pattern pidPattern = Pattern.compile(markerPID + "(\\p{Digit}+) " + markerPIID + "(\\p{Digit}+)"); //$NON-NLS-1$ //$NON-NLS-2$
-	final Pattern terminalPathPattern = Pattern.compile(markerSSH + "(/.+)"); //$NON-NLS-1$
+	private final static String markerPID = "PID="; //$NON-NLS-1$
+	private final static String markerPIID = "PIID="; //$NON-NLS-1$
+	private final static String markerSSH = "SSH_TTY="; //$NON-NLS-1$
+	private final Pattern pidPattern = Pattern.compile(markerPID + "(\\p{Digit}+) " + markerPIID + "(\\p{Digit}+)"); //$NON-NLS-1$ //$NON-NLS-2$
+	private final Pattern terminalPathPattern = Pattern.compile(markerSSH + "(/.+)"); //$NON-NLS-1$
 
 	// OutputStream that sends input to remote process input stream.
-	OutputStream outputToControlTerminalInput;
-	InputStream inputFromControlTerminalOutput;
+	private OutputStream outputToControlTerminalInput;
+	private InputStream inputFromControlTerminalOutput;
 
 	// Control channel
-	ChannelExec shell;
+	private ChannelExec shell;
 
 	// Control terminal path.
-	String controlTerminalPath;
+	private String controlTerminalPath;
 
 	// Control terminal observer thread.
-	TextStreamObserver controlTerminalObserver;
+	private TextStreamObserver controlTerminalObserver;
 
 	/**
-	 * Parent execution manager who will be notified about events from the control channel.
+	 * Parent execution manager who will be notified about events from the
+	 * control channel.
 	 */
-	private Connection connection;
+	private final Connection connection;
 
 	public ControlChannel(Connection connection) {
 		this.connection = connection;
 	}
-	
+
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
-		try{
+		try {
 			// Open exec channel and alloc terminal
 			shell = connection.createExecChannel(false);
 			shell.setPty(true);
@@ -75,23 +76,24 @@ public class ControlChannel implements ILineStreamListener {
 			close();
 			throw new RemoteConnectionException(Messages.ControlChannel_Open_FailedCreateIOStream, e);
 		}
-		
+
 		// Create stream observer and start it
 		controlTerminalObserver = new TextStreamObserver(inputFromControlTerminalOutput, this);
 		controlTerminalObserver.start();
-		
+
 		try {
 			// Clean shell prompt.
 			outputToControlTerminalInput.write("export PS1=\n".getBytes()); //$NON-NLS-1$
-			
-			// Write terminal path on control channel, to be read by the observer
+
+			// Write terminal path on control channel, to be read by the
+			// observer
 			String command = "/bin/sh -c 'echo \"" + markerSSH + "$SSH_TTY\"'\n"; //$NON-NLS-1$ //$NON-NLS-2$
 			outputToControlTerminalInput.write(command.getBytes());
 			outputToControlTerminalInput.flush();
 		} catch (IOException e) {
 			throw new RemoteConnectionException(Messages.ControlChannel_Open_FailedSendInitCommands, e);
 		}
-		
+
 		// Wait until the channel answers the terminal path
 		Debug.println2(Messages.ControlChannel_Debug_StartedWaitingControlTerminalPath);
 		synchronized (this) {
@@ -157,12 +159,11 @@ public class ControlChannel implements ILineStreamListener {
 
 	public synchronized String getKillablePrefix(int internaID) {
 		return "echo \"" + markerPID + "$$ " //$NON-NLS-1$ //$NON-NLS-2$
-				+ markerPIID + Integer.toString(internaID)
-				+ "\" > " + controlTerminalPath; //$NON-NLS-1$
+				+ markerPIID + Integer.toString(internaID) + "\" > " + controlTerminalPath; //$NON-NLS-1$
 	}
 
 	public void close() {
-		if (controlTerminalObserver != null) { 
+		if (controlTerminalObserver != null) {
 			controlTerminalObserver.kill();
 		}
 		controlTerminalObserver = null;
@@ -172,6 +173,9 @@ public class ControlChannel implements ILineStreamListener {
 			shell.disconnect();
 		}
 		shell = null;
-		connection = null;
+	}
+
+	public boolean isConnected() {
+		return shell != null && shell.isConnected();
 	}
 }

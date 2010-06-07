@@ -14,26 +14,37 @@ package org.eclipse.ptp.remotetools.core;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
-
 /**
  * A connection to a remote host. Serves as a starting point for creating
  * {@link IRemoteExecutionManager}, that to operations on the remote host.
- * @author Richard Maciel, Daniel Felix Ferber
- * @since 1.1
- * <b>Review OK</b>
  * 
- * NOTE: this interface should not normally be used directly
+ * @author Richard Maciel, Daniel Felix Ferber
+ * @since 1.1 <b>Review OK</b>
+ * 
+ *        NOTE: this interface should not normally be used directly
  * @see org.eclipse.ptp.remote.core.IRemoteConnection
  */
-public interface IRemoteConnection
-{
+public interface IRemoteConnection {
 	/**
 	 * Connect to the remote machine.
 	 * 
-	 * @param monitor progress monitor
+	 * @param authToken
+	 *            authentication information for connection
+	 * @param hostname
+	 *            host to connect to
+	 * @param port
+	 *            port number of remote host or 0 for default port
+	 * @param cipherType
+	 *            cipher type or null for default cypher
+	 * @param timeout
+	 *            connection timeout or 0 for default timeout
+	 * @param monitor
+	 *            progress monitor
 	 * @throws RemoteConnectionException
+	 * @since 3.0
 	 */
-	public void connect(IProgressMonitor monitor) throws RemoteConnectionException;
+	public void connect(AuthToken authToken, String hostname, int port, String cipherType, int timeout, IProgressMonitor monitor)
+			throws RemoteConnectionException;
 
 	/**
 	 * Terminate connection to remote machine.
@@ -54,7 +65,8 @@ public interface IRemoteConnection
 	 * Create a proper instance of {@link IRemoteExecutionManager}.
 	 * 
 	 * @return the {@link IRemoteExecutionManager} for this connection
-	 * @throws RemoteConnectionException if the {@link IRemoteExecutionManager} could not be created.
+	 * @throws RemoteConnectionException
+	 *             if the {@link IRemoteExecutionManager} could not be created.
 	 */
 	public IRemoteExecutionManager createRemoteExecutionManager() throws RemoteConnectionException;
-}	
+}

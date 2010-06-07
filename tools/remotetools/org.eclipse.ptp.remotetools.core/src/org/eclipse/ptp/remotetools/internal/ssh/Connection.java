@@ -150,25 +150,24 @@ public class Connection implements IRemoteConnection {
 	/**
 	 * Data structure to access the ssh library.
 	 */
-	private final IJSchService jsch;
+	private final IJSchService jsch = RemotetoolsPlugin.getDefault().getJSchService();
 	/**
 	 * A connection to the remote host. The default connections is always
 	 * created, but more connections may be added to the pool on demand.
 	 */
-	Session defaultSession;
-	private final AuthToken authToken;
-	private final String username;
-	private final String hostname;
-	private final int port;
-	private final int timeout;
+	private Session defaultSession;
+	private String fUsername;
+	private String fHostname;
+	private int fPort;
+	private int fTimeout;
+	private String fCipherType;
 
-	private final String cipherType;
 	private final SSHUserInfo sshuserinfo = new SSHUserInfo();
 
 	/**
-	 * All executions managers created for this connection.
+	 * The execution managers created for this connection.
 	 */
-	private final ArrayList<IRemoteExecutionManager> executionManagers = new ArrayList<IRemoteExecutionManager>();
+	private IRemoteExecutionManager executionManager = null;
 	/**
 	 * Tunnels to remote host.
 	 */
@@ -179,7 +178,8 @@ public class Connection implements IRemoteConnection {
 	 */
 	private static final int SFTP_POOLSIZE = 3;
 
-	private ArrayBlockingQueue<ChannelSftp> sftpChannelPool;
+	private final ArrayBlockingQueue<ChannelSftp> sftpChannelPool = new ArrayBlockingQueue<ChannelSftp>(SFTP_POOLSIZE);
+
 	/**
 	 * Hashtable that keeps all remote executions that can be killed. The table
 	 * is indexed by Internal PID.
@@ -217,35 +217,19 @@ public class Connection implements IRemoteConnection {
 
 	private RemotePortForwardingPool forwardingPool;
 
-	public Connection(AuthToken authToken, String hostname) {
-		this(authToken, hostname, ConnectionProperties.defaultPort, CipherTypes.CIPHER_DEFAULT, ConnectionProperties.defaultTimeout);
-	}
-
-	public Connection(AuthToken authToken, String hostname, int port) {
-		this(authToken, hostname, port, CipherTypes.CIPHER_DEFAULT, ConnectionProperties.defaultTimeout);
-	}
-
-	public Connection(AuthToken authToken, String hostname, int port, String cipherType) {
-		this(authToken, hostname, port, CipherTypes.CIPHER_DEFAULT, ConnectionProperties.defaultTimeout);
-	}
-
-	/**
-	 * Default constructor
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param authToken
-	 * @param hostname
-	 * @param port
-	 * @param timeout
-	 * @param cipherType
+	 * @see
+	 * org.eclipse.ptp.remotetools.core.IRemoteConnection#connect(org.eclipse
+	 * .ptp.remotetools.core.AuthToken, java.lang.String, int, java.lang.String,
+	 * int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public Connection(AuthToken authToken, String hostname, int port, String cipherType, int timeout) {
-		this.jsch = RemotetoolsPlugin.getDefault().getJSchService();
-		this.authToken = authToken;
-		this.username = authToken.getUsername();
-		this.hostname = hostname;
-		this.port = port;
-		this.timeout = timeout;
-		this.cipherType = cipherType;
+	public synchronized void connect(AuthToken authToken, String hostname, int port, String cipherType, int timeout,
+			IProgressMonitor monitor) throws RemoteConnectionException {
+		this.nextInternalPID = 0;
+
+		fUsername = authToken.getUsername();
 
 		// Convert information for the UserInfo class used by JSch
 		if (authToken instanceof PasswdAuthToken) {
@@ -255,31 +239,39 @@ public class Connection implements IRemoteConnection {
 			KeyAuthToken token = (KeyAuthToken) authToken;
 			sshuserinfo.setUsePassword(false);
 			sshuserinfo.setPassphrase(token.getPassphrase());
-		} else {
-			throw new RuntimeException(Messages.Connection_AuthenticationTypeNotSupported);
-		}
-	}
-
-	public synchronized void connect(IProgressMonitor monitor) throws RemoteConnectionException {
-		this.nextInternalPID = 0;
-
-		/*
-		 * Insert key information if necessary
-		 */
-		if (authToken instanceof KeyAuthToken) {
+		} else if (authToken instanceof KeyAuthToken) {
 			KeyAuthToken token = (KeyAuthToken) authToken;
 			try {
 				jsch.getJSch().addIdentity(token.getKeyPath().getAbsolutePath());
 			} catch (JSchException e) {
 				throw new RemoteConnectionException(Messages.Connection_Connect_InvalidPrivateKey, e);
 			}
+		} else {
+			throw new RuntimeException(Messages.Connection_AuthenticationTypeNotSupported);
 		}
+
+		fHostname = hostname;
+
+		if (port == 0) {
+			port = ConnectionProperties.defaultPort;
+		}
+		fPort = port;
+
+		if (cipherType == null) {
+			cipherType = CipherTypes.CIPHER_DEFAULT;
+		}
+		fCipherType = cipherType;
+
+		if (timeout == 0) {
+			timeout = ConnectionProperties.defaultTimeout;
+		}
+		fTimeout = timeout;
 
 		/*
 		 * Create session.
 		 */
 		try {
-			defaultSession = jsch.createSession(hostname, port, username);
+			defaultSession = jsch.createSession(fHostname, fPort, fUsername);
 			defaultSession.setUserInfo(sshuserinfo);
 			defaultSession.setServerAliveInterval(300000);
 			defaultSession.setServerAliveCountMax(6);
@@ -294,7 +286,7 @@ public class Connection implements IRemoteConnection {
 		 * Connect to remote host.
 		 */
 		try {
-			defaultSession.connect(timeout);
+			defaultSession.connect(fTimeout);
 		} catch (JSchException e) {
 			disconnect();
 			throw new RemoteConnectionException(Messages.Connection_Connect_FailedConnect, e);
@@ -306,8 +298,10 @@ public class Connection implements IRemoteConnection {
 		/*
 		 * Create control execution channel.
 		 */
-		try {
+		if (controlChannel == null) {
 			controlChannel = new ControlChannel(this);
+		}
+		try {
 			controlChannel.open(monitor);
 		} catch (RemoteConnectionException e) {
 			disconnect();
@@ -317,7 +311,6 @@ public class Connection implements IRemoteConnection {
 		/*
 		 * Create sft pool.
 		 */
-		sftpChannelPool = new ArrayBlockingQueue<ChannelSftp>(SFTP_POOLSIZE);
 		try {
 			for (int i = 0; i < SFTP_POOLSIZE; i++) {
 				ChannelSftp sftp = (ChannelSftp) defaultSession.openChannel("sftp"); //$NON-NLS-1$
@@ -354,7 +347,9 @@ public class Connection implements IRemoteConnection {
 		ConnectionSlot slot = new ConnectionSlot(defaultSession, ConnectionProperties.initialDefaultSessionLoad);
 		connectionPool.add(slot);
 
-		forwardingPool = new RemotePortForwardingPool(this);
+		if (forwardingPool == null) {
+			forwardingPool = new RemotePortForwardingPool(this);
+		}
 	}
 
 	/*
@@ -364,12 +359,10 @@ public class Connection implements IRemoteConnection {
 	 * org.eclipse.ptp.remotetools.IRemoteConnection#getRemoteExecutionManager()
 	 */
 	public synchronized IRemoteExecutionManager createRemoteExecutionManager() throws RemoteConnectionException {
-		if (executionManagers.size() > 0) {
-			return executionManagers.get(0);
+		if (executionManager == null) {
+			executionManager = new ExecutionManager(this);
 		}
-		ExecutionManager e = new ExecutionManager(this);
-		executionManagers.add(e);
-		return e;
+		return executionManager;
 	}
 
 	/*
@@ -380,10 +373,10 @@ public class Connection implements IRemoteConnection {
 	public synchronized void disconnect() {
 		/*
 		 * First, cancel all ongoing executions and tunnels created by managers,
-		 * by closing their execution managers.
+		 * by closing the execution manager.
 		 */
-		for (IRemoteExecutionManager manager : executionManagers) {
-			manager.close();
+		if (executionManager != null) {
+			executionManager.close();
 		}
 
 		if (executionObserver != null) {
@@ -397,48 +390,47 @@ public class Connection implements IRemoteConnection {
 			controlChannel.close();
 		}
 
-		if (sftpChannelPool != null) {
-			boolean bInterrupted = Thread.interrupted();
-			while (!sftpChannelPool.isEmpty()) {
-				try {
-					sftpChannelPool.take().disconnect();
-				} catch (InterruptedException e) {
-					bInterrupted = true;
-				}
+		boolean bInterrupted = Thread.interrupted();
+		while (!sftpChannelPool.isEmpty()) {
+			try {
+				sftpChannelPool.take().disconnect();
+			} catch (InterruptedException e) {
+				bInterrupted = true;
 			}
-			if (bInterrupted) {
-				Thread.currentThread().interrupt(); // set interrupt state
-			}
+		}
+		sftpChannelPool.clear();
+		if (bInterrupted) {
+			Thread.currentThread().interrupt(); // set interrupt state
 		}
 
 		/*
 		 * Close all connections from the pool.
 		 */
-		if (connectionPool != null) {
-			for (ConnectionSlot slot : connectionPool) {
-				slot.session.disconnect();
-			}
+		for (ConnectionSlot slot : connectionPool) {
+			slot.session.disconnect();
 		}
+		connectionPool.clear();
 
 		/*
 		 * Reset internal state variables.
 		 */
 		defaultSession = null;
-		controlChannel = null;
-		executionObserver = null;
-		sftpChannelPool = null;
+
 		if (forwardingPool != null) {
 			forwardingPool.disconnect();
-			forwardingPool = null;
 		}
 	}
 
 	public String getHostname() {
-		return hostname;
+		return fHostname;
 	}
 
 	public int getPort() {
-		return port;
+		return fPort;
+	}
+
+	public Session getSession() {
+		return defaultSession;
 	}
 
 	/*
@@ -486,11 +478,11 @@ public class Connection implements IRemoteConnection {
 	}
 
 	public int getTimeout() {
-		return timeout;
+		return fTimeout;
 	}
 
 	public String getUsername() {
-		return username;
+		return fUsername;
 	}
 
 	/*
@@ -501,9 +493,15 @@ public class Connection implements IRemoteConnection {
 	public synchronized boolean isConnected() {
 		if (defaultSession == null) {
 			return false;
-		} else {
-			return defaultSession.isConnected();
 		}
+
+		try {
+			test();
+		} catch (RemoteConnectionException e) {
+			return false;
+		}
+
+		return defaultSession.isConnected();
 	}
 
 	/**
@@ -547,7 +545,7 @@ public class Connection implements IRemoteConnection {
 		 */
 		Session newSession = null;
 		try {
-			newSession = jsch.createSession(hostname, port, username);
+			newSession = jsch.createSession(fHostname, fPort, fUsername);
 			sshuserinfo.reset();
 			newSession.setUserInfo(sshuserinfo);
 			newSession.setServerAliveInterval(300000);
@@ -561,7 +559,7 @@ public class Connection implements IRemoteConnection {
 		 * Connect to remote host.
 		 */
 		try {
-			newSession.connect(timeout);
+			newSession.connect(fTimeout);
 		} catch (JSchException e) {
 			throw new RemoteConnectionException(Messages.Connection_CreateConnectionSlot_FailedConnectNewSession, e);
 		}
@@ -586,18 +584,18 @@ public class Connection implements IRemoteConnection {
 		 * cipher
 		 */
 		// TODO: Let the user select a list of ciphers, instead of only one
-		if (!cipherType.equals(CipherTypes.CIPHER_DEFAULT)) {
+		if (!fCipherType.equals(CipherTypes.CIPHER_DEFAULT)) {
 
 			// Verify if the cipher is supported. Throw an exception if it isnt.
-			if (!CipherTypes.getCipherTypesMap().containsKey(cipherType)) {
+			if (!CipherTypes.getCipherTypesMap().containsKey(fCipherType)) {
 				// TODO: Throw a real exception, not a runtime one
 				throw new RuntimeException(Messages.Connection_SetCipherType_CipherNotSupported);
 			}
 
 			// Set the session's cipher
 			Hashtable<String, String> config = new Hashtable<String, String>();
-			config.put("cipher.s2c", cipherType); //$NON-NLS-1$
-			config.put("cipher.c2s", cipherType); //$NON-NLS-1$
+			config.put("cipher.s2c", fCipherType); //$NON-NLS-1$
+			config.put("cipher.c2s", fCipherType); //$NON-NLS-1$
 
 			session.setConfig(config);
 		}
@@ -739,10 +737,6 @@ public class Connection implements IRemoteConnection {
 		}
 	}
 
-	protected synchronized void releaseExcutionManager(ExecutionManager manager) {
-		executionManagers.remove(manager);
-	}
-
 	/**
 	 * Release the forwarding of the remote port.
 	 * 
@@ -801,7 +795,7 @@ public class Connection implements IRemoteConnection {
 		/*
 		 * Check control channel.
 		 */
-		if (!controlChannel.shell.isConnected()) {
+		if (controlChannel == null || !controlChannel.isConnected()) {
 			throw new RemoteConnectionException(Messages.Connection_1);
 		}
 
