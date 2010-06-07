@@ -45,7 +45,7 @@ public class PBSBatchScriptTemplateManager {
 	private static final String DEFAULT_TEMPLATE = Messages.PBSBatchScriptTemplateManager_defaultTemplate;
 	private static final String FULL_TEMPLATE = Messages.PBSBatchScriptTemplateManager_fullTemplate;
 	private static final String RESOURCE_PATH = Messages.PBSBatchScriptTemplateManager_resourcePath
-			+ System.getProperty("file.separator");
+			+ System.getProperty("file.separator"); //$NON-NLS-1$
 	private static final String SUFFIX = Messages.PBSBatchScriptTemplateManager_templateSuffix;
 
 	private PBSBatchScriptTemplate current;
@@ -65,8 +65,7 @@ public class PBSBatchScriptTemplateManager {
 	public String[] findAvailableTemplates() {
 		List<String> templateNames = new ArrayList<String>();
 		try {
-			File attrconf = PBSUIPlugin.getDefault().getStateLocation()
-					.toFile();
+			File attrconf = PBSUIPlugin.getDefault().getStateLocation().toFile();
 			SuffixFilter filter = new SuffixFilter(SUFFIX);
 			File[] properties = attrconf.listFiles(filter);
 			for (int i = 0; i < properties.length; i++)
@@ -92,15 +91,12 @@ public class PBSBatchScriptTemplateManager {
 	 *            current launch configuration
 	 * @return populated template object
 	 */
-	public PBSBatchScriptTemplate loadTemplate(String choice,
-			ILaunchConfiguration config) {
+	public PBSBatchScriptTemplate loadTemplate(String choice, ILaunchConfiguration config) {
 		current = new PBSBatchScriptTemplate();
-		if (choice == null || ConfigUtils.EMPTY_STRING.equals(choice)) {
+		if (choice == null || ConfigUtils.EMPTY_STRING.equals(choice))
 			return current;
-		}
 		try {
-			File f = new File(PBSUIPlugin.getDefault().getStateLocation()
-					.toFile(), choice);
+			File f = new File(PBSUIPlugin.getDefault().getStateLocation().toFile(), choice);
 			if (!f.exists())
 				return current;
 			current.setConfiguration(config);
@@ -122,11 +118,9 @@ public class PBSBatchScriptTemplateManager {
 	 */
 	public void removeTemplate(String name) throws IllegalAccessError {
 		if (DEFAULT_TEMPLATE.equals(name) || FULL_TEMPLATE.equals(name))
-			throw new IllegalAccessError(name
-					+ Messages.PBSAttributeTemplateManager_removeError);
+			throw new IllegalAccessError(name + Messages.PBSAttributeTemplateManager_removeError);
 
-		File configFile = new File(PBSUIPlugin.getDefault().getStateLocation()
-				.toFile(), name);
+		File configFile = new File(PBSUIPlugin.getDefault().getStateLocation().toFile(), name);
 		if (configFile.exists())
 			configFile.delete();
 	}
@@ -143,12 +137,10 @@ public class PBSBatchScriptTemplateManager {
 	 * @throws NoSuchElementException
 	 * @throws IllegalAccessError
 	 */
-	public void storeTemplate(String editedContent, String fileName)
-			throws IOException, NoSuchElementException, IllegalAccessError {
+	public void storeTemplate(String editedContent, String fileName) throws IOException, NoSuchElementException, IllegalAccessError {
 		FileWriter fw = null;
 		try {
-			File configFile = new File(PBSUIPlugin.getDefault()
-					.getStateLocation().toFile(), fileName);
+			File configFile = new File(PBSUIPlugin.getDefault().getStateLocation().toFile(), fileName);
 			if (configFile.exists())
 				configFile.delete();
 			fw = new FileWriter(configFile, false);
@@ -174,30 +166,23 @@ public class PBSBatchScriptTemplateManager {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessError
 	 */
-	public String validateTemplateNameForEdit(String fileName)
-			throws IllegalArgumentException, IllegalAccessError {
+	public String validateTemplateNameForEdit(String fileName) throws IllegalArgumentException, IllegalAccessError {
 		if (fileName.length() == 0)
-			throw new IllegalArgumentException(
-					Messages.PBSRMLaunchConfigEditChoose_illegalArgument);
-		if (!fileName
-				.endsWith(Messages.PBSBatchScriptTemplateManager_templateSuffix))
-			fileName = fileName
-					+ Messages.PBSBatchScriptTemplateManager_templateSuffix;
+			throw new IllegalArgumentException(Messages.PBSRMLaunchConfigEditChoose_illegalArgument);
+		if (!fileName.endsWith(Messages.PBSBatchScriptTemplateManager_templateSuffix))
+			fileName = fileName + Messages.PBSBatchScriptTemplateManager_templateSuffix;
 
 		if (DEFAULT_TEMPLATE.equals(fileName) || FULL_TEMPLATE.equals(fileName))
-			throw new IllegalAccessError(fileName
-					+ Messages.PBSAttributeTemplateManager_storeError);
+			throw new IllegalAccessError(fileName + Messages.PBSAttributeTemplateManager_storeError);
 		return fileName;
 	}
 
 	/*
 	 * Instantiates the two preconfigured templates from plugin resources.
 	 */
-	private PBSBatchScriptTemplate getResourceTemplate(String name)
-			throws Throwable {
+	private PBSBatchScriptTemplate getResourceTemplate(String name) throws Throwable {
 		Bundle bundle = PBSUIPlugin.getDefault().getBundle();
-		URL url = FileLocator
-				.find(bundle, new Path(RESOURCE_PATH + name), null);
+		URL url = FileLocator.find(bundle, new Path(RESOURCE_PATH + name), null);
 		if (url == null)
 			return null;
 		InputStream s = null;
@@ -231,8 +216,7 @@ public class PBSBatchScriptTemplateManager {
 		readOnly.add(DEFAULT_TEMPLATE);
 		readOnly.add(FULL_TEMPLATE);
 		for (int i = 0; i < found.length; i++)
-			if (DEFAULT_TEMPLATE.equals(found[i])
-					|| FULL_TEMPLATE.equals(found[i])) {
+			if (DEFAULT_TEMPLATE.equals(found[i]) || FULL_TEMPLATE.equals(found[i])) {
 				readOnly.remove(found[i]);
 				if (readOnly.isEmpty())
 					return;

@@ -53,9 +53,9 @@ public class ConfigUtils {
 	}
 
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	public static final String LINE_SEP = System.getProperty("line.separator");
-	public static String REMOTE_LINE_SEP = "\n";
-	public static String REMOTE_PATH_SEP = "/";
+	public static final String LINE_SEP = System.getProperty("line.separator"); //$NON-NLS-1$
+	public static String REMOTE_LINE_SEP = "\n"; //$NON-NLS-1$
+	public static String REMOTE_PATH_SEP = "/"; //$NON-NLS-1$
 
 	private ConfigUtils() {
 	}
@@ -76,10 +76,8 @@ public class ConfigUtils {
 	 * @return the constructed placeholder
 	 * @throws IllegalValueException
 	 */
-	public static AttributePlaceholder getAttributePlaceholder(String key,
-			String value, String toolTip,
-			Map<String, IAttributeDefinition<?, ?, ?>> defs)
-			throws IllegalValueException {
+	public static AttributePlaceholder getAttributePlaceholder(String key, String value, String toolTip,
+			Map<String, IAttributeDefinition<?, ?, ?>> defs) throws IllegalValueException {
 		AttributePlaceholder ap = new AttributePlaceholder();
 		ap.setName(key);
 		if (!EMPTY_STRING.equals(toolTip))
@@ -87,8 +85,7 @@ public class ConfigUtils {
 		if (defs != null) {
 			IAttributeDefinition<?, ?, ?> def = defs.get(key);
 			if (def == null)
-				throw new IllegalValueException(Messages.PBSAttributeNotFound
-						+ key);
+				throw new IllegalValueException(Messages.PBSAttributeNotFound + key);
 			/*
 			 * creates with default value; we save this in the placeholder
 			 */
@@ -96,12 +93,9 @@ public class ConfigUtils {
 			ap.setAttribute(attr);
 			String defaultValue = attr.getValueAsString();
 			ap.setDefaultString(defaultValue);
-			if (value != null) {
-				if (!EMPTY_STRING.equals(value)
-						|| (attr instanceof StringAttribute && !EMPTY_STRING
-								.equals(defaultValue)))
+			if (value != null)
+				if (!EMPTY_STRING.equals(value) || (attr instanceof StringAttribute && !EMPTY_STRING.equals(defaultValue)))
 					attr.setValueAsString(value);
-			}
 		}
 		return ap;
 	}

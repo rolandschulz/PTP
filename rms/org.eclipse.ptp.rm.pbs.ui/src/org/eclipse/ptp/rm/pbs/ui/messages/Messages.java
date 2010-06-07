@@ -16,7 +16,9 @@ package org.eclipse.ptp.rm.pbs.ui.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	public static Object BASH_EXPORT;
+	public static String DialogClose;
+
+	public static String BASH_EXPORT;
 
 	public static String DynamicTabWizardPage_ATTRIBUTE;
 	public static String DynamicTabWizardPage_constraints;
@@ -30,7 +32,6 @@ public class Messages extends NLS {
 	public static String PBSAttributeTemplateManager_removeError;
 	public static String PBSAttributeTemplateManager_storeError;
 
-	public static String PBSAttributeTemplateManager_validateError;
 	public static String PBSBatchScriptDislay;
 	public static String PBSBatchScriptTemplate_chdirTag;
 	public static String PBSBatchScriptTemplate_envTag;
@@ -40,7 +41,6 @@ public class Messages extends NLS {
 	public static String PBSBatchScriptTemplate_mpiCores_flag;
 	public static String PBSBatchScriptTemplate_mpioptPlaceholder;
 	public static String PBSBatchScriptTemplate_parseError;
-	public static String PBSBatchScriptTemplate_prargsPlaceholder;
 	public static String PBSBatchScriptTemplate_prargsTag;
 	public static String PBSBatchScriptTemplate_precmdPlaceholder;
 	public static String PBSBatchScriptTemplate_pstcmdPlaceholder;
@@ -86,11 +86,8 @@ public class Messages extends NLS {
 	public static String PBSRMLaunchConfigPreferences_message;
 	public static String PBSRMLaunchConfigTemplate_message;
 	public static String PBSRMLaunchConfigTemplate_title;
-	public static String PBSRMLaunchConfigToggleError_message;
-	public static String PBSRMLaunchConfigToggleError_title;
 	public static String PBSRMLaunchConfigViewScript_title;
 
-	public static String PBSRMLaunchDataSource_IncompleteValue;
 	public static String PBSRMLaunchDataSource_ValueNotSet;
 
 	public static String PBSServiceProvider_defaultTemplateName;

@@ -52,8 +52,7 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	/*
 	 * Associated with the selection of a choice of configuration file.
 	 */
-	private class ConfigurationChangeListener implements ModifyListener,
-			SelectionListener, ISelectionChangedListener {
+	private class ConfigurationChangeListener implements ModifyListener, SelectionListener, ISelectionChangedListener {
 		private boolean ignore = false;
 
 		/**
@@ -93,8 +92,7 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	/*
 	 * Associated with the delete button.
 	 */
-	private class DeleteConfigurationSelectionAdapter implements
-			SelectionListener {
+	private class DeleteConfigurationSelectionAdapter implements SelectionListener {
 		public void widgetDefaultSelected(SelectionEvent e) {
 			widgetSelected(e);
 		}
@@ -107,10 +105,8 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 		public void widgetSelected(SelectionEvent e) {
 			try {
 				Shell shell = getShell();
-				String[] availableTemplates = templateManager
-						.findAvailableTemplates();
-				ComboEntryDialog comboDialog = new ComboEntryDialog(shell,
-						Messages.PBSRMLaunchConfigDeleteChoose_message,
+				String[] availableTemplates = templateManager.findAvailableTemplates();
+				ComboEntryDialog comboDialog = new ComboEntryDialog(shell, Messages.PBSRMLaunchConfigDeleteChoose_message,
 						availableTemplates);
 				if (comboDialog.open() == Window.CANCEL)
 					return;
@@ -123,8 +119,7 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 				}
 			} catch (Throwable t) {
 				t.printStackTrace();
-				WidgetUtils.errorMessage(getShell(), t,
-						Messages.PBSRMLaunchConfigDeleteError_message,
+				WidgetUtils.errorMessage(getShell(), t, Messages.PBSRMLaunchConfigDeleteError_message,
 						Messages.PBSRMLaunchConfigDeleteError_title, false);
 			}
 		}
@@ -133,8 +128,7 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	/*
 	 * Associated with the edit button.
 	 */
-	private class EditConfigurationSelectionAdapter implements
-			SelectionListener {
+	private class EditConfigurationSelectionAdapter implements SelectionListener {
 		public void widgetDefaultSelected(SelectionEvent e) {
 			widgetSelected(e);
 		}
@@ -150,33 +144,25 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 				Shell shell = getShell();
 				String newName = null;
 				String oldName = null;
-				String[] availableTemplates = templateManager
-						.findAvailableTemplates();
-				ComboEntryDialog comboDialog = new ComboEntryDialog(shell,
-						Messages.PBSRMLaunchConfigEditChoose_message,
+				String[] availableTemplates = templateManager.findAvailableTemplates();
+				ComboEntryDialog comboDialog = new ComboEntryDialog(shell, Messages.PBSRMLaunchConfigEditChoose_message,
 						availableTemplates);
 				if (comboDialog.open() == Window.CANCEL)
 					return;
 				oldName = comboDialog.getChoice();
 
-				InputDialog nameDialog = new InputDialog(shell,
-						Messages.PBSRMLaunchConfigEditChoose_new + "?",
-						Messages.PBSRMLaunchConfigEditChoose_new_name, null,
-						null);
+				InputDialog nameDialog = new InputDialog(shell, Messages.PBSRMLaunchConfigEditChoose_new + "?", //$NON-NLS-1$ 
+						Messages.PBSRMLaunchConfigEditChoose_new_name, null, null);
 				if (nameDialog.open() == Window.CANCEL)
 					newName = oldName;
-				else {
+				else
 					newName = nameDialog.getValue();
-				}
 
 				newName = templateManager.validateTemplateNameForEdit(newName);
 
-				PBSBatchScriptTemplate template = templateManager.loadTemplate(
-						oldName, null);
-				ScrollingEditableMessageDialog dialog = new ScrollingEditableMessageDialog(
-						getShell(),
-						Messages.PBSRMLaunchConfigEditChoose_message, template
-								.getText());
+				PBSBatchScriptTemplate template = templateManager.loadTemplate(oldName, null);
+				ScrollingEditableMessageDialog dialog = new ScrollingEditableMessageDialog(getShell(),
+						Messages.PBSRMLaunchConfigEditChoose_message, template.getText());
 				if (dialog.open() == Window.CANCEL)
 					return;
 				String edited = dialog.getValue();
@@ -188,8 +174,7 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 					fireModifyTemplateChoice(newName);
 			} catch (Throwable t) {
 				t.printStackTrace();
-				WidgetUtils.errorMessage(getShell(), t,
-						Messages.PBSRMLaunchConfigEditError_message,
+				WidgetUtils.errorMessage(getShell(), t, Messages.PBSRMLaunchConfigEditError_message,
 						Messages.PBSRMLaunchConfigEditError_title, false);
 			} finally {
 				if (fw != null)
@@ -209,8 +194,7 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	private final PBSBatchScriptTemplateManager templateManager;
 	private Combo templates;
 
-	public PBSBatchScriptTemplateWizardPage(IRMConfigurationWizard wizard)
-			throws Throwable {
+	public PBSBatchScriptTemplateWizardPage(IRMConfigurationWizard wizard) throws Throwable {
 		super(wizard, Messages.PBSConfigurationWizardPage_name);
 		setTitle(Messages.PBSConfigurationWizardPage_title);
 		setDescription(Messages.PBSConfigurationWizardPage_description);
@@ -228,12 +212,11 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 		String last = provider.getDefaultTemplateName();
 		String[] items = templates.getItems();
 		int i = 0;
-		for (; i < items.length; i++) {
+		for (; i < items.length; i++)
 			if (items[i].equals(last)) {
 				templates.select(i);
 				break;
 			}
-		}
 		if (i == items.length)
 			templates.select(0);
 		setControl(composite);
@@ -253,38 +236,29 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	}
 
 	private void createContents(Composite parent) {
-		Group templateContainer = WidgetUtils.createFillingGroup(parent,
-				Messages.PBSRMLaunchConfigGroup0_title, 2, 1, false);
+		Group templateContainer = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigGroup0_title, 2, 1, false);
 		listener = new ConfigurationChangeListener();
 		String[] available = templateManager.findAvailableTemplates();
 		/*
 		 * There should always be at least two choices, the full and default, so
 		 * available.length will be > 0.
 		 */
-		templates = WidgetUtils.createItemCombo(templateContainer,
-				Messages.PBSRMLaunchConfigTemplate_title, available,
-				available[0], Messages.PBSRMLaunchConfigTemplate_message, true,
-				listener, 1);
-		WidgetUtils.createButton(templateContainer,
-				Messages.PBSRMLaunchConfigEditButton_title, null, SWT.PUSH, 1,
-				true, new EditConfigurationSelectionAdapter());
-		WidgetUtils.createButton(templateContainer,
-				Messages.PBSRMLaunchConfigDeleteButton_title, null, SWT.PUSH,
-				1, true, new DeleteConfigurationSelectionAdapter());
+		templates = WidgetUtils.createItemCombo(templateContainer, Messages.PBSRMLaunchConfigTemplate_title, available,
+				available[0], Messages.PBSRMLaunchConfigTemplate_message, true, listener, 1);
+		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigEditButton_title, null, SWT.PUSH, 1, true,
+				new EditConfigurationSelectionAdapter());
+		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigDeleteButton_title, null, SWT.PUSH, 1, true,
+				new DeleteConfigurationSelectionAdapter());
 
-		Group preferencesContainer = WidgetUtils.createFillingGroup(parent,
-				Messages.PBSRMLaunchConfigPreferences_message, 1, 1, false);
-		Table t = WidgetUtils.createFillingTable(preferencesContainer, 3, 500,
-				1, SWT.FULL_SELECTION | SWT.MULTI);
+		Group preferencesContainer = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigPreferences_message, 1, 1,
+				false);
+		Table t = WidgetUtils.createFillingTable(preferencesContainer, 3, 500, 1, SWT.FULL_SELECTION | SWT.MULTI);
 		readOnlyView = new TableViewer(t);
 		readOnlyView.setContentProvider(new AttributeContentProvider());
 		readOnlyView.setLabelProvider(new AttributeLabelProvider());
-		WidgetUtils.addTableColumn(readOnlyView,
-				Messages.PBSRMLaunchConfigPreferences_column_0, SWT.LEFT, null);
-		WidgetUtils.addTableColumn(readOnlyView,
-				Messages.PBSRMLaunchConfigPreferences_column_1, SWT.LEFT, null);
-		WidgetUtils.addTableColumn(readOnlyView,
-				Messages.PBSRMLaunchConfigPreferences_column_2, SWT.LEFT, null);
+		WidgetUtils.addTableColumn(readOnlyView, Messages.PBSRMLaunchConfigPreferences_column_0, SWT.LEFT, null);
+		WidgetUtils.addTableColumn(readOnlyView, Messages.PBSRMLaunchConfigPreferences_column_1, SWT.LEFT, null);
+		WidgetUtils.addTableColumn(readOnlyView, Messages.PBSRMLaunchConfigPreferences_column_2, SWT.LEFT, null);
 		readOnlyView.getTable().setHeaderVisible(true);
 	}
 

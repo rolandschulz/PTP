@@ -172,7 +172,7 @@ public class PBSBatchScriptTemplate {
 		String line = null;
 		AttributePlaceholder ap = null;
 		boolean processedExecLine = false;
-		String separator = System.getProperty("line.separator"); // $NON-NLS-0$
+		String separator = ConfigUtils.LINE_SEP;
 		try {
 			br = new BufferedReader(new InputStreamReader(input), BUFFER_SIZE);
 			while (true) {
@@ -184,13 +184,13 @@ public class PBSBatchScriptTemplate {
 				if (line == null)
 					break;
 				text.append(line).append(separator);
-				if (line.startsWith("#PBS")) { // $NON-NLS-1$
+				if (line.startsWith("#PBS")) { //$NON-NLS-1$
 					ap = handlePBSJobAttribute(line, defs);
 					if (ap != null) {
 						pbsJobAttributes.put(ap.getName(), ap);
 						continue;
 					}
-				} else if (line.startsWith("#"))
+				} else if (line.startsWith("#")) //$NON-NLS-1$
 					continue;
 
 				if (processedExecLine) {
@@ -358,7 +358,7 @@ public class PBSBatchScriptTemplate {
 				if (ap != null)
 					cores = computeMPICoresFromNodesString(ap.getAttribute().getValueAsString());
 			}
-			cores = MPICORES_FLAG + " " + cores;
+			cores = MPICORES_FLAG + " " + cores; //$NON-NLS-1$
 		}
 		mpiOpt.getAttribute().setValueAsString(cores);
 	}
@@ -380,7 +380,7 @@ public class PBSBatchScriptTemplate {
 			StringBuffer sb = new StringBuffer();
 			for (Iterator<Entry> i = vars.entrySet().iterator(); i.hasNext();) {
 				Entry entry = i.next();
-				sb.append(Messages.BASH_EXPORT).append(" ").append(entry.getKey()).append("=").append(entry.getValue())
+				sb.append(Messages.BASH_EXPORT).append(" ").append(entry.getKey()).append("=").append(entry.getValue()) //$NON-NLS-1$ //$NON-NLS-2$
 						.append(ConfigUtils.LINE_SEP);
 			}
 			template = replaceWithValue(TAG_ENV, sb.toString(), template);
@@ -529,7 +529,7 @@ public class PBSBatchScriptTemplate {
 	 */
 	private String removeLine(String name, String script) {
 		StringBuffer p = new StringBuffer();
-		p.append(ConfigUtils.LINE_SEP).append(".*@").append(name).append(".*@").append(ConfigUtils.LINE_SEP);
+		p.append(ConfigUtils.LINE_SEP).append(".*@").append(name).append(".*@").append(ConfigUtils.LINE_SEP); //$NON-NLS-1$ //$NON-NLS-2$
 		Matcher m = Pattern.compile(p.toString()).matcher(script);
 		if (m.find())
 			return m.replaceAll(ConfigUtils.LINE_SEP);
@@ -540,7 +540,7 @@ public class PBSBatchScriptTemplate {
 	 * Eliminates an empty attribute placeholder.
 	 */
 	private String removePlaceholder(String name, String script) {
-		name = "@" + name + "@ ";
+		name = "@" + name + "@ "; //$NON-NLS-1$ //$NON-NLS-2$
 		Matcher m = Pattern.compile(name).matcher(script);
 		if (m.find())
 			return m.replaceAll(ConfigUtils.EMPTY_STRING);
@@ -555,10 +555,10 @@ public class PBSBatchScriptTemplate {
 	 * Replaces attribute placeholder with the given value.
 	 */
 	private String replaceWithValue(String name, String value, String script) {
-		Matcher m = Pattern.compile("@" + name + "@").matcher(script);
+		Matcher m = Pattern.compile("@" + name + "@").matcher(script); //$NON-NLS-1$ //$NON-NLS-2$
 		if (m.find()) {
-			value = value.replaceAll("\\\\", "\\\\\\\\"); // \ -> \\
-			value = value.replaceAll("\\$", "\\\\\\$"); // $ -> \$
+			value = value.replaceAll("\\\\", "\\\\\\\\"); //$NON-NLS-1$ //$NON-NLS-2$ // \ -> \\
+			value = value.replaceAll("\\$", "\\\\\\$"); //$NON-NLS-1$ //$NON-NLS-2$ // $ -> \$
 			return m.replaceAll(value);
 		}
 		return script;
@@ -580,18 +580,18 @@ public class PBSBatchScriptTemplate {
 	private static String computeMPICoresFromNodesString(String value) {
 		int cores = 0;
 		try {
-			String[] nodeSpec = value.split("[+]");
+			String[] nodeSpec = value.split("[+]"); //$NON-NLS-1$
 			for (int i = 0; i < nodeSpec.length; i++) {
 				int nodes = 1;
 				int ppn = 1;
-				String[] part = nodeSpec[i].split(":");
+				String[] part = nodeSpec[i].split(":"); //$NON-NLS-1$
 				for (int j = 0; j < part.length; j++) {
 					try {
 						nodes = Integer.parseInt(part[j]);
 					} catch (NumberFormatException nfe) {
 					}
 					if (part[j].startsWith("ppn")) { //$NON-NLS-1$
-						String[] ppnDef = part[j].split("=");
+						String[] ppnDef = part[j].split("="); //$NON-NLS-1$
 						if (ppnDef.length > 1)
 							ppn = Integer.parseInt(ppnDef[1]);
 					}
@@ -602,17 +602,17 @@ public class PBSBatchScriptTemplate {
 			t.printStackTrace();
 		}
 
-		return "" + cores;
+		return "" + cores; //$NON-NLS-1$
 	}
 
 	/*
 	 * Escaping to conform with the parsing of the proxy protocol.
 	 */
 	private static String denormalize(String content) {
-		content = content.replaceAll("\\\\", "\\\\\\\\");
-		content = content.replaceAll(ConfigUtils.LINE_SEP, "\\\\n");
-		content = content.replaceAll("\\t", "\\\\t");
-		content = content.replaceAll(" ", "\\\\s");
+		content = content.replaceAll("\\\\", "\\\\\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll(ConfigUtils.LINE_SEP, "\\\\n"); //$NON-NLS-1$ 
+		content = content.replaceAll("\\t", "\\\\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll(" ", "\\\\s"); //$NON-NLS-1$ //$NON-NLS-2$
 		return content;
 	}
 

@@ -51,10 +51,8 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 	private Map<String, AttributePlaceholder> pbsJobAttributes;
 	private final Map<Control, AttributePlaceholder> valueWidgets;
 
-	public PBSRMLaunchConfigurationDynamicTabWizardPage(
-			Map<Control, AttributePlaceholder> valueWidgets,
-			RMLaunchConfigurationDynamicTabWidgetListener listener,
-			PBSBatchScriptTemplate template) {
+	public PBSRMLaunchConfigurationDynamicTabWizardPage(Map<Control, AttributePlaceholder> valueWidgets,
+			RMLaunchConfigurationDynamicTabWidgetListener listener, PBSBatchScriptTemplate template) {
 		super(ConfigUtils.EMPTY_STRING);
 		this.valueWidgets = valueWidgets;
 		this.listener = listener;
@@ -63,31 +61,22 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 		loadConstraints();
 	}
 
-	public void createControl(Composite parent) { // FIXME make me scroll!
+	public void createControl(Composite parent) {
 		container = WidgetUtils.createAnonymousNonFillingGroup(parent, 3);
-		WidgetUtils.createLabel(container,
-				Messages.DynamicTabWizardPage_ATTRIBUTE, SWT.LEFT, 1)
-				.setForeground(WidgetUtils.DKMG);
-		WidgetUtils.createLabel(container, Messages.DynamicTabWizardPage_VALUE,
-				SWT.LEFT, 1).setForeground(WidgetUtils.DKMG);
-		WidgetUtils.createLabel(container,
-				Messages.DynamicTabWizardPage_DESCRIPTION, SWT.LEFT, 1)
-				.setForeground(WidgetUtils.DKMG);
+		WidgetUtils.createLabel(container, Messages.DynamicTabWizardPage_ATTRIBUTE, SWT.LEFT, 1).setForeground(WidgetUtils.DKMG);
+		WidgetUtils.createLabel(container, Messages.DynamicTabWizardPage_VALUE, SWT.LEFT, 1).setForeground(WidgetUtils.DKMG);
+		WidgetUtils.createLabel(container, Messages.DynamicTabWizardPage_DESCRIPTION, SWT.LEFT, 1).setForeground(WidgetUtils.DKMG);
 		if (pbsJobAttributes != null)
-			for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values()
-					.iterator(); i.hasNext();) {
+			for (Iterator<AttributePlaceholder> i = pbsJobAttributes.values().iterator(); i.hasNext();) {
 				AttributePlaceholder ap = i.next();
-				if (Messages.PBSAttributeInternalExtension.equals(ap
-						.getToolTip()))
+				if (Messages.PBSAttributeInternalExtension.equals(ap.getToolTip()))
 					continue;
 				IAttribute<?, ?, ?> attr = ap.getAttribute();
 				String name = ap.getName();
 				String descr = attr.getDefinition().getDescription();
 				Label l = WidgetUtils.createLabel(container, name, SWT.LEFT, 1);
 				l.setToolTipText(ap.getToolTip());
-				valueWidgets.put(
-						getValueWidget(container, ap.getDefaultString(), attr),
-						ap);
+				valueWidgets.put(getValueWidget(container, ap.getDefaultString(), attr), ap);
 				l = WidgetUtils.createLabel(container, descr, SWT.LEFT, 1);
 				l.setForeground(WidgetUtils.DKBL);
 			}
@@ -99,15 +88,12 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 	 * four mappings implemented here: Integer : Spinner, Boolean : Button,
 	 * Constrained : Combo, else : Text.
 	 */
-	private Control getValueWidget(Composite container, String defaultString,
-			IAttribute<?, ?, ?> attr) {
+	private Control getValueWidget(Composite container, String defaultString, IAttribute<?, ?, ?> attr) {
 		String value = attr.getValueAsString();
 		Control c = null;
 		if (attr instanceof BooleanAttribute) {
-			Button b = WidgetUtils.createButton(container,
-					ConfigUtils.EMPTY_STRING, null, SWT.CHECK, 1, false,
-					listener);
-			if ("true".equals(value))
+			Button b = WidgetUtils.createButton(container, ConfigUtils.EMPTY_STRING, null, SWT.CHECK, 1, false, listener);
+			if ("true".equals(value)) //$NON-NLS-1$
 				b.setSelection(true);
 			c = b;
 		} else if (attr instanceof IntegerAttribute)
@@ -115,19 +101,16 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 			 * For spinners, the default string should represent the minimum
 			 * value
 			 */
-			c = WidgetUtils.createSpinner(container, null,
-					Integer.parseInt(defaultString), Integer.MAX_VALUE,
+			c = WidgetUtils.createSpinner(container, null, Integer.parseInt(defaultString), Integer.MAX_VALUE,
 					Integer.parseInt(value), 1, false, listener);
 		else {
 			String name = attr.getDefinition().getId();
 			String constraints = constrained.getProperty(name);
 			if (constraints != null) {
-				String[] items = constraints.split(",");
-				c = WidgetUtils.createItemCombo(container, null, items,
-						items[0], ConfigUtils.EMPTY_STRING, false, listener, 1);
+				String[] items = constraints.split(","); //$NON-NLS-1$
+				c = WidgetUtils.createItemCombo(container, null, items, items[0], ConfigUtils.EMPTY_STRING, false, listener, 1);
 			} else
-				c = WidgetUtils.createText(container, value, true, listener,
-						null);
+				c = WidgetUtils.createText(container, value, true, listener, null);
 			c.setForeground(WidgetUtils.DKRD);
 		}
 		return c;
@@ -138,8 +121,7 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 	 */
 	private void loadConstraints() {
 		Bundle bundle = PBSUIPlugin.getDefault().getBundle();
-		URL url = FileLocator.find(bundle, new Path(
-				Messages.DynamicTabWizardPage_constraints), null);
+		URL url = FileLocator.find(bundle, new Path(Messages.DynamicTabWizardPage_constraints), null);
 		if (url == null)
 			return;
 		InputStream s = null;

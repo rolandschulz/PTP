@@ -43,18 +43,14 @@ import org.eclipse.swt.widgets.Text;
  * @author arossi
  */
 public class WidgetUtils {
-	public static final Color DKBL = Display.getDefault().getSystemColor(
-			SWT.COLOR_DARK_BLUE);
-	public static final Color DKMG = Display.getDefault().getSystemColor(
-			SWT.COLOR_DARK_MAGENTA);
-	public static final Color DKRD = Display.getDefault().getSystemColor(
-			SWT.COLOR_DARK_RED);
+	public static final Color DKBL = Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
+	public static final Color DKMG = Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA);
+	public static final Color DKRD = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
 
 	private WidgetUtils() {
 	}
 
-	public static TableColumn addTableColumn(final TableViewer viewer,
-			final String columnName, int style, SelectionListener l) {
+	public static TableColumn addTableColumn(final TableViewer viewer, final String columnName, int style, SelectionListener l) {
 		Table t = viewer.getTable();
 
 		TableColumn c = new TableColumn(t, style);
@@ -64,8 +60,7 @@ public class WidgetUtils {
 		return c;
 	}
 
-	public static Group createAnonymousNonFillingGroup(Composite parent,
-			int columns) {
+	public static Group createAnonymousNonFillingGroup(Composite parent, int columns) {
 		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 		data.horizontalAlignment = SWT.FILL;
 		data.grabExcessHorizontalSpace = true;
@@ -84,8 +79,7 @@ public class WidgetUtils {
 		return group;
 	}
 
-	public static Button createButton(Composite parent, String buttonText,
-			Image image, int style, int colSpan, boolean fill,
+	public static Button createButton(Composite parent, String buttonText, Image image, int style, int colSpan, boolean fill,
 			SelectionListener l) {
 
 		Button button = new Button(parent, style);
@@ -115,8 +109,7 @@ public class WidgetUtils {
 		return composite;
 	}
 
-	public static Group createFillingGroup(Composite parent, String text,
-			int columns, int colSpan, boolean verticalFill) {
+	public static Group createFillingGroup(Composite parent, String text, int columns, int colSpan, boolean verticalFill) {
 		GridData data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
@@ -138,8 +131,7 @@ public class WidgetUtils {
 		return group;
 	}
 
-	public static Table createFillingTable(Composite parent, int numColumns,
-			int suggestedWidth, int colSpan, int tableStyle) {
+	public static Table createFillingTable(Composite parent, int numColumns, int suggestedWidth, int colSpan, int tableStyle) {
 		GridData data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
@@ -156,15 +148,13 @@ public class WidgetUtils {
 
 		TableLayout layout = new TableLayout();
 		for (int i = 0; i < numColumns; i++)
-			layout.addColumnData(new ColumnPixelData(suggestedWidth
-					/ numColumns));
+			layout.addColumnData(new ColumnPixelData(suggestedWidth / numColumns));
 		t.setLayout(layout);
 
 		return t;
 	}
 
-	public static Combo createItemCombo(Composite container,
-			String labelString, String[] items, String initial, String tooltip,
+	public static Combo createItemCombo(Composite container, String labelString, String[] items, String initial, String tooltip,
 			boolean fill, ModifyListener listener, int colSpan) {
 		if (labelString != null) {
 			Label label = new Label(container, SWT.NONE);
@@ -192,8 +182,7 @@ public class WidgetUtils {
 		return combo;
 	}
 
-	public static Label createLabel(Composite container, String text,
-			int style, int colSpan) {
+	public static Label createLabel(Composite container, String text, int style, int colSpan) {
 		GridData data = new GridData();
 		data.horizontalSpan = colSpan;
 
@@ -206,8 +195,7 @@ public class WidgetUtils {
 		return label;
 	}
 
-	public static Spinner createSpinner(Composite container,
-			String labelString, int min, int max, int initial, int colSpan,
+	public static Spinner createSpinner(Composite container, String labelString, int min, int max, int initial, int colSpan,
 			boolean fill, ModifyListener listener) {
 		if (labelString != null) {
 			GridData data = new GridData();
@@ -233,8 +221,7 @@ public class WidgetUtils {
 		return s;
 	}
 
-	public static Text createText(Composite container, String initialValue,
-			boolean fill, ModifyListener listener, Color color) {
+	public static Text createText(Composite container, String initialValue, boolean fill, ModifyListener listener, Color color) {
 
 		GridData data = new GridData();
 		if (fill)
@@ -252,11 +239,10 @@ public class WidgetUtils {
 		return text;
 	}
 
-	public static void errorMessage(Shell s, Throwable e, String message,
-			String title, boolean causeTrace) {
+	public static void errorMessage(Shell s, Throwable e, String message, String title, boolean causeTrace) {
 		String append = e == null ? ConfigUtils.EMPTY_STRING : e.getMessage();
 		Throwable t = e == null ? null : e.getCause();
-		String lineSep = System.getProperty("line.separator");
+		String lineSep = ConfigUtils.LINE_SEP;
 		if (causeTrace) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);

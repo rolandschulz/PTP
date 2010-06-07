@@ -29,8 +29,7 @@ public class ComboEntryDialog extends Dialog {
 	private Combo combo;
 	private final String title;
 
-	public ComboEntryDialog(Shell parentShell, String dialogTitle,
-			String[] initialValues) {
+	public ComboEntryDialog(Shell parentShell, String dialogTitle, String[] initialValues) {
 		super(parentShell);
 		this.title = dialogTitle;
 		if (initialValues == null)
@@ -72,8 +71,7 @@ public class ComboEntryDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
-		combo = WidgetUtils.createItemCombo(composite, title, choices, "", "",
-				true, null, 2);
+		combo = WidgetUtils.createItemCombo(composite, title, choices, "", "", true, null, 2); //$NON-NLS-1$ //$NON-NLS-2$
 		combo.setFocus();
 		applyDialogFont(composite);
 		return composite;
