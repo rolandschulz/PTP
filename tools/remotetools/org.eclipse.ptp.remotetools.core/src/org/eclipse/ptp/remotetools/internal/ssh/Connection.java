@@ -239,8 +239,6 @@ public class Connection implements IRemoteConnection {
 			KeyAuthToken token = (KeyAuthToken) authToken;
 			sshuserinfo.setUsePassword(false);
 			sshuserinfo.setPassphrase(token.getPassphrase());
-		} else if (authToken instanceof KeyAuthToken) {
-			KeyAuthToken token = (KeyAuthToken) authToken;
 			try {
 				jsch.getJSch().addIdentity(token.getKeyPath().getAbsolutePath());
 			} catch (JSchException e) {
