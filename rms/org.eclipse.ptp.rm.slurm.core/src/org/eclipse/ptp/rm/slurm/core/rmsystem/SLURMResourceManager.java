@@ -25,6 +25,7 @@ import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.rm.slurm.core.SLURMJobAttributes;
 import org.eclipse.ptp.rm.slurm.core.SLURMNodeAttributes;
+import org.eclipse.ptp.rm.slurm.core.messages.Messages;
 import org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMProxyRuntimeClient;
 import org.eclipse.ptp.rm.slurm.core.rtsystem.SLURMRuntimeSystem;
 import org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager;
@@ -173,7 +174,7 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
  	 * @see org.eclipse.ptp.rtsystem.IRuntimeEventListener#handleEvent(org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;)
  	 */
  	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
- 		final String title="JobSubmit Error";
+ 		final String title=Messages.SLURMResourceManager_0;
  		final String msg = e.getErrorMessage();
  		
  		//System.out.println("Job submit error!");
