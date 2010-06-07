@@ -59,9 +59,8 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 		}
 
 		synchronized (this) {
-			if (fServerRunner != null) {
+			if (fServerRunner != null)
 				fServerRunner.cancel();
-			}
 		}
 	}
 
@@ -91,9 +90,8 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 			 */
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 					getConfiguration().getRemoteServicesId());
-			if (remoteServices == null) {
+			if (remoteServices == null)
 				throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_1, getConfiguration().getRemoteServicesId()));
-			}
 
 			subMon.worked(5);
 
@@ -102,18 +100,15 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 			} else {
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 				IRemoteConnection conn = connMgr.getConnection(getConfiguration().getConnectionName());
-				if (conn == null) {
+				if (conn == null)
 					throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_2, getConfiguration().getConnectionName()));
-				}
 
 				subMon.subTask(Messages.PBSProxyRuntimeClient_3);
 
-				if (!conn.isOpen()) {
+				if (!conn.isOpen())
 					conn.open(subMon.newChild(4));
-				}
-				if (monitor.isCanceled()) {
+				if (monitor.isCanceled())
 					return;
-				}
 
 				subMon.subTask(Messages.PBSProxyRuntimeClient_4);
 
@@ -144,9 +139,8 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 					// args += " --debug=" + getDebugOptions().SERVER_DEBUG_LEVEL; //$NON-NLS-1$
 				}
 
-				if (getDebugOptions().CLIENT_TRACING) {
+				if (getDebugOptions().CLIENT_TRACING)
 					System.out.println("Server args: " + args.toString()); //$NON-NLS-1$
-				}
 
 				subMon.subTask(Messages.PBSProxyRuntimeClient_5);
 
@@ -182,9 +176,8 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 			}
 			throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_7, e.getMessage()));
 		} finally {
-			if (monitor != null) {
+			if (monitor != null)
 				monitor.done();
-			}
 			synchronized (this) {
 				fServerRunner = null;
 			}
