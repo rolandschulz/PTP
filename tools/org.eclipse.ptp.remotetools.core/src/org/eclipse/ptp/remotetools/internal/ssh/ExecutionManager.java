@@ -11,8 +11,10 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
@@ -124,7 +126,8 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		 * Cancel all operations. Each operation implements its own logic how to
 		 * cancel. This simply broadcasts the cancel to all running operations.
 		 */
-		for (IRemoteOperation operation : executions) {
+		List<IRemoteOperation> operations = new ArrayList<IRemoteOperation>(executions);
+		for (IRemoteOperation operation : operations) {
 			operation.cancel();
 		}
 		cancelFlag = true;
@@ -168,10 +171,10 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		/*
 		 * Close all channels for remote executions.
 		 */
-		for (IRemoteOperation operation : executions) {
+		List<IRemoteOperation> operations = new ArrayList<IRemoteOperation>(executions);
+		for (IRemoteOperation operation : operations) {
 			operation.close();
 		}
-		executions.clear();
 	}
 
 	/**
