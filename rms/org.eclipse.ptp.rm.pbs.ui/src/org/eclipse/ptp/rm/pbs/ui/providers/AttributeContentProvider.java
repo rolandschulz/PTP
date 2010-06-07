@@ -44,8 +44,7 @@ public class AttributeContentProvider implements IStructuredContentProvider {
 			return all.toArray(new AttributePlaceholder[0]);
 		} else if (inputElement instanceof Map<?, ?>) {
 			Map<?, ?> m = (Map<?, ?>) inputElement;
-			Collection<AttributePlaceholder> c = (Collection<AttributePlaceholder>) m
-					.values();
+			Collection<AttributePlaceholder> c = (Collection<AttributePlaceholder>) m.values();
 			return c.toArray(new AttributePlaceholder[0]);
 		} else if (inputElement instanceof AttributePlaceholder)
 			return new Object[] { inputElement };

@@ -139,7 +139,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				try {
 					template.setMPIAttributes((String) value);
 				} catch (IllegalValueException t) {
-					throw new ValidationException(t.getMessage() + ": " + t.getCause());
+					throw new ValidationException(t.getMessage() + ": " + t.getCause()); //$NON-NLS-1$
 				}
 			}
 		}
@@ -262,8 +262,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 					Combo cmb = (Combo) c;
 					String value = cmb.getText();
 					AttributePlaceholder ap = valueWidgets.get(c);
-					if (value.indexOf("?") >= 0)
-						throw new ValidationException(ap.getName() + ": " + Messages.PBSRMLaunchDataSource_ValueNotSet);
+					if (value.indexOf("?") >= 0) //$NON-NLS-1$ 
+						throw new ValidationException(ap.getName() + ": " + Messages.PBSRMLaunchDataSource_ValueNotSet); //$NON-NLS-1$ 
 				}
 			}
 		}
@@ -387,7 +387,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				if (dialog.open() == Window.CANCEL)
 					return;
 				attr.setValueAsString(dialog.getValue());
-				// dataSource.copyToStorage();
 			} catch (Throwable t) {
 				WidgetUtils.errorMessage(control.getShell(), t, Messages.PBSBatchScriptTemplateEditError_message,
 						Messages.PBSBatchScriptTemplateEditError_title, false);
@@ -434,7 +433,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	private static final Map<String, ILaunchConfiguration> configurations = new HashMap<String, ILaunchConfiguration>();
 
-	private static final String[] mpiChoices = Messages.MPICommands.split(",");
+	private static final String[] mpiChoices = Messages.MPICommands.split(","); //$NON-NLS-1$ 
 
 	private static final String TAG_CURRENT_TEMPLATE = Messages.PBSRMLaunchConfigCurrentTemplate;
 
@@ -668,7 +667,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * widgets on the basis of its placeholders.
 	 */
 	private void fireTemplateChange() {
-		new UIJob("template change") {
+		new UIJob("template change") {//$NON-NLS-1$ 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {

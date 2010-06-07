@@ -48,7 +48,7 @@ public class AttributeLabelProvider implements ITableLabelProvider {
 			return ap.getToolTip();
 		default:
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	public boolean isLabelProperty(Object element, String property) {
