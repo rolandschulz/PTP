@@ -84,10 +84,6 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				fStartupMonitor.setCanceled(true);
 			}
 		}
-
-		if (fConnection != null && fConnection.isOpen()) {
-			fConnection.close();
-		}
 	}
 
 	/**
