@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
 
 public class PBSProxyServerRunner extends AbstractRemoteServerRunner {
-	public static String SERVER_ID = "org.eclipse.ptp.rm.pbs.PBSProxyServer"; //$NON-NLS-1$
+	public static final String SERVER_ID = "org.eclipse.ptp.rm.pbs.PBSProxyServer"; //$NON-NLS-1$
 
 	private static final String SUCCESS_STRING = "PBSProxyRuntimeServer started"; //$NON-NLS-1$
 
