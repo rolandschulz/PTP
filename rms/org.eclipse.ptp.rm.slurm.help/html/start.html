@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Getting Started</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+
+<body>
+<h1>SLURM Resource Manager for PTP</h1>
+<h2><A name=starting></A>Getting Started</h2>
+<p>Define an appropriate project, either a C/C++ project using CDT or a FORTRAN project using Photran. You can define 
+either a standard make project or a managed make project.</p>
+
+<p>When you define the project, you should specify the project location as a directory which is <b>shared among all nodes</b>
+(for example, the directory on NFS, lustre fielsystem etc.) 
+where the parallel application will run to ensure SLURMt has access to the executable on all nodes. The 
+following image shows how a project can be created using a directory visible to all nodes.</p>
+<img src="images/project_create_1.png"> 
+
+<p>You should use the following compiler invocation commands
+to invoke the compiler if you want to build a parallel program to run with the SLURM proxy, 
+either in your makefile, or when specifying the compiler and linker in a managed make project.</p>
+<li>Linux</li>
+<ul>
+<li>mpcc for C programs</li>
+<li>mpcxx for C++ programs</li>
+<li>mpif77 or mpif90 for FORTRAN programs</li>
+</ul> 
+<p>The following image shows how the compiler is specified for a managed make project. The correct linker should also
+be specified by clicking the settings for the linker.</p>
+<img src="images/project_create_2.png">
+
+<p><a href="toc.html">Back to Table of Contents</a>
+</body>
+</html>

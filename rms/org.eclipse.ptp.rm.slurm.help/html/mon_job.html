@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Monitoring Application Execution</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+
+<body>
+<h1>SLURM Resource Manager for PTP</h1>
+<h2><a name=monitoring></a>Monitoring Application Execution</h2>
+
+<p>Once you click run to invoke the application, the resource manager will monitor the application's execution. 
+When SLURM allocates tasks to nodes, the default machine view for the resource manager will be updated to show the nodes 
+that are currently in use. If you move the mouse over a node icon, in the machine view, you will see the hostname for that node. 
+If you double click a node icon in the machine view, the node attributes and process info windows in the machine view
+will be updated to report current status for that node. Once a job completes, the machines view will be updated to 
+show the current status. Nodes state in the machines view are updated periodically by slurm proxy. </p>
+
+<p>Once a parallel application starts, the jobs view will be updated to show an entry for that job, along with icons for each
+task in the application. The job and task icons will change state once the
+job is running, and again when the application exits, to show that the job has completed. At any time that a job is shown in
+the jobs view, you can double click a task icon to show the stdout output for that task if stdout has not been
+redirected to a file.</p>
+
+<p><a href="toc.html">Back to Table of Contents</a>
+</body>
+</html>
