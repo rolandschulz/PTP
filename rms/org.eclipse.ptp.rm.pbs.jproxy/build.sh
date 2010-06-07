@@ -16,7 +16,7 @@
 # Usage: build.sh
 #
 
-JDT_UI=/path/to/eclipse/plugins/org.eclipse.jdt.ui_3.6.0.v20100513-0800.jar
+JDT_UI=/path/to/eclipse/plugins/org.eclipse.jdt.ui_*.jar
 
 rm -rf build_tmp
 mkdir build_tmp
