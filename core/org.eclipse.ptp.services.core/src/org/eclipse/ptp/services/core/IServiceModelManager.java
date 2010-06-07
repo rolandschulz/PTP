@@ -224,6 +224,15 @@ public interface IServiceModelManager extends IAdaptable {
 	public IServiceConfiguration newServiceConfiguration(String name);
 
 	/**
+	 * Remaps all the configurations and services associated to the removed project to the added project.
+	 * 
+	 * @param removedProject project removed from workspace
+	 * @param addedProject project added to workspace
+	 * @since 2.0
+	 */
+	public void remap(IProject removedProject, IProject addedProject);
+	
+	/**
 	 * Removes all the configurations and services associated to the given project.
 	 * If the project has not been configured then this method does nothing.
 	 * 
