@@ -98,7 +98,7 @@ sdm_LINK = $(CCLD) $(sdm_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
 am_sdm_test_OBJECTS = src/test/sdm_test-sdm_test.$(OBJEXT)
 sdm_test_OBJECTS = $(am_sdm_test_OBJECTS)
-sdm_test_DEPENDENCIES = libsdm.a libdbgclnt.a libdbgutils.a \
+sdm_test_DEPENDENCIES = libdbgclnt.a libsdm.a libdbgutils.a \
 	libaif/libaif.a libmi/libmi.a
 sdm_test_LINK = $(CCLD) $(sdm_test_CFLAGS) $(CFLAGS) \
 	$(sdm_test_LDFLAGS) $(LDFLAGS) -o $@
@@ -253,7 +253,7 @@ libsdm_a_CFLAGS = -I./include $(AM_CFLAGS)
 sdm_test_SOURCES = src/test/sdm_test.c
 sdm_test_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 sdm_test_LDFLAGS = -g
-sdm_test_LDADD = libsdm.a libdbgclnt.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
+sdm_test_LDADD = libdbgclnt.a libsdm.a libdbgutils.a libaif/libaif.a libmi/libmi.a @CLNT_LIBS@
 noinst_HEADERS = include/backend.h \
 							include/breakpoint.h \
 							include/dbg_master.h \
