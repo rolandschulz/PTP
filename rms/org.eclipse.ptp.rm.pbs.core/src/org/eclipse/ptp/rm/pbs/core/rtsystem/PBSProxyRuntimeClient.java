@@ -14,6 +14,7 @@ package org.eclipse.ptp.rm.pbs.core.rtsystem;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -25,6 +26,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.launch.core.RemoteServerManager;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeClient;
+import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.jproxy.server.PBSProxyServerRunner;
 
@@ -81,7 +83,7 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 		}
 
 		try {
-			subMon.subTask("Initializing remote services");
+			subMon.subTask(Messages.PBSProxyRuntimeClient_0);
 
 			/*
 			 * This can fail if we are restarting the RM from saved information
@@ -90,20 +92,21 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 					getConfiguration().getRemoteServicesId());
 			if (remoteServices == null) {
-				throw new IOException(NLS.bind("Could not find remote servers ID: {0}", getConfiguration().getRemoteServicesId()));
+				throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_1, getConfiguration().getRemoteServicesId()));
 			}
 
 			subMon.worked(5);
 
 			if (getConfiguration().testOption(IRemoteProxyOptions.MANUAL_LAUNCH)) {
+				// TODO: implement manual launch
 			} else {
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 				IRemoteConnection conn = connMgr.getConnection(getConfiguration().getConnectionName());
 				if (conn == null) {
-					throw new IOException(NLS.bind("No such connection: {0}", getConfiguration().getConnectionName()));
+					throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_2, getConfiguration().getConnectionName()));
 				}
 
-				subMon.subTask("Opening session");
+				subMon.subTask(Messages.PBSProxyRuntimeClient_3);
 
 				if (!conn.isOpen()) {
 					conn.open(subMon.newChild(4));
@@ -112,7 +115,7 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 					return;
 				}
 
-				subMon.subTask("Creating session");
+				subMon.subTask(Messages.PBSProxyRuntimeClient_4);
 
 				sessionCreate();
 
@@ -138,19 +141,19 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 				}
 
 				if (getDebugOptions().SERVER_DEBUG_LEVEL > 0) {
-					//					args += " --debug=" + getDebugOptions().SERVER_DEBUG_LEVEL; //$NON-NLS-1$
+					// args += " --debug=" + getDebugOptions().SERVER_DEBUG_LEVEL; //$NON-NLS-1$
 				}
 
 				if (getDebugOptions().CLIENT_TRACING) {
 					System.out.println("Server args: " + args.toString()); //$NON-NLS-1$
 				}
 
-				subMon.subTask("Launching server");
+				subMon.subTask(Messages.PBSProxyRuntimeClient_5);
 
 				PBSProxyServerRunner runner = (PBSProxyServerRunner) RemoteServerManager.getServer(PBSProxyServerRunner.SERVER_ID,
 						conn);
 				runner.setVariable("args", args); //$NON-NLS-1$
-				runner.setWorkDir(conn.getWorkingDirectory());
+				runner.setWorkDir(new Path(conn.getWorkingDirectory()).append(".eclipsesettings").toString()); //$NON-NLS-1$
 				runner.startServer(subMon);
 
 				synchronized (this) {
@@ -160,7 +163,7 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 				subMon.worked(2);
 			}
 
-			subMon.subTask("Starting runtime system");
+			subMon.subTask(Messages.PBSProxyRuntimeClient_6);
 			super.startup();
 			subMon.worked(2);
 
@@ -170,14 +173,14 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 			} catch (IOException e1) {
 				PTPCorePlugin.log(e1);
 			}
-			throw new IOException(NLS.bind("Failed to start proxy: {0}", e.getMessage()));
+			throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_7, e.getMessage()));
 		} catch (RemoteConnectionException e) {
 			try {
 				sessionFinish();
 			} catch (IOException e1) {
 				PTPCorePlugin.log(e1);
 			}
-			throw new IOException(NLS.bind("Failed to start proxy: {0}", e.getMessage()));
+			throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_7, e.getMessage()));
 		} finally {
 			if (monitor != null) {
 				monitor.done();

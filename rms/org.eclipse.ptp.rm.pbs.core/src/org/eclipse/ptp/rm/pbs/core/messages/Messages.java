@@ -156,6 +156,14 @@ public class Messages extends NLS {
 	public static String PBSNodeAttributes_3;
 	public static String PBSNodeAttributes_4;
 	public static String PBSNodeAttributes_5;
+	public static String PBSProxyRuntimeClient_0;
+	public static String PBSProxyRuntimeClient_1;
+	public static String PBSProxyRuntimeClient_2;
+	public static String PBSProxyRuntimeClient_3;
+	public static String PBSProxyRuntimeClient_4;
+	public static String PBSProxyRuntimeClient_5;
+	public static String PBSProxyRuntimeClient_6;
+	public static String PBSProxyRuntimeClient_7;
 	public static String PBSQueueAttributes_0;
 	public static String PBSQueueAttributes_1;
 	public static String PBSQueueAttributes_10;

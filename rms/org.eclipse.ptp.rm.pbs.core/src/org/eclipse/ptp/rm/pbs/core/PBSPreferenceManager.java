@@ -14,8 +14,8 @@ package org.eclipse.ptp.rm.pbs.core;
 import org.eclipse.core.runtime.Preferences;
 
 public class PBSPreferenceManager {
-	private static final String SELECTED = "selectedAttributes";
-	private static final String TEMPLATE = "attributeConfiguration";
+	private static final String SELECTED = "selectedAttributes"; //$NON-NLS-1$
+	private static final String TEMPLATE = "attributeConfiguration"; //$NON-NLS-1$
 
 	public static Preferences getPreferences() {
 		return Activator.getDefault().getPluginPreferences();
