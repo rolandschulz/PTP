@@ -350,6 +350,13 @@ public class Connection implements IRemoteConnection {
 		if (forwardingPool == null) {
 			forwardingPool = new RemotePortForwardingPool(this);
 		}
+
+		/*
+		 * Reset cancel flag
+		 */
+		if (executionManager != null) {
+			executionManager.resetCancel();
+		}
 	}
 
 	/*

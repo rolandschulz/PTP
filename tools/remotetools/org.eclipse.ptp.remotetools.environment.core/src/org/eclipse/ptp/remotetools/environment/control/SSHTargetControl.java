@@ -278,10 +278,7 @@ public abstract class SSHTargetControl implements ITargetControl {
 				disconnect();
 				throw new CoreException(new Status(IStatus.CANCEL, getPluginId(), 0, Messages.SSHTargetControl_1, null));
 			}
-			if (remoteConnection != null) {
-				kill(monitor);
-				createRemoteExecutionManager().resetCancel();
-			}
+			kill(monitor);
 			connect(monitor);
 			if (monitor.isCanceled()) {
 				disconnect();

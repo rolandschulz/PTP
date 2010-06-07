@@ -15,18 +15,27 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
 /**
+ * NOTE: this interface should not normally be used directly but called via the
+ * org.eclipse.ptp.remote.core interfaces.
+ * 
  * A connection to a remote host. Serves as a starting point for creating
  * {@link IRemoteExecutionManager}, that to operations on the remote host.
+ * 
+ * It is the responsibility of the caller to check that a remote connection is
+ * open before using it. If the connection was open, but has been closed for
+ * some reason, {@link #disconnect()} must be called before
+ * {@link #connect(AuthToken, String, int, String, int, IProgressMonitor)} is
+ * called again.
  * 
  * @author Richard Maciel, Daniel Felix Ferber
  * @since 1.1 <b>Review OK</b>
  * 
- *        NOTE: this interface should not normally be used directly
  * @see org.eclipse.ptp.remote.core.IRemoteConnection
  */
 public interface IRemoteConnection {
 	/**
-	 * Connect to the remote machine.
+	 * Connect to the remote machine. The {@link #disconnect()} method must be
+	 * called before this method if the connection was dropped for some reason.
 	 * 
 	 * @param authToken
 	 *            authentication information for connection
