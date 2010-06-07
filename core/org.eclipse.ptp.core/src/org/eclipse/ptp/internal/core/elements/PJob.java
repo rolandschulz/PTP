@@ -378,7 +378,8 @@ public class PJob extends Parent implements IPJobControl {
 		currentProcessJobRanks.andNot(processJobRanks);
 
 		// remove these processes from each AttributeIndexSet
-		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
+		final List<AttributeIndexSet<?>> values = new ArrayList<AttributeIndexSet<?>>(processAttributesMap.values());
+		for (AttributeIndexSet<?> ais : values) {
 			ais.clearIndices(processJobRanks);
 		}
 
