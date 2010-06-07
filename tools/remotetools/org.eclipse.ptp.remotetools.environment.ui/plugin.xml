@@ -31,6 +31,24 @@
                visible="true">
          </view>
       </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.ui.PTPRunPerspective">
+         <view
+               id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.views.PropertySheet">
+         </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+         <view
+               id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ptp.rdt.ui.callHierarchy">
+         </view>
+      </perspectiveExtension>
    </extension>
 
 </plugin>
