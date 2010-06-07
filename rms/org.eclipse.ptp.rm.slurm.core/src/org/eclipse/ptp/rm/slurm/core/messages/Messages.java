@@ -19,7 +19,28 @@ public class Messages extends NLS {
 
 	public static String SLURMJobAttributes_0;
 	public static String SLURMJobAttributes_1;
-	
+	public static String SLURMJobAttributes_10;
+	public static String SLURMJobAttributes_11;
+	public static String SLURMJobAttributes_2;
+	public static String SLURMJobAttributes_3;
+	public static String SLURMJobAttributes_4;
+	public static String SLURMJobAttributes_5;
+	public static String SLURMJobAttributes_6;
+	public static String SLURMJobAttributes_7;
+	public static String SLURMJobAttributes_8;
+	public static String SLURMJobAttributes_9;
+	public static String SLURMNodeAttributes_0;
+	public static String SLURMNodeAttributes_1;
+	public static String SLURMNodeAttributes_2;
+	public static String SLURMNodeAttributes_3;
+	public static String SLURMNodeAttributes_4;
+	public static String SLURMNodeAttributes_5;
+	public static String SLURMNodeAttributes_6;
+	public static String SLURMNodeAttributes_7;
+	public static String SLURMNodeAttributes_8;
+	public static String SLURMNodeAttributes_9;
+	public static String SLURMResourceManager_0;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
@@ -29,4 +50,3 @@ public class Messages extends NLS {
 		// Prevent instances.
 	}
 }
-

@@ -40,14 +40,14 @@ public class SLURMPreferenceManager {
 	public static void initializePreferences() {
 		Preferences preferences = Activator.getDefault().getPluginPreferences();
 		
-		String server = "";
+		String server = ""; //$NON-NLS-1$
 			
 		if (PROXY_EXECUTABLE_PATH != null) {
 			//server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
 		} else {
 			//server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME);
 			if (server == null) {
-				server = "";
+				server = ""; //$NON-NLS-1$
 			}
        }
 		

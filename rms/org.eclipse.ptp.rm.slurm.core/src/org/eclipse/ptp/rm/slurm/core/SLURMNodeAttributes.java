@@ -16,6 +16,7 @@ package org.eclipse.ptp.rm.slurm.core;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.rm.slurm.core.messages.Messages;
 
 
 /**
@@ -30,24 +31,24 @@ public class SLURMNodeAttributes {
 	
 	
 	private final static IntegerAttributeDefinition sockAttrDef = 
-		new IntegerAttributeDefinition(SOCKNUMBER_ATTR_ID, "Sock Number", //$NON-NLS-1$
-				"sockets number of node", true, 0);//$NON-NLS-1$
+		new IntegerAttributeDefinition(SOCKNUMBER_ATTR_ID, Messages.SLURMNodeAttributes_2, 
+				Messages.SLURMNodeAttributes_3, true, 0);
 	
 	private final static IntegerAttributeDefinition coreAttrDef = 
-		new IntegerAttributeDefinition(CORENUMBER_ATTR_ID, "Core Number", //$NON-NLS-1$
-				"cores number of node", true, 0);//$NON-NLS-1$
+		new IntegerAttributeDefinition(CORENUMBER_ATTR_ID, Messages.SLURMNodeAttributes_4, 
+				Messages.SLURMNodeAttributes_5, true, 0);
 		
 	private final static IntegerAttributeDefinition threadAttrDef = 
-		new IntegerAttributeDefinition(THREADNUMBER_ATTR_ID, "Thread Number", //$NON-NLS-1$
-				"threads number of node", true, 0);//$NON-NLS-1$
+		new IntegerAttributeDefinition(THREADNUMBER_ATTR_ID, Messages.SLURMNodeAttributes_6, 
+				Messages.SLURMNodeAttributes_7, true, 0);
 
 	private final static StringAttributeDefinition cpuAttrDef = 
-		new StringAttributeDefinition(CPUARCH_ATTR_ID, "CPU Arch", //$NON-NLS-1$
-				"CPU Arch of node", true, "");//$NON-NLS-1$
+		new StringAttributeDefinition(CPUARCH_ATTR_ID, Messages.SLURMNodeAttributes_8, 
+				Messages.SLURMNodeAttributes_9, true, ""); //$NON-NLS-2$
 	
 	private final static StringAttributeDefinition osAttrDef = 
-		new StringAttributeDefinition(OS_ATTR_ID, "Operating Systerm", //$NON-NLS-1$
-				"OS of node", true, "");//$NON-NLS-1$
+		new StringAttributeDefinition(OS_ATTR_ID, Messages.SLURMNodeAttributes_0, 
+				Messages.SLURMNodeAttributes_1, true, ""); //$NON-NLS-2$
 	
 	public static IntegerAttributeDefinition getSockNumberAttributeDefinition() {
 		return sockAttrDef;
