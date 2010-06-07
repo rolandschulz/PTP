@@ -200,7 +200,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributeKeys(java.util.BitSet)
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<IAttributeDefinition<?, ?, ?>> getProcessAttributeKeys(BitSet processJobRanks) {
+	public synchronized Set<IAttributeDefinition<?, ?, ?>> getProcessAttributeKeys(BitSet processJobRanks) {
 		final Set<IAttributeDefinition<?, ?, ?>> results = new HashSet<IAttributeDefinition<?, ?, ?>>();
 		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
 			final Set<IAttribute<?, ?, ?>> attrs =
@@ -217,7 +217,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(java.util.BitSet)
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<IAttribute<?, ?, ?>> getProcessAttributes(BitSet processJobRanks) {
+	public synchronized Set<IAttribute<?, ?, ?>> getProcessAttributes(BitSet processJobRanks) {
 		final Set<IAttribute<?, ?, ?>> results = new HashSet<IAttribute<?, ?, ?>>();
 		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
 			final Set<IAttribute<?, ?, ?>> attrs =
@@ -240,7 +240,7 @@ public class PJob extends Parent implements IPJobControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(java.lang.String, java.util.BitSet)
 	 */
-	public Set<IAttribute<?,?,?>> getProcessAttributes(String attrDefId, BitSet processJobRanks) {
+	public synchronized Set<IAttribute<?,?,?>> getProcessAttributes(String attrDefId, BitSet processJobRanks) {
 		Set<IAttribute<?, ?, ?>> results = new HashSet<IAttribute<?,?,?>>();
 		for (Entry<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> entry : processAttributesMap.entrySet()) {
 			IAttributeDefinition<?, ?, ?> def = entry.getKey();
@@ -373,7 +373,7 @@ public class PJob extends Parent implements IPJobControl {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#removeProcesses(java.util.BitSet)
 	 */
-	public void removeProcessesByJobRanks(BitSet processJobRanks) {
+	public synchronized void removeProcessesByJobRanks(BitSet processJobRanks) {
 		// remove these processes from the master set
 		currentProcessJobRanks.andNot(processJobRanks);
 
@@ -516,7 +516,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	private synchronized <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
 	AttributeIndexSet<A> getAttributeIndexSet(D def) {
 		AttributeIndexSet<A> attributeIndexSet = (AttributeIndexSet<A>) processAttributesMap.get(def);
 		if (attributeIndexSet == null) {
