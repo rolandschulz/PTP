@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2006 IBM Corporation.
+ * Copyright (c) 2006, 2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,46 +14,45 @@ package org.eclipse.ptp.remotetools.internal.ssh;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.remotetools.core.messages.Messages;
 
 /**
  * Observer responsible for updating the list of running process.
  * 
+ * Note: This must be a Thread not a Job as it may be run very early on in
+ * Eclipse startup.
+ * 
  * @author Richard Maciel
  * @since 1.1
  */
-class ExecutionObserver extends Job {
-	private Connection fConnection;
+public class ExecutionObserver extends Thread {
+	private final Connection fConnection;
+	private boolean fCanceled = false;
 
 	public ExecutionObserver(Connection connection) {
-		super(
-				Messages.ExecutionObserver_ExecutionObserver_RemoteCommandObserver);
+		super(Messages.ExecutionObserver_ExecutionObserver_RemoteCommandObserver);
 		fConnection = connection;
 	}
-	
+
+	public void cancel() {
+		fCanceled = true;
+	}
+
 	/**
 	 * Check for process that finished and remove then from the table until
 	 * there are no more process.
-	 * 
-	 * @param monitor
-	 * @return Status of the run.
 	 */
-	protected IStatus run(IProgressMonitor monitor) {
-		while (!monitor.isCanceled()) {
+	@Override
+	public void run() {
+		while (!fCanceled) {
 			KillableExecution finished = null;
-			if (fConnection.isConnected()
-					&& fConnection.getActiveProcessTable() != null) {
+			if (fConnection.isConnected() && fConnection.getActiveProcessTable() != null) {
 				synchronized (fConnection) {
-					Iterator<Entry<Integer, KillableExecution>> iterator = fConnection
-							.getActiveProcessTable().entrySet().iterator();
+					Iterator<Entry<Integer, KillableExecution>> iterator = fConnection.getActiveProcessTable().entrySet()
+							.iterator();
 
 					while (iterator.hasNext()) {
-						Entry<Integer, KillableExecution> entry = iterator
-								.next();
+						Entry<Integer, KillableExecution> entry = iterator.next();
 
 						if (!entry.getValue().isRunning()) {
 							finished = entry.getValue();
@@ -77,7 +76,6 @@ class ExecutionObserver extends Job {
 			}
 
 		}
-		return Status.OK_STATUS;
 	}
 
 }
