@@ -367,10 +367,10 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			try {
 				if (ap != null)
 					openEditor(ap, title);
-				else if (o == viewScript)
+				else if (o == viewScript) {
 					openReadOnly(template.realize());
-				// else
-				super.widgetSelected(e);
+					super.widgetSelected(e);
+				}
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
