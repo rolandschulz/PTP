@@ -277,6 +277,11 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			return false;
 		}
 		binary = buildInfo.getBuildArtifactName();
+		
+		if(binary.equals("${ProjName}")){
+			binary=thisProject.getName();
+		}
+		
 		String bextension = buildInfo.getBuildArtifactExtension();
 		if (bextension.length() > 0)
 			binary = binary + "." + bextension; //$NON-NLS-1$
