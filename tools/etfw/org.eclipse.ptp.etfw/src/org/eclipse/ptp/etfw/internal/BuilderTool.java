@@ -446,7 +446,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 				numChanges += modifyCommand(tools[i], getToolCommand(tool.getF90Compiler(), configuration), allargs,
 						tool.replaceCompiler);
 			}
-			if (toolid.indexOf(".upc.") >= 0) //$NON-NLS-1$
+			if ((toolid.indexOf(".upc.") >= 0)||(toolid.indexOf(".bupc.") >= 0)||(toolid.indexOf(".xlupc.") >= 0)) //$NON-NLS-1$
 			{
 				numChanges += modifyCommand(tools[i], getToolCommand(tool.getUPCCompiler(), configuration), allargs,
 						tool.replaceCompiler);
