@@ -52,10 +52,11 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	protected WritableByteChannel sessOutput;
 	private final IProxyCommandFactory proxyCommandFactory;
 	private Thread commandThread;
+	/**
+	 * @since 4.0
+	 */
 	protected Thread stateMachineThread;
 	private final List<IProxyCommandListener> listeners = Collections.synchronizedList(new ArrayList<IProxyCommandListener>());
-
-
 
 	public AbstractProxyServer(String host, int port, IProxyCommandFactory factory) {
 		this.sessHost = host;
