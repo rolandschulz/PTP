@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -309,7 +310,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
 			if (jarURL != null) {
 				jarURL = FileLocator.toFileURL(jarURL);
-				local = EFS.getStore(jarURL.toURI());
+				local = EFS.getStore(URIUtil.toURI(jarURL));
 			}
 			if (local == null) {
 				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_11,
