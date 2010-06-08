@@ -31,6 +31,7 @@ public class BarrierExpression {
 	protected BarrierExpression operand2_;
 	
 	protected int length;
+	/** 'Top' is symbol for infinite length, or error */
 	public static final int TOP = -3;
 	
 	/* For instrumentation */
