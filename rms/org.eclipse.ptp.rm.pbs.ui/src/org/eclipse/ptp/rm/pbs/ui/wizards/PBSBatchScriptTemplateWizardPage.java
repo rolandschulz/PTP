@@ -29,11 +29,11 @@ import org.eclipse.ptp.rm.pbs.ui.providers.AttributeContentProvider;
 import org.eclipse.ptp.rm.pbs.ui.providers.AttributeLabelProvider;
 import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
+import org.eclipse.ptp.rm.ui.utils.WidgetListener;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -52,29 +52,26 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	/*
 	 * Associated with the selection of a choice of configuration file.
 	 */
-	private class ConfigurationChangeListener implements ModifyListener, SelectionListener, ISelectionChangedListener {
-		/**
-		 * If the ignore flag is toggled, no action is taken. For the sequence
-		 * of actions on update, see
-		 * {@link PBSLaunchConfigurationWizardDataDelegate#fireModifyTemplateChoice}
-		 * .
-		 */
-		public void modifyText(ModifyEvent e) {
-			if (e.getSource() == templates) {
-				String choice = templates.getText();
-				fireModifyTemplateChoice(choice);
-			}
-		}
+	private class ConfigurationChangeListener extends WidgetListener implements ISelectionChangedListener {
 
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (event.getSource() == readOnlyView)
 				updateSettings();
 		}
 
-		public void widgetDefaultSelected(SelectionEvent e) {
-		}
-
-		public void widgetSelected(SelectionEvent e) {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.rm.ui.utils.WidgetListener#doModifyText(org.eclipse
+		 * .swt.events.ModifyEvent)
+		 */
+		@Override
+		protected void doModifyText(ModifyEvent e) {
+			if (e.getSource() == templates) {
+				String choice = templates.getText();
+				fireModifyTemplateChoice(choice);
+			}
 		}
 	}
 
@@ -275,7 +272,9 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	 * combo box.
 	 */
 	private void updateTemplates() {
+		listener.disable();
 		String text = templates.getText();
+
 		templates.setItems(templateManager.findAvailableTemplates());
 		int index = 0;
 		for (int i = 0; i < templates.getItemCount(); i++)
@@ -283,6 +282,13 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 				index = i;
 				break;
 			}
-		templates.select(index);
+		String newText = templates.getItem(index);
+		if (!newText.equals(text)) {
+			listener.enable();
+			templates.select(index);
+		} else {
+			templates.select(index);
+			listener.enable();
+		}
 	}
 }
