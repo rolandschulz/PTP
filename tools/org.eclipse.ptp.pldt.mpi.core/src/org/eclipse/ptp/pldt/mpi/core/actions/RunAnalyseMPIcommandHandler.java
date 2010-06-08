@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.mpi.core.MPIArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.mpi.core.MpiIDs;
 import org.eclipse.ptp.pldt.mpi.core.MpiPlugin;
@@ -97,7 +97,7 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 	}
     @Override
 	protected void activateArtifactView() {
-		ViewActivater.activateView(MpiIDs.MPI_VIEW_ID);
+		ViewActivator.activateView(MpiIDs.MPI_VIEW_ID);
 	}
     @Override
 	public boolean areIncludePathsNeeded() {
