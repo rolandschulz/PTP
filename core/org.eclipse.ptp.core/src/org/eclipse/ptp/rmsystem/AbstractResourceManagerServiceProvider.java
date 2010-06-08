@@ -32,8 +32,7 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ui.IMemento;
 
-public abstract class AbstractResourceManagerServiceProvider extends
-		ServiceProvider implements IResourceManagerConfiguration,
+public abstract class AbstractResourceManagerServiceProvider extends ServiceProvider implements IResourceManagerConfiguration,
 		IServiceProviderWorkingCopy {
 	private static final String TAG_AUTOSTART = "autoStart"; //$NON-NLS-1$
 
@@ -43,13 +42,10 @@ public abstract class AbstractResourceManagerServiceProvider extends
 	private static final String TAG_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String TAG_REMOTE_SERVICES_ID = "remoteServicesID"; //$NON-NLS-1$
 	private static final String TAG_STATE = "state"; //$NON-NLS-1$
-	private final IModelManager fModelManager = PTPCorePlugin.getDefault()
-			.getModelManager();
+	private final IModelManager fModelManager = PTPCorePlugin.getDefault().getModelManager();
 
-	private final IServiceModelManager fServiceManager = ServiceModelManager
-			.getInstance();
-	private final IService fLaunchService = fServiceManager
-			.getService(IServiceConstants.LAUNCH_SERVICE);
+	private final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
+	private final IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
 	/*
 	 * If we're a working copy, keep a copy of the original
 	 */
@@ -182,8 +178,7 @@ public abstract class AbstractResourceManagerServiceProvider extends
 	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getState()
 	 */
 	public ResourceManagerAttributes.State getState() {
-		return ResourceManagerAttributes.State.valueOf(getString(TAG_STATE,
-				ResourceManagerAttributes.State.STOPPED.toString()));
+		return ResourceManagerAttributes.State.valueOf(getString(TAG_STATE, ResourceManagerAttributes.State.STOPPED.toString()));
 	}
 
 	/*
@@ -210,6 +205,11 @@ public abstract class AbstractResourceManagerServiceProvider extends
 		return name;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
+	 */
 	public boolean isConfigured() {
 		return !getConnectionName().equals("") && getRemoteServicesId() != null; //$NON-NLS-1$
 	}
@@ -386,8 +386,7 @@ public abstract class AbstractResourceManagerServiceProvider extends
 	}
 
 	private void removeThisProviderFromAllConfigurations() {
-		Set<IServiceConfiguration> configs = fServiceManager
-				.getConfigurations();
+		Set<IServiceConfiguration> configs = fServiceManager.getConfigurations();
 
 		for (IServiceConfiguration config : configs)
 			if (this == config.getServiceProvider(fLaunchService))
