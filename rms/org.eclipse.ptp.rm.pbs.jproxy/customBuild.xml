@@ -175,7 +175,7 @@
 	<target name="jar.remote" depends="prepare.remote.jar, assemble.remote">
 		<jar destfile="${server.jar}" basedir="${server.builddir}">
 			<manifest>
-				<attribute name="Rsrc-Class-Path" value=". utils_core.jar proxy_protocol.jar rm_proxy_core.jar"/>
+				<attribute name="Rsrc-Class-Path" value="./ utils_core.jar proxy_protocol.jar rm_proxy_core.jar"/>
 				<attribute name="Class-Path" value="."/>
 				<attribute name="Rsrc-Main-Class" value="org.eclipse.ptp.rm.pbs.jproxy.PBSProxyRuntimeServer"/>
 				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
