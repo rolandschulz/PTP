@@ -247,8 +247,10 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 									sendEvent(e);
 								}
 							} catch (IOException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
+								System.err.println(Messages.getString("PBSProxyRuntimeServer.6")); //$NON-NLS-1$
+								state = ServerState.SHUTDOWN;
+								stateMachineThread.interrupt();
 							}
 						}
 						try {
@@ -258,7 +260,6 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						;
 					}
 					System.err.println(Messages.getString("PBSProxyRuntimeServer.0")); //$NON-NLS-1$
 				}

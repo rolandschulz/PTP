@@ -52,7 +52,10 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	protected WritableByteChannel sessOutput;
 	private final IProxyCommandFactory proxyCommandFactory;
 	private Thread commandThread;
+	protected Thread stateMachineThread;
 	private final List<IProxyCommandListener> listeners = Collections.synchronizedList(new ArrayList<IProxyCommandListener>());
+
+
 
 	public AbstractProxyServer(String host, int port, IProxyCommandFactory factory) {
 		this.sessHost = host;
@@ -188,7 +191,8 @@ public abstract class AbstractProxyServer implements IProxyServer {
 
 				System.out.println("server thread exited"); //$NON-NLS-1$
 				if (error) {
-					System.out.println(" due to errors"); //$NON-NLS-1$
+					System.out.println(" due to errors .. shutting down"); //$NON-NLS-1$
+					stateMachineThread.interrupt();
 				} else {
 					System.out.println(" normally"); //$NON-NLS-1$
 				}
@@ -196,6 +200,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 		};
 		commandThread.start();
 		try {
+			stateMachineThread = Thread.currentThread();
 			runStateMachine();
 			commandThread.interrupt();
 		} catch (InterruptedException e) {
