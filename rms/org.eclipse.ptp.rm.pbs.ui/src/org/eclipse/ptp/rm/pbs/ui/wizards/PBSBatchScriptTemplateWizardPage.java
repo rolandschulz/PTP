@@ -53,8 +53,6 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	 * Associated with the selection of a choice of configuration file.
 	 */
 	private class ConfigurationChangeListener implements ModifyListener, SelectionListener, ISelectionChangedListener {
-		private boolean ignore = false;
-
 		/**
 		 * If the ignore flag is toggled, no action is taken. For the sequence
 		 * of actions on update, see
@@ -62,11 +60,10 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 		 * .
 		 */
 		public void modifyText(ModifyEvent e) {
-			if (!ignore())
-				if (e.getSource() == templates) {
-					String choice = templates.getText();
-					fireModifyTemplateChoice(choice);
-				}
+			if (e.getSource() == templates) {
+				String choice = templates.getText();
+				fireModifyTemplateChoice(choice);
+			}
 		}
 
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -78,14 +75,6 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 		}
 
 		public void widgetSelected(SelectionEvent e) {
-		}
-
-		private synchronized boolean ignore() {
-			return ignore;
-		}
-
-		private synchronized void toggleIgnore() {
-			ignore = !ignore;
 		}
 	}
 
@@ -286,10 +275,14 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	 * combo box.
 	 */
 	private void updateTemplates() {
-		listener.toggleIgnore();
 		String text = templates.getText();
 		templates.setItems(templateManager.findAvailableTemplates());
-		templates.setText(text);
-		listener.toggleIgnore();
+		int index = 0;
+		for (int i = 0; i < templates.getItemCount(); i++)
+			if (templates.getItem(i).equals(text)) {
+				index = i;
+				break;
+			}
+		templates.select(index);
 	}
 }
