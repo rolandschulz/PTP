@@ -97,4 +97,10 @@
                file="templates/upc_templates.xml">
          </include>
       </extension>
+      <extension
+            point="org.eclipse.core.runtime.preferences">
+         <initializer
+               class="org.eclipse.ptp.pldt.upc.prefs.UPCPreferenceInitializer">
+         </initializer>
+      </extension>
 </plugin>

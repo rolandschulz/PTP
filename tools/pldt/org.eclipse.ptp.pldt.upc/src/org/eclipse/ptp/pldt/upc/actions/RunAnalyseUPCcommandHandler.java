@@ -19,7 +19,7 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.upc.UPCArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.upc.UPCIDs;
 import org.eclipse.ptp.pldt.upc.UPCPlugin;
@@ -52,12 +52,13 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
+		boolean allowPrefixOnlyMatch=UPCPlugin.getDefault().getPreferenceStore().getBoolean(UPCIDs.UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE);	
 		try {
 			lang = tu.getLanguage();
 
 			IASTTranslationUnit atu = tu.getAST();
 			if (lang.getId().equals(UPCLanguage.ID)) {// cdt40
-				atu.accept(new UPCCASTVisitor(includes, fileName, msr));
+				atu.accept(new UPCCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			}
 
 		} catch (CoreException e) {
@@ -103,6 +104,11 @@ public class RunAnalyseUPCcommandHandler extends RunAnalyseHandlerBase {
 
 	@Override
 	protected void activateArtifactView() {
-		ViewActivater.activateView(UPCIDs.UPC_VIEW_ID);
+		ViewActivator.activateView(UPCIDs.UPC_VIEW_ID);
 	}
+    @Override
+	public boolean areIncludePathsNeeded() {
+    	boolean allowPrefixOnlyMatch= UPCPlugin.getDefault().getPreferenceStore().getBoolean(UPCIDs.UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+    	return !allowPrefixOnlyMatch;
+    }
 }

@@ -54,6 +54,7 @@ public class Messages extends NLS {
 	public static String UPCPreferencePage_please_choose_a_directory;
 	public static String UPCPreferencePage_preference_label_upc_include_paths;
 	public static String UPCPreferencePage_use_default;
+	public static String UPCPreferencePage_recognize_APIs_by_prefix_alone;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
