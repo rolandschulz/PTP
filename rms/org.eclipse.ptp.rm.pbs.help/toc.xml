@@ -8,14 +8,12 @@
 
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="PTP: Running PBS Jobs" topic="html/toc.html">
-   <topic label="Main Topic"  href="html/PBSHelpPage.html">
+<toc label="PTP: Running PBS Jobs" topic="html/toc.html"> 
       <topic label="Introduction" href="html/PBSHelpPage.html#Introduction"/>
       <topic label="Requirements" href="html/PBSHelpPage.html#Requirements"/>
       <topic label="Installation" href="html/PBSHelpPage.html#Installation"/>
       <topic label="Creating a Resource Manager" href="html/PBSHelpPage.html#Creating_a_Resource_Manager"/>
       <topic label="Submitting a Job" href="html/PBSHelpPage.html#Submitting_a_Job"/>
       <topic label="The PBS Batch Script Template" href="html/PBSHelpPage.html#The_PBS_Batch_Script_Template"/>
-   </topic>
 </toc>
 
