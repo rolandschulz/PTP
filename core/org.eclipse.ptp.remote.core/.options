@@ -1,1 +1,2 @@
-org.eclipse.ptp.remote/debug=true
+org.eclipse.ptp.remote.core/debug=false
+org.eclipse.ptp.remote.core/debug/server/tracing=false
