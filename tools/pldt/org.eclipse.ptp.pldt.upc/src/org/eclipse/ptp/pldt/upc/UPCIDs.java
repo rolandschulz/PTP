@@ -26,4 +26,11 @@ public interface UPCIDs {
 
 	// artifact view id
 	String UPC_VIEW_ID = "org.eclipse.ptp.pldt.upc.views.upcArtifactView"; //$NON-NLS-1$
+	
+    /** 
+     * If we recognize UPC APIs by prefix (upc_) alone, we don't need the include file location and the hassle 
+     * that it causes for users to get it right.
+     */
+	public static final String UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE = "upcRecognizeAPIsByPrefixAlone"; //$NON-NLS-1$
+
 }
