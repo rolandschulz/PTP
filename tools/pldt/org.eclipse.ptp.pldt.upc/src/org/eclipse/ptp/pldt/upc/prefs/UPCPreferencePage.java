@@ -41,6 +41,8 @@ public class UPCPreferencePage extends FieldEditorPreferencePage implements IWor
 	// UPC_LOCATION_AIX="/opt/rsct/lapi/eclipse/help";
 	// private static final String
 	// UPC_LOCATION_LINUX="opt/ibmhpc/lapi/eclipse/help";
+	
+	private static final String UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.UPCPreferencePage_recognize_APIs_by_prefix_alone; //$NON-NLS-1$
 
 	private static final String UPC_WHICH_HELP_ID = "default"; // alternatives are: default, aix, linux, other //$NON-NLS-1$
 
