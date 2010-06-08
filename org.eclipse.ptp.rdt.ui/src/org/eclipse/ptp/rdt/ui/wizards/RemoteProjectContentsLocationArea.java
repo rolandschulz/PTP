@@ -248,7 +248,7 @@ public class RemoteProjectContentsLocationArea {
 	 * @return String
 	 */
 	private String getDefaultPathDisplayString() {
-		if (getRemoteConnection().isOpen()) {
+		if (getRemoteConnection() != null && getRemoteConnection().isOpen()) {
 			IRemoteFileManager fileMgr = getRemoteServices().getFileManager(getRemoteConnection());
 			URI defaultURI = fileMgr.toURI(getRemoteConnection().getWorkingDirectory());
 
