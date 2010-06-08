@@ -16,6 +16,7 @@ import java.beans.IntrospectionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,12 +34,61 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
  * XML file reader.
  */
 public class XMLReader implements IParser {
+
+	/**
+	 * This class ensures that the InputStream has only valid XML unicode
+	 * characters as specified by the XML 1.0 standard. For reference, please
+	 * see <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+	 * standard</a>. This method will return an empty String if the input is
+	 * null or empty.
+	 * 
+	 * From: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+	 * Not OK for UTF longer than 2 bytes
+	 * 
+	 */
+	class StripNonValidXMLCharactersReader extends InputStreamReader {
+		public StripNonValidXMLCharactersReader(InputStream in) {
+			super(in);
+		}
+
+		@Override
+		public int read() throws IOException {
+			char cbuf[] = new char[1];
+			int ret;
+			while ((ret = read(cbuf, 0, 1)) != -1)
+				;
+			if (ret > 0)
+				return cbuf[0];
+			else
+				return -1;
+		}
+
+		@Override
+		public int read(char cbuf[], int offset, int length) throws IOException {
+			int ret = super.read(cbuf, offset, length);
+			int skip = 0;
+			for (int i = offset; i < offset + ret; i++) {
+				char current = cbuf[i];
+				if (!((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+						|| ((current >= 0xE000) && (current <= 0xFFFD)) || ((current >= 0x10000) && (current <= 0x10FFFF)))) {
+					skip++;
+					continue;
+				}
+				if (skip > 0) {
+					cbuf[i - skip] = cbuf[i];
+				}
+			}
+			return ret - skip;
+		}
+
+	}
 
 	/** The DEBUG. */
 	private static boolean DEBUG = false;
@@ -49,8 +99,7 @@ public class XMLReader implements IParser {
 	 * @param argv
 	 *            the arguments
 	 */
-	public static void main(String argv[]) throws IntrospectionException,
-			IllegalAccessException, InvocationTargetException,
+	public static void main(String argv[]) throws IntrospectionException, IllegalAccessException, InvocationTargetException,
 			InstantiationException, FileNotFoundException {
 		DEBUG = true;
 		// parseXML(ModelQstatJob.class, new File("qstat_valid.xml"));
@@ -58,12 +107,12 @@ public class XMLReader implements IParser {
 		// File("pbsnodes.helics.xml")));
 	}
 
-	private NodeList getXMLChildren(InputStream in) throws SAXException,
-			IOException, ParserConfigurationException {
+	private NodeList getXMLChildren(InputStream in) throws SAXException, IOException, ParserConfigurationException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document doc = builder.parse(in);
 
+		Document doc = builder.parse(new InputSource(new StripNonValidXMLCharactersReader(in)));
+		// Document doc = builder.parse(in);
 		Element root = doc.getDocumentElement();
 		root.normalize();
 
@@ -85,8 +134,7 @@ public class XMLReader implements IParser {
 		try {
 			xmlNodes = getXMLChildren(in);
 		} catch (Exception e) {
-			// e.printStackTrace(); //Ignore Premature end of file, TODO: don't
-			// ignore other things
+			e.printStackTrace(); // TODO: Ignore Premature end of file, make sure errors are shown to user
 			return new HashSet<IElement>();
 		}
 		try {
@@ -118,8 +166,7 @@ public class XMLReader implements IParser {
 		return elementList;
 	}
 
-	private IElement populateElement(AttributeDefinition attrDef,
-			Map<String, String> input) throws UnknownValueExecption {
+	private IElement populateElement(AttributeDefinition attrDef, Map<String, String> input) throws UnknownValueExecption {
 		IElement element = attrDef.createElement();
 
 		// PropertyDescriptor[] properties =
@@ -138,10 +185,8 @@ public class XMLReader implements IParser {
 		return element;
 	}
 
-	protected Map<String, String> populateInput(Node node,
-			Map<String, String> input) throws IntrospectionException,
-			IllegalAccessException, InvocationTargetException,
-			InstantiationException {
+	protected Map<String, String> populateInput(Node node, Map<String, String> input) throws IntrospectionException,
+			IllegalAccessException, InvocationTargetException, InstantiationException {
 		if (input == null) {
 			input = new HashMap<String, String>();
 		}
@@ -158,8 +203,7 @@ public class XMLReader implements IParser {
 				if (childNode.getChildNodes().getLength() > 1) {
 					populateInput(childNode, input);
 				} else {
-					input.put(childNode.getNodeName().toLowerCase(), childNode
-							.getTextContent());
+					input.put(childNode.getNodeName().toLowerCase(), childNode.getTextContent());
 				}
 			}
 
