@@ -11,7 +11,8 @@
 <h2><a name="Introduction"></a>Introduction</h2>
 <p>The PBS Eclipse plug-in, part of the <a
  href="../../org.eclipse.ptp.help/html/PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">
-Parallel Tools Platform</a> (PTP), allows you to launch and monitor applications
+Parallel Tools Platform</a> (PTP), allows you to launch and monitor
+applications
 on local or remote PBS (Portable Batch System) Distributed Resource
 Managers.<br>
 </p>
@@ -44,7 +45,8 @@ feature.&nbsp; The PBS plugin features a pre-built executable .jar
 deployed to the chosen location (local or remote) when the
 proxy is launched; there is nothing else to do by way of copying or
 compiling/building on the target resource.
-<h2><a name="Creating_a_Resource_Manager"></a>Creating a Resource Manager</h2>
+<h2><a name="Creating_a_Resource_Manager"></a>Creating a Resource
+Manager</h2>
 <p>The PBS Resource Manager has no general preferences to be set.&nbsp;
 However, when an instance of the manager is created, the user has the
 option to pre-define which batch-script template it will use, or to
@@ -60,7 +62,8 @@ select "Open Perspective" &gt;&gt; "Other"; in the dialog box, choose
 </ul>
 <br>
 <p style="margin-left: 40px;">
-<img  alt="Choose Parallel Runtime" src="images/01chooseParallelRuntime.jpg"><br>
+<img alt="Choose Parallel Runtime"
+ src="images/01chooseParallelRuntime.jpg"><br>
 <br>
 </p>
 <ul>
@@ -75,8 +78,10 @@ select "Open Perspective" &gt;&gt; "Other"; in the dialog box, choose
 <br>
 </div>
 <ul>
-  <li>You should now see the first of five wizard pages that appear in the
-dialog ("Choose Resource Manager Type").  This one allows you to select which type of resource manager to
+  <li>You should now see the first of five wizard pages that appear in
+the
+dialog ("Choose Resource Manager Type"). This one allows you to select
+which type of resource manager to
 instantiate:</li>
 </ul>
 <br>
@@ -88,9 +93,10 @@ instantiate:</li>
 <div style="margin-left: 40px;"><br>
 </div>
 <ul>
-  <li>In the "Choose Resource Manager Type" dialog, choose "PBS", and click "Next". 
-The following page ("PBS Proxy Configuration")
-allows you to set up the PBS provider.&nbsp;&nbsp; The location can be either
+  <li>In the "Choose Resource Manager Type" dialog, choose "PBS", and
+click "Next". The following page ("PBS Proxy Configuration")
+allows you to set up the PBS provider.&nbsp;&nbsp; The location can be
+either
 local or remote; in the former case, nothing else need be done on this
 page.&nbsp; For remote PBS, you will need to configure the connection
 to the host/resource.&nbsp; For this case, next to "Remote service
@@ -103,26 +109,25 @@ provider", select the "Remote Tools" option:</li>
 <br>
 </div>
 <div style="margin-left: 40px;"><span style="font-weight: bold;"></span><br>
-Next, still in the "PBS Proxy Configuration" dialog, click the "New" button 
-next to "Proxy Server Connection" 
-<!-- BRT: or is it next to "Connection name" which is what my dialog says -->
-to bring up the connection dialog entitled "Target Environment Configuration" as shown here:
+Next, still in the "PBS Proxy Configuration" dialog, click the "New"
+button next to "Connection name"
+to bring up the connection dialog entitled "Target Environment
+Configuration" as shown here:
 <br>
 <br>
 <br>
 <img style="width: 835px; height: 773px;"
  alt="Configure Remote Connection"
  src="images/05configureRemoteHost.jpg"><br>
- 
-<p>Here under "Remote Host" you can name the resource, provide its address, and set up the
+<p>Here under "Remote Host" you can name the resource, provide its
+address, and set up the
 SSH connection with the user name and password, or choose public key
 authentication.<br>
 </p>
 <p>When you have finished entering the appropriate values, click
-"Finish" to return to the wizard page.&nbsp; 
-<p>Also, back in the "PBS Proxy Configuration" dialog, 
-<b>be sure to choose the "SSH port forwarding"</b> 
-option  under "Tunneling Options".<br>
+"Finish" to return to the wizard page.&nbsp; </p>
+<p>Also, back in the "PBS Proxy Configuration" dialog, <b>be sure to
+choose the "SSH port forwarding"</b> option under "Tunneling Options".<br>
 <br>
 </p>
 </div>
@@ -200,23 +205,18 @@ use by any PBS resource manager instance.<br>
 manager and create its configuration (or add it to an empty
 pre-existing one).&nbsp;&nbsp; After you have completed the wizard
 configuration and clicked "Finish", the new resource manager should
-appear in the Resource Managers view.</li>
+appear in the Resource Managers view (see next section).<br>
+  </li>
 </ul>
 <br>
-<div style="margin-left: 40px;"><img
- style="width: 742px; height: 396px;" alt="New Resource Manager"
- src="images/10newResourceManager.jpg"><br>
-<br>
-<br>
-</div>
-o ready to deply this resource manager and submit a job to
+We are now ready to deploy this resource manager and submit a job to
 it.&nbsp; The following section demonstrates how to use the PBS launch
-configuration.<br>
-<h2 style="text-align: left;"><a name="Submitting_a_Job"></a>Submitting a Job</h2>
+configuration to complete this process.<br>
+<h2 style="text-align: left;"><a name="Submitting_a_Job"></a>Submitting
+a Job</h2>
 <br>
 While not strictly necessary, we will first start the PBS resource
 manager before proceeding to the creation of a run configuration.&nbsp;
-<!-- BRT: I believe the RM *must* be started in order for it to be selected in the run config dialog. -->
 <br>
 <br>
 <ul>
@@ -231,11 +231,17 @@ Manager" from the context menu (right mouse):<br>
 </div>
 <br>
 <br>
-The PBS resource manager should turn green indicated it has been started successfully.
-<p>
-<!--  BRT: image would be nice here with green icon -->
-<p>
-In order to launch a job, you will also have to have defined an
+The PBS resource manager should turn green indicated it has been
+started successfully.<br>
+<br>
+<br>
+<div style="margin-left: 40px;"><img
+ style="width: 742px; height: 396px;" alt="New Resource Manager"
+ src="images/10newResourceManager.jpg"><br>
+<br>
+</div>
+<p><!--  BRT: image would be nice here with green icon --></p>
+<p>In order to launch a job, you will also have to have defined an
 appropriate project, either a C/C++ project using CDT, or a Fortran
 project using Photran, and to have compiled an executable for it.<br>
 <br>
@@ -243,6 +249,7 @@ Next, we will create a configuration for launching jobs to this
 manager.&nbsp; The procedure is identical to that for creating any Run
 Configuration in Eclipse.<br>
 <br>
+</p>
 <ul>
   <li>Either select <span style="font-weight: bold;">Run</span>
 &gt;&gt; "Run Configurations ..." using the menu, or click on the small
@@ -269,9 +276,9 @@ the customized <span style="font-style: italic;">alr_template</span>;
 we have also renamed this configuration "PBS_alr":</li>
 </ul>
 <br>
-<div style="margin-left: 40px;"><img border=1
+<div style="margin-left: 40px;"><img
  style="width: 1167px; height: 730px;" alt="Create PBS_alr"
- src="images/13createPBS_alr.jpg"><br>
+ src="images/13createPBS_alr.jpg" border="1"><br>
 <br>
 </div>
 <br>
@@ -295,15 +302,12 @@ available, all you need to do is open the <span
 (usually "SDM") and give it a dummy path (any file will do).&nbsp; You
 should now be able to save the configuration by clicking "Apply".<br>
 <br>
-<h3><a name="The_PBS_Launch_Tab"></a>The PBS Launch Tab</h3>
+<h3><a name="The_PBS_Launch_Tab"></a>The PBS Launch Attributes</h3>
 <br>
-<!-- BRT: where is this tab? I don't see it in the launch config dialog above.
-Please use the exact names of the dialog titles etc. so it's easier to tell what
-you are describing. Thanks.
-Do you mean the "Launch Attributes" area of the Resources tab? That's what it looks like. -->
-The tab, which allows you to configure the job -- in more specific
+The "Launch Attributes" area of the "Resources" tab, which allows you
+to configure the job -- in more specific
 terms, generate the script to be given to the PBS batch system via the
-proxy -- is generated from the chosen template, and consists of three
+proxy -- is built from the chosen template, and consists of three
 sections.&nbsp; The top panel allows you to switch out the current
 template for any of the other available ones, and also allows you to
 see what the batch script to be given to the proxy will look like, on
@@ -323,8 +327,7 @@ often give you additional information on formatting for that particular
 attribute.<br>
 <br>
 <br>
-<img  alt="Launch Tab Details"
- src="images/14launchTabDetails.jpg"><br>
+<img alt="Launch Tab Details" src="images/14launchTabDetails.jpg"><br>
 <br>
 <br>
 <h3>Persistence</h3>
@@ -342,7 +345,10 @@ To
 illustrate
 this,
 let
-us suppose we had two different configurations,
+us
+suppose
+we
+had two different configurations,
 <span style="font-style: italic;">PBS_A</span> and <span
  style="font-style: italic;">PBS_B</span>; let us further suppose they
 both use the <span style="font-style: italic;">PBS@Local</span>
@@ -384,14 +390,10 @@ Template</h2>
 For those wishing to create customized templates, we provide here a
 description of the template contents.<br>
 <br>
+By way of illustration, the following reproduces the full_template
+provided with the PBS plugin:<br>
 <br>
-<!-- BRT: this might be more readable by putting the text here instead of the (blurry) image.
-Just put <pre> before it and </pre> after it to prevent html formatting. -->
-<div style="margin-left: 80px;"><a href="#Submitting_a_Job"><img
- alt="Template" src="images/15template.jpg"
- style="border: 0px solid ; width: 515px; height: 819px;"></a><br>
-</div>
-<br>
+<pre>#!/bin/bash<br><br>#####################################################################<br>## Template for PBS Batch Script Generated by PBS Resource Manager<br>## Launch Tab<br>## <br>## This template contains all the currently recognized Job Attributes.<br>## <br>## Placeholders (@NAME@) are included for the PBS Job Attribute <br>## names as specified by qsub, plus the following internal variables:<br>##<br>## - env                     : place for defining extra environment<br>##                             variables (NB: should not be removed)<br>## - prependedBash           : dynamically change arbitrary bash <br>##                             commands which should precede the <br>##                             execution of the main application code<br>## - mpiCommand mpiOptions   : run under MPI<br>## - executablePath progArgs : the actual application<br>## - postpendedBash          : dynamically change arbitrary bash <br>##                             commands which should follow the <br>##                             execution of the main application code<br>##<br>## A template can also directly contain arbitrary shell scripting (not <br>## to be replaced via the 'prepended' and 'postpended' placeholders);<br>## these lines will remain fixed and will not be exposed through<br>## the Launch Tab for modification (they can however be altered by <br>## using the Resource Manager Properties "Edit" Tab).<br>##<br>## NOTE: We advise removing either the ncpus or the nodes resource,<br>##       depending on the PBS configuration (nodes is more common);<br>##       otherwise, the correct value must be set on both redundantly<br>##       in order for the MPI computation to be correct (and <br>##       some systems might reject a script with both set).<br>#####################################################################<br><br>#PBS -A @Account_Name@<br>#PBS -c @Checkpoint@<br>#PBS -C @directive@<br>#PBS -e @Error_Path@<br>#PBS -h @Hold_Types@<br>#PBS -j @Join_Path@<br>#PBS -k @Keep_Files@<br>#PBS -l arch=@Resource_List.arch@<br>#PBS -l cput=@Resource_List.cput@<br>#PBS -l file=@Resource_List.file@<br>#PBS -l host=@Resource_List.host@<br>#PBS -l mem=@Resource_List.mem@<br>#PBS -l ncpus=@Resource_List.ncpus@<br>#PBS -l nice=@Resource_List.nice@<br>#PBS -l nodes=@Resource_List.nodes@<br>#PBS -l ompthreads=@Resource_List.ompthreads@<br>#PBS -l pcput=@Resource_List.pcput@<br>#PBS -l pmem=@Resource_List.pmem@<br>#PBS -l pvmem=@Resource_List.pvmem@<br>#PBS -l vmem=@Resource_List.vmem@<br>#PBS -l walltime=@Resource_List.walltime@<br>#PBS -m @Mail_Points@<br>#PBS -M @Mail_Users@<br>#PBS -N @Job_Name@<br>#PBS -o @Output_Path@<br>#PBS -p @Priority@<br>#PBS -q @destination@<br>#PBS -r @Rerunnable@<br>#PBS -S @Shell_Path_List@<br>#PBS -u @User_List@<br>#PBS -v @Variable_List@<br>#PBS -V @export_all@<br>#PBS -W depend=@depend@<br>#PBS -W group_list=@group_list@<br>#PBS -W stagein=@stagein@<br>#PBS -W stageout=@stageout@<br>@env@<br>@prependedBash@<br>cd @directory@<br>@mpiCommand@ @mpiOptions@ @executablePath@ @progArgs@<br>@postpendedBash@<br><br></pre>
 The PBS Launch tab (Run Configuration) uses placeholder syntax to
 generate the actual batch script; in substituting the actual values, a
 placeholder marker (or, in the case of the PBS directives, the entire
