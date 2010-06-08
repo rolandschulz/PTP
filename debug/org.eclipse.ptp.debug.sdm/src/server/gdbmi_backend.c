@@ -2599,11 +2599,13 @@ GetPartialArrayAIF(char *expr, MIVar *var)
 	} else {
 		for (i = 0; i < var->numchild; i++) {
 			ac = GetPartialAIF(expr, var->children[i]);
-			if (a == NULL) {
-				a = EmptyArrayToAIF(0, var->numchild, ac);
+			if (ac != NULL) {
+				if (a == NULL) {
+					a = EmptyArrayToAIF(0, var->numchild, ac);
+				}
+				AIFAddArrayElement(a, i, ac);
+				AIFFree(ac);
 			}
-			AIFAddArrayElement(a, i, ac);
-			AIFFree(ac);
 		}
 	}
 	return a;
@@ -2626,8 +2628,10 @@ GetPartialStructAIF(char *expr, MIVar *var)
 	if (var->children != NULL) {
 		for (i = 0; i < var->numchild; i++) {
 			ac = GetPartialAIF(expr, var->children[i]);
-			AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, var->children[i]->exp, ac);
-			AIFFree(ac);
+			if (ac != NULL) {
+				AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, var->children[i]->exp, ac);
+				AIFFree(ac);
+			}
 		}
 	}
 	return a;
@@ -2734,8 +2738,10 @@ GetPartialUnionAIF(char *expr, MIVar *var)
 	if (var->children != NULL) {
 		for (i = 0; i < var->numchild; i++) {
 			ac = GetPartialAIF(expr, var->children[i]);
-			AIFAddFieldToUnion(a, var->children[i]->exp, ac);
-			AIFFree(ac);
+			if (ac != NULL) {
+				AIFAddFieldToUnion(a, var->children[i]->exp, ac);
+				AIFFree(ac);
+			}
 		}
 	}
 	return a;
@@ -2783,8 +2789,9 @@ GetPartialPointerAIF(char *expr, MIVar *var)
 		default:
 			if (var->numchild == 1) {
 				a = GetPartialAIF(expr, var->children[0]);
+			} else {
+				a = VoidToAIF(0, 0);
 			}
-			a = VoidToAIF(0, 0);
 			break;
 		}
 	} else {
@@ -2875,7 +2882,7 @@ GetPartialAIF(char *expr, MIVar *var)
 {
 	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
 
-	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
+	if (var->type == NULL || strcmp(var->type, "<text variable, no debug info>") == 0) {
 		DbgSetError(DBGERR_NOSYMS, "");
 		return NULL;
 	}
