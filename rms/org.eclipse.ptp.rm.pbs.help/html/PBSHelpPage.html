@@ -8,7 +8,7 @@
 </head>
 <body>
 <h1>How to Run PBS Jobs in PTP</h1>
-<h2>Introduction</h2>
+<h2><a name="Introduction"></a>Introduction</h2>
 <p>The PBS Eclipse plug-in, part of the <a
  href="../../org.eclipse.ptp.rm.ibm.pe.help/html/PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">Parallel
 Tools
@@ -25,7 +25,7 @@ the application as a job to the PBS batch system, and reporting
 application
 status to the PTP PBS plugin.<br>
 </p>
-<h2>Requirements</h2>
+<h2><a name="Requirements"></a>Requirements</h2>
 <p>In addition to having Eclipse and PTP installed, you need to have
 the following software packages installed.</p>
 <ul>
@@ -37,7 +37,7 @@ installed a PBS system (<a href="http://www.pbsworks.com/">PBS Pro</a>,
 Torque</a>) there. <br>
   </li>
 </ul>
-<h2>Installation</h2>
+<h2><a name="Requirements"></a>Installation</h2>
 <br>
 Nothing need be done beyond the normal intallation of the PTP
 feature.&nbsp; The PBS plugin features a pre-built executable .jar
@@ -45,7 +45,7 @@ feature.&nbsp; The PBS plugin features a pre-built executable .jar
 deployed to the chosen location (local or remote) when the
 proxy is launched; there is nothing else to do by way of copying or
 compiling/building on the target resource.
-<h2>Creating a Resource Manager</h2>
+<h2><a name="Requirements"></a>Creating a Resource Manager</h2>
 <p>The PBS Resource Manager has no general preferences to be set.&nbsp;
 However, when an instance of the manager is created, the user has the
 option to pre-define which batch-script template it will use, or to
@@ -208,10 +208,9 @@ appear in the Resource Managers view.</li>
 We are now ready to deply this resource manager and submit a job to
 it.&nbsp; The following section demonstrates how to use the PBS launch
 configuration.<br>
-<h2 style="text-align: left;">Submitting a Job to PBS<br>
-</h2>
-<div style="margin-left: 40px;"><br>
-</div>
+<h2 style="text-align: left;"><a name="Submitting_a_Job"></a>Submitting
+a Job</h2>
+<br>
 While not strictly necessary, we will first start the PBS resource
 manager before proceeding to the creation of a run configuration.&nbsp;
 <br>
@@ -252,7 +251,8 @@ arrow to the right of the Run icon on the toolbar:</li>
   <li>From the list of configuration types displayed, right- (control-)
 click on "Parallel Application", and choose "New".&nbsp; A new
 configuration will be added and the tab viewer associated with it
-displayed.&nbsp; If only one resource manager is available from the list
+displayed.&nbsp; If only one resource manager is available from the
+list
 in the Resource Managers view, the "Resource" tab will be automatically
 configured with it; otherwise, you will need to select a resource
 manager from the drop down list at the top of the view.&nbsp; Here, we
@@ -326,7 +326,11 @@ bash commands, job attribute values, etc., belong to <span
  style="font-style: italic;">PBS_alr</span>); the choice of template,
 however, belongs to the <span style="font-style: italic;">Resource
 Manager</span> (in our example, <span style="font-style: italic;">PBS@Local</span>).&nbsp;&nbsp;
-To illustrate this, let us suppose we had two different configurations,
+To
+illustrate
+this,
+let
+us suppose we had two different configurations,
 <span style="font-style: italic;">PBS_A</span> and <span
  style="font-style: italic;">PBS_B</span>; let us further suppose they
 both use the <span style="font-style: italic;">PBS@Local</span>
@@ -351,7 +355,7 @@ inside the template associated with the new resource manager.&nbsp; <span
  style="font-style: italic;">,</span> will remain unaffected.</li>
 </ul>
 <br>
-<h3>Submitting</h3>
+<h3>Launching</h3>
 <br>
 As with other resource managers, submission to the proxy takes place
 when you click on the "Run" button at the bottom of the Run
@@ -369,9 +373,9 @@ For those wishing to create customized templates, we provide here a
 description of the template contents.<br>
 <br>
 <br>
-<div style="margin-left: 80px;"><img
- style="width: 515px; height: 819px;" alt="Template"
- src="images/15template.jpg"><br>
+<div style="margin-left: 80px;"><a href="#Submitting_a_Job"><img
+ alt="Template" src="images/15template.jpg"
+ style="border: 0px solid ; width: 515px; height: 819px;"></a><br>
 </div>
 <br>
 The PBS Launch tab (Run Configuration) uses placeholder syntax to
