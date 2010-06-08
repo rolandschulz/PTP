@@ -11,38 +11,44 @@
 
 <p>Topics  include:
 <ol>
-<li><a href="#create">Creating a parallel launch configuration</a></li>
+<li><a href="#create">Creating a <b>Parallel Application</b> Run Configuration</a></li>
 <li><a href="#resources">Completing the <b>Resources tab</b></a></li>
 <li><a href="#application">Completing the <b>Application tab</b></a></li>
+<li><a href="#arguments">Completing the <b>Arguments tab</b></a></li>
+<li><a href="#environment">Completing the <b>Environment tab</b></a></li>
 <li><a href="#synchronize">Completing the <b>Synchronize tab</b></a></li>
 <li><a href="#debugger">Completing the <b>Debugger tab</b></a></li>
-<li><a href="#arguments">Completing the <b>Arguments tab</b></a></li>
 <li><a href="#launch">Launching the application</b></a></li>
 </ol>
 
-<h2 id="create">Step 1: Create a parallel launch configuration</h2>
-<p>Note: At least one resource manager must have been configured and started before it is possible to create
-a parallel launch configuration.
+<h2 id="create">Step 1: Create a parallel application Run Configuration</h2>
+<p>Note: At least one resource manager must have been configured before it is possible to create
+a parallel application run configuration.
 <ol>
-<li><p>Open the run configuration dialog using <b>Run &gt; Open Run Dialog...</b>
+<li><p>Open the <b>Run Configuration</b> dialog using <b>Run &gt; Open Run Dialog...</b>
 or click the run icon menu on the tool bar and select <b>Open Run Dialog...</b></p><p><br></p></li>
-<li><p>Create a new parallel launch configuration by clicking <b>Parallel Application</b> and
+<li><p>Create a new parallel application run configuration by clicking <b>Parallel Application</b> and
 then clicking on the <b>New</b> button icon.</p><p><br></p>
 <p><img src="images/03launch1.png"></p><p><br></p>
 </li>
-<li><p>Enter a name for the configuration in the <b>Name:</b> field. Here we use the same name as the project.</p></li>
+<li><p>Enter a name for the configuration in the <b>Name:</b> field. Here we use the same name as the project.</p>
+<p><br></p>
+<p><img src="images/03launch1a.png"></p></li>
 </ol>
 
 <h2 id="resources">Step 2: Complete the Resources tab</h2>
 <p>The <b>Resources tab</b> is used to specify the resources required for the job execution. The contents of this tab will vary for different resource managers. This description only applys to the Open MPI and MPICH2 resource managers.</p>
 <ol>
-<li><p>Select a resource manager from the drop-down (Note: a resource manager
-must be running for it to appear in the list. If there is only one resource manager running, then it will be
-automatically selected.)</p><p><br></p></li>
-<li><p>Some resource managers require a job queue to be selected using a <b>Queue:</b> drop-down. If there is
-no drop-down, then this resource manager does not support multiple queues.</p><p><br></p></li>
+<li><p>Select a resource manager you wish to use from the drop-down. If there is only one resource manager, then it will be
+automatically selected. If the resource manager you have selected is not running, then you will see a warning message in the
+dialog.</p><p><br></p></li>
 <li><p>Enter a value in the <b>Number of Processes</b> field. This field must be greater than 0 in 
-order to launch a job, and specifies the number of processes to use for the application launch.</p><p><br></p>
+order to launch a job, and specifies the number of processes to use for the application launch.</p><p><br></p></li>
+<li><p>Fields in the <b>Options</b> section 
+correspond to command-line options supported by Open MPI. If desired, it is also possible to specify
+a file containing the list of hosts on which to run the application using the <b>Host file</b> field, or the list can be entered directly into
+the <b>Host list</b> field. </p>
+<p><br></p>
 <p><img src="images/03launchResTab.png"></p>
 </li>
 </ol>
@@ -54,8 +60,8 @@ order to launch a job, and specifies the number of processes to use for the appl
 and binaries for the application.</p><p><br></p></li>
 
 <li><p>Select the <b>Application Program</b> (executable) you wish to launch. 
-If the Resource Manager is connected to a remote target, then this means the path of the executable on the remote target. 
-Otherwise, for a Resource Manager on the local machine, it should be the path to the executable within the project directory. </p><p><br></p></li>
+If the resource manager is connected to a remote target, then this means the <i>path of the executable on the remote target</i>. 
+Otherwise, for a resource manager on the local machine, it should be the path to the executable within the project directory. </p><p><br></p></li>
 
 <li><p>If you are running the application on a remote machine and the project was <i>built</i> locally, then you will have to copy 
 the executable to the remote machine first. For this purpose, you may enable <b>Copy executable from local filesystem</b> and fill
@@ -67,13 +73,35 @@ copy the executable manually to the remote target.</p>
 <p><img src="images/03launch6.png"></p><p><br></p>
 
 <li><p>If you wish to have the output from all processes in a single output console,
-check the <b>Display combined output in a console view</b> option.</p><p><br></p>
+ensure that the <b>Display output from all processes in a console view</b> option is checked.</p><p><br></p>
 </li>
 </ol>
 
-<h2 id="synchronize">Step 4: Complete the <b>Synchronize</b> tab</h2>
+<h2 id="arguments">Step 4: Complete the Arguments tab</h2>
+<p>The <b>Arguments tab</b> is used to specify any command-line arguments require by the parallel application and to modify the working directory.</p>
+<ol>
+<li><p>Enter any arguments required by the application in the <b>Parallel program arguments</b> field. This is a free form text field that will be passed
+to the application verbatim.</p><p><br></p></li>
+<li><p>Select a different working directory if desired. The working directory is set just prior to the application launch. Note that for a remote launch, this 
+will be a directory on the remote machine.</p></li>
+<p><img src="images/03launch3.png"></p><p><br></p>
+</ol>
+
+<h2 id="environment">Step 5: Complete the Environment tab</h2>
+<p>The <b>Environment tab</b> is used to specify any environment variables require by the parallel application or in order to run the application. The tab 
+also provides the option to append the environment variables to the native environment, or to replace the native environment with
+the variables specified in the tab.</p>
+<ol>
+<li><p>Use the <b>New...</b> button to create a new environment variable.</p><p><br></p></li>
+<li><p>Use the <b>Select...</b> button to import environment variables.</p><p><br></p></li>
+<li><p>Use the <b>Edit...</b> button to edit an environment variables.</p><p><br></p></li>
+<li><p>Use the <b>Remove...</b> button to remove an environment variables.</p><p><br></p></li>
+<p><img src="images/03launch4.png"></p><p><br></p>
+</ol>
+
+<h2 id="synchronize">Step 6: Complete the <b>Synchronize</b> tab</h2>
 <p>
-The <b>Synchronize tab</b> is used in scenarios where the Resource Manager is connected to a remote target.
+The <b>Synchronize tab</b> is used in scenarios where the resource manager is connected to a remote target.
 The tab specifies rules that describe files or directories that need to be copied (<i>uploaded</i>) to the remote target before starting the parallel application execution. 
 Typically, this feature is used to upload dependencies (like dynamic libraries) or input data for test cases.
 </p>
@@ -88,46 +116,41 @@ This tab also allows to specify rules describing files on the remote host to be 
 </li>
 
 <li>
-<p>
-In order to specify files to be copied to the remote target (<i>uploaded</i>), click on <b>New upload rule</b>.
-</p>
-<p>
-An upload rule lists a collection of files or directories that shall be copied into a single directory.
-</p>
+<p>In order to specify files to be copied from the local system to the remote target (<i>uploaded</i>), click on <b>New upload rule</b>. An upload rule lists a 
+collection of files or directories that shall be copied into a single directory.</p><p><br></p>
 <p>
 If <b>Use directory from launch configuration</b> is enabled, then the listed files or directories are copied to the working directory specified on the launch configuration. 
 At the moment, this is equivalent to same directory that contains the executable for the parallel application. 
 If not enabled, they you must specify on <b>Remote directory</b> a path where the files or directories will be placed. 
 The path may be absolute or relative (to the working directory).
-</p>
+</p><p><br></p>
 <p>
 In the list underneath, <b>Selected file(s)</b>, add the files or directories that shall be copied.
 Click on <b>File(s)</b> to  select one or more individual files from anywhere in the local file system. 
 The <b>Directory</b> button works similarly to select a directory from the local file system. 
 Directories are copied recursively. 
 The <b>Workspace</b> button allows easily choosing files from the current workspace.
-</p>
+</p><p><br></p>
 <p>
 On the bottom of the dialog, you may wish to set attributes to be applied to the copied files on the remote target. 
 The options <b>Readonly</b> or <b>Executable</b> sets all copied files to read-only or executable on the remote host.
 If <b>Preserve time attributes</b> is enabled, then the remote copy will assume the same time stamp then the local file, otherwise, the time stamp will be the time the file was copied.
-Also, if the file already exists on the remote target, you may choose how to react in <b>If file already exists</b>.
+Also, if the file already exists on the remote target, you may choose how to react in the <b>If file already exists</b> dropdown.</p><p><br></p>
 <p><img src="images/03launch8.png"></p><p><br></p>
 <p><br></p>
 </li>
 <li>
-In order to specify files to be copied from the remote target (<i>downloaded</i>) after the parallel application finishes, click on <b>New download rule</b>.
-</p>
+<p>In order to specify files to be copied from the remote target to the local system (<i>downloaded</i>) after the parallel application finishes, 
+click on <b>New download rule</b>.</p><p><br></p>
 <p>
-An download rule  lists a collection of files or directories that shall be copied into a single local directory. 
-Its optins are very similar to the upload rule.
-</p>
+An download rule lists a collection of files or directories that shall be copied into a single local directory. 
+Its options are very similar to the upload rule.
+</p><p><br></p>
 <p><img src="images/03launch9.png"></p><p><br></p>
-<p><br></p>
 </li>
 </ol>
 
-<h2 id="debugger">Step 5: Complete the Debugger tab</h2>
+<h2 id="debugger">Step 7: Complete the Debugger tab</h2>
 <p>The <b>Debugger tab</b> is only required if you are planning to debug the application. However 
 it is a good idea to complete it now, even if you are only planning to launch a non-debug job.</p>
 <ol>
@@ -145,34 +168,21 @@ architecture (<code>x86</code>, <code>x86_64</code>, or <code>ppc</code>), and v
 <li><p>Set the <b>Debugger session address</b>. This is the address that the debugger will connect 
 to when it starts, and will depend on where you are launching the application:</p><p><br></p>
 <ul>
-<li><p>If you are launching onto the local machine, use <code>localhost</code> (some systems will 
-accept <code>localhost.localdomain</code>).</p><p><br></p></li>
-<li><p>If you are launching onto a remote machine without using port forwarding (as specified in the 
-resource manager configuration), then this should be the address of the local machine (the one 
-running Eclipse) <i>as viewed from one of the nodes of the parallel machine</i>. Note that if the 
-parallel machine configuration precludes nodes accessing your local machine, you will need to 
-reconfigure the resource manager to use port forwarding.</p><p><br></p></li>
-<li><p>If you are launching onto a remote machine using port forwarding, this is the address of the 
-remote machine <i>as viewed from one of its nodes</i>. Note that you will need to have the <code>GatewayPorts</code> option set to <code>yes</code>
-in the <code>sshd</code> configuration file on the remote system (see the manual page for <code>sshd_config</code>) for this to work.</p><p><br></p>
-<p><img src="images/03launch5.png"></p>
-</p></li>
+<li><p>If you are launching onto the local machine, or onto a remote machine using port forwarding, use <code>localhost</code>. (Note that you will need to 
+have the <code>GatewayPorts</code> option set to <code>yes</code> in the <code>sshd</code> configuration file on the remote system 
+for this to work with port forwarding.)</p><p><br></p></li>
+<li><p>If you are launching onto a remote machine without using port forwarding, then this should be the address of the local machine (the one 
+running Eclipse). <i>This address must be accessible from the remote machine.</i>. If your local network configuration 
+precludes the remote machine accessing your local machine, you will need to 
+reconfigure the resource manager to use port forwarding.</p><p><br></p>
+<p><img src="images/03launch5.png"></p></li>
 </ul>
 
 </li>
 </ol>
 
-<h2 id="arguments">Step 6: Complete the Arguments tab</h2>
-<p></p>
-<ol>
-<li><p>Enter any <i>program</i> arguments.</p><p><br></p></li>
-<li><p>Select a different working directory if desired. Note that for a remote launch, this will be 
-the location of the execution on the remote machine.</p></li>
-</ol>
-
-<h2 id="launch">Step 6: Launching the application</h2>
-<p>The launch configuration is now complete. Click on the <b>Run</b> button to launch the program.
-At this point the application should begin execution. 
+<h2 id="launch">Step 8: Launching the application</h2>
+<p>The launch configuration is now complete. Click on the <b>Apply</b> button to save the configuration. The <b>Run</b> button can now be used to launch the program.
 The <a href="05monitoring.html">Monitoring Parallel Machines and Jobs</a> section will show you how to
 monitor the program's execution.</p>
 
