@@ -92,14 +92,6 @@ public class ModelManager implements IModelManager {
 
 		public void handleEvent(IServiceModelEvent event) {
 			switch (event.getType()) {
-			case IServiceModelEvent.SERVICE_CONFIGURATION_ADDED: {
-				IServiceProvider provider = ((IServiceConfiguration) event.getSource()).getServiceProvider(fLaunchService);
-				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					addResourceManager(((IResourceManagerConfiguration) provider).createResourceManager());
-				}
-				break;
-			}
-
 			case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED: {
 				IServiceProvider provider = ((IServiceConfiguration) event.getSource()).getServiceProvider(fLaunchService);
 				if (provider != null && provider instanceof IResourceManagerConfiguration) {
@@ -115,13 +107,24 @@ public class ModelManager implements IModelManager {
 			case IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED: {
 				IServiceConfiguration config = (IServiceConfiguration) event.getSource();
 				IServiceProvider oldProvider = event.getOldProvider();
-				if (oldProvider != null && oldProvider instanceof IResourceManagerConfiguration) {
+				if (oldProvider != null) {
+					if (oldProvider instanceof IResourceManagerConfiguration) {
+						IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
+						if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
+							IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) oldProvider)
+									.getUniqueName());
+							if (rm != null) {
+								rm.setConfiguration((IResourceManagerConfiguration) newProvider);
+							}
+						}
+					}
+				} else {
 					IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
 					if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
-						IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) oldProvider)
+						IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
 								.getUniqueName());
-						if (rm != null) {
-							rm.setConfiguration((IResourceManagerConfiguration) newProvider);
+						if (rm == null) {
+							addResourceManager(((IResourceManagerConfiguration) newProvider).createResourceManager());
 						}
 					}
 				}

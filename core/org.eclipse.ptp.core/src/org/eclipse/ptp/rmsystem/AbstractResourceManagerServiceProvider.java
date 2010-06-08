@@ -103,6 +103,26 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.services.core.ServiceProvider#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof AbstractResourceManagerServiceProvider)) {
+			return false;
+		}
+		return getUniqueName().equals(((AbstractResourceManagerServiceProvider) obj).getUniqueName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#getAutoStart()
 	 */
 	public boolean getAutoStart() {
