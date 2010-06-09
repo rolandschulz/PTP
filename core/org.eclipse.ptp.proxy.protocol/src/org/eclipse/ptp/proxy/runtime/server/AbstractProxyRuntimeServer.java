@@ -102,6 +102,9 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 	 * Initialize server. Throws exception if any of the requirements for the
 	 * server is not fullfilled.
 	 */
+	/**
+	 * @since 4.0
+	 */
 	protected abstract void initServer() throws Exception;
 
 	/*
