@@ -10,8 +10,7 @@ Running the MPI Tools within the Parallel Language Development Tools
 <body>
 <h1 id="top"> Running the MPI Tools within the Parallel Language Development Tools</h1>
 <p>To run the PTP PLDT MPI Tools, 
-create a project (e.g a Managed Make C project), and
-set the preferences and include paths as described in
+create a project, and set the preferences and include paths as described in
 <a href="setup.html">Setup for PTP MPI Tools</a>.
 
 <p>The Parallel Language Development Tools should work on Standard Make C projects as well, and
@@ -26,7 +25,7 @@ then that is what was formerly called a "Standard Make" project.  Confused enoug
 
 <ol>
 <li>Within the project, create a C file that includes MPI code. A sample is <a href="samples/testMPI.c">testMPI.c</a> 
-If you used the PLDT new project wizard to create an MPI project, then you probably already have one.
+If you used the PLDT new project wizard to create a "Hello World" MPI project, then you probably already have one.
 
 <p>Note: A sample C++ file with MPI calls 
 is <a href="samples/testMPIcpp.cpp">testMPIcpp.cpp</a>.
@@ -61,6 +60,8 @@ in the MPI preferences page) listed.
 Note that the MPI analysis may require this even if 
 the build procedure - such as  a build command like 'mpicc' - 
 implicitly does this include for you during build.
+<li><b>OR</b> assure that the "Recognize artifacts by prefix (MPI_) alone" checkbox is checked in the 
+MPI preferences.
 </ol>
 <p>&nbsp;
 <li>Double click on any line in the MPI Artifact View
