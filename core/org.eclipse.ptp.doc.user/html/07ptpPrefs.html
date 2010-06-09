@@ -7,6 +7,22 @@
 <body>
 
 <h1>Preferences</h1>
+<p>Topics include:</p>
+<ul>
+	<li><a href="#open">Opening PTP Preferences</li>
+	<li><a href="#main">Main Parallel Tools Preferences </li>
+	<li><a href="#debug">Debug Preferences  </li>
+	<ul>
+		<li><a href="#sdm">SDM (Scalable Debug Manager) Preferences</a></li>
+	</ul>
+	<li><a href="#external">External Tools Framework (ETFw) Preferences</a></li>
+	<li><a href="#pldt">PLDT</a></li>
+	
+	<li><a href="#rm">Resource Manager Preferences</a></li>
+	<li><a href="#viewer">PTP Viewer Preferences</a></li>
+	<li><a href="#service">Service Configurations Preferences </a></li>
+</ul>
+<h2 id="open">Opening the PTP Preferences</h2>
 <p>To open the <b>Preferences dialog</b>, select:</p>
 <ul>
 	<li>
@@ -78,7 +94,7 @@ variable information.</p>
 	changed.</dd>
 </dl>
 
-<h2>SDM (Scalable Debug Manager) Preferences (Parallel Tools &gt;
+<h2 id="sdm">SDM (Scalable Debug Manager) Preferences (Parallel Tools &gt;
 Debug &gt; SDM)</h2>
 <p>These are preferences for controlling the behavior of the
 scalable debug manager, which is server component of the parallel
@@ -118,17 +134,27 @@ normally only used by PTP developers.</p>
 	information that is generated.</dd>
 </dl>
 
-<h2 id="external">External Tools Preferences Page (Parallel Tools
-&gt; External Tools)</h2>
+<h2 id="external">External Tools Preferences Page (Parallel Tools &gt; External Tools)</h2>
 <p>This is a category for configuring external tools that are
-provided using the ETFw extensions.</p>
+provided using the ETFw extensions.
+For more information see <a href="http://wiki.eclipse.org/PTP/ETFw/PTP_External_Tools_Framework">the ETFw wiki page</a>.
+</p>
 <p><img src="images/07prefsExternal.png"></p>
-
+<a name="feedback"></a>
+<p>The Feedback view preferences page handles cases where extensions are installed that utilize the
+Feedback view.  Here a checkbox controls whether or not the items in the Feedback tree table view
+are left expanded/contracted or not.
+See <a href="PLUGINS_ROOT/org.eclipse.ptp.etfw.feedback/html/toc.html">
+Feedback view</a> for more information.
+</p>
 <p><img src="images/07prefsExternal2.png"></p>
+<p>The Tool Configuration Location page allows the user to enter information about where to find
+tools that utilize the ETFw extensions.  In this case PPW and TAU tools can have their bin directories specified.
 
+</p>
 <p><img src="images/07prefsExternal3.png"></p>
 
-<h2 id="pldt">Parallel Language Development Tool (PLDT) Preferences</h2>
+<h2 id="pldt">Parallel Language Development Tools (PLDT) Preferences</h2>
 <p>See the help for <a
 	href="PLUGINS_ROOT/org.eclipse.ptp.pldt.help/html/toc.html">PLDT</a></p>
 
