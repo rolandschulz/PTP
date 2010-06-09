@@ -27,11 +27,17 @@ public class Messages extends NLS
 
     public static String FortranFindReferencesActionDelegate_PleaseSelectAnIdentifier;
 
+    public static String FortranFindReferencesSearchQuery_FileScope;
+
     public static String FortranFindReferencesSearchQuery_nMatches;
 
     public static String FortranFindReferencesSearchQuery_OneMatch;
 
+    public static String FortranFindReferencesSearchQuery_ProjectScope;
+
     public static String FortranFindReferencesSearchQuery_SearchSuccessful;
+
+    public static String FortranFindReferencesSearchQuery_WorkspaceScope;
 
     public static String FortranSearchPage_AllOccurrences;
 

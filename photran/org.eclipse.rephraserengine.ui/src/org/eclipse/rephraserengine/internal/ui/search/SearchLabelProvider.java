@@ -8,7 +8,6 @@
  * Contributors:
  *    Markus Schorn - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.rephraserengine.internal.ui.search;
 
 import org.eclipse.jface.viewers.LabelProvider;
@@ -46,8 +45,8 @@ public class SearchLabelProvider extends LabelProvider
         switch (count)
         {
             case 0:  return text;
-            case 1:  return Messages.SearchLabelProvider_OneMatch;
-            default: return Messages.bind(Messages.SearchLabelProvider_nMatches, count);
+            case 1:  return text + " " + Messages.SearchLabelProvider_OneMatch; //$NON-NLS-1$
+            default: return text + " " + Messages.bind(Messages.SearchLabelProvider_nMatches, count); //$NON-NLS-1$
         }
     }
 

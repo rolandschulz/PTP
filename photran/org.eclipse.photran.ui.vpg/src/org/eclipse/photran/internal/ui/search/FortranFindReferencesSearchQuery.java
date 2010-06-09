@@ -121,6 +121,11 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
             {
                 return !tokenRef.getFile().equals(file);
             }
+            
+            @Override public String toString()
+            {
+                return Messages.FortranFindReferencesSearchQuery_FileScope;
+            }
         },
         
         PROJECT
@@ -129,6 +134,11 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
             {
                 return !tokenRef.getFile().getProject().equals(file.getProject());
             }
+            
+            @Override public String toString()
+            {
+                return Messages.FortranFindReferencesSearchQuery_ProjectScope;
+            }
         },
         
         WORKSPACE
@@ -136,6 +146,11 @@ public class FortranFindReferencesSearchQuery implements ISearchQuery
             @Override public boolean filterOut(PhotranTokenRef tokenRef, IFile file)
             {
                 return false;
+            }
+            
+            @Override public String toString()
+            {
+                return Messages.FortranFindReferencesSearchQuery_WorkspaceScope;
             }
         };
 
