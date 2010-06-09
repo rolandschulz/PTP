@@ -15,11 +15,13 @@ import java.util.ResourceBundle;
 
 import com.ibm.icu.text.MessageFormat;
 
+/**
+ * @since 2.0
+ */
 public class Messages {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.managedbuilder.xlc.ui.messages.messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-			.getBundle(BUNDLE_NAME);
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	private Messages() {
 	}
@@ -31,7 +33,7 @@ public class Messages {
 			return '!' + key + '!';
 		}
 	}
-	
+
 	public static String getString(String key, String... substitutions) {
 		try {
 			String message = RESOURCE_BUNDLE.getString(key);

@@ -29,48 +29,49 @@ import org.eclipse.ptp.rdt.core.remotemake.RemoteSpecsRunSIProvider;
 
 /**
  * @author crecoskie
- *
+ * @since 2.0
+ * 
  */
 public class RemoteXLCSpecsRunSIProvider extends RemoteSpecsRunSIProvider implements IExternalScannerInfoProvider {
 
 	@Override
 	protected List<String> getCommand(IProject project, String providerId, IScannerConfigBuilderInfo2 buildInfo) {
 		// get the command that is provided in the extension point
-		String gcc  = buildInfo.getProviderRunCommand(providerId);
-		
-		// The CDT build macro system is busted in CDT 5.0.x, so resolve the compiler command ourselves
-		
-			
+		String gcc = buildInfo.getProviderRunCommand(providerId);
+
+		// The CDT build macro system is busted in CDT 5.0.x, so resolve the
+		// compiler command ourselves
+
 		// figure out compiler path from properties and preferences
-		String compilerPath = "";	 //$NON-NLS-1$
-			// search for property first
-			
-			try {
-				compilerPath = project.getPersistentProperty(new QualifiedName("", //$NON-NLS-1$
-						PreferenceConstants.P_XL_COMPILER_ROOT));
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if(compilerPath == null) {
-				// use the workbench preference
-				IPreferenceStore prefStore = XLCUIPlugin.getDefault().getPreferenceStore();
-				compilerPath = prefStore.getString(PreferenceConstants.P_XL_COMPILER_ROOT);
-			}
-			
-		if(compilerPath == null) {
+		String compilerPath = ""; //$NON-NLS-1$
+		// search for property first
+
+		try {
+			compilerPath = project.getPersistentProperty(new QualifiedName("", //$NON-NLS-1$
+					PreferenceConstants.P_XL_COMPILER_ROOT));
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if (compilerPath == null) {
+			// use the workbench preference
+			IPreferenceStore prefStore = XLCUIPlugin.getDefault().getPreferenceStore();
+			compilerPath = prefStore.getString(PreferenceConstants.P_XL_COMPILER_ROOT);
+		}
+
+		if (compilerPath == null) {
 			compilerPath = ""; //$NON-NLS-1$
 		}
-			
+
 		gcc = gcc.replaceAll("\\$\\{XL_COMPILER_ROOT\\}", compilerPath); //$NON-NLS-1$
-		
+
 		String args = buildInfo.getProviderRunArguments(providerId);
 		String specsFileName = getSpecsFileName(project);
-		
-		if(gcc == null || args == null || specsFileName == null)
+
+		if (gcc == null || args == null || specsFileName == null)
 			return null;
-		
+
 		IFileStore specsFilestore;
 		try {
 			specsFilestore = createSpecsFile(project, specsFileName, null);
@@ -81,15 +82,15 @@ public class RemoteXLCSpecsRunSIProvider extends RemoteSpecsRunSIProvider implem
 			RDTLog.logError(e);
 			return null;
 		}
-		
+
 		String specsFilePath = EFSExtensionManager.getDefault().getPathFromURI(specsFilestore.toURI());
 		args = args.replace(SPECS_FILE_PATH_VAR, specsFilePath);
-		
+
 		List<String> command = new ArrayList<String>();
 		command.add(gcc);
-		for(String arg : args.split(" ")) //$NON-NLS-1$
+		for (String arg : args.split(" ")) //$NON-NLS-1$
 			command.add(arg);
-		
+
 		return command;
 	}
 

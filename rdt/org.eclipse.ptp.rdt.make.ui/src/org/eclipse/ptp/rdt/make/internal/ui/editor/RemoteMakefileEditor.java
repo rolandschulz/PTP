@@ -20,12 +20,14 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 
 /**
- * Remote version of the CDT makefile editor.
- * It hides actions in the Outline view for makefiles in remote projects.
- *
+ * Remote version of the CDT makefile editor. It hides actions in the Outline
+ * view for makefiles in remote projects.
+ * 
+ * @since 1.1
+ * 
  */
 public class RemoteMakefileEditor extends MakefileEditor {
-	
+
 	public RemoteMakefileEditor() {
 		super();
 	}
@@ -34,7 +36,7 @@ public class RemoteMakefileEditor extends MakefileEditor {
 	public MakefileContentOutlinePage getOutlinePage() {
 		if (!isRemote())
 			return super.getOutlinePage();
-		
+
 		if (page == null) {
 			page = new RemoteMakefileContentOutlinePage(this);
 			page.addSelectionChangedListener(this);
@@ -42,7 +44,7 @@ public class RemoteMakefileEditor extends MakefileEditor {
 		}
 		return page;
 	}
-	
+
 	private boolean isRemote() {
 		IEditorInput editorInput = getEditorInput();
 		if (editorInput instanceof IFileEditorInput) {
@@ -54,7 +56,7 @@ public class RemoteMakefileEditor extends MakefileEditor {
 					return true;
 				}
 			}
-		}			
+		}
 		return false;
 	}
 }
