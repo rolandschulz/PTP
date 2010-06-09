@@ -1,0 +1,92 @@
+<html>
+<head>
+<title>
+Running PTP UPC Tools 
+</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+	<script type="text/javascript" src="thumb.js"> </script>
+	</head>
+<body>
+<h1 id="top"> Running PTP UPC Tools Plug-in</h1>
+
+<p>The basic instructions for running the UPC tools 
+(finding UPC artifacts, navigating to source code, using Help)
+are the same
+as for <a href="run.html">running the MPI tools</a>, but the basics
+and some differences for UPC are noted here.
+
+<p>Note that UPC features are an <i>optional</i> feature of CDT, and are not in the default installation.
+It requires an alternative parser, etc. from the regular CDT C and C++ support.
+See <a href="http://wiki.eclipse.org/PTP/other_tools_setup">UPC tools setup</a> on the PTP wiki
+for how to install CDT optional features for UPC support.
+
+<h2 id="prefs">UPC Preferences</h2>
+<p>Set up UPC Preferences. Here you can specify the UPC include file location.
+This is used for the PLDT analysis feature (not for building).
+It helps to determine whether APIs and other artifacts are related to UPC.
+Alternatively, if you leave the checkbox selected indicating "Recognize APIs by prefix (upc_) alone?"
+then the header file is not used.  This is a much simpler setup and seems less error prone.
+So if the checkbox is checked (which is the default), PLDT does not need the header file to find UPC artifacts.
+It may still ask for it, but won't be used if this is checked.
+
+<br><img src="images/upcPrefs.png">
+<br>&nbsp;
+<h2 id="langmap">Language Mappings</h2>
+
+<p>By default, files of extention ".upc" are considered UPC files.
+See <a href="http://wiki.eclipse.org/PTP/other_tools_setup">UPC tools setup</a> on the PTP wiki
+for how to enable UPC support (parsing, editor highlighting, etc.) on other files including files
+with extensions of .c, .h, etc.
+
+
+
+
+<h2 id="proj">UPC Project Properties</h2>
+<p>Set up UPC project include paths, compiler options, etc. in Project Properties.
+Note that if you use one of the CDT <a href="upc_wizards.html">UPC New Project wizards</a> and toolchains,
+some of this may already be set up for you.
+<br><img src="images/upcProperties.png">
+<br>&nbsp;
+
+<h2 id="art">Finding UPC artifacts</h2>
+<p>Finding UPC artifacts is similar to finding MPI or OpenMP artifacts.
+Select the file (or container: project/folder) to search in the Project Explorer view,
+and Select "Show UPC Artifacts"  from the PLDT menu.
+<br><img src="images/menuShowUPCartifacts.png">
+
+<p>UPC artifacts found and shown in the UPC Artifact View.  Note that "artifacts" are currently defined
+as UPC APIs.  Language features such as upc_forall, upc_barrier, THREADS, etc will not be listed in the
+UPC Artifact View.  Note that they <i>are </i> highlighted with syntax coloring in the editor.
+The UPC Preferences page lets you select you to determine UPC artifacts.  We recommend using the prefix (upc_) to determine
+this, as it is less confusing and less error-prone.
+<p><img src="images/upc_editorAndArtifacts.png">
+<p>Note that currently only UPC APIs (function calls) are identified as artifacts.
+UPC language features are highlighted by CDT.
+<p><img src="images/upc_editorVsArtifacts.png">
+
+<p>&nbsp;
+<h2 id="templates">UPC code templates</h2>
+<p>Some code templates for useful UPC idioms and commonly-used language constructs are included with
+CDT and PTP.
+<p>Note that the optional UPC feature of CDT, as well as the UPC feature of PLDT, must both be installed
+to see and use all the UPC templates.
+<p>To activate code templates, position your cursor where you want to enter the code,
+and press control-space <i>twice.</i>
+You will see a possibly long list of templates to insert.
+To cull the list to just UPC features, type "upc" or "upc_" before hitting control-space (twice).
+The templates that start with the prefix you typed are listed.
+<br><img src="images/upc_template1.png">
+<p>If you choose the highlighted template above, the content will be inserted into your code:
+<br><img src="images/upc_template2.png">
+
+<p>Some variables in the template are replaceable by your own values.  These are highlighted in blue 
+in this example.  Type your variable over these and all instances will be changed to match.
+
+<p>Templates can be easily changed and added to by the user.
+See the Eclipse Preferences, 
+
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>

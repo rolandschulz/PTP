@@ -10,7 +10,7 @@
       <topic label="Running PTP OpenMP tools"  href="html/runOMP.html"/> 
    <topic href="html/barrier.html" label="MPI Barrier Analysis">
    </topic> 
-      <topic href="html/runUPC.html" label="UPC tools"/>
+      <topic href="html/upc.html" label="UPC tools"/>
    <topic href="html/whatsnew.html" label="New and Noteworthy"/>
 
 
