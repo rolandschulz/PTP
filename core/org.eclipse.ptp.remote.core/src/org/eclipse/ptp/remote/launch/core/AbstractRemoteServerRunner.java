@@ -444,9 +444,9 @@ public abstract class AbstractRemoteServerRunner extends Job {
 								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
 									setServerState(ServerState.RUNNING);
 								}
-								if (DebugUtil.SERVER_TRACING) {
+//								if (DebugUtil.SERVER_TRACING) {
 									System.err.println("SERVER: " + output); //$NON-NLS-1$
-								}
+//								}
 							}
 						}
 					} catch (IOException e) {
