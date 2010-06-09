@@ -14,8 +14,10 @@ package org.eclipse.ptp.rdt.make.internal.ui.editor;
 import org.eclipse.cdt.make.internal.ui.editor.MakefileContentOutlinePage;
 import org.eclipse.cdt.make.internal.ui.editor.MakefileEditor;
 
-public class RemoteMakefileContentOutlinePage extends
-		MakefileContentOutlinePage {
+/**
+ * @since 1.1
+ */
+public class RemoteMakefileContentOutlinePage extends MakefileContentOutlinePage {
 
 	public RemoteMakefileContentOutlinePage(MakefileEditor editor) {
 		super(editor);
