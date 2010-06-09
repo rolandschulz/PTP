@@ -14,27 +14,35 @@ package org.eclipse.ptp.rdt.make.internal.ui.editor;
 import org.eclipse.cdt.make.internal.ui.editor.MakefileContentOutlinePage;
 import org.eclipse.jface.viewers.ISelection;
 
-public class AddBuildTargetAction extends
-		org.eclipse.cdt.make.internal.ui.editor.AddBuildTargetAction {
+/**
+ * @since 1.1
+ */
+public class AddBuildTargetAction extends org.eclipse.cdt.make.internal.ui.editor.AddBuildTargetAction {
 
 	public AddBuildTargetAction(MakefileContentOutlinePage outliner) {
 		super(outliner);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.make.internal.ui.editor.AddBuildTargetAction#canActionBeAdded(org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.make.internal.ui.editor.AddBuildTargetAction#canActionBeAdded
+	 * (org.eclipse.jface.viewers.ISelection)
 	 */
 	@Override
 	public boolean canActionBeAdded(ISelection selection) {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.make.internal.ui.editor.AddBuildTargetAction#run()
 	 */
 	@Override
 	public void run() {
-		//do nothing
+		// do nothing
 	}
 
 }

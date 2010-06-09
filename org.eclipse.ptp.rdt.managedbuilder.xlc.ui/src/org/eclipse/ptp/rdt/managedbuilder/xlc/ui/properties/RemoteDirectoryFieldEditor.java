@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * A field editor for a remote directory path type preference.
+ * 
+ * @since 2.0
  */
 public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 
@@ -54,6 +56,7 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 	 * (non-Javadoc) Method declared on StringButtonFieldEditor. Browse the
 	 * remote directories and returns the selected directory.
 	 */
+	@Override
 	protected String changePressed() {
 
 		String remotePath = browseRemoteLocation(getShell(), getTextControl().getText());
@@ -135,6 +138,7 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 	 * Method declared on StringFieldEditor. Checks whether the remote dir is
 	 * validated
 	 */
+	@Override
 	protected boolean doCheckState() {
 
 		updateCurrentRemoteFile();
