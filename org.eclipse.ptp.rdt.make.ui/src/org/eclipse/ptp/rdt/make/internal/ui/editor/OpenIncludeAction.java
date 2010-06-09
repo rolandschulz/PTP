@@ -14,23 +14,30 @@ package org.eclipse.ptp.rdt.make.internal.ui.editor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 
-
-public class OpenIncludeAction extends
-		org.eclipse.cdt.make.internal.ui.editor.OpenIncludeAction {
+/**
+ * @since 1.1
+ */
+public class OpenIncludeAction extends org.eclipse.cdt.make.internal.ui.editor.OpenIncludeAction {
 
 	public OpenIncludeAction(ISelectionProvider provider) {
 		super(provider);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.make.internal.ui.editor.OpenIncludeAction#canActionBeAdded(org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.cdt.make.internal.ui.editor.OpenIncludeAction#canActionBeAdded
+	 * (org.eclipse.jface.viewers.ISelection)
 	 */
 	@Override
 	public boolean canActionBeAdded(ISelection selection) {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.cdt.make.internal.ui.editor.OpenIncludeAction#run()
 	 */
 	@Override
