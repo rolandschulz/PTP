@@ -423,8 +423,8 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     @Override
     public void dispose()
     {
-        if (clipboard != null)
-            clipboard.dispose();
+        if (clipboard != null) clipboard.dispose();
+        if (selectionFilterAction != null) selectionFilterAction.dispose();
         super.dispose();
     }
 }

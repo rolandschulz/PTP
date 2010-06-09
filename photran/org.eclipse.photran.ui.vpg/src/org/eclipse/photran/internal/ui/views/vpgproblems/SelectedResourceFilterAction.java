@@ -53,7 +53,12 @@ public class SelectedResourceFilterAction extends Action implements ISelectionLi
         
         vpgView.getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(this);
     }
-    
+
+    void dispose()
+    {
+        vpgView.getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
+    }
+
     @Override public void run()
     {
         vpgView.setErrorWarningFilterButtonText();
