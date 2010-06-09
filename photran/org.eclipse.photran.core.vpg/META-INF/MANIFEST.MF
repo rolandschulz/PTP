@@ -34,3 +34,4 @@ Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.internal.core.vpg
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Localization: plugin
