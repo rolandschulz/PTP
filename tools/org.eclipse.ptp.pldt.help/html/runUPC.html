@@ -14,7 +14,13 @@ Running PTP UPC Tools
 are the same
 as for <a href="run.html">running the MPI tools.</a>.
 
-<p>Set up UPC Preferences
+<p>Set up UPC Preferences. Here you can specify the UPC include file location.
+This is used for the PLDT analysis feature (not for building).
+It helps to determine whether APIs and other artifacts are related to UPC.
+Alternatively, if you leave the checkbox selected indicating "Recognize APIs by prefix (upc_) alone?"
+then the header file is not used.  This is a much simpler setup and seems less error prone.
+So if the checkbox is checked, PLDT does not need the header file to find UPC artifacts.
+
 <br><img src="images/upcPrefs.png">
 <br>&nbsp;
 
