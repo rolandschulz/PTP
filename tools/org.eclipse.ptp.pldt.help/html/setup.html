@@ -25,12 +25,12 @@ Tools feature for MPI development, you need to
 </ol>
 
 <h2 id="prefs">Specifying the MPI Include path in Preferences</h2>
-<p>Note: As of PLDT 2.1, you will be prompted if the MPI (or OpenMP) include path hasn't been set up in PLDT Preferences.
+<p>During project creation, you will be prompted if the MPI (or OpenMP) include path hasn't been set up in PLDT Preferences.
 The first time you use the New Project Wizard to create an MPI or OpenMP project, 
 you'll be prompted to set up the preferences to point to the appropriate header files.
 <p>Or, you can set it up ahead of time as specified below.
 <p>To specify the MPI include path, use Window > Preferences. (For Mac, use Eclipse > Preferences)
-Under PTP, Parallel Language Development Tools, MPI...
+Under Parallel Tools, Parallel Language Development Tools, MPI...
 (Note: If you do not have core PTP installed, the "Parallel Language 
 Development Tools" section in the preferences will be in the main list.)
 
@@ -75,6 +75,8 @@ Enter a project name; under Project types, expand 'executable' and select, e.g. 
 <p>After specifying the preferences, or if it wasn't required, select Next to go to the next page of the New Project Wizard.
 
 <br>On the next page, the Basic Settings page of the wizard, fill in any project template values, e.g. your name.
+The name is used in a comment in the file.  The "Hello World Greeting" is used in the sample statement
+in the code that is generated.  The "Source" field indicates the name of the source folder that is generated in the project.
 <br>Then select Next.
 <br><img src="images/mpiWizard2.gif">
 <p>On the next page, "MPI Project Settings" page,  the "Add MPI project settings to this project" should be checked.
