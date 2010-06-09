@@ -7,7 +7,6 @@
       <topic label="Creating an MPI Project"  href="html/01buildMPIprog.html"/> 
       <topic label="Configuring Resource Managers"  href="html/02resMgrSetup.html"/> 
       <topic label="Launching Parallel Programs"  href="html/03pLaunchConfig.html"/> 
-      <topic label="Launching Parallel Programs for Debugging"  href="html/04pLaunchConfigDebug.html"/> 
       <topic label="Monitoring Parallel Machines and Jobs" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
       <topic label="PTP Preferences" href="html/07ptpPrefs.html" />
