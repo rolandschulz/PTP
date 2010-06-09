@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.upc.prefs;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
@@ -80,6 +81,9 @@ public class UPCPreferencePage extends FieldEditorPreferencePage implements IWor
 
 	@Override
 	protected void createFieldEditors() {
+        BooleanFieldEditor bPrefix = new BooleanFieldEditor(UPCIDs.UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE, UPC_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL, getFieldEditorParent());
+        addField(bPrefix);
+        
 		PathEditor pathEditor = new PathEditor(UPCIDs.UPC_INCLUDES, INCLUDES_PREFERENCE_LABEL, INCLUDES_PREFERENCE_BROWSE,
 				getFieldEditorParent());
 		addField(pathEditor);
