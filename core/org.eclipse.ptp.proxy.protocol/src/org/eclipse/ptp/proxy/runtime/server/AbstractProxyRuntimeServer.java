@@ -99,6 +99,12 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 	}
 
 	/*
+	 * Initialize server. Throws exception if any of the requirements for the
+	 * server is not fullfilled.
+	 */
+	protected abstract void initServer() throws Exception;
+
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.proxy.server.AbstractProxyServer#runStateMachine()
@@ -122,9 +128,17 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				transID = command.getTransactionID();
 				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (command instanceof IProxyRuntimeInitCommand) {
-					event = fEventFactory.newOKEvent(transID);
-					sendEvent(event);
-					state = ServerState.DISCOVERY;
+					try {
+						initServer();
+						event = fEventFactory.newOKEvent(transID);
+						sendEvent(event);
+						state = ServerState.DISCOVERY;
+					} catch (Exception e) {
+						event = fEventFactory.newErrorEvent(transID, 0, e.getMessage());
+						e.printStackTrace();
+						sendEvent(event);
+						state = ServerState.SHUTDOWN;
+					}
 				} else {
 					System.err.println("unexpected command (INIT): " + command); //$NON-NLS-1$
 				}

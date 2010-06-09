@@ -17,6 +17,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,9 +54,15 @@ public class XMLReader implements IParser {
 	 * From: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
 	 * Not OK for UTF longer than 2 bytes
 	 * 
+	 * If the XML is empty it provides "<D></D>"
+	 * 
 	 */
-	class StripNonValidXMLCharactersReader extends InputStreamReader {
-		public StripNonValidXMLCharactersReader(InputStream in) {
+	class FixInValidXMLReader extends InputStreamReader {
+		boolean isEmpty = false;
+		int totalBytesRead = 0;
+		Reader emptyInput = null;
+		
+		public FixInValidXMLReader(InputStream in) {
 			super(in);
 		}
 
@@ -72,8 +80,14 @@ public class XMLReader implements IParser {
 
 		@Override
 		public int read(char cbuf[], int offset, int length) throws IOException {
+			if (emptyInput!=null)
+				return emptyInput.read(cbuf, offset, length);
 			int ret = super.read(cbuf, offset, length);
 			int skip = 0;
+			if (totalBytesRead==0 && ret<1) {  /*Send non-empty valid XML if input stream is empty*/
+				emptyInput = new StringReader("<D></D>");
+				return emptyInput.read(cbuf, offset, length);
+			}
 			for (int i = offset; i < offset + ret; i++) {
 				char current = cbuf[i];
 				if (!((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
@@ -85,7 +99,9 @@ public class XMLReader implements IParser {
 					cbuf[i - skip] = cbuf[i];
 				}
 			}
-			return ret - skip;
+			ret-=skip;
+			totalBytesRead+=ret;
+			return ret;
 		}
 
 	}
@@ -111,7 +127,7 @@ public class XMLReader implements IParser {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 
-		Document doc = builder.parse(new InputSource(new StripNonValidXMLCharactersReader(in)));
+		Document doc = builder.parse(new InputSource(new FixInValidXMLReader(in)));
 		// Document doc = builder.parse(in);
 		Element root = doc.getDocumentElement();
 		root.normalize();
@@ -126,37 +142,25 @@ public class XMLReader implements IParser {
 	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
 	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
 	 */
-	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
+	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) throws SAXException, IOException,
+			ParserConfigurationException, UnknownValueExecption {
 		// public <T extends IElement> Set<T> parse(Class<IElement> pojoClazz,
 		// InputStream in) {
 		Set<IElement> elementList = null;
 		NodeList xmlNodes = null;
-		try {
-			xmlNodes = getXMLChildren(in);
-		} catch (Exception e) {
-			e.printStackTrace(); // TODO: Ignore Premature end of file, make sure errors are shown to user
-			return new HashSet<IElement>();
-		}
-		try {
-			in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		xmlNodes = getXMLChildren(in);
+		in.close();
 		elementList = new HashSet<IElement>(xmlNodes.getLength());
 		for (int i = 0; i < xmlNodes.getLength(); i++) {
 			Node node = xmlNodes.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				try {
-					Map<String, String> input = populateInput(node, null);
-					IElement bean = populateElement(attrDef, input);
-					if (DEBUG) {
-						System.out.println(bean);
-						System.out.println();
-					}
-					elementList.add(bean);
-				} catch (Exception e) {
-					e.printStackTrace();
+				Map<String, String> input = populateInput(node, null);
+				IElement element = populateElement(attrDef, input);
+				if (DEBUG) {
+					System.out.println(element);
+					System.out.println();
 				}
+				elementList.add(element);
 			}
 		}
 
@@ -166,7 +170,7 @@ public class XMLReader implements IParser {
 		return elementList;
 	}
 
-	private IElement populateElement(AttributeDefinition attrDef, Map<String, String> input) throws UnknownValueExecption {
+	private IElement populateElement(AttributeDefinition attrDef, Map<String, String> input) throws UnknownValueExecption  {
 		IElement element = attrDef.createElement();
 
 		// PropertyDescriptor[] properties =
@@ -185,8 +189,7 @@ public class XMLReader implements IParser {
 		return element;
 	}
 
-	protected Map<String, String> populateInput(Node node, Map<String, String> input) throws IntrospectionException,
-			IllegalAccessException, InvocationTargetException, InstantiationException {
+	protected Map<String, String> populateInput(Node node, Map<String, String> input) {
 		if (input == null) {
 			input = new HashMap<String, String>();
 		}
