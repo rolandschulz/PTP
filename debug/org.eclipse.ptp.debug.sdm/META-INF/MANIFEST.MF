@@ -6,3 +6,4 @@ Bundle-Version: 4.0.0.qualifier
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ptp.proxy,
  org.eclipse.ptp.utils
+Bundle-Localization: plugin
