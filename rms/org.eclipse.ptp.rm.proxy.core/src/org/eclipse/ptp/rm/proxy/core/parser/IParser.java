@@ -32,6 +32,7 @@ public interface IParser {
 	 * @param in
 	 *            the input stream
 	 * @return the set of elements read
+	 * @throws Execption
 	 */
-	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in);
+	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) throws Exception;
 }

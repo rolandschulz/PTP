@@ -1,7 +1,5 @@
 package org.eclipse.ptp.rm.pbs.jproxy.parser;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,10 +18,7 @@ public class QstatJobXMLReader extends XMLReader {
 	 * dom.Node, java.util.Map)
 	 */
 	@Override
-	protected Map<String, String> populateInput(Node node,
-			Map<String, String> input) throws IntrospectionException,
-			IllegalAccessException, InvocationTargetException,
-			InstantiationException {
+	protected Map<String, String> populateInput(Node node, Map<String, String> input) {
 
 		// Hack to recover from not well-formed XML (old qstat versions generate
 		// not well-formed XML)

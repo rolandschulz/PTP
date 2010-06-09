@@ -78,6 +78,14 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		}
 	}
 
+	private static String normalize(String content) {
+		content = content.replaceAll("\\\\\\\\", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll("\\\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll("\\\\t", "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll("\\\\s", " "); //$NON-NLS-1$ //$NON-NLS-2$
+		return content;
+	}
+
 	/**
 	 * @since 4.0
 	 */
@@ -90,7 +98,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					int port = new Integer(args[i].substring(7));
 					argsMap.put("port", port); //$NON-NLS-1$
 				} catch (NumberFormatException e) {
-					System.err.println(org.eclipse.ptp.proxy.messages.Messages.AbstractProxyRuntimeServer_0 + args[i + 1].substring(7));
+					System.err.println(org.eclipse.ptp.proxy.messages.Messages.AbstractProxyRuntimeServer_0
+							+ args[i + 1].substring(7));
 				}
 			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
 				String host = args[i].substring(7);
@@ -103,14 +112,6 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		return argsMap;
 	}
 
-	private static String normalize(String content) {
-		content = content.replaceAll("\\\\\\\\", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
-		content = content.replaceAll("\\\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		content = content.replaceAll("\\\\t", "\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		content = content.replaceAll("\\\\s", " "); //$NON-NLS-1$ //$NON-NLS-2$
-		return content;
-	}
-
 	private Controller nodeController;
 
 	private Controller queueController;
@@ -121,6 +122,39 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
 	private PBSProxyRuntimeServer(String host, int port) {
 		super(host, port, new ProxyRuntimeEventFactory());
+
+		nodeController = new Controller("pbsnodes -x", // command //$NON-NLS-1$
+				new AttributeDefinition(new PBSNodeClientAttributes()), // attributes.
+																		// TODO:
+																		// should
+																		// include
+																		// a
+																		// flag
+																		// whether
+																		// mandatory.
+				new NodeEventFactory(), new XMLReader() // Parser
+		);
+
+		queueController = new Controller("qstat -Q -f -1", // command //$NON-NLS-1$
+				new AttributeDefinition(new PBSQueueClientAttributes()), // attributes
+				new QueueEventFactory(), new QstatQueuesReader() // Parser
+		);
+
+		jobController = new Controller("qstat -x", // command //$NON-NLS-1$
+				new AttributeDefinition(new PBSJobClientAttributes()), // attributes
+				new JobEventFactory(), new QstatJobXMLReader(), // Parser
+				queueController // Parent
+		);
+
+		if (debugReadFromFiles) {
+			nodeController.setDebug(debugFolder + "/pbsnodes_1.xml", //$NON-NLS-1$
+					debugFolder + "/pbsnodes_2.xml"); //$NON-NLS-1$
+			queueController.setDebug(debugFolder + "/qstat_Q_1.xml", //$NON-NLS-1$
+					debugFolder + "/qstat_Q_2.xml"); //$NON-NLS-1$
+			jobController.setDebug(debugFolder + "/qstat_1.xml", debugFolder //$NON-NLS-1$
+					+ "/qstat_2.xml"); //$NON-NLS-1$
+		}
+
 	}
 
 	// private boolean procDone(Process p) {
@@ -140,8 +174,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			try {
 				Process p = Runtime.getRuntime().exec("whoami"); //$NON-NLS-1$
 				p.waitFor();
-				user = new BufferedReader(new InputStreamReader(
-						p.getInputStream())).readLine();
+				user = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
 			} catch (IOException e) {
 				// Auto-generated catch block
 				e.printStackTrace();
@@ -151,6 +184,20 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			}
 		}
 		return user;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer#
+	 * initServer()
+	 */
+	@Override
+	protected void initServer() throws Exception {
+		// Test whether all programs and parser work
+		nodeController.parse();
+		queueController.parse();
+		jobController.parse();
 	}
 
 	/*
@@ -172,17 +219,19 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		// MACHINES
 		int resourceManagerID = ElementIDGenerator.getInstance().getBaseID();
 
-
 		try {
 			Process p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$
 			p.waitFor();
 			String server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-			server = server.split(" ")[1]; //$NON-NLS-1$
+			if (server==null || server.split(" ").length<2) //$NON-NLS-1$
+				server = "UNKNOWN"; //$NON-NLS-1$
+			else 
+				server = server.split(" ")[1]; //$NON-NLS-1$
 			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(transID,
 					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(machineID), //$NON-NLS-1$
 							"2", //$NON-NLS-1$
 							"machineState=UP", //$NON-NLS-1$
-							"name="+server //$NON-NLS-1$
+							"name=" + server //$NON-NLS-1$
 					}));
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -191,39 +240,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			e.printStackTrace();
 		}
 
-		nodeController = new Controller("pbsnodes -x", // command //$NON-NLS-1$
-				new AttributeDefinition(new PBSNodeClientAttributes()), // attributes.
-																		// TODO:
-																		// should
-																		// include
-																		// a
-																		// flag
-																		// whether
-																		// mandatory.
-				new NodeEventFactory(), new XMLReader(), // Parser
-				machineID // BaseID
-		);
-
-		queueController = new Controller("qstat -Q -f -1", // command //$NON-NLS-1$
-				new AttributeDefinition(new PBSQueueClientAttributes()), // attributes
-				new QueueEventFactory(), new QstatQueuesReader(), // Parser
-				resourceManagerID // BaseID
-		);
-
-		jobController = new Controller("qstat -x", // command //$NON-NLS-1$
-				new AttributeDefinition(new PBSJobClientAttributes()), // attributes
-				new JobEventFactory(), new QstatJobXMLReader(), // Parser
-				queueController // Parent
-		);
-
-		if (debugReadFromFiles) {
-			nodeController.setDebug(debugFolder + "/pbsnodes_1.xml", //$NON-NLS-1$
-					debugFolder + "/pbsnodes_2.xml"); //$NON-NLS-1$
-			queueController.setDebug(debugFolder + "/qstat_Q_1.xml", //$NON-NLS-1$
-					debugFolder + "/qstat_Q_2.xml"); //$NON-NLS-1$
-			jobController.setDebug(debugFolder + "/qstat_1.xml", debugFolder //$NON-NLS-1$
-					+ "/qstat_2.xml"); //$NON-NLS-1$
-		}
+		nodeController.setBaseID(machineID);
+		queueController.setBaseID(resourceManagerID);
 
 		jobController.setFilter("job_owner", Pattern.quote(getUser()) + "@.*"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -238,10 +256,15 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					while (state != ServerState.SHUTDOWN) {
 						{
 							List<IProxyEvent> events = new ArrayList<IProxyEvent>();
-							events.addAll(nodeController.update());
-							events.addAll(queueController.update());
-							events.addAll(jobController.update());
 							try {
+								try {
+									events.addAll(nodeController.update());
+									events.addAll(queueController.update());
+									events.addAll(jobController.update());
+								} catch (Exception e) {
+									e.printStackTrace();
+									sendEvent(getEventFactory().newErrorEvent(transID, 0, e.getMessage()));
+								}
 								for (IProxyEvent e : events) {
 									e.setTransactionID(transID);
 									sendEvent(e);
@@ -412,8 +435,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			if (p.exitValue() == 0) {
 				sendEvent(getEventFactory().newOKEvent(transID));
 			} else {
-				BufferedReader err = new BufferedReader(new InputStreamReader(
-						p.getErrorStream()));
+				BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 				String line, errMsg = ""; //$NON-NLS-1$
 				while ((line = err.readLine()) != null) {
 					errMsg += line;

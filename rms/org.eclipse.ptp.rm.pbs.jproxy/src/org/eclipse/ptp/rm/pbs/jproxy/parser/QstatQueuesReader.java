@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
+import org.eclipse.ptp.rm.proxy.core.element.IElement.UnknownValueExecption;
 import org.eclipse.ptp.rm.proxy.core.parser.IParser;
 
 // TODO: Auto-generated Javadoc
@@ -38,7 +39,7 @@ public class QstatQueuesReader implements IParser {
 	private Set<IElement> queues;
 
 	private void _parse(InputStream in, AttributeDefinition attrDef)
-			throws Exception, IOException {
+			throws IOException, UnknownValueExecption {
 		queues = new HashSet<IElement>();
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -107,17 +108,11 @@ public class QstatQueuesReader implements IParser {
 	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
 	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
 	 */
-	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) {
+	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) throws IOException, UnknownValueExecption  {
 		Set<IElement> queues = new HashSet<IElement>();
-		try {
-			// qstat -Q -f is not XML - specific Reader has to be used.
-			_parse(in, attrDef);
-			queues = getQueues();
-		} catch (IOException e) {
-			System.out.println(e);
-		} catch (Exception e) {
-			System.out.println(e);
-		}
+		// qstat -Q -f is not XML - specific Reader has to be used.
+		_parse(in, attrDef);
+		queues = getQueues();
 
 		// System.err.println("queues length -> " + queues.size());
 		return queues;
