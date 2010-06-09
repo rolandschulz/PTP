@@ -98,6 +98,8 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     private ErrorWarningFilterAction warningsFilterAction = null;
     private ErrorWarningFilterAction errorsFilterAction   = null;
     private SelectedResourceFilterAction selectionFilterAction      = null;
+    
+    private boolean disposed = false;
 
     public int[] markerCount = {0,0,0};  //Number of Warnings and Errors respectively
     
@@ -172,17 +174,20 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
             {
                 public void run()
                 {
-                    final List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+                    if (!disposed)
+                    {
+                        final List<IMarker> markers = PhotranVPG.getInstance().recomputeErrorLogMarkers();
+                        
+                        Table t = tableViewer.getTable();
+                        
+                        t.removeAll();
+                        t.update();
                     
-                    Table t = tableViewer.getTable();
-                    
-                    t.removeAll();
-                    t.update();
-                
-                    tableViewer.setInput(markers);
-                    countMarkers(markers);
-                   
-                    setErrorWarningFilterButtonText();
+                        tableViewer.setInput(markers);
+                        countMarkers(markers);
+                       
+                        setErrorWarningFilterButtonText();
+                    }
                 }
             });
 
@@ -425,6 +430,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     {
         if (clipboard != null) clipboard.dispose();
         if (selectionFilterAction != null) selectionFilterAction.dispose();
+        disposed = true;
         super.dispose();
     }
 }
