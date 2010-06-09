@@ -24,6 +24,7 @@ import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
+import org.eclipse.photran.internal.core.lexer.LexerException;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.preprocessor.fortran_include.IncludeLoaderCallback;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
@@ -223,6 +224,7 @@ public class FortranEditorTasks
                         FortranEditorTasks.instance(editor).astTasks.removeAll(tasksToRemove);
                     }
                 }
+                catch (LexerException e)  { /* Ignore syntax errors */ }
                 catch (SyntaxException e) { /* Ignore syntax errors */ }
                 catch (Throwable e) { FortranUIPlugin.log(Messages.FortranEditorTasks_ErrorRunningASTTasks, e); }
             }

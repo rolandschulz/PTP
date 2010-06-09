@@ -122,6 +122,12 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 			if (ast != null) return ast;
 		}
 
+	    boolean shouldComputeEdgesAndAnnotations =
+	        forceRecomputationOfEdgesAndAnnotations || db.isOutOfDate(filename);
+	    
+        if (shouldComputeEdgesAndAnnotations)
+	        log.clearEntriesFor(filename);
+
 		long start = System.currentTimeMillis();
 		ast = parse(filename);
 		long parseTime = System.currentTimeMillis() - start;
@@ -137,7 +143,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
 		}
 
 		long computeTime = -1L;
-		if (forceRecomputationOfEdgesAndAnnotations || db.isOutOfDate(filename))
+		if (shouldComputeEdgesAndAnnotations)
             computeTime = computeEdgesAndAnnotations(filename, ast);
 
 		debug(parseTime, computeTime, filename);
@@ -192,7 +198,7 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
     protected long computeEdgesAndAnnotations(String filename, A ast)
     {
         long start = System.currentTimeMillis();
-        log.clearEntriesFor(filename);
+        // Log cleared prior to parse -- log.clearEntriesFor(filename);
         db.deleteAllEdgesAndAnnotationsFor(filename);
         populateVPG(filename, ast);
         db.updateModificationStamp(filename);

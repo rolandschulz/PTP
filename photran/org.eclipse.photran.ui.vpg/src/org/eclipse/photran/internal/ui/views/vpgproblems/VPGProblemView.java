@@ -145,16 +145,17 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
     
     public void onLogChange()
     {
-        if (markersTask == null)
+        synchronized (VPGProblemView.this)
         {
             // If non-null, this task is already running; don't start a 2nd instance
-            
+            if (markersTask != null) return;
+
             markersTask = new RecreateMarkers();
-            
-            WorkspaceJob job = new RecreateMarkers();
-            job.setRule(MultiRule.combine(VPGSchedulingRule.getInstance(),
-                                          ResourcesPlugin.getWorkspace().getRoot()));
-            job.schedule();
+            markersTask.setRule(
+                MultiRule.combine(
+                    VPGSchedulingRule.getInstance(),
+                    ResourcesPlugin.getWorkspace().getRoot()));
+            markersTask.schedule();
         }
     }
     
@@ -166,7 +167,7 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
         }
         
         @Override public IStatus runInWorkspace(final IProgressMonitor monitor)
-        {   
+        {
             getDisplay().syncExec(new Runnable()
             {
                 public void run()
@@ -184,8 +185,12 @@ public class VPGProblemView extends ViewPart implements VPGLog.ILogListener
                     setErrorWarningFilterButtonText();
                 }
             });
+
+            synchronized (VPGProblemView.this)
+            {
+                markersTask = null;
+            }
             
-            markersTask = null;
             return Status.OK_STATUS;
         }
     }
