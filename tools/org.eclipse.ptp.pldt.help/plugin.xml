@@ -15,7 +15,6 @@
                   closedIcon="icons/analyze.gif"
                   id="org.eclipse.ptp.pldt.help.icon"
                   openIcon="icons/analyze.gif"/>
-      <index path="org.eclipse.ptp.pldt.help.index1"/>
    </extension>
 
   <extension
