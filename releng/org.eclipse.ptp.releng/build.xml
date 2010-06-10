@@ -197,10 +197,8 @@
 		<echo message="Adding download stats"/>
 		<unzip src="${p2dir}/artifacts.jar" dest="${p2dir}"/>
 		<move file="${p2dir}/artifacts.xml" tofile="${p2dir}/artifacts.xml_tmp"/>
-		<xslt style="${basedir}/addDownloadStats.xsl" basedir="${p2dir}" destdir="${p2dir}" in="artifacts.xml_tmp" out="artifacts.xml" />
-		<zip destfile="${p2dir}/artifacts.jar" basedir="${p2dir}">
-			<include name="artifacts.xml"/>
-		</zip>
+		<xslt style="${basedir}/addDownloadStats.xsl" in="${p2dir}/artifacts.xml_tmp" out="${p2dir}/artifacts.xml" />
+		<zip destfile="${p2dir}/artifacts.jar" basedir="${p2dir}" includes="artifacts.xml"/>
 		<delete file="${p2dir}/artifacts.xml"/>
 		<delete file="${p2dir}/artifacts.xml_tmp"/>
 	</target>
