@@ -40,7 +40,8 @@
 		<property name="collectingFolder" value="eclipse"/>
 		<property name="archivePrefix" value="eclipse"/>
 		<property name="zipsdir" value="${buildDirectory}/${buildType}.${buildId}"/>
-		<property name="ptpMasterFile" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
+		<property name="masterFile" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
+		<property name="masterFeature" value="org.eclipse.ptp.master_${branchVersion}.jar"/>
 		<property name="eclipseTest" value="org.eclipse.test_3.2.0"/>
 		<property name="mailto" value="g.watson@computer.org"/>
 		<property name="eclipseRoot" value=":pserver:anonymous@dev.eclipse.org:/cvsroot/eclipse"/>
@@ -88,9 +89,9 @@
 		<condition property="hasErrors">
 			<contains string="${compileLog}" substring=" ERROR"/>
 		</condition>
-		<move file="${zipsdir}/${ptpMasterFile}" todir="${buildDirectory}"/>
+		<move file="${zipsdir}/${masterFile}" todir="${buildDirectory}"/>
 		
-		<unzip src="${buildDirectory}/${ptpMasterFile}" dest="${buildDirectory}/site"/>
+		<unzip src="${buildDirectory}/${masterFile}" dest="${buildDirectory}/site"/>
 		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="index.html" todir="${buildDirectory}/site/eclipse"/>
@@ -104,20 +105,23 @@
 		</replace>
 		<copy file="pack.properties" todir="${buildDirectory}/site/eclipse"/>
 
-		<zip destfile="${zipsdir}/${ptpMasterFile}"
+		<!-- remove the master feature from the update site -->
+		<delete verbose="true" file="${buildDirectory}/site/eclipse/features/${masterFeature}"/>
+
+		<zip destfile="${zipsdir}/${masterFile}"
 			basedir="${buildDirectory}/site/eclipse"/>
 	</target>
 
 	<target name="sign" depends="init" unless="hasErrors">
 		<exec executable="sign">
-			<arg value="${buildDirectory}/${buildType}.${buildId}/${ptpMasterFile}"/>
+			<arg value="${buildDirectory}/${buildType}.${buildId}/${masterFile}"/>
 			<arg value="nomail"/>
 			<arg value="${buildDirectory}/signed"/>
 		</exec>
 		<waitfor maxwait="60" maxwaitunit="minute">
-			<available file="${buildDirectory}/signed/${ptpMasterFile}"/>
+			<available file="${buildDirectory}/signed/${masterFile}"/>
 		</waitfor>
-		<move file="${buildDirectory}/signed/${ptpMasterFile}" todir="${zipsdir}"/>
+		<move file="${buildDirectory}/signed/${masterFile}" todir="${zipsdir}"/>
 	</target>
 	
 	<target name="test" depends="init" unless="hasErrors"/>
@@ -141,7 +145,7 @@
 		<symlink link="${releaseDir}/latest" resource="${copyToDir}" overwrite="true"/>
 		<delete file="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" followsymlinks="false" failonerror="false"/>
 		<!--symlink action="delete" link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" failonerror="false"/-->
-		<symlink link="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${ptpMasterFile}" overwrite="true"/>
+		<symlink link="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${masterFile}" overwrite="true"/>
 		<delete file="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" followsymlinks="false" failonerror="false"/>
 		<!--symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/-->
 		<symlink link="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
@@ -150,7 +154,7 @@
 	<target name="p2" depends="init" unless="hasErrors">
 		<!-- unzip the signed master site -->
 		<property name="p2dir" value="${zipsdir}/p2"/>
-		<property name="destination" value="${zipsdir}/${ptpMasterFile}"/>
+		<property name="destination" value="${zipsdir}/${masterFile}"/>
 		
 		<unzip src="${destination}" dest="${p2dir}"/>
 		
