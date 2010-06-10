@@ -163,6 +163,11 @@
 			<param name="p2site" value="${p2dir}"/>
 		</antcall>
 		
+		<!-- add download stats -->
+		<antcall target="download.stats">
+			<param name="p2site" value="${p2dir}"/>
+		</antcall>
+		
 		<!-- zip everything back up -->
 		<zip destfile="${destination}"
 			basedir="${p2dir}"/>
@@ -188,6 +193,18 @@
         </java>
 	</target>
 	
+	<target name = "download.stats">
+		<echo message="Adding download stats"/>
+		<unzip src="${p2dir}/artifacts.jar" dest="${p2dir}"/>
+		<move file="${p2dir}/artifacts.xml" tofile="${p2dir}/artifacts.xml_tmp"/>
+		<xslt style="${basedir}/addDownloadStats.xsl" basedir="${p2dir}" destdir="${p2dir}" in="artifacts.xml_tmp" out="artifacts.xml" />
+		<zip destfile="${p2dir}/artifacts.jar" basedir="${p2dir}">
+			<include name="artifacts.xml"/>
+		</zip>
+		<delete file="${p2dir}/artifacts.xml"/>
+		<delete file="${p2dir}/artifacts.xml_tmp"/>
+	</target>
+		
 	<target name="tagone">
 		<cvs cvsroot="/cvsroot/tools" command="rtag ${tagbranch} ${tagname} ${tagmodule}"/>
 	</target>
