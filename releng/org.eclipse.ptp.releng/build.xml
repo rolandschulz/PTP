@@ -41,7 +41,7 @@
 		<property name="archivePrefix" value="eclipse"/>
 		<property name="zipsdir" value="${buildDirectory}/${buildType}.${buildId}"/>
 		<property name="masterFile" value="ptp-master-${ptpBranchVersion}-${buildId}.zip"/>
-		<property name="masterFeature" value="org.eclipse.ptp.master_${branchVersion}.jar"/>
+		<property name="masterFeature" value="org.eclipse.ptp.master_${ptpBranchVersion}.${timestamp}.jar"/>
 		<property name="eclipseTest" value="org.eclipse.test_3.2.0"/>
 		<property name="mailto" value="g.watson@computer.org"/>
 		<property name="eclipseRoot" value=":pserver:anonymous@dev.eclipse.org:/cvsroot/eclipse"/>
