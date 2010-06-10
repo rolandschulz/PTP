@@ -59,26 +59,6 @@ cvs co -r $TAG -d org.eclipse.ptp_${TAG} org.eclipse.ptp/releng/org.eclipse.ptp.
 cd org.eclipse.ptp_${TAG}
 sh build.sh $*
 
-# Build RDT server packages
-#cd results/plugins
-
-# Check out rdt.core.remotejars, rdt.core.stubs, cdt.core, cdt.core.lrparser, cdt.core.lrparser.xlc for source
-#export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
-#cvs co -r $TAG -d org.eclipse.ptp.rdt.core.remotejars org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.remotejars
-#cvs co -r $TAG -d org.eclipse.ptp.rdt.core.stubs org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.core.stubs
-#cvs co -r $CDT_TAG -d org.eclipse.cdt.core org.eclipse.cdt/all/org.eclipse.cdt.core
-#cvs co -r $CDT_TAG -d org.eclipse.cdt.core.lrparser org.eclipse.cdt/lrparser/org.eclipse.cdt.core.lrparser
-#cvs co -r $CDT_TAG -d org.eclipse.cdt.core.lrparser.xlc org.eclipse.cdt/xlc/org.eclipse.cdt.core.lrparser.xlc
-#cvs co -r $CDT_TAG -d org.eclipse.cdt.core.parser.upc org.eclipse.cdt/upc/org.eclipse.cdt.core.parser.upc
-
-#cd org.eclipse.ptp.rdt.core.remotejars
-
-# run the script in remotejars
-#export PATH=/opt/public/common/ibm-java2-ppc-50/bin:$PATH
-#echo `java -version`
-#java -jar ../../../tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar \
-#	-ws gtk -arch ppc -os linux -application org.eclipse.ant.core.antRunner
-
 } >$BUILD_LOG 2>&1
 
 if grep -q 'BUILD FAILED' $BUILD_LOG; then
