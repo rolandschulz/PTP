@@ -82,7 +82,6 @@
 			<property name="builder" value="${basedir}/master" />
 		</ant>
 		<concat destfile="${zipsdir}/compilelog.txt">
-			<fileset dir="${buildDirectory}/plugins" includes="**/*.bin.log"/>
 			<fileset dir="${buildDirectory}/plugins" includes="**/*@dot.log"/>
 		</concat>
 		<loadfile property="compileLog" srcFile="${zipsdir}/compilelog.txt"/>
