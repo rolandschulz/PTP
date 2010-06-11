@@ -28,9 +28,9 @@
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="S-3.6RC4-201006031500"/>
-	<property name="platformBaseName" value="eclipse-platform-3.6RC4"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-3.6RC4.zip"/>
+	<property name="platformVersion" value="I20100608-0911"/>
+	<property name="platformBaseName" value="eclipse-platform-I20100608-0911"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-I20100608-0911.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.2.1.v20100412.jar"/>
 	
 	<property name="coreRuntimeVersion" value="3.6.0.v20100505"/>
