@@ -76,7 +76,7 @@ public class RemoteServerManager {
 						Object exec = ce.createExecutableExtension(ATTR_CLASS);
 						if (exec instanceof AbstractRemoteServerRunner) {
 							server = (AbstractRemoteServerRunner) exec;
-							server.setBundleId(ce.getDeclaringExtension().getNamespaceIdentifier());
+							server.setBundleId(ce.getContributor().getName());
 							server.setLaunchCommand(ce.getAttribute(ATTR_LAUNCH_COMMAND));
 							server.setPayload(ce.getAttribute(ATTR_PAYLOAD));
 							return server;
