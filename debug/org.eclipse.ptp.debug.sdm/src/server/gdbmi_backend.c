@@ -518,7 +518,7 @@ AsyncStop(void *data)
 		} else {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_SIGNAL;
-			e->dbg_event_u.suspend_event.ev_u.sig = MISignalInfoNew();
+			e->dbg_event_u.suspend_event.ev_u.sig = NewSignalInfo();
 			e->dbg_event_u.suspend_event.ev_u.sig->name = strdup(evt->sigName);
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
@@ -531,7 +531,7 @@ AsyncStop(void *data)
 	case MIEventTypeInferiorSignalExit:
 		e = NewDbgEvent(DBGEV_EXIT);
 		e->dbg_event_u.exit_event.reason = DBGEV_EXIT_SIGNAL;
-		e->dbg_event_u.exit_event.ev_u.sig = MISignalInfoNew();
+		e->dbg_event_u.exit_event.ev_u.sig = NewSignalInfo();
 		e->dbg_event_u.exit_event.ev_u.sig->name = strdup(evt->sigName);
 		e->dbg_event_u.exit_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 		//RemoveAllMaps();
@@ -1684,6 +1684,7 @@ GDBCLIListSignals(char* name)
 	MIList *		signals;
 	MISignalInfo *	sig;
 	dbg_event *		e;
+	signal_info *	s;
 
 	CHECK_SESSION();
 
@@ -1700,7 +1701,7 @@ GDBCLIListSignals(char* name)
 	e = NewDbgEvent(DBGEV_SIGNALS);
 	e->dbg_event_u.list = NewList();
 	for (MIListSet(signals); ((sig = (MISignalInfo *)MIListGet(signals)) != NULL); ) {
-		signal_info *s = NewSignalInfo();
+		s = NewSignalInfo();
 		s->name = strdup(sig->name);
 		s->pass = sig->pass;
 		s->print = sig->print;
