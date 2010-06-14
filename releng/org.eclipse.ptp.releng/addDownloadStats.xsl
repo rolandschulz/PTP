@@ -41,7 +41,7 @@ Gregoire Dupe
  	<xsl:template name="artifact_properties">
  		<properties size='{@size+1}'>
 			<xsl:copy-of select="property" />
-			<property name='download.stats' value='{../@id}.{substring(../@version, 1, string-length(../@version)-15)}' />
+			<property name='download.stats' value='{../@id}_{substring(../@version, 1, string-length(../@version)-15)}' />
 		</properties>
 	</xsl:template>
 
