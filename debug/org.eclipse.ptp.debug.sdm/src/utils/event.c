@@ -51,7 +51,7 @@ dbg_add_breakpoint(proxy_msg *m, breakpoint *bp)
 }
 
 static void
-dbg_add_signalinfo(proxy_msg *m, MISignalInfo *sig)
+dbg_add_signalinfo(proxy_msg *m, signal_info *sig)
 {
 	if (sig == NULL) {
 		proxy_msg_add_string(m, EMPTY);
@@ -104,11 +104,11 @@ dbg_add_stackframes(proxy_msg *m, List *lst)
 static void
 dbg_add_signals(proxy_msg *m, List *lst)
 {
-	MISignalInfo *	s;
+	signal_info *	s;
 
 	proxy_msg_add_int(m, SizeOfList(lst));
 
-	for (SetList(lst); (s = (MISignalInfo *)GetListElement(lst)) != NULL; ) {
+	for (SetList(lst); (s = (signal_info *)GetListElement(lst)) != NULL; ) {
 		dbg_add_signalinfo(m, s);
 	}
 }
@@ -404,9 +404,9 @@ dbg_str_to_stackframe(char ***args, int *nargs, stackframe **frame)
 }
 
 static int
-dbg_str_to_signalinfo(char ***args, int *nargs, MISignalInfo **sig)
+dbg_str_to_signalinfo(char ***args, int *nargs, signal_info **sig)
 {
-	MISignalInfo *s;
+	signal_info *s;
 
 	if (strcmp(*(*args), EMPTY) == 0) {
 		(*args)++;
@@ -415,14 +415,14 @@ dbg_str_to_signalinfo(char ***args, int *nargs, MISignalInfo **sig)
 		return 0;
 	}
 
-	s = MISignalInfoNew();
+	s = NewSignalInfo();
 
 	if (dbg_copy_str(args, nargs, &s->name) < 0 ||
 		dbg_str_to_int(args, nargs, &s->stop) < 0 ||
 		dbg_str_to_int(args, nargs, &s->print) < 0 ||
 		dbg_str_to_int(args, nargs, &s->pass) < 0 ||
 		dbg_copy_str(args, nargs, &s->desc) < 0) {
-			MISignalInfoFree(s);
+			FreeSignalInfo(s);
 			return -1;
 	}
 
@@ -460,7 +460,7 @@ dbg_str_to_signals(char ***args, int *nargs, List **lst)
 {
 	int				i;
 	int				count;
-	MISignalInfo *	sig;
+	signal_info *	sig;
 
 	if (dbg_str_to_int(args, nargs, &count) < 0) {
 	}
@@ -784,7 +784,7 @@ FreeDbgEvent(dbg_event *e) {
 		switch (e->dbg_event_u.suspend_event.reason) {
 		case DBGEV_SUSPEND_SIGNAL:
 			if (e->dbg_event_u.suspend_event.ev_u.sig != NULL) {
-				MISignalInfoFree(e->dbg_event_u.suspend_event.ev_u.sig);
+				FreeSignalInfo(e->dbg_event_u.suspend_event.ev_u.sig);
 			}
 			break;
 		case DBGEV_SUSPEND_INT:
@@ -807,7 +807,7 @@ FreeDbgEvent(dbg_event *e) {
 		switch (e->dbg_event_u.suspend_event.reason) {
 			case DBGEV_EXIT_SIGNAL:
 				if (e->dbg_event_u.suspend_event.ev_u.sig != NULL) {
-					MISignalInfoFree(e->dbg_event_u.suspend_event.ev_u.sig);
+					FreeSignalInfo(e->dbg_event_u.suspend_event.ev_u.sig);
 				}
 				break;
 			case DBGEV_EXIT_NORMAL:
@@ -866,7 +866,7 @@ FreeDbgEvent(dbg_event *e) {
 
 	case DBGEV_SIGNALS:
 		if (e->dbg_event_u.list != NULL) {
-			DestroyList(e->dbg_event_u.list, MISignalInfoFree);
+			DestroyList(e->dbg_event_u.list, FreeSignalInfo);
 		}
 		break;
 

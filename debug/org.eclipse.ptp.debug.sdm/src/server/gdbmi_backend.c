@@ -38,6 +38,7 @@
 #include "dbg.h"
 #include "dbg_event.h"
 #include "backend.h"
+#include "signal_info.h"
 #include "list.h"
 
 #include "MI.h"
@@ -1699,7 +1700,12 @@ GDBCLIListSignals(char* name)
 	e = NewDbgEvent(DBGEV_SIGNALS);
 	e->dbg_event_u.list = NewList();
 	for (MIListSet(signals); ((sig = (MISignalInfo *)MIListGet(signals)) != NULL); ) {
-		AddToList(e->dbg_event_u.list, sig);
+		signal_info *s = NewSignalInfo();
+		s->name = strdup(sig->name);
+		s->pass = sig->pass;
+		s->print = sig->print;
+		s->desc = strdup(sig->desc);
+		AddToList(e->dbg_event_u.list, s);
 	}
 	SaveEvent(e);
 	MIListFree(signals, MISignalInfoFree);

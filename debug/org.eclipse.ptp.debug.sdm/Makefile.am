@@ -43,7 +43,8 @@ noinst_HEADERS =			include/backend.h \
 							include/routing_table.h \
 							include/sdm.h \
 							include/session.h \
-							include/stackframe.h
+							include/stackframe.h \
+							include/signal_info.h
 
 noinst_LIBRARIES =			libsdm.a libdbgclnt.a libdbgutils.a
 
@@ -53,6 +54,7 @@ libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/breakpoint.c \
 							src/utils/stackframe.c \
+							src/utils/signal_info.c \
 							src/utils/event.c \
 							src/utils/itimer.c \
 							src/utils/memoryinfo.c \

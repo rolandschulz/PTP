@@ -65,6 +65,7 @@ libdbgutils_a_LIBADD =
 am_libdbgutils_a_OBJECTS = src/utils/libdbgutils_a-error.$(OBJEXT) \
 	src/utils/libdbgutils_a-breakpoint.$(OBJEXT) \
 	src/utils/libdbgutils_a-stackframe.$(OBJEXT) \
+	src/utils/libdbgutils_a-signal_info.$(OBJEXT) \
 	src/utils/libdbgutils_a-event.$(OBJEXT) \
 	src/utils/libdbgutils_a-itimer.$(OBJEXT) \
 	src/utils/libdbgutils_a-memoryinfo.$(OBJEXT) \
@@ -268,7 +269,8 @@ noinst_HEADERS = include/backend.h \
 							include/routing_table.h \
 							include/sdm.h \
 							include/session.h \
-							include/stackframe.h
+							include/stackframe.h \
+							include/signal_info.h
 
 noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
@@ -276,6 +278,7 @@ libdbgclnt_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES = src/utils/error.c \
 							src/utils/breakpoint.c \
 							src/utils/stackframe.c \
+							src/utils/signal_info.c \
 							src/utils/event.c \
 							src/utils/itimer.c \
 							src/utils/memoryinfo.c \
@@ -364,6 +367,8 @@ src/utils/libdbgutils_a-error.$(OBJEXT): src/utils/$(am__dirstamp) \
 src/utils/libdbgutils_a-breakpoint.$(OBJEXT):  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libdbgutils_a-stackframe.$(OBJEXT):  \
+	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libdbgutils_a-signal_info.$(OBJEXT):  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libdbgutils_a-event.$(OBJEXT): src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -495,6 +500,7 @@ mostlyclean-compile:
 	-rm -f src/utils/libdbgutils_a-event.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-itimer.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-memoryinfo.$(OBJEXT)
+	-rm -f src/utils/libdbgutils_a-signal_info.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-stackframe.$(OBJEXT)
 
 distclean-compile:
@@ -523,6 +529,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-itimer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-memoryinfo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-stackframe.Po@am__quote@
 
 .c.o:
@@ -596,6 +603,20 @@ src/utils/libdbgutils_a-stackframe.obj: src/utils/stackframe.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/stackframe.c' object='src/utils/libdbgutils_a-stackframe.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-stackframe.obj `if test -f 'src/utils/stackframe.c'; then $(CYGPATH_W) 'src/utils/stackframe.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/stackframe.c'; fi`
+
+src/utils/libdbgutils_a-signal_info.o: src/utils/signal_info.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-signal_info.o -MD -MP -MF src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Tpo -c -o src/utils/libdbgutils_a-signal_info.o `test -f 'src/utils/signal_info.c' || echo '$(srcdir)/'`src/utils/signal_info.c
+@am__fastdepCC_TRUE@	mv -f src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Tpo src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/signal_info.c' object='src/utils/libdbgutils_a-signal_info.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-signal_info.o `test -f 'src/utils/signal_info.c' || echo '$(srcdir)/'`src/utils/signal_info.c
+
+src/utils/libdbgutils_a-signal_info.obj: src/utils/signal_info.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-signal_info.obj -MD -MP -MF src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Tpo -c -o src/utils/libdbgutils_a-signal_info.obj `if test -f 'src/utils/signal_info.c'; then $(CYGPATH_W) 'src/utils/signal_info.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/signal_info.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Tpo src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/signal_info.c' object='src/utils/libdbgutils_a-signal_info.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-signal_info.obj `if test -f 'src/utils/signal_info.c'; then $(CYGPATH_W) 'src/utils/signal_info.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/signal_info.c'; fi`
 
 src/utils/libdbgutils_a-event.o: src/utils/event.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-event.o -MD -MP -MF src/utils/$(DEPDIR)/libdbgutils_a-event.Tpo -c -o src/utils/libdbgutils_a-event.o `test -f 'src/utils/event.c' || echo '$(srcdir)/'`src/utils/event.c
