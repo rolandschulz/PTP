@@ -438,7 +438,7 @@
 		</copy>
 		
 		<touch file="${remoteServerTempDir}/rdtserver_version.dat"/>
-		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${ptpVersion}-${timestamp}</concat>
+		<concat destfile="${remoteServerTempDir}/rdtserver_version.dat">${serverVersion}-${timestamp}</concat>
 	</target>
 	
 	<target name="tar.remote" depends="prepare.remote.tar, assemble.remote">
