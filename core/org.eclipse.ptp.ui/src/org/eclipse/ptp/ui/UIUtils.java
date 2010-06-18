@@ -179,4 +179,20 @@ public class UIUtils {
 			});
 		}
 	}
+    public static void safeRunSyncInUIThread(final ISafeRunnable safeRunnable) {
+		if (PTPUIPlugin.getDisplay().isDisposed()) {
+			try {
+				safeRunnable.run();
+			} catch (Exception e) {
+				PTPCorePlugin.log(e);
+			}
+		}
+		else {
+			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					SafeRunnable.run(safeRunnable);
+				}
+			});
+		}
+	}
 }

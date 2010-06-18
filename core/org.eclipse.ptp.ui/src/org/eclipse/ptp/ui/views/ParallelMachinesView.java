@@ -127,7 +127,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		public void handleEvent(final INewNodeEvent e) {
 			final boolean isCurrent = e.getSource().equals(getCurrentMachine());
 
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() {
 					for (IPNode node : e.getNodes()) {
 						if (isCurrent) {
@@ -155,7 +155,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		public void handleEvent(final IRemoveNodeEvent e) {
 			final boolean isCurrent = e.getSource().equals(getCurrentMachine());
 
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() {
 					for (IPNode node : e.getNodes()) {
 						if (isCurrent) {
@@ -221,7 +221,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			 */
 			if (e.getSource() instanceof IPNode) {
 				if ((IPNode) e.getSource() == getRegisteredNode()) {	
-					UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+					UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 						public void run() {
 							processTableViewer.refresh();
 						}
@@ -240,7 +240,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			 */
 			if (e.getSource() instanceof IPNode) {
 				if ((IPNode) e.getSource() == getRegisteredNode()) {	
-					UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+					UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 						public void run() {
 							processTableViewer.refresh();
 						}
@@ -258,7 +258,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			 * Update node icons when a process is removed from a node. 
 			 */
 			if (e.getSource() instanceof IPNode) {
-				UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 					public void run() {
 						IPNode node = (IPNode)e.getSource();
 						if (node == getRegisteredNode()) {
@@ -276,7 +276,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() {
 					if (!elementViewComposite.isDisposed()) {
 						machineTableViewer.refresh(true);
@@ -323,7 +323,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			/*
 			 * Update views when a machine is removed.
 			 */
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				public void run() {
 					for (IPMachine machine : e.getMachines()) {
 						/*
@@ -410,7 +410,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	}
 	
 	public void changeMachineRefresh(final IPMachine machine) {
-		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+		UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 			public void run() {
 				if (!elementViewComposite.isDisposed()) {
 					changeMachine(machine);

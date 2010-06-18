@@ -182,7 +182,7 @@ public class SLURMResourceManager extends AbstractRuntimeResourceManager {
  		/*
  		 * see showErrorDialog(title, msg, status) in UIUtils.java;
  		 */
- 		Display.getDefault().asyncExec(new Runnable() {
+ 		Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final Shell shell = Display.getDefault().getActiveShell();
                 MessageDialog.openError(shell, title, msg);
