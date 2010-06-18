@@ -190,7 +190,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				final IProject project = verifyProject(configuration);
 				final IPath execPath = verifyExecutablePath(configuration);
 
-				Display.getDefault().asyncExec(new Runnable() {
+				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						IRunnableWithProgress runnable = new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -235,7 +235,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				 * Completion of launch fails, then terminate the job and
 				 * display error message.
 				 */
-				Display.getDefault().asyncExec(new Runnable() {
+				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
 						PTPLaunchPlugin.log(e);

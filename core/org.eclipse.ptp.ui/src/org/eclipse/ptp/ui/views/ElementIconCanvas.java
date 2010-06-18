@@ -79,7 +79,7 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 	public void setElementSet(IElementSet e_set) {
 		this.cur_element_set = e_set;
 		this.selection = null;
-		getDisplay().asyncExec(new Runnable() {
+		getDisplay().syncExec(new Runnable() {
 			public void run() {
 				setTotal(cur_element_set == null ? 0 : cur_element_set.size());
 			}
@@ -167,7 +167,7 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 		setSelection(new StructuredSelection(getSelectedElements()));
 	}
 	public void updateToolTipText(Object obj, final String content) {
-		getDisplay().asyncExec(new Runnable() {
+		getDisplay().syncExec(new Runnable() {
 			public void run() {
 				if (fInformationControl != null) {
 					fInformationControl.setInformation(content);
