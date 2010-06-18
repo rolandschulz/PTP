@@ -20,10 +20,6 @@
 #ifndef _BPMAP_H_
 #define _BPMAP_H_
 
-#include <list.h>
-
-#include "bpmap.h"
-
 extern void		AddBPMap(int local, int remote, int temp);
 extern void		ClearBPMaps(void);
 extern int		IsTempBP(int id);
