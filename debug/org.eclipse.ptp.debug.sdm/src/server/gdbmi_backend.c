@@ -33,49 +33,18 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <aif.h>
-
+#include "gdb.h"
 #include "dbg.h"
 #include "dbg_event.h"
 #include "backend.h"
 #include "signal_info.h"
-#include "list.h"
+#include "bpmap.h"
 
-#include "MI.h"
-
-struct bpentry {
-	int local;
-	int remote;
-	int temp;
-};
-typedef struct bpentry	bpentry;
-
-struct bpmap {
-	int				nels; // number of elements currently in map
-	int				size; // total size of map
-	struct bpentry *	maps;
-};
-
-struct varinfo {
-	char * name; //variable name
-	MIVar *mivar;
-};
-typedef struct varinfo	varinfo;
-
-struct varmap {
-	int nels; // number of elements currently in map
-	int size; // total size of map
-	struct varinfo * maps;
-};
-
-static double		GDB_Version;
-static int			ADDRESS_LENGTH = 0;
 static MISession *	DebugSession;
 static List *		EventList;
 static void			(*EventCallback)(dbg_event *);
 static int			ServerExit;
 static int			Started;
-static struct bpmap	BPMap = { 0, 0, NULL };
 static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
@@ -112,14 +81,7 @@ static int	GDBMIQuit(void);
 static int	GDBEvaluatePartialExpression(char *, char *, int, int);
 static int	GDBMIVarDelete(char*);
 
-static void 	SendCommandWait(MISession *, MICommand *);
-static int		SetAndCheckBreak(int, int, int, char *, char *, int, int);
-static int		GetStackframes(int, int, int, List **);
-static int		GetAIFVar(char *, AIF **, char **);
-static MIVar *	GetMIVarDetails(char *, MIVar *, int);
-static AIF * 	GetAIF(MIVar *, int);
-static AIF * 	GetPartialAIF(char *, MIVar *);
-static void 	RemoveAllMaps();
+static int		SetAndCheckBreakpoint(int, int, int, char *, char *, int, int);
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -180,310 +142,36 @@ SaveEvent(dbg_event *e)
 	AddToList(EventList, (void *)e);
 }
 
-/*
- * Create a new MI variable and corresponding MIVar object using
- * the supplied expression 'expr'. Sets the 'exp' field to the
- * expression if it is not already set.
- * Returns NULL if the variable can't be created.
- */
-static MIVar*
-CreateMIVar(char *expr)
-{
-	MICommand *cmd;
-	MIVar *mivar;
-
-	cmd = MIVarCreate("-", "*", expr);
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		//DbgSetError(DBGERR_UNKNOWN_VARIABLE, GetLastErrorStr());
-		MICommandFree(cmd);
-		return NULL;
-	}
-	mivar = MIGetVarCreateInfo(cmd);
-	if (mivar->exp == NULL) {
-		mivar->exp = strdup(expr);
-	}
-	MICommandFree(cmd);
-	return mivar;
-}
-
-static void
-DeleteMIVar(char *mi_name)
-{
-	MICommand *cmd;
-	cmd = MIVarDelete(mi_name);
-	SendCommandWait(DebugSession, cmd);
-	MICommandFree(cmd);
-}
-
-static void
-AddBPMap(int local, int remote, int temp)
-{
-	int				i;
-	struct bpentry *	map;
-
-	if (BPMap.size == 0) {
-		BPMap.maps = (struct bpentry *)malloc(sizeof(struct bpentry) * 100);
-		BPMap.size = 100;
-
-		for (i = 0; i < BPMap.size; i++) {
-			map = &BPMap.maps[i];
-			map->remote = map->local = -1;
-			map->temp = 0;
-		}
-	}
-
-	if (BPMap.nels == BPMap.size) {
-		i = BPMap.size;
-		BPMap.size *= 2;
-		BPMap.maps = (struct bpentry *)realloc(BPMap.maps, sizeof(struct bpentry) * BPMap.size);
-
-		for (; i < BPMap.size; i++) {
-			map = &BPMap.maps[i];
-			map->remote = map->local = -1;
-			map->temp = 0;
-		}
-	}
-
-	for (i = 0; i < BPMap.size; i++) {
-		map = &BPMap.maps[i];
-		if (map->remote == -1) {
-			map->remote = remote;
-			map->local = local;
-			map->temp = temp;
-			BPMap.nels++;
-			break;
-		}
-	}
-}
-
-static void
-RemoveBPMap(bpentry *bp)
-{
-	int				i;
-	struct bpentry *	map;
-	for (i = 0; i < BPMap.size; i++) {
-		map = &BPMap.maps[i];
-		if (map == bp) {
-			map->remote = -1;
-			map->local = -1;
-			map->temp = 0;
-			BPMap.nels--;
-			break;
-		}
-	}
-}
-
-static bpentry *
-FindLocalBP(int local)
-{
-	int				i;
-	struct bpentry *	map;
-	for (i = 0; i < BPMap.size; i++) {
-		map = &BPMap.maps[i];
-		if (map->local == local) {
-			return map;
-		}
-	}
-	return NULL;
-}
-
-static bpentry *
-FindRemoteBP(int remote)
-{
-	int				i;
-	struct bpentry *	map;
-	for (i = 0; i < BPMap.size; i++) {
-		map = &BPMap.maps[i];
-		if (map->remote == remote) {
-			return map;
-		}
-	}
-	return NULL;
-}
-
-static void
-RemoveAllBPMap()
-{
-	int				i;
-	struct bpentry *	map;
-	int length = BPMap.size;
-	for (i = 0; i < length; i++) {
-		map = &BPMap.maps[i];
-		if (map == NULL)
-			return;
-
-		map->remote = -1;
-		map->local = -1;
-		map->temp = 0;
-		BPMap.nels--;
-	}
-}
-
-static stackframe *
-GetCurrentFrame()
-{
-	stackframe *f;
-	List *	frames;
-
-	if (GetStackframes(1, 0, 0, &frames) != DBGRES_OK)
-		return NULL;
-
-	if (EmptyList(frames)) {
-		DbgSetError(DBGERR_DEBUGGER, "Could not get current stack frame");
-		return NULL;
-	}
-
-	SetList(frames);
-	f = (stackframe *)GetListElement(frames);
-	DestroyList(frames, NULL);
-	return f;
-}
-
-static stackframe *
-ConvertMIFrameToStackframe(MIFrame *f)
-{
-	stackframe *	s;
-	if (f == NULL) {//by default return current frame
-		return GetCurrentFrame();
-	}
-	s = NewStackframe(f->level);
-	if ( f->addr != NULL )
-		s->loc.addr = strdup(f->addr);
-	if ( f->func != NULL )
-		s->loc.func = strdup(f->func);
-	if ( f->file != NULL )
-		s->loc.file = strdup(f->file);
-	s->loc.line = f->line;
-	return s;
-}
-
-static void
-RemoveAllMaps()
-{
-	RemoveAllBPMap();
-}
-
-static void
-SetDebugError(MICommand * cmd)
-{
-	if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-		char *err = MICommandResultErrorMessage(cmd);
-		if (err != NULL) {
-			DbgSetError(DBGERR_DEBUGGER, err);
-			free(err);
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");
-		}
-	} else {
-		DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-	}
-}
-static List *
-GetChangedVariables()
-{
-	MICommand *cmd;
-	MIList *changes;
-	List *changedVars;
-	MIVarChange *var;
-
-	cmd = MIVarUpdate("*");
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GetChangedVariables error\n");
-		SetDebugError(cmd);
-		MICommandFree(cmd);
-		return NULL;
-	}
-	MIGetVarUpdateInfo(cmd, &changes);
-	MICommandFree(cmd);
-
-	changedVars = NewList();
-	for (MIListSet(changes); (var = (MIVarChange *)MIListGet(changes)) != NULL;) {
-		if (var->in_scope == 1) {
-			AddToList(changedVars, (void *)strdup(var->name));
-		}
-		else {
-			DeleteMIVar(var->name);
-		}
-	}
-	MIListFree(changes, MIVarChangeFree);
-	return changedVars;
-}
-
-static int
-GetMIInfoDepth()
-{
-	MICommand *cmd;
-	int depth;
-
-	cmd = MIStackInfoDepth();
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GDBMIStackInfoDepth error\n");
-		SetDebugError(cmd);
-		MICommandFree(cmd);
-		return -1;
-	}
-	depth = MIGetStackInfoDepth(cmd);
-	MICommandFree(cmd);
-	return depth;
-}
-/**
- * not used
- *
-static void
-set_frame_with_line(stackframe *current_f, int depth)
-{
-	stackframe *f;
-	List * frames;
-
-	if (GetStackframes(0, 1, depth, &frames) != DBGRES_OK) {
-		return NULL;
-	}
-
-	for (SetList(frames); (f = (stackframe *)GetListElement(frames)) != NULL;) {
-		if (f->loc.line > 0) {
-			current_f->level = f->level;
-			current_f->loc.file = strdup(f->loc.file);
-			current_f->loc.func = strdup(f->loc.func);
-			current_f->loc.addr = strdup(f->loc.addr);
-			current_f->loc.line = f->loc.line;
-			break;
-		}
-	}
-	DestroyList(frames, FreeStackframe);
-}
-*/
-
 /**** aysnc stop ****/
 static int
 AsyncStop(void *data)
 {
-	dbg_event *	e;
+	dbg_event *		e;
 	stackframe *	frame;
-	bpentry * bpmap;
-	MIEvent *	evt = (MIEvent *)data;
+	MIEvent *		evt = (MIEvent *)data;
 
 	switch (evt->type)
 	{
 	case MIEventTypeBreakpointHit:
-		bpmap = FindLocalBP(evt->bkptno);
-		if (!bpmap->temp) {
+		if (!IsTempBP(evt->bkptno)) {
 			e = NewDbgEvent(DBGEV_SUSPEND);
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_BPHIT;
-			e->dbg_event_u.suspend_event.ev_u.bpid = bpmap->remote;
+			e->dbg_event_u.suspend_event.ev_u.bpid = GetRemoteBPID(evt->bkptno);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = NULL;
-			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth();
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth(DebugSession);
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables(DebugSession);
 			break;
 		}
 		/* else must be a temporary breakpoint drop through... */
-		RemoveBPMap(bpmap);
+		RemoveBPMap(evt->bkptno);
 
 	case MIEventTypeSuspended:
-		frame = ConvertMIFrameToStackframe(evt->frame);
+		if (evt->frame != NULL) {
+			frame = ConvertMIFrame(evt->frame);
+		} else {
+			frame = GetCurrentFrame(DebugSession);
+		}
 		if (frame == NULL) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -491,14 +179,18 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_INT;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth();
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth(DebugSession);
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables(DebugSession);
 		}
 		break;
 
 	case MIEventTypeFunctionFinished:
 	case MIEventTypeSteppingRange:
-		frame = ConvertMIFrameToStackframe(evt->frame);
+		if (evt->frame != NULL) {
+			frame = ConvertMIFrame(evt->frame);
+		} else {
+			frame = GetCurrentFrame(DebugSession);
+		}
 		if (frame == NULL) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -506,13 +198,17 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.reason = DBGEV_SUSPEND_STEP;
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth();
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth(DebugSession);
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables(DebugSession);
 		}
 		break;
 
 	case MIEventTypeSignal:
-		frame = ConvertMIFrameToStackframe(evt->frame);
+		if (evt->frame != NULL) {
+			frame = ConvertMIFrame(evt->frame);
+		} else {
+			frame = GetCurrentFrame(DebugSession);
+		}
 		if (frame == NULL) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -523,8 +219,8 @@ AsyncStop(void *data)
 			e->dbg_event_u.suspend_event.ev_u.sig->desc = strdup(evt->sigMeaning);
 			e->dbg_event_u.suspend_event.thread_id = evt->threadId;
 			e->dbg_event_u.suspend_event.frame = frame;
-			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth();
-			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables();
+			e->dbg_event_u.suspend_event.depth = GetMIInfoDepth(DebugSession);
+			e->dbg_event_u.suspend_event.changed_vars = GetChangedVariables(DebugSession);
 		}
 		break;
 
@@ -587,7 +283,6 @@ GDBMIInit(void (*event_callback)(dbg_event *))
 	EventCallback = event_callback;
 	DebugSession = NULL;
 	EventList = NewList();
-	GDB_Version = -1.0;
 	ServerExit = 0;
 
 	signal(SIGTERM, SIG_IGN);
@@ -595,22 +290,6 @@ GDBMIInit(void (*event_callback)(dbg_event *))
 	signal(SIGINT, SIG_IGN);
 
 	return DBGRES_OK;
-}
-
-/*
- * Send command and wait for a response.
- */
-static void
-SendCommandWait(MISession *sess, MICommand *cmd)
-{
-	MISessionSendCommand(sess, cmd);
-	do {
-		MISessionProgress(sess);
-		if (sess->out_fd == -1) {
-			DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- SendCommandWait sess->out_fd = -1\n");
-			break;
-		}
-	} while (!MISessionCommandCompleted(sess));
 }
 
 /*
@@ -694,16 +373,9 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 	MISessionRegisterEventCallback(sess, AsyncCallback);
 	MISessionRegisterTargetCallback(sess, StreamTargetCallback);
 
+	GetGDBVersion(sess);
+
 	DebugSession = sess;
-
-	cmd = MIGDBVersion();
-	SendCommandWait(sess, cmd);
-	if (MICommandResultOK(cmd)) {
-		GDB_Version = CLIGetGDBVersion(cmd);
-		DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "------------------- gdb version: %f\n", GDB_Version);
-	}
-	MICommandFree(cmd);
-
 	Started = 0;
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 
@@ -778,7 +450,7 @@ GDBMISetLineBreakpoint(int bpid, int isTemp, int isHard, char *file, int line, c
 	else
 		asprintf(&where, "%s:%d", file, line);
 
-	res = SetAndCheckBreak(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
+	res = SetAndCheckBreakpoint(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
 
 	free(where);
 
@@ -801,7 +473,7 @@ GDBMISetFuncBreakpoint(int bpid, int isTemp, int isHard, char *file, char *func,
 	else
 		asprintf(&where, "%s:%s", file, func);
 
-	res = SetAndCheckBreak(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
+	res = SetAndCheckBreakpoint(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
 
 	free(where);
 
@@ -809,18 +481,17 @@ GDBMISetFuncBreakpoint(int bpid, int isTemp, int isHard, char *file, char *func,
 }
 
 /*
-** Check that breakpoint command has succeded and
-** extract appropriate information. Returns breakpoint
-** id in bid. Adds to breakpoint list if necessary.
+** Check that breakpoint command has succeeded and
+** extract appropriate information. Returns breakpoint id.
+** Adds to breakpoint list if necessary.
 */
 static int
-SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition, int ignoreCount, int tid)
+SetAndCheckBreakpoint(int bpid, int isTemp, int isHard, char *where, char *condition, int ignoreCount, int tid)
 {
 	dbg_event *		e;
 	MIBreakpoint *	bpt;
 	MICommand *		cmd;
 	MIList *		bpts;
-	breakpoint *	bp;
 
 	if (condition != NULL && strlen(condition) == 0)
 		condition = NULL;
@@ -838,7 +509,6 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 
 	if (bpts == NULL) {
 		DbgSetError(DBGERR_NOFILE, where);
-		//DbgSetError(DBGERR_NOFILE, "error getting breakpoint information");
 		return DBGRES_ERR;
 	}
 
@@ -847,30 +517,18 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 
 	AddBPMap(bpt->number, bpid, isTemp);
 
-	//if the type is temporary, no need to send bpt set event
+	/*
+	 * if the type is temporary, no need to send DBGEV_BPSET event
+	 */
 	if (isTemp) {
 		SaveEvent(NewDbgEvent(DBGEV_OK));
 		MIListFree(bpts, MIBreakpointFree);
 		return DBGRES_OK;
 	}
 
-	bp = NewBreakpoint(bpt->number);
-
-	bp->ignore = bpt->ignore;
-	bp->type = strdup(bpt->type);
-	bp->hits = bpt->times;
-
-	if ( bpt->file != NULL )
-		bp->loc.file = strdup(bpt->file);
-	if ( bpt->func != NULL )
-		bp->loc.func = strdup(bpt->func);
-	if ( bpt->address != NULL )
-		bp->loc.addr = strdup(bpt->address);
-	bp->loc.line = bpt->line;
-
 	e = NewDbgEvent(DBGEV_BPSET);
 	e->dbg_event_u.bpset_event.bpid = bpid;
-	e->dbg_event_u.bpset_event.bp = bp;
+	e->dbg_event_u.bpset_event.bp = ConvertMIBreakpoint(bpt);
 	SaveEvent(e);
 
 	MIListFree(bpts, MIBreakpointFree);
@@ -883,20 +541,20 @@ SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition,
 static int
 GDBMIDeleteBreakpoint(int bpid)
 {
-	bpentry *	bp;
+	int			bpid_local;
 	char *		bpstr;
 	MICommand *	cmd;
 
 	CHECK_SESSION();
 
-	if ((bp = FindRemoteBP(bpid)) == NULL) {
+	if ((bpid_local = GetLocalBPID(bpid)) < 0) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 
-	cmd = MIBreakDelete(1, &bp->local);
+	cmd = MIBreakDelete(1, &bpid_local);
 	SendCommandWait(DebugSession, cmd);
 
 	if (!MICommandResultOK(cmd)) {
@@ -905,7 +563,7 @@ GDBMIDeleteBreakpoint(int bpid)
 		return DBGRES_ERR;
 	}
 
-	RemoveBPMap(bp);
+	RemoveBPMap(bpid_local);
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 
 	return DBGRES_OK;
@@ -917,20 +575,20 @@ GDBMIDeleteBreakpoint(int bpid)
 static int
 GDBMIEnableBreakpoint(int bpid)
 {
-	bpentry *	bp;
+	int			bpid_local;
 	char *		bpstr;
 	MICommand *	cmd;
 
 	CHECK_SESSION();
 
-	if ((bp = FindRemoteBP(bpid)) == NULL) {
+	if ((bpid_local = GetLocalBPID(bpid)) < 0) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 
-	cmd = MIBreakEnable(1, &bp->local);
+	cmd = MIBreakEnable(1, &bpid_local);
 	SendCommandWait(DebugSession, cmd);
 
 	if (!MICommandResultOK(cmd)) {
@@ -948,20 +606,20 @@ GDBMIEnableBreakpoint(int bpid)
 static int
 GDBMIDisableBreakpoint(int bpid)
 {
-	bpentry *	bp;
+	int			bpid_local;
 	char *		bpstr;
 	MICommand *	cmd;
 
 	CHECK_SESSION();
 
-	if ((bp = FindRemoteBP(bpid)) == NULL) {
+	if ((bpid_local = GetLocalBPID(bpid)) < 0) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 
-	cmd = MIBreakDisable(1, &bp->local);
+	cmd = MIBreakDisable(1, &bpid_local);
 	SendCommandWait(DebugSession, cmd);
 
 	if (!MICommandResultOK(cmd)) {
@@ -979,20 +637,20 @@ GDBMIDisableBreakpoint(int bpid)
 static int
 GDBMIConditionBreakpoint(int bpid, char *expr)
 {
-	bpentry *	bp;
+	int			bpid_local;
 	char *		bpstr;
 	MICommand *	cmd;
 
 	CHECK_SESSION();
 
-	if ((bp = FindRemoteBP(bpid)) == NULL) {
+	if ((bpid_local = GetLocalBPID(bpid)) < 0) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 
-	cmd = MIBreakCondition(1, &bp->local, expr);
+	cmd = MIBreakCondition(1, &bpid_local, expr);
 	SendCommandWait(DebugSession, cmd);
 
 	if (!MICommandResultOK(cmd)) {
@@ -1010,20 +668,20 @@ GDBMIConditionBreakpoint(int bpid, char *expr)
 static int
 GDBMIBreakpointAfter(int bpid, int icount)
 {
-	bpentry *	bp;
+	int			bpid_local;
 	char *		bpstr;
 	MICommand *	cmd;
 
 	CHECK_SESSION();
 
-	if ((bp = FindRemoteBP(bpid)) == NULL) {
+	if ((bpid_local = GetLocalBPID(bpid)) < 0) {
 		asprintf(&bpstr, "%d", bpid);
 		DbgSetError(DBGERR_NOBP, bpstr);
 		free(bpstr);
 		return DBGRES_ERR;
 	}
 
-	cmd = MIBreakAfter(1, &bp->local, icount);
+	cmd = MIBreakAfter(1, &bpid_local, icount);
 	SendCommandWait(DebugSession, cmd);
 
 	if (!MICommandResultOK(cmd)) {
@@ -1267,59 +925,6 @@ GDBMISetCurrentStackframe(int level)
 	return DBGRES_OK;
 }
 
-static int
-GetStackframes(int current, int low, int high, List **flist)
-{
-	MIList *		frames;
-	MIFrame *		f;
-	MICommand *		cmd;
-	stackframe *	s;
-
-	//checking gdb version
-	if (current) {
-		if (GDB_Version > 6.3) {
-			cmd = MIStackInfoFrame();
-		} else {
-			cmd = CLIFrame();
-		}
-	} else {
-		if (low == 0 && high == 0) {
-			cmd = MIStackListAllFrames();
-		} else {
-			cmd = MIStackListFrames(low, high);
-		}
-	}
-	SendCommandWait(DebugSession, cmd);
-
-	if (!MICommandResultOK(cmd)) {
-		DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- GetStackframes error\n");
-		SetDebugError(cmd);
-		MICommandFree(cmd);
-		return DBGRES_ERR;
-	}
-
-	if (current)
-		frames = MIGetFrameInfo(cmd);
-	else
-		frames = MIGetStackListFramesInfo(cmd);
-
-	MICommandFree(cmd);
-
-	if ( frames == NULL )
-	{
-		DbgSetError(DBGERR_DEBUGGER, "Failed to get stack frames from backend");
-		return DBGRES_ERR;
-	}
-
-	*flist = NewList();
-	for (MIListSet(frames); (f = (MIFrame *)MIListGet(frames)) != NULL; ) {
-		s = ConvertMIFrameToStackframe(f);
-		AddToList(*flist, (void *)s);
-	}
-	MIListFree(frames, MIFrameFree);
-	return DBGRES_OK;
-}
-
 /*
 ** List current or all stack frames.
 */
@@ -1331,7 +936,7 @@ GDBMIListStackframes(int low, int high)
 
 	CHECK_SESSION();
 
-	if (GetStackframes(0, low, high, &frames) != DBGRES_OK)
+	if (GetStackframes(DebugSession, 0, low, high, &frames) != DBGRES_OK)
 		return DBGRES_ERR;
 
 	e = NewDbgEvent(DBGEV_FRAMES);
@@ -1383,44 +988,6 @@ GDBMIGetLocalVariables(void)
 }
 
 /*
- * This is needed to check for a bug in the Linux x86 GCC 4.1 compiler
- * that causes gdb 6.4 and 6.5 to crash under certain conditions.
- */
-#define GDB_BUG_2188	__gnu_linux__ && __i386__ && __GNUC__ == 4 && __GNUC_MINOR__ == 1
-
-#if GDB_BUG_2188
-static int
-CurrentFrame(int level, char *name)
-{
-	MICommand *	cmd;
-	MIFrame *	frame;
-	List *		frames;
-	int val = 0;
-
-	if (GDB_Version > 6.3 && GDB_Version < 6.7) {
-		cmd = MIStackListFrames(level, level);
-		SendCommandWait(DebugSession, cmd);
-		if (!MICommandResultOK(cmd)) {
-			MICommandFree(cmd);
-			return val;
-		}
-		frames = MIGetStackListFramesInfo(cmd);
-
-		//only one frame
-		SetList(frames);
-		if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
-			if (frame->func != NULL && strncmp(frame->func, name, 4) == 0) {
-				val = 1;
-			}
-		}
-		DestroyList(frames, MIFrameFree);
-	}
-
-	return val;
-}
-#endif /* GDB_BUG_2188 */
-
-/*
 ** List arguments.
 */
 static int
@@ -1459,7 +1026,7 @@ GDBMIListArguments(int low, int high)
 	MIListSet(frames);
 	if ((frame = (MIFrame *)MIListGet(frames)) != NULL) {
 #if GDB_BUG_2188
-		if (!CurrentFrame(frame->level, "main")) {
+		if (!CurrentFrame(DebugSession, frame->level, "main")) {
 #endif /* GDB_BUG_2188 */
 			for (MIListSet(frame->args); (arg = (MIArg *)MIListGet(frame->args)) != NULL; ) {
 				AddToList(e->dbg_event_u.list, (void *)strdup(arg->name));
@@ -1499,7 +1066,7 @@ GDBMIQuit(void)
 		SendCommandWait(DebugSession, cmd);
 		MICommandFree(cmd);
 	}
-	RemoveAllMaps();
+	ClearBPMaps();
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	ServerExit++;
 
@@ -1544,11 +1111,10 @@ GDBMIGetInfoThread(void)
 static int
 GDBMISetThreadSelect(int threadNum)
 {
-	MICommand *	cmd;
-	dbg_event *	e;
-	MIThreadSelectInfo * info;
-	//MIFrame *f;
-	stackframe *s = NULL;
+	MICommand *				cmd;
+	dbg_event *				e;
+	MIThreadSelectInfo *	info;
+	stackframe *			s = NULL;
 
 	CHECK_SESSION();
 
@@ -1563,7 +1129,7 @@ GDBMISetThreadSelect(int threadNum)
 	MICommandFree(cmd);
 
 	if (info->frame != NULL) {
-		s = ConvertMIFrameToStackframe(info->frame);
+		s = ConvertMIFrame(info->frame);
 	}
 	e = NewDbgEvent(DBGEV_THREAD_SELECT);
 	e->dbg_event_u.thread_select_event.thread_id = info->current_thread_id;
@@ -1584,7 +1150,7 @@ GDBMIStackInfoDepth()
 
 	CHECK_SESSION();
 
-	if ((depth = GetMIInfoDepth()) == -1) {
+	if ((depth = GetMIInfoDepth(DebugSession)) == -1) {
 		return DBGRES_ERR;
 	}
 	e = NewDbgEvent(DBGEV_STACK_DEPTH);
@@ -1714,27 +1280,6 @@ GDBCLIListSignals(char* name)
 	return DBGRES_OK;
 }
 
-#if 0
-static int
-GDBCLISignalInfo(char* arg)
-{
-	MICommand *	cmd;
-
-	CHECK_SESSION();
-
-	cmd = CLISignalInfo(arg);
-	MICommandRegisterCallback(cmd, ProcessCLIResultRecord, DebugSession);
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		SetDebugError(cmd);
-		MICommandFree(cmd);
-		return DBGRES_ERR;
-	}
-	MICommandFree(cmd);
-	return DBGRES_OK;
-}
-#endif
-
 static int
 GDBCLIHandle(char *arg)
 {
@@ -1764,7 +1309,7 @@ GDBMIEvaluateExpression(char *exp)
 	AIF *		a;
 	dbg_event *	e;
 
-	if (GetAIFVar(exp, &a, &type) != DBGRES_OK)
+	if (GetAIFVar(DebugSession, exp, &a, &type) != DBGRES_OK)
 		return DBGRES_ERR;
 
 	e = NewDbgEvent(DBGEV_DATA);
@@ -1775,6 +1320,7 @@ GDBMIEvaluateExpression(char *exp)
 
 	return DBGRES_OK;
 }
+
 /*
 ** Find native type of variable.
 */
@@ -1787,7 +1333,7 @@ GDBMIGetNativeType(char *var)
 
 	CHECK_SESSION();
 
-	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
+	if (GetAIFVar(DebugSession, var, &a, &type) != DBGRES_OK)
 		return DBGRES_ERR;
 
 	e = NewDbgEvent(DBGEV_TYPE);
@@ -1796,1174 +1342,6 @@ GDBMIGetNativeType(char *var)
 	SaveEvent(e);
 	AIFFree(a);
 	return DBGRES_OK;
-}
-
-static int
-GetAIFVar(char *var, AIF **val, char **type)
-{
-	AIF * res;
-	MIVar *mivar;
-
-	mivar = CreateMIVar(var);
-	if (mivar == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_VARIABLE, var);
-		return DBGRES_ERR;
-	}
-
-	if ((res = GetAIF(mivar, 0)) == NULL) {
-		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
-		DeleteMIVar(mivar->name);
-		MIVarFree(mivar);
-		return DBGRES_ERR;
-	}
-	*type = strdup(mivar->type);
-	*val = res;
-
-	DeleteMIVar(mivar->name);
-	MIVarFree(mivar);
-
-	return DBGRES_OK;
-}
-
-static char *
-GetVarValue(char *var)
-{
-	char *		res;
-	MICommand *	cmd = MIVarEvaluateExpression(var);
-
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		SetDebugError(cmd);
-		MICommandFree(cmd);
-		return "";
-	}
-	res = MIGetVarEvaluateExpressionInfo(cmd);
-	MICommandFree(cmd);
-	return res;
-}
-
-static int
-GetAddressLength()
-{
-	if (ADDRESS_LENGTH != 0) {
-		return ADDRESS_LENGTH;
-	}
-	char * res;
-	MICommand * cmd = MIDataEvaluateExpression("\"sizeof(char *)\"");
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		SetDebugError(cmd);
-		MICommandFree(cmd);
-		return 0;
-	}
-	res = MIGetDataEvaluateExpressionInfo(cmd);
-	MICommandFree(cmd);
-
-	ADDRESS_LENGTH = (int)strtol(res, NULL, 10);
-
-	free(res);
-
-	return ADDRESS_LENGTH;
-}
-
-/*
- * Try to find the type of a variable using the 'ptype'
- * command. First try using the type field, or if this
- * fails, try using the expression 'expr'.
- */
-static char *
-GetPtypeValue(char *expr, MIVar *var)
-{
-	char * type = NULL;
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPtypeValue(%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-	MICommand* cmd = CLIPType(var->type);
-	MICommandSetTimeout(cmd, 100);
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		if (expr == NULL) {
-			DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "---------------------- GetPtypeValue failed and expr was NULL\n");
-			return NULL;
-		}
-		cmd = CLIPType(expr);
-		MICommandSetTimeout(cmd, 100);
-		SendCommandWait(DebugSession, cmd);
-		if (!MICommandResultOK(cmd)) {
-			DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "---------------------- GetPtypeValue failed\n");
-			return NULL;
-		}
-	}
-	type = CLIGetPTypeInfo(cmd);
-	MICommandFree(cmd);
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPtypeValue returns %s\n", type);
-	return type;
-}
-
-/*
- * Create a variable containing the fields of a class
- */
-static MIVar *
-GetMIVarClassFields(char *name)
-{
-	MICommand *	cmd;
-	MIVar *		v = NULL;
-
-	v = MIVarNew();
-	cmd = MIVarListChildren(name);
-
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		MICommandFree(cmd);
-		MIVarFree(v);
-		return NULL;
-	}
-
-	MIGetVarListChildrenInfo(cmd, v);
-	MICommandFree(cmd);
-
-	v->name = strdup(name);
-	return v;
-}
-
-/********************************************************
- * TYPE CONVERSION
- ********************************************************/
-#define T_OTHER			0
-#define T_CHAR			1
-#define T_SHORT			2
-#define T_USHORT		3
-#define T_INT			4
-#define T_UINT			5
-#define T_LONG			6
-#define T_ULONG			7
-#define T_LONGLONG		8
-#define T_ULONGLONG		9
-#define T_FLOAT			10
-#define T_DOUBLE		11
-#define T_STRING		12
-#define T_BOOLEAN		13
-
-#define T_CHAR_PTR		14
-#define T_FUNCTION		15
-#define T_VOID_PTR		16
-#define T_UNION			17
-#define T_ENUM			18
-#define T_ARRAY			19
-#define T_STRUCT		20
-#define T_POINTER		21
-#define T_CLASS			22
-
-static int
-GetSimpleType(char *type)
-{
-	char *t = NULL;
-	int id;
-	int len = strlen(type);
-
-	if (type[len - 1] == ')') { // function
-		return T_FUNCTION;
-	}
-	if (strncmp(type, "void *", 6) == 0) { // void pointer
-		return T_VOID_PTR;
-	}
-	if (strncmp(type, "enum", 4) == 0) { // enum
-		return T_ENUM;
-	}
-
-	//check modifiers
-	if (strncmp(type, "const volatile", 14) == 0) {
-		t = strdup(&type[15]); //+ 1 remove whitespeace
-	} else if (strncmp(type, "volatile", 8) == 0) {
-		t = strdup(&type[9]); //+ 1 remove whitespeace
-	} else if (strncmp(type, "const", 5) == 0) {
-		t = strdup(&type[6]); //+ 1 remove whitespeace
-	} else {
-		t = strdup(type);
-	}
-
-	if (strncmp(t, "char *", 6) == 0) {
-		id = T_CHAR_PTR;
-	} else if (strncmp(t, "char", 4) == 0) {
-		id = T_CHAR;
-	} else if (strncmp(t, "unsigned char", 13) == 0) {
-		id = T_CHAR;
-	} else if (strncmp(t, "short int", 9) == 0 || strncmp(t, "int2", 4) == 0) {
-		id = T_SHORT;
-	} else if (strncmp(t, "short unsigned int", 18) == 0) {
-		id = T_USHORT;
-	} else if (strncmp(t, "int", 3) == 0 || strncmp(t, "int4", 4) == 0) {
-		id = T_INT;
-	} else if (strncmp(t, "unsigned int", 12) == 0) {
-		id = T_UINT;
-	} else if (strncmp(t, "long int", 8) == 0 || strncmp(t, "int8", 4) == 0) {
-		id = T_LONG;
-	} else if (strncmp(t, "long unsigned int", 17) == 0) {
-		id = T_ULONG;
-#ifdef CC_HAS_LONG_LONG
-	} else if (strncmp(t, "long long int", 13) == 0 || strncmp(t, "real*16", 7) == 0) {
-		id = T_LONGLONG;
-	} else if (strncmp(t, "long long unsigned int", 22) == 0) {
-		id = T_ULONGLONG;
-#endif /* CC_HAS_LONG_LONG */
-	} else if (strncmp(t, "long", 4) == 0 || strncmp(t, "real*4", 6) == 0) {
-		id = T_LONG;
-	} else if (strncmp(t, "float", 5) == 0 || strncmp(t, "real*8", 6) == 0) {
-		id = T_FLOAT;
-	} else if (strncmp(t, "double", 6) == 0) {
-		id = T_DOUBLE;
-	} else if (strncmp(t, "string", 6) == 0) {
-		id = T_STRING;
-	} else if (strncmp(t, "logical4", 8) == 0) {
- 		id = T_BOOLEAN;
- 	} else {
-		id =  T_OTHER;
-	}
-
-	free(t);
-	return id;
-}
-
-static int
-GetComplexType(char *type)
-{
-	int len = strlen(type);
-	switch (type[len - 1]) {
-	case ']':
-		return T_ARRAY;
-	case '*':
-		if (type[len - 2] == '*') { //pointer pointer
-			return T_POINTER;
-		}
-		if (strncmp(type, "char", 4) == 0) { //char pointer
-			return T_CHAR_PTR;
-		}
-		return T_POINTER; //normal pointer
-	default:
-		if (strncmp(type, "union", 5) == 0) {
-			return T_UNION;
-		}
-		if (strncmp(type, "struct", 6) == 0) {
-			return T_STRUCT;
-		}
-		if (strncmp(type, "class", 5) == 0) {
-			return T_CLASS;
-		}
-		return T_OTHER;
-	}
-}
-
-static int
-GetType(char *type)
-{
-	int id = GetSimpleType(type);
-	if (id == T_OTHER) {
-		id = GetComplexType(type);
-	}
-	return id;
-}
-
-/*
- * Find the base type of the pointer type.
- * Assumes type string is '<base type>*'
- */
-static int
-GetPointerBaseType(char *type)
-{
-	int		id;
-	char *	p;
-	char *	str = strdup(type);
-
-	p = &str[strlen(type) - 1];
-	*p-- = '\0';
-	while (p != str && *p == ' ') {
-		*p-- = '\0';
-	}
-
-	id = GetType(str);
-	free(str);
-
-	return id;
-}
-
-/*
- * Get the base type of an array from it's type
- * definition string. This is only used if it's
- * not possible to get the type of one of the
- * array elements.
- */
-static int
-GetArrayBaseType(MIVar *var)
-{
-	int		id;
-	char *	p;
-	char *	str = strdup(var->type);
-
-	p = strchr(str, '[');
-	*p-- = '\0';
-	while (p != str && *p == ' ') {
-		*p-- = '\0';
-	}
-
-	id = GetType(str);
-	if (id == T_OTHER) {
-		p = GetPtypeValue(NULL, var);
-		if (p != NULL) {
-			id = GetType(p);
-			free(p);
-		}
-	}
-
-	free(str);
-
-	return id;
-}
-
-/*
- * Get the name of a type (struct, union or enum) from the
- * MI type string.
- *
- * Returns the type name or NULL if the type is unnamed.
- */
-static char *
-GetTypeName(char *type)
-{
-	char *	p;
-
-	if ((p = strchr(type, ' ')) != NULL) {
-		p++;
-		if (strcmp(p, "{...}") == 0) {
-			return NULL;
-		}
-		return p;
-	}
-	return type;
-}
-
-/*
- * Convert an access qualifier string to AIFAccess.
- *
- * If the string is empty, then the qualifier is assumed to be AIF_ACCESS_PACKAGE.
- *
- * Any other string will be treated as AIF_ACCESS_UNKNOWN
- */
-static AIFAccess
-GetAccessQualifier(char *access)
-{
-	if (strcmp(access, "private") == 0) {
-		return AIF_ACCESS_PRIVATE;
-	} else if (strcmp(access, "protected") == 0) {
-		return AIF_ACCESS_PROTECTED;
-	} else if (strcmp(access, "public") == 0) {
-		return AIF_ACCESS_PUBLIC;
-	} else if (*access == '\0') {
-		return AIF_ACCESS_PACKAGE;
-	}
-
-	return AIF_ACCESS_UNKNOWN;
-}
-
-static AIF*
-CreateSimpleAIF(int id, char *res)
-{
-	char *pch;
-
-	if (res == NULL) {
-		return NULL;
-	}
-	switch (id) {
-		case T_STRING:
-		case T_CHAR:
-			if ((pch = strchr(res, ' ')) != NULL) {
-				pch++;
-				if (*pch == '\'') { //character
-					pch--;
-					*pch = '\0';
-					return CharToAIF((char)strtol(res, NULL, 10));
-				}
-				else { //string
-					return StringToAIF(pch);
-				}
-			}
-			else {
-				return CharToAIF((char)strtol(res, NULL, 10));
-			}
-			break;
-		case T_SHORT:
-			return ShortToAIF((short)strtol(res, NULL, 10));
-		case T_USHORT:
-			return UnsignedShortToAIF((unsigned short)strtoul(res, NULL, 10));
-		case T_INT:
-			return IntToAIF((int)strtol(res, NULL, 10));
-		case T_UINT:
-			return UnsignedIntToAIF((unsigned int)strtoul(res, NULL, 10));
-		case T_LONG:
-			return LongToAIF(strtol(res, NULL, 10));
-		case T_ULONG:
-			return UnsignedLongToAIF((unsigned long)strtoul(res, NULL, 10));
-		#ifdef CC_HAS_LONG_LONG
-			case T_LONGLONG:
-				return LongLongToAIF(strtoll(res, NULL));
-			case T_ULONGLONG:
-				return UnsignedLongLongToAIF((unsigned long long)strtoull(res, NULL));
-		#endif /* CC_HAS_LONG_LONG */
-		case T_FLOAT:
-			return FloatToAIF((float)strtod(res, NULL));
-		case T_DOUBLE:
-			return DoubleToAIF(strtod(res, NULL));
-		default://other type
-			return VoidToAIF(0, 0);
-	}
-}
-
-static AIF *
-GetAIFPointer(char *addr, AIF *i)
-{
-	AIF *ac;
-	AIF *a;
-	char *pch;
-
-	if (addr == NULL) {
-		ac = VoidToAIF(0, 0);
-	} else {
-		if ((pch = strchr(addr, ' ')) != NULL) {
-			*pch = '\0';
-		}
-		addr += 2; //skip 0x
-		ac = AddressToAIF(addr, GetAddressLength());
-	}
-	a = PointerToAIF(ac, i);
-	AIFFree(ac);
-	return a;
-}
-
-/*
- * Convert an MI value to a character pointer.
- *
- * Possible values are:
- *
- * "" 				- invalid/uninitialized pointer
- * "0x0" 			- null pointer
- * "0xaddr \"str\"" - address and string
- */
-static AIF *
-GetCharPointerAIF(char *res)
-{
-	char *	pch;
-	char *	val;
-	char *	addr;
-	AIF *	a;
-	AIF *	ac;
-
-	if (*res == '\0') {
-		addr = strdup("0");
-		val = "";
-	} else {
-		addr = strdup(res + 2);  //skip 0x
-		if ((pch = strchr(addr, ' ')) != NULL) {
-			*pch++ = '\0';
-			val = pch;
-		} else {
-			val = "";
-		}
-	}
-
-	ac = AddressToAIF(addr, GetAddressLength());
-	a = CharPointerToAIF(ac, val);
-	free(addr);
-	AIFFree(ac);
-	return a;
-}
-
-static AIF *
-GetSimpleAIF(MIVar *var)
-{
-	AIF *	a = NULL;
-	AIF *	ac;
-	char *	pt;
-	char *	v;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetSimpleAIF (%s)\n", var->type);
-
-	int id = GetSimpleType(var->type);
-	if (id == T_OTHER) {
-		pt = GetPtypeValue(NULL, var);
-		if (pt != NULL) {
-			if (var->type != NULL) {
-				free(var->type);
-			}
-			var->type = pt;
-			id = GetSimpleType(var->type);
-		}
-	}
-	switch (id) {
-	case T_FUNCTION:
-		return MakeAIF("&/is4", var->exp);
-	case T_VOID_PTR:
-		ac = VoidToAIF(0, 0);
-		v = GetVarValue(var->name);
-		a = GetAIFPointer(v, ac);
-		free(v);
-		AIFFree(ac);
-		return a;
-	case T_ENUM:
-		return EmptyEnumToAIF(GetTypeName(var->type));
-	case T_OTHER:
-		return NULL;
-	default:
-		v = GetVarValue(var->name);
-		a = CreateSimpleAIF(id, v);
-		free(v);
-		return a;
-	}
-}
-
-static AIF*
-GetNamedAIF(AIF *a, int named)
-{
-	if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
-		return NameAIF(a, named);
-	}
-	return a;
-}
-
-static AIF *
-GetStructAIF(MIVar *var, int named)
-{
-	int		i;
-	MIVar *	v;
-	AIF *	a;
-	AIF *	ac;
-
-	named++;
-
-	a = EmptyAggregateToAIF(GetTypeName(var->type));
-
-	for (i=0; i < var->numchild; i++) {
-		v = var->children[i];
-		//check whether child contains parent
-		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			a = GetNamedAIF(a, named);
-			ac = AIFNullPointer(a);
-		} else if ((ac = GetAIF(v, named)) == NULL) {
-			AIFFree(a);
-			return NULL;
-		}
-		AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, v->exp, ac);
-	}
-	return a;
-}
-
-static void
-AddFieldToAggregate(AIF *a, MIVar *var, AIFAccess access, int named)
-{
-	AIF *	ac = GetAIF(var, named);
-	if (ac != NULL) {
-		DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- AddFieldToAggregate adding field %s = (%s, %d)\n", var->exp, AIF_FORMAT(ac), AIF_LEN(ac));
-		AIFAddFieldToAggregate(a, access, var->exp, ac);
-		AIFFree(ac);
-	}
-}
-
-/*
- * Get information from the "fake" child that is used
- * to contain the field information for a particular
- * access type.
- */
-static void
-GetAggregateFields(AIF *a, char *name, AIFAccess access, int named)
-{
-	int			i;
-	MIVar *		var;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetAggregateFields (%s, %d)\n", name, access);
-
-	var = GetMIVarClassFields(name);
-
-	if (var != NULL) {
-		if (var->children != NULL) {
-			for (i = 0; i < var->numchild; i++) {
-				AddFieldToAggregate(a, var->children[i], access, named);
-			}
-		}
-
-		MIVarFree(var);
-	}
-}
-
-static AIF *
-GetClassAIF(MIVar *var, int named)
-{
-	int			i;
-	MIVar *		child;
-	AIFAccess	access;
-	AIF *		a;
-
-	named++;
-
-	a = EmptyAggregateToAIF(GetTypeName(var->type));
-
-	for (i=0; i < var->numchild; i++) {
-		child = var->children[i];
-		access = GetAccessQualifier(child->exp);
-		if (access != AIF_ACCESS_UNKNOWN) {
-			GetAggregateFields(a, child->name, access, named);
-		} else {
-			AddFieldToAggregate(a, child, AIF_ACCESS_PUBLIC, named);
-		}
-	}
-	return a;
-}
-
-static AIF *
-GetUnionAIF(MIVar *var, int named)
-{
-	int		i;
-	MIVar *	v;
-	AIF *	a;
-	AIF *	ac;
-
-	named++;
-
-	a = EmptyUnionToAIF(GetTypeName(var->type));
-
-	for (i=0; i<var->numchild; i++) {
-		v = var->children[i];
-		//check whether child contains parent
-		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			a = GetNamedAIF(a, named);
-			ac = AIFNullPointer(a);
-		} else if ((ac = GetAIF(v, named)) == NULL) {
-			AIFFree(a);
-			return NULL;
-		}
-		AIFAddFieldToUnion(a, v->exp, ac);
-		AIFFree(ac);
-	}
-	return a;
-}
-
-static AIF *
-GetArrayAIF(MIVar *var, int named)
-{
-	int		i;
-	int		id;
-	MIVar *	v;
-	AIF *	a = NULL;
-	AIF *	ac;
-
-	if (var->numchild <= 0) {
-		id = GetArrayBaseType(var);
-		ac = CreateSimpleAIF(id, "");
-		a = EmptyArrayToAIF(0, 0, ac);
-		AIFFree(ac);
-	} else {
-		for (i = 0; i < var->numchild; i++) {
-			v = var->children[i];
-			if ((ac = GetAIF(v, named)) == NULL) {
-				return NULL;
-			}
-			if (a == NULL) {
-				a = EmptyArrayToAIF(0, var->numchild, ac);
-			}
-			AIFAddArrayElement(a, i, ac);
-			AIFFree(ac);
-		}
-	}
-	return a;
-}
-
-static AIF *
-GetPointerAIF(MIVar *var, int named)
-{
-	AIF *	ac = NULL;
-	AIF *	a;
-	char *	v;
-	int		id;
-
-	id = GetPointerBaseType(var->type);
-
-	switch (id) {
-		case T_CHAR_PTR:
-			v = GetVarValue(var->children[0]->name);
-			a = GetCharPointerAIF(v);
-			free(v);
-			return a;
-		case T_UNION:
-			ac = GetUnionAIF(var, named);
-			break;
-		case T_STRUCT:
-			ac = GetStructAIF(var, named);
-			break;
-		default:
-			if (var->numchild == 1) {
-				ac = GetAIF(var->children[0], named);
-			}
-			break;
-	}
-
-	if (ac == NULL) {
-		ac = VoidToAIF(0, 0);
-	}
-	v = GetVarValue(var->name);
-	a = GetAIFPointer(v, ac);
-	free(v);
-	AIFFree(ac);
-	return a;
-}
-
-static AIF *
-GetComplexAIF(MIVar *var, int named)
-{
-	char *	v;
-	AIF *	a = NULL;
-
-	int id = GetComplexType(var->type);
-	switch (id) {
-	case T_ARRAY:
-		a = GetArrayAIF(var, named);
-		break;
-	case T_CHAR_PTR:
-		v = GetVarValue(var->name);
-		a = GetCharPointerAIF(v);
-		free(v);
-		break;
-	case T_POINTER:
-		a = GetPointerAIF(var, named);
-		break;
-	case T_UNION:
-		a = GetUnionAIF(var, named);
-		break;
-	case T_STRUCT:
-		a = GetStructAIF(var, named);
-		break;
-	case T_CLASS:
-		a = GetClassAIF(var, named);
-		break;
-	default:
-		/*
-		 * Maybe it was simple all along
-		 */
-		a = GetSimpleAIF(var);
-	}
-	return a;
-}
-
-static AIF *
-GetAIF(MIVar *var, int named)
-{
-	MICommand	*cmd;
-
-	if (strcmp(var->type, "<text variable, no debug info>") == 0) {
-		DbgSetError(DBGERR_NOSYMS, "");
-		return NULL;
-	}
-	if (var->numchild == 0) { //simple type
-		return GetSimpleAIF(var);
-	}
-	//complex type
-	cmd = MIVarListChildren(var->name);
-	SendCommandWait(DebugSession, cmd);
-	if (!MICommandResultOK(cmd)) {
-		if (MICommandResultClass(cmd) == MIResultRecordERROR) {
-			char *err = MICommandResultErrorMessage(cmd);
-			if (err != NULL) {
-				DbgSetError(DBGERR_DEBUGGER, err);
-				free(err);
-			} else {
-				DbgSetError(DBGERR_DEBUGGER, "got error from gdb, but no message");
-			}
-		} else {
-			DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
-		}
-		MICommandFree(cmd);
-		return NULL;
-	}
-	MIGetVarListChildrenInfo(cmd, var);
-	MICommandFree(cmd);
-
-	return GetComplexAIF(var, named);
-}
-
-/*************************** PARTIAL AIF ***************************/
-
-/*
- * Create an array type corresponding to 'var'.
- */
-static AIF *
-GetPartialArrayAIF(char *expr, MIVar *var)
-{
-	AIF *	a = NULL;
-	AIF *	ac;
-	int 	i;
-	int 	id;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialArrayAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	if (var->children == NULL || var->numchild <= 0) {
-		id = GetArrayBaseType(var);
-		ac = CreateSimpleAIF(id, "");
-		a = EmptyArrayToAIF(0, var->numchild > 0 ? var->numchild : 0, ac);
-		AIFFree(ac);
-	} else {
-		for (i = 0; i < var->numchild; i++) {
-			ac = GetPartialAIF(expr, var->children[i]);
-			if (ac != NULL) {
-				if (a == NULL) {
-					a = EmptyArrayToAIF(0, var->numchild, ac);
-				}
-				AIFAddArrayElement(a, i, ac);
-				AIFFree(ac);
-			}
-		}
-	}
-	return a;
-}
-
-/*
- * Create a struct type corresponding to 'var'.
- */
-static AIF *
-GetPartialStructAIF(char *expr, MIVar *var)
-{
-	AIF *	ac;
-	AIF *	a;
-	int		i;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialStructAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	a = EmptyAggregateToAIF(GetTypeName(var->type));
-
-	if (var->children != NULL) {
-		for (i = 0; i < var->numchild; i++) {
-			ac = GetPartialAIF(expr, var->children[i]);
-			if (ac != NULL) {
-				AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, var->children[i]->exp, ac);
-				AIFFree(ac);
-			}
-		}
-	}
-	return a;
-}
-
-static void
-AddPartialFieldToAggregate(char *field, AIF *a, MIVar *var, AIFAccess access)
-{
-	AIF *	ac = GetPartialAIF(field, var);
-	if (ac != NULL) {
-		DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- AddPartialFieldToAggregate adding field %s = (%s, %d)\n", var->exp, AIF_FORMAT(ac), AIF_LEN(ac));
-		AIFAddFieldToAggregate(a, access, var->exp, ac);
-		AIFFree(ac);
-	} else {
-		DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- AddPartialFieldToAggregate field %s was null!\n", field);
-	}
-}
-
-/*
- * Get information from the "fake" child that is used
- * to contain the field information for a particular
- * access type.
- */
-static void
-GetPartialAggregateFields(char *expr, AIF *a, char *name, AIFAccess access)
-{
-	int			i;
-	MIVar *		var;
-	char *		field;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialAggregateFields (%s, %s, %d)\n", expr != NULL ? expr : "NULL", name, access);
-
-	var = GetMIVarClassFields(name);
-
-	if (var != NULL) {
-		if (var->children != NULL) {
-			for (i = 0; i < var->numchild; i++) {
-				asprintf(&field, "(%s).%s", expr, var->children[i]->exp);
-				AddPartialFieldToAggregate(field, a, var->children[i], access);
-				free(field);
-			}
-		}
-
-		MIVarFree(var);
-	}
-}
-
-/*
- * Create a class type corresponding to 'var'.
- *
- * An MI class variable has up to three children, one for
- * each access type "public", "protected", and "private".
- * These children are "fake" in that they do not correspond
- * to normal variables, but contain one child for each field
- * for the access type.
- */
-static AIF *
-GetPartialClassAIF(char *expr, MIVar *var)
-{
-	AIF *		a;
-	char *		field;
-	int			i;
-	MIVar *		child;
-	AIFAccess	access;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialClassAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	a = EmptyAggregateToAIF(GetTypeName(var->type));
-
-	if (var->children != NULL) {
-		for (i = 0; i < var->numchild; i++) {
-			child = var->children[i];
-			access = GetAccessQualifier(child->exp);
-			if (access != AIF_ACCESS_UNKNOWN) {
-				GetPartialAggregateFields(expr, a, child->name, access);
-			} else if (strcmp(child->name, child->type) == 0) { // base type
-				asprintf(&field, "(struct %s).%s", expr, child->exp);
-				AddPartialFieldToAggregate(field, a, child, AIF_ACCESS_PUBLIC);
-				free(field);
-			} else {
-				asprintf(&field, "(%s).%s", expr, child->exp);
-				AddPartialFieldToAggregate(field, a, child, AIF_ACCESS_PUBLIC);
-				free(field);
-			}
-		}
-	}
-	return a;
-}
-
-/*
- * Create a union type corresponding to 'var'.
- */
-static AIF *
-GetPartialUnionAIF(char *expr, MIVar *var)
-{
-	AIF *	ac;
-	AIF *	a;
-	int		i;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialUnionAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	a = EmptyUnionToAIF(GetTypeName(var->type));
-
-	if (var->children != NULL) {
-		for (i = 0; i < var->numchild; i++) {
-			ac = GetPartialAIF(expr, var->children[i]);
-			if (ac != NULL) {
-				AIFAddFieldToUnion(a, var->children[i]->exp, ac);
-				AIFFree(ac);
-			}
-		}
-	}
-	return a;
-}
-
-/*
- * Create a pointer to the base type of 'var'. Only obtain
- * the minimum amount of type information.
- */
-static AIF *
-GetPartialPointerAIF(char *expr, MIVar *var)
-{
-	AIF *	ac;
-	AIF *	a;
-	char *	v;
-	int		id;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialPointerAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	id = GetPointerBaseType(var->type);
-
-	if (var->children != NULL) {
-		switch (id) {
-		case T_CHAR_PTR:
-			v = GetVarValue(var->children[0]->name);
-			a = GetCharPointerAIF(v);
-			free(v);
-			break;
-		case T_POINTER:
-			ac = VoidToAIF(0, 0);
-			v = GetVarValue(var->children[0]->name);
-			a = GetAIFPointer(v, ac);
-			free(v);
-			AIFFree(ac);
-			break;
-		case T_UNION:
-			a = GetPartialUnionAIF(expr, var);
-			break;
-		case T_STRUCT:
-			a = GetPartialStructAIF(expr, var);
-			break;
-		case T_CLASS:
-			a = GetPartialClassAIF(expr, var);
-			break;
-		default:
-			if (var->numchild == 1) {
-				a = GetPartialAIF(expr, var->children[0]);
-			} else {
-				a = VoidToAIF(0, 0);
-			}
-			break;
-		}
-	} else {
-		switch (id) {
-		case T_CHAR_PTR:
-			v = GetVarValue(var->name);
-			a = GetCharPointerAIF(v);
-			free(v);
-			break;
-		default:
-			a = VoidToAIF(0, 0);
-			break;
-		}
-	}
-	v = GetVarValue(var->name);
-	ac = GetAIFPointer(v, a);
-	free(v);
-	AIFFree(a);
-	return ac;
-}
-
-/*
- * Create a complex AIF object corresponding to 'var'.
- */
-static AIF *
-GetPartialComplexAIF(char *expr, MIVar *var)
-{
-	char *	v;
-	char *	type;
-	AIF *	a = NULL;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialComplexAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	int id = GetComplexType(var->type);
-	if (id == T_OTHER) {
-		type = GetPtypeValue(expr, var);
-		if (type != NULL) {
-			var->type = type;
-			id = GetComplexType(var->type);
-		}
-	}
-	switch (id) {
-	case T_ARRAY:
-		a = GetPartialArrayAIF(expr, var);
-		break;
-	case T_CHAR_PTR:
-		v = GetVarValue(var->name);
-		a = GetCharPointerAIF(v);
-		free(v);
-		break;
-	case T_POINTER:
-		a = GetPartialPointerAIF(expr, var);
-		break;
-	case T_UNION:
-		a = GetPartialUnionAIF(expr, var);
-		break;
-	case T_STRUCT:
-		a = GetPartialStructAIF(expr, var);
-		break;
-	case T_CLASS:
-		a = GetPartialClassAIF(expr, var);
-		break;
-	default:
-		/*
-		 * Maybe it was simple all along
-		 */
-		a = GetSimpleAIF(var);
-	}
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialComplexAIF id is %d, returns %s\n", id, a != NULL ? AIF_FORMAT(a) : "NULL");
-	return a;
-}
-
-/*
- * Create a partial AIF object corresponding to 'var'.
- *
- * A partial AIF object contains only only enough type
- * information to determine if the variable is
- * structured or not. This speeds up displaying the variable
- * in the UI as the variable contents do not need to be
- * read from the program.
- *
- * Detailed type information and the variable contents will
- * be requested by the UI as the user drills into the variable.
- */
-static AIF *
-GetPartialAIF(char *expr, MIVar *var)
-{
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	if (var->type == NULL || strcmp(var->type, "<text variable, no debug info>") == 0) {
-		DbgSetError(DBGERR_NOSYMS, "");
-		return NULL;
-	}
-	if (var->numchild == 0) {
-		return GetSimpleAIF(var);
-	}
-	return GetPartialComplexAIF(expr, var);
-}
-
-/*
- * Get MI variable details. If 'mivar' is NULL then an MIVar object is created
- * with the name 'name', otherwise the details are added to the existing variable.
- *
- * If 'listChildren' is true, then the variable's children will be
- * queried also. If 'listChildren' is false, only 'numchildren' will be supplied.
- *
- * Returns a new MIVar object or NULL if any commands fail.
- */
-static MIVar *
-GetMIVarDetails(char *name, MIVar *mivar, int listChildren)
-{
-	MICommand *	cmd;
-	MIVar *		v = NULL;
-
-	if (mivar == NULL || mivar->type == NULL) {
-		cmd = MIVarInfoType(name);
-		SendCommandWait(DebugSession, cmd);
-		if (!MICommandResultOK(cmd)) {
-			MICommandFree(cmd);
-			return NULL;
-		}
-
-		v = MIGetVarInfoType(cmd);
-		MICommandFree(cmd);
-
-		if (mivar == NULL) {
-			mivar = v;
-			if (mivar->name == NULL) {
-				mivar->name = strdup(name);
-			}
-		} else {
-			mivar->type = strdup(v->type);
-			MIVarFree(v);
-		}
-	}
-
-	/*
-	 * Only fetch child info if we haven't already done it.
-	 */
-	if (mivar->children == NULL || mivar->numchild == 0) {
-		if (listChildren) {
-			cmd = MIVarListChildren(name);
-		} else {
-			cmd = MIVarInfoNumChildren(name);
-		}
-
-		SendCommandWait(DebugSession, cmd);
-		if (!MICommandResultOK(cmd)) {
-			MICommandFree(cmd);
-			if (mivar == v) {
-				MIVarFree(v);
-			}
-			return NULL;
-		}
-
-		if (listChildren) {
-			MIGetVarListChildrenInfo(cmd, mivar);
-		} else {
-			MIGetVarInfoNumChildren(cmd, mivar);
-		}
-
-		MICommandFree(cmd);
-	}
-	return mivar;
 }
 
 /*
@@ -2988,18 +1366,18 @@ GDBEvaluatePartialExpression(char* expr, char* var_id, int list_child, int expre
 			expr, var_id, list_child, express);
 
 	if (strlen(var_id) != 0) {
-		mivar = GetMIVarDetails(var_id, NULL, list_child);
+		mivar = GetMIVarDetails(DebugSession, var_id, NULL, list_child);
 	}
 
 	if (mivar == NULL) {
-		mivar = CreateMIVar(expr);
+		mivar = CreateMIVar(DebugSession, expr);
 	}
 
 	if (mivar != NULL) {
 		if (mivar->numchild == 1 && mivar->children == NULL) {
 			list_child = 1;
 		}
-		mivar = GetMIVarDetails(mivar->name, mivar, list_child);
+		mivar = GetMIVarDetails(DebugSession, mivar->name, mivar, list_child);
 	}
 
 	if (mivar == NULL) {
@@ -3007,7 +1385,7 @@ GDBEvaluatePartialExpression(char* expr, char* var_id, int list_child, int expre
 		return DBGRES_ERR;
 	}
 
-	if ((a = GetPartialAIF(expr, mivar)) == NULL) {
+	if ((a = GetPartialAIF(DebugSession, expr, mivar)) == NULL) {
 		DbgSetError(DBGERR_UNKNOWN_TYPE, mivar->type);
 		MIVarFree(mivar);
 		return DBGRES_ERR;
@@ -3030,7 +1408,7 @@ static int
 GDBMIVarDelete(char *name)
 {
 	CHECK_SESSION();
-	DeleteMIVar(name);
+	DeleteMIVar(DebugSession, name);
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	return DBGRES_OK;
 }

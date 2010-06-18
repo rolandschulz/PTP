@@ -53,11 +53,14 @@ libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 
 libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/breakpoint.c \
+							src/utils/bpmap.c \
 							src/utils/stackframe.c \
 							src/utils/signal_info.c \
 							src/utils/event.c \
 							src/utils/itimer.c \
 							src/utils/memoryinfo.c \
-							src/utils/debug.c
+							src/utils/debug.c \
+							src/utils/gdb_aif.c \
+							src/utils/gdb_mi.c
 						
 libdbgutils_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
