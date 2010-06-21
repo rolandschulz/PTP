@@ -18,7 +18,9 @@ import org.eclipse.ptp.pldt.upc.UPCPlugin;
 
 /**
  * Class used to initialize default preference values.
+ * 
  * @author Beth Tibbitts
+ * @since 4.0
  */
 public class UPCPreferenceInitializer extends AbstractPreferenceInitializer {
 
