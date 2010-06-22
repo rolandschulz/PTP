@@ -1,0 +1,12 @@
+program reverseLoopWithExpr
+
+    integer i, j
+    j = 4
+
+    !<<<<<6,1,8,1,pass
+    do i=j*j,3,-(j)
+
+        print *, i
+    end do
+
+end program reverseLoopWithExpr

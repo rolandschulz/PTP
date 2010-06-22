@@ -1,0 +1,14 @@
+program reverseNested
+
+    integer i, j
+
+    !<<<<<5,1,7,1,pass
+    do i=10,1,-1
+
+        do j=2,8,2
+
+            print *, i
+        end do
+    end do
+
+end program reverseNested

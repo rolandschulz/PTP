@@ -304,6 +304,10 @@ public class Messages extends NLS
 
     public static String RepObsOpersRefactoring_SelectedFileCannotBeParsed;
 
+    public static String ReverseLoopRefactoring_Name;
+
+    public static String ReverseLoopRefactoring_SelectDoLoop;
+
     public static String StandardizeStatementsRefactoring_Name;
 
     public static String StandardizeStatementsRefactoring_SelectedFileCannotBeParsed;

@@ -73,6 +73,9 @@
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring"
          />
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.ReverseLoopRefactoring"
+         />
       </group>
       <group><!-- Refactorings that reformat code -->
          <resourceRefactoring
