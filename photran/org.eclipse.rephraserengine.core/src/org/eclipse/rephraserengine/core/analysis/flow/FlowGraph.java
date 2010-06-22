@@ -96,13 +96,22 @@ public class FlowGraph<U>
         {
             sb.append(String.format("%" + nameLen + "s: %s\n", //$NON-NLS-1$ //$NON-NLS-2$
                 node.getName(),
-                node.getData().toString().replace("\n", "\n" + spaces))); //$NON-NLS-1$ //$NON-NLS-2$
+                nodeDataAsString(node).replace("\n", "\n" + spaces))); //$NON-NLS-1$ //$NON-NLS-2$
 
             for (FlowGraphNode<U> succ : node.getSuccessors())
                 sb.append(String.format("    => %s\n", succ.getName())); //$NON-NLS-1$
         }
         if (sb.length() > 0) sb.deleteCharAt(sb.length()-1);
         return sb.toString();
+    }
+
+    /**
+     * @param node
+     * @return
+     */
+    protected String nodeDataAsString(FlowGraphNode<U> node)
+    {
+        return String.valueOf(node.getData());
     }
 
     private String spaces(int count)

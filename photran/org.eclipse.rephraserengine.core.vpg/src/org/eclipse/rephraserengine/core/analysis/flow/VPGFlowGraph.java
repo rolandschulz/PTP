@@ -52,7 +52,7 @@ public abstract class VPGFlowGraph<R extends TokenRef<?>, U>
 
         private String generateNodeName()
         {
-            return Integer.toString(++lastNodeNumber);
+            return "node" + Integer.toString(++lastNodeNumber); //$NON-NLS-1$
         }
 
         public FlowGraphNode<U> get(R tokenRef)
