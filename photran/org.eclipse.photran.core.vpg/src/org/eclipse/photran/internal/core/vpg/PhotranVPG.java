@@ -510,6 +510,11 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
         return getOutgoingDependenciesFrom("module:" + canonicalizeIdentifier(moduleName)); //$NON-NLS-1$
     }
 
+    public List<IFile> findFilesThatImportModule(String moduleName)
+    {
+        return getIncomingDependenciesTo("module:" + canonicalizeIdentifier(moduleName)); //$NON-NLS-1$
+    }
+
     public List<IFile> findFilesThatUseCommonBlock(String commonBlockName)
     {
         // The unnamed common block is stored with the empty name as its name

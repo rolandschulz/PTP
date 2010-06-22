@@ -10,16 +10,18 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.binding;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Terminal;
@@ -65,6 +67,7 @@ import org.eclipse.photran.internal.core.parser.ASTSubroutineNameNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeNameNode;
+import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVarOrFnRefNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
@@ -532,58 +535,77 @@ public abstract class ScopingNode extends ASTNode
 
 	public Iterable<ScopingNode> findImportingScopes()
 	{
-//		PhotranVPG vpg = PhotranVPG.getInstance();
-//
-//		Set<PhotranTokenRef> result = new HashSet<PhotranTokenRef>();
-//		for (Definition def : getAllDefinitions())
-//		    if (def != null) // TODO: Why are we getting null here?
-//		        for (TokenRef<Token> t : vpg.db.getOutgoingEdgeTargets(def.getTokenRef(), PhotranVPG.IMPORTED_INTO_SCOPE_EDGE_TYPE))
-//		            result.add((PhotranTokenRef)t);
-//
-//	    List<ScopingNode> scopes = new LinkedList<ScopingNode>();
-//	    for (PhotranTokenRef tokenRef : result)
-//	    	scopes.add(tokenRef.findToken().getEnclosingScope());
-//	    return scopes;
-
-		// Find all references to things defined in this scope (presumably a module),
-		// and sort them by file and offset
-        Set<PhotranTokenRef> allReferences = new TreeSet<PhotranTokenRef>();
-        for (Definition def : getAllDefinitions())
-            if (def != null)
-                allReferences.addAll(def.findAllReferences(false));
-
-        // Now go through each file, parse it, and collect the containing scope's representative token
-        final Set<PhotranTokenRef> scopes = new HashSet<PhotranTokenRef>();
-        for (PhotranTokenRef ref : allReferences)
-            scopes.add(ref.findToken().findNearestAncestor(ScopingNode.class).getRepresentativeToken());
-
-        // And return an iterable that will parse files and change the representative tokens back into ScopingNodes
-        return new Iterable<ScopingNode>()
-        {
-            public Iterator<ScopingNode> iterator()
+	    if (this instanceof ASTModuleNode)
+	    {
+            return new Iterable<ScopingNode>()
             {
-                return new TokenRefToScopeIterator(scopes);
-            }
-        };
+                public Iterator<ScopingNode> iterator()
+                {
+                    String moduleName = getName();
+                    return new ModuleIterator(moduleName);
+                }
+            };
+	    }
+	    else
+	    {
+            return Collections.emptyList();
+	    }
 	}
 
-	private static class TokenRefToScopeIterator implements Iterator<ScopingNode>
+	private static class ModuleIterator implements Iterator<ScopingNode>
 	{
-        private Iterator<PhotranTokenRef> it;
+	    private String moduleName;
+	    private Iterator<IFile> files;
+        private Iterator<ScopingNode> scopesInFile;
 
-        public TokenRefToScopeIterator(Set<PhotranTokenRef> scopes)
+        public ModuleIterator(String moduleName)
         {
-            this.it = scopes.iterator();
+            this.moduleName = moduleName;
+            this.files = PhotranVPG.getInstance().findFilesThatImportModule(moduleName).iterator();
+            this.scopesInFile = Collections.<ScopingNode>emptyList().iterator();
         }
 
         public boolean hasNext()
         {
-            return it.hasNext();
+            if (scopesInFile.hasNext())
+                return true;
+            else
+                return this.files.hasNext();
         }
 
         public ScopingNode next()
         {
-            return findScopingNodeForRepresentativeToken(it.next());
+            if (scopesInFile.hasNext())
+                return scopesInFile.next();
+            else
+                return firstScopeInNextFile();
+        }
+
+        private ScopingNode firstScopeInNextFile()
+        {
+            if (!files.hasNext()) return null;
+            
+            IFortranAST ast = PhotranVPG.getInstance().acquireTransientAST(files.next());
+            if (ast == null) return firstScopeInNextFile();
+            
+            scopesInFile = collectImportingScopingNodes(ast).iterator();
+            if (!scopesInFile.hasNext()) return firstScopeInNextFile();
+            
+            return scopesInFile.next();
+        }
+
+        private Set<ScopingNode> collectImportingScopingNodes(IFortranAST ast)
+        {
+            final Set<ScopingNode> importingScopes = new HashSet<ScopingNode>();
+            ast.accept(new ASTVisitor()
+            {
+                @Override public void visitASTUseStmtNode(ASTUseStmtNode node)
+                {
+                    if (node.getName().getText().equalsIgnoreCase(moduleName))
+                        importingScopes.add(node.findFirstToken().getEnclosingScope());
+                }
+            });
+            return importingScopes;
         }
 
         public void remove()
@@ -707,6 +729,7 @@ public abstract class ScopingNode extends ASTNode
 		if (def == null) return false;
 
 		((PhotranVPGBuilder)PhotranVPG.getInstance()).setDefinitionFor(identifier.getTokenRef(), def);
+        bindings.foundDefinition(def.getTokenRef(), getGlobalScope());
 		return true;
 	}
 
