@@ -4,7 +4,8 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.rephraserengine.core.vpg
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.eclipse.rephraserengine.core.preservation,
+Export-Package: org.eclipse.rephraserengine.core.analysis.flow,
+ org.eclipse.rephraserengine.core.preservation,
  org.eclipse.rephraserengine.core.vpg,
  org.eclipse.rephraserengine.core.vpg.db.caching,
  org.eclipse.rephraserengine.core.vpg.db.cdt,
