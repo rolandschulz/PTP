@@ -64,6 +64,11 @@
              class="org.eclipse.photran.internal.core.refactoring.MoveCommonToModuleRefactoring"
          /-->
       </group>
+      <group><!-- Refactorings that eliminate old language constructs -->
+         <resourceRefactoring
+         	class="org.eclipse.photran.internal.core.refactoring.RemoveArithmeticIfRefactoring"
+         />
+      </group>
       <group><!-- Refactorings for performance/loop transformations -->
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring"

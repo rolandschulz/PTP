@@ -276,6 +276,10 @@ public class Messages extends NLS
 
     public static String MoveCommonToModuleRefactoring_SelectVarOrBlockInCommonStmt;
     
+    public static String RemoveArithmeticIfRefactoring_Error;
+
+    public static String RemoveArithmeticIfRefactoring_Name;
+
     public static String RemoveUnusedVariablesRefactoring_CouldNotCompleteOperation;
 
     public static String RemoveUnusedVariablesRefactoring_DoesNotRemovedUnusedVarsWithDefsOnAnotherLine;

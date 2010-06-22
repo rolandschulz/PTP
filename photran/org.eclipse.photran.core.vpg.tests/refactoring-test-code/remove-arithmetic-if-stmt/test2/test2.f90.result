@@ -1,0 +1,31 @@
+program test2 !<<<<< 1,1,pass
+
+integer :: test = -3
+
+if(test< 0) then
+    goto 10
+else if(test == 0) then 
+    goto 10
+else 
+    goto 10
+end if
+
+if(test< 0) then
+    goto 10
+else if(test == 0) then 
+    goto 10
+else 
+    goto 10
+end if
+
+if(test< 0) then
+    goto 10
+else if(test == 0) then 
+    goto 10
+else 
+    goto 10
+end if
+
+10 print *, "Hi!"
+
+end program test2

@@ -1,0 +1,23 @@
+program test1 !<<<<< 1,1,pass
+
+INTEGER :: chicken = 0
+INTEGER :: rice
+
+if(chicken< 0) then
+    goto 10
+else if(chicken == 0) then 
+    goto 20
+else 
+    goto 30
+end if
+
+10 rice = 1
+	goto 40
+20 rice = 2
+	goto 40
+30 rice = &
+	& 3
+
+40 print *, rice
+
+end program test1
