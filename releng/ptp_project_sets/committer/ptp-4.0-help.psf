@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.eclipse.team.cvs.core.cvsnature">
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/doc/org.eclipse.ptp.help,org.eclipse.ptp.help,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/etfw/org.eclipse.ptp.etfw.feedback,org.eclipse.ptp.etfw.feedback,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/org.eclipse.ptp.pldt.help,org.eclipse.ptp.pldt.help,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/tools/gem/org.eclipse.ptp.gem.help,org.eclipse.ptp.gem.help,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.doc.user,org.eclipse.ptp.rdt.doc.user,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.help,org.eclipse.ptp.rm.ibm.ll.help,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.pe.help,org.eclipse.ptp.rm.ibm.pe.help,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.pbs.help,org.eclipse.ptp.rm.pbs.help,ptp_4_0"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.slurm.help,org.eclipse.ptp.rm.slurm.help,ptp_4_0"/>
+</provider>
+</psf>
