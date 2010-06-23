@@ -28,6 +28,8 @@ public class Messages extends NLS
     public static String PerfectLoopNest_LinearFunctionOfNonIndexVariable;
 
     public static String PerfectLoopNest_OnlySingleSubscriptsAreCurrentlySupported;
+
+    public static String VariableReference_AssignmentStmtCannotBeProcessed;
     static
     {
         // initialize resource bundle

@@ -93,8 +93,37 @@ public class DependencesTest extends AbstractDependencesTestCase
         assertTrue(deps.getDependences().isEmpty());
     }
 
-    // FIXME
-    public void testEvenOdd() throws Exception
+    public void testSubtract1() throws Exception
+    {
+        LoopDependences deps = dependences(
+            "DO I = 1+3, N\n" +
+            "    A(I-3) = A(I)\n" +
+            "ENDDO\n");
+
+        assertEquals("[a(1*i-3)]", deps.getWrites().toString());
+        assertEquals("[a(1*i+0), i]", deps.getReads().toString());
+
+        System.out.println(deps.getDependences());
+        assertFalse(deps.getDependences().isEmpty());
+        assertEquals("[Anti-dependence from a(1*i+0) to a(1*i-3), Flow dependence from a(1*i-3) to a(1*i+0)]", deps.getDependences().toString());
+    }
+
+    public void testSubtract2() throws Exception
+    {
+        LoopDependences deps = dependences(
+            "DO I = 1+3, N\n" +
+            "    A(I) = A(I-3)\n" +
+            "ENDDO\n");
+
+        assertEquals("[a(1*i+0)]", deps.getWrites().toString());
+        assertEquals("[a(1*i-3), i]", deps.getReads().toString());
+
+        //System.out.println(deps.getDependences());
+        assertFalse(deps.getDependences().isEmpty());
+        assertEquals("[Anti-dependence from a(1*i-3) to a(1*i+0), Flow dependence from a(1*i+0) to a(1*i-3)]", deps.getDependences().toString());
+    }
+
+    public void testEvenOdd1() throws Exception
     {
         LoopDependences deps = dependences(
             "DO I = 1, N\n" +
@@ -104,7 +133,19 @@ public class DependencesTest extends AbstractDependencesTestCase
         assertEquals("[a(2*i+0)]", deps.getWrites().toString());
         assertEquals("[a(2*i+3), i]", deps.getReads().toString());
 
-        System.out.println(deps.getDependences());
+        assertTrue(deps.getDependences().isEmpty());
+    }
+
+    public void testEvenOdd2() throws Exception
+    {
+        LoopDependences deps = dependences(
+            "DO I = 1+3, N\n" +
+            "    A(2*I) = A(2*I-3)\n" +
+            "ENDDO\n");
+
+        assertEquals("[a(2*i+0)]", deps.getWrites().toString());
+        assertEquals("[a(2*i-3), i]", deps.getReads().toString());
+
         assertTrue(deps.getDependences().isEmpty());
     }
 }
