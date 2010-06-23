@@ -9,10 +9,11 @@
  * Contributors:
  *     UIUC - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.photran.internal.tests.refactoring.reverseloop;
+package org.eclipse.photran.internal.tests.refactoring;
 
 import junit.framework.Test;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.refactoring.ReverseLoopRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
@@ -21,7 +22,6 @@ import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers
  * Unit tests for the Reverse Loop refactoring.
  *
  * @author Ashley Kasza
- * 
  */
 public class ReverseLoopRefactoringTestSuite extends PhotranRefactoringTestSuiteFromMarkers<ReverseLoopRefactoring>
 {
@@ -29,9 +29,6 @@ public class ReverseLoopRefactoringTestSuite extends PhotranRefactoringTestSuite
 
     public static Test suite() throws Exception
     {
-        
-        //TestSuite suite = new TestSuite();
-        
         return new ReverseLoopRefactoringTestSuite();
     }
 
@@ -42,5 +39,9 @@ public class ReverseLoopRefactoringTestSuite extends PhotranRefactoringTestSuite
               DIR,
               ReverseLoopRefactoring.class);
     }
-    
+
+    @Override protected boolean shouldCompile(IFile fileContainingMarker)
+    {
+       return false;
+    }
 }
