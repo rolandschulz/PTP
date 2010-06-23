@@ -68,6 +68,9 @@
          <resourceRefactoring
          	class="org.eclipse.photran.internal.core.refactoring.RemoveArithmeticIfRefactoring"
          />
+         <editorRefactoring
+         	class="org.eclipse.photran.internal.core.refactoring.RemoveComputedGoToRefactoring"
+         />
       </group>
       <group><!-- Refactorings for performance/loop transformations -->
          <editorRefactoring
