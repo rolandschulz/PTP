@@ -432,6 +432,8 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
 //      out.println("    Incoming Edge Cache: " + incomingEdgeCache.size() + " entries (max " + maxEdgeCacheEntries + ")");
 //      out.println("    Incoming Edge Cache: " + outgoingEdgeCache.size() + " entries (max " + maxEdgeCacheEntries + ")");
 //      out.println("    Annotation Cache: " + annotationCache.size() + " entries (max " + maxAnnotationCacheEntries + ")");
+        
+        db.printStatisticsOn(out);
     }
 
     @Override public void resetStatistics()

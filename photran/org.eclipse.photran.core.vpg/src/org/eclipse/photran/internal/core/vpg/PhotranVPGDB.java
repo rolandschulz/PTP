@@ -14,12 +14,14 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.rephraserengine.core.vpg.db.caching.CachingDB;
 import org.eclipse.rephraserengine.core.vpg.db.cdt.CDTDB;
+import org.eclipse.rephraserengine.core.vpg.db.profiling.ProfilingDB;
 
-public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB, PhotranVPGLog>
+
+public class PhotranVPGDB extends CachingDB<IFortranAST, Token, PhotranTokenRef, ProfilingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB, PhotranVPGLog>, PhotranVPGLog>
 {
     public PhotranVPGDB()
     {
-        super(new PhotranCDTDB(), 500, 10000);
+        super(new ProfilingDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGDB.PhotranCDTDB, PhotranVPGLog>(new PhotranCDTDB()), 500, 10000);
     }
 
     static class PhotranCDTDB extends CDTDB<IFortranAST, Token, PhotranTokenRef, PhotranVPGLog>
