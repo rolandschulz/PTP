@@ -8,7 +8,7 @@
 
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="PTP: Running IBM LoadLeveler Batch Jobs">
+<toc label="Running IBM LoadLeveler Batch Jobs" link_to="../org.eclipse.ptp.help/toc.xml#ptpLL">
 	<topic label="Introduction"  href="html/IBMLLMainHelp.html#introduction"> 
 	</topic>
 	<topic label="Requirements" href="html/IBMLLMainHelp.html#requirements"></topic>
