@@ -1,0 +1,21 @@
+program test5
+    implicit none
+
+    integer :: n
+
+    n = 1
+
+    ! this is a comment
+    select case (n*2)
+    case (1)
+        go to 123
+    end select
+    ! another comment
+
+    print *, "It wasn't handled"
+    stop
+
+123 print *, "It was one"
+    stop
+
+end program test5

@@ -1,0 +1,29 @@
+program test2
+    implicit none
+
+    integer :: n
+
+    n = 1
+
+    select case (n*2)
+    case (1)
+        go to 10
+    case (2)
+        go to 20
+    case (3)
+        go to 30
+    end select
+
+    print *, "It wasn't handled"
+    stop
+
+10  print *, "It was one"
+    stop
+
+20  print *, "It was two"
+    stop
+
+30  print *, "It was three"
+    stop
+
+end program test2

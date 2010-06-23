@@ -280,6 +280,10 @@ public class Messages extends NLS
 
     public static String RemoveArithmeticIfRefactoring_Name;
 
+    public static String RemoveComputedGoToRefactoring_Name;
+
+    public static String RemoveComputedGoToRefactoring_PleaseSelectComputedGotoStmt;
+
     public static String RemoveUnusedVariablesRefactoring_CouldNotCompleteOperation;
 
     public static String RemoveUnusedVariablesRefactoring_DoesNotRemovedUnusedVarsWithDefsOnAnotherLine;
