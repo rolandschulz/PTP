@@ -34,14 +34,14 @@ import org.eclipse.rse.services.shells.IHostShellChangeEvent;
 import org.eclipse.rse.services.shells.IHostShellOutputListener;
 
 public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutputListener {
-	private boolean mergeOutput;
-	private IHostShell hostShell;
+	private final boolean mergeOutput;
+	private final IHostShell hostShell;
 	private InputStream inputStream = null;
 	private InputStream errorStream = null;
 	private HostShellOutputStream outputStream = null;
 	private PipedOutputStream hostShellInput = null;
 	private PipedOutputStream hostShellError = null;
-	
+
 	public RSEProcess(IHostShell hostShell, boolean mergeOutput) throws IOException {
 		this.hostShell = hostShell;
 		this.mergeOutput = mergeOutput;
@@ -58,8 +58,10 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		this.hostShell.getStandardOutputReader().addOutputListener(this);
 		this.hostShell.getStandardErrorReader().addOutputListener(this);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#destroy()
 	 */
 	@Override
@@ -75,12 +77,15 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 			errorStream.close();
 			outputStream.close();
 		} catch (IOException e) {
-			//FIXME IOException when closing one of the streams will leave others open
+			// FIXME IOException when closing one of the streams will leave
+			// others open
 			// Ignore
-		}	
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#exitValue()
 	 */
 	@Override
@@ -91,12 +96,15 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		// No way to tell what the exit value was.
 		// TODO it would be possible to get the exit value
 		// when the remote process is started like this:
-		//   sh -c 'remotecmd ; echo "-->RSETAG<-- $?\"'
-		// Then the output steram could be examined for -->RSETAG<-- to get the exit value.
+		// sh -c 'remotecmd ; echo "-->RSETAG<-- $?\"'
+		// Then the output steram could be examined for -->RSETAG<-- to get the
+		// exit value.
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getErrorStream()
 	 */
 	@Override
@@ -104,7 +112,9 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		return errorStream;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getInputStream()
 	 */
 	@Override
@@ -112,7 +122,9 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		return inputStream;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getOutputStream()
 	 */
 	@Override
@@ -120,21 +132,18 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		return outputStream;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#waitFor()
 	 */
 	@Override
 	public synchronized int waitFor() throws InterruptedException {
-		while(hostShell.isActive()) {
-			try {
-				wait(1000);
-			} catch (InterruptedException e) {
-				// ignore because we're polling to see if shell is still active.
-			}
-		}
-		
+		waitForHostShellTermination();
+
 		try {
-			// Wait a second to try to get some more output from the target shell before closing.
+			// Wait a second to try to get some more output from the target
+			// shell before closing.
 			wait(1000);
 			// Allow for the data from the stream to be read if it's available
 			if (inputStream.available() != 0 || errorStream.available() != 0) {
@@ -152,10 +161,13 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		}
 		return 0;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.AbstractRemoteProcess#isCompleted()
 	 */
+	@Override
 	public boolean isCompleted() {
 		try {
 			exitValue();
@@ -164,16 +176,22 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Process an RSE Shell event, by writing the lines of text contained
-	 * in the event into the adapter's streams.
+	 * Process an RSE Shell event, by writing the lines of text contained in the
+	 * event into the adapter's streams.
+	 * 
 	 * @see org.eclipse.rse.services.shells.IHostShellOutputListener#shellOutputChanged(org.eclipse.rse.services.shells.IHostShellChangeEvent)
 	 */
 	public void shellOutputChanged(IHostShellChangeEvent event) {
 		IHostOutput[] input = event.getLines();
 		OutputStream outputStream = event.isError() ? hostShellError : hostShellInput;
 		if (input.length == 0) {
+			/*
+			 * Avoid closing the stream too quickly. This can cause reader
+			 * threads to miss output from the shell
+			 */
+			waitForHostShellTermination();
 			try {
 				outputStream.close();
 			} catch (IOException e) {
@@ -181,14 +199,25 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 			return;
 		}
 		try {
-			for(int i = 0; i < input.length; i++) {
+			for (int i = 0; i < input.length; i++) {
 				outputStream.write(input[i].getString().getBytes());
 				outputStream.write('\n');
 				outputStream.flush();
 			}
-		} catch(IOException e) {
+		} catch (IOException e) {
 			// Ignore
 		}
 	}
-	
+
+	private synchronized void waitForHostShellTermination() {
+		while (hostShell.isActive()) {
+			try {
+				wait(1000);
+			} catch (InterruptedException e) {
+				// ignore because we're polling to see if shell is still
+				// active.
+			}
+		}
+	}
+
 }
