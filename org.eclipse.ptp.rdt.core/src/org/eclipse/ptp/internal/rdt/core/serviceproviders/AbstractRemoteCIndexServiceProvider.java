@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,8 +52,8 @@ public abstract class AbstractRemoteCIndexServiceProvider extends ServiceProvide
 	public static final String NAME = Messages.RemoteCIndexServiceProvider_0;
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.CIndexingService"; //$NON-NLS-1$
 	
-	private static final String HOST_NAME_KEY = "host-name"; //$NON-NLS-1$
-	private static final String INDEX_LOCATION_KEY = "index-location"; //$NON-NLS-1$
+	public static final String HOST_NAME_KEY = "host-name"; //$NON-NLS-1$
+	public static final String INDEX_LOCATION_KEY = "index-location"; //$NON-NLS-1$
 	
 	public synchronized ICallHierarchyService getCallHierarchyService() {
 		if(!isConfigured())
