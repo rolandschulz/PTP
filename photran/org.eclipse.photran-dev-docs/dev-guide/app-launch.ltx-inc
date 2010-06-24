@@ -11,7 +11,7 @@
 	\item In that dialog, create a new \textbf{Eclipse Application} launch configuration. Call it ``Photran''.
 	\item For the configuration that you have just created, switch to the ``Arguments'' tab.
 	\item Change the ``VM arguments'' field to: \\
-	      \centerline{-ea -XX:PermSize=64M -XX:MaxPermSize=128 -Xms64m -Xmx768m}
+	      \centerline{-ea -XX:PermSize=64m -XX:MaxPermSize=128m -Xms64m -Xmx768m}
 	      (These arguments will enable assertions, increase the amount of
 	      \href{http://wiki.eclipse.org/FAQ_How_do_I_increase_the_permgen_size_available_to_Eclipse\%3F}
 	           {PermGen space},
