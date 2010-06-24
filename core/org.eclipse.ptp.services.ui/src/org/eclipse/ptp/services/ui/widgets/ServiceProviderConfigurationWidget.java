@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -478,7 +478,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	
 	private void selectProvider(final IServiceProviderDescriptor descriptor) {
 		TreeItem serviceTreeItem = servicesTree.getSelection()[0];
-		IServiceProvider newProvider = (IServiceProvider)servicesTree.getData(PROVIDER_KEY);
+		IServiceProvider newProvider = (IServiceProvider)serviceTreeItem.getData(PROVIDER_KEY);
 		if (newProvider == null || !newProvider.getId().equals(descriptor.getId())) {
 			IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
 			IServiceProvider existingProvider = getExistingProvider(descriptor.getId(), service);
