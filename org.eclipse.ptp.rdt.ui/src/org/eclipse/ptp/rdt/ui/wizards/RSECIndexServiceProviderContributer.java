@@ -17,6 +17,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.internal.rdt.core.serviceproviders.AbstractRemoteCIndexServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -45,23 +46,24 @@ import org.eclipse.swt.widgets.Label;
  */
 public class RSECIndexServiceProviderContributer implements IServiceProviderContributor {
 
-	private RSECIndexServiceProvider fProvider;
+	private IServiceProviderWorkingCopy fProviderWorkingCopy;
 
 	private final Map<Integer, IHost> hostComboIndexToHostMap = new HashMap<Integer, IHost>();
 
 	private IHost selectedHost;
 	private String configPath;
 
-	public void configureServiceProvider(IServiceProvider sp, final Composite container) {
+	public void configureServiceProvider(IServiceProviderWorkingCopy sp, final Composite container) {
+		//The UI components works with IServiceProviderWorkingCopy and not the original IServiceProvider
+		
+		fProviderWorkingCopy = null;
 		if (sp instanceof IServiceProviderWorkingCopy) {
-			sp = ((IServiceProviderWorkingCopy) sp).getOriginal();
+			fProviderWorkingCopy = (IServiceProviderWorkingCopy) sp;
 		}
 
-		if (!(sp instanceof RSECIndexServiceProvider)) {
+		if (!(sp.getOriginal() instanceof RSECIndexServiceProvider)) {
 			throw new IllegalArgumentException(); // should never happen
 		}
-
-		fProvider = (RSECIndexServiceProvider) sp;
 
 		container.setLayout(new GridLayout(1, false));
 
@@ -85,7 +87,7 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 																				// space
 
 		// attempt to restore settings from saved state
-		IHost hostSelected = fProvider.getHost();
+		String hostName = fProviderWorkingCopy.getString(AbstractRemoteCIndexServiceProvider.HOST_NAME_KEY, ""); //$NON-NLS-1$
 
 		// populate the combo with a list of hosts
 		IHost[] hosts = SystemStartHere.getConnections();
@@ -95,7 +97,7 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 			hostCombo.add(hosts[k].getAliasName(), k);
 			hostComboIndexToHostMap.put(k, hosts[k]);
 
-			if (hostSelected != null && hostSelected.getAliasName().compareTo(hosts[k].getAliasName()) == 0) {
+			if (hostName.length() > 0 && hostName.compareTo(hosts[k].getAliasName()) == 0) {
 				toSelect = k;
 			}
 		}
@@ -137,14 +139,7 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 
 		});
 
-		configPath = fProvider.getIndexLocation();
-		if (fProvider.isConfigured() && configPath == null) // happens if the
-															// project was
-															// created before
-															// the index
-															// location feature
-															// was added
-			configPath = ""; //$NON-NLS-1$
+		configPath = fProviderWorkingCopy.getString(AbstractRemoteCIndexServiceProvider.INDEX_LOCATION_KEY, ""); //$NON-NLS-1$
 
 		final IndexFileLocationWidget scopeWidget = new IndexFileLocationWidget(container, SWT.NONE, selectedHost, configPath);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
@@ -174,10 +169,8 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 	}
 
 	private void updateProvider() {
-		// set the host for the service provider
-		fProvider.setConnection(selectedHost, getDStoreConnectorService(selectedHost));
-		fProvider.setIndexLocation(configPath);
-		fProvider.setConfigured(true);
+		fProviderWorkingCopy.putString(AbstractRemoteCIndexServiceProvider.HOST_NAME_KEY, selectedHost.getAliasName());
+		fProviderWorkingCopy.putString(AbstractRemoteCIndexServiceProvider.INDEX_LOCATION_KEY, configPath);
 	}
 
 	private IConnectorService getDStoreConnectorService(IHost host) {
