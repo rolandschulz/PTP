@@ -9,16 +9,17 @@
 
 \begin{enumerate}
 \item You will need to be running \textbf{Eclipse 3.6 (Helios)} on a Java 5 or later JVM.
-      You should install the \textit{Eclipse SDK,} which includes the Eclipse Platform,
+      You should install \textit{Eclipse Classic 3.6} (also called the \textit{Eclipse SDK),}
+      which includes the Eclipse Platform,
       Java development tools, and Plug-in Development Environment.  (Since Photran is a
       set of Eclipse plug-ins, you need a version of Eclipse that includes the Plug-in
       Development Environment.)
-      \begin{itemize}
-      \item As of May, 2010, Eclipse 3.6 \textit{has not yet been released.}  You can download a
-      release candidate of the Eclipse SDK from
-      \url{http://download.eclipse.org/eclipse/downloads/drops/S-3.6RC2-201005201744/}.
-      The file you download should be named \textit{eclipse-SDK-3.6RC2-win32.zip} or something similar.
-      \end{itemize}
+      %\begin{itemize}
+      %\item As of May, 2010, Eclipse 3.6 \textit{has not yet been released.}  You can download a
+      %release candidate of the Eclipse SDK from
+      %\url{http://download.eclipse.org/eclipse/downloads/drops/S-3.6RC2-201005201744/}.
+      %The file you download should be named \textit{eclipse-SDK-3.6RC2-win32.zip} or something similar.
+      %\end{itemize}
 \item \textit{(Optional)} We also recommend that you install the following Eclipse plug-ins:
       \begin{enumerate}
       \item \href{http://subclipse.tigris.org/}{\textbf{Subclipse}} --
