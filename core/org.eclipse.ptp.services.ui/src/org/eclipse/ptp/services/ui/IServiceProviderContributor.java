@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -30,13 +31,13 @@ public interface IServiceProviderContributor {
 
 
 	/**
-	 * Creates a section on the service model properties page to configure the service provider.
+	 * Creates a section on the service model properties page to configure the service provider working copy.
 	 * The composite does not have a layout manager attached.
 	 * 
-	 * @param provider
+	 * @param provider working copy
 	 * @param composite
 	 */
-	public void configureServiceProvider(IServiceProvider provider, Composite composite);
+	public void configureServiceProvider(IServiceProviderWorkingCopy provider, Composite composite);
 	
 	/**
 	 * Retrieve the wizard pages for a service provider
