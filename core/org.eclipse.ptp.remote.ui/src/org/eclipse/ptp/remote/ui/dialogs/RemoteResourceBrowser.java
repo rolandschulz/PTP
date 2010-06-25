@@ -97,8 +97,7 @@ public class RemoteResourceBrowser extends Dialog {
 	private IRemoteUIConnectionManager fUIConnMgr = null;
 	private int optionFlags = SINGLE;
 
-	public RemoteResourceBrowser(IRemoteServices services,
-			IRemoteConnection conn, Shell parent, int flags) {
+	public RemoteResourceBrowser(IRemoteServices services, IRemoteConnection conn, Shell parent, int flags) {
 		super(parent);
 		setShellStyle(SWT.RESIZE | getShellStyle());
 		fServices = services;
@@ -108,16 +107,15 @@ public class RemoteResourceBrowser extends Dialog {
 			showConnections = true;
 		}
 		fConnMgr = services.getConnectionManager();
-		fUIConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
-				services).getUIConnectionManager();
+		fUIConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services).getUIConnectionManager();
 		setTitle(Messages.RemoteResourceBrowser_resourceTitle);
 		setType(FILE_BROWSER | DIRECTORY_BROWSER);
 	}
 
 	/**
-	 * Get the fConnection that was selected
+	 * Get the connection that was selected
 	 * 
-	 * @return selected fConnection
+	 * @return selected connection
 	 */
 	public IRemoteConnection getConnection() {
 		return fConnection;
@@ -200,10 +198,10 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Change the viewers input. Called when a new fConnection is selected.
+	 * Change the viewers input. Called when a new connection is selected.
 	 * 
 	 * @param conn
-	 *            new fConnection
+	 *            new connection
 	 * @return true if input successfully changed
 	 */
 	private boolean changeInput(final IRemoteConnection conn) {
@@ -227,8 +225,8 @@ public class RemoteResourceBrowser extends Dialog {
 			 */
 			String cwd = conn.getWorkingDirectory();
 			IPath initial = findInitialPath(cwd, fInitialPath);
-			
-			//TODO: not platform independent - needs IRemotePath 
+
+			// TODO: not platform independent - needs IRemotePath
 			setRoot(initial.toString());
 
 			fConnection = conn;
@@ -237,19 +235,18 @@ public class RemoteResourceBrowser extends Dialog {
 
 		return false;
 	}
-	
+
 	/**
-	 * When a new fConnection is selected, make sure it is open before using it.
+	 * When a new connection is selected, make sure it is open before using it.
 	 */
 	private void connectionSelected() {
 		int i = connectionCombo.getSelectionIndex();
 		if (i >= 0) {
 			/*
-			 * Make sure the fConnection is open before we try and read from the
-			 * fConnection.
+			 * Make sure the connection is open before we try and read from the
+			 * connection.
 			 */
-			final IRemoteConnection conn = fConnMgr
-					.getConnection(connectionCombo.getItem(i));
+			final IRemoteConnection conn = fConnMgr.getConnection(connectionCombo.getItem(i));
 			if (!changeInput(conn)) {
 				/*
 				 * Reset combo back to the previous selection
@@ -269,7 +266,7 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Create composite to allow fConnection selection and creation.
+	 * Create composite to allow connection selection and creation.
 	 * 
 	 * @param comp
 	 */
@@ -280,6 +277,7 @@ public class RemoteResourceBrowser extends Dialog {
 		layout.marginWidth = 0;
 		connComp.setLayout(layout);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd.horizontalSpan = 2;
 		connComp.setLayoutData(gd);
 
 		Label label = new Label(connComp, SWT.NONE);
@@ -306,10 +304,10 @@ public class RemoteResourceBrowser extends Dialog {
 		gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		newButton.setLayoutData(gd);
 		newButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent evt) {
 				if (fUIConnMgr != null) {
-					IRemoteConnection conn = fUIConnMgr
-							.newConnection(getShell());
+					IRemoteConnection conn = fUIConnMgr.newConnection(getShell());
 					if (conn != null) {
 						updateConnectionCombo(conn);
 					}
@@ -319,9 +317,9 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Determine the initial path for the browser. If the initial path is
-	 * not supplied or does not exist on the remote machine, then the
-	 * initial path will be the cwd.
+	 * Determine the initial path for the browser. If the initial path is not
+	 * supplied or does not exist on the remote machine, then the initial path
+	 * will be the cwd.
 	 * 
 	 * @param cwd
 	 * @param initialPath
@@ -330,19 +328,22 @@ public class RemoteResourceBrowser extends Dialog {
 	private IPath findInitialPath(String cwd, String initialPath) {
 		if (initialPath != null) {
 			IPath path = new Path(initialPath);
-			if (path.isAbsolute() &&
-				fFileMgr.getResource(initialPath).fetchInfo().exists()) {
-				return new Path(initialPath);
+			if (!path.isAbsolute()) {
+				path = new Path(cwd).append(path);
+			}
+			if (fFileMgr.getResource(path.toString()).fetchInfo().exists()) {
+				return path;
 			}
 		}
 		return new Path(cwd);
 	}
 
 	/**
-	 * Set the root directory for the browser. This will also update
-	 * the text field with the path.
+	 * Set the root directory for the browser. This will also update the text
+	 * field with the path.
 	 * 
-	 * @param path path of root directory
+	 * @param path
+	 *            path of root directory
 	 */
 	private void setRoot(String path) {
 		if (fFileMgr != null) {
@@ -355,11 +356,11 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	/**
-	 * Update fConnection combo dropdown with current connections. If supplied
+	 * Update connection combo dropdown with current connections. If supplied
 	 * conn will be selected in the list.
 	 * 
 	 * @param conn
-	 *            fConnection to select in the list
+	 *            connection to select in the list
 	 */
 	private void updateConnectionCombo(IRemoteConnection conn) {
 		IRemoteConnectionManager mgr = fServices.getConnectionManager();
@@ -411,12 +412,15 @@ public class RemoteResourceBrowser extends Dialog {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.Dialog#createButton(org.eclipse.swt.widgets.Composite, int, java.lang.String, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.Dialog#createButton(org.eclipse.swt.widgets
+	 * .Composite, int, java.lang.String, boolean)
 	 */
 	@Override
-	protected Button createButton(Composite parent, int id, String label,
-			boolean defaultButton) {
+	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
 		Button button = super.createButton(parent, id, label, defaultButton);
 		if (id == IDialogConstants.OK_ID) {
 			okButton = button;
@@ -443,7 +447,7 @@ public class RemoteResourceBrowser extends Dialog {
 		}
 		return contents;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -456,8 +460,7 @@ public class RemoteResourceBrowser extends Dialog {
 		Composite main = (Composite) super.createDialogArea(parent);
 
 		final Composite dialogComp = new Composite(main, SWT.NONE);
-		dialogComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-				false));
+		dialogComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		dialogComp.setLayout(layout);
@@ -481,27 +484,32 @@ public class RemoteResourceBrowser extends Dialog {
 		});
 		remotePathText.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
-				getShell().setDefaultButton(null); // allow text widget to receive SWT.DefaultSelection event
+				getShell().setDefaultButton(null); // allow text widget to
+													// receive
+													// SWT.DefaultSelection
+													// event
 			}
+
 			public void focusLost(FocusEvent e) {
 				getShell().setDefaultButton(okButton);
 			}
 		});
-		remotePathText.addSelectionListener(new SelectionAdapter(){
+		remotePathText.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				remotePathText.setSelection(remotePathText.getText().length());
 				setRoot(remotePathText.getText());
 			}
-			
+
 		});
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.widthHint = widthHint;
 		remotePathText.setLayoutData(gd);
-		
-		upButton = new Button(dialogComp, SWT.PUSH|SWT.FLAT);
+
+		upButton = new Button(dialogComp, SWT.PUSH | SWT.FLAT);
 		upButton.setImage(RemoteUIImages.get(RemoteUIImages.IMG_ELCL_UP_NAV));
 		upButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (!fRootPath.isRoot()) {
 					setRoot(fRootPath.removeLastSegments(1).toOSString());
@@ -527,21 +535,17 @@ public class RemoteResourceBrowser extends Dialog {
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				ISelection selection = event.getSelection();
-				if (!selection.isEmpty()
-						&& selection instanceof IStructuredSelection) {
+				if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
 					IStructuredSelection ss = (IStructuredSelection) selection;
 					Object element = ss.getFirstElement();
 					if (element instanceof DeferredFileStore) {
 						DeferredFileStore dfs = (DeferredFileStore) element;
-						remotePathText.setText(dfs.getFileStore()
-								.toURI().getPath());
+						remotePathText.setText(dfs.getFileStore().toURI().getPath());
 					}
 					Vector<String> selectedPaths = new Vector<String>(ss.size());
 					for (Object currentSelection : ss.toArray()) {
 						if (currentSelection instanceof DeferredFileStore) {
-							selectedPaths.add(((DeferredFileStore) currentSelection)
-											.getFileStore().toURI()
-											.getPath());
+							selectedPaths.add(((DeferredFileStore) currentSelection).getFileStore().toURI().getPath());
 						}
 					}
 					remotePaths = selectedPaths.toArray(new String[0]);
@@ -555,22 +559,22 @@ public class RemoteResourceBrowser extends Dialog {
 				Object o = s.getFirstElement();
 				if (treeViewer.isExpandable(o)) {
 					treeViewer.setExpandedState(o, !treeViewer.getExpandedState(o));
-				}			
+				}
 			}
-			
+
 		});
 		if (browserType == DIRECTORY_BROWSER) {
 			treeViewer.addFilter(new ViewerFilter() {
-				public boolean select(Viewer viewer, Object parentElement,
-						Object element) {
+				@Override
+				public boolean select(Viewer viewer, Object parentElement, Object element) {
 					if ((element instanceof DeferredFileStore)) {
-						return ((DeferredFileStore)element).isContainer();
+						return ((DeferredFileStore) element).isContainer();
 					}
 					return element instanceof PendingUpdateAdapter;
 				}
 			});
 		}
-		
+
 		updateDialog();
 
 		return main;
