@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -72,67 +71,72 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
 			throws CoreException {
-		if (!(launch instanceof IPLaunch)) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
-		}
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-		monitor.beginTask("", 250); //$NON-NLS-1$
-		monitor.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
-		if (monitor.isCanceled())
-			return;
-
-		IPDebugger debugger = null;
-
-		monitor.worked(10);
-		monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
-
-		AttributeManager attrManager = getAttributeManager(configuration, mode);
-
-		// All copy pre-"job submission" occurs here
-		copyExecutable(configuration, monitor);
-		doPreLaunchSynchronization(configuration, monitor);
-
-		// switch perspective
-		switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
 		try {
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				// show ptp debug view
-				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-				monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
+			if (!(launch instanceof IPLaunch)) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
+			}
+			SubMonitor progress = SubMonitor.convert(monitor, 100);
+			//		progress.beginTask("", 25); //$NON-NLS-1$
+			progress.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
+			progress.setWorkRemaining(90);
+			if (progress.isCanceled()) {
+				return;
+			}
 
-				/*
-				 * Create the debugger extension, then the connection point for
-				 * the debug server. The debug server is launched via the
-				 * submitJob() command.
-				 */
+			IPDebugger debugger = null;
 
-				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
-				debugger = debugConfig.getDebugger();
-				debugger.initialize(configuration, attrManager, monitor);
-				if (monitor.isCanceled()) {
-					return;
+			progress.worked(10);
+			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
+
+			AttributeManager attrManager = getAttributeManager(configuration, mode);
+
+			// All copy pre-"job submission" occurs here
+			copyExecutable(configuration, progress.newChild(10));
+			doPreLaunchSynchronization(configuration, progress.newChild(10));
+
+			// switch perspective
+			switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
+			try {
+				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+					// show ptp debug view
+					showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+					progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
+
+					/*
+					 * Create the debugger extension, then the connection point
+					 * for the debug server. The debug server is launched via
+					 * the submitJob() command.
+					 */
+
+					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+					debugger = debugConfig.getDebugger();
+					debugger.initialize(configuration, attrManager, progress.newChild(10));
+					if (progress.isCanceled()) {
+						return;
+					}
+					attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
+					attrManager.addAttribute(JobAttributes.getDebuggerIdAttributeDefinition().create(debugConfig.getID()));
 				}
-				attrManager.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(true));
-				attrManager.addAttribute(JobAttributes.getDebuggerIdAttributeDefinition().create(debugConfig.getID()));
+
+				progress.worked(10);
+				progress.subTask(Messages.ParallelLaunchConfigurationDelegate_7);
+
+				submitJob(configuration, mode, (IPLaunch) launch, attrManager, debugger, progress.newChild(40));
+
+				progress.worked(10);
+			} catch (CoreException e) {
+				if (debugger != null) {
+					debugger.cleanup((IPLaunch) launch);
+				}
+				if (e.getStatus().getCode() != IStatus.CANCEL) {
+					throw e;
+				}
 			}
-
-			monitor.worked(10);
-			monitor.subTask(Messages.ParallelLaunchConfigurationDelegate_7);
-
-			submitJob(configuration, mode, (IPLaunch) launch, attrManager, debugger, monitor);
-
-			monitor.worked(10);
-		} catch (CoreException e) {
-			if (debugger != null) {
-				debugger.cleanup((IPLaunch) launch);
-			}
-			if (e.getStatus().getCode() != IStatus.CANCEL)
-				throw e;
 		} finally {
-			monitor.done();
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 

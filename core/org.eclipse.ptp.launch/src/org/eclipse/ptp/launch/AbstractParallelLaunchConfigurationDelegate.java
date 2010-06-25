@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -269,13 +270,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				if (stateAttr != null) {
 					JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
 					if (jobSub != null) {
+						/*
+						 * The job must now be SUBMITTED as we've been called by
+						 * a job event handler. Set the status so that anyone
+						 * waiting on the job submission will be notified.
+						 */
+						jobSub.setStatus(JobSubStatus.SUBMITTED);
+
 						switch (stateAttr.getValue()) {
 						case RUNNING:
 							/*
 							 * When the job starts running call back to notify
 							 * that job submission is completed.
 							 */
-							jobSub.setStatus(JobSubStatus.SUBMITTED);
 							doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
 									jobSub.getAttrMgr(), jobSub.getDebugger(), job);
 							break;
@@ -295,9 +302,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 							}
 
 							/*
-							 * Job has terminated, so clean up.
+							 * Clean up any launch activities.
 							 */
 							doCleanupLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch());
+
 							jobSubmissions.remove(jobSub);
 							break;
 						}
@@ -1257,22 +1265,35 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected void submitJob(ILaunchConfiguration configuration, String mode, IPLaunch launch, AttributeManager attrMgr,
 			IPDebugger debugger, IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		try {
+			final IResourceManager rm = getResourceManager(configuration);
+			if (rm == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
+			}
 
-		final IResourceManager rm = getResourceManager(configuration);
-		if (rm == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
-		}
+			JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
+			jobSubmissions.put(jobSub.getId(), jobSub);
 
-		JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
-		jobSubmissions.put(jobSub.getId(), jobSub);
+			JobSubStatus status;
 
-		rm.submitJob(jobSub.getId(), configuration, attrMgr, monitor);
+			try {
+				rm.submitJob(jobSub.getId(), configuration, attrMgr, progress.newChild(5));
+				status = jobSub.waitFor(progress.newChild(5));
+			} catch (CoreException e) {
+				jobSub.setError(e.getMessage());
+				jobSub.setStatus(JobSubStatus.ERROR);
+				status = JobSubStatus.ERROR;
+			}
 
-		JobSubStatus status = jobSub.waitFor(monitor);
-
-		if (status == JobSubStatus.ERROR) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, jobSub.getError()));
+			if (status == JobSubStatus.ERROR) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, jobSub.getError()));
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 
