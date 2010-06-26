@@ -48,6 +48,9 @@ public class Binder
         ast.accept(new SpecificationCollector());   logTime(start, SpecificationCollector.class, filename);
         
                                                     start = System.currentTimeMillis();
+        ast.accept(new SubprogramTypeCollector());  logTime(start, SubprogramTypeCollector.class, filename);
+                                                    
+                                                    start = System.currentTimeMillis();
         ast.accept(new ModuleLoader(file));         logTime(start, ModuleLoader.class, filename);
         // TODO: Type check here so derived type components can be resolved
                                                     start = System.currentTimeMillis();

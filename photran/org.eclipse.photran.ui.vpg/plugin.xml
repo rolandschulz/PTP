@@ -510,6 +510,12 @@
                menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"/>
          <!-- -->
          <action
+               label="%action.label.19"
+               class="org.eclipse.photran.internal.ui.actions.HighlightVariableAccesses"
+               menubarPath="org.eclipse.jdt.ui.refactoring.menu/debugging/debugging"
+               id="org.eclipse.photran.ui.HighlightVariableAccessesAction"/>
+         <!-- -->
+         <action
                class="org.eclipse.photran.internal.ui.actions.ResetBinderStatistics"
                id="org.eclipse.photran.ui.ResetBinderStatisticsAction"
                label="%action.label.16"

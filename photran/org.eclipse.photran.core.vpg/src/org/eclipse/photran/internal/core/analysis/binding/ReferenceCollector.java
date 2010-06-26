@@ -12,6 +12,8 @@ package org.eclipse.photran.internal.core.analysis.binding;
 
 import java.util.List;
 
+import org.eclipse.photran.internal.core.analysis.types.FunctionType;
+import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTAcImpliedDoNode;
@@ -50,7 +52,9 @@ import org.eclipse.photran.internal.core.parser.ASTEndWhereStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTExitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTFieldSelectorNode;
 import org.eclipse.photran.internal.core.parser.ASTFinalBindingNode;
+import org.eclipse.photran.internal.core.parser.ASTForallTripletSpecListNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionArgListNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionArgNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionParNode;
 import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTGenericBindingNode;
@@ -70,6 +74,7 @@ import org.eclipse.photran.internal.core.parser.ASTSFDataRefNode;
 import org.eclipse.photran.internal.core.parser.ASTSFExprListNode;
 import org.eclipse.photran.internal.core.parser.ASTSFVarNameNode;
 import org.eclipse.photran.internal.core.parser.ASTScalarVariableNode;
+import org.eclipse.photran.internal.core.parser.ASTSectionSubscriptNode;
 import org.eclipse.photran.internal.core.parser.ASTSpecificBindingNode;
 import org.eclipse.photran.internal.core.parser.ASTStmtFunctionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTStructureComponentNode;
@@ -85,14 +90,17 @@ import org.eclipse.photran.internal.core.parser.ASTVariableNode;
 import org.eclipse.photran.internal.core.parser.ASTWaitSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWaitStmtNode;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
+import org.eclipse.rephraserengine.core.util.Pair;
 
 /**
- * Phase 6 of name-binding analysis.
+ * Phase 7 of name-binding analysis.
  * <p> 
  * Visits an AST, collecting variables references outside declaration and
- * specification statements.
+ * specification statements.  Also marks variable accesses as reads, writes,
+ * or both.
  * <p>
  * Note: Fields in derived types (e.g., <FieldSelector>) and named function arguments are NOT handled.
  * 
@@ -101,25 +109,52 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  */
 class ReferenceCollector extends BindingCollector
 {
+    private void markAccess(Token ident, VariableAccess access)
+    {
+        PhotranVPG.getDatabase().setAnnotation(
+            ident.getTokenRef(),
+            PhotranVPG.VARIABLE_ACCESS_ANNOTATION_TYPE,
+            access);
+    }
+
+    // Occurs only in the context of an <SFExprList>, which provides the
+    // argument expressions in an array access (but not a function call)
     @Override public void visitASTSFDataRefNode(ASTSFDataRefNode node)
     {
         super.traverseChildren(node);
-        if (node.getName() != null)
-            bind(node.getName());
+        Token ident = node.getName();
+        if (ident != null)
+        {
+            bind(ident);
+            markAccess(ident, VariableAccess.READ);
+        }
     }
 
+    // Occurs in the context of a <RdFmtId> or a <CExpr>.
+    // A <CExpr> occurs in the context of:
+    //   <ConnectSpec>, <CloseSpec>, <FormatIdentifier>, <InquireSpec>
     @Override public void visitASTCPrimaryNode(ASTCPrimaryNode node)
     {
         super.traverseChildren(node);
         if (node.getName() != null)
-            bind(node.getName().getName());
+        {
+            Token ident = node.getName().getName();
+            bind(ident);
+            markAccess(ident, VariableAccess.RW);
+        }
     }
 
+    // Occurs in the context of <UFExpr>,
+    // which occurs in the context of a <UnitIdentifier>, <RdUnitId>, <RdFmtIdExpr>
     @Override public void visitASTUFPrimaryNode(ASTUFPrimaryNode node)
     {
         super.traverseChildren(node);
         if (node.getName() != null)
-            bind(node.getName().getName());
+        {
+            Token ident = node.getName().getName();
+            bind(ident);
+            markAccess(ident, VariableAccess.RW);
+        }
     }
 
     // <NamedConstantUse> ::= T_IDENT
@@ -127,7 +162,9 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTNamedConstantUseNode(ASTNamedConstantUseNode node)
     {
         super.traverseChildren(node);
-        bind(node.getName());
+        Token ident = node.getName();
+        bind(ident);
+        markAccess(ident, VariableAccess.READ);
     }
 
     // # R430
@@ -160,7 +197,9 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTAcImpliedDoNode(ASTAcImpliedDoNode node)
     {
         super.traverseChildren(node);
-        bind(node.getImpliedDoVariable().getImpliedDoVariable());
+        Token ident = node.getImpliedDoVariable().getImpliedDoVariable();
+        bind(ident);
+        markAccess(ident, VariableAccess.IMPLIED_DO);
     }
 
     // # R502
@@ -193,7 +232,9 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTDataImpliedDoNode(ASTDataImpliedDoNode node)
     {
         super.traverseChildren(node);
-        bind(node.getImpliedDoVariable());
+        Token ident = node.getImpliedDoVariable();
+        bind(ident);
+        markAccess(ident, VariableAccess.IMPLIED_DO);
     }
 
     // <DataStmtValue> ::=
@@ -201,10 +242,17 @@ class ReferenceCollector extends BindingCollector
     // | T_ICON T_ASTERISK <DataStmtConstant>
     // | <NamedConstantUse> T_ASTERISK <DataStmtConstant>
 
+    // Occurs in the context of a <DataStmtValueList>, which occurs in the context of
+    // a <DataStmtSet>
     @Override public void visitASTDataStmtValueNode(ASTDataStmtValueNode node)
     {
         super.traverseChildren(node);
-        if (node.getNamedConstKind() != null) bind(node.getNamedConstKind().getName());
+        if (node.getNamedConstKind() != null)
+        {
+            Token ident = node.getNamedConstKind().getName();
+            bind(ident);
+            markAccess(ident, VariableAccess.READ);
+        }
     }
 
     // # R544
@@ -291,10 +339,17 @@ class ReferenceCollector extends BindingCollector
     // <VariableName>
     // | <ArrayElement>
 
+    // Occurs in the context of <ConnectSpec>, <CloseSpec>, <IOControlSpec>, <PositionSpec>, <InquireStmt>, <InquireSpec>
+    
     @Override public void visitASTScalarVariableNode(ASTScalarVariableNode node)
     {
         super.traverseChildren(node);
-        if (node.getVariableName() != null) bind(node.getVariableName());
+        Token ident = node.getVariableName();
+        if (ident != null)
+        {
+            bind(ident);
+            markAccess(ident, VariableAccess.WRITE);
+        }
     }
 
     // # R612
@@ -311,15 +366,24 @@ class ReferenceCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        if (node.getName() != null)
+        Token ident = node.getName();
+        if (ident != null)
         {
             // <Variable> is the only context where a <DataRef> does not refer to a member of a derived type 
         	if (!node.hasDerivedTypeComponentName() && node.getParent().getParent() instanceof ASTVariableNode)
-        		bind(node.getName());
+        	{
+        		bind(ident);
+        		// FIXME: Variable access
+        	}
         	else if (!node.hasDerivedTypeComponentName() && node.getParent().getParent() instanceof ASTCallStmtNode)
-                bind(node.getName());
+        	{
+                bind(ident);
+                // FIXME: Variable access
+        	}
         	else
-        		dontbind(node.getName());
+        	{
+        		dontbind(ident);
+        	}
         }
         if (node.getName/*getComponentName*/() != null)
             dontbind(node.getName/*getComponentName*/());
@@ -330,13 +394,18 @@ class ReferenceCollector extends BindingCollector
     // <VariableName> <FieldSelector>
     // | @:<StructureComponent> <FieldSelector>
 
+    // Occurs in the context of <DataIDoObject>, nested <StructureComponent>s, <ArrayElement>, 
     @Override
     public void visitASTStructureComponentNode(ASTStructureComponentNode node)
     {
         super.traverseChildren(node);
         
         if (node.getVariableName() != null)
-            bind(node.getVariableName().getVariableName());
+        {
+            Token ident = node.getVariableName().getVariableName();
+            bind(ident);
+            markAccess(ident, VariableAccess.READ);
+        }
     }
 
     // <FieldSelector> ::=
@@ -357,7 +426,12 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTArrayElementNode(ASTArrayElementNode node)
     {
         super.traverseChildren(node);
-        if (node.getVariableName() != null) bind(node.getVariableName());
+        Token ident = node.getVariableName();
+        if (ident != null)
+        {
+            bind(ident);
+            markAccess(ident, VariableAccess.READ);
+        }
     }
 
     // <AllocateObject> ::=
@@ -369,7 +443,11 @@ class ReferenceCollector extends BindingCollector
         super.traverseChildren(node);
         
         if (node.getVariableName() != null)
-            bind(node.getVariableName().getVariableName());
+        {
+            Token ident = node.getVariableName().getVariableName();
+            bind(ident);
+            markAccess(ident, VariableAccess.WRITE);
+        }
     }
 
     // # R630
@@ -383,24 +461,41 @@ class ReferenceCollector extends BindingCollector
     // | <Name> T_PERCENT <Name>
     // | @:<PointerField> <FieldSelector>
 
+    // Occurs in the context of a NULLIFY statement
     @Override public void visitASTPointerObjectNode(ASTPointerObjectNode node)
     {
         super.traverseChildren(node);
         
         if (node.getName() != null)
-            bind(node.getName().getName());
+        {
+            Token ident = node.getName().getName();
+            bind(ident);
+            markAccess(ident, VariableAccess.WRITE);
+        }
         else
         {
             IASTListNode<ASTPointerFieldNode> list = node.getPointerField();
             for (int i = 0; i < list.size(); i++)
             {
                 if (list.get(i).getName() != null)
-                    bind(list.get(i).getName().getName());
+                {
+                    Token ident = list.get(i).getName().getName();
+                    bind(ident);
+                    markAccess(ident, VariableAccess.WRITE);
+                }
+                
                 if (list.get(i).getComponentName() != null)
                     dontbind(list.get(i).getComponentName().getName());
+                
                 if (list.get(i).getSFDummyArgNameList() != null)
+                {
                     for (int j = 0; j < list.get(i).getSFDummyArgNameList().size(); j++)
-                        bind(list.get(i).getSFDummyArgNameList().get(j).getName/*getVariableName*/());
+                    {
+                        Token ident = list.get(i).getSFDummyArgNameList().get(j).getName/*getVariableName*/();
+                        bind(ident);
+                        markAccess(ident, VariableAccess.READ);
+                    }
+                }
             }
         }
     }
@@ -425,7 +520,11 @@ class ReferenceCollector extends BindingCollector
         super.traverseChildren(node);
         
         if (node.getName() != null && node.getName().getName() != null && node.getName().getName().getText().trim().length() > 0)
+        {
             bind(node.getName().getName());
+            markAccess(node.getName().getName(), determineAccess(node));
+            // TODO: If this is a function call, we shouldn't mark it with a read access
+        }
 
         IASTListNode<ASTFunctionArgListNode> list = node.getFunctionArgList();
         if (list != null)
@@ -434,20 +533,166 @@ class ReferenceCollector extends BindingCollector
                     dontbind(list.get(i).getFunctionArg().getName());
     }
 
+    private VariableAccess determineAccess(ASTVarOrFnRefNode node)
+    {
+        if (isVariableExpr(node) && isSubprogramInvocationArg(node))
+            return getSubprogramArgIntent(getSubprogramArgInfo(node));
+        else
+            return VariableAccess.READ;
+    }
+
+    private boolean isVariableExpr(ASTVarOrFnRefNode node)
+    {
+        return node.getName() != null
+            && node.getFunctionArgList() == null
+            && node.getPrimarySectionSubscriptList() == null
+            && node.getSubstringRange() == null
+            && node.getDerivedTypeComponentRef() == null
+            && node.getComponentSectionSubscriptList() == null
+            && node.getSubstringRange2() == null;
+    }
+
+    private boolean isSubprogramInvocationArg(ASTVarOrFnRefNode node)
+    {
+        return getSubprogramArgInfo(node) != null;
+    }
+
+    private Pair<Token, ? extends Object> getSubprogramArgInfo(ASTVarOrFnRefNode node)
+    {
+        Pair<Token, ? extends Object> result = getSubroutineArgInfo(node);
+        if (result != null) return result;
+        
+        result = getFunctionArgInfo(node);
+        if (result != null) return result;
+        
+        result = getPrimarySectionSubcriptInfo(node);
+        return result;
+    }
+    
+    private Pair<Token, ? extends Object> getSubroutineArgInfo(ASTVarOrFnRefNode node)
+    {
+        IASTNode parent = node.getParent();
+        IASTNode grandparent = parent.getParent(); if (grandparent == null) return null;
+        IASTNode greatGrandparent = grandparent.getParent(); if (greatGrandparent == null) return null;
+
+        if (parent instanceof ASTSubroutineArgNode && greatGrandparent instanceof ASTCallStmtNode)
+        {
+            ASTCallStmtNode callStmt = (ASTCallStmtNode)greatGrandparent;
+            ASTSubroutineArgNode argNode = (ASTSubroutineArgNode)parent;
+            if (argNode.getName() != null)
+            {
+                return new Pair<Token, String>(
+                    callStmt.getSubroutineName(),
+                    argNode.getName().getText());
+            }
+            else
+            {
+                return new Pair<Token, Integer>(
+                    callStmt.getSubroutineName(),
+                    callStmt.getArgList().indexOf(parent));
+            }
+        }
+        return null;
+    }
+    
+    private Pair<Token, String> getFunctionArgInfo(ASTVarOrFnRefNode node)
+    {
+        IASTNode parent = node.getParent();
+        IASTNode grandparent = parent.getParent(); if (grandparent == null) return null;
+        IASTNode greatGrandparent = grandparent.getParent(); if (greatGrandparent == null) return null;
+        IASTNode greatGreatGrandparent = greatGrandparent.getParent(); if (greatGreatGrandparent == null) return null;
+
+        if (node.getParent() instanceof ASTFunctionArgNode
+            && grandparent instanceof ASTFunctionArgListNode
+            && greatGreatGrandparent instanceof ASTVarOrFnRefNode)
+        {
+            ASTVarOrFnRefNode fnCall = (ASTVarOrFnRefNode)greatGreatGrandparent;
+            if (fnCall.getFunctionArgList() != null)
+            {
+                return new Pair<Token, String>(
+                    fnCall.getName().getName(),
+                    //fnCall.getFunctionArgList().indexOf(grandparent));
+                    ((ASTFunctionArgNode)parent).getName().getText());
+            }
+        }
+        return null;
+    }
+
+    private Pair<Token, Integer> getPrimarySectionSubcriptInfo(ASTVarOrFnRefNode node)
+    {
+        IASTNode parent = node.getParent();
+        IASTNode grandparent = parent.getParent(); if (grandparent == null) return null;
+        IASTNode greatGrandparent = grandparent.getParent(); if (greatGrandparent == null) return null;
+
+        if (parent instanceof ASTSectionSubscriptNode && greatGrandparent instanceof ASTVarOrFnRefNode)
+        {
+            ASTVarOrFnRefNode fnCall = (ASTVarOrFnRefNode)greatGrandparent;
+            if (fnCall.getPrimarySectionSubscriptList() != null
+                    && fnCall.getPrimarySectionSubscriptList().contains(parent))
+                return new Pair<Token, Integer>(
+                    fnCall.getName().getName(),
+                    fnCall.getPrimarySectionSubscriptList().indexOf(parent));
+        }
+        
+        return null;
+    }
+
+    private VariableAccess getSubprogramArgIntent(Pair<Token, ? extends Object> subprogramArgInfo)
+    {
+        Token subprogramName = subprogramArgInfo.fst;
+        if (subprogramName != null)
+        {
+            List<PhotranTokenRef> bindings = bind(subprogramName); // List<Definition> bindings = subprogramName.resolveBinding();
+            if (bindings.size() >= 1)
+                return getSubprogramArgIntentFromDef(vpg.getDefinitionFor(bindings.get(0)), subprogramArgInfo.snd);
+        }
+        return VariableAccess.RW;
+    }
+
+    private VariableAccess getSubprogramArgIntentFromDef(Definition def, Object subprogramArg)
+    {
+        if (def != null && def.isSubprogram())
+        {
+            Type fnType = def.getType();
+            if (fnType instanceof FunctionType)
+            {
+                FunctionType functionType = (FunctionType)fnType;
+                if (subprogramArg instanceof Integer)
+                    return functionType.getArgumentAccess((Integer)subprogramArg);
+                else if (subprogramArg instanceof String)
+                    return functionType.getArgumentAccess((String)subprogramArg);
+            }
+
+            return VariableAccess.RW; // Should never happen, but default to intent(inout) if it does
+        }
+        // Not a subprogram
+        {
+            return VariableAccess.READ;
+        }
+    }
+
     @Override public void visitASTSFExprListNode(ASTSFExprListNode node)
     {
         super.traverseChildren(node);
         
         if (node.getSFDummyArgNameList() != null)
+        {
             for (int j = 0; j < node.getSFDummyArgNameList().size(); j++)
-                bind(node.getSFDummyArgNameList().get(j).getName/*getVariableName*/());
+            {
+                Token ident = node.getSFDummyArgNameList().get(j).getName/*getVariableName*/();
+                bind(ident);
+                markAccess(ident, VariableAccess.READ);
+            }
+        }
     }
     
     @Override public void visitASTSFVarNameNode(ASTSFVarNameNode node)
     {
         super.traverseChildren(node);
         
-        bind(node.getName().getName());
+        Token ident = node.getName().getName();
+        bind(ident);
+        markAccess(ident, VariableAccess.READ);
     }
     
     // # R735 - JO - Macro substituted
@@ -465,10 +710,19 @@ class ReferenceCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        bind(node.getLhsVariable().getName());
+        Token lhsIdent = node.getLhsVariable().getName();
+        bind(lhsIdent);
+        markAccess(lhsIdent, VariableAccess.WRITE);
+        
         if (node.getLhsNameList() != null)
+        {
             for (int j = 0; j < node.getLhsNameList().size(); j++)
-                bind(node.getLhsNameList().get(j).getName());
+            {
+                Token ident = node.getLhsNameList().get(j).getName();
+                bind(ident);
+                markAccess(ident, VariableAccess.READ);
+            }
+        }
     }
 
     // # R744
@@ -502,6 +756,19 @@ class ReferenceCollector extends BindingCollector
         if (node.getEndName() != null) bind(node.getEndName());
     }
 
+    // # R750
+    // <ForallTripletSpecList> ::=
+    //     | <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript>
+    //     | <Name> -:T_EQUALS Lb:<Subscript> -:T_COLON Ub:<Subscript> -:T_COLON stepExpr:<Expr>
+
+    @Override public void visitASTForallTripletSpecListNode(ASTForallTripletSpecListNode node)
+    {
+        super.traverseChildren(node);
+        Token ident = node.getName().getName();
+        bind(ident);
+        markAccess(ident, VariableAccess.FORALL);
+    }
+    
     // # R753
     // <EndForallStmt> ::=
     // <LblDef> T_END T_FORALL ( <EndName> )? T_EOS
@@ -578,7 +845,12 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTLoopControlNode(ASTLoopControlNode node)
     {
         super.traverseChildren(node);
-        if (node.getVariableName() != null) bind(node.getVariableName());
+        Token ident = node.getVariableName();
+        if (ident != null)
+        {
+            bind(ident);
+            markAccess(ident, VariableAccess.WRITE);
+        }
     }
 
     // # R825
@@ -627,7 +899,12 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTIoControlSpecNode(ASTIoControlSpecNode node)
     {
         super.traverseChildren(node);
-        if (node.getNamelistGroupName() != null) bind(node.getNamelistGroupName().getNamelistGroupName());
+        if (node.getNamelistGroupName() != null)
+        {
+            Token ident = node.getNamelistGroupName().getNamelistGroupName();
+            bind(ident);
+            markAccess(ident, VariableAccess.WRITE); // TODO: Is WRITE what we want?
+        }
     }
 
     // # R916
@@ -638,7 +915,9 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTInputImpliedDoNode(ASTInputImpliedDoNode node)
     {
         super.traverseChildren(node);
-        bind(node.getImpliedDoVariable());
+        Token ident = node.getImpliedDoVariable();
+        bind(ident);
+        markAccess(ident, VariableAccess.IMPLIED_DO);
     }
 
     // <OutputImpliedDo> ::=
@@ -650,7 +929,9 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTOutputImpliedDoNode(ASTOutputImpliedDoNode node)
     {
         super.traverseChildren(node);
-        bind(node.getImpliedDoVariable());
+        Token ident = node.getImpliedDoVariable();
+        bind(ident);
+        markAccess(ident, VariableAccess.IMPLIED_DO);
     }
 
     // <EditElement> ::=
@@ -663,7 +944,12 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTEditElementNode(ASTEditElementNode node)
     {
         super.traverseChildren(node);
-        if (node.getIdentifier() != null) bind(node.getIdentifier()); // TODO: Is ANY correct?
+        Token ident = node.getIdentifier();
+        if (ident != null)
+        {
+            bind(ident); // TODO: Is ANY correct?
+            markAccess(ident, VariableAccess.READ);
+        }
     }
 
     // # R1103
@@ -884,11 +1170,18 @@ class ReferenceCollector extends BindingCollector
         // Assume this is actually an assignment statement instead of a statement function
         
         //addDefinition(node.getName(), Type.UNKNOWN);
-        bind(node.getName().getName());
+        Token functionName = node.getName().getName();
+        bind(functionName);
 
         if (node.getSFDummyArgNameList() != null)
+        {
             for (int j = 0; j < node.getSFDummyArgNameList().size(); j++)
-                bind(node.getSFDummyArgNameList().get(j).getName());
+            {
+                Token argName = node.getSFDummyArgNameList().get(j).getName();
+                bind(argName);
+                markAccess(functionName, VariableAccess.STMT_FUNCTION_ARG);
+            }
+        }
     }
 
     // #/* Assign Statement */
@@ -898,7 +1191,9 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTAssignStmtNode(ASTAssignStmtNode node)
     {
         super.traverseChildren(node);
-        bind(node.getVariableName());
+        Token ident = node.getVariableName();
+        bind(ident);
+        markAccess(ident, VariableAccess.WRITE);
     }
 
     // #/* Assigned GOTO Statement */
@@ -912,7 +1207,9 @@ class ReferenceCollector extends BindingCollector
     @Override public void visitASTAssignedGotoStmtNode(ASTAssignedGotoStmtNode node)
     {
         super.traverseChildren(node);
-        bind(node.getVariableName());
+        Token ident = node.getVariableName();
+        bind(ident);
+        markAccess(ident, VariableAccess.READ);
     }
 
     // F03
@@ -982,7 +1279,10 @@ class ReferenceCollector extends BindingCollector
                 {
                     Token variable = waitSpec.getExpr().findFirstToken();
                     if (variable != null && variable.getTerminal() == Terminal.T_IDENT)
+                    {
                         bind(variable);
+                        markAccess(variable, VariableAccess.WRITE);
+                    }
                 }
             }
         }

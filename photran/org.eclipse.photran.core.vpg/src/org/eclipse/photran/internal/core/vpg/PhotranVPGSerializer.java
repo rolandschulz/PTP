@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
+import org.eclipse.photran.internal.core.analysis.binding.VariableAccess;
 import org.eclipse.photran.internal.core.analysis.types.ArraySpec;
 import org.eclipse.photran.internal.core.analysis.types.Dimension;
 import org.eclipse.photran.internal.core.analysis.types.Type;
@@ -41,16 +42,17 @@ public class PhotranVPGSerializer
     private PhotranVPGSerializer() {;}
     
     // EACH SERIALIZABLE CLASS MUST HAVE A UNIQUE LETTER
-    public static final byte CLASS_NULL         = '0';
-    public static final byte CLASS_STRING       = 's';
-    public static final byte CLASS_INT          = 'i';
-    public static final byte CLASS_BOOLEAN      = 'b';
-    public static final byte CLASS_TOKENREF     = 'T';
-    public static final byte CLASS_DEFINITION   = 'D';
-    public static final byte CLASS_TYPE         = 'Y';
-    public static final byte CLASS_ARRAYSPEC    = 'A';
-    public static final byte CLASS_DIMENSION    = 'M';
-    public static final byte CLASS_IMPLICITSPEC = 'I';
+    public static final byte CLASS_NULL           = '0';
+    public static final byte CLASS_STRING         = 's';
+    public static final byte CLASS_INT            = 'i';
+    public static final byte CLASS_BOOLEAN        = 'b';
+    public static final byte CLASS_TOKENREF       = 'T';
+    public static final byte CLASS_DEFINITION     = 'D';
+    public static final byte CLASS_TYPE           = 'Y';
+    public static final byte CLASS_ARRAYSPEC      = 'A';
+    public static final byte CLASS_DIMENSION      = 'M';
+    public static final byte CLASS_IMPLICITSPEC   = 'I';
+    public static final byte CLASS_VARIABLEACCESS = 'V';
 
     protected static IOException readFailure()
     {
@@ -134,17 +136,18 @@ public class PhotranVPGSerializer
             int code = in.read();
             switch (code)
             {
-                case CLASS_NULL:        return null;
-                case CLASS_STRING:      return (T)readString(in);
-                case CLASS_INT:         return (T)Integer.valueOf(readInt(in));
-                case CLASS_BOOLEAN:     return (T)Boolean.valueOf(readBoolean(in));
+                case CLASS_NULL:           return null;
+                case CLASS_STRING:         return (T)readString(in);
+                case CLASS_INT:            return (T)Integer.valueOf(readInt(in));
+                case CLASS_BOOLEAN:        return (T)Boolean.valueOf(readBoolean(in));
 
-                case CLASS_TOKENREF:     return (T)PhotranTokenRef.readFrom(in);
-                case CLASS_DEFINITION:   return (T)Definition.readFrom(in);
-                case CLASS_TYPE:         return (T)Type.readFrom(in);
-                case CLASS_ARRAYSPEC:    return (T)ArraySpec.readFrom(in);
-                case CLASS_DIMENSION:    return (T)Dimension.readFrom(in);
-                case CLASS_IMPLICITSPEC: return (T)ImplicitSpec.readFrom(in);
+                case CLASS_TOKENREF:       return (T)PhotranTokenRef.readFrom(in);
+                case CLASS_DEFINITION:     return (T)Definition.readFrom(in);
+                case CLASS_TYPE:           return (T)Type.readFrom(in);
+                case CLASS_ARRAYSPEC:      return (T)ArraySpec.readFrom(in);
+                case CLASS_DIMENSION:      return (T)Dimension.readFrom(in);
+                case CLASS_IMPLICITSPEC:   return (T)ImplicitSpec.readFrom(in);
+                case CLASS_VARIABLEACCESS: return (T)VariableAccess.readFrom(in);
 
                 default:                 throw new Error("Unknown class code in deserialization: " + Integer.toString(code)); //$NON-NLS-1$
             }

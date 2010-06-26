@@ -63,6 +63,8 @@ public class Messages extends NLS
 
     public static String PhotranVPG_Type;
 
+    public static String PhotranVPG_VariableAccess;
+
     public static String PhotranVPGBuilder_ErrorParsingFile;
 
     public static String PhotranVPGBuilder_ErrorParsingFileMessage;

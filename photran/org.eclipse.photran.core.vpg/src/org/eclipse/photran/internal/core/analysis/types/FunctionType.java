@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.photran.internal.core.analysis.binding.VariableAccess;
+import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGSerializer;
 
 /**
@@ -30,11 +32,54 @@ public class FunctionType extends Type
     // ***WARNING*** If any fields change, the serialization methods (below) must also change!
     private String name;
     private Type returnType = Type.UNKNOWN;
+    private List<String> argumentNames = new LinkedList<String>();
     private List<Type> argumentTypes = new LinkedList<Type>();
+    private List<VariableAccess> argumentIntents = new LinkedList<VariableAccess>();
 
     public FunctionType(String name)
     {
         this.name = name.toLowerCase();
+    }
+
+    /**
+     * @param argument the index of the function argument (0 = first argument, 1 = second, etc.)
+     * @return {@link VariableAccess#READ} if the given argument is intent(in),
+     *         {@link VariableAccess#WRITE} if the given argument is intent(out), and
+     *         {@link VariableAccess#RW} otherwise. 
+     */
+    public VariableAccess getArgumentAccess(int argument)
+    {
+        if (argument < 0 || argument >= argumentIntents.size())
+            return VariableAccess.RW;
+        else
+            return argumentIntents.get(argument);
+    }
+
+    /**
+     * @param argument the index of the function argument (0 = first argument, 1 = second, etc.)
+     * @return {@link VariableAccess#READ} if the given argument is intent(in),
+     *         {@link VariableAccess#WRITE} if the given argument is intent(out), and
+     *         {@link VariableAccess#RW} otherwise. 
+     */
+    public VariableAccess getArgumentAccess(String argName)
+    {
+        return getArgumentAccess(argumentNames.indexOf(PhotranVPG.canonicalizeIdentifier(argName)));
+    }
+
+    public void setReturnType(Type type)
+    {
+        this.returnType = type;
+    }
+
+    public void addArgument(String name, Type type, VariableAccess intent)
+    {
+        if (name == null) name = ""; //$NON-NLS-1$
+        if (type == null) type = Type.UNKNOWN;
+        if (intent == null) intent = VariableAccess.RW;
+
+        argumentNames.add(PhotranVPG.canonicalizeIdentifier(name));
+        argumentTypes.add(type);
+        argumentIntents.add(intent);
     }
 
     @Override public String toString()
@@ -82,9 +127,15 @@ public class FunctionType extends Type
         
         PhotranVPGSerializer.serialize(returnType, out);
         
-        PhotranVPGSerializer.serialize(argumentTypes.size(), out);
-        for (Type argType : argumentTypes)
-            PhotranVPGSerializer.serialize(argType, out);
+        int args = argumentTypes.size();
+        
+        PhotranVPGSerializer.serialize(args, out);
+        for (int i = 0; i < args; i++)
+        {
+            PhotranVPGSerializer.serialize(argumentNames.get(i), out);
+            PhotranVPGSerializer.serialize(argumentTypes.get(i), out);
+            PhotranVPGSerializer.serialize(argumentIntents.get(i), out);
+        }
     }
 
     public static Type finishReadFrom(InputStream in) throws IOException
@@ -96,7 +147,11 @@ public class FunctionType extends Type
         
         int args = PhotranVPGSerializer.deserialize(in);
         for (int i = 0; i < args; i++)
+        {
+            result.argumentNames.add((String)PhotranVPGSerializer.deserialize(in));
             result.argumentTypes.add((Type)PhotranVPGSerializer.deserialize(in));
+            result.argumentIntents.add((VariableAccess)PhotranVPGSerializer.deserialize(in));
+        }
         
         return result;
     }

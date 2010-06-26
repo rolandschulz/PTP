@@ -31,7 +31,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
 
 /**
- * Phase 5 of name-binding analysis.
+ * Phase 6 of name-binding analysis.
  * <p>
  * Visits USE statements in an AST, marking a dependency in the VPG,
  * locating the used module, and importing declarations from it.

@@ -51,7 +51,6 @@ import org.eclipse.photran.internal.core.parser.ASTTypeAttrSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeParamDeclNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeParamDefStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IInterfaceSpecification;
@@ -457,27 +456,7 @@ class DefinitionCollector extends BindingCollector
     {
         super.traverseChildren(node);
         
-        Type type = Type.UNKNOWN;
-        if (node.getPrefixSpecList() != null)
-        {
-            for (int i = 0; i < node.getPrefixSpecList().size(); i++)
-            {
-                ASTTypeSpecNode typeSpec = node.getPrefixSpecList().get(i).getTypeSpec();
-                if (typeSpec != null) type = Type.parse(typeSpec);
-            }
-        }
-        
-        Token functionName = node.getFunctionName().getFunctionName();
-        
-        if (node.hasResultClause())
-        {
-            addDefinition(functionName, Definition.Classification.FUNCTION, type);
-        }
-        else
-        {
-        	// TODO: Type
-            addDefinition(functionName, Definition.Classification.FUNCTION, Type.UNKNOWN);
-        }
+        addDefinition(node.getFunctionName().getFunctionName(), Definition.Classification.FUNCTION, Type.UNKNOWN);
     }
 
     // # R1222

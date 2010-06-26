@@ -77,6 +77,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     public static final int MODULE_TOKENREF_ANNOTATION_TYPE = 5;
     public static final int MODULE_SYMTAB_ENTRY_COUNT_ANNOTATION_TYPE = 6;
     public static final int MODULE_SYMTAB_ENTRY_ANNOTATION_TYPE = 7;
+    public static final int VARIABLE_ACCESS_ANNOTATION_TYPE = 8;
 	private static final String[] annotationTypeDescriptions =
 	{
 	    Messages.PhotranVPG_DefaultVisibilityForScopeIsPrivate,
@@ -87,6 +88,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	    Messages.PhotranVPG_ModuleTokenRef,
 	    Messages.PhotranVPG_ModuleSymbolTableEntryCount,
 	    Messages.PhotranVPG_ModuleSymbolTableEntry,
+	    Messages.PhotranVPG_VariableAccess
 	};
 
 	private static PhotranVPG instance = null;

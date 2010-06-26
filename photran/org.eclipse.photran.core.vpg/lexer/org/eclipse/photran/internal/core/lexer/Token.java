@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.binding.VariableAccess;
 import org.eclipse.photran.internal.core.parser.ASTNodeUtil;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IASTVisitor;
@@ -79,6 +80,9 @@ public class Token implements IToken, IASTNode
     protected int line = -1, col = -1, fileOffset = -1, streamOffset = -1, length = -1;
     
     protected PhotranTokenRef tokenRef = null;
+    
+    /** This is a cached value from the VPG; see {@link #getVariableAccessType()} */
+    private VariableAccess varAccessType = null;
 
     ///////////////////////////////////////////////////////////////////////////
     // Constructors
@@ -589,6 +593,30 @@ public class Token implements IToken, IASTNode
 		}
 		
 		return result;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * Assuming this token is an identifier ({@link #isIdentifier()}) representing a variable,
+     * returns the type of access represented by this occurrence of the variable.
+     * <p>
+     * If this token is not a variable, or if it is used in a declarative content (e.g., a
+     * specification statement), this method will return {@link VariableAccess#NONE}.
+     */
+    public VariableAccess getVariableAccessType()
+    {
+        if (varAccessType == null)
+        {
+            varAccessType = (VariableAccess)
+                PhotranVPG.getDatabase().getAnnotation(
+                    getTokenRef(),
+                    PhotranVPG.VARIABLE_ACCESS_ANNOTATION_TYPE);
+            if (varAccessType == null)
+                varAccessType = VariableAccess.NONE;
+        }
+
+        return varAccessType;
     }
     
     ///////////////////////////////////////////////////////////////////////////
