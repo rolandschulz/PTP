@@ -202,13 +202,16 @@ public class WorkbenchSelectionInfo
                 }
                 else if (r instanceof IFolder || r instanceof IProject)
                 {
-                    try
+                    if (r.isAccessible())
                     {
-                        files.addAll(findAllFilesIn(((IContainer)r).members()));
-                    }
-                    catch (CoreException e)
-                    {
-                        e.printStackTrace();
+                        try
+                        {
+                            files.addAll(findAllFilesIn(((IContainer)r).members()));
+                        }
+                        catch (CoreException e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
