@@ -17,9 +17,29 @@ import java.util.ArrayList;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTIfStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTAssociateStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTBlockStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTCaseStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTDoConstructNode;
+import org.eclipse.photran.internal.core.parser.ASTElseIfStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTElseStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTElseWhereStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTForallConstructStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTFunctionStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTIfThenStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTInterfaceStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTModuleStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTProgramStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSelectCaseStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSelectTypeStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTSubroutineStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTVisitor;
+import org.eclipse.photran.internal.core.parser.ASTWhereConstructStmtNode;
+import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IActionStmt;
 
 /**
@@ -167,7 +187,7 @@ final class StartOfLine
         int start = 0;
         int end = comments.indexOf('\n', start);
         
-        while (end > start)
+        while (end >= start)
         {
             result.add(comments.substring(start, end+1));
             
@@ -232,7 +252,22 @@ final class StartOfLine
     {
         String whiteText = getFirstTokenOnLine().getWhiteBefore();
         int lastCR = whiteText.lastIndexOf('\n');
-        return whiteText.substring(lastCR + 1);
+        String result = whiteText.substring(lastCR + 1);
+        if (result.equals("") && getFirstTokenOnLine() == label) //$NON-NLS-1$
+        {
+            whiteText = spaces(label.getText().length()) + firstStmtToken.getWhiteBefore();
+            lastCR = whiteText.lastIndexOf('\n');
+            result = whiteText.substring(lastCR + 1);
+        }
+        return result;
+    }
+
+    private String spaces(int count)
+    {
+        StringBuilder sb = new StringBuilder(count);
+        for (int i = 0; i < count; i++)
+            sb.append(' ');
+        return sb.toString();
     }
 
     public Token getFirstTokenOnLine()
@@ -253,47 +288,41 @@ final class StartOfLine
 
     public boolean startsIndentedRegion()
     {
-        Terminal t = firstStmtToken.getTerminal();
-        return t == Terminal.T_PROGRAM
-            || t == Terminal.T_FUNCTION
-            || t == Terminal.T_SUBROUTINE
-            || t == Terminal.T_MODULE
-            || t == Terminal.T_BLOCK
-            || t == Terminal.T_BLOCKDATA
-            || t == Terminal.T_FORALL
-            || t == Terminal.T_WHERE
-            || t == Terminal.T_TYPE && !startsTypeDeclaration()
-            || t == Terminal.T_IF && !startsSingleLineIfStmt()
-            || t == Terminal.T_ELSE
-            || t == Terminal.T_ELSEWHERE
-            || t == Terminal.T_ELSEIF
-            || t == Terminal.T_SELECTCASE
-            || t == Terminal.T_SELECT
-            || t == Terminal.T_CASE
-            || t == Terminal.T_DO
-            || t == Terminal.T_INTERFACE
-            || t == Terminal.T_CONTAINS
-            || t == Terminal.T_ASSOCIATE;
+        return starts(ASTProgramStmtNode.class)
+            || starts(ASTFunctionStmtNode.class)
+            || starts(ASTSubroutineStmtNode.class)
+            || starts(ASTModuleStmtNode.class)
+            || starts(ASTBlockStmtNode.class)
+            || starts(ASTBlockDataStmtNode.class)
+            || starts(ASTForallConstructStmtNode.class)
+            || starts(ASTWhereConstructStmtNode.class)
+            || starts(ASTDerivedTypeStmtNode.class)
+            || starts(ASTIfThenStmtNode.class)
+            || starts(ASTElseStmtNode.class)
+            || starts(ASTElseWhereStmtNode.class)
+            || starts(ASTElseIfStmtNode.class)
+            || starts(ASTSelectCaseStmtNode.class)
+            || starts(ASTSelectTypeStmtNode.class)
+            || starts(ASTCaseStmtNode.class)
+            || starts(ASTDoConstructNode.class)
+            || starts(ASTLabelDoStmtNode.class)
+            || starts(ASTInterfaceStmtNode.class)
+            || starts(ASTContainsStmtNode.class)
+            || starts(ASTAssociateStmtNode.class);
     }
 
-    private boolean startsTypeDeclaration()
+    private boolean starts(Class<? extends IASTNode> nodeClass)
     {
-        return firstStmtToken.findNearestAncestor(ASTTypeDeclarationStmtNode.class) != null;
-    }
-
-    /**
-     * @return true iff this line is the start of a (single-line) IF statement
-     * (as opposed to an if-then construct, which usually spans multiple lines)
-     */
-    private boolean startsSingleLineIfStmt()
-    {
-        return firstStmtToken.findNearestAncestor(ASTIfStmtNode.class) != null;
+        return firstStmtToken.findNearestAncestor(nodeClass) != null;
     }
 
     public boolean endsIndentedRegion()
     {
         Terminal t = firstStmtToken.getTerminal();
-        return t == Terminal.T_END
+        return t == Terminal.T_CASE
+            || t == Terminal.T_CONTAINS
+            || t == Terminal.T_END
+            || t == Terminal.T_ENDBEFORESELECT
             || t == Terminal.T_ENDBLOCK
             || t == Terminal.T_ENDBLOCKDATA
             || t == Terminal.T_ENDDO
@@ -310,8 +339,7 @@ final class StartOfLine
             || t == Terminal.T_ENDWHERE
             || t == Terminal.T_ELSE
             || t == Terminal.T_ELSEWHERE
-            || t == Terminal.T_ELSEIF
-            || t == Terminal.T_CONTAINS;
+            || t == Terminal.T_ELSEIF;
     }
     
     @Override public String toString()
