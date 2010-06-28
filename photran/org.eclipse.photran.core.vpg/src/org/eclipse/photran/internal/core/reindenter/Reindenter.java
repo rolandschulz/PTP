@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.parser.IASTNode;
  * whiteAfter parts of a Token; it will not generalize to parsers that, say, include
  * newlines in the whitetext.
  */
-public class Reindenter
+public final class Reindenter
 {
     public static enum Strategy
     {
@@ -106,4 +106,6 @@ public class Reindenter
         if (firstTokenInRegion != null && lastTokenInRegion != null)
             ast.accept(strategy.createVisitor(ast, firstTokenInRegion, lastTokenInRegion));
     }
+    
+    private Reindenter() {}
 }
