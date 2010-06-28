@@ -23,6 +23,8 @@ import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.SWT;
@@ -167,10 +169,12 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 
 	private void browse() {
 		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices);
-		String remotePath = uiServices.getUIFileManager().browseDirectory(this.getShell(),
-				Messages.getString("RemoteBuildServiceFileLocationWidget.0"), text.getText(), 0); //$NON-NLS-1$
-		if (remotePath != null)
-			text.setText(remotePath);
+		IRemoteUIFileManager fmConnection = uiServices.getUIFileManager();
+		fmConnection.setConnection(fRemoteConnection);
+		
+		String remotePath = fmConnection.browseDirectory(this.getShell(), Messages.getString("RemoteBuildServiceFileLocationWidget.0"), text.getText(), IRemoteUIConstants.NONE); //$NON-NLS-1$
+ 		if(remotePath != null)
+ 			text.setText(remotePath);
 	}
 
 	private void restoreDefault() {
