@@ -286,6 +286,68 @@
      </viewerContribution>
    </extension>
 
+   <!--============-->
+   <!-- Reindenter -->
+   <!--============-->
+   <extension point="org.eclipse.ui.popupMenus">
+	  <viewerContribution 
+	        targetID="#FortranEditorContextMenu" 
+	        id="org.eclipse.photran.ui.FixedReindenterContribution">
+	     <action 
+	           label="%action.label.reindent" 
+               definitionId="org.eclipse.photran.ui.ReindenterCommand"
+	           class="org.eclipse.photran.internal.ui.actions.ReindentAction" 
+	           menubarPath="group.edit" 
+	           id="org.eclipse.photran.ui.ReindenterMenuAction"/>
+	  </viewerContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="%category.name"
+            description="%category.description"
+            id="org.eclipse.photran.ui.SourceEditingCategory">
+      </category>
+      <command
+            categoryId="org.eclipse.photran.ui.SourceEditingCategory"
+            description="%command.description"
+            id="org.eclipse.photran.ui.ReindenterCommand"
+            name="%command.name.reindent">
+      </command>
+   </extension>
+   <extension point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="%actionSet.label.reindent"
+            description="%actionSet.description.reindent"
+            visible="false"
+            id="org.eclipse.photran.ui.Reindenter">
+	     <action 
+	           label="%action.label.reindent.0" 
+               menubarPath="edit/additions"
+               definitionId="org.eclipse.photran.ui.ReindenterCommand"
+	           class="org.eclipse.photran.internal.ui.actions.ReindentAction" 
+	           id="org.eclipse.photran.ui.ReindenterAction">
+	     </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation targetID="org.eclipse.photran.ui.Reindenter">
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
+      </actionSetPartAssociation>
+   </extension>
+   <extension
+            point="org.eclipse.ui.bindings">
+        <!--win32:  M1=CTRL,    M2=SHIFT, M3=ALT, M4=-
+            carbon: M1=COMMAND, M2=SHIFT, M3=ALT, M4=CTRL -->
+        <!-- Bind Ctrl+I to Reindent -->
+        <key
+            sequence="M1+I"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            contextId="org.eclipse.photran.ui.FortranEditorContext"
+            commandId="org.eclipse.photran.ui.ReindenterCommand"/>
+   </extension>
+
    <!--====================================-->
    <!-- Fortran Search and Find References -->
    <!--====================================-->
