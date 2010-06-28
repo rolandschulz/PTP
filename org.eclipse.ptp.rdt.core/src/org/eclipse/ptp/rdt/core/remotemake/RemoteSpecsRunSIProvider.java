@@ -146,22 +146,26 @@ public class RemoteSpecsRunSIProvider extends RemoteRunSIProvider {
 			IFileInfo fileInfo = specsFile.fetchInfo();
 
 			if (!fileInfo.exists()) {
-				InputStream is = new ByteArrayInputStream("\n".getBytes()); //$NON-NLS-1$
-				OutputStream os = specsFile.openOutputStream(EFS.NONE, null);
 				try {
+					// If the working directory doesn't exist, create it. 
+					if (!workingDir.fetchInfo().exists()) {
+						workingDir.mkdir(0, monitor);
+					}
+
+					InputStream is = new ByteArrayInputStream("\n".getBytes()); //$NON-NLS-1$
+					OutputStream os = specsFile.openOutputStream(EFS.NONE, null);
 
 					int data = is.read();
 					while (data != -1) {
 						os.write(data);
 						data = is.read();
 					}
-
+					
 					is.close();
 					os.close();
 				} catch (IOException e) {
 					RDTLog.logError(e);
 				}
-
 			}
 
 			return specsFile;
