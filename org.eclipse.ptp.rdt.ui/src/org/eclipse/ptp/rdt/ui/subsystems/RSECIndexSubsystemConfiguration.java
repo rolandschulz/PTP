@@ -61,6 +61,21 @@ public class RSECIndexSubsystemConfiguration extends SubSystemConfiguration impl
 		return DStoreConnectorServiceManager.getInstance().getConnectorService(host, getServiceImplType());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.rse.core.subsystems.SubSystemConfiguration#setConnectorService(org.eclipse.rse.core.model.IHost, org.eclipse.rse.core.subsystems.IConnectorService)
+	 */
+	@Override
+	public void setConnectorService(IHost host, IConnectorService connectorService) {
+		DStoreConnectorServiceManager.getInstance().setConnectorService(host, getServiceImplType(), connectorService);
+        ISubSystem[] sses = getSubSystems(host, false);
+        if (sses != null && sses.length > 0){
+            for (int i = 0; i < sses.length; i++){
+                ISubSystem ss = sses[i];
+                ss.setConnectorService(connectorService);
+            }
+        }
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
