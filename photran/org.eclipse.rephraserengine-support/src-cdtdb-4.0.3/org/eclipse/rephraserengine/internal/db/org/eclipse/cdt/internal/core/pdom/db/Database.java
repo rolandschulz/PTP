@@ -626,7 +626,20 @@ public class Database {
 			fIsMarkedIncomplete= true;
 			try {
 				final ByteBuffer buf= ByteBuffer.wrap(new byte[4]);
-				fFile.getChannel().write(buf, 0);
+
+//              fFile.getChannel().write(buf, 0);
+		        int retries= 0; // JO -- Copied code from above to handle bug 318197
+		        do {
+		            try {
+		                fFile.getChannel().write(buf, 0);
+		                return;
+		            }
+		            catch (ClosedChannelException e) {
+		                // bug 219834 file may have be closed by interrupting a thread during an I/O operation.
+		                reopen(e, ++retries);
+		            }
+		        } while(true);
+
 			} catch (IOException e) {
 				throw new CoreException(new DBStatus(e));
 			}
