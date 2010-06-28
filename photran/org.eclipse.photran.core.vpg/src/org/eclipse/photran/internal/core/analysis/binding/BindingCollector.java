@@ -14,9 +14,9 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
+import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Token;
-import org.eclipse.photran.internal.core.parser.ASTVisitor;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
@@ -28,7 +28,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPGBuilder;
  * @author Jeff Overbey
  * @see Binder
  */
-public abstract class BindingCollector extends ASTVisitor
+public abstract class BindingCollector extends ASTVisitorWithLoops
 {
 	protected PhotranVPGBuilder vpg = (PhotranVPGBuilder)PhotranVPG.getInstance();
 
