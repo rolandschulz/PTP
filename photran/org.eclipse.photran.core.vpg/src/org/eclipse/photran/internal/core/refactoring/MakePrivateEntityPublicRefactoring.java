@@ -34,7 +34,7 @@ import org.eclipse.photran.internal.core.parser.ASTSeparatedListNode;
 import org.eclipse.photran.internal.core.parser.ASTSubroutineSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTTypeDeclarationStmtNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
+import org.eclipse.photran.internal.core.reindenter.Reindenter;
 
 /**
  *

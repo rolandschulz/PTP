@@ -27,8 +27,8 @@ import org.eclipse.photran.internal.core.parser.ASTTypeSpecNode;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
+import org.eclipse.photran.internal.core.reindenter.Reindenter;
 
 /**
  * Standardize Statements: refactoring that rewrites variables declarations,

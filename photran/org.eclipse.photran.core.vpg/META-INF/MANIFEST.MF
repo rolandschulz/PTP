@@ -30,6 +30,7 @@ Export-Package: org.eclipse.photran.core,
  org.eclipse.photran.internal.core.refactoring,
  org.eclipse.photran.internal.core.refactoring.infrastructure,
  org.eclipse.photran.internal.core.refactoring.interfaces,
+ org.eclipse.photran.internal.core.reindenter,
  org.eclipse.photran.internal.core.util,
  org.eclipse.photran.internal.core.vpg
 Bundle-ClassPath: .

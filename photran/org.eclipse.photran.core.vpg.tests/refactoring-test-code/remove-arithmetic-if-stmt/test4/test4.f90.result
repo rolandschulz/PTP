@@ -1,4 +1,4 @@
-program test3 !<<<<< 1,1,pass
+program test4 !<<<<< 1,1,pass
 
 INTEGER :: chicken = 0
 INTEGER :: rice
@@ -24,4 +24,4 @@ end do
 
 40 print *, rice
 
-end program test3
+end program test4

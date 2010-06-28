@@ -20,7 +20,7 @@ import org.eclipse.photran.internal.core.parser.ASTNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IExpr;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
+import org.eclipse.photran.internal.core.reindenter.Reindenter;
 
 /**
  * Refactoring which replaces a computed GOTO statement with a SELECT CASE statement with nested

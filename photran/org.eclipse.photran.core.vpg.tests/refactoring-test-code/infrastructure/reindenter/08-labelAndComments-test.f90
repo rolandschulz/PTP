@@ -1,0 +1,11 @@
+program labelAndComment !<<<<<START
+	implicit none
+	integer :: x, y, z
+	
+		!now, I will assign values to these variables
+		x = 5
+		y = 10
+		z = 20 !this is my favorite number
+		
+		2 if(x == 5) print *, "Hello"
+				end program !<<<<<END

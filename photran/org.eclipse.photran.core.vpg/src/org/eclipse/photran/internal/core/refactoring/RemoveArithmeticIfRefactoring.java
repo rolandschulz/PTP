@@ -23,8 +23,8 @@ import org.eclipse.photran.internal.core.parser.ASTArithmeticIfStmtNode;
 import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter.Strategy;
+import org.eclipse.photran.internal.core.reindenter.Reindenter;
+import org.eclipse.photran.internal.core.reindenter.Reindenter.Strategy;
 
 /**
  * Refactoring to remove arithmetic if statements in Fortran files.

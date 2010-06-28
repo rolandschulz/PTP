@@ -27,8 +27,8 @@ import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IDataStmtObject;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
-import org.eclipse.photran.internal.core.refactoring.infrastructure.Reindenter;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.SourcePrinter;
+import org.eclipse.photran.internal.core.reindenter.Reindenter;
 
 /**
  * Data To Parameter: refactoring to transform variables declared as data in variables declared
