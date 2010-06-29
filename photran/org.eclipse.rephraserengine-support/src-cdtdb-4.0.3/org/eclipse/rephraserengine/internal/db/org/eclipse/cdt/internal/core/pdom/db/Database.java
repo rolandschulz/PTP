@@ -159,7 +159,7 @@ public class Database {
 
 	private void reopen(ClosedChannelException e, int attempt) throws ClosedChannelException, FileNotFoundException {
 		// only if the current thread was not interrupted we try to reopen the file.
-		if (e instanceof ClosedByInterruptException || attempt >= 20) {
+		if (!(e instanceof ClosedByInterruptException) || attempt >= 20) { // JO negated first part
 			throw e;
 		}
 		openFile();
