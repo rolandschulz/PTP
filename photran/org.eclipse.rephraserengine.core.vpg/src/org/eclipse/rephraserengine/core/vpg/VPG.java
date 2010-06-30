@@ -202,7 +202,6 @@ public abstract class VPG<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, 
         db.deleteAllEdgesAndAnnotationsFor(filename);
         populateVPG(filename, ast);
         db.updateModificationStamp(filename);
-        db.flush();
         return System.currentTimeMillis()-start;
     }
 
