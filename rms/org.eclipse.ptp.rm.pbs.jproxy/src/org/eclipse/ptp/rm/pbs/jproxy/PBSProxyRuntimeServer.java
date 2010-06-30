@@ -79,7 +79,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	}
 
 	private static String normalize(String content) {
-		content = content.replaceAll("\\\\\\\\", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
+		content = content.replaceAll("\\\\\\\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
 		content = content.replaceAll("\\\\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		content = content.replaceAll("\\\\t", "\t"); //$NON-NLS-1$ //$NON-NLS-2$
 		content = content.replaceAll("\\\\s", " "); //$NON-NLS-1$ //$NON-NLS-2$
