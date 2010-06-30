@@ -53,6 +53,9 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 	private IHost selectedHost;
 	private String configPath;
 
+	/**
+	 * @since 3.0
+	 */
 	public void configureServiceProvider(IServiceProviderWorkingCopy sp, final Composite container) {
 		//The UI components works with IServiceProviderWorkingCopy and not the original IServiceProvider
 		
@@ -87,7 +90,7 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 																				// space
 
 		// attempt to restore settings from saved state
-		String hostName = fProviderWorkingCopy.getString(AbstractRemoteCIndexServiceProvider.HOST_NAME_KEY, ""); //$NON-NLS-1$
+		String hostName = fProviderWorkingCopy.getString(AbstractRemoteCIndexServiceProvider.HOST_NAME_KEY, null);
 
 		// populate the combo with a list of hosts
 		IHost[] hosts = SystemStartHere.getConnections();
@@ -97,7 +100,7 @@ public class RSECIndexServiceProviderContributer implements IServiceProviderCont
 			hostCombo.add(hosts[k].getAliasName(), k);
 			hostComboIndexToHostMap.put(k, hosts[k]);
 
-			if (hostName.length() > 0 && hostName.compareTo(hosts[k].getAliasName()) == 0) {
+			if (hostName != null && hostName.compareTo(hosts[k].getAliasName()) == 0) {
 				toSelect = k;
 			}
 		}
