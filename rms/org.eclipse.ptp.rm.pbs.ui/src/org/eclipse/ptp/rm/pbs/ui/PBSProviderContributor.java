@@ -18,6 +18,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rm.pbs.ui.wizards.PBSBatchScriptTemplateWizardPage;
 import org.eclipse.ptp.rm.pbs.ui.wizards.PBSResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMServiceProviderConfigurationWizard;
@@ -29,11 +30,14 @@ public class PBSProviderContributor implements IServiceProviderContributor {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.services.ui.IServiceProviderContributor#
-	 * configureServiceProvider(org.eclipse.ptp.services.core.IServiceProvider,
+	 * configureServiceProvider
+	 * (org.eclipse.ptp.services.core.IServiceProviderWorkingCopy,
 	 * org.eclipse.swt.widgets.Composite)
 	 */
-	public void configureServiceProvider(IServiceProvider provider,
-			Composite comp) {
+	/**
+	 * @since 5.0
+	 */
+	public void configureServiceProvider(IServiceProviderWorkingCopy provider, Composite comp) {
 		// Nothing
 	}
 
@@ -61,11 +65,9 @@ public class PBSProviderContributor implements IServiceProviderContributor {
 		WizardPage wizardPages[];
 
 		wizardPages = new WizardPage[2];
-		wizardPages[0] = new PBSResourceManagerConfigurationWizardPage(
-				(IRMConfigurationWizard) wizard);
+		wizardPages[0] = new PBSResourceManagerConfigurationWizardPage((IRMConfigurationWizard) wizard);
 		try {
-			wizardPages[1] = new PBSBatchScriptTemplateWizardPage(
-					(IRMConfigurationWizard) wizard);
+			wizardPages[1] = new PBSBatchScriptTemplateWizardPage((IRMConfigurationWizard) wizard);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

@@ -17,37 +17,53 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rm.slurm.ui.wizards.SLURMResourceManagerConfigurationWizardPage;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMServiceProviderConfigurationWizard;
 import org.eclipse.swt.widgets.Composite;
 
-public class SLURMProviderContributor implements IServiceProviderContributor 
-{
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.ui.IServiceProviderContributor#configureServiceProvider(org.eclipse.ptp.services.core.IServiceProvider, org.eclipse.swt.widgets.Composite)
+public class SLURMProviderContributor implements IServiceProviderContributor {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.services.ui.IServiceProviderContributor#
+	 * configureServiceProvider
+	 * (org.eclipse.ptp.services.core.IServiceProviderWorkingCopy,
+	 * org.eclipse.swt.widgets.Composite)
 	 */
-	public void configureServiceProvider(IServiceProvider provider, Composite comp) 
-	{
+	/**
+	 * @since 4.0
+	 */
+	public void configureServiceProvider(IServiceProviderWorkingCopy provider, Composite comp) {
 		// Nothing
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.ui.IServiceProviderContributor#getWizard(org.eclipse.ptp.services.core.IServiceProvider, org.eclipse.jface.wizard.IWizardPage)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.services.ui.IServiceProviderContributor#getWizard(org
+	 * .eclipse.ptp.services.core.IServiceProvider,
+	 * org.eclipse.jface.wizard.IWizardPage)
 	 */
 	public IWizard getWizard(IServiceProvider provider, IWizardPage page) {
 		return new RMServiceProviderConfigurationWizard(provider, page);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.services.ui.IServiceProviderContributor#getWizardPages(org.eclipse.jface.wizard.IWizard, org.eclipse.ptp.services.core.IServiceProvider)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.services.ui.IServiceProviderContributor#getWizardPages
+	 * (org.eclipse.jface.wizard.IWizard,
+	 * org.eclipse.ptp.services.core.IServiceProvider)
 	 */
-	public WizardPage[] getWizardPages(IWizard wizard, IServiceProvider provider) 
-	{
+	public WizardPage[] getWizardPages(IWizard wizard, IServiceProvider provider) {
 		WizardPage wizardPages[];
-		
+
 		wizardPages = new WizardPage[1];
-		wizardPages[0] = new SLURMResourceManagerConfigurationWizardPage((IRMConfigurationWizard)wizard);
+		wizardPages[0] = new SLURMResourceManagerConfigurationWizardPage((IRMConfigurationWizard) wizard);
 		return wizardPages;
 	}
 
