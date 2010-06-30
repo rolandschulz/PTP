@@ -112,4 +112,9 @@ public class DummyFile implements IIndexFile, Serializable {
 		return null;
 	}
 
+	public int getEncodingHashcode() throws CoreException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }
