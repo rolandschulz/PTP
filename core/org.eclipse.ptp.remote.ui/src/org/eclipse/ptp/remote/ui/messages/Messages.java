@@ -20,6 +20,10 @@ public class Messages extends NLS {
 
 	public static String LocalUIConnectionManager_1;
 
+	public static String LocalUIConnectionManager_2;
+
+	public static String LocalUIConnectionManager_3;
+
 	public static String PTPRemoteUIPlugin_0;
 
 	public static String PTPRemoteUIPlugin_1;
