@@ -478,7 +478,7 @@ public class ServiceProviderConfigurationWidget extends Composite {
 	
 	private void selectProvider(final IServiceProviderDescriptor descriptor) {
 		TreeItem serviceTreeItem = servicesTree.getSelection()[0];
-		IServiceProvider newProvider = (IServiceProvider)serviceTreeItem.getData(PROVIDER_KEY);
+		IServiceProviderWorkingCopy newProvider = (IServiceProviderWorkingCopy)serviceTreeItem.getData(PROVIDER_KEY);
 		if (newProvider == null || !newProvider.getId().equals(descriptor.getId())) {
 			IService service = (IService) serviceTreeItem.getData(SERVICE_KEY);
 			IServiceProvider existingProvider = getExistingProvider(descriptor.getId(), service);

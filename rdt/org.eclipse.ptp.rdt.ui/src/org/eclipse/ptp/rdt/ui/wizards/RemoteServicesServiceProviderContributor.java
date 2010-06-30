@@ -46,6 +46,9 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
  	private RemoteBuildServiceFileLocationWidget fBuildConfigLocationWidget;
 
 	
+	/**
+	 * @since 3.0
+	 */
 	public void configureServiceProvider(IServiceProviderWorkingCopy provider, final Composite container) {
 		//The UI components works with IServiceProviderWorkingCopy and not the original IServiceProvider
 		
@@ -72,7 +75,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
         providerCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
         
         //attempt to restore settings from saved state
-        String providerSelected = fProviderWorkingCopy.getString(RemoteBuildServiceProvider.REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, ""); //$NON-NLS-1$
+        String providerSelected = fProviderWorkingCopy.getString(RemoteBuildServiceProvider.REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, null);
         
         // populate the combo with a list of providers
         IRemoteServices[] providers = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
@@ -82,7 +85,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
         	providerCombo.add(providers[k].getName(), k);
         	fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
         	
-        	if (providerSelected.length() > 0 && providerSelected.compareTo(providers[k].getId()) == 0) {
+        	if (providerSelected != null && providerSelected.compareTo(providers[k].getId()) == 0) {
         		toSelect = k;
         	}
         }
@@ -179,14 +182,14 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
 		connectionCombo.removeAll();
 		
 		//attempt to restore settings from saved state
-        String connection = fProviderWorkingCopy.getString(RemoteBuildServiceProvider.REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, ""); //$NON-NLS-1$
+        String connection = fProviderWorkingCopy.getString(RemoteBuildServiceProvider.REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, null);
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
 		int toSelect = 0;
         
         for(int k = 0; k < connections.length; k++) {
         	connectionCombo.add(connections[k].getName(), k);
         	fComboIndexToRemoteConnectionMap.put(k, connections[k]);
-        	if (connection.length() > 0 && connection.equals(connections[k].getName())) {
+        	if (connection != null && connection.equals(connections[k].getName())) {
         		toSelect = k;
         	}
         }
