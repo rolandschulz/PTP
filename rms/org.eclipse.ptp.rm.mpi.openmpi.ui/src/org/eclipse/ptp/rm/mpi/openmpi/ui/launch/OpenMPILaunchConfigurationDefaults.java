@@ -25,11 +25,10 @@ import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.osgi.framework.Bundle;
 
-
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class OpenMPILaunchConfigurationDefaults {
 	public static int ATTR_NUMPROCS;
@@ -74,8 +73,7 @@ public class OpenMPILaunchConfigurationDefaults {
 		// TODO: read ATTR_PARAMETERS
 	}
 
-	public static Properties read(Path defaultsPropertiesPath, Bundle bundle)
-	throws CoreException {
+	public static Properties read(Path defaultsPropertiesPath, Bundle bundle) throws CoreException {
 		InputStream inStream;
 		Properties properties = new Properties();
 		try {
@@ -90,10 +88,10 @@ public class OpenMPILaunchConfigurationDefaults {
 	public static String getString(Bundle bundle, Properties properties, String key) throws CoreException {
 		String value = properties.getProperty(key);
 		if (value == null) {
-			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPILaunchConfigurationDefaults_MissingValue, key)));
-		} else {
-			return value;
+			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(
+					Messages.OpenMPILaunchConfigurationDefaults_MissingValue, key)));
 		}
+		return value;
 	}
 
 	public static int getInteger(Bundle bundle, Properties properties, String key) throws CoreException {
@@ -101,7 +99,8 @@ public class OpenMPILaunchConfigurationDefaults {
 		try {
 			return Integer.parseInt(value);
 		} catch (NumberFormatException e) {
-			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.OpenMPILaunchConfigurationDefaults_FailedParseInteger, key)));
+			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(
+					Messages.OpenMPILaunchConfigurationDefaults_FailedParseInteger, key)));
 		}
 	}
 
