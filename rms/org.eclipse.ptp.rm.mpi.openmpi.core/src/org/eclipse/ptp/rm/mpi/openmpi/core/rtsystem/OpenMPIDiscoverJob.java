@@ -404,7 +404,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			}
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getDefault().getBundle().getSymbolicName(),
-					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParseOutput, e));
+					e.getMessage(), null));
 		}
 	}
 }
