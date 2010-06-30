@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -31,6 +32,7 @@ public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
 	 * @see org.eclipse.ptp.remote.core.IRemoteUIConnectionManager#newConnection()
 	 */
 	public IRemoteConnection newConnection(Shell shell) {
+		MessageDialog.openInformation(shell,Messages.LocalUIConnectionManager_2,Messages.LocalUIConnectionManager_3);
 		return null;
 	}
 	
