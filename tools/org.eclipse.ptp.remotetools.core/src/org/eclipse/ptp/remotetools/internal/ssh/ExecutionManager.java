@@ -13,8 +13,6 @@ package org.eclipse.ptp.remotetools.internal.ssh;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.ptp.remotetools.core.IRemoteCopyTools;
@@ -126,9 +124,8 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		 * Cancel all operations. Each operation implements its own logic how to
 		 * cancel. This simply broadcasts the cancel to all running operations.
 		 */
-		List<IRemoteOperation> operations = new ArrayList<IRemoteOperation>(executions);
-		for (IRemoteOperation operation : operations) {
-			operation.cancel();
+		for (IRemoteOperation execution : new ArrayList<IRemoteOperation>(executions)) {
+			execution.cancel();
 		}
 		cancelFlag = true;
 	}
@@ -157,9 +154,7 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		/*
 		 * Close all tunnels.
 		 */
-		while (tunnels.size() > 0) {
-			Iterator<IRemoteTunnel> iterator = tunnels.iterator();
-			IRemoteTunnel tunnel = iterator.next();
+		for (IRemoteTunnel tunnel : new ArrayList<IRemoteTunnel>(tunnels)) {
 			try {
 				// releaseTunnel() already removes the entry from the list.
 				releaseTunnel(tunnel);
@@ -171,9 +166,8 @@ public class ExecutionManager implements IRemoteExecutionManager {
 		/*
 		 * Close all channels for remote executions.
 		 */
-		List<IRemoteOperation> operations = new ArrayList<IRemoteOperation>(executions);
-		for (IRemoteOperation operation : operations) {
-			operation.close();
+		for (IRemoteOperation execution : new ArrayList<IRemoteOperation>(executions)) {
+			execution.close();
 		}
 	}
 
@@ -302,9 +296,12 @@ public class ExecutionManager implements IRemoteExecutionManager {
 	}
 
 	public synchronized void releaseTunnel(IRemoteTunnel tunnel) throws RemoteConnectionException {
-		test();
-		connection.releaseTunnel((RemoteTunnel) tunnel);
-		tunnels.remove(tunnel);
+		try {
+			test();
+			connection.releaseTunnel((RemoteTunnel) tunnel);
+		} finally {
+			tunnels.remove(tunnel);
+		}
 	}
 
 	protected synchronized void registerOperation(IRemoteOperation operation) {
