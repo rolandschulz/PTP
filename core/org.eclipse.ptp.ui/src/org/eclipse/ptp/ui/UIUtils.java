@@ -179,7 +179,7 @@ public class UIUtils {
 	}
 
 	/**
-	 * @since 4.0
+	 * @since 4.1
 	 */
 	public static void safeRunSyncInUIThread(final ISafeRunnable safeRunnable) {
 		if (PTPUIPlugin.getDisplay().isDisposed()) {
