@@ -331,12 +331,6 @@ public class Connection implements IRemoteConnection {
 		}
 
 		/*
-		 * Create observer thread and start it
-		 */
-		executionObserver = new ExecutionObserver(this);
-		executionObserver.start();
-
-		/*
 		 * The default session cannot be fully used for connection pool, since
 		 * some channels are already using pty.
 		 */
@@ -353,6 +347,12 @@ public class Connection implements IRemoteConnection {
 		if (executionManager != null) {
 			executionManager.resetCancel();
 		}
+
+		/*
+		 * Create observer thread and start it
+		 */
+		executionObserver = new ExecutionObserver(this);
+		executionObserver.start();
 	}
 
 	/*
@@ -715,10 +715,12 @@ public class Connection implements IRemoteConnection {
 		controlChannel.killRemoteProcess(execution.getPID());
 	}
 
-	protected synchronized void registerObservedExecution(IRemoteOperation operation) {
+	protected void registerObservedExecution(IRemoteOperation operation) {
 		if (operation instanceof KillableExecution) {
 			KillableExecution killableExecution = (KillableExecution) operation;
-			getActiveProcessTable().put(new Integer(killableExecution.getInternaID()), killableExecution);
+			synchronized (getActiveProcessTable()) {
+				getActiveProcessTable().put(new Integer(killableExecution.getInternaID()), killableExecution);
+			}
 		}
 	}
 
@@ -761,12 +763,14 @@ public class Connection implements IRemoteConnection {
 		tunnels.remove(tunnel);
 	}
 
-	protected synchronized void setPID(int piid, int pid) {
+	protected void setPID(int piid, int pid) {
 		// Look for the object which key is PIID.
-		KillableExecution rce = getActiveProcessTable().get(new Integer(piid));
-		if (rce != null) {
-			// Process could be already finished and removed fro mthe table.
-			rce.setPID(pid);
+		synchronized (getActiveProcessTable()) {
+			KillableExecution exec = getActiveProcessTable().get(new Integer(piid));
+			if (exec != null) {
+				// Process could be already finished and removed fro mthe table.
+				exec.setPID(pid);
+			}
 		}
 	}
 
@@ -804,10 +808,12 @@ public class Connection implements IRemoteConnection {
 
 	}
 
-	protected synchronized void unregisterObservedExecution(IRemoteOperation operation) {
+	protected void unregisterObservedExecution(IRemoteOperation operation) {
 		if (operation instanceof KillableExecution) {
 			KillableExecution killableExecution = (KillableExecution) operation;
-			getActiveProcessTable().remove(new Integer(killableExecution.getInternaID()));
+			synchronized (getActiveProcessTable()) {
+				getActiveProcessTable().remove(new Integer(killableExecution.getInternaID()));
+			}
 		}
 	}
 }
