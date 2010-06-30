@@ -37,6 +37,9 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
+/**
+ * @since 2.0
+ */
 public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements IRemoteToolsIndexServiceProvider,
 		IServiceProviderWorkingCopy {
 
@@ -56,9 +59,18 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	public static final String NAME = Messages.RemoteToolsCIndexServiceProvider_0;
 	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.CIndexingService"; //$NON-NLS-1$
 
-	private static final String SERVICE_ID_KEY = "service-name"; //$NON-NLS-1$
-	private static final String CONNECTION_NAME_KEY = "connection-name"; //$NON-NLS-1$
-	private static final String INDEX_LOCATION_KEY = "index-location"; //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
+	public static final String SERVICE_ID_KEY = "service-name"; //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
+	public static final String CONNECTION_NAME_KEY = "connection-name"; //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
+	public static final String INDEX_LOCATION_KEY = "index-location"; //$NON-NLS-1$
 
 	public RemoteToolsCIndexServiceProvider() {
 	}

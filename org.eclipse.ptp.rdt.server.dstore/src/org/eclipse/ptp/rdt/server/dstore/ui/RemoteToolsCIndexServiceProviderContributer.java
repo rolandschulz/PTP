@@ -13,6 +13,8 @@ package org.eclipse.ptp.rdt.server.dstore.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -25,6 +27,7 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.services.core.IServiceProvider;
+import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.ui.IServiceProviderContributor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -41,7 +44,7 @@ import org.eclipse.swt.widgets.Label;
 
 public class RemoteToolsCIndexServiceProviderContributer implements IServiceProviderContributor {
 
-	private RemoteToolsCIndexServiceProvider fProvider;
+	private IServiceProviderWorkingCopy fProviderWorkingCopy;
 
 	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
 	private IRemoteServices fSelectedServices;
@@ -57,11 +60,18 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 	 * configureServiceProvider(org.eclipse.ptp.services.core.IServiceProvider,
 	 * org.eclipse.swt.widgets.Composite)
 	 */
-	public void configureServiceProvider(IServiceProvider sp, final Composite container) {
-		if (!(sp instanceof RemoteToolsCIndexServiceProvider))
+	/**
+	 * @since 2.0
+	 */
+	public void configureServiceProvider(IServiceProviderWorkingCopy sp, final Composite container) {
+		
+		fProviderWorkingCopy = null;
+		
+		if (sp instanceof IServiceProviderWorkingCopy) {
+			fProviderWorkingCopy = (IServiceProviderWorkingCopy) sp;
+		}
+		if (!(sp.getOriginal() instanceof RemoteToolsCIndexServiceProvider))
 			throw new IllegalArgumentException(); // should never happen
-
-		fProvider = (RemoteToolsCIndexServiceProvider) sp;
 
 		container.setLayout(new GridLayout(1, false));
 
@@ -130,7 +140,10 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 				int selectionIndex = connectionCombo.getSelectionIndex();
 				fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
 				updateNewConnectionButtonEnabled(newConnectionButton);
-				fProvider.setConnection(fSelectedConnection);
+				fProviderWorkingCopy.putString(RemoteToolsCIndexServiceProvider.SERVICE_ID_KEY, fSelectedConnection.getRemoteServices().getId());
+				fProviderWorkingCopy.putString(RemoteToolsCIndexServiceProvider.CONNECTION_NAME_KEY, fSelectedConnection.getName());
+				IPath workingDir = new Path(fSelectedConnection.getWorkingDirectory());
+				fProviderWorkingCopy.putString(RemoteToolsCIndexServiceProvider.INDEX_LOCATION_KEY, workingDir.append(".eclipsesettings").toString());
 				fServerWidget.setConnection(fSelectedConnection);
 			}
 		});
@@ -150,7 +163,7 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 			public void modifyText(ModifyEvent e) {
 				if (e.data == FieldModifier.VALUE_INDEX_LOCATION) {
 					fConfigPath = fServerWidget.getIndexLocation();
-					fProvider.setIndexLocation(fConfigPath);
+					fProviderWorkingCopy.putString(RemoteToolsCIndexServiceProvider.INDEX_LOCATION_KEY, fConfigPath);
 				}
 			}
 		});
@@ -159,7 +172,7 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 		 * Initialize widget with default values. This will trigger ModifyEvents
 		 * on the widget to update the field variables.
 		 */
-		fServerWidget.setIndexLocation(fProvider.getIndexLocation());
+		fServerWidget.setIndexLocation(fProviderWorkingCopy.getString(RemoteToolsCIndexServiceProvider.INDEX_LOCATION_KEY, "")); //$NON-NLS-N$
 	}
 
 	/*
@@ -199,10 +212,13 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 
 		// attempt to restore settings from saved state
 		IRemoteConnection connectionSelected = null;
-		if (fProvider.getServiceId() != null) {
-			IRemoteServices providerSelected = PTPRemoteCorePlugin.getDefault().getRemoteServices(fProvider.getServiceId());
-			if (providerSelected != null && fProvider.getConnectionName() != null) {
-				connectionSelected = providerSelected.getConnectionManager().getConnection(fProvider.getConnectionName());
+		String serviceID = fProviderWorkingCopy.getString(RemoteToolsCIndexServiceProvider.SERVICE_ID_KEY, null);
+		
+		if (serviceID != null) {
+			IRemoteServices providerSelected = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
+			String connectionName = fProviderWorkingCopy.getString(RemoteToolsCIndexServiceProvider.CONNECTION_NAME_KEY, null);
+			if (providerSelected != null && connectionName != null) {
+				connectionSelected = providerSelected.getConnectionManager().getConnection(connectionName);
 			}
 		}
 
@@ -226,8 +242,9 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 	private void populateProviderCombo(final Combo providerCombo) {
 		// attempt to restore settings from saved state
 		IRemoteServices providerSelected = null;
-		if (fProvider.getServiceId() != null) {
-			providerSelected = PTPRemoteCorePlugin.getDefault().getRemoteServices(fProvider.getServiceId());
+		String serviceID = fProviderWorkingCopy.getString(RemoteToolsCIndexServiceProvider.SERVICE_ID_KEY, null);
+		if (serviceID != null) {
+			providerSelected = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
 		}
 
 		// populate the combo with a list of providers
