@@ -23,16 +23,19 @@ photran_version=$2
 PTP_FEATURES="\
 	org.eclipse.ptp-feature \
 	org.eclipse.ptp.core-feature \
-	org.eclipse.ptp.external-feature \
-	org.eclipse.ptp.master \
 	org.eclipse.ptp.etfw-feature \
+	org.eclipse.ptp.etfw.ppw-feature \
 	org.eclipse.ptp.etfw.tau-feature \
 	org.eclipse.ptp.etfw.tau.fortran-feature \
-	org.eclipse.ptp.isp-feature \
+	org.eclipse.ptp.external-feature \
+	org.eclipse.ptp.gem-feature \
+	org.eclipse.ptp.master \
 	org.eclipse.ptp.pldt-feature \
 	org.eclipse.ptp.pldt.lapi-feature \
 	org.eclipse.ptp.pldt.upc-feature \
 	org.eclipse.ptp.rdt-feature \
+	org.eclipse.ptp.rdt.remotejars-feature \
+	org.eclipse.ptp.rdt.remotetools-feature \
 	org.eclipse.ptp.rdt.xlc-feature \
 	org.eclipse.ptp.remote-feature \
 	org.eclipse.ptp.remote.remotetools-feature \
@@ -42,8 +45,9 @@ PTP_FEATURES="\
 	org.eclipse.ptp.rm.ibm.pe-feature \
 	org.eclipse.ptp.rm.mpich2-feature \
 	org.eclipse.ptp.rm.openmpi-feature \
-	org.eclipse.ptp.rm.slurm-feature \
 	org.eclipse.ptp.rm.pbs-feature \
+	org.eclipse.ptp.rm.slurm-feature \
+	org.eclipse.ptp.sci-feature \
 	org.eclipse.ptp.sdm-feature \
 	org.eclipse.ptp.services-feature \
 	org.eclipse.ptp.utils-feature"
@@ -68,7 +72,6 @@ PTP_C_PROJECTS="\
 	org.eclipse.ptp.proxy \
 	org.eclipse.ptp.rm.ibm.pe.proxy \
 	org.eclipse.ptp.rm.ibm.ll.proxy \
-	org.eclipse.ptp.rm.pbs.proxy \
 	org.eclipse.ptp.rm.slurm.proxy \
 	org.eclipse.ptp.utils"
 	
@@ -80,12 +83,6 @@ update_feature() {
 update_manifest() {
 	sed -e "s/Bundle-Version: *[0-9]\.[0-9]\.[0-9]\.qualifier/Bundle-Version: $2.qualifier/" < $1/META-INF/MANIFEST.MF > $TMP_DIR/${1}_MANIFEST.MF
 	mv $TMP_DIR/${1}_MANIFEST.MF $1/META-INF/MANIFEST.MF
-}
-
-update_configure() {
-	sed -e "s/AC_INIT(\[*\([^],]*\)\]*, *\[*[0-9]\.[0-9]\.[0-9]\]*)/AC_INIT([\1], [$2])/" < $1/configure.in > $TMP_DIR/${1}_configure.in
-	mv $TMP_DIR/${1}_configure.in $1/configure.in
-	(cd $1; autoconf)
 }
 
 for feature in $PTP_FEATURES; do
@@ -101,7 +98,6 @@ done
 for project in $PTP_C_PROJECTS; do
 	echo "Updating $project..."
 	update_manifest $project $ptp_version
-	update_configure $project $ptp_version
 done
 
 for feature in $PHOTRAN_FEATURES; do
@@ -111,7 +107,6 @@ done
 
 echo "Updating org.eclipse.ptp.releng..."
 sed -e "s/<property name=\"ptpBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"ptpBranchVersion\" value=\"$ptp_version\"\/>/" \
-	-e "s/<property name=\"photranBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"photranBranchVersion\" value=\"$photran_version\"\/>/" \
 	< org.eclipse.ptp.releng/build.xml > $TMP_DIR/org.eclipse.ptp.releng_build.xml
 mv $TMP_DIR/org.eclipse.ptp.releng_build.xml org.eclipse.ptp.releng/build.xml
 
