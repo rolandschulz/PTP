@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.HashMap;
+
+import org.eclipse.rephraserengine.core.util.Pair;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
@@ -373,6 +375,18 @@ public final class ProfilingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T
     }
 
     // ANNOTATIONS /////////////////////////////////////////////////////////////
+
+    @Override public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename)
+    {
+        long startTime = System.currentTimeMillis();
+        
+        Iterable<Pair<R, Serializable>> result =  db.getAllAnnotationsFor(filename);
+        
+        long endTime = System.currentTimeMillis();
+        
+        update("getAllAnnotationsFor", endTime - startTime); //$NON-NLS-1$
+        return result;
+}
 
     @Override public void setAnnotation(R token, int annotationID, Serializable annotation)
     {

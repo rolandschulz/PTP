@@ -24,6 +24,7 @@ import java.util.LinkedList;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.rephraserengine.core.util.Pair;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
@@ -725,6 +726,60 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         {
             getVPG().log.logError(e);
             return null;
+        }
+    }
+
+    @Override public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename)
+    {
+        try
+        {
+            final IntVector records = db.annotations.findAllAnnotationRecordsFor(filename);
+
+            return new Iterable<Pair<R, Serializable>>()
+            {
+                public Iterator<Pair<R, Serializable>> iterator()
+                {
+                    return new Iterator<Pair<R, Serializable>>()
+                    {
+                        private int nextRecord = 0;
+                        private int numRecords = records.size();
+
+                        public boolean hasNext()
+                        {
+                            return nextRecord < numRecords;
+                        }
+
+                        public Pair<R, Serializable> next()
+                        {
+                            try
+                            {
+                                R tokenRef = getVPG().createTokenRef(
+                                    db.files.getFilename(db.annotations.getFileRecordPtr(records.get(nextRecord))).getString(),
+                                    db.annotations.getOffset(records.get(nextRecord)),
+                                    db.annotations.getLength(records.get(nextRecord)));
+                                Serializable result = getVPG().db.getAnnotation(tokenRef, db.annotations.getAnnotationType(records.get(nextRecord)));
+                                nextRecord++;
+                                return new Pair<R, Serializable>(tokenRef, result);
+                            }
+                            catch (CoreException e)
+                            {
+                                getVPG().log.logError(e);
+                                throw new Error(e);
+                            }
+                        }
+
+                        public void remove()
+                        {
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+            };
+        }
+        catch (CoreException e)
+        {
+            getVPG().log.logError(e);
+            return new LinkedList<Pair<R, Serializable>>();
         }
     }
 

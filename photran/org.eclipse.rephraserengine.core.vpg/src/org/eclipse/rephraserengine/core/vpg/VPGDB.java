@@ -15,6 +15,8 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Iterator;
 
+import org.eclipse.rephraserengine.core.util.Pair;
+
 /**
  * @author Jeff Overbey
  *
@@ -233,6 +235,15 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
      *  if it does not exist */
     abstract public Serializable getAnnotation(R tokenRef, int annotationID);
 
+    /**
+     * Returns a list of all of the annotations in the given file.
+     * <p>
+     * Due to implementation details, some annotations may be listed more than once.
+     * 
+     * @since 3.0
+     */
+    abstract public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename);
+    
     // UTILITY METHODS /////////////////////////////////////////////////////////
 
     public abstract void printOn(PrintStream out);

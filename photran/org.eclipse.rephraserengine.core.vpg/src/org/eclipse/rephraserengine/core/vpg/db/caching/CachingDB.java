@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.rephraserengine.core.util.Pair;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPG;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
@@ -398,6 +399,11 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
             annotationCache.put(key, ann);
             return ann;
         }
+    }
+
+    @Override public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename)
+    {
+        return db.getAllAnnotationsFor(filename);
     }
 
     // UTILITY METHODS /////////////////////////////////////////////////////////
