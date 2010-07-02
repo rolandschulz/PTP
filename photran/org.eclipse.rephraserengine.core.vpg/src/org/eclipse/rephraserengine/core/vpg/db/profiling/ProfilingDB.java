@@ -376,11 +376,11 @@ public final class ProfilingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T
 
     // ANNOTATIONS /////////////////////////////////////////////////////////////
 
-    @Override public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename)
+    @Override public Iterable<Pair<R, Integer>> getAllAnnotationsFor(String filename)
     {
         long startTime = System.currentTimeMillis();
         
-        Iterable<Pair<R, Serializable>> result =  db.getAllAnnotationsFor(filename);
+        Iterable<Pair<R, Integer>> result =  db.getAllAnnotationsFor(filename);
         
         long endTime = System.currentTimeMillis();
         

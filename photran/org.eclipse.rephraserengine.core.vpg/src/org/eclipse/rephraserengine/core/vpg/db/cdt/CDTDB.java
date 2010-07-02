@@ -729,17 +729,17 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         }
     }
 
-    @Override public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename)
+    @Override public Iterable<Pair<R, Integer>> getAllAnnotationsFor(String filename)
     {
         try
         {
             final IntVector records = db.annotations.findAllAnnotationRecordsFor(filename);
 
-            return new Iterable<Pair<R, Serializable>>()
+            return new Iterable<Pair<R, Integer>>()
             {
-                public Iterator<Pair<R, Serializable>> iterator()
+                public Iterator<Pair<R, Integer>> iterator()
                 {
-                    return new Iterator<Pair<R, Serializable>>()
+                    return new Iterator<Pair<R, Integer>>()
                     {
                         private int nextRecord = 0;
                         private int numRecords = records.size();
@@ -749,7 +749,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                             return nextRecord < numRecords;
                         }
 
-                        public Pair<R, Serializable> next()
+                        public Pair<R, Integer> next()
                         {
                             try
                             {
@@ -757,9 +757,9 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
                                     db.files.getFilename(db.annotations.getFileRecordPtr(records.get(nextRecord))).getString(),
                                     db.annotations.getOffset(records.get(nextRecord)),
                                     db.annotations.getLength(records.get(nextRecord)));
-                                Serializable result = getVPG().db.getAnnotation(tokenRef, db.annotations.getAnnotationType(records.get(nextRecord)));
+                                int type = db.annotations.getAnnotationType(records.get(nextRecord));
                                 nextRecord++;
-                                return new Pair<R, Serializable>(tokenRef, result);
+                                return new Pair<R, Integer>(tokenRef, type);
                             }
                             catch (CoreException e)
                             {
@@ -779,7 +779,7 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
         catch (CoreException e)
         {
             getVPG().log.logError(e);
-            return new LinkedList<Pair<R, Serializable>>();
+            return new LinkedList<Pair<R, Integer>>();
         }
     }
 

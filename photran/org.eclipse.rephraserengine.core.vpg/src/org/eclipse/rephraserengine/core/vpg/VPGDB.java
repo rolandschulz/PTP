@@ -228,7 +228,7 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
      */
     abstract public void setAnnotation(R token, int annotationID, Serializable annotation);
 
-    /** Deletes the annotation with the given IDfor the given token, if it exists. */
+    /** Deletes the annotation with the given ID for the given token, if it exists. */
     abstract public void deleteAnnotation(R token, int annotationID);
 
     /** @return the annotation with the given ID for the given token, or <code>null</code>
@@ -238,11 +238,14 @@ public abstract class VPGDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     /**
      * Returns a list of all of the annotations in the given file.
      * <p>
+     * The first entry of each pair is a {@link TokenRef}, and the second is an annotation type.
+     * The annotation can be retrieved using {@link VPGDB#getAnnotation(TokenRef, int)}.
+     * <p>
      * Due to implementation details, some annotations may be listed more than once.
      * 
      * @since 3.0
      */
-    abstract public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename);
+    abstract public Iterable<Pair<R, Integer>> getAllAnnotationsFor(String filename);
     
     // UTILITY METHODS /////////////////////////////////////////////////////////
 

@@ -401,7 +401,7 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
         }
     }
 
-    @Override public Iterable<Pair<R, Serializable>> getAllAnnotationsFor(String filename)
+    @Override public Iterable<Pair<R, Integer>> getAllAnnotationsFor(String filename)
     {
         return db.getAllAnnotationsFor(filename);
     }
