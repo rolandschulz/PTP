@@ -139,8 +139,8 @@ public abstract class CDTDB<A, T, R extends TokenRef<T>, L extends VPGLog<T, R>>
     {
         try
         {
-            lock.delete();
             db.close();
+            lock.delete();
         }
         catch (CoreException e)
         {
