@@ -18,7 +18,6 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
-import org.eclipse.ptp.remote.rse.core.messages.Messages;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
@@ -28,6 +27,7 @@ public class RSEServices implements IRemoteServices {
 	private IRemoteConnectionManager fConnMgr = null;
 	
 	private final IRemoteServicesDescriptor fDescriptor;
+	private boolean fInitialized;
 	
 	public RSEServices(IRemoteServicesDescriptor descriptor) {
 		fDescriptor = descriptor;
@@ -107,28 +107,40 @@ public class RSEServices implements IRemoteServices {
 	 * @see org.eclipse.ptp.remote.IRemoteServicesDelegate#initialize()
 	 */
 	public void initialize() {
-		if (fRegistry == null) {
-			try {
-				RSECorePlugin.waitForInitCompletion();
-			} catch (InterruptedException e) {
-				RSEAdapterCorePlugin.log(e);
+		if (!fInitialized) {
+			fRegistry = RSECorePlugin.getTheSystemRegistry();
+			if (fRegistry == null) {
+				return;
 			}
-			if (RSECorePlugin.isTheSystemRegistryActive()) {
-				fRegistry = RSECorePlugin.getTheSystemRegistry();
-			} else {
-				RSEAdapterCorePlugin.log(Messages.RSEServices_0);
+
+			// The old code that tried to wait for RSE to initialize
+			// was wrong. If the init job hadn't run yet, it wouldn't block.
+			// However, we can't block here anyway, because this can get called
+			// from the main thread on startup, before RSE is initialized.
+			// This would mean we deadlock ourselves.
+
+			// So if RSE isn't initialized, report out initialization failed,
+			// and the next time someone tries to use the service,
+			// initialization
+			// will be attempted again.
+
+			if (!RSECorePlugin.isInitComplete(RSECorePlugin.INIT_ALL)) {
+				return;
 			}
+
+			if (!RSECorePlugin.getThePersistenceManager().isRestoreComplete()) {
+				return;
+			}
+
+			fConnMgr = new RSEConnectionManager(fRegistry, this);
 		}
+		fInitialized = true;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
 	 */
 	public boolean isInitialized() {
-		initialize();
-		if (fRegistry == null) {
-			return false;
-		}
-		return true;
+		return fInitialized;
 	}
 }
