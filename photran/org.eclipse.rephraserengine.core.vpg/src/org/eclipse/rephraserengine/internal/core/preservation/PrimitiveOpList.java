@@ -150,27 +150,16 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
 
     public Interval dnorm(String filename, Interval interval)
     {
-        int lb = interval.lb;
         for (PrimitiveOp op : list)
         {
-            if (op.filename.equals(filename) && op.daff(this).contains(lb))
+            if (op.filename.equals(filename)
+                && interval.isSubsetOf(op.daff(this)))
             {
-                lb = op.daff(this).lb;
-                break;
+                return op.daff(this);
             }
         }
 
-        int ub = interval.ub;
-        for (PrimitiveOp op : list)
-        {
-            if (op.filename.equals(filename) && op.daff(this).contains(ub))
-            {
-                ub = op.daff(this).ub;
-                break;
-            }
-        }
-
-        return new Interval(lb, ub);
+        return interval;
     }
 
     @Override public String toString()
