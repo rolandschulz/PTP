@@ -14,7 +14,7 @@ package org.eclipse.rephraserengine.internal.core.preservation;
  * A primitive operation: alpha, epsilon, or rho.
  *
  * @author Jeff Overbey
- * 
+ *
  * @since 1.0
  */
 public abstract class PrimitiveOp
@@ -70,11 +70,11 @@ public abstract class PrimitiveOp
     {
         this.filename = filename;
     }
-    
+
     public abstract Interval iaff();
-    
+
     public abstract Interval daff(PrimitiveOpList s);
-    
+
     public abstract int adjust(String filename, int n);
 
     @Override public abstract String toString();
@@ -101,19 +101,19 @@ public abstract class PrimitiveOp
             this.j = j;
             this.k = k;
         }
-        
+
         @Override public Interval iaff()
         {
             return j;
         }
-        
+
         @Override public Interval daff(PrimitiveOpList s)
         {
-            int lb = s.offset(filename, k.lb);
+            int lb = s.without(this).offset(filename, k.lb);
             int ub = lb + k.cardinality();
             return new Interval(lb, ub);
         }
-        
+
         @Override public int adjust(String filename, int n)
         {
             if (this.filename.equals(filename) && n >= j.ub)

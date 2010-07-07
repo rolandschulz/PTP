@@ -20,12 +20,12 @@ import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
  * A list of {@link PrimitiveOp}s.
  *
  * @author Jeff Overbey
- * 
+ *
  * @since 1.0
  */
 public final class PrimitiveOpList implements Iterable<PrimitiveOp>
 {
-    protected List<PrimitiveOp> list;
+    protected final List<PrimitiveOp> list;
 
     public PrimitiveOpList()
     {
@@ -38,6 +38,17 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
 
         for (PrimitiveOp op : ops)
             add(op);
+    }
+
+    public PrimitiveOpList without(PrimitiveOp opToOmit)
+    {
+        PrimitiveOpList result = new PrimitiveOpList();
+
+        for (PrimitiveOp op : list)
+            if (!op.equals(opToOmit))
+                result.add(op);
+
+        return result;
     }
 
 //    public boolean isEmpty()
@@ -111,7 +122,7 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
 
         list.add(opToAdd);
     }
-    
+
     public int offset(String filename, int n)
     {
         int result = n;
@@ -119,7 +130,7 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
             result += op.adjust(filename, n);
         return result;
     }
-    
+
     public Interval inorm(String filename, Interval interval)
     {
         int lb = offset(filename, interval.lb);
@@ -131,7 +142,7 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
                 break;
             }
         }
-        
+
         int ub = offset(filename, interval.ub);
         for (PrimitiveOp op : list)
         {
@@ -141,10 +152,10 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
                 break;
             }
         }
-        
+
         return new Interval(lb, ub);
     }
-    
+
     public Interval dnorm(String filename, Interval interval)
     {
         int lb = interval.lb;
@@ -156,7 +167,7 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
                 break;
             }
         }
-        
+
         int ub = interval.ub;
         for (PrimitiveOp op : list)
         {
@@ -166,10 +177,10 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
                 break;
             }
         }
-        
+
         return new Interval(lb, ub);
     }
-    
+
     @Override public String toString()
     {
         StringBuilder sb = new StringBuilder();

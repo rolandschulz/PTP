@@ -32,18 +32,18 @@ import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSink
  * A mutable, in-memory copy of part of a program graph.
  *
  * @author Jeff Overbey
- * 
+ *
  * @since 1.0
  */
 public final class Model
 {
     private static final class Entry implements Comparable<Entry>
     {
-        private int edgeType;
-        private String sourceFilename;
-        private Interval source, origSource;
-        private String sinkFilename;
-        private Interval sink;
+        private final int edgeType;
+        private final String sourceFilename;
+        private final Interval source, origSource;
+        private final String sinkFilename;
+        private final Interval sink;
 
         public Entry(String sourceFilename, Interval source, String sinkFilename, Interval sink, int edgeType)
         {
@@ -142,7 +142,7 @@ public final class Model
         this.files = vpg.sortFilesAccordingToDependencies(new ArrayList<String>(filenames), new NullProgressMonitor());
 
         this.filesWithNoEdges = new TreeSet<String>();
-        
+
         pm = new SubProgressMonitor(pm, ticks, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
         pm.beginTask(Messages.bind(Messages.Model_Computing, name), files.size());
         this.edges = new TreeSet<Entry>();
@@ -158,7 +158,7 @@ public final class Model
     private void addEdges(String filename, IProgressMonitor pm)
     {
         int count = 0;
-        
+
         for (VPGEdge<?,?,?> edge : vpg.db.getAllEdgesFor(filename))
         {
             TokenRef<?> source = edge.getSource();
@@ -171,10 +171,10 @@ public final class Model
                     sink.getFilename(),
                     new Interval(sink.getOffset(), sink.getEndOffset()),
                     edge.getType()));
-            
+
             count++;
         }
-        
+
         if (count == 0)
             filesWithNoEdges.add(filename);
     }
@@ -195,9 +195,12 @@ public final class Model
         {
             if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, primitiveOps, true))
             {
-                entry.source = primitiveOps.inorm(entry.sourceFilename, entry.source);
-                entry.sink = primitiveOps.inorm(entry.sinkFilename, entry.sink);
-                revisedList.add(entry);
+                revisedList.add(new Entry(
+                    entry.sourceFilename,
+                    primitiveOps.inorm(entry.sourceFilename, entry.source),
+                    entry.sinkFilename,
+                    primitiveOps.inorm(entry.sinkFilename, entry.sink),
+                    entry.edgeType));
             }
             pm.worked(1);
         }
@@ -218,9 +221,12 @@ public final class Model
         {
             if (entry.shouldPreserveAccordingTo(preserveEdgeTypes, primitiveOps, false))
             {
-                entry.source = primitiveOps.dnorm(entry.sourceFilename, entry.source);
-                entry.sink = primitiveOps.dnorm(entry.sinkFilename, entry.sink);
-                revisedList.add(entry);
+                revisedList.add(new Entry(
+                    entry.sourceFilename,
+                    primitiveOps.dnorm(entry.sourceFilename, entry.source),
+                    entry.sinkFilename,
+                    primitiveOps.dnorm(entry.sinkFilename, entry.sink),
+                    entry.edgeType));
             }
             pm.worked(1);
         }
@@ -354,7 +360,7 @@ public final class Model
                     sb.append(", "); //$NON-NLS-1$
                     sb.append(String.format("%5d", entry.sink.ub)); //$NON-NLS-1$
                     sb.append(")"); //$NON-NLS-1$
-        
+
                     if (fileContents != null)
                     {
                         sb.append("           ["); //$NON-NLS-1$
@@ -384,7 +390,7 @@ public final class Model
                             sb.append(")"); //$NON-NLS-1$
                         }
                     }
-    
+
                     sb.append('\n');
                 }
             }
