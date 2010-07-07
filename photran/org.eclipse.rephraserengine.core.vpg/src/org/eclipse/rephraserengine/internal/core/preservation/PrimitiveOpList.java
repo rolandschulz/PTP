@@ -143,7 +143,7 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
         }
 
         int lb = offset(filename, interval.lb);
-        int ub = offset(filename, interval.ub);
+        int ub = offset(filename, interval.ub-1)+1;
         //if (ub <= lb) ub = lb + interval.cardinality(); // Can't happen (?)
         return new Interval(lb, ub);
     }
