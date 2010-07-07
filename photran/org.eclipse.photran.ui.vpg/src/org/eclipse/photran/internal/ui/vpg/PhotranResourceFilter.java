@@ -41,7 +41,7 @@ public class PhotranResourceFilter implements IResourceFilter
                 && PhotranVPG.getInstance().shouldProcessFile((IFile)resource)
                 && ((IFile)resource).isAccessible()
                 && (!SourceForm.isFixedForm((IFile)resource) || FortranResourceRefactoring.FIXED_FORM_REFACTORING_ENABLED)
-                && !SourceForm.isCPreprocessed((IFile)resource);
+                && (!SourceForm.isCPreprocessed((IFile)resource) || FortranResourceRefactoring.PREPROCESSOR_REFACTORING_ENABLED);
         else
             return true;
     }

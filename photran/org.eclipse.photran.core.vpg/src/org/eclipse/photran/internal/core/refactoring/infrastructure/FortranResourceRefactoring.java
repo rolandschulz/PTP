@@ -76,6 +76,9 @@ public abstract class FortranResourceRefactoring
     // TEMPORARY -- So we can continue working on fixed form refactoring while effectively disabling it in the public 6.0 release
     public static final boolean FIXED_FORM_REFACTORING_ENABLED = System.getenv("ENABLE_FIXED_FORM_REFACTORING") != null; //$NON-NLS-1$
     
+    // TEMPORARY -- So we can continue working on fixed form refactoring while effectively disabling it in the public 6.0 release
+    public static final boolean PREPROCESSOR_REFACTORING_ENABLED = System.getenv("ENABLE_PREPROCESSOR_REFACTORING") != null; //$NON-NLS-1$
+    
     @Override
     protected final PhotranVPG getVPG()
     {
