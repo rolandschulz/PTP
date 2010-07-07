@@ -29,15 +29,16 @@ import org.eclipse.rephraserengine.core.util.OffsetLength;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 import org.eclipse.rephraserengine.internal.core.preservation.Model;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOpList;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeAdded;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeDeleted;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSinkChanged;
 import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.ModelDiffProcessor;
+import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Epsilon;
+import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Mu;
 import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Rho;
+import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOpList;
 
 /**
  * Checks for preservation of semantic edges in a program graph modulo a sequence of primitive
@@ -176,6 +177,44 @@ public final class PreservationAnalysis
             newLength);
 
         primitiveOps.add(rho);
+    }
+
+    /**
+     * @since 3.0
+     */
+    public void markMu(IFile file, Object oldNode, Object newNode)
+    {
+        String filename = EclipseVPG.getFilenameForIFile(file);
+
+        OffsetLength oldOffsetLength = (OffsetLength)adapterManager.getAdapter(oldNode, OffsetLength.class);
+        if (oldOffsetLength == null)
+            throw new Error("Unable to get OffsetLength adapter for " + oldNode.getClass().getName()); //$NON-NLS-1$
+
+        OffsetLength newOffsetLength = (OffsetLength)adapterManager.getAdapter(newNode, OffsetLength.class);
+        if (newOffsetLength == null)
+            throw new Error("Unable to get OffsetLength adapter for " + newNode.getClass().getName()); //$NON-NLS-1$
+
+        Mu mu = PrimitiveOp.mu(
+            filename,
+            oldOffsetLength,
+            newOffsetLength);
+
+        primitiveOps.add(mu);
+    }
+
+    /**
+     * @since 3.0
+     */
+    public void markMu(IFile file, OffsetLength oldOffsetLength, OffsetLength newOffsetLength)
+    {
+        String filename = EclipseVPG.getFilenameForIFile(file);
+
+        Mu mu = PrimitiveOp.mu(
+            filename,
+            oldOffsetLength,
+            newOffsetLength);
+
+        primitiveOps.add(mu);
     }
 
     @Override public String toString()

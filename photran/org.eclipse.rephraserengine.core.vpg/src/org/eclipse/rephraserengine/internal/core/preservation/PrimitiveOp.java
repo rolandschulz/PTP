@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.internal.core.preservation;
 
+import org.eclipse.rephraserengine.core.util.OffsetLength;
+
 /**
  * A primitive operation: alpha, epsilon, or rho.
  *
@@ -58,6 +60,23 @@ public abstract class PrimitiveOp
     public static Rho rho(String filename, int offset, int oldLength, int newLength)
     {
         return new Rho(filename, new Interval(offset, offset+oldLength), new Interval(offset, offset+newLength));
+    }
+
+    public static Mu mu(String filename, OffsetLength j, OffsetLength k)
+    {
+        return new Mu(filename,
+            new Interval(j.getOffset(), j.getPositionPastEnd()),
+            new Interval(k.getOffset(), k.getPositionPastEnd()));
+    }
+
+    public static Mu mu(String filename, Interval j, Interval k)
+    {
+        return new Mu(filename, j, k);
+    }
+
+    public static Mu mu(String filename, int j_lb, int j_ub, int k_lb, int k_ub)
+    {
+        return new Mu(filename, new Interval(j_lb, j_ub), new Interval(k_lb, k_ub));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,6 +173,63 @@ public abstract class PrimitiveOp
         private Epsilon(String filename, Interval j)
         {
             super(filename, j, new Interval(j.lb, j.lb));
+        }
+    }
+
+    public static class Mu extends PrimitiveOp
+    {
+        public final Interval j, k;
+
+        private Mu(String filename, Interval j, Interval k)
+        {
+            super(filename);
+
+            if (j.overlaps(k))
+                throw new IllegalArgumentException("Mu-operation has overlapping intervals"); //$NON-NLS-1$
+
+            this.j = j;
+            this.k = k;
+        }
+
+        @Override public Interval iaff()
+        {
+            return j;
+        }
+
+        @Override public Interval daff(PrimitiveOpList s)
+        {
+            int lb = s.without(this).offset(filename, k.lb);
+            int ub = lb + k.cardinality();
+            return new Interval(lb, ub);
+        }
+
+        @Override public int adjust(String filename, int n)
+        {
+            Alpha alpha = PrimitiveOp.alpha(this.filename, this.k);
+            int adjustment = alpha.adjust(filename, n);
+            
+            Epsilon epsilon = PrimitiveOp.epsilon(this.filename, this.j);
+            adjustment += epsilon.adjust(filename, n+adjustment);
+            
+            return adjustment;
+        }
+
+        @Override public String toString()
+        {
+            return filename + ":" + "mu<" + j + ", " + k + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        }
+
+        @Override public int hashCode()
+        {
+            return 17 * j.hashCode() + k.hashCode();
+        }
+
+        @Override public boolean equals(Object o)
+        {
+            return o != null
+                && this.getClass().equals(o.getClass())
+                && this.j.equals(((Mu)o).j)
+                && this.k.equals(((Mu)o).k);
         }
     }
 }

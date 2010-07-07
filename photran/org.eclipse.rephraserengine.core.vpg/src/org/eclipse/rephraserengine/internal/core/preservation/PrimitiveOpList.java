@@ -133,26 +133,18 @@ public final class PrimitiveOpList implements Iterable<PrimitiveOp>
 
     public Interval inorm(String filename, Interval interval)
     {
+        for (PrimitiveOp op : list)
+        {
+            if (op.filename.equals(filename)
+                && interval.isSubsetOf(op.iaff(/*this*/)))
+            {
+                return op.daff(this);
+            }
+        }
+
         int lb = offset(filename, interval.lb);
-        for (PrimitiveOp op : list)
-        {
-            if (op.filename.equals(filename) && op.daff(this).contains(lb))
-            {
-                lb = op.daff(this).lb;
-                break;
-            }
-        }
-
         int ub = offset(filename, interval.ub);
-        for (PrimitiveOp op : list)
-        {
-            if (op.filename.equals(filename) && op.daff(this).contains(ub))
-            {
-                ub = op.daff(this).ub;
-                break;
-            }
-        }
-
+        //if (ub <= lb) ub = lb + interval.cardinality(); // Can't happen (?)
         return new Interval(lb, ub);
     }
 

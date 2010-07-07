@@ -26,9 +26,10 @@ public final class Interval implements Comparable<Interval>
 
     public Interval(int lb, int ub)
     {
-        if (ub < lb) throw new IllegalArgumentException(
-            "An interval [j,k) must have j <= k.  " + //$NON-NLS-1$
-            "[" + lb + "," + ub + ") is not a valid interval"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        if (ub < lb)
+            throw new IllegalArgumentException(
+                "An interval [j,k) must have j <= k.  " + //$NON-NLS-1$
+                "[" + lb + "," + ub + ") is not a valid interval"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         this.lb = lb;
         this.ub = ub;
