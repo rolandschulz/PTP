@@ -209,7 +209,7 @@ public abstract class PrimitiveOp
             int adjustment = alpha.adjust(filename, n);
             
             Epsilon epsilon = PrimitiveOp.epsilon(this.filename, this.j);
-            adjustment += epsilon.adjust(filename, n+adjustment);
+            adjustment += epsilon.adjust(filename, n/*+adjustment*/);
             
             return adjustment;
         }
