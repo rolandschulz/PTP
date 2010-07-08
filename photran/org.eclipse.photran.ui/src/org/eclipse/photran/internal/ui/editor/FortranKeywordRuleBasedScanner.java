@@ -60,7 +60,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
                                           "EQUIVALENCE", "ERR", "EXIST", "EXIT", "EXTENDS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                                           "EXTENSIBLE", "EXTERNAL", "FILE", "FMT", "FLUSH", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                                           "FORALL", "FORM", "FORMAT", "FORMATTED", "FUNCTION", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-                                          "GO", "IF", "IMPLICIT", "IN", "INOUT", "INCLUDE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+                                          "GOTO", "IF", "IMPLICIT", "IN", "INOUT", "INCLUDE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
                                           "INQUIRE", "INTENT", "INTERFACE", "INTRINSIC", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                                           "IOLENGTH", "IOSTAT", "INSTRINSIC", "KIND", "LEN", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                                           "MODULE", "NAME", "NAMED", "NAMELIST", "NEXTREC", "NML", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
