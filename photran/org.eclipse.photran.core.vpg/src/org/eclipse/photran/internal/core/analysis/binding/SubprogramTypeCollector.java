@@ -65,10 +65,19 @@ class SubprogramTypeCollector extends BindingCollector
         if (node.getSubroutinePars() != null)
         {
             for (ASTSubroutineParNode param : node.getSubroutinePars())
-                type.addArgument(
-                    param.getVariableName().getText(),
-                    typeOf(param.getVariableName()),
-                    intentOf(param.getVariableName()));
+            {
+                if (param.isAsterisk())
+                {
+                    // TODO: type.addArgument(name, type, intent)
+                }
+                else
+                {
+                    type.addArgument(
+                        param.getVariableName().getText(),
+                        typeOf(param.getVariableName()),
+                        intentOf(param.getVariableName()));
+                }
+            }
         }
         return type;
     }
