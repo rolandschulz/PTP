@@ -446,6 +446,34 @@ public abstract class ScopingNode extends ASTNode
         return getBody();
     }
 
+    public IASTListNode<IInternalSubprogram> getInternalSubprograms()
+    {
+        // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
+        // AND DYNAMICALLY DISPATCHED TO!
+
+        if (this instanceof ASTMainProgramNode)
+            return ((ASTMainProgramNode)this).getInternalSubprograms();
+        else if (this instanceof ASTFunctionSubprogramNode)
+            return ((ASTFunctionSubprogramNode)this).getInternalSubprograms();
+        else if (this instanceof ASTSubroutineSubprogramNode)
+            return ((ASTSubroutineSubprogramNode)this).getInternalSubprograms();
+        else if (this instanceof ASTModuleNode)
+            return collectModuleSubprograms(((ASTModuleNode)this).getModuleBody());
+        else if (this instanceof ASTSubmoduleNode)
+            return collectModuleSubprograms(((ASTSubmoduleNode)this).getModuleBody());
+        else
+            return new ASTListNode<IInternalSubprogram>();
+    }
+    
+    private IASTListNode<IInternalSubprogram> collectModuleSubprograms(IASTListNode<IModuleBodyConstruct> moduleBody)
+    {
+        IASTListNode<IInternalSubprogram> result = new ASTListNode<IInternalSubprogram>();
+        for (IModuleBodyConstruct c : moduleBody)
+            if (c instanceof ASTSubroutineSubprogramNode || c instanceof ASTFunctionSubprogramNode)
+                result.add((IInternalSubprogram)c);
+        return result;
+    }
+
     public boolean isSubprogram()
     {
         return this instanceof ASTFunctionSubprogramNode || this instanceof ASTSubroutineSubprogramNode;
