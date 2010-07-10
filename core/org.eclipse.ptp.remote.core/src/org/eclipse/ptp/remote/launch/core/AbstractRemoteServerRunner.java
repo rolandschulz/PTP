@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -60,6 +62,10 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private String fWorkDir = null;
 	private ServerState fServerState = ServerState.STARTING;
 	private IRemoteProcess fRemoteProcess;
+
+	private String fVerifyCommand;
+	private String fVerifyPattern;
+	private String fVerifyReqVersion;
 
 	public AbstractRemoteServerRunner(String name) {
 		super(name);
@@ -170,12 +176,78 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * @since 4.1 Gets the verify command.
+	 * 
+	 * @return the verify command
+	 */
+	public String getVerifyCommand() {
+		return fVerifyCommand;
+	}
+
+	/**
+	 * @since 4.1 Gets the verify pattern.
+	 * 
+	 * @return the verify pattern
+	 */
+	public String getVerifyPattern() {
+		return fVerifyPattern;
+	}
+
+	/**
+	 * @since 4.1 Gets the verify required version.
+	 * 
+	 * @return the verify required version
+	 */
+	public String getVerifyReqVersion() {
+		return fVerifyReqVersion;
+	}
+
+	/**
 	 * Get the working directory. This is the location of the payload.
 	 * 
 	 * @return working directory
 	 */
 	public String getWorkingDir() {
 		return fWorkDir;
+	}
+
+	/**
+	 * Checks if the valid version installed on the remote server. It uses a
+	 * pattern which is define in the "plugin.xml" file to match with the output
+	 * 
+	 * @param subMon
+	 *            monitor object
+	 * @return true, if the valid version is installed on the remote server
+	 */
+	private boolean isValidVersionInstalled(SubMonitor subMon) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		String s;
+
+		IRemoteProcess p = runVerifyCommand(subMon); // get the remote process
+														// that runs the verify
+														// command
+
+		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream())); // get
+																									// the
+																									// buffer
+																									// reader
+
+		// read the output from the command
+		while ((s = stdInput.readLine()) != null) {
+			sb.append(s);
+		}
+
+		Pattern pattern = Pattern.compile(getVerifyPattern()); // compile the
+																// pattern for
+																// search
+		Matcher m = pattern.matcher(sb.toString()); // get a matcher object
+
+		while (m.find()) {
+			return true; // return true if we find the specified pattern matched
+							// with the output stream
+		}
+
+		return false;
 	}
 
 	/**
@@ -332,6 +404,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 * Check if process terminated successfully (if not canceled).
 			 */
 			if (fRemoteProcess.exitValue() != 0) {
+
+				// Check if the valid java version is installed on the server
+				if (!isValidVersionInstalled(subMon)) {
+					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, NLS.bind(
+							Messages.AbstractRemoteServerRunner_12, getVerifyReqVersion())));
+				}
+
 				if (!subMon.isCanceled()) {
 					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, NLS.bind(
 							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue())));
@@ -352,6 +431,30 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				monitor.done();
 			}
 		}
+	}
+
+	/**
+	 * Run version verify command on the remote server.
+	 * 
+	 * @param subMon
+	 *            the monitor object
+	 * @return the IRemoteProcess object
+	 * @throws Exception
+	 *             the exception
+	 */
+	private IRemoteProcess runVerifyCommand(SubMonitor subMon) throws IOException {
+		/*
+		 * Now run version checker command on the server.
+		 */
+		subMon.subTask(Messages.AbstractRemoteServerRunner_13);
+		// specify the verify command to check the software version
+		String verifyCmd = RemoteVariableManager.getInstance().performStringSubstitution(getVerifyCommand());
+		List<String> verifyArgs = Arrays.asList(verifyCmd.split(" ")); //$NON-NLS-1$
+		IRemoteProcessBuilder builder = getRemoteConnection().getRemoteServices().getProcessBuilder(getRemoteConnection(),
+				verifyArgs);
+		builder.redirectErrorStream(true);
+		builder.environment().putAll(getEnv());
+		return builder.start();
 	}
 
 	/**
@@ -438,6 +541,36 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	public void setVariable(String name, String value) {
 		RemoteVariableManager.getInstance().setVariable(name, value);
+	}
+
+	/**
+	 * @since 4.1 Sets the verify command.
+	 * 
+	 * @param fVerifyCommand
+	 *            the new verify command
+	 */
+	public void setVerifyCommand(String fVerifyCommand) {
+		this.fVerifyCommand = fVerifyCommand;
+	}
+
+	/**
+	 * @since 4.1 Sets the verify pattern.
+	 * 
+	 * @param fVerifyPattern
+	 *            the new verify pattern
+	 */
+	public void setVerifyPattern(String fVerifyPattern) {
+		this.fVerifyPattern = fVerifyPattern;
+	}
+
+	/**
+	 * @since 4.1 Sets the verify req version.
+	 * 
+	 * @param fVerifyReqVersion
+	 *            the new verify req version
+	 */
+	public void setVerifyReqVersion(String fVerifyReqVersion) {
+		this.fVerifyReqVersion = fVerifyReqVersion;
 	}
 
 	/**
