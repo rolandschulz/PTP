@@ -31,28 +31,6 @@ public class RemoteServerManager {
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
 	/**
-	 * Get the remote server identified by id using the remote connection.
-	 * 
-	 * @param id
-	 *            id of the remote server
-	 * @param connection
-	 *            connection used to launch server
-	 * @return instance of the remote server, or null if no extension can be
-	 *         found
-	 */
-	public static AbstractRemoteServerRunner getServer(String id, IRemoteConnection connection) {
-		AbstractRemoteServerRunner server = fServerMap.get(getKey(id, connection));
-		if (server == null) {
-			server = createServer(id);
-			if (server != null) {
-				server.setRemoteConnection(connection);
-				fServerMap.put(getKey(id, connection), server);
-			}
-		}
-		return server;
-	}
-
-	/**
 	 * Create the remote server give its id.
 	 * 
 	 * @param id
@@ -101,5 +79,27 @@ public class RemoteServerManager {
 	 */
 	private static String getKey(String id, IRemoteConnection connection) {
 		return id + ";" + connection.getRemoteServices().getId() + "." + connection.getName(); //$NON-NLS-1$//$NON-NLS-2$
+	}
+
+	/**
+	 * Get the remote server identified by id using the remote connection.
+	 * 
+	 * @param id
+	 *            id of the remote server
+	 * @param connection
+	 *            connection used to launch server
+	 * @return instance of the remote server, or null if no extension can be
+	 *         found
+	 */
+	public static AbstractRemoteServerRunner getServer(String id, IRemoteConnection connection) {
+		AbstractRemoteServerRunner server = fServerMap.get(getKey(id, connection));
+		if (server == null) {
+			server = createServer(id);
+			if (server != null) {
+				server.setRemoteConnection(connection);
+				fServerMap.put(getKey(id, connection), server);
+			}
+		}
+		return server;
 	}
 }
