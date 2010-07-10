@@ -23,8 +23,8 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	private static final String TAG_INVOCATION_OPTIONS = "invocationOptions"; //$NON-NLS-1$
 	private static final String TAG_LOCAL_ADDRESS = "localAddress"; //$NON-NLS-1$
 
-	private List<String> invocationOptions = new ArrayList<String>();
-	
+	private final List<String> invocationOptions = new ArrayList<String>();
+
 	public AbstractRemoteResourceManagerServiceProvider() {
 		// Empty
 	}
@@ -39,7 +39,7 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	}
 
 	/**
-	 * Append invocation options to existing options. The contents of optionString are 
+	 * Append invocation options to existing options. The contents of optionString are
 	 * split into space separated strings.
 	 * 
 	 * @param optionString string containing the space separated invocation options
@@ -47,30 +47,19 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	public void addInvocationOptions(String optionString) {
 		if (!optionString.equals("")) { //$NON-NLS-1$
 			String[] options = optionString.split(" "); //$NON-NLS-1$
-			
+
 			for (String option : options) {
 				invocationOptions.add(option);
 			}
 		}
 	}
-	
-	/**
-	 * Get the invocation options as a list of strings. Returns
-	 * an empty list if there are no options
-	 * 
-	 * @return list of strings containing invocation options
-	 */
-	public List<String> getInvocationOptions() {
-		addInvocationOptions(getString(TAG_INVOCATION_OPTIONS, "")); //$NON-NLS-1$
-	    return invocationOptions;
-	}
-	
+
 	/**
 	 * Convert invocation options to a string
 	 * 
 	 * @return invocation options separated by spaces
 	 */
-	public String getInvocationOptionsStr() {
+	private String convertInvocationOptionsStr() {
 		String opts = ""; //$NON-NLS-1$
 		for (int i = 0; i < invocationOptions.size(); i++) {
 			if (i > 0) {
@@ -80,7 +69,28 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 		}
 		return opts;
 	}
-	
+
+	/**
+	 * Get the invocation options as a list of strings. Returns
+	 * an empty list if there are no options
+	 * 
+	 * @return list of strings containing invocation options
+	 */
+	public List<String> getInvocationOptions() {
+		addInvocationOptions(getString(TAG_INVOCATION_OPTIONS, "")); //$NON-NLS-1$
+		return invocationOptions;
+	}
+
+	/**
+	 * Get invocation options
+	 * 
+	 * @return invocation options separated by spaces
+	 */
+	public String getInvocationOptionsStr() {
+		getInvocationOptions();
+		return convertInvocationOptionsStr();
+	}
+
 	/**
 	 * Get the local address for the proxy to connect to
 	 * 
@@ -89,7 +99,7 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	public String getLocalAddress() {
 		return getString(TAG_LOCAL_ADDRESS, "localhost"); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Get the remote configuration options.
 	 * 
@@ -107,8 +117,8 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 			return 0;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Get the proxy server path. This may be a path on a remote system.
 	 * 
@@ -117,7 +127,7 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	public String getProxyServerPath() {
 		return getString(TAG_PROXY_PATH, ""); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Set the invocation options. The contents of optionString are split into space
 	 * separated strings. Any existing options are discarded.
@@ -127,9 +137,9 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	public void setInvocationOptions(String optionString) {
 		invocationOptions.clear();
 		addInvocationOptions(optionString);
-		putString(TAG_INVOCATION_OPTIONS, getInvocationOptionsStr());
+		putString(TAG_INVOCATION_OPTIONS, convertInvocationOptionsStr());
 	}
-	
+
 	/**
 	 * Set the local address
 	 * 
@@ -155,7 +165,7 @@ public abstract class AbstractRemoteResourceManagerServiceProvider extends Abstr
 	 */
 	public void setProxyServerPath(String proxyServerPath) {
 		putString(TAG_PROXY_PATH, proxyServerPath);
-	}	
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rm.remote.core.IRemoteResourceManagerConfiguration#testOption(int)

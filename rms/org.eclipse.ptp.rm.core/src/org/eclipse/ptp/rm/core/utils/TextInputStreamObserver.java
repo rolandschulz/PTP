@@ -31,7 +31,7 @@ public class TextInputStreamObserver extends Thread {
 	/**
 	 * Stream that is been observed and read.
 	 */
-	private BufferedReader reader;
+	private final BufferedReader reader;
 
 	/**
 	 * Signals that bridge should stop.
@@ -41,19 +41,19 @@ public class TextInputStreamObserver extends Thread {
 	/**
 	 * Listener that is called when data is received.
 	 */
-	private ITextInputStreamListener listener;
+	private final ITextInputStreamListener listener;
+
+	public TextInputStreamObserver(BufferedReader input, ITextInputStreamListener listener) {
+		this.reader = input;
+		this.listener = listener;
+		setName(this.getClass().getName());
+	}
 
 	public TextInputStreamObserver(BufferedReader input, ITextInputStreamListener listener,
 			String name) {
 		this.reader = input;
 		this.listener = listener;
 		setName(name);
-	}
-
-	public TextInputStreamObserver(BufferedReader input, ITextInputStreamListener listener) {
-		this.reader = input;
-		this.listener = listener;
-		setName(this.getClass().getName());
 	}
 
 	/**
@@ -74,16 +74,6 @@ public class TextInputStreamObserver extends Thread {
 		listener.newLine(line);
 	}
 
-	void streamClosed() {
-		log("Stream closed"); //$NON-NLS-1$
-		listener.streamClosed();
-	}
-
-	void streamError(Exception e) {
-		log("Recovered from exception: " + e.getMessage()); //$NON-NLS-1$
-		listener.streamError(e);
-	}
-
 	@Override
 	public void run() {
 		String line;
@@ -94,27 +84,34 @@ public class TextInputStreamObserver extends Thread {
 				if (line == null) {
 					streamClosed();
 					return;
-				} else {
-					newLine(line);
 				}
+				newLine(line);
 			} catch (IOException e) {
 				if (e instanceof EOFException) {
 					streamClosed();
 					break;
-				} else {
-					streamError(e);
-					break;
 				}
+				streamError(e);
+				break;
 			} catch (NullPointerException e) {
 				if (killed) {
 					streamClosed();
 					break;
-				} else {
-					streamError(e);
-					break;
 				}
+				streamError(e);
+				break;
 			}
 		}
+	}
+
+	void streamClosed() {
+		log("Stream closed"); //$NON-NLS-1$
+		listener.streamClosed();
+	}
+
+	void streamError(Exception e) {
+		log("Recovered from exception: " + e.getMessage()); //$NON-NLS-1$
+		listener.streamError(e);
 	}
 
 }
