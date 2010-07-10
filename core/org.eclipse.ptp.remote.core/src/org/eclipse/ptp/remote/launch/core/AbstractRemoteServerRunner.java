@@ -68,6 +68,55 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		setSystem(!DEBUG);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.jobs.Job#canceling()
+	 */
+	@Override
+	protected void canceling() {
+		terminateServer();
+	}
+
+	/**
+	 * Called on termination of the server process
+	 */
+	protected abstract void doFinishServer(IProgressMonitor monitor);
+
+	/**
+	 * Called if the server is restarted
+	 * 
+	 * @return false if restart should be aborted
+	 */
+	protected abstract boolean doRestartServer(IProgressMonitor monitor);
+
+	/**
+	 * Called once the server starts
+	 * 
+	 * @return false if server should be aborted
+	 */
+	protected abstract boolean doStartServer(IProgressMonitor monitor);
+
+	/**
+	 * Called with each line of stderr from the server. Implementers can use
+	 * this to determine when the server has successfully started.
+	 * 
+	 * @param output
+	 *            line of stderr output from server
+	 * @return true if the server has started
+	 */
+	protected abstract boolean doVerifyServerRunningFromStderr(String output);
+
+	/**
+	 * Called with each line of stdout from the server. Implementers can use
+	 * this to determine when the server has successfully started.
+	 * 
+	 * @param output
+	 *            line of stdout output from server
+	 * @return true if the server has started
+	 */
+	protected abstract boolean doVerifyServerRunningFromStdout(String output);
+
 	public Map<String, String> getEnv() {
 		return fEnv;
 	}
@@ -130,6 +179,182 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Launch the server use the supplied remote connection. The server file is
+	 * cached on the remote machine prior to the first launch.
+	 * 
+	 * @param conn
+	 *            connection to remote machine for launch
+	 * @param monitor
+	 *            progress monitor
+	 * @return remote process representing the server invocation
+	 * @throws IOException
+	 */
+	private IRemoteProcess launchServer(IRemoteConnection conn, IProgressMonitor monitor) throws IOException {
+		try {
+			SubMonitor subMon = SubMonitor.convert(monitor, 100);
+			/*
+			 * First check if the remote file exists or is a different size to
+			 * the local version and copy over if required.
+			 */
+			IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
+			IFileStore directory = fileManager.getResource(getWorkingDir());
+			/*
+			 * Create the directory if it doesn't exist (has no effect if the
+			 * directory already exists). Also, check if a file of this name
+			 * exists and generate exception if it does.
+			 */
+			directory.mkdir(EFS.NONE, subMon.newChild(10));
+			IFileStore server = directory.getChild(getPayload());
+			IFileInfo serverInfo = server.fetchInfo(EFS.NONE, subMon.newChild(10));
+			IFileStore local = null;
+			URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
+			if (jarURL != null) {
+				jarURL = FileLocator.toFileURL(jarURL);
+				local = EFS.getStore(URIUtil.toURI(jarURL));
+			}
+			if (local == null) {
+				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_11,
+						new Object[] { getPayload(), fBundle.getSymbolicName() }));
+			}
+			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
+			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
+				local.copy(server, EFS.OVERWRITE, subMon.newChild(70));
+			}
+
+			/*
+			 * Now launch the server.
+			 */
+			subMon.subTask(Messages.AbstractRemoteServerRunner_5);
+			String launchCmd = RemoteVariableManager.getInstance().performStringSubstitution(getLaunchCommand());
+			List<String> launchArgs = Arrays.asList(launchCmd.split(" ")); //$NON-NLS-1$
+			IRemoteProcessBuilder builder = conn.getRemoteServices().getProcessBuilder(conn, launchArgs);
+			builder.directory(directory);
+			builder.environment().putAll(getEnv());
+			return builder.start();
+		} catch (Exception e) {
+			throw new IOException(e.getMessage());
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
+	 * IProgressMonitor)
+	 */
+	@Override
+	protected IStatus run(IProgressMonitor monitor) {
+		assert fLaunchCommand != null;
+		assert fRemoteProcess == null;
+
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+
+		try {
+			if (subMon.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			fRemoteProcess = launchServer(fRemoteConnection, subMon.newChild(50));
+
+			if (subMon.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						while (getServerState() != ServerState.FINISHED) {
+							String output = stdout.readLine();
+							if (output != null) {
+								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStdout(output)) {
+									setServerState(ServerState.RUNNING);
+								}
+								if (DebugUtil.SERVER_TRACING) {
+									System.out.println("SERVER: " + output); //$NON-NLS-1$
+								}
+							}
+						}
+					} catch (IOException e) {
+						// Ignore
+					}
+				}
+			}, "dstore server stdout").start(); //$NON-NLS-1$
+
+			final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
+			new Thread(new Runnable() {
+				public void run() {
+					try {
+						while (getServerState() != ServerState.FINISHED) {
+							String output = stderr.readLine();
+							if (output != null) {
+								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
+									setServerState(ServerState.RUNNING);
+								}
+								// if (DebugUtil.SERVER_TRACING) {
+								System.err.println("SERVER: " + output); //$NON-NLS-1$
+								// }
+							}
+						}
+					} catch (IOException e) {
+						// Ignore
+					}
+				}
+			}, "dstore server stderr").start(); //$NON-NLS-1$
+
+			subMon.worked(50);
+			subMon.subTask(Messages.AbstractRemoteServerRunner_1);
+
+			/*
+			 * Wait while running but not canceled.
+			 */
+			while (!fRemoteProcess.isCompleted() && !subMon.isCanceled()) {
+				synchronized (this) {
+					try {
+						wait(500);
+					} catch (InterruptedException e) {
+						// Ignore interrupt;
+					}
+				}
+			}
+
+			try {
+				fRemoteProcess.waitFor();
+			} catch (InterruptedException e) {
+				// Do nothing
+			}
+
+			/*
+			 * Check if process terminated successfully (if not canceled).
+			 */
+			if (fRemoteProcess.exitValue() != 0) {
+				if (!subMon.isCanceled()) {
+					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, NLS.bind(
+							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue())));
+				}
+			}
+			return subMon.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
+		} catch (CoreException e) {
+			return e.getStatus();
+		} catch (IOException e) {
+			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, e.getMessage(), null);
+		} finally {
+			synchronized (this) {
+				fRemoteProcess = null;
+				doFinishServer(subMon.newChild(1));
+			}
+			setServerState(ServerState.FINISHED);
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
 	 * Set the id of the bundle containing the remote server file.
 	 * 
 	 * @param id
@@ -185,6 +410,22 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	public void setRemoteConnection(IRemoteConnection conn) {
 		fRemoteConnection = conn;
 		setName(fServerName + " (" + conn.getName() + ")");//$NON-NLS-1$//$NON-NLS-2$
+	}
+
+	/**
+	 * Change the state of the server
+	 * 
+	 * @param state
+	 *            new server state
+	 */
+	protected synchronized void setServerState(ServerState state) {
+		if (fServerState != state) {
+			if (DebugUtil.SERVER_TRACING) {
+				System.out.println("SERVER RUNNER: " + state.toString()); //$NON-NLS-1$
+			}
+			fServerState = state;
+			this.notifyAll();
+		}
 	}
 
 	/**
@@ -275,247 +516,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			if (monitor != null) {
 				monitor.done();
 			}
-		}
-	}
-
-	/**
-	 * Launch the server use the supplied remote connection. The server file is
-	 * cached on the remote machine prior to the first launch.
-	 * 
-	 * @param conn
-	 *            connection to remote machine for launch
-	 * @param monitor
-	 *            progress monitor
-	 * @return remote process representing the server invocation
-	 * @throws IOException
-	 */
-	private IRemoteProcess launchServer(IRemoteConnection conn, IProgressMonitor monitor) throws IOException {
-		try {
-			SubMonitor subMon = SubMonitor.convert(monitor, 100);
-			/*
-			 * First check if the remote file exists or is a different size to
-			 * the local version and copy over if required.
-			 */
-			IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
-			IFileStore directory = fileManager.getResource(getWorkingDir());
-			/*
-			 * Create the directory if it doesn't exist (has no effect if the
-			 * directory already exists). Also, check if a file of this name
-			 * exists and generate exception if it does.
-			 */
-			directory.mkdir(EFS.NONE, subMon.newChild(10));
-			IFileStore server = directory.getChild(getPayload());
-			IFileInfo serverInfo = server.fetchInfo(EFS.NONE, subMon.newChild(10));
-			IFileStore local = null;
-			URL jarURL = FileLocator.find(fBundle, new Path(getPayload()), null);
-			if (jarURL != null) {
-				jarURL = FileLocator.toFileURL(jarURL);
-				local = EFS.getStore(URIUtil.toURI(jarURL));
-			}
-			if (local == null) {
-				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_11,
-						new Object[] { getPayload(), fBundle.getSymbolicName() }));
-			}
-			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
-			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
-				local.copy(server, EFS.OVERWRITE, subMon.newChild(70));
-			}
-
-			/*
-			 * Now launch the server.
-			 */
-			subMon.subTask(Messages.AbstractRemoteServerRunner_5);
-			String launchCmd = RemoteVariableManager.getInstance().performStringSubstitution(getLaunchCommand());
-			List<String> launchArgs = Arrays.asList(launchCmd.split(" ")); //$NON-NLS-1$
-			IRemoteProcessBuilder builder = conn.getRemoteServices().getProcessBuilder(conn, launchArgs);
-			builder.directory(directory);
-			builder.environment().putAll(getEnv());
-			return builder.start();
-		} catch (Exception e) {
-			throw new IOException(e.getMessage());
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.jobs.Job#canceling()
-	 */
-	@Override
-	protected void canceling() {
-		terminateServer();
-	}
-
-	/**
-	 * Called on termination of the server process
-	 */
-	protected abstract void doFinishServer(IProgressMonitor monitor);
-
-	/**
-	 * Called if the server is restarted
-	 * 
-	 * @return false if restart should be aborted
-	 */
-	protected abstract boolean doRestartServer(IProgressMonitor monitor);
-
-	/**
-	 * Called once the server starts
-	 * 
-	 * @return false if server should be aborted
-	 */
-	protected abstract boolean doStartServer(IProgressMonitor monitor);
-
-	/**
-	 * Called with each line of stderr from the server. Implementers can use
-	 * this to determine when the server has successfully started.
-	 * 
-	 * @param output
-	 *            line of stderr output from server
-	 * @return true if the server has started
-	 */
-	protected abstract boolean doVerifyServerRunningFromStderr(String output);
-
-	/**
-	 * Called with each line of stdout from the server. Implementers can use
-	 * this to determine when the server has successfully started.
-	 * 
-	 * @param output
-	 *            line of stdout output from server
-	 * @return true if the server has started
-	 */
-	protected abstract boolean doVerifyServerRunningFromStdout(String output);
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
-	 * IProgressMonitor)
-	 */
-	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-		assert fLaunchCommand != null;
-		assert fRemoteProcess == null;
-
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-
-		try {
-			if (subMon.isCanceled()) {
-				return Status.CANCEL_STATUS;
-			}
-
-			fRemoteProcess = launchServer(fRemoteConnection, subMon.newChild(50));
-
-			if (subMon.isCanceled()) {
-				return Status.CANCEL_STATUS;
-			}
-
-			final BufferedReader stdout = new BufferedReader(new InputStreamReader(fRemoteProcess.getInputStream()));
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						while (getServerState() != ServerState.FINISHED) {
-							String output = stdout.readLine();
-							if (output != null) {
-								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStdout(output)) {
-									setServerState(ServerState.RUNNING);
-								}
-								if (DebugUtil.SERVER_TRACING) {
-									System.out.println("SERVER: " + output); //$NON-NLS-1$
-								}
-							}
-						}
-					} catch (IOException e) {
-						// Ignore
-					}
-				}
-			}, "dstore server stdout").start(); //$NON-NLS-1$
-
-			final BufferedReader stderr = new BufferedReader(new InputStreamReader(fRemoteProcess.getErrorStream()));
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						while (getServerState() != ServerState.FINISHED) {
-							String output = stderr.readLine();
-							if (output != null) {
-								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
-									setServerState(ServerState.RUNNING);
-								}
-//								if (DebugUtil.SERVER_TRACING) {
-									System.err.println("SERVER: " + output); //$NON-NLS-1$
-//								}
-							}
-						}
-					} catch (IOException e) {
-						// Ignore
-					}
-				}
-			}, "dstore server stderr").start(); //$NON-NLS-1$
-
-			subMon.worked(50);
-			subMon.subTask(Messages.AbstractRemoteServerRunner_1);
-
-			/*
-			 * Wait while running but not canceled.
-			 */
-			while (!fRemoteProcess.isCompleted() && !subMon.isCanceled()) {
-				synchronized (this) {
-					try {
-						wait(500);
-					} catch (InterruptedException e) {
-						// Ignore interrupt;
-					}
-				}
-			}
-
-			try {
-				fRemoteProcess.waitFor();
-			} catch (InterruptedException e) {
-				// Do nothing
-			}
-
-			/*
-			 * Check if process terminated successfully (if not canceled).
-			 */
-			if (fRemoteProcess.exitValue() != 0) {
-				if (!subMon.isCanceled()) {
-					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, NLS.bind(
-							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue())));
-				}
-			}
-			return subMon.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
-		} catch (CoreException e) {
-			return e.getStatus();
-		} catch (IOException e) {
-			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, e.getMessage(), null);
-		} finally {
-			synchronized (this) {
-				fRemoteProcess = null;
-				doFinishServer(subMon.newChild(1));
-			}
-			setServerState(ServerState.FINISHED);
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
-
-	/**
-	 * Change the state of the server
-	 * 
-	 * @param state
-	 *            new server state
-	 */
-	protected synchronized void setServerState(ServerState state) {
-		if (fServerState != state) {
-			if (DebugUtil.SERVER_TRACING) {
-				System.out.println("SERVER RUNNER: " + state.toString()); //$NON-NLS-1$
-			}
-			fServerState = state;
-			this.notifyAll();
 		}
 	}
 
