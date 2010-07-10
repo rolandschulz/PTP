@@ -353,12 +353,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 
 		if (queue != null) {
 			ElementAttributeManager mgr = e.getElementAttributeManager();
+			Collection<IPJobControl> newJobs = new ArrayList<IPJobControl>();
 
 			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 				AttributeManager jobAttrs = entry.getValue();
 
 				RangeSet jobIds = entry.getKey();
-				List<IPJobControl> newJobs = new ArrayList<IPJobControl>(jobIds.size());
 
 				for (String elementId : jobIds) {
 					IPJobControl job = getJobControl(elementId);
@@ -382,8 +382,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 					}
 				}
 
-				addJobs(queue, newJobs);
+				
 			}
+			addJobs(queue, newJobs);
 		} else {
 			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_0 + e.getParentId());
 		}
@@ -428,11 +429,11 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 
 		if (machine != null) {
 			ElementAttributeManager mgr = e.getElementAttributeManager();
+			Collection<IPNodeControl> newNodes = new ArrayList<IPNodeControl>();
 
 			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
 				AttributeManager attrs = entry.getValue();
 				RangeSet nodeIds = entry.getKey();
-				List<IPNodeControl> newNodes = new ArrayList<IPNodeControl>(nodeIds.size());
 
 				for (String elementId : nodeIds) {
 					IPNodeControl node = getNodeControl(elementId);
@@ -442,8 +443,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 					}
 				}
 
-				addNodes(machine, newNodes);
+				
 			}
+			addNodes(machine, newNodes);
 		} else {
 			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_1 + e.getParentId());
 		}
