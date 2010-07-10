@@ -83,7 +83,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 * available on entire PTP.
 	 */
 	private static final Pattern variablePattern = Pattern
-			.compile(("/$/{(/w+)(" + "(?:(?:////)|(?:///})|[^/}])*" + ")/}").replace('/', '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	.compile(("/$/{(/w+)(" + "(?:(?:////)|(?:///})|[^/}])*" + ")/}").replace('/', '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final Pattern parameterPattern = Pattern.compile(":((?:(?:////)|(?:///:)|(?:///})|[^:])*)".replace('/', '\\')); //$NON-NLS-1$
 
 	public AbstractToolRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
@@ -93,55 +93,6 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 		this.rtSystem = rtSystem;
 		this.jobID = jobID;
 		this.queueID = queueID;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
-	 */
-	@Override
-	public Object getAdapter(Class adapter) {
-		if (adapter == IToolRuntimeSystemJob.class) {
-			return this;
-		}
-		return super.getAdapter(adapter);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.IToolRuntimeSystemJob#getJobID()
-	 */
-	public String getJobID() {
-		return jobID;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.core.rtsystem.IToolRuntimeSystemJob#getRtSystem()
-	 */
-	public AbstractToolRuntimeSystem getRtSystem() {
-		return rtSystem;
-	}
-
-	/**
-	 * Get the environment map from the job attributes
-	 * 
-	 * @param environmentMap
-	 */
-	private void retrieveEnvironmentFromAttrMrg(HashMap<String, String> environmentMap) {
-		ArrayAttribute<String> environmentAttribute = getAttrMgr().getAttribute(JobAttributes.getEnvironmentAttributeDefinition());
-		if (environmentAttribute != null) {
-			List<String> environment = environmentAttribute.getValue();
-			for (String entry : environment) {
-				int i = entry.indexOf('=');
-				String key = entry.substring(0, i);
-				String value = entry.substring(i + 1);
-				environmentMap.put(key, value);
-			}
-		}
 	}
 
 	/*
@@ -283,6 +234,19 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 */
 	protected abstract void doWaitExecution(IProgressMonitor monitor) throws CoreException;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	@Override
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+		if (adapter == IToolRuntimeSystemJob.class) {
+			return this;
+		}
+		return super.getAdapter(adapter);
+	}
+
 	/**
 	 * Get the job attribute manager.
 	 * 
@@ -307,6 +271,15 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				JobAttributes.getWorkingDirectoryAttributeDefinition() };
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.IToolRuntimeSystemJob#getJobID()
+	 */
+	public String getJobID() {
+		return jobID;
+	}
+
 	/**
 	 * Get the remote execution command process
 	 * 
@@ -323,6 +296,15 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 */
 	protected String getQueueID() {
 		return queueID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.core.rtsystem.IToolRuntimeSystemJob#getRtSystem()
+	 */
+	public AbstractToolRuntimeSystem getRtSystem() {
+		return rtSystem;
 	}
 
 	/**
@@ -610,6 +592,24 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	}
 
 	/**
+	 * Get the environment map from the job attributes
+	 * 
+	 * @param environmentMap
+	 */
+	private void retrieveEnvironmentFromAttrMrg(HashMap<String, String> environmentMap) {
+		ArrayAttribute<String> environmentAttribute = getAttrMgr().getAttribute(JobAttributes.getEnvironmentAttributeDefinition());
+		if (environmentAttribute != null) {
+			List<String> environment = environmentAttribute.getValue();
+			for (String entry : environment) {
+				int i = entry.indexOf('=');
+				String key = entry.substring(0, i);
+				String value = entry.substring(i + 1);
+				environmentMap.put(key, value);
+			}
+		}
+	}
+
+	/**
 	 * Retrieve the working directory for the launch.
 	 * 
 	 * @param baseSubstitutionAttributeManager
@@ -781,7 +781,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			DebugUtil
-					.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
+			.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
 
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle finish", getJobID()); //$NON-NLS-1$
