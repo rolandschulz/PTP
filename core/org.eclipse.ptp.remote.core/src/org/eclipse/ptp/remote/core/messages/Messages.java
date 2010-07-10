@@ -7,6 +7,8 @@ public class Messages extends NLS {
 	public static String AbstractRemoteServerRunner_1;
 	public static String AbstractRemoteServerRunner_10;
 	public static String AbstractRemoteServerRunner_11;
+	public static String AbstractRemoteServerRunner_12;
+	public static String AbstractRemoteServerRunner_13;
 	public static String AbstractRemoteServerRunner_3;
 	public static String AbstractRemoteServerRunner_5;
 	public static String AbstractRemoteServerRunner_6;

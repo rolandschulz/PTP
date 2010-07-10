@@ -29,6 +29,9 @@ public class RemoteServerManager {
 	private static final String ATTR_LAUNCH_COMMAND = "launchCommand"; //$NON-NLS-1$
 	private static final String ATTR_PAYLOAD = "payload"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATTR_VERIFYCOMMAND = "verifyCommand"; //$NON-NLS-1$
+	private static final String ATTR_VERIFYPATTERN = "verifyPattern"; //$NON-NLS-1$
+	private static final String ATTR_VERIFYREQVERSION = "verifyReqVersion"; //$NON-NLS-1$
 
 	/**
 	 * Create the remote server give its id.
@@ -57,6 +60,10 @@ public class RemoteServerManager {
 							server.setBundleId(ce.getContributor().getName());
 							server.setLaunchCommand(ce.getAttribute(ATTR_LAUNCH_COMMAND));
 							server.setPayload(ce.getAttribute(ATTR_PAYLOAD));
+							server.setVerifyCommand(ce.getAttribute(ATTR_VERIFYCOMMAND));
+							server.setVerifyPattern(ce.getAttribute(ATTR_VERIFYPATTERN));
+							server.setVerifyReqVersion(ce.getAttribute(ATTR_VERIFYREQVERSION));
+
 							return server;
 						}
 					} catch (CoreException e) {

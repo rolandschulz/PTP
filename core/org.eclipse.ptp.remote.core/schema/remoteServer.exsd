@@ -77,6 +77,28 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="verifyCommand" type="string" use="required">
+            <annotation>
+               <documentation>
+                  This will be used to specify the command to check the desired software on remote server
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyPattern" type="string" use="required">
+            <annotation>
+               <documentation>
+                  This will be used to specify the search pattern in the form of regular expression which will be used to verify the output of the command specified in the verifyCommand attribute.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="verifyReqVersion" type="string" use="required">
+            <annotation>
+               <documentation>
+                  This will be used to specify the minimum required version. This attribute is used
+for showing error message to the user.
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
