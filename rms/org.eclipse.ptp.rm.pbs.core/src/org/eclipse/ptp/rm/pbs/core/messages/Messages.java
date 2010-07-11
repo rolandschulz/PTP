@@ -21,48 +21,6 @@ import org.eclipse.osgi.util.NLS;
  * @author arossi
  */
 public class Messages extends NLS {
-	public static String PBSJobAttributeDefaultValue_0;
-	public static String PBSJobAttributeDefaultValue_1;
-	public static String PBSJobAttributeDefaultValue_10;
-	public static String PBSJobAttributeDefaultValue_11;
-	public static String PBSJobAttributeDefaultValue_12;
-	public static String PBSJobAttributeDefaultValue_13;
-	public static String PBSJobAttributeDefaultValue_14;
-	public static String PBSJobAttributeDefaultValue_15;
-	public static String PBSJobAttributeDefaultValue_16;
-	public static String PBSJobAttributeDefaultValue_17;
-	public static String PBSJobAttributeDefaultValue_18;
-	public static String PBSJobAttributeDefaultValue_19;
-	public static String PBSJobAttributeDefaultValue_2;
-	public static String PBSJobAttributeDefaultValue_20;
-	public static String PBSJobAttributeDefaultValue_21;
-	public static String PBSJobAttributeDefaultValue_22;
-	public static String PBSJobAttributeDefaultValue_23;
-	public static String PBSJobAttributeDefaultValue_24;
-	public static String PBSJobAttributeDefaultValue_25;
-	public static String PBSJobAttributeDefaultValue_26;
-	public static String PBSJobAttributeDefaultValue_27;
-	public static String PBSJobAttributeDefaultValue_28;
-	public static String PBSJobAttributeDefaultValue_29;
-	public static String PBSJobAttributeDefaultValue_3;
-	public static String PBSJobAttributeDefaultValue_30;
-	public static String PBSJobAttributeDefaultValue_31;
-	public static String PBSJobAttributeDefaultValue_32;
-	public static String PBSJobAttributeDefaultValue_33;
-	public static String PBSJobAttributeDefaultValue_34;
-	public static String PBSJobAttributeDefaultValue_35;
-	public static String PBSJobAttributeDefaultValue_36;
-	public static String PBSJobAttributeDefaultValue_37;
-	public static String PBSJobAttributeDefaultValue_38;
-	public static String PBSJobAttributeDefaultValue_39;
-	public static String PBSJobAttributeDefaultValue_4;
-	public static String PBSJobAttributeDefaultValue_40;
-	public static String PBSJobAttributeDefaultValue_41;
-	public static String PBSJobAttributeDefaultValue_5;
-	public static String PBSJobAttributeDefaultValue_6;
-	public static String PBSJobAttributeDefaultValue_7;
-	public static String PBSJobAttributeDefaultValue_8;
-	public static String PBSJobAttributeDefaultValue_9;
 	public static String PBSJobAttributeDescription_0;
 	public static String PBSJobAttributeDescription_1;
 
@@ -106,9 +64,6 @@ public class Messages extends NLS {
 	public static String PBSJobAttributeDescription_7;
 	public static String PBSJobAttributeDescription_8;
 	public static String PBSJobAttributeDescription_9;
-	public static String PBSJobAttributeName_0;
-	public static String PBSJobAttributeName_1;
-
 	public static String PBSJobAttributeName_10;
 	public static String PBSJobAttributeName_11;
 	public static String PBSJobAttributeName_12;
@@ -149,6 +104,8 @@ public class Messages extends NLS {
 	public static String PBSJobAttributeName_7;
 	public static String PBSJobAttributeName_8;
 	public static String PBSJobAttributeName_9;
+	public static String PBSJobAttributes_0;
+	public static String PBSJobAttributes_1;
 	public static String PBSNodeAttributes_0;
 	public static String PBSNodeAttributes_1;
 

@@ -4,7 +4,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html Contributors:
  * IBM Corporation - Initial API and implementatio Albert L. Rossi (NCSA) -
- * Updated attributes (bug 310189) Updated attributes 04/30/2010 
+ * Updated attributes (bug 310189) Updated attributes 04/30/2010
  * Updated attributes 05/11/2010
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.core;
@@ -31,137 +31,137 @@ public class PBSJobAttributes {
 
 	static {
 		attrMap = new TreeMap<String, IAttributeDefinition<?, ?, ?>>();
-		attrMap.put(Messages.PBSJobAttributeName_0, // ACCOUNT_NAME
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_0, Messages.PBSJobAttributeName_0,
-						Messages.PBSJobAttributeDescription_0, true, Messages.PBSJobAttributeDefaultValue_0.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_1, // CHECKPOINT
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_1, Messages.PBSJobAttributeName_1,
-						Messages.PBSJobAttributeDescription_1, true, Messages.PBSJobAttributeDefaultValue_1.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_2, // DEPEND
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_2, Messages.PBSJobAttributeName_2,
-						Messages.PBSJobAttributeDescription_2, true, Messages.PBSJobAttributeDefaultValue_2.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_3, // DESTINATION
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_3, Messages.PBSJobAttributeName_3,
-						Messages.PBSJobAttributeDescription_3, true, Messages.PBSJobAttributeDefaultValue_3.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_4, // DIRECTIVE
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_4, Messages.PBSJobAttributeName_4,
-						Messages.PBSJobAttributeDescription_4, true, Messages.PBSJobAttributeDefaultValue_4.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_5, // EXPORT_ALL
-				new BooleanAttributeDefinition(Messages.PBSJobAttributeName_5, Messages.PBSJobAttributeName_5,
-						Messages.PBSJobAttributeDescription_5, true, new Boolean(Messages.PBSJobAttributeDefaultValue_5)));
-		attrMap.put(Messages.PBSJobAttributeName_6, // ERROR_PATH
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_6, Messages.PBSJobAttributeName_6,
-						Messages.PBSJobAttributeDescription_6, true, Messages.PBSJobAttributeDefaultValue_6.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_7, // EXECUTION_TIME
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_7, Messages.PBSJobAttributeName_7,
-						Messages.PBSJobAttributeDescription_7, true, Messages.PBSJobAttributeDefaultValue_7.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_8, // GROUP_LIST
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_8, Messages.PBSJobAttributeName_8,
-						Messages.PBSJobAttributeDescription_8, true, Messages.PBSJobAttributeDefaultValue_8.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_9, // HOLD_TYPES
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_9, Messages.PBSJobAttributeName_9,
-						Messages.PBSJobAttributeDescription_9, true, Messages.PBSJobAttributeDefaultValue_9.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_10, // JOB_NAME
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_10, Messages.PBSJobAttributeName_10,
-						Messages.PBSJobAttributeDescription_10, true, Messages.PBSJobAttributeDefaultValue_10.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_11, // JOIN_PATH
-				new BooleanAttributeDefinition(Messages.PBSJobAttributeName_11, Messages.PBSJobAttributeName_11,
-						Messages.PBSJobAttributeDescription_11, true, new Boolean(Messages.PBSJobAttributeDefaultValue_11)));
-		attrMap.put(Messages.PBSJobAttributeName_12, // KEEP_FILES
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_12, Messages.PBSJobAttributeName_12,
-						Messages.PBSJobAttributeDescription_12, true, Messages.PBSJobAttributeDefaultValue_12.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_13, // MAIL_POINTS
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_13, Messages.PBSJobAttributeName_13,
-						Messages.PBSJobAttributeDescription_13, true, Messages.PBSJobAttributeDefaultValue_13.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_14, // MAIL_USERS
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_14, Messages.PBSJobAttributeName_14,
-						Messages.PBSJobAttributeDescription_14, true, Messages.PBSJobAttributeDefaultValue_14.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_15, // OUTPUT_PATH
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_15, Messages.PBSJobAttributeName_15,
-						Messages.PBSJobAttributeDescription_15, true, Messages.PBSJobAttributeDefaultValue_15.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_16, // PRIORITY
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_16, Messages.PBSJobAttributeName_16,
-						Messages.PBSJobAttributeDescription_16, true, Messages.PBSJobAttributeDefaultValue_16.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_17, // RERUNNABLE
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_17, Messages.PBSJobAttributeName_17,
-						Messages.PBSJobAttributeDescription_17, true, Messages.PBSJobAttributeDefaultValue_17.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_18, // ARCH
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_18, Messages.PBSJobAttributeName_18,
-						Messages.PBSJobAttributeDescription_18, true, Messages.PBSJobAttributeDefaultValue_18.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_19, // CPUT
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_19, Messages.PBSJobAttributeName_19,
-						Messages.PBSJobAttributeDescription_19, true, Messages.PBSJobAttributeDefaultValue_19.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_20, // FILE
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_20, Messages.PBSJobAttributeName_20,
-						Messages.PBSJobAttributeDescription_20, true, Messages.PBSJobAttributeDefaultValue_20.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_21, // HOST
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_21, Messages.PBSJobAttributeName_21,
-						Messages.PBSJobAttributeDescription_21, true, Messages.PBSJobAttributeDefaultValue_21.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_22, // MEM
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_22, Messages.PBSJobAttributeName_22,
-						Messages.PBSJobAttributeDescription_22, true, Messages.PBSJobAttributeDefaultValue_22));
-		attrMap.put(Messages.PBSJobAttributeName_23, // NCPUS
-				new IntegerAttributeDefinition(Messages.PBSJobAttributeName_23, Messages.PBSJobAttributeName_23,
-						Messages.PBSJobAttributeDescription_23, true, new Integer(Messages.PBSJobAttributeDefaultValue_23)));
-		attrMap.put(Messages.PBSJobAttributeName_24, // NICE
-				new IntegerAttributeDefinition(Messages.PBSJobAttributeName_24, Messages.PBSJobAttributeName_24,
-						Messages.PBSJobAttributeDescription_24, true, new Integer(Messages.PBSJobAttributeDefaultValue_24)));
-		attrMap.put(Messages.PBSJobAttributeName_25, // NODES
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_25, Messages.PBSJobAttributeName_25,
-						Messages.PBSJobAttributeDescription_25, true, Messages.PBSJobAttributeDefaultValue_25.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_26, // OMPTHREADS
-				new IntegerAttributeDefinition(Messages.PBSJobAttributeName_26, Messages.PBSJobAttributeName_26,
-						Messages.PBSJobAttributeDescription_26, true, new Integer(Messages.PBSJobAttributeDefaultValue_26)));
-		attrMap.put(Messages.PBSJobAttributeName_27, // PCPUT
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_27, Messages.PBSJobAttributeName_27,
-						Messages.PBSJobAttributeDescription_27, true, Messages.PBSJobAttributeDefaultValue_27.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_28, // PMEM
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_28, Messages.PBSJobAttributeName_28,
-						Messages.PBSJobAttributeDescription_28, true, Messages.PBSJobAttributeDefaultValue_28.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_29, // PVMEM
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_29, Messages.PBSJobAttributeName_29,
-						Messages.PBSJobAttributeDescription_29, true, Messages.PBSJobAttributeDefaultValue_29.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_30, // VMEM
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_30, Messages.PBSJobAttributeName_30,
-						Messages.PBSJobAttributeDescription_30, true, Messages.PBSJobAttributeDefaultValue_30.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_31, // WALLTIME
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_31, Messages.PBSJobAttributeName_31,
-						Messages.PBSJobAttributeDescription_31, true, Messages.PBSJobAttributeDefaultValue_31));
-		attrMap.put(Messages.PBSJobAttributeName_32, // SHELL_PATH_LIST
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_32, Messages.PBSJobAttributeName_32,
-						Messages.PBSJobAttributeDescription_32, true, Messages.PBSJobAttributeDefaultValue_32.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_33, // STAGEIN
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_33, Messages.PBSJobAttributeName_33,
-						Messages.PBSJobAttributeDescription_33, true, Messages.PBSJobAttributeDefaultValue_33.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_34, // STAGEOUT
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_34, Messages.PBSJobAttributeName_34,
-						Messages.PBSJobAttributeDescription_34, true, Messages.PBSJobAttributeDefaultValue_34.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_35, // USER_LIST
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_35, Messages.PBSJobAttributeName_35,
-						Messages.PBSJobAttributeDescription_35, true, Messages.PBSJobAttributeDefaultValue_35.trim()));
-		attrMap.put(Messages.PBSJobAttributeName_36, // VARIABLE_LIST
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_36, Messages.PBSJobAttributeName_36,
-						Messages.PBSJobAttributeDescription_36, true, Messages.PBSJobAttributeDefaultValue_36.trim()));
+		attrMap.put("Account_Name", // ACCOUNT_NAME //$NON-NLS-1$
+				new StringAttributeDefinition("Account_Name", Messages.PBSJobAttributes_0, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_0, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Checkpoint", // CHECKPOINT //$NON-NLS-1$
+				new StringAttributeDefinition("Checkpoint", Messages.PBSJobAttributes_1, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_1, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("depend", // DEPEND //$NON-NLS-1$
+				new StringAttributeDefinition("depend", Messages.PBSJobAttributeName_2, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_2, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("destination", // DESTINATION //$NON-NLS-1$
+				new StringAttributeDefinition("destination", Messages.PBSJobAttributeName_3, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_3, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("directive", // DIRECTIVE //$NON-NLS-1$
+				new StringAttributeDefinition("directive", Messages.PBSJobAttributeName_4, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_4, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("export_all", // EXPORT_ALL //$NON-NLS-1$
+				new BooleanAttributeDefinition("export_all", Messages.PBSJobAttributeName_5, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_5, true, new Boolean("true"))); //$NON-NLS-1$
+		attrMap.put("Error_Path", // ERROR_PATH //$NON-NLS-1$
+				new StringAttributeDefinition("Error_Path", Messages.PBSJobAttributeName_6, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_6, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Execution_Time", // EXECUTION_TIME //$NON-NLS-1$
+				new StringAttributeDefinition("Execution_Time", Messages.PBSJobAttributeName_7, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_7, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("group_list", // GROUP_LIST //$NON-NLS-1$
+				new StringAttributeDefinition("group_list", Messages.PBSJobAttributeName_8, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_8, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Hold_Types", // HOLD_TYPES //$NON-NLS-1$
+				new StringAttributeDefinition("Hold_Types", Messages.PBSJobAttributeName_9, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_9, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Job_Name", // JOB_NAME //$NON-NLS-1$
+				new StringAttributeDefinition("Job_Name", Messages.PBSJobAttributeName_10, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_10, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Join_Path", // JOIN_PATH //$NON-NLS-1$
+				new BooleanAttributeDefinition("Join_Path", Messages.PBSJobAttributeName_11, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_11, true, new Boolean("false"))); //$NON-NLS-1$
+		attrMap.put("Keep_Files", // KEEP_FILES //$NON-NLS-1$
+				new StringAttributeDefinition("Keep_Files", Messages.PBSJobAttributeName_12, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_12, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Mail_Points", // MAIL_POINTS //$NON-NLS-1$
+				new StringAttributeDefinition("Mail_Points", Messages.PBSJobAttributeName_13, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_13, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Mail_Users", // MAIL_USERS //$NON-NLS-1$
+				new StringAttributeDefinition("Mail_Users", Messages.PBSJobAttributeName_14, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_14, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Output_Path", // OUTPUT_PATH //$NON-NLS-1$
+				new StringAttributeDefinition("Output_Path", Messages.PBSJobAttributeName_15, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_15, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Priority", // PRIORITY //$NON-NLS-1$
+				new StringAttributeDefinition("Priority", Messages.PBSJobAttributeName_16, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_16, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Rerunnable", // RERUNNABLE //$NON-NLS-1$
+				new StringAttributeDefinition("Rerunnable", Messages.PBSJobAttributeName_17, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_17, true, "n".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.arch", // ARCH //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.arch", Messages.PBSJobAttributeName_18, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_18, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.cput", // CPUT //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.cput", Messages.PBSJobAttributeName_19, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_19, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.file", // FILE //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.file", Messages.PBSJobAttributeName_20, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_20, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.host", // HOST //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.host", Messages.PBSJobAttributeName_21, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_21, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.mem", // MEM //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.mem", Messages.PBSJobAttributeName_22, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_22, true, "")); //$NON-NLS-1$
+		attrMap.put("Resource_List.ncpus", // NCPUS //$NON-NLS-1$
+				new IntegerAttributeDefinition("Resource_List.ncpus", Messages.PBSJobAttributeName_23, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_23, true, new Integer("1"))); //$NON-NLS-1$
+		attrMap.put("Resource_List.nice", // NICE //$NON-NLS-1$
+				new IntegerAttributeDefinition("Resource_List.nice", Messages.PBSJobAttributeName_24, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_24, true, new Integer("0"))); //$NON-NLS-1$
+		attrMap.put("Resource_List.nodes", // NODES //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.nodes", Messages.PBSJobAttributeName_25, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_25, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.ompthreads", // OMPTHREADS //$NON-NLS-1$
+				new IntegerAttributeDefinition("Resource_List.ompthreads", Messages.PBSJobAttributeName_26, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_26, true, new Integer("1"))); //$NON-NLS-1$
+		attrMap.put("Resource_List.pcput", // PCPUT //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.pcput", Messages.PBSJobAttributeName_27, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_27, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.pmem", // PMEM //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.pmem", Messages.PBSJobAttributeName_28, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_28, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.pvmem", // PVMEM //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.pvmem", Messages.PBSJobAttributeName_29, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_29, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.vmem", // VMEM //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.vmem", Messages.PBSJobAttributeName_30, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_30, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Resource_List.walltime", // WALLTIME //$NON-NLS-1$
+				new StringAttributeDefinition("Resource_List.walltime", Messages.PBSJobAttributeName_31, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_31, true, "00:30:00")); //$NON-NLS-1$
+		attrMap.put("Shell_Path_List", // SHELL_PATH_LIST //$NON-NLS-1$
+				new StringAttributeDefinition("Shell_Path_List", Messages.PBSJobAttributeName_32, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_32, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("stagein", // STAGEIN //$NON-NLS-1$
+				new StringAttributeDefinition("stagein", Messages.PBSJobAttributeName_33, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_33, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("stageout", // STAGEOUT //$NON-NLS-1$
+				new StringAttributeDefinition("stageout", Messages.PBSJobAttributeName_34, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_34, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("User_List", // USER_LIST //$NON-NLS-1$
+				new StringAttributeDefinition("User_List", Messages.PBSJobAttributeName_35, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_35, true, "".trim())); //$NON-NLS-1$
+		attrMap.put("Variable_List", // VARIABLE_LIST //$NON-NLS-1$
+				new StringAttributeDefinition("Variable_List", Messages.PBSJobAttributeName_36, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_36, true, "".trim())); //$NON-NLS-1$
 		// non-standard, added internally
-		attrMap.put(Messages.PBSJobAttributeName_37, // MPIOPTIONS
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_37, Messages.PBSJobAttributeName_37,
-						Messages.PBSJobAttributeDescription_37, true, Messages.PBSJobAttributeDefaultValue_37.trim()));
+		attrMap.put("mpiOptions", // MPIOPTIONS //$NON-NLS-1$
+				new StringAttributeDefinition("mpiOptions", Messages.PBSJobAttributeName_37, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_37, true, "-n 1".trim())); //$NON-NLS-1$
 		// non-standard, added internally
-		attrMap.put(Messages.PBSJobAttributeName_38, // SCRIPT
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_38, Messages.PBSJobAttributeName_38,
-						Messages.PBSJobAttributeDescription_38, true, Messages.PBSJobAttributeDefaultValue_38.trim()));
+		attrMap.put("script", // SCRIPT //$NON-NLS-1$
+				new StringAttributeDefinition("script", Messages.PBSJobAttributeName_38, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_38, true, "".trim())); //$NON-NLS-1$
 		// non-standard, added internally
-		attrMap.put(Messages.PBSJobAttributeName_39, // MPICOMMAND
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_39, Messages.PBSJobAttributeName_39,
-						Messages.PBSJobAttributeDescription_39, true, Messages.PBSJobAttributeDefaultValue_39.trim()));
+		attrMap.put("mpiCommand", // MPICOMMAND //$NON-NLS-1$
+				new StringAttributeDefinition("mpiCommand", Messages.PBSJobAttributeName_39, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_39, true, "mpiexec".trim())); //$NON-NLS-1$
 		// non-standard, added internally
-		attrMap.put(Messages.PBSJobAttributeName_40, // PREPEND
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_40, Messages.PBSJobAttributeName_40,
-						Messages.PBSJobAttributeDescription_40, true, Messages.PBSJobAttributeDefaultValue_40.trim()));
+		attrMap.put("prependedBash", // PREPEND //$NON-NLS-1$
+				new StringAttributeDefinition("prependedBash", Messages.PBSJobAttributeName_40, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_40, true, "".trim())); //$NON-NLS-1$
 		// non-standard, added internally
-		attrMap.put(Messages.PBSJobAttributeName_41, // POSTPEND
-				new StringAttributeDefinition(Messages.PBSJobAttributeName_41, Messages.PBSJobAttributeName_41,
-						Messages.PBSJobAttributeDescription_41, true, Messages.PBSJobAttributeDefaultValue_41.trim()));
+		attrMap.put("postpendedBash", // POSTPEND //$NON-NLS-1$
+				new StringAttributeDefinition("postpendedBash", Messages.PBSJobAttributeName_41, //$NON-NLS-1$
+						Messages.PBSJobAttributeDescription_41, true, "".trim())); //$NON-NLS-1$
 	}
 
 	/**
