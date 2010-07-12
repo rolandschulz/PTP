@@ -469,8 +469,14 @@ public abstract class ScopingNode extends ASTNode
     {
         IASTListNode<IInternalSubprogram> result = new ASTListNode<IInternalSubprogram>();
         for (IModuleBodyConstruct c : moduleBody)
+        {
             if (c instanceof ASTSubroutineSubprogramNode || c instanceof ASTFunctionSubprogramNode)
-                result.add((IInternalSubprogram)c);
+            {
+                IASTNode oldParent = c.getParent();
+                result.add((IInternalSubprogram)c); // Will reset parent of c
+                c.setParent(oldParent);
+            }
+        }
         return result;
     }
 
