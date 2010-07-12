@@ -51,12 +51,16 @@ import org.eclipse.swt.graphics.Image;
  * 
  */
 public class MachineManager extends AbstractElementManager implements IMachineManager {
-	private Map<String, IPMachine> machineList = new HashMap<String, IPMachine>();
+	private final Map<String, IPMachine> machineList = new HashMap<String, IPMachine>();
 	protected IPMachine cur_machine = null;
 	protected final String DEFAULT_TITLE = Messages.MachineManager_0;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IMachineManager#addMachine(org.eclipse.ptp.core.elements.IPMachine)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.IMachineManager#addMachine(org.eclipse.ptp.core.elements
+	 * .IPMachine)
 	 */
 	public void addMachine(IPMachine mac) {
 		if (mac != null) {
@@ -66,7 +70,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 				machineList.put(mac.getID(), mac);
 				setElementHandler(mac.getID(), handler);
 			} else {
-				handler = getElementHandler(mac.getID());				
+				handler = getElementHandler(mac.getID());
 			}
 			List<IElement> elements = new ArrayList<IElement>();
 			IElementSet set = handler.getSetRoot();
@@ -76,9 +80,13 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 			set.addElements(elements.toArray(new IElement[0]));
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IMachineManager#addNode(org.eclipse.ptp.core.elements.IPNode)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.IMachineManager#addNode(org.eclipse.ptp.core.elements
+	 * .IPNode)
 	 */
 	public void addNode(IPNode node) {
 		addMachine(node.getMachine());
@@ -86,8 +94,10 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		IElementSet set = elementHandler.getSetRoot();
 		set.addElements(new IElement[] { createNodeElement(set, node.getID(), node.getName(), node) });
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.managers.AbstractElementManager#clear()
 	 */
 	@Override
@@ -97,15 +107,19 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		}
 		super.clear();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IMachineManager#findMachineById(java.lang.String)
 	 */
 	public IPMachine findMachineById(String id) {
-		return (IPMachine) machineList.get(id);
+		return machineList.get(id);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IMachineManager#findNode(java.lang.String)
 	 */
 	public IPNode findNode(String id) {
@@ -116,22 +130,29 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		}
 		return machine.getNodeById(id);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IMachineManager#getCurrentMachine()
 	 */
 	public IPMachine getCurrentMachine() {
 		return cur_machine;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IElementManager#getFullyQualifiedName(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.IElementManager#getFullyQualifiedName(java.lang.String
+	 * )
 	 */
 	public String getFullyQualifiedName(String id) {
 		if (id.equals(EMPTY_ID)) {
 			return DEFAULT_TITLE;
 		}
-		//TODO check that this is what should happen. Can we just use cur_machine?
+		// TODO check that this is what should happen. Can we just use
+		// cur_machine?
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {
 			IResourceManager rm = machine.getResourceManager();
@@ -141,15 +162,19 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		}
 		return ""; //$NON-NLS-1$
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IMachineManager#getMachines()
 	 */
 	public IPMachine[] getMachines() {
 		return machineList.values().toArray(new IPMachine[0]);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IElementManager#getName(java.lang.String)
 	 */
 	public String getName(String id) {
@@ -157,27 +182,27 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 			return ""; //$NON-NLS-1$
 		return cur_machine.getName();
 	}
-	
-	/** 
+
+	/**
 	 * Get node status.
 	 * 
-	 * Currently the node status is determined as follows:
-	 * 	- if the node is up:
-	 * 		- if there are *any* running processes on the node: NODE_RUNNING
-	 * 		- if there are no running processes, but one or more exited processes on the node: NODE_EXITED
-	 *  - if the node is down: NODE_DOWN
-	 *  - if the node is error: NODE_ERROR
-	 *  
-	 *  TODO: in the future, the machine view should be linked to the jobs view. The node state should only
-	 *  be shown as NODE_RUNNING if any processes belonging to the current job are running.
-	 *  
+	 * Currently the node status is determined as follows: - if the node is up:
+	 * - if there are *any* running processes on the node: NODE_RUNNING - if
+	 * there are no running processes, but one or more exited processes on the
+	 * node: NODE_EXITED - if the node is down: NODE_DOWN - if the node is
+	 * error: NODE_ERROR
+	 * 
+	 * TODO: in the future, the machine view should be linked to the jobs view.
+	 * The node state should only be shown as NODE_RUNNING if any processes
+	 * belonging to the current job are running.
+	 * 
 	 * @param node
 	 * @return
 	 */
 	private int getNodeState(IPNode node) {
 		if (node != null) {
 			NodeAttributes.State nodeState = node.getState();
-			
+
 			if (nodeState == NodeAttributes.State.UP) {
 				Set<? extends IPJob> jobs = node.getJobs();
 				for (IPJob job : jobs) {
@@ -192,20 +217,26 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 					}
 				}
 			}
-			
+
 			return nodeState.ordinal();
 		}
 		return NodeAttributes.State.UNKNOWN.ordinal();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.managers.AbstractElementManager#getImage(org.eclipse.ptp.ui.model.IElement)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.managers.AbstractElementManager#getImage(org.eclipse
+	 * .ptp.ui.model.IElement)
 	 */
+	@Override
 	public Image getImage(IElement element) {
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {
 			IResourceManager rm = machine.getResourceManager();
-			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(rm.getResourceManagerId());
+			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+					rm.getResourceManagerId());
 			if (presentation != null) {
 				final Image image = presentation.getImage(element);
 				if (image != null) {
@@ -217,8 +248,10 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IElementManager#initial()
 	 */
 	public IPElement initial(IPUniverse universe) {
@@ -231,9 +264,13 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IMachineManager#removeMachine(org.eclipse.ptp.core.elements.IPMachine)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.IMachineManager#removeMachine(org.eclipse.ptp.core
+	 * .elements.IPMachine)
 	 */
 	public void removeMachine(IPMachine machine) {
 		machineList.remove(machine.getID());
@@ -246,34 +283,46 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 					set.removeElement(node.getID());
 				}
 			}
+			removeElementHandler(machine.getID());
 		}
-		removeElementHandler(machine.getID());
 		if (cur_machine == machine) {
 			cur_machine = null;
 		}
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IMachineManager#removeNode(org.eclipse.ptp.core.elements.IPNode)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.IMachineManager#removeNode(org.eclipse.ptp.core.elements
+	 * .IPNode)
 	 */
 	public void removeNode(IPNode node) {
 		IElementHandler elementHandler = getElementHandler(node.getMachine().getID());
-		IElementSet set = elementHandler.getSetRoot();
-		IElement element = set.getElementByID(node.getID());
-		if (element != null) {
-			set.removeElement(node.getID());
+		if (elementHandler != null) {
+			IElementSet set = elementHandler.getSetRoot();
+			IElement element = set.getElementByID(node.getID());
+			if (element != null) {
+				set.removeElement(node.getID());
+			}
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IElementManager#setCurrentSetId(java.lang.String)
 	 */
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.IMachineManager#setMachine(org.eclipse.ptp.core.elements.IPMachine)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.IMachineManager#setMachine(org.eclipse.ptp.core.elements
+	 * .IPMachine)
 	 */
 	public void setMachine(IPMachine machine) {
 		if (machine != cur_machine) {
@@ -281,23 +330,28 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 			addMachine(machine);
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IElementManager#shutdown()
 	 */
+	@Override
 	public void shutdown() {
 		clear();
 		modelPresentation = null;
 		super.shutdown();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.IElementManager#size()
 	 */
 	public int size() {
 		return machineList.size();
 	}
-	
+
 	/**
 	 * @param set
 	 * @param key
@@ -306,6 +360,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	 */
 	protected IElement createNodeElement(IElementSet set, String key, String name, IPNode node) {
 		return new Element(set, key, name, node) {
+			@Override
 			public int compareTo(IElement e) {
 				return getID().compareTo(e.getID());
 			}
