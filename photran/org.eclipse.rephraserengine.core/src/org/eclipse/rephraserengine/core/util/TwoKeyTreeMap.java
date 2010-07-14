@@ -18,7 +18,10 @@ import java.util.TreeMap;
  * 
  * @see TwoKeyHashMap
  */
-public final class TwoKeyTreeMap<RowType, ColType, CellType> implements Iterable<CellType>
+public final class TwoKeyTreeMap<RowType  extends Comparable<RowType>,
+                                 ColType  extends Comparable<ColType>,
+                                 CellType extends Comparable<CellType>>
+        implements Iterable<CellType>
 {
     protected TreeMap<RowType, TreeMap<ColType, CellType>> table = new TreeMap<RowType, TreeMap<ColType, CellType>>();
 
