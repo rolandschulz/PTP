@@ -40,6 +40,33 @@ public class FunctionType extends Type
     {
         this.name = name.toLowerCase();
     }
+    
+    /** @return the return type of the function */
+    public Type getReturnType()
+    {
+        return returnType;
+    }
+
+    /**
+     * @param argument the index of the function argument (0 = first argument, 1 = second, etc.)
+     * @return the type of the given argument
+     */
+    public Type getArgumentType(int argument)
+    {
+        if (argument < 0 || argument >= argumentIntents.size())
+            return Type.TYPE_ERROR;
+        else
+            return argumentTypes.get(argument);
+    }
+
+    /**
+     * @param argument the index of the function argument (0 = first argument, 1 = second, etc.)
+     * @return the type of the given argument 
+     */
+    public Type getArgumentType(String argName)
+    {
+        return getArgumentType(argumentNames.indexOf(PhotranVPG.canonicalizeIdentifier(argName)));
+    }
 
     /**
      * @param argument the index of the function argument (0 = first argument, 1 = second, etc.)
