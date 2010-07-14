@@ -5,5 +5,5 @@ Bundle-Vendor: %pluginProvider
 Bundle-SymbolicName: org.eclipse.ptp.utils.extensionpoints.core
 Bundle-Version: 1.0.0.qualifier
 Export-Package: org.eclipse.ptp.utils.extensionpoints.core
-Import-Package: org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0"
