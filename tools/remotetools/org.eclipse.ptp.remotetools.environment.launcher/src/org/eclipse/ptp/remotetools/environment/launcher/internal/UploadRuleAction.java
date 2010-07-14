@@ -37,7 +37,7 @@ import org.eclipse.ptp.remotetools.environment.launcher.data.UploadRule;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
-import org.eclipse.ptp.utils.core.file.FileRecursiveEnumeration;
+import org.eclipse.ptp.utils.file.core.FileRecursiveEnumeration;
 
 public class UploadRuleAction implements IRuleAction {
 	

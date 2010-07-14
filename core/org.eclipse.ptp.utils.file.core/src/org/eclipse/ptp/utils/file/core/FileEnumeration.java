@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.utils.core.file;
+package org.eclipse.ptp.utils.file.core;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,7 +47,7 @@ public class FileEnumeration implements Enumeration<File> {
 		} else if (root.isDirectory()) {
 			files = root.listFiles();
 			if (files == null) {
-				throw new IOException(NLS.bind(Messages.FileEnumeration_0, root.getAbsolutePath()));
+				throw new IOException(NLS.bind(Messages.getString("FileEnumeration_0"), root.getAbsolutePath()));
 			}
 		} else {
 			Assert.isTrue(false);

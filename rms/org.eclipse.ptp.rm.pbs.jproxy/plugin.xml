@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-    <extension
-           point="org.eclipse.ptp.remote.core.remoteServer">
-        <remoteServer
-              class="org.eclipse.ptp.rm.pbs.jproxy.server.PBSProxyServerRunner"
-              id="org.eclipse.ptp.rm.pbs.PBSProxyServer"
-              launchCommand="java -Xms64m -Xmx128m -Xss2m -jar ${payload} ${args}"
-              name="%PBSProxyServer.name"
-              payload="pbs_proxy.jar"
-              verifyCommand="java -version"
-              verifyPattern ="^(java version )(.)(1\.[5-9]|[2-9]\.).*$"
-              verifyReqVersion="Java 1.5">
-        </remoteServer>
-     </extension>
+
 </plugin>

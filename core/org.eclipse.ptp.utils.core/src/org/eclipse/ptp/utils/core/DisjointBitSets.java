@@ -145,7 +145,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public void andNot(BitSet set) {
 		if (set == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_0);
+			throw new NullPointerException(Messages.getString("DisjointBitSets_0"));
 		}
 
 		// remove these bitset from the total bitset
@@ -171,10 +171,10 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public void andNot(K key, BitSet set) {
 		if (key == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_1);
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
 		}
 		if (set == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_0);
+			throw new NullPointerException(Messages.getString("DisjointBitSets_0"));
 		}
 		BitSet bitset = bitSetMap.get(key);
 		if (bitset == null) {
@@ -204,6 +204,14 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 		return new DisjointBitSets<K>(this);
 	}
 
+	private K copyKey(K key) {
+		if (keyCopier == null) {
+			return key;
+		} else {
+			return keyCopier.copy(key);
+		}
+	}
+
 	/**
 	 * Retrieve the {@code BitSet} representing the set that contain this value
 	 * for their key.
@@ -216,7 +224,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public BitSet getBitSet(K key) {
 		if (key == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_1);
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
 		}
 
 		BitSet bitSet = bitSetMap.get(key);
@@ -275,7 +283,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public DisjointBitSets<K> getSubset(BitSet bitset) {
 		if (bitset == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_2);
+			throw new NullPointerException(Messages.getString("DisjointBitSets_2"));
 		}
 
 		DisjointBitSets<K> subSet = new DisjointBitSets<K>(bitset.size(), this.keyCopier);
@@ -317,6 +325,74 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	}
 
 	/**
+	 * @param key
+	 * @param bitset
+	 * @param setting
+	 *            true means overwrite, false means union
+	 */
+	private void innerSetBitSet(K key, BitSet bitset, boolean setting) {
+		if (key == null) {
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
+		}
+		if (bitset == null) {
+			throw new NullPointerException(Messages.getString("DisjointBitSets_2"));
+		}
+
+		if (setting) {
+			// If we are setting then remove the old bitset for the
+			// key from the total
+			BitSet oldAttrIndices = bitSetMap.get(key);
+			if (oldAttrIndices != null) {
+				unionOfBitSets.andNot(oldAttrIndices);
+			}
+
+		}
+
+		// union these bitset with the total bitset
+		unionOfBitSets.or(bitset);
+
+		// remove these bitset from the BitSets for all **other** values of A
+		// to maintain disjoint bitset sets
+
+		// If the incoming key is already in the map
+		// it will be handled in the following for loop.
+		// If not then it needs to be handled as a separate
+		// case.
+		boolean equalsCaseHandled = false;
+		boolean foundEmpties = false;
+
+		for (Map.Entry<K, BitSet> entry : bitSetMap.entrySet()) {
+			K entryKey = entry.getKey();
+			BitSet bitSetForEntry = entry.getValue();
+			if (!key.equals(entryKey)) {
+				// remove bitset from bitSetForEntry
+				bitSetForEntry.andNot(bitset);
+			} else {
+				if (setting) {
+					bitSetForEntry.clear();
+				}
+				bitSetForEntry.or(bitset);
+				// if there were not entries for this key
+				// then this code will not be executed.
+				equalsCaseHandled = true;
+			}
+			foundEmpties = foundEmpties || bitSetForEntry.isEmpty();
+		}
+
+		// If we didn't handle the equals case in the above for-loop,
+		// then we should add a copy of the incoming bitset
+		// into the map.
+		if (!equalsCaseHandled) {
+			bitSetMap.put(key, (BitSet) bitset.clone());
+		}
+
+		// we may have some attributes with empty BitSets
+		if (foundEmpties) {
+			removeEmptyBitSets();
+		}
+	}
+
+	/**
 	 * @param bitset
 	 * @return whether there are bitset in common with those that contain an
 	 *         key.
@@ -325,7 +401,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public boolean intersects(BitSet bitset) {
 		if (bitset == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_2);
+			throw new NullPointerException(Messages.getString("DisjointBitSets_2"));
 		}
 		return unionOfBitSets.intersects(bitset);
 	}
@@ -392,7 +468,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public void remove(K key) {
 		if (key == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_1);
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
 		}
 		BitSet bitset = bitSetMap.get(key);
 		if (bitset == null) {
@@ -400,91 +476,6 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 		}
 		unionOfBitSets.andNot(bitset);
 		bitSetMap.remove(key);
-	}
-
-	public void setKeyCopier(ICopier<K> keyCopier) {
-		this.keyCopier = keyCopier;
-	}
-
-	@Override
-	public String toString() {
-		return bitSetMap.toString();
-	}
-
-	private K copyKey(K key) {
-		if (keyCopier == null) {
-			return key;
-		} else {
-			return keyCopier.copy(key);
-		}
-	}
-
-	/**
-	 * @param key
-	 * @param bitset
-	 * @param setting
-	 *            true means overwrite, false means union
-	 */
-	private void innerSetBitSet(K key, BitSet bitset, boolean setting) {
-		if (key == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_1);
-		}
-		if (bitset == null) {
-			throw new NullPointerException(Messages.DisjointBitSets_2);
-		}
-
-		if (setting) {
-			// If we are setting then remove the old bitset for the
-			// key from the total
-			BitSet oldAttrIndices = bitSetMap.get(key);
-			if (oldAttrIndices != null) {
-				unionOfBitSets.andNot(oldAttrIndices);
-			}
-
-		}
-
-		// union these bitset with the total bitset
-		unionOfBitSets.or(bitset);
-
-		// remove these bitset from the BitSets for all **other** values of A
-		// to maintain disjoint bitset sets
-
-		// If the incoming key is already in the map
-		// it will be handled in the following for loop.
-		// If not then it needs to be handled as a separate
-		// case.
-		boolean equalsCaseHandled = false;
-		boolean foundEmpties = false;
-
-		for (Map.Entry<K, BitSet> entry : bitSetMap.entrySet()) {
-			K entryKey = entry.getKey();
-			BitSet bitSetForEntry = entry.getValue();
-			if (!key.equals(entryKey)) {
-				// remove bitset from bitSetForEntry
-				bitSetForEntry.andNot(bitset);
-			} else {
-				if (setting) {
-					bitSetForEntry.clear();
-				}
-				bitSetForEntry.or(bitset);
-				// if there were not entries for this key
-				// then this code will not be executed.
-				equalsCaseHandled = true;
-			}
-			foundEmpties = foundEmpties || bitSetForEntry.isEmpty();
-		}
-
-		// If we didn't handle the equals case in the above for-loop,
-		// then we should add a copy of the incoming bitset
-		// into the map.
-		if (!equalsCaseHandled) {
-			bitSetMap.put(key, (BitSet) bitset.clone());
-		}
-
-		// we may have some attributes with empty BitSets
-		if (foundEmpties) {
-			removeEmptyBitSets();
-		}
 	}
 
 	/**
@@ -501,5 +492,14 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 				bitSetMap.remove(key);
 			}
 		}
+	}
+
+	public void setKeyCopier(ICopier<K> keyCopier) {
+		this.keyCopier = keyCopier;
+	}
+
+	@Override
+	public String toString() {
+		return bitSetMap.toString();
 	}
 }

@@ -22,3 +22,4 @@ Export-Package: org.eclipse.ptp.remotetools.environment,
  org.eclipse.ptp.remotetools.environment.wizard,
  org.eclipse.ptp.remotetools.utils.verification
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: org.eclipse.ptp.utils.extensionpoints.core

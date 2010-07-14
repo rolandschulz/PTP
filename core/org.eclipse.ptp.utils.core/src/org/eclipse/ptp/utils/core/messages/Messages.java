@@ -1,16 +1,19 @@
 package org.eclipse.ptp.utils.core.messages;
 
-import org.eclipse.osgi.util.NLS;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.utils.core.messages.messages"; //$NON-NLS-1$
-	public static String DisjointBitSets_0;
-	public static String DisjointBitSets_1;
-	public static String DisjointBitSets_2;
-	public static String FileEnumeration_0;
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+public class Messages {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.utils.core"; //$NON-NLS-1$
+
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
 
 	private Messages() {
