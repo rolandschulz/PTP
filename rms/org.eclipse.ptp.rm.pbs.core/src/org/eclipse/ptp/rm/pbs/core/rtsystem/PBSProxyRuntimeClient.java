@@ -147,6 +147,7 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 				PBSProxyServerRunner runner = (PBSProxyServerRunner) RemoteServerManager.getServer(PBSProxyServerRunner.SERVER_ID,
 						conn);
 				runner.setVariable("args", args); //$NON-NLS-1$
+				runner.setVariable("javaargs", getConfiguration().getInvocationOptionsStr());
 				runner.setWorkDir(new Path(conn.getWorkingDirectory()).append(".eclipsesettings").toString()); //$NON-NLS-1$
 				runner.startServer(subMon);
 
