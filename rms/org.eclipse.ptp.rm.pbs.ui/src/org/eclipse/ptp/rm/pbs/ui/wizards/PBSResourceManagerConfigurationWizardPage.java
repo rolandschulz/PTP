@@ -15,7 +15,7 @@ import org.eclipse.ptp.rm.ui.wizards.AbstractRemoteProxyResourceManagerConfigura
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 
 public final class PBSResourceManagerConfigurationWizardPage extends
-		AbstractRemoteProxyResourceManagerConfigurationWizardPage {
+AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 
 	public PBSResourceManagerConfigurationWizardPage(
 			IRMConfigurationWizard wizard) {
@@ -23,5 +23,6 @@ public final class PBSResourceManagerConfigurationWizardPage extends
 		setTitle(Messages.PBSResourceManagerConfigurationWizardPage_title);
 		setDescription(Messages.PBSResourceManagerConfigurationWizardPage_description);
 		proxyPathEnabled = false;
+		manualLaunchEnabled = false;
 	}
 }
