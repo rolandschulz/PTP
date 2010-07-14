@@ -81,10 +81,10 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
     private static final String FAIL_FINAL = "fail-final";
 
     /** The marker to search for */
-    protected static final String MARKER = "!<<<<<";
+    public static final String MARKER = "!<<<<<";
 
     /** Filter that determines which files will be imported into the runtime workspace */
-    protected static final FilenameFilter FORTRAN_FILE_FILTER = new FilenameFilter()
+    public static final FilenameFilter FORTRAN_FILE_FILTER = new FilenameFilter()
     {
         public boolean accept(File dir, String filename)
         {
