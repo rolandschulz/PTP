@@ -31,7 +31,7 @@ public class RemoteServerManager {
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATTR_VERIFYCOMMAND = "verifyCommand"; //$NON-NLS-1$
 	private static final String ATTR_VERIFYPATTERN = "verifyPattern"; //$NON-NLS-1$
-	private static final String ATTR_VERIFYREQVERSION = "verifyReqVersion"; //$NON-NLS-1$
+	private static final String ATTR_VERIFYFAILMESSAGE = "verifyFailMessage"; //$NON-NLS-1$
 
 	/**
 	 * Create the remote server give its id.
@@ -62,7 +62,7 @@ public class RemoteServerManager {
 							server.setPayload(ce.getAttribute(ATTR_PAYLOAD));
 							server.setVerifyCommand(ce.getAttribute(ATTR_VERIFYCOMMAND));
 							server.setVerifyPattern(ce.getAttribute(ATTR_VERIFYPATTERN));
-							server.setVerifyReqVersion(ce.getAttribute(ATTR_VERIFYREQVERSION));
+							server.setVerifyFailMessage(ce.getAttribute(ATTR_VERIFYFAILMESSAGE));
 
 							return server;
 						}
