@@ -16,6 +16,7 @@ import java.io.OutputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.lexer.Token;
+import org.eclipse.rephraserengine.core.util.OffsetLength;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 
 /**
@@ -45,7 +46,12 @@ public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializ
 		super(copyFrom);
 	}
 
-	public IFile getFile()
+    public PhotranTokenRef(String filename, OffsetLength ol)
+    {
+        this(filename, ol.getOffset(), ol.getLength());
+    }
+
+    public IFile getFile()
 	{
 		return PhotranVPG.getIFileForFilename(getFilename());
 	}

@@ -21,6 +21,8 @@ public class Messages extends NLS
 
     public static String PhotranVPG_AnalysisRefactoringNotEnabled;
 
+    public static String PhotranVPG_ControlFlow;
+
     public static String PhotranVPG_DefaultVisibilityForScopeIsPrivate;
 
     public static String PhotranVPG_Definition;

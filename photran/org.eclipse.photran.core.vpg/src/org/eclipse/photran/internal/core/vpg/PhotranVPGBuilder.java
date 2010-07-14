@@ -24,12 +24,15 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
+import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.SyntaxException;
 import org.eclipse.photran.internal.core.analysis.binding.Binder;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.Definition.Visibility;
 import org.eclipse.photran.internal.core.analysis.binding.ImplicitSpec;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
+import org.eclipse.photran.internal.core.analysis.flow.ControlFlowAnalysis;
+import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.FixedFormReplacement;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
@@ -52,6 +55,9 @@ import org.eclipse.rephraserengine.core.vpg.VPGEdge;
  */
 public class PhotranVPGBuilder extends PhotranVPG
 {
+    /** See {@link ControlFlowAnalysis} class comment for why this is temporarily disabled */
+    public boolean TEMP_____ENABLE_FLOW_ANALYSIS = false; // TODO: Temporary
+    
 	protected PhotranVPGBuilder()
 	{
 		super();
@@ -466,6 +472,14 @@ public class PhotranVPGBuilder extends PhotranVPG
         long start = System.currentTimeMillis();
         Binder.bind(ast, getIFileForFilename(filename));
         debug("  - Elapsed time in Binder#bind: " + (System.currentTimeMillis()-start) + " ms", filename); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        if (TEMP_____ENABLE_FLOW_ANALYSIS || FortranCorePlugin.inTestingMode())
+        {
+            LoopReplacer.replaceAllLoopsIn(ast.getRoot());
+            start = System.currentTimeMillis();
+            ControlFlowAnalysis.analyze(filename, ast.getRoot());
+            debug("  - Elapsed time in ControlFlowAnalysis#analyze: " + (System.currentTimeMillis()-start) + " ms", filename); //$NON-NLS-1$ //$NON-NLS-2$
+        }
     }
 
     public static boolean isEmpty(ASTExecutableProgramNode ast)

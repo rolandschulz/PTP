@@ -1,0 +1,38 @@
+ node1: null
+    => node3
+ node3: p => my_buddy
+    => node4
+ node4: select type (p)
+      		type is (person)
+      		    print *, "1"
+      		    print *, "2"
+      		type is (friend)
+      		    print *, "3"
+      		    do i=1,5
+      		    	print *, "4"
+      		    	cycle
+      		    	print *, "5"
+      		    end do
+          end select
+    => node5
+    => node6
+ node5: print *, "1"
+    => node7
+ node7: print *, "2"
+    => node9
+ node9: print *, "6"
+    => node2
+ node2: null
+ node6: print *, "3"
+    => node8
+ node8: do i=1,5
+      		    	print *, "4"
+      		    	cycle
+      		    	print *, "5"
+      		    end do
+    => node10
+    => node9
+node10: print *, "4"
+    => node11
+node11: cycle
+    => node8

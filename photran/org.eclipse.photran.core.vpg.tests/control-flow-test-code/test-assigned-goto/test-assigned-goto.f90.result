@@ -1,0 +1,9 @@
+node1: null
+    => node3
+node3: assign 200 to return_label
+    => node4
+node4: goto return_label
+    => node5
+node5: 200 print *, "but I will!"
+    => node2
+node2: null

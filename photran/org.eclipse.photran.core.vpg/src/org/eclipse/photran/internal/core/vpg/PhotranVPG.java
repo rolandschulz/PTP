@@ -59,6 +59,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
     public static final int RENAMED_BINDING_EDGE_TYPE = 3;
     public static final int DEFINITION_IS_PRIVATE_IN_SCOPE_EDGE_TYPE = 4;
     public static final int ILLEGAL_SHADOWING_EDGE_TYPE = 5;
+    public static final int CONTROL_FLOW_EDGE_TYPE = 6;
     private static final String[] edgeTypeDescriptions =
 	{
 	    Messages.PhotranVPG_DefinitionScopeRelationship,
@@ -67,6 +68,7 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 	    Messages.PhotranVPG_RenamedBinding,
 	    Messages.PhotranVPG_DefinitionIsPrivateInScope,
 	    Messages.PhotranVPG_IllegalShadowing,
+	    Messages.PhotranVPG_ControlFlow
 	};
 
 	public static final int SCOPE_DEFAULT_VISIBILITY_IS_PRIVATE_ANNOTATION_TYPE = 0;

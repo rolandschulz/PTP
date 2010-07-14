@@ -1,0 +1,16 @@
+node1: null
+    => node3
+node3: do i=1,10
+     		array(i) = i
+     	end do
+    => node4
+    => node5
+node4: array(i) = i
+    => node3
+node5: where (array < 5) array = 1
+    => node6
+node6: array = 1
+    => node7
+node7: print *, "2"
+    => node2
+node2: null

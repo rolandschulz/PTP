@@ -1,0 +1,21 @@
+ node1: null
+    => node3
+ node3: if (x > 2) then
+    => node4
+    => node5
+ node4: print *, "x is greater than 2!"
+    => node6
+ node6: print *, "This print statement is after the if construct!"
+    => node2
+ node2: null
+ node5: else if (x < -2) then
+    => node7
+    => node8
+ node7: print *, "x is less than -2!"
+    => node9
+ node9: print *, "..."
+    => node6
+ node8: else
+    => node10
+node10: print *, "I have no clue what x is!"
+    => node6

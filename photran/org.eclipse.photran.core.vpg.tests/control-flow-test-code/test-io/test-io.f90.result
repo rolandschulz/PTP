@@ -1,0 +1,9 @@
+node1: null
+    => node3
+node3: print *, "hello world!"
+    => node4
+node4: read *, x
+    => node5
+node5: write (*,*) "test"
+    => node2
+node2: null

@@ -1,0 +1,17 @@
+node1: null
+    => node3
+node3: me%age = 23
+    => node4
+node4: me%weight%onEarth = 150
+    => node5
+node5: associate (myWeight => me%weight)
+     
+     		print *, myWeight%onEarth
+     
+     	end associate
+    => node6
+node6: print *, myWeight%onEarth
+    => node7
+node7: print *, "I am a heavy boy!"
+    => node2
+node2: null

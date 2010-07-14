@@ -1,0 +1,5 @@
+node1: subroutine testsub
+    => node3
+node3: print *, "Inside the subroutine!"
+    => node2
+node2: null

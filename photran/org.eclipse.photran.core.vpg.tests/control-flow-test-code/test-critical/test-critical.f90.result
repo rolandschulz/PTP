@@ -1,0 +1,9 @@
+node1: null
+    => node3
+node3: critical
+     		print *, "Hello"
+     	end critical
+    => node4
+node4: print *, "Hello"
+    => node2
+node2: null

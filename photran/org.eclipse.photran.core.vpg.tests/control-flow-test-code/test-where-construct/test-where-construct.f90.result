@@ -1,0 +1,67 @@
+ node1: null
+    => node3
+ node3: do i=1,10
+      		array(i) = i
+      	end do
+    => node4
+    => node5
+ node4: array(i) = i
+    => node3
+ node5: where (array > 5)
+      		array = 2
+      		array = 3
+      	elsewhere (array < 2)
+      		array = 10
+      	elsewhere (array < 5)
+      		array = 400
+      	elsewhere
+      		array = 1
+      	end where
+    => node6
+    => node7
+ node6: array = 2
+    => node8
+ node8: array = 3
+    => node2
+ node2: null
+ node7: where (array > 5)
+      		array = 2
+      		array = 3
+      	elsewhere (array < 2)
+      		array = 10
+      	elsewhere (array < 5)
+      		array = 400
+      	elsewhere
+      		array = 1
+      	end where
+    => node9
+    => node10
+ node9: array = 10
+    => node2
+node10: where (array > 5)
+      		array = 2
+      		array = 3
+      	elsewhere (array < 2)
+      		array = 10
+      	elsewhere (array < 5)
+      		array = 400
+      	elsewhere
+      		array = 1
+      	end where
+    => node11
+    => node12
+node11: array = 400
+    => node2
+node12: where (array > 5)
+      		array = 2
+      		array = 3
+      	elsewhere (array < 2)
+      		array = 10
+      	elsewhere (array < 5)
+      		array = 400
+      	elsewhere
+      		array = 1
+      	end where
+    => node13
+node13: array = 1
+    => node2

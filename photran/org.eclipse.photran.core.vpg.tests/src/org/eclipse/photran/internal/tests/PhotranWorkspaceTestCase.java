@@ -152,7 +152,8 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
         project = null;
 	}
 
-    private IFile importFile(String fileName, String contents ) throws Exception{
+    protected IFile importFile(String fileName, String contents) throws Exception
+    {
 		//Obtain file handle
 		IFile file = project.getProject().getFile(fileName);
 		

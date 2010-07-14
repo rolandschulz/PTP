@@ -1,0 +1,13 @@
+node1: null
+    => node3
+node3: do while (i < 5)
+     		print *, "Hello"
+     		i = i + 1
+     	end do
+    => node4
+    => node2
+node4: print *, "Hello"
+    => node5
+node5: i = i + 1
+    => node3
+node2: null

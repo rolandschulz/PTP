@@ -1,0 +1,5 @@
+node1: function testfunction(A)
+    => node3
+node3: testfunction = 4;
+    => node2
+node2: null

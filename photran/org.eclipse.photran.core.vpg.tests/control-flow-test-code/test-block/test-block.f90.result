@@ -1,0 +1,13 @@
+node1: null
+    => node3
+node3: block
+     		integer :: x=2
+     
+     		print *, x
+     	end block
+    => node4
+node4: print *, x
+    => node5
+node5: print *, x
+    => node2
+node2: null

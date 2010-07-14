@@ -1,0 +1,9 @@
+node1: null
+    => node3
+node3: print *, "1"
+    => node4
+node4: go to 20
+    => node5
+node5: 20	print *, "3"
+    => node2
+node2: null

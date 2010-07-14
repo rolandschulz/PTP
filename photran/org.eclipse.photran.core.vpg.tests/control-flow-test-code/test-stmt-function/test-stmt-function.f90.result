@@ -1,0 +1,7 @@
+node1: null
+    => node3
+node3: teststmtfun(z) = z * 2. + 1.
+    => node4
+node4: print *, teststmtfun(x)
+    => node2
+node2: null

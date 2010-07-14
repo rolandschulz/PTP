@@ -1,0 +1,10 @@
+node1: null
+    => node3
+node3: do i=1,5
+     		print *, "Hello"
+     	end do
+    => node4
+    => node2
+node4: print *, "Hello"
+    => node3
+node2: null

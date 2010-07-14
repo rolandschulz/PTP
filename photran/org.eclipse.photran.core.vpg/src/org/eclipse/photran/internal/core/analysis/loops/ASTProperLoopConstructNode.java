@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.loops;
 
+import java.util.HashSet;
+
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTExitStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTListNode;
 import org.eclipse.photran.internal.core.parser.ASTNode;
@@ -122,5 +125,19 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
     public Token getIndexVariable()
     {
         return getLoopHeader().getLoopControl().getVariableName();
+    }
+    
+    public HashSet<ASTExitStmtNode> getExits()
+    {
+        final HashSet<ASTExitStmtNode> exits = new HashSet<ASTExitStmtNode>();
+        
+        getBody().accept(new ASTVisitorWithLoops(){
+           @Override public void visitASTExitStmtNode(ASTExitStmtNode node)
+           {
+               exits.add(node);
+           }
+        });
+        
+        return exits;
     }
 }

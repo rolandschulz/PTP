@@ -1,0 +1,16 @@
+node1: null
+    => node3
+node3: if (x) 10,20,30
+    => node4
+    => node5
+    => node6
+node4: 10	print *, "1"
+    => node7
+node7: return
+node5: 20	print *, "2"
+    => node6
+node6: 30	print *, "3"
+    => node8
+node8: print *, "4"
+    => node2
+node2: null

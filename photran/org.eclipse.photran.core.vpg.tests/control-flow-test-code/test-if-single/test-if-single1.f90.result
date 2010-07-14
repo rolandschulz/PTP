@@ -1,0 +1,10 @@
+node1: null
+    => node3
+node3: if (.true.) a = 1
+    => node4
+    => node5
+node4: a = 1
+    => node5
+node5: a = 2
+    => node2
+node2: null

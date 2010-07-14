@@ -1,0 +1,26 @@
+node1: null
+    => node3
+node3: firstdo: do i=1,5
+     		innerdo: do j=1,5
+     			print *, "1"
+     			exit firstdo
+     			print *, "2"
+     		end do
+     		print *, "3"
+     	end do
+    => node4
+    => node2
+node4: innerdo: do j=1,5
+     			print *, "1"
+     			exit firstdo
+     			print *, "2"
+     		end do
+    => node5
+    => node6
+node5: print *, "1"
+    => node7
+node7: exit firstdo
+    => node2
+node2: null
+node6: print *, "3"
+    => node3

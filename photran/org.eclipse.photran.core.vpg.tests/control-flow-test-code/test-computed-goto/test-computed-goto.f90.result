@@ -1,0 +1,14 @@
+node1: null
+    => node3
+node3: go to (10,20) x
+    => node4
+    => node5
+    => node6
+node4: print *, "0"
+    => node5
+node5: 10	print *, "1"
+    => node7
+node7: return
+node6: 20	print *, "2"
+    => node2
+node2: null

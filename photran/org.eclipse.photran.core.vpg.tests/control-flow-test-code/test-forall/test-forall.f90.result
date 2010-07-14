@@ -1,0 +1,10 @@
+node1: null
+    => node3
+node3: forall (I = 1:5)
+    => node4
+    => node2
+node4: array(I) = 2
+    => node5
+node5: array(I) = array(I) * 2
+    => node3
+node2: null
