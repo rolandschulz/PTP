@@ -51,6 +51,8 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.ui,org.eclipse.ptp.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.utils,org.eclipse.ptp.utils"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.utils.core,org.eclipse.ptp.utils.core"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.utils.file.core,org.eclipse.ptp.utils.file.core"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.utils.extensionpoints.core,org.eclipse.ptp.utils.extensionpoints.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.utils.core.tests,org.eclipse.ptp.utils.core.tests"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.utils.ui,org.eclipse.ptp.utils.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/core/org.eclipse.ptp.services.core,org.eclipse.ptp.services.core"/>
