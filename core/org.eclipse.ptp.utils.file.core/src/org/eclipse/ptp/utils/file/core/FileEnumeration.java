@@ -47,7 +47,7 @@ public class FileEnumeration implements Enumeration<File> {
 		} else if (root.isDirectory()) {
 			files = root.listFiles();
 			if (files == null) {
-				throw new IOException(NLS.bind(Messages.getString("FileEnumeration_0"), root.getAbsolutePath()));
+				throw new IOException(NLS.bind(Messages.getString("FileEnumeration_0"), root.getAbsolutePath())); //$NON-NLS-1$
 			}
 		} else {
 			Assert.isTrue(false);

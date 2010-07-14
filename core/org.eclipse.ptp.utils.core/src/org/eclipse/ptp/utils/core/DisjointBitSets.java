@@ -145,7 +145,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public void andNot(BitSet set) {
 		if (set == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_0"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_0")); //$NON-NLS-1$
 		}
 
 		// remove these bitset from the total bitset
@@ -171,10 +171,10 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public void andNot(K key, BitSet set) {
 		if (key == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1")); //$NON-NLS-1$
 		}
 		if (set == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_0"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_0")); //$NON-NLS-1$
 		}
 		BitSet bitset = bitSetMap.get(key);
 		if (bitset == null) {
@@ -224,7 +224,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public BitSet getBitSet(K key) {
 		if (key == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1")); //$NON-NLS-1$
 		}
 
 		BitSet bitSet = bitSetMap.get(key);
@@ -283,7 +283,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public DisjointBitSets<K> getSubset(BitSet bitset) {
 		if (bitset == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_2"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_2")); //$NON-NLS-1$
 		}
 
 		DisjointBitSets<K> subSet = new DisjointBitSets<K>(bitset.size(), this.keyCopier);
@@ -332,10 +332,10 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	private void innerSetBitSet(K key, BitSet bitset, boolean setting) {
 		if (key == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1")); //$NON-NLS-1$
 		}
 		if (bitset == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_2"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_2")); //$NON-NLS-1$
 		}
 
 		if (setting) {
@@ -401,7 +401,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public boolean intersects(BitSet bitset) {
 		if (bitset == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_2"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_2")); //$NON-NLS-1$
 		}
 		return unionOfBitSets.intersects(bitset);
 	}
@@ -468,7 +468,7 @@ public class DisjointBitSets<K> implements Iterable<DisjointBitSets.Entry<K>> {
 	 */
 	public void remove(K key) {
 		if (key == null) {
-			throw new NullPointerException(Messages.getString("DisjointBitSets_1"));
+			throw new NullPointerException(Messages.getString("DisjointBitSets_1")); //$NON-NLS-1$
 		}
 		BitSet bitset = bitSetMap.get(key);
 		if (bitset == null) {
