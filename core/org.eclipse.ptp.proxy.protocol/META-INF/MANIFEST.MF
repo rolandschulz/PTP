@@ -19,6 +19,5 @@ Export-Package: org.eclipse.ptp.proxy.client,
  org.eclipse.ptp.proxy.util
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
-Import-Package: org.eclipse.osgi.util
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.ptp.utils.core
