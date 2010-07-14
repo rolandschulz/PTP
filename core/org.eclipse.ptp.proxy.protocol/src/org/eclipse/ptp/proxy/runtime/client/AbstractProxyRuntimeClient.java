@@ -20,13 +20,13 @@
 package org.eclipse.ptp.proxy.runtime.client;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.proxy.client.AbstractProxyClient;
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.event.IProxyConnectedEvent;
@@ -810,7 +810,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 					state = ProxyState.ERROR;
 					fireProxyRuntimeErrorStateEvent(eventFactory
 							.newProxyRuntimeErrorStateEvent());
-					throw new IllegalStateException(NLS.bind(
+					throw new IllegalStateException(MessageFormat.format(
 							Messages.AbstractProxyRuntimeClient_3, event
 									.toString()));
 				}
@@ -850,7 +850,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							state = ProxyState.ERROR;
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
-							throw new IllegalStateException(NLS.bind(
+							throw new IllegalStateException(MessageFormat.format(
 									Messages.AbstractProxyRuntimeClient_4,
 									event.toString()));
 						}
@@ -858,7 +858,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 						state = ProxyState.ERROR;
 						fireProxyRuntimeErrorStateEvent(eventFactory
 								.newProxyRuntimeErrorStateEvent());
-						throw new IllegalStateException(NLS.bind(
+						throw new IllegalStateException(MessageFormat.format(
 								Messages.AbstractProxyRuntimeClient_5, event
 										.toString()));
 					}
@@ -902,7 +902,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 							state = ProxyState.ERROR;
 							fireProxyRuntimeErrorStateEvent(eventFactory
 									.newProxyRuntimeErrorStateEvent());
-							throw new IllegalStateException(NLS.bind(
+							throw new IllegalStateException(MessageFormat.format(
 									Messages.AbstractProxyRuntimeClient_6,
 									event.toString()));
 						}
@@ -910,7 +910,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 						state = ProxyState.ERROR;
 						fireProxyRuntimeErrorStateEvent(eventFactory
 								.newProxyRuntimeErrorStateEvent());
-						throw new IllegalStateException(NLS.bind(
+						throw new IllegalStateException(MessageFormat.format(
 								Messages.AbstractProxyRuntimeClient_7, event
 										.toString()));
 					}
@@ -937,7 +937,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 						processRunningEvent(command, event);
 					} else {
 						state = ProxyState.ERROR;
-						throw new IllegalStateException(NLS.bind(
+						throw new IllegalStateException(MessageFormat.format(
 								Messages.AbstractProxyRuntimeClient_8, event
 										.toString()));
 					}
@@ -967,8 +967,8 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient
 				break;
 
 			default:
-				throw new IllegalStateException(NLS
-						.bind(Messages.AbstractProxyRuntimeClient_9, state
+				throw new IllegalStateException(MessageFormat.format(
+						Messages.AbstractProxyRuntimeClient_9, state
 								.toString()));
 			}
 		}

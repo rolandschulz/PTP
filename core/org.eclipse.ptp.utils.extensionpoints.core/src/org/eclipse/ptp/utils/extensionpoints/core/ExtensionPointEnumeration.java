@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.utils.core.extensionpoints;
+package org.eclipse.ptp.utils.extensionpoints.core;
 
 import java.util.Enumeration;
 import java.util.NoSuchElementException;

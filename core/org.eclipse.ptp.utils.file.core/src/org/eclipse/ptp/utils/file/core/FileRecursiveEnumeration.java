@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.utils.core.file;
+package org.eclipse.ptp.utils.file.core;
 
 import java.io.File;
 import java.io.IOException;

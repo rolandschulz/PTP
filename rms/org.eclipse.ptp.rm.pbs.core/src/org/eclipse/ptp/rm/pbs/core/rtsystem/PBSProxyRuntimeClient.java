@@ -28,7 +28,7 @@ import org.eclipse.ptp.remote.launch.core.RemoteServerManager;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteProxyRuntimeClient;
 import org.eclipse.ptp.rm.pbs.core.messages.Messages;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
-import org.eclipse.ptp.rm.pbs.jproxy.server.PBSProxyServerRunner;
+import org.eclipse.ptp.rm.pbs.core.server.PBSProxyServerRunner;
 
 /**
  * @since 4.0

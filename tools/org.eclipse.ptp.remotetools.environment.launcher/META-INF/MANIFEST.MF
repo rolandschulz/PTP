@@ -35,3 +35,5 @@ Export-Package: org.eclipse.ptp.remotetools.environment.launcher,
  org.eclipse.ptp.remotetools.environment.launcher.ui,
  org.eclipse.ptp.remotetools.environment.launcher.variables
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: org.eclipse.ptp.utils.extensionpoints.core,
+ org.eclipse.ptp.utils.file.core

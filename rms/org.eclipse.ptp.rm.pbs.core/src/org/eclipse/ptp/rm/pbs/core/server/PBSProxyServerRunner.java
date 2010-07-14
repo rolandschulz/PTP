@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.jproxy.server;
+package org.eclipse.ptp.rm.pbs.core.server;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
