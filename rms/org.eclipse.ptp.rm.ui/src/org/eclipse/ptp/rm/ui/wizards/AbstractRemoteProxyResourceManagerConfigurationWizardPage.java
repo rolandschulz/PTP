@@ -278,6 +278,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected boolean proxyOptionsEnabled = true;
 
+	/**
+	 * @since 1.2
+	 */
+	protected boolean manualLaunchEnabled = true;
+
 	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard, String title) {
 		super(wizard, title);
 		setPageComplete(false);
@@ -468,8 +473,10 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		/*
 		 * Manual launch
 		 */
-		manualButton = createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
-		manualButton.addSelectionListener(listener);
+		if (manualLaunchEnabled) {
+			manualButton = createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
+			manualButton.addSelectionListener(listener);
+		}
 
 		registerListeners();
 	}
