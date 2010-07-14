@@ -16,13 +16,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.photran.core.IFortranAST;
+import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.parser.ASTAssignmentStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTDataImpliedDoNode;
 import org.eclipse.photran.internal.core.parser.ASTDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDataStmtValueNode;
 import org.eclipse.photran.internal.core.parser.ASTDatalistNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
+import org.eclipse.photran.internal.core.parser.ASTVariableNode;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IDataStmtObject;
@@ -88,7 +91,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
     private void makeChangesTo(IFile file, IFortranAST ast, RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure
     {
         for (ScopingNode scope : ast.getRoot().getAllContainedScopes())
-            new ScopeConverter().convert(scope, ast);
+            new ScopeConverter().convert(scope, ast, status);
 
         if (changesWereMade)
         {
@@ -106,7 +109,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
         private List<IASTNode> nodesToDelete = new LinkedList<IASTNode>();
         
         @SuppressWarnings("unchecked")
-        public void convert(ScopingNode scope, IFortranAST ast) throws PreconditionFailure
+        public void convert(ScopingNode scope, IFortranAST ast, RefactoringStatus status) throws PreconditionFailure
         {
             if (scope instanceof ASTExecutableProgramNode || scope instanceof ASTDerivedTypeDefNode)
                 return;
@@ -114,16 +117,16 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
             this.ast = ast;
             this.scopeBody = (IASTListNode<IASTNode>)scope.getBody();
             
-            convert();
+            convert(status);
         }
 
-        private void convert() throws PreconditionFailure
+        private void convert(RefactoringStatus status) throws PreconditionFailure
         {
             List<String> assignedVars = determineAssignedVariables();
             
             for (IASTNode node : scopeBody)
                 if (node instanceof ASTDataStmtNode)
-                   convertDataStmt((ASTDataStmtNode)node, assignedVars);
+                   convertDataStmt((ASTDataStmtNode)node, assignedVars, status);
 
             insertAndDeleteStmts();
             
@@ -148,14 +151,14 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
             return assignedVars;
         }
         
-        private void convertDataStmt(ASTDataStmtNode node, List<String> assignedVars) throws PreconditionFailure
+        private void convertDataStmt(ASTDataStmtNode node, List<String> assignedVars, RefactoringStatus status) throws PreconditionFailure
         {
             if (node.getDatalist() == null)
                 throw new PreconditionFailure(Messages.DataToParameterRefactoring_EmptyDataListInNode);
 
             int size = node.getDatalist().size();
             for (ASTDatalistNode dataList : node.getDatalist())
-                size = new DataListConverter().convert(dataList, size, assignedVars, this);
+                size = new DataListConverter().convert(dataList, size, assignedVars, this, status);
         }
 
         private void insertAndDeleteStmts()
@@ -262,7 +265,7 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
         private List<IDataStmtObject> objectsToDelete;
         private List<ASTDataStmtValueNode> valuesToDelete;
         
-        public int convert(ASTDatalistNode dataList, int numDataLists, List<String> assignedVars, ScopeConverter scopeConverter)
+        public int convert(ASTDatalistNode dataList, int numDataLists, List<String> assignedVars, ScopeConverter scopeConverter, RefactoringStatus status) throws PreconditionFailure
         {
             this.dataList = dataList;
             this.objectList = dataList.getDataStmtSet().getDataStmtObjectList();
@@ -273,29 +276,67 @@ public class DataToParameterRefactoring extends FortranResourceRefactoring
             this.objectsToDelete = new LinkedList<IDataStmtObject>();
             this.valuesToDelete = new LinkedList<ASTDataStmtValueNode>();
 
-            for (int i = 0; i < dataList.getDataStmtSet().getDataStmtObjectList().size(); i++)
-                transformToParameter(i, assignedVars);
+            transformToParameters(dataList, assignedVars, status);
 
             return removeASTEntries(numDataLists);
         }
-        
-        private void transformToParameter(int index, List<String> assignedVars)
+
+        protected void transformToParameters(ASTDatalistNode dataList, List<String> assignedVars, RefactoringStatus status)
+            throws org.eclipse.rephraserengine.core.vpg.refactoring.VPGRefactoring.PreconditionFailure
         {
-            String parameterName = objectList.get(index).toString().trim();
-            
-            if (!assignedVars.contains(parameterName))
+            for (int i = 0; i < dataList.getDataStmtSet().getDataStmtObjectList().size(); i++)
             {
-                changesWereMade = true;
+                String parameterName = objectList.get(i).toString().trim();
                 
-                IASTNode parameterStmt = createParameterStmt(index, parameterName);
-                
-                scopeConverter.addDataStmtAndParameterStmt(dataStmt, parameterStmt);
-                
-                valuesToDelete.add(valueList.get(index));
-                objectsToDelete.add(objectList.get(index));
+                if (objectList.get(i) instanceof ASTDataImpliedDoNode)
+                {
+                    status.addError(Messages.DataToParameterRefactoring_ImpliedDoNotSupported);
+                    break;
+                }
+                else
+                {
+                    Definition definition = getDefinition((ASTVariableNode)objectList.get(i));
+                    
+                    if (definition.getArraySpec() != null)
+                    {
+                        status.addError(Messages.DataToParameterRefactoring_ArraysNotSupported);
+                        break;
+                    }
+                    
+                    if (definition.isPointer())
+                    {
+                        status.addError(Messages.DataToParameterRefactoring_PointersNotSupported);
+                        break;
+                    }
+                    
+                    if (!assignedVars.contains(parameterName))
+                    {
+                        changesWereMade = true;
+                        
+                        IASTNode parameterStmt = createParameterStmt(i, parameterName);
+                        
+                        scopeConverter.addDataStmtAndParameterStmt(dataStmt, parameterStmt);
+                        
+                        valuesToDelete.add(valueList.get(i));
+                        objectsToDelete.add(objectList.get(i));
+                    }
+                }
             }
         }
 
+        private Definition getDefinition(ASTVariableNode astVariableNode) throws PreconditionFailure
+        {
+            List<Definition> definitionList = astVariableNode.findFirstToken().resolveBinding();
+            
+            if (definitionList.size() == 0)
+                throw new PreconditionFailure(Messages.DataToParameterRefactoring_DefinitionNotFound);
+            
+            if (definitionList.size() > 1)
+                throw new PreconditionFailure(Messages.DataToParameterRefactoring_AmbiguouslyDefined);
+
+            return definitionList.get(0);
+        }
+        
         private IASTNode createParameterStmt(int index, String parameterName)
         {
             StringBuffer parameterStmt = new StringBuffer("parameter ( "); //$NON-NLS-1$

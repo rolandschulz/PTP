@@ -206,9 +206,19 @@ public class Messages extends NLS
     public static String CommonVarNamesRefactoring_SelectCommonBlockName;
 
     public static String CommonVarNamesRefactoring_VariableTypesDiffer;
+    public static String DataToParameterRefactoring_AmbiguouslyDefined;
+
+    public static String DataToParameterRefactoring_ArraysNotSupported;
+
+    public static String DataToParameterRefactoring_DefinitionNotFound;
+
     public static String DataToParameterRefactoring_EmptyDataListInNode;
 
+    public static String DataToParameterRefactoring_ImpliedDoNotSupported;
+
     public static String DataToParameterRefactoring_Name;
+
+    public static String DataToParameterRefactoring_PointersNotSupported;
 
     public static String DataToParameterRefactoring_RefactorNotConsideringVarAssignment;
 

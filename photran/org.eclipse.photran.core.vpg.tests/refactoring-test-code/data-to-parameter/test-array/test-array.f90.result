@@ -1,0 +1,15 @@
+program testarray !<<<<< 1,1,fail-final
+    integer :: myArray(5)
+    integer :: a,x,y,z
+    integer :: matrix(5,5)
+    
+    parameter ( x = 2 )
+    
+    data myArray, z / 3,4,5,6,7, 4/
+    parameter ( y = 2 )
+    
+    data ((matrix(i,j), i=1,5,2), j=1,5) / 15*0 /
+    
+    parameter ( a = 3 )
+
+end program testarray

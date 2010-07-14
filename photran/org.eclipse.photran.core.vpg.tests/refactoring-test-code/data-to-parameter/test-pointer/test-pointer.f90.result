@@ -1,0 +1,12 @@
+program testpointer !<<<<< 1,1,fail-final
+    integer, pointer :: p
+    integer :: q,x,y,z
+    
+    parameter ( x = 1 )
+    
+    data p, y / null(), 1 /
+    parameter ( q = 3 )
+    
+    parameter ( z = 2 )
+
+end program testpointer
