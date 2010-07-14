@@ -20,6 +20,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
@@ -31,39 +32,22 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-public abstract class ExtendableRMLaunchConfigurationDynamicTab
-extends
-org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab
-implements IRMLaunchConfigurationContentsChangedListener {
+public abstract class ExtendableRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigurationDynamicTab implements
+		IRMLaunchConfigurationContentsChangedListener {
 
 	private final List<BaseRMLaunchConfigurationDynamicTab> tabControllers = new ArrayList<BaseRMLaunchConfigurationDynamicTab>();
 	private Composite control;
 
-	protected void addDynamicTab(BaseRMLaunchConfigurationDynamicTab tabController) {
-		tabControllers.add(tabController);
-		tabController.addContentsChangedListener(this);
-	}
-
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
-			if (! validation.isSuccess())
+			if (!validation.isSuccess())
 				return validation;
 		}
 		return new RMLaunchValidation(true, null);
 	}
 
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
-		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
-			if (! validation.isSuccess())
-				return validation;
-		}
-		return new RMLaunchValidation(true, null);
-	}
-
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue)
-	throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		control.setLayout(layout);
@@ -80,46 +64,8 @@ implements IRMLaunchConfigurationContentsChangedListener {
 		}
 	}
 
-	public Control getControl() {
-		return control;
-	}
-
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
-		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
-			if (! validation.isSuccess()) {
-				resultValidation = validation;
-			}
-		}
-		return resultValidation;
-	}
-
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.performApply(configuration, rm, queue);
-			if (! validation.isSuccess()) {
-				resultValidation = validation;
-			}
-		}
-		return resultValidation;
-	}
-
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
-		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			RMLaunchValidation validation = tabControl.setDefaults(configuration, rm, queue);
-			if (! validation.isSuccess()) {
-				resultValidation = validation;
-			}
-		}
-		return resultValidation;
-	}
-
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration,
-			String mode) throws CoreException {
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
+			throws CoreException {
 		List<IAttribute<?, ?, ?>> attributes = new ArrayList<IAttribute<?, ?, ?>>();
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			IAttribute<?, ?, ?> attributeArray[] = tabControl.getAttributes(rm, queue, configuration, mode);
@@ -131,13 +77,60 @@ implements IRMLaunchConfigurationContentsChangedListener {
 		return attributes.toArray(new IAttribute<?, ?, ?>[attributes.size()]);
 	}
 
-	public void updateControls() {
-		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
-			tabControl.updateControls();
-		}
+	public Control getControl() {
+		return control;
 	}
 
 	public void handleContentsChanged(IRMLaunchConfigurationDynamicTab factory) {
 		fireContentsChanged();
+	}
+
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
+			if (!validation.isSuccess())
+				resultValidation = validation;
+		}
+		return resultValidation;
+	}
+
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
+			if (!validation.isSuccess())
+				return validation;
+		}
+		return new RMLaunchValidation(true, null);
+	}
+
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+			RMLaunchValidation validation = tabControl.performApply(configuration, rm, queue);
+			if (!validation.isSuccess())
+				resultValidation = validation;
+		}
+		return resultValidation;
+	}
+
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
+			RMLaunchValidation validation = tabControl.setDefaults(configuration, rm, queue);
+			if (!validation.isSuccess())
+				resultValidation = validation;
+		}
+		return resultValidation;
+	}
+
+	public void updateControls() {
+		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers)
+			tabControl.updateControls();
+	}
+
+	protected void addDynamicTab(BaseRMLaunchConfigurationDynamicTab tabController) {
+		tabControllers.add(tabController);
+		tabController.addContentsChangedListener(this);
 	}
 }
