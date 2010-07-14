@@ -65,7 +65,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 	private String fVerifyCommand;
 	private String fVerifyPattern;
-	private String fVerifyReqVersion;
+	private String fVerifyFailMessage;
 
 	public AbstractRemoteServerRunner(String name) {
 		super(name);
@@ -185,21 +185,21 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * @since 4.1 Gets the verify fail message.
+	 * 
+	 * @return the verify fail message
+	 */
+	public String getVerifyFailMessage() {
+		return fVerifyFailMessage;
+	}
+
+	/**
 	 * @since 4.1 Gets the verify pattern.
 	 * 
 	 * @return the verify pattern
 	 */
 	public String getVerifyPattern() {
 		return fVerifyPattern;
-	}
-
-	/**
-	 * @since 4.1 Gets the verify required version.
-	 * 
-	 * @return the verify required version
-	 */
-	public String getVerifyReqVersion() {
-		return fVerifyReqVersion;
 	}
 
 	/**
@@ -406,9 +406,14 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			if (fRemoteProcess.exitValue() != 0) {
 
 				// Check if the valid java version is installed on the server
-				if (!isValidVersionInstalled(subMon)) {
-					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, NLS.bind(
-							Messages.AbstractRemoteServerRunner_12, getVerifyReqVersion())));
+				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
+					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
+						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, getVerifyFailMessage()));
+					} else {
+						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID,
+								Messages.AbstractRemoteServerRunner_12));
+					}
+
 				}
 
 				if (!subMon.isCanceled()) {
@@ -448,8 +453,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		 */
 		subMon.subTask(Messages.AbstractRemoteServerRunner_13);
 		// specify the verify command to check the software version
-		String verifyCmd = RemoteVariableManager.getInstance().performStringSubstitution(getVerifyCommand());
-		List<String> verifyArgs = Arrays.asList(verifyCmd.split(" ")); //$NON-NLS-1$
+		List<String> verifyArgs = Arrays.asList(getVerifyCommand().split(" ")); //$NON-NLS-1$
 		IRemoteProcessBuilder builder = getRemoteConnection().getRemoteServices().getProcessBuilder(getRemoteConnection(),
 				verifyArgs);
 		builder.redirectErrorStream(true);
@@ -554,6 +558,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * @since 4.1 Sets the verify fail message.
+	 * 
+	 * @param fVerifyFailMessage
+	 *            the new verify fail message
+	 */
+	public void setVerifyFailMessage(String fVerifyFailMessage) {
+		this.fVerifyFailMessage = fVerifyFailMessage;
+	}
+
+	/**
 	 * @since 4.1 Sets the verify pattern.
 	 * 
 	 * @param fVerifyPattern
@@ -561,16 +575,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	public void setVerifyPattern(String fVerifyPattern) {
 		this.fVerifyPattern = fVerifyPattern;
-	}
-
-	/**
-	 * @since 4.1 Sets the verify req version.
-	 * 
-	 * @param fVerifyReqVersion
-	 *            the new verify req version
-	 */
-	public void setVerifyReqVersion(String fVerifyReqVersion) {
-		this.fVerifyReqVersion = fVerifyReqVersion;
 	}
 
 	/**
