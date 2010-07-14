@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2007 University of Illinois at Urbana-Champaign and others.
+ * Copyright (c) 2010 University of Illinois at Urbana-Champaign and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     UIUC - Initial API and implementation
+ *     Dirk Rossow - Initial API and implementation
+ *     UIUC - Enhancements for fixed form refactoring support
  *******************************************************************************/
 package org.eclipse.photran.internal.core.lexer;
 
@@ -23,21 +24,23 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  * correct start/end line/col in the {@link IToken} objects).
  * 
  * @author Dirk Rossow
+ * @author Rui Wang, Esfar Huq - Fixed an issue involving comments disappearing during
+ *                               fixed-form refactoring (Bug 287764)
  */
 // JO -- Added type parameters to mollify Java 5 compilers
 class FixedFormLexerPrepass {
-	static final int inStart=0;
-	static final int inHollerith=1;
-	static final int inDblQuote=2;
-	static final int inDblQuoteEnd=3;
-	static final int inQuote=4;
-	static final int inQuoteEnd=5;
+	private static final int inStart=0;
+	private static final int inHollerith=1;
+	private static final int inDblQuote=2;
+	private static final int inDblQuoteEnd=3;
+	private static final int inQuote=4;
+	private static final int inQuoteEnd=5;
 	
 	//private String fileContent = "";
-	StringBuilder strBuilder = new StringBuilder();
+	private StringBuilder strBuilder = new StringBuilder();
 
 	private int state = inStart;
-    int hollerithLength = -2; //-1: hollerith could start, -2: hollerith cant start
+	private int hollerithLength = -2; //-1: hollerith could start, -2: hollerith cant start
 
 	private int actLinePos = 0;
 	private PreLexerLine actLine = null;
@@ -62,10 +65,6 @@ class FixedFormLexerPrepass {
 		this.in = new OffsetLineReader(in);
 	}
 	
-//	public FixedFormLexerPrepass(InputStream in) {
-//		this(new InputStreamReader(in));
-//	}
-	
 	public int getLine(int absCharPos) {
 		if (absCharPos<0) return 0;
         int lastCharPos = lineMapping.length() - 1;
@@ -86,7 +85,6 @@ class FixedFormLexerPrepass {
 	
 	public int read() throws Exception {
 		int c = internalRead();
-		//System.out.print((char)c);
 		return c;
 	}
 	
@@ -172,6 +170,7 @@ class FixedFormLexerPrepass {
 					state=inStart;
 					//TODO: If previous line is a comment, handle this in a special way
 					markPosition(prevLine.linePos,prevLine.length(),prevLine.offset+prevLine.length());
+					
 					return '\n';
 				}
 			}
@@ -190,17 +189,6 @@ class FixedFormLexerPrepass {
 		}
 	}
 
-//	private PreLexerLine getNextNonCommentLine() {
-//		for (;;) {
-//			PreLexerLine line = getNextLine();
-//			if (line==null) return null;
-//			if (line.type!=PreLexerLine.COMMENT) return line;
-//			else {
-//				//TODO: save non-tree tokens 
-//			}
-//		}
-//	}
-	
 	private PreLexerLine getNextLine() {
 		try {
 			int actOffset=in.getOffset();
@@ -210,8 +198,7 @@ class FixedFormLexerPrepass {
 			
 			strBuilder.append(line);
 			strBuilder.append(in.getFileEOL());
-			//fileContent = fileContent.concat(line);
-			//fileContent = fileContent.concat(in.getFileEOL());
+			
 			EOFLinePos=in.getLineNumber()+1;//-1; //Move that token past the last line
 			EOFColPos=0;//line.length();
 			EOFOffsetPos=actOffset+line.length()+in.getFileEOL().length();//To accomodate for End-of-line statement
@@ -238,15 +225,7 @@ class FixedFormLexerPrepass {
 	    //Create a positionInFile object, with line,col and offset set to the END of the potential whitespace
 	    PositionInFile posInFile = new PositionInFile(ln, colBefore, offsetBefore, false);
 	    String result = (String)whiteSpaceMapping.get(posInFile);
-	    /* Iterator iter = whiteSpaceMapping.keySet().iterator();
-	    while(iter.hasNext())
-	    {
-	        PositionInFile temp = (PositionInFile)iter.next();
-	        if(posInFile.isSameEnd(temp))
-	        {
-	            return (String)whiteSpaceMapping.get(temp);
-	        }
-	    }*/
+	   
 	    if(result==null)
 	        return ""; //$NON-NLS-1$
 	    
@@ -260,14 +239,9 @@ class FixedFormLexerPrepass {
 	    int startWhitespace = -1;
 	    int length = line.length();
 	    
-	    if(line.type == PreLexerLine.COMMENT)
+	    if(line.type == PreLexerLine.COMMENT) 
 	    {
-	        if(startWhitespace == -1)
-                startWhitespace = charPos;
-	        //Append current line to prevWhiteSpace
-            prevWhiteSpace = prevWhiteSpace.concat(line.getText().substring(charPos));
-            //Since PreLexerLine throws away whitespace, attach a "new line" character to our whitespace
-            prevWhiteSpace = prevWhiteSpace.concat(in.getFileEOL()); 
+	        startWhitespace = saveWhitespace(line, charPos, startWhitespace); 
             charPos = -1; //Finished line
             //Don't insert the white-space because full-line comments are associated with whatever token
             // you find on the NEXT line, so don't add them to the map yet
@@ -294,11 +268,12 @@ class FixedFormLexerPrepass {
 	        }
 	        else if(c=='!' || charPos >= FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getValue()) //It a comment, grab the rest of the line
 	        {
-	            if(startWhitespace == -1)
-                    startWhitespace = charPos;
-	            whiteAgg = whiteAgg.concat(line.getText().substring(charPos));
-	            charPos = length;  //Finished line
-	            break;
+	            startWhitespace = saveWhitespace(line, charPos, startWhitespace); 
+	            charPos = -1; //Finished line
+	            //Don't insert the white-space because full-line comments are associated with whatever token
+	            // you find on the NEXT line, so don't add them to the map yet
+	            return charPos;
+	            
 	        }
 	        else //Not a whitespace character
 	        {
@@ -325,6 +300,17 @@ class FixedFormLexerPrepass {
 	    
         return charPos;
 	}
+
+    private int saveWhitespace(PreLexerLine line, int charPos, int startWhitespace)
+    {
+        if(startWhitespace == -1)
+            startWhitespace = charPos;
+        //Append current line to prevWhiteSpace
+        prevWhiteSpace = prevWhiteSpace.concat(line.getText().substring(charPos));
+        //Since PreLexerLine throws away whitespace, attach a "new line" character to our whitespace
+        prevWhiteSpace = prevWhiteSpace.concat(in.getFileEOL());
+        return startWhitespace;
+    }
 	
 	// return: -1 : end of line reached
 	private int getNextSigPos(PreLexerLine line, int startPos) {
