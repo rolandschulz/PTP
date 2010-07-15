@@ -17,6 +17,8 @@ package org.eclipse.photran.internal.tests;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +40,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.photran.internal.core.FProjectNature;
 import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
@@ -56,8 +61,24 @@ import org.eclipse.rephraserengine.core.util.Spawner;
  * @author aniefer
  * @author Jeff Overbey - Modified so that every test case creates a new project - Added line/column
  *         computation when importing files - Added {@link #compileAndRunFortranProgram(String...)}
+ *         Also added marker infrastructure.
  */
 public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
+
+    /** The marker to search for */
+    public static final String MARKER = "!<<<<<";
+
+    /** Filter that determines which files will be imported into the runtime workspace */
+    public static final FilenameFilter FORTRAN_FILE_FILTER = new FilenameFilter()
+    {
+        public boolean accept(File dir, String filename)
+        {
+            return !filename.endsWith(".result")
+                && !filename.equalsIgnoreCase("CVS")
+                && !filename.equalsIgnoreCase(".svn");
+        }
+    };
+
     static protected NullProgressMonitor	monitor;
     static protected IWorkspace 			workspace;
     static protected IProject 				project;
@@ -69,7 +90,7 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
 	
     private HashMap<String, ArrayList<Integer>> lineMaps = new HashMap<String, ArrayList<Integer>>();
 
-	static void initProject() {
+    static void initProject() {
 		if (project != null) {
 			return;
 		}
@@ -309,5 +330,53 @@ public abstract class PhotranWorkspaceTestCase extends PhotranTestCase {
     protected int getLineColOffset(String filename, LineCol lineCol)
     {
         return lineMaps.get(filename).get(lineCol.getLine()-1) + (lineCol.getCol()-1);
+    }
+
+    protected String[] parseMarker(String markerText)
+    {
+        String[] markerStrings = markerText.split(",");
+        for (int i = 0; i < markerStrings.length; i++)
+            markerStrings[i] = markerStrings[i].trim();
+        return markerStrings;
+    }
+
+    protected TextSelection determineSelection(String[] markerStrings, IFile fileContainingMarker) throws IOException, CoreException
+    {
+        assertTrue(markerStrings.length >= 2);
+        int fromLine = Integer.parseInt(markerStrings[0]);
+        int fromCol = Integer.parseInt(markerStrings[1]);
+        int fromOffset = getLineColOffset(fileContainingMarker.getName(), new LineCol(fromLine, fromCol));
+        int length = 0;
+        if (markerStrings.length >= 4 && isInteger(markerStrings[2]) && isInteger(markerStrings[3]))
+        {
+            int toLine = Integer.parseInt(markerStrings[2]);
+            int toCol = Integer.parseInt(markerStrings[3]);
+            int toOffset = getLineColOffset(fileContainingMarker.getName(), new LineCol(toLine, toCol));
+            length = toOffset - fromOffset;
+        }
+        TextSelection selection = new TextSelection(createDocument(fileContainingMarker),  fromOffset, length);
+        return selection;
+    }
+
+    /**
+     * @return true iff {@link Integer#parseInt(String)} can successfully parse the given
+     *         string can be parsed as an integer
+     */
+    protected boolean isInteger(String string)
+    {
+        try
+        {
+            Integer.parseInt(string);
+            return true;
+        }
+        catch (NumberFormatException e)
+        {
+            return false;
+        }
+    }
+
+    private IDocument createDocument(IFile fileContainingMarker) throws IOException, CoreException
+    {
+        return new Document(readWorkspaceFile(fileContainingMarker.getName()));
     }
 }

@@ -24,7 +24,6 @@ import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
 import org.eclipse.photran.internal.core.vpg.PhotranTokenRef;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.Activator;
-import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
 import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 import org.eclipse.rephraserengine.core.analysis.flow.FlowGraphNode;
 import org.eclipse.rephraserengine.core.analysis.flow.VPGFlowGraph;
@@ -47,9 +46,9 @@ public class ControlFlowTestSuite extends GeneralTestSuiteFromMarkers
     public ControlFlowTestSuite() throws Exception
     {
         super("Constructing control flow graph for",
-            PhotranRefactoringTestSuiteFromMarkers.MARKER,
+            PhotranWorkspaceTestCase.MARKER,
             new File(DIR),
-            PhotranRefactoringTestSuiteFromMarkers.FORTRAN_FILE_FILTER);
+            PhotranWorkspaceTestCase.FORTRAN_FILE_FILTER);
     }
 
     @Override

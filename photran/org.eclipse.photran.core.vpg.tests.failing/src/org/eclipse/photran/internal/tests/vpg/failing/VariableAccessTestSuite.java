@@ -23,7 +23,6 @@ import org.eclipse.photran.internal.core.analysis.loops.ASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.photran.internal.tests.failing.Activator;
-import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
 import org.eclipse.photran.internal.tests.PhotranWorkspaceTestCase;
 import org.eclipse.rephraserengine.testing.junit3.GeneralTestSuiteFromMarkers;
 
@@ -44,9 +43,9 @@ public class VariableAccessTestSuite extends GeneralTestSuiteFromMarkers
     public VariableAccessTestSuite() throws Exception
     {
         super("Constructing variable access marking for",
-            PhotranRefactoringTestSuiteFromMarkers.MARKER,
+            PhotranWorkspaceTestCase.MARKER,
             new File(DIR),
-            PhotranRefactoringTestSuiteFromMarkers.FORTRAN_FILE_FILTER);
+            PhotranWorkspaceTestCase.FORTRAN_FILE_FILTER);
     }
     
     @Override
@@ -125,14 +124,6 @@ public class VariableAccessTestSuite extends GeneralTestSuiteFromMarkers
             line += "\n";
             
             return line;
-        }
-
-        private String[] parseMarker(String markerText)
-        {
-            String[] markerStrings = markerText.split(",");
-            for (int i = 0; i < markerStrings.length; i++)
-                markerStrings[i] = markerStrings[i].trim();
-            return markerStrings;
         }
         
         private Token findTokenByLineCol(IFortranAST ast, int line, int col)

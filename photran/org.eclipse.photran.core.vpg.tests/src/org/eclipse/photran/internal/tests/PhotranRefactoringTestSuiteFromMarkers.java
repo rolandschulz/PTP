@@ -11,7 +11,6 @@
 package org.eclipse.photran.internal.tests;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -26,8 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
@@ -36,7 +33,6 @@ import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranEditorRefactoring;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
-import org.eclipse.photran.internal.core.util.LineCol;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.eclipse.rephraserengine.core.vpg.refactoring.VPGResourceRefactoring;
 import org.eclipse.rephraserengine.testing.junit3.GeneralTestSuiteFromMarkers;
@@ -80,20 +76,6 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
     /** Text of the last marker field when a refactoring is expected to fail final precondition check */
     private static final String FAIL_FINAL = "fail-final";
 
-    /** The marker to search for */
-    public static final String MARKER = "!<<<<<";
-
-    /** Filter that determines which files will be imported into the runtime workspace */
-    public static final FilenameFilter FORTRAN_FILE_FILTER = new FilenameFilter()
-    {
-        public boolean accept(File dir, String filename)
-        {
-            return !filename.endsWith(".result")
-                && !filename.equalsIgnoreCase("CVS")
-                && !filename.equalsIgnoreCase(".svn");
-        }
-    };
-    
     /** The activator class that will be used to load test files from the source tree */
     protected Plugin activator;
     
@@ -102,7 +84,7 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
 
     protected PhotranRefactoringTestSuiteFromMarkers(Plugin activator, String descriptionPrefix, String directory, Class<R> clazz) throws Exception
     {
-        super(descriptionPrefix, MARKER, new File(directory), FORTRAN_FILE_FILTER,
+        super(descriptionPrefix, PhotranWorkspaceTestCase.MARKER, new File(directory), PhotranWorkspaceTestCase.FORTRAN_FILE_FILTER,
               activator, // initializationData[0]
               clazz);    // initializationData[1]
     }
@@ -199,8 +181,8 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
             IFile fileContainingMarker = importFiles();
             R refactoring = createRefactoring();
 
-            String[] markerFields = parseMarker();
-            TextSelection selection = determineSelection(markerFields);
+            String[] markerFields = parseMarker(markerText);
+            TextSelection selection = determineSelection(markerFields, fileContainingMarker);
 
             appendFilenameToDescription(markerFields);
 
@@ -240,36 +222,6 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
             return compileAndRunFortranProgram(files.keySet().toArray(new String[files.size()]));
         }
 
-        private String[] parseMarker()
-        {
-            String[] markerStrings = markerText.split(",");
-            for (int i = 0; i < markerStrings.length; i++)
-                markerStrings[i] = markerStrings[i].trim();
-            return markerStrings;
-        }
-
-        private TextSelection determineSelection(String[] markerStrings) throws IOException, CoreException
-        {
-            assertTrue(markerStrings.length >= 2);
-            int fromLine = Integer.parseInt(markerStrings[0]);
-            int fromCol = Integer.parseInt(markerStrings[1]);
-            int fromOffset = getLineColOffset(fileContainingMarker.getName(), new LineCol(fromLine, fromCol));
-            int length = 0;
-            if (markerStrings.length >= 4 && isInteger(markerStrings[2]) && isInteger(markerStrings[3]))
-            {
-                int toLine = Integer.parseInt(markerStrings[2]);
-                int toCol = Integer.parseInt(markerStrings[3]);
-                int toOffset = getLineColOffset(fileContainingMarker.getName(), new LineCol(toLine, toCol));
-                length = toOffset - fromOffset;
-            }
-            TextSelection selection = new TextSelection(createDocument(),  fromOffset, length);
-            return selection;
-        }
-
-        private IDocument createDocument() throws IOException, CoreException
-        {
-            return new Document(readWorkspaceFile(fileContainingMarker.getName()));
-        }
 
         private void appendFilenameToDescription(String[] markerStrings)
         {
@@ -325,23 +277,6 @@ public abstract class PhotranRefactoringTestSuiteFromMarkers<R extends VPGResour
                 + File.separator
                 + filename
                 +  ".result");
-        }
-
-        /**
-         * @return true iff {@link Integer#parseInt(String)} can successfully parse the given
-         *         string can be parsed as an integer
-         */
-        private boolean isInteger(String string)
-        {
-            try
-            {
-                Integer.parseInt(string);
-                return true;
-            }
-            catch (NumberFormatException e)
-            {
-                return false;
-            }
         }
 
         private void importFiles(String subdir) throws Exception
