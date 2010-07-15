@@ -63,6 +63,7 @@ public class WorkbenchSelectionInfo
     private List<IResource> selectedResources;
     private List<IFile> allFilesInSelectedResources;
     private ITextSelection selectionInEditor;
+    private Boolean someFilesAreSelected;
 
     /**
      * Default constructor; uses a {@link DefaultResourceFilter} and tracks the selection in the
@@ -129,7 +130,7 @@ public class WorkbenchSelectionInfo
         if (selection instanceof IStructuredSelection)
         {
             selectedResources = getResourcesSelectedIn((IStructuredSelection)selection);
-            allFilesInSelectedResources = findAllFilesIn(selectedResources);
+            allFilesInSelectedResources = null; // Populate on demand (see getAllFilesInSelectedResources())
         }
 
         IWorkbenchPage activePage = workbenchWindow.getActivePage();
@@ -184,21 +185,31 @@ public class WorkbenchSelectionInfo
         return result;
     }
 
-    private List<IFile> findAllFilesIn(Collection<IResource> resources)
+    public boolean someFilesAreSelected()
     {
-        return findAllFilesIn(resources.toArray(new IResource[resources.size()]));
+        if (someFilesAreSelected == null)
+            someFilesAreSelected = internalSomeFilesAreSelected();
+        
+        return someFilesAreSelected;
     }
 
-    private List<IFile> findAllFilesIn(IResource[] resources)
+    private boolean internalSomeFilesAreSelected()
     {
-        ArrayList<IFile> files = new ArrayList<IFile>();
+        if (allFilesInSelectedResources != null)
+            return !allFilesInSelectedResources.isEmpty();
+        else
+            return internalSomeFilesAreSelected(selectedResources.toArray(new IResource[selectedResources.size()]));
+    }
+
+    private boolean internalSomeFilesAreSelected(IResource[] resources)
+    {
         for (IResource r : resources)
         {
             if (resourceFilter.shouldProcess(r))
             {
                 if (r instanceof IFile)
                 {
-                    files.add((IFile)r);
+                    return true;
                 }
                 else if (r instanceof IFolder || r instanceof IProject)
                 {
@@ -206,7 +217,8 @@ public class WorkbenchSelectionInfo
                     {
                         try
                         {
-                            files.addAll(findAllFilesIn(((IContainer)r).members()));
+                            if (internalSomeFilesAreSelected(((IContainer)r).members()))
+                                return true;;
                         }
                         catch (CoreException e)
                         {
@@ -216,12 +228,8 @@ public class WorkbenchSelectionInfo
                 }
             }
         }
-        return files;
-    }
 
-    public boolean someFilesAreSelected()
-    {
-        return allFilesInSelectedResources != null && !allFilesInSelectedResources.isEmpty();
+        return false;
     }
 
     /** @return true iff the active editor in the workbench is editing a document based on an
@@ -348,9 +356,47 @@ public class WorkbenchSelectionInfo
      */
     public List<IFile> getAllFilesInSelectedResources()
     {
+        if (allFilesInSelectedResources == null)
+            allFilesInSelectedResources = findAllFilesIn(selectedResources);
+        
         return allFilesInSelectedResources;
     }
-    
+
+    private List<IFile> findAllFilesIn(Collection<IResource> resources)
+    {
+        return findAllFilesIn(resources.toArray(new IResource[resources.size()]));
+    }
+
+    private List<IFile> findAllFilesIn(IResource[] resources)
+    {
+        ArrayList<IFile> files = new ArrayList<IFile>();
+        for (IResource r : resources)
+        {
+            if (resourceFilter.shouldProcess(r))
+            {
+                if (r instanceof IFile)
+                {
+                    files.add((IFile)r);
+                }
+                else if (r instanceof IFolder || r instanceof IProject)
+                {
+                    if (r.isAccessible())
+                    {
+                        try
+                        {
+                            files.addAll(findAllFilesIn(((IContainer)r).members()));
+                        }
+                        catch (CoreException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        return files;
+    }
+
     /**
      * @return an error message to display to the user, if all of the files in the selection were
      * filtered out, which describes why that happened and possibly what the user can do about it;

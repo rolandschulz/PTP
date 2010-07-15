@@ -11,7 +11,6 @@
 package org.eclipse.rephraserengine.ui.menus;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -164,7 +163,7 @@ public final class RefactorMenu extends CompoundContributionItem
                         refactoring,
                         label,
                         customInputPage,
-                        selection.getAllFilesInSelectedResources()));
+                        selection));
                 }
                 catch (Throwable t)
                 {
@@ -256,18 +255,18 @@ public final class RefactorMenu extends CompoundContributionItem
         private IResourceRefactoring refactoring;
         private String label;
         private CustomUserInputPage customInputPage;
-        private List<IFile> selectedFiles;
+        private WorkbenchSelectionInfo selection;
 
         public ResourceRefactoringContributionItem(
             IResourceRefactoring refactoring,
             String label,
             CustomUserInputPage customInputPage,
-            List<IFile> selectedFiles)
+            WorkbenchSelectionInfo selection)
         {
             this.refactoring = refactoring;
             this.label = label != null ? label : refactoring.getName() + "..."; //$NON-NLS-1$
             this.customInputPage = customInputPage;
-            this.selectedFiles = selectedFiles;
+            this.selection = selection;
         }
 
         @Override public void fill(Menu parent, int index)
@@ -279,7 +278,7 @@ public final class RefactorMenu extends CompoundContributionItem
                 @SuppressWarnings("unchecked")
                 @Override public void widgetSelected(SelectionEvent e)
                 {
-                    refactoring.initialize(selectedFiles);
+                    refactoring.initialize(selection.getAllFilesInSelectedResources());
                     new RefactoringAction(refactoring, customInputPage).run();
                 }
             });
