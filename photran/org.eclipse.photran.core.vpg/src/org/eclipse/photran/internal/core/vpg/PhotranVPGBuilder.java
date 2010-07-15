@@ -328,7 +328,7 @@ public class PhotranVPGBuilder extends PhotranVPG
         return parse(filename, null);
     }
 
-    private IFortranAST parse(final String filename, Reader stream)
+    private IFortranAST parse(String filename, Reader stream)
     {
         if (filename == null || isVirtualFile(filename)) return null;
 
@@ -349,33 +349,34 @@ public class PhotranVPGBuilder extends PhotranVPG
             catch (SyntaxException e)
             {
                 if (e.getFile() != null && e.getFile().getIFile() != null)
-                {
-                    log.clearEntriesFor(PhotranVPG.getFilenameForIFile(e.getFile().getIFile()));
-                    log.logError(
-                        Messages.bind(
-                            Messages.PhotranVPGBuilder_ErrorParsingFileMessage,
-                            filename,
-                            e.getMessage()),
-                        new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
-                }
-                else
-                    logError(file, Messages.bind(Messages.PhotranVPGBuilder_ErrorParsingFile, filename), e);
+                    filename = PhotranVPG.getFilenameForIFile(e.getFile().getIFile());
+
+                log.clearEntriesFor(PhotranVPG.getFilenameForIFile(e.getFile().getIFile()));
+                log.logError(
+                    Messages.bind(
+                        Messages.PhotranVPGBuilder_ErrorParsingFileMessage,
+                        filename,
+                        e.getMessage()),
+                    new PhotranTokenRef(filename, e.getTokenOffset(), e.getTokenLength()));
+//              else
+//                  logError(file, Messages.bind(Messages.PhotranVPGBuilder_ErrorParsingFile, filename), e);
                 return null;
             }
             catch (LexerException e)
             {
                 if (e.getFile() != null && e.getFile().getIFile() != null)
-                {
-                    log.clearEntriesFor(PhotranVPG.getFilenameForIFile(e.getFile().getIFile()));
-                    log.logError(
-                        Messages.bind(
-                            Messages.PhotranVPGBuilder_ErrorParsingFileMessage,
-                            filename,
-                            e.getMessage()),
-                        new PhotranTokenRef(e.getFile().getIFile(), e.getTokenOffset(), e.getTokenLength()));
-                }
-                else
-                    logError(file, Messages.bind(Messages.PhotranVPGBuilder_ErrorParsingFile, filename), e);
+                    filename = PhotranVPG.getFilenameForIFile(e.getFile().getIFile());
+
+                log.clearEntriesFor(filename);
+                log.logError(
+                    Messages.bind(
+                        Messages.PhotranVPGBuilder_ErrorParsingFileMessage,
+                        filename,
+                        e.getMessage()),
+                    new PhotranTokenRef(filename, e.getTokenOffset(), e.getTokenLength()));
+//              }
+//              else
+//                  logError(file, Messages.bind(Messages.PhotranVPGBuilder_ErrorParsingFile, filename), e);
                 return null;
             }
     //        catch (CoreException e)
