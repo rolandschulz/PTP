@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project org.eclipse.ptp.rm.pbs.jproxy with Jar-in-Jar Loader">
-    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
-    <!--ANT 1.7 is required                                        -->
-    <target name="create_run_jar">
-        <jar destfile="../org.eclipse.ptp.rm.pbs.core/pbs_proxy.jar">
-            <manifest>
-                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
-                <attribute name="Rsrc-Main-Class" value="org.eclipse.ptp.rm.pbs.jproxy.PBSProxyRuntimeServer"/>
-                <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./"/>
-            </manifest>
-            <zipfileset src="jar-in-jar-loader.zip"/>
-            <fileset dir="bin"/>
-            <fileset dir="../org.eclipse.ptp.proxy.protocol/bin"/>
-            <fileset dir="../org.eclipse.ptp.utils.core/bin"/>
-            <fileset dir="../org.eclipse.ptp.rm.proxy.core/bin"/>
-        </jar>
-    </target>
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="pbs_proxy.jar" name="com.chartle.ant">
+
+	<!--
+    ===================
+	ECLIPSE TASK JAR
+    ===================
+    -->
+
+	<target name="pbs_proxy.jar" description="Creates the PBS Proxy JAR">
+		<property name="jar-with-dependencies" value="pbs_proxy.jar" />
+		<delete file="${jar-with-dependencies}"/>
+
+		<taskdef name="jar-eclipse" classname="${ant.project.name}.JarEclipseProject" classpath="${ant.project.name}.jar" />
+		<jar-eclipse outjar="${jar-with-dependencies}" />
+	</target>
+
+	
 </project>
