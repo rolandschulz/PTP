@@ -445,5 +445,6 @@ public class CachingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T, R, L>,
     @Override public void resetStatistics()
     {
         edgeHits = edgeMisses = annotationHits = annotationMisses = totalEdgeListBuildTime = totalDeserializationTime = 0;
+        db.resetStatistics();
     }
 }

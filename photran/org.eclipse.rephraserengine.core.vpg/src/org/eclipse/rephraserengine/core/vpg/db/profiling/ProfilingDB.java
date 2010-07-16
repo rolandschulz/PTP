@@ -444,6 +444,7 @@ public final class ProfilingDB<A, T, R extends TokenRef<T>, D extends VPGDB<A, T
         methodCalls = new HashMap <String, Integer>();
         methodTimes = new HashMap <String, Long>();
         methodLongestCall = new HashMap <String, Long>();
+        db.resetStatistics();
     }
 
     @Override
