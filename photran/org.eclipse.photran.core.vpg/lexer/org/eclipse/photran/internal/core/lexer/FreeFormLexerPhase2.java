@@ -1409,7 +1409,7 @@ public class FreeFormLexerPhase2 implements ILexer
                 && t.getTerminal() != Terminal.T_REWIND
                 && t.getTerminal() != Terminal.T_INQUIRE)
             {
-                if (t.getTerminal() != Terminal.T_IF || tokenFollowingParentheticalPos < 0)
+                if (t.getTerminal() != Terminal.T_IF || tokenFollowingParentheticalPos < 0 || tokenFollowingParentheticalPos >= tokenStream.size())
                     return false;
 
                 t = (IToken)tokenStream.elementAt(tokenFollowingParentheticalPos);
