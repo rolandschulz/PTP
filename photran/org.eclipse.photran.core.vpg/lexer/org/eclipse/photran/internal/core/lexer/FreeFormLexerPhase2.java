@@ -423,11 +423,16 @@ public class FreeFormLexerPhase2 implements ILexer
                  new StmtMustStartWith(Terminal.T_IMPLICIT),
                  new MustBePrecededByOneOf(Terminal.T_IMPLICIT, Terminal.T_COMMA));
         applySameRulesTo(Terminal.T_REAL);
+        applySameRulesTo(Terminal.T_DOUBLECOMPLEX);
         applySameRulesTo(Terminal.T_DOUBLEPRECISION);
-        applySameRulesTo(Terminal.T_COMPLEX);
+        //applySameRulesTo(Terminal.T_COMPLEX);
         applySameRulesTo(Terminal.T_LOGICAL);
         applySameRulesTo(Terminal.T_CHARACTER);
         applySameRulesTo(Terminal.T_DOUBLE);
+
+        addRules(Terminal.T_COMPLEX,
+            new StmtMustStartWithOneOf(Terminal.T_IMPLICIT, Terminal.T_DOUBLE),
+            new MustBePrecededByOneOf(Terminal.T_IMPLICIT, Terminal.T_COMMA, Terminal.T_DOUBLE));
 
         // R622
         addRules(Terminal.T_STATEQ,
@@ -831,6 +836,7 @@ public class FreeFormLexerPhase2 implements ILexer
 
                 if (!isType(t)
                         && !(t.getTerminal() == Terminal.T_PRECISION && pret.getTerminal() == Terminal.T_DOUBLE)
+                        && !(t.getTerminal() == Terminal.T_COMPLEX && pret.getTerminal() == Terminal.T_DOUBLE)
                         && t.getTerminal() != Terminal.T_RECURSIVE
                         && t.getTerminal() != Terminal.T_PURE
                         && t.getTerminal() != Terminal.T_IMPURE // F08
@@ -912,6 +918,13 @@ public class FreeFormLexerPhase2 implements ILexer
                         && ((IToken)tokenStream.elementAt(i+2)).getTerminal() == Terminal.T_ASTERISK
                         && ((IToken)tokenStream.elementAt(i+3)).getTerminal() == Terminal.T_ICON)
             i += 4;
+        // ...or the first four tokens are DOUBLE COMPLEX * <kind>
+        else if (i+3 < tokenStream.size()
+                        && ((IToken)tokenStream.elementAt(i)).getTerminal() == Terminal.T_DOUBLE
+                        && ((IToken)tokenStream.elementAt(i+1)).getTerminal() == Terminal.T_COMPLEX
+                        && ((IToken)tokenStream.elementAt(i+2)).getTerminal() == Terminal.T_ASTERISK
+                        && ((IToken)tokenStream.elementAt(i+3)).getTerminal() == Terminal.T_ICON)
+            i += 4;
         // ...or the first three tokens are <type> * <kind>
         else if (i+2 < tokenStream.size()
                         && ((IToken)tokenStream.elementAt(i+1)).getTerminal() == Terminal.T_ASTERISK
@@ -926,6 +939,11 @@ public class FreeFormLexerPhase2 implements ILexer
         else if (i+1 < tokenStream.size()
                         && ((IToken)tokenStream.elementAt(i)).getTerminal() == Terminal.T_DOUBLE
                         && ((IToken)tokenStream.elementAt(i+1)).getTerminal() == Terminal.T_PRECISION)
+            i += 2;
+        // ...or the first two tokens are DOUBLE COMPLEX
+        else if (i+1 < tokenStream.size()
+                        && ((IToken)tokenStream.elementAt(i)).getTerminal() == Terminal.T_DOUBLE
+                        && ((IToken)tokenStream.elementAt(i+1)).getTerminal() == Terminal.T_COMPLEX)
             i += 2;
         else
             ++i;
@@ -1754,6 +1772,7 @@ public class FreeFormLexerPhase2 implements ILexer
         return type.getTerminal() == Terminal.T_CHARACTER
             || type.getTerminal() == Terminal.T_COMPLEX
             || type.getTerminal() == Terminal.T_DOUBLE
+            || type.getTerminal() == Terminal.T_DOUBLECOMPLEX
             || type.getTerminal() == Terminal.T_DOUBLEPRECISION
             || type.getTerminal() == Terminal.T_INTEGER
             || type.getTerminal() == Terminal.T_LOGICAL

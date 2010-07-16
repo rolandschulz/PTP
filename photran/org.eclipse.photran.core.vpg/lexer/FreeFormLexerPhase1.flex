@@ -364,6 +364,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{Comment}?{LineTerminator}
 "DIRECT"[ \t]*"="                               { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_DIRECTEQ); }
 "DO"                                            { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_DO); }
 "DOUBLE"{StarredType}                           { wantEos = true;                     return token(Terminal.T_DOUBLE); }
+"DOUBLECOMPLEX"{StarredType}                    { wantEos = true;                     return token(Terminal.T_DOUBLECOMPLEX); }
 "DOUBLEPRECISION"{StarredType}                  { wantEos = true;                     return token(Terminal.T_DOUBLEPRECISION); }
 "ELEMENTAL"                                     { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ELEMENTAL); }
 "ELSE"                                          { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_ELSE); }

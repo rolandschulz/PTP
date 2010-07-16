@@ -29,8 +29,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTTypeParamValueNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTTypeParamValueNode
-    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTTypeParamValueNode
     IExpr expr; // in ASTTypeParamValueNode
+    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTTypeParamValueNode
 
     public boolean isAsterisk()
     {
@@ -44,18 +44,6 @@ public class ASTTypeParamValueNode extends ASTNode
     }
 
 
-    public boolean isColon()
-    {
-        return this.isColon != null;
-    }
-
-    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isColon = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public IExpr getExpr()
     {
         return this.expr;
@@ -64,6 +52,18 @@ public class ASTTypeParamValueNode extends ASTNode
     public void setExpr(IExpr newValue)
     {
         this.expr = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isColon()
+    {
+        return this.isColon != null;
+    }
+
+    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isColon = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -85,8 +85,8 @@ public class ASTTypeParamValueNode extends ASTNode
         switch (index)
         {
         case 0:  return this.isAsterisk;
-        case 1:  return this.isColon;
-        case 2:  return this.expr;
+        case 1:  return this.expr;
+        case 2:  return this.isColon;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -96,8 +96,8 @@ public class ASTTypeParamValueNode extends ASTNode
         switch (index)
         {
         case 0:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 1:  this.expr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 2:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

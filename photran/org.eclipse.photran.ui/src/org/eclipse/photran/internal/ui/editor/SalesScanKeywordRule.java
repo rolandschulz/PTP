@@ -554,6 +554,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                     || precedingKeyword.equalsIgnoreCase("end"); //$NON-NLS-1$
             // END FORTRAN 2008
             // N.B. These rules depend on the token preceding this one
+            else if (keyword.equalsIgnoreCase("complex") && precedingKeyword.equalsIgnoreCase("double")) //$NON-NLS-1$ //$NON-NLS-2$
+                return true;
             else if (isType(keyword) && !keyword.equalsIgnoreCase("type")) //$NON-NLS-1$
                 return isPrefixSpec(precedingKeyword)|| precedingKeyword.equalsIgnoreCase("implicit"); //$NON-NLS-1$
             else if (isPrefixSpec(keyword))
@@ -570,6 +572,8 @@ public class SalesScanKeywordRule extends WordRule implements IRule
                 return precedingKeyword.equalsIgnoreCase("else") || precedingKeyword.equalsIgnoreCase("end"); //$NON-NLS-1$ //$NON-NLS-2$
             else if (keyword.equalsIgnoreCase("none")) //$NON-NLS-1$
                 return precedingKeyword.equalsIgnoreCase("implicit"); //$NON-NLS-1$
+            else if (keyword.equalsIgnoreCase("complex")) //$NON-NLS-1$
+                return precedingKeyword.equalsIgnoreCase("double"); //$NON-NLS-1$
             else if (keyword.equalsIgnoreCase("precision")) //$NON-NLS-1$
                 return precedingKeyword.equalsIgnoreCase("double"); //$NON-NLS-1$
             else if (keyword.equalsIgnoreCase("while")) //$NON-NLS-1$
@@ -639,6 +643,7 @@ public class SalesScanKeywordRule extends WordRule implements IRule
             return kw.equalsIgnoreCase("character") //$NON-NLS-1$
                 || kw.equalsIgnoreCase("complex") //$NON-NLS-1$
                 || kw.equalsIgnoreCase("double") //$NON-NLS-1$
+                || kw.equalsIgnoreCase("doublecomplex") //$NON-NLS-1$
                 || kw.equalsIgnoreCase("doubleprecision") //$NON-NLS-1$
                 || kw.equalsIgnoreCase("integer") //$NON-NLS-1$
                 || kw.equalsIgnoreCase("logical") //$NON-NLS-1$

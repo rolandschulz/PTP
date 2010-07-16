@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
@@ -24,8 +25,9 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  * correct start/end line/col in the {@link IToken} objects).
  * 
  * @author Dirk Rossow
- * @author Rui Wang, Esfar Huq - Fixed an issue involving comments disappearing during
- *                               fixed-form refactoring (Bug 287764)
+ * @author Timofey Yuvashev - Added whitetext collection (for refactoring)
+ * @author Rui Wang, Esfar Huq - Certain comments were lost during whitetext collection (Bug 287764)
+ * @author Jeff Overbey - Disallowed Holleriths in certain statements
  */
 // JO -- Added type parameters to mollify Java 5 compilers
 class FixedFormLexerPrepass {
@@ -359,7 +361,7 @@ class FixedFormLexerPrepass {
 					hollerithLength=-1;
 					state=inDblQuote;
 				} 
-				else if ((c=='h') || (c=='H')) 
+				else if ((c=='h' || c=='H') && line.hollerithsOK()) 
 				{
 					if (hollerithLength>0) 
 					    state=inHollerith;
@@ -438,7 +440,7 @@ class FixedFormLexerPrepass {
 		}
 		return -1; //end of line reached
 	}
-    
+
     public String getFileEOL()
     {
         return in.getFileEOL();
@@ -543,7 +545,25 @@ class PreLexerLine {
 		else type=STMT;
 	}
 	 
-	public int length() {
+    
+    // JO -- Do not recognize holleriths inside DO statements and type declaration statements
+	// IMPORTANT: If this is modified, FixedFormLexerPhase1.flex must also be modified to call
+	//            disallowHolleriths() on the affected statements
+    private static final Pattern DO_STMT_PATTERN = Pattern.compile("^[ \\t0-9]*do[ \\t]*[0-9]+.*", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+    private static final Pattern TYPE_DECL_STMT_PATTERN = Pattern.compile("^[ \\t0-9]*(integer|real|double|complex|logical|character).*", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+    private Boolean hollerithsOK = null;
+    public boolean hollerithsOK()
+    {
+        if (hollerithsOK == null)
+        {
+            hollerithsOK = !DO_STMT_PATTERN.matcher(lineText).matches()
+                        && !TYPE_DECL_STMT_PATTERN.matcher(lineText).matches();
+        }
+
+        return hollerithsOK;
+    }
+
+    public int length() {
 		return lineText.length();
 	}
 	

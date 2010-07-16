@@ -26,7 +26,8 @@ public abstract class TypeProcessor<T>
 	public T ifInteger(Type type) {return null;}
 	public T ifReal(Type type) {return null;}
 	public T ifDoublePrecision(Type type) {return null;}
-	public T ifComplex(Type type) {return null;}
+    public T ifComplex(Type type) {return null;}
+    public T ifDoubleComplex(Type type) {return null;}
 	public T ifLogical(Type type) {return null;}
 	public T ifCharacter(Type type) {return null;}
     public T ifDerivedType(String derivedTypeName, DerivedType type) {return null;}

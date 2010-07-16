@@ -33,7 +33,7 @@ public class ASTEntityDeclNode extends ASTNode
     ASTCharLengthNode initialCharLength; // in ASTEntityDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenLparen2; // in ASTEntityDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTSlash; // in ASTEntityDeclNode
-    ASTLogicalConstNode logicalConstant; // in ASTEntityDeclNode
+    ASTConstantNode constant; // in ASTEntityDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTSlash2; // in ASTEntityDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTEntityDeclNode
     ASTArraySpecNode arraySpec; // in ASTEntityDeclNode
@@ -70,14 +70,14 @@ public class ASTEntityDeclNode extends ASTNode
     }
 
 
-    public ASTLogicalConstNode getLogicalConstant()
+    public ASTConstantNode getConstant()
     {
-        return this.logicalConstant;
+        return this.constant;
     }
 
-    public void setLogicalConstant(ASTLogicalConstNode newValue)
+    public void setConstant(ASTConstantNode newValue)
     {
-        this.logicalConstant = newValue;
+        this.constant = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -151,7 +151,7 @@ public class ASTEntityDeclNode extends ASTNode
         case 2:  return this.initialCharLength;
         case 3:  return this.hiddenLparen2;
         case 4:  return this.hiddenTSlash;
-        case 5:  return this.logicalConstant;
+        case 5:  return this.constant;
         case 6:  return this.hiddenTSlash2;
         case 7:  return this.hiddenTLparen;
         case 8:  return this.arraySpec;
@@ -176,7 +176,7 @@ public class ASTEntityDeclNode extends ASTNode
         case 2:  this.initialCharLength = (ASTCharLengthNode)value; if (value != null) value.setParent(this); return;
         case 3:  this.hiddenLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 4:  this.hiddenTSlash = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.logicalConstant = (ASTLogicalConstNode)value; if (value != null) value.setParent(this); return;
+        case 5:  this.constant = (ASTConstantNode)value; if (value != null) value.setParent(this); return;
         case 6:  this.hiddenTSlash2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 7:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 8:  this.arraySpec = (ASTArraySpecNode)value; if (value != null) value.setParent(this); return;

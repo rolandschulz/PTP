@@ -75,18 +75,21 @@ public abstract class ASTNodeWithErrorRecoverySymbols extends ASTNode
     @Override public Object clone()
     {
             ASTNodeWithErrorRecoverySymbols copy = (ASTNodeWithErrorRecoverySymbols)super.clone();
-            copy.errorInfo = new ErrorRecoveryInfo(errorInfo.errorState,
-                                                   errorInfo.errorLookahead,
-                                                   errorInfo.expectedLookaheadSymbols);
-            for (IASTNode n : this.getSymbolsDiscardedDuringErrorRecovery())
+            if (errorInfo != null)
             {
-                if (n == null)
-                    copy.errorInfo.<IASTNode>getDiscardedSymbols().add(null);
-                else
+                copy.errorInfo = new ErrorRecoveryInfo(errorInfo.errorState,
+                                                       errorInfo.errorLookahead,
+                                                       errorInfo.expectedLookaheadSymbols);
+                for (IASTNode n : this.getSymbolsDiscardedDuringErrorRecovery())
                 {
-                    IASTNode newChild = (IASTNode)n.clone();
-                    newChild.setParent(copy);
-                    copy.errorInfo.<IASTNode>getDiscardedSymbols().add(newChild);
+                    if (n == null)
+                        copy.errorInfo.<IASTNode>getDiscardedSymbols().add(null);
+                    else
+                    {
+                        IASTNode newChild = (IASTNode)n.clone();
+                        newChild.setParent(copy);
+                        copy.errorInfo.<IASTNode>getDiscardedSymbols().add(newChild);
+                    }
                 }
             }
             return copy;

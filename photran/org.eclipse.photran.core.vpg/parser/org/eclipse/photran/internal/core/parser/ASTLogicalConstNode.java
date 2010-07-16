@@ -28,23 +28,11 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTLogicalConstNode extends ASTNode implements IExpr
 {
-    org.eclipse.photran.internal.core.lexer.Token isTrue; // in ASTLogicalConstNode
     org.eclipse.photran.internal.core.lexer.Token isFalse; // in ASTLogicalConstNode
+    org.eclipse.photran.internal.core.lexer.Token isTrue; // in ASTLogicalConstNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTUnderscore; // in ASTLogicalConstNode
     ASTNamedConstantUseNode namedConstKind; // in ASTLogicalConstNode
     org.eclipse.photran.internal.core.lexer.Token intKind; // in ASTLogicalConstNode
-
-    public boolean isTrue()
-    {
-        return this.isTrue != null;
-    }
-
-    public void setIsTrue(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isTrue = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
 
     public boolean isFalse()
     {
@@ -54,6 +42,18 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     public void setIsFalse(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isFalse = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isTrue()
+    {
+        return this.isTrue != null;
+    }
+
+    public void setIsTrue(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isTrue = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -99,8 +99,8 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     {
         switch (index)
         {
-        case 0:  return this.isTrue;
-        case 1:  return this.isFalse;
+        case 0:  return this.isFalse;
+        case 1:  return this.isTrue;
         case 2:  return this.hiddenTUnderscore;
         case 3:  return this.namedConstKind;
         case 4:  return this.intKind;
@@ -112,8 +112,8 @@ public class ASTLogicalConstNode extends ASTNode implements IExpr
     {
         switch (index)
         {
-        case 0:  this.isTrue = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isFalse = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isFalse = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isTrue = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 2:  this.hiddenTUnderscore = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.namedConstKind = (ASTNamedConstantUseNode)value; if (value != null) value.setParent(this); return;
         case 4:  this.intKind = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;

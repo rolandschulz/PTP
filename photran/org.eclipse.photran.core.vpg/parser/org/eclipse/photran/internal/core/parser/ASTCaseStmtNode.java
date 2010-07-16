@@ -30,10 +30,10 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTCase; // in ASTCaseStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hasDefaultSelector; // in ASTCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCaseStmtNode
     IASTListNode<ASTCaseValueRangeNode> caseValueRangeListSelector; // in ASTCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCaseStmtNode
-    org.eclipse.photran.internal.core.lexer.Token hasDefaultSelector; // in ASTCaseStmtNode
     ASTNameNode name; // in ASTCaseStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTCaseStmtNode
 
@@ -49,18 +49,6 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     }
 
 
-    public IASTListNode<ASTCaseValueRangeNode> getCaseValueRangeListSelector()
-    {
-        return this.caseValueRangeListSelector;
-    }
-
-    public void setCaseValueRangeListSelector(IASTListNode<ASTCaseValueRangeNode> newValue)
-    {
-        this.caseValueRangeListSelector = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public boolean hasDefaultSelector()
     {
         return this.hasDefaultSelector != null;
@@ -69,6 +57,18 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
     public void setHasDefaultSelector(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.hasDefaultSelector = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public IASTListNode<ASTCaseValueRangeNode> getCaseValueRangeListSelector()
+    {
+        return this.caseValueRangeListSelector;
+    }
+
+    public void setCaseValueRangeListSelector(IASTListNode<ASTCaseValueRangeNode> newValue)
+    {
+        this.caseValueRangeListSelector = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -106,10 +106,10 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         {
         case 0:  return this.label;
         case 1:  return this.hiddenTCase;
-        case 2:  return this.hiddenTLparen;
-        case 3:  return this.caseValueRangeListSelector;
-        case 4:  return this.hiddenTRparen;
-        case 5:  return this.hasDefaultSelector;
+        case 2:  return this.hasDefaultSelector;
+        case 3:  return this.hiddenTLparen;
+        case 4:  return this.caseValueRangeListSelector;
+        case 5:  return this.hiddenTRparen;
         case 6:  return this.name;
         case 7:  return this.hiddenTEos;
         default: throw new IllegalArgumentException("Invalid index");
@@ -122,10 +122,10 @@ public class ASTCaseStmtNode extends ASTNodeWithErrorRecoverySymbols implements 
         {
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 1:  this.hiddenTCase = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value; if (value != null) value.setParent(this); return;
-        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hasDefaultSelector = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.caseValueRangeListSelector = (IASTListNode<ASTCaseValueRangeNode>)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 6:  this.name = (ASTNameNode)value; if (value != null) value.setParent(this); return;
         case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");

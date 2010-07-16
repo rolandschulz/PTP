@@ -11,9 +11,9 @@ echo Generating parser and AST classes...
 java -Xmx1024M -cp $SRCDIR/ludwig.jar \
 	Main_LALR1_Java_AST_Prototype \
 	-startSymbols "<ExecutableProgram>, <Body>, <Expr>, <ContainsStmt>" \
+	-package "org.eclipse.photran.internal.core.parser" \
 	-shift T_COMMA "<IoControlSpecList>" \
 	-reduce "<SFVarName>" "<SFDummyArgName>" \
-	-package "org.eclipse.photran.internal.core.parser" \
 	-prec "<DeferredShapeSpecList> > <AssumedShapeSpec>" \
 	-prec "<BodyPlusInternals> > <Label>, T_ICON" \
 	-prec "<TypeBoundProcedurePart> > T_ICON" \

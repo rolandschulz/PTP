@@ -911,6 +911,7 @@ ASTLogicalConstNode:<LogicalConstant> ::=
 ASTTypeSpecNode:<TypeSpec> ::=
   |     isInteger(bool):T_INTEGER
   |        isReal(bool):T_REAL
+  |  isDblComplex(bool):T_DOUBLECOMPLEX        # JO This is an extension
   |      isDouble(bool):T_DOUBLEPRECISION
   |     isComplex(bool):T_COMPLEX
   |     isLogical(bool):T_LOGICAL
@@ -919,6 +920,7 @@ ASTTypeSpecNode:<TypeSpec> ::=
   |        isReal(bool):T_REAL                 <KindSelector>
   |      isDouble(bool):T_DOUBLE -:T_PRECISION
   |     isComplex(bool):T_COMPLEX              <KindSelector>
+  |  isDblComplex(bool):T_DOUBLE -:T_COMPLEX   # JO This is an extension
   |   isCharacter(bool):T_CHARACTER            <CharSelector>
   |     isLogical(bool):T_LOGICAL              <KindSelector>
 # | isDerivedType(bool):T_TYPE -:T_LPAREN (inline):<TypeName> -:T_RPAREN
@@ -931,12 +933,14 @@ ASTTypeSpecNode:<TypeSpec> ::=
 ASTTypeSpecNode:<TypeSpecNoPrefix> ::=
   |     isInteger(bool):T_INTEGER
   |        isReal(bool):T_REAL
+  |  isDblComplex(bool):T_DOUBLECOMPLEX        # JO This is an extension
   |      isDouble(bool):T_DOUBLEPRECISION
   |     isComplex(bool):T_COMPLEX
   |     isLogical(bool):T_LOGICAL
   |   isCharacter(bool):T_CHARACTER
   |     isInteger(bool):T_INTEGER              <KindSelector>
   |        isReal(bool):T_REAL                 <KindSelector>
+  |  isDblComplex(bool):T_DOUBLE -:T_COMPLEX   # JO This is an extension
   |      isDouble(bool):T_DOUBLE -:T_PRECISION
   |     isComplex(bool):T_COMPLEX              <KindSelector>
   |   isCharacter(bool):T_CHARACTER            <CharSelector>
@@ -1017,7 +1021,7 @@ ASTAttrSpecNode:<AttrSpec> ::=
   | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_LBRACKET <CoarraySpec> -:T_RBRACKET -:T_ASTERISK <CharLength> <Initialization>
 # Extension supported by gfortran and IBM XL Fortran (see Bug 294055)
 # This actually accepts a superset (allowing multiple "a /.true./" declarations) but is close enough
-  | <ObjectName> -:T_SLASH <LogicalConstant> -:T_SLASH
+  | <ObjectName> -:T_SLASH <Constant> -:T_SLASH
 
 # JO -- Added error production
 <InvalidEntityDecl> ::=
@@ -1027,7 +1031,7 @@ ASTAttrSpecNode:<AttrSpec> ::=
 
 # R505
 <Initialization> ::=
-  | assignsExpr(bool):T_EQUALS        assignedExpr:<Expr>
+  | assignsExpr(bool):T_EQUALS assignedExpr:<Expr>
   | assignsNull(bool):T_EQGREATERTHAN -:T_NULL -:T_LPAREN -:T_RPAREN
 
 # R506 Should this be 'kind=' or 'kind' '='?
@@ -2141,8 +2145,32 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
   | <ConditionalBody> <EndIfStmt>
 
 (list):<ConditionalBody> ::=
-  |                     <ExecutionPartConstruct>
+  |                   <ExecutionPartConstruct>
   | <ConditionalBody> <ExecutionPartConstruct>
+
+##JO
+#<IfConstruct> ::=
+#| <IfPart>                          <EndIfStmt>
+#| <IfPart> <ElseIfParts>            <EndIfStmt>
+#| <IfPart>               <ElsePart> <EndIfStmt>
+#| <IfPart> <ElseIfParts> <ElsePart> <EndIfStmt>
+#
+#<IfPart> ::=
+#| <IfThenStmt>
+#| <IfThenStmt> ifBody:<ConditionalBody>
+#
+#(list):<ElseIfParts> ::=
+#                <ElseIfPart>
+#| <ElseIfParts> <ElseIfPart>
+#
+#<ElseIfPart> ::=
+#| <ElseIfStmt>
+#| <ElseIfStmt> body:<ConditionalBody>
+#
+#<ElsePart> ::=
+#| <ElseStmt>
+#| <ElseStmt> elseBody:<ConditionalBody>
+
 ##JO--X
 #<IfConstruct> ::=
 #  | <IfThenStmt> thenBody:<ConditionalBody> <ElseIfParts> <ElseStmt> elseBody:<ConditionalBody> <EndIfStmt>

@@ -54,7 +54,7 @@ public class FortranKeywordRuleBasedScanner extends RuleBasedScanner
                                           "BLOCKDATA", "CALL", "CASE", "CLOSE", "CLASS", "COMMON", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
                                           "CONTAINS", "CONTINUE", "CYCLE", "DATA", "DEALLOCATE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                                           "DEFAULT", "DELIM", "DIMENSION", "DIRECT", "DO", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-                                          "DOUBLE", "DOUBLEPRECISION", "ELEMENTAL", "ELSE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                                          "DOUBLE", "DOUBLECOMPLEX", "DOUBLEPRECISION", "ELEMENTAL", "ELSE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                                           "ELSEIF", "ELSEWHERE", "END", "ENDBLOCK", "ENDBLOCKDATA", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                                           "ENDDO", "ENDFILE", "ENDIF", "ENTRY", "EOR", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                                           "EQUIVALENCE", "ERR", "EXIST", "EXIT", "EXTENDS", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$

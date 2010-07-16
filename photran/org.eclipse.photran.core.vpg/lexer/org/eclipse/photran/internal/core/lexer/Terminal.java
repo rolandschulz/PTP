@@ -207,6 +207,7 @@ public final class Terminal
     public static final Terminal T_FORMATTEDEQ = new Terminal("formatted=");
     public static final Terminal T_SEQUENTIALEQ = new Terminal("sequential=");
     public static final Terminal T_ELSEWHERE = new Terminal("elsewhere");
+    public static final Terminal T_DOUBLECOMPLEX = new Terminal("doublecomplex");
     public static final Terminal T_DOUBLEPRECISION = new Terminal("doubleprecision");
     public static final Terminal T_PROGRAM = new Terminal("program");
     public static final Terminal T_SAVE = new Terminal("save");

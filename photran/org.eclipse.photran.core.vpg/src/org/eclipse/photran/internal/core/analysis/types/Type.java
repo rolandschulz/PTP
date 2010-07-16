@@ -81,6 +81,8 @@ public abstract class Type implements IPhotranSerializable, Serializable
             return Type.DOUBLEPRECISION;
         else if (node.isComplex())
             return Type.COMPLEX;
+        else if (node.isDblComplex())
+            return Type.DOUBLECOMPLEX;
         else if (node.isLogical())
             return Type.LOGICAL;
         else if (node.isCharacter())
@@ -215,6 +217,36 @@ public abstract class Type implements IPhotranSerializable, Serializable
                                         @Override public Type ifDoublePrecision(Type type) { return Type.COMPLEX; }
                                         @Override public Type ifInteger(Type type) { return Type.COMPLEX; }
                                         @Override public Type ifReal(Type type) { return Type.COMPLEX; }
+                                     });
+        }
+    };
+
+    public static Type DOUBLECOMPLEX = new PrimitiveType()
+    {
+        @Override public String toString()
+        {
+            return "doublecomplex"; //$NON-NLS-1$
+        }
+        
+        @Override public String getThreeLetterTypeSerializationCode()
+        {
+           return "dcx";  //$NON-NLS-1$
+        }
+
+        @Override public <T> T processUsing(TypeProcessor<T> p)
+        {
+            return p.ifDoubleComplex(this);
+        }
+
+        @Override
+        public Type getCommonType(Type other)
+        {
+            return this.processUsing(new TypeProcessor<Type>()
+                                     {
+                                        @Override public Type ifComplex(Type type) { return Type.DOUBLECOMPLEX; }
+                                        @Override public Type ifDoublePrecision(Type type) { return Type.DOUBLECOMPLEX; }
+                                        @Override public Type ifInteger(Type type) { return Type.DOUBLECOMPLEX; }
+                                        @Override public Type ifReal(Type type) { return Type.DOUBLECOMPLEX; }
                                      });
         }
     };
@@ -358,6 +390,7 @@ public abstract class Type implements IPhotranSerializable, Serializable
         setThreeLetterTypeSerializationCode(REAL);
         setThreeLetterTypeSerializationCode(DOUBLEPRECISION);
         setThreeLetterTypeSerializationCode(COMPLEX);
+        setThreeLetterTypeSerializationCode(DOUBLECOMPLEX);
         setThreeLetterTypeSerializationCode(LOGICAL);
         setThreeLetterTypeSerializationCode(CHARACTER);
         setThreeLetterTypeSerializationCode(UNKNOWN);
