@@ -93,7 +93,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 	 * @throws IOException
 	 */
 	public void startup(IProgressMonitor monitor) throws IOException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 12);
+		SubMonitor subMon = SubMonitor.convert(monitor, 16);
 
 		if (getDebugOptions().CLIENT_TRACING) {
 			System.out.println(toString()
@@ -102,31 +102,31 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 		}
 
 		synchronized (this) {
-			fStartupMonitor = monitor;
+			fStartupMonitor = subMon;
 		}
 
 		try {
-			monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_1);
+			subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_1);
 
 			/*
 			 * This can fail if we are restarting the RM from saved information
 			 * and the saved remote services provider is no longer available...
 			 */
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-					getConfiguration().getRemoteServicesId());
+					getConfiguration().getRemoteServicesId(), subMon.newChild(4));
 			if (remoteServices == null) {
 				throw new IOException(NLS.bind(Messages.AbstractRemoteProxyRuntimeClient_10, getConfiguration()
 						.getRemoteServicesId()));
 			}
 
-			monitor.worked(5);
+			subMon.worked(5);
 
 			if (getConfiguration().testOption(IRemoteProxyOptions.MANUAL_LAUNCH)) {
-				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_2);
+				subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_2);
 
 				sessionCreate();
 
-				monitor.worked(5);
+				subMon.worked(5);
 
 				List<String> args = new ArrayList<String>();
 				args.add(getConfiguration().getProxyServerPath());
@@ -148,7 +148,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 
 				final String msg = NLS.bind(Messages.AbstractRemoteProxyRuntimeClient_3, args.toString());
 
-				monitor.subTask(msg);
+				subMon.subTask(msg);
 
 				Status info = new Status(IStatus.INFO, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, msg, null);
 				PTPCorePlugin.log(info);
@@ -160,17 +160,17 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 							.getConnectionName()));
 				}
 
-				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_4);
+				subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_4);
 
 				if (!fConnection.isOpen()) {
 					fConnection.open(subMon.newChild(4));
 				}
-				if (monitor.isCanceled()) {
+				if (subMon.isCanceled()) {
 					fConnection.close();
 					return;
 				}
 
-				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_5);
+				subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_5);
 
 				/*
 				 * Check the remote proxy exists
@@ -191,16 +191,16 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 							.getProxyServerPath()));
 				}
 
-				if (monitor.isCanceled()) {
+				if (subMon.isCanceled()) {
 					fConnection.close();
 					return;
 				}
 
-				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_6);
+				subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_6);
 
 				sessionCreate();
 
-				monitor.worked(1);
+				subMon.worked(1);
 
 				ArrayList<String> args = new ArrayList<String>();
 				args.add(getConfiguration().getProxyServerPath());
@@ -213,7 +213,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 					} catch (RemoteConnectionException e) {
 						throw new IOException(e.getMessage());
 					}
-					if (monitor.isCanceled()) {
+					if (subMon.isCanceled()) {
 						sessionFinish();
 						return;
 					}
@@ -233,12 +233,12 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 					System.out.println("Launch command: " + args.toString()); //$NON-NLS-1$
 				}
 
-				monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_7);
+				subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_7);
 
 				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(fConnection, args);
 				IRemoteProcess process = processBuilder.start();
 
-				monitor.worked(2);
+				subMon.worked(2);
 
 				final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -274,9 +274,9 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				}
 			}
 
-			monitor.subTask(Messages.AbstractRemoteProxyRuntimeClient_8);
+			subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_8);
 			super.startup();
-			monitor.worked(2);
+			subMon.worked(2);
 
 		} catch (IOException e) {
 			try {
@@ -290,6 +290,9 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 		} finally {
 			synchronized (this) {
 				fStartupMonitor = null;
+			}
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
 	}

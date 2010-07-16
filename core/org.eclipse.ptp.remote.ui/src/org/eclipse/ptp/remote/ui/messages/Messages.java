@@ -15,30 +15,22 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.remote.ui.messages.messages"; //$NON-NLS-1$
-	
+
 	public static String LocalUIConnectionManager_0;
-
 	public static String LocalUIConnectionManager_1;
-
 	public static String LocalUIConnectionManager_2;
-
 	public static String LocalUIConnectionManager_3;
-
 	public static String PTPRemoteUIPlugin_0;
-
 	public static String PTPRemoteUIPlugin_1;
-
+	public static String PTPRemoteUIPlugin_2;
+	public static String PTPRemoteUIPlugin_3;
+	public static String PTPRemoteUIPlugin_4;
 	public static String RemoteDirectoryWidget_0;
-
 	public static String RemoteDirectoryWidget_1;
-
 	public static String RemoteDirectoryWidget_2;
-
 	public static String RemoteDirectoryWidget_3;
-
 	public static String RemoteResourceBrowser_1;
 	public static String RemoteResourceBrowser_2;
-
 	public static String RemoteResourceBrowser_resourceTitle;
 	public static String RemoteResourceBrowser_fileTitle;
 	public static String RemoteResourceBrowser_directoryTitle;
@@ -47,7 +39,6 @@ public class Messages extends NLS {
 	public static String RemoteResourceBrowser_directoryLabel;
 	public static String RemoteResourceBrowser_connectonLabel;
 	public static String RemoteResourceBrowser_newConnection;
-
 	public static String RemoteUIServicesProxy_1;
 	public static String RemoteUIServicesProxy_2;
 
