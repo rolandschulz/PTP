@@ -65,18 +65,6 @@ import org.eclipse.core.resources.IFile;
     private void unsetSOL() {
         if (yystate()==YYINITIAL) yybegin(YYSTANDARD);
     }
-    
-    // JO
-    // IMPORTANT: If this is called on a new type of statement,
-    //            PreLexerLine#hollerithsOK() in FixedFormLexerPrepass
-    //            must also be modified to recognize the statement.
-    //            This ensures that spaces will be removed from the
-    //            text it would otherwise treat as a Hollerith.  (This
-    //            can lead to errors like "extraneous character: (space)"
-    //            and "Hollerith spans multiple lines without continuation")
-    private void disallowHolleriths() {
-        if (yystate()==YYSTANDARD) yybegin(YYSTANDARD_NOHOLLERITH);
-    }
 
     public int getLine() {
         return prepass.getLine(yychar);
@@ -322,7 +310,6 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 %state DBLQUOTED
 %state HOLLERITH
 %state YYSTANDARD
-%state YYSTANDARD_NOHOLLERITH
 %state OPERATORorFORMAT
 %state IDENT
 
@@ -330,9 +317,8 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 
 /* Lexical rules */
 
-/* YYSTANDARD and YYSTANDARD_NOHOLLERITH are similar to YYINITIAL but exist to ignore some tokens on start of line */
-/* YYSTANDARD_NOHOLLERITH prevents recognition of Holleriths in certain contexts */
 
+/* ignore some tokens  on start of line*/
 <YYSTANDARD,IMPLICIT,OPERATORorFORMAT> {
 {Hcon}                                          { stringBuffer = new StringBuffer();
                                                   String text = yytext();
@@ -342,10 +328,6 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
                                                       throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0");
                                                   yybegin(HOLLERITH);
                                                 }
-}
-
-/* ignore some tokens  on start of line*/
-<YYSTANDARD_NOHOLLERITH,YYSTANDARD,IMPLICIT,OPERATORorFORMAT> {
 {Rcon1}                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
 {Rcon2}/{NumDotLkahead}                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RCON); }
 {Dcon1}                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DCON); }
@@ -360,7 +342,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 }
 
 
-<YYSTANDARD_NOHOLLERITH,YYSTANDARD,YYINITIAL,IMPLICIT,OPERATORorFORMAT> {
+<YYSTANDARD,YYINITIAL,IMPLICIT,OPERATORorFORMAT> {
 // Intel Extension
 "CONVERT"[ \t]*"="                              { wantEos = true; yybegin(YYINITIAL); return token(Terminal.T_CONVERTEQ); }
 // New for Fortran 2008 //////////////////////////////////
@@ -424,7 +406,6 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "ADVANCE="                                      { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ADVANCEEQ); }
 "ALLOCATABLE"                                   { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ALLOCATABLE); }
 "ALLOCATE"                                      { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ALLOCATE); }
-"ASSIGN"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ASSIGN); }
 "ASSIGNMENT"                                    { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ASSIGNMENT); }
 "BACKSPACE"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_BACKSPACE); }
 "BLANK="                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_BLANKEQ); }
@@ -432,10 +413,10 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "BLOCKDATA"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_BLOCKDATA); }
 "CALL"                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CALL); }
 "CASE"                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CASE); }
-"CHARACTER"{StarredType}                        { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_CHARACTER); }
+"CHARACTER"{StarredType}                        { wantEos = true; unsetSOL();          return token(Terminal.T_CHARACTER); }
 "CLOSE"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CLOSE); }
 "COMMON"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_COMMON); }
-"COMPLEX"{StarredType}                          { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_COMPLEX); }
+"COMPLEX"{StarredType}                          { wantEos = true; unsetSOL();          return token(Terminal.T_COMPLEX); }
 "CONTAINS"                                      { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CONTAINS); }
 "CONTINUE"                                      { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CONTINUE); }
 "CYCLE"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_CYCLE); }
@@ -445,10 +426,9 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "DELIM="                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DELIMEQ); }
 "DIMENSION"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DIMENSION); }
 "DIRECT="                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DIRECTEQ); }
-"DO"                                            { wantEos = true; yybegin(YYSTANDARD); disallowHolleriths(); return token(Terminal.T_DO); }
-"DOUBLE"{StarredType}                           { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_DOUBLE); }
-"DOUBLECOMPLEX"{StarredType}                    { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_DOUBLECOMPLEX); }
-"DOUBLEPRECISION"{StarredType}                  { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_DOUBLEPRECISION); }
+"DO"                                            { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DO); }
+"DOUBLE"{StarredType}                           { wantEos = true; unsetSOL();          return token(Terminal.T_DOUBLE); }
+"DOUBLEPRECISION"{StarredType}                  { wantEos = true; unsetSOL();          return token(Terminal.T_DOUBLEPRECISION); }
 "ELEMENTAL"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ELEMENTAL); }
 "ELSE"                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ELSE); }
 "ELSEIF"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_ELSEIF); }
@@ -490,7 +470,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "IN"                                            { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_IN); }
 "INOUT"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_INOUT); }
 "INQUIRE"                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_INQUIRE); }
-"INTEGER"{StarredType}                          { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_INTEGER); }
+"INTEGER"{StarredType}                          { wantEos = true; unsetSOL();          return token(Terminal.T_INTEGER); }
 "INTENT"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_INTENT); }
 "INTERFACE"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_INTERFACE); }
 "INTRINSIC"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_INTRINSIC); }
@@ -498,7 +478,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "IOSTAT="                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_IOSTATEQ); }
 "KIND="                                         { wantEos = true; unsetSOL();          return token(Terminal.T_KINDEQ); }
 "LEN="                                          { wantEos = true; unsetSOL();          return token(Terminal.T_LENEQ); }
-"LOGICAL"{StarredType}                          { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_LOGICAL); }
+"LOGICAL"{StarredType}                          { wantEos = true; unsetSOL();          return token(Terminal.T_LOGICAL); }
 "MODULE"                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_MODULE); }
 "NAMED="                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_NAMEDEQ); }
 "NAME="                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_NAMEEQ); }
@@ -520,7 +500,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "PAUSE"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_PAUSE); }
 "POINTER"                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_POINTER); }
 "POSITION="                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_POSITIONEQ); }
-"PRECISION"                                     { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_PRECISION); }
+"PRECISION"                                     { wantEos = true; unsetSOL();          return token(Terminal.T_PRECISION); }
 "PRINT"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_PRINT); }
 "PRIVATE"                                       { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_PRIVATE); }
 "PROCEDURE"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_PROCEDURE); }
@@ -530,7 +510,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "READ"                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_READ); }
 "READ="                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_READEQ); }
 "READWRITE="                                    { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_READWRITEEQ); }
-"REAL"{StarredType}                             { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_REAL); }
+"REAL"{StarredType}                             { wantEos = true; unsetSOL();          return token(Terminal.T_REAL); }
 "REC="                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RECEQ); }
 "RECL="                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RECLEQ); }
 "RECURSIVE"                                     { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_RECURSIVE); }
@@ -559,7 +539,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 "WHILE"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_WHILE); }
 "WRITE"                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_WRITE); }
 "WRITE="                                        { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_WRITEEQ); }
-"*"                                             { wantEos = true; unsetSOL();          disallowHolleriths(); return token(Terminal.T_ASTERISK); }
+"*"                                             { wantEos = true; unsetSOL();          return token(Terminal.T_ASTERISK); }
 ".AND."                                         { wantEos = true; unsetSOL();          return token(Terminal.T_AND); }
 ":"                                             { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_COLON); }
 ","                                             { wantEos = true; unsetSOL();          return token(Terminal.T_COMMA); }
@@ -623,7 +603,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 {xImpl}$                                        { wantEos = true;                     return token(Terminal.T_X_IMPL); }
 }
 
-<YYSTANDARD_NOHOLLERITH,YYSTANDARD,IMPLICIT> {
+<YYSTANDARD,IMPLICIT> {
 "(/"                                            { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_LPARENSLASH); }
 "/)"                                            { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_SLASHRPAREN); }
 }
