@@ -14,7 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.core.messages.messages"; //$NON-NLS-1$
-	
+
 	public static String AbstractRemoteProxyRuntimeClient_0;
 	public static String AbstractRemoteProxyRuntimeClient_1;
 	public static String AbstractRemoteProxyRuntimeClient_2;
@@ -31,10 +31,8 @@ public class Messages extends NLS {
 	public static String AbstractRemoteProxyRuntimeClient_13;
 	public static String AbstractRemoteProxyRuntimeClient_14;
 	public static String AbstractRemoteProxyRuntimeClient_15;
-	
 	public static String AbstractRemoteCommandJob_Exception_CommandFailed;
 	public static String AbstractRemoteCommandJob_Exception_InternalError;
-	
 	public static String AbstractToolRuntimeSystem_0;
 	public static String AbstractToolRuntimeSystem_1;
 	public static String AbstractToolRuntimeSystem_2;
@@ -53,9 +51,8 @@ public class Messages extends NLS {
 	public static String AbstractToolRuntimeSystemJob_Exception_WaitExecution;
 	public static String AbstractToolRuntimeSystemJob_Success;
 	public static String AbstractToolRuntimeSystemJob_UserCanceled;
-	
 	public static String ToolsRMPlugin_Exception_InternalError;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

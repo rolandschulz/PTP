@@ -547,27 +547,29 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 * .IProgressMonitor)
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 90);
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 
 		synchronized (this) {
-			startupMonitor = monitor;
+			startupMonitor = subMon;
 		}
 
-		monitor.subTask(Messages.AbstractToolRuntimeSystem_1);
+		subMon.subTask(Messages.AbstractToolRuntimeSystem_1);
 
 		DebugUtil.trace(DebugUtil.RTS_TRACING, "RTS {0}: startup", rmConfiguration.getName()); //$NON-NLS-1$
 
 		try {
-			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId());
+			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmConfiguration.getRemoteServicesId(),
+					subMon.newChild(10));
 			if (remoteServices == null) {
 				throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID,
 						Messages.AbstractToolRuntimeSystem_Exception_NoRemoteServices));
 			}
+
 			IRemoteConnectionManager connectionManager = remoteServices.getConnectionManager();
 			Assert.isNotNull(connectionManager);
 
-			monitor.worked(10);
-			monitor.subTask(Messages.AbstractToolRuntimeSystem_2);
+			subMon.worked(10);
+			subMon.subTask(Messages.AbstractToolRuntimeSystem_2);
 
 			connection = connectionManager.getConnection(rmConfiguration.getConnectionName());
 			if (connection == null) {
@@ -583,7 +585,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 				}
 			}
 
-			if (monitor.isCanceled()) {
+			if (subMon.isCanceled()) {
 				connection.close();
 				return;
 			}
@@ -595,7 +597,7 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 				throw e;
 			}
 
-			if (monitor.isCanceled()) {
+			if (subMon.isCanceled()) {
 				connection.close();
 				return;
 			}
@@ -627,6 +629,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		} finally {
 			synchronized (this) {
 				startupMonitor = null;
+			}
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
 	}

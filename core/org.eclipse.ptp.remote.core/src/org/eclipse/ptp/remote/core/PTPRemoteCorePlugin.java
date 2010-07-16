@@ -11,9 +11,11 @@
 package org.eclipse.ptp.remote.core;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -22,11 +24,15 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.remote.core.messages.Messages;
 import org.eclipse.ptp.remote.internal.core.DebugUtil;
 import org.eclipse.ptp.remote.internal.core.LocalServices;
 import org.eclipse.ptp.remote.internal.core.RemoteServicesProxy;
@@ -174,22 +180,61 @@ public class PTPRemoteCorePlugin extends Plugin {
 	/**
 	 * Retrieve a sorted list of remote services.
 	 * 
+	 * Note that these services may not be initialized and their status should
+	 * be checked by calling {@link IRemoteServices#isInitialized} before they
+	 * are used.
+	 * 
+	 * Alternatively, use {@link #getAllRemoteServices(IProgressMonitor)} to
+	 * obtain all initialized services.
+	 * 
 	 * @return remote services
 	 */
 	public synchronized IRemoteServices[] getAllRemoteServices() {
 		retrieveRemoteServices();
-		IRemoteServices[] services = new IRemoteServices[allRemoteServicesById.size()];
-		int i = 0;
+		List<IRemoteServices> services = new ArrayList<IRemoteServices>();
 		for (RemoteServicesProxy proxy : allRemoteServicesById.values()) {
-			services[i++] = proxy.getServices();
+			services.add(proxy.getServices());
 		}
-		Arrays.sort(services, new RemoteServicesSorter());
-		return services;
+		Collections.sort(services, new RemoteServicesSorter());
+		return services.toArray(new IRemoteServices[0]);
+	}
+
+	/**
+	 * Retrieve a sorted list of remote services. The remote services are
+	 * guaranteed to have been initialized.
+	 * 
+	 * Note that this will trigger plugin loading for all remote services
+	 * implementations.
+	 * 
+	 * @return remote services
+	 * @since 4.1
+	 */
+	public synchronized IRemoteServices[] getAllRemoteServices(IProgressMonitor monitor) {
+		retrieveRemoteServices();
+		List<IRemoteServices> initializedServices = new ArrayList<IRemoteServices>();
+		SubMonitor progress = SubMonitor.convert(monitor, allRemoteServicesById.size());
+		try {
+			for (RemoteServicesProxy proxy : allRemoteServicesById.values()) {
+				IRemoteServices services = proxy.getServices();
+				if (initializeRemoteServices(services, progress.newChild(1))) {
+					initializedServices.add(services);
+				}
+				if (progress.isCanceled()) {
+					break;
+				}
+			}
+			Collections.sort(initializedServices, new RemoteServicesSorter());
+			return initializedServices.toArray(new IRemoteServices[0]);
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
 	 * Retrieve the default remote services plugin. The default is the
-	 * LocalServices provider, which is guaranteed to exist.
+	 * LocalServices provider, which is guaranteed to exist and be initialized.
 	 * 
 	 * @return default remote services provider
 	 */
@@ -201,24 +246,14 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the remote services descriptor identified by id
-	 * 
-	 * @param id
-	 *            id of the remote services
-	 * @return remote services descriptor
-	 */
-	public IRemoteServicesDescriptor getRemoteServicesDescriptor(String id) {
-		retrieveRemoteServices();
-		return allRemoteServicesById.get(id);
-	}
-
-	/**
-	 * Get the remote services implementation identified by id
+	 * Get the remote services implementation identified by id. The remote
+	 * services retrieved may not have been initialized.
 	 * 
 	 * @param id
 	 *            id of the remote services
 	 * @return remote services
 	 */
+	@Deprecated
 	public synchronized IRemoteServices getRemoteServices(String id) {
 		retrieveRemoteServices();
 		RemoteServicesProxy proxy = allRemoteServicesById.get(id);
@@ -234,11 +269,35 @@ public class PTPRemoteCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Get the remote services identified by a URI
+	 * Get the remote services implementation identified by id and ensure that
+	 * it is initialized. This method will present the user with a dialog box
+	 * that can be canceled.
+	 * 
+	 * @param id
+	 *            id of remote services to retrieve
+	 * @param monitor
+	 *            progress monitor to allow user to cancel operation
+	 * @return initialized remote services, or null if the services cannot be
+	 *         found or initialized
+	 * @since 4.1
+	 */
+	public IRemoteServices getRemoteServices(String id, IProgressMonitor monitor) {
+		IRemoteServices services = getRemoteServices(id);
+		if (!initializeRemoteServices(services, monitor)) {
+			return null;
+		}
+		return services;
+	}
+
+	/**
+	 * Get the remote services identified by a URI. The remote services
+	 * retrieved may not have been initialized.
 	 * 
 	 * @param uri
-	 * @return remote services
+	 *            URI of remote services to retrieve
+	 * @return remote services, or null if no corresponding services found
 	 */
+	@Deprecated
 	public IRemoteServices getRemoteServices(URI uri) {
 		retrieveRemoteServices();
 		String scheme = uri.getScheme();
@@ -249,6 +308,39 @@ public class PTPRemoteCorePlugin extends Plugin {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Get the remote services implementation identified by URI and ensure that
+	 * it is initialized. This method will present the user with a dialog box
+	 * that can be canceled.
+	 * 
+	 * @param uri
+	 *            URI of remote services to retrieve
+	 * @param monitor
+	 *            progress monitor to allow user to cancel operation
+	 * @return initialized remote services, or null if the services cannot be
+	 *         found or initialized
+	 * @since 4.1
+	 */
+	public IRemoteServices getRemoteServices(URI uri, IProgressMonitor monitor) {
+		IRemoteServices services = getRemoteServices(uri);
+		if (!initializeRemoteServices(services, monitor)) {
+			return null;
+		}
+		return services;
+	}
+
+	/**
+	 * Get the remote services descriptor identified by id
+	 * 
+	 * @param id
+	 *            id of the remote services
+	 * @return remote services descriptor
+	 */
+	public IRemoteServicesDescriptor getRemoteServicesDescriptor(String id) {
+		retrieveRemoteServices();
+		return allRemoteServicesById.get(id);
 	}
 
 	/*
@@ -277,6 +369,43 @@ public class PTPRemoteCorePlugin extends Plugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
+	}
+
+	/**
+	 * Ensure the remote services is initialized. This method will present the
+	 * user with a dialog box that can be canceled.
+	 * 
+	 * @param services
+	 *            remote services to initialize
+	 * @param monitor
+	 *            progress monitor to allow user to cancel operation
+	 * @return true if the remote services was initialized, or false otherwise
+	 */
+	private boolean initializeRemoteServices(IRemoteServices services, IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		progress.setTaskName(NLS.bind(Messages.PTPRemoteCorePlugin_0, services.getName()));
+		try {
+			while (!services.isInitialized() && !progress.isCanceled()) {
+				progress.setWorkRemaining(9);
+				try {
+					synchronized (this) {
+						wait(100);
+					}
+				} catch (InterruptedException e) {
+					// Ignore
+				}
+				services.initialize();
+				progress.worked(1);
+			}
+			if (progress.isCanceled()) {
+				return false;
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -327,4 +456,5 @@ public class PTPRemoteCorePlugin extends Plugin {
 			}
 		}
 	}
+
 }
