@@ -248,6 +248,16 @@ public class PhotranVPGBuilder extends PhotranVPG
         {
             calculateFileDepsFromModuleAndUseStmts(filename, lexer);
         }
+        catch (LexerException e)
+        {
+            if (e.getFile() != null && e.getFile().getIFile() != null)
+                filename = PhotranVPG.getFilenameForIFile(e.getFile().getIFile());
+
+            log.logError(
+                e.getMessage(),
+                new PhotranTokenRef(filename, e.getTokenOffset(), e.getTokenLength()));
+
+        }
         catch (Exception e)
         {
             log.logError(e);
