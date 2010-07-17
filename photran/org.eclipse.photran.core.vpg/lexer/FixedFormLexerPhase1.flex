@@ -332,6 +332,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 
 /* YYSTANDARD and YYSTANDARD_NOHOLLERITH are similar to YYINITIAL but exist to ignore some tokens on start of line */
 /* YYSTANDARD_NOHOLLERITH prevents recognition of Holleriths in certain contexts */
+/* Incidentally, this is also a state where we don't want to recognize {Pcon} (e.g., DO 1874 p = 1, N) */
 
 <YYSTANDARD,IMPLICIT,OPERATORorFORMAT> {
 {Hcon}                                          { stringBuffer = new StringBuffer();
@@ -342,6 +343,7 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
                                                       throw new LexerException(this, "Lexer Error (line " + (getLine()+1) + ", col " + (getCol()+1) + "): Invalid length of hollerith literal: 0");
                                                   yybegin(HOLLERITH);
                                                 }
+{Pcon}                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_PCON); }
 }
 
 /* ignore some tokens  on start of line*/
@@ -351,7 +353,6 @@ FortranInclude="INCLUDE"[ \t]*[\'\"][^\r\n]*[\'\"]{LineTerminator}
 {Dcon1}                                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DCON); }
 {Dcon2}/{NumDotLkahead}                         { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_DCON); }
 {Fcon}                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_FCON); }
-{Pcon}                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_PCON); }
 {Xcon}                                          { wantEos = true; yybegin(YYSTANDARD); return token(Terminal.T_XCON); }
 }
 
