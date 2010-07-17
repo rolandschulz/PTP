@@ -28,20 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTSubroutineParNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTSubroutineParNode
     org.eclipse.photran.internal.core.lexer.Token isAsterisk; // in ASTSubroutineParNode
-
-    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
-    {
-        return this.variableName;
-    }
-
-    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.variableName = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
+    org.eclipse.photran.internal.core.lexer.Token variableName; // in ASTSubroutineParNode
 
     public boolean isAsterisk()
     {
@@ -51,6 +39,18 @@ public class ASTSubroutineParNode extends ASTNode
     public void setIsAsterisk(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isAsterisk = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public org.eclipse.photran.internal.core.lexer.Token getVariableName()
+    {
+        return this.variableName;
+    }
+
+    public void setVariableName(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.variableName = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -71,8 +71,8 @@ public class ASTSubroutineParNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.variableName;
-        case 1:  return this.isAsterisk;
+        case 0:  return this.isAsterisk;
+        case 1:  return this.variableName;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -81,8 +81,8 @@ public class ASTSubroutineParNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.variableName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

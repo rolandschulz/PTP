@@ -901,6 +901,7 @@ ASTLogicalConstNode:<LogicalConstant> ::=
   | (inline):<LblDef> <TypeSpec> <AttrSpecSeq> -:T_COLON -:T_COLON <EntityDeclList> -:T_EOS
   | (inline):<LblDef> <TypeSpec>               -:T_COLON -:T_COLON <EntityDeclList> -:T_EOS
   | (inline):<LblDef> <TypeSpec>                                   <EntityDeclList> -:T_EOS
+  | (inline):<LblDef> <TypeSpec> -:T_COMMA                         <EntityDeclList> -:T_EOS # JO -- This is an extension
 
 (list):<AttrSpecSeq> ::=
   |               -:T_COMMA <AttrSpec>
@@ -2623,9 +2624,10 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # R909
 <ReadStmt> ::=
-  | (inline):<LblDef> -:T_READ <RdCtlSpec>         <InputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_READ <RdCtlSpec> -:T_COMMA <InputItemList> -:T_EOS # JO -- This is an extension
+  | (inline):<LblDef> -:T_READ <RdCtlSpec>           <InputItemList> -:T_EOS
   | (inline):<LblDef> -:T_READ <RdCtlSpec>                           -:T_EOS
-  | (inline):<LblDef> -:T_READ <RdFmtId> -:T_COMMA <InputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_READ <RdFmtId>   -:T_COMMA <InputItemList> -:T_EOS
   | (inline):<LblDef> -:T_READ <RdFmtId>                             -:T_EOS
 
 <RdCtlSpec> ::=
@@ -2633,7 +2635,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
   | -:T_LPAREN <RdIoCtlSpecList> -:T_RPAREN
 
 <RdUnitId> ::=
-  | -:T_LPAREN readUnitExpr:<UFExpr>         -:T_RPAREN
+  | -:T_LPAREN readUnitExpr:<UFExpr>               -:T_RPAREN
   | -:T_LPAREN readUnitIsAsterisk(bool):T_ASTERISK -:T_RPAREN
 
 (list):<RdIoCtlSpecList> ::=
@@ -2653,8 +2655,9 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # R910
 <WriteStmt> ::=
-  | (inline):<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN <OutputItemList> -:T_EOS
-  | (inline):<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN                  -:T_EOS
+  | (inline):<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN -:T_COMMA <OutputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN           <OutputItemList> -:T_EOS
+  | (inline):<LblDef> -:T_WRITE -:T_LPAREN <IoControlSpecList> -:T_RPAREN                            -:T_EOS
 
 # R911
 <PrintStmt> ::=

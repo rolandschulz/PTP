@@ -551,13 +551,15 @@ class PreLexerLine {
 	//            disallowHolleriths() on the affected statements
     private static final Pattern DO_STMT_PATTERN = Pattern.compile("^[ \\t0-9]*do[ \\t]*[0-9]+.*", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
     private static final Pattern TYPE_DECL_STMT_PATTERN = Pattern.compile("^[ \\t0-9]*(integer|real|double|complex|logical|character).*", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+    private static final Pattern LABELED_ASGT_TO_H = Pattern.compile("^[ \\t0-9]+h.*=.*", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
     private Boolean hollerithsOK = null;
     public boolean hollerithsOK()
     {
         if (hollerithsOK == null)
         {
             hollerithsOK = !DO_STMT_PATTERN.matcher(lineText).matches()
-                        && !TYPE_DECL_STMT_PATTERN.matcher(lineText).matches();
+                        && !TYPE_DECL_STMT_PATTERN.matcher(lineText).matches()
+                        && !LABELED_ASGT_TO_H.matcher(lineText).matches();
         }
 
         return hollerithsOK;

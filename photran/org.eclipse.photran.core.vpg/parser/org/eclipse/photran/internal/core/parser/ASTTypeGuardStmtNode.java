@@ -28,8 +28,8 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTTypeGuardStmtNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isType; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token isClass; // in ASTTypeGuardStmtNode
+    org.eclipse.photran.internal.core.lexer.Token isType; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTIs; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTTypeGuardStmtNode
     ASTTypeSpecNode typeSpecNoPrefix; // in ASTTypeGuardStmtNode
@@ -39,18 +39,6 @@ public class ASTTypeGuardStmtNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token selectConstructName; // in ASTTypeGuardStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTTypeGuardStmtNode
 
-    public boolean isType()
-    {
-        return this.isType != null;
-    }
-
-    public void setIsType(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isType = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public boolean isClass()
     {
         return this.isClass != null;
@@ -59,6 +47,18 @@ public class ASTTypeGuardStmtNode extends ASTNode
     public void setIsClass(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isClass = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isType()
+    {
+        return this.isType != null;
+    }
+
+    public void setIsType(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isType = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -115,8 +115,8 @@ public class ASTTypeGuardStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isType;
-        case 1:  return this.isClass;
+        case 0:  return this.isClass;
+        case 1:  return this.isType;
         case 2:  return this.hiddenTIs;
         case 3:  return this.hiddenTLparen;
         case 4:  return this.typeSpecNoPrefix;
@@ -133,8 +133,8 @@ public class ASTTypeGuardStmtNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isType = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isClass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isClass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isType = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 2:  this.hiddenTIs = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 4:  this.typeSpecNoPrefix = (ASTTypeSpecNode)value; if (value != null) value.setParent(this); return;

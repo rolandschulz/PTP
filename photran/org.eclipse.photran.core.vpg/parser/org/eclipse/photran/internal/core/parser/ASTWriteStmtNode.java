@@ -33,6 +33,7 @@ public class ASTWriteStmtNode extends ASTNode implements IActionStmt
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTWriteStmtNode
     IASTListNode<ASTIoControlSpecListNode> ioControlSpecList; // in ASTWriteStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTWriteStmtNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTComma; // in ASTWriteStmtNode
     ASTOutputItemListNode outputItemList; // in ASTWriteStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTWriteStmtNode
 
@@ -82,7 +83,7 @@ public class ASTWriteStmtNode extends ASTNode implements IActionStmt
 
     @Override protected int getNumASTFields()
     {
-        return 7;
+        return 8;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -94,8 +95,9 @@ public class ASTWriteStmtNode extends ASTNode implements IActionStmt
         case 2:  return this.hiddenTLparen;
         case 3:  return this.ioControlSpecList;
         case 4:  return this.hiddenTRparen;
-        case 5:  return this.outputItemList;
-        case 6:  return this.hiddenTEos;
+        case 5:  return this.hiddenTComma;
+        case 6:  return this.outputItemList;
+        case 7:  return this.hiddenTEos;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -109,8 +111,9 @@ public class ASTWriteStmtNode extends ASTNode implements IActionStmt
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.ioControlSpecList = (IASTListNode<ASTIoControlSpecListNode>)value; if (value != null) value.setParent(this); return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.outputItemList = (ASTOutputItemListNode)value; if (value != null) value.setParent(this); return;
-        case 6:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.outputItemList = (ASTOutputItemListNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

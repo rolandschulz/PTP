@@ -28,37 +28,13 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTProcComponentAttrSpecNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isPointer; // in ASTProcComponentAttrSpecNode
-    ASTAccessSpecNode accessSpec; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token isPass; // in ASTProcComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isNoPass; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token argName; // in ASTProcComponentAttrSpecNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTProcComponentAttrSpecNode
-    org.eclipse.photran.internal.core.lexer.Token isNoPass; // in ASTProcComponentAttrSpecNode
-
-    public boolean isPointer()
-    {
-        return this.isPointer != null;
-    }
-
-    public void setIsPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isPointer = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public ASTAccessSpecNode getAccessSpec()
-    {
-        return this.accessSpec;
-    }
-
-    public void setAccessSpec(ASTAccessSpecNode newValue)
-    {
-        this.accessSpec = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
+    ASTAccessSpecNode accessSpec; // in ASTProcComponentAttrSpecNode
+    org.eclipse.photran.internal.core.lexer.Token isPointer; // in ASTProcComponentAttrSpecNode
 
     public boolean isPass()
     {
@@ -68,6 +44,18 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
     public void setIsPass(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isPass = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isNoPass()
+    {
+        return this.isNoPass != null;
+    }
+
+    public void setIsNoPass(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isNoPass = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -84,14 +72,26 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
     }
 
 
-    public boolean isNoPass()
+    public ASTAccessSpecNode getAccessSpec()
     {
-        return this.isNoPass != null;
+        return this.accessSpec;
     }
 
-    public void setIsNoPass(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setAccessSpec(ASTAccessSpecNode newValue)
     {
-        this.isNoPass = newValue;
+        this.accessSpec = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isPointer()
+    {
+        return this.isPointer != null;
+    }
+
+    public void setIsPointer(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isPointer = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -112,13 +112,13 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isPointer;
-        case 1:  return this.accessSpec;
-        case 2:  return this.isPass;
-        case 3:  return this.hiddenTLparen;
-        case 4:  return this.argName;
-        case 5:  return this.hiddenTRparen;
-        case 6:  return this.isNoPass;
+        case 0:  return this.isPass;
+        case 1:  return this.isNoPass;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.argName;
+        case 4:  return this.hiddenTRparen;
+        case 5:  return this.accessSpec;
+        case 6:  return this.isPointer;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -127,13 +127,13 @@ public class ASTProcComponentAttrSpecNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isPointer = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.accessSpec = (ASTAccessSpecNode)value; if (value != null) value.setParent(this); return;
-        case 2:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 4:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 6:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.accessSpec = (ASTAccessSpecNode)value; if (value != null) value.setParent(this); return;
+        case 6:  this.isPointer = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
