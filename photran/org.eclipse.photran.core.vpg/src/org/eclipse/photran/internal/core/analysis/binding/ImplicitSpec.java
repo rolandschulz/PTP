@@ -132,7 +132,7 @@ public class ImplicitSpec implements IPhotranSerializable
      */
     public void setType(char letter, Type type)
     {
-        if (!Character.isLetter(letter)) throw new Error("Non-letter passed to setType"); //$NON-NLS-1$
+        if (!Character.isLetter(letter)) return; //throw new Error("Non-letter passed to setType");
         letter = Character.toUpperCase(letter);
         typeMap[letter - 'A'] = type;
     }
