@@ -362,7 +362,6 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
         try
         {
             R tokenRef = null;
-            String message = ""; //$NON-NLS-1$
             for (int i = 0; i < log.size(); i++)
             {
                 Entry entry = log.get(i);
@@ -379,9 +378,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                         Integer.toString(tokenRef.getLength()) +
                         EOL);
                 
-                message = entry.getMessage();
-                message.replaceAll(EOL, EOL_ESCAPE);
-                output.write(message + EOL);
+                output.write(entry.getMessage().replaceAll(EOL, EOL_ESCAPE) + EOL);
             }
         }
         finally
@@ -408,27 +405,23 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
             FileInputStream fstream = new FileInputStream(getLogFile());
             BufferedReader bRead = new BufferedReader(new InputStreamReader(fstream));
             
-            String line;
-            boolean isWarning = false;
-            R tokenRef = null;
-            String[] tokenRefString = null;
-            String message = ""; //$NON-NLS-1$
-            
             clear();
             
+            String line;
             while ((line = bRead.readLine()) != null)
             {
-                isWarning = Boolean.parseBoolean(line);
+                boolean isWarning = Boolean.parseBoolean(line);
                 
                 //read tokenRef values
                 line = bRead.readLine();
+                R tokenRef;
                 if (line.trim().equals("")) //$NON-NLS-1$
                 {
                     tokenRef = null;
                 }
                 else
                 {
-                    tokenRefString = line.split("\\,"); //$NON-NLS-1$
+                    String[] tokenRefString = line.split("\\,"); //$NON-NLS-1$
                     tokenRef = vpg.createTokenRef(
                         tokenRefString[0],
                         Integer.parseInt(tokenRefString[1]),
@@ -437,10 +430,7 @@ public abstract class VPGLog<T, R extends TokenRef<T>>
                 
                 //read message
                 line = bRead.readLine();
-                message = line;
-                message.replaceAll("&EOL;", EOL); //$NON-NLS-1$
-                
-                log.add(new Entry(isWarning, message, tokenRef));
+                log.add(new Entry(isWarning, line.replaceAll(EOL_ESCAPE, EOL), tokenRef));
             }
             
             bRead.close();
