@@ -79,6 +79,7 @@
 
 # Custom code
 * IActionStmt =>    Token getLabel(); void setLabel(Token label);
+* ASTTypeSpecNode =>    public org.eclipse.photran.internal.core.lexer.Token getCharacterToken() { return this.isCharacter; }
 
 #######################################################################################################################
 # Section 2 Rules

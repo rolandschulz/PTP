@@ -1,0 +1,30 @@
+program main !<<<<< 1, 1, 21, 17, pass
+
+    implicit none
+
+	character(len=12)::cint(12,12)
+	character(len=1)::cnmlp(lon,lat,2)
+	character(len=1)::rainp(lon,lat,2)
+
+    character(len=10)::UnOld!This  is a comment
+    character(len=5)::lolo='helios'!This  is a comment
+	character(len=3)::CONST
+	character(len=3)::GREEK
+	character(len=10)::CATLOG
+	character(len=20)::NAME
+	character(len=10)::uno
+	character(len=10)::dos
+    character(len=20)::hname
+	character(len=10)::str
+	character(len=20)::hname
+	character(len=50)::name
+	character(len=50)::lname
+	character(len=50)::expdesc
+	character(len=65)::hist
+!	no change
+	character (len=10)s , str2*36
+	character (len=10)s1 , str1='lola'
+	character(len=10) :: UnNewString10
+	integer i
+
+end program main

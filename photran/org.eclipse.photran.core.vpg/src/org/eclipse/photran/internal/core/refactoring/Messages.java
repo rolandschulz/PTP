@@ -314,6 +314,10 @@ public class Messages extends NLS
 
     public static String RemoveUnusedVariablesRefactoring_VariableUnusedAndWillBeRemoved;
 
+    public static String ReplaceCharacterToCharacterLenRefactoring_CharacterStarDeclNotSelected;
+
+    public static String ReplaceCharacterToCharacterLenRefactoring_Name;
+
     public static String RepObsOpersRefactoring_Name;
 
     public static String RepObsOpersRefactoring_SelectedFileCannotBeParsed;

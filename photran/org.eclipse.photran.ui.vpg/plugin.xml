@@ -84,6 +84,9 @@
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.RemoveUnreferencedLabelsRefactoring"
          />         
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.ReplaceCharacterStarRefactoring"
+         />
          <resourceRefactoring
              class="org.eclipse.photran.internal.core.refactoring.RepObsOpersRefactoring"
          />

@@ -125,6 +125,11 @@ public class ASTTypeSpecNode extends ASTNode
         return this.isCharacter != null;
     }
 
+    public org.eclipse.photran.internal.core.lexer.Token getCharacterToken()
+    {
+        return this.isCharacter;
+    }
+
     public void setIsCharacter(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isCharacter = newValue;
