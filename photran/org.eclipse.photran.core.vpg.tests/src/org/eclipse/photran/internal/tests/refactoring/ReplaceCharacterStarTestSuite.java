@@ -8,10 +8,11 @@
  * Contributors:
  *     Esfar Huq, UIUC - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.photran.internal.tests.refactoring;
 
 import junit.framework.Test;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.photran.internal.core.refactoring.ReplaceCharacterStarRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
@@ -42,5 +43,13 @@ public class ReplaceCharacterStarTestSuite extends PhotranRefactoringTestSuiteFr
               "Running Replace CHARACTER* refactoring in",
               DIR,
               ReplaceCharacterStarRefactoring.class);
+    }
+
+    /**
+     * Prevents compilation of any tests we know don't compile
+     */
+    @Override protected boolean shouldCompile(IFile fileContainingMarker)
+    {
+       return false;
     }
 }
