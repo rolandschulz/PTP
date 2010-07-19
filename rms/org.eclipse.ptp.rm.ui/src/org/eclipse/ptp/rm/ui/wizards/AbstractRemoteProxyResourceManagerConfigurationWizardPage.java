@@ -670,7 +670,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 *            first item in the list.
 	 */
 	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
-		IRemoteServices[] allRemoteServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices[] allRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices();
 		int selectionIndex = remoteCombo.getSelectionIndex();
 		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >= 0) {
 			remoteServices = allRemoteServices[selectionIndex];
@@ -778,7 +778,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * routine when the default index is selected.
 	 */
 	protected void initializeRemoteServicesCombo() {
-		IRemoteServices[] allServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices[] allServices = PTPRemoteUIPlugin.getDefault().getRemoteServices();
 		IRemoteServices defServices;
 		if (remoteServices != null)
 			defServices = remoteServices;
