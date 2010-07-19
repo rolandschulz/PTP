@@ -325,7 +325,11 @@ public class Messages extends NLS
     public static String StandardizeStatementsRefactoring_Name;
 
     public static String StandardizeStatementsRefactoring_SelectedFileCannotBeParsed;
-
+    
+    public static String RemoveUnreferencedLabelsRefactoring_Name;
+    
+    public static String RemoveUnreferencedLabelsRefactoring_ThereMustBeAtLeastOneLabeledStatement;
+    
     static
     {
         // initialize resource bundle

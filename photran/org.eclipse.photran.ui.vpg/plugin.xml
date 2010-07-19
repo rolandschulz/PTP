@@ -81,6 +81,9 @@
          />
       </group>
       <group><!-- Refactorings that reformat code -->
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.RemoveUnreferencedLabelsRefactoring"
+         />         
          <resourceRefactoring
              class="org.eclipse.photran.internal.core.refactoring.RepObsOpersRefactoring"
          />

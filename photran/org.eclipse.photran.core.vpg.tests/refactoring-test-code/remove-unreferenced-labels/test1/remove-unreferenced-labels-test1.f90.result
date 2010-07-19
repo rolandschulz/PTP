@@ -1,0 +1,17 @@
+program main
+  integer ::i
+      i=1
+      if (i.lt.10) then !<<<<< 1, 1, 19, 10, pass
+         i=1
+     else
+      end if
+
+end program
+subroutine OneSubroutine
+          return
+      end subroutine
+
+      integer function OneFunc()
+          OneFunc=1
+          return
+      end

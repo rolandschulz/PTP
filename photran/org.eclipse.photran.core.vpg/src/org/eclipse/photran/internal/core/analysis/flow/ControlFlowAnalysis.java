@@ -269,7 +269,8 @@ public class ControlFlowAnalysis extends ASTVisitorWithLoops
     {
         flowTo(node);
 
-        node.getConditionalBody().accept(this);
+        if (node.getConditionalBody() != null)
+            node.getConditionalBody().accept(this);
     }
 
     @Override
