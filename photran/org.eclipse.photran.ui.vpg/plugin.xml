@@ -620,6 +620,7 @@
          <!-- Omitting this since most of the actions are only meaningful when an editor is open:
          <actionSet id="org.eclipse.photran.ui.DebugActionSet"/-->
          <actionSet id="org.eclipse.rephraserengine.ui.DebugActionSet"/>
+         <actionSet id="org.eclipse.rephraserengine.ui.vpg.BrowserActionSet"/>
       </perspectiveExtension>
    </extension>
    <extension
@@ -628,6 +629,9 @@
          <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
       <actionSetPartAssociation targetID="org.eclipse.rephraserengine.ui.DebugActionSet">
+         <part id="org.eclipse.photran.ui.FortranEditor"/>
+      </actionSetPartAssociation>
+      <actionSetPartAssociation targetID="org.eclipse.rephraserengine.ui.vpg.BrowserActionSet">
          <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>
    </extension>
