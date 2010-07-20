@@ -983,7 +983,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		 */
 		if (!loading) {
 			muxPortFwd = portForwardingButton.getSelection();
-			manualLaunch = manualButton.getSelection();
+			if (manualButton != null)
+				manualLaunch = manualButton.getSelection();
 		}
 
 		/*
