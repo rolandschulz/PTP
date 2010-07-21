@@ -112,11 +112,11 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		return argsMap;
 	}
 
-	private Controller nodeController;
+	private final Controller nodeController;
 
-	private Controller queueController;
+	private final Controller queueController;
 
-	private Controller jobController;
+	private final Controller jobController;
 
 	String user = null;
 
@@ -125,13 +125,13 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
 		nodeController = new Controller("pbsnodes -x", // command //$NON-NLS-1$
 				new AttributeDefinition(new PBSNodeClientAttributes()), // attributes.
-																		// TODO:
-																		// should
-																		// include
-																		// a
-																		// flag
-																		// whether
-																		// mandatory.
+				// TODO:
+				// should
+				// include
+				// a
+				// flag
+				// whether
+				// mandatory.
 				new NodeEventFactory(), new XMLReader() // Parser
 		);
 
@@ -220,19 +220,19 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		int resourceManagerID = ElementIDGenerator.getInstance().getBaseID();
 
 		try {
-			Process p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$
+			Process p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$ //TODO: read std-err for errors
 			p.waitFor();
 			String server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
 			if (server==null || server.split(" ").length<2) //$NON-NLS-1$
 				server = "UNKNOWN"; //$NON-NLS-1$
-			else 
+			else
 				server = server.split(" ")[1]; //$NON-NLS-1$
 			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(transID,
 					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(machineID), //$NON-NLS-1$
-							"2", //$NON-NLS-1$
-							"machineState=UP", //$NON-NLS-1$
-							"name=" + server //$NON-NLS-1$
-					}));
+					"2", //$NON-NLS-1$
+					"machineState=UP", //$NON-NLS-1$
+					"name=" + server //$NON-NLS-1$
+			}));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (InterruptedException e) {
@@ -357,7 +357,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		String args[] = { "qsub", tmp.getAbsolutePath() }; //$NON-NLS-1$
 		Process p = null;
 		try {
-			p = Runtime.getRuntime().exec(args);
+			p = new ProcessBuilder(args).redirectErrorStream(true).start();
 			p.waitFor();
 
 			try {
@@ -367,7 +367,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					sendEvent(getEventFactory().newOKEvent(transID));
 				} else {
 					// if error get error messaes from stderr
-					BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+					BufferedReader err = new BufferedReader(new InputStreamReader(p.getInputStream()));
 					String line, errMsg = ""; //$NON-NLS-1$
 					while ((line = err.readLine()) != null) {
 						errMsg += line;
@@ -376,15 +376,15 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					String errArgs[] = { "jobSubId=" + jobSubId, //$NON-NLS-1$
 							"errorCode=" + 0, //$NON-NLS-1$
 							// p.exitValue()
-							"errorMsg=" + errMsg }; //$NON-NLS-1$ 
+							"errorMsg=" + errMsg }; //$NON-NLS-1$
 					sendEvent(getEventFactory().newProxyRuntimeSubmitJobErrorEvent(transID, errArgs)); // TODO:
-																										// document
-																										// in
-																										// wiki
-																										// -
-																										// following
-																										// here
-																										// proxy_event:proxy_submitjob_error_event
+					// document
+					// in
+					// wiki
+					// -
+					// following
+					// here
+					// proxy_event:proxy_submitjob_error_event
 					System.out.println("submitJob: err: " + errMsg); //$NON-NLS-1$
 				}
 			} catch (IOException e1) { // sendEvent, readLine
@@ -430,12 +430,12 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		System.out.println(Messages.getString("PBSProxyRuntimeServer.25") + id + "," + job.getKey()); //$NON-NLS-1$ //$NON-NLS-2$
 		String args[] = { "qdel", job.getKey() }; //$NON-NLS-1$
 		try {
-			Process p = Runtime.getRuntime().exec(args);
+			Process p = new ProcessBuilder(args).redirectErrorStream(true).start();
 			p.waitFor();
 			if (p.exitValue() == 0) {
 				sendEvent(getEventFactory().newOKEvent(transID));
 			} else {
-				BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+				BufferedReader err = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				String line, errMsg = ""; //$NON-NLS-1$
 				while ((line = err.readLine()) != null) {
 					errMsg += line;
