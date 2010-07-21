@@ -98,7 +98,6 @@ public class GenericASTVisitor implements IASTVisitor
     public void visitASTComponentInitializationNode(ASTComponentInitializationNode node) {}
     public void visitASTComponentNameNode(ASTComponentNameNode node) {}
     public void visitASTComputedGotoStmtNode(ASTComputedGotoStmtNode node) {}
-    public void visitASTConnectSpecListNode(ASTConnectSpecListNode node) {}
     public void visitASTConnectSpecNode(ASTConnectSpecNode node) {}
     public void visitASTConstantNode(ASTConstantNode node) {}
     public void visitASTContainsStmtNode(ASTContainsStmtNode node) {}

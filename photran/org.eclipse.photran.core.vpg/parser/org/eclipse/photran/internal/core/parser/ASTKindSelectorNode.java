@@ -29,6 +29,7 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTKindSelectorNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTKindSelectorNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTKindSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTKindeq; // in ASTKindSelectorNode
     IExpr kindExpr; // in ASTKindSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTKindSelectorNode
@@ -54,7 +55,7 @@ public class ASTKindSelectorNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 4;
+        return 5;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -62,9 +63,10 @@ public class ASTKindSelectorNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTLparen;
-        case 1:  return this.hiddenTKindeq;
-        case 2:  return this.kindExpr;
-        case 3:  return this.hiddenTRparen;
+        case 1:  return this.hiddenTAsterisk;
+        case 2:  return this.hiddenTKindeq;
+        case 3:  return this.kindExpr;
+        case 4:  return this.hiddenTRparen;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -74,9 +76,10 @@ public class ASTKindSelectorNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.kindExpr = (IExpr)value; if (value != null) value.setParent(this); return;
-        case 3:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.kindExpr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

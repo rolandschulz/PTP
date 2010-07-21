@@ -1040,6 +1040,7 @@ ASTAttrSpecNode:<AttrSpec> ::=
 <KindSelector> ::=
     -:T_LPAREN -:T_KINDEQ kindExpr:<Expr> -:T_RPAREN
   | -:T_LPAREN            kindExpr:<Expr> -:T_RPAREN
+  | -:T_ASTERISK          kindExpr:<Expr>  # JO -- This is an extension
 
 ## R507
 #<CharSelector> ::=
@@ -1081,6 +1082,7 @@ ASTAttrSpecNode:<AttrSpec> ::=
 <CharLength> ::=
   | -:T_LPAREN (inline):<CharLenParamValue> -:T_RPAREN
   | constIntLength:T_ICON
+  | constNameLength:<Name>
 
 # R511
 <AccessSpec> ::=
@@ -2576,11 +2578,12 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 
 # R905 -- also F03 R905
 (list):<ConnectSpecList> ::=
-  | <UnitIdentifier>
+#  | <UnitIdentifier> # JO -- Removed to support extension below
   |                             <ConnectSpec>
   | <ConnectSpecList> -:T_COMMA <ConnectSpec>
 
 <ConnectSpec> ::=
+  | filename:<UnitIdentifier> # JO -- This is an extension
   | -:T_UNITEQ                  <UnitIdentifier>
   | -:T_ERREQ             errLbl:<LblRef>
   | -:T_FILEEQ          fileExpr:<CExpr>

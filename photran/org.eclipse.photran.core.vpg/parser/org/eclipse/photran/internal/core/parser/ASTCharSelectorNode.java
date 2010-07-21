@@ -31,6 +31,7 @@ public class ASTCharSelectorNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen2; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTAsterisk; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharSelectorNode
+    ASTNameNode constNameLength; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharSelectorNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTKindEq2; // in ASTCharSelectorNode
     IExpr kindExpr2; // in ASTCharSelectorNode
@@ -52,6 +53,18 @@ public class ASTCharSelectorNode extends ASTNode
     public void setConstIntLength(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.constIntLength = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public ASTNameNode getConstNameLength()
+    {
+        return this.constNameLength;
+    }
+
+    public void setConstNameLength(ASTNameNode newValue)
+    {
+        this.constNameLength = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -125,7 +138,7 @@ public class ASTCharSelectorNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 15;
+        return 16;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -135,18 +148,19 @@ public class ASTCharSelectorNode extends ASTNode
         case 0:  return this.hiddenTLparen2;
         case 1:  return this.hiddenTAsterisk;
         case 2:  return this.constIntLength;
-        case 3:  return this.hiddenTLparen;
-        case 4:  return this.hiddenTKindEq2;
-        case 5:  return this.kindExpr2;
-        case 6:  return this.hiddenTComma2;
-        case 7:  return this.hiddenTLeneq;
-        case 8:  return this.isAssumedLength;
-        case 9:  return this.lengthExpr;
-        case 10: return this.isColon;
-        case 11: return this.hiddenTComma;
-        case 12: return this.hiddenTKindeq;
-        case 13: return this.kindExpr;
-        case 14: return this.hiddenTRparen;
+        case 3:  return this.constNameLength;
+        case 4:  return this.hiddenTLparen;
+        case 5:  return this.hiddenTKindEq2;
+        case 6:  return this.kindExpr2;
+        case 7:  return this.hiddenTComma2;
+        case 8:  return this.hiddenTLeneq;
+        case 9:  return this.isAssumedLength;
+        case 10: return this.lengthExpr;
+        case 11: return this.isColon;
+        case 12: return this.hiddenTComma;
+        case 13: return this.hiddenTKindeq;
+        case 14: return this.kindExpr;
+        case 15: return this.hiddenTRparen;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -158,18 +172,19 @@ public class ASTCharSelectorNode extends ASTNode
         case 0:  this.hiddenTLparen2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 1:  this.hiddenTAsterisk = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 2:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 4:  this.hiddenTKindEq2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.kindExpr2 = (IExpr)value; if (value != null) value.setParent(this); return;
-        case 6:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 7:  this.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 8:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 9:  this.lengthExpr = (IExpr)value; if (value != null) value.setParent(this); return;
-        case 10: this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 11: this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 12: this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 13: this.kindExpr = (IExpr)value; if (value != null) value.setParent(this); return;
-        case 14: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.constNameLength = (ASTNameNode)value; if (value != null) value.setParent(this); return;
+        case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.hiddenTKindEq2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.kindExpr2 = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTComma2 = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTLeneq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 10: this.lengthExpr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 11: this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 12: this.hiddenTComma = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 13: this.hiddenTKindeq = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 14: this.kindExpr = (IExpr)value; if (value != null) value.setParent(this); return;
+        case 15: this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

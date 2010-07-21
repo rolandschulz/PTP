@@ -31,7 +31,7 @@ public class ASTOpenStmtNode extends ASTNode implements IActionStmt
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTOpenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTOpen; // in ASTOpenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTOpenStmtNode
-    IASTListNode<ASTConnectSpecListNode> connectSpecList; // in ASTOpenStmtNode
+    IASTListNode<ASTConnectSpecNode> connectSpecList; // in ASTOpenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTOpenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTOpenStmtNode
 
@@ -47,12 +47,12 @@ public class ASTOpenStmtNode extends ASTNode implements IActionStmt
     }
 
 
-    public IASTListNode<ASTConnectSpecListNode> getConnectSpecList()
+    public IASTListNode<ASTConnectSpecNode> getConnectSpecList()
     {
         return this.connectSpecList;
     }
 
-    public void setConnectSpecList(IASTListNode<ASTConnectSpecListNode> newValue)
+    public void setConnectSpecList(IASTListNode<ASTConnectSpecNode> newValue)
     {
         this.connectSpecList = newValue;
         if (newValue != null) newValue.setParent(this);
@@ -93,7 +93,7 @@ public class ASTOpenStmtNode extends ASTNode implements IActionStmt
         case 0:  this.label = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 1:  this.hiddenTOpen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.connectSpecList = (IASTListNode<ASTConnectSpecListNode>)value; if (value != null) value.setParent(this); return;
+        case 3:  this.connectSpecList = (IASTListNode<ASTConnectSpecNode>)value; if (value != null) value.setParent(this); return;
         case 4:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 5:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");

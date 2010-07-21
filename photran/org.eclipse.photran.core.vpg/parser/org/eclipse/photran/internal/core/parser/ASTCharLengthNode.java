@@ -29,23 +29,12 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTCharLengthNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharLengthNode
-    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLengthNode
     IExpr lengthExpr; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCharLengthNode
-
-    public boolean isColon()
-    {
-        return this.isColon != null;
-    }
-
-    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isColon = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
+    ASTNameNode constNameLength; // in ASTCharLengthNode
 
     public org.eclipse.photran.internal.core.lexer.Token getConstIntLength()
     {
@@ -55,6 +44,18 @@ public class ASTCharLengthNode extends ASTNode
     public void setConstIntLength(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.constIntLength = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isColon()
+    {
+        return this.isColon != null;
+    }
+
+    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isColon = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -83,6 +84,18 @@ public class ASTCharLengthNode extends ASTNode
     }
 
 
+    public ASTNameNode getConstNameLength()
+    {
+        return this.constNameLength;
+    }
+
+    public void setConstNameLength(ASTNameNode newValue)
+    {
+        this.constNameLength = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
     @Override
     public void accept(IASTVisitor visitor)
     {
@@ -92,7 +105,7 @@ public class ASTCharLengthNode extends ASTNode
 
     @Override protected int getNumASTFields()
     {
-        return 6;
+        return 7;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -100,11 +113,12 @@ public class ASTCharLengthNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTLparen;
-        case 1:  return this.isColon;
-        case 2:  return this.constIntLength;
+        case 1:  return this.constIntLength;
+        case 2:  return this.isColon;
         case 3:  return this.isAssumedLength;
         case 4:  return this.lengthExpr;
         case 5:  return this.hiddenTRparen;
+        case 6:  return this.constNameLength;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -114,11 +128,12 @@ public class ASTCharLengthNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 3:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 4:  this.lengthExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.constNameLength = (ASTNameNode)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

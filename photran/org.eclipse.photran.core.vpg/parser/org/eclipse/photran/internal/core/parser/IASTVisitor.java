@@ -92,7 +92,6 @@ public interface IASTVisitor
     void visitASTComponentInitializationNode(ASTComponentInitializationNode node);
     void visitASTComponentNameNode(ASTComponentNameNode node);
     void visitASTComputedGotoStmtNode(ASTComputedGotoStmtNode node);
-    void visitASTConnectSpecListNode(ASTConnectSpecListNode node);
     void visitASTConnectSpecNode(ASTConnectSpecNode node);
     void visitASTConstantNode(ASTConstantNode node);
     void visitASTContainsStmtNode(ASTContainsStmtNode node);

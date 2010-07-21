@@ -98,7 +98,6 @@ public class ASTVisitor implements IASTVisitor
     public void visitASTComponentInitializationNode(ASTComponentInitializationNode node) { traverseChildren(node); }
     public void visitASTComponentNameNode(ASTComponentNameNode node) { traverseChildren(node); }
     public void visitASTComputedGotoStmtNode(ASTComputedGotoStmtNode node) { traverseChildren(node); }
-    public void visitASTConnectSpecListNode(ASTConnectSpecListNode node) { traverseChildren(node); }
     public void visitASTConnectSpecNode(ASTConnectSpecNode node) { traverseChildren(node); }
     public void visitASTConstantNode(ASTConstantNode node) { traverseChildren(node); }
     public void visitASTContainsStmtNode(ASTContainsStmtNode node) { traverseChildren(node); }

@@ -184,12 +184,12 @@ final class ContainsStmtParsingTables extends ParsingTables
         {
             final int rows = 4;
             final int cols = 2;
-            final int compressedBytes = 32;
+            final int compressedBytes = 31;
             final int uncompressedBytes = 33;
             
             byte[] decoded = new byte[compressedBytes];
             base64Decode(decoded,
-                "eNpz/dTAfoChgdHhBgOD6zUg/swABg2sEJoBAKRABvA=");
+                "eNpz/dLAfoChgdHhBgODKwh/ZQCDBlYIzQAApMgG9g==");
             
             byte[] buffer = new byte[uncompressedBytes];
             Inflater inflater = new Inflater();
