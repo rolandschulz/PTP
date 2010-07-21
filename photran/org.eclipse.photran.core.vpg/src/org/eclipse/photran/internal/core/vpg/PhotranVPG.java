@@ -529,20 +529,20 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
 
     public Iterable<String> listAllModules()
     {
-        return listAllStartingWith("module:"); //$NON-NLS-1$
+        return listAllDependentFilenamesStartingWith("module:"); //$NON-NLS-1$
     }
 
     public Iterable<String> listAllSubprograms()
     {
-        return listAllStartingWith("subprogram:"); //$NON-NLS-1$
+        return listAllDependentFilenamesStartingWith("subprogram:"); //$NON-NLS-1$
     }
 
     public Iterable<String> listAllCommonBlocks()
     {
-        return listAllStartingWith("common:"); //$NON-NLS-1$
+        return listAllFilenamesWithDependentsStartingWith("common:"); //$NON-NLS-1$
     }
 
-    private Iterable<String> listAllStartingWith(String prefix)
+    private Iterable<String> listAllDependentFilenamesStartingWith(String prefix)
     {
         /*
          * When there is a module "module1" declared in module1.f90, the VPG
@@ -553,10 +553,34 @@ public abstract class PhotranVPG extends EclipseVPG<IFortranAST, Token, PhotranT
          * So we can determine all modules by searching the list of dependent
          * filenames.  Note that this will include every module that is
          * declared, even if it is never used.
+         * 
+         * This same procedure works for external subprograms as well.
          */
 
         TreeSet<String> result = new TreeSet<String>();
         for (String name : db.listAllDependentFilenames())
+            if (name.startsWith(prefix))
+                result.add(name.substring(prefix.length()));
+        for (String name : db.listAllFilenamesWithDependents())
+            if (name.startsWith(prefix))
+                result.add(name.substring(prefix.length()));
+        return result;
+    }
+
+    private Iterable<String> listAllFilenamesWithDependentsStartingWith(String prefix)
+    {
+        /*
+         * When there is a common block "common1" declared in common1.f90, the VPG
+         * will contain a dependency
+         *
+         *     common1.f90    -----depends-on----->    common:common1
+         *
+         * So we can determine all commons by searching the list of filenames
+         * with dependencies.
+         */
+
+        TreeSet<String> result = new TreeSet<String>();
+        for (String name : db.listAllFilenamesWithDependents())
             if (name.startsWith(prefix))
                 result.add(name.substring(prefix.length()));
         return result;
