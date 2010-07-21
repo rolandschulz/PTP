@@ -171,7 +171,8 @@ public class Controller {
 
 	private InputStream readProgramOutput(String string) throws IOException {
 		String[] args = string.split(" "); //$NON-NLS-1$
-		Process p = Runtime.getRuntime().exec(args);
+		Process p = Runtime.getRuntime().exec(args); // TODO read stderr for
+														// potential errors
 
 		// read the standard output of the command
 		return new BufferedInputStream(p.getInputStream());
@@ -232,13 +233,13 @@ public class Controller {
 
 		List<IProxyEvent> events = new ArrayList<IProxyEvent>();
 		List<List<String>> allNewArgs = addedElements.serializeSplittedByParent(); // all
-																					// Elements
-																					// split
-																					// by
-																					// ParentKey
+		// Elements
+		// split
+		// by
+		// ParentKey
 
 		for (List<String> newEventArgs : allNewArgs) { // loop over different
-														// parents
+			// parents
 			// change first element of string list (contains parent) from
 			// (parent) key to (parent) ID
 			newEventArgs.set(0, Integer.toString(getParentIDFromKey(newEventArgs.get(0))));
