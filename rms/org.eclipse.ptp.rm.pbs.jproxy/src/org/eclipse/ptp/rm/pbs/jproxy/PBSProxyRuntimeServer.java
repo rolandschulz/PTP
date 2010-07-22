@@ -350,7 +350,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			out.write(script);
 			out.close();
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			e1.printStackTrace(); /* TODO: should send error message */
+			return;
 		}
 
 		// Call Qsub with job-script
