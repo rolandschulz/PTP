@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.proxy.protocol
-Bundle-Version: 4.0.0.qualifier
+Bundle-Version: 5.0.0.qualifier
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.proxy.client,
  org.eclipse.ptp.proxy.command,
@@ -21,3 +21,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.ptp.utils.core
+Bundle-ClassPath: proxy_protocol.jar
