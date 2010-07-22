@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.core;
 
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+
 /**
  * Defines constants used to store preferences for a tool. This preference
  * manager only defines constants. It does not provide static methods to
@@ -21,7 +23,7 @@ package org.eclipse.ptp.rm.core;
  * 
  * @author Daniel Felix Ferber
  */
-public abstract class AbstractToolsPreferenceManager {
+public abstract class AbstractToolsPreferenceManager extends AbstractPreferenceInitializer {
 	public static final String PREFS_LAUNCH_CMD = "launchCmd"; //$NON-NLS-1$
 	public static final String PREFS_DEBUG_CMD = "debugCmd"; //$NON-NLS-1$
 	public static final String PREFS_DISCOVER_CMD = "discoverCmd"; //$NON-NLS-1$

@@ -11,13 +11,16 @@
 package org.eclipse.ptp.rm.mpi.openmpi.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class OpenMPIPreferenceManager extends AbstractToolsPreferenceManager {
 	public static final String PREFIX_AUTO = "openmpi-auto-"; //$NON-NLS-1$
@@ -25,39 +28,60 @@ public class OpenMPIPreferenceManager extends AbstractToolsPreferenceManager {
 	public static final String PREFIX_13 = "openmpi-1.3-"; //$NON-NLS-1$
 	public static final String PREFIX_14 = "openmpi-1.4-"; //$NON-NLS-1$
 
-	public static Preferences getPreferences() {
-		return OpenMPIPlugin.getDefault().getPluginPreferences();
+	/**
+	 * @since 4.0
+	 */
+	public static IPreferencesService getPreferences() {
+		return Platform.getPreferencesService();
 	}
 
 	public static void savePreferences() {
-		OpenMPIPlugin.getDefault().savePluginPreferences();
+		// do nothing
 	}
 
-	public static void initializePreferences() throws CoreException {
-		Preferences preferences = OpenMPIPlugin.getDefault().getPluginPreferences();
-		// Initialize only preferences as in OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES
-		OpenMPIAutoDefaults.loadDefaults();
-		preferences.setDefault(PREFIX_AUTO + PREFS_LAUNCH_CMD, OpenMPIAutoDefaults.LAUNCH_CMD);
-		preferences.setDefault(PREFIX_AUTO + PREFS_DEBUG_CMD, OpenMPIAutoDefaults.DEBUG_CMD);
-		preferences.setDefault(PREFIX_AUTO + PREFS_DISCOVER_CMD, OpenMPIAutoDefaults.DISCOVER_CMD);
-		preferences.setDefault(PREFIX_AUTO + PREFS_REMOTE_INSTALL_PATH, OpenMPIAutoDefaults.PATH);
-		
-		OpenMPI12Defaults.loadDefaults();
-		preferences.setDefault(PREFIX_12 + PREFS_LAUNCH_CMD, OpenMPI12Defaults.LAUNCH_CMD);
-		preferences.setDefault(PREFIX_12 + PREFS_DEBUG_CMD, OpenMPI12Defaults.DEBUG_CMD);
-		preferences.setDefault(PREFIX_12 + PREFS_DISCOVER_CMD, OpenMPI12Defaults.DISCOVER_CMD);
-		preferences.setDefault(PREFIX_12 + PREFS_REMOTE_INSTALL_PATH, OpenMPI12Defaults.PATH);
+	@Override
+	public void initializeDefaultPreferences() {
+		Preferences preferences = new DefaultScope().getNode(OpenMPIPlugin.getUniqueIdentifier());
+		// Initialize only preferences as in
+		// OpenMpiResourceManagerConfiguration.OPENMPI_CAPABILITIES
+		try {
+			OpenMPIAutoDefaults.loadDefaults();
+		} catch (CoreException e) {
+			OpenMPIPlugin.log(e);
+		}
+		preferences.put(PREFIX_AUTO + PREFS_LAUNCH_CMD, OpenMPIAutoDefaults.LAUNCH_CMD);
+		preferences.put(PREFIX_AUTO + PREFS_DEBUG_CMD, OpenMPIAutoDefaults.DEBUG_CMD);
+		preferences.put(PREFIX_AUTO + PREFS_DISCOVER_CMD, OpenMPIAutoDefaults.DISCOVER_CMD);
+		preferences.put(PREFIX_AUTO + PREFS_REMOTE_INSTALL_PATH, OpenMPIAutoDefaults.PATH);
 
-		OpenMPI13Defaults.loadDefaults();
-		preferences.setDefault(PREFIX_13 + PREFS_LAUNCH_CMD, OpenMPI13Defaults.LAUNCH_CMD);
-		preferences.setDefault(PREFIX_13 + PREFS_DEBUG_CMD, OpenMPI13Defaults.DEBUG_CMD);
-		preferences.setDefault(PREFIX_13 + PREFS_DISCOVER_CMD, OpenMPI13Defaults.DISCOVER_CMD);
-		preferences.setDefault(PREFIX_13 + PREFS_REMOTE_INSTALL_PATH, OpenMPI13Defaults.PATH);
+		try {
+			OpenMPI12Defaults.loadDefaults();
+		} catch (CoreException e) {
+			OpenMPIPlugin.log(e);
+		}
+		preferences.put(PREFIX_12 + PREFS_LAUNCH_CMD, OpenMPI12Defaults.LAUNCH_CMD);
+		preferences.put(PREFIX_12 + PREFS_DEBUG_CMD, OpenMPI12Defaults.DEBUG_CMD);
+		preferences.put(PREFIX_12 + PREFS_DISCOVER_CMD, OpenMPI12Defaults.DISCOVER_CMD);
+		preferences.put(PREFIX_12 + PREFS_REMOTE_INSTALL_PATH, OpenMPI12Defaults.PATH);
 
-		OpenMPI14Defaults.loadDefaults();
-		preferences.setDefault(PREFIX_14 + PREFS_LAUNCH_CMD, OpenMPI14Defaults.LAUNCH_CMD);
-		preferences.setDefault(PREFIX_14 + PREFS_DEBUG_CMD, OpenMPI14Defaults.DEBUG_CMD);
-		preferences.setDefault(PREFIX_14 + PREFS_DISCOVER_CMD, OpenMPI14Defaults.DISCOVER_CMD);
-		preferences.setDefault(PREFIX_14 + PREFS_REMOTE_INSTALL_PATH, OpenMPI14Defaults.PATH);
+		try {
+			OpenMPI13Defaults.loadDefaults();
+		} catch (CoreException e) {
+			OpenMPIPlugin.log(e);
+		}
+		preferences.put(PREFIX_13 + PREFS_LAUNCH_CMD, OpenMPI13Defaults.LAUNCH_CMD);
+		preferences.put(PREFIX_13 + PREFS_DEBUG_CMD, OpenMPI13Defaults.DEBUG_CMD);
+		preferences.put(PREFIX_13 + PREFS_DISCOVER_CMD, OpenMPI13Defaults.DISCOVER_CMD);
+		preferences.put(PREFIX_13 + PREFS_REMOTE_INSTALL_PATH, OpenMPI13Defaults.PATH);
+
+		try {
+			OpenMPI14Defaults.loadDefaults();
+		} catch (CoreException e) {
+			OpenMPIPlugin.log(e);
+		}
+		preferences.put(PREFIX_14 + PREFS_LAUNCH_CMD, OpenMPI14Defaults.LAUNCH_CMD);
+		preferences.put(PREFIX_14 + PREFS_DEBUG_CMD, OpenMPI14Defaults.DEBUG_CMD);
+		preferences.put(PREFIX_14 + PREFS_DISCOVER_CMD, OpenMPI14Defaults.DISCOVER_CMD);
+		preferences.put(PREFIX_14 + PREFS_REMOTE_INSTALL_PATH, OpenMPI14Defaults.PATH);
 	}
 }

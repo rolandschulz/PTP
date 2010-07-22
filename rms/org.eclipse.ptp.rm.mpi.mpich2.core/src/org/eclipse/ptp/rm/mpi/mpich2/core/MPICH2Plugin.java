@@ -20,6 +20,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
  * @author Daniel Felix Ferber
  */
 public class MPICH2Plugin extends Plugin {
@@ -39,19 +40,22 @@ public class MPICH2Plugin extends Plugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 		MPICH2Defaults.loadDefaults();
-		MPICH2PreferenceManager.initializePreferences();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
@@ -61,7 +65,7 @@ public class MPICH2Plugin extends Plugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static MPICH2Plugin getDefault() {
@@ -70,6 +74,7 @@ public class MPICH2Plugin extends Plugin {
 
 	/**
 	 * Raise core exception.
+	 * 
 	 * @param message
 	 * @return
 	 */
@@ -79,6 +84,7 @@ public class MPICH2Plugin extends Plugin {
 
 	/**
 	 * Raise core exception.
+	 * 
 	 * @param message
 	 * @param t
 	 * @return
