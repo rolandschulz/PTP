@@ -47,6 +47,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -183,6 +184,10 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 */
 	protected IRemoteServices remoteServices = null;
 	/**
+	 * @since 2.0
+	 */
+	protected IRemoteServices[] fAllRemoteServices = null;
+	/**
 	 * @since 1.1
 	 */
 	protected IRemoteConnectionManager connectionManager = null;
@@ -279,9 +284,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	protected boolean proxyOptionsEnabled = true;
 
 	/**
-	 * @since 1.2
+	 * @since 2.0
 	 */
-	protected boolean manualLaunchEnabled = true;
+	protected boolean fManualLaunchEnabled = true;
 
 	public AbstractRemoteProxyResourceManagerConfigurationWizardPage(IRMConfigurationWizard wizard, String title) {
 		super(wizard, title);
@@ -473,7 +478,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		/*
 		 * Manual launch
 		 */
-		if (manualLaunchEnabled) {
+		if (fManualLaunchEnabled) {
 			manualButton = createCheckButton(parent, "Launch server manually"); //$NON-NLS-1$
 			manualButton.addSelectionListener(listener);
 		}
@@ -670,10 +675,9 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 *            first item in the list.
 	 */
 	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
-		IRemoteServices[] allRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices();
 		int selectionIndex = remoteCombo.getSelectionIndex();
-		if (allRemoteServices != null && allRemoteServices.length > 0 && selectionIndex >= 0) {
-			remoteServices = allRemoteServices[selectionIndex];
+		if (fAllRemoteServices != null && fAllRemoteServices.length > 0 && selectionIndex >= 0) {
+			remoteServices = fAllRemoteServices[selectionIndex];
 			connectionManager = remoteServices.getConnectionManager();
 			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 			if (remUIServices != null)
@@ -778,25 +782,29 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	 * routine when the default index is selected.
 	 */
 	protected void initializeRemoteServicesCombo() {
-		IRemoteServices[] allServices = PTPRemoteUIPlugin.getDefault().getRemoteServices();
+		IWizardContainer container = null;
+		if (getControl().isVisible()) {
+			container = getWizard().getContainer();
+		}
+		fAllRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(container);
 		IRemoteServices defServices;
 		if (remoteServices != null)
 			defServices = remoteServices;
 		else
 			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
 		int defIndex = 0;
-		Arrays.sort(allServices, new Comparator<IRemoteServices>() {
+		Arrays.sort(fAllRemoteServices, new Comparator<IRemoteServices>() {
 			public int compare(IRemoteServices c1, IRemoteServices c2) {
 				return c1.getName().compareToIgnoreCase(c2.getName());
 			}
 		});
 		remoteCombo.removeAll();
-		for (int i = 0; i < allServices.length; i++) {
-			remoteCombo.add(allServices[i].getName());
-			if (allServices[i].equals(defServices))
+		for (int i = 0; i < fAllRemoteServices.length; i++) {
+			remoteCombo.add(fAllRemoteServices[i].getName());
+			if (fAllRemoteServices[i].equals(defServices))
 				defIndex = i;
 		}
-		if (allServices.length > 0) {
+		if (fAllRemoteServices.length > 0) {
 			remoteCombo.select(defIndex);
 			/*
 			 * Linux doesn't call selection handler so need to call it

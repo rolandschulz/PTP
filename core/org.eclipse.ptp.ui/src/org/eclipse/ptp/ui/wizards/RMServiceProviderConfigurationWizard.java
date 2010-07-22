@@ -16,10 +16,11 @@ import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.ui.wizards.ServiceProviderConfigurationWizard;
 
 /**
- * Transitional class to allow the RM configuration framework to be used with the service model.
+ * Transitional class to allow the RM configuration framework to be used with
+ * the service model.
  * 
  * @author greg
- *
+ * 
  */
 public class RMServiceProviderConfigurationWizard extends ServiceProviderConfigurationWizard implements IRMConfigurationWizard {
 
@@ -27,12 +28,14 @@ public class RMServiceProviderConfigurationWizard extends ServiceProviderConfigu
 		super(provider, page);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.wizards.IRMConfigurationWizard#getConfiguration()
 	 */
 	public IResourceManagerConfiguration getConfiguration() {
 		if (fProvider instanceof IResourceManagerConfiguration) {
-			return (IResourceManagerConfiguration)fProvider;
+			return (IResourceManagerConfiguration) fProvider;
 		}
 		return null;
 	}
