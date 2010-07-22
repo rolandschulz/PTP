@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTInvalidEntityDeclNode extends ASTNodeWithErrorRecoverySymbols
+public class ASTInvalidEntityDeclNode extends ASTNode
 {
     ASTObjectNameNode objectName; // in ASTInvalidEntityDeclNode
     org.eclipse.photran.internal.core.lexer.Token hiddenAsterisk2; // in ASTInvalidEntityDeclNode

@@ -903,6 +903,7 @@ ASTLogicalConstNode:<LogicalConstant> ::=
   | (inline):<LblDef> <TypeSpec>               -:T_COLON -:T_COLON <EntityDeclList> -:T_EOS
   | (inline):<LblDef> <TypeSpec>                                   <EntityDeclList> -:T_EOS
   | (inline):<LblDef> <TypeSpec> -:T_COMMA                         <EntityDeclList> -:T_EOS # JO -- This is an extension
+  | (inline):<LblDef> <TypeSpec> (error) T_EOS
 
 (list):<AttrSpecSeq> ::=
   |               -:T_COMMA <AttrSpec>
@@ -1023,13 +1024,15 @@ ASTAttrSpecNode:<AttrSpec> ::=
   | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_LBRACKET <CoarraySpec> -:T_RBRACKET -:T_ASTERISK <CharLength> <Initialization>
 # Extension supported by gfortran and IBM XL Fortran (see Bug 294055)
 # This actually accepts a superset (allowing multiple "a /.true./" declarations) but is close enough
-  | <ObjectName> -:T_SLASH <Constant> -:T_SLASH
+  | <ObjectName>                                                             -:T_SLASH <DataStmtValueList> -:T_SLASH
+  | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN                           -:T_SLASH <DataStmtValueList> -:T_SLASH
+  | <ObjectName>                                   -:T_ASTERISK <CharLength> -:T_SLASH <DataStmtValueList> -:T_SLASH
+  | <ObjectName> -:T_LPAREN <ArraySpec> -:T_RPAREN -:T_ASTERISK <CharLength> -:T_SLASH <DataStmtValueList> -:T_SLASH
 
 # JO -- Added error production
 <InvalidEntityDecl> ::=
   | <ObjectName> asterisk2(omit):T_ASTERISK initial-char-length:<CharLength> lparen2(omit):T_LPAREN <ArraySpec> rparen2(omit):T_RPAREN
   | <ObjectName> asterisk2(omit):T_ASTERISK initial-char-length:<CharLength> lparen2(omit):T_LPAREN <ArraySpec> rparen2(omit):T_RPAREN <Initialization>
-  | <ObjectName> (error) T_EOS
 
 # R505
 <Initialization> ::=
@@ -2195,8 +2198,10 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 <IfThenStmt> ::=
   | (inline):<LblDef>                                      -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
   | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN -:T_THEN -:T_EOS
-  | (inline):<LblDef>                                      -:T_IF (error) T_EOS
-  | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF (error) T_EOS
+  | (inline):<LblDef>                                      -:T_IF <IfThenError> -:T_EOS
+  | (inline):<LblDef> IfConstruct(inline):<Name> -:T_COLON -:T_IF <IfThenError> -:T_EOS
+
+<IfThenError> ::= (error) T_THEN
 
 # R804
 # JO -- Added error production
@@ -2226,7 +2231,7 @@ ASTAssignmentStmtNode:<PointerAssignmentStmt> ::=
 # JO -- Added error production
 <IfStmt> ::=
   | (inline):<LblDef> T_IF -:T_LPAREN guardingExpression:<Expr> -:T_RPAREN <ActionStmt>
-#  | (inline):<LblDef> T_IF (error) T_EOS
+  | (inline):<LblDef> T_IF (error) T_EOS
 
 # F08 R807
 <BlockConstruct> ::=

@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTIfThenStmtNode extends ASTNodeWithErrorRecoverySymbols implements IActionStmt
+public class ASTIfThenStmtNode extends ASTNode implements IActionStmt
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTIfThenStmtNode
     org.eclipse.photran.internal.core.lexer.Token name; // in ASTIfThenStmtNode
@@ -34,6 +34,7 @@ public class ASTIfThenStmtNode extends ASTNodeWithErrorRecoverySymbols implement
     org.eclipse.photran.internal.core.lexer.Token hiddenTIf; // in ASTIfThenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTIfThenStmtNode
     IExpr guardingExpression; // in ASTIfThenStmtNode
+    ASTIfThenErrorNode ifThenError; // in ASTIfThenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTIfThenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTThen; // in ASTIfThenStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTIfThenStmtNode
@@ -74,6 +75,18 @@ public class ASTIfThenStmtNode extends ASTNodeWithErrorRecoverySymbols implement
     }
 
 
+    public ASTIfThenErrorNode getIfThenError()
+    {
+        return this.ifThenError;
+    }
+
+    public void setIfThenError(ASTIfThenErrorNode newValue)
+    {
+        this.ifThenError = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
     @Override
     public void accept(IASTVisitor visitor)
     {
@@ -85,7 +98,7 @@ public class ASTIfThenStmtNode extends ASTNodeWithErrorRecoverySymbols implement
 
     @Override protected int getNumASTFields()
     {
-        return 9;
+        return 10;
     }
 
     @Override protected IASTNode getASTField(int index)
@@ -98,9 +111,10 @@ public class ASTIfThenStmtNode extends ASTNodeWithErrorRecoverySymbols implement
         case 3:  return this.hiddenTIf;
         case 4:  return this.hiddenTLparen;
         case 5:  return this.guardingExpression;
-        case 6:  return this.hiddenTRparen;
-        case 7:  return this.hiddenTThen;
-        case 8:  return this.hiddenTEos;
+        case 6:  return this.ifThenError;
+        case 7:  return this.hiddenTRparen;
+        case 8:  return this.hiddenTThen;
+        case 9:  return this.hiddenTEos;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -115,9 +129,10 @@ public class ASTIfThenStmtNode extends ASTNodeWithErrorRecoverySymbols implement
         case 3:  this.hiddenTIf = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 4:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 5:  this.guardingExpression = (IExpr)value; if (value != null) value.setParent(this); return;
-        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 7:  this.hiddenTThen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 8:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.ifThenError = (ASTIfThenErrorNode)value; if (value != null) value.setParent(this); return;
+        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 8:  this.hiddenTThen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 9:  this.hiddenTEos = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

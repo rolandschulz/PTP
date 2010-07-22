@@ -208,6 +208,7 @@ public class ASTVisitor implements IASTVisitor
     public void visitASTGotoStmtNode(ASTGotoStmtNode node) { traverseChildren(node); }
     public void visitASTIfConstructNode(ASTIfConstructNode node) { traverseChildren(node); }
     public void visitASTIfStmtNode(ASTIfStmtNode node) { traverseChildren(node); }
+    public void visitASTIfThenErrorNode(ASTIfThenErrorNode node) { traverseChildren(node); }
     public void visitASTIfThenStmtNode(ASTIfThenStmtNode node) { traverseChildren(node); }
     public void visitASTImageSelectorNode(ASTImageSelectorNode node) { traverseChildren(node); }
     public void visitASTImageSetNode(ASTImageSetNode node) { traverseChildren(node); }

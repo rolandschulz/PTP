@@ -26,7 +26,7 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTTypeDeclarationStmtNode extends ASTNode implements IDeclarationConstruct
+public class ASTTypeDeclarationStmtNode extends ASTNodeWithErrorRecoverySymbols implements IDeclarationConstruct
 {
     org.eclipse.photran.internal.core.lexer.Token label; // in ASTTypeDeclarationStmtNode
     ASTTypeSpecNode typeSpec; // in ASTTypeDeclarationStmtNode

@@ -29,12 +29,24 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 public class ASTCharLengthNode extends ASTNode
 {
     org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTCharLengthNode
+    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token constIntLength; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTCharLengthNode
-    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLengthNode
     IExpr lengthExpr; // in ASTCharLengthNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTCharLengthNode
     ASTNameNode constNameLength; // in ASTCharLengthNode
+
+    public boolean isAssumedLength()
+    {
+        return this.isAssumedLength != null;
+    }
+
+    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isAssumedLength = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
 
     public org.eclipse.photran.internal.core.lexer.Token getConstIntLength()
     {
@@ -56,18 +68,6 @@ public class ASTCharLengthNode extends ASTNode
     public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.isColon = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public boolean isAssumedLength()
-    {
-        return this.isAssumedLength != null;
-    }
-
-    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isAssumedLength = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -113,9 +113,9 @@ public class ASTCharLengthNode extends ASTNode
         switch (index)
         {
         case 0:  return this.hiddenTLparen;
-        case 1:  return this.constIntLength;
-        case 2:  return this.isColon;
-        case 3:  return this.isAssumedLength;
+        case 1:  return this.isAssumedLength;
+        case 2:  return this.constIntLength;
+        case 3:  return this.isColon;
         case 4:  return this.lengthExpr;
         case 5:  return this.hiddenTRparen;
         case 6:  return this.constNameLength;
@@ -128,9 +128,9 @@ public class ASTCharLengthNode extends ASTNode
         switch (index)
         {
         case 0:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 2:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 1:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.constIntLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 4:  this.lengthExpr = (IExpr)value; if (value != null) value.setParent(this); return;
         case 5:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 6:  this.constNameLength = (ASTNameNode)value; if (value != null) value.setParent(this); return;

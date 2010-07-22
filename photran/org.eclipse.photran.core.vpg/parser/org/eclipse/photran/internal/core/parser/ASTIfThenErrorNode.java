@@ -26,67 +26,25 @@ import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.*;                   import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;                   import org.eclipse.photran.internal.core.SyntaxException;                   import java.io.IOException;
 
 @SuppressWarnings("all")
-public class ASTCharLenParamValueNode extends ASTNode
+public class ASTIfThenErrorNode extends ASTNodeWithErrorRecoverySymbols
 {
-    org.eclipse.photran.internal.core.lexer.Token isColon; // in ASTCharLenParamValueNode
-    IExpr lengthExpr; // in ASTCharLenParamValueNode
-    org.eclipse.photran.internal.core.lexer.Token isAssumedLength; // in ASTCharLenParamValueNode
-
-    public boolean isColon()
-    {
-        return this.isColon != null;
-    }
-
-    public void setIsColon(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isColon = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public IExpr getLengthExpr()
-    {
-        return this.lengthExpr;
-    }
-
-    public void setLengthExpr(IExpr newValue)
-    {
-        this.lengthExpr = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
-    public boolean isAssumedLength()
-    {
-        return this.isAssumedLength != null;
-    }
-
-    public void setIsAssumedLength(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isAssumedLength = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
 
     @Override
     public void accept(IASTVisitor visitor)
     {
-        visitor.visitASTCharLenParamValueNode(this);
+        visitor.visitASTIfThenErrorNode(this);
         visitor.visitASTNode(this);
     }
 
     @Override protected int getNumASTFields()
     {
-        return 3;
+        return 0;
     }
 
     @Override protected IASTNode getASTField(int index)
     {
         switch (index)
         {
-        case 0:  return this.isColon;
-        case 1:  return this.lengthExpr;
-        case 2:  return this.isAssumedLength;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -95,9 +53,6 @@ public class ASTCharLenParamValueNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isColon = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 1:  this.lengthExpr = (IExpr)value; if (value != null) value.setParent(this); return;
-        case 2:  this.isAssumedLength = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

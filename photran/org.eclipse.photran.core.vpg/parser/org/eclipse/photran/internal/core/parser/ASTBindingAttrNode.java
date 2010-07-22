@@ -28,23 +28,23 @@ import org.eclipse.photran.internal.core.lexer.*;                   import org.e
 @SuppressWarnings("all")
 public class ASTBindingAttrNode extends ASTNode
 {
-    org.eclipse.photran.internal.core.lexer.Token isDeferred; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token isPass; // in ASTBindingAttrNode
     ASTAccessSpecNode accessSpec; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token isNoPass; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token isNonOverridable; // in ASTBindingAttrNode
-    org.eclipse.photran.internal.core.lexer.Token isPass; // in ASTBindingAttrNode
-    org.eclipse.photran.internal.core.lexer.Token hiddenTLparen; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token argName; // in ASTBindingAttrNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTRparen; // in ASTBindingAttrNode
+    org.eclipse.photran.internal.core.lexer.Token isDeferred; // in ASTBindingAttrNode
 
-    public boolean isDeferred()
+    public boolean isPass()
     {
-        return this.isDeferred != null;
+        return this.isPass != null;
     }
 
-    public void setIsDeferred(org.eclipse.photran.internal.core.lexer.Token newValue)
+    public void setIsPass(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
-        this.isDeferred = newValue;
+        this.isPass = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -85,18 +85,6 @@ public class ASTBindingAttrNode extends ASTNode
     }
 
 
-    public boolean isPass()
-    {
-        return this.isPass != null;
-    }
-
-    public void setIsPass(org.eclipse.photran.internal.core.lexer.Token newValue)
-    {
-        this.isPass = newValue;
-        if (newValue != null) newValue.setParent(this);
-    }
-
-
     public org.eclipse.photran.internal.core.lexer.Token getArgName()
     {
         return this.argName;
@@ -105,6 +93,18 @@ public class ASTBindingAttrNode extends ASTNode
     public void setArgName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.argName = newValue;
+        if (newValue != null) newValue.setParent(this);
+    }
+
+
+    public boolean isDeferred()
+    {
+        return this.isDeferred != null;
+    }
+
+    public void setIsDeferred(org.eclipse.photran.internal.core.lexer.Token newValue)
+    {
+        this.isDeferred = newValue;
         if (newValue != null) newValue.setParent(this);
     }
 
@@ -125,14 +125,14 @@ public class ASTBindingAttrNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  return this.isDeferred;
+        case 0:  return this.isPass;
         case 1:  return this.accessSpec;
-        case 2:  return this.isNoPass;
-        case 3:  return this.isNonOverridable;
-        case 4:  return this.isPass;
-        case 5:  return this.hiddenTLparen;
-        case 6:  return this.argName;
-        case 7:  return this.hiddenTRparen;
+        case 2:  return this.hiddenTLparen;
+        case 3:  return this.isNoPass;
+        case 4:  return this.isNonOverridable;
+        case 5:  return this.argName;
+        case 6:  return this.hiddenTRparen;
+        case 7:  return this.isDeferred;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }
@@ -141,14 +141,14 @@ public class ASTBindingAttrNode extends ASTNode
     {
         switch (index)
         {
-        case 0:  this.isDeferred = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 0:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         case 1:  this.accessSpec = (ASTAccessSpecNode)value; if (value != null) value.setParent(this); return;
-        case 2:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 3:  this.isNonOverridable = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 4:  this.isPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 5:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 6:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
-        case 7:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 2:  this.hiddenTLparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 3:  this.isNoPass = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 4:  this.isNonOverridable = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 5:  this.argName = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 6:  this.hiddenTRparen = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
+        case 7:  this.isDeferred = (org.eclipse.photran.internal.core.lexer.Token)value; if (value != null) value.setParent(this); return;
         default: throw new IllegalArgumentException("Invalid index");
         }
     }

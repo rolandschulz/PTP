@@ -202,6 +202,7 @@ public interface IASTVisitor
     void visitASTGotoStmtNode(ASTGotoStmtNode node);
     void visitASTIfConstructNode(ASTIfConstructNode node);
     void visitASTIfStmtNode(ASTIfStmtNode node);
+    void visitASTIfThenErrorNode(ASTIfThenErrorNode node);
     void visitASTIfThenStmtNode(ASTIfThenStmtNode node);
     void visitASTImageSelectorNode(ASTImageSelectorNode node);
     void visitASTImageSetNode(ASTImageSetNode node);

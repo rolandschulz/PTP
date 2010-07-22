@@ -208,6 +208,7 @@ public class GenericASTVisitor implements IASTVisitor
     public void visitASTGotoStmtNode(ASTGotoStmtNode node) {}
     public void visitASTIfConstructNode(ASTIfConstructNode node) {}
     public void visitASTIfStmtNode(ASTIfStmtNode node) {}
+    public void visitASTIfThenErrorNode(ASTIfThenErrorNode node) {}
     public void visitASTIfThenStmtNode(ASTIfThenStmtNode node) {}
     public void visitASTImageSelectorNode(ASTImageSelectorNode node) {}
     public void visitASTImageSetNode(ASTImageSetNode node) {}
