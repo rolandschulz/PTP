@@ -10,49 +10,63 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider implements IMPICH2ResourceManagerConfiguration {
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
+	private static final String EMPTY_STR = ""; //$NON-NLS-1$
 
 	public MPICH2ServiceProvider() {
 		super(MPICH2_CAPABILITIES);
 
-		Preferences prefs = MPICH2PreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_LAUNCH_CMD));
-		setDebugCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_DEBUG_CMD));
-		setDiscoverCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_DISCOVER_CMD));
-		setPeriodicMonitorCmd(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
-		setPeriodicMonitorTime(prefs.getInt(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME));
-		setRemoteInstallPath(prefs.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+		IPreferencesService prefs = MPICH2PreferenceManager.getPreferences();
+		setLaunchCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null));
+		setDebugCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null));
+		setDiscoverCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null));
+		setPeriodicMonitorCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_CMD, EMPTY_STR, null));
+		setPeriodicMonitorTime(prefs.getInt(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME, 0, null));
+		setRemoteInstallPath(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null));
 	}
-	
+
 	/**
 	 * Constructor for creating a working copy of the service provider
 	 * 
-	 * @param provider provider we are making a copy from
+	 * @param provider
+	 *            provider we are making a copy from
 	 */
 	public MPICH2ServiceProvider(MPICH2ServiceProvider provider) {
 		super(provider);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
 		return new MPICH2ServiceProvider(this);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
+	 * createResourceManager()
 	 */
 	@Override
 	public IResourceManagerControl createResourceManager() {
@@ -60,23 +74,32 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 		return new MPICH2ResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
+	 * getResourceManagerId()
 	 */
 	@Override
 	public String getResourceManagerId() {
 		return getId();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration#getVersionId()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.
+	 * IMPICH2ResourceManagerConfiguration#getVersionId()
 	 */
 	public String getVersionId() {
 		return getString(TAG_VERSION_ID, ""); //$NON-NLS-1$
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#setDefaultNameAndDesc()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
+	 * setDefaultNameAndDesc()
 	 */
 	public void setDefaultNameAndDesc() {
 		String name = Messages.MPICH2ResourceManagerConfiguration_defaultName;
@@ -87,9 +110,12 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 		setName(name);
 		setDescription(Messages.MPICH2ResourceManagerConfiguration_defaultDescription);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration#setVersionId(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.
+	 * IMPICH2ResourceManagerConfiguration#setVersionId(java.lang.String)
 	 */
 	public void setVersionId(String versionId) {
 		putString(TAG_VERSION_ID, versionId);

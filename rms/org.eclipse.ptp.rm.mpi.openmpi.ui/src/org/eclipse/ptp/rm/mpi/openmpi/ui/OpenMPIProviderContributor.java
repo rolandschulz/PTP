@@ -60,12 +60,8 @@ public class OpenMPIProviderContributor implements IServiceProviderContributor {
 	 * org.eclipse.ptp.services.core.IServiceProvider)
 	 */
 	public WizardPage[] getWizardPages(IWizard wizard, IServiceProvider provider) {
-		WizardPage wizardPages[];
-
-		wizardPages = new WizardPage[2];
-		wizardPages[0] = new OpenMPIRMConfigurationWizardPage((IRMConfigurationWizard) wizard);
-		wizardPages[1] = new OpenMPIConfigurationWizardPage((IRMConfigurationWizard) wizard);
-		return wizardPages;
+		return new WizardPage[] { new OpenMPIRMConfigurationWizardPage((IRMConfigurationWizard) wizard),
+				new OpenMPIConfigurationWizardPage((IRMConfigurationWizard) wizard) };
 	}
 
 }

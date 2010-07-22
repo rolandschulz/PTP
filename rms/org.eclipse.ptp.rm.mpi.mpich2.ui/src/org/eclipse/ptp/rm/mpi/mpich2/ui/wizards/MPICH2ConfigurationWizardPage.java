@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.ui.wizards;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
 import org.eclipse.ptp.rm.mpi.mpich2.ui.messages.Messages;
@@ -32,12 +33,14 @@ import org.eclipse.swt.widgets.Label;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWizardPage {
+	private static final String EMPTY_STR = ""; //$NON-NLS-1$
 
-	String versionIds[] = new String[] { };
-	String versionsNames[] = new String[] { Messages.MPICH2ConfigurationWizardPage_VersionCombo_Version12, Messages.MPICH2ConfigurationWizardPage_VersionCombo_Version13};
+	private final String versionIds[] = new String[] {};
+	private final String versionsNames[] = new String[] { Messages.MPICH2ConfigurationWizardPage_VersionCombo_Version12,
+			Messages.MPICH2ConfigurationWizardPage_VersionCombo_Version13 };
 
 	protected Combo versionCombo;
 
@@ -92,7 +95,6 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 			super.validateLocal();
 		}
 
-
 		@Override
 		public void setConfig(IResourceManagerConfiguration configuration) {
 			this.config = (IMPICH2ResourceManagerConfiguration) configuration;
@@ -111,10 +113,8 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 	}
 
 	public MPICH2ConfigurationWizardPage(IRMConfigurationWizard wizard) {
-		super(wizard, IMPICH2ResourceManagerConfiguration.MPICH2_CAPABILITIES, 
-				Messages.MPICH2ConfigurationWizardPage_Name, 
-				Messages.MPICH2ConfigurationWizardPage_Title, 
-				Messages.MPICH2ConfigurationWizardPage_Description);
+		super(wizard, IMPICH2ResourceManagerConfiguration.MPICH2_CAPABILITIES, Messages.MPICH2ConfigurationWizardPage_Name,
+				Messages.MPICH2ConfigurationWizardPage_Title, Messages.MPICH2ConfigurationWizardPage_Description);
 	}
 
 	@Override
@@ -166,11 +166,15 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 		String debugCmd = null;
 		String discoverCmd = null;
 		String remoteInstallPath = null;
-		Preferences preferences = MPICH2PreferenceManager.getPreferences();
-		launchCmd = preferences.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_LAUNCH_CMD);
-		debugCmd = preferences.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_DEBUG_CMD);
-		discoverCmd = preferences.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_DISCOVER_CMD);
-		remoteInstallPath = preferences.getString(MPICH2PreferenceManager.PREFIX + MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
+		IPreferencesService preferences = MPICH2PreferenceManager.getPreferences();
+		launchCmd = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
+		debugCmd = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
+		discoverCmd = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
+		remoteInstallPath = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null);
 		resetErrorMessages();
 		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
 		dataSource.setUseDefaults(true);

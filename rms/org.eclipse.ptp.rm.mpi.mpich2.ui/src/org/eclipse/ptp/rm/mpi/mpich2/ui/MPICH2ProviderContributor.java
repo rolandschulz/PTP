@@ -60,12 +60,8 @@ public class MPICH2ProviderContributor implements IServiceProviderContributor {
 	 * org.eclipse.ptp.services.core.IServiceProvider)
 	 */
 	public WizardPage[] getWizardPages(IWizard wizard, IServiceProvider provider) {
-		WizardPage wizardPages[];
-
-		wizardPages = new WizardPage[2];
-		wizardPages[0] = new MPICH2RMConfigurationWizardPage((IRMConfigurationWizard) wizard);
-		wizardPages[1] = new MPICH2ConfigurationWizardPage((IRMConfigurationWizard) wizard);
-		return wizardPages;
+		return new WizardPage[] { new MPICH2RMConfigurationWizardPage((IRMConfigurationWizard) wizard),
+				new MPICH2ConfigurationWizardPage((IRMConfigurationWizard) wizard) };
 	}
 
 }

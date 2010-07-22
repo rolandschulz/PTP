@@ -13,11 +13,12 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
+import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
@@ -27,37 +28,43 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
 
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
+	private static final String EMPTY_STR = ""; //$NON-NLS-1$
 
 	/*
-	 * Actual version that is used to select correct commands. This version
-	 * only persists while the RM is running.
+	 * Actual version that is used to select correct commands. This version only
+	 * persists while the RM is running.
 	 */
 	private int majorVersion = 0;
 	private int minorVersion = 0;
 	private int serviceVersion = 0;
-	
+
 	public OpenMPIServiceProvider() {
 		super(OPENMPI_CAPABILITIES);
-		
+
 		/*
 		 * By default, assume openmpi auto configuration.
 		 */
-		Preferences prefs = OpenMPIPreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_LAUNCH_CMD));
-		setDebugCmd(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_DEBUG_CMD));
-		setDiscoverCmd(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_DISCOVER_CMD));
-		setRemoteInstallPath(prefs.getString(OpenMPIPreferenceManager.PREFIX_AUTO + OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+		IPreferencesService prefs = OpenMPIPreferenceManager.getPreferences();
+		setLaunchCmd(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null));
+		setDebugCmd(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null));
+		setDiscoverCmd(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null));
+		setRemoteInstallPath(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null));
 		setVersionId(VERSION_AUTO);
 		setUseInstallDefaults(true);
 		setUseToolDefaults(true);
 		setCommandsEnabled(false);
 		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
 	}
-	
+
 	/**
 	 * Constructor for creating a working copy of the service provider
 	 * 
-	 * @param provider provider we are making a copy from
+	 * @param provider
+	 *            provider we are making a copy from
 	 */
 	public OpenMPIServiceProvider(OpenMPIServiceProvider provider) {
 		super(provider);
@@ -66,19 +73,25 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 		serviceVersion = provider.getServiceVersion();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#copy()
 	 */
+	@Override
 	public IServiceProviderWorkingCopy copy() {
 		return new OpenMPIServiceProvider(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
+	 * createResourceManager()
 	 */
 	@Override
 	public IResourceManagerControl createResourceManager() {
-		IPUniverseControl universe = (IPUniverseControl)PTPCorePlugin.getDefault().getUniverse();
+		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
 		return new OpenMPIResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
 
@@ -86,29 +99,38 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	 * Get the detected Open MPI version. Only the major and minor version
 	 * numbers are used. Any point or beta release information is discarded.
 	 * 
-	 * @return string representing the detected version 
-	 *         or "unknown" if no version has been detected
+	 * @return string representing the detected version or "unknown" if no
+	 *         version has been detected
 	 */
 	public String getDetectedVersion() {
 		return majorVersion + "." + minorVersion; //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#getMajorVersion()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.
+	 * IOpenMPIResourceManagerConfiguration#getMajorVersion()
 	 */
 	public int getMajorVersion() {
 		return majorVersion;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration#getMinorVersion()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.
+	 * IOpenMPIResourceManagerConfiguration#getMinorVersion()
 	 */
 	public int getMinorVersion() {
 		return minorVersion;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
+	 * getResourceManagerId()
 	 */
 	@Override
 	public String getResourceManagerId() {
@@ -132,9 +154,13 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	public String getVersionId() {
 		return getString(TAG_VERSION_ID, ""); //$NON-NLS-1$
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc
+	 * ()
 	 */
 	public void setDefaultNameAndDesc() {
 		String name = Messages.OpenMPIResourceManagerConfiguration_defaultName;
@@ -149,16 +175,16 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	/**
 	 * Set the detected Open MPI version. Allowable version formats are:
 	 * 
-	 * 1.3		-> major=1, minor=3, point=0
-	 * 1.2.8	-> major=1, minor=2, point=8
-	 * 1.2b1	-> major=1, minor=2, point=0
+	 * 1.3 -> major=1, minor=3, point=0 1.2.8 -> major=1, minor=2, point=8 1.2b1
+	 * -> major=1, minor=2, point=0
 	 * 
 	 * Currently only 1.2 and 1.3 versions are valid.
 	 * 
-	 * If the versionId is not VERSION_AUTO, then the detected version
-	 * must match the versionId.
+	 * If the versionId is not VERSION_AUTO, then the detected version must
+	 * match the versionId.
 	 * 
-	 * @param version string representing the detected version
+	 * @param version
+	 *            string representing the detected version
 	 * @return true if version was correct
 	 */
 	public boolean setDetectedVersion(String version) {
@@ -184,15 +210,15 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	/**
 	 * Set the version that is selected when configuring the RM
 	 * 
-	 * @param versionId string representing the Open MPI version
+	 * @param versionId
+	 *            string representing the Open MPI version
 	 */
 	public void setVersionId(String versionId) {
 		putString(TAG_VERSION_ID, versionId);
 	}
-	
+
 	private boolean validateVersion() {
-		return getDetectedVersion().equals(VERSION_12)
-			|| getDetectedVersion().equals(VERSION_13)
-			|| getDetectedVersion().equals(VERSION_14);
+		return getDetectedVersion().equals(VERSION_12) || getDetectedVersion().equals(VERSION_13)
+				|| getDetectedVersion().equals(VERSION_14);
 	}
 }
