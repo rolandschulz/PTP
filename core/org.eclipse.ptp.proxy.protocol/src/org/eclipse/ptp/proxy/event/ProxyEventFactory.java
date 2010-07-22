@@ -74,7 +74,7 @@ public class ProxyEventFactory extends AbstractProxyEventFactory {
 	/**
 	 * @since 4.0
 	 */
-	public ProxyShutdownEvent newShutdownEvent(int transID) {
+	public IProxyShutdownEvent newShutdownEvent(int transID) {
 		return new ProxyShutdownEvent(transID);
 	}
 
