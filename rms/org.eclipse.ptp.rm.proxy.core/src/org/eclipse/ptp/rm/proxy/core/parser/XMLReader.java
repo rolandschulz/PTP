@@ -61,7 +61,7 @@ public class XMLReader implements IParser {
 		boolean isEmpty = false;
 		int totalBytesRead = 0;
 		Reader emptyInput = null;
-		
+
 		public FixInValidXMLReader(InputStream in) {
 			super(in);
 		}
@@ -70,8 +70,10 @@ public class XMLReader implements IParser {
 		public int read() throws IOException {
 			char cbuf[] = new char[1];
 			int ret;
-			while ((ret = read(cbuf, 0, 1)) != -1)
-				;
+
+			while ((ret = read(cbuf, 0, 1)) != -1) {
+			}
+
 			if (ret > 0)
 				return cbuf[0];
 			else
@@ -85,7 +87,7 @@ public class XMLReader implements IParser {
 			int ret = super.read(cbuf, offset, length);
 			int skip = 0;
 			if (totalBytesRead==0 && ret<1) {  /*Send non-empty valid XML if input stream is empty*/
-				emptyInput = new StringReader("<D></D>");
+				emptyInput = new StringReader("<D></D>"); //$NON-NLS-1$
 				return emptyInput.read(cbuf, offset, length);
 			}
 			for (int i = offset; i < offset + ret; i++) {
@@ -116,7 +118,7 @@ public class XMLReader implements IParser {
 	 *            the arguments
 	 */
 	public static void main(String argv[]) throws IntrospectionException, IllegalAccessException, InvocationTargetException,
-			InstantiationException, FileNotFoundException {
+	InstantiationException, FileNotFoundException {
 		DEBUG = true;
 		// parseXML(ModelQstatJob.class, new File("qstat_valid.xml"));
 		// new XMLReader().parse(ModelNode.class, new FileInputStream(new
@@ -143,7 +145,7 @@ public class XMLReader implements IParser {
 	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
 	 */
 	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) throws SAXException, IOException,
-			ParserConfigurationException, UnknownValueExecption {
+	ParserConfigurationException, UnknownValueExecption {
 		// public <T extends IElement> Set<T> parse(Class<IElement> pojoClazz,
 		// InputStream in) {
 		Set<IElement> elementList = null;

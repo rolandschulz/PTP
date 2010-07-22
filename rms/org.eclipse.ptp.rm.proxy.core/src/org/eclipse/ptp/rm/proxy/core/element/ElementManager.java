@@ -31,7 +31,7 @@ import org.eclipse.ptp.utils.core.RangeSet;
 public class ElementManager {
 
 	/** The key to element. */
-	private Map<String, IElement> keyToElement;
+	private final Map<String, IElement> keyToElement;
 	// private Map<String, T> elementIDToElement; //only required if requests to
 	// getElementByElementID are common
 	// public ElementManager() {
@@ -249,7 +249,6 @@ public class ElementManager {
 	 */
 	public List<String> serialize() {
 		List<String> eventArgs = new ArrayList<String>();
-		;
 		// create the Args for one sendEvent (all Element Arguments with the
 		// same parent)
 		eventArgs.add(new Integer(size()).toString());// Number of Elements
