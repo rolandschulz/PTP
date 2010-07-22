@@ -23,6 +23,6 @@ AbstractRemoteProxyResourceManagerConfigurationWizardPage {
 		setTitle(Messages.PBSResourceManagerConfigurationWizardPage_title);
 		setDescription(Messages.PBSResourceManagerConfigurationWizardPage_description);
 		proxyPathEnabled = false;
-		manualLaunchEnabled = false;
+		fManualLaunchEnabled = false;
 	}
 }
