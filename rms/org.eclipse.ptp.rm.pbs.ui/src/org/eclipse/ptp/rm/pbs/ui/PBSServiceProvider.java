@@ -13,12 +13,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
-import org.eclipse.ptp.rm.pbs.core.PBSPreferenceManager;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
@@ -30,7 +28,6 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
  * Service provider for IBM Parallel Environment
  */
 public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPBSResourceManagerConfiguration {
-	private final Preferences preferences = PBSPreferenceManager.getPreferences();
 
 	public PBSServiceProvider() {
 		super();
