@@ -21,6 +21,7 @@ import java.util.Enumeration;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
@@ -276,60 +277,6 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	@Override
 	public RMDataSource getDataSource() {
 		return (RMDataSource) super.getDataSource();
-	}
-
-	/**
-	 * Initialize the contents of the local address selection combo. Host names
-	 * are obtained by performing a reverse lookup on the IP addresses of each
-	 * network interface. If DNS is configured correctly, this should add the
-	 * fully qualified domain name, otherwise it will probably be the IP
-	 * address. We also add the configuration address to the combo in case it
-	 * was specified manually.
-	 */
-	public void initializeLocalHostCombo() {
-		final boolean enabled = getWidgetListener().isEnabled();
-		getWidgetListener().disable();
-		Set<String> addrs = new TreeSet<String>();
-		try {
-			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-			while (netInterfaces.hasMoreElements()) {
-				NetworkInterface ni = netInterfaces.nextElement();
-				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
-				while (alladdr.hasMoreElements()) {
-					InetAddress ip = alladdr.nextElement();
-					if (ip instanceof Inet4Address) {
-						addrs.add(fixHostName(ip.getCanonicalHostName()));
-					}
-				}
-			}
-		} catch (Exception e) {
-			// At least we'll still get localhost
-		}
-		if (addrs.size() == 0) {
-			addrs.add("localhost"); //$NON-NLS-1$
-		}
-		localAddrCombo.removeAll();
-		int index = 0;
-		int selection = -1;
-		for (String addr : addrs) {
-			localAddrCombo.add(addr);
-			if (addr.equals(getDataSource().getLocalAddr())) {
-				selection = index;
-			}
-			index++;
-		}
-		/*
-		 * localAddr is not in the list, so add it and make it the current
-		 * selection
-		 */
-		if (selection < 0) {
-			if (!getDataSource().getLocalAddr().equals("")) { //$NON-NLS-1$
-				localAddrCombo.add(getDataSource().getLocalAddr());
-			}
-			selection = localAddrCombo.getItemCount() - 1;
-		}
-		localAddrCombo.select(selection);
-		getWidgetListener().setEnabled(enabled);
 	}
 
 	/*
@@ -713,6 +660,60 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	}
 
 	/**
+	 * Initialize the contents of the local address selection combo. Host names
+	 * are obtained by performing a reverse lookup on the IP addresses of each
+	 * network interface. If DNS is configured correctly, this should add the
+	 * fully qualified domain name, otherwise it will probably be the IP
+	 * address. We also add the configuration address to the combo in case it
+	 * was specified manually.
+	 */
+	protected void initializeLocalHostCombo() {
+		final boolean enabled = getWidgetListener().isEnabled();
+		getWidgetListener().disable();
+		Set<String> addrs = new TreeSet<String>();
+		try {
+			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (netInterfaces.hasMoreElements()) {
+				NetworkInterface ni = netInterfaces.nextElement();
+				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
+				while (alladdr.hasMoreElements()) {
+					InetAddress ip = alladdr.nextElement();
+					if (ip instanceof Inet4Address) {
+						addrs.add(fixHostName(ip.getCanonicalHostName()));
+					}
+				}
+			}
+		} catch (Exception e) {
+			// At least we'll still get localhost
+		}
+		if (addrs.size() == 0) {
+			addrs.add("localhost"); //$NON-NLS-1$
+		}
+		localAddrCombo.removeAll();
+		int index = 0;
+		int selection = -1;
+		for (String addr : addrs) {
+			localAddrCombo.add(addr);
+			if (addr.equals(getDataSource().getLocalAddr())) {
+				selection = index;
+			}
+			index++;
+		}
+		/*
+		 * localAddr is not in the list, so add it and make it the current
+		 * selection
+		 */
+		if (selection < 0) {
+			if (!getDataSource().getLocalAddr().equals("")) { //$NON-NLS-1$
+				localAddrCombo.add(getDataSource().getLocalAddr());
+			}
+			selection = localAddrCombo.getItemCount() - 1;
+		}
+		localAddrCombo.select(selection);
+		getWidgetListener().setEnabled(enabled);
+	}
+
+	/**
 	 * Initialize the contents of the remote services combo. Keeps an array of
 	 * remote services that matches the combo elements. Returns the id of the
 	 * selected element.
@@ -720,7 +721,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	protected String initializeRemoteServicesCombo(String id) {
 		final boolean enabled = getWidgetListener().isEnabled();
 		getWidgetListener().disable();
-		fRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices();
+		IWizardContainer container = null;
+		if (getControl().isVisible()) {
+			container = getWizard().getContainer();
+		}
+		fRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(container);
 		IRemoteServices defServices;
 		if (id != null) {
 			defServices = getRemoteServices(id);

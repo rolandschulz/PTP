@@ -63,8 +63,8 @@ import org.eclipse.swt.widgets.Text;
 public class RMServicesConfigurationWizard extends Wizard implements IRMConfigurationWizard {
 
 	/**
-	 * Wizard page for common resource manager configuration.
-	 * This is the final page that the wizard will display.
+	 * Wizard page for common resource manager configuration. This is the final
+	 * page that the wizard will display.
 	 */
 	private class ResourceManagerPage extends WizardPage {
 
@@ -79,10 +79,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		}
 
 		public void createControl(Composite parent) {
-	        Composite composite = new Composite(parent, SWT.NULL);
-	        composite.setFont(parent.getFont());
-	        composite.setLayout(new GridLayout());
-	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+			Composite composite = new Composite(parent, SWT.NULL);
+			composite.setFont(parent.getFont());
+			composite.setLayout(new GridLayout());
+			composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 			createRMControl(composite);
 
@@ -92,11 +92,11 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		public String getRMDesc() {
 			return descText.getText();
 		}
-		
+
 		public String getRMName() {
 			return nameText.getText();
 		}
-		
+
 		private void createRMControl(Composite container) {
 			Group nameGroup = new Group(container, SWT.SHADOW_ETCHED_IN);
 			GridLayout layout = new GridLayout();
@@ -105,8 +105,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			nameGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			nameGroup.setText(Messages.RMServicesConfigurationWizard_11);
 
-			final Button useDefaultsButton = new Button(nameGroup,
-					SWT.TOGGLE | SWT.CHECK);
+			final Button useDefaultsButton = new Button(nameGroup, SWT.TOGGLE | SWT.CHECK);
 			useDefaultsButton.setText(Messages.RMServicesConfigurationWizard_3);
 			useDefaultsButton.setSelection(fUseDefaultNameAndDesc);
 			GridData buttonData = new GridData();
@@ -128,13 +127,13 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 					getContainer().updateButtons();
 				}
 			});
-			
+
 			Label nameLabel = new Label(nameGroup, SWT.NONE);
 			nameLabel.setText(Messages.RMServicesConfigurationWizard_4);
 			nameText = new Text(nameGroup, SWT.BORDER);
 			nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			nameText.setText(""); //$NON-NLS-1$
-			nameText.addModifyListener(new ModifyListener(){
+			nameText.addModifyListener(new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
 					if (nameText.getText().equals(EMPTY_STRING)) {
 						setPageComplete(false);
@@ -144,18 +143,20 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 						setPageComplete(true);
 						setErrorMessage(null);
 					}
-				}});
+				}
+			});
 
 			Label descLabel = new Label(nameGroup, SWT.NONE);
 			descLabel.setText(Messages.RMServicesConfigurationWizard_6);
 			descText = new Text(nameGroup, SWT.BORDER);
 			descText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			descText.setText(""); //$NON-NLS-1$
-			descText.addModifyListener(new ModifyListener(){
+			descText.addModifyListener(new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
 					getConfiguration().setDescription(descText.getText());
-				}});
-			
+				}
+			});
+
 			Group startGroup = new Group(container, SWT.SHADOW_ETCHED_IN);
 			startGroup.setText(Messages.RMServicesConfigurationWizard_12);
 			startGroup.setLayout(new GridLayout(1, true));
@@ -164,19 +165,23 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			autoStartButton.setText(Messages.RMServicesConfigurationWizard_13);
 			autoStartButton.addSelectionListener(new SelectionAdapter() {
 
-				/* (non-Javadoc)
-				 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org
+				 * .eclipse.swt.events.SelectionEvent)
 				 */
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					getConfiguration().setAutoStart(autoStartButton.getSelection());
 				}
-				
+
 			});
-			
+
 			setPageComplete(true);
 		}
-		
+
 		private void setAutoStart(boolean flag) {
 			autoStartButton.setSelection(flag);
 		}
@@ -191,10 +196,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			descText.setText(config.getDescription());
 		}
 	}
-	
+
 	/**
-	 * Wizard page for selecting a service configuration from a list
-	 * of service configurations.
+	 * Wizard page for selecting a service configuration from a list of service
+	 * configurations.
 	 */
 	private class SelectServiceConfigurationPage extends WizardPage {
 		private AddServiceConfigurationWidget serviceConfigWidget;
@@ -205,29 +210,33 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			setDescription(Messages.RMServicesConfigurationWizard_0);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt
+		 * .widgets.Composite)
 		 */
 		public void createControl(Composite parent) {
-	        Composite composite = new Composite(parent, SWT.NULL);
-	        composite.setFont(parent.getFont());
-	        composite.setLayout(new GridLayout());
-	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-	        
-	        serviceConfigWidget = new AddServiceConfigurationWidget(composite, SWT.NONE, null, 
-	        							Collections.singleton(fLaunchService), false);
-	        GridData data = new GridData(GridData.FILL_BOTH);
-	        serviceConfigWidget.setLayoutData(data);
-	        serviceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
+			Composite composite = new Composite(parent, SWT.NULL);
+			composite.setFont(parent.getFont());
+			composite.setLayout(new GridLayout());
+			composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+			serviceConfigWidget = new AddServiceConfigurationWidget(composite, SWT.NONE, null,
+					Collections.singleton(fLaunchService), false);
+			GridData data = new GridData(GridData.FILL_BOTH);
+			serviceConfigWidget.setLayoutData(data);
+			serviceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
 				public void selectionChanged(SelectionChangedEvent event) {
 					setPageComplete(getServiceConfiguration() != null);
 				}
-	        });
+			});
 
 			setControl(composite);
 			setPageComplete(false);
 		}
-		
+
 		/**
 		 * Get the service configuration selected in the widget.
 		 * 
@@ -236,9 +245,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		public IServiceConfiguration getServiceConfiguration() {
 			return serviceConfigWidget.getServiceConfiguration();
 		}
-		
+
 		/**
-		 * Set the name that will be displayed in the create configuration text box.
+		 * Set the name that will be displayed in the create configuration text
+		 * box.
 		 * 
 		 * @param name
 		 */
@@ -247,13 +257,13 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			serviceConfigWidget.setSelection(false);
 		}
 	}
-	
+
 	/**
-	 * Wizard page for selecting the resource manager type. 
+	 * Wizard page for selecting the resource manager type.
 	 * 
-	 * Resource manager types correspond to service providers for
-	 * the Launch service that implement IResourceManagerConfiguration.
-	 *
+	 * Resource manager types correspond to service providers for the Launch
+	 * service that implement IResourceManagerConfiguration.
+	 * 
 	 */
 	private class SelectServiceProviderPage extends WizardPage {
 
@@ -267,11 +277,11 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		}
 
 		public void createControl(Composite parent) {
-	        Composite composite = new Composite(parent, SWT.NULL);
-	        composite.setFont(parent.getFont());
-	        composite.setLayout(new GridLayout());
-	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-	        
+			Composite composite = new Composite(parent, SWT.NULL);
+			composite.setFont(parent.getFont());
+			composite.setLayout(new GridLayout());
+			composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
 			createServiceProviderChoiceControl(composite);
 
 			parent.getDisplay().asyncExec(new Runnable() {
@@ -289,9 +299,9 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			/*
 			 * Locate all service providers
 			 * 
-			 * TODO: This assumes all LAUNCH_SERVICE providers implement IResourceManagerConfiguration
-			 * 		 Probably better to create an RM_LAUNCH_SERVICE instead.
-			 * 
+			 * TODO: This assumes all LAUNCH_SERVICE providers implement
+			 * IResourceManagerConfiguration Probably better to create an
+			 * RM_LAUNCH_SERVICE instead.
 			 */
 			fProviders = fLaunchService.getProvidersByPriority().toArray(new IServiceProviderDescriptor[0]);
 			String[] providerNames = new String[fProviders.length];
@@ -301,12 +311,12 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 
 			Label label = new Label(container, SWT.NONE);
 			label.setText(Messages.RMServicesConfigurationWizard_8);
-			fServiceProviderList = new List(container, SWT.SINGLE | SWT.BORDER
-					| SWT.V_SCROLL);
+			fServiceProviderList = new List(container, SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
 			fServiceProviderList.setLayoutData(new GridData(GridData.FILL_BOTH));
 			fServiceProviderList.setItems(providerNames);
 			fServiceProviderList.setEnabled(fProviders.length > 0);
 			fServiceProviderList.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleProviderSelection();
 				}
@@ -320,21 +330,19 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	}
 
 	public final static String EMPTY_STRING = ""; //$NON-NLS-1$
-	
+
 	private final ArrayList<IWizardPage> fWizardPages = new ArrayList<IWizardPage>();
-	private final SelectServiceProviderPage fSelectServiceProviderPage = 
-		new SelectServiceProviderPage(Messages.RMServicesConfigurationWizard_9);
-	private final SelectServiceConfigurationPage fSelectServiceConfigurationPage = 
-		new SelectServiceConfigurationPage(Messages.RMServicesConfigurationWizard_1);
-	private final ResourceManagerPage fResourceManagerPage = 
-		new ResourceManagerPage(Messages.RMServicesConfigurationWizard_10);
+	private final SelectServiceProviderPage fSelectServiceProviderPage = new SelectServiceProviderPage(
+			Messages.RMServicesConfigurationWizard_9);
+	private final SelectServiceConfigurationPage fSelectServiceConfigurationPage = new SelectServiceConfigurationPage(
+			Messages.RMServicesConfigurationWizard_1);
+	private final ResourceManagerPage fResourceManagerPage = new ResourceManagerPage(Messages.RMServicesConfigurationWizard_10);
 	private final IServiceModelManager fModelManager = ServiceModelManager.getInstance();
 	private final IService fLaunchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
 
-	private Map<String, IWizardPage[]> fCachedPages = new HashMap<String, IWizardPage[]>();
+	private final Map<String, IWizardPage[]> fCachedPages = new HashMap<String, IWizardPage[]>();
 	private boolean fUseDefaultNameAndDesc = true;
 	private boolean fUsingWorkingCopy = false;
-	private IServiceConfiguration fServiceConfiguration = null; 
 	private IServiceProvider fServiceProvider = null;
 
 	/*
@@ -342,22 +350,27 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 */
 	public RMServicesConfigurationWizard() {
 		setForcePreviousAndNextButtons(true);
+		setNeedsProgressMonitor(true);
 		setWizardPages(null);
 	}
 
 	/*
-	 * Constructor used when editing configuration of an existing resource manager.
+	 * Constructor used when editing configuration of an existing resource
+	 * manager.
 	 */
 	public RMServicesConfigurationWizard(IResourceManagerControl resourceManager) {
 		this();
 		fUseDefaultNameAndDesc = false;
 		fUsingWorkingCopy = true;
-		setServiceProvider(((IServiceProvider)resourceManager.getConfiguration()).copy());
+		setServiceProvider(((IServiceProvider) resourceManager.getConfiguration()).copy());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#addPages()
 	 */
+	@Override
 	public void addPages() {
 		if (!fUsingWorkingCopy) {
 			addPage(fSelectServiceProviderPage);
@@ -369,9 +382,12 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		super.addPages();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#canFinish()
 	 */
+	@Override
 	public boolean canFinish() {
 		int numPages = getNumPages();
 		for (int i = 0; i < numPages; ++i) {
@@ -384,15 +400,17 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.wizards.IRMConfigurationWizard#getConfiguration()
 	 */
 	public IResourceManagerConfiguration getConfiguration() {
 		/*
-		 * We know the following cast is safe, because only service providers that
-		 * implement IResourceManagerConfiguration can be selected
+		 * We know the following cast is safe, because only service providers
+		 * that implement IResourceManagerConfiguration can be selected
 		 */
-		return (IResourceManagerConfiguration)getServiceProvider();
+		return (IResourceManagerConfiguration) getServiceProvider();
 	}
 
 	/**
@@ -409,9 +427,14 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		return fResourceManagerPage.getRMName();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.wizard.Wizard#getNextPage(org.eclipse.jface.wizard.IWizardPage)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.wizard.Wizard#getNextPage(org.eclipse.jface.wizard.
+	 * IWizardPage)
 	 */
+	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
 		int numPages = getNumPages();
 
@@ -436,33 +459,41 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		return nextPage;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.wizard.Wizard#getPreviousPage(org.eclipse.jface.wizard.IWizardPage)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.wizard.Wizard#getPreviousPage(org.eclipse.jface.wizard
+	 * .IWizardPage)
 	 */
+	@Override
 	public IWizardPage getPreviousPage(IWizardPage page) {
-        int index = fWizardPages.indexOf(page);
-        if (index == 0 || index == -1) {
+		int index = fWizardPages.indexOf(page);
+		if (index == 0 || index == -1) {
 			// first page or page not found
-            return null;
+			return null;
 		} else {
-			return (IWizardPage) fWizardPages.get(index - 1);
+			return fWizardPages.get(index - 1);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
+	@Override
 	public boolean performFinish() {
 		if (fUseDefaultNameAndDesc) {
 			getConfiguration().setDefaultNameAndDesc();
 		}
 		if (fUsingWorkingCopy) {
-			((IServiceProviderWorkingCopy)getServiceProvider()).save();
+			((IServiceProviderWorkingCopy) getServiceProvider()).save();
 		} else {
 			IServiceConfiguration config = fSelectServiceConfigurationPage.getServiceConfiguration();
 			IServiceProvider provider = config.getServiceProvider(fLaunchService);
 			if (provider != null) {
-				boolean replace = MessageDialog.openQuestion(getShell(), Messages.RMServicesConfigurationWizard_15, 
+				boolean replace = MessageDialog.openQuestion(getShell(), Messages.RMServicesConfigurationWizard_15,
 						NLS.bind(Messages.RMServicesConfigurationWizard_16, provider.getName()));
 				if (!replace) {
 					return false;
@@ -480,14 +511,14 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	private int getNumPages() {
 		return fWizardPages.size();
 	}
-	
+
 	/**
 	 * @return
 	 */
 	private IServiceProvider getServiceProvider() {
 		return fServiceProvider;
 	}
-	
+
 	/**
 	 * @param provider
 	 */
