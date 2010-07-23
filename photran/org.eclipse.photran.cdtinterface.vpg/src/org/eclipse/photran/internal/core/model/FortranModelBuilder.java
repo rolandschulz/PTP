@@ -11,6 +11,7 @@ import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.photran.core.IFortranAST;
 import org.eclipse.photran.internal.core.FortranAST;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
@@ -67,8 +68,22 @@ public class FortranModelBuilder implements IFortranModelBuilder
         try
         {
             IFile file = translationUnit.getFile();
-            ISourceForm sourceForm = determineSourceForm(file);
-            String filename = determineFilename(file);
+            
+            ISourceForm sourceForm;
+            String filename;
+            if (file != null)
+            {
+                sourceForm = determineSourceForm(file);
+                filename = determineFilename(file);
+                createSourceFormNode(SourceForm.descriptionFor(file));
+            }
+            else
+            {
+                IPath location = translationUnit.getLocation();
+                sourceForm = determineSourceForm(location);
+                filename = determineFilename(location);
+                createSourceFormNode(SourceForm.descriptionFor(filename));
+            }
             lexer = new ASTLexerFactory().createLexer(
                 new StringReader(translationUnit.getBuffer().getContents()),
                 file,
@@ -77,8 +92,6 @@ public class FortranModelBuilder implements IFortranModelBuilder
             // There may be more than one FortranModelBuilder running at once, so, unfortunately, we have to
             // create a new parser each time
             IFortranAST ast = new FortranAST(file, new Parser().parse(lexer), lexer.getTokenList());
-
-            createSourceFormNode(SourceForm.descriptionFor(file));
 
             if (isParseTreeModelEnabled())
             {
@@ -125,6 +138,19 @@ public class FortranModelBuilder implements IFortranModelBuilder
 
         // From CDT: important to know if the unit has parse errors or not
         setIsStructureKnown(wasSuccessful);
+    }
+
+    private String determineFilename(IPath path)
+    {
+        if (path == null)
+            return ""; //$NON-NLS-1$
+        else
+            return path.toFile().getAbsolutePath();
+    }
+
+    private ISourceForm determineSourceForm(IPath path)
+    {
+        return SourceForm.of(path.toOSString());
     }
 
     private String determineFilename(IFile file)

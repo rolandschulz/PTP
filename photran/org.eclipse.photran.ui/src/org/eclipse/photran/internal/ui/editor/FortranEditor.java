@@ -567,7 +567,13 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
 
     public boolean isFixedForm()
     {
-        return SourceForm.isFixedForm(getIFile());
+        IFile file = getIFile();
+        if (file != null) return SourceForm.isFixedForm(getIFile());
+        
+        IEditorInput input = getEditorInput();
+        if (input != null) return SourceForm.isFixedForm(input.getName());
+        
+        return false;
     }
 
     public IFile getIFile()

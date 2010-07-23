@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.photran.internal.core;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.photran.internal.core.vpg.PhotranVPG;
 import org.osgi.framework.BundleContext;
 
@@ -61,4 +63,16 @@ public class Activator extends Plugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
+    
+    public static void log(Throwable e) {
+        log("Error", e); //$NON-NLS-1$
+    }
+
+    public static void log(String message, Throwable e) {
+        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, e));
+    }
+
+    public static void log(IStatus status) {
+        getDefault().getLog().log(status);
+    }
 }

@@ -57,6 +57,11 @@ public final class SourceForm
         return SourceForm.of(determineFilename(file), propertiesFor(file));
     }
 
+    public static ISourceForm of(String filename)
+    {
+        return SourceForm.of(filename, null);
+    }
+
     /**
      * @return the name of the source form that will handle the given file (i.e., the <i>name</i>
      *         attribute of the contribution to the {@value #SOURCE_FORM_EXTENSION_POINT_ID}
@@ -143,6 +148,16 @@ public final class SourceForm
     private static boolean isDefaultHandler(IConfigurationElement config)
     {
         return config.getAttribute("priority").equals("default"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    /**
+     * @return the name of the source form that will handle the given file (i.e., the <i>name</i>
+     *         attribute of the contribution to the {@value #SOURCE_FORM_EXTENSION_POINT_ID}
+     *         extension point)
+     */
+    public static String descriptionFor(String filename)
+    {
+        return SourceForm.descriptionFor(filename, null);
     }
 
     private static String descriptionFor(String filename, SourceFormProperties properties)
@@ -273,6 +288,11 @@ public final class SourceForm
     public static boolean isFixedForm(IFile file)
     {
         return SourceForm.of(file).isFixedForm();
+    }
+
+    public static boolean isFixedForm(String filename)
+    {
+        return SourceForm.of(filename).isFixedForm();
     }
 
     public static boolean isCPreprocessed(IFile file)

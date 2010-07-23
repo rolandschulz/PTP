@@ -206,10 +206,10 @@ public class ProducerMap {
 	 *         offset in the mapping
 	 */
 	public void setMarkB(int newMarkB) {
-		if(newMarkB < markB) throw new IllegalArgumentException(
-				"newMarkB must be >= markB"); //$NON-NLS-1$
-		if(newMarkB > finalOffset) throw new IllegalArgumentException(
-				"newMarkB must be <= the final offset"); //$NON-NLS-1$
+		if(newMarkB < markB)
+		    throw new IllegalArgumentException("newMarkB must be >= markB"); //$NON-NLS-1$
+		if(newMarkB > finalOffset)
+		    throw new IllegalArgumentException("newMarkB must be <= the final offset"); //$NON-NLS-1$
 		
 		boolean wasEqual = false;
 		while(true) {

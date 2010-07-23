@@ -211,7 +211,10 @@ public class PhotranVPGBuilder extends PhotranVPG
     private ISourceForm determineSourceForm(final String filename)
     {
         IFile file = getIFileForFilename(filename);
-        return SourceForm.of(file).configuredWith(new IncludeLoaderCallback(file.getProject())
+        if (file == null)
+            return SourceForm.of(filename);
+        else
+            return SourceForm.of(file).configuredWith(new IncludeLoaderCallback(file.getProject())
             {
                 @Override
                 public Reader getIncludedFileAsStream(String fileToInclude) throws FileNotFoundException

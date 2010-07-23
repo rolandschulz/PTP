@@ -157,17 +157,20 @@ class DefinitionCollector extends BindingCollector
         ScopingNode enclosingScope = node.findNearestAncestor(ScopingNode.class);
         
         IASTListNode<ASTEntityDeclNode> decls = node.getEntityDeclList();
-        for (int i = 0; i < decls.size(); i++)
+        if (decls != null)
         {
-            ASTEntityDeclNode entityDecl = decls.get(i);
-            Token objectNameIdent = getObjectNameIdent(entityDecl);
-            
-            Definition def = addDefinition(objectNameIdent,
-                                           Definition.Classification.VARIABLE_DECLARATION,
-                                           Type.parse(node.getTypeSpec()));
-            def.setAttributes(node.getAttrSpecSeq(), enclosingScope);
-            def.setArraySpec(getArraySpec(entityDecl)); // (p.119) This overrides the DIMENSION attribute
-            setDefinition(objectNameIdent, def);
+            for (int i = 0; i < decls.size(); i++)
+            {
+                ASTEntityDeclNode entityDecl = decls.get(i);
+                Token objectNameIdent = getObjectNameIdent(entityDecl);
+                
+                Definition def = addDefinition(objectNameIdent,
+                                               Definition.Classification.VARIABLE_DECLARATION,
+                                               Type.parse(node.getTypeSpec()));
+                def.setAttributes(node.getAttrSpecSeq(), enclosingScope);
+                def.setArraySpec(getArraySpec(entityDecl)); // (p.119) This overrides the DIMENSION attribute
+                setDefinition(objectNameIdent, def);
+            }
         }
     }
 
