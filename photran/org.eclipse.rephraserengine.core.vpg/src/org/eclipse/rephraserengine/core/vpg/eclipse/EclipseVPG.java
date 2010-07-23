@@ -130,11 +130,24 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
             collectFilesToIndex(visitor, monitor);
             visitor.calculateDependencies(monitor);
             visitor.index(monitor);
+            flushDatabaseNoFail();
             return Status.OK_STATUS;
         }
         catch (CoreException e)
         {
             return e.getStatus();
+        }
+    }
+    
+    private void flushDatabaseNoFail()
+    {
+        try
+        {
+            db.flush();
+        }
+        catch (Throwable e)
+        {
+            // Ignore errors
         }
     }
 
@@ -264,6 +277,7 @@ public abstract class EclipseVPG<A, T, R extends TokenRef<T>, D extends VPGDB<A,
                 delta.accept(visitor); // Collect files to index
                 visitor.calculateDependencies(monitor);
                 visitor.index(monitor);
+                flushDatabaseNoFail();
                 return Status.OK_STATUS;
             }
             catch (CoreException e)
