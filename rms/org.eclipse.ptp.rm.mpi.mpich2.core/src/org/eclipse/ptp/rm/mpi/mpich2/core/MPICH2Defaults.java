@@ -10,25 +10,19 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.core;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
+import org.eclipse.ptp.rm.core.AbstractRMDefaults;
 import org.osgi.framework.Bundle;
 
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
-public class MPICH2Defaults {
+public class MPICH2Defaults extends AbstractRMDefaults {
 
 	public static String LAUNCH_CMD = null;
 	public static String DEBUG_CMD = null;
@@ -58,43 +52,5 @@ public class MPICH2Defaults {
 		assert DISCOVER_CMD != null;
 		assert PERIODIC_CMD != null;
 		assert PATH != null;
-	}
-
-	public static Properties read(Path defaultsPropertiesPath, Bundle bundle)
-	throws CoreException {
-		InputStream inStream;
-		Properties properties = new Properties();
-		try {
-			inStream = FileLocator.openStream(bundle, defaultsPropertiesPath, false);
-			properties.load(inStream);
-
-
-		} catch (IOException e) {
-			throw MPICH2Plugin.coreErrorException(Messages.MPICH2Defaults_Exception_FailedReadFile, e);
-		}
-		return properties;
-	}
-
-	public static String getString(Bundle bundle, Properties properties, String key) throws CoreException {
-		String value = properties.getProperty(key);
-		if (value == null) {
-			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.MPICH2Defaults_MissingValue, key)));
-		}
-		
-		return value;
-	}
-
-	public static int getInteger(Bundle bundle, Properties properties, String key) throws CoreException {
-		String value = getString(bundle, properties, key);
-		try {
-			return Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			throw new CoreException(new Status(IStatus.ERROR, bundle.getSymbolicName(), NLS.bind(Messages.MPICH2Defaults_FailedParseInteger, key)));
-		}
-	}
-
-	public static boolean getBoolean(Bundle bundle, Properties properties, String key) throws CoreException {
-		String value = getString(bundle, properties, key);
-		return Boolean.parseBoolean(value);
 	}
 }

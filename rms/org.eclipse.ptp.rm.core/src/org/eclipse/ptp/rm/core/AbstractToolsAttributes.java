@@ -16,15 +16,15 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
  * 
  * @author Daniel Felix Ferber
  */
-public class AbstractToolsAttributes {
+public abstract class AbstractToolsAttributes {
 
 	/*
-	 * I have disabled getLaunchArgumentsAttributeDefinition since
-	 * the launch command will contain all arguments and a variable substitution
-	 * to be replaced with the program executable path.
+	 * I have disabled getLaunchArgumentsAttributeDefinition since the launch
+	 * command will contain all arguments and a variable substitution to be
+	 * replaced with the program executable path.
 	 */
 
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
+	public static IAttributeDefinition<?, ?, ?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[] {};
 	}
 }
