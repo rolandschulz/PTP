@@ -15,13 +15,10 @@ import org.eclipse.osgi.util.NLS;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.mpi.mpich2.core.messages.messages"; //$NON-NLS-1$
-	public static String MPICH2Defaults_Exception_FailedReadFile;
-	public static String MPICH2Defaults_FailedParseInteger;
-	public static String MPICH2Defaults_MissingValue;
 	public static String MPICH2ApplicationAttributes_effectiveMPICH2EnvAttrDef_description;
 	public static String MPICH2ApplicationAttributes_effectiveMPICH2EnvAttrDef_title;
 	public static String MPICH2ApplicationAttributes_effectiveMPICH2ProgArgsAttrDef_description;
@@ -83,30 +80,30 @@ public class Messages extends NLS {
 	public static String MPICH2DiscoverJob_name;
 	public static String MPICH2DiscoverJob_parsingErrorMessage;
 	public static String MPICH2DiscoverJob_processErrorMessage;
-	
+
 	public static String MPICH2MonitorJob_interruptedErrorMessage;
 	public static String MPICH2MonitorJob_name;
 	public static String MPICH2MonitorJob_parsingErrorMessage;
 	public static String MPICH2MonitorJob_processErrorMessage;
 	public static String MPICH2MonitorJob_Exception_CommandFailed;
 	public static String MPICH2MonitorJob_Exception_InternalError;
-	
+
 	public static String MPICH2ProcessMapText12Parser_Exception_InvalidLine;
 	public static String MPICH2ProcessMapText12Parser_Exception_MissingDisplayMapInformation;
 	public static String MPICH2ProcessMapText12Parser_Exception_BrokenDisplayMapInformation;
-	
+
 	public static String MPICH2ProcessMapXml13Parser_Exception_AttributeNotInteger;
 	public static String MPICH2ProcessMapXml13Parser_Exception_MissingAttribute;
 	public static String MPICH2ProcessMapXml13Parser_Exception_UnknownAttribute;
 	public static String MPICH2ProcessMapXml13Parser_Exception_UnknownElement;
-	
+
 	public static String MPICH2RuntimeSystem_JobName;
 	public static String MPICH2RuntimeSystemJob_Exception_FailedParse;
 	public static String MPICH2RuntimeSystemJob_Exception_HostnamesDoNotMatch;
 	public static String MPICH2RuntimeSystemJob_ProcessName;
 	public static String MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithExitValue;
 	public static String MPICH2RuntimeSystemJob_Exception_ExecutionFailedWithSignal;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

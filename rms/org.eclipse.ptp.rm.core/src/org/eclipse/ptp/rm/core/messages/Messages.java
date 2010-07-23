@@ -15,6 +15,9 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.core.messages.messages"; //$NON-NLS-1$
 
+	public static String AbstractRMDefaults_Exception_FailedReadFile;
+	public static String AbstractRMDefaults_FailedParseInteger;
+	public static String AbstractRMDefaults_MissingValue;
 	public static String AbstractRemoteProxyRuntimeClient_0;
 	public static String AbstractRemoteProxyRuntimeClient_1;
 	public static String AbstractRemoteProxyRuntimeClient_2;
