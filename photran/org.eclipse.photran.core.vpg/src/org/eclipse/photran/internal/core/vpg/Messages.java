@@ -75,6 +75,8 @@ public class Messages extends NLS
 
     public static String PhotranVPGSerializer_AnnotationCorrupted;
 
+    public static String PhotranVPGStartup_FlushingDatabase;
+
     static
     {
         // initialize resource bundle
