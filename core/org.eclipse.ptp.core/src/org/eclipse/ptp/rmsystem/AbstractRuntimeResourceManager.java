@@ -84,6 +84,7 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.utils.core.RangeSet;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @author greg
@@ -686,7 +687,21 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public void handleEvent(IRuntimeMessageEvent e) {
 		// MessageAttributes.Level level = e.getLevel();
-		// FIXME: implement logging
+		int severity = IStatus.ERROR;
+		switch (e.getLevel()) {
+		case DEBUG:
+		case INFO:
+			severity = IStatus.INFO;
+			break;
+		case FATAL: /* should this map to cancel instead? */
+			severity = IStatus.ERROR;
+			break;
+		case WARNING:
+			severity = IStatus.WARNING;
+		}
+		StatusManager.getManager().handle(new Status(severity,
+				PTPCorePlugin.PLUGIN_ID, e.getText()),
+				(severity == IStatus.ERROR) ? StatusManager.SHOW : StatusManager.LOG);
 	}
 
 	/*

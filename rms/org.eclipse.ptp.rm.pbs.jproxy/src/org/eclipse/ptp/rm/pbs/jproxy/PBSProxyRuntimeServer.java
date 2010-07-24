@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.ptp.proxy.event.IProxyEvent;
+import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer;
 import org.eclipse.ptp.proxy.runtime.server.ElementIDGenerator;
@@ -220,7 +221,13 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		int resourceManagerID = ElementIDGenerator.getInstance().getBaseID();
 
 		try {
-			Process p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$ //TODO: read std-err for errors
+			Process p = null;
+			try {
+				p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$
+			} catch (IOException e1) {
+				sendEvent(getEventFactory().newProxyRuntimeMessageEvent(Level.ERROR, e1.getMessage()));
+				return;
+			}
 			p.waitFor();
 			String server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
 			if (server==null || server.split(" ").length<2) //$NON-NLS-1$
@@ -258,12 +265,11 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 							List<IProxyEvent> events = new ArrayList<IProxyEvent>();
 							try {
 								try {
-									events.addAll(nodeController.update());
-									events.addAll(queueController.update());
-									events.addAll(jobController.update());
+										events.addAll(nodeController.update());
+										events.addAll(queueController.update());
+										events.addAll(jobController.update());
 								} catch (Exception e) {
-									e.printStackTrace();
-									sendEvent(getEventFactory().newErrorEvent(transID, 0, e.getMessage()));
+									sendEvent(getEventFactory().newProxyRuntimeMessageEvent(Level.ERROR, e.getMessage()));
 								}
 								for (IProxyEvent e : events) {
 									e.setTransactionID(transID);
@@ -275,6 +281,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 								state = ServerState.SHUTDOWN;
 								stateMachineThread.interrupt();
 							}
+
 						}
 						try {
 							// System.err.println("Event Loop sleeps...");
@@ -442,8 +449,8 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					errMsg += line;
 				}
 				err.close();
-				String errArgs[] = { "errorCode=" + p.exitValue(), "errorMsg=" + errMsg }; //$NON-NLS-1$ //$NON-NLS-2$
-				sendEvent(getEventFactory().newErrorEvent(transID, errArgs));
+				String errArgs[] = { "jobSubId=" + id, "errorCode=" + 0, "errorMsg=" + errMsg }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				sendEvent(getEventFactory().newProxyRuntimeTerminateJobErrorEvent(transID, errArgs));
 			}
 			System.out.println(p.exitValue());
 		} catch (IOException e) {
