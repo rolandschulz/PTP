@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.elements.events.IQueueChangeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class QueueChangeEvent implements IQueueChangeEvent {
 
@@ -37,14 +37,19 @@ public class QueueChangeEvent implements IQueueChangeEvent {
 		this.attributes = attrs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedEvent#getAttributes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IQueueChangedEvent#getAttributes()
 	 */
 	public AttributeManager getAttributes() {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IQueueChangedEvent#getSource()
 	 */
 	public IPQueue getSource() {

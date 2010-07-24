@@ -27,28 +27,33 @@ import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class NewQueueEvent implements
 		INewQueueEvent {
 
 	private final IResourceManager rm;
-	private final Collection<IPQueue>  queues;
+	private final Collection<IPQueue> queues;
 
 	public NewQueueEvent(IResourceManager manager, Collection<IPQueue> queues) {
 		this.rm = manager;
 		this.queues = queues;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.INewQueueEvent#getQueue()
 	 */
-	public Collection<IPQueue>  getQueues() {
+	public Collection<IPQueue> getQueues() {
 		return queues;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getSource()
 	 */
 	public IResourceManager getSource() {
 		return rm;

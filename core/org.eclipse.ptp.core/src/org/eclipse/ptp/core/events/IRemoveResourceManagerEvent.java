@@ -8,7 +8,7 @@ public interface IRemoveResourceManagerEvent {
 	 * @return
 	 */
 	public IResourceManager getResourceManager();
-	
+
 	/**
 	 * @return
 	 */

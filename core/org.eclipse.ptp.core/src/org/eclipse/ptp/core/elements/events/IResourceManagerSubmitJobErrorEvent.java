@@ -11,15 +11,13 @@
 
 package org.eclipse.ptp.core.elements.events;
 
-
-
 /**
  * This event is sent when a job submission fails.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener
  */
 public interface IResourceManagerSubmitJobErrorEvent extends IResourceManagerErrorEvent {
-	
+
 	/**
 	 * Get the job submission id that was used in the original submission
 	 * 

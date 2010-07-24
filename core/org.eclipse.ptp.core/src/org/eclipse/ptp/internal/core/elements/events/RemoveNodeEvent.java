@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class RemoveNodeEvent implements IRemoveNodeEvent {
 
@@ -39,15 +39,21 @@ public class RemoveNodeEvent implements IRemoveNodeEvent {
 		this.nodes = nodes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent#getNodes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent#getNodes()
 	 */
 	public Collection<IPNode> getNodes() {
 		return nodes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IMachineRemoveNodeEvent#getSource()
 	 */
 	public IPMachine getSource() {
 		return machine;

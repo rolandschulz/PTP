@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class JobChangeEvent implements IJobChangeEvent {
 
@@ -37,14 +37,19 @@ public class JobChangeEvent implements IJobChangeEvent {
 		this.attributes = attrs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IJobChangedEvent#getAttributes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IJobChangedEvent#getAttributes()
 	 */
 	public AttributeManager getAttributes() {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IJobChangedEvent#getSource()
 	 */
 	public IPJob getSource() {

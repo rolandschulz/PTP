@@ -20,7 +20,7 @@ package org.eclipse.ptp.core;
 
 public class IDGenerator {
 	private static int current_ID = 1;
-	
+
 	public static int getNewID() {
 		return current_ID++;
 	}

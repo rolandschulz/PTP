@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.rtsystem.events;
 
 import org.eclipse.ptp.rtsystem.events.IRuntimeConnectedStateEvent;
 
-
 public class RuntimeConnectedStateEvent implements IRuntimeConnectedStateEvent {
 
 }

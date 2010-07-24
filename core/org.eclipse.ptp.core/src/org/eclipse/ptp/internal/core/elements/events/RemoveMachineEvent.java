@@ -18,10 +18,10 @@ import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 
 /**
  * @author Greg Watson
- *
+ * 
  */
 public class RemoveMachineEvent implements
-	IRemoveMachineEvent {
+		IRemoveMachineEvent {
 
 	private final IResourceManager rm;
 	private final Collection<IPMachine> machines;
@@ -31,15 +31,23 @@ public class RemoveMachineEvent implements
 		this.machines = machines;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachines()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachines
+	 * ()
 	 */
 	public Collection<IPMachine> getMachines() {
 		return machines;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource
+	 * ()
 	 */
 	public IResourceManager getSource() {
 		return rm;

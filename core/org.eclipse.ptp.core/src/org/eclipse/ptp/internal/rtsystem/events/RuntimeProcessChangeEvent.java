@@ -32,8 +32,11 @@ public class RuntimeProcessChangeEvent extends AbstractRuntimeChangeEvent implem
 		this.jobId = jobId;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent#getJobId()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeProcessChangeEvent#getJobId()
 	 */
 	public String getJobId() {
 		return jobId;

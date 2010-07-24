@@ -28,11 +28,11 @@ public class DebugUtil {
 		if (PTPCorePlugin.getDefault().isDebugging()) {
 			String option = Platform.getDebugOption(PROTOCOL_TRACING_OPTION);
 			if (option != null) {
-				PROTOCOL_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+				PROTOCOL_TRACING = option.equalsIgnoreCase("true"); //$NON-NLS-1$
 			}
 			option = Platform.getDebugOption(PROXY_CLIENT_TRACING_OPTION);
 			if (option != null) {
-				PROXY_CLIENT_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+				PROXY_CLIENT_TRACING = option.equalsIgnoreCase("true"); //$NON-NLS-1$
 			}
 			option = Platform.getDebugOption(PROXY_SERVER_DEBUG_LEVEL_OPTION);
 			if (option != null) {
@@ -44,7 +44,7 @@ public class DebugUtil {
 			}
 			option = Platform.getDebugOption(RM_TRACING_OPTION);
 			if (option != null) {
-				RM_TRACING = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
+				RM_TRACING = option.equalsIgnoreCase("true"); //$NON-NLS-1$
 			}
 		}
 	}

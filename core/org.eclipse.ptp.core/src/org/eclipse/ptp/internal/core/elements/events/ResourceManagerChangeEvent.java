@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class ResourceManagerChangeEvent implements IResourceManagerChangeEvent {
 
@@ -38,15 +38,22 @@ public class ResourceManagerChangeEvent implements IResourceManagerChangeEvent {
 		this.attributes = attrs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#getAttributes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#
+	 * getAttributes()
 	 */
 	public AttributeManager getAttributes() {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#getSource
+	 * ()
 	 */
 	public IResourceManager getSource() {
 		return rm;

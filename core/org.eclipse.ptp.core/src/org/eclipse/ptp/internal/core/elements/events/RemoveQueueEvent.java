@@ -27,10 +27,10 @@ import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class RemoveQueueEvent implements
-	IRemoveQueueEvent {
+		IRemoveQueueEvent {
 
 	private final IResourceManager rm;
 	private final Collection<IPQueue> queues;
@@ -40,15 +40,21 @@ public class RemoveQueueEvent implements
 		this.queues = queues;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getQueues()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getQueues()
 	 */
 	public Collection<IPQueue> getQueues() {
 		return queues;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getSource()
 	 */
 	public IResourceManager getSource() {
 		return rm;

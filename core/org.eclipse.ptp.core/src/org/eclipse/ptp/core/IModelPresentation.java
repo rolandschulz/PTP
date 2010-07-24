@@ -22,10 +22,10 @@ import org.eclipse.ptp.core.elements.IPUniverse;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public interface IModelPresentation {
-	
+
 	/**
 	 * @return
 	 */

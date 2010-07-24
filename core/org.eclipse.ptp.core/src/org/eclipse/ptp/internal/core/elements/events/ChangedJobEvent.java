@@ -27,26 +27,30 @@ import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class ChangedJobEvent implements IChangedJobEvent {
 
 	private final IPQueue queue;
 	private final Collection<IPJob> jobs;
-	
+
 	public ChangedJobEvent(IPQueue queue, Collection<IPJob> jobs) {
 		this.queue = queue;
 		this.jobs = jobs;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IChangedJobEvent#getJobs()
 	 */
 	public Collection<IPJob> getJobs() {
 		return jobs;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IChangedJobEvent#getSource()
 	 */
 	public IPQueue getSource() {

@@ -27,27 +27,32 @@ import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class ChangedNodeEvent implements IChangedNodeEvent {
 
 	private final IPMachine machine;
 	private final Collection<IPNode> nodes;
 
-	public ChangedNodeEvent(IPMachine machine, 
+	public ChangedNodeEvent(IPMachine machine,
 			Collection<IPNode> nodes) {
 		this.machine = machine;
 		this.nodes = nodes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.INodeChangedEvent#getAttributes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.INodeChangedEvent#getAttributes()
 	 */
 	public Collection<IPNode> getNodes() {
 		return nodes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IChangedNodeEvent#getSource()
 	 */
 	public IPMachine getSource() {

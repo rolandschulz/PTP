@@ -25,26 +25,31 @@ import org.eclipse.ptp.core.elements.events.INodeChangeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class NodeChangeEvent implements INodeChangeEvent {
 
 	private final IPNode node;
 	private final AttributeManager attributes;
-	
-	public NodeChangeEvent(IPNode node,	AttributeManager attrs) {
+
+	public NodeChangeEvent(IPNode node, AttributeManager attrs) {
 		this.node = node;
 		this.attributes = attrs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.INodeChangeEvent#getAttributes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.INodeChangeEvent#getAttributes()
 	 */
 	public AttributeManager getAttributes() {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.INodeChangeEvent#getSource()
 	 */
 	public IPNode getSource() {

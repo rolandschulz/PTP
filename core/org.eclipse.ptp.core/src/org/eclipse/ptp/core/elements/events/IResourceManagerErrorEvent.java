@@ -23,7 +23,7 @@ public interface IResourceManagerErrorEvent {
 	 * @return
 	 */
 	String getMessage();
-	
+
 	/**
 	 * @return
 	 */

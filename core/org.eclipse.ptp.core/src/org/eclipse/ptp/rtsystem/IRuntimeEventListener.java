@@ -50,107 +50,107 @@ public interface IRuntimeEventListener {
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeAttributeDefinitionEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeConnectedStateEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeErrorStateEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeJobChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeMachineChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeMessageEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeNewJobEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeNewMachineEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeNewNodeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeNewProcessEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeNewQueueEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeNodeChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeProcessChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeQueueChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeRemoveAllEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeRemoveJobEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeRemoveMachineEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeRemoveNodeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeRemoveProcessEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeRemoveQueueEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeRMChangeEvent e);
-	
+
 	/**
 	 * @param e
 	 */
@@ -160,17 +160,17 @@ public interface IRuntimeEventListener {
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeShutdownStateEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeStartupErrorEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IRuntimeSubmitJobErrorEvent e);
-	
+
 	/**
 	 * @param e
 	 */

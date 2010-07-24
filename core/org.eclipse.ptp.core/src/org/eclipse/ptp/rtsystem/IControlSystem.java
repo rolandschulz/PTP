@@ -24,37 +24,41 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 
 /**
- * A Control System is a portion of a runtime system that handles controlling jobs.  This includes
- * starting new jobs, terminating jobs, getting information about running jobs and processes, etc.
+ * A Control System is a portion of a runtime system that handles controlling
+ * jobs. This includes starting new jobs, terminating jobs, getting information
+ * about running jobs and processes, etc.
  * 
  * @author Nathan DeBardeleben
  */
 
-public interface IControlSystem {	
-	
+public interface IControlSystem {
+
 	/**
-	 * Submits a job run using the submission ID and the attributes provided by the AttributeManager.  
-	 * The AttributeManager contains resource manager specific information about 
-	 * how the user wants to run the job, such as the program name, number of processes, etc.
+	 * Submits a job run using the submission ID and the attributes provided by
+	 * the AttributeManager. The AttributeManager contains resource manager
+	 * specific information about how the user wants to run the job, such as the
+	 * program name, number of processes, etc.
 	 * 
-	 * The job submission ID can be used to identify the new job that 
-	 * is created. The ID will be returned as an attribute on the new job.
+	 * The job submission ID can be used to identify the new job that is
+	 * created. The ID will be returned as an attribute on the new job.
 	 * 
-	 * This will call will result in either a new job event when the job is created
-	 * by the resource manager or an error event if the job submission fails.
+	 * This will call will result in either a new job event when the job is
+	 * created by the resource manager or an error event if the job submission
+	 * fails.
 	 * 
 	 * @param subId
-	 * @param attrMgr 
-	 * @throws CoreException 
+	 * @param attrMgr
+	 * @throws CoreException
 	 */
 	public void submitJob(String subId, AttributeManager attrMgr) throws CoreException;
 
 	/**
-	 * Terminates a running job.  The {@link IPJob} contains the job identifier used to 
-	 * locate the job by the control system.
+	 * Terminates a running job. The {@link IPJob} contains the job identifier
+	 * used to locate the job by the control system.
 	 * 
-	 * @param job the job to terminate
-	 * @throws CoreException 
+	 * @param job
+	 *            the job to terminate
+	 * @throws CoreException
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
 }

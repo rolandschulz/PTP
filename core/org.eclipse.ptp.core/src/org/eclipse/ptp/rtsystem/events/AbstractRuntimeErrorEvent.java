@@ -19,24 +19,27 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-
 public abstract class AbstractRuntimeErrorEvent implements IRuntimeErrorEvent {
 	private int errorCode;
 	private String errorMessage;
-	
+
 	public AbstractRuntimeErrorEvent(int code, String message) {
 		this.errorCode = code;
 		this.errorMessage = message;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getErrorCode()
 	 */
 	public int getErrorCode() {
 		return errorCode;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getErrorMessage()
 	 */
 	public String getErrorMessage() {

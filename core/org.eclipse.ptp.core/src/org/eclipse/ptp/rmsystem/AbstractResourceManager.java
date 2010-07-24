@@ -882,7 +882,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @return
 	 */
 	protected CoreException makeCoreException(String string) {
-		IStatus status = new Status(Status.ERROR, PTPCorePlugin.getUniqueIdentifier(), Status.ERROR, string, null);
+		IStatus status = new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, string, null);
 		return new CoreException(status);
 	}
 

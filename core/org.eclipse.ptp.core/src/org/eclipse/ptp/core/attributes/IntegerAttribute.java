@@ -21,7 +21,7 @@ package org.eclipse.ptp.core.attributes;
 import org.eclipse.ptp.core.messages.Messages;
 
 public final class IntegerAttribute
-extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
+		extends AbstractAttribute<Integer, IntegerAttribute, IntegerAttributeDefinition> {
 
 	private Integer value;
 
@@ -36,11 +36,13 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 	}
 
 	@Override
-    protected synchronized int doCompareTo(IntegerAttribute other) {
-        return value.compareTo(other.value);
-    }
-	
-	/* (non-Javadoc)
+	protected synchronized int doCompareTo(IntegerAttribute other) {
+		return value.compareTo(other.value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
@@ -54,23 +56,23 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 	}
 
 	@Override
-    protected synchronized boolean doEquals(IntegerAttribute other) {
-        return value.equals(other.value);
-    }
+	protected synchronized boolean doEquals(IntegerAttribute other) {
+		return value.equals(other.value);
+	}
 
 	@Override
-    protected synchronized int doHashCode() {
-        return value.hashCode();
-    }
+	protected synchronized int doHashCode() {
+		return value.hashCode();
+	}
 
 	private int getMaxValue() {
 		return getDefinition().getMaxValue();
 	}
-	
+
 	private int getMinValue() {
 		return getDefinition().getMinValue();
 	}
-	
+
 	public synchronized Integer getValue() {
 		return value.intValue();
 	}
@@ -86,28 +88,26 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 				return false;
 			}
 			return true;
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return false;
 		}
 	}
 
-    public synchronized void setValue(Integer value) throws IllegalValueException {
+	public synchronized void setValue(Integer value) throws IllegalValueException {
 		if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
 			throw new IllegalValueException(Messages.IntegerAttribute_0);
 		}
 		this.value = value;
 	}
 
-    public synchronized void setValueAsString(String string) throws IllegalValueException {
+	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		try {
 			Integer value = Integer.valueOf(string);
 			if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
 				throw new IllegalValueException(Messages.IntegerAttribute_1);
 			}
 			this.value = value;
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			throw new IllegalValueException(e);
 		}
 	}

@@ -27,15 +27,18 @@ public interface IPQueueControl extends IPElementControl, IPQueue {
 	/**
 	 * Add attributes to a collection of jobs.
 	 * 
-	 * @param jobs collection of IJobControls
-	 * @param attrs array of attributes to add to each job
+	 * @param jobs
+	 *            collection of IJobControls
+	 * @param attrs
+	 *            array of attributes to add to each job
 	 */
-	public void addJobAttributes(Collection<IPJobControl> jobs, IAttribute<?,?,?>[] attrs);
+	public void addJobAttributes(Collection<IPJobControl> jobs, IAttribute<?, ?, ?>[] attrs);
 
 	/**
 	 * Add the collection of jobs to the queue.
 	 * 
-	 * @param jobs collection of IJobControls
+	 * @param jobs
+	 *            collection of IJobControls
 	 */
 	public void addJobs(Collection<IPJobControl> jobs);
 
@@ -46,18 +49,19 @@ public interface IPQueueControl extends IPElementControl, IPQueue {
 	 * @return job associated with the job ID
 	 */
 	public IPJobControl getJobControl(String job_id);
-	
+
 	/**
 	 * Get all the jobs in this queue.
 	 * 
 	 * @return array of jobs
 	 */
 	public Collection<IPJobControl> getJobControls();
-	
+
 	/**
 	 * Remove job from the queue
 	 * 
-	 * @param jobs to remove
+	 * @param jobs
+	 *            to remove
 	 */
 	public void removeJobs(Collection<IPJobControl> jobs);
 }

@@ -59,7 +59,9 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse.ptp.core.attributes.AbstractAttribute)
+	 * @see
+	 * org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse
+	 * .ptp.core.attributes.AbstractAttribute)
 	 */
 	@Override
 	protected synchronized int doCompareTo(ArrayAttribute<T> other) {
@@ -83,7 +85,9 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		return value.size() - other.value.size();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
@@ -91,15 +95,21 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		return new ArrayAttribute<T>(getDefinition(), value);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doEquals(org.eclipse.ptp.core.attributes.AbstractAttribute)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.AbstractAttribute#doEquals(org.eclipse
+	 * .ptp.core.attributes.AbstractAttribute)
 	 */
 	@Override
 	protected synchronized boolean doEquals(ArrayAttribute<T> other) {
 		return value.equals(other.value);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doHashCode()
 	 */
 	@Override
@@ -107,36 +117,44 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		return value.hashCode();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
 	 */
 	public synchronized List<T> getValue() {
 		return value;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
 	 */
 	public synchronized String getValueAsString() {
 		return Arrays.toString(value.toArray());
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
 	public boolean isValid(String string) {
 		try {
-			@SuppressWarnings({"unused", "unchecked"})
+			@SuppressWarnings({ "unused", "unchecked" })
 			T obj = (T) string;
 		} catch (ClassCastException e) {
 			return false;
 		}
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
 	 */
 	public synchronized void setValue(List<? extends T> value) {
 		if (value != null) {
@@ -158,8 +176,12 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang
+	 * .String)
 	 */
 	@SuppressWarnings("unchecked")
 	public void setValueAsString(String string) throws IllegalValueException {

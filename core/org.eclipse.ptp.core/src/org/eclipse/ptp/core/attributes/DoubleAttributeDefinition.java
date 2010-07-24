@@ -20,15 +20,14 @@ package org.eclipse.ptp.core.attributes;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-
 public final class DoubleAttributeDefinition
-extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefinition> {
+		extends AbstractAttributeDefinition<Double, DoubleAttribute, DoubleAttributeDefinition> {
 
 	private final Double minValue;
 	private final Double maxValue;
 	private final Double defaultValue;
 
-	public DoubleAttributeDefinition(final String uniqueId, final String name, 
+	public DoubleAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final Double defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
@@ -36,8 +35,8 @@ extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefini
 		this.maxValue = Double.POSITIVE_INFINITY;
 	}
 
-	public DoubleAttributeDefinition(final String uniqueId, final String name, 
-			final String description, final boolean display, 
+	public DoubleAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display,
 			final Double defaultValue, final double minValue, final double maxValue) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (minValue > maxValue) {
@@ -51,7 +50,9 @@ extends AbstractAttributeDefinition<Double,DoubleAttribute,DoubleAttributeDefini
 		this.maxValue = maxValue;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public DoubleAttribute create() throws IllegalValueException {

@@ -730,7 +730,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 					}
 				}
 
-				
 			}
 			addJobs(queue, newJobs);
 		} else {
@@ -791,7 +790,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 					}
 				}
 
-				
 			}
 			addNodes(machine, newNodes);
 		} else {

@@ -25,18 +25,17 @@ import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 
-
 /**
  * @author rsqrd
  * 
  */
 public interface IQueueChildListener {
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IChangedJobEvent e);
-	
+
 	/**
 	 * @param e
 	 */

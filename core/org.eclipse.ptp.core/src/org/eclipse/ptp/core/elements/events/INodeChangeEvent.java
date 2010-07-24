@@ -16,7 +16,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPNode;
 
@@ -27,14 +26,14 @@ import org.eclipse.ptp.core.elements.IPNode;
  * @see org.eclipse.ptp.core.elements.listeners.INodeListener
  */
 public interface INodeChangeEvent {
-	
+
 	/**
 	 * Get the attributes that have changed
 	 * 
 	 * @return changed attributes
 	 */
 	public AttributeManager getAttributes();
-	
+
 	/**
 	 * Get the source of the event
 	 * 

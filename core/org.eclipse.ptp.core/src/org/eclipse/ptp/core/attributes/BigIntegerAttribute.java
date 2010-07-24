@@ -23,7 +23,7 @@ import java.math.BigInteger;
 import org.eclipse.ptp.core.messages.Messages;
 
 public final class BigIntegerAttribute
-extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefinition> {
+		extends AbstractAttribute<BigInteger, BigIntegerAttribute, BigIntegerAttributeDefinition> {
 
 	private BigInteger value;
 
@@ -45,11 +45,13 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 	}
 
 	@Override
-    protected synchronized int doCompareTo(BigIntegerAttribute other) {
-        return value.compareTo(other.value);
-    }
-	
-	/* (non-Javadoc)
+	protected synchronized int doCompareTo(BigIntegerAttribute other) {
+		return value.compareTo(other.value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
@@ -63,14 +65,14 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 	}
 
 	@Override
-    protected synchronized boolean doEquals(BigIntegerAttribute other) {
-        return value.equals(other.value);
-    }
+	protected synchronized boolean doEquals(BigIntegerAttribute other) {
+		return value.equals(other.value);
+	}
 
 	@Override
-    protected synchronized int doHashCode() {
-        return value.hashCode();
-    }
+	protected synchronized int doHashCode() {
+		return value.hashCode();
+	}
 
 	private BigInteger getMaxValue() {
 		return getDefinition().getMaxValue();
@@ -79,11 +81,11 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 	private BigInteger getMinValue() {
 		return getDefinition().getMinValue();
 	}
-	
+
 	public synchronized BigInteger getValue() {
 		return value;
 	}
-	
+
 	public synchronized String getValueAsString() {
 		return value.toString();
 	}
@@ -95,20 +97,19 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 				return false;
 			}
 			return true;
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return false;
 		}
 	}
 
-    public synchronized void setValue(BigInteger value) throws IllegalValueException {
+	public synchronized void setValue(BigInteger value) throws IllegalValueException {
 		if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
 			throw new IllegalValueException(Messages.BigIntegerAttribute_0);
 		}
 		this.value = value;
 	}
 
-    public synchronized void setValue(Integer ivalue) throws IllegalValueException {
+	public synchronized void setValue(Integer ivalue) throws IllegalValueException {
 		BigInteger value = BigInteger.valueOf(ivalue);
 		if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
 			throw new IllegalValueException(Messages.BigIntegerAttribute_1);
@@ -116,15 +117,14 @@ extends AbstractAttribute<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefi
 		this.value = value;
 	}
 
-    public synchronized void setValueAsString(String string) throws IllegalValueException {
+	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		try {
 			BigInteger value = new BigInteger(string);
 			if (value.compareTo(getMinValue()) < 0 || value.compareTo(getMaxValue()) > 0) {
 				throw new IllegalValueException(Messages.BigIntegerAttribute_2);
 			}
 			this.value = value;
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			throw new IllegalValueException(e);
 		}
 	}

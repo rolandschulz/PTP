@@ -27,18 +27,22 @@ public interface IResourceManagerControl extends IResourceManager, IPElementCont
 	/**
 	 * Add attributes to a collection of machines.
 	 * 
-	 * @param machines collection of IPMachineControl
-	 * @param attrs array of attributes to add to each machine
+	 * @param machines
+	 *            collection of IPMachineControl
+	 * @param attrs
+	 *            array of attributes to add to each machine
 	 */
-	public void addMachineAttributes(Collection<IPMachineControl> machines, IAttribute<?,?,?>[] attrs);
-	
+	public void addMachineAttributes(Collection<IPMachineControl> machines, IAttribute<?, ?, ?>[] attrs);
+
 	/**
 	 * Add attributes to a collection of queues.
 	 * 
-	 * @param queues collection of IPQueueControl
-	 * @param attrs array of attributes to add to each queue
+	 * @param queues
+	 *            collection of IPQueueControl
+	 * @param attrs
+	 *            array of attributes to add to each queue
 	 */
-	public void addQueueAttributes(Collection<IPQueueControl> queues, IAttribute<?,?,?>[] attrs);
+	public void addQueueAttributes(Collection<IPQueueControl> queues, IAttribute<?, ?, ?>[] attrs);
 
 	/**
 	 * Disable event processing. The RM state will be set to SUSPENDED.
@@ -58,34 +62,37 @@ public interface IResourceManagerControl extends IResourceManager, IPElementCont
 	 * @throws CoreException
 	 */
 	public void enableEvents() throws CoreException;
-	
+
 	/**
 	 * Get the configuration associated with this resource manager.
 	 * 
 	 * @return resource manager configuration
 	 */
 	public IResourceManagerConfiguration getConfiguration();
-	
+
 	/**
-	 * Get the IPMachineControl interfaces for machines that this resource manager knows about.
+	 * Get the IPMachineControl interfaces for machines that this resource
+	 * manager knows about.
 	 * 
 	 * @return IPMachineControl interfaces
 	 */
 	public Collection<IPMachineControl> getMachineControls();
-	
+
 	/**
-	 * Get the IPQueueControl interfaces for queues that this resource manager knows about.
+	 * Get the IPQueueControl interfaces for queues that this resource manager
+	 * knows about.
 	 * 
 	 * @return IPQueueControl interfaces
 	 */
 	public Collection<IPQueueControl> getQueueControls();
-	
+
 	/**
-	 * Set the configuration for this resource manager. This will replace the existing
-	 * configuration with a new configuration. The method is responsible for dealing with
-	 * any saved state that needs to be cleaned up.
+	 * Set the configuration for this resource manager. This will replace the
+	 * existing configuration with a new configuration. The method is
+	 * responsible for dealing with any saved state that needs to be cleaned up.
 	 * 
-	 * @param config the new configuration
+	 * @param config
+	 *            the new configuration
 	 */
 	public void setConfiguration(IResourceManagerConfiguration config);
 

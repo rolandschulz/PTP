@@ -16,27 +16,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
- * This event is generated when one or more queues are removed. It is
- * a bulk event that is sent to child listeners on the source resource manager.
+ * This event is generated when one or more queues are removed. It is a bulk
+ * event that is sent to child listeners on the source resource manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
  */
 public interface IRemoveQueueEvent {
-	
+
 	/**
 	 * Get the removed queues
 	 * 
 	 * @return the removed queue
 	 */
 	public Collection<IPQueue> getQueues();
-	
+
 	/**
 	 * Get the event source
 	 * 

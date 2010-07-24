@@ -15,7 +15,6 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.messages.Messages;
 
-
 /**
  * Queue attributes
  */
@@ -28,22 +27,22 @@ public class QueueAttributes {
 	private static final String STATE_ATTR_ID = "queueState"; //$NON-NLS-1$
 	private static final String STATUS_ATTR_ID = "queueStatus"; //$NON-NLS-1$
 
-	private final static EnumeratedAttributeDefinition<State> stateAttrDef = 
-		new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", Messages.QueueAttributes_0, //$NON-NLS-1$
-				false, State.NORMAL);
+	private final static EnumeratedAttributeDefinition<State> stateAttrDef =
+			new EnumeratedAttributeDefinition<State>(STATE_ATTR_ID, "state", Messages.QueueAttributes_0, //$NON-NLS-1$
+					false, State.NORMAL);
 
-	private final static StringAttributeDefinition statusAttrDef = 
-		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", //$NON-NLS-1$
-				Messages.QueueAttributes_1, true, ""); //$NON-NLS-1$
+	private final static StringAttributeDefinition statusAttrDef =
+			new StringAttributeDefinition(STATUS_ATTR_ID, "Status", //$NON-NLS-1$
+					Messages.QueueAttributes_1, true, ""); //$NON-NLS-1$
 
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef, statusAttrDef};
+	public static IAttributeDefinition<?, ?, ?>[] getDefaultAttributeDefinitions() {
+		return new IAttributeDefinition[] { stateAttrDef, statusAttrDef };
 	}
-	
+
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
-	
+
 	public static StringAttributeDefinition getStatusAttributeDefinition() {
 		return statusAttrDef;
 	}

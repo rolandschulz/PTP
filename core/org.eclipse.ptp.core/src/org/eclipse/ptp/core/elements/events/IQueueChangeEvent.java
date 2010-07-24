@@ -16,7 +16,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPQueue;
 
@@ -28,14 +27,14 @@ import org.eclipse.ptp.core.elements.IPQueue;
  */
 
 public interface IQueueChangeEvent {
-	
+
 	/**
 	 * Get the attributes that have changed.
 	 * 
 	 * @return attributes that have changed
 	 */
 	public AttributeManager getAttributes();
-	
+
 	/**
 	 * Get the source of the event
 	 * 

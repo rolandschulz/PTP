@@ -16,7 +16,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPMachine;
 
@@ -27,12 +26,12 @@ import org.eclipse.ptp.core.elements.IPMachine;
  * @see org.eclipse.ptp.core.elements.listeners.IMachineListener
  */
 public interface IMachineChangeEvent {
-	
+
 	/**
 	 * @return
 	 */
 	public AttributeManager getAttributes();
-	
+
 	/**
 	 * @return the source of the event
 	 */

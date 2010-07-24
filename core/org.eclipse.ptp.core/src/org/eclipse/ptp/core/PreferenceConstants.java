@@ -23,7 +23,7 @@ public interface PreferenceConstants {
 	public static final String PREFS_OUTPUT_DIR = "PREFS_OUTPUT_DIR"; //$NON-NLS-1$
 	public static final String PREFS_STORE_LINES = "PREFS_STORE_LINES"; //$NON-NLS-1$
 	public static final String PREFS_AUTO_START_RMS = "autoStartRMs"; //$NON-NLS-1$
-	
+
 	public static final int DEFAULT_STORE_LINES = 100;
 	public static final String DEFAULT_OUTPUT_DIR_NAME = "output"; //$NON-NLS-1$
 	public static final boolean DEFAULT_AUTO_START = true;

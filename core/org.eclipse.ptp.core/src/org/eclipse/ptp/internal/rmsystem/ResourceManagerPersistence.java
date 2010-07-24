@@ -43,6 +43,7 @@ import org.eclipse.ui.XMLMemento;
 /**
  * @deprecated persistence is now handled by service configurations
  */
+@Deprecated
 public class ResourceManagerPersistence {
 
 	private static final String TAG_RESOURCEMANAGER_INDEX = "ResourceManagerIndex"; //$NON-NLS-1$
@@ -100,20 +101,20 @@ public class ResourceManagerPersistence {
 	}
 
 	private final List<IResourceManagerControl> resourceManagers =
-	    new ArrayList<IResourceManagerControl>();
+			new ArrayList<IResourceManagerControl>();
 
 	private IResourceManagerControl savedCurrentResourceManager;
 
-    private final List<IResourceManagerControl> rmsNeedStarting =
-        new ArrayList<IResourceManagerControl>();
+	private final List<IResourceManagerControl> rmsNeedStarting =
+			new ArrayList<IResourceManagerControl>();
 
 	public IResourceManagerControl[] getResourceManagerControls() {
 		return resourceManagers.toArray(new IResourceManagerControl[0]);
 	}
 
 	public IResourceManagerControl[] getResourceManagerControlsNeedStarting() {
-        return rmsNeedStarting.toArray(new IResourceManagerControl[0]);
-    }
+		return rmsNeedStarting.toArray(new IResourceManagerControl[0]);
+	}
 
 	private IResourceManagerFactory getResourceManagerFactory(
 			IResourceManagerFactory[] factories, String id) {
@@ -131,39 +132,41 @@ public class ResourceManagerPersistence {
 
 	/**
 	 * Loads saved resource managers.
+	 * 
 	 * @param file
 	 * @param factories
 	 * @param monitor
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public void loadResourceManagers(File file,
 			IResourceManagerFactory[] factories) throws CoreException {
-        rmsNeedStarting.clear();
-        resourceManagers.clear();
+		rmsNeedStarting.clear();
+		resourceManagers.clear();
 
-        FileReader reader = null;
-        try {
-            reader = new FileReader(file);
-            loadResourceManagers(XMLMemento.createReadRoot(reader), factories);
-        } catch (FileNotFoundException e) {
-            // ignored... no ResourceManager items exist yet.
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                PTPCorePlugin.log(e);
-            }
-        }
+		FileReader reader = null;
+		try {
+			reader = new FileReader(file);
+			loadResourceManagers(XMLMemento.createReadRoot(reader), factories);
+		} catch (FileNotFoundException e) {
+			// ignored... no ResourceManager items exist yet.
+		} finally {
+			try {
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException e) {
+				PTPCorePlugin.log(e);
+			}
+		}
 	}
 
-    /**
+	/**
 	 * Loads saved resource managers.
+	 * 
 	 * @param memento
 	 * @param factories
 	 * @param monitor
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	private void loadResourceManagers(XMLMemento memento,
 			IResourceManagerFactory[] factories) throws CoreException {
@@ -185,9 +188,10 @@ public class ResourceManagerPersistence {
 				if (configuration != null) {
 					tmpRMs[index] = factory.create(configuration);
 					if (tmpRMs[index] != null) {
-						// start the resource manager if it was running when saved.
+						// start the resource manager if it was running when
+						// saved.
 						if (isRunning) {
-						    rmsNeedStarting .add(tmpRMs[index]);
+							rmsNeedStarting.add(tmpRMs[index]);
 						}
 						rms.add(tmpRMs[index]);
 					}
@@ -198,7 +202,7 @@ public class ResourceManagerPersistence {
 		resourceManagers.addAll(rms);
 		if (statuses.size() > 0) {
 			throw new CoreException(new MultiStatus(PTPCorePlugin.PLUGIN_ID,
-					MultiStatus.ERROR, statuses.toArray(new IStatus[0]),
+					IStatus.ERROR, statuses.toArray(new IStatus[0]),
 					Messages.ResourceManagerPersistence_2, null));
 		}
 	}

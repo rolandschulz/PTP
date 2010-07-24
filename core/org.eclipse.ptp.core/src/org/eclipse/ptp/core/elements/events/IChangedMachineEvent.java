@@ -16,20 +16,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
- * This event is generated when the attributes on one or more machines have changed. It is
- * a bulk event that is sent to child listeners on the source resource manager.
+ * This event is generated when the attributes on one or more machines have
+ * changed. It is a bulk event that is sent to child listeners on the source
+ * resource manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
  */
 public interface IChangedMachineEvent {
-	
+
 	/**
 	 * Get the changed machines
 	 * 

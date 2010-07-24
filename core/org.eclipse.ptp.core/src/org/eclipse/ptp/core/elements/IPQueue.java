@@ -39,8 +39,7 @@ public interface IPQueue extends IPElement {
 	public void addElementListener(IQueueListener listener);
 
 	/**
-	 * Find a job object using its ID.
-	 * Returns null if no job is found.
+	 * Find a job object using its ID. Returns null if no job is found.
 	 * 
 	 * @param job_id
 	 * @return IPJob
@@ -48,8 +47,7 @@ public interface IPQueue extends IPElement {
 	public IPJob getJobById(String job_id);
 
 	/**
-	 * Get the jobs in this queue. 
-	 * Returns an empty array if there are no jobs
+	 * Get the jobs in this queue. Returns an empty array if there are no jobs
 	 * 
 	 * @return array of jobs in this queue
 	 */
@@ -61,21 +59,21 @@ public interface IPQueue extends IPElement {
 	 * @return IResourceManager
 	 */
 	public IResourceManager getResourceManager();
-	
+
 	/**
 	 * Get the internal state of the process.
 	 * 
 	 * @return process state
 	 */
 	public QueueAttributes.State getState();
-	
+
 	/**
 	 * Remove a listener for events related to children of this queue.
 	 * 
 	 * @param listener
 	 */
 	public void removeChildListener(IQueueChildListener listener);
-	
+
 	/**
 	 * Remove a listener for events related to this queue.
 	 * 

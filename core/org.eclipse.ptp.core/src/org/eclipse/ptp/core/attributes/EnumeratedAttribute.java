@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.messages.Messages;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public final class EnumeratedAttribute<E extends Enum<E>> extends
 		AbstractAttribute<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
@@ -67,56 +67,60 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 	}
 
 	@Override
-    protected synchronized int doCompareTo(EnumeratedAttribute<E> other) {
-        return value.compareTo(other.value);
-    }
+	protected synchronized int doCompareTo(EnumeratedAttribute<E> other) {
+		return value.compareTo(other.value);
+	}
 
-    /* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
 	protected EnumeratedAttribute<E> doCopy() {
 		return new EnumeratedAttribute<E>(getDefinition(), value);
 	}
-    
+
 	@Override
-    protected synchronized boolean doEquals(EnumeratedAttribute<E> other) {
-        return value == other.value;
-    }
-		
+	protected synchronized boolean doEquals(EnumeratedAttribute<E> other) {
+		return value == other.value;
+	}
+
 	@Override
-    protected synchronized int doHashCode() {
-        return value.hashCode();
-    }
-	
+	protected synchronized int doHashCode() {
+		return value.hashCode();
+	}
+
 	/**
-     * @return
-     */
-    public List<? extends E> getEnumerations() {
+	 * @return
+	 */
+	public List<? extends E> getEnumerations() {
 		return getDefinition().getEnumerations();
 	}
 
 	/**
-     * @return
-     */
-    public List<String> getEnumerationStrings() {
+	 * @return
+	 */
+	public List<String> getEnumerationStrings() {
 		return getDefinition().getEnumerationStrings();
 	}
-	
-	/**
-     * @return
-     */
-    public synchronized E getValue() {
-        return value;
-    }
 
-	/* (non-Javadoc)
+	/**
+	 * @return
+	 */
+	public synchronized E getValue() {
+		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
 	 */
 	public synchronized String getValueAsString() {
 		return value.toString();
 	}
-	
+
 	/**
 	 * @return the valueIndex
 	 */
@@ -124,7 +128,9 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		return value.ordinal();
 	}
 
-    /* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
 	public boolean isValid(String string) {
@@ -142,7 +148,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		this.value = value;
 	}
 
-    /**
+	/**
 	 * @param valueIndex
 	 * @throws IllegalValueException
 	 */
@@ -154,17 +160,20 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		this.value = enumerations.get(valueIndex);
 	}
 
-    /* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public synchronized void setValueAsString(String string) throws IllegalValueException {
 		Class<E> enumClass = getDefinition().getEnumClass();
-        E eval;
-        try {
-        	eval = E.valueOf(enumClass, string);
-        } catch (IllegalArgumentException e) {
-        	throw new IllegalValueException(e);
-        }
+		E eval;
+		try {
+			eval = Enum.valueOf(enumClass, string);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalValueException(e);
+		}
 		this.value = eval;
 	}
 }

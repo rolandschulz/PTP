@@ -45,8 +45,8 @@ public class Queue<T> {
 		}
 		return array;
 	}
-	
-    public boolean isEmpty() {
+
+	public boolean isEmpty() {
 		boolean empty;
 		synchronized (list) {
 			empty = list.isEmpty();

@@ -38,19 +38,22 @@ public class FileStorage extends PlatformObject implements IStorage {
 	IPath path;
 	InputStream in = null;
 
-	public FileStorage(InputStream in, IPath path){
+	public FileStorage(InputStream in, IPath path) {
 		this.path = path;
 		this.in = in;
 	}
-	public FileStorage(IPath path){
+
+	public FileStorage(IPath path) {
 		this.path = path;
-	}        
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj instanceof IStorage) {
-			IPath p= getFullPath();
-			IPath objPath= ((IStorage)obj).getFullPath();
+			IPath p = getFullPath();
+			IPath objPath = ((IStorage) obj).getFullPath();
 			if (p != null && objPath != null)
 				return p.equals(objPath);
 		}
@@ -58,7 +61,7 @@ public class FileStorage extends PlatformObject implements IStorage {
 	}
 
 	public InputStream getContents() throws CoreException {
-		if (in == null) {	
+		if (in == null) {
 			try {
 				return new FileInputStream(path.toFile());
 			} catch (FileNotFoundException e) {
@@ -81,6 +84,7 @@ public class FileStorage extends PlatformObject implements IStorage {
 	public String getName() {
 		return this.path.lastSegment();
 	}
+
 	/**
 	 * @see IStorage#isReadOnly()
 	 */
@@ -91,6 +95,7 @@ public class FileStorage extends PlatformObject implements IStorage {
 	/**
 	 * @see IStorage#isReadOnly()
 	 */
+	@Override
 	public String toString() {
 		return path.toOSString();
 	}

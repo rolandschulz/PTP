@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.elements.events.IMachineChangeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class MachineChangeEvent implements IMachineChangeEvent {
 
@@ -37,15 +37,21 @@ public class MachineChangeEvent implements IMachineChangeEvent {
 		this.attributes = attrs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedEvent#getAttributes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IMachineChangedEvent#getAttributes()
 	 */
 	public AttributeManager getAttributes() {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IMachineChangedEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IMachineChangedEvent#getSource()
 	 */
 	public IPMachine getSource() {
 		return machine;

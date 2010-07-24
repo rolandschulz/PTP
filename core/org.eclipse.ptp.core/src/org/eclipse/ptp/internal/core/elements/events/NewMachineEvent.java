@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class NewMachineEvent implements
 		INewMachineEvent {
@@ -40,15 +40,23 @@ public class NewMachineEvent implements
 		this.machines = machines;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine
+	 * ()
 	 */
 	public Collection<IPMachine> getMachines() {
 		return machines;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource
+	 * ()
 	 */
 	public IResourceManager getSource() {
 		return rm;

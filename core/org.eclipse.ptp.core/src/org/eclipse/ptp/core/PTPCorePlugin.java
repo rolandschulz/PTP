@@ -47,7 +47,7 @@ public class PTPCorePlugin extends Plugin {
 	public static PTPCorePlugin getDefault() {
 		return plugin;
 	}
-	
+
 	/**
 	 * Returns the string from the plugin's resource bundle, or 'key' if not
 	 * found.
@@ -114,7 +114,7 @@ public class PTPCorePlugin extends Plugin {
 	 * ModelManager for this Eclipse session
 	 */
 	private ModelManager modelManager;
-	
+
 	/**
 	 * The constructor.
 	 */
@@ -128,7 +128,7 @@ public class PTPCorePlugin extends Plugin {
 			resourceBundle = null;
 		}
 	}
-	
+
 	/**
 	 * Get the model manager
 	 * 
@@ -137,7 +137,7 @@ public class PTPCorePlugin extends Plugin {
 	public IModelManager getModelManager() {
 		return modelManager;
 	}
-	
+
 	/**
 	 * Get the presentation manager. This is now the model manager.
 	 * 
@@ -156,6 +156,7 @@ public class PTPCorePlugin extends Plugin {
 
 	/**
 	 * Convenience function to return the universe
+	 * 
 	 * @return the universe
 	 */
 	public IPUniverse getUniverse() {
@@ -163,55 +164,60 @@ public class PTPCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Locate the fragment for our architecture. This should really be phased out, since
-	 * there is now no guarantee that there will be local executables for the proxy
-	 * server or debugger.
+	 * Locate the fragment for our architecture. This should really be phased
+	 * out, since there is now no guarantee that there will be local executables
+	 * for the proxy server or debugger.
 	 * 
 	 * @param fragment
 	 * @param file
 	 * @return path to "bin" directory in fragment
 	 */
-	public String locateFragmentFile(String fragment, String file) {		
+	public String locateFragmentFile(String fragment, String file) {
 		Bundle[] frags = Platform.getFragments(Platform.getBundle(PTPCorePlugin.PLUGIN_ID));
-		
+
 		if (frags != null) {
 			String os = Platform.getOS();
 			String arch = Platform.getOSArch();
-			String frag_os_arch = fragment+"."+os+"."+arch; //$NON-NLS-1$ //$NON-NLS-2$
-			
-			for (int i=0; i<frags.length; i++) {
+			String frag_os_arch = fragment + "." + os + "." + arch; //$NON-NLS-1$ //$NON-NLS-2$
+
+			for (int i = 0; i < frags.length; i++) {
 				Bundle frag = frags[i];
 				URL path = frag.getEntry("/"); //$NON-NLS-1$
 				try {
 					URL local_path = FileLocator.toFileURL(path);
 					String str_path = local_path.getPath();
-					
-					/* 
-					 * Check each fragment that matches our os and arch for a bin directory.
+
+					/*
+					 * Check each fragment that matches our os and arch for a
+					 * bin directory.
 					 */
-	
+
 					int idx = str_path.indexOf(frag_os_arch);
 					if (idx > 0) {
-						/* found it!  This is the right fragment for our OS & arch */
-						String file_path = str_path + "bin/"+file; //$NON-NLS-1$
+						/*
+						 * found it! This is the right fragment for our OS &
+						 * arch
+						 */
+						String file_path = str_path + "bin/" + file; //$NON-NLS-1$
 						File f = new File(file_path);
 						if (f.exists()) {
 							return file_path;
 						}
 					}
-	
-				} catch(Exception e) { 
+
+				} catch (Exception e) {
 				}
 			}
 		}
-		
+
 		/* guess we never found it.... */
 		return null;
 	}
-	
+
 	/**
 	 * This method is called upon plug-in activation
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
@@ -222,6 +228,7 @@ public class PTPCorePlugin extends Plugin {
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		modelManager.shutdown();
 	}

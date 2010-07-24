@@ -15,9 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 public final class ArrayAttributeDefinition<T extends Comparable<? super T>>
-extends AbstractAttributeDefinition<List<? extends T>,ArrayAttribute<T>,ArrayAttributeDefinition<T>> {
+		extends AbstractAttributeDefinition<List<? extends T>, ArrayAttribute<T>, ArrayAttributeDefinition<T>> {
 
 	private final List<T> defaultValue;
 
@@ -25,9 +24,8 @@ extends AbstractAttributeDefinition<List<? extends T>,ArrayAttribute<T>,ArrayAtt
 			final String description, final boolean display, final U[] defaultValue) {
 		super(uniqueId, name, description, display);
 		if (defaultValue != null) {
-			this.defaultValue = Arrays.asList((T[])defaultValue.clone());
-		}
-		else {
+			this.defaultValue = Arrays.asList((T[]) defaultValue.clone());
+		} else {
 			this.defaultValue = new ArrayList<T>();
 		}
 	}

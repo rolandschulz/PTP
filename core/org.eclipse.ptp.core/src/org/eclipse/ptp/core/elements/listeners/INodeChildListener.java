@@ -25,20 +25,19 @@ import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 
-
 /**
  * @author rsqrd
  * 
  */
 public interface INodeChildListener {
-	
+
 	/**
 	 * Handle IChangedProcessEvent
 	 * 
 	 * @param e
 	 */
 	public void handleEvent(IChangedProcessEvent e);
-	
+
 	/**
 	 * Handle INewProcessEvent
 	 * 
@@ -47,7 +46,7 @@ public interface INodeChildListener {
 	public void handleEvent(INewProcessEvent e);
 
 	/**
-	 * Handle 
+	 * Handle
 	 * 
 	 * @param e
 	 */

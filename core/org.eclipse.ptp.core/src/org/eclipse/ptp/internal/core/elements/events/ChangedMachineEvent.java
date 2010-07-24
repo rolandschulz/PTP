@@ -27,27 +27,31 @@ import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class ChangedMachineEvent implements
 		IChangedMachineEvent {
 
 	private final IResourceManager rm;
 	private final Collection<IPMachine> machines;
-	
+
 	public ChangedMachineEvent(IResourceManager manager, Collection<IPMachine> machines) {
 		this.rm = manager;
 		this.machines = machines;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.events.IChangedMachineEvent#getMachines()
 	 */
 	public Collection<IPMachine> getMachines() {
 		return machines;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.events.IChangedMachineEvent#getSource()
 	 */
 	public IResourceManager getSource() {

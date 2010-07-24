@@ -28,7 +28,7 @@ import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class ChangedProcessEvent implements IChangedProcessEvent {
 
@@ -36,7 +36,7 @@ public class ChangedProcessEvent implements IChangedProcessEvent {
 	private final BitSet processes;
 	private final IPElement source;
 	private final AttributeManager attrManager;
-	
+
 	public ChangedProcessEvent(IPElement source, IPJob job, BitSet processes,
 			AttributeManager attrManager) {
 		this.source = source;
@@ -45,29 +45,40 @@ public class ChangedProcessEvent implements IChangedProcessEvent {
 		this.attrManager = attrManager;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getAttributes()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getAttributes()
 	 */
 	public AttributeManager getAttributes() {
 		return attrManager;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getJob()
 	 */
 	public IPJob getJob() {
 		return job;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getProcesses()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IChangedProcessEvent#getProcesses()
 	 */
 	public BitSet getProcesses() {
 		return processes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IJobChangedProcessEvent#getSource()
 	 */
 	public IPElement getSource() {
 		return source;

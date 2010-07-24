@@ -21,11 +21,10 @@ package org.eclipse.ptp.internal.rtsystem.events;
 
 import org.eclipse.ptp.rtsystem.events.IRuntimeDisconnectedEvent;
 
-
 public class RuntimeDisconnectedEvent implements IRuntimeDisconnectedEvent {
 
 	private String message;
-	
+
 	public RuntimeDisconnectedEvent(String msg) {
 		message = msg;
 	}

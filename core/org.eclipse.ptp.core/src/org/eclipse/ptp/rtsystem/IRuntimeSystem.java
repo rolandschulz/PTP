@@ -22,36 +22,42 @@ package org.eclipse.ptp.rtsystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {	
+public interface IRuntimeSystem extends IControlSystem, IMonitoringSystem {
 
 	/**
-	 * Adds a listener to the runtime system.  The runtime system may fire events
-	 * and will use this list of listeners to determine who to send these events to.
+	 * Adds a listener to the runtime system. The runtime system may fire events
+	 * and will use this list of listeners to determine who to send these events
+	 * to.
 	 * 
-	 * @param listener someone that wants to listener to runtime events
+	 * @param listener
+	 *            someone that wants to listener to runtime events
 	 */
 	public void addRuntimeEventListener(IRuntimeEventListener listener);
-	
+
 	/**
 	 * Removes a listener from the list of things listening to runtime events on
 	 * this runtime system.
 	 * 
-	 * @param listener the listener to remove
+	 * @param listener
+	 *            the listener to remove
 	 */
 	public void removeRuntimeEventListener(IRuntimeEventListener listener);
-	
+
 	/**
 	 * Called when the control system is being shutdown.
-	 * @throws CoreException 
+	 * 
+	 * @throws CoreException
 	 */
 	public void shutdown() throws CoreException;
 
 	/**
 	 * Called to start the runtime system.
 	 * 
-	 * @param monitor the progress monitor to use for reporting progress to the user. It is the caller's responsibility
-     *                to call done() on the given monitor. Accepts null, indicating that no progress should be
-     *                reported and that the operation cannot be cancelled.
+	 * @param monitor
+	 *            the progress monitor to use for reporting progress to the
+	 *            user. It is the caller's responsibility to call done() on the
+	 *            given monitor. Accepts null, indicating that no progress
+	 *            should be reported and that the operation cannot be cancelled.
 	 * @throws CoreException
 	 */
 	public void startup(IProgressMonitor monitor) throws CoreException;

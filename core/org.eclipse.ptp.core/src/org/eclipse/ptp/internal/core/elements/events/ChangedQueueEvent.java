@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class ChangedQueueEvent implements
 		IChangedQueueEvent {
@@ -35,20 +35,23 @@ public class ChangedQueueEvent implements
 	private final IResourceManager rm;
 	private final Collection<IPQueue> queues;
 
-
 	public ChangedQueueEvent(IResourceManager manager, Collection<IPQueue> queues) {
 		this.rm = manager;
 		this.queues = queues;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.events.IChangedQueueEvent#getQueues()
 	 */
 	public Collection<IPQueue> getQueues() {
 		return queues;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rmsystem.events.IChangedQueueEvent#getSource()
 	 */
 	public IResourceManager getSource() {

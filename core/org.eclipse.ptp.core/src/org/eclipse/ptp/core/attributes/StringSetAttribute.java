@@ -23,7 +23,7 @@ import java.util.List;
 import org.eclipse.ptp.core.messages.Messages;
 
 public final class StringSetAttribute
-extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition> {
+		extends AbstractAttribute<String, StringSetAttribute, StringSetAttributeDefinition> {
 
 	private String value;
 
@@ -47,11 +47,13 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	}
 
 	@Override
-    protected int doCompareTo(StringSetAttribute other) {
-        return getValueIndex() - other.getValueIndex();
-    }
+	protected int doCompareTo(StringSetAttribute other) {
+		return getValueIndex() - other.getValueIndex();
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
@@ -65,34 +67,40 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	}
 
 	@Override
-    protected synchronized boolean doEquals(StringSetAttribute other) {
-        return value.equals(other.value);
-    }
+	protected synchronized boolean doEquals(StringSetAttribute other) {
+		return value.equals(other.value);
+	}
 
-    @Override
-    protected synchronized int doHashCode() {
-        return value.hashCode();
-    }
+	@Override
+	protected synchronized int doHashCode() {
+		return value.hashCode();
+	}
 
-    /* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
 	 */
 	public String getValue() {
 		return getValueAsString();
 	}
 
-    /* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
 	 */
 	public synchronized String getValueAsString() {
 		return value;
 	}
 
-    public synchronized int getValueIndex() {
-        return getDefinition().getValues().indexOf(value);
-    }
+	public synchronized int getValueIndex() {
+		return getDefinition().getValues().indexOf(value);
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
 	public boolean isValid(String valueIn) {
@@ -101,20 +109,26 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 		return isValid;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
 	 */
 	public void setValue(String value) throws IllegalValueException {
 		setValueAsString(value);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public synchronized void setValueAsString(String valueIn) throws IllegalValueException {
 		if (!isValid(valueIn)) {
 			throw new IllegalValueException(Messages.StringSetAttribute_0 + valueIn +
-					Messages.StringSetAttribute_1 +	getDefinition().getName());
+					Messages.StringSetAttribute_1 + getDefinition().getName());
 		}
 		this.value = valueIn;
 	}

@@ -32,7 +32,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @param listener
 	 */
 	public void addListener(IModelManagerChildListener listener);
-	
+
 	/**
 	 * Add a resource manager to the model.
 	 * 
@@ -46,7 +46,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @param addedManagers
 	 */
 	public void addResourceManagers(IResourceManagerControl[] addedManagers);
-	
+
 	/**
 	 * Find the resource manager with the supplied unique name
 	 * 
@@ -54,7 +54,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @return resource manager
 	 */
 	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName);
-	
+
 	/**
 	 * Find resource managers that have been started
 	 * 
@@ -64,9 +64,9 @@ public interface IModelManager extends IModelPresentation {
 	public IResourceManager[] getStartedResourceManagers(IPUniverse universe);
 
 	/**
-	 * Loads saved resource managers. Loading of resource manager configuration is
-	 * now handled by the {@link ServiceModelManager}. This method now just starts
-	 * any resource managers that require autostart.
+	 * Loads saved resource managers. Loading of resource manager configuration
+	 * is now handled by the {@link ServiceModelManager}. This method now just
+	 * starts any resource managers that require autostart.
 	 * 
 	 * @throws CoreException
 	 */
@@ -78,29 +78,33 @@ public interface IModelManager extends IModelPresentation {
 	 * @param listener
 	 */
 	public void removeListener(IModelManagerChildListener listener);
-	
+
 	/**
 	 * Remove a resource manager from the model.
 	 * 
 	 * @param removedManager
 	 */
 	public void removeResourceManager(IResourceManagerControl removedManager);
-	
+
 	/**
 	 * Remove resource managers from the model.
 	 * 
 	 * @param removedRMs
 	 */
 	public void removeResourceManagers(IResourceManagerControl[] removedRMs);
-	
+
 	/**
 	 * Save the resource manager configurations
-	 * @deprecated Resource manager persistence is handled by {@link ServiceModelManager}
+	 * 
+	 * @deprecated Resource manager persistence is handled by
+	 *             {@link ServiceModelManager}
 	 */
+	@Deprecated
 	public void saveResourceManagers();
-	
+
 	/**
 	 * Shuts down the model manager. Should only be called at plugin shutdown.
+	 * 
 	 * @throws CoreException
 	 */
 	public void shutdown() throws CoreException;
@@ -120,10 +124,11 @@ public interface IModelManager extends IModelPresentation {
 	public void stopResourceManagers() throws CoreException;
 
 	/**
-	 * Notify the model that the resource manager attributes
-	 * or configuration has been changed.
+	 * Notify the model that the resource manager attributes or configuration
+	 * has been changed.
 	 * 
-	 * @param rm resource manager
+	 * @param rm
+	 *            resource manager
 	 */
 	public void updateResourceManager(IResourceManager rm);
 }

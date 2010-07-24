@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class NewProcessEvent implements INewProcessEvent {
 
@@ -41,21 +41,27 @@ public class NewProcessEvent implements INewProcessEvent {
 		this.processes = (BitSet) processes.clone();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.INewProcessEvent#getJob()
 	 */
 	public IPJob getJob() {
 		return job;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.INewProcessEvent#getProcesses()
 	 */
 	public BitSet getProcesses() {
 		return processes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IJobNewProcessEvent#getSource()
 	 */
 	public IPElement getSource() {
