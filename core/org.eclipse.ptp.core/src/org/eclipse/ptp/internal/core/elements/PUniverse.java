@@ -64,12 +64,19 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
+	 */
+	@Override
+	protected void doAddAttributeHook(AttributeManager attrs) {
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPUniverseControl#getNextResourceManagerId()
 	 */
 	public synchronized int getNextResourceManagerId() {
 		return (nextResourceManagerId++ << RMID_SHIFT);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPUniverse#findResourceManagerById(java.lang.String)
 	 */
@@ -90,7 +97,7 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	public IResourceManagerControl[] getResourceManagerControls() {
 		return resourceManagers.toArray(new IResourceManagerControl[0]);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPUniverse#getResourceManagers()
 	 */
@@ -119,12 +126,5 @@ public class PUniverse extends Parent implements IPUniverseControl {
 		for (IResourceManager rm : removedRMs) {
 			removeResourceManager(rm);
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
-	 */
-	@Override
-	protected void doAddAttributeHook(AttributeManager attrs) {
 	}
 }

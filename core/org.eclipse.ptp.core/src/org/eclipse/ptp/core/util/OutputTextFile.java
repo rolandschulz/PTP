@@ -54,8 +54,29 @@ public class OutputTextFile implements PreferenceConstants {
 		init();
 	}
 
-	private void init() {
-		file = getFilePath();
+	public void delete() {
+		if (file != null && file.exists()) {
+			file.delete();
+		}
+
+		file = null;
+	}
+
+	public String getContents() {
+		if (file == null)
+			return null;
+
+		InputStream is = null;
+		try {
+			is = new BufferedInputStream(new FileInputStream(file));
+			return readString(is, ResourcesPlugin.getEncoding());
+		} catch (FileNotFoundException e) {
+			System.out.println("OutputTextFile - read file err: " //$NON-NLS-1$
+					+ e.getMessage());
+		} finally {
+			is = null;
+		}
+		return null;
 	}
 
 	private File getFilePath() {
@@ -68,6 +89,36 @@ public class OutputTextFile implements PreferenceConstants {
 					+ e.getMessage());
 		}
 		return tmpFile;
+	}
+
+	private void init() {
+		file = getFilePath();
+	}
+
+	private String readString(InputStream is, String encoding) {
+		if (is == null)
+			return null;
+
+		BufferedReader reader = null;
+		try {
+			StringBuffer buffer = new StringBuffer();
+			char[] part = new char[2048];
+			int read = 0;
+			reader = new BufferedReader(new InputStreamReader(is, encoding));
+			while ((read = reader.read(part)) != -1)
+				buffer.append(part, 0, read);
+
+			return buffer.toString();
+		} catch (IOException ex) {
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException ex) {
+				}
+			}
+		}
+		return null;
 	}
 
 	public void write(String text) {
@@ -101,56 +152,5 @@ public class OutputTextFile implements PreferenceConstants {
 			}
 			fos = null;
 		}
-	}
-
-	public void delete() {
-		if (file != null && file.exists()) {
-			file.delete();
-		}
-
-		file = null;
-	}
-
-	public String getContents() {
-		if (file == null)
-			return null;
-
-		InputStream is = null;
-		try {
-			is = new BufferedInputStream(new FileInputStream(file));
-			return readString(is, ResourcesPlugin.getEncoding());
-		} catch (FileNotFoundException e) {
-			System.out.println("OutputTextFile - read file err: " //$NON-NLS-1$
-					+ e.getMessage());
-		} finally {
-			is = null;
-		}
-		return null;
-	}
-
-	private String readString(InputStream is, String encoding) {
-		if (is == null)
-			return null;
-
-		BufferedReader reader = null;
-		try {
-			StringBuffer buffer = new StringBuffer();
-			char[] part = new char[2048];
-			int read = 0;
-			reader = new BufferedReader(new InputStreamReader(is, encoding));
-			while ((read = reader.read(part)) != -1)
-				buffer.append(part, 0, read);
-
-			return buffer.toString();
-		} catch (IOException ex) {
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException ex) {
-				}
-			}
-		}
-		return null;
 	}
 }

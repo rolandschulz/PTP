@@ -24,9 +24,9 @@ import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 
 public interface IRuntimeMessageEvent extends IRuntimeEvent {
 	/**
-	 * @return message level
+	 * @return message attributes
 	 */
-	public MessageAttributes.Level getLevel();
+	public AttributeManager getAttributes();
 
 	/**
 	 * @return message code
@@ -34,12 +34,12 @@ public interface IRuntimeMessageEvent extends IRuntimeEvent {
 	public int getCode();
 
 	/**
+	 * @return message level
+	 */
+	public MessageAttributes.Level getLevel();
+	
+	/**
 	 * @return message text
 	 */
 	public String getText();
-	
-	/**
-	 * @return message attributes
-	 */
-	public AttributeManager getAttributes();
 }

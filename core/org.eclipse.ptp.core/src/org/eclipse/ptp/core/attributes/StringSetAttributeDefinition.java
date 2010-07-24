@@ -30,19 +30,19 @@ extends AbstractAttributeDefinition<String,StringSetAttribute,StringSetAttribute
 
 	public StringSetAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, 
-			final String defaultValue, final String[] values) throws IllegalValueException {
-		super(uniqueId, name, description, display);
-		this.defaultValue = defaultValue;
-		this.values = Arrays.asList(values);
-	}
-
-	public StringSetAttributeDefinition(final String uniqueId, final String name,
-			final String description, final boolean display, 
 			final String defaultValue, final List<String> values)
 	throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 		this.values = new ArrayList<String>(values);
+	}
+
+	public StringSetAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display, 
+			final String defaultValue, final String[] values) throws IllegalValueException {
+		super(uniqueId, name, description, display);
+		this.defaultValue = defaultValue;
+		this.values = Arrays.asList(values);
 	}
 
 	/* (non-Javadoc)

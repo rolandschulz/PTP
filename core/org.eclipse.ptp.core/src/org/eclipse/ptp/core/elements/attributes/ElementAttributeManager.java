@@ -31,10 +31,6 @@ public class ElementAttributeManager {
 		this.map = new HashMap<RangeSet, AttributeManager>();
 	}
 
-	public void setAttributeManager(RangeSet ids, AttributeManager attr) {
-		map.put(ids, attr);
-	}
-	
 	public AttributeManager getAttributeManager(Integer id) {
 		return map.get(id);
 	}
@@ -45,5 +41,9 @@ public class ElementAttributeManager {
 	
 	public Set<Map.Entry<RangeSet, AttributeManager>> getEntrySet() {
 		return map.entrySet();
+	}
+	
+	public void setAttributeManager(RangeSet ids, AttributeManager attr) {
+		map.put(ids, attr);
 	}
 }

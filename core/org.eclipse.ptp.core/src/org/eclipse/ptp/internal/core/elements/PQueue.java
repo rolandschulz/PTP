@@ -105,85 +105,11 @@ public class PQueue extends Parent implements IPQueueControl {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPQueue#getJobById(java.lang.String)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
 	 */
-	public IPJob getJobById(String job_id) {
-		return getJobControl(job_id);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControl(java.lang.String)
-	 */
-	public IPJobControl getJobControl(String job_id) {
-		IPElementControl element = findChild(job_id);
-		if (element != null) {
-			return (IPJobControl) element;
-		}
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControls()
-	 */
-	public Collection<IPJobControl> getJobControls() {
-		IPElementControl[] children = getChildren();
-		List<IPJobControl> jobs =
-			new ArrayList<IPJobControl>(children.length);
-		for (IPElementControl element : children) {
-			jobs.add((IPJobControl)element);
-		}
-		return jobs;	
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPQueue#getJobs()
-	 */
-	public IPJob[] getJobs() {
-		Collection<IPJobControl> jobs = getJobControls();
-		return jobs.toArray(new IPJobControl[jobs.size()]);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
-	 */
-	public IResourceManager getResourceManager() {
-		return (IResourceManager) getParent();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPQueue#getState()
-	 */
-	public State getState() {
-		return getAttribute(QueueAttributes.getStateAttributeDefinition()).getValue();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPQueue#removeChildListener(org.eclipse.ptp.core.elements.listeners.IQueueJobListener)
-	 */
-	public void removeChildListener(IQueueChildListener listener) {
-		childListeners.remove(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPQueue#removeElementListener(org.eclipse.ptp.core.elements.listeners.IQueueListener)
-	 */
-	public void removeElementListener(IQueueListener listener) {
-		elementListeners.remove(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#removeJobs(java.util.Collection)
-	 */
-	public void removeJobs(Collection<IPJobControl> jobControls) {
-		List<IPJob> jobs = new ArrayList<IPJob>(jobControls.size());
-		
-		for (IPJobControl job : jobControls) {
-			job.removeProcessesByJobRanks(job.getProcessJobRanks());
-			removeChild(job);
-			jobs.add(job);
-		}
-		
-		fireRemoveJobs(jobs);
+	@Override
+	protected void doAddAttributeHook(AttributeManager attrs) {
+		fireChangedQueue(attrs);
 	}
 
 	/**
@@ -242,11 +168,85 @@ public class PQueue extends Parent implements IPQueueControl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#getJobById(java.lang.String)
 	 */
-	@Override
-	protected void doAddAttributeHook(AttributeManager attrs) {
-		fireChangedQueue(attrs);
+	public IPJob getJobById(String job_id) {
+		return getJobControl(job_id);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControl(java.lang.String)
+	 */
+	public IPJobControl getJobControl(String job_id) {
+		IPElementControl element = findChild(job_id);
+		if (element != null) {
+			return (IPJobControl) element;
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#getJobControls()
+	 */
+	public Collection<IPJobControl> getJobControls() {
+		IPElementControl[] children = getChildren();
+		List<IPJobControl> jobs =
+			new ArrayList<IPJobControl>(children.length);
+		for (IPElementControl element : children) {
+			jobs.add((IPJobControl)element);
+		}
+		return jobs;	
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#getJobs()
+	 */
+	public IPJob[] getJobs() {
+		Collection<IPJobControl> jobs = getJobControls();
+		return jobs.toArray(new IPJobControl[jobs.size()]);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
+	 */
+	public IResourceManager getResourceManager() {
+		return (IResourceManager) getParent();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#getState()
+	 */
+	public State getState() {
+		return getAttribute(QueueAttributes.getStateAttributeDefinition()).getValue();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#removeChildListener(org.eclipse.ptp.core.elements.listeners.IQueueJobListener)
+	 */
+	public void removeChildListener(IQueueChildListener listener) {
+		childListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elements.IPQueue#removeElementListener(org.eclipse.ptp.core.elements.listeners.IQueueListener)
+	 */
+	public void removeElementListener(IQueueListener listener) {
+		elementListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPQueueControl#removeJobs(java.util.Collection)
+	 */
+	public void removeJobs(Collection<IPJobControl> jobControls) {
+		List<IPJob> jobs = new ArrayList<IPJob>(jobControls.size());
+		
+		for (IPJobControl job : jobControls) {
+			job.removeProcessesByJobRanks(job.getProcessJobRanks());
+			removeChild(job);
+			jobs.add(job);
+		}
+		
+		fireRemoveJobs(jobs);
 	}
 
 }

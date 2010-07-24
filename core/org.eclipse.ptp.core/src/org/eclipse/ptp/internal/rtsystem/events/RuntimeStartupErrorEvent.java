@@ -19,11 +19,11 @@ public class RuntimeStartupErrorEvent
 	extends AbstractRuntimeErrorEvent
 		implements IRuntimeStartupErrorEvent {
 
-	public RuntimeStartupErrorEvent(String message) {
-		super(0, message);
-	}
-
 	public RuntimeStartupErrorEvent(int code, String message) {
 		super(code, message);
+	}
+
+	public RuntimeStartupErrorEvent(String message) {
+		super(0, message);
 	}
 }

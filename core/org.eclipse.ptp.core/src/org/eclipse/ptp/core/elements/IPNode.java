@@ -42,6 +42,22 @@ public interface IPNode extends IPElement {
 	public void addElementListener(INodeListener listener);
 
 	/**
+	 * Get the job ranks for processes associated with this node and this job
+	 * 
+	 * @param job
+	 * 
+	 * @return collection of process ranks
+	 * @since 4.0
+	 */
+	public BitSet getJobProcessRanks(IPJob job);
+
+	/**
+	 * @return the jobs that have processes running on this node
+	 * @since 4.0
+	 */
+	public Set<? extends IPJob> getJobs();
+
+	/**
 	 * Returns the parent Machine that this Node is contained within.
 	 * 
 	 * @return The Machine this Node is part of
@@ -57,22 +73,6 @@ public interface IPNode extends IPElement {
 	 * @return The node number of this Node as a String
 	 */
 	public String getNodeNumber();
-
-	/**
-	 * Get the job ranks for processes associated with this node and this job
-	 * 
-	 * @param job
-	 * 
-	 * @return collection of process ranks
-	 * @since 4.0
-	 */
-	public BitSet getJobProcessRanks(IPJob job);
-
-	/**
-	 * @return the jobs that have processes running on this node
-	 * @since 4.0
-	 */
-	public Set<? extends IPJob> getJobs();
 
 	/**
 	 * Returns the state of the node

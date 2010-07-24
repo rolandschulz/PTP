@@ -44,19 +44,19 @@ public class NodeAttributes {
 		new IntegerAttributeDefinition(NUMBER_ATTR_ID, "Node Number",  //$NON-NLS-1$
 				Messages.NodeAttributes_2, true, 0);
 	
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
+		return new IAttributeDefinition[]{stateAttrDef, statusAttrDef, numAttrDef};
+	}
+	
+	public static IntegerAttributeDefinition getNumberAttributeDefinition() {
+		return numAttrDef;
+	}
+
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	
 	public static StringAttributeDefinition getStatusAttributeDefinition() {
 		return statusAttrDef;
-	}
-
-	public static IntegerAttributeDefinition getNumberAttributeDefinition() {
-		return numAttrDef;
-	}
-	
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef, statusAttrDef, numAttrDef};
 	}
 }

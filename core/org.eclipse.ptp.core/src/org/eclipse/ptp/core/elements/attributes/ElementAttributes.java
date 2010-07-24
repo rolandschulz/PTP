@@ -32,18 +32,18 @@ public class ElementAttributes {
 	private final static StringAttributeDefinition nameAttributeDefinition = 
 		new StringAttributeDefinition(ATTR_NAME, "Name", Messages.ElementAttributes_1, true, ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-	public static StringAttributeDefinition getIdAttributeDefinition() {
-		return idAttributeDefinition;
-	}
-	
-	public static StringAttributeDefinition getNameAttributeDefinition() {
-		return nameAttributeDefinition;
-	}
-
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				idAttributeDefinition, 
 				nameAttributeDefinition
 			};
+	}
+	
+	public static StringAttributeDefinition getIdAttributeDefinition() {
+		return idAttributeDefinition;
+	}
+
+	public static StringAttributeDefinition getNameAttributeDefinition() {
+		return nameAttributeDefinition;
 	}
 }

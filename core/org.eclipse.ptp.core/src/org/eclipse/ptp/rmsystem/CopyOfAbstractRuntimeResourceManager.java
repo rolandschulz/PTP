@@ -1,15 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2006 The Regents of the University of California. 
- * This material was produced under U.S. Government contract W-7405-ENG-36 
- * for Los Alamos National Laboratory, which is operated by the University 
- * of California for the U.S. Department of Energy. The U.S. Government has 
- * rights to use, reproduce, and distribute this software. NEITHER THE 
- * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
- * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
- * to produce derivative works, such modified software should be clearly marked, 
+ * Copyright (c) 2006 The Regents of the University of California.
+ * This material was produced under U.S. Government contract W-7405-ENG-36
+ * for Los Alamos National Laboratory, which is operated by the University
+ * of California for the U.S. Department of Energy. The U.S. Government has
+ * rights to use, reproduce, and distribute this software. NEITHER THE
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
+ * to produce derivative works, such modified software should be clearly marked,
  * so as not to confuse it with the version available from LANL.
  * 
- * Additionally, this program and the accompanying materials 
+ * Additionally, this program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -84,12 +84,13 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 import org.eclipse.ptp.utils.core.RangeSet;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @author greg
  * 
  */
-public abstract class AbstractRuntimeResourceManager extends AbstractResourceManager implements IRuntimeEventListener {
+public abstract class CopyOfAbstractRuntimeResourceManager extends AbstractResourceManager implements IRuntimeEventListener {
 
 	private class JobSubmission {
 		private ILaunchConfiguration configuration;
@@ -209,7 +210,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	private final Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 	private IRuntimeSystem runtimeSystem;
 
-	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
+	public CopyOfAbstractRuntimeResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id, universe, config);
 	}
 
@@ -397,7 +398,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	@Override
 	protected IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
+	throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -686,7 +687,21 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public void handleEvent(IRuntimeMessageEvent e) {
 		// MessageAttributes.Level level = e.getLevel();
-		// FIXME: implement logging
+		int severity = Status.ERROR;
+		switch(e.getLevel()) {
+		case DEBUG:
+		case INFO:
+			severity = Status.INFO;
+			break;
+		case FATAL:  /*should this map to cancel instead?*/
+			severity = Status.ERROR;
+			break;
+		case WARNING:
+			severity = Status.WARNING;
+		}
+		StatusManager.getManager().handle(new Status(severity,
+				PTPCorePlugin.PLUGIN_ID, e.getText()),
+				(severity==Status.ERROR)?StatusManager.SHOW:StatusManager.LOG);
 	}
 
 	/*
@@ -730,7 +745,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 					}
 				}
 
-				
+
 			}
 			addJobs(queue, newJobs);
 		} else {
@@ -791,7 +806,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 					}
 				}
 
-				
+
 			}
 			addNodes(machine, newNodes);
 		} else {

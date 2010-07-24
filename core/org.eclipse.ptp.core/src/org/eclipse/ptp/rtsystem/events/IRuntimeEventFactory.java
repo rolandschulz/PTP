@@ -171,17 +171,17 @@ public interface IRuntimeEventFactory {
 	public IRuntimeShutdownStateEvent newRuntimeShutdownStateEvent();
 
 	/**
-	 * @param message
-	 * @return
-	 */
-	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(String message);
-
-	/**
 	 * @param code
 	 * @param message
 	 * @return
 	 */
 	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(int code, String message);
+
+	/**
+	 * @param message
+	 * @return
+	 */
+	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(String message);
 
 	/**
 	 * @param code

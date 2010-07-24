@@ -39,13 +39,6 @@ public abstract class Parent extends PElement {
 		super(id, parent, type, attrs);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
-	 */
-	public boolean hasChildren() {
-		return getElementInfo().hasChildren();
-	}
-
 	/**
 	 * Add a child element.
 	 * 
@@ -72,6 +65,13 @@ public abstract class Parent extends PElement {
 	 */
 	protected IPElementControl[] getChildren() {
 		return getElementInfo().getChildren();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
+	 */
+	public boolean hasChildren() {
+		return getElementInfo().hasChildren();
 	}
 
 	/**

@@ -26,17 +26,22 @@ extends Comparable<IAttributeDefinition<?,?,?>> {
 	/**
 	 * @return
 	 */
-	public String getDescription();
+	public A create() throws IllegalValueException;
 
 	/**
 	 * @return
 	 */
-	public boolean getDisplay();
+	public A create(String value) throws IllegalValueException;
 	
 	/**
 	 * @return
 	 */
-	public String getName();
+	public String getDescription();
+	
+	/**
+	 * @return
+	 */
+	public boolean getDisplay();
 	
 	/**
 	 * @return
@@ -46,10 +51,5 @@ extends Comparable<IAttributeDefinition<?,?,?>> {
 	/**
 	 * @return
 	 */
-	public A create() throws IllegalValueException;
-	
-	/**
-	 * @return
-	 */
-	public A create(String value) throws IllegalValueException;
+	public String getName();
 }

@@ -73,19 +73,19 @@ public final class DateAttributeDefinition extends AbstractAttributeDefinition<C
 		return new DateAttribute(this, value);
 	}
 
+	/**
+	 * @since 4.0
+	 */
+	public DateFormat getDateFormat() {
+		return outputDateFormat;
+	}
+
 	public synchronized Date getMaxDate() {
 		return maxDate;
 	}
 
 	public synchronized Date getMinDate() {
 		return minDate;
-	}
-
-	/**
-	 * @since 4.0
-	 */
-	public DateFormat getDateFormat() {
-		return outputDateFormat;
 	}
 
 	public synchronized void setValidRange(Date minDate, Date maxDate) throws IllegalValueException {

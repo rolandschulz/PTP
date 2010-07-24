@@ -46,23 +46,23 @@ public class MessageAttributes {
 		new StringAttributeDefinition(TEXT_ATTR_ID, "Message Text", //$NON-NLS-1$
 				Messages.MessageAttributes_2, true, ""); //$NON-NLS-1$
 
-	public static EnumeratedAttributeDefinition<Level> getLevelAttributeDefinition() {
-		return levelAttrDef;
-	}
-	
 	public static IntegerAttributeDefinition getCodeAttributeDefinition() {
 		return codeAttrDef;
 	}
-
-	public static StringAttributeDefinition getTextAttributeDefinition() {
-		return textAttrDef;
-	}
-
+	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				levelAttrDef, 
 				codeAttrDef, 
 				textAttrDef
 			};
+	}
+
+	public static EnumeratedAttributeDefinition<Level> getLevelAttributeDefinition() {
+		return levelAttrDef;
+	}
+
+	public static StringAttributeDefinition getTextAttributeDefinition() {
+		return textAttrDef;
 	}
 }

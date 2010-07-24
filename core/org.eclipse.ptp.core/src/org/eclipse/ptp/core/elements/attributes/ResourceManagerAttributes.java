@@ -47,8 +47,8 @@ public class ResourceManagerAttributes {
 		new StringAttributeDefinition(TYPE_ATTR_ID, "type",  //$NON-NLS-1$
 				Messages.ResourceManagerAttributes_3, false, Messages.ResourceManagerAttributes_4);
 	
-	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
-		return stateAttrDef;
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
+		return new IAttributeDefinition[]{stateAttrDef, descAttrDef, typeAttrDef, rmIDAttrDef};
 	}
 	
 	public static StringAttributeDefinition getDescriptionAttributeDefinition() {
@@ -59,11 +59,11 @@ public class ResourceManagerAttributes {
 		return rmIDAttrDef;
 	}
 	
-	public static StringAttributeDefinition getTypeAttributeDefinition() {
-		return typeAttrDef;
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
+		return stateAttrDef;
 	}
 	
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef, descAttrDef, typeAttrDef, rmIDAttrDef};
+	public static StringAttributeDefinition getTypeAttributeDefinition() {
+		return typeAttrDef;
 	}
 }

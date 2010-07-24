@@ -90,6 +90,21 @@ public class PJob extends Parent implements IPJobControl {
 		processOutput = new ProcessOutput(this);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void addAttributesForJobRanks(BitSet processJobRanks, AttributeManager attrs) {
+		StringAttribute stdOutAttr = attrs.getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
+		if (stdOutAttr != null) {
+			addOutput(stdOutAttr.getValue(), processJobRanks);
+		}
+		for (IAttribute<?, ?, ?> attr : attrs.getAttributes()) {
+			// get the process set for the attributes
+			// corresponding to attr's definition
+			AttributeIndexSet attrIds = getAttributeIndexSet(attr.getDefinition());
+			// add the procces' ranks to that attribute
+			attrIds.addIndicesToAttribute(attr, processJobRanks);
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#addChildListener(org.eclipse.ptp.core.elements.listeners.IJobProcessListener)
 	 */
@@ -102,6 +117,14 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	public void addElementListener(IJobListener listener) {
 		elementListeners.add(listener);
+	}
+
+	/**
+	 * @param output
+	 * @param processJobRanks
+	 */
+	private void addOutput(String output, BitSet processJobRanks) {
+		processOutput.addOutput(output, processJobRanks);
 	}
 
 	/* (non-Javadoc)
@@ -161,6 +184,115 @@ public class PJob extends Parent implements IPJobControl {
 		fireNewProcesses(newProcessJobRanks);
 	}
 
+	/**
+	 * @param processJobRanks 
+	 * 
+	 */
+	private void clearOutput(BitSet processJobRanks) {
+		final AttributeIndexSet<StringAttribute> outAttrs =
+			getAttributeIndexSet(ProcessAttributes.getStdoutAttributeDefinition());
+
+		// if all of the processes have had their output cleared
+		// then delete the output file
+		outAttrs.clearIndices(processJobRanks);
+		if (outAttrs.isEmpty()) {
+			processOutput.delete();
+		}
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
+	 */
+	@Override
+	protected void doAddAttributeHook(AttributeManager attribs) {
+		fireChangedJob(attribs);
+	}
+
+
+	/**
+	 * Notify listeners when a job attribute has changed.
+	 * 
+	 * @param attrs
+	 */
+	private void fireChangedJob(AttributeManager attrs) {
+		IJobChangeEvent e = new JobChangeEvent(this, attrs);
+
+		for (Object listener : elementListeners.getListeners()) {
+			((IJobListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Send IChangedProcessEvent to registered listeners
+	 * 
+	 * @param processes
+	 * @param attributes 
+	 */
+	private void fireChangedProcesses(BitSet processes,
+			AttributeManager attributes) {
+		IChangedProcessEvent e = 
+			new ChangedProcessEvent(this, this, processes,
+					attributes);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IJobChildListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Notify listeners when a new processes are created.
+	 * 
+	 * @param processes
+	 */
+	private void fireNewProcesses(BitSet processes) {
+		INewProcessEvent e = 
+			new NewProcessEvent(this, this, processes);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IJobChildListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Notify listeners when the collection of processes are removed.
+	 * 
+	 * @param processes to remove
+	 */
+	private void fireRemoveProcesses(BitSet processes) {
+		IRemoveProcessEvent e = 
+			new RemoveProcessEvent(this, this, processes);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IJobChildListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * @param attrs
+	 * @param def
+	 * @return
+	 */
+	private <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	A getAttribute(AttributeManager attrs, D def) {
+		return attrs.getAttribute(def);
+	}
+
+	/**
+	 * @param def
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private synchronized <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
+	AttributeIndexSet<A> getAttributeIndexSet(D def) {
+		AttributeIndexSet<A> attributeIndexSet = (AttributeIndexSet<A>) processAttributesMap.get(def);
+		if (attributeIndexSet == null) {
+			attributeIndexSet = new AttributeIndexSet<A>();
+			processAttributesMap.put(def, attributeIndexSet);
+		}
+		return attributeIndexSet;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getLaunchConfiguration()
 	 */
@@ -195,7 +327,6 @@ public class PJob extends Parent implements IPJobControl {
 		return attrs.iterator().next();
 	}
 
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributeKeys(java.util.BitSet)
 	 */
@@ -211,7 +342,6 @@ public class PJob extends Parent implements IPJobControl {
 		}
 		return results;
 	}
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(java.util.BitSet)
@@ -402,135 +532,5 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	public synchronized void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void addAttributesForJobRanks(BitSet processJobRanks, AttributeManager attrs) {
-		StringAttribute stdOutAttr = attrs.getAttribute(ProcessAttributes.getStdoutAttributeDefinition());
-		if (stdOutAttr != null) {
-			addOutput(stdOutAttr.getValue(), processJobRanks);
-		}
-		for (IAttribute<?, ?, ?> attr : attrs.getAttributes()) {
-			// get the process set for the attributes
-			// corresponding to attr's definition
-			AttributeIndexSet attrIds = getAttributeIndexSet(attr.getDefinition());
-			// add the procces' ranks to that attribute
-			attrIds.addIndicesToAttribute(attr, processJobRanks);
-		}
-	}
-
-	/**
-	 * @param output
-	 * @param processJobRanks
-	 */
-	private void addOutput(String output, BitSet processJobRanks) {
-		processOutput.addOutput(output, processJobRanks);
-	}
-
-	/**
-	 * @param processJobRanks 
-	 * 
-	 */
-	private void clearOutput(BitSet processJobRanks) {
-		final AttributeIndexSet<StringAttribute> outAttrs =
-			getAttributeIndexSet(ProcessAttributes.getStdoutAttributeDefinition());
-
-		// if all of the processes have had their output cleared
-		// then delete the output file
-		outAttrs.clearIndices(processJobRanks);
-		if (outAttrs.isEmpty()) {
-			processOutput.delete();
-		}
-	}
-
-	/**
-	 * Notify listeners when a job attribute has changed.
-	 * 
-	 * @param attrs
-	 */
-	private void fireChangedJob(AttributeManager attrs) {
-		IJobChangeEvent e = new JobChangeEvent(this, attrs);
-
-		for (Object listener : elementListeners.getListeners()) {
-			((IJobListener)listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * Send IChangedProcessEvent to registered listeners
-	 * 
-	 * @param processes
-	 * @param attributes 
-	 */
-	private void fireChangedProcesses(BitSet processes,
-			AttributeManager attributes) {
-		IChangedProcessEvent e = 
-			new ChangedProcessEvent(this, this, processes,
-					attributes);
-
-		for (Object listener : childListeners.getListeners()) {
-			((IJobChildListener)listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * Notify listeners when a new processes are created.
-	 * 
-	 * @param processes
-	 */
-	private void fireNewProcesses(BitSet processes) {
-		INewProcessEvent e = 
-			new NewProcessEvent(this, this, processes);
-
-		for (Object listener : childListeners.getListeners()) {
-			((IJobChildListener)listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * Notify listeners when the collection of processes are removed.
-	 * 
-	 * @param processes to remove
-	 */
-	private void fireRemoveProcesses(BitSet processes) {
-		IRemoveProcessEvent e = 
-			new RemoveProcessEvent(this, this, processes);
-
-		for (Object listener : childListeners.getListeners()) {
-			((IJobChildListener)listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * @param attrs
-	 * @param def
-	 * @return
-	 */
-	private <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	A getAttribute(AttributeManager attrs, D def) {
-		return attrs.getAttribute(def);
-	}
-
-	/**
-	 * @param def
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private synchronized <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	AttributeIndexSet<A> getAttributeIndexSet(D def) {
-		AttributeIndexSet<A> attributeIndexSet = (AttributeIndexSet<A>) processAttributesMap.get(def);
-		if (attributeIndexSet == null) {
-			attributeIndexSet = new AttributeIndexSet<A>();
-			processAttributesMap.put(def, attributeIndexSet);
-		}
-		return attributeIndexSet;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
-	 */
-	@Override
-	protected void doAddAttributeHook(AttributeManager attribs) {
-		fireChangedJob(attribs);
 	}
 }

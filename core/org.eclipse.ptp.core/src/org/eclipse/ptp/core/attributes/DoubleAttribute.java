@@ -35,53 +35,12 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 		setValueAsString(initialValue);
 	}
 
-	public synchronized Double getValue() {
-		return value;
-	}
+	@Override
+    protected synchronized int doCompareTo(DoubleAttribute other) {
+        return value.compareTo(other.value);
+    }
 	
-	public synchronized String getValueAsString() {
-		return value.toString();
-	}
-	
-	public boolean isValid(String string) {
-		try {
-			Double.parseDouble(string);
-			return true;
-		}
-		catch (NumberFormatException e) {
-			return false;
-		}
-	}
-
-	public synchronized void setValue(Double value) throws IllegalValueException {
-		if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
-			throw new IllegalValueException(Messages.DoubleAttribute_0);
-		}
-		this.value = value;
-	}
-
-	public synchronized void setValueAsString(String string) throws IllegalValueException {
-		try {
-			Double value = Double.valueOf(string);
-			if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
-				throw new IllegalValueException(Messages.DoubleAttribute_1);
-			}
-			this.value = value;
-		}
-		catch (NumberFormatException e) {
-			throw new IllegalValueException(e);
-		}
-	}
-	
-	private double getMinValue() {
-		return getDefinition().getMinValue();
-	}
-	
-	private double getMaxValue() {
-		return getDefinition().getMaxValue();
-	}
-
-    /* (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
@@ -93,20 +52,61 @@ extends AbstractAttribute<Double,DoubleAttribute,DoubleAttributeDefinition> {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	@Override
-    protected synchronized int doCompareTo(DoubleAttribute other) {
-        return value.compareTo(other.value);
-    }
-
-    @Override
     protected synchronized boolean doEquals(DoubleAttribute other) {
         return value.equals(other.value);
     }
 
-    @Override
+	@Override
     protected synchronized int doHashCode() {
         return value.hashCode();
     }
+
+	private double getMaxValue() {
+		return getDefinition().getMaxValue();
+	}
+	
+	private double getMinValue() {
+		return getDefinition().getMinValue();
+	}
+	
+	public synchronized Double getValue() {
+		return value;
+	}
+
+    public synchronized String getValueAsString() {
+		return value.toString();
+	}
+
+	public boolean isValid(String string) {
+		try {
+			Double.parseDouble(string);
+			return true;
+		}
+		catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+    public synchronized void setValue(Double value) throws IllegalValueException {
+		if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
+			throw new IllegalValueException(Messages.DoubleAttribute_0);
+		}
+		this.value = value;
+	}
+
+    public synchronized void setValueAsString(String string) throws IllegalValueException {
+		try {
+			Double value = Double.valueOf(string);
+			if (value.doubleValue() < getMinValue() || value.doubleValue() > getMaxValue()) {
+				throw new IllegalValueException(Messages.DoubleAttribute_1);
+			}
+			this.value = value;
+		}
+		catch (NumberFormatException e) {
+			throw new IllegalValueException(e);
+		}
+	}
 
 }

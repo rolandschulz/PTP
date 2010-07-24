@@ -30,23 +30,14 @@ public class Queue<T> {
 		list = Collections.synchronizedList(new LinkedList<T>());
 	}
 
-	public T removeItem() throws InterruptedException {
-		synchronized (list) {
-			while (list.isEmpty()) {
-				list.wait();
-			}
-			return list.remove(0);
-		}
-	}
-
 	public void addItem(T item) {
 		synchronized (list) {
 			list.add(item);
 			list.notifyAll();
 		}
 	}
-	
-    public T[] clearItems() {
+
+	public T[] clearItems() {
 		T[] array;
 		synchronized (list) {
 			array = (T[]) list.toArray();
@@ -54,12 +45,21 @@ public class Queue<T> {
 		}
 		return array;
 	}
-
-	public boolean isEmpty() {
+	
+    public boolean isEmpty() {
 		boolean empty;
 		synchronized (list) {
 			empty = list.isEmpty();
 		}
 		return empty;
+	}
+
+	public T removeItem() throws InterruptedException {
+		synchronized (list) {
+			while (list.isEmpty()) {
+				list.wait();
+			}
+			return list.remove(0);
+		}
 	}
 }
