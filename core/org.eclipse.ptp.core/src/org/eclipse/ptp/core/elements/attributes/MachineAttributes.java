@@ -39,15 +39,15 @@ public class MachineAttributes {
         new IntegerAttributeDefinition(NUMNODES_ATTR_ID, "nodes", Messages.MachineAttributes_1, //$NON-NLS-1$
                 true, 0);
     
-    public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
-        return stateAttrDef;
-    }
+    public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
+		return new IAttributeDefinition[]{stateAttrDef, numNodesAttrDef};
+	}
     
     public static IntegerAttributeDefinition getNumNodesAttributeDefinition() {
         return numNodesAttrDef;
     }
     
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef, numNodesAttrDef};
-	}
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
+        return stateAttrDef;
+    }
 }

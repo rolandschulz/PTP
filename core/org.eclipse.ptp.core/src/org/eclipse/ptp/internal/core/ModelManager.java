@@ -194,6 +194,43 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
+	/**
+	 * Fire a changed resource manager event.
+	 * 
+	 * @param rms
+	 *            collection of resource managers
+	 */
+	private void fireChangedResourceManager(final Collection<IResourceManager> rms) {
+		IChangedResourceManagerEvent event = new ChangedResourceManagerEvent(this, rms);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener) listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * Fire a new resource manager event.
+	 * 
+	 * @param rm
+	 */
+	private void fireNewResourceManager(final IResourceManager rm) {
+		INewResourceManagerEvent event = new NewResourceManagerEvent(this, rm);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener) listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * Fire a remove resource manager event.
+	 * 
+	 * @param rm
+	 */
+	private void fireRemoveResourceManager(final IResourceManager rm) {
+		IRemoveResourceManagerEvent event = new RemoveResourceManagerEvent(this, rm);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener) listener).handleEvent(event);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -336,6 +373,16 @@ public class ModelManager implements IModelManager {
 		resourceManagerListeners.clear();
 	}
 
+	/**
+	 * shuts down all of the resource managers.
+	 */
+	private synchronized void shutdownResourceManagers() {
+		IResourceManagerControl[] resourceManagers = universe.getResourceManagerControls();
+		for (int i = 0; i < resourceManagers.length; ++i) {
+			resourceManagers[i].dispose();
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -343,6 +390,19 @@ public class ModelManager implements IModelManager {
 	 */
 	public void start() throws CoreException {
 		loadResourceManagers();
+	}
+
+	/**
+	 * Start all resource managers.
+	 * 
+	 * @param rmsNeedStarting
+	 * @throws CoreException
+	 */
+	private void startResourceManagers(IResourceManagerControl[] rmsNeedStarting) throws CoreException {
+		for (final IResourceManagerControl rm : rmsNeedStarting) {
+			Job job = new RMStartupJob(rm);
+			job.schedule();
+		}
 	}
 
 	/*
@@ -366,66 +426,6 @@ public class ModelManager implements IModelManager {
 	 */
 	public void updateResourceManager(IResourceManager rm) {
 		fireChangedResourceManager(Arrays.asList(rm));
-	}
-
-	/**
-	 * Fire a changed resource manager event.
-	 * 
-	 * @param rms
-	 *            collection of resource managers
-	 */
-	private void fireChangedResourceManager(final Collection<IResourceManager> rms) {
-		IChangedResourceManagerEvent event = new ChangedResourceManagerEvent(this, rms);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * Fire a new resource manager event.
-	 * 
-	 * @param rm
-	 */
-	private void fireNewResourceManager(final IResourceManager rm) {
-		INewResourceManagerEvent event = new NewResourceManagerEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * Fire a remove resource manager event.
-	 * 
-	 * @param rm
-	 */
-	private void fireRemoveResourceManager(final IResourceManager rm) {
-		IRemoveResourceManagerEvent event = new RemoveResourceManagerEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * shuts down all of the resource managers.
-	 */
-	private synchronized void shutdownResourceManagers() {
-		IResourceManagerControl[] resourceManagers = universe.getResourceManagerControls();
-		for (int i = 0; i < resourceManagers.length; ++i) {
-			resourceManagers[i].dispose();
-		}
-	}
-
-	/**
-	 * Start all resource managers.
-	 * 
-	 * @param rmsNeedStarting
-	 * @throws CoreException
-	 */
-	private void startResourceManagers(IResourceManagerControl[] rmsNeedStarting) throws CoreException {
-		for (final IResourceManagerControl rm : rmsNeedStarting) {
-			Job job = new RMStartupJob(rm);
-			job.schedule();
-		}
 	}
 
 }

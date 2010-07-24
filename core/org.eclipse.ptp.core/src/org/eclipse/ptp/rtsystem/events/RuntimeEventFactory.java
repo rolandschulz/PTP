@@ -312,20 +312,20 @@ public class RuntimeEventFactory implements IRuntimeEventFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
-	 * newRuntimeStartupErrorEvent(java.lang.String)
+	 * newRuntimeStartupErrorEvent(int, java.lang.String)
 	 */
-	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(String message) {
-		return new RuntimeStartupErrorEvent(message);
+	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(int code, String message) {
+		return new RuntimeStartupErrorEvent(code, message);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeEventFactory#
-	 * newRuntimeStartupErrorEvent(int, java.lang.String)
+	 * newRuntimeStartupErrorEvent(java.lang.String)
 	 */
-	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(int code, String message) {
-		return new RuntimeStartupErrorEvent(code, message);
+	public IRuntimeStartupErrorEvent newRuntimeStartupErrorEvent(String message) {
+		return new RuntimeStartupErrorEvent(message);
 	}
 
 	/*

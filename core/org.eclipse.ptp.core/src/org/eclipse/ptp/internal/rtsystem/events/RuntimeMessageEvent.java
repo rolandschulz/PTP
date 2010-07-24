@@ -61,12 +61,10 @@ public class RuntimeMessageEvent implements IRuntimeMessageEvent {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getLevel()
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent#getAttributes()
 	 */
-	public MessageAttributes.Level getLevel() {
-		EnumeratedAttribute<Level> level = 
-			attributes.getAttribute(MessageAttributes.getLevelAttributeDefinition());
-		return level.getValue();
+	public AttributeManager getAttributes() {
+		return attributes;
 	}
 
 	/* (non-Javadoc)
@@ -79,19 +77,21 @@ public class RuntimeMessageEvent implements IRuntimeMessageEvent {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getLevel()
+	 */
+	public MessageAttributes.Level getLevel() {
+		EnumeratedAttribute<Level> level = 
+			attributes.getAttribute(MessageAttributes.getLevelAttributeDefinition());
+		return level.getValue();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getText()
 	 */
 	public String getText() {
 		StringAttribute text = 
 			attributes.getAttribute(MessageAttributes.getTextAttributeDefinition());
 		return text.getValue();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent#getAttributes()
-	 */
-	public AttributeManager getAttributes() {
-		return attributes;
 	}
 
 }

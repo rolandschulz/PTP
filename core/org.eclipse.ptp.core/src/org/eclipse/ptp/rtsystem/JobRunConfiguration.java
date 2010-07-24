@@ -64,40 +64,44 @@ public class JobRunConfiguration {
 		debuggerArgs = null;
 	}
 
-	public String getExecName() {
-		return execName;
-	}
-
-	public String getPathToExec() {
-		return pathToExec;
-	}
-
-	public String getResourceManagerName() {
-		return resourceManagerName;
-	}
-
-	public String getQueueName() {
-		return queueName;
-	}
-
-	public String getWorkingDir() {
-		return workingDir;
-	}
-
 	public String[] getArguments() {
 		return arguments;
 	}
 
-	public String[] getEnvironment() {
-		return environment;
+	public String[] getDebuggerArgs() {
+		return debuggerArgs;
 	}
 
 	public String getDebuggerPath() {
 		return debuggerPath;
 	}
 
-	public String[] getDebuggerArgs() {
-		return debuggerArgs;
+	public String[] getEnvironment() {
+		return environment;
+	}
+
+	public String getExecName() {
+		return execName;
+	}
+
+	public IAttribute<?, ?, ?>[] getLaunchAttributes() {
+		return launchAttributes;
+	}
+
+	public String getPathToExec() {
+		return pathToExec;
+	}
+
+	public String getQueueName() {
+		return queueName;
+	}
+
+	public String getResourceManagerName() {
+		return resourceManagerName;
+	}
+
+	public String getWorkingDir() {
+		return workingDir;
 	}
 
 	public boolean isDebug() {
@@ -108,12 +112,12 @@ public class JobRunConfiguration {
 		isDebugJob = true;
 	}
 
-	public void setDebuggerPath(String path) {
-		debuggerPath = path;
-	}
-
 	public void setDebuggerArgs(String args) {
 		debuggerArgs = args.split(" "); //$NON-NLS-1$
+	}
+
+	public void setDebuggerPath(String path) {
+		debuggerPath = path;
 	}
 
 	@Override
@@ -124,9 +128,5 @@ public class JobRunConfiguration {
 				"resourceManagerName:\t" + resourceManagerName + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
 				"queueName:\t" + queueName + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
 				"isDebug?\t\t" + isDebugJob; //$NON-NLS-1$
-	}
-
-	public IAttribute<?, ?, ?>[] getLaunchAttributes() {
-		return launchAttributes;
 	}
 }

@@ -158,12 +158,12 @@ public class JobAttributes {
 		return debugExecPathAttrDef;
 	}
 	
-	public static BooleanAttributeDefinition getDebuggerStopInMainFlagAttributeDefinition() {
-		return debugStopInMainAttrDef;
-	}
-	
 	public static StringAttributeDefinition getDebuggerIdAttributeDefinition() {
 		return debuggerIdAttrDef;
+	}
+	
+	public static BooleanAttributeDefinition getDebuggerStopInMainFlagAttributeDefinition() {
+		return debugStopInMainAttrDef;
 	}
 	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
@@ -204,16 +204,16 @@ public class JobAttributes {
 		return execPathAttrDef;
 	}
 
-	public static BooleanAttributeDefinition getLaunchedByPTPFlagAttributeDefinition() {
-		return launchedByPTPFlagAttrDef;
-	}
-
 	public static IntegerAttributeDefinition getIOForwardingAttributeDefinition() {
 		return ioForwardingAttrDef;
 	}
 
 	public static StringAttributeDefinition getJobIdAttributeDefinition() {
 		return jobIdAttrDef;
+	}
+
+	public static BooleanAttributeDefinition getLaunchedByPTPFlagAttributeDefinition() {
+		return launchedByPTPFlagAttrDef;
 	}
 	
 	public static IntegerAttributeDefinition getNumberOfProcessesAttributeDefinition() {

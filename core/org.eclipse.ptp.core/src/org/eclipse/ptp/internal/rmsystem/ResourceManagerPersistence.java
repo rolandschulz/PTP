@@ -115,6 +115,16 @@ public class ResourceManagerPersistence {
         return rmsNeedStarting.toArray(new IResourceManagerControl[0]);
     }
 
+	private IResourceManagerFactory getResourceManagerFactory(
+			IResourceManagerFactory[] factories, String id) {
+		for (int i = 0; i < factories.length; i++) {
+			if (factories[i].getId().equals(id))
+				return factories[i];
+		}
+
+		return null;
+	}
+
 	public IResourceManager getSavedCurrentResourceManager() {
 		return savedCurrentResourceManager;
 	}
@@ -146,16 +156,6 @@ public class ResourceManagerPersistence {
                 PTPCorePlugin.log(e);
             }
         }
-	}
-
-	private IResourceManagerFactory getResourceManagerFactory(
-			IResourceManagerFactory[] factories, String id) {
-		for (int i = 0; i < factories.length; i++) {
-			if (factories[i].getId().equals(id))
-				return factories[i];
-		}
-
-		return null;
 	}
 
     /**

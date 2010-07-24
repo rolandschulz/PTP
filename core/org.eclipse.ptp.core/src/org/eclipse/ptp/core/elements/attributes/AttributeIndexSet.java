@@ -54,6 +54,15 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterabl
 	}
 
 	/**
+	 * @param subSet
+	 */
+	private AttributeIndexSet(DisjointBitSets<A> subSet) {
+		// no need to copy the subSet since it is derived
+		// from a copy
+		this.disjointBitSets = subSet;
+	}
+
+	/**
 	 * @param nIndices
 	 *            the initial number of indices
 	 */
@@ -64,15 +73,6 @@ public class AttributeIndexSet<A extends IAttribute<?, A, ?>> implements Iterabl
 				return attr.copy();
 			}
 		});
-	}
-
-	/**
-	 * @param subSet
-	 */
-	private AttributeIndexSet(DisjointBitSets<A> subSet) {
-		// no need to copy the subSet since it is derived
-		// from a copy
-		this.disjointBitSets = subSet;
 	}
 
 	/**

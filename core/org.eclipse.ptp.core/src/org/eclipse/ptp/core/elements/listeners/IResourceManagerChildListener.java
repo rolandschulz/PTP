@@ -38,22 +38,22 @@ public interface IResourceManagerChildListener {
 	/**
 	 * @param e
 	 */
-	public void handleEvent(INewMachineEvent e);
-	
-	/**
-	 * @param e
-	 */
-	public void handleEvent(INewQueueEvent e);
-
-	/**
-	 * @param e
-	 */
 	public void handleEvent(IChangedMachineEvent e);
 	
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IChangedQueueEvent e);
+
+	/**
+	 * @param e
+	 */
+	public void handleEvent(INewMachineEvent e);
+	
+	/**
+	 * @param e
+	 */
+	public void handleEvent(INewQueueEvent e);
 	
 	/**
 	 * @param e

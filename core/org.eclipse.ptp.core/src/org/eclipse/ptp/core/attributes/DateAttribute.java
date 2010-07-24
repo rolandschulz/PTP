@@ -32,20 +32,6 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 
 	private static DateFormat[] dateFormats = null;
 
-	public static void main(String[] args) throws IllegalValueException {
-		Calendar cal = Calendar.getInstance();
-		DateAttributeDefinition def = new DateAttributeDefinition(
-				"uniqId", "name", "desc", true, cal.getTime(), DateFormat.getDateTimeInstance()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		DateAttribute mda = def.create();
-		mda.setValue(cal);
-		System.out.println(mda.toString());
-		String str = mda.toString();
-		cal.add(Calendar.MONTH, 2);
-		System.out.println(mda.toString());
-		mda.setValueAsString(str);
-		System.out.println(mda.toString());
-	}
-
 	private static DateFormat[] getDateFormats() {
 		if (dateFormats != null) {
 			return dateFormats;
@@ -66,6 +52,20 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 		return dateFormats;
 	}
 
+	public static void main(String[] args) throws IllegalValueException {
+		Calendar cal = Calendar.getInstance();
+		DateAttributeDefinition def = new DateAttributeDefinition(
+				"uniqId", "name", "desc", true, cal.getTime(), DateFormat.getDateTimeInstance()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		DateAttribute mda = def.create();
+		mda.setValue(cal);
+		System.out.println(mda.toString());
+		String str = mda.toString();
+		cal.add(Calendar.MONTH, 2);
+		System.out.println(mda.toString());
+		mda.setValueAsString(str);
+		System.out.println(mda.toString());
+	}
+
 	protected final Calendar value = Calendar.getInstance();
 
 	public DateAttribute(DateAttributeDefinition definition, Date initialValue) throws IllegalValueException {
@@ -78,6 +78,39 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 		setValueAsString(initialValue);
 	}
 
+	@Override
+	protected int doCompareTo(DateAttribute other) {
+		return value.compareTo(other.value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	/**
+	 * @since 4.0
+	 */
+	@Override
+	protected DateAttribute doCopy() {
+		try {
+			return new DateAttribute(getDefinition(), value.getTime());
+		} catch (IllegalValueException e) {
+			// shouldn't happen
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	protected boolean doEquals(DateAttribute other) {
+		return value.equals(other.value);
+	}
+
+	@Override
+	protected int doHashCode() {
+		return value.hashCode();
+	}
+
 	/**
 	 * @since 4.0
 	 */
@@ -87,6 +120,14 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 
 	public Date getDateValue() {
 		return value.getTime();
+	}
+
+	private Date getMaxDate() {
+		return getDefinition().getMaxDate();
+	}
+
+	private Date getMinDate() {
+		return getDefinition().getMinDate();
 	}
 
 	public Calendar getValue() {
@@ -109,6 +150,23 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 			return false;
 		}
 		return true;
+	}
+
+	private Date parseString(String string) {
+		Date date = null;
+		final ParsePosition parsePosition = new ParsePosition(0);
+		date = getDateFormat().parse(string, parsePosition);
+		if (date != null) {
+			return date;
+		}
+		for (int i = 0; i < getDateFormats().length; ++i) {
+			parsePosition.setIndex(0);
+			date = getDateFormats()[i].parse(string, parsePosition);
+			if (date != null) {
+				return date;
+			}
+		}
+		return date;
 	}
 
 	public void setValue(Calendar calendar) throws IllegalValueException {
@@ -145,66 +203,8 @@ public class DateAttribute extends AbstractAttribute<Calendar, DateAttribute, Da
 
 	}
 
-	private Date getMaxDate() {
-		return getDefinition().getMaxDate();
-	}
-
-	private Date getMinDate() {
-		return getDefinition().getMinDate();
-	}
-
-	private Date parseString(String string) {
-		Date date = null;
-		final ParsePosition parsePosition = new ParsePosition(0);
-		date = getDateFormat().parse(string, parsePosition);
-		if (date != null) {
-			return date;
-		}
-		for (int i = 0; i < getDateFormats().length; ++i) {
-			parsePosition.setIndex(0);
-			date = getDateFormats()[i].parse(string, parsePosition);
-			if (date != null) {
-				return date;
-			}
-		}
-		return date;
-	}
-
 	private String toString(Date date) {
 		return getDateFormat().format(date);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
-	 */
-	/**
-	 * @since 4.0
-	 */
-	@Override
-	protected DateAttribute doCopy() {
-		try {
-			return new DateAttribute(getDefinition(), value.getTime());
-		} catch (IllegalValueException e) {
-			// shouldn't happen
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	protected int doCompareTo(DateAttribute other) {
-		return value.compareTo(other.value);
-	}
-
-	@Override
-	protected boolean doEquals(DateAttribute other) {
-		return value.equals(other.value);
-	}
-
-	@Override
-	protected int doHashCode() {
-		return value.hashCode();
 	}
 
 }

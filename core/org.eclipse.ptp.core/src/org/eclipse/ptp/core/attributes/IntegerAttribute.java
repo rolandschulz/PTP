@@ -35,10 +35,46 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 		setValueAsString(initialValue);
 	}
 
+	@Override
+    protected synchronized int doCompareTo(IntegerAttribute other) {
+        return value.compareTo(other.value);
+    }
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected IntegerAttribute doCopy() {
+		try {
+			return new IntegerAttribute(getDefinition(), value);
+		} catch (IllegalValueException e) {
+			// shouldn't happen
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+    protected synchronized boolean doEquals(IntegerAttribute other) {
+        return value.equals(other.value);
+    }
+
+	@Override
+    protected synchronized int doHashCode() {
+        return value.hashCode();
+    }
+
+	private int getMaxValue() {
+		return getDefinition().getMaxValue();
+	}
+	
+	private int getMinValue() {
+		return getDefinition().getMinValue();
+	}
+	
 	public synchronized Integer getValue() {
 		return value.intValue();
 	}
-	
+
 	public synchronized String getValueAsString() {
 		return value.toString();
 	}
@@ -56,14 +92,14 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 		}
 	}
 
-	public synchronized void setValue(Integer value) throws IllegalValueException {
+    public synchronized void setValue(Integer value) throws IllegalValueException {
 		if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
 			throw new IllegalValueException(Messages.IntegerAttribute_0);
 		}
 		this.value = value;
 	}
 
-	public synchronized void setValueAsString(String string) throws IllegalValueException {
+    public synchronized void setValueAsString(String string) throws IllegalValueException {
 		try {
 			Integer value = Integer.valueOf(string);
 			if (value.intValue() < getMinValue() || value.intValue() > getMaxValue()) {
@@ -75,40 +111,4 @@ extends AbstractAttribute<Integer,IntegerAttribute,IntegerAttributeDefinition> {
 			throw new IllegalValueException(e);
 		}
 	}
-	
-	private int getMinValue() {
-		return getDefinition().getMinValue();
-	}
-	
-	private int getMaxValue() {
-		return getDefinition().getMaxValue();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
-	 */
-	@Override
-	protected IntegerAttribute doCopy() {
-		try {
-			return new IntegerAttribute(getDefinition(), value);
-		} catch (IllegalValueException e) {
-			// shouldn't happen
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-    protected synchronized int doCompareTo(IntegerAttribute other) {
-        return value.compareTo(other.value);
-    }
-
-    @Override
-    protected synchronized boolean doEquals(IntegerAttribute other) {
-        return value.equals(other.value);
-    }
-
-    @Override
-    protected synchronized int doHashCode() {
-        return value.hashCode();
-    }
 }

@@ -23,13 +23,13 @@ public class FilterAttributes {
 	private final static BooleanAttributeDefinition filterChildrenAttributeDefinition = 
 		new BooleanAttributeDefinition(ATTR_FILTER_CHILDREN, ATTR_FILTER_CHILDREN, ATTR_FILTER_CHILDREN, false, false);
 
-	public static BooleanAttributeDefinition getFilterChildrenAttributeDefinition() {
-		return filterChildrenAttributeDefinition;
-	}
-	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				filterChildrenAttributeDefinition
 			};
+	}
+	
+	public static BooleanAttributeDefinition getFilterChildrenAttributeDefinition() {
+		return filterChildrenAttributeDefinition;
 	}
 }

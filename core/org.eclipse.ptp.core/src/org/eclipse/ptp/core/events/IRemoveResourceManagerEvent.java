@@ -7,10 +7,10 @@ public interface IRemoveResourceManagerEvent {
 	/**
 	 * @return
 	 */
-	public IModelManager getSource();
+	public IResourceManager getResourceManager();
 	
 	/**
 	 * @return
 	 */
-	public IResourceManager getResourceManager();
+	public IModelManager getSource();
 }

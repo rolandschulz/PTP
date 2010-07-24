@@ -33,18 +33,6 @@ public abstract class AbstractAttribute<T, A extends AbstractAttribute<T, A, D>,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#copy()
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public A copy() {
-		return doCopy();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(A other) {
@@ -60,6 +48,41 @@ public abstract class AbstractAttribute<T, A extends AbstractAttribute<T, A, D>,
 		final int doCompareTo = doCompareTo(other);
 		return doCompareTo;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#copy()
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public A copy() {
+		return doCopy();
+	}
+
+	/**
+	 * @param other
+	 * @return
+	 */
+	protected abstract int doCompareTo(A other);
+
+	/**
+	 * @return
+	 * @since 4.0
+	 */
+	protected abstract A doCopy();
+
+	/**
+	 * @param other
+	 * @return
+	 */
+	protected abstract boolean doEquals(A other);
+
+	/**
+	 * @return
+	 */
+	protected abstract int doHashCode();
 
 	/*
 	 * (non-Javadoc)
@@ -126,27 +149,4 @@ public abstract class AbstractAttribute<T, A extends AbstractAttribute<T, A, D>,
 	public String toString() {
 		return getValueAsString();
 	}
-
-	/**
-	 * @param other
-	 * @return
-	 */
-	protected abstract int doCompareTo(A other);
-
-	/**
-	 * @return
-	 * @since 4.0
-	 */
-	protected abstract A doCopy();
-
-	/**
-	 * @param other
-	 * @return
-	 */
-	protected abstract boolean doEquals(A other);
-
-	/**
-	 * @return
-	 */
-	protected abstract int doHashCode();
 }

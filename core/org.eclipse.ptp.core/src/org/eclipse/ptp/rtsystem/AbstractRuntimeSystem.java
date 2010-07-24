@@ -55,34 +55,6 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 		listeners.add(listener);
 	}
 
-	public void removeRuntimeEventListener(IRuntimeEventListener listener) {
-		listeners.remove(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String,
-	 *  java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
-	 */
-	public IAttribute<?,?,?>[] getLaunchAttributes(String machineName, String queueName,
-			IAttribute<?,?,?>[] currentAttrs) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void removeJob(IPJob job) {
-		// TODO Auto-generated method stub
-
-	}
-	
-	/**
-	 * @param event
-	 */
-	protected void fireRuntimeMessageEvent(IRuntimeMessageEvent event) {
-		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleEvent(event);
-		}
-	}
-	
 	/**
 	 * @param event
 	 */
@@ -91,7 +63,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-	
+
 	/**
 	 * @param event
 	 */
@@ -100,7 +72,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-	
+
 	/**
 	 * @param event
 	 */
@@ -118,7 +90,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-
+	
 	/**
 	 * @param event
 	 */
@@ -127,20 +99,11 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-
+	
 	/**
 	 * @param event
 	 */
-	protected void fireRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent event) {
-		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * @param event
-	 */
-	protected void fireRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent event) {
+	protected void fireRuntimeMessageEvent(IRuntimeMessageEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
@@ -149,21 +112,12 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	/**
 	 * @param event
 	 */
-	protected void fireRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent event) {
-		for (Object listener : listeners.getListeners()) {
-			((IRuntimeEventListener)listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * @param event
-	 */
 	protected void fireRuntimeNewJobEvent(IRuntimeNewJobEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-
+	
 	/**
 	 * @param event
 	 */
@@ -190,7 +144,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-	
+
 	/**
 	 * @param event
 	 */
@@ -203,12 +157,39 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 	/**
 	 * @param event
 	 */
+	protected void fireRuntimeNodeChangeEvent(IRuntimeNodeChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeProcessChangeEvent(IRuntimeProcessChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	protected void fireRuntimeQueueChangeEvent(IRuntimeQueueChangeEvent event) {
+		for (Object listener : listeners.getListeners()) {
+			((IRuntimeEventListener)listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
 	protected void fireRuntimeRemoveAllEvent(IRuntimeRemoveAllEvent event) {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-	
+
 	/**
 	 * @param event
 	 */
@@ -261,7 +242,8 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
-	}	
+	}
+	
 	/**
 	 * @param event
 	 */
@@ -270,7 +252,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-
+	
 	/**
 	 * @param event
 	 */
@@ -279,7 +261,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
 	}
-
+	
 	/**
 	 * @param event
 	 */
@@ -287,8 +269,7 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
-	}
-
+	}	
 	/**
 	 * @param event
 	 */
@@ -305,5 +286,24 @@ public abstract class AbstractRuntimeSystem implements IRuntimeSystem {
 		for (Object listener : listeners.getListeners()) {
 			((IRuntimeEventListener)listener).handleEvent(event);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rmsystem.IResourceManager#getLaunchAttributes(java.lang.String,
+	 *  java.lang.String, org.eclipse.ptp.core.attributes.IAttribute[])
+	 */
+	public IAttribute<?,?,?>[] getLaunchAttributes(String machineName, String queueName,
+			IAttribute<?,?,?>[] currentAttrs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void removeJob(IPJob job) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void removeRuntimeEventListener(IRuntimeEventListener listener) {
+		listeners.remove(listener);
 	}
 }

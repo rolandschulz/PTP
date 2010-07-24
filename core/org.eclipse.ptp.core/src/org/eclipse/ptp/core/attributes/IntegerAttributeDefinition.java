@@ -58,11 +58,11 @@ extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDef
 		return new IntegerAttribute(this, defaultValue);
 	}
 
-	public IntegerAttribute create(String value) throws IllegalValueException {
+	public IntegerAttribute create(Integer value) throws IllegalValueException {
 		return new IntegerAttribute(this, value);
 	}
 
-	public IntegerAttribute create(Integer value) throws IllegalValueException {
+	public IntegerAttribute create(String value) throws IllegalValueException {
 		return new IntegerAttribute(this, value);
 	}
 

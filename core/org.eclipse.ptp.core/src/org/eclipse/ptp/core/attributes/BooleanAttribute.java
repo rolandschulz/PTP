@@ -34,6 +34,34 @@ public class BooleanAttribute extends AbstractAttribute<Boolean, BooleanAttribut
 		this.value = Boolean.valueOf(initialValue);
 	}
 
+	@Override
+	protected synchronized int doCompareTo(BooleanAttribute other) {
+		return value.compareTo(other.value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	/**
+	 * @since 4.0
+	 */
+	@Override
+	protected BooleanAttribute doCopy() {
+		return new BooleanAttribute(getDefinition(), value);
+	}
+
+	@Override
+	protected synchronized boolean doEquals(BooleanAttribute other) {
+		return value.equals(other.value);
+	}
+
+	@Override
+	protected synchronized int doHashCode() {
+		return value.hashCode();
+	}
+
 	public synchronized Boolean getValue() {
 		return value.booleanValue();
 	}
@@ -58,34 +86,6 @@ public class BooleanAttribute extends AbstractAttribute<Boolean, BooleanAttribut
 			throw new IllegalValueException(string + Messages.BooleanAttribute_0);
 		}
 		value = Boolean.valueOf(string);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
-	 */
-	/**
-	 * @since 4.0
-	 */
-	@Override
-	protected BooleanAttribute doCopy() {
-		return new BooleanAttribute(getDefinition(), value);
-	}
-
-	@Override
-	protected synchronized int doCompareTo(BooleanAttribute other) {
-		return value.compareTo(other.value);
-	}
-
-	@Override
-	protected synchronized boolean doEquals(BooleanAttribute other) {
-		return value.equals(other.value);
-	}
-
-	@Override
-	protected synchronized int doHashCode() {
-		return value.hashCode();
 	}
 
 }

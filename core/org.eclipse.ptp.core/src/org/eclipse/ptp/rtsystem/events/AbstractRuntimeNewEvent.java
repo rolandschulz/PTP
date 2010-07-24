@@ -31,16 +31,16 @@ public abstract class AbstractRuntimeNewEvent implements IRuntimeNewEvent {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeNewEvent#getParentId()
-	 */
-	public String getParentId() {
-		return parentId;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeNewEvent#getElementAttributeManager()
 	 */
 	public ElementAttributeManager getElementAttributeManager() {
 		return attrMgr;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeNewEvent#getParentId()
+	 */
+	public String getParentId() {
+		return parentId;
 	}
 }

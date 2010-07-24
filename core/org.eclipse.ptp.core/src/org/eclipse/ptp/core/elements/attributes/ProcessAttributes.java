@@ -64,34 +64,6 @@ public class ProcessAttributes {
 		new StringAttributeDefinition(NODEID_ATTR_ID, "Process Node ID",  //$NON-NLS-1$
 				Messages.ProcessAttributes_7, true, ""); //$NON-NLS-1$
 	
-	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
-		return stateAttrDef;
-	}
-	
-	public static StringAttributeDefinition getStatusAttributeDefinition() {
-		return statusAttrDef;
-	}
-	
-	public static IntegerAttributeDefinition getExitCodeAttributeDefinition() {
-		return exitCodeAttrDef;
-	}
-	
-	public static StringAttributeDefinition getSignalNameAttributeDefinition() {
-		return signalNameAttrDef;
-	}
-	
-	public static StringAttributeDefinition getStdoutAttributeDefinition() {
-		return stdoutAttrDef;
-	}
-	
-	public static StringAttributeDefinition getStderrAttributeDefinition() {
-		return stderrAttrDef;
-	}
-	
-	public static StringAttributeDefinition getNodeIdAttributeDefinition() {
-		return nodeIdAttrDef;
-	}
-	
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				stateAttrDef, 
@@ -102,5 +74,33 @@ public class ProcessAttributes {
 				stderrAttrDef,
 				nodeIdAttrDef
 			};
+	}
+	
+	public static IntegerAttributeDefinition getExitCodeAttributeDefinition() {
+		return exitCodeAttrDef;
+	}
+	
+	public static StringAttributeDefinition getNodeIdAttributeDefinition() {
+		return nodeIdAttrDef;
+	}
+	
+	public static StringAttributeDefinition getSignalNameAttributeDefinition() {
+		return signalNameAttrDef;
+	}
+	
+	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
+		return stateAttrDef;
+	}
+	
+	public static StringAttributeDefinition getStatusAttributeDefinition() {
+		return statusAttrDef;
+	}
+	
+	public static StringAttributeDefinition getStderrAttributeDefinition() {
+		return stderrAttrDef;
+	}
+	
+	public static StringAttributeDefinition getStdoutAttributeDefinition() {
+		return stdoutAttrDef;
 	}
 }

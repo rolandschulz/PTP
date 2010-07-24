@@ -68,6 +68,8 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return getName().compareTo(obj.getName());
 	}
 	
+	protected abstract void doAddAttributeHook(AttributeManager attrs);
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition)
 	 */
@@ -95,12 +97,21 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	public IAttribute<?,?,?>[] getAttributes() {
 		return attributeValues.getAttributes();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPElement#getDisplayAttributes()
 	 */
 	public IAttribute<?,?,?>[] getDisplayAttributes() {
 		return attributeValues.getDisplayAttributes();
+	}
+
+	/**
+	 * Find the element info for this element
+	 * 
+	 * @return PElementInfo
+	 */
+	protected PElementInfo getElementInfo() {
+		return elementInfo;
 	}
 
 	/* (non-Javadoc)
@@ -148,22 +159,11 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	public int size() {
 		return getElementInfo().size();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
 		return getName();
-	}
-
-	protected abstract void doAddAttributeHook(AttributeManager attrs);
-	
-	/**
-	 * Find the element info for this element
-	 * 
-	 * @return PElementInfo
-	 */
-	protected PElementInfo getElementInfo() {
-		return elementInfo;
 	}
 }

@@ -141,6 +141,15 @@ public interface IResourceManager extends IPElement, IAdaptable, IResourceManage
 	public ResourceManagerAttributes.State getState();
 
 	/**
+	 * Get a unique name that can be used to identify this resource manager
+	 * persistently between PTP invocations. Used by the
+	 * ResourceManagerPersistence.
+	 * 
+	 * @return string representing a unique name for the resource manager
+	 */
+	public String getUniqueName();
+
+	/**
 	 * Remove listener for child events
 	 * 
 	 * @param listener
@@ -244,13 +253,4 @@ public interface IResourceManager extends IPElement, IAdaptable, IResourceManage
 	 * @throws CoreException
 	 */
 	public void terminateJob(IPJob job) throws CoreException;
-
-	/**
-	 * Get a unique name that can be used to identify this resource manager
-	 * persistently between PTP invocations. Used by the
-	 * ResourceManagerPersistence.
-	 * 
-	 * @return string representing a unique name for the resource manager
-	 */
-	public String getUniqueName();
 }

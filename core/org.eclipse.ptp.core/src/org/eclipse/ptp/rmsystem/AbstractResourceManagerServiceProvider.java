@@ -274,6 +274,14 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 		fModelManager.addListener(fModelListener);
 	}
 
+	private void removeThisProviderFromAllConfigurations() {
+		Set<IServiceConfiguration> configs = fServiceManager.getConfigurations();
+
+		for (IServiceConfiguration config : configs)
+			if (this == config.getServiceProvider(fLaunchService))
+				config.setServiceProvider(fLaunchService, null);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -403,13 +411,5 @@ public abstract class AbstractResourceManagerServiceProvider extends ServiceProv
 	 */
 	public void unregisterListeners() {
 		fModelManager.removeListener(fModelListener);
-	}
-
-	private void removeThisProviderFromAllConfigurations() {
-		Set<IServiceConfiguration> configs = fServiceManager.getConfigurations();
-
-		for (IServiceConfiguration config : configs)
-			if (this == config.getServiceProvider(fLaunchService))
-				config.setServiceProvider(fLaunchService, null);
 	}
 }

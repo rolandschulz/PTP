@@ -35,6 +35,16 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 	private E value;
 
 	/**
+	 * @param description
+	 * @param enumerations
+	 * @param value
+	 */
+	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition, E value) {
+		super(definition);
+		setValue(value);
+	}
+
+	/**
 	 * @param definition
 	 * @param valueIndex
 	 * @throws IllegalValueException
@@ -56,16 +66,29 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		setValueAsString(valueString);
 	}
 
-	/**
-	 * @param description
-	 * @param enumerations
-	 * @param value
-	 */
-	public EnumeratedAttribute(EnumeratedAttributeDefinition<E> definition, E value) {
-		super(definition);
-		setValue(value);
-	}
+	@Override
+    protected synchronized int doCompareTo(EnumeratedAttribute<E> other) {
+        return value.compareTo(other.value);
+    }
 
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected EnumeratedAttribute<E> doCopy() {
+		return new EnumeratedAttribute<E>(getDefinition(), value);
+	}
+    
+	@Override
+    protected synchronized boolean doEquals(EnumeratedAttribute<E> other) {
+        return value == other.value;
+    }
+		
+	@Override
+    protected synchronized int doHashCode() {
+        return value.hashCode();
+    }
+	
 	/**
      * @return
      */
@@ -73,20 +96,20 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		return getDefinition().getEnumerations();
 	}
 
-    /**
+	/**
      * @return
      */
     public List<String> getEnumerationStrings() {
 		return getDefinition().getEnumerationStrings();
 	}
-    
+	
 	/**
      * @return
      */
     public synchronized E getValue() {
         return value;
     }
-		
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
 	 */
@@ -101,7 +124,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		return value.ordinal();
 	}
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
 	public boolean isValid(String string) {
@@ -111,7 +134,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		}
 		return true;
 	}
-	
+
 	/**
 	 * @param value
 	 */
@@ -119,7 +142,7 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		this.value = value;
 	}
 
-	/**
+    /**
 	 * @param valueIndex
 	 * @throws IllegalValueException
 	 */
@@ -130,8 +153,8 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
 		}
 		this.value = enumerations.get(valueIndex);
 	}
-	
-	/* (non-Javadoc)
+
+    /* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
 	 */
 	public synchronized void setValueAsString(String string) throws IllegalValueException {
@@ -144,27 +167,4 @@ public final class EnumeratedAttribute<E extends Enum<E>> extends
         }
 		this.value = eval;
 	}
-
-    /* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
-	 */
-	@Override
-	protected EnumeratedAttribute<E> doCopy() {
-		return new EnumeratedAttribute<E>(getDefinition(), value);
-	}
-
-	@Override
-    protected synchronized int doCompareTo(EnumeratedAttribute<E> other) {
-        return value.compareTo(other.value);
-    }
-
-    @Override
-    protected synchronized boolean doEquals(EnumeratedAttribute<E> other) {
-        return value == other.value;
-    }
-
-    @Override
-    protected synchronized int doHashCode() {
-        return value.hashCode();
-    }
 }

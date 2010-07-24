@@ -88,6 +88,18 @@ public class AttributeManager {
 	}
 
 	/**
+	 * @param <T>
+	 * @param <A>
+	 * @param <D>
+	 * @param def
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getAttribute(D def) {
+		return (A) this.getAttribute(def.getId());
+	}
+
+	/**
 	 * @param id
 	 * @return
 	 */
@@ -100,18 +112,6 @@ public class AttributeManager {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * @param <T>
-	 * @param <A>
-	 * @param <D>
-	 * @param def
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getAttribute(D def) {
-		return (A) this.getAttribute(def.getId());
 	}
 
 	/**

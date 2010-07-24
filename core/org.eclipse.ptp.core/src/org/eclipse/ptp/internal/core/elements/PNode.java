@@ -111,12 +111,77 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
+	 */
+	@Override
+	protected void doAddAttributeHook(AttributeManager attrs) {
+		fireChangedNode(attrs);
+	}
+	
+	/**
+	 * Notify listeners when a node attribute has changed.
+	 * 
+	 * @param attrs
+	 */
+	private void fireChangedNode(AttributeManager attrs) {
+		INodeChangeEvent e = new NodeChangeEvent(this, attrs);
+		
+		for (Object listener : elementListeners.getListeners()) {
+			((INodeListener)listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Send IChangedProcessEvent to registered listeners
+	 * @param job
+	 * @param processes
+	 * @param attrManager 
+	 */
+	private void fireChangedProcesses(IPJob job, BitSet processes,
+			AttributeManager attrManager) {
+		IChangedProcessEvent e = 
+			new ChangedProcessEvent(this, job, processes, attrManager);
+		
+		for (Object listener : childListeners.getListeners()) {
+			((INodeChildListener)listener).handleEvent(e);
+		}
+	}
+	
+	/**
+	 * Send INewProcessEvent to registered listeners
+	 * 
+	 * @param job the job that possesses these processes
+	 * @param processes indices of added processes
+	 */
+	private void fireNewProcesses(IPJob job, BitSet processes) {
+		INewProcessEvent e = 
+			new NewProcessEvent(this, job, processes);
+		
+		for (Object listener : childListeners.getListeners()) {
+			((INodeChildListener)listener).handleEvent(e);
+		}
+	}
+	
+	/**
+	 * @param job the job that used to posses these processes
+	 * @param processes indices of removed processes
+	 */
+	private void fireRemoveProcesses(IPJob job, BitSet processes) {
+		IRemoveProcessEvent e = 
+			new RemoveProcessEvent(this, job, processes);
+		
+		for (Object listener : childListeners.getListeners()) {
+			((INodeChildListener)listener).handleEvent(e);
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#getJobProcessRanks(org.eclipse.ptp.core.elements.IPJob)
 	 */
 	public BitSet getJobProcessRanks(IPJob job) {
 		return (BitSet) jobProcessRanksMap.get(job).clone();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#getJobs()
 	 */
@@ -130,7 +195,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	public IPMachine getMachine() {
 		return getMachineControl();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elementcontrols.IPNodeControl#getMachineControl()
 	 */
@@ -143,7 +208,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.IPNode#getNodeNumber()
 	 */
@@ -176,7 +241,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	public void handleEvent(INewProcessEvent e) {
 		// Do nothing
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.elements.listeners.IJobChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveProcessEvent)
 	 */
@@ -213,71 +278,6 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 		jobProcessRanks.andNot(ranks);
 
 		fireRemoveProcesses(job, ranks);
-	}
-
-	/**
-	 * Notify listeners when a node attribute has changed.
-	 * 
-	 * @param attrs
-	 */
-	private void fireChangedNode(AttributeManager attrs) {
-		INodeChangeEvent e = new NodeChangeEvent(this, attrs);
-		
-		for (Object listener : elementListeners.getListeners()) {
-			((INodeListener)listener).handleEvent(e);
-		}
-	}
-	
-	/**
-	 * Send IChangedProcessEvent to registered listeners
-	 * @param job
-	 * @param processes
-	 * @param attrManager 
-	 */
-	private void fireChangedProcesses(IPJob job, BitSet processes,
-			AttributeManager attrManager) {
-		IChangedProcessEvent e = 
-			new ChangedProcessEvent(this, job, processes, attrManager);
-		
-		for (Object listener : childListeners.getListeners()) {
-			((INodeChildListener)listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * Send INewProcessEvent to registered listeners
-	 * 
-	 * @param job the job that possesses these processes
-	 * @param processes indices of added processes
-	 */
-	private void fireNewProcesses(IPJob job, BitSet processes) {
-		INewProcessEvent e = 
-			new NewProcessEvent(this, job, processes);
-		
-		for (Object listener : childListeners.getListeners()) {
-			((INodeChildListener)listener).handleEvent(e);
-		}
-	}
-
-	/**
-	 * @param job the job that used to posses these processes
-	 * @param processes indices of removed processes
-	 */
-	private void fireRemoveProcesses(IPJob job, BitSet processes) {
-		IRemoveProcessEvent e = 
-			new RemoveProcessEvent(this, job, processes);
-		
-		for (Object listener : childListeners.getListeners()) {
-			((INodeChildListener)listener).handleEvent(e);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
-	 */
-	@Override
-	protected void doAddAttributeHook(AttributeManager attrs) {
-		fireChangedNode(attrs);
 	}
 
 }

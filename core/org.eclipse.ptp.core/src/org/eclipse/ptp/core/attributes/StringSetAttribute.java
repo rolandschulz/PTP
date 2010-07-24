@@ -46,52 +46,12 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 		setValueAsString(valueIn);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
-	 */
-	public String getValue() {
-		return getValueAsString();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
-	 */
-	public synchronized String getValueAsString() {
-		return value;
-	}
-
-	public synchronized int getValueIndex() {
-        return getDefinition().getValues().indexOf(value);
+	@Override
+    protected int doCompareTo(StringSetAttribute other) {
+        return getValueIndex() - other.getValueIndex();
     }
 
-    /* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
-	 */
-	public boolean isValid(String valueIn) {
-		final List<String> values = getDefinition().getValues();
-		final boolean isValid = values.contains(valueIn);
-		return isValid;
-	}
-
-    /* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
-	 */
-	public void setValue(String value) throws IllegalValueException {
-		setValueAsString(value);
-	}
-
-    /* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
-	 */
-	public synchronized void setValueAsString(String valueIn) throws IllegalValueException {
-		if (!isValid(valueIn)) {
-			throw new IllegalValueException(Messages.StringSetAttribute_0 + valueIn +
-					Messages.StringSetAttribute_1 +	getDefinition().getName());
-		}
-		this.value = valueIn;
-	}
-
-    /* (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
@@ -105,18 +65,58 @@ extends AbstractAttribute<String,StringSetAttribute,StringSetAttributeDefinition
 	}
 
 	@Override
-    protected int doCompareTo(StringSetAttribute other) {
-        return getValueIndex() - other.getValueIndex();
-    }
-
-	@Override
     protected synchronized boolean doEquals(StringSetAttribute other) {
         return value.equals(other.value);
     }
 
-	@Override
+    @Override
     protected synchronized int doHashCode() {
         return value.hashCode();
     }
+
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValue()
+	 */
+	public String getValue() {
+		return getValueAsString();
+	}
+
+    /* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#getValueAsString()
+	 */
+	public synchronized String getValueAsString() {
+		return value;
+	}
+
+    public synchronized int getValueIndex() {
+        return getDefinition().getValues().indexOf(value);
+    }
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
+	 */
+	public boolean isValid(String valueIn) {
+		final List<String> values = getDefinition().getValues();
+		final boolean isValid = values.contains(valueIn);
+		return isValid;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	 */
+	public void setValue(String value) throws IllegalValueException {
+		setValueAsString(value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.String)
+	 */
+	public synchronized void setValueAsString(String valueIn) throws IllegalValueException {
+		if (!isValid(valueIn)) {
+			throw new IllegalValueException(Messages.StringSetAttribute_0 + valueIn +
+					Messages.StringSetAttribute_1 +	getDefinition().getName());
+		}
+		this.value = valueIn;
+	}
 
 }

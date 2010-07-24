@@ -36,15 +36,15 @@ public class QueueAttributes {
 		new StringAttributeDefinition(STATUS_ATTR_ID, "Status", //$NON-NLS-1$
 				Messages.QueueAttributes_1, true, ""); //$NON-NLS-1$
 
+	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
+		return new IAttributeDefinition[]{stateAttrDef, statusAttrDef};
+	}
+	
 	public static EnumeratedAttributeDefinition<State> getStateAttributeDefinition() {
 		return stateAttrDef;
 	}
 	
 	public static StringAttributeDefinition getStatusAttributeDefinition() {
 		return statusAttrDef;
-	}
-	
-	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
-		return new IAttributeDefinition[]{stateAttrDef, statusAttrDef};
 	}
 }

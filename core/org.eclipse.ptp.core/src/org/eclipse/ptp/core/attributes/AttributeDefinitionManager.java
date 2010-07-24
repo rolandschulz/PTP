@@ -34,42 +34,25 @@ public class AttributeDefinitionManager {
 	}
 
 	/**
-	 * Create an attribute definition
-	 * 
-	 * @param attr
-	 */
-	public void setAttributeDefinition(IAttributeDefinition<?, ?, ?> attrDef) {
-		synchronized (attributeDefs) {
-			if (!attributeDefs.containsKey(attrDef.getId())) {
-				attributeDefs.put(attrDef.getId(), attrDef);
-			}
-		}
-	}
-
-	/**
-	 * @param attrDefs
-	 */
-	public void setAttributeDefinitions(IAttributeDefinition<?, ?, ?>[] attrDefs) {
-		for (IAttributeDefinition<?, ?, ?> attrDef : attrDefs) {
-			setAttributeDefinition(attrDef);
-		}
-	}
-
-	/**
-	 * Lookup an attribute definition
-	 * 
-	 * @param attrId
-	 * @return attribute definition
-	 */
-	public IAttributeDefinition<?, ?, ?> getAttributeDefinition(String attrId) {
-		return attributeDefs.get(attrId);
-	}
-
-	/**
 	 * Clear attribute definitions
 	 */
 	public void clear() {
 		attributeDefs.clear();
+	}
+
+	/**
+	 * @param <T>
+	 * @param uniqueId
+	 * @param name
+	 * @param description
+	 * @param defaultValue
+	 * @return
+	 */
+	public <T extends Comparable<T>> ArrayAttributeDefinition<T> createArrayAttributeDefinition(final String uniqueId,
+			final String name, final String description, final boolean display, final T[] defaultValue) {
+		ArrayAttributeDefinition<T> def = new ArrayAttributeDefinition<T>(uniqueId, name, description, display, defaultValue);
+		setAttributeDefinition(def);
+		return def;
 	}
 
 	/**
@@ -256,21 +239,6 @@ public class AttributeDefinitionManager {
 	}
 
 	/**
-	 * @param <T>
-	 * @param uniqueId
-	 * @param name
-	 * @param description
-	 * @param defaultValue
-	 * @return
-	 */
-	public <T extends Comparable<T>> ArrayAttributeDefinition<T> createArrayAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display, final T[] defaultValue) {
-		ArrayAttributeDefinition<T> def = new ArrayAttributeDefinition<T>(uniqueId, name, description, display, defaultValue);
-		setAttributeDefinition(def);
-		return def;
-	}
-
-	/**
 	 * @param uniqueId
 	 * @param name
 	 * @param description
@@ -282,5 +250,37 @@ public class AttributeDefinitionManager {
 	public StringSetAttributeDefinition createStringSetAttributeDefinition(String uniqueId, String name, String description,
 			final boolean display, String defaultValue, String[] values) throws IllegalValueException {
 		return new StringSetAttributeDefinition(uniqueId, name, description, display, defaultValue, values);
+	}
+
+	/**
+	 * Lookup an attribute definition
+	 * 
+	 * @param attrId
+	 * @return attribute definition
+	 */
+	public IAttributeDefinition<?, ?, ?> getAttributeDefinition(String attrId) {
+		return attributeDefs.get(attrId);
+	}
+
+	/**
+	 * Create an attribute definition
+	 * 
+	 * @param attr
+	 */
+	public void setAttributeDefinition(IAttributeDefinition<?, ?, ?> attrDef) {
+		synchronized (attributeDefs) {
+			if (!attributeDefs.containsKey(attrDef.getId())) {
+				attributeDefs.put(attrDef.getId(), attrDef);
+			}
+		}
+	}
+
+	/**
+	 * @param attrDefs
+	 */
+	public void setAttributeDefinitions(IAttributeDefinition<?, ?, ?>[] attrDefs) {
+		for (IAttributeDefinition<?, ?, ?> attrDef : attrDefs) {
+			setAttributeDefinition(attrDef);
+		}
 	}
 }

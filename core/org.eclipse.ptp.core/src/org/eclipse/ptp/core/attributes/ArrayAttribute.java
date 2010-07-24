@@ -40,9 +40,9 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	 * @param <U>
 	 * @param value
 	 */
-	public synchronized <U extends T> void addAll(U[] value) {
+	public synchronized <U extends T> void addAll(List<U> value) {
 		if (value != null) {
-			this.value.addAll(Arrays.asList(value));
+			this.value.addAll(value);
 		}
 	}
 
@@ -50,10 +50,61 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 	 * @param <U>
 	 * @param value
 	 */
-	public synchronized <U extends T> void addAll(List<U> value) {
+	public synchronized <U extends T> void addAll(U[] value) {
 		if (value != null) {
-			this.value.addAll(value);
+			this.value.addAll(Arrays.asList(value));
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse.ptp.core.attributes.AbstractAttribute)
+	 */
+	@Override
+	protected synchronized int doCompareTo(ArrayAttribute<T> other) {
+		// This is a lexicographic compare.
+
+		int results = 0;
+		Iterator<T> it1 = value.iterator();
+		Iterator<T> it2 = other.value.iterator();
+		while (it1.hasNext() && it2.hasNext()) {
+			T o1 = it1.next();
+			T o2 = it2.next();
+			results = o1.compareTo(o2);
+			if (results != 0) {
+				return results;
+			}
+		}
+		// If they compared the same up to here
+		// then the lexicographic compare is based
+		// on their sizes, the shortest
+		// one is less than the longer one.
+		return value.size() - other.value.size();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
+	 */
+	@Override
+	protected ArrayAttribute<T> doCopy() {
+		return new ArrayAttribute<T>(getDefinition(), value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doEquals(org.eclipse.ptp.core.attributes.AbstractAttribute)
+	 */
+	@Override
+	protected synchronized boolean doEquals(ArrayAttribute<T> other) {
+		return value.equals(other.value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doHashCode()
+	 */
+	@Override
+	protected synchronized int doHashCode() {
+		return value.hashCode();
 	}
 
 	/* (non-Javadoc)
@@ -70,6 +121,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		return Arrays.toString(value.toArray());
 	}
 
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#isValid(java.lang.String)
 	 */
@@ -82,7 +134,7 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		}
 		return true;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
 	 */
@@ -117,57 +169,5 @@ public final class ArrayAttribute<T extends Comparable<? super T>> extends
 		} catch (ClassCastException e) {
 			throw new IllegalValueException(e);
 		}
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
-	 */
-	@Override
-	protected ArrayAttribute<T> doCopy() {
-		return new ArrayAttribute<T>(getDefinition(), value);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doCompareTo(org.eclipse.ptp.core.attributes.AbstractAttribute)
-	 */
-	@Override
-	protected synchronized int doCompareTo(ArrayAttribute<T> other) {
-		// This is a lexicographic compare.
-
-		int results = 0;
-		Iterator<T> it1 = value.iterator();
-		Iterator<T> it2 = other.value.iterator();
-		while (it1.hasNext() && it2.hasNext()) {
-			T o1 = it1.next();
-			T o2 = it2.next();
-			results = o1.compareTo(o2);
-			if (results != 0) {
-				return results;
-			}
-		}
-		// If they compared the same up to here
-		// then the lexicographic compare is based
-		// on their sizes, the shortest
-		// one is less than the longer one.
-		return value.size() - other.value.size();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doEquals(org.eclipse.ptp.core.attributes.AbstractAttribute)
-	 */
-	@Override
-	protected synchronized boolean doEquals(ArrayAttribute<T> other) {
-		return value.equals(other.value);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doHashCode()
-	 */
-	@Override
-	protected synchronized int doHashCode() {
-		return value.hashCode();
 	}
 }

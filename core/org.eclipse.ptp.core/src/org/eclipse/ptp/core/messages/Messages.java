@@ -20,11 +20,8 @@ public class Messages extends NLS {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages() {
-		// Prevent instances.
-	}
-
 	public static String AbstractProxyRuntimeSystem_0;
+
 	public static String AbstractProxyRuntimeSystem_1;
 	public static String AbstractProxyRuntimeSystem_10;
 	public static String AbstractProxyRuntimeSystem_11;
@@ -154,4 +151,7 @@ public class Messages extends NLS {
 	public static String ResourceManagerPersistence_2;
 	public static String StringSetAttribute_0;
 	public static String StringSetAttribute_1;
+	private Messages() {
+		// Prevent instances.
+	}
 }

@@ -29,13 +29,13 @@ import org.eclipse.ptp.core.elements.IPMachine;
 public interface IMachineChangeEvent {
 	
 	/**
-	 * @return the source of the event
-	 */
-	public IPMachine getSource();
-	
-	/**
 	 * @return
 	 */
 	public AttributeManager getAttributes();
+	
+	/**
+	 * @return the source of the event
+	 */
+	public IPMachine getSource();
 
 }

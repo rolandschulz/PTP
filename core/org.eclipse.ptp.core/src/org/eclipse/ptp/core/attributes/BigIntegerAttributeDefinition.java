@@ -60,15 +60,15 @@ extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAtt
 		return new BigIntegerAttribute(this, defaultValue);
 	}
 
-	public BigIntegerAttribute create(String value) throws IllegalValueException {
-		return new BigIntegerAttribute(this, value);
-	}
-
 	public BigIntegerAttribute create(BigInteger value) throws IllegalValueException {
 		return new BigIntegerAttribute(this, value);
 	}
 
 	public BigIntegerAttribute create(Integer value) throws IllegalValueException {
+		return new BigIntegerAttribute(this, value);
+	}
+
+	public BigIntegerAttribute create(String value) throws IllegalValueException {
 		return new BigIntegerAttribute(this, value);
 	}
 

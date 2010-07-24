@@ -35,14 +35,14 @@ public class ErrorAttributes {
 		return codeAttrDef;
 	}
 
-	public static StringAttributeDefinition getMsgAttributeDefinition() {
-		return msgAttrDef;
-	}
-
 	public static IAttributeDefinition<?,?,?>[] getDefaultAttributeDefinitions() {
 		return new IAttributeDefinition[]{
 				codeAttrDef, 
 				msgAttrDef
 			};
+	}
+
+	public static StringAttributeDefinition getMsgAttributeDefinition() {
+		return msgAttrDef;
 	}
 }
