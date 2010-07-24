@@ -22,8 +22,9 @@ import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * Tagging interface for resource menu contributions
+ * 
  * @author rsqrd
- *
+ * 
  */
 public interface IResourceManagerMenuContribution extends IAdaptable {
 

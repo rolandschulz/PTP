@@ -19,6 +19,6 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-public interface IRuntimeEvent {	
+public interface IRuntimeEvent {
 
 }

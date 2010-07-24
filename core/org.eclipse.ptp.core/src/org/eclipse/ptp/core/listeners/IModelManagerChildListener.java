@@ -22,7 +22,6 @@ import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 
-
 public interface IModelManagerChildListener {
 
 	/**

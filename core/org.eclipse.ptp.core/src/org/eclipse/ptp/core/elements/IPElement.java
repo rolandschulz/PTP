@@ -23,20 +23,20 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 
 public interface IPElement extends IAdaptable {
-	
+
 	/**
 	 * Sets the attribute value.
 	 * 
 	 * @param attrValue
 	 */
-	public void addAttribute(IAttribute<?,?,?> attrValue);
+	public void addAttribute(IAttribute<?, ?, ?> attrValue);
 
 	/**
 	 * Sets the attribute values.
 	 * 
 	 * @param attrValues
 	 */
-	public void addAttributes(IAttribute<?,?,?>[] attrValues);
+	public void addAttributes(IAttribute<?, ?, ?>[] attrValues);
 
 	/**
 	 * Returns the attribute corresponding to the attribute definition.
@@ -44,8 +44,8 @@ public interface IPElement extends IAdaptable {
 	 * @param attrDef
 	 * @return The attribute for this attribute definition
 	 */
-	public <T, A extends IAttribute<T,A,D>, D extends IAttributeDefinition<T,A,D>>
-	A getAttribute(D attrDef);
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+			A getAttribute(D attrDef);
 
 	/**
 	 * Returns the attribute corresponding to the attribute definition ID.
@@ -53,28 +53,29 @@ public interface IPElement extends IAdaptable {
 	 * @param attrDefId
 	 * @return The attribute for this attribute definition
 	 */
-	public IAttribute<?,?,?> getAttribute(String attrDefId);
-	
+	public IAttribute<?, ?, ?> getAttribute(String attrDefId);
+
 	/**
 	 * Get all the attribute definitions that this element knows about.
 	 * 
 	 * @return array of IAttributeDefinition keys
 	 */
-	public IAttributeDefinition<?,?,?>[] getAttributeKeys();
-	
+	public IAttributeDefinition<?, ?, ?>[] getAttributeKeys();
+
 	/**
 	 * Returns an array containing all attributes.
 	 * 
 	 * @return An array of attributes for this element
 	 */
-	public IAttribute<?,?,?>[] getAttributes();
+	public IAttribute<?, ?, ?>[] getAttributes();
 
 	/**
-	 * Returns an array containing all attributes that should be displayed in a UI.
+	 * Returns an array containing all attributes that should be displayed in a
+	 * UI.
 	 * 
 	 * @return An array of attributes for this element
 	 */
-	public IAttribute<?,?,?>[] getDisplayAttributes();
+	public IAttribute<?, ?, ?>[] getDisplayAttributes();
 
 	/**
 	 * Returns the unique ID for this Element
@@ -84,8 +85,8 @@ public interface IPElement extends IAdaptable {
 	public String getID();
 
 	/**
-	 * Returns a name for this Element. An Element name does not need to
-	 * be unique. It is primarily used for UI display purposes.
+	 * Returns a name for this Element. An Element name does not need to be
+	 * unique. It is primarily used for UI display purposes.
 	 * 
 	 * @return This Element's name
 	 */
@@ -96,8 +97,7 @@ public interface IPElement extends IAdaptable {
 	 * 
 	 * @param attrValue
 	 */
-	public void removeAttribute(IAttribute<?,?,?> attrValue);
-
+	public void removeAttribute(IAttribute<?, ?, ?> attrValue);
 
 	/**
 	 * Returns the number of children of this Element.

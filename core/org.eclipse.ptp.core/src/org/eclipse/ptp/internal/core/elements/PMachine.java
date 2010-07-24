@@ -52,8 +52,8 @@ public class PMachine extends Parent implements IPMachineControl {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ListenerList childListeners = new ListenerList();
 	private String arch = Messages.PMachine_0;
-    
-    public PMachine(String id, IResourceManagerControl rm, IAttribute<?,?,?>[] attrs) {
+
+	public PMachine(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
 		super(id, rm, P_MACHINE, attrs);
 		/*
 		 * Create required attributes.
@@ -64,33 +64,46 @@ public class PMachine extends Parent implements IPMachineControl {
 			addAttribute(machineState);
 		}
 		IntegerAttribute numNodes = getAttribute(MachineAttributes.getNumNodesAttributeDefinition());
-        if (numNodes == null) {
-            try {
-                numNodes = MachineAttributes.getNumNodesAttributeDefinition().create(0);
-            } catch (IllegalValueException e) {
-                //FIXME
-                throw new RuntimeException(e);
-            }
-            addAttribute(numNodes);
-        }
+		if (numNodes == null) {
+			try {
+				numNodes = MachineAttributes.getNumNodesAttributeDefinition().create(0);
+			} catch (IllegalValueException e) {
+				// FIXME
+				throw new RuntimeException(e);
+			}
+			addAttribute(numNodes);
+		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPMachine#addChildListener(org.eclipse.ptp.core.elements.listeners.IMachineNodeListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPMachine#addChildListener(org.eclipse.
+	 * ptp.core.elements.listeners.IMachineNodeListener)
 	 */
 	public void addChildListener(IMachineChildListener listener) {
 		childListeners.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPMachine#addElementListener(org.eclipse.ptp.core.elements.listeners.IMachineListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPMachine#addElementListener(org.eclipse
+	 * .ptp.core.elements.listeners.IMachineListener)
 	 */
 	public void addElementListener(IMachineListener listener) {
 		elementListeners.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodeAttributes(java.util.Collection, org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodeAttributes
+	 * (java.util.Collection,
+	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
 	public void addNodeAttributes(Collection<IPNodeControl> nodeControls,
 			IAttribute<?, ?, ?>[] attrs) {
@@ -101,29 +114,37 @@ public class PMachine extends Parent implements IPMachineControl {
 		fireChangedNodes(nodes);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util.Collection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#addNodes(java.util
+	 * .Collection)
 	 */
 	public void addNodes(Collection<IPNodeControl> nodeControls) {
 		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
-		
+
 		for (IPNodeControl node : nodeControls) {
 			addChild(node);
 			nodes.add(node);
 		}
-		
+
 		try {
 			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getChildren().length);
-        } catch (IllegalValueException e) {
-            // FIXME
-            throw new RuntimeException(e);
-        }
-        
+		} catch (IllegalValueException e) {
+			// FIXME
+			throw new RuntimeException(e);
+		}
+
 		fireNewNodes(nodes);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java.util.Map)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.internal.core.elements.PElement#doAddAttributeHook(java
+	 * .util.Map)
 	 */
 	@Override
 	protected void doAddAttributeHook(AttributeManager attrs) {
@@ -134,11 +155,11 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @param attrs
 	 */
 	private void fireChangedMachine(AttributeManager attrs) {
-		IMachineChangeEvent e = 
-			new MachineChangeEvent(this, attrs);
-		
+		IMachineChangeEvent e =
+				new MachineChangeEvent(this, attrs);
+
 		for (Object listener : elementListeners.getListeners()) {
-			((IMachineListener)listener).handleEvent(e);
+			((IMachineListener) listener).handleEvent(e);
 		}
 	}
 
@@ -148,25 +169,25 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @param nodes
 	 */
 	private void fireChangedNodes(Collection<IPNode> nodes) {
-		IChangedNodeEvent e = 
-			new ChangedNodeEvent(this, nodes);
-		
+		IChangedNodeEvent e =
+				new ChangedNodeEvent(this, nodes);
+
 		for (Object listener : childListeners.getListeners()) {
-			((IMachineChildListener)listener).handleEvent(e);
+			((IMachineChildListener) listener).handleEvent(e);
 		}
 	}
-	
+
 	/**
 	 * Send INewNodeEvent to registered listeners
 	 * 
 	 * @param nodes
 	 */
 	private void fireNewNodes(Collection<IPNode> nodes) {
-		INewNodeEvent e = 
-			new NewNodeEvent(this, nodes);
-		
+		INewNodeEvent e =
+				new NewNodeEvent(this, nodes);
+
 		for (Object listener : childListeners.getListeners()) {
-			((IMachineChildListener)listener).handleEvent(e);
+			((IMachineChildListener) listener).handleEvent(e);
 		}
 	}
 
@@ -174,23 +195,28 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @param node
 	 */
 	private void fireRemoveNodes(Collection<IPNode> nodes) {
-		IRemoveNodeEvent e = 
-			new RemoveNodeEvent(this, nodes);
-		
+		IRemoveNodeEvent e =
+				new RemoveNodeEvent(this, nodes);
+
 		for (Object listener : childListeners.getListeners()) {
-			((IMachineChildListener)listener).handleEvent(e);
+			((IMachineChildListener) listener).handleEvent(e);
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getArch()
 	 */
 	public synchronized String getArch() {
 		return arch;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
 	 */
 	public IPNode getNodeById(String id) {
 		IPElementControl element = findChild(id);
@@ -200,20 +226,25 @@ public class PMachine extends Parent implements IPMachineControl {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#getNodeControls()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#getNodeControls()
 	 */
 	public Collection<IPNodeControl> getNodeControls() {
 		IPElementControl[] children = getChildren();
 		List<IPNodeControl> nodes =
-			new ArrayList<IPNodeControl>(children.length);
+				new ArrayList<IPNodeControl>(children.length);
 		for (IPElementControl element : children) {
-			nodes.add((IPNodeControl)element);
+			nodes.add((IPNodeControl) element);
 		}
 		return nodes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getNodes()
 	 */
 	public IPNode[] getNodes() {
@@ -221,72 +252,92 @@ public class PMachine extends Parent implements IPMachineControl {
 		return nodes.toArray(new IPNode[nodes.size()]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
 	public IResourceManager getResourceManager() {
 		return (IResourceManager) getParent();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPMachine#getState()
 	 */
 	public State getState() {
 		return getAttribute(MachineAttributes.getStateAttributeDefinition()).getValue();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPMachine#removeChildListener(org.eclipse.ptp.core.elements.listeners.IMachineNodeListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPMachine#removeChildListener(org.eclipse
+	 * .ptp.core.elements.listeners.IMachineNodeListener)
 	 */
 	public void removeChildListener(IMachineChildListener listener) {
 		childListeners.remove(listener);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPMachine#removeElementListener(org.eclipse.ptp.core.elements.listeners.IMachineListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPMachine#removeElementListener(org.eclipse
+	 * .ptp.core.elements.listeners.IMachineListener)
 	 */
 	public void removeElementListener(IMachineListener listener) {
 		elementListeners.remove(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPMachineControl#removeNode(org.eclipse.ptp.core.elementcontrols.IPNodeControl)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#removeNode(org.
+	 * eclipse.ptp.core.elementcontrols.IPNodeControl)
 	 */
 	public void removeNodes(Collection<IPNodeControl> nodeControls) {
 		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
-		
+
 		for (IPNodeControl node : nodeControls) {
 			removeChild(node);
 			nodes.add(node);
 		}
-		
+
 		try {
 			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getChildren().length);
-        } catch (IllegalValueException e) {
-            // FIXME
-            throw new RuntimeException(e);
-        }
+		} catch (IllegalValueException e) {
+			// FIXME
+			throw new RuntimeException(e);
+		}
 
-        fireRemoveNodes(nodes);
+		fireRemoveNodes(nodes);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPMachine#setArch(java.lang.String)
 	 */
 	public synchronized void setArch(String arch) {
 		this.arch = arch;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPMachine#totalNodes()
 	 */
 	public int totalNodes() {
 		try {
 			getAttribute(MachineAttributes.getNumNodesAttributeDefinition()).setValue(getChildren().length);
-        } catch (IllegalValueException e) {
-            // FIXME
-            throw new RuntimeException(e);
-        }
+		} catch (IllegalValueException e) {
+			// FIXME
+			throw new RuntimeException(e);
+		}
 		return size();
 	}
 

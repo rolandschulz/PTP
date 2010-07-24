@@ -18,9 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-
 public final class StringAttribute
-extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
+		extends AbstractAttribute<String, StringAttribute, StringAttributeDefinition> {
 
 	private final StringBuffer value = new StringBuffer();
 
@@ -30,33 +29,35 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 	}
 
 	@Override
-    protected synchronized int doCompareTo(StringAttribute other) {
-        return value.toString().compareTo(other.value.toString());
-    }
-	
-	/* (non-Javadoc)
+	protected synchronized int doCompareTo(StringAttribute other) {
+		return value.toString().compareTo(other.value.toString());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.AbstractAttribute#doClone()
 	 */
 	@Override
 	protected StringAttribute doCopy() {
 		return new StringAttribute(getDefinition(), value.toString());
 	}
-	
-	@Override
-    protected synchronized boolean doEquals(StringAttribute other) {
-        return value.toString().equals(other.value.toString());
-    }
 
 	@Override
-    protected synchronized int doHashCode() {
-        return value.toString().hashCode();
-    }
+	protected synchronized boolean doEquals(StringAttribute other) {
+		return value.toString().equals(other.value.toString());
+	}
 
-    public synchronized String getValue() {
+	@Override
+	protected synchronized int doHashCode() {
+		return value.toString().hashCode();
+	}
+
+	public synchronized String getValue() {
 		return value.toString();
 	}
 
-    public String getValueAsString() {
+	public String getValueAsString() {
 		return getValue();
 	}
 
@@ -64,20 +65,27 @@ extends AbstractAttribute<String,StringAttribute,StringAttributeDefinition> {
 		return true;
 	}
 
-    /* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttribute#setValue(java.lang.Object)
 	 */
 	public void setValue(String value) throws IllegalValueException {
 		setValueAsString(value);
 	}
 
-	/* (non-Javadoc)
-     * @see org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang.String)
-     */
-    public synchronized void setValueAsString(String string) {
-    	if (string == null) {
-    		string = ""; //$NON-NLS-1$
-    	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttribute#setValueAsString(java.lang
+	 * .String)
+	 */
+	public synchronized void setValueAsString(String string) {
+		if (string == null) {
+			string = ""; //$NON-NLS-1$
+		}
 		this.value.replace(0, this.value.length(), string);
 	}
 }

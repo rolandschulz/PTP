@@ -14,20 +14,22 @@ package org.eclipse.ptp.internal.rtsystem.events;
 import org.eclipse.ptp.rtsystem.events.AbstractRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent;
 
-
-public class RuntimeSubmitJobErrorEvent 
-	extends AbstractRuntimeErrorEvent
+public class RuntimeSubmitJobErrorEvent
+		extends AbstractRuntimeErrorEvent
 		implements IRuntimeSubmitJobErrorEvent {
 
 	private String jobSubID;
-	
+
 	public RuntimeSubmitJobErrorEvent(int code, String message, String jobSubID) {
 		super(code, message);
 		this.jobSubID = jobSubID;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent#getJobSubID()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeSubmitJobErrorEvent#getJobSubID()
 	 */
 	public String getJobSubID() {
 		return jobSubID;

@@ -28,18 +28,21 @@ public interface IPMachineControl extends IPElementControl, IPMachine {
 	/**
 	 * Add attributes to a collection of nodes.
 	 * 
-	 * @param nodes collection of IPNodeControls
-	 * @param attrs array of attributes to add to each node
+	 * @param nodes
+	 *            collection of IPNodeControls
+	 * @param attrs
+	 *            array of attributes to add to each node
 	 */
-	public void addNodeAttributes(Collection<IPNodeControl> nodes, IAttribute<?,?,?>[] attrs);
-	
+	public void addNodeAttributes(Collection<IPNodeControl> nodes, IAttribute<?, ?, ?>[] attrs);
+
 	/**
 	 * Add a collection of nodes to the machine.
 	 * 
-	 * @param node collection of IPNodeControls
+	 * @param node
+	 *            collection of IPNodeControls
 	 */
 	public void addNodes(Collection<IPNodeControl> nodes);
-	
+
 	/**
 	 * Get the nodes known by this machine
 	 * 
@@ -50,7 +53,8 @@ public interface IPMachineControl extends IPElementControl, IPMachine {
 	/**
 	 * Remove a collection of nodes from this machine
 	 * 
-	 * @param nodes to remove
+	 * @param nodes
+	 *            to remove
 	 */
 	public void removeNodes(Collection<IPNodeControl> nodes);
 }

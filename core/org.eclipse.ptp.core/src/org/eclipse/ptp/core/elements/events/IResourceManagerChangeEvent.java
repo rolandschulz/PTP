@@ -16,25 +16,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
- * This event is sent when the attributes on a resource manager change. It is sent to
- * element listeners on the resource manager.
+ * This event is sent when the attributes on a resource manager change. It is
+ * sent to element listeners on the resource manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener
  */
 public interface IResourceManagerChangeEvent {
-	
+
 	/**
 	 * Get the changed attributes
 	 * 
 	 * @return changed attributes
 	 */
 	public AttributeManager getAttributes();
-	
+
 	/**
 	 * Get the event source.
 	 * 

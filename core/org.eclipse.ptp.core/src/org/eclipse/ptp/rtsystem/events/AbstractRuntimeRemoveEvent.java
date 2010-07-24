@@ -15,7 +15,7 @@ import org.eclipse.ptp.utils.core.RangeSet;
 
 public abstract class AbstractRuntimeRemoveEvent implements IRuntimeRemoveEvent {
 	private RangeSet elementIds;
-	
+
 	public AbstractRuntimeRemoveEvent() {
 		this.elementIds = null;
 	}
@@ -24,7 +24,9 @@ public abstract class AbstractRuntimeRemoveEvent implements IRuntimeRemoveEvent 
 		this.elementIds = elementIds;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeRemoveEvent#getElementIds()
 	 */
 	public RangeSet getElementIds() {

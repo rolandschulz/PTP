@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.rtsystem.events;
 
 import org.eclipse.ptp.rtsystem.events.IRuntimeRunningStateEvent;
 
-
 public class RuntimeRunningStateEvent implements IRuntimeRunningStateEvent {
 
 }

@@ -37,71 +37,94 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	protected final IPElementControl elementParent;
 	protected final int elementType;
 
-	protected PElement(String id, IPElementControl parent, int type, IAttribute<?,?,?>[] attrs) {
+	protected PElement(String id, IPElementControl parent, int type, IAttribute<?, ?, ?>[] attrs) {
 		elementId = id;
 		elementType = type;
 		elementParent = parent;
-		ArrayList<IAttribute<?, ?, ?>> attrList = new ArrayList<IAttribute<?,?,?>>(Arrays.asList(attrs));
+		ArrayList<IAttribute<?, ?, ?>> attrList = new ArrayList<IAttribute<?, ?, ?>>(Arrays.asList(attrs));
 		attrList.add(ElementAttributes.getIdAttributeDefinition().create(id));
 		attributeValues.addAttributes(attrList.toArray(new IAttribute<?, ?, ?>[0]));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#addAttribute(org.eclipse.ptp.core.attributes.IAttribute)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPElement#addAttribute(org.eclipse.ptp.
+	 * core.attributes.IAttribute)
 	 */
-	public void addAttribute(IAttribute<?,?,?> attrib) {
-		addAttributes(new IAttribute<?,?,?>[]{attrib});
+	public void addAttribute(IAttribute<?, ?, ?> attrib) {
+		addAttributes(new IAttribute<?, ?, ?>[] { attrib });
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#addAttributes(org.eclipse.ptp.core.attributes.IAttribute[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPElement#addAttributes(org.eclipse.ptp
+	 * .core.attributes.IAttribute[])
 	 */
-	public void addAttributes(IAttribute<?,?,?>[] attribs) {
+	public void addAttributes(IAttribute<?, ?, ?>[] attribs) {
 		attributeValues.addAttributes(attribs);
 		doAddAttributeHook(new AttributeManager(attribs));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(IPElementControl obj) {
 		return getName().compareTo(obj.getName());
 	}
-	
+
 	protected abstract void doAddAttributeHook(AttributeManager attrs);
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes.IAttributeDefinition)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.IPElement#getAttribute(org.eclipse.ptp.core.attributes
+	 * .IAttributeDefinition)
 	 */
 	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getAttribute(D attrDef) {
 		return attributeValues.getAttribute(attrDef);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#getAttribute(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPElement#getAttribute(java.lang.String)
 	 */
-	public IAttribute<?,?,?> getAttribute(String attrId) {
+	public IAttribute<?, ?, ?> getAttribute(String attrId) {
 		return attributeValues.getAttribute(attrId);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributeKeys()
 	 */
-	public IAttributeDefinition<?,?,?>[] getAttributeKeys() {
+	public IAttributeDefinition<?, ?, ?>[] getAttributeKeys() {
 		return attributeValues.getKeys();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPElement#getAttributes()
 	 */
-	public IAttribute<?,?,?>[] getAttributes() {
+	public IAttribute<?, ?, ?>[] getAttributes() {
 		return attributeValues.getAttributes();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPElement#getDisplayAttributes()
 	 */
-	public IAttribute<?,?,?>[] getDisplayAttributes() {
+	public IAttribute<?, ?, ?>[] getDisplayAttributes() {
 		return attributeValues.getDisplayAttributes();
 	}
 
@@ -114,21 +137,28 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return elementInfo;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#getElementType()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elementcontrols.IPElementControl#getElementType()
 	 */
 	public int getElementType() {
 		return elementType;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPElement#getID()
 	 */
 	public String getID() {
 		return elementId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.IPElement#getName()
 	 */
 	public String getName() {
@@ -139,30 +169,41 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 		return getID();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#getParent()
 	 */
 	public IPElementControl getParent() {
 		return elementParent;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.IPElement#removeAttribute(org.eclipse.ptp.core.attributes.IAttribute)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.IPElement#removeAttribute(org.eclipse.ptp
+	 * .core.attributes.IAttribute)
 	 */
-	public void removeAttribute(IAttribute<?,?,?> attrib) {
+	public void removeAttribute(IAttribute<?, ?, ?> attrib) {
 		attributeValues.removeAttribute(attrib);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#size()
 	 */
 	public int size() {
 		return getElementInfo().size();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return getName();
 	}

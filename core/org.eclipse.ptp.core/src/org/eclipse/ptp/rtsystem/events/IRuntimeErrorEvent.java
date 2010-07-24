@@ -11,13 +11,12 @@
 
 package org.eclipse.ptp.rtsystem.events;
 
-
 public interface IRuntimeErrorEvent extends IRuntimeEvent {
 	/**
 	 * @return the error code
 	 */
 	public int getErrorCode();
-	
+
 	/**
 	 * @return the error message
 	 */

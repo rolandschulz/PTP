@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class RemoveResourceManagerEvent implements IRemoveResourceManagerEvent {
 
@@ -37,15 +37,23 @@ public class RemoveResourceManagerEvent implements IRemoveResourceManagerEvent {
 		this.rm = rm;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine
+	 * ()
 	 */
 	public IResourceManager getResourceManager() {
 		return rm;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource
+	 * ()
 	 */
 	public IModelManager getSource() {
 		return mm;

@@ -18,27 +18,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
- * This event is generated when one or more new queues are created. It is
- * a bulk event that is sent to child listeners on the source resource manager.
+ * This event is generated when one or more new queues are created. It is a bulk
+ * event that is sent to child listeners on the source resource manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
  */
 public interface INewQueueEvent {
-	
+
 	/**
 	 * Get the queues that have been created
 	 * 
 	 * @return the new queue
 	 */
 	public Collection<IPQueue> getQueues();
-	
+
 	/**
 	 * Get the source of this event
 	 * 

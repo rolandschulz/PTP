@@ -9,15 +9,14 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.ptp.internal.rtsystem.events;
 
 import org.eclipse.ptp.rtsystem.events.AbstractRuntimeRemoveEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeRemoveJobEvent;
 import org.eclipse.ptp.utils.core.RangeSet;
 
-public class RuntimeRemoveJobEvent 
-	extends AbstractRuntimeRemoveEvent 
+public class RuntimeRemoveJobEvent
+		extends AbstractRuntimeRemoveEvent
 		implements IRuntimeRemoveJobEvent {
 
 	public RuntimeRemoveJobEvent(RangeSet ids) {

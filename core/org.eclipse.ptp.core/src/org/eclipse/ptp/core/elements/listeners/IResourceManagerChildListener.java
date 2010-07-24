@@ -21,25 +21,24 @@
  */
 package org.eclipse.ptp.core.elements.listeners;
 
-import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
-import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.INewMachineEvent;
+import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
-
 
 /**
  * @author rsqrd
  * 
  */
 public interface IResourceManagerChildListener {
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IChangedMachineEvent e);
-	
+
 	/**
 	 * @param e
 	 */
@@ -49,12 +48,12 @@ public interface IResourceManagerChildListener {
 	 * @param e
 	 */
 	public void handleEvent(INewMachineEvent e);
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(INewQueueEvent e);
-	
+
 	/**
 	 * @param e
 	 */

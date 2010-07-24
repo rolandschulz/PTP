@@ -37,7 +37,7 @@ public interface IRuntimeMessageEvent extends IRuntimeEvent {
 	 * @return message level
 	 */
 	public MessageAttributes.Level getLevel();
-	
+
 	/**
 	 * @return message text
 	 */

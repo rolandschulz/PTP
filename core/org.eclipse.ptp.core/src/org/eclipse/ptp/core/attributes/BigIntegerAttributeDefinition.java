@@ -22,9 +22,8 @@ import java.math.BigInteger;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-
 public final class BigIntegerAttributeDefinition
-extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAttributeDefinition> {
+		extends AbstractAttributeDefinition<BigInteger, BigIntegerAttribute, BigIntegerAttributeDefinition> {
 
 	private final BigInteger minValue;
 	private final BigInteger maxValue;
@@ -53,7 +52,9 @@ extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAtt
 		this.maxValue = maxValue;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public BigIntegerAttribute create() throws IllegalValueException {
@@ -79,5 +80,5 @@ extends AbstractAttributeDefinition<BigInteger,BigIntegerAttribute,BigIntegerAtt
 	public BigInteger getMinValue() {
 		return minValue;
 	}
-	
+
 }

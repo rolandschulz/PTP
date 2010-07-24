@@ -29,15 +29,21 @@ public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
 		this.message = message;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getMessage()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getMessage()
 	 */
 	public String getMessage() {
 		return message;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getSource()
 	 */
 	public IResourceManager getSource() {
 		return rm;

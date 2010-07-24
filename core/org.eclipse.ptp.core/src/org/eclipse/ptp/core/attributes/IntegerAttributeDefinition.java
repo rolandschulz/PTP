@@ -20,15 +20,14 @@ package org.eclipse.ptp.core.attributes;
 
 import org.eclipse.ptp.core.messages.Messages;
 
-
 public final class IntegerAttributeDefinition
-extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDefinition> {
+		extends AbstractAttributeDefinition<Integer, IntegerAttribute, IntegerAttributeDefinition> {
 
 	private final Integer minValue;
 	private final Integer maxValue;
 	private final Integer defaultValue;
 
-	public IntegerAttributeDefinition(final String uniqueId, final String name, 
+	public IntegerAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final Integer defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
@@ -36,8 +35,8 @@ extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDef
 		this.maxValue = Integer.MAX_VALUE;
 	}
 
-	public IntegerAttributeDefinition(final String uniqueId, final String name, 
-			final String description, final boolean display, 
+	public IntegerAttributeDefinition(final String uniqueId, final String name,
+			final String description, final boolean display,
 			final Integer defaultValue, final Integer minValue, final Integer maxValue) throws IllegalValueException {
 		super(uniqueId, name, description, display);
 		if (minValue > maxValue) {
@@ -51,7 +50,9 @@ extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDef
 		this.maxValue = maxValue;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public IntegerAttribute create() throws IllegalValueException {
@@ -73,5 +74,5 @@ extends AbstractAttributeDefinition<Integer,IntegerAttribute,IntegerAttributeDef
 	public Integer getMinValue() {
 		return minValue;
 	}
-	
+
 }

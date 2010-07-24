@@ -18,19 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-
 public final class BooleanAttributeDefinition
-extends AbstractAttributeDefinition<Boolean,BooleanAttribute,BooleanAttributeDefinition> {
+		extends AbstractAttributeDefinition<Boolean, BooleanAttribute, BooleanAttributeDefinition> {
 
 	private final Boolean defaultValue;
-	
-	public BooleanAttributeDefinition(final String uniqueId, final String name, 
+
+	public BooleanAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final Boolean defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public BooleanAttribute create() {
@@ -40,7 +41,7 @@ extends AbstractAttributeDefinition<Boolean,BooleanAttribute,BooleanAttributeDef
 	public BooleanAttribute create(Boolean value) {
 		return new BooleanAttribute(this, value);
 	}
-	
+
 	public BooleanAttribute create(String value) {
 		return new BooleanAttribute(this, value);
 	}

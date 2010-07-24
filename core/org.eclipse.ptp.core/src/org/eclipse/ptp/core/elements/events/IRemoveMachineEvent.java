@@ -16,27 +16,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IResourceManager;
 
 /**
- * This event is generated when one or more machines are removed. It is
- * a bulk event that is sent to child listeners on the source resource manager.
+ * This event is generated when one or more machines are removed. It is a bulk
+ * event that is sent to child listeners on the source resource manager.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
  */
 public interface IRemoveMachineEvent {
-	
+
 	/**
 	 * Get the machines that were removed
 	 * 
 	 * @return the removed machines
 	 */
 	public Collection<IPMachine> getMachines();
-	
+
 	/**
 	 * Get the event source
 	 * 

@@ -25,18 +25,17 @@ import org.eclipse.ptp.core.elements.events.IChangedProcessEvent;
 import org.eclipse.ptp.core.elements.events.INewProcessEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 
-
 /**
  * @author rsqrd
  * 
  */
 public interface IJobChildListener {
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IChangedProcessEvent e);
-	
+
 	/**
 	 * @param e
 	 */

@@ -16,10 +16,10 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 
 /**
  * @author grw
- *
+ * 
  */
-public class ResourceManagerSubmitJobErrorEvent extends ResourceManagerErrorEvent 
-	implements IResourceManagerSubmitJobErrorEvent {
+public class ResourceManagerSubmitJobErrorEvent extends ResourceManagerErrorEvent
+		implements IResourceManagerSubmitJobErrorEvent {
 
 	private final String id;
 
@@ -28,8 +28,12 @@ public class ResourceManagerSubmitJobErrorEvent extends ResourceManagerErrorEven
 		this.id = id;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent#getJobSubmissionId()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent
+	 * #getJobSubmissionId()
 	 */
 	public String getJobSubmissionId() {
 		return id;

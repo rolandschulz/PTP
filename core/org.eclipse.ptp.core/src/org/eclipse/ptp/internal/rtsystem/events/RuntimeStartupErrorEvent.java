@@ -14,9 +14,8 @@ package org.eclipse.ptp.internal.rtsystem.events;
 import org.eclipse.ptp.rtsystem.events.AbstractRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeStartupErrorEvent;
 
-
-public class RuntimeStartupErrorEvent 
-	extends AbstractRuntimeErrorEvent
+public class RuntimeStartupErrorEvent
+		extends AbstractRuntimeErrorEvent
 		implements IRuntimeStartupErrorEvent {
 
 	public RuntimeStartupErrorEvent(int code, String message) {

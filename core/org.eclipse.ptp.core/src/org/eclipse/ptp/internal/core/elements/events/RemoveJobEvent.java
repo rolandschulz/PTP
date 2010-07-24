@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class RemoveJobEvent implements IRemoveJobEvent {
 
@@ -39,15 +39,21 @@ public class RemoveJobEvent implements IRemoveJobEvent {
 		this.jobs = jobs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent#getProcess()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent#getProcess()
 	 */
 	public Collection<IPJob> getJobs() {
 		return jobs;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent#getSource()
 	 */
 	public IPQueue getSource() {
 		return queue;

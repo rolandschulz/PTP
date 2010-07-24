@@ -35,14 +35,15 @@ public abstract class Parent extends PElement {
 		Arrays.sort(elements);
 	}
 
-	public Parent(String id, IPElementControl parent, int type, IAttribute<?,?,?>[] attrs) {
+	public Parent(String id, IPElementControl parent, int type, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, type, attrs);
 	}
 
 	/**
 	 * Add a child element.
 	 * 
-	 * @param member child to add
+	 * @param member
+	 *            child to add
 	 */
 	protected void addChild(IPElementControl member) {
 		getElementInfo().addChild(member);
@@ -51,7 +52,8 @@ public abstract class Parent extends PElement {
 	/**
 	 * Find a child element using the key
 	 * 
-	 * @param key key used to identify the child
+	 * @param key
+	 *            key used to identify the child
 	 * @return IPElementControl of the child, or null
 	 */
 	protected IPElementControl findChild(String key) {
@@ -67,7 +69,9 @@ public abstract class Parent extends PElement {
 		return getElementInfo().getChildren();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
 	 */
 	public boolean hasChildren() {
@@ -77,7 +81,8 @@ public abstract class Parent extends PElement {
 	/**
 	 * Remove a child element.
 	 * 
-	 * @param member child to remove
+	 * @param member
+	 *            child to remove
 	 */
 	protected void removeChild(IPElement member) {
 		getElementInfo().removeChild(member);

@@ -18,15 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-public abstract class AbstractAttributeDefinition<T,
-												  A extends IAttribute<T,A,D>,
-												  D extends AbstractAttributeDefinition<T,A,D>>
-implements IAttributeDefinition<T,A,D> {
+public abstract class AbstractAttributeDefinition<T, A extends IAttribute<T, A, D>, D extends AbstractAttributeDefinition<T, A, D>>
+		implements IAttributeDefinition<T, A, D> {
 	private final String name;
 	private final String description;
 	private final String uniqueId;
 	private final boolean display;
-	
+
 	public AbstractAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display) {
 		this.uniqueId = uniqueId;
@@ -39,7 +37,9 @@ implements IAttributeDefinition<T,A,D> {
 		return this.name.compareTo(arg0.getName());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -58,36 +58,47 @@ implements IAttributeDefinition<T,A,D> {
 			return false;
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getDescription()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.attributes.IAttributeDefinition#getDescription()
 	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getDisplay()
 	 */
 	public boolean getDisplay() {
 		return display;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getId()
 	 */
 	public String getId() {
 		return uniqueId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttributeDefinition#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -99,6 +110,7 @@ implements IAttributeDefinition<T,A,D> {
 		return result;
 	}
 
+	@Override
 	public String toString() {
 		return name;
 	}

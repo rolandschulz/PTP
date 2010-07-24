@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.events.IRemoveProcessEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class RemoveProcessEvent implements IRemoveProcessEvent {
 
@@ -41,22 +41,31 @@ public class RemoveProcessEvent implements IRemoveProcessEvent {
 		this.processes = (BitSet) processes.clone();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IRemoveProcessEvent#getJob()
 	 */
 	public IPJob getJob() {
 		return job;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent#getProcesses()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent#getProcesses
+	 * ()
 	 */
 	public BitSet getProcesses() {
 		return processes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.INodeRemoveProcessEvent#getSource()
 	 */
 	public IPElement getSource() {
 		return source;

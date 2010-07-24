@@ -13,7 +13,6 @@ package org.eclipse.ptp.internal.rtsystem.events;
 
 import org.eclipse.ptp.rtsystem.events.IRuntimeErrorStateEvent;
 
-
 public class RuntimeErrorStateEvent implements IRuntimeErrorStateEvent {
 
 }

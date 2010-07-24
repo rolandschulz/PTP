@@ -24,13 +24,13 @@ import org.eclipse.ptp.rtsystem.events.IRuntimeAttributeDefinitionEvent;
 
 public class RuntimeAttributeDefinitionEvent implements IRuntimeAttributeDefinitionEvent {
 
-	private IAttributeDefinition<?,?,?>[] attributeDefs;
-	
-	public RuntimeAttributeDefinitionEvent(IAttributeDefinition<?,?,?>[] defs) {
+	private IAttributeDefinition<?, ?, ?>[] attributeDefs;
+
+	public RuntimeAttributeDefinitionEvent(IAttributeDefinition<?, ?, ?>[] defs) {
 		attributeDefs = defs;
 	}
 
-	public IAttributeDefinition<?,?,?>[] getDefinitions() {
+	public IAttributeDefinition<?, ?, ?>[] getDefinitions() {
 		return attributeDefs;
 	}
 }

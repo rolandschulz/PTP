@@ -24,16 +24,17 @@ package org.eclipse.ptp.rmsystem;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ui.IMemento;
 
-
 /**
  * @author rsqrd
  * 
  */
 public interface IResourceManagerFactory {
 	/**
-	 * Copy a configuration. This can be used to provide a temporary working copy of a configuration
-	 *
-	 * @param configuration configuration to copy
+	 * Copy a configuration. This can be used to provide a temporary working
+	 * copy of a configuration
+	 * 
+	 * @param configuration
+	 *            configuration to copy
 	 * @return copy of the configuration
 	 */
 	public IResourceManagerConfiguration copyConfiguration(IResourceManagerConfiguration configuration);
@@ -41,11 +42,12 @@ public interface IResourceManagerFactory {
 	/**
 	 * Create a resource manager using the supplied configuration
 	 * 
-	 * @param configuration configuration to use when creating resource manager
+	 * @param configuration
+	 *            configuration to use when creating resource manager
 	 * @return resource manager control
 	 */
 	public IResourceManagerControl create(IResourceManagerConfiguration configuration);
-	
+
 	/**
 	 * Create a default configuration
 	 * 
@@ -66,20 +68,23 @@ public interface IResourceManagerFactory {
 	 * @return factory name
 	 */
 	public String getName();
-	
+
 	/**
 	 * Load a resource manager configuration from saved state
 	 * 
-	 * @param memento saved state of configuration
+	 * @param memento
+	 *            saved state of configuration
 	 * @return resource manager configuration
 	 */
 	public IResourceManagerConfiguration loadConfiguration(IMemento memento);
-	
+
 	/**
 	 * Replace a resource manager configuration with a working copy.
 	 * 
-	 * @param configuration working copy
-	 * @param resourceManager resource manager
+	 * @param configuration
+	 *            working copy
+	 * @param resourceManager
+	 *            resource manager
 	 */
 	public void saveConfiguration(IResourceManagerConfiguration configuration, IResourceManagerControl resourceManager);
 }

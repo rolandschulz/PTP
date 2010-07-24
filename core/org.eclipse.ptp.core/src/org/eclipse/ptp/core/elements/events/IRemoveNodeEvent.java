@@ -16,20 +16,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 
 /**
- * This event is generated when one or more nodes are removed. It is
- * a bulk event that is sent to child listeners on the source machine.
+ * This event is generated when one or more nodes are removed. It is a bulk
+ * event that is sent to child listeners on the source machine.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener
  */
 public interface IRemoveNodeEvent {
-	
+
 	/**
 	 * Get the nodes that have been removed
 	 * 

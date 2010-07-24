@@ -14,7 +14,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.core.messages.messages"; //$NON-NLS-1$
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
@@ -151,6 +151,7 @@ public class Messages extends NLS {
 	public static String ResourceManagerPersistence_2;
 	public static String StringSetAttribute_0;
 	public static String StringSetAttribute_1;
+
 	private Messages() {
 		// Prevent instances.
 	}

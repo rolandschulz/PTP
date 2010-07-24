@@ -22,21 +22,20 @@
 package org.eclipse.ptp.core.elements.listeners;
 
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.INewNodeEvent;
-
+import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 
 /**
  * @author rsqrd
  * 
  */
 public interface IMachineChildListener {
-	
+
 	/**
 	 * @param e
 	 */
 	public void handleEvent(IChangedNodeEvent e);
-	
+
 	/**
 	 * @param e
 	 */

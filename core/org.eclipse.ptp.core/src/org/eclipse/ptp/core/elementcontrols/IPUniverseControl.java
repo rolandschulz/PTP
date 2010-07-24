@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.elements.IResourceManager;
  * Adds the internal functionality of an IPElement to an IPUniverse
  * 
  * @author rsqrd
- *
+ * 
  */
 public interface IPUniverseControl extends IPUniverse, IPElementControl {
 
@@ -40,5 +40,5 @@ public interface IPUniverseControl extends IPUniverse, IPElementControl {
 	public void removeResourceManager(IResourceManager removedManager);
 
 	public void removeResourceManagers(IResourceManager[] removedRMs);
-	
+
 }

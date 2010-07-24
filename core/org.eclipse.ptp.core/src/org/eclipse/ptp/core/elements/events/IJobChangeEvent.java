@@ -16,25 +16,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 
 /**
- * This event is sent when the attributes on a job change. It is sent to
- * element listeners on the job.
+ * This event is sent when the attributes on a job change. It is sent to element
+ * listeners on the job.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IJobListener
  */
 public interface IJobChangeEvent {
-	
+
 	/**
 	 * Get the attributes that have changed
 	 * 
 	 * @return changed attributes
 	 */
 	public AttributeManager getAttributes();
-	
+
 	/**
 	 * Get the source of the event
 	 * 

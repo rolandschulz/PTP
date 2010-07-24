@@ -29,8 +29,8 @@ import org.eclipse.ptp.core.elements.IPElement;
  *
  */
 public class PElementInfo {
-	private final Map<String, IPElementControl> fChildren = 
-		Collections.synchronizedMap(new HashMap<String, IPElementControl>());
+	private final Map<String, IPElementControl> fChildren =
+			Collections.synchronizedMap(new HashMap<String, IPElementControl>());
 	protected final IPElementControl element;
 
 	public PElementInfo(IPElementControl element) {
@@ -46,9 +46,12 @@ public class PElementInfo {
 		fChildren.put(member.getID(), member);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#clone()
 	 */
+	@Override
 	public Object clone() {
 		try {
 			return super.clone();
@@ -66,7 +69,7 @@ public class PElementInfo {
 	public IPElementControl findChild(String key) {
 		synchronized (fChildren) {
 			if (fChildren.containsKey(key)) {
-				return (IPElementControl) fChildren.get(key);
+				return fChildren.get(key);
 			}
 		}
 		return null;
@@ -78,7 +81,7 @@ public class PElementInfo {
 	 * @return children
 	 */
 	public IPElementControl[] getChildren() {
-		 return (IPElementControl[]) fChildren.values().toArray(new IPElementControl[size()]);
+		return fChildren.values().toArray(new IPElementControl[size()]);
 	}
 
 	/**

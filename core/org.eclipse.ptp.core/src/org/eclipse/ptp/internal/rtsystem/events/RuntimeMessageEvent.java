@@ -28,11 +28,10 @@ import org.eclipse.ptp.core.elements.attributes.MessageAttributes;
 import org.eclipse.ptp.core.elements.attributes.MessageAttributes.Level;
 import org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent;
 
-
 public class RuntimeMessageEvent implements IRuntimeMessageEvent {
 
 	AttributeManager attributes;
-	
+
 	public RuntimeMessageEvent(AttributeManager attrs) {
 		if (attrs.getAttribute(MessageAttributes.getLevelAttributeDefinition()) == null) {
 			attrs.addAttribute(MessageAttributes.getLevelAttributeDefinition().create());
@@ -59,38 +58,46 @@ public class RuntimeMessageEvent implements IRuntimeMessageEvent {
 		}
 		this.attributes = attrs;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeMessageEvent#getAttributes()
 	 */
 	public AttributeManager getAttributes() {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getCode()
 	 */
 	public int getCode() {
-		IntegerAttribute code = 
-			attributes.getAttribute(MessageAttributes.getCodeAttributeDefinition());
+		IntegerAttribute code =
+				attributes.getAttribute(MessageAttributes.getCodeAttributeDefinition());
 		return code.getValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getLevel()
 	 */
 	public MessageAttributes.Level getLevel() {
-		EnumeratedAttribute<Level> level = 
-			attributes.getAttribute(MessageAttributes.getLevelAttributeDefinition());
+		EnumeratedAttribute<Level> level =
+				attributes.getAttribute(MessageAttributes.getLevelAttributeDefinition());
 		return level.getValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeErrorEvent#getText()
 	 */
 	public String getText() {
-		StringAttribute text = 
-			attributes.getAttribute(MessageAttributes.getTextAttributeDefinition());
+		StringAttribute text =
+				attributes.getAttribute(MessageAttributes.getTextAttributeDefinition());
 		return text.getValue();
 	}
 

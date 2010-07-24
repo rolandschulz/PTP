@@ -16,20 +16,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 
 /**
- * This event is generated when one or more jobs are removed. It is
- * a bulk event that is sent to child listeners on the source queue.
+ * This event is generated when one or more jobs are removed. It is a bulk event
+ * that is sent to child listeners on the source queue.
  * 
  * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener
  */
 public interface IRemoveJobEvent {
-	
+
 	/**
 	 * Get the removed jobs
 	 * 

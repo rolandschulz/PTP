@@ -18,19 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.attributes;
 
-
 public final class StringAttributeDefinition
-extends AbstractAttributeDefinition<String,StringAttribute,StringAttributeDefinition> {
+		extends AbstractAttributeDefinition<String, StringAttribute, StringAttributeDefinition> {
 
 	private final String defaultValue;
-	
-	public StringAttributeDefinition(final String uniqueId, final String name, 
+
+	public StringAttributeDefinition(final String uniqueId, final String name,
 			final String description, final boolean display, final String defaultValue) {
 		super(uniqueId, name, description, display);
 		this.defaultValue = defaultValue;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.attributes.IAttribute#create(java.lang.String)
 	 */
 	public StringAttribute create() {

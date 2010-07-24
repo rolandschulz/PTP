@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.events.INewNodeEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class NewNodeEvent implements INewNodeEvent {
 
@@ -39,15 +39,21 @@ public class NewNodeEvent implements INewNodeEvent {
 		this.nodes = nodes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent#getProcess()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent#getProcess()
 	 */
 	public Collection<IPNode> getNodes() {
 		return nodes;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.elements.events.IMachineNewNodeEvent#getSource()
 	 */
 	public IPMachine getSource() {
 		return machine;

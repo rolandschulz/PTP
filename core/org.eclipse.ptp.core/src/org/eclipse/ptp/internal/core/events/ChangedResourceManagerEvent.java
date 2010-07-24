@@ -27,27 +27,35 @@ import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class ChangedResourceManagerEvent implements IChangedResourceManagerEvent {
 
 	private final IModelManager mm;
 	private final Collection<IResourceManager> rms;
-	
+
 	public ChangedResourceManagerEvent(IModelManager mm, Collection<IResourceManager> rms) {
 		this.mm = mm;
 		this.rms = rms;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine
+	 * ()
 	 */
 	public Collection<IResourceManager> getResourceManagers() {
 		return rms;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource
+	 * ()
 	 */
 	public IModelManager getSource() {
 		return mm;

@@ -36,7 +36,7 @@ public interface IPElementControl extends IPElement {
 	 * Element tag for an error / undefined type
 	 */
 	public static final int P_TYPE_ERROR = -1;
-	
+
 	/**
 	 * Element tag for Universe Elements
 	 */
@@ -61,12 +61,12 @@ public interface IPElementControl extends IPElement {
 	 * Element tag for Process Elements
 	 */
 	public static final int P_PROCESS = 14;
-	
+
 	/**
 	 * Element tag for Resource Manager Elements
 	 */
 	public static final int P_RESOURCE_MANAGER = 15;
-	
+
 	/**
 	 * Element tag for Queue Elements
 	 */

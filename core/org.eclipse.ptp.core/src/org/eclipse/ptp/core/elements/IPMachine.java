@@ -22,7 +22,6 @@ import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
 
-
 /**
  * Interface class for a model of a machine. Machines are comprised of nodes
  * which may have processes running on them. The Machine model is intented to be
@@ -34,7 +33,7 @@ import org.eclipse.ptp.core.elements.listeners.IMachineListener;
  * @author Nathan DeBardeleben
  */
 public interface IPMachine extends IPElement {
-	
+
 	/**
 	 * Add a listener for events related to children of this machine.
 	 * 
@@ -55,11 +54,11 @@ public interface IPMachine extends IPElement {
 	 * @return The architecture of this Machine
 	 */
 	public String getArch();
-	
+
 	/**
-	 * Given a node id, attempts to find it as a Node object
-	 * contained in this Machine. If found, the Node object is returned.
-	 * Otherwise, <code>null</code> is returned.
+	 * Given a node id, attempts to find it as a Node object contained in this
+	 * Machine. If found, the Node object is returned. Otherwise,
+	 * <code>null</code> is returned.
 	 * 
 	 * @param id
 	 *            The ID to find in this Machine
@@ -68,21 +67,20 @@ public interface IPMachine extends IPElement {
 	public IPNode getNodeById(String id);
 
 	/**
-	 * Returns an array of all the Nodes that this Machine is comprised of. 
+	 * Returns an array of all the Nodes that this Machine is comprised of.
 	 * Returns an empty array if there are no nodes.
 	 * 
-	 * @return The Nodes in this Machine - <code>null</code> if there are
-	 *         none.
+	 * @return The Nodes in this Machine - <code>null</code> if there are none.
 	 */
 	public IPNode[] getNodes();
-	
+
 	/**
 	 * Get the resource manager that controls this machine.
 	 * 
 	 * @return the machine's parent resource manager
 	 */
 	public IResourceManager getResourceManager();
-	
+
 	/**
 	 * Get the state of the machine
 	 * 
@@ -113,7 +111,7 @@ public interface IPMachine extends IPElement {
 	 *            The architecture of this machine
 	 */
 	public void setArch(String arch);
-	
+
 	/**
 	 * Counts all the Nodes associated with this Machine and returns that as an
 	 * <code>int</code>.

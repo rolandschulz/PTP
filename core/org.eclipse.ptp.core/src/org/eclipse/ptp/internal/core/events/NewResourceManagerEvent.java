@@ -25,7 +25,7 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 
 /**
  * @author rsqrd
- *
+ * 
  */
 public class NewResourceManagerEvent implements INewResourceManagerEvent {
 
@@ -37,15 +37,23 @@ public class NewResourceManagerEvent implements INewResourceManagerEvent {
 		this.rm = rm;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine
+	 * ()
 	 */
 	public IResourceManager getResourceManager() {
 		return rm;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource
+	 * ()
 	 */
 	public IModelManager getSource() {
 		return mm;

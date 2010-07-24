@@ -14,20 +14,22 @@ package org.eclipse.ptp.internal.rtsystem.events;
 import org.eclipse.ptp.rtsystem.events.AbstractRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent;
 
-
-public class RuntimeTerminateJobErrorEvent 
-	extends AbstractRuntimeErrorEvent
+public class RuntimeTerminateJobErrorEvent
+		extends AbstractRuntimeErrorEvent
 		implements IRuntimeTerminateJobErrorEvent {
 
 	private String jobID;
-	
+
 	public RuntimeTerminateJobErrorEvent(int code, String message, String jobID) {
 		super(code, message);
 		this.jobID = jobID;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent#getJobID()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rtsystem.events.IRuntimeTerminateJobErrorEvent#getJobID()
 	 */
 	public String getJobID() {
 		return jobID;

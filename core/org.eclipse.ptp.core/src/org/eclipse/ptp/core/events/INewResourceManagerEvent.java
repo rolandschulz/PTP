@@ -19,7 +19,7 @@ public interface INewResourceManagerEvent {
 	 * @return
 	 */
 	public IResourceManager getResourceManager();
-	
+
 	/**
 	 * @return
 	 */

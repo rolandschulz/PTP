@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.rtsystem.events;
 
 import org.eclipse.ptp.rtsystem.events.IRuntimeShutdownStateEvent;
 
-
 public class RuntimeShutdownStateEvent implements IRuntimeShutdownStateEvent {
 
 }

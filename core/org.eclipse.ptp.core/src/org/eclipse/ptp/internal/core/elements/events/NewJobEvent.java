@@ -21,13 +21,13 @@ package org.eclipse.ptp.internal.core.elements.events;
 
 import java.util.Collection;
 
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPJob;
+import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.events.INewJobEvent;
 
 /**
  * @author grw
- *
+ * 
  */
 public class NewJobEvent implements INewJobEvent {
 
@@ -39,14 +39,18 @@ public class NewJobEvent implements INewJobEvent {
 		this.jobs = jobs;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IQueueNewJobEvent#getProcess()
 	 */
 	public Collection<IPJob> getJobs() {
 		return jobs;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IQueueNewJobEvent#getSource()
 	 */
 	public IPQueue getSource() {
