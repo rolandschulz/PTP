@@ -25,10 +25,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.attributes.AttributeDefinitionManager;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.BooleanAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -247,8 +249,9 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	 *            the ID of the job
 	 * @param attrMgr
 	 *            attributes from the job thread
+	 * @return job id of the newly created job
 	 */
-	public String createJob(String parentID, AttributeManager attrMgr) {
+	public String createJob(String parentID, AttributeManager attrMgr) throws CoreException {
 		ElementAttributeManager mgr = new ElementAttributeManager();
 		AttributeManager jobAttrMgr = new AttributeManager();
 
@@ -263,15 +266,14 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		jobAttrMgr.addAttribute(ElementAttributes.getNameAttributeDefinition().create(generateJobName()));
 
 		/*
-		 * Get relevant attributes from launch attributes.
+		 * Get mandatory launch attributes.
 		 */
-		String subId = attrMgr.getAttribute(JobAttributes.getSubIdAttributeDefinition()).getValue();
-		String execName = attrMgr.getAttribute(JobAttributes.getExecutableNameAttributeDefinition()).getValue();
-		String execPath = attrMgr.getAttribute(JobAttributes.getExecutablePathAttributeDefinition()).getValue();
-		String workDir = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue();
-		Integer numProcs = attrMgr.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition()).getValue();
-		List<String> progArgs = attrMgr.getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition()).getValue();
-		BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
+		String subId = getAttributeValue(JobAttributes.getSubIdAttributeDefinition(), attrMgr);
+		String execName = getAttributeValue(JobAttributes.getExecutableNameAttributeDefinition(), attrMgr);
+		String execPath = getAttributeValue(JobAttributes.getExecutablePathAttributeDefinition(), attrMgr);
+		String workDir = getAttributeValue(JobAttributes.getWorkingDirectoryAttributeDefinition(), attrMgr);
+		Integer numProcs = getAttributeValue(JobAttributes.getNumberOfProcessesAttributeDefinition(), attrMgr);
+		List<? extends String> progArgs = getAttributeValue(JobAttributes.getProgramArgumentsAttributeDefinition(), attrMgr);
 
 		/*
 		 * Copy these relevant attributes to IPJob.
@@ -286,6 +288,11 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 			RMCorePlugin.log(e);
 		}
 		jobAttrMgr.addAttribute(JobAttributes.getProgramArgumentsAttributeDefinition().create(progArgs.toArray(new String[0])));
+
+		/*
+		 * Copy optional attributes
+		 */
+		BooleanAttribute debugAttr = attrMgr.getAttribute(JobAttributes.getDebugFlagAttributeDefinition());
 		if (debugAttr != null) {
 			jobAttrMgr.addAttribute(JobAttributes.getDebugFlagAttributeDefinition().create(debugAttr.getValue()));
 		}
@@ -707,6 +714,27 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	}
 
 	/**
+	 * Safely retrieve an attribute value.
+	 * 
+	 * @param attrDef
+	 *            attribute definition of the attribute to retrieve
+	 * @param attrMgr
+	 *            attribute manager containing the attributes
+	 * @return value of the attribute
+	 * @throws CoreException
+	 *             if the attribute does not exist.
+	 */
+	private <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> T getAttributeValue(D attrDef,
+			AttributeManager attrMgr) throws CoreException {
+		IAttribute<T, A, D> attr = attrMgr.getAttribute(attrDef);
+		if (attr == null) {
+			throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.PLUGIN_ID, NLS.bind(
+					Messages.AbstractToolRuntimeSystem_3, attrDef.getName())));
+		}
+		return attr.getValue();
+	}
+
+	/**
 	 * Creates a job that keeps monitoring the remote machine. The default
 	 * implementation runs the continuous monitor command if defined in the RM
 	 * capability.
@@ -800,15 +828,6 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 	}
 
 	/**
-	 * @since 2.0
-	 */
-	protected int generateIntID() {
-		int id = nextID;
-		nextID++;
-		return id;
-	}
-
-	/**
 	 * Generate a range set of count IDs
 	 * 
 	 * @param count
@@ -819,6 +838,15 @@ public abstract class AbstractToolRuntimeSystem extends AbstractRuntimeSystem {
 		int start = nextID;
 		nextID += count;
 		return new RangeSet(start, nextID - 1);
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	protected int generateIntID() {
+		int id = nextID;
+		nextID++;
+		return id;
 	}
 
 	/**

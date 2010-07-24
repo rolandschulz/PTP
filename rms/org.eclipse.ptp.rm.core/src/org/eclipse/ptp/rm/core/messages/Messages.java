@@ -39,6 +39,8 @@ public class Messages extends NLS {
 	public static String AbstractToolRuntimeSystem_0;
 	public static String AbstractToolRuntimeSystem_1;
 	public static String AbstractToolRuntimeSystem_2;
+
+	public static String AbstractToolRuntimeSystem_3;
 	public static String AbstractToolRuntimeSystem_Exception_NoConnection;
 	public static String AbstractToolRuntimeSystem_Exception_NoRemoteServices;
 	public static String AbstractToolRuntimeSystem_Exception_ResourceManagerNotInitialized;
