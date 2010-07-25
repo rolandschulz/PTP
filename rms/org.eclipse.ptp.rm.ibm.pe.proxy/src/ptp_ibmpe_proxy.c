@@ -223,6 +223,12 @@ typedef struct
     long long ulimit; /* Attribute's upper limit              */
 } long_int_launch_attr;
 
+typedef struct
+{
+    int (*handler)(int, void *);
+    jobinfo *job;
+} handler_info;
+
 static RETSIGTYPE ptp_signal_handler(int sig);
 static int server(char *name, char *host, int port);
 static int PE_start_daemon(int trans_id, int nargs, char *args[]);
@@ -234,6 +240,7 @@ static int PE_start_events(int trans_id, int nargs, char *args[]);
 static int PE_halt_events(int trans_id, int nargs, char *args[]);
 static int PE_suspend_events(int trans_id, int nargs, char *args[]);
 static int PE_resume_events(int trans_id, int nargs, char *args[]);
+static int PE_filter_events(int trans_id, int nargs, char *args[]);
 static int PE_set_filters(int trans_id, int nargs, char *args[]);
 static int PE_clear_filters(int trans_id, int nargs, char *args[]);
 static int PE_get_attributes(int trans_id, int nargs, char *args[]);
@@ -326,6 +333,7 @@ static int max_node_sleep_seconds = 300; /* Max. LL node status interval    */
 static int job_sleep_seconds = 30; /* LL job status interval        */
 static char ibmll_libpath_name[_POSIX_PATH_MAX]; /* LoadLeveler lib path */
 static char miniproxy_path[_POSIX_PATH_MAX];
+static List *active_stdio; /* Active stdio file descriptor list */
 
 /*
  * List functions are safe for adding or removing list elements since they
@@ -521,9 +529,20 @@ static void run_get_time(char *msg, struct timeval *base_time);
  * Proxy infrastructure expects commands in exactly this sequence.
  * Be careful when adding or deleting commands
  */
-static proxy_cmd cmds[] = { PE_quit, PE_start_daemon, PE_define_model, PE_start_events, PE_halt_events, PE_submit_job,
-        PE_terminate_job, PE_suspend_events, PE_resume_events, PE_set_filters, PE_clear_filters,
-	PE_get_attributes, PE_query_attributes };
+static proxy_cmd cmds[] = { PE_quit,
+                            PE_start_daemon,
+                            PE_define_model,
+                            PE_start_events,
+                            PE_halt_events,
+                            PE_submit_job,
+                            PE_terminate_job,
+                            PE_filter_events,
+                            PE_suspend_events,
+                            PE_resume_events,
+                            PE_set_filters,
+                            PE_clear_filters,
+	                    PE_get_attributes,
+                            PE_query_attributes };
 static proxy_commands command_tab = { 0, sizeof cmds / sizeof(proxy_cmd), cmds };
 
 static char *mp_infolevel_labels[] = { "Error", "Warning", "Informational", "Diagnostic", "Diagnostic level 4",
@@ -801,6 +820,7 @@ int PE_start_daemon(int trans_id, int nargs, char *args[])
     my_username = strdup(userinfo->pw_name);
     base_id = strtol(args[1], NULL, 10);
     nodes = HashCreate(1024);
+    active_stdio = NewList();
     pthread_attr_init(&thread_attrs);
     pthread_attr_setdetachstate(&thread_attrs, PTHREAD_CREATE_DETACHED);
     pthread_attr_init(&term_thread_attrs);
@@ -971,6 +991,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     int debug_sdm_mode;
     char mp_rdma_count_value[50];
     char mp_buffer_mem_value[50];
+    handler_info *stdio_handler_info;
 
     TRACE_ENTRY;
     RUN_START_TIMING;
@@ -1360,7 +1381,6 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     TRACE_DETAIL_V("stdout FD %d %d\n", stdout_pipe[0], stdout_pipe[1]);
     status = setup_stderr_fd(trans_id, jobid, stderr_pipe, stderr_path, "stderr", &(job->stderr_fd),
             &(job->stderr_file), &(job->stderr_redirect));
-    RegisterFileHandler(job->stderr_fd, READ_FILE_HANDLER, stderr_handler, job);
     if (status == -1) {
         if (current_hostlist != NULL) {
             free(current_hostlist);
@@ -1368,6 +1388,12 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
         TRACE_EXIT;
         return PTP_PROXY_RES_OK;
     }
+    RegisterFileHandler(job->stderr_fd, READ_FILE_HANDLER, stderr_handler, job);
+    stdio_handler_info = (handler_info *) malloc(sizeof(handler_info));
+    malloc_check(stdio_handler_info, __FUNCTION__, __LINE__);
+    stdio_handler_info->handler = stderr_handler;
+    stdio_handler_info->job = job;
+    AddToList(active_stdio, stdio_handler_info);
     TRACE_DETAIL_V("stderr FD %d %d\n", stderr_pipe[0], stderr_pipe[1]);
     job->poe_taskid = -1;
     job->app_working_dir = cwd;
@@ -1598,32 +1624,104 @@ int PE_quit(int trans_id, int nargs, char *args[])
 }
 
 int PE_suspend_events(int trans_id, int nargs, char *args[])
-{
+{ 
+    proxy_set_flow_control(1);
+    send_ok_event(trans_id);
     return PTP_PROXY_RES_OK;
 }
 
 int PE_resume_events(int trans_id, int nargs, char *args[])
 {
+    proxy_set_flow_control(0);
+    send_ok_event(trans_id);
+    return PTP_PROXY_RES_OK;
+}
+
+int PE_filter_events(int trans_id, int nargs, char *args[])
+{
+    send_ok_event(trans_id);
     return PTP_PROXY_RES_OK;
 }
 
 int PE_set_filters(int trans_id, int nargs, char *args[])
 {
+    handler_info *fd_info;
+    int i;
+    char suspend_stdout;
+    char suspend_stderr;
+
+    suspend_stdout = 0;
+    suspend_stderr = 0;
+    for (i = 0; i < nargs; i++) {
+        if (strcmp(args[i], "stdout") == 0) {
+            suspend_stdout = 1;
+        }
+        else {
+            if (strcmp(args[i], "stderr") == 0) {
+                suspend_stderr = 1;
+            }
+        }
+    }
+    SetList(active_stdio);
+    fd_info = GetListElement(active_stdio);
+    while (fd_info != NULL) {
+        if (suspend_stdout && (fd_info->handler == stdout_handler)) {
+          UnregisterFileHandler(fd_info->job->stdout_fd);
+        }
+        if (suspend_stderr && (fd_info->handler == stderr_handler)) {
+          UnregisterFileHandler(fd_info->job->stderr_fd);
+        }
+        fd_info = GetListElement(active_stdio);
+    }
+    send_ok_event(trans_id);
     return PTP_PROXY_RES_OK;
 }
 
 int PE_clear_filters(int trans_id, int nargs, char *args[])
 {
+    handler_info *fd_info;
+    int i;
+    char resume_stdout;
+    char resume_stderr;
+
+    resume_stdout = 0;
+    resume_stderr = 0;
+    for (i = 0; i < nargs; i++) {
+        if (strcmp(args[i], "stdout") == 0) {
+            resume_stdout = 1;
+        }
+        else {
+            if (strcmp(args[i], "stderr") == 0) {
+                resume_stderr = 1;
+            }
+        }
+    }
+    SetList(active_stdio);
+    fd_info = GetListElement(active_stdio);
+    while (fd_info != NULL) {
+        if (resume_stdout && (fd_info->handler == stdout_handler)) {
+          RegisterFileHandler(fd_info->job->stdout_fd, READ_FILE_HANDLER,
+                              stdout_handler, fd_info->job);
+        }
+        if (resume_stderr && (fd_info->handler == stderr_handler)) {
+          RegisterFileHandler(fd_info->job->stderr_fd, READ_FILE_HANDLER,
+                              stderr_handler, fd_info->job);
+        }
+        fd_info = GetListElement(active_stdio);
+    }
+    send_ok_event(trans_id);
     return PTP_PROXY_RES_OK;
 }
 
 int PE_get_attributes(int trans_id, int nargs, char *args[])
 {
+    send_ok_event(trans_id);
     return PTP_PROXY_RES_OK;
 }
 
 int PE_query_attributes(int trans_id, int nargs, char *args[])
 {
+    send_ok_event(trans_id);
     return PTP_PROXY_RES_OK;
 }
 
@@ -1698,6 +1796,7 @@ startup_monitor(void *job_ident)
     char task_range[15];
     struct timeval current_time;
     char jobid[11];
+    handler_info *stdio_handler_info;
 
     TRACE_ENTRY;
     job = (jobinfo *) job_ident;
@@ -2096,6 +2195,11 @@ startup_monitor(void *job_ident)
      */
     if (!job->stdout_redirect && !job->discovered_job) {
         RegisterFileHandler(job->stdout_fd, READ_FILE_HANDLER, stdout_handler, job);
+        stdio_handler_info = (handler_info *) malloc(sizeof(handler_info));
+        malloc_check(stdio_handler_info, __FUNCTION__, __LINE__);
+        stdio_handler_info->handler = stdout_handler;
+        stdio_handler_info->job = job;
+        AddToList(active_stdio, stdio_handler_info);
     }
     if (job->debugging) {
         /*
@@ -5279,8 +5383,20 @@ int write_output(int fd, jobinfo * job, ioinfo * file_info)
         }
     }
     else {
+        handler_info *stdio_handler_info;
+
         print_message(TRACE_DETAIL_MESSAGE, "EOF for fd %d. Unregistering handler\n", fd);
         UnregisterFileHandler(fd);
+        SetList(active_stdio);
+        stdio_handler_info = GetListElement(active_stdio);
+        while (stdio_handler_info != NULL) {
+          if ((fd == stdio_handler_info->job->stdout_fd) || 
+              (fd == stdio_handler_info->job->stderr_fd)) {
+            RemoveFromList(active_stdio, stdio_handler_info);
+            break;
+          }
+          stdio_handler_info = GetListElement(active_stdio);
+        }
         close(fd);
         return 0;
     }
