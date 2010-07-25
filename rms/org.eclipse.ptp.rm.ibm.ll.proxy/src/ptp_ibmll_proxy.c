@@ -1090,11 +1090,13 @@ int command_terminate(int gui_transmission_id, int nargs, char *args[])
 
 int command_suspend_events(int gui_transmission_id, int nargs, char *args[])
 {
+    proxy_set_flow_control(1);
     return PTP_PROXY_RES_OK;
 }
 
 int command_resume_events(int gui_transmission_id, int nargs, char *args[])
 {
+    proxy_set_flow_control(0);
     return PTP_PROXY_RES_OK;
 }
 
