@@ -18,7 +18,7 @@ import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
  * @author Jeff Overbey
  * @see IASTVisitorWithLoops
  */
-public class GenericASTVisitorWithLoops extends GenericASTVisitor
+public class GenericASTVisitorWithLoops extends GenericASTVisitor implements IASTVisitorWithLoops
 {
     public void visitASTProperLoopConstructNode(ASTProperLoopConstructNode node) {}
 }
