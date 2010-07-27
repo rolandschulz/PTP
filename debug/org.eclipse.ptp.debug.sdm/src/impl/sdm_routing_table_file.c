@@ -45,28 +45,20 @@ sdm_routing_table_init(int argc, char *argv[])
 	FILE *				rt_file;
 	int					rv;
 	int					tbl_size;
-	int					master = 0;
+	int					id = -1; /* assume master */
 	int					ch;
 	char *				envval = NULL;
 	char **				var;
-
-	for (ch = 0; ch < argc; ch++) {
-		char * arg = argv[ch];
-		if (strncmp(arg, "--master", 8) == 0) {
-			master = 1;
-			break;
-		}
-	}
 
 	/*
 	 * Master and servers wait for the routing file to appear
 	 */
 	rv = wait_for_routing_file("routing_file", &rt_file, &tbl_size, ROUTING_TABLE_TIMEOUT); //TODO: Get filename from the environment
-	if(rv == -1) { // No need to close, since wait_for_routing_file does it when error
+	if (rv == -1) { // No need to close, since wait_for_routing_file does it when error
 		// Error!
 		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Error opening the routing file\n");
 		return -1;
-	} else if(rv == -2){
+	} else if (rv == -2){
 		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Timeout while waiting for routing file\n");
 		return -1;
 	}
@@ -81,29 +73,42 @@ sdm_routing_table_init(int argc, char *argv[])
 	SDM_MASTER = tbl_size;
 
 	/*
-	 * Since the SDM servers will be started by the mpirun, get
-	 * the ID from the environment.
-	 * Important! If the variable is not declared, then
-	 * this sdm is the master.
+	 * If sdm servers are started by the mpirun, then their ID (rank) will be
+	 * available from the environment. Important! If the variable is not found, then
+	 * this sdm is assumed to be the master.
+	 *
+	 * The master sdm usually has the option "--master" (apart from the case above).
+	 *
+	 * Server sdm's can also have their ID's set using the "--server=id" option. This
+	 * allows the servers to be started by a non-MPI runtime.
 	 */
 
-	for (var = MPIRankVars; *var != NULL; var++) {
-		envval = getenv(*var);
-		if (envval != NULL) {
+	for (ch = 0; ch < argc; ch++) {
+		char * arg = argv[ch];
+		if (strncmp(arg, "--master", 8) == 0) {
 			break;
+		} else if (strncmp(arg, "--server", 8) == 0) {
+			id = (int)strtol(arg+8, NULL, 10);
 		}
 	}
 
-	if (!master && envval == NULL) {
-		DEBUG_PRINTS(DEBUG_LEVEL_ROUTING, "Could not find my ID!\n");
-		return -1;
+	/*
+	 * If no options were set, check the environment
+	 */
+	if (id < 0) {
+		for (var = MPIRankVars; *var != NULL; var++) {
+			envval = getenv(*var);
+			if (envval != NULL) {
+				id = (int)strtol(envval, NULL, 10);
+				break;
+			}
+		}
 	}
 
-	if (envval != NULL) {
-		int id = strtol(envval, NULL, 10);
-		sdm_route_set_id(id);
-	} else {
+	if (id < 0) {
 		sdm_route_set_id(SDM_MASTER);
+	} else {
+		sdm_route_set_id(id);
 	}
 
 	DEBUG_PRINTF(DEBUG_LEVEL_ROUTING, "[%d] size %d\n", sdm_route_get_id(), sdm_route_get_size());

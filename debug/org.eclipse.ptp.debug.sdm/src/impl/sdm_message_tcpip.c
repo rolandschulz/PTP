@@ -334,7 +334,7 @@ sdm_tcpip_init()
 				childsockd = sdm_connect_to_child(entry->hostname, entry->port);
 
 				if (childsockd < 0) {
-					DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] failed to bind to connect to child %s:%d\n", sdm_route_get_id(), entry->hostname, entry->port);
+					DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] failed to connect to child %s:%d\n", sdm_route_get_id(), entry->hostname, entry->port);
 					return -1;
 				}
 				DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Connection to child %d successful\n", sdm_route_get_id(), mapp->id);
