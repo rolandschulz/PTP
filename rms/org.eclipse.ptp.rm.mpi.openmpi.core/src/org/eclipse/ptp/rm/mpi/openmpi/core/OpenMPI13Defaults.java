@@ -15,7 +15,6 @@ import java.util.Properties;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rm.core.AbstractRMDefaults;
-import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.osgi.framework.Bundle;
 
 /**
@@ -34,7 +33,7 @@ public class OpenMPI13Defaults extends AbstractRMDefaults {
 
 	public static void loadDefaults() throws CoreException {
 		Path defaultsPropertiesPath = new Path(defaultsResourcePath);
-		Bundle bundle = RMCorePlugin.getDefault().getBundle();
+		Bundle bundle = OpenMPIPlugin.getDefault().getBundle();
 		Properties properties = read(defaultsPropertiesPath, bundle);
 
 		LAUNCH_CMD = getString(bundle, properties, "LAUNCH_CMD"); //$NON-NLS-1$
