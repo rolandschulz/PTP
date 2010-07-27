@@ -513,7 +513,7 @@ GetSimpleAIF(MISession *session, MIVar *var)
 	}
 	switch (id) {
 	case T_FUNCTION:
-		return MakeAIF("&/is4", var->exp);
+		return MakeAIF("&/is4", strdup(var->exp));
 	case T_VOID_PTR:
 		ac = VoidToAIF(0, 0);
 		v = GetVarValue(session, var->name);
