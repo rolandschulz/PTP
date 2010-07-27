@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -268,81 +269,90 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#initialize(java.util.List)
 	 */
 	public void initialize(ILaunchConfiguration configuration, List<String> args, IProgressMonitor monitor) throws PDIException {
-		int port = 0;
-
-		/*
-		 * If there is an existing port specified, use it if possible.
-		 */
-		for (String arg : args) {
-			if (arg.startsWith("--port=")) { //$NON-NLS-1$
-				try {
-					port = Integer.parseInt(arg.substring(7, arg.length()));
-				} catch (NumberFormatException e) {
-				}
-				break;
-			}
-		}
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 
 		try {
-			doInitialize(port);
-		} catch (IOException e) {
-			throw new PDIException(null, Messages.PDIDebugger_7 + e.getMessage());
-		}
+			int port = 0;
 
-		IResourceManagerControl rm = getResourceManager(configuration);
-		if (rm != null) {
-			port = getSessionPort();
-			IResourceManagerConfiguration conf = rm.getConfiguration();
-			if (conf instanceof IRemoteResourceManagerConfiguration) {
-				IRemoteResourceManagerConfiguration remConf = (IRemoteResourceManagerConfiguration) conf;
-				if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
-					IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-							remConf.getRemoteServicesId());
-					if (remoteServices != null) {
-						IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-						if (connMgr != null) {
-							IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
-							if (conn != null) {
-								try {
-									/*
-									 * Bind remote port to all interfaces. This
-									 * allows the sdm master process running on
-									 * a cluster node to use the tunnel.
-									 * 
-									 * FIXME: Since this requires a special
-									 * option to be enabled in sshd on the head
-									 * node (GatewayPorts), I'd like this to go
-									 * way.
-									 */
-									port = conn.forwardRemotePort("", getSessionPort(), monitor); //$NON-NLS-1$
-								} catch (RemoteConnectionException e) {
-									throw new PDIException(null, e.getMessage());
-								}
-								if (monitor.isCanceled()) {
-									return;
-								}
-							} else {
-								throw new PDIException(null, Messages.PDIDebugger_8);
-							}
-						} else {
-							throw new PDIException(null, Messages.PDIDebugger_9);
-						}
-					} else {
-						throw new PDIException(null, Messages.PDIDebugger_10);
+			/*
+			 * If there is an existing port specified, use it if possible.
+			 */
+			for (String arg : args) {
+				if (arg.startsWith("--port=")) { //$NON-NLS-1$
+					try {
+						port = Integer.parseInt(arg.substring(7, arg.length()));
+					} catch (NumberFormatException e) {
 					}
+					break;
 				}
 			}
-			args.add("--port=" + port); //$NON-NLS-1$
-		} else {
-			throw new PDIException(null, Messages.PDIDebugger_11);
-		}
 
-		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
+			try {
+				doInitialize(port);
+			} catch (IOException e) {
+				throw new PDIException(null, Messages.PDIDebugger_7 + e.getMessage());
+			}
 
-		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
-			int level = store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL);
-			if ((level & SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) == SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) {
-				getDebugOptions().PROTOCOL_TRACING = true;
+			IResourceManagerControl rm = getResourceManager(configuration);
+			if (rm != null) {
+				port = getSessionPort();
+				IResourceManagerConfiguration conf = rm.getConfiguration();
+				if (conf instanceof IRemoteResourceManagerConfiguration) {
+					IRemoteResourceManagerConfiguration remConf = (IRemoteResourceManagerConfiguration) conf;
+					if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+						IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
+								remConf.getRemoteServicesId(), progress.newChild(5));
+						if (remoteServices != null) {
+							IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+							if (connMgr != null) {
+								IRemoteConnection conn = connMgr.getConnection(remConf.getConnectionName());
+								if (conn != null) {
+									try {
+										/*
+										 * Bind remote port to all interfaces.
+										 * This allows the sdm master process
+										 * running on a cluster node to use the
+										 * tunnel.
+										 * 
+										 * FIXME: Since this requires a special
+										 * option to be enabled in sshd on the
+										 * head node (GatewayPorts), I'd like
+										 * this to go way.
+										 */
+										port = conn.forwardRemotePort("", getSessionPort(), progress.newChild(5)); //$NON-NLS-1$
+									} catch (RemoteConnectionException e) {
+										throw new PDIException(null, e.getMessage());
+									}
+									if (progress.isCanceled()) {
+										return;
+									}
+								} else {
+									throw new PDIException(null, Messages.PDIDebugger_8);
+								}
+							} else {
+								throw new PDIException(null, Messages.PDIDebugger_9);
+							}
+						} else {
+							throw new PDIException(null, Messages.PDIDebugger_10);
+						}
+					}
+				}
+				args.add("--port=" + port); //$NON-NLS-1$
+			} else {
+				throw new PDIException(null, Messages.PDIDebugger_11);
+			}
+
+			Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
+
+			if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
+				int level = store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL);
+				if ((level & SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) == SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) {
+					getDebugOptions().PROTOCOL_TRACING = true;
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
 	}
