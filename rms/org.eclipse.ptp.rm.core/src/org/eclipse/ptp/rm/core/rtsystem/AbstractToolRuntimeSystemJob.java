@@ -83,7 +83,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 * available on entire PTP.
 	 */
 	private static final Pattern variablePattern = Pattern
-	.compile(("/$/{(/w+)(" + "(?:(?:////)|(?:///})|[^/}])*" + ")/}").replace('/', '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			.compile(("/$/{(/w+)(" + "(?:(?:////)|(?:///})|[^/}])*" + ")/}").replace('/', '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final Pattern parameterPattern = Pattern.compile(":((?:(?:////)|(?:///:)|(?:///})|[^:])*)".replace('/', '\\')); //$NON-NLS-1$
 
 	public AbstractToolRuntimeSystemJob(String jobID, String queueID, String name, AbstractToolRuntimeSystem rtSystem,
@@ -439,9 +439,9 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 				try {
 					newAttributeManager.addAttribute(attributeDefinition.create());
 				} catch (IllegalValueException e) {
-					throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), NLS
-							.bind(Messages.AbstractToolRuntimeSystemJob_Exception_DefaultAttributeValue, attributeDefinition
-									.getName()), e));
+					throw new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(),
+							NLS.bind(Messages.AbstractToolRuntimeSystemJob_Exception_DefaultAttributeValue,
+									attributeDefinition.getName()), e));
 				}
 			}
 		}
@@ -503,9 +503,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			StringAttribute execName = getAttrMgr().getAttribute(JobAttributes.getExecutableNameAttributeDefinition());
 			StringAttribute execPath = getAttrMgr().getAttribute(JobAttributes.getExecutablePathAttributeDefinition());
 			IPath path = new Path(execPath.getValue());
-			path.append(execName.getValue());
 			ArrayAttribute<String> arguments = getAttrMgr().getAttribute(JobAttributes.getProgramArgumentsAttributeDefinition());
-			command.add(path.toOSString());
+			command.add(path.append(execName.getValue()).toOSString());
 			command.addAll(arguments.getValue());
 		} else {
 			// Use the tool to launch executable
@@ -781,7 +780,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			}
 
 			DebugUtil
-			.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
+					.trace(DebugUtil.RTS_JOB_TRACING, "RTS job #{0}: exit value {1}", getJobID(), new Integer(process.exitValue())); //$NON-NLS-1$
 
 			try {
 				DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: handle finish", getJobID()); //$NON-NLS-1$
