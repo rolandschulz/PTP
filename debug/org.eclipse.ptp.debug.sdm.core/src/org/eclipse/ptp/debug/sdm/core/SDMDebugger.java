@@ -398,25 +398,35 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	private void prepareRoutingFile(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
-		IPath routingFilePath = new Path(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition()).getValue());
-		routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 
-		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
-		IResourceManagerConfiguration conf = rm.getConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
-		IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
-		IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
-		IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
+		try {
+			IPath routingFilePath = new Path(attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition())
+					.getValue());
+			routingFilePath = routingFilePath.append("routing_file"); //$NON-NLS-1$
 
-		fRoutingFileStore = remoteFileManager.getResource(routingFilePath.toString());
+			IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
+			IResourceManagerConfiguration conf = rm.getConfiguration();
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
+					progress.newChild(5));
+			IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
+			IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
+			IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
 
-		if (fRoutingFileStore.fetchInfo(EFS.NONE, monitor).exists()) {
-			try {
-				fRoutingFileStore.delete(0, monitor);
-			} catch (CoreException e) {
-				throw newCoreException(e.getLocalizedMessage());
+			fRoutingFileStore = remoteFileManager.getResource(routingFilePath.toString());
+
+			if (fRoutingFileStore.fetchInfo(EFS.NONE, progress.newChild(3)).exists()) {
+				try {
+					fRoutingFileStore.delete(0, progress.newChild(2));
+				} catch (CoreException e) {
+					throw newCoreException(e.getLocalizedMessage());
+				}
+				fRoutingFileStore.fetchInfo();
 			}
-			fRoutingFileStore.fetchInfo();
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
 	}
 
