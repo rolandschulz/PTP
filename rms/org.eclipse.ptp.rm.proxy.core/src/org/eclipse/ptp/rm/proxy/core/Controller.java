@@ -161,7 +161,9 @@ public class Controller {
 		} else {
 			is = readProgramOutput(command);
 		}
-
+		/*
+		 * throws Exception to allow any Exception from different parsers
+		 */
 		return parser.parse(attrDef, is);
 	}
 
