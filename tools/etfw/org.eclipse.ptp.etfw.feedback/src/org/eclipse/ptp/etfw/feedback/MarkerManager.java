@@ -26,6 +26,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.ui.texteditor.MarkerUtilities;
@@ -248,6 +249,10 @@ public class MarkerManager {
 	public void createMarkers(List<IFeedbackItem> itemlist, String markerID) {
 
 		boolean dbgTags = true;
+		if(itemlist.size()==0) {
+			MessageDialog.openInformation(null, "No Feedback items found", "No Feedback items found");
+			return;
+		}
 		// HACK we need to be able to remove markers on (all?) files in the
 		// list.
 		// What if some markers were from other things? need to use only our
