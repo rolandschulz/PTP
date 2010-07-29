@@ -30,7 +30,7 @@ public class VarInt {
 		while (buffer.hasRemaining()) {
 			byte b = buffer.get();
 			fValue <<= 7;
-			fValue &= (b & 0x7f);
+			fValue |= (b & 0x7f);
 			if ((b & 0x80) == 0) {
 				fValid = true;
 				break;
@@ -57,7 +57,7 @@ public class VarInt {
 				byte b = (byte) (val & 0x7f);
 				val >>= 7;
 				if (val > 0) {
-					b &= 0x80;
+					b |= 0x80;
 				}
 				fBytes.put(b);
 			}
