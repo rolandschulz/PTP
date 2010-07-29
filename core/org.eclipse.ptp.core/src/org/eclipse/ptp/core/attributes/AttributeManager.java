@@ -58,7 +58,6 @@ public class AttributeManager {
 	 * 
 	 * @param attrs
 	 */
-	@SuppressWarnings("rawtypes")
 	public void addAttributes(IAttribute<?, ?, ?>[] attrs) {
 		synchronized (map) {
 			for (IAttribute<?, ?, ?> attr : attrs) {
@@ -166,7 +165,6 @@ public class AttributeManager {
 	/**
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	public String[] toStringArray() {
 		ArrayList<String> res = new ArrayList<String>();
 

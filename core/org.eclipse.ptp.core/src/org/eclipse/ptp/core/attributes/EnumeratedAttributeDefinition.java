@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class EnumeratedAttributeDefinition<E extends Enum<E>>
-		extends AbstractAttributeDefinition<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
+public final class EnumeratedAttributeDefinition<E extends Enum<E>> extends
+		AbstractAttributeDefinition<E, EnumeratedAttribute<E>, EnumeratedAttributeDefinition<E>> {
 
 	private final E defaultValue;
 	private final Class<E> enumClass;
 
-	public EnumeratedAttributeDefinition(final String uniqueId,
-			final String name, final String description, final boolean display,
+	@SuppressWarnings("unchecked")
+	public EnumeratedAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display,
 			final E defaultValueIn) {
 		super(uniqueId, name, description, display);
 		final Class<E> eClass = (Class<E>) defaultValueIn.getClass();
