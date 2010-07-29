@@ -376,6 +376,14 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.generic.core"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.generic.ui"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.core"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
