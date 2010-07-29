@@ -9,7 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.elements.IPJob;
@@ -120,11 +121,12 @@ public class ProcessOutput {
 	/**
 	 * Create a local cache for process output.
 	 */
-	@SuppressWarnings("deprecation")
 	private void setOutputStore() {
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		outputDirPath = preferences.getString(PreferenceConstants.PREFS_OUTPUT_DIR);
-		storeLines = preferences.getInt(PreferenceConstants.PREFS_STORE_LINES);
+		IPreferencesService preferences = Platform.getPreferencesService();
+		outputDirPath = preferences.getString(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_OUTPUT_DIR,
+				PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME, null);
+		storeLines = preferences.getInt(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_STORE_LINES,
+				PreferenceConstants.DEFAULT_STORE_LINES, null);
 		if (outputDirPath == null || outputDirPath.length() == 0) {
 			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation()
 					.append(PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME).toOSString();

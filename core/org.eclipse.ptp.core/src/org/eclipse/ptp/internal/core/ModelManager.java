@@ -28,9 +28,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IServiceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -311,7 +313,9 @@ public class ModelManager implements IModelManager {
 			}
 		}
 
-		if (PTPCorePlugin.getDefault().getPluginPreferences().getBoolean(PreferenceConstants.PREFS_AUTO_START_RMS)) {
+		IPreferencesService preferences = Platform.getPreferencesService();
+		if (preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS,
+				PreferenceConstants.DEFAULT_AUTO_START, null)) {
 			startResourceManagers(rmsNeedStarting.toArray(new IResourceManagerControl[0]));
 		}
 	}

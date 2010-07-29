@@ -25,8 +25,7 @@ public abstract class AbstractAttributeDefinition<T, A extends IAttribute<T, A, 
 	private final String uniqueId;
 	private final boolean display;
 
-	public AbstractAttributeDefinition(final String uniqueId, final String name,
-			final String description, final boolean display) {
+	public AbstractAttributeDefinition(final String uniqueId, final String name, final String description, final boolean display) {
 		this.uniqueId = uniqueId;
 		this.name = name;
 		this.description = description;
@@ -43,6 +42,7 @@ public abstract class AbstractAttributeDefinition<T, A extends IAttribute<T, A, 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	final public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -105,8 +105,7 @@ public abstract class AbstractAttributeDefinition<T, A extends IAttribute<T, A, 
 	final public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result +
-				((uniqueId == null) ? 0 : uniqueId.hashCode());
+		result = prime * result + ((uniqueId == null) ? 0 : uniqueId.hashCode());
 		return result;
 	}
 

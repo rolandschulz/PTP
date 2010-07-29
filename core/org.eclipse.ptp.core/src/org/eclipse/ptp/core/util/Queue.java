@@ -37,6 +37,7 @@ public class Queue<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public T[] clearItems() {
 		T[] array;
 		synchronized (list) {
