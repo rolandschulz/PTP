@@ -11,7 +11,11 @@
 package org.eclipse.ptp.proxy.util;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.util.ArrayList;
 
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
@@ -29,6 +33,8 @@ public class ProtocolUtil {
 	public final static int CHAR = 13;
 	public final static int STRING = 14;
 	public final static int UNSIGNED = 15;
+
+	private final static ArrayList<String> fStringTable = new ArrayList<String>();
 
 	/**
 	 * Decode a string into a BigInteger
@@ -79,6 +85,44 @@ public class ProtocolUtil {
 	}
 
 	/**
+	 * Convert a proxy representation of an attribute into a Java String
+	 * 
+	 * Attributes are key/value pairs of the form "key=value". They are encoded
+	 * into a pair of length/value pairs, with the first length/value pair being
+	 * the key of a key=value pair and the second length/value pair being the
+	 * value of a key=value pair or a stand-alone string's value.
+	 * 
+	 * @param buf
+	 *            buffer containing bytes to decode
+	 * @param decoder
+	 *            charset decoder
+	 * @return attribute converted to Java String
+	 * @since 5.0
+	 */
+	public static String decodeAttribute(ByteBuffer buf, CharsetDecoder decoder) {
+		String result = ""; //$NON-NLS-1$
+
+		String key = decodeString(buf, decoder);
+		if (key == null) {
+			return null;
+		}
+		if (key.length() > 0) {
+			result = key;
+		}
+		String value = decodeString(buf, decoder);
+		if (value == null) {
+			return null;
+		}
+		if (value.length() > 0) {
+			if (result.length() > 0) {
+				result += "="; //$NON-NLS-1$
+			}
+			result += value;
+		}
+		return result;
+	}
+
+	/**
 	 * Convert as sequence of hexadecimal values to a Java byte array.
 	 * 
 	 * @param str
@@ -95,6 +139,71 @@ public class ProtocolUtil {
 		}
 
 		return strBytes;
+	}
+
+	/**
+	 * Convert a proxy representation of a string to a String.
+	 * 
+	 * A string is represented as a length/value pair. The length portion of the
+	 * length/value pair identifies one of the following possibilities:
+	 * 
+	 * <pre>
+	 * Length = 0 
+	 * 		means this field is not present. Value is omitted. 
+	 * Length < 0 
+	 * 		means this is a string. The length is the negative value of the string
+	 *      length. The value is the actual string without the trailing x'00' byte.
+	 * Length > 0
+	 * 		is a string index identifying a previously processed string. Value is omitted.
+	 * </pre>
+	 * 
+	 * Lengths are always represented as VarInts.
+	 * 
+	 * In order to reduce message traffic, only the first occurrence of a string
+	 * is included in the packet. When a unique string is seen, it is added to a
+	 * string table. Subsequent references to the same string will use the index
+	 * of the string in the string table, rather than the actual string.
+	 * 
+	 * @param buf
+	 *            byte buffer containing string to be decoded
+	 * @param decoder
+	 *            charset decoder
+	 * @return decoded string or null if the string couldn't be decoded
+	 * @since 5.0
+	 */
+	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder) {
+		String result = ""; //$NON-NLS-1$
+		VarInt strLen = new VarInt(buf);
+		if (!strLen.isValid()) {
+			return null;
+		}
+		int len = strLen.getValue();
+		if (len < 0) {
+			/*
+			 * Normal string. Decode and insert into string table.
+			 */
+			len = -len;
+			ByteBuffer strBuf = buf.slice();
+			strBuf.limit(len);
+			try {
+				CharBuffer chars = decoder.decode(strBuf);
+				result = chars.toString();
+			} catch (CharacterCodingException e) {
+				return null;
+			}
+			try {
+				buf.position(buf.position() + len);
+			} catch (IllegalArgumentException e) {
+				return null;
+			}
+			fStringTable.add(result);
+		} else {
+			/*
+			 * String table entry
+			 */
+			result = fStringTable.get(len - 1);
+		}
+		return result;
 	}
 
 	/**
