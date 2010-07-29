@@ -133,6 +133,9 @@ static int
 GetComplexType(char *type)
 {
 	int len = strlen(type);
+
+	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetComplexType (%s)\n", type);
+
 	switch (type[len - 1]) {
 	case ']':
 		return T_ARRAY;
@@ -799,34 +802,9 @@ GetPartialArrayAIF(MISession *session, char *expr, MIVar *var)
 }
 
 /*
- * Create a struct type corresponding to 'var'.
- */
-AIF *
-GetPartialStructAIF(MISession *session, char *expr, MIVar *var)
-{
-	AIF *	ac;
-	AIF *	a;
-	int		i;
-
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialStructAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
-
-	a = EmptyAggregateToAIF(GetTypeName(var->type));
-
-	if (var->children != NULL) {
-		for (i = 0; i < var->numchild; i++) {
-			ac = GetPartialAIF(session, expr, var->children[i]);
-			if (ac != NULL) {
-				AIFAddFieldToAggregate(a, AIF_ACCESS_PUBLIC, var->children[i]->exp, ac);
-				AIFFree(ac);
-			}
-		}
-	}
-	return a;
-}
-
-
-/*
- * Create a class type corresponding to 'var'.
+ * Create an aggregate type corresponding to 'var'. The only difference
+ * between a class and a struct aggregate type is that classes can have
+ * members with access qualifiers other than public.
  *
  * An MI class variable has up to three children, one for
  * each access type "public", "protected", and "private".
@@ -835,7 +813,7 @@ GetPartialStructAIF(MISession *session, char *expr, MIVar *var)
  * for the access type.
  */
 AIF *
-GetPartialClassAIF(MISession *session, char *expr, MIVar *var)
+GetPartialAggregateAIF(MISession *session, char *expr, MIVar *var)
 {
 	AIF *		a;
 	char *		field;
@@ -843,17 +821,21 @@ GetPartialClassAIF(MISession *session, char *expr, MIVar *var)
 	MIVar *		child;
 	AIFAccess	access;
 
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialClassAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
+	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialAggregateAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
 
 	a = EmptyAggregateToAIF(GetTypeName(var->type));
 
 	if (var->children != NULL) {
 		for (i = 0; i < var->numchild; i++) {
 			child = var->children[i];
-			access = GetAccessQualifier(child->exp);
-			if (access != AIF_ACCESS_UNKNOWN) {
-				GetPartialAggregateFields(session, expr, a, child->name, access);
-			} else if (strcmp(child->name, child->type) == 0) { // base type
+			if (child->type == NULL) {
+				access = GetAccessQualifier(child->exp);
+				if (access != AIF_ACCESS_UNKNOWN) {
+					GetPartialAggregateFields(session, expr, a, child->name, access);
+					continue;
+				}
+			}
+			if (strcmp(child->name, child->type) == 0) { // base type
 				asprintf(&field, "(struct %s).%s", expr, child->exp);
 				AddPartialFieldToAggregate(session, field, a, child, AIF_ACCESS_PUBLIC);
 				free(field);
@@ -927,10 +909,8 @@ GetPartialPointerAIF(MISession *session, char *expr, MIVar *var)
 			a = GetPartialUnionAIF(session, expr, var);
 			break;
 		case T_STRUCT:
-			a = GetPartialStructAIF(session, expr, var);
-			break;
 		case T_CLASS:
-			a = GetPartialClassAIF(session, expr, var);
+			a = GetPartialAggregateAIF(session, expr, var);
 			break;
 		default:
 			if (var->numchild == 1) {
@@ -975,6 +955,9 @@ GetPartialComplexAIF(MISession *session, char *expr, MIVar *var)
 	if (id == T_OTHER) {
 		type = GetPtypeValue(session, expr, var);
 		if (type != NULL) {
+			if (var->type != NULL) {
+				free(var->type);
+			}
 			var->type = type;
 			id = GetComplexType(var->type);
 		}
@@ -995,10 +978,8 @@ GetPartialComplexAIF(MISession *session, char *expr, MIVar *var)
 		a = GetPartialUnionAIF(session, expr, var);
 		break;
 	case T_STRUCT:
-		a = GetPartialStructAIF(session, expr, var);
-		break;
 	case T_CLASS:
-		a = GetPartialClassAIF(session, expr, var);
+		a = GetPartialAggregateAIF(session, expr, var);
 		break;
 	default:
 		/*
