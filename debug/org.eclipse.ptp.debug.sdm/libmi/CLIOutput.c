@@ -166,13 +166,79 @@ CLIGetGDBVersion(MICommand *cmd)
 	return -1.0;
 }
 
+/*
+ * Attempt to fix up the type information returned by the ptype command.
+ *
+ * - Replace newlines and tabs with spaces and replace multiple spaces with a single space.
+ * - Remove "\\n" sequences.
+ * - Discard '{' and any following characters
+ *
+ * Space allocated for the result must be freed by the caller.
+ */
+static char *
+fix_type(char *str)
+{
+	int		finished = 0;
+	int		seen_space = 0;
+	int		seen_backslash = 0;
+	char *	s = str;
+	char *	r;
+	char * 	result = (char *)malloc(strlen(str));
+
+	/*
+	 * Remove leading whitespace
+	 */
+	while (isspace(*s)) {
+		s++;
+	}
+
+	for (r = result; *s != '\0' && !finished; s++) {
+		switch (*s) {
+		case ' ':
+		case '\n':
+		case '\t':
+			if (!seen_space) {
+				*r++ = ' ';
+				seen_space = 1;
+			}
+			break;
+
+		case '\\':
+			seen_backslash = 1;
+			break;
+
+		case '{':
+			finished = 1;
+			break;
+
+		default:
+			if (!seen_backslash) {
+				*r++ = *s;
+			}
+			seen_backslash = 0;
+			seen_space = 0;
+		}
+	}
+
+	*r = '\0';
+
+	/*
+	 * Remove trailing whitespace
+	 */
+	r--;
+	while (isspace(*r) && r >= result) {
+		*r-- = '\0';
+	}
+
+	return result;
+}
+
 char *
 CLIGetPTypeInfo(MICommand *cmd)
 {
 	MIList *		oobs;
 	MIOOBRecord *	oob;
 	char *			text = NULL;
-	char *			p = NULL;
 
 	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL)
 		return NULL;
@@ -187,18 +253,21 @@ CLIGetPTypeInfo(MICommand *cmd)
 			text++;
 		}
 
-		if (strncmp(text, "type", 4) == 0) {
-			text += 7; //bypass " = "
-			p = strchr(text, '{');
-			if (p != NULL) {
-				*(--p) = '\0';//remove the whitespace before {
-				return strdup(text);
+		if (strncmp(text, "type =", 6) == 0) {
+			text += 6;
+			text = fix_type(text);
+
+			if (strlen(text) == 0) {
+				/*
+				 * Look at next line for type
+				 */
+				oob = (MIOOBRecord *)MIListGet(oobs);
+				if (oob != NULL) {
+					free(text);
+					text = fix_type(oob->cstring);
+				}
 			}
-			p = strchr(text, '\\');
-			if (p != NULL) {
-				*p = '\0';
-				return strdup(text);
-			}
+			return text;
 		}
 	}
 	return NULL;
