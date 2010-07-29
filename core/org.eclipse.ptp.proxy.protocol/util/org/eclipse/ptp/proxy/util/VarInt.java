@@ -51,8 +51,7 @@ public class VarInt {
 	 */
 	public ByteBuffer getBytes() {
 		if (fBytes == null && fValid) {
-			fBytes = ByteBuffer.allocate(4); // maximum size of
-												// varint enconding
+			fBytes = ByteBuffer.allocate(5); // maximum size of varint enconding
 			int val = fValue;
 			while (val > 0) {
 				byte b = (byte) (val & 0x7f);
