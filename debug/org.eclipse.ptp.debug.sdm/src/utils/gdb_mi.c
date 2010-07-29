@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "gdb.h"
 #include "dbg.h"
@@ -50,6 +51,28 @@ SendCommandWait(MISession *session, MICommand *cmd)
 }
 
 /*
+ * If this is a refence type, then remove the trailing '&'. This
+ * is required because 'ptype' is not able to deal with '&' in
+ * an expression.
+ */
+static void
+FixReferenceType(char *type)
+{
+	char *	t = &type[strlen(type)-1];
+
+	while (t >= type) {
+		if (isspace(*t)) {
+			*t-- = '\0';
+			continue;
+		} else if (*t == '&') {
+			*t = '\0';
+		}
+
+		break;
+	}
+}
+
+/*
  * Create a new MI variable and corresponding MIVar object using
  * the supplied expression 'expr'. Sets the 'exp' field to the
  * expression if it is not already set.
@@ -72,6 +95,7 @@ CreateMIVar(MISession *session, char *expr)
 	if (mivar->exp == NULL) {
 		mivar->exp = strdup(expr);
 	}
+	FixReferenceType(mivar->type);
 	MICommandFree(cmd);
 	return mivar;
 }
@@ -337,7 +361,7 @@ GetPtypeValue(MISession *session, char *expr, MIVar *var)
 
 	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPtypeValue(%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
 	cmd = CLIPType(var->type);
-	MICommandSetTimeout(cmd, 100);
+	MICommandSetTimeout(cmd, 1000);
 	SendCommandWait(session, cmd);
 	if (!MICommandResultOK(cmd)) {
 		if (expr == NULL) {
@@ -354,7 +378,7 @@ GetPtypeValue(MISession *session, char *expr, MIVar *var)
 	}
 	type = CLIGetPTypeInfo(cmd);
 	MICommandFree(cmd);
-	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPtypeValue returns %s\n", type);
+	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPtypeValue returns \"%s\"\n", type);
 	return type;
 }
 
@@ -419,6 +443,7 @@ GetMIVarDetails(MISession *session, char *name, MIVar *mivar, int listChildren)
 			mivar->type = strdup(v->type);
 			MIVarFree(v);
 		}
+		FixReferenceType(mivar->type);
 	}
 
 	/*
