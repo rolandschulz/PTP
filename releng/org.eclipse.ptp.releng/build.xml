@@ -340,6 +340,14 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.utils.extensionpoints.core"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.utils.file.core"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/core/org.eclipse.ptp.utils.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
