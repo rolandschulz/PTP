@@ -367,9 +367,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
 									setServerState(ServerState.RUNNING);
 								}
-								// if (DebugUtil.SERVER_TRACING) {
-								System.err.println("SERVER: " + output); //$NON-NLS-1$
-								// }
+								PTPRemoteCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, 
+										fServerName + ": " + output	)); //$NON-NLS-1$
 							}
 						}
 					} catch (IOException e) {
