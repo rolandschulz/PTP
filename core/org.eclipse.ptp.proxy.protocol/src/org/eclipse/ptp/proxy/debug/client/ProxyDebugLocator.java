@@ -24,11 +24,11 @@ import java.math.BigInteger;
 import org.eclipse.ptp.proxy.util.ProtocolUtil;
 
 public class ProxyDebugLocator {
-	private String		file;
-	private String		function;
-	private int			line;
-	private BigInteger	address;
-	
+	private String file;
+	private String function;
+	private int line;
+	private BigInteger address;
+
 	public ProxyDebugLocator(String file, String function, String line, String address) {
 		this.file = file;
 		this.function = function;
@@ -38,11 +38,15 @@ public class ProxyDebugLocator {
 		}
 		this.address = ProtocolUtil.decodeAddress(address);
 	}
-	
+
+	public BigInteger getAddress() {
+		return address;
+	}
+
 	public String getFile() {
 		return file;
 	}
-	
+
 	public String getFunction() {
 		return function;
 	}
@@ -51,11 +55,8 @@ public class ProxyDebugLocator {
 		return line;
 	}
 
-	public BigInteger getAddress() {
-		return address;
-	}
-	
+	@Override
 	public String toString() {
-		return file + ":" + function + ":" + line + ":" + address.toString();	 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return file + ":" + function + ":" + line + ":" + address.toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

@@ -344,6 +344,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	private void runPacketThread() {
 		packetThread = new Thread("Proxy Client Packet Thread") { //$NON-NLS-1$
+			@Override
 			public void run() {
 				// Loop processing messages from the proxy for the duration of
 				// the session

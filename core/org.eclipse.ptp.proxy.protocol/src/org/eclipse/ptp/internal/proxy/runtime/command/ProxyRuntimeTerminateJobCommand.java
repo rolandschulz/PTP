@@ -18,12 +18,12 @@ public class ProxyRuntimeTerminateJobCommand extends AbstractProxyCommand
 
 	public final static String JOB_ID_ATTR = "jobId"; //$NON-NLS-1$
 
+	public ProxyRuntimeTerminateJobCommand(int transID, String[] args) {
+		super(TERMINATE_JOB, transID, args);
+	}
+
 	public ProxyRuntimeTerminateJobCommand(String jobId) {
 		super(TERMINATE_JOB);
 		addArgument(JOB_ID_ATTR + "=" + jobId); //$NON-NLS-1$
-	}
-
-	public ProxyRuntimeTerminateJobCommand(int transID, String[] args) {
-		super(TERMINATE_JOB, transID, args);
 	}
 }

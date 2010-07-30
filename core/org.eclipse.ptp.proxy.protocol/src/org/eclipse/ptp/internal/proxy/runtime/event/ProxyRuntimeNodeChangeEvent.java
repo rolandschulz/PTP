@@ -23,7 +23,7 @@ import org.eclipse.ptp.proxy.runtime.event.AbstractProxyRuntimeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeNodeChangeEvent;
 
 public class ProxyRuntimeNodeChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeNodeChangeEvent {
-	
+
 	public ProxyRuntimeNodeChangeEvent(int transID, String[] args) {
 		super(NODE_CHANGE, transID, args);
 	}

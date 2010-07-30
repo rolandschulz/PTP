@@ -22,12 +22,10 @@ package org.eclipse.ptp.internal.proxy.runtime.event;
 import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeAttributeDefEvent;
 
-
-public class ProxyRuntimeAttributeDefEvent extends AbstractProxyEvent 
-	implements IProxyRuntimeAttributeDefEvent {
+public class ProxyRuntimeAttributeDefEvent extends AbstractProxyEvent
+		implements IProxyRuntimeAttributeDefEvent {
 
 	public ProxyRuntimeAttributeDefEvent(int transID, String[] args) {
 		super(ATTR_DEF, transID, args);
 	}
 }
-

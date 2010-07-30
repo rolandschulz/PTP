@@ -26,20 +26,22 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugSetThreadSelectEvent;
 public class ProxyDebugSetThreadSelectEvent extends AbstractProxyDebugEvent implements IProxyDebugSetThreadSelectEvent {
 	private int thread_id = -1;
 	private ProxyDebugStackFrame frame;
-	
+
 	public ProxyDebugSetThreadSelectEvent(int transID, String bits, int thread_id, ProxyDebugStackFrame frame) {
 		super(transID, EVENT_DBG_THREAD_SELECT, bits);
 		this.thread_id = thread_id;
 		this.frame = frame;
 	}
-	
+
 	public ProxyDebugStackFrame getFrame() {
 		return this.frame;
 	}
+
 	public int getThreadId() {
 		return this.thread_id;
 	}
-	
+
+	@Override
 	public String toString() {
 		String res = "EVENT_DBG_THREAD_SELECT transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 		res += "\n id: " + frame.toString(); //$NON-NLS-1$

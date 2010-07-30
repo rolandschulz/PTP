@@ -22,8 +22,8 @@ package org.eclipse.ptp.internal.proxy.runtime.event;
 import org.eclipse.ptp.proxy.runtime.event.AbstractProxyRuntimeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeErrorStateEvent;
 
-public class ProxyRuntimeErrorStateEvent 
-	extends AbstractProxyRuntimeEvent 
+public class ProxyRuntimeErrorStateEvent
+		extends AbstractProxyRuntimeEvent
 		implements IProxyRuntimeErrorStateEvent {
 
 	public ProxyRuntimeErrorStateEvent() {

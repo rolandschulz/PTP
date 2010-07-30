@@ -23,16 +23,18 @@ import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugSuspendEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointHitEvent;
 
 public class ProxyDebugBreakpointHitEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugBreakpointHitEvent {
-	private int	bpId;
+	private int bpId;
 
 	public ProxyDebugBreakpointHitEvent(int transID, String set, int id, int thread_id, int depth, String[] vars) {
 		super(transID, set, null, thread_id, depth, vars);
 		this.bpId = id;
 	}
-	
+
 	public int getBreakpointId() {
 		return this.bpId;
 	}
+
+	@Override
 	public String toString() {
 		return "EVENT_DBG_BPHIT transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}

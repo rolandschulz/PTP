@@ -1,10 +1,13 @@
 package org.eclipse.ptp.proxy.debug.command;
 
-
 public class ProxyDebugSetLineBreakpointCommand extends AbstractProxyDebugCommand implements IProxyDebugCommand {
-	
-	public ProxyDebugSetLineBreakpointCommand(String bits, 
-			int bpid, boolean isTemporary, boolean isHardware, String file, int line, 
+
+	public ProxyDebugSetLineBreakpointCommand(int transID, String[] args) {
+		super(SETLINEBREAKPOINT, transID, args);
+	}
+
+	public ProxyDebugSetLineBreakpointCommand(String bits,
+			int bpid, boolean isTemporary, boolean isHardware, String file, int line,
 			String expression, int ignoreCount, int tid) {
 		super(SETLINEBREAKPOINT, bits);
 		addArgument(bpid);
@@ -15,9 +18,5 @@ public class ProxyDebugSetLineBreakpointCommand extends AbstractProxyDebugComman
 		addArgument(expression);
 		addArgument(ignoreCount);
 		addArgument(tid);
-	}
-	
-	public ProxyDebugSetLineBreakpointCommand(int transID, String[] args) {
-		super(SETLINEBREAKPOINT, transID, args);
 	}
 }

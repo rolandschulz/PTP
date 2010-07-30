@@ -15,8 +15,8 @@ import org.eclipse.ptp.proxy.event.IProxyErrorEvent;
 import org.eclipse.ptp.proxy.runtime.event.AbstractProxyRuntimeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeStartupErrorEvent;
 
-public class ProxyRuntimeStartupErrorEvent 
-	extends AbstractProxyRuntimeEvent 
+public class ProxyRuntimeStartupErrorEvent
+		extends AbstractProxyRuntimeEvent
 		implements IProxyRuntimeStartupErrorEvent {
 
 	public ProxyRuntimeStartupErrorEvent(String message) {

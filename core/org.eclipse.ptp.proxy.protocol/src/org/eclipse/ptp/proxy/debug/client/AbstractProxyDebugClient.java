@@ -62,24 +62,35 @@ import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 
 public abstract class AbstractProxyDebugClient extends AbstractProxyClient implements IProxyDebugClient, IProxyEventListener {
 
+	protected enum DebugProxyState {
+		DISCONNECTED, DISCONNECTING, CONNECTED, CONNECTING
+	}
+
 	private final List<IProxyDebugEventListener> listeners = Collections
 			.synchronizedList(new ArrayList<IProxyDebugEventListener>());
-
 	protected boolean waiting = false;
 	protected boolean timeout = false;
 	protected final ReentrantLock waitLock = new ReentrantLock();
 	protected final Condition waitCondition = waitLock.newCondition();
 	protected volatile DebugProxyState state;
-	protected IProxyDebugEventFactory factory;
 
-	protected enum DebugProxyState {
-		DISCONNECTED, DISCONNECTING, CONNECTED, CONNECTING
-	}
+	protected IProxyDebugEventFactory factory;
 
 	public AbstractProxyDebugClient() {
 		super();
 		this.factory = new ProxyDebugEventFactory();
 		super.setEventFactory(factory);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#
+	 * addProxyDebugEventListener
+	 * (org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
+	 */
+	public void addProxyDebugEventListener(IProxyDebugEventListener listener) {
+		listeners.add(listener);
 	}
 
 	/**
@@ -122,185 +133,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		removeProxyEventListener(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#
-	 * addProxyDebugEventListener
-	 * (org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
-	 */
-	public void addProxyDebugEventListener(IProxyDebugEventListener listener) {
-		listeners.add(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#
-	 * removeProxyDebugEventListener
-	 * (org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
-	 */
-	public void removeProxyDebugEventListener(IProxyDebugEventListener listener) {
-		listeners.remove(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
-	 * eclipse.ptp.core.proxy.event.IProxyConnectedEvent)
-	 */
-	public void handleEvent(IProxyConnectedEvent e) {
-		waitLock.lock();
-		try {
-			state = DebugProxyState.CONNECTED;
-			if (waiting) {
-				waitCondition.signalAll();
-				waiting = false;
-			}
-		} finally {
-			waitLock.unlock();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
-	 * eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent)
-	 */
-	public void handleEvent(IProxyDisconnectedEvent e) {
-		waitLock.lock();
-		try {
-			if (state == DebugProxyState.DISCONNECTING) {
-				state = DebugProxyState.DISCONNECTED;
-				if (waiting) {
-					waitCondition.signalAll();
-					waiting = false;
-				}
-			}
-		} finally {
-			waitLock.unlock();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
-	 * eclipse.ptp.core.proxy.event.IProxyErrorEvent)
-	 */
-	public void handleEvent(IProxyErrorEvent e) {
-		// Do nothing
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
-	 * eclipse.ptp.core.proxy.event.IProxyMessageEvent)
-	 */
-	public void handleEvent(IProxyMessageEvent e) {
-		waitLock.lock();
-		try {
-			if (state == DebugProxyState.DISCONNECTING) {
-				state = DebugProxyState.DISCONNECTED;
-				if (waiting) {
-					waitCondition.signalAll();
-					waiting = false;
-				}
-			}
-		} finally {
-			waitLock.unlock();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
-	 * eclipse.ptp.core.proxy.event.IProxyOKEvent)
-	 */
-	public void handleEvent(IProxyOKEvent e) {
-		// Do nothing
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
-	 * eclipse.ptp.core.proxy.event.IProxyTimeoutEvent)
-	 */
-	public void handleEvent(IProxyTimeoutEvent e) {
-		waitLock.lock();
-		try {
-			timeout = true;
-			if (waiting) {
-				waitCondition.signalAll();
-				waiting = false;
-			}
-		} finally {
-			waitLock.unlock();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
-	 * .ptp.proxy.event.IProxyExtendedEvent)
-	 */
-	public void handleEvent(IProxyExtendedEvent e) {
-		if (e instanceof IProxyDebugArgsEvent) {
-			fireProxyDebugArgsEvent((IProxyDebugArgsEvent) e);
-		} else if (e instanceof IProxyDebugBreakpointHitEvent) {
-			fireProxyDebugBreakpointHitEvent((IProxyDebugBreakpointHitEvent) e);
-		} else if (e instanceof IProxyDebugBreakpointSetEvent) {
-			fireProxyDebugBreakpointSetEvent((IProxyDebugBreakpointSetEvent) e);
-		} else if (e instanceof IProxyDebugDataEvent) {
-			fireProxyDebugDataEvent((IProxyDebugDataEvent) e);
-		} else if (e instanceof IProxyDebugExitEvent) {
-			fireProxyDebugExitEvent((IProxyDebugExitEvent) e);
-		} else if (e instanceof IProxyDebugErrorEvent) {
-			fireProxyDebugErrorEvent((IProxyDebugErrorEvent) e);
-		} else if (e instanceof IProxyDebugInfoThreadsEvent) {
-			fireProxyDebugInfoThreadsEvent((IProxyDebugInfoThreadsEvent) e);
-		} else if (e instanceof IProxyDebugOutputEvent) {
-			fireProxyDebugOutputEvent((IProxyDebugOutputEvent) e);
-		} else if (e instanceof IProxyDebugMemoryInfoEvent) {
-			fireProxyDebugMemoryInfoEvent((IProxyDebugMemoryInfoEvent) e);
-		} else if (e instanceof IProxyDebugOKEvent) {
-			fireProxyDebugOKEvent((IProxyDebugOKEvent) e);
-		} else if (e instanceof IProxyDebugSetThreadSelectEvent) {
-			fireProxyDebugSetThreadSelectEvent((IProxyDebugSetThreadSelectEvent) e);
-		} else if (e instanceof IProxyDebugSignalEvent) {
-			fireProxyDebugSignalEvent((IProxyDebugSignalEvent) e);
-		} else if (e instanceof IProxyDebugSignalExitEvent) {
-			fireProxyDebugSignalExitEvent((IProxyDebugSignalExitEvent) e);
-		} else if (e instanceof IProxyDebugSignalsEvent) {
-			fireProxyDebugSignalsEvent((IProxyDebugSignalsEvent) e);
-		} else if (e instanceof IProxyDebugStackframeEvent) {
-			fireProxyDebugStackframeEvent((IProxyDebugStackframeEvent) e);
-		} else if (e instanceof IProxyDebugStackInfoDepthEvent) {
-			fireProxyDebugStackInfoDepthEvent((IProxyDebugStackInfoDepthEvent) e);
-		} else if (e instanceof IProxyDebugStepEvent) {
-			fireProxyDebugStepEvent((IProxyDebugStepEvent) e);
-		} else if (e instanceof IProxyDebugSuspendEvent) {
-			fireProxyDebugSuspendEvent((IProxyDebugSuspendEvent) e);
-		} else if (e instanceof IProxyDebugTypeEvent) {
-			fireProxyDebugTypeEvent((IProxyDebugTypeEvent) e);
-		} else if (e instanceof IProxyDebugVarsEvent) {
-			fireProxyDebugVarsEvent((IProxyDebugVarsEvent) e);
-		}
-	}
-
 	protected void fireProxyDebugArgsEvent(IProxyDebugArgsEvent e) {
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {
@@ -329,13 +161,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 
-	protected void fireProxyDebugExitEvent(IProxyDebugExitEvent e) {
-		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
-		for (IProxyDebugEventListener listener : la) {
-			listener.handleProxyDebugExitEvent(e);
-		}
-	}
-
 	protected void fireProxyDebugErrorEvent(IProxyDebugErrorEvent e) {
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {
@@ -343,20 +168,17 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 
+	protected void fireProxyDebugExitEvent(IProxyDebugExitEvent e) {
+		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
+		for (IProxyDebugEventListener listener : la) {
+			listener.handleProxyDebugExitEvent(e);
+		}
+	}
+
 	protected void fireProxyDebugInfoThreadsEvent(IProxyDebugInfoThreadsEvent e) {
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {
 			listener.handleProxyDebugInfoThreadsEvent(e);
-		}
-	}
-
-	/**
-	 * @since 4.0
-	 */
-	protected void fireProxyDebugOutputEvent(IProxyDebugOutputEvent e) {
-		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
-		for (IProxyDebugEventListener listener : la) {
-			listener.handleProxyDebugOutputEvent(e);
 		}
 	}
 
@@ -371,6 +193,16 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
 		for (IProxyDebugEventListener listener : la) {
 			listener.handleProxyDebugOKEvent(e);
+		}
+	}
+
+	/**
+	 * @since 4.0
+	 */
+	protected void fireProxyDebugOutputEvent(IProxyDebugOutputEvent e) {
+		IProxyDebugEventListener[] la = listeners.toArray(new IProxyDebugEventListener[0]);
+		for (IProxyDebugEventListener listener : la) {
+			listener.handleProxyDebugOutputEvent(e);
 		}
 	}
 
@@ -442,6 +274,174 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		for (IProxyDebugEventListener listener : la) {
 			listener.handleProxyDebugVarsEvent(e);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyConnectedEvent)
+	 */
+	public void handleEvent(IProxyConnectedEvent e) {
+		waitLock.lock();
+		try {
+			state = DebugProxyState.CONNECTED;
+			if (waiting) {
+				waitCondition.signalAll();
+				waiting = false;
+			}
+		} finally {
+			waitLock.unlock();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyDisconnectedEvent)
+	 */
+	public void handleEvent(IProxyDisconnectedEvent e) {
+		waitLock.lock();
+		try {
+			if (state == DebugProxyState.DISCONNECTING) {
+				state = DebugProxyState.DISCONNECTED;
+				if (waiting) {
+					waitCondition.signalAll();
+					waiting = false;
+				}
+			}
+		} finally {
+			waitLock.unlock();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyErrorEvent)
+	 */
+	public void handleEvent(IProxyErrorEvent e) {
+		// Do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.proxy.event.IProxyEventListener#handleEvent(org.eclipse
+	 * .ptp.proxy.event.IProxyExtendedEvent)
+	 */
+	public void handleEvent(IProxyExtendedEvent e) {
+		if (e instanceof IProxyDebugArgsEvent) {
+			fireProxyDebugArgsEvent((IProxyDebugArgsEvent) e);
+		} else if (e instanceof IProxyDebugBreakpointHitEvent) {
+			fireProxyDebugBreakpointHitEvent((IProxyDebugBreakpointHitEvent) e);
+		} else if (e instanceof IProxyDebugBreakpointSetEvent) {
+			fireProxyDebugBreakpointSetEvent((IProxyDebugBreakpointSetEvent) e);
+		} else if (e instanceof IProxyDebugDataEvent) {
+			fireProxyDebugDataEvent((IProxyDebugDataEvent) e);
+		} else if (e instanceof IProxyDebugExitEvent) {
+			fireProxyDebugExitEvent((IProxyDebugExitEvent) e);
+		} else if (e instanceof IProxyDebugErrorEvent) {
+			fireProxyDebugErrorEvent((IProxyDebugErrorEvent) e);
+		} else if (e instanceof IProxyDebugInfoThreadsEvent) {
+			fireProxyDebugInfoThreadsEvent((IProxyDebugInfoThreadsEvent) e);
+		} else if (e instanceof IProxyDebugOutputEvent) {
+			fireProxyDebugOutputEvent((IProxyDebugOutputEvent) e);
+		} else if (e instanceof IProxyDebugMemoryInfoEvent) {
+			fireProxyDebugMemoryInfoEvent((IProxyDebugMemoryInfoEvent) e);
+		} else if (e instanceof IProxyDebugOKEvent) {
+			fireProxyDebugOKEvent((IProxyDebugOKEvent) e);
+		} else if (e instanceof IProxyDebugSetThreadSelectEvent) {
+			fireProxyDebugSetThreadSelectEvent((IProxyDebugSetThreadSelectEvent) e);
+		} else if (e instanceof IProxyDebugSignalEvent) {
+			fireProxyDebugSignalEvent((IProxyDebugSignalEvent) e);
+		} else if (e instanceof IProxyDebugSignalExitEvent) {
+			fireProxyDebugSignalExitEvent((IProxyDebugSignalExitEvent) e);
+		} else if (e instanceof IProxyDebugSignalsEvent) {
+			fireProxyDebugSignalsEvent((IProxyDebugSignalsEvent) e);
+		} else if (e instanceof IProxyDebugStackframeEvent) {
+			fireProxyDebugStackframeEvent((IProxyDebugStackframeEvent) e);
+		} else if (e instanceof IProxyDebugStackInfoDepthEvent) {
+			fireProxyDebugStackInfoDepthEvent((IProxyDebugStackInfoDepthEvent) e);
+		} else if (e instanceof IProxyDebugStepEvent) {
+			fireProxyDebugStepEvent((IProxyDebugStepEvent) e);
+		} else if (e instanceof IProxyDebugSuspendEvent) {
+			fireProxyDebugSuspendEvent((IProxyDebugSuspendEvent) e);
+		} else if (e instanceof IProxyDebugTypeEvent) {
+			fireProxyDebugTypeEvent((IProxyDebugTypeEvent) e);
+		} else if (e instanceof IProxyDebugVarsEvent) {
+			fireProxyDebugVarsEvent((IProxyDebugVarsEvent) e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyMessageEvent)
+	 */
+	public void handleEvent(IProxyMessageEvent e) {
+		waitLock.lock();
+		try {
+			if (state == DebugProxyState.DISCONNECTING) {
+				state = DebugProxyState.DISCONNECTED;
+				if (waiting) {
+					waitCondition.signalAll();
+					waiting = false;
+				}
+			}
+		} finally {
+			waitLock.unlock();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyOKEvent)
+	 */
+	public void handleEvent(IProxyOKEvent e) {
+		// Do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.core.proxy.event.IProxyEventListener#handleEvent(org.
+	 * eclipse.ptp.core.proxy.event.IProxyTimeoutEvent)
+	 */
+	public void handleEvent(IProxyTimeoutEvent e) {
+		waitLock.lock();
+		try {
+			timeout = true;
+			if (waiting) {
+				waitCondition.signalAll();
+				waiting = false;
+			}
+		} finally {
+			waitLock.unlock();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.debug.client.IProxyDebugClient#
+	 * removeProxyDebugEventListener
+	 * (org.eclipse.ptp.proxy.debug.client.event.IProxyDebugEventListener)
+	 */
+	public void removeProxyDebugEventListener(IProxyDebugEventListener listener) {
+		listeners.remove(listener);
 	}
 
 }

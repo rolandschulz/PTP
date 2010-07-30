@@ -22,6 +22,7 @@ package org.eclipse.ptp.proxy.debug.event;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugBreakpoint;
 
 public interface IProxyDebugBreakpointSetEvent extends IProxyDebugEvent {
-	public int getBreakpointId();
 	public ProxyDebugBreakpoint getBreakpoint();
+
+	public int getBreakpointId();
 }

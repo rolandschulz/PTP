@@ -19,26 +19,25 @@
 
 package org.eclipse.ptp.proxy.debug.client;
 
-
 public class ProxyDebugMemory {
 	private String addr;
 	private String ascii;
 	private String[] data;
-	
+
 	public ProxyDebugMemory(String addr, String ascii, String[] data) {
 		this.addr = addr;
 		this.ascii = ascii;
 		this.data = data;
 	}
-	
+
 	public String getAddress() {
 		return addr;
 	}
-	
+
 	public String getAscii() {
 		return ascii;
 	}
-	
+
 	public String[] getData() {
 		return data;
 	}

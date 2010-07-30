@@ -23,5 +23,6 @@ import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 
 public interface IProxyDebugSetThreadSelectEvent extends IProxyDebugEvent {
 	public ProxyDebugStackFrame getFrame();
+
 	public int getThreadId();
 }

@@ -23,26 +23,26 @@ import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeMessageEvent;
 
-public class ProxyRuntimeMessageEvent extends AbstractProxyEvent 
+public class ProxyRuntimeMessageEvent extends AbstractProxyEvent
 		implements IProxyRuntimeMessageEvent {
 
 	public ProxyRuntimeMessageEvent(int transID, String[] args) {
 		super(MESSAGE, transID, args);
 	}
-	
-	public ProxyRuntimeMessageEvent(Level level, String message) {
-		this(level, 0, message);
+
+	public ProxyRuntimeMessageEvent(IProxyMessageEvent event) {
+		this(event.getTransactionID(), event.getAttributes());
 	}
 
 	public ProxyRuntimeMessageEvent(Level level, int code, String message) {
 		super(MESSAGE, 0, new String[] {
-			IProxyMessageEvent.LEVEL_ATTR + "=" + level.name(), //$NON-NLS-1$
-			IProxyMessageEvent.CODE_ATTR + "=" + code, //$NON-NLS-1$
-			IProxyMessageEvent.TEXT_ATTR + "=" + message //$NON-NLS-1$
+				IProxyMessageEvent.LEVEL_ATTR + "=" + level.name(), //$NON-NLS-1$
+				IProxyMessageEvent.CODE_ATTR + "=" + code, //$NON-NLS-1$
+				IProxyMessageEvent.TEXT_ATTR + "=" + message //$NON-NLS-1$
 		});
 	}
-	
-	public ProxyRuntimeMessageEvent(IProxyMessageEvent event) {
-		this(event.getTransactionID(), event.getAttributes());
+
+	public ProxyRuntimeMessageEvent(Level level, String message) {
+		this(level, 0, message);
 	}
 }

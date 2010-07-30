@@ -19,13 +19,13 @@
 package org.eclipse.ptp.proxy.debug.client;
 
 public class ProxyDebugBreakpoint {
-	private String ignore; 
+	private String ignore;
 	private String spec;
 	private String del;
 	private String type;
 	private ProxyDebugLineLocation loc;
-	
-	public ProxyDebugBreakpoint(String ignore, String spec, String del, 
+
+	public ProxyDebugBreakpoint(String ignore, String spec, String del,
 			String type, ProxyDebugLineLocation loc) {
 		this.ignore = ignore;
 		this.spec = spec;
@@ -34,28 +34,29 @@ public class ProxyDebugBreakpoint {
 		this.loc = loc;
 	}
 
-	public String getIgnore() {
-		return ignore;
-	}
-	
-	public String getSpec() {
-		return spec;
-	}
-	
 	public String getDel() {
 		return del;
 	}
-	
+
+	public String getIgnore() {
+		return ignore;
+	}
+
+	public ProxyDebugLineLocation getLocation() {
+		return loc;
+	}
+
+	public String getSpec() {
+		return spec;
+	}
+
 	public String getType() {
 		return type;
 	}
-	
-	public ProxyDebugLineLocation getLocation(){
-		return loc;
-	}
-	
+
+	@Override
 	public String toString() {
-		return getIgnore() + " " + getSpec() + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-			getDel() + " " + getType() + " " + getLocation().toString(); //$NON-NLS-1$ //$NON-NLS-2$
+		return getIgnore() + " " + getSpec() + " " + //$NON-NLS-1$ //$NON-NLS-2$
+				getDel() + " " + getType() + " " + getLocation().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

@@ -24,23 +24,25 @@ import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugSuspendEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalEvent;
 
 public class ProxyDebugSignalEvent extends AbstractProxyDebugSuspendEvent implements IProxyDebugSignalEvent {
-	private String		signalName;
-	private String		signalMeaning;
-	
-	public ProxyDebugSignalEvent(int transID, String set, String name, String meaning, ProxyDebugStackFrame frame, int tid, int depth, String[] vars) {
+	private String signalName;
+	private String signalMeaning;
+
+	public ProxyDebugSignalEvent(int transID, String set, String name, String meaning, ProxyDebugStackFrame frame, int tid,
+			int depth, String[] vars) {
 		super(transID, set, frame, tid, depth, vars);
 		this.signalName = name;
 		this.signalMeaning = meaning;
 	}
-	
-	public String getSignalName() {
-		return this.signalName;
-	}
-	
+
 	public String getSignalMeaning() {
 		return this.signalMeaning;
 	}
-	
+
+	public String getSignalName() {
+		return this.signalName;
+	}
+
+	@Override
 	public String toString() {
 		String res = "EVENT_DBG_SIGNAL transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.signalName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.getFrame() != null)

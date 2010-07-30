@@ -22,7 +22,7 @@ package org.eclipse.ptp.proxy.debug.event;
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 
 public abstract class AbstractProxyDebugSuspendEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private int	thread_id = 0;
+	private int thread_id = 0;
 	private ProxyDebugStackFrame frame;
 	private String[] changed_vars;
 	private int depth = 0;
@@ -34,20 +34,20 @@ public abstract class AbstractProxyDebugSuspendEvent extends AbstractProxyDebugE
 		this.depth = depth;
 		this.changed_vars = vars;
 	}
-	
-	public int getThreadId() {
-		return this.thread_id;
-	}
-	
-	public ProxyDebugStackFrame getFrame() {
-		return this.frame;
-	}
-	
+
 	public String[] getChangedVars() {
 		return this.changed_vars;
 	}
 
 	public int getDepth() {
 		return this.depth;
+	}
+
+	public ProxyDebugStackFrame getFrame() {
+		return this.frame;
+	}
+
+	public int getThreadId() {
+		return this.thread_id;
 	}
 }

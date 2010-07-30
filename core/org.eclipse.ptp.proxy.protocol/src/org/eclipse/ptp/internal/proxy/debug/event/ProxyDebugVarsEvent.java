@@ -24,16 +24,17 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugVarsEvent;
 
 public class ProxyDebugVarsEvent extends AbstractProxyDebugEvent implements IProxyDebugVarsEvent {
 	private String[] vars;
-	
+
 	public ProxyDebugVarsEvent(int transID, String set, String[] vars) {
 		super(transID, EVENT_DBG_VARS, set);
 		this.vars = vars;
 	}
-	
+
 	public String[] getVariables() {
 		return this.vars;
 	}
-	
+
+	@Override
 	public String toString() {
 		String res = "EVENT_DBG_VARS transid=" + getTransactionID() + " " + this.getBitSet().toString() + " {"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -42,7 +43,7 @@ public class ProxyDebugVarsEvent extends AbstractProxyDebugEvent implements IPro
 				res += ", "; //$NON-NLS-1$
 			res += vars[i];
 		}
-		
+
 		res += "}"; //$NON-NLS-1$
 		return res;
 	}

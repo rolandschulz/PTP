@@ -19,6 +19,5 @@
 
 package org.eclipse.ptp.proxy.debug.event;
 
-
 public interface IProxyDebugStepEvent extends IProxyDebugSuspendEvent {
 }

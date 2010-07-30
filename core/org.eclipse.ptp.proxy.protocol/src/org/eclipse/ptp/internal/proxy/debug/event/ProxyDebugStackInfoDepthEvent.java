@@ -23,17 +23,18 @@ import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugStackInfoDepthEvent;
 
 public class ProxyDebugStackInfoDepthEvent extends AbstractProxyDebugEvent implements IProxyDebugStackInfoDepthEvent {
-	private int	depth;
-	
+	private int depth;
+
 	public ProxyDebugStackInfoDepthEvent(int transID, String bits, int depth) {
 		super(transID, EVENT_DBG_STACK_INFO_DEPTH, bits);
 		this.depth = depth;
 	}
-	
+
 	public int getDepth() {
 		return this.depth;
 	}
-	
+
+	@Override
 	public String toString() {
 		return "EVENT_DBG_STACK_INFO_DEPTH transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}

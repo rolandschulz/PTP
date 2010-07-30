@@ -14,8 +14,8 @@ package org.eclipse.ptp.internal.proxy.runtime.event;
 import org.eclipse.ptp.proxy.runtime.event.AbstractProxyRuntimeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRemoveNodeEvent;
 
-public class ProxyRuntimeRemoveNodeEvent 
-	extends AbstractProxyRuntimeEvent 
+public class ProxyRuntimeRemoveNodeEvent
+		extends AbstractProxyRuntimeEvent
 		implements IProxyRuntimeRemoveNodeEvent {
 
 	public ProxyRuntimeRemoveNodeEvent(int transID, String[] args) {

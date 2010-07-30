@@ -25,14 +25,17 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugSignalsEvent;
 
 public class ProxyDebugSignalsEvent extends AbstractProxyDebugEvent implements IProxyDebugSignalsEvent {
 	private ProxyDebugSignal[] signals;
-	
+
 	public ProxyDebugSignalsEvent(int transID, String bits, ProxyDebugSignal[] signals) {
 		super(transID, EVENT_DBG_SIGNALS, bits);
 		this.signals = signals;
 	}
+
 	public ProxyDebugSignal[] getSignals() {
 		return signals;
 	}
+
+	@Override
 	public String toString() {
 		String res = "EVENT_DBG_SIGNALS transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 		return res;

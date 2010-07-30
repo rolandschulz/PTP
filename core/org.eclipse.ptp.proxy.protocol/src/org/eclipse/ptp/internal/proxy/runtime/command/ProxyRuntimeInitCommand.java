@@ -14,9 +14,9 @@ import org.eclipse.ptp.proxy.client.IProxyClient;
 import org.eclipse.ptp.proxy.command.AbstractProxyCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
 
-public class ProxyRuntimeInitCommand 
-	extends AbstractProxyCommand implements IProxyRuntimeInitCommand {
-	
+public class ProxyRuntimeInitCommand
+		extends AbstractProxyCommand implements IProxyRuntimeInitCommand {
+
 	public final static String PROTOCOL_VERSION_ATTR = "version"; //$NON-NLS-1$
 	public final static String BASE_ID_ATTR = "baseId"; //$NON-NLS-1$
 
@@ -25,7 +25,7 @@ public class ProxyRuntimeInitCommand
 		addArgument(PROTOCOL_VERSION_ATTR + "=" + IProxyClient.WIRE_PROTOCOL_VERSION); //$NON-NLS-1$
 		addArgument(BASE_ID_ATTR + "=" + baseId); //$NON-NLS-1$
 	}
-	
+
 	public ProxyRuntimeInitCommand(int transID, String[] args) {
 		super(INIT, transID, args);
 	}

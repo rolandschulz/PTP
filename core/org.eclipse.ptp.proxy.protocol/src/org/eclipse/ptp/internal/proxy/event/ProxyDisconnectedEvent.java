@@ -23,13 +23,15 @@ import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyDisconnectedEvent;
 
 public class ProxyDisconnectedEvent extends AbstractProxyEvent implements IProxyDisconnectedEvent {
-	
+
 	private boolean error = false;
-	
+
 	public ProxyDisconnectedEvent(boolean error) {
 		super(DISCONNECTED, 0, null);
 		this.error = error;
 	}
-	
-	public boolean wasError() { return error; }
+
+	public boolean wasError() {
+		return error;
+	}
 }

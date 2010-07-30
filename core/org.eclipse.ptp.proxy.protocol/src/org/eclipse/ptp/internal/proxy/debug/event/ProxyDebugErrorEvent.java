@@ -22,26 +22,25 @@ package org.eclipse.ptp.internal.proxy.debug.event;
 import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugErrorEvent;
 
-
-
 public class ProxyDebugErrorEvent extends AbstractProxyDebugEvent implements IProxyDebugErrorEvent {
-	private int		errorCode;
-	private String	errorMsg;
-	
+	private int errorCode;
+	private String errorMsg;
+
 	public ProxyDebugErrorEvent(int transID, String bits, int code, String msg) {
 		super(transID, EVENT_DBG_ERROR, bits);
 		this.errorCode = code;
 		this.errorMsg = msg;
 	}
-	
+
 	public int getErrorCode() {
 		return this.errorCode;
 	}
-	
+
 	public String getErrorMessage() {
 		return this.errorMsg;
 	}
 
+	@Override
 	public String toString() {
 		return "EVENT_DBG_ERROR transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.errorCode + " " + this.errorMsg; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}

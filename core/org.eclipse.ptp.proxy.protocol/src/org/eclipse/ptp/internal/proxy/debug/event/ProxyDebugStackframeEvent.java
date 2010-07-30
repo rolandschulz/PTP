@@ -25,16 +25,17 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugStackframeEvent;
 
 public class ProxyDebugStackframeEvent extends AbstractProxyDebugEvent implements IProxyDebugStackframeEvent {
 	private ProxyDebugStackFrame[] frames;
-	
+
 	public ProxyDebugStackframeEvent(int transID, String bits, ProxyDebugStackFrame[] frames) {
 		super(transID, EVENT_DBG_FRAMES, bits);
 		this.frames = frames;
 	}
-	
+
 	public ProxyDebugStackFrame[] getFrames() {
 		return this.frames;
 	}
-	
+
+	@Override
 	public String toString() {
 		String res = "EVENT_DBG_FRAMES transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 		for (int i = 0; i < frames.length; i++) {

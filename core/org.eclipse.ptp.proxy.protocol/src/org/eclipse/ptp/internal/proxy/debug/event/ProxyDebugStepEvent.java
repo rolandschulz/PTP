@@ -27,7 +27,8 @@ public class ProxyDebugStepEvent extends AbstractProxyDebugSuspendEvent implemen
 	public ProxyDebugStepEvent(int transID, String set, ProxyDebugStackFrame frame, int thread_id, int depth, String[] vars) {
 		super(transID, set, frame, thread_id, depth, vars);
 	}
-	
+
+	@Override
 	public String toString() {
 		return "EVENT_DBG_STEP transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.getFrame().toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}

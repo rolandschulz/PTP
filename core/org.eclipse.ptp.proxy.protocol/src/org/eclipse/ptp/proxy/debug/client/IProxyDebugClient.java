@@ -23,5 +23,6 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
 
 public interface IProxyDebugClient {
 	public void addProxyDebugEventListener(IProxyDebugEventListener listener);
+
 	public void removeProxyDebugEventListener(IProxyDebugEventListener listener);
 }
