@@ -30,7 +30,7 @@ public class ElementIDGenerator {
 
 	ElementIDGenerator(int base_ID) {
 		if (instance != null) {
-			throw new RuntimeException(Messages.ElementIDGenerator_0);
+			throw new RuntimeException(Messages.getString("ElementIDGenerator_0")); //$NON-NLS-1$
 		}
 		this.base_ID = base_ID;
 		instance = this;

@@ -91,12 +91,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private Thread acceptThread;
 	private Thread packetThread;
 
-	private DebugOptions debugOptions;
+	private final DebugOptions debugOptions;
 	private SessionState state;
 
-	private List<IProxyEventListener> listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
+	private final List<IProxyEventListener> listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 	private ProxyEventQueue eventQueue;
-	private Vector<AbstractProxyCommand> pendingCommands;
+	private final Vector<AbstractProxyCommand> pendingCommands;
 
 	public AbstractProxyClient() {
 		this.debugOptions = new DebugOptions();
@@ -332,7 +332,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 
 		synchronized (state) {
 			if (state != SessionState.CONNECTED) {
-				throw new IOException(Messages.AbstractProxyClient_4);
+				throw new IOException(Messages.getString("AbstractProxyClient_4")); //$NON-NLS-1$
 			}
 			state = SessionState.RUNNING;
 		}
@@ -396,7 +396,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	 */
 	public synchronized void sendCommand(IProxyCommand cmd) throws IOException {
 		if (!isReady()) {
-			throw new IOException(Messages.AbstractProxyClient_0);
+			throw new IOException(Messages.getString("AbstractProxyClient_0")); //$NON-NLS-1$
 		}
 		ProxyPacket packet = new ProxyPacket(cmd);
 		if (getDebugOptions().PROTOCOL_TRACING) {
@@ -541,10 +541,10 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
 				} catch (ClosedByInterruptException e) {
 					error = true;
-					fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, Messages.AbstractProxyClient_1));
+					fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, Messages.getString("AbstractProxyClient_1"))); //$NON-NLS-1$
 				} catch (IOException e) {
 					error = true;
-					fireProxyMessageEvent(new ProxyMessageEvent(Level.FATAL, Messages.AbstractProxyClient_2));
+					fireProxyMessageEvent(new ProxyMessageEvent(Level.FATAL, Messages.getString("AbstractProxyClient_2"))); //$NON-NLS-1$
 				} finally {
 					try {
 						sessSvrSock.close();
@@ -556,7 +556,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					synchronized (state) {
 						if (isInterrupted()) {
 							error = true;
-							fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, Messages.AbstractProxyClient_3));
+							fireProxyMessageEvent(new ProxyMessageEvent(Level.WARNING, Messages.getString("AbstractProxyClient_3"))); //$NON-NLS-1$
 						}
 						if (!error && state == SessionState.WAITING) {
 							state = SessionState.CONNECTED;

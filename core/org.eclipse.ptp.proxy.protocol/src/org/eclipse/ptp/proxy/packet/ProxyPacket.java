@@ -41,9 +41,9 @@ public class ProxyPacket {
 	private int packetTransID;
 	private String[] packetArgs;
 
-	private Charset charset = Charset.forName("US-ASCII"); //$NON-NLS-1$
-	private CharsetEncoder encoder = charset.newEncoder();
-	private CharsetDecoder decoder = charset.newDecoder();
+	private final Charset charset = Charset.forName("US-ASCII"); //$NON-NLS-1$
+	private final CharsetEncoder encoder = charset.newEncoder();
+	private final CharsetDecoder decoder = charset.newDecoder();
 
 	public ProxyPacket() {
 	}
@@ -92,13 +92,12 @@ public class ProxyPacket {
 	 * @throws IOException
 	 *             if EOF
 	 */
-	private void fullRead(ReadableByteChannel channel, ByteBuffer buf)
-			throws IOException {
+	private void fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
 		buf.clear();
 		while (buf.hasRemaining()) {
 			int n = channel.read(buf);
 			if (n < 0) {
-				throw new IOException(Messages.ProxyPacket_2);
+				throw new IOException(Messages.getString("ProxyPacket_2")); //$NON-NLS-1$
 			}
 		}
 		buf.flip();
@@ -114,12 +113,11 @@ public class ProxyPacket {
 	 * @param buf
 	 * @throws IOException
 	 */
-	private void fullWrite(WritableByteChannel channel, ByteBuffer buf)
-			throws IOException {
+	private void fullWrite(WritableByteChannel channel, ByteBuffer buf) throws IOException {
 		while (buf.hasRemaining()) {
 			int n = channel.write(buf);
 			if (n < 0) {
-				throw new IOException(Messages.ProxyPacket_3);
+				throw new IOException(Messages.getString("ProxyPacket_3")); //$NON-NLS-1$
 			}
 		}
 	}
@@ -208,7 +206,7 @@ public class ProxyPacket {
 			} else {
 				System.out.println("BAD PACKET LENGTH: \"" + len_str + "\""); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			throw new IOException(Messages.ProxyPacket_0);
+			throw new IOException(Messages.getString("ProxyPacket_0")); //$NON-NLS-1$
 		}
 
 		/*
@@ -219,8 +217,7 @@ public class ProxyPacket {
 		CharBuffer packetBuf = decoder.decode(packetBytes);
 
 		if (debug) {
-			System.out
-					.println("RECEIVE:[" + len_str + " -> " + packetBuf + "] -> " + Thread.currentThread().getName()); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+			System.out.println("RECEIVE:[" + len_str + " -> " + packetBuf + "] -> " + Thread.currentThread().getName()); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 		}
 
 		/*
@@ -256,7 +253,7 @@ public class ProxyPacket {
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("BAD PACKET FORMAT: \"" + packetBuf + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-			throw new IOException(Messages.ProxyPacket_1);
+			throw new IOException(Messages.getString("ProxyPacket_1")); //$NON-NLS-1$
 		} catch (IndexOutOfBoundsException e1) {
 			return false;
 		}

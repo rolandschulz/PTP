@@ -99,7 +99,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					int port = new Integer(args[i].substring(7));
 					argsMap.put("port", port); //$NON-NLS-1$
 				} catch (NumberFormatException e) {
-					System.err.println(org.eclipse.ptp.proxy.messages.Messages.AbstractProxyRuntimeServer_0
+					System.err.println(org.eclipse.ptp.proxy.messages.Messages.getString("AbstractProxyRuntimeServer_0")
 							+ args[i + 1].substring(7));
 				}
 			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
@@ -126,13 +126,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
 		nodeController = new Controller("pbsnodes -x", // command //$NON-NLS-1$
 				new AttributeDefinition(new PBSNodeClientAttributes()), // attributes.
-				// TODO:
-				// should
-				// include
-				// a
-				// flag
-				// whether
-				// mandatory.
+				// TODO: should include a flag whether mandatory.
 				new NodeEventFactory(), new XMLReader() // Parser
 		);
 
@@ -265,9 +259,9 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 							List<IProxyEvent> events = new ArrayList<IProxyEvent>();
 							try {
 								try {
-										events.addAll(nodeController.update());
-										events.addAll(queueController.update());
-										events.addAll(jobController.update());
+									events.addAll(nodeController.update());
+									events.addAll(queueController.update());
+									events.addAll(jobController.update());
 								} catch (Exception e) {
 									sendEvent(getEventFactory().newProxyRuntimeMessageEvent(Level.ERROR, e.getMessage()));
 								}
