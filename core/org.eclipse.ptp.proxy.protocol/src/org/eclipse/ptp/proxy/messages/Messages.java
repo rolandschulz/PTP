@@ -18,28 +18,6 @@ public class Messages {
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
-	public static String AbstractProxyClient_0;
-	public static String AbstractProxyClient_1;
-	public static String AbstractProxyClient_2;
-	public static String AbstractProxyClient_3;
-	public static String AbstractProxyClient_4;
-	public static String AbstractProxyRuntimeClient_0;
-	public static String AbstractProxyRuntimeClient_1;
-	public static String AbstractProxyRuntimeClient_2;
-	public static String AbstractProxyRuntimeClient_3;
-	public static String AbstractProxyRuntimeClient_4;
-	public static String AbstractProxyRuntimeClient_5;
-	public static String AbstractProxyRuntimeClient_6;
-	public static String AbstractProxyRuntimeClient_7;
-	public static String AbstractProxyRuntimeClient_8;
-	public static String AbstractProxyRuntimeClient_9;
-	public static String AbstractProxyRuntimeServer_0;
-	public static String ElementIDGenerator_0;
-	public static String ProxyPacket_0;
-	public static String ProxyPacket_1;
-	public static String ProxyPacket_2;
-	public static String ProxyPacket_3;
-
 	public static String getString(String key) {
 		try {
 			return RESOURCE_BUNDLE.getString(key);
