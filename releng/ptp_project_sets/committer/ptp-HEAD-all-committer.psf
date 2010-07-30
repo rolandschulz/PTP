@@ -109,6 +109,8 @@
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.server.dstore,org.eclipse.ptp.rdt.server.dstore"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.ui,org.eclipse.ptp.rdt.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.core,org.eclipse.ptp.rm.core"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.generic.core,org.eclipse.ptp.rm.generic.core"/>
+<project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.generic.ui,org.eclipse.ptp.rm.generic.ui"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.core,org.eclipse.ptp.rm.ibm.ll.core"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.help,org.eclipse.ptp.rm.ibm.ll.help"/>
 <project reference="1.0,:extssh:dev.eclipse.org:/cvsroot/tools,org.eclipse.ptp/rms/org.eclipse.ptp.rm.ibm.ll.proxy,org.eclipse.ptp.rm.ibm.ll.proxy"/>
