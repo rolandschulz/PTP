@@ -986,6 +986,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 */
 		if (attrMgr.getAttribute(JobAttributes.getQueueIdAttributeDefinition()) == null) {
 			IPQueue queue = getQueueDefault(rm);
+			if (queue == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.AbstractParallelLaunchConfigurationDelegate_2));
+			}
 			attrMgr.addAttribute(JobAttributes.getQueueIdAttributeDefinition().create(queue.getID()));
 		}
 
