@@ -151,7 +151,6 @@ public class XMLReader implements IParser {
 		Set<IElement> elementList = null;
 		NodeList xmlNodes = null;
 		xmlNodes = getXMLChildren(in);
-		in.close();
 		elementList = new HashSet<IElement>(xmlNodes.getLength());
 		for (int i = 0; i < xmlNodes.getLength(); i++) {
 			Node node = xmlNodes.item(i);

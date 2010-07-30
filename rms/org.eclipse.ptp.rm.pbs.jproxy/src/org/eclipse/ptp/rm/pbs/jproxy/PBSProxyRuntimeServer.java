@@ -189,6 +189,18 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	 */
 	@Override
 	protected void initServer() throws Exception {
+		Controller.ErrorHandler handler = new Controller.ErrorHandler() {
+			public void handle(Level level, String msg) {
+				try {
+					sendEvent(getEventFactory().newProxyRuntimeMessageEvent(level, msg));
+				} catch (IOException e) {
+					e.printStackTrace(); // sendEvent failed - can't signal UI
+				}
+			}
+		};
+		nodeController.setErrorHandler(handler);
+		queueController.setErrorHandler(handler);
+		jobController.setErrorHandler(handler);
 		// Test whether all programs and parser work
 		nodeController.parse();
 		queueController.parse();
