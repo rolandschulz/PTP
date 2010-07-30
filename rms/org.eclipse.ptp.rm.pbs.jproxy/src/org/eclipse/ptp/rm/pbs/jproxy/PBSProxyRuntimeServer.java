@@ -99,7 +99,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					int port = new Integer(args[i].substring(7));
 					argsMap.put("port", port); //$NON-NLS-1$
 				} catch (NumberFormatException e) {
-					System.err.println(org.eclipse.ptp.proxy.messages.Messages.getString("AbstractProxyRuntimeServer_0")
+					System.err.println(org.eclipse.ptp.proxy.messages.Messages.getString("AbstractProxyRuntimeServer_0") //$NON-NLS-1$
 							+ args[i + 1].substring(7));
 				}
 			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$

@@ -126,7 +126,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				// instead of getting the base_ID the hard way, rather implement
 				// a getBase_ID method in IProxyRuntimeInitCommand.
 				int base_ID = Integer.parseInt(command.getArguments()[1].split("=")[1]); //$NON-NLS-1$
-				new ElementIDGenerator(base_ID);
+				ElementIDGenerator.getInstance().setBaseID(base_ID); /* initialization */
 
 				transID = command.getTransactionID();
 				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -186,6 +186,10 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 					System.err.println("unexpected command (NORM): " + command); //$NON-NLS-1$
 				}
 				// state = ServerState.NORMAL;
+				break;
+			case SHUTDOWN:
+				break;
+			case SUSPENDED:
 				break;
 			}
 		}

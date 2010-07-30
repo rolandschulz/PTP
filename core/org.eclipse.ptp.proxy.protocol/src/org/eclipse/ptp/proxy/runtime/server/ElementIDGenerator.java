@@ -20,20 +20,17 @@ import org.eclipse.ptp.utils.core.RangeSet;
  */
 public class ElementIDGenerator {
 	public static ElementIDGenerator getInstance() {
+		if (instance == null)
+			instance = new ElementIDGenerator();
 		return instance;
 	}
 
 	private int baseIDoffset = 0;
-	private final int base_ID;
+	private int base_ID = -1;
 
 	private static ElementIDGenerator instance = null;
 
-	ElementIDGenerator(int base_ID) {
-		if (instance != null) {
-			throw new RuntimeException(Messages.getString("ElementIDGenerator_0")); //$NON-NLS-1$
-		}
-		this.base_ID = base_ID;
-		instance = this;
+	private ElementIDGenerator() {
 	}
 
 	public int getBaseID() {
@@ -50,5 +47,15 @@ public class ElementIDGenerator {
 		RangeSet range = new RangeSet(base_ID + baseIDoffset, base_ID + baseIDoffset + size);
 		baseIDoffset += size - 1;
 		return range;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public void setBaseID(int base_ID) {
+		if (this.base_ID != -1) {
+			throw new RuntimeException(Messages.getString("ElementIDGenerator.0")); //$NON-NLS-1$
+		}
+		this.base_ID = base_ID;
 	}
 }

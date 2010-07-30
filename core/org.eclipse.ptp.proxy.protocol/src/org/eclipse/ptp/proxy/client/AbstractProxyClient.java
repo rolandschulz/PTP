@@ -639,6 +639,12 @@ public abstract class AbstractProxyClient implements IProxyClient {
 					// TODO: stop shutdown timeout
 				}
 				break;
+			case SHUTDOWN:
+				/* ignore */
+				break;
+			case SHUTTING_DOWN:
+				/* ignore */
+				break;
 			}
 		}
 	}

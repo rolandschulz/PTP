@@ -22,7 +22,7 @@ package org.eclipse.ptp.proxy.event;
 public interface IProxyMessageEvent extends IProxyEvent {
 	public enum Level {
 		FATAL, ERROR, WARNING, INFO, DEBUG, UNDEFINED
-	};
+	}
 
 	public static final String LEVEL_ATTR = "messageLevel"; //$NON-NLS-1$
 	public static final String CODE_ATTR = "messageCode"; //$NON-NLS-1$
