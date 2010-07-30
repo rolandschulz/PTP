@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.data;
+package org.eclipse.ptp.launch.internal.rulesengine;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +21,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
+import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
 
 /*
  * TODO: NEEDS TO BE DOCUMENTED

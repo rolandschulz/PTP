@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED
+ * 
+ * @since 5.0
  */
 public interface IRuleAction {
 	public void run() throws CoreException;

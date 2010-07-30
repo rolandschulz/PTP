@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.data;
+package org.eclipse.ptp.launch.internal.rulesengine;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +21,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
+import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
 
 /*
  * TODO: NEEDS TO BE DOCUMENTED!
@@ -30,19 +32,22 @@ import org.eclipse.ptp.launch.messages.Messages;
  * A local file is copied into the remote directory.
  * A local directory has its content copied recursively into the remote directory.
  */
+/**
+ * @since 4.1
+ */
 public class DownloadRule implements ISynchronizationRule {
 	private int overwritePolicy = OverwritePolicies.UNKNOWN;
 
 	private boolean asReadOnly = false;
 	private boolean asExecutable = false;
 	private boolean preserveTimeStamp = false;
-	
+
 	/** Local destiny directory where the files are downloaded into. */
 	private String localDirectory = null;
-	
+
 	/**
-	 * List of remote source paths, represented as strings.
-	 * They may be files or directories.
+	 * List of remote source paths, represented as strings. They may be files or
+	 * directories.
 	 */
 	private List<String> remoteFileList = new ArrayList<String>();
 
@@ -62,16 +67,16 @@ public class DownloadRule implements ISynchronizationRule {
 		 */
 		String list[] = data.split("\n"); //$NON-NLS-1$
 		/*
-		 * Check if the first token is the proper identifier. If not, the string does not represent a rule that
-		 * can be parsed by this class.
+		 * Check if the first token is the proper identifier. If not, the string
+		 * does not represent a rule that can be parsed by this class.
 		 */
 		{
 			if (list.length < 1) {
-				throwError(Messages.DownloadRule_0+this.getClass().getName());
+				throwError(Messages.DownloadRule_0 + this.getClass().getName());
 			}
 			String s = list[0];
-			if (! s.equalsIgnoreCase(SerializationKeys.TYPE_DOWNLOAD)) {
-				throwError(Messages.DownloadRule_0+this.getClass().getName());
+			if (!s.equalsIgnoreCase(SerializationKeys.TYPE_DOWNLOAD)) {
+				throwError(Messages.DownloadRule_0 + this.getClass().getName());
 			}
 		}
 		for (int i = 1; i < list.length; i++) {
@@ -81,7 +86,7 @@ public class DownloadRule implements ISynchronizationRule {
 			 */
 			int p = s.indexOf(' ');
 			if (p == -1) {
-				logError(Messages.DownloadRule_1+s);
+				logError(Messages.DownloadRule_1 + s);
 				continue;
 			}
 			String key = s.substring(0, p);
@@ -89,7 +94,7 @@ public class DownloadRule implements ISynchronizationRule {
 			parseEntry(key, value);
 		}
 	}
-	
+
 	public DownloadRule(DownloadRule rule) {
 		this.overwritePolicy = rule.overwritePolicy;
 		this.asReadOnly = rule.asReadOnly;
@@ -104,7 +109,7 @@ public class DownloadRule implements ISynchronizationRule {
 	}
 
 	private void throwError(String string) {
-		throw new RuntimeException(string);		
+		throw new RuntimeException(string);
 	}
 
 	private void parseEntry(String key, String value) {
@@ -120,7 +125,7 @@ public class DownloadRule implements ISynchronizationRule {
 			} else if (value.equalsIgnoreCase(SerializationKeys.KEY_OVERWRITE_POLICY_SKIP)) {
 				overwritePolicy = OverwritePolicies.SKIP;
 			} else {
-				logError(Messages.DownloadRule_2+value);
+				logError(Messages.DownloadRule_2 + value);
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_FLAGS)) {
 			String flags[] = value.split(" "); //$NON-NLS-1$
@@ -129,7 +134,7 @@ public class DownloadRule implements ISynchronizationRule {
 				if (flag.equalsIgnoreCase(SerializationKeys.KEY_FLAGS_TIMESTAMP)) {
 					preserveTimeStamp = true;
 				} else {
-					logError(Messages.DownloadRule_3+flag);
+					logError(Messages.DownloadRule_3 + flag);
 				}
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_REMOTE_PATH)) {
@@ -143,11 +148,11 @@ public class DownloadRule implements ISynchronizationRule {
 				} else if (flag.equalsIgnoreCase(SerializationKeys.KEY_PERMISSIONS_READONLY)) {
 					asReadOnly = true;
 				} else {
-					logError(Messages.DownloadRule_4+flag);
+					logError(Messages.DownloadRule_4 + flag);
 				}
-			}			
+			}
 		} else {
-			logError(Messages.DownloadRule_5+key);
+			logError(Messages.DownloadRule_5 + key);
 		}
 	}
 
@@ -158,19 +163,20 @@ public class DownloadRule implements ISynchronizationRule {
 	/*
 	 * The rule as a serialized string.
 	 */
+	@Override
 	public String toString() {
 		List<String> l = new ArrayList<String>();
 		if (localDirectory != null) {
-			l.add(SerializationKeys.KEY_LOCAL_PATH+" "+localDirectory.trim()); //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_LOCAL_PATH + " " + localDirectory.trim()); //$NON-NLS-1$
 		}
 		if (overwritePolicy == OverwritePolicies.ALWAYS) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_ALWAYS);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_ALWAYS); //$NON-NLS-1$
 		} else if (overwritePolicy == OverwritePolicies.ASK) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_ASK);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_ASK); //$NON-NLS-1$
 		} else if (overwritePolicy == OverwritePolicies.NEWER) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_NEWER);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_NEWER); //$NON-NLS-1$
 		} else if (overwritePolicy == OverwritePolicies.SKIP) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_SKIP);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_SKIP); //$NON-NLS-1$
 		}
 		if (asExecutable || asReadOnly) {
 			String s = SerializationKeys.KEY_PERMISSIONS;
@@ -187,18 +193,20 @@ public class DownloadRule implements ISynchronizationRule {
 			if (preserveTimeStamp) {
 				s += " " + SerializationKeys.KEY_FLAGS_TIMESTAMP; //$NON-NLS-1$
 			}
-			l.add(s);			
+			l.add(s);
 		}
 		for (Iterator<String> iter = remoteFileList.iterator(); iter.hasNext();) {
-			String remotePath = (String) iter.next();
-			if (remotePath == null) continue;
-			if (remotePath.trim().length() == 0) continue;
-			
-			l.add(SerializationKeys.KEY_REMOTE_PATH+" "+remotePath.trim());  //$NON-NLS-1$
+			String remotePath = iter.next();
+			if (remotePath == null)
+				continue;
+			if (remotePath.trim().length() == 0)
+				continue;
+
+			l.add(SerializationKeys.KEY_REMOTE_PATH + " " + remotePath.trim()); //$NON-NLS-1$
 		}
 		String result = new String(SerializationKeys.TYPE_DOWNLOAD);
 		for (Iterator<String> iter = l.iterator(); iter.hasNext();) {
-			String element = (String) iter.next();
+			String element = iter.next();
 			result += "\n" + element; //$NON-NLS-1$
 		}
 		return result;
@@ -243,7 +251,7 @@ public class DownloadRule implements ISynchronizationRule {
 			return null;
 		}
 	}
-	
+
 	public void setLocalDirectory(String localDirectory) {
 		if (localDirectory != null) {
 			this.localDirectory = localDirectory.trim();
@@ -251,38 +259,38 @@ public class DownloadRule implements ISynchronizationRule {
 			this.localDirectory = null;
 		}
 	}
-	
+
 	public int getRemoteFileCount() {
 		return remoteFileList.size();
 	}
-	
-	public String [] getRemoteFilesAsStringArray() {
-		String result [] = new String [remoteFileList.size()];
+
+	public String[] getRemoteFilesAsStringArray() {
+		String result[] = new String[remoteFileList.size()];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = (String) remoteFileList.get(i);
+			result[i] = remoteFileList.get(i);
 		}
 		return result;
 	}
 
-	public IPath [] getRemoteFilesAsPathArray() {
-		IPath result [] = new IPath [remoteFileList.size()];
+	public IPath[] getRemoteFilesAsPathArray() {
+		IPath result[] = new IPath[remoteFileList.size()];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = new Path((String) remoteFileList.get(i));
+			result[i] = new Path(remoteFileList.get(i));
 		}
 		return result;
 	}
 
-	public File [] getRemoteFilesAsFileArray() {
-		File result [] = new File [remoteFileList.size()];
+	public File[] getRemoteFilesAsFileArray() {
+		File result[] = new File[remoteFileList.size()];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = new File((String) remoteFileList.get(i));
+			result[i] = new File(remoteFileList.get(i));
 		}
 		return result;
 	}
-	
+
 	public class RemoteFileIteratorAsString implements Iterator<Object> {
 		Iterator<String> iteratorref = remoteFileList.iterator();
-		
+
 		public boolean hasNext() {
 			return iteratorref.hasNext();
 		}
@@ -293,12 +301,13 @@ public class DownloadRule implements ISynchronizationRule {
 
 		public void remove() {
 			iteratorref.remove();
-		}		
+		}
 	}
 
 	public class RemoteFileIteratorAsPath extends RemoteFileIteratorAsString {
+		@Override
 		public Object next() {
-			return new Path((String)iteratorref.next());
+			return new Path(iteratorref.next());
 		}
 	}
 
@@ -332,22 +341,22 @@ public class DownloadRule implements ISynchronizationRule {
 		r.setLocalDirectory("/tmp/a"); //$NON-NLS-1$
 		System.out.println(r);
 		r.setOverwritePolicy(OverwritePolicies.ASK);
-		System.out.println(r);		
+		System.out.println(r);
 	}
 
 	public void removeRemoteFile(String entry) {
 		for (Iterator<String> iter = remoteFileList.iterator(); iter.hasNext();) {
-			String element = (String) iter.next();
+			String element = iter.next();
 			if (element.equals(entry)) {
 				iter.remove();
 			}
 		}
 	}
-	
+
 	public void removeRemoteFile(IPath entry) {
 		removeRemoteFile(entry.toOSString());
 	}
-	
+
 	public void setRemoteFiles(String[] items) {
 		clearRemoteFiles();
 		for (int i = 0; i < items.length; i++) {
@@ -357,7 +366,7 @@ public class DownloadRule implements ISynchronizationRule {
 			}
 		}
 	}
-	
+
 	public void setRemoteFiles(IPath[] items) {
 		clearRemoteFiles();
 		for (int i = 0; i < items.length; i++) {
@@ -367,7 +376,7 @@ public class DownloadRule implements ISynchronizationRule {
 			}
 		}
 	}
-	
+
 	public void clearRemoteFiles() {
 		remoteFileList.clear();
 	}
@@ -387,15 +396,17 @@ public class DownloadRule implements ISynchronizationRule {
 	// FIXME: Throw core exception
 	public void validate() throws CoreException {
 		if (overwritePolicy == OverwritePolicies.UNKNOWN) {
-			//RemoteLauncherPlugin.throwCoreException(Messages.DownloadRule_Validation_MissingOverwritePolicy, IRemoteLaunchErrors.INVALID_RULE);
+			// RemoteLauncherPlugin.throwCoreException(Messages.DownloadRule_Validation_MissingOverwritePolicy,
+			// IRemoteLaunchErrors.INVALID_RULE);
 		}
 		if (localDirectory == null) {
-			//RemoteLauncherPlugin.throwCoreException(Messages.DownloadRule_Validation_MissingRemoteDirectory, IRemoteLaunchErrors.INVALID_RULE);
+			// RemoteLauncherPlugin.throwCoreException(Messages.DownloadRule_Validation_MissingRemoteDirectory,
+			// IRemoteLaunchErrors.INVALID_RULE);
 		}
 	}
-	
+
 	public String toLabel() {
-		String result = NLS.bind(Messages.DownloadRule_6, new Object[]{Integer.toString(remoteFileList.size()), localDirectory});
+		String result = NLS.bind(Messages.DownloadRule_6, new Object[] { Integer.toString(remoteFileList.size()), localDirectory });
 		return result;
 	}
 

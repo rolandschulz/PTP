@@ -15,10 +15,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.launch.data.DownloadBackRule;
-import org.eclipse.ptp.launch.data.DownloadRule;
-import org.eclipse.ptp.launch.data.ISynchronizationRule;
-import org.eclipse.ptp.launch.data.UploadRule;
+import org.eclipse.ptp.launch.internal.rulesengine.DownloadBackAction;
+import org.eclipse.ptp.launch.internal.rulesengine.DownloadBackRule;
+import org.eclipse.ptp.launch.internal.rulesengine.DownloadRule;
+import org.eclipse.ptp.launch.internal.rulesengine.DownloadRuleAction;
+import org.eclipse.ptp.launch.internal.rulesengine.UploadRule;
+import org.eclipse.ptp.launch.internal.rulesengine.UploadRuleAction;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED

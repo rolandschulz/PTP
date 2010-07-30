@@ -9,7 +9,11 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.data;
+package org.eclipse.ptp.launch.rulesengine;
+
+import org.eclipse.ptp.launch.internal.rulesengine.DownloadRule;
+import org.eclipse.ptp.launch.internal.rulesengine.SerializationKeys;
+import org.eclipse.ptp.launch.internal.rulesengine.UploadRule;
 
 /**
  * TODO: NEEDS TO BE DOCUMENTED

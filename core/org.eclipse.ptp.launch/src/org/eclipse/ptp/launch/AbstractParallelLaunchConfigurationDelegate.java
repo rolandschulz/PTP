@@ -97,12 +97,12 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.launch.data.ISynchronizationRule;
-import org.eclipse.ptp.launch.data.RuleFactory;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
+import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
+import org.eclipse.ptp.launch.rulesengine.RuleFactory;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -726,6 +726,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#
 	 * addSynchronizationRule(org.eclipse.ptp.launch.data.ISynchronizationRule)
 	 */
+	/**
+	 * @since 4.1
+	 */
 	public void addSynchronizationRule(ISynchronizationRule rule) {
 		extraSynchronizationRules.add(rule);
 	}
@@ -1186,6 +1189,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	/**
 	 * Returns the (possible empty) list of synchronization rule objects
 	 * according to the rules described in the configuration.
+	 * 
+	 * @since 4.1
 	 */
 	protected ISynchronizationRule[] getSynchronizeRules(ILaunchConfiguration configuration) throws CoreException {
 		List<?> ruleStrings = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList<String>());

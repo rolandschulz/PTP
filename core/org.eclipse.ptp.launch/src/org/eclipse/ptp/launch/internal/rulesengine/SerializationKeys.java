@@ -9,15 +9,15 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.data;
+package org.eclipse.ptp.launch.internal.rulesengine;
 
 /**
  * TODO: NEEDS TO BE DOCUMENTED
  */
-interface SerializationKeys {
+public interface SerializationKeys {
 	public static String TYPE_UPLOAD = "upload"; //$NON-NLS-1$
 	public static String TYPE_DOWNLOAD = "download"; //$NON-NLS-1$
-	
+
 	public static String KEY_REMOTE_PATH = "remote-path"; //$NON-NLS-1$
 
 	public static String KEY_OVERWRITE_POLICY = "overwrite-policy"; //$NON-NLS-1$

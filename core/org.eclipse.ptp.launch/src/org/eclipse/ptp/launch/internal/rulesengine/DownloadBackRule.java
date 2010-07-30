@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.data;
+package org.eclipse.ptp.launch.internal.rulesengine;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,28 +18,31 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.launch.messages.Messages;
+import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 
-
+/**
+ * @since 4.1
+ */
 public class DownloadBackRule implements ISynchronizationRule {
 	List<IPath> remoteFiles = new ArrayList<IPath>();
 	List<File> localFiles = new ArrayList<File>();
-	
+
 	public DownloadBackRule() {
 	}
-	
+
 	public void add(File local, IPath remote) {
 		remoteFiles.add(remote);
 		localFiles.add(local);
 	}
-	
+
 	public File getLocalFile(int index) {
-		return (File) localFiles.get(index);
+		return localFiles.get(index);
 	}
-		
+
 	public IPath getRemoteFile(int index) {
-		return (IPath) remoteFiles.get(index);
+		return remoteFiles.get(index);
 	}
-	
+
 	public int count() {
 		return remoteFiles.size();
 	}
