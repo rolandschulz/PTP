@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.proxy.util;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -18,6 +19,7 @@ import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
+import org.eclipse.ptp.proxy.util.messages.Messages;
 
 public class ProtocolUtil {
 	public final static int HEXADECIMAL = 0;
@@ -97,23 +99,19 @@ public class ProtocolUtil {
 	 * @param decoder
 	 *            charset decoder
 	 * @return attribute converted to Java String
+	 * @throws IOException
+	 *             if decoding failed
 	 * @since 5.0
 	 */
-	public static String decodeAttribute(ByteBuffer buf, CharsetDecoder decoder) {
+	public static String decodeAttribute(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
 		String result = ""; //$NON-NLS-1$
 
 		String key = decodeString(buf, decoder);
-		if (key == null) {
-			return null;
-		}
-		if (key.length() > 0) {
+		if (key != null) {
 			result = key;
 		}
 		String value = decodeString(buf, decoder);
-		if (value == null) {
-			return null;
-		}
-		if (value.length() > 0) {
+		if (value != null) {
 			if (result.length() > 0) {
 				result += "="; //$NON-NLS-1$
 			}
@@ -151,8 +149,8 @@ public class ProtocolUtil {
 	 * Length = 0 
 	 * 		means this field is not present. Value is omitted. 
 	 * Length < 0 
-	 * 		means this is a string. The length is the negative value of the string
-	 *      length. The value is the actual string without the trailing x'00' byte.
+	 * 		means this is a string. The actual string length is -(length + 1).
+	 *      The value is the actual string without the trailing x'00' byte.
 	 * Length > 0
 	 * 		is a string index identifying a previously processed string. Value is omitted.
 	 * </pre>
@@ -168,33 +166,46 @@ public class ProtocolUtil {
 	 *            byte buffer containing string to be decoded
 	 * @param decoder
 	 *            charset decoder
-	 * @return decoded string or null if the string couldn't be decoded
+	 * @return decoded string or null if the field should be skipped
+	 * @throws IOException
+	 *             if the string can't be decoded
+	 * 
 	 * @since 5.0
 	 */
-	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder) {
+	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
 		String result = ""; //$NON-NLS-1$
 		VarInt strLen = new VarInt(buf);
 		if (!strLen.isValid()) {
-			return null;
+			throw new IOException(Messages.getString("ProtocolUtil.0")); //$NON-NLS-1$
 		}
 		int len = strLen.getValue();
+		if (len == 0) {
+			return null;
+		}
 		if (len < 0) {
 			/*
 			 * Normal string. Decode and insert into string table.
 			 */
-			len = -len;
-			ByteBuffer strBuf = buf.slice();
-			strBuf.limit(len);
-			try {
-				CharBuffer chars = decoder.decode(strBuf);
-				result = chars.toString();
-			} catch (CharacterCodingException e) {
-				return null;
-			}
-			try {
-				buf.position(buf.position() + len);
-			} catch (IllegalArgumentException e) {
-				return null;
+			len = -(len + 1);
+
+			if (len > 0) {
+				ByteBuffer strBuf = buf.slice();
+				try {
+					strBuf.limit(len);
+				} catch (IllegalArgumentException e) {
+					throw new IOException(e.getMessage());
+				}
+				try {
+					CharBuffer chars = decoder.decode(strBuf);
+					result = chars.toString();
+				} catch (CharacterCodingException e) {
+					throw new IOException(e.getMessage());
+				}
+				try {
+					buf.position(buf.position() + len);
+				} catch (IllegalArgumentException e) {
+					throw new IOException(e.getMessage());
+				}
 			}
 			fStringTable.add(result);
 		} else {
