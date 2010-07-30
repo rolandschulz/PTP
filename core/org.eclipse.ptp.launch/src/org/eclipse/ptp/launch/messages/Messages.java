@@ -113,6 +113,8 @@ public class Messages extends NLS {
 
 	public static String AbstractParallelLaunchConfigurationDelegate_0;
 	public static String AbstractParallelLaunchConfigurationDelegate_1;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_2;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_not_specified;
 	public static String AbstractParallelLaunchConfigurationDelegate_Project_does_not_exist_or_is_not_a_project;
 	public static String AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified;
