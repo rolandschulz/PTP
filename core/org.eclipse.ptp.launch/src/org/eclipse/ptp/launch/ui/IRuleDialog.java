@@ -11,11 +11,14 @@
  *****************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
-import org.eclipse.ptp.launch.data.ISynchronizationRule;
+import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 
 /**
  * TODO: NEEDS TO BE DOCUMENTED
  */
 public interface IRuleDialog {
+	/**
+	 * @since 5.0
+	 */
 	public ISynchronizationRule getRuleWorkingCopy();
 }

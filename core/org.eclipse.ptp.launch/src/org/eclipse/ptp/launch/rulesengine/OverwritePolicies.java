@@ -9,17 +9,19 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.data;
+package org.eclipse.ptp.launch.rulesengine;
 
 /**
  * TODO: NEEDS TO BE DOCUMENTED
+ * 
+ * @since 5.0
  */
 public interface OverwritePolicies {
-	
+
 	public static final int UNKNOWN = 0;
 	public static final int SKIP = 1;
 	public static final int ALWAYS = 2;
 	public static final int NEWER = 3;
 	public static final int ASK = 4;
-	
+
 }

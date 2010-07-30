@@ -12,9 +12,9 @@
 package org.eclipse.ptp.launch.ui;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.ptp.launch.data.DownloadRule;
-import org.eclipse.ptp.launch.data.ISynchronizationRule;
-import org.eclipse.ptp.launch.data.UploadRule;
+import org.eclipse.ptp.launch.internal.rulesengine.DownloadRule;
+import org.eclipse.ptp.launch.internal.rulesengine.UploadRule;
+import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.swt.widgets.Shell;
 
 /**

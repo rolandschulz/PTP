@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.rulesengine;
+package org.eclipse.ptp.launch.internal.rulesengine;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.data.DownloadBackRule;
-import org.eclipse.ptp.launch.data.OverwritePolicies;
-import org.eclipse.ptp.launch.data.UploadRule;
+import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
+import org.eclipse.ptp.launch.rulesengine.IRuleAction;
+import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 /**

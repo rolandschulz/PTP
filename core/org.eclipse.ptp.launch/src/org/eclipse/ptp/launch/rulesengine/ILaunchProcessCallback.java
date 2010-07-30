@@ -13,14 +13,17 @@ package org.eclipse.ptp.launch.rulesengine;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.launch.data.ISynchronizationRule;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED
+ * 
+ * @since 5.0
  */
 public interface ILaunchProcessCallback {
 	public IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException;
+
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration) throws CoreException;
+
 	public void addSynchronizationRule(ISynchronizationRule downloadBackRule);
 }
