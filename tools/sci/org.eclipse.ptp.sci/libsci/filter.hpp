@@ -59,6 +59,7 @@ class Filter
         int unload();
 
         int getId();
+        sci_filter_info_t & getInfo() { return info; }
 };
 
 #endif

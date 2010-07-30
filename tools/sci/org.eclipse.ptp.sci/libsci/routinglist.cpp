@@ -281,7 +281,7 @@ void RoutingList::mcast(Message *msg, int *sorList, int num)
     Message **segments;
     int segnum = getSegments(msg, &segments, num);
     for (i = 0; i < num; i++) {
-        gCtrlBlock->queryQueue(successorList[i])->multiProduce(segments, segnum);
+        gCtrlBlock->queryQueue(sorList[i])->multiProduce(segments, segnum);
     }
     ::free(segments);
     if (msg->decRefCount() == 0) {

@@ -47,6 +47,13 @@ string SysUtil::itoa(int value)
     return string(buffer);
 }
 
+string SysUtil::lltoa(long long value)
+{
+    static char buffer[128];
+    sprintf(buffer, "%lld", value);
+    return string(buffer);
+}
+
 double SysUtil::microseconds()
 {
     struct timeval time_v;

@@ -35,6 +35,7 @@
 using namespace std;
 
 #include "general.hpp"
+#include "message.hpp"
 
 class Filter;
 
@@ -46,10 +47,9 @@ class FilterList
     private:
         FilterList();
         static FilterList    *instance;
-        
         FILTER_MAP           filterInfo;
-
         pthread_mutex_t      mtx;
+        Message              *flistMsg;
 
     public:
         ~FilterList();
@@ -61,6 +61,9 @@ class FilterList
         Filter * getFilter(int filter_id);
         int numOfFilters();
         void retrieveFilterList(int *ret_val);
+        Message * packMsg(sci_filter_list_t &flist);
+        Message * getFlistMsg() { return flistMsg; }
+        void loadFilterList(Message &msg, bool invoke = true);
 
     private:
         void lock();

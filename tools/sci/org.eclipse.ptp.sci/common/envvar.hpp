@@ -44,9 +44,11 @@ class EnvVar
         void set(string &env, const char *val);
         void set(string &env, string &val);
         void set(string &env, int val);
+        void set(string &env, long long val);
         void set(const char *env, const char *val);
         void set(const char *env, string &val);
         void set(const char *env, int val);
+        void set(const char *env, long long val);
         string & get(string &env);
         string & get(const char *env);
 

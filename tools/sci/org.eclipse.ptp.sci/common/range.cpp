@@ -54,15 +54,15 @@ bool Range::operator != (Range &r)
 
 bool Range::Intersects(Range r)
 {
-    return (first <= r.first && r.first < last
-             || first < r.last && r.last <= last
+    return (((first <= r.first) && (r.first < last))
+             || ((first < r.last) && (r.last <= last))
              || this->Contains(r) || r.Contains(*this));
 }
 
 bool Range::Touches(Range r)
 {
-    return (first <= r.first && r.first <= last
-             || first <= r.last && r.last <= last
+    return (((first <= r.first) && (r.first <= last))
+             || ((first <= r.last) && (r.last <= last))
              || this->Contains(r) || r.Contains(*this));
 }
 

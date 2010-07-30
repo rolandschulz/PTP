@@ -26,6 +26,10 @@
 #ifndef _IPCONVERTER_HPP
 #define _IPCONVERTER_HPP
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef _SCI_LINUX
 #include <sys/types.h>
 #include <sys/socket.h>

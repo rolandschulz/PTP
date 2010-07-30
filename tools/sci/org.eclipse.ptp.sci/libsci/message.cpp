@@ -23,7 +23,6 @@
 
 ****************************************************************************/
 
-#include "message.hpp"
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/time.h>
@@ -34,8 +33,10 @@
 
 #include "exception.hpp"
 #include "log.hpp"
-
+#include "sshfunc.hpp"
 #include "atomic.hpp"
+
+#include "message.hpp"
 
 Message::Message(Type t)
     : type(t)
@@ -62,7 +63,7 @@ Message::~Message()
 int Message::joinSegments(Message **segments, int segnum)
 {
     int i;
-    char **bufs = (char **)::malloc(segnum * sizeof(char *));
+    char **bufs = (char **)malloc(segnum * sizeof(char *));
     int *sizes = new int[segnum];
     int fid = segments[0]->getFilterID();
     sci_group_t gid = segments[0]->getGroup();
@@ -128,6 +129,10 @@ int Message::decRefCount()
 
 Stream & operator >> (Stream &stream, Message &msg)
 {  
+    struct iovec vecs[6];
+    struct iovec sign = {0};
+    int rc, tmp0, tmp1, tmp2, tmp3, tmp4;
+
     // receive message header
     stream >> (int &) msg.type;
     stream >> msg.msgID;
@@ -141,12 +146,57 @@ Stream & operator >> (Stream &stream, Message &msg)
         ::memset(msg.buf, 0, msg.len);
         stream.read(msg.buf, msg.len);
     }
+    stream >> sign;
+    tmp0 = htonl(msg.type);
+    vecs[0].iov_base = &tmp0;
+    vecs[0].iov_len = sizeof(tmp0);
+    tmp1 = htonl(msg.msgID);
+    vecs[1].iov_base = &tmp1;
+    vecs[1].iov_len = sizeof(tmp1);
+    tmp2 = htonl(msg.filterID);
+    vecs[2].iov_base = &tmp2;
+    vecs[2].iov_len = sizeof(tmp2);
+    tmp3 = htonl(msg.group);
+    vecs[3].iov_base = &tmp3;
+    vecs[3].iov_len = sizeof(tmp3);
+    tmp4 = htonl(msg.len);
+    vecs[4].iov_base = &tmp4;
+    vecs[4].iov_len = sizeof(tmp4);
+    vecs[5].iov_base = msg.buf;
+    vecs[5].iov_len = msg.len;
+    rc = SSHFUNC->verify_data(vecs, 6, &sign);
+    delete [] (char *)sign.iov_base;
+    if (rc != 0) {
+        throw Exception(Exception::INVALID_SIGNATURE);
+    }
 
     return stream;
 }
 
 Stream & operator << (Stream &stream, Message &msg)
 {
+    struct iovec vecs[6];
+    struct iovec sign = {0};
+    int tmp0, tmp1, tmp2, tmp3, tmp4;
+
+    tmp0 = htonl(msg.type);
+    vecs[0].iov_base = &tmp0;
+    vecs[0].iov_len = sizeof(tmp0);
+    tmp1 = htonl(msg.msgID);
+    vecs[1].iov_base = &tmp1;
+    vecs[1].iov_len = sizeof(tmp1);
+    tmp2 = htonl(msg.filterID);
+    vecs[2].iov_base = &tmp2;
+    vecs[2].iov_len = sizeof(tmp2);
+    tmp3 = htonl(msg.group);
+    vecs[3].iov_base = &tmp3;
+    vecs[3].iov_len = sizeof(tmp3);
+    tmp4 = htonl(msg.len);
+    vecs[4].iov_base = &tmp4;
+    vecs[4].iov_len = sizeof(tmp4);
+    vecs[5].iov_base = msg.buf;
+    vecs[5].iov_len = msg.len;
+    SSHFUNC->sign_data(vecs, 6, &sign);
     // send message header
     stream << (int) msg.type;
     stream << msg.msgID;
@@ -158,6 +208,8 @@ Stream & operator << (Stream &stream, Message &msg)
     if (msg.len > 0) {
         stream.write(msg.buf, msg.len);
     }
+    stream << sign;
+    SSHFUNC->free_signature(&sign);
  
     return stream.flush();
 }

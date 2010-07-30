@@ -35,6 +35,7 @@ class SysUtil
 {       
     public:
         static string itoa(int value);
+        static string lltoa(long long value);
         static double microseconds();
         static void sleep(int nsecs);
 

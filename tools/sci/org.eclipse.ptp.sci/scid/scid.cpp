@@ -23,6 +23,10 @@
 
 ****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <signal.h>
@@ -176,7 +180,7 @@ int main(int argc, char *argv[])
         JOB_INFO::iterator it;
         for (it = jobInfo.begin(); it != jobInfo.end(); ) {
             if ((SysUtil::microseconds() - it->second.timestamp) > FIVE_MINUTES) {
-                jobInfo.erase(it++);
+                jobInfo.erase(it);
                 log_crit("Erase jobInfo item %d", it->first);
             } else {
                 ++it;

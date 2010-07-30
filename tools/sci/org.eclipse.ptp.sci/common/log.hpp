@@ -26,9 +26,11 @@
 #ifndef _LOG_HPP
 #define _LOG_HPP
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <pthread.h>
 #include <string>
-#include <vector>
 
 #define MAX_LOG_LEN 1024
 #define MAX_PATH_LEN 512
@@ -52,7 +54,7 @@ class Log
         Log();
         
         int permitLevel;
-        char *logDir;
+        string logDir;
         char logPath[2 * MAX_PATH_LEN];
 
         static Log *logger;
@@ -68,7 +70,7 @@ class Log
         void init(const char *directory = "../log", const char * filename = "debug.log", int level = INFORMATION);
         void print(int level, char * srcFile, int srcLine, const char * format, ...);
 
-        const char * getLogDir() { return logDir; }
+        string & getLogDir() { return logDir; }
         int getLogLevel() { return permitLevel; }
 };
 

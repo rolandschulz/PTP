@@ -52,6 +52,8 @@
 #include "observer.hpp"
 #include "parent.hpp"
 
+const long long FLOWCTL_THRESHOLD = 1024 * 1024 * 1024 * 2LL;
+
 CtrlBlock * CtrlBlock::instance = NULL;
 
 CtrlBlock::CtrlBlock()
@@ -84,6 +86,14 @@ CtrlBlock::CtrlBlock()
     queueInfo.clear();
 
     enabled = false;
+    ctrlID = gNotifier->allocate();
+
+    // flow control threshold
+    thresHold = FLOWCTL_THRESHOLD;
+    char *envp = getenv("SCI_FLOWCTL_THRESHOLD");
+    if(envp != NULL) {
+        thresHold = ::atoll(envp);
+    } 
 
     ::pthread_mutex_init(&mtx, NULL);
 }
@@ -179,9 +189,7 @@ int CtrlBlock::initBE(int hndl, sci_info_t * info)
 
 void CtrlBlock::term()
 {
-    while (enabled) {
-        SysUtil::sleep(1000);
-    }
+    gNotifier->freeze(ctrlID, NULL);
 
     // stop listener if have
     if (listener != NULL) {
@@ -198,7 +206,7 @@ void CtrlBlock::term()
     // produce a NULL message in all message queues
     QUEUE_VEC::iterator qit = queues.begin();
     for (; qit!=queues.end(); ++qit) {
-        (*qit)->produce();
+        (*qit)->notify();
     }
 
     // close all streams
@@ -302,6 +310,7 @@ void CtrlBlock::disable()
     if (!enabled) // already disabled?
         return;
     
+    gNotifier->notify(ctrlID);
     enabled = false;
 }
 
@@ -499,6 +508,16 @@ void CtrlBlock::setParentStream(Stream * stream)
 Stream * CtrlBlock::getParentStream()
 {
     return parentStream;
+}
+
+void CtrlBlock::setFlowctlThreshold(long long th)
+{
+    thresHold = th;
+}
+
+long long CtrlBlock::getFlowctlThreshold()
+{
+    return thresHold;
 }
 
 void CtrlBlock::genSelfInfo(MessageQueue * queue, bool isUncle)

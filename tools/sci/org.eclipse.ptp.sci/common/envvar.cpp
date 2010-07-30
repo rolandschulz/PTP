@@ -54,6 +54,11 @@ void EnvVar::set(string &env, int value)
     envlist[env] = env + "=" + SysUtil::itoa(value);
 }
 
+void EnvVar::set(string &env, long long value)
+{
+    envlist[env] = env + "=" + SysUtil::lltoa(value);
+}
+
 void EnvVar::set(const char *env, const char *value)
 {
     assert(env);
@@ -72,6 +77,12 @@ void EnvVar::set(const char *env, int value)
 {
     assert(env);
     envlist[env] = string(env) + "=" + SysUtil::itoa(value);
+}
+
+void EnvVar::set(const char *env, long long value)
+{
+    assert(env);
+    envlist[env] = string(env) + "=" + SysUtil::lltoa(value);
 }
 
 string & EnvVar::get(string &env)

@@ -30,6 +30,7 @@
 #include <assert.h>
 
 #include "filter.hpp"
+#include "packer.hpp"
 
 FilterList* FilterList::instance = NULL;
 FilterList * FilterList::getInstance()
@@ -41,6 +42,7 @@ FilterList * FilterList::getInstance()
 }
 
 FilterList::FilterList()
+    : flistMsg(NULL)
 {
     filterInfo.clear();
 
@@ -90,6 +92,52 @@ Filter * FilterList::getFilter(int filter_id)
     unlock();
 
     return filter;
+}
+
+Message * FilterList::packMsg(sci_filter_list_t &flist)
+{
+    int i = 0;
+    char *bufs[1];
+    int sizes[1];
+    Packer packer;
+
+    packer.packInt(flist.num);
+    for (i = 0; i < flist.num; i++) {
+        packer.packInt(flist.filters[i].filter_id);
+        packer.packStr(flist.filters[i].so_file);
+    }
+    
+    bufs[0] = packer.getPackedMsg();
+    sizes[0] = packer.getPackedMsgLen();
+
+    Message *msg = new Message();
+    msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 1, bufs, sizes, Message::FILTER_LIST);
+    delete [] bufs[0];
+
+    return msg;
+}
+
+void FilterList::loadFilterList(Message &msg, bool invoke) 
+{
+    int i = 0;
+    Packer packer(msg.getContentBuf());
+    int num = packer.unpackInt();
+    sci_filter_info_t finfo;
+    Filter *filter = NULL;
+    char *bufs[1];
+    int sizes[1];
+
+    for (i = 0; i < num; i++) {
+        finfo.filter_id = packer.unpackInt();
+        finfo.so_file = packer.unpackStr();
+        filter = new Filter(finfo);
+        loadFilter(finfo.filter_id, filter, invoke);
+    }
+
+    bufs[0] = msg.getContentBuf();
+    sizes[0] = msg.getContentLen();
+    flistMsg = new Message();
+    flistMsg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 1, bufs, sizes, msg.getType());
 }
 
 int FilterList::unloadFilter(int filter_id, bool invoke)

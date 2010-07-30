@@ -31,7 +31,8 @@ const char * ErrMsg[] = {
     "Error occur when call getaddrinfo.",
     "Invalid user credential.",
     "Error occur when call some system call.",
-    "Invalid launch action."
+    "Invalid launch action.",
+    "Invalid message signature."
 };
 
 Exception::Exception(int code) throw()

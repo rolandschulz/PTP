@@ -73,6 +73,7 @@ class CtrlBlock
         ROLE                 role;
         int                  handle;
         int                  jobKey;
+        int                  ctrlID;
         bool                 enabled;
 
         sci_info_t           *endInfo;
@@ -81,6 +82,9 @@ class CtrlBlock
 
         Observer             *observer;
         ErrorInjector        *errInjector;
+
+        // flow control threshold
+        long long            thresHold;
 
         // internal queue, processor, stream information
         QUEUE_VEC            queues;
@@ -175,6 +179,9 @@ class CtrlBlock
 
         void setParentStream(Stream *stream);
         Stream * getParentStream();
+
+        void setFlowctlThreshold(long long th);
+        long long getFlowctlThreshold();
 
         void genSelfInfo(MessageQueue *queue, bool isUncle);
 

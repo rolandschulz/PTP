@@ -22,8 +22,9 @@
    10/06/08 nieyy        Initial code (D153875)
 
 ****************************************************************************/
-
-#include "filter.hpp"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
@@ -37,6 +38,7 @@
 #include "message.hpp"
 #include "queue.hpp"
 #include "filterproc.hpp"
+#include "filter.hpp"
 
 Filter::Filter()
 {
@@ -101,7 +103,7 @@ void Filter::unpackMsg(Message &msg)
 int Filter::load()
 {
 #ifdef _SCI_LINUX // Linux
-    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL);
+    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
 #else // aix
     file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL | RTLD_MEMBER);
 #endif

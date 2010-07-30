@@ -28,12 +28,13 @@
 
 #include <pthread.h>
 
-const int MAX_SERIAL_NUM = 256;
+const int MAX_SERIAL_NUM = 1024;
 
 struct serialNtfTest 
 {
     bool    freezed; // freeze() been called?
     bool    notified; // notify() been called?
+    bool    used;    // allocate() been called?
     void    *ret;
 };
 

@@ -34,7 +34,8 @@ class Exception
             GET_ADDR_INFO,
             INVALID_USER,
             SYS_CALL,
-            INVALID_LAUNCH
+            INVALID_LAUNCH,
+            INVALID_SIGNATURE
         };
         
     private:

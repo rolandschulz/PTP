@@ -60,7 +60,7 @@ void Log::init(const char *directory, const char * filename, int level)
     char node[256] = {0};
     gethostname(node, sizeof(node));
 
-    logDir = (char *) directory;
+    logDir = directory;
     sprintf(logPath, "%s/%s.%s.%d" , directory, node, filename, (int)getpid());
     permitLevel = level;
 }

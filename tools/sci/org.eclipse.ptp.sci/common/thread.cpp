@@ -23,19 +23,27 @@
 
 ****************************************************************************/
 
-#include "thread.hpp"
 #include <assert.h>
 #include <string.h>
+#include <signal.h>
+
+#include "thread.hpp"
 
 using namespace std;
 
 void* init(void * pthis)
 {
+    sigset_t sigs_to_block;
+    sigset_t old_sigs;
+    sigfillset(&sigs_to_block);
+    pthread_sigmask(SIG_SETMASK, &sigs_to_block, &old_sigs);
+
     Thread *p = (Thread *) pthis;
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     p->setState(true);
     p->run();
+    pthread_sigmask(SIG_SETMASK, &old_sigs, NULL);
 
     return 0;
 }

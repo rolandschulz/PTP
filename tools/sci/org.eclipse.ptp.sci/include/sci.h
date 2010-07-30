@@ -41,6 +41,7 @@
 #define SCI_ERR_NO_MEM               (-2021)
 #define SCI_ERR_LAUNCH_FAILED        (-2022)
 #define SCI_ERR_POLL_INVALID         (-2023)
+#define SCI_ERR_INVALID_USER         (-2024)
 
 #define SCI_ERR_PARENT_BROKEN        (-5000)
 #define SCI_ERR_CHILD_BROKEN         (-5001)
@@ -92,15 +93,26 @@ typedef enum {
 #pragma enum (pop)
 
 typedef struct {
-    sci_end_type_t   type;
-    sci_mode_t       mode;
-    SCI_msg_hndlr    *hndlr;
-    void             *param;
-    SCI_err_hndlr    *err_hndlr;
-    char             *hostfile;
-    char             *bepath;
-    char             **beenvp;
-    char             reserve[64];
+    int              filter_id;
+    char             *so_file;
+} sci_filter_info_t;
+
+typedef struct {
+    int                 num;
+    sci_filter_info_t   *filters;
+} sci_filter_list_t;
+
+typedef struct {
+    sci_end_type_t       type;
+    sci_mode_t           mode;
+    SCI_msg_hndlr        *hndlr;
+    void                 *param;
+    SCI_err_hndlr        *err_hndlr;
+    char                 *hostfile;
+    char                 *bepath;
+    char                 **beenvp;
+    sci_filter_list_t    filter_list;    
+    char                 reserve[52];
 } sci_fe_info_t;
 
 typedef struct {
@@ -119,13 +131,9 @@ typedef union {
 } sci_info_t;
 
 typedef struct {
-    int              filter_id;
-    char             *so_file;
-} sci_filter_info_t;
-
-typedef struct {
     int              id;
     char             *hostname;
+    int              level;
 } sci_be_t;
 
 typedef enum {
@@ -138,7 +146,8 @@ typedef enum {
     AGENT_ID,
     NUM_SUCCESSORS,
     SUCCESSOR_IDLIST,
-    HEALTH_STATUS
+    HEALTH_STATUS,
+    AGENT_LEVEL
 } sci_query_t;
 
 typedef enum {

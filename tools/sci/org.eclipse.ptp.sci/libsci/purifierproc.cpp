@@ -106,6 +106,9 @@ void PurifierProcessor::process(Message * msg)
         case Message::FILTER_UNLOAD:
             gFilterList->unloadFilter(msg->getFilterID(), false);
             break;
+        case Message::FILTER_LIST:
+            gFilterList->loadFilterList(*msg, false);
+            break;
         case Message::BE_REMOVE:
         case Message::QUIT:
             gStateMachine->parse(StateMachine::USER_QUIT);
