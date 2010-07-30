@@ -194,6 +194,11 @@ int SCI_Query(sci_query_t query, void *ret_val)
                 *p = 1; // 1 - exited
             }
             break;
+        case AGENT_LEVEL:
+            if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
+                return SCI_ERR_INVALID_CALLER;
+            *p = gCtrlBlock->getTopology()->getLevel();
+            break;
         default:
             return SCI_ERR_UNKNOWN_INFO;
     }
@@ -659,6 +664,7 @@ int SCI_BE_add(sci_be_t *be)
     try {
         Packer packer; 
         packer.packStr(be->hostname);
+        packer.packInt(be->level);
 
         char *bufs[1];
         int sizes[1];

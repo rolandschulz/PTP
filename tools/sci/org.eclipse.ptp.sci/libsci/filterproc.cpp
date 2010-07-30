@@ -93,23 +93,6 @@ void FilterProcessor::write(Message * msg)
         return;
     }
 
-    if ((msg->getType() == Message::INIT_ACK) && 
-            (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END)) {
-        struct eventRC {
-            int num;
-            int count;
-        } *frc;
-
-        frc = (eventRC *)gNotifier->getRetVal(msg->getID());
-        frc->count++;
-        if (frc->count == frc->num) {
-            gNotifier->notify(msg->getID());
-        }
-        inQueue->remove();
-
-        return;
-    }
-
     if (observer) {
         observer->notify();
     }

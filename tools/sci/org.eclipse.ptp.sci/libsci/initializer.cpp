@@ -26,6 +26,9 @@
 
 ****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "initializer.hpp"
 #include <assert.h>
 #include <unistd.h>
@@ -40,6 +43,7 @@
 #include "socket.hpp"
 #include "stream.hpp"
 #include "exception.hpp"
+#include "sshfunc.hpp"
 
 #include "ctrlblock.hpp"
 #include "routinglist.hpp"
@@ -61,6 +65,7 @@
 #include "errinjector.hpp"
 #include "eventntf.hpp"
 #include "allocator.hpp"
+#include "filterlist.hpp"
 
 #define SCI_DAEMON_PORT 6688
 
@@ -303,6 +308,8 @@ int Initializer::initFE(int hndl)
     if (handler) {
         handler->start();
     }
+    Message *flistMsg = gFilterList->packMsg(gCtrlBlock->getEndInfo()->fe_info.filter_list);
+    routerInQ->produce(flistMsg);
     int msgID = gNotifier->allocate();
     Message *topoMsg = topo->packMsg();
     topoMsg->setID(msgID);
@@ -317,6 +324,7 @@ int Initializer::initAgent(int hndl)
     string nodeAddr;
     int port = -1;
 
+    getIntToken();
     // get hostname and port no from environment variable.
     char *envp = ::getenv("SCI_WORK_DIRECTORY");
     if (envp != NULL) {
@@ -416,12 +424,50 @@ int Initializer::initAgent(int hndl)
     return SCI_SUCCESS;
 }
 
+int Initializer::getIntToken()
+{
+#ifndef PSEC_OPEN_SSL
+    return 0;
+#endif 
+    Stream ss;
+    struct iovec token = {0};
+    ss.init(MAX_FD);
+    ss >> token >> endl;
+    SSHFUNC->set_user_token(&token);
+    delete [] (char *)token.iov_base;
+
+    return 0;
+}
+
 int Initializer::initBE(int hndl)
 {
     char *envp = ::getenv("SCI_USE_EXTLAUNCHER");
-    if (envp != NULL) {
-        if (::strcasecmp(envp, "yes") == 0) {
-            initExtBE(hndl);
+    if ((envp != NULL) && (::strcasecmp(envp, "yes") == 0)) {
+        int rc = initExtBE(hndl);
+        if (rc != 0)
+            return rc;
+    } else {
+        int rc = getIntToken();
+        envp = ::getenv("SCI_SYNC_INIT");
+        if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
+            Stream stream;
+            string retStr = "OK :)";
+            try {
+                struct iovec vecs[2];
+                struct iovec sign = {0};
+
+                vecs[0].iov_base = &rc;
+                vecs[0].iov_len = sizeof(rc);
+                vecs[1].iov_base = (char *)retStr.c_str();
+                vecs[1].iov_len = retStr.size() + 1;
+                SSHFUNC->sign_data(vecs, 2, &sign);
+                stream.init(SCI_INIT_FD);
+                stream << rc << retStr << sign << endl;
+                stream.stop();
+                SSHFUNC->free_signature(&sign);
+            } catch (SocketException &e) {
+                printf("socket exception %s", e.getErrMsg().c_str());
+            }
         }
     }
 
@@ -488,13 +534,6 @@ int Initializer::initBE(int hndl)
     userQ->setName("userQ");
     gCtrlBlock->registerQueue(userQ);
     gCtrlBlock->setUpQueue(userQ);
-    envp = ::getenv("SCI_SYNC_INIT");
-    if (envp && (strcasecmp(envp, "yes") == 0)) {
-        int msgID = atoi(::getenv("SCI_INIT_ACKID"));
-        Message *msg = new Message();
-        msg->build(SCI_FILTER_NULL, hndl, 0, NULL, NULL, Message::INIT_ACK, msgID);
-        userQ->produce(msg);
-    }
 
     MessageQueue *sysQ = new MessageQueue();
     sysQ->setName("sysQ");
@@ -547,21 +586,47 @@ int Initializer::initBE(int hndl)
     return SCI_SUCCESS;
 }
 
-void Initializer::initExtBE(int hndl)
+int Initializer::initExtBE(int hndl)
 {
     string envStr;
     char hostname[256];
 
     Stream stream;
+    psec_idbuf_desc &usertok = SSHFUNC->get_token();
     struct passwd *pwd = ::getpwuid(::getuid());
     string username = pwd->pw_name;
+    struct iovec sign = {0};
+    struct iovec token = {0};
+    struct iovec vecs[3];
+    int rc, tmp0, tmp1, tmp2;
+    Launcher::MODE mode = Launcher::REQUEST;
+    int jobKey = gCtrlBlock->getJobKey();
+
+    tmp0 = htonl(mode);
+    vecs[0].iov_base = &tmp0;
+    vecs[0].iov_len = sizeof(tmp0);
+    tmp1 = htonl(jobKey);
+    vecs[1].iov_base = &tmp1;
+    vecs[1].iov_len = sizeof(tmp1);
+    tmp2 = htonl(hndl);
+    vecs[2].iov_base = &tmp2;
+    vecs[2].iov_len = sizeof(tmp2);
+    rc = SSHFUNC->sign_data(vecs, 3, &sign);
 
     ::gethostname(hostname, sizeof(hostname));
     stream.init(hostname, SCI_DAEMON_PORT);
-    stream << username << (int) Launcher::REQUEST << gCtrlBlock->getJobKey() << hndl << endl;
-    stream >> envStr >> endl;
-        
+    stream << username.c_str() << usertok << sign << (int)mode << jobKey << hndl << endl;
+    SSHFUNC->free_signature(&sign);
+    stream >> envStr >> token >> sign >> endl;
     stream.stop();
+    vecs[0].iov_base = (char *)envStr.c_str(); 
+    vecs[0].iov_len = envStr.size() + 1;
+    vecs[1] = token;
+    rc = SSHFUNC->verify_data(vecs, 2, &sign);
+    SSHFUNC->set_user_token(&token);
+    delete [] (char *)sign.iov_base;
+    if (rc != 0)
+        return -1;
 
     string key, val;
     char *st = (char *) envStr.c_str();
@@ -577,6 +642,8 @@ void Initializer::initExtBE(int hndl)
             ::setenv(key.c_str(), val.c_str(), 1);
         }
     }
+    
+    return 0;
 }
 
 void Initializer::initListener()

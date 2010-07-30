@@ -26,6 +26,9 @@
 #ifndef _ATOMIC_HPP
 #define _ATOMIC_HPP
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <assert.h>
 #include <pthread.h>
 

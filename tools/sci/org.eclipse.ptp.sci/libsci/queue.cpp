@@ -36,12 +36,10 @@
 #include "atomic.hpp"
 
 #include "message.hpp"
+#include "tools.hpp"
 
-
-const long long FLOWCTL_THRESHOLD = 1024 * 1024 * 1024 * 2LL;
-volatile long long MessageQueue::thresHold = 0;
-
-MessageQueue::MessageQueue()
+MessageQueue::MessageQueue(bool ctl)
+    : thresHold(0), flowCtl(ctl)
 {
     ::pthread_mutex_init(&mtx, NULL);
     ::sem_init(&sem, 0, 0);
@@ -64,10 +62,16 @@ MessageQueue::~MessageQueue()
 }
 
 int MessageQueue::flowControl(int size)
-{       
-    if ((size > 0) && (thresHold > FLOWCTL_THRESHOLD)) {
-        sleep(1);
-    }   
+{
+    long long flowctlThreshold = gCtrlBlock->getFlowctlThreshold();
+
+    if(flowCtl) {
+        if ((gCtrlBlock->getMyRole() != CtrlBlock::BACK_END) && (size > 0)) {
+            while (thresHold > flowctlThreshold) {
+                SysUtil::sleep(1000);
+            }   
+        }
+    }
 
     return 0;
 }
@@ -87,11 +91,20 @@ int MessageQueue::multiProduce(Message **msgs, int num)
         queue.push_back(msgs[i]);
         ::sem_post(&sem);
     }
-    thresHold += len;
+    
+    if(flowCtl) {
+        thresHold += len;
+    }
+
     unlock();
     flowControl(len);
 
     return 0;
+}
+
+void MessageQueue::notify()
+{
+    ::sem_post(&sem);
 }
 
 void MessageQueue::produce(Message *msg)
@@ -99,13 +112,15 @@ void MessageQueue::produce(Message *msg)
     int len = 0; 
 
     if (!msg) {
-        ::sem_post(&sem);
         return;
     }
     len = msg->getContentLen();
     lock();
     queue.push_back(msg);
-    thresHold += len;
+    if(flowCtl) {
+        thresHold += len;
+    }
+
     unlock();
     ::sem_post(&sem);
     flowControl(len);
@@ -120,7 +135,7 @@ int  MessageQueue::multiConsume(Message **msgs, int num)
 
     for (i = 0; i < num; i++) {
         if (sem_wait_i(&sem, -1) != 0) {
-            return NULL;
+            return -1;
         }
     }
     lock();
@@ -129,9 +144,11 @@ int  MessageQueue::multiConsume(Message **msgs, int num)
         queue.pop_front();
         len += msgs[i]->getContentLen();
     }
-    thresHold -= len;
+    if (flowCtl) {
+        thresHold -= len;
+    }
+
     unlock();
-    flowControl(-len);
 
     return 0;
 }
@@ -150,10 +167,11 @@ Message* MessageQueue::consume(int millisecs)
     if (!queue.empty()) {
         msg = queue.front();
         len = msg->getContentLen();
-        thresHold -= len;
+        if (flowCtl) {
+            thresHold -= len;
+        }
     }
     unlock();
-    flowControl(-len);
 
     return msg;
 }
@@ -185,6 +203,19 @@ int MessageQueue::getSize()
     unlock();
 
     return size;
+}
+
+void MessageQueue::setName(string str)
+{
+    name = str;
+    if (getName() == "filterInQ") { 
+        flowCtl = true;
+    }
+}
+
+string MessageQueue::getName()
+{
+    return name;
 }
 
 int MessageQueue::sem_wait_i(sem_t *psem, int usecs)

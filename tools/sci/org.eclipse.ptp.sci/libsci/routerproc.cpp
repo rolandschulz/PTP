@@ -133,6 +133,9 @@ void RouterProcessor::process(Message * msg)
 
             gRoutingList->bcast(SCI_GROUP_ALL, msg);
             break;
+        case Message::FILTER_LIST:
+            gFilterList->loadFilterList(*msg);
+            break;
         case Message::GROUP_CREATE:
         case Message::GROUP_FREE:
         case Message::GROUP_OPERATE:

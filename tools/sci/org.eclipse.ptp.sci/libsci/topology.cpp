@@ -23,6 +23,9 @@
 
 ****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "topology.hpp"
 #include <stdlib.h>
 #include <math.h>
@@ -38,7 +41,6 @@
 #include "log.hpp"
 #include "tools.hpp"
 #include "packer.hpp"
-#include "socket.hpp"
 #include "exception.hpp"
 #include "ipconverter.hpp"
 
@@ -46,13 +48,14 @@
 #include "message.hpp"
 #include "queue.hpp"
 #include "routinglist.hpp"
+#include "filterlist.hpp"
 #include "processor.hpp"
 #include "eventntf.hpp"
 #include "listener.hpp"
 #include "parent.hpp"
+#include "sshfunc.hpp"
 
 const int ONE_KK = 1024 * 1024;
-const int MAX_FD = 1024;
 const int SCI_DAEMON_PORT = 6688;
 
 int BEMap::input(const char * filename, int num)
@@ -231,11 +234,7 @@ int Topology::init()
     }
 
     // check agent path
-#ifdef __64BIT__
-    const char *agentName = "scia64";
-#else
     const char *agentName = "scia";
-#endif
 
     if ((envp = ::getenv("SCI_AGENT_PATH")) != NULL) {
         agentPath = envp;
@@ -260,7 +259,8 @@ int Topology::deploy()
             gCtrlBlock->genSelfInfo(gCtrlBlock->getFilterOutQueue(), true);
         }
     }
-    rc = launcher.syncWaiting(getBENum());
+    if (rc == SCI_SUCCESS)
+        rc = launcher.syncWaiting();
 
     return rc;
 }
@@ -271,6 +271,7 @@ int Topology::addBE(Message *msg)
 
     Packer packer(msg->getContentBuf());
     char *host = packer.unpackStr();
+    int lev = packer.unpackInt();
     int id = (int) msg->getGroup();
 
     // find the first child agent with weight < fanOut
@@ -285,7 +286,7 @@ int Topology::addBE(Message *msg)
     }
 
     int rc = SCI_SUCCESS;
-    if (aID == INVLIDSUCCESSORID) {
+    if ((aID == INVLIDSUCCESSORID) && ((lev <= level) || (level == height))) {
         // if do not find
         Launcher launcher(*this);
         if (weightMap.size() == 0) { // if this agent does not have any child agents, launch a back end
@@ -293,8 +294,10 @@ int Topology::addBE(Message *msg)
         } else { // if this agent has child agent(s), launch an agent
             rc = launcher.launchAgent(id, host);
         }
-        launcher.syncWaiting(1);
+        launcher.syncWaiting();
     } else {
+        if (aID == INVLIDSUCCESSORID)
+            aID = weightMap.begin()->first;
         // otherwise delegate this command
         gRoutingList->addBE(SCI_GROUP_ALL, aID, id);
         gRoutingList->ucast(aID, msg);
@@ -371,18 +374,14 @@ void Topology::decWeight(int id)
 
 bool Topology::isFullTree(int beNum)
 { 
-    int h = (int)(::log((double)beNum) / ::log((double)fanOut)); 	
-    if (h == 0)
-        return false;
-
-    if ((int)(::pow((double)fanOut, (double)h)) == beNum)
+    if (beNum >= fanOut)
         return true;
 
     return false;
 }
 
 Launcher::Launcher(Topology &topo)
-	: topology(topo), shell(""), mode(INTERNAL), sync(false), ackID(-1)
+	: topology(topo), shell(""), mode(INTERNAL), sync(false)
 {
     char *envp = NULL;
     char tmp[256] = {0};
@@ -450,16 +449,8 @@ Launcher::Launcher(Topology &topo)
     env.set("SCI_SYNC_INIT", "no");
     envp = ::getenv("SCI_SYNC_INIT");
     if (envp && (::strcasecmp(envp, "yes") == 0)) {
-        char *ev = ::getenv("SCI_INIT_ACKID");
         sync = true;
         env.set("SCI_SYNC_INIT", "yes");
-        if (ev != NULL) {
-            ackID = atoi(ev);
-            env.set("SCI_INIT_ACKID", ev); 
-        } else {
-            ackID = gNotifier->allocate();
-            env.set("SCI_INIT_ACKID", SysUtil::itoa(ackID).c_str()); 
-        }
     }
     env.set("SCI_ENABLE_FAILOVER", "no");
     envp = ::getenv("SCI_ENABLE_FAILOVER");
@@ -513,7 +504,7 @@ Launcher::~Launcher()
 
 int Launcher::launch()
 {
-    int tree = 1;
+    int tree = 2;
     int rc = 0;
 
     char *envp = ::getenv("SCI_DEBUG_TREE");
@@ -522,7 +513,6 @@ int Launcher::launch()
     }
 
     if (tree != 2) {
-        // use tree 1 when default
         rc = launch_tree1();
     } else {
         rc = launch_tree2();
@@ -531,27 +521,102 @@ int Launcher::launch()
     return rc;
 }
 
-int Launcher::syncWaiting(int beNum)
+int Launcher::sendInitRet(int rc, string &retStr)
 {
-    struct {
-        int num;
-        int count;
-    } rc;
+    if (sync && (gCtrlBlock->getMyRole() == CtrlBlock::AGENT)) {
+        struct iovec vecs[2];
+        struct iovec sign = {0};
+        Stream stream;
 
-    if (!sync || (gCtrlBlock->getMyRole() != CtrlBlock::FRONT_END))
-        return 0;
-
-    rc.num = beNum;
-    rc.count = 0;
-    gNotifier->freeze(ackID, &rc);
+        SSHFUNC->sign_data(vecs, 2, &sign);
+        stream.init(SCI_INIT_FD);
+        stream << rc << retStr << sign << endl;
+        stream.stop();
+        SSHFUNC->free_signature(&sign);
+    }
 
     return 0;
+}
+
+int Launcher::syncWaiting()
+{
+    int rc = 0;
+    int sockfd = -1;
+    int maxfd = -1;
+    string retStr;
+    string backStr("OK :)");
+    fd_set rset;
+    struct timeval tm = {300, 0};
+
+    if (!sync)
+        return 0;
+
+    while ((initStreams.size() > 0) && (rc == 0)) {
+        FD_ZERO(&rset);
+        vector<Stream *>::iterator it;
+        for (it = initStreams.begin(); it != initStreams.end(); ++it) {
+            sockfd = (*it)->getSocket();
+            FD_SET(sockfd, &rset);
+            maxfd = (maxfd > sockfd) ? maxfd : sockfd;
+        }
+
+        rc = select(maxfd+1, &rset, NULL, NULL, &tm);
+        if (rc == 0)
+            rc = -1;
+        for (it = initStreams.begin(); it != initStreams.end(); ) {
+            sockfd = (*it)->getSocket();
+            if (FD_ISSET(sockfd, &rset)) {
+                try {
+                    int rt = -1;
+                    struct iovec vecs[2];
+                    struct iovec sign = {0};
+
+                    (**it) >> rc >> retStr >> sign >> endl;
+                    (*it)->stop();
+                    delete *it;
+                    initStreams.erase(it);
+                    vecs[0].iov_base = &rc;
+                    vecs[0].iov_len = sizeof(rc);
+                    vecs[1].iov_base = (char *)retStr.c_str();
+                    vecs[1].iov_len = retStr.size() + 1;
+                    rt = SSHFUNC->verify_data(vecs, 2, &sign);
+                    delete [] (char *)sign.iov_base;
+                    if ((rc != 0) || (rt != 0)) {
+                        rc = -1;
+                        log_error("Launching init stream error, %d - %s", rc, retStr.c_str());
+                        break;
+                    }
+                } catch (SocketException &e) {
+                    delete *it;
+                    initStreams.erase(it);
+                    log_error("Launching init stream socket exception, %s", e.getErrMsg().c_str());
+                    rc = -1;
+                }
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    if (rc != 0) {
+        backStr = localName + "timeout or socket error";
+        vector<Stream *>::iterator it;
+        for (it = initStreams.begin(); it != initStreams.end(); ++it) {
+            delete *it;
+        }
+        initStreams.clear();
+    }
+    assert(initStreams.size() == 0);
+    sendInitRet(rc, backStr);
+
+    return rc;
 }
 
 int Launcher::launchBE(int beID, const char * hostname)
 {
     int rc;
     char queueName[32];
+    Message *flistMsg = gFilterList->getFlistMsg();
 
     gRoutingList->addBE(SCI_GROUP_ALL, VALIDBACKENDIDS, beID);
 
@@ -560,6 +625,7 @@ int Launcher::launchBE(int beID, const char * hostname)
     queue->setName(string(queueName));
     gCtrlBlock->registerQueue(queue);
     gCtrlBlock->mapQueue(beID, queue);
+    queue->produce(flistMsg);
 
     rc = launchClient(beID, topology.bePath, hostname, mode);
     if (rc == SCI_SUCCESS) {
@@ -594,7 +660,12 @@ int Launcher::launchAgent(int beID, const char * hostname)
 
     rc = launchClient(childTopo->agentID, childTopo->agentPath, hostname);
     if (rc == SCI_SUCCESS) {
+        Message *flistMsg = gFilterList->getFlistMsg();
         Message *topoMsg = childTopo->packMsg();
+        if (flistMsg != NULL) {
+            flistMsg->setRefCount(flistMsg->getRefCount() + 1);
+            queue->produce(flistMsg);
+        }
         queue->produce(topoMsg);
         gCtrlBlock->genSelfInfo(queue, false);
         
@@ -615,18 +686,47 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m)
     env.set("SCI_PARENT_PORT", gCtrlBlock->getListener()->getBindPort());
     env.set("SCI_CLIENT_ID", ID);
     env.set("SCI_PARENT_ID", topology.agentID);
+    // flow control threshold
+    env.set("SCI_FLOWCTL_THRESHOLD", gCtrlBlock->getFlowctlThreshold());
 
     log_debug("Launch client: %s: %s", host.c_str(), path.c_str());
     
     if (shell.empty()) {
         struct passwd *pwd = ::getpwuid(::getuid());
         string usernam = pwd->pw_name;
+
         try {
-            Stream stream;
-            stream.init(host.c_str(), SCI_DAEMON_PORT);
+            int tmp0, tmp1, tmp2;
+            struct iovec sign = {0};
+            struct iovec vecs[6];
             int jobKey = gCtrlBlock->getJobKey();
-            stream << usernam << (int)m << jobKey << ID << path << env.getEnvString() << endl;
-            stream.stop();
+            psec_idbuf_desc &usertok = SSHFUNC->get_token();
+            Stream *stream = new Stream();
+            stream->init(host.c_str(), SCI_DAEMON_PORT);
+
+            tmp0 = htonl(m);
+            vecs[0].iov_base = &tmp0;
+            vecs[0].iov_len = sizeof(tmp0);
+            tmp1 = htonl(jobKey);
+            vecs[1].iov_base = &tmp1;
+            vecs[1].iov_len = sizeof(tmp1);
+            tmp2 = htonl(ID);
+            vecs[2].iov_base = &tmp2;
+            vecs[2].iov_len = sizeof(tmp2);
+            vecs[3].iov_base = &sync;
+            vecs[3].iov_len = sizeof(sync);
+            vecs[4].iov_base = (void *)path.c_str();
+            vecs[4].iov_len = path.size() + 1;
+            vecs[5].iov_base = (void *)env.getEnvString().c_str();
+            vecs[5].iov_len = env.getEnvString().size() + 1;
+            rc = SSHFUNC->sign_data(vecs, 6, &sign);
+            *stream << usernam << usertok << sign << (int)m << jobKey << ID << sync << path << env.getEnvString() << endl;
+            SSHFUNC->free_signature(&sign);
+            if (sync) {
+                initStreams.push_back(stream);
+            } else {
+                delete stream;
+            }
         } catch (SocketException &e) {
             rc = -1;
             log_error("Launcher: socket exception: %s", e.getErrMsg().c_str());
@@ -636,8 +736,11 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m)
         rc = system(cmd.c_str());
     }
 
-    if (rc != SCI_SUCCESS)
+    if (rc != SCI_SUCCESS) {
+        string errStr = host + " failed to launch client";
         rc = SCI_ERR_LAUNCH_FAILED;
+        sendInitRet(rc, errStr);
+    }
 
     return rc;
 }
@@ -649,7 +752,8 @@ int Launcher::launch_tree1()
     // this tree will have minimum agents
     int totalSize = (int) topology.beMap.size();
     char queueName[32];
-   
+    Message *flistMsg = gFilterList->getFlistMsg();
+
     if (totalSize <= topology.fanOut) {
         // no need to generate agent
         BEMap::iterator it = topology.beMap.begin();
@@ -658,6 +762,8 @@ int Launcher::launch_tree1()
         int startID = initID;
         int endID = initID + totalSize - 1;
         gRoutingList->initSubGroup(VALIDBACKENDIDS, startID, endID);
+        if (flistMsg != NULL)
+            flistMsg->setRefCount(totalSize + 1);
         
         for ( ; it != topology.beMap.end(); ++it) {
             MessageQueue *queue = new MessageQueue();
@@ -665,13 +771,13 @@ int Launcher::launch_tree1()
             queue->setName(string(queueName));
             gCtrlBlock->registerQueue(queue);
             gCtrlBlock->mapQueue((*it).first, queue);
+            queue->produce(flistMsg); 
 
             rc = launchClient((*it).first, topology.bePath, (*it).second, mode);
-            if (rc == SCI_SUCCESS) {
-                gCtrlBlock->genSelfInfo(queue, false);
-            } else {
+            if (rc != SCI_SUCCESS) {
                 return rc;
             }
+            gCtrlBlock->genSelfInfo(queue, false);
         }
 
         return SCI_SUCCESS;
@@ -690,6 +796,8 @@ int Launcher::launch_tree1()
     } else {
         step = (totalSize - (totalSize % divf)) / divf + 1;
     }
+    if (flistMsg != NULL)
+        flistMsg->setRefCount((totalSize + step - 1) / step + 1);
     ::srand((unsigned int) ::time(NULL));
     BEMap::iterator it = topology.beMap.begin();
     int initID = (*it).first;
@@ -734,6 +842,7 @@ int Launcher::launch_tree1()
         rc = launchClient(childTopo->agentID, topology.agentPath, hostname);
         if (rc == SCI_SUCCESS) {
             Message *msg = childTopo->packMsg();
+            queue->produce(flistMsg); // before topology message
             queue->produce(msg);
             gCtrlBlock->genSelfInfo(queue, false);
             delete childTopo;
@@ -757,10 +866,15 @@ int Launcher::launch_tree2()
     int size = 0;
     int out = topology.fanOut;
     char queueName[32];
+    Message *flistMsg = gFilterList->getFlistMsg();
+    int ref = 0; 
 
     if (totalSize == 0)
         return SCI_SUCCESS;
 
+    ref = (totalSize > out) ? out : totalSize;
+    if (flistMsg != NULL)
+        flistMsg->setRefCount(ref + 1);  // Keep it undeleted
     // launch all of my back ends
     BEMap::iterator it = topology.beMap.begin();
     int initID = (*it).first;
@@ -774,6 +888,7 @@ int Launcher::launch_tree2()
             queue->setName(string(queueName));
             gCtrlBlock->registerQueue(queue);
             gCtrlBlock->mapQueue((*it).first, queue);
+            queue->produce(flistMsg); 
         
             gRoutingList->addBE(SCI_GROUP_ALL, VALIDBACKENDIDS, (*it).first);
 
@@ -785,8 +900,7 @@ int Launcher::launch_tree2()
             }
             it++;
         } else {
-            string hostname;
-            BEMap::iterator fh = it;
+            string &hostname = it->second;
             Topology *childTopo = new Topology(topology.nextAgentID--);
             childTopo->fanOut  = topology.fanOut;
             childTopo->level = topology.level + 1;
@@ -810,18 +924,10 @@ int Launcher::launch_tree2()
             gCtrlBlock->registerQueue(queue);
             gCtrlBlock->mapQueue(childTopo->agentID, queue);
             
-            int pos = ::rand() % step;
-            for (i = 0; i < step; i++) {
-                if (pos == i) {
-                    hostname = fh->second;
-                    break;
-                }
-                fh++;
-            }
-
             rc = launchClient(childTopo->agentID, topology.agentPath, hostname);
             if (rc == SCI_SUCCESS) {
                 Message *msg = childTopo->packMsg();
+                queue->produce(flistMsg); // make the filter list loaded before topology
                 queue->produce(msg);
                 gCtrlBlock->genSelfInfo(queue, false);
                 delete childTopo;

@@ -26,40 +26,66 @@
 #ifndef _EXTLAUNCH_HPP
 #define _EXTLAUNCH_HPP
 
+#include <sys/uio.h>
 #include <pwd.h>
-
-#include "thread.hpp"
 
 #include <string>
 #include <map>
 
+#include "thread.hpp"
 #define FIVE_MINUTES 5000000 * 60
 
 using namespace std;
 
 class Stream;
 
+enum LAUNCH_MODE {
+    INTERNAL,
+    REGISTER,
+    REQUEST
+};
+
 class ExtLauncher : public Thread 
 {
     private:
         Stream         *stream;
+        string          retStr;
+        string          userName;
+        struct iovec    usertok;
+        char            sessionKey[64];
+        size_t          ssKeyLen;
+        LAUNCH_MODE     mode;
+        bool            sync;
 
+    private:
+        char *getExename(char *path);
+
+        int verifyToken(bool suser = false);
+        int verifyData(struct iovec &sign, int jobkey, int id, char *path = NULL, char *envStr = NULL);
+        int doVerify(struct iovec &sign, int jobkey, int id, char *path = NULL, char *envStr = NULL);
+        int putSessionKey(int fd, struct iovec &sign, int jobkey, int id, char *path, char *envStr, bool suer = true);
+        int getSessionKey(int fd);
+        int sendResult(Stream &s, int rc);
     public:
         ExtLauncher(Stream *s);
         virtual ~ExtLauncher();
 
         virtual void run();
 
-        int launchInt(char *path, char *envStr, struct passwd *pwd);
-        int launchReg(int key, int id, const char *envStr);
-        int launchReq(int key, int id);
+        int launchInt(int jobkey, int id, char *path, char *envStr, struct iovec &sign);
+        int launchReg(int jobkey, int id, const char *envStr);
+        int launchReq(int jobkey, int id);
         int regInfo();
 };
 
 typedef map<int, string> TASK_CONFIG;
 typedef struct TASK_INFO {
-    TASK_CONFIG config;
-    double      timestamp;
+    string          user;
+    bool            sync;
+    Stream          *stream;
+    TASK_CONFIG     config;
+    double          timestamp;
+    struct iovec    token;
 };
 typedef map<int, TASK_INFO> JOB_INFO;
 

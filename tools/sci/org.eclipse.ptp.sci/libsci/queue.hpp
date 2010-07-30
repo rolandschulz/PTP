@@ -44,18 +44,20 @@ class Message;
 class MessageQueue 
 {      
     private:
-        deque<Message*>       queue;
-        pthread_mutex_t       mtx;
-        sem_t                 sem;
+        deque<Message*>                 queue;
+        pthread_mutex_t                 mtx;
+        sem_t                           sem;
 
-        string                name;
-        volatile static long long      thresHold;
+        string                          name;
+        volatile long long              thresHold;
+        bool                            flowCtl;
 
     public:
-        MessageQueue();
+        MessageQueue(bool ctl = false);
         ~MessageQueue();
 
-        void produce(Message *msg = NULL);
+        void produce(Message *msg);
+        void notify();
         int multiProduce(Message **msgs, int num);
         int multiConsume(Message **msgs, int num);
         Message *consume(int millisecs=-1);
@@ -63,15 +65,15 @@ class MessageQueue
 
         int getSize();
 
-        void setName(string str) { name = str; }
-        string getName() { return name; }
+        void setName(string str); 
+        string getName();
 
     private:
         int sem_wait_i(sem_t *psem, int usecs);
 
         void lock();
         void unlock();
-        static int flowControl(int size);
+        int flowControl(int size);
 };
 
 #endif

@@ -28,14 +28,16 @@
 
 #include <netdb.h>
 #include <netinet/in.h>
+#include <sys/uio.h>
 #include <string>
+
+#include "socket.hpp"
+
 
 using namespace std;
 
 typedef void (EndOfLine)();
 void endl();
-
-class Socket;
 
 class Stream 
 {
@@ -46,7 +48,6 @@ class Stream
 
         bool         readActive;
         bool         writeActive;
-        static long long    thresHold;
 
     public:
         Stream();
@@ -55,6 +56,7 @@ class Stream
         int init(const char *nodeAddr, in_port_t port);
         int init(int sockfd);
         int setAsync();
+        int getSocket() { return socket->getFd(); }
 
         void read(char *buf, int size);
         void write(const char *buf, int size);
@@ -66,15 +68,21 @@ class Stream
         Stream & flush();
 
         Stream & operator >> (char &value);
+        Stream & operator >> (bool &value);
         Stream & operator >> (int &value);
+        Stream & operator >> (long &value);
         Stream & operator >> (char *value);
         Stream & operator >> (string &value);
+        Stream & operator >> (struct iovec &value);
         Stream & operator >> (EndOfLine);
         
         Stream & operator << (char value);
+        Stream & operator << (bool value);
         Stream & operator << (int value);
+        Stream & operator << (long value);
         Stream & operator << (const char *value);
         Stream & operator << (const string &value);
+        Stream & operator << (struct iovec &value);
         Stream & operator << (EndOfLine);
 
     private:

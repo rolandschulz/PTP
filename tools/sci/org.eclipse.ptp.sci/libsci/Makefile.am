@@ -1,0 +1,40 @@
+AUTOMAKE_OPTIONS=foreign
+SOURCES = \
+    allocator.cpp  errdetector.cpp  errmonitor.cpp  filterproc.cpp   message.cpp    purifierproc.cpp  routinglist.cpp \
+    api.cpp        errevent.cpp     eventntf.cpp    handlerproc.cpp  observer.cpp   queue.cpp         statemachine.cpp \
+    ctrlblock.cpp  errhandler.cpp   filter.cpp      initializer.cpp  parent.cpp     readerproc.cpp    topology.cpp \
+    dgroup.cpp     errinjector.cpp  filterlist.cpp  listener.cpp     processor.cpp  routerproc.cpp    writerproc.cpp 
+
+noinst_HEADERS = \
+    allocator.hpp errdetector.hpp errmonitor.hpp filterproc.hpp listener.hpp processor.hpp routerproc.hpp writerproc.hpp \
+    atomic.hpp     errevent.hpp     eventntf.hpp    general.hpp      message.hpp   purifierproc.hpp  routinglist.hpp \
+    ctrlblock.hpp  errhandler.hpp   filter.hpp      handlerproc.hpp  observer.hpp  queue.hpp         statemachine.hpp \
+    dgroup.hpp     errinjector.hpp  filterlist.hpp  initializer.hpp  parent.hpp    readerproc.hpp    topology.hpp
+
+include_HEADERS = ../include/sci.h
+
+OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
+OBJECTS64 = $(addsuffix .64o, $(basename $(SOURCES)))
+
+if SYSTEM_AIX
+lib_LIBRARIES = libsci_r.a
+
+SCI_CPPFLAGS = -g -O0 -DREENTRANT -D_SCI_DEBUG -I../include -I../common -I../libsci -I../ -I../secmod -qmkshrobj 
+libsci_r.a : libsci_r.o libsci64_r.o
+	$(AR) -X32_64 -rv $@ $^
+libsci_r.o : $(OBJECTS)
+	$(CXX) -q32 $(SCI_CPPFLAGS) -o $@ $^ -L../common -lcmn
+libsci64_r.o : $(OBJECTS64)
+	$(CXX) -q64 $(SCI_CPPFLAGS) -o $@ $^ -L../common -lcmn64
+
+%.o: %.cpp
+	$(CXX) -q32 -c $(SCI_CPPFLAGS) -o $@ $< 
+
+%.64o: %.cpp
+	$(CXX) -q64 -c $(SCI_CPPFLAGS) -o $@ $< 
+else
+lib_LTLIBRARIES=libsci.la
+libsci_la_SOURCES = $(SOURCES)
+libsci_la_CPPFLAGS = -I../include -I../common -I../secmod
+libsci_la_LDFLAGS= -L../common -lcmn -lrt 
+endif

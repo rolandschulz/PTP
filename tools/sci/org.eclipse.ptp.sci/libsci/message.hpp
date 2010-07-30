@@ -54,7 +54,7 @@ class Message
             // used for dynamic +/- backend messages
             BE_REMOVE = -1011,
             BE_ADD = -1012,
-            INIT_ACK = -1013,
+            FILTER_LIST = -1013,
             // used for error handling
             UNCLE = -2001,
             UNCLE_LIST = -2002,

@@ -42,7 +42,6 @@ Socket::Socket(int sockfd)
 
 Socket::~Socket()
 {
-    close(BOTH);
     ::close(socket);
 }
 
@@ -278,6 +277,7 @@ void Socket::close(Socket::DIRECTION how)
             break;
         case BOTH:
             ::shutdown(socket, SHUT_RDWR);
+            ::close(socket);
         default:
             break;
     }

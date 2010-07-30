@@ -58,7 +58,8 @@ class Initializer
         int initFE(int hndl);
         int initAgent(int hndl);
         int initBE(int hndl);
-        void initExtBE(int hndl);
+        int initExtBE(int hndl);
+        int getIntToken();
 
         void initListener();
 };

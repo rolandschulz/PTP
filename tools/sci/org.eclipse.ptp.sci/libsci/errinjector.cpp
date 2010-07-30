@@ -135,12 +135,12 @@ void ErrorInjector::process(Stream *stream)
         catch (SocketException &e) {
             log_error("error injector socket exception %s", e.getErrMsg().c_str());
             monitor->setState(false);
-            gCtrlBlock->getMonitorInQueue()->produce();
+            gCtrlBlock->getMonitorInQueue()->notify();
             break;
         } catch (...) {
             log_error("unknown exception");
             monitor->setState(false);
-            gCtrlBlock->getMonitorInQueue()->produce();
+            gCtrlBlock->getMonitorInQueue()->notify();
             break;
         }
         handleCommand(numArr, errInjectType);

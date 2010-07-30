@@ -32,6 +32,7 @@
 #include "socket.hpp"
 
 const int  BUFFER_SIZE = 4380;
+const int MAX_NETWORK_SIZE = 1024 * 1024 * 8; // Max length = 8M
 const char END_OF_LINE = '\n';
 
 void endl() {}
@@ -56,7 +57,11 @@ Stream::~Stream()
 
 int Stream::init(const char *nodeAddr, in_port_t port)
 {
-    socket = new Socket();
+    if (socket != NULL) {
+        socket->close(Socket::BOTH);
+    } else {
+        socket = new Socket();
+    }
    
     if ((nodeAddr == NULL) || (port <= 0)) 
         return -1;
@@ -71,7 +76,11 @@ int Stream::init(const char *nodeAddr, in_port_t port)
 
 int Stream::init(int sockfd)
 {
-    socket = new Socket();
+    if (socket != NULL) {
+        socket->close(Socket::BOTH);
+    } else {
+        socket = new Socket();
+    }
     socket->setFd(sockfd);
 
     readActive = true;
@@ -162,6 +171,13 @@ Stream & Stream::operator >> (char &value)
     return *this;
 }
 
+Stream & Stream::operator >> (bool &value) 
+{
+    read((char *)&value, sizeof(value));
+
+    return *this;
+}
+
 Stream & Stream::operator >> (int &value)
 {
     read((char *)&value, sizeof(value));
@@ -170,11 +186,27 @@ Stream & Stream::operator >> (int &value)
     return *this;
 }
 
+Stream & Stream::operator >> (long &value)
+{
+    int low = 0;
+    int high = 0;
+    int nbyte;
+
+    *this >> nbyte;
+    *this >> low;
+    nbyte -= sizeof(int);
+    if (nbyte != 0) {
+        *this >> high;
+    }
+    value = high << sizeof(int) | low;
+    
+    return *this;
+}
+
 Stream & Stream::operator >> (char *value)
 {
     int len;
     *this >> len;
-    len = ntohl(len);
     read(value, len);
     
     return *this;
@@ -183,14 +215,31 @@ Stream & Stream::operator >> (char *value)
 Stream & Stream::operator >> (string &value)
 {
     int len;
+    char *buf = NULL;
     *this >> len;
-    len = ntohl(len);
     
-    char *buf = new char[len];
+    if (len > MAX_NETWORK_SIZE)
+        throw SocketException(SocketException::NET_ERR_DATA);
+
+    buf = new char[len];
     read(buf, len);
     value = buf;
     delete [] buf;
    
+    return *this;
+}
+
+Stream & Stream::operator >> (struct iovec &value)
+{
+    *this >> (long &)value.iov_len;
+    if (value.iov_len > (int)MAX_NETWORK_SIZE)
+        throw SocketException(SocketException::NET_ERR_DATA);
+
+    if (value.iov_len > 0) {
+        value.iov_base = new char[value.iov_len]; // must free it outside
+        read((char *)value.iov_base, value.iov_len);
+    }
+
     return *this;
 }
 
@@ -213,11 +262,35 @@ Stream & Stream::operator << (char value)
     return *this;
 }
 
-Stream & Stream::operator << (int value)
+Stream & Stream::operator << (bool value)
 {
     checkBuffer(sizeof(value));
-    *(int *)cursor = htonl(value);
+    *(bool *)cursor = value;
     cursor += sizeof(value);
+   
+    return *this;
+}
+
+Stream & Stream::operator << (int value)
+{
+    int tmp = htonl(value);
+    checkBuffer(sizeof(value));
+    memcpy(cursor, &tmp, sizeof(tmp));
+    cursor += sizeof(value);
+   
+    return *this;
+}
+
+Stream & Stream::operator << (long value)
+{
+    *this << (int)sizeof(value);
+    if (sizeof(long) > sizeof(int)) {
+        int low = value << sizeof(int) >> sizeof(int);
+        int high = value >> sizeof(int);
+        *this << low << high;
+    } else {
+        *this << (int)value;
+    }
    
     return *this;
 }
@@ -225,8 +298,7 @@ Stream & Stream::operator << (int value)
 Stream & Stream::operator << (const char *value)
 {
     int len = ::strlen(value) + 1; // including '\0' at the end
-    int tmp = htonl(len);
-    *this << tmp;
+    *this << len;
 
     int count = len;
     char *p = (char *)value;
@@ -245,6 +317,25 @@ Stream & Stream::operator << (const char *value)
 Stream & Stream::operator << (const string &value)
 {
     *this << value.c_str();
+
+    return *this;
+}
+
+Stream & Stream::operator << (struct iovec &value)
+{
+    long len = (long)value.iov_len;
+    int count = len;
+    char *p = (char *)value.iov_base;
+
+    *this << len;
+    while (len > 0) {
+        checkBuffer(len);
+        count = (len - BUFFER_SIZE) > 0 ? BUFFER_SIZE : len;
+        ::memcpy(cursor, p, count);
+        cursor += count;
+        p += count;
+        len -= count;
+    }
 
     return *this;
 }

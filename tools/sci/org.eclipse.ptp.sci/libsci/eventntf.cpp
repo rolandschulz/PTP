@@ -53,9 +53,11 @@ int EventNotify::allocate()
     int num;
 
     lock();
-    serialNum = (serialNum + 1) % MAX_SERIAL_NUM;
-    serialNum = (serialNum == 0) ? 1 : serialNum;
+    do {
+        serialNum = (serialNum + 1) % MAX_SERIAL_NUM;
+    } while (serialTest[serialNum].used == true);
     num = serialNum;
+    serialTest[serialNum].used = true;
     unlock();
 
     return num;
@@ -66,11 +68,12 @@ void EventNotify::freeze(int id, void *ret_val)
     lock();
     serialTest[id].ret = ret_val;
     serialTest[id].notified = false;
-    serialTest[id].freezed= true;
-    while(serialTest[id].notified == false) {
+    serialTest[id].freezed = true;
+    while (serialTest[id].notified == false) {
         ::pthread_cond_wait(&cond, &mtx);
     }
-    serialTest[id].freezed= false;
+    serialTest[id].freezed = false;
+    serialTest[id].used = false;
     unlock();
 }
 
@@ -96,6 +99,7 @@ bool EventNotify::test(int id)
         /* Almost impossible running into here */
         SysUtil::sleep(1000);
     }
+    assert(serialTest[id].used = true);
     
     return true;
 }

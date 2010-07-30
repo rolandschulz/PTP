@@ -34,7 +34,7 @@ using namespace std;
 
 #include "sci.h"
 #include "general.hpp"
-
+#include "stream.hpp"
 #include "envvar.hpp"
 
 class Message;
@@ -80,6 +80,7 @@ class Topology
         bool hasBE(int beID);
         int getBENum();
         int getLevel();
+        int getFanout() { return fanOut; }
 
         void incWeight(int id);
         void decWeight(int id);
@@ -106,7 +107,7 @@ class Launcher
         string          localName;
         MODE            mode;
         bool            sync;
-        int             ackID;
+        vector<Stream *> initStreams;
 
     public:    
         Launcher(Topology &topy);
@@ -116,7 +117,8 @@ class Launcher
         
         int launchBE(int beID, const char *hostname);
         int launchAgent(int beID, const char *hostname);
-        int syncWaiting(int beNum);
+        int syncWaiting();
+        int sendInitRet(int rc, string &retStr);
 
     private:
         int launchClient(int ID, string &path, string host, MODE m = INTERNAL);
@@ -124,6 +126,9 @@ class Launcher
         int launch_tree1(); // mininum agents
         int launch_tree2(); // maximum agents
 };
+
+const int MAX_FD = 256;
+const int SCI_INIT_FD = MAX_FD + 1;
 
 #endif
 

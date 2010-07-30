@@ -100,6 +100,6 @@ void WriterProcessor::setOutStream(Stream * stream)
 void WriterProcessor::stop()
 {
     setState(false);
-    inQueue->produce();
+    inQueue->notify();
 }
 
