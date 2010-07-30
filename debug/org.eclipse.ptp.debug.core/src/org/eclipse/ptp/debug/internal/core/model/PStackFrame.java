@@ -330,6 +330,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java
 	 * .lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IRunToLine.class) {
@@ -1005,26 +1006,28 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	 * @throws DebugException
 	 */
 	protected synchronized List<IPVariable> getVariables0() throws DebugException {
-		if (isDisposed()) {
-			return Collections.EMPTY_LIST;
-		}
-		PThread thread = (PThread) getThread();
-		if (thread.isSuspended()) {
-			if (fVariables == null) {
-				List<IPDIVariableDescriptor> vars = getAllPDIVariableObjects();
-				fVariables = new ArrayList<IPVariable>(vars.size());
-				Iterator<IPDIVariableDescriptor> it = vars.iterator();
-				while (it.hasNext()) {
-					fVariables.add(PVariableFactory.createLocalVariable(this, it.next()));
+		if (!isDisposed()) {
+			PThread thread = (PThread) getThread();
+			if (thread.isSuspended()) {
+				if (fVariables == null) {
+					List<IPDIVariableDescriptor> vars = getAllPDIVariableObjects();
+					fVariables = new ArrayList<IPVariable>(vars.size());
+					Iterator<IPDIVariableDescriptor> it = vars.iterator();
+					while (it.hasNext()) {
+						fVariables.add(PVariableFactory.createLocalVariable(this, it.next()));
+					}
+				} else {
+					if (refreshVariables()) {
+						updateVariables();
+					}
 				}
-			} else {
-				if (refreshVariables()) {
-					updateVariables();
-				}
+				setRefreshVariables(false);
 			}
-			setRefreshVariables(false);
+			if (fVariables != null) {
+				return fVariables;
+			}
 		}
-		return (fVariables != null) ? fVariables : Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	/**

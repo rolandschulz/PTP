@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.messages.Messages;
@@ -48,7 +49,7 @@ import org.osgi.framework.BundleContext;
 
 public class PTPDebugCorePlugin extends Plugin {
 	class EventDispatchJob extends Job {
-		private EventNotifier fNotifier = new EventNotifier();
+		private final EventNotifier fNotifier = new EventNotifier();
 
 		/**
 		 * Creates a new event dispatch job.
@@ -58,21 +59,24 @@ public class PTPDebugCorePlugin extends Plugin {
 			setPriority(Job.INTERACTIVE);
 			setSystem(true);
 		}
-		
+
+		@Override
 		public boolean shouldRun() {
 			return shouldSchedule();
 		}
 
+		@Override
 		public boolean shouldSchedule() {
 			return !(isShuttingDown() || fEventListeners.isEmpty());
 		}
 
+		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			while (!fEventQueue.isEmpty()) {
 				IPDebugEvent event = null;
 				synchronized (fEventQueue) {
 					if (!fEventQueue.isEmpty()) {
-						event = (IPDebugEvent) fEventQueue.remove(0);
+						event = fEventQueue.remove(0);
 					}
 				}
 				if (event != null) {
@@ -82,7 +86,7 @@ public class PTPDebugCorePlugin extends Plugin {
 			return Status.OK_STATUS;
 		}
 	}
-	
+
 	class EventNotifier implements ISafeRunnable {
 		private IPDebugEvent fEvent;
 		private IPDebugEventListener fListener;
@@ -105,25 +109,24 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 
 		public void handleException(Throwable exception) {
-			log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR,
-					Messages.PTPDebugCorePlugin_0, exception));
+			log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, Messages.PTPDebugCorePlugin_0, exception));
 		}
 
 		public void run() throws Exception {
 			fListener.handleDebugEvent(fEvent);
 		}
 	}
-	
+
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.core"; //$NON-NLS-1$
-	
+
 	public static final int INTERNAL_ERROR = 1000;
-	
+
 	/**
 	 * Constant identifying the job family identifier for the background event
 	 * job.
 	 */
 	public static final Object FAMILY_EVENT = new Object();
-	
+
 	public static final String PDEBUGGER_EXTENSION_POINT_ID = "parallelDebuggers"; //$NON-NLS-1$
 	public static final String DEBUGGER_ELEMENT = "debugger"; //$NON-NLS-1$
 
@@ -136,7 +139,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	public static PDebugModel getDebugModel() {
 		return debugModel;
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -156,28 +159,28 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		return getDefault().getBundle().getSymbolicName();
 	}
-	
+
 	/**
 	 * @return
 	 */
 	public static IWorkspace getWorkspace() {
 		return ResourcesPlugin.getWorkspace();
 	}
-	
+
 	/**
 	 * @param status
 	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
-	
+
 	/**
 	 * @param message
 	 */
 	public static void log(String message) {
 		getDefault().getLog().log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, message, null));
 	}
-	
+
 	/**
 	 * @param t
 	 */
@@ -198,9 +201,9 @@ public class PTPDebugCorePlugin extends Plugin {
 
 	private HashMap<String, PDebugConfiguration> fDebugConfigurations;
 	private CommonSourceLookupDirector fCommonSourceLookupDirector;
-	private EventDispatchJob dispatchJob = new EventDispatchJob();
-	private ListenerList fEventListeners = new ListenerList();
-	private List<IPDebugEvent> fEventQueue = new ArrayList<IPDebugEvent>();
+	private final EventDispatchJob dispatchJob = new EventDispatchJob();
+	private final ListenerList fEventListeners = new ListenerList();
+	private final List<IPDebugEvent> fEventQueue = new ArrayList<IPDebugEvent>();
 	private boolean fShuttingDown = false;
 	private int fDispatching = 0;
 
@@ -232,15 +235,18 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * @return
 	 */
 	public int getCommandTimeout() {
-		return getPluginPreferences().getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
+		IPreferencesService preferences = Platform.getPreferencesService();
+		return preferences.getInt(getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT,
+				IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT, null);
 	}
 
 	/**
 	 * @return
 	 */
 	public IPSourceLocation[] getCommonSourceLocations() {
-		return SourceUtils.getCommonSourceLocationsFromMemento(getPluginPreferences().getString(
-				IPDebugConstants.PREF_SOURCE_LOCATIONS));
+		IPreferencesService preferences = Platform.getPreferencesService();
+		return SourceUtils.getCommonSourceLocationsFromMemento(preferences.getString(getUniqueIdentifier(),
+				IPDebugConstants.PREF_SOURCE_LOCATIONS, "", null)); //$NON-NLS-1$
 	}
 
 	/**
@@ -259,10 +265,9 @@ public class PTPDebugCorePlugin extends Plugin {
 		if (fDebugConfigurations == null) {
 			initializeDebugConfiguration();
 		}
-		IPDebugConfiguration dbgCfg = (IPDebugConfiguration) fDebugConfigurations.get(id);
+		IPDebugConfiguration dbgCfg = fDebugConfigurations.get(id);
 		if (dbgCfg == null) {
-			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 100, Messages.PTPDebugCorePlugin_2,
-					null);
+			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 100, Messages.PTPDebugCorePlugin_2, null);
 			throw new CoreException(status);
 		}
 		return dbgCfg;
@@ -275,7 +280,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		if (fDebugConfigurations == null) {
 			initializeDebugConfiguration();
 		}
-		return (IPDebugConfiguration[]) fDebugConfigurations.values().toArray(new IPDebugConfiguration[0]);
+		return fDebugConfigurations.values().toArray(new IPDebugConfiguration[0]);
 	}
 
 	/**
@@ -311,18 +316,28 @@ public class PTPDebugCorePlugin extends Plugin {
 		fShuttingDown = value;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		debugModel = new PDebugModel();
 		initializeCommonSourceLookupDirector();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
 			setShuttingDown(true);
@@ -363,8 +378,9 @@ public class PTPDebugCorePlugin extends Plugin {
 	private void initializeCommonSourceLookupDirector() {
 		if (fCommonSourceLookupDirector == null) {
 			fCommonSourceLookupDirector = new CommonSourceLookupDirector();
-			String newMemento = getPluginPreferences().getString(
-					IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS);
+			IPreferencesService preferences = Platform.getPreferencesService();
+			String newMemento = preferences.getString(getUniqueIdentifier(), IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, "", //$NON-NLS-1$
+					null);
 			if (newMemento.length() == 0) {
 				// Convert source locations to source containers
 				fCommonSourceLookupDirector.setSourceContainers(SourceUtils.convertSourceLocations(getCommonSourceLocations()));

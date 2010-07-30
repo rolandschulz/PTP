@@ -224,16 +224,16 @@ public class PMemoryBlockExtension extends PDebugElement implements IMemoryBlock
 		IPDIMemoryBlock pdiBlock = getPDIBlock();
 		if (pdiBlock == null
 				|| pdiBlock.getStartAddress().compareTo(address) > 0
-				|| pdiBlock.getStartAddress().add(BigInteger.valueOf(pdiBlock.getLength())).compareTo(
-						address.add(BigInteger.valueOf(length))) < 0) {
+				|| pdiBlock.getStartAddress().add(BigInteger.valueOf(pdiBlock.getLength()))
+						.compareTo(address.add(BigInteger.valueOf(length))) < 0) {
 			synchronized (this) {
 				byte[] bytes = null;
 				try {
 					pdiBlock = getPDIBlock();
 					if (pdiBlock == null
 							|| pdiBlock.getStartAddress().compareTo(address) > 0
-							|| pdiBlock.getStartAddress().add(BigInteger.valueOf(pdiBlock.getLength())).compareTo(
-									address.add(BigInteger.valueOf(length))) < 0) {
+							|| pdiBlock.getStartAddress().add(BigInteger.valueOf(pdiBlock.getLength()))
+									.compareTo(address.add(BigInteger.valueOf(length))) < 0) {
 						if (pdiBlock != null) {
 							disposePDIBlock();
 							fBytes = null;
@@ -241,18 +241,18 @@ public class PMemoryBlockExtension extends PDebugElement implements IMemoryBlock
 						setPDIBlock(createPDIBlock(address, length));
 					}
 					bytes = getPDIBlock().getBytes();
+					fBytes = new MemoryByte[bytes.length];
+					for (int i = 0; i < bytes.length; ++i) {
+						fBytes[i] = createMemoryByte(bytes[i], getPDIBlock().getFlags(i),
+								hasChanged(getRealBlockAddress().add(BigInteger.valueOf(i))));
+					}
 				} catch (final PDIException e) {
 					targetRequestFailed(e.getMessage(), null);
-				}
-				fBytes = new MemoryByte[bytes.length];
-				for (int i = 0; i < bytes.length; ++i) {
-					fBytes[i] = createMemoryByte(bytes[i], getPDIBlock().getFlags(i), hasChanged(getRealBlockAddress().add(
-							BigInteger.valueOf(i))));
 				}
 			}
 		}
 		MemoryByte[] result = new MemoryByte[0];
-		if (fBytes != null) {
+		if (fBytes != null && pdiBlock != null) {
 			final int offset = address.subtract(getRealBlockAddress()).intValue();
 			final int offsetInBytes = offset * pdiBlock.getWordSize();
 			final long lengthInBytes = length * pdiBlock.getWordSize();

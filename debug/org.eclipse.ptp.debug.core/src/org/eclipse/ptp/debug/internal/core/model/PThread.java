@@ -60,11 +60,11 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class PThread extends PDebugElement implements IPThread, IRestart, IResumeWithoutSignal, IPDIEventListener {
 	private final static int MAX_STACK_DEPTH = 100;
-	private IPDIThread pdiThread;
+	private final IPDIThread pdiThread;
 	private ArrayList<IStackFrame> fStackFrames;
 	private boolean fRefreshChildren = true;
 	private boolean fIsCurrent = false;
@@ -86,43 +86,57 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		getPDISession().getEventManager().addEventListener(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IRestart#canRestart()
 	 */
 	public boolean canRestart() {
 		return getDebugTarget() instanceof IRestart && ((IRestart) getDebugTarget()).canRestart();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
 	public boolean canResume() {
 		return isSuspended();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal
+	 * ()
 	 */
 	public boolean canResumeWithoutSignal() {
 		return (getDebugTarget() instanceof IResumeWithoutSignal && ((IResumeWithoutSignal) getDebugTarget())
 				.canResumeWithoutSignal());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
 	 */
 	public boolean canStepInto() {
 		return canStep();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
 	 */
 	public boolean canStepOver() {
 		return canStep();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
 	 */
 	public boolean canStepReturn() {
@@ -132,7 +146,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return (fStackFrames.size() > 1);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
@@ -140,7 +156,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return (state.equals(PDebugElementState.RESUMED) || state.equals(PDebugElementState.STEPPED));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
@@ -163,14 +181,20 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return computeStackFrames(refreshChildren());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java
+	 * .lang.Class)
 	 */
+	@Override
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IRunToLine.class) || adapter.equals(IRunToAddress.class) || adapter.equals(IJumpToLine.class)
 				|| adapter.equals(IJumpToAddress.class)) {
 			try {
-				return (IPStackFrame) getTopStackFrame();
+				return getTopStackFrame();
 			} catch (DebugException e) {
 				// do nothing
 			}
@@ -179,7 +203,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 			return this;
 		if (adapter == IPStackFrame.class) {
 			try {
-				return (IPStackFrame) getTopStackFrame();
+				return getTopStackFrame();
 			} catch (DebugException e) {
 				// do nothing
 			}
@@ -190,7 +214,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return super.getAdapter(adapter);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
 	 */
 	public IBreakpoint[] getBreakpoints() {
@@ -206,45 +232,57 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 			if (bkpt != null)
 				list.add(bkpt);
 		}
-		return (IBreakpoint[]) list.toArray(new IBreakpoint[list.size()]);
+		return list.toArray(new IBreakpoint[list.size()]);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getDebugTarget()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getDebugTarget()
 	 */
+	@Override
 	public PDebugTarget getDebugTarget() {
 		return fDebugTarget;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
 		return getPDIThread().toString();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IThread#getPriority()
 	 */
 	public int getPriority() throws DebugException {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IThread#getStackFrames()
 	 */
 	public IStackFrame[] getStackFrames() throws DebugException {
-		List<IStackFrame> list = Collections.EMPTY_LIST;
+		List<IStackFrame> list = Collections.emptyList();
 		try {
 			list = computeStackFrames();
 		} catch (DebugException e) {
 			setStatus(IPDebugElementStatus.ERROR, e.getStatus().getMessage());
 			throw e;
 		}
-		return (IStackFrame[]) list.toArray(new IStackFrame[list.size()]);
+		return list.toArray(new IStackFrame[list.size()]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IThread#getTopStackFrame()
 	 */
 	public IStackFrame getTopStackFrame() throws DebugException {
@@ -252,39 +290,36 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return (c.isEmpty()) ? null : (IStackFrame) c.get(0);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	public synchronized void handleDebugEvents(IPDIEvent[] events) {
 		/*
-		 * FIXME Not support thread, always fire event by target
-		if (isDisposed())
-			return;
-		for (int i = 0; i < events.length; i++) {
-			IPDIEvent event = events[i];
-			if (!event.contains(getPDITarget().getTasks()))
-				continue;
-			
-			if (event instanceof IPDISuspendedEvent) {
-				handleSuspendedEvent((IPDISuspendedEvent)event);
-			}
-			else if (event instanceof IPDIResumedEvent) {
-				handleResumedEvent((IPDIResumedEvent)event);
-			}
-			else if (event instanceof IPDIDestroyedEvent) {
-				handleTerminatedEvent((IPDIDestroyedEvent)event);
-			}
-			else if (event instanceof IPDIDisconnectedEvent) {
-				handleDisconnectedEvent((IPDIDisconnectedEvent)event);
-			}
-			else if (event instanceof IPDIChangedEvent) {
-				handleChangedEvent((IPDIChangedEvent)event);
-			}
-		}
+		 * FIXME Not support thread, always fire event by target if
+		 * (isDisposed()) return; for (int i = 0; i < events.length; i++) {
+		 * IPDIEvent event = events[i]; if
+		 * (!event.contains(getPDITarget().getTasks())) continue;
+		 * 
+		 * if (event instanceof IPDISuspendedEvent) {
+		 * handleSuspendedEvent((IPDISuspendedEvent)event); } else if (event
+		 * instanceof IPDIResumedEvent) {
+		 * handleResumedEvent((IPDIResumedEvent)event); } else if (event
+		 * instanceof IPDIDestroyedEvent) {
+		 * handleTerminatedEvent((IPDIDestroyedEvent)event); } else if (event
+		 * instanceof IPDIDisconnectedEvent) {
+		 * handleDisconnectedEvent((IPDIDisconnectedEvent)event); } else if
+		 * (event instanceof IPDIChangedEvent) {
+		 * handleChangedEvent((IPDIChangedEvent)event); } }
 		 */
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IThread#hasStackFrames()
 	 */
 	public boolean hasStackFrames() throws DebugException {
@@ -294,28 +329,36 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
 		return (getState().equals(PDebugElementState.STEPPING)) || (getState().equals(PDebugElementState.STEPPED));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
 		return getState().equals(PDebugElementState.SUSPENDED);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
 		return getDebugTarget().isTerminated();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IRestart#restart()
 	 */
 	public void restart() throws DebugException {
@@ -324,7 +367,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
@@ -340,8 +385,12 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#resumeWithoutSignal()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#resumeWithoutSignal
+	 * ()
 	 */
 	public void resumeWithoutSignal() throws DebugException {
 		if (canResumeWithoutSignal()) {
@@ -349,7 +398,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#stepInto()
 	 */
 	public void stepInto() throws DebugException {
@@ -369,7 +420,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#stepOver()
 	 */
 	public void stepOver() throws DebugException {
@@ -389,7 +442,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
 	 */
 	public void stepReturn() throws DebugException {
@@ -409,7 +464,9 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
@@ -425,16 +482,21 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
 		getDebugTarget().terminate();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		String result = ""; //$NON-NLS-1$
 		try {
@@ -765,7 +827,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	 * @return
 	 */
 	protected boolean isInstructionsteppingEnabled() {
-		return ((PDebugTarget) getDebugTarget()).isInstructionSteppingEnabled();
+		return (getDebugTarget()).isInstructionSteppingEnabled();
 	}
 
 	/**

@@ -34,14 +34,12 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.IPSignalManager;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.TaskSet;
-import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
-import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.debug.internal.core.model.PSignal;
 
 /**
@@ -49,14 +47,12 @@ import org.eclipse.ptp.debug.internal.core.model.PSignal;
  */
 public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalManager {
 	private class PSignalSet {
-		private IPDebugTarget debugTarget;
 		private final TaskSet sTasks;
 		private IPSignal[] fSignals = null;
 		private boolean fIsDisposed = false;
 
-		public PSignalSet(TaskSet sTasks, PDebugTarget debugTarget) {
+		public PSignalSet(TaskSet sTasks) {
 			this.sTasks = sTasks;
-			this.debugTarget = debugTarget;
 		}
 
 		/**
@@ -91,16 +87,6 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 
 		/**
 		 * @return
-		 */
-		public IPDebugTarget getDebugTarget() {
-			if (debugTarget == null) {
-				debugTarget = session.findDebugTarget(sTasks);
-			}
-			return debugTarget;
-		}
-
-		/**
-		 * @return
 		 * @throws DebugException
 		 */
 		public synchronized IPSignal[] getSignals() throws DebugException {
@@ -111,7 +97,7 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 					for (int i = 0; i < pdiSignals.length; ++i) {
 						list.add(new PSignal(session, sTasks, pdiSignals[i]));
 					}
-					fSignals = (IPSignal[]) list.toArray(new IPSignal[list.size()]);
+					fSignals = list.toArray(new IPSignal[list.size()]);
 				} catch (PDIException e) {
 					throwDebugException(e.getMessage(), DebugException.TARGET_REQUEST_FAILED, e);
 				}
@@ -137,8 +123,12 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 		this.session = session;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#dispose(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSignalManager#dispose(org.eclipse
+	 * .ptp.core.util.TaskSet)
 	 */
 	public void dispose(TaskSet qTasks) {
 		getSignalSet(qTasks).dispose();
@@ -149,14 +139,16 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 	 */
 	public void dispose(IProgressMonitor monitor) {
 		DebugPlugin.getDefault().asyncExec(new Runnable() {
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see java.lang.Runnable#run()
 			 */
 			public void run() {
 				synchronized (fPSignalSetMap) {
 					Iterator<PSignalSet> it = fPSignalSetMap.values().iterator();
 					while (it.hasNext()) {
-						((PSignalSet) it.next()).dispose();
+						(it.next()).dispose();
 					}
 					fPSignalSetMap.clear();
 				}
@@ -164,9 +156,12 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 		});
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IPDISession.class))
 			return getSession();
@@ -175,8 +170,12 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#getSignals(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSignalManager#getSignals(org.eclipse
+	 * .ptp.core.util.TaskSet)
 	 */
 	public IPSignal[] getSignals(TaskSet qTasks) throws DebugException {
 		return getSignalSet(qTasks).getSignals();
@@ -188,23 +187,32 @@ public class PSignalManager implements IAdaptable, IPDIEventListener, IPSignalMa
 	 */
 	public PSignalSet getSignalSet(TaskSet qTasks) {
 		synchronized (fPSignalSetMap) {
-			PSignalSet set = (PSignalSet) fPSignalSetMap.get(qTasks);
+			PSignalSet set = fPSignalSetMap.get(qTasks);
 			if (set == null) {
-				set = new PSignalSet(qTasks, null);
+				set = new PSignalSet(qTasks);
 				fPSignalSetMap.put(qTasks, set);
 			}
 			return set;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	public void handleDebugEvents(IPDIEvent[] events) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSignalManager#signalChanged(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSignalManager#signalChanged(org
+	 * .eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
 	 */
 	public void signalChanged(TaskSet qTasks, IPDISignal pdiSignal) {
 		getSignalSet(qTasks).signalChanged(pdiSignal);

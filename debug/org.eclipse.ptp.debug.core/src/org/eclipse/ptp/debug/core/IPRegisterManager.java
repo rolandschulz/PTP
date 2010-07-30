@@ -12,11 +12,10 @@ package org.eclipse.ptp.debug.core;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPPersistableRegisterGroup;
 import org.eclipse.ptp.debug.core.model.IPRegisterDescriptor;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
-import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
-import org.eclipse.ptp.debug.internal.core.model.PStackFrame;
 
 /**
  * @author greg
@@ -52,16 +51,16 @@ public interface IPRegisterManager {
 	 * @param frame
 	 * @return
 	 * @throws DebugException
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public IRegisterGroup[] getRegisterGroups(TaskSet qTasks, PStackFrame frame) throws DebugException;
+	public IRegisterGroup[] getRegisterGroups(TaskSet qTasks, IPStackFrame frame) throws DebugException;
 
 	/**
 	 * @param qTasks
 	 * @param debugTarget
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public void initialize(TaskSet qTasks, PDebugTarget debugTarget);
+	public void initialize(TaskSet qTasks, IPDebugTarget debugTarget);
 
 	/**
 	 * @param qTasks

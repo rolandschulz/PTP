@@ -18,28 +18,32 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 /**
  * @author clement
- *
+ * 
  */
 public interface ITargetProperties {
 	public static final String PREF_INSTRUCTION_STEPPING_MODE = "instruction_stepping_mode"; //$NON-NLS-1$
 
 	/**
-	 * Adds a property change listener to this target.
-	 * Has no affect if the identical listener is already registered.
-	 *
-	 * @param listener a property change listener
+	 * Adds a preference change listener to this target. Has no affect if the
+	 * identical listener is already registered.
+	 * 
+	 * @param listener
+	 *            a property change listener
+	 * @since 5.0
 	 */
-	public void addPropertyChangeListener(Preferences.IPropertyChangeListener listener);
+	public void addPreferenceChangeListener(IEclipsePreferences.IPreferenceChangeListener listener);
 
 	/**
-	 * Removes the given listener from this target.
-	 * Has no affect if the listener is not registered.
-	 *
-	 * @param listener a property change listener
+	 * Removes the given listener from this target. Has no affect if the
+	 * listener is not registered.
+	 * 
+	 * @param listener
+	 *            a property change listener
+	 * @since 5.0
 	 */
-	public void removePropertyChangeListener(Preferences.IPropertyChangeListener listener);
+	public void removePreferenceChangeListener(IEclipsePreferences.IPreferenceChangeListener listener);
 }

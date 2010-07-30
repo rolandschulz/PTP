@@ -25,22 +25,28 @@ import java.util.Map;
  * @author Clement
  */
 public class PDebugBreakpointInfo extends PDebugInfo implements IPDebugBreakpointInfo {
-	private int bpid;
-	private Map<String, ?> infoMap;
-	
+	private final int fBpid;
+	private final Map<String, ?> fInfoMap;
+
 	public PDebugBreakpointInfo(IPDebugInfo info, int bpid) {
-		this(info, bpid, Collections.EMPTY_MAP);
+		this(info, bpid, null);
 	}
+
 	public PDebugBreakpointInfo(IPDebugInfo info, int bpid, Map<String, ?> infoMap) {
 		super(info);
-		this.bpid = bpid;
-		this.infoMap = infoMap;
+		fBpid = bpid;
+		if (infoMap == null) {
+			fInfoMap = Collections.emptyMap();
+		} else {
+			fInfoMap = infoMap;
+		}
 	}
+
 	public int getBreakpointID() {
-		return bpid;
+		return fBpid;
 	}
-	public Map<String,?> getInfo() {
-		return infoMap;
+
+	public Map<String, ?> getInfo() {
+		return fInfoMap;
 	}
 }
-

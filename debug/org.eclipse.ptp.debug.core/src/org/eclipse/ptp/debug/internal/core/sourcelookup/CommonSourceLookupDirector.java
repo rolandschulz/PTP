@@ -19,20 +19,27 @@
 package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector;
+import org.osgi.service.prefs.Preferences;
 
 public class CommonSourceLookupDirector extends PSourceLookupDirector {
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupDirector#setSourceContainers(org.eclipse.debug.core.sourcelookup.ISourceContainer[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.sourcelookup.AbstractSourceLookupDirector#
+	 * setSourceContainers
+	 * (org.eclipse.debug.core.sourcelookup.ISourceContainer[])
 	 */
+	@Override
 	public void setSourceContainers(ISourceContainer[] containers) {
 		try {
 			super.setSourceContainers(containers);
-			PTPDebugCorePlugin.getDefault().getPluginPreferences().setValue(IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, getMemento());
-			PTPDebugCorePlugin.getDefault().savePluginPreferences();
+			Preferences preferences = new InstanceScope().getNode(PTPDebugCorePlugin.getUniqueIdentifier());
+			preferences.put(IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, getMemento());
 		} catch (CoreException e) {
 			PTPDebugCorePlugin.log(e.getStatus());
 		}

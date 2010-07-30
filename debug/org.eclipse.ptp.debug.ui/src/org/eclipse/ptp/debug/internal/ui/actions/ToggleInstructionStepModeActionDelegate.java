@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
-import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.jface.action.IAction;
@@ -34,101 +34,124 @@ import org.eclipse.ui.actions.ActionDelegate;
 /**
  * @author Clement chu
  */
-public class ToggleInstructionStepModeActionDelegate extends ActionDelegate implements IViewActionDelegate, IPropertyChangeListener {
+public class ToggleInstructionStepModeActionDelegate extends ActionDelegate implements IViewActionDelegate,
+		IPreferenceChangeListener {
 	private IPDebugTarget fTarget = null;
 	private IAction fAction = null;
 	private IViewPart fView;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Preferences.IPropertyChangeListener#propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.
+	 * IPreferenceChangeListener
+	 * #preferenceChange(org.eclipse.core.runtime.preferences
+	 * .IEclipsePreferences.PreferenceChangeEvent)
 	 */
-	public void propertyChange(PropertyChangeEvent event) {
+	public void preferenceChange(PreferenceChangeEvent event) {
 		IAction action = getAction();
 		if (action != null) {
 			if (event.getNewValue() instanceof Boolean) {
-				boolean value = ((Boolean)event.getNewValue()).booleanValue();
+				boolean value = ((Boolean) event.getNewValue()).booleanValue();
 				if (value != action.isChecked())
 					action.setChecked(value);
 			}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
 	public void init(IViewPart view) {
 		fView = view;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate2#dispose()
 	 */
+	@Override
 	public void dispose() {
 		IPDebugTarget target = getTarget();
-		if (target != null)
-			target.removePropertyChangeListener(this);
+		if (target != null) {
+			target.removePreferenceChangeListener(this);
+		}
 		setTarget(null);
 		setAction(null);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
 	 */
+	@Override
 	public void init(IAction action) {
 		setAction(action);
 		action.setChecked(false);
 		action.setEnabled(false);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
+	@Override
 	public void run(IAction action) {
 		/*
-		boolean enabled = getAction().isChecked();
-		IPDebugTarget target = getTarget();
-		if (target != null) {
-			target.enableInstructionStepping(enabled);
-			if (enabled) {
-				try {
-					getView().getSite().getPage().showView(IPTPDebugUIConstants.ID_DISASSEMBLY_VIEW);
-				}
-				catch(PartInitException e) {
-					PTPDebugUIPlugin.log(e.getStatus());
-				}
-			}
-		}
-		*/
+		 * boolean enabled = getAction().isChecked(); IPDebugTarget target =
+		 * getTarget(); if (target != null) {
+		 * target.enableInstructionStepping(enabled); if (enabled) { try {
+		 * getView
+		 * ().getSite().getPage().showView(IPTPDebugUIConstants.ID_DISASSEMBLY_VIEW
+		 * ); } catch(PartInitException e) {
+		 * PTPDebugUIPlugin.log(e.getStatus()); } } }
+		 */
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action
+	 * .IAction, org.eclipse.swt.widgets.Event)
 	 */
+	@Override
 	public void runWithEvent(IAction action, Event event) {
 		run(action);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
+	 * .IAction, org.eclipse.jface.viewers.ISelection)
 	 */
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		IPDebugTarget newTarget = null;
 		if (selection instanceof IStructuredSelection) {
-			newTarget = getTargetFromSelection(((IStructuredSelection)selection).getFirstElement());
+			newTarget = getTargetFromSelection(((IStructuredSelection) selection).getFirstElement());
 		}
 		IPDebugTarget oldTarget = getTarget();
 		if (oldTarget != null && !oldTarget.equals(newTarget)) {
-			oldTarget.removePropertyChangeListener(this);
+			oldTarget.removePreferenceChangeListener(this);
 			setTarget(null);
 			action.setChecked(false);
 		}
 		if (newTarget != null && !newTarget.isTerminated() && !newTarget.isDisconnected()) {
 			setTarget(newTarget);
-			newTarget.addPropertyChangeListener(this);
+			newTarget.addPreferenceChangeListener(this);
 			action.setChecked(newTarget.isInstructionSteppingEnabled());
 		}
-		action.setEnabled(newTarget != null && newTarget.supportsInstructionStepping() 
-						   && !newTarget.isTerminated() && !newTarget.isDisconnected());
+		action.setEnabled(newTarget != null && newTarget.supportsInstructionStepping() && !newTarget.isTerminated()
+				&& !newTarget.isDisconnected());
 	}
 
 	private IPDebugTarget getTarget() {
@@ -149,11 +172,12 @@ public class ToggleInstructionStepModeActionDelegate extends ActionDelegate impl
 
 	private IPDebugTarget getTargetFromSelection(Object element) {
 		if (element instanceof IDebugElement) {
-			IDebugTarget target = ((IDebugElement)element).getDebugTarget();
-			return (target instanceof IPDebugTarget) ? (IPDebugTarget)target : null;
+			IDebugTarget target = ((IDebugElement) element).getDebugTarget();
+			return (target instanceof IPDebugTarget) ? (IPDebugTarget) target : null;
 		}
 		return null;
 	}
+
 	public IViewPart getView() {
 		return fView;
 	}

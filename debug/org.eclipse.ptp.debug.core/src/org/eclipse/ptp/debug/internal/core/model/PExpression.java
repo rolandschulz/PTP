@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -25,6 +27,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.model.PVariableFormat;
+import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIChangedEvent;
@@ -57,8 +60,9 @@ public class PExpression extends PLocalVariable implements IExpression {
 	 */
 	public PExpression(PStackFrame frame, IPDITargetExpression pdiExpression, IPDIVariableDescriptor varObject) {
 		super(frame, varObject);
-		setFormat(PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences()
-				.getInt(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT)));
+		IPreferencesService preferences = Platform.getPreferencesService();
+		setFormat(PVariableFormat.getFormat(preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
+				IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL, null)));
 		fText = pdiExpression.getExpressionText();
 		fPDIExpression = pdiExpression;
 		fStackFrame = frame;

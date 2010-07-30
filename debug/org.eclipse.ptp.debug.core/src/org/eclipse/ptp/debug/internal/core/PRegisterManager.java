@@ -50,10 +50,8 @@ import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterDescriptor;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIRegisterGroup;
-import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.debug.internal.core.model.PRegisterDescriptor;
 import org.eclipse.ptp.debug.internal.core.model.PRegisterGroup;
-import org.eclipse.ptp.debug.internal.core.model.PStackFrame;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,7 +69,7 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		private IPDebugTarget debugTarget = null;
 		private final TaskSet rTasks;
 
-		public PRegisterSet(TaskSet rTasks, PDebugTarget debugTarget) {
+		public PRegisterSet(TaskSet rTasks, IPDebugTarget debugTarget) {
 			this.rTasks = rTasks;
 			this.debugTarget = debugTarget;
 		}
@@ -184,8 +182,8 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		 * @return
 		 * @throws DebugException
 		 */
-		public IRegisterGroup[] getRegisterGroups(PStackFrame frame) throws DebugException {
-			IRegisterGroup[] groups = (IRegisterGroup[]) fRegisterGroups.toArray(new IRegisterGroup[0]);
+		public IRegisterGroup[] getRegisterGroups(IPStackFrame frame) throws DebugException {
+			IRegisterGroup[] groups = fRegisterGroups.toArray(new IRegisterGroup[0]);
 			if (getCurrentFrame() != frame) {
 				for (int i = 0; i < groups.length; ++i) {
 					((PRegisterGroup) groups[i]).resetRegisterValues();
@@ -216,7 +214,7 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 					PTPDebugCorePlugin.log(e);
 				}
 			}
-			fRegisterDescriptors = (IPRegisterDescriptor[]) list.toArray(new IPRegisterDescriptor[0]);
+			fRegisterDescriptors = list.toArray(new IPRegisterDescriptor[0]);
 			createRegisterGroups();
 		}
 
@@ -298,7 +296,7 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		/**
 		 * @param currentFrame
 		 */
-		public void setCurrentFrame(PStackFrame currentFrame) {
+		public void setCurrentFrame(IPStackFrame currentFrame) {
 			fCurrentFrame = currentFrame;
 		}
 
@@ -389,12 +387,19 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		this.session = session;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#addRegisterGroup(org.eclipse.ptp.core.util.TaskSet, java.lang.String, org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#addRegisterGroup
+	 * (org.eclipse.ptp.core.util.TaskSet, java.lang.String,
+	 * org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
 	 */
 	public void addRegisterGroup(final TaskSet qTasks, final String name, final IPRegisterDescriptor[] descriptors) {
 		DebugPlugin.getDefault().asyncExec(new Runnable() {
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see java.lang.Runnable#run()
 			 */
 			public void run() {
@@ -408,14 +413,16 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 	 */
 	public void dispose(IProgressMonitor monitor) {
 		DebugPlugin.getDefault().asyncExec(new Runnable() {
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see java.lang.Runnable#run()
 			 */
 			public void run() {
 				synchronized (fRegisterSetMap) {
 					Iterator<PRegisterSet> it = fRegisterSetMap.values().iterator();
 					while (it.hasNext()) {
-						((PRegisterSet) it.next()).dispose();
+						(it.next()).dispose();
 					}
 					fRegisterSetMap.clear();
 				}
@@ -433,9 +440,12 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		return getRegisterSet(qTasks).findDescriptor(groupName, name);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IPSession.class))
 			return getSession();
@@ -444,24 +454,36 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#getAllRegisterDescriptors(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#
+	 * getAllRegisterDescriptors(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public IPRegisterDescriptor[] getAllRegisterDescriptors(TaskSet qTasks) throws DebugException {
 		return getRegisterSet(qTasks).getAllRegisterDescriptors();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#getCurrentFrame(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#getCurrentFrame
+	 * (org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public IPStackFrame getCurrentFrame(TaskSet qTasks) {
 		return getRegisterSet(qTasks).getCurrentFrame();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#getRegisterGroups(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.internal.core.model.PStackFrame)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#getRegisterGroups
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.internal.core.model.PStackFrame)
 	 */
-	public IRegisterGroup[] getRegisterGroups(TaskSet qTasks, PStackFrame frame) throws DebugException {
+	public IRegisterGroup[] getRegisterGroups(TaskSet qTasks, IPStackFrame frame) throws DebugException {
 		return getRegisterSet(qTasks).getRegisterGroups(frame);
 	}
 
@@ -471,7 +493,7 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 	 */
 	public PRegisterSet getRegisterSet(TaskSet qTasks) {
 		synchronized (fRegisterSetMap) {
-			PRegisterSet set = (PRegisterSet) fRegisterSetMap.get(qTasks);
+			PRegisterSet set = fRegisterSetMap.get(qTasks);
 			if (set == null) {
 				set = new PRegisterSet(qTasks, null);
 				fRegisterSetMap.put(qTasks, set);
@@ -480,10 +502,15 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#initialize(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.internal.core.model.PDebugTarget)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#initialize(org.
+	 * eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugTarget)
 	 */
-	public void initialize(TaskSet qTasks, PDebugTarget debugTarget) {
+	public void initialize(TaskSet qTasks, IPDebugTarget debugTarget) {
 		synchronized (fRegisterSetMap) {
 			PRegisterSet set = new PRegisterSet(qTasks, debugTarget);
 			fRegisterSetMap.put(qTasks, set);
@@ -491,8 +518,14 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#modifyRegisterGroup(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.model.IPPersistableRegisterGroup, org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#modifyRegisterGroup
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.model.IPPersistableRegisterGroup,
+	 * org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
 	 */
 	public void modifyRegisterGroup(final TaskSet qTasks, final IPPersistableRegisterGroup group,
 			final IPRegisterDescriptor[] descriptors) {
@@ -514,8 +547,13 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		});
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#removeRegisterGroups(org.eclipse.ptp.core.util.TaskSet, org.eclipse.debug.core.model.IRegisterGroup[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#removeRegisterGroups
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.debug.core.model.IRegisterGroup[])
 	 */
 	public void removeRegisterGroups(final TaskSet qTasks, final IRegisterGroup[] groups) {
 		DebugPlugin.getDefault().asyncExec(new Runnable() {
@@ -525,12 +563,18 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		});
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#restoreDefaults(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#restoreDefaults
+	 * (org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void restoreDefaults(final TaskSet qTasks) {
 		DebugPlugin.getDefault().asyncExec(new Runnable() {
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see java.lang.Runnable#run()
 			 */
 			public void run() {
@@ -554,8 +598,12 @@ public class PRegisterManager implements IAdaptable, IPRegisterManager {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPRegisterManager#targetSuspended(org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPRegisterManager#targetSuspended
+	 * (org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void targetSuspended(TaskSet qTasks) {
 		getRegisterSet(qTasks).targetSuspended();

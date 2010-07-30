@@ -67,8 +67,7 @@ import org.xml.sax.SAXException;
  * @author Clement chu
  * 
  */
-public class PSourceLocator implements IPSourceLocator,
-		IPersistableSourceLocator, IResourceChangeListener {
+public class PSourceLocator implements IPSourceLocator, IPersistableSourceLocator, IResourceChangeListener {
 	private static final String SOURCE_LOCATOR_NAME = "pSourceLocator"; //$NON-NLS-1$
 	private static final String DISABLED_GENERIC_PROJECT_NAME = "disabledGenericProject"; //$NON-NLS-1$
 	private static final String ADDITIONAL_SOURCE_LOCATION_NAME = "additionalSourceLocation"; //$NON-NLS-1$
@@ -89,29 +88,28 @@ public class PSourceLocator implements IPSourceLocator,
 		setSourceLocations(getDefaultSourceLocations());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#contains(org.eclipse.core.resources.IResource)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#contains(org.
+	 * eclipse.core.resources.IResource)
 	 */
-	@SuppressWarnings("rawtypes")
 	public boolean contains(IResource resource) {
 		IPSourceLocation[] locations = getSourceLocations();
 		for (int i = 0; i < locations.length; ++i) {
 			if (resource instanceof IProject) {
 				if (locations[i] instanceof PProjectSourceLocation
-						&& ((PProjectSourceLocation) locations[i]).getProject()
-								.equals(resource)) {
+						&& ((PProjectSourceLocation) locations[i]).getProject().equals(resource)) {
 					return true;
 				}
 			}
 			if (resource instanceof IFile) {
 				try {
-					Object result = locations[i].findSourceElement(resource
-							.getLocation().toOSString());
-					if (result instanceof IFile
-							&& ((IFile) result).equals(resource))
+					Object result = locations[i].findSourceElement(resource.getLocation().toOSString());
+					if (result instanceof IFile && ((IFile) result).equals(resource))
 						return true;
-					if (result instanceof List
-							&& ((List<?>) result).contains(resource))
+					if (result instanceof List && ((List<?>) result).contains(resource))
 						return true;
 				} catch (CoreException e) {
 				}
@@ -120,8 +118,12 @@ public class PSourceLocator implements IPSourceLocator,
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#findSourceElement(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#findSourceElement
+	 * (java.lang.String)
 	 */
 	public Object findSourceElement(String fileName) {
 		Object result = null;
@@ -140,30 +142,33 @@ public class PSourceLocator implements IPSourceLocator,
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#getLineNumber(org.eclipse.debug.core.model.IStackFrame)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#getLineNumber
+	 * (org.eclipse.debug.core.model.IStackFrame)
 	 */
 	public int getLineNumber(IStackFrame frame) {
-		return (frame instanceof IPStackFrame) ? ((IPStackFrame) frame)
-				.getFrameLineNumber() : 0;
+		return (frame instanceof IPStackFrame) ? ((IPStackFrame) frame).getFrameLineNumber() : 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IPersistableSourceLocator#getMemento()
 	 */
 	public String getMemento() throws CoreException {
 		Document document = null;
 		Throwable ex = null;
 		try {
-			document = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder().newDocument();
+			document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 			Element node = document.createElement(SOURCE_LOCATOR_NAME);
 			document.appendChild(node);
 			IPSourceLocation[] locations = getSourceLocations();
 			saveDisabledGenericSourceLocations(locations, document, node);
 			saveAdditionalSourceLocations(locations, document, node);
-			node.setAttribute(ATTR_DUPLICATE_FILES, new Boolean(
-					searchForDuplicateFiles()).toString());
+			node.setAttribute(ATTR_DUPLICATE_FILES, new Boolean(searchForDuplicateFiles()).toString());
 			return PDebugUtils.serializeDocument(document);
 		} catch (ParserConfigurationException e) {
 			ex = e;
@@ -177,44 +182,60 @@ public class PSourceLocator implements IPSourceLocator,
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#getProject()
 	 */
 	public IProject getProject() {
 		return fProject;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.ISourceLocator#getSourceElement(org.eclipse.debug.core.model.IStackFrame)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.ISourceLocator#getSourceElement(org.eclipse
+	 * .debug.core.model.IStackFrame)
 	 */
 	public Object getSourceElement(IStackFrame stackFrame) {
 		return getInput(stackFrame);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#getSourceLocations()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#getSourceLocations
+	 * ()
 	 */
 	public IPSourceLocation[] getSourceLocations() {
 		return fSourceLocations;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IPersistableSourceLocator#initializeDefaults(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IPersistableSourceLocator#initializeDefaults
+	 * (org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public void initializeDefaults(ILaunchConfiguration configuration)
-			throws CoreException {
+	public void initializeDefaults(ILaunchConfiguration configuration) throws CoreException {
 		setSourceLocations(getDefaultSourceLocations());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IPersistableSourceLocator#initializeFromMemento(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IPersistableSourceLocator#initializeFromMemento
+	 * (java.lang.String)
 	 */
 	public void initializeFromMemento(String memento) throws CoreException {
 		Exception ex = null;
 		try {
 			Element root = null;
-			DocumentBuilder parser = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder();
+			DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			StringReader reader = new StringReader(memento);
 			InputSource source = new InputSource(reader);
 			root = parser.parse(source).getDocumentElement();
@@ -225,16 +246,13 @@ public class PSourceLocator implements IPSourceLocator,
 			// Add locations based on referenced projects
 			IProject project = getProject();
 			if (project != null && project.exists() && project.isOpen())
-				sourceLocations.addAll(Arrays
-						.asList(getDefaultSourceLocations()));
+				sourceLocations.addAll(Arrays.asList(getDefaultSourceLocations()));
 			removeDisabledLocations(root, sourceLocations);
 			addAdditionalLocations(root, sourceLocations);
 			// To support old launch configuration
 			addOldLocations(root, sourceLocations);
-			setSourceLocations((IPSourceLocation[]) sourceLocations
-					.toArray(new IPSourceLocation[sourceLocations.size()]));
-			setSearchForDuplicateFiles(Boolean.valueOf(
-					root.getAttribute(ATTR_DUPLICATE_FILES)).booleanValue());
+			setSourceLocations(sourceLocations.toArray(new IPSourceLocation[sourceLocations.size()]));
+			setSearchForDuplicateFiles(Boolean.valueOf(root.getAttribute(ATTR_DUPLICATE_FILES)).booleanValue());
 			return;
 		} catch (ParserConfigurationException e) {
 			ex = e;
@@ -246,15 +264,18 @@ public class PSourceLocator implements IPSourceLocator,
 		abort(Messages.PSourceLocator_2, ex);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org
+	 * .eclipse.core.resources.IResourceChangeEvent)
 	 */
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (event.getSource() instanceof IWorkspace && event.getDelta() != null) {
 			IResourceDelta[] deltas = event.getDelta().getAffectedChildren();
 			if (deltas != null) {
-				ArrayList<IResource> list = new ArrayList<IResource>(
-						deltas.length);
+				ArrayList<IResource> list = new ArrayList<IResource>(deltas.length);
 				for (int i = 0; i < deltas.length; ++i)
 					if (deltas[i].getResource() instanceof IProject)
 						list.add(deltas[i].getResource());
@@ -263,15 +284,21 @@ public class PSourceLocator implements IPSourceLocator,
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#searchForDuplicateFiles()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#
+	 * searchForDuplicateFiles()
 	 */
 	public boolean searchForDuplicateFiles() {
 		return fDuplicateFiles;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#setSearchForDuplicateFiles(boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#
+	 * setSearchForDuplicateFiles(boolean)
 	 */
 	public void setSearchForDuplicateFiles(boolean search) {
 		fDuplicateFiles = search;
@@ -280,28 +307,28 @@ public class PSourceLocator implements IPSourceLocator,
 			locations[i].setSearchForDuplicateFiles(search);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#setSourceLocations(org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator#setSourceLocations
+	 * (org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation[])
 	 */
 	public void setSourceLocations(IPSourceLocation[] locations) {
 		fSourceLocations = locations;
 	}
 
 	private void abort(String message, Throwable e) throws CoreException {
-		IStatus s = new Status(IStatus.ERROR, PTPDebugCorePlugin
-				.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR,
-				message, e);
+		IStatus s = new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR, message,
+				e);
 		throw new CoreException(s);
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void addAdditionalLocations(Element root,
-			List<IPSourceLocation> sourceLocations) throws CoreException {
+	private void addAdditionalLocations(Element root, List<IPSourceLocation> sourceLocations) throws CoreException {
 		Bundle bundle = PTPDebugCorePlugin.getDefault().getBundle();
-		MultiStatus status = new MultiStatus(PTPDebugCorePlugin
-				.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR,
-				Messages.PSourceLocator_3,
-				null);
+		MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR,
+				Messages.PSourceLocator_3, null);
 		NodeList list = root.getChildNodes();
 		int length = list.getLength();
 		for (int i = 0; i < length; ++i) {
@@ -309,35 +336,28 @@ public class PSourceLocator implements IPSourceLocator,
 			short type = node.getNodeType();
 			if (type == Node.ELEMENT_NODE) {
 				Element entry = (Element) node;
-				if (entry.getNodeName().equalsIgnoreCase(
-						ADDITIONAL_SOURCE_LOCATION_NAME)) {
+				if (entry.getNodeName().equalsIgnoreCase(ADDITIONAL_SOURCE_LOCATION_NAME)) {
 					String className = entry.getAttribute(ATTR_CLASS);
 					String data = entry.getAttribute(ATTR_MEMENTO);
 					if (isEmpty(className)) {
-						PTPDebugCorePlugin
-								.log(Messages.PSourceLocator_4);
+						PTPDebugCorePlugin.log(Messages.PSourceLocator_4);
 						continue;
 					}
 					Class clazz = null;
 					try {
 						clazz = bundle.loadClass(className);
 					} catch (ClassNotFoundException e) {
-						PTPDebugCorePlugin
-								.log(NLS.bind(
-												Messages.PSourceLocator_5,
-												new Object[] { className }));
+						PTPDebugCorePlugin.log(NLS.bind(Messages.PSourceLocator_5, new Object[] { className }));
 						continue;
 					}
 					IPSourceLocation location = null;
 					try {
 						location = (IPSourceLocation) clazz.newInstance();
 					} catch (IllegalAccessException e) {
-						PTPDebugCorePlugin
-								.log(Messages.PSourceLocator_6);
+						PTPDebugCorePlugin.log(Messages.PSourceLocator_6);
 						continue;
 					} catch (InstantiationException e) {
-						PTPDebugCorePlugin
-								.log(Messages.PSourceLocator_6);
+						PTPDebugCorePlugin.log(Messages.PSourceLocator_6);
 						continue;
 					}
 					try {
@@ -354,8 +374,7 @@ public class PSourceLocator implements IPSourceLocator,
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void addOldLocations(Element root,
-			List<IPSourceLocation> sourceLocations) throws CoreException {
+	private void addOldLocations(Element root, List<IPSourceLocation> sourceLocations) throws CoreException {
 		Bundle bundle = PTPDebugCorePlugin.getDefault().getBundle();
 		NodeList list = root.getChildNodes();
 		int length = list.getLength();
@@ -368,37 +387,31 @@ public class PSourceLocator implements IPSourceLocator,
 					String className = entry.getAttribute(ATTR_CLASS);
 					String data = entry.getAttribute(ATTR_MEMENTO);
 					if (isEmpty(className)) {
-						PTPDebugCorePlugin
-								.log(Messages.PSourceLocator_4);
+						PTPDebugCorePlugin.log(Messages.PSourceLocator_4);
 						continue;
 					}
 					Class clazz = null;
 					try {
 						clazz = bundle.loadClass(className);
 					} catch (ClassNotFoundException e) {
-						PTPDebugCorePlugin.log(NLS.bind(
-												Messages.PSourceLocator_5,
-												new Object[] { className }));
+						PTPDebugCorePlugin.log(NLS.bind(Messages.PSourceLocator_5, new Object[] { className }));
 						continue;
 					}
 					IPSourceLocation location = null;
 					try {
 						location = (IPSourceLocation) clazz.newInstance();
 					} catch (IllegalAccessException e) {
-						PTPDebugCorePlugin
-								.log(Messages.PSourceLocator_6);
+						PTPDebugCorePlugin.log(Messages.PSourceLocator_6);
 						continue;
 					} catch (InstantiationException e) {
-						PTPDebugCorePlugin
-								.log(Messages.PSourceLocator_6);
+						PTPDebugCorePlugin.log(Messages.PSourceLocator_6);
 						continue;
 					}
 					location.initializeFrom(data);
 					if (!sourceLocations.contains(location)) {
 						if (location instanceof PProjectSourceLocation)
 							((PProjectSourceLocation) location)
-									.setGenerated(isReferencedProject(((PProjectSourceLocation) location)
-											.getProject()));
+									.setGenerated(isReferencedProject(((PProjectSourceLocation) location).getProject()));
 						sourceLocations.add(location);
 					}
 				}
@@ -413,8 +426,7 @@ public class PSourceLocator implements IPSourceLocator,
 	private boolean isReferencedProject(IProject ref) {
 		if (getProject() != null) {
 			try {
-				return Arrays.asList(getProject().getReferencedProjects())
-						.contains(ref);
+				return Arrays.asList(getProject().getReferencedProjects()).contains(ref);
 			} catch (CoreException e) {
 				PTPDebugCorePlugin.log(e);
 			}
@@ -422,8 +434,7 @@ public class PSourceLocator implements IPSourceLocator,
 		return false;
 	}
 
-	private void removeDisabledLocations(Element root,
-			List<IPSourceLocation> sourceLocations) {
+	private void removeDisabledLocations(Element root, List<IPSourceLocation> sourceLocations) {
 		NodeList list = root.getChildNodes();
 		int length = list.getLength();
 		HashSet<String> disabledProjects = new HashSet<String>(length);
@@ -432,12 +443,10 @@ public class PSourceLocator implements IPSourceLocator,
 			short type = node.getNodeType();
 			if (type == Node.ELEMENT_NODE) {
 				Element entry = (Element) node;
-				if (entry.getNodeName().equalsIgnoreCase(
-						DISABLED_GENERIC_PROJECT_NAME)) {
+				if (entry.getNodeName().equalsIgnoreCase(DISABLED_GENERIC_PROJECT_NAME)) {
 					String projectName = entry.getAttribute(ATTR_PROJECT_NAME);
 					if (isEmpty(projectName)) {
-						PTPDebugCorePlugin
-								.log(Messages.PSourceLocator_4);
+						PTPDebugCorePlugin.log(Messages.PSourceLocator_4);
 					}
 					disabledProjects.add(projectName.trim());
 				}
@@ -445,11 +454,9 @@ public class PSourceLocator implements IPSourceLocator,
 		}
 		Iterator<IPSourceLocation> it = sourceLocations.iterator();
 		while (it.hasNext()) {
-			IPSourceLocation location = (IPSourceLocation) it.next();
+			IPSourceLocation location = it.next();
 			if (location instanceof IProjectSourceLocation
-					&& disabledProjects
-							.contains(((IProjectSourceLocation) location)
-									.getProject().getName()))
+					&& disabledProjects.contains(((IProjectSourceLocation) location).getProject().getName()))
 				it.remove();
 		}
 	}
@@ -457,14 +464,11 @@ public class PSourceLocator implements IPSourceLocator,
 	private void removeGenericSourceLocations() {
 		fReferencedProjects.clear();
 		IPSourceLocation[] locations = getSourceLocations();
-		ArrayList<IPSourceLocation> newLocations = new ArrayList<IPSourceLocation>(
-				locations.length);
+		ArrayList<IPSourceLocation> newLocations = new ArrayList<IPSourceLocation>(locations.length);
 		for (int i = 0; i < locations.length; ++i)
-			if (!(locations[i] instanceof IProjectSourceLocation)
-					|| !((IProjectSourceLocation) locations[i]).isGeneric())
+			if (!(locations[i] instanceof IProjectSourceLocation) || !((IProjectSourceLocation) locations[i]).isGeneric())
 				newLocations.add(locations[i]);
-		setSourceLocations((IPSourceLocation[]) newLocations
-				.toArray(new IPSourceLocation[newLocations.size()]));
+		setSourceLocations(newLocations.toArray(new IPSourceLocation[newLocations.size()]));
 	}
 
 	private void resetSourceLocations(List<IResource> affectedProjects) {
@@ -477,11 +481,9 @@ public class PSourceLocator implements IPSourceLocator,
 		}
 	}
 
-	private void saveAdditionalSourceLocations(IPSourceLocation[] locations,
-			Document doc, Element node) {
+	private void saveAdditionalSourceLocations(IPSourceLocation[] locations, Document doc, Element node) {
 		for (int i = 0; i < locations.length; i++) {
-			if (locations[i] instanceof IProjectSourceLocation
-					&& ((IProjectSourceLocation) locations[i]).isGeneric())
+			if (locations[i] instanceof IProjectSourceLocation && ((IProjectSourceLocation) locations[i]).isGeneric())
 				continue;
 			Element child = doc.createElement(ADDITIONAL_SOURCE_LOCATION_NAME);
 			child.setAttribute(ATTR_CLASS, locations[i].getClass().getName());
@@ -495,8 +497,7 @@ public class PSourceLocator implements IPSourceLocator,
 		}
 	}
 
-	private void saveDisabledGenericSourceLocations(
-			IPSourceLocation[] locations, Document doc, Element node) {
+	private void saveDisabledGenericSourceLocations(IPSourceLocation[] locations, Document doc, Element node) {
 		IProject project = getProject();
 		if (project != null && project.exists() && project.isOpen()) {
 			List<IProject> list = PDebugUtils.getReferencedProjects(project);
@@ -507,15 +508,12 @@ public class PSourceLocator implements IPSourceLocator,
 				names.add(((IProject) it.next()).getName());
 			}
 			for (int i = 0; i < locations.length; ++i)
-				if (locations[i] instanceof IProjectSourceLocation
-						&& ((IProjectSourceLocation) locations[i]).isGeneric())
-					names.remove(((IProjectSourceLocation) locations[i])
-							.getProject().getName());
+				if (locations[i] instanceof IProjectSourceLocation && ((IProjectSourceLocation) locations[i]).isGeneric())
+					names.remove(((IProjectSourceLocation) locations[i]).getProject().getName());
 
 			it = names.iterator();
 			while (it.hasNext()) {
-				Element child = doc
-						.createElement(DISABLED_GENERIC_PROJECT_NAME);
+				Element child = doc.createElement(DISABLED_GENERIC_PROJECT_NAME);
 				child.setAttribute(ATTR_PROJECT_NAME, (String) it.next());
 				node.appendChild(child);
 			}
@@ -528,21 +526,16 @@ public class PSourceLocator implements IPSourceLocator,
 	}
 
 	private void updateGenericSourceLocations(List<IResource> affectedProjects) {
-		List<IProject> newRefs = PDebugUtils
-				.getReferencedProjects(getProject());
+		List<IProject> newRefs = PDebugUtils.getReferencedProjects(getProject());
 		IPSourceLocation[] locations = getSourceLocations();
-		ArrayList<IPSourceLocation> newLocations = new ArrayList<IPSourceLocation>(
-				locations.length);
+		ArrayList<IPSourceLocation> newLocations = new ArrayList<IPSourceLocation>(locations.length);
 		for (int i = 0; i < locations.length; ++i) {
-			if (!(locations[i] instanceof IProjectSourceLocation)
-					|| !((IProjectSourceLocation) locations[i]).isGeneric()) {
+			if (!(locations[i] instanceof IProjectSourceLocation) || !((IProjectSourceLocation) locations[i]).isGeneric()) {
 				newLocations.add(locations[i]);
 			} else {
-				IProject project = ((IProjectSourceLocation) locations[i])
-						.getProject();
+				IProject project = ((IProjectSourceLocation) locations[i]).getProject();
 				if (project.exists() && project.isOpen()) {
-					if (newRefs.contains(project)
-							|| project.equals(getProject())) {
+					if (newRefs.contains(project) || project.equals(getProject())) {
 						newLocations.add(locations[i]);
 						newRefs.remove(project);
 					}
@@ -551,35 +544,27 @@ public class PSourceLocator implements IPSourceLocator,
 		}
 		Iterator<IProject> it = newRefs.iterator();
 		while (it.hasNext()) {
-			IProject project = (IProject) it.next();
+			IProject project = it.next();
 			if (!fReferencedProjects.contains(project))
-				newLocations.add(SourceLookupFactory
-						.createProjectSourceLocation(project));
+				newLocations.add(SourceLookupFactory.createProjectSourceLocation(project));
 		}
 		fReferencedProjects = newRefs;
-		setSourceLocations((IPSourceLocation[]) newLocations
-				.toArray(new IPSourceLocation[newLocations.size()]));
+		setSourceLocations(newLocations.toArray(new IPSourceLocation[newLocations.size()]));
 	}
 
 	protected IPSourceLocation[] getDefaultSourceLocations() {
 		Iterator<IProject> it = fReferencedProjects.iterator();
-		ArrayList<IProjectSourceLocation> list = new ArrayList<IProjectSourceLocation>(
-				fReferencedProjects.size());
-		if (getProject() != null && getProject().exists()
-				&& getProject().isOpen())
-			list.add(SourceLookupFactory
-					.createProjectSourceLocation(getProject()));
+		ArrayList<IProjectSourceLocation> list = new ArrayList<IProjectSourceLocation>(fReferencedProjects.size());
+		if (getProject() != null && getProject().exists() && getProject().isOpen())
+			list.add(SourceLookupFactory.createProjectSourceLocation(getProject()));
 		while (it.hasNext()) {
-			IProject project = (IProject) it.next();
+			IProject project = it.next();
 			if (project != null && project.exists() && project.isOpen())
-				list.add(SourceLookupFactory
-						.createProjectSourceLocation(project));
+				list.add(SourceLookupFactory.createProjectSourceLocation(project));
 		}
-		return (IPSourceLocation[]) list.toArray(new IPSourceLocation[list
-				.size()]);
+		return list.toArray(new IPSourceLocation[list.size()]);
 	}
 
-	@SuppressWarnings("rawtypes")
 	protected Object getInput(IStackFrame f) {
 		if (f instanceof IPStackFrame) {
 			IPStackFrame frame = (IPStackFrame) f;
@@ -606,8 +591,7 @@ public class PSourceLocator implements IPSourceLocator,
 					}
 				}
 			}
-			return (list.size() > 0) ? ((list.size() == 1) ? list.getFirst()
-					: list) : null;
+			return (list.size() > 0) ? ((list.size() == 1) ? list.getFirst() : list) : null;
 		}
 		return null;
 	}
