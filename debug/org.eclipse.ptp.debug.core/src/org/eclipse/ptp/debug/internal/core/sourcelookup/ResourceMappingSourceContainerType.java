@@ -54,18 +54,18 @@ public class ResourceMappingSourceContainerType extends AbstractSourceContainerT
 				}
 				String projectName = element.getAttribute(PROJECT_NAME);
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				if (project == null) {
-					abort(NLS.bind(Messages.ResourceMappingSourceContainerType_1, projectName), null);
-				}
-				IPath local = new Path(element.getAttribute(PROJECT_PATH));
-				IContainer container = project;
-				if (!local.isEmpty()) {
-					container = project.getFolder(local);
-					if (!container.exists()) {
-						abort(Messages.ResourceMappingSourceContainerType_2, null);
+				if (project != null) {
+					IPath local = new Path(element.getAttribute(PROJECT_PATH));
+					IContainer container = project;
+					if (!local.isEmpty()) {
+						container = project.getFolder(local);
+						if (!container.exists()) {
+							abort(Messages.ResourceMappingSourceContainerType_2, null);
+						}
 					}
+					return new ResourceMappingSourceContainer(remote, container);
 				}
-				return new ResourceMappingSourceContainer(remote, container);
+				abort(NLS.bind(Messages.ResourceMappingSourceContainerType_1, projectName), null);
 			}
 			abort(Messages.ResourceMappingSourceContainerType_3, null);
 		}

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
@@ -28,6 +29,7 @@ import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.model.PVariableFormat;
+import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIChangedEvent;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
@@ -137,8 +139,8 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		public int sizeof();
 	}
 
-	private PVariableFormat fFormat = PVariableFormat.getFormat(PTPDebugCorePlugin.getDefault().getPluginPreferences().getInt(
-			IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT));
+	private PVariableFormat fFormat = PVariableFormat.getFormat(Platform.getPreferencesService().getInt(
+			PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, IPDIFormat.NATURAL, null));
 	private boolean fIsDisposed = false;
 	private boolean fIsEnabled = true;
 	private String fName;
@@ -185,8 +187,11 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IEnableDisableTarget#canEnableDisable()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IEnableDisableTarget#canEnableDisable()
 	 */
 	public boolean canEnableDisable() {
 		return !(getParent() instanceof IValue);
@@ -209,16 +214,23 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IFormatSupport#changeFormat(org.eclipse.ptp.debug.core.model.PVariableFormat)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IFormatSupport#changeFormat(org.eclipse
+	 * .ptp.debug.core.model.PVariableFormat)
 	 */
 	public void changeFormat(PVariableFormat format) throws DebugException {
 		setFormat(format);
 		resetValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#dispose()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#dispose()
 	 */
 	@Override
 	public void dispose() {
@@ -226,7 +238,9 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		setDisposed(true);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -241,7 +255,9 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPVariable#getExpressionString()
 	 */
 	public String getExpressionString() throws DebugException {
@@ -249,21 +265,27 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return (iv != null) ? iv.getQualifiedName() : null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IFormatSupport#getFormat()
 	 */
 	public PVariableFormat getFormat() {
 		return fFormat;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IVariable#getName()
 	 */
 	public String getName() throws DebugException {
 		return fName;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IVariable#getReferenceTypeName()
 	 */
 	public String getReferenceTypeName() throws DebugException {
@@ -271,7 +293,9 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return (aif != null) ? aif.getType().toString() : ""; //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IVariable#getValue()
 	 */
 	public IPValue getValue() throws DebugException {
@@ -288,8 +312,12 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return PValueFactory.NULL_VALUE;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	public void handleDebugEvents(IPDIEvent[] events) {
 		for (final IPDIEvent event2 : events) {
@@ -306,7 +334,9 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IVariable#hasValueChanged()
 	 */
 	public boolean hasValueChanged() throws DebugException {
@@ -317,7 +347,9 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return (iv != null) ? iv.isChanged() : false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPVariable#isArgument()
 	 */
 	public boolean isArgument() {
@@ -332,7 +364,9 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return (getShadow() != null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IEnableDisableTarget#isEnabled()
 	 */
 	public boolean isEnabled() {
@@ -355,8 +389,11 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		resetValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IEnableDisableTarget#setEnabled(boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IEnableDisableTarget#setEnabled(boolean)
 	 */
 	public void setEnabled(boolean enabled) throws DebugException {
 		IInternalVariable iv = getOriginal();
@@ -371,15 +408,23 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		fireChangeEvent(DebugEvent.STATE);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.debug.core.model.IValue)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.
+	 * debug.core.model.IValue)
 	 */
 	public void setValue(IValue value) throws DebugException {
 		notSupported(Messages.PVariable_1);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IValueModification#setValue(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IValueModification#setValue(java.lang.String
+	 * )
 	 */
 	public void setValue(String expression) throws DebugException {
 		final IInternalVariable iv = getCurrentInternalVariable();
@@ -389,15 +434,21 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IFormatSupport#supportsFormatting()
 	 */
 	public boolean supportsFormatting() {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IValueModification#supportsValueModification()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IValueModification#supportsValueModification
+	 * ()
 	 */
 	public boolean supportsValueModification() {
 		try {
@@ -407,15 +458,23 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IValueModification#verifyValue(org.eclipse.debug.core.model.IValue)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IValueModification#verifyValue(org.eclipse
+	 * .debug.core.model.IValue)
 	 */
 	public boolean verifyValue(IValue value) throws DebugException {
 		return value.getDebugTarget().equals(getDebugTarget());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IValueModification#verifyValue(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IValueModification#verifyValue(java.lang
+	 * .String)
 	 */
 	public boolean verifyValue(String expression) throws DebugException {
 		return true;
@@ -548,8 +607,11 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return fIsDisposed;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#preserve()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#preserve()
 	 */
 	@Override
 	protected void preserve() {
@@ -560,8 +622,11 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#resetValue()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#resetValue()
 	 */
 	@Override
 	protected void resetValue() {
@@ -582,8 +647,12 @@ public abstract class PVariable extends AbstractPVariable implements IPDIEventLi
 		return (iv != null && iv.isSameDescriptor(vo));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#setChanged(boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.AbstractPVariable#setChanged
+	 * (boolean)
 	 */
 	@Override
 	protected void setChanged(boolean changed) {

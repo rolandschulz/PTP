@@ -41,15 +41,23 @@ public class PSetManager implements IPSetManager {
 		createSet(PreferenceConstants.SET_ROOT_ID, session.getTasks());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#addTasks(java.lang.String, org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSetManager#addTasks(java.lang.String
+	 * , org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void addTasks(String sid, TaskSet tasks) {
 		createSet(sid, tasks);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#createSet(java.lang.String, org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSetManager#createSet(java.lang.
+	 * String, org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void createSet(String sid, TaskSet tasks) {
 		TaskSet oldTasks = getTasks(sid);
@@ -60,8 +68,12 @@ public class PSetManager implements IPSetManager {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#deleteSets(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSetManager#deleteSets(java.lang
+	 * .String)
 	 */
 	public void deleteSets(String sid) {
 		setMap.remove(sid);
@@ -81,23 +93,31 @@ public class PSetManager implements IPSetManager {
 		return session;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#getTasks(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSetManager#getTasks(java.lang.String
+	 * )
 	 */
 	public TaskSet getTasks(String sid) {
 		return setMap.get(sid);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.IPSetManager#removeTasks(java.lang.String, org.eclipse.ptp.core.util.TaskSet)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.IPSetManager#removeTasks(java.lang
+	 * .String, org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void removeTasks(String sid, TaskSet tasks) {
 		TaskSet oldTasks = getTasks(sid);
 		if (oldTasks != null) {
 			oldTasks.andNot(tasks);
-		}
-		if (oldTasks.isEmpty()) {
-			deleteSets(sid);
+			if (oldTasks.isEmpty()) {
+				deleteSets(sid);
+			}
 		}
 	}
 

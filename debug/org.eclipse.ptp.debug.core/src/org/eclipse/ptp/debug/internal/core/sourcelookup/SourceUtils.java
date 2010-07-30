@@ -64,9 +64,9 @@ public class SourceUtils {
 				containers.add(new ProjectSourceContainer(((IProjectSourceLocation) locations[i]).getProject(), false));
 			}
 		}
-		return (ISourceContainer[]) containers.toArray(new ISourceContainer[containers.size()]);
+		return containers.toArray(new ISourceContainer[containers.size()]);
 	}
-	
+
 	/**
 	 * @param memento
 	 * @return
@@ -82,16 +82,19 @@ public class SourceUtils {
 				if (root.getNodeName().equalsIgnoreCase(NAME_COMMON_SOURCE_LOCATIONS))
 					result = initializeSourceLocations(root);
 			} catch (ParserConfigurationException e) {
-				PTPDebugCorePlugin.log(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), 0, Messages.SourceUtils_0, e));
+				PTPDebugCorePlugin.log(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), 0,
+						Messages.SourceUtils_0, e));
 			} catch (SAXException e) {
-				PTPDebugCorePlugin.log(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), 0, Messages.SourceUtils_1, e));
+				PTPDebugCorePlugin.log(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), 0,
+						Messages.SourceUtils_1, e));
 			} catch (IOException e) {
-				PTPDebugCorePlugin.log(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), 0, Messages.SourceUtils_2, e));
+				PTPDebugCorePlugin.log(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), 0,
+						Messages.SourceUtils_2, e));
 			}
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @param locations
 	 * @return
@@ -115,11 +118,12 @@ public class SourceUtils {
 		PTPDebugCorePlugin.log(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), 0, Messages.SourceUtils_3, ex));
 		return null;
 	}
-	
+
 	/**
 	 * @param root
 	 * @return
 	 */
+	@SuppressWarnings("rawtypes")
 	public static IPSourceLocation[] initializeSourceLocations(Element root) {
 		List<IPSourceLocation> sourceLocations = new LinkedList<IPSourceLocation>();
 		NodeList list = root.getChildNodes();
@@ -162,9 +166,9 @@ public class SourceUtils {
 				}
 			}
 		}
-		return (IPSourceLocation[]) sourceLocations.toArray(new IPSourceLocation[sourceLocations.size()]);
+		return sourceLocations.toArray(new IPSourceLocation[sourceLocations.size()]);
 	}
-	
+
 	/**
 	 * @param string
 	 * @return
@@ -172,7 +176,7 @@ public class SourceUtils {
 	private static boolean isEmpty(String string) {
 		return (string == null || string.trim().length() == 0);
 	}
-	
+
 	/**
 	 * @param doc
 	 * @param node

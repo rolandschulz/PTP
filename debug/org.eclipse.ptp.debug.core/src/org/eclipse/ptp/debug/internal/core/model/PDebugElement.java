@@ -86,8 +86,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	 * @throws DebugException
 	 */
 	public static void targetRequestFailed(String message, PDIException e) throws DebugException {
-		requestFailed(NLS.bind(Messages.PDebugElement_0, new Object[] { message }), e,
-				DebugException.TARGET_REQUEST_FAILED);
+		requestFailed(NLS.bind(Messages.PDebugElement_0, new Object[] { message }), e, DebugException.TARGET_REQUEST_FAILED);
 	}
 
 	/**
@@ -96,8 +95,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	 * @throws DebugException
 	 */
 	public static void targetRequestFailed(String message, Throwable e) throws DebugException {
-		throwDebugException(NLS.bind(Messages.PDebugElement_0, new Object[] { message }),
-				DebugException.TARGET_REQUEST_FAILED, e);
+		throwDebugException(NLS.bind(Messages.PDebugElement_0, new Object[] { message }), DebugException.TARGET_REQUEST_FAILED, e);
 	}
 
 	/**
@@ -197,9 +195,13 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 		fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
+	@Override
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IDebugElement.class))
 			return this;
@@ -219,14 +221,19 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 		return super.getAdapter(adapter);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getCurrentStateInfo()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugElement#getCurrentStateInfo()
 	 */
 	public synchronized Object getCurrentStateInfo() {
 		return fCurrentStateInfo;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
 	 */
 	public IDebugTarget getDebugTarget() {
@@ -234,28 +241,36 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 		return fSession.getLaunch().getDebugTarget(getID());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getID()
 	 */
 	public int getID() {
 		return tasks.nextSetBit(0);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
 	 */
 	public ILaunch getLaunch() {
 		return fSession.getLaunch();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugElementStatus#getMessage()
 	 */
 	public String getMessage() {
 		return fMessage;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
 	 */
 	public String getModelIdentifier() {
@@ -281,21 +296,27 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 		return debugTarget.getPDITarget();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getSession()
 	 */
 	public IPSession getSession() {
 		return fSession;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugElementStatus#getSeverity()
 	 */
 	public synchronized int getSeverity() {
 		return fSeverity;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugElement#getState()
 	 */
 	public PDebugElementState getState() {
@@ -311,7 +332,9 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 		return tasks;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugElementStatus#isOK()
 	 */
 	public synchronized boolean isOK() {
@@ -336,8 +359,8 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	 * @param e
 	 */
 	protected void infoMessage(Throwable e) {
-		IStatus newStatus = new Status(IStatus.INFO, PDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO, e
-				.getMessage(), null);
+		IStatus newStatus = new Status(IStatus.INFO, PDebugModel.getPluginIdentifier(), IPDebugConstants.STATUS_CODE_INFO,
+				e.getMessage(), null);
 		PDebugUtils.info(newStatus, getDebugTarget());
 	}
 

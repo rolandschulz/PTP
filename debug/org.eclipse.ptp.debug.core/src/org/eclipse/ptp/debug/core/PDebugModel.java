@@ -552,7 +552,7 @@ public class PDebugModel {
 	 */
 	public IPSession createDebugSession(IPDebugger debugger, IPLaunch launch, IProject project, IPath coreFile,
 			IProgressMonitor monitor) throws CoreException {
-		long timeout = PTPDebugCorePlugin.getDefault().getPluginPreferences().getLong(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT);
+		long timeout = PTPDebugCorePlugin.getDefault().getCommandTimeout();
 		IPDISession pdiSession = debugger.createDebugSession(timeout, launch, coreFile, monitor);
 		IPSession session = new PSession(pdiSession, launch, project);
 		sessionMgr.addSession(launch.getPJob(), session);

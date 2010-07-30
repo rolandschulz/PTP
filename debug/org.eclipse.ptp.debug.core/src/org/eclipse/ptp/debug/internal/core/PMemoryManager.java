@@ -84,7 +84,7 @@ public class PMemoryManager implements IAdaptable, IPDIEventListener, IPMemoryMa
 		private IPDebugTarget debugTarget = null;
 		private final TaskSet mTasks;
 
-		public PMemoryBlockRetrievalExtension(TaskSet mTasks, PDebugTarget debugTarget) {
+		public PMemoryBlockRetrievalExtension(TaskSet mTasks, IPDebugTarget debugTarget) {
 			this.mTasks = mTasks;
 			this.debugTarget = debugTarget;
 		}
@@ -166,8 +166,8 @@ public class PMemoryManager implements IAdaptable, IPDIEventListener, IPMemoryMa
 					if (frame != null) {
 						// We need to provide a better way for retrieving the
 						// address of expression
-						final IPDITargetExpression pdiExpression = session.getPDISession().getExpressionManager().createExpression(
-								frame.getTasks(), expression);
+						final IPDITargetExpression pdiExpression = session.getPDISession().getExpressionManager()
+								.createExpression(frame.getTasks(), expression);
 						exp = new PExpression(frame, pdiExpression, null);
 						final IValue value = exp.getValue();
 						if (value instanceof IPValue) {
@@ -472,6 +472,7 @@ public class PMemoryManager implements IAdaptable, IPDIEventListener, IPMemoryMa
 	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IPDISession.class)) {
 			return getSession();
@@ -572,7 +573,7 @@ public class PMemoryManager implements IAdaptable, IPDIEventListener, IPMemoryMa
 	 * .ptp.core.util.TaskSet,
 	 * org.eclipse.ptp.debug.internal.core.model.PDebugTarget)
 	 */
-	public void initialize(TaskSet qTasks, PDebugTarget debugTarget) {
+	public void initialize(TaskSet qTasks, IPDebugTarget debugTarget) {
 		synchronized (fMemoryRetrievalMap) {
 			final PMemoryBlockRetrievalExtension set = new PMemoryBlockRetrievalExtension(qTasks, debugTarget);
 			fMemoryRetrievalMap.put(qTasks, set);

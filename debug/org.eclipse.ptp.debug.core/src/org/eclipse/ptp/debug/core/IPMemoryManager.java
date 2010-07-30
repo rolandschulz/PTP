@@ -13,7 +13,7 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
-import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 
 /**
  * @author greg
@@ -47,9 +47,9 @@ public interface IPMemoryManager {
 	/**
 	 * @param qTasks
 	 * @param debugTarget
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public void initialize(TaskSet qTasks, PDebugTarget debugTarget);
+	public void initialize(TaskSet qTasks, IPDebugTarget debugTarget);
 
 	/**
 	 * @param qTasks

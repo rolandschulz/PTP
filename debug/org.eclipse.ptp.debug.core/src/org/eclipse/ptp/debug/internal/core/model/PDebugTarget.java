@@ -34,9 +34,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -60,6 +63,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.DirectorySourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugUtils;
@@ -117,9 +121,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		ISourceLookupChangeListener {
 	private final String PROCESS_NAME = Messages.PDebugTarget_0;
 	private ArrayList<IThread> fThreads;
-	private IPDITarget pdiTarget;
+	private final IPDITarget pdiTarget;
 	private Boolean fIsLittleEndian = null;
-	private Preferences fPreferences = null;
+	private IEclipsePreferences fPreferences = null;
 
 	public PDebugTarget(IPSession session, IPDITarget pdiTarget, boolean allowTerminate, boolean allowDisconnect) {
 		super(session, pdiTarget.getTasks());
@@ -142,40 +146,64 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.ITargetProperties#addPropertyChangeListener(org.eclipse.core.runtime.Preferences.IPropertyChangeListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.model.ITargetProperties#
+	 * addPreferenceChangeListener
+	 * (org.eclipse.core.runtime.preferences.IEclipsePreferences
+	 * .IPreferenceChangeListener)
 	 */
-	public void addPropertyChangeListener(IPropertyChangeListener listener) {
-		if (fPreferences != null)
-			fPreferences.addPropertyChangeListener(listener);
+	public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
+		if (fPreferences != null) {
+			fPreferences.addPreferenceChangeListener(listener);
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#addRegisterGroup(java.lang.String, org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugTarget#addRegisterGroup(java.
+	 * lang.String, org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
 	 */
 	public void addRegisterGroup(String name, IPRegisterDescriptor[] descriptors) {
 		fSession.getRegisterManager().addRegisterGroup(getTasks(), name, descriptors);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.IBreakpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse
+	 * .debug.core.model.IBreakpoint)
 	 */
 	public void breakpointAdded(IBreakpoint breakpoint) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse
+	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse
+	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
 	 */
 	public boolean canDisconnect() {
@@ -183,29 +211,39 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IRestart#canRestart()
 	 */
 	public boolean canRestart() {
 		return isSuspended();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
 	public boolean canResume() {
 		return isSuspended();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal
+	 * ()
 	 */
 	public boolean canResumeWithoutSignal() {
 		// Check if the configuration supports this!!!
 		return (canResume() && getCurrentStateInfo() instanceof IPDISignalInfo);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
@@ -222,21 +260,26 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
 		return isAvailable();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#createGlobalVariable(org.eclipse.ptp.debug.core.model.IPGlobalVariableDescriptor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugTarget#createGlobalVariable(org
+	 * .eclipse.ptp.debug.core.model.IPGlobalVariableDescriptor)
 	 */
 	public IPGlobalVariable createGlobalVariable(IPGlobalVariableDescriptor info) throws DebugException {
 		IPDIVariableDescriptor vo = null;
 		try {
-			vo = (IPDIVariableDescriptor) getPDITarget().getGlobalVariableDescriptors(info.getPath().lastSegment(), null,
-					info.getName());
+			vo = getPDITarget().getGlobalVariableDescriptors(info.getPath().lastSegment(), null, info.getName());
 		} catch (PDIException e) {
 			throw new DebugException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(),
 					DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(), //$NON-NLS-1$
@@ -245,41 +288,60 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		return PVariableFactory.createGlobalVariable(this, info, vo);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDisconnect#disconnect()
 	 */
 	public void disconnect() throws DebugException {
 		targetRequestFailed(Messages.PDebugTarget_1, null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#dispose()
 	 */
 	public void dispose() {
 		cleanup();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.ISteppingModeTarget#enableInstructionStepping(boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.model.ISteppingModeTarget#
+	 * enableInstructionStepping(boolean)
 	 */
 	public void enableInstructionStepping(boolean enabled) {
-		fPreferences.setValue(PREF_INSTRUCTION_STEPPING_MODE, enabled);
+		fPreferences.putBoolean(PREF_INSTRUCTION_STEPPING_MODE, enabled);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IExpressionListener#expressionAdded(org.eclipse.debug.core.model.IExpression)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IExpressionListener#expressionAdded(org.eclipse
+	 * .debug.core.model.IExpression)
 	 */
 	public void expressionAdded(IExpression expression) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IExpressionListener#expressionChanged(org.eclipse.debug.core.model.IExpression)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IExpressionListener#expressionChanged(org.eclipse
+	 * .debug.core.model.IExpression)
 	 */
 	public void expressionChanged(IExpression expression) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IExpressionListener#expressionRemoved(org.eclipse.debug.core.model.IExpression)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IExpressionListener#expressionRemoved(org.eclipse
+	 * .debug.core.model.IExpression)
 	 */
 	public void expressionRemoved(IExpression expression) {
 		if (expression instanceof PExpression && expression.getDebugTarget().equals(this)) {
@@ -287,9 +349,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getAdapter(java
+	 * .lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
+	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IPDebugElement.class))
 			return this;
@@ -310,22 +378,32 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		return super.getAdapter(adapter);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#getBreakpointAddress(org.eclipse.ptp.debug.core.model.IPLineBreakpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugTarget#getBreakpointAddress(org
+	 * .eclipse.ptp.debug.core.model.IPLineBreakpoint)
 	 */
 	public BigInteger getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException {
 		return (fSession.getBreakpointManager() != null) ? fSession.getBreakpointManager().getBreakpointAddress(breakpoint)
 				: new BigInteger("0"); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getDebugTarget()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getDebugTarget()
 	 */
+	@Override
 	public PDebugTarget getDebugTarget() {
 		return this;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IExecFileInfo#getGlobals()
 	 */
 	public IPGlobalVariableDescriptor[] getGlobals() throws DebugException {
@@ -333,58 +411,81 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		return new IPGlobalVariableDescriptor[0];
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long, long)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long,
+	 * long)
 	 */
 	public IMemoryBlock getMemoryBlock(long startAddress, long length) throws DebugException {
 		return fSession.getMemoryManager().getMemoryBlock(getTasks(), startAddress, length);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getName()
 	 */
 	public String getName() throws DebugException {
 		return PROCESS_NAME + getID();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.model.PDebugElement#getPDITarget()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.model.PDebugElement#getPDITarget()
 	 */
+	@Override
 	public IPDITarget getPDITarget() {
 		return pdiTarget;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
 	 */
 	public IProcess getProcess() {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#getRegisterDescriptors()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugTarget#getRegisterDescriptors()
 	 */
 	public IPRegisterDescriptor[] getRegisterDescriptors() throws DebugException {
 		return fSession.getRegisterManager().getAllRegisterDescriptors(getTasks());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#getSignals()
 	 */
 	public IPSignal[] getSignals() throws DebugException {
 		return fSession.getSignalManager().getSignals(getTasks());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getThreads()
 	 */
 	public IThread[] getThreads() {
 		List<IThread> threads = getThreadList();
-		return (IThread[]) threads.toArray(new IThread[threads.size()]);
+		return threads.toArray(new IThread[threads.size()]);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents(org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener#handleDebugEvents
+	 * (org.eclipse.ptp.debug.core.pdi.event.IPDIEvent[])
 	 */
 	public void handleDebugEvents(IPDIEvent[] events) {
 		for (IPDIEvent event : events) {
@@ -407,39 +508,52 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#hasSignals()
 	 */
 	public boolean hasSignals() throws DebugException {
 		return (fSession.getSignalManager().getSignals(getTasks()).length > 0);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
 	 */
 	public boolean hasThreads() throws DebugException {
 		return getThreadList().size() > 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IDisconnect#isDisconnected()
 	 */
 	public boolean isDisconnected() {
 		return (getState().equals(PDebugElementState.DISCONNECTED));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.ISteppingModeTarget#isInstructionSteppingEnabled()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.model.ISteppingModeTarget#
+	 * isInstructionSteppingEnabled()
 	 */
 	public boolean isInstructionSteppingEnabled() {
-		if (fPreferences == null)
+		if (fPreferences == null) {
 			return false;
-		return fPreferences.getBoolean(PREF_INSTRUCTION_STEPPING_MODE)
-				|| PTPDebugCorePlugin.getDefault().getPluginPreferences()
-						.getBoolean(IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON);
+		}
+		IPreferencesService preferences = Platform.getPreferencesService();
+		return fPreferences.getBoolean(PREF_INSTRUCTION_STEPPING_MODE, IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE)
+				|| preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON,
+						IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE, null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#isLittleEndian()
 	 */
 	public boolean isLittleEndian() {
@@ -450,41 +564,59 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		return fIsLittleEndian.booleanValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#isPostMortem()
 	 */
 	public boolean isPostMortem() {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
 		return (getState().equals(PDebugElementState.SUSPENDED));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
 		return (getState().equals(PDebugElementState.TERMINATED));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.ILaunchListener#launchAdded(org.eclipse.debug.core.ILaunch)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.ILaunchListener#launchAdded(org.eclipse.debug.
+	 * core.ILaunch)
 	 */
 	public void launchAdded(ILaunch launch) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.ILaunchListener#launchChanged(org.eclipse.debug.core.ILaunch)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.ILaunchListener#launchChanged(org.eclipse.debug
+	 * .core.ILaunch)
 	 */
 	public void launchChanged(ILaunch launch) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.ILaunchListener#launchRemoved(org.eclipse.debug.core.ILaunch)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.ILaunchListener#launchRemoved(org.eclipse.debug
+	 * .core.ILaunch)
 	 */
 	public void launchRemoved(ILaunch launch) {
 		if (!isAvailable()) {
@@ -495,29 +627,46 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#modifyRegisterGroup(org.eclipse.ptp.debug.core.model.IPPersistableRegisterGroup, org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugTarget#modifyRegisterGroup(org
+	 * .eclipse.ptp.debug.core.model.IPPersistableRegisterGroup,
+	 * org.eclipse.ptp.debug.core.model.IPRegisterDescriptor[])
 	 */
 	public void modifyRegisterGroup(IPPersistableRegisterGroup group, IPRegisterDescriptor[] descriptors) {
 		fSession.getRegisterManager().modifyRegisterGroup(getTasks(), group, descriptors);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.ITargetProperties#removePropertyChangeListener(org.eclipse.core.runtime.Preferences.IPropertyChangeListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.model.ITargetProperties#
+	 * removePreferenceChangeListener
+	 * (org.eclipse.core.runtime.preferences.IEclipsePreferences
+	 * .IPreferenceChangeListener)
 	 */
-	public void removePropertyChangeListener(IPropertyChangeListener listener) {
-		if (fPreferences != null)
-			fPreferences.removePropertyChangeListener(listener);
+	public void removePreferenceChangeListener(IPreferenceChangeListener listener) {
+		if (fPreferences != null) {
+			fPreferences.removePreferenceChangeListener(listener);
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#removeRegisterGroups(org.eclipse.debug.core.model.IRegisterGroup[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugTarget#removeRegisterGroups(org
+	 * .eclipse.debug.core.model.IRegisterGroup[])
 	 */
 	public void removeRegisterGroups(IRegisterGroup[] groups) {
 		fSession.getRegisterManager().removeRegisterGroups(getTasks(), groups);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IRestart#restart()
 	 */
 	public void restart() throws DebugException {
@@ -527,14 +676,20 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPDebugTarget#restoreDefaultRegisterGroups()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPDebugTarget#restoreDefaultRegisterGroups
+	 * ()
 	 */
 	public void restoreDefaultRegisterGroups() {
 		fSession.getRegisterManager().restoreDefaults(getTasks());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
@@ -550,8 +705,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#resumeWithoutSignal()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IResumeWithoutSignal#resumeWithoutSignal
+	 * ()
 	 */
 	public void resumeWithoutSignal() throws DebugException {
 		if (!canResume())
@@ -565,22 +724,33 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener#sourceContainersChanged(org.eclipse.debug.core.sourcelookup.ISourceLookupDirector)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener#
+	 * sourceContainersChanged
+	 * (org.eclipse.debug.core.sourcelookup.ISourceLookupDirector)
 	 */
 	public void sourceContainersChanged(ISourceLookupDirector director) {
 		setSourceLookupPath(director.getSourceContainers());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse.debug.core.model.IBreakpoint)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse
+	 * .debug.core.model.IBreakpoint)
 	 */
 	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
 		return (breakpoint instanceof IPBreakpoint);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.ISteppingModeTarget#supportsInstructionStepping()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.model.ISteppingModeTarget#
+	 * supportsInstructionStepping()
 	 */
 	public boolean supportsInstructionStepping() {
 		// TODO Not implement yet
@@ -588,14 +758,20 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval
+	 * ()
 	 */
 	public boolean supportsStorageRetrieval() {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
@@ -611,7 +787,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
@@ -627,9 +805,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		String result = ""; //$NON-NLS-1$
 		try {
@@ -662,7 +843,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		disposeSignalManager();
 		disposeRegisterManager();
 		disposeMemoryManager();
-//		disposeSourceManager();
+		// disposeSourceManager();
 		disposeSourceLookupPath();
 		removeAllExpressions();
 		disposePreferences();
@@ -808,7 +989,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		}
 		debugEvents.add(createResumeEvent(detail));
 		resumeThreads(debugEvents, detail);
-		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
+		fireEventSet(debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
 
 	/**
@@ -898,8 +1079,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * 
 	 */
 	private void initializePreferences() {
-		fPreferences = new Preferences();
-		fPreferences.setDefault(PREF_INSTRUCTION_STEPPING_MODE, false);
+		fPreferences = new InstanceScope().getNode(PTPCorePlugin.getUniqueIdentifier());
+		fPreferences.putBoolean(PREF_INSTRUCTION_STEPPING_MODE, IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE);
 	}
 
 	/**
@@ -916,7 +1097,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		ArrayList<String> list = new ArrayList<String>(containers.length);
 		getSourceLookupPath(list, containers);
 		try {
-			getPDITarget().setSourcePaths((String[]) list.toArray(new String[list.size()]));
+			getPDITarget().setSourcePaths(list.toArray(new String[list.size()]));
 		} catch (PDIException e) {
 			PTPDebugCorePlugin.log(e);
 		}
@@ -1029,7 +1210,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		initializeThreads(debugEvents);
 		initializeRegisters();
 		initializeMemoryBlocks();
-		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
+		fireEventSet(debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
 
 	/**
@@ -1052,7 +1233,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	protected void initializeSourceLookupPath() {
 		ISourceLocator locator = getLaunch().getSourceLocator();
 		if (locator instanceof PSourceLookupDirector) {
-			PSourceLookupDirector director = (PSourceLookupDirector)locator;
+			PSourceLookupDirector director = (PSourceLookupDirector) locator;
 			ISourceContainer[] sc = director.getSourceContainers();
 			List<ISourceContainer> list = new ArrayList<ISourceContainer>(Arrays.asList(sc));
 			IPath backend = new Path(getSession().getProject().getLocationURI().getPath());
@@ -1126,8 +1307,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		IPDIThread[] pdiThreads = new IPDIThread[0];
 		IPDIThread currentPDIThread = null;
 		try {
-			pdiThreads = (IPDIThread[]) getPDITarget().getThreads();
-			currentPDIThread = (IPDIThread) getPDITarget().getCurrentThread();
+			pdiThreads = getPDITarget().getThreads();
+			currentPDIThread = getPDITarget().getCurrentThread();
 		} catch (PDIException e) {
 		}
 		for (int i = 0; i < pdiThreads.length; ++i) {
@@ -1153,7 +1334,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 			debugEvents.add(((PThread) it.next()).createCreateEvent());
 		}
 		if (debugEvents.size() > 0)
-			fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
+			fireEventSet(debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 		return newThreads;
 	}
 
@@ -1183,7 +1364,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 			thread.terminated();
 			debugEvents.add(thread.createTerminateEvent());
 		}
-		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
+		fireEventSet(debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
 
 	/**
@@ -1224,7 +1405,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 			PThread thread = (PThread) it.next();
 			IPDIThread suspensionThread = null;
 			try {
-				suspensionThread = (IPDIThread) getPDITarget().getCurrentThread();
+				suspensionThread = getPDITarget().getCurrentThread();
 			} catch (PDIException e) {
 				// ignore
 			}

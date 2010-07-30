@@ -360,7 +360,7 @@ public class PValue extends AbstractPValue {
 	 */
 	protected synchronized List<IVariable> getVariables0() throws DebugException {
 		if (!isAllocated() || !hasVariables()) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		if (fVariables.size() == 0) {
 			try {
