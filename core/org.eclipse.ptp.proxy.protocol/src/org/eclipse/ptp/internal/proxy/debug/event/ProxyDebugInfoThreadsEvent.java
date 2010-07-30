@@ -24,16 +24,17 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugInfoThreadsEvent;
 
 public class ProxyDebugInfoThreadsEvent extends AbstractProxyDebugEvent implements IProxyDebugInfoThreadsEvent {
 	private String[] thread_ids;
-	
+
 	public ProxyDebugInfoThreadsEvent(int transID, String bits, String[] thread_ids) {
 		super(transID, EVENT_DBG_THREADS, bits);
 		this.thread_ids = thread_ids;
 	}
-	
+
 	public String[] getThreadIds() {
 		return this.thread_ids;
 	}
 
+	@Override
 	public String toString() {
 		String res = "EVENT_DBG_THREADS: transid=" + getTransactionID() + " " + this.getBitSet().toString() + " {"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -42,7 +43,7 @@ public class ProxyDebugInfoThreadsEvent extends AbstractProxyDebugEvent implemen
 				res += ", "; //$NON-NLS-1$
 			res += thread_ids[i];
 		}
-		
+
 		res += "}"; //$NON-NLS-1$
 		return res;
 	}

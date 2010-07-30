@@ -21,27 +21,26 @@ package org.eclipse.ptp.proxy.debug.client;
 
 import org.eclipse.ptp.proxy.util.ProtocolUtil;
 
-
 public class ProxyDebugAIF {
-	private String	fds;
-	private String	description;
-	private byte[]	data;
-	
+	private String fds;
+	private String description;
+	private byte[] data;
+
 	public ProxyDebugAIF(String fds, String data, String desc) {
 		this.fds = fds;
 		this.data = ProtocolUtil.decodeBytes(data);
 		this.description = desc;
 	}
-	
-	public String getFDS() {
-		return fds;
-	}
-	
+
 	public byte[] getData() {
 		return data;
 	}
 
 	public String getDescription() {
 		return description;
+	}
+
+	public String getFDS() {
+		return fds;
 	}
 }

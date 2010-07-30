@@ -24,20 +24,21 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugMemoryInfoEvent;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public class ProxyDebugMemoryInfoEvent extends AbstractProxyDebugEvent implements IProxyDebugMemoryInfoEvent {
 	private ProxyDebugMemoryInfo memoryInfo;
-	
+
 	public ProxyDebugMemoryInfoEvent(int transID, String bits, ProxyDebugMemoryInfo memoryInfo) {
 		super(transID, EVENT_DBG_DATA_READ_MEMORY, bits);
 		this.memoryInfo = memoryInfo;
 	}
-	
+
 	public ProxyDebugMemoryInfo getMemoryInfo() {
 		return this.memoryInfo;
 	}
-	
+
+	@Override
 	public String toString() {
 		return "EVENT_DBG_DATA_READ_MEMORY transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}

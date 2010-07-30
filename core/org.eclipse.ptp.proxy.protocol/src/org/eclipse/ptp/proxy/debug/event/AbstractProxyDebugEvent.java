@@ -22,13 +22,13 @@ package org.eclipse.ptp.proxy.debug.event;
 import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 
 public abstract class AbstractProxyDebugEvent extends AbstractProxyEvent implements IProxyDebugEvent {
-	private String	bits;
-	
+	private String bits;
+
 	public AbstractProxyDebugEvent(int transID, int id, String bits) {
 		super(id, transID);
 		this.bits = bits;
 	}
-	
+
 	public String getBitSet() {
 		return bits;
 	}

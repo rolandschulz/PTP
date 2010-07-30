@@ -23,7 +23,7 @@ import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyTimeoutEvent;
 
 public class ProxyTimeoutEvent extends AbstractProxyEvent implements IProxyTimeoutEvent {
-	
+
 	public ProxyTimeoutEvent() {
 		super(TIMEOUT, 0, null);
 	}

@@ -20,10 +20,9 @@ package org.eclipse.ptp.proxy.debug.event;
 
 import org.eclipse.ptp.proxy.debug.client.ProxyDebugMemoryInfo;
 
-
 /**
  * @author clement chu
- *
+ * 
  */
 public interface IProxyDebugMemoryInfoEvent extends IProxyDebugEvent {
 	public ProxyDebugMemoryInfo getMemoryInfo();

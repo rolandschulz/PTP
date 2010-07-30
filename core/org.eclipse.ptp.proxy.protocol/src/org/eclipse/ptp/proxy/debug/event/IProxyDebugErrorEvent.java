@@ -21,5 +21,6 @@ package org.eclipse.ptp.proxy.debug.event;
 
 public interface IProxyDebugErrorEvent extends IProxyDebugEvent {
 	public int getErrorCode();
+
 	public String getErrorMessage();
 }

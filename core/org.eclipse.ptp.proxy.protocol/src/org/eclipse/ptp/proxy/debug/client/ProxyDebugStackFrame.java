@@ -19,24 +19,24 @@
 
 package org.eclipse.ptp.proxy.debug.client;
 
-
 public class ProxyDebugStackFrame {
-	private int					level;
-	private ProxyDebugLocator	loc;
-	
+	private int level;
+	private ProxyDebugLocator loc;
+
 	public ProxyDebugStackFrame(int level, ProxyDebugLocator loc) {
 		this.level = level;
 		this.loc = loc;
 	}
-	
+
 	public int getLevel() {
 		return this.level;
 	}
-	
+
 	public ProxyDebugLocator getLocator() {
 		return loc;
 	}
-	
+
+	@Override
 	public String toString() {
 		return getLevel() + " " + loc.toString(); //$NON-NLS-1$
 	}

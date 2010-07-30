@@ -14,8 +14,8 @@ package org.eclipse.ptp.internal.proxy.runtime.event;
 import org.eclipse.ptp.proxy.runtime.event.AbstractProxyRuntimeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeSubmitJobErrorEvent;
 
-public class ProxyRuntimeSubmitJobErrorEvent 
-	extends AbstractProxyRuntimeEvent 
+public class ProxyRuntimeSubmitJobErrorEvent
+		extends AbstractProxyRuntimeEvent
 		implements IProxyRuntimeSubmitJobErrorEvent {
 
 	public ProxyRuntimeSubmitJobErrorEvent(int transID, String[] args) {

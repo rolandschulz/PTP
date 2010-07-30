@@ -27,8 +27,8 @@ public class ProxyDebugSignal {
 	private boolean pass;
 	private boolean print;
 	private String desc;
-	
-	public ProxyDebugSignal(String name, boolean stop, boolean print, 
+
+	public ProxyDebugSignal(String name, boolean stop, boolean print,
 			boolean pass, String desc) {
 		this.name = name;
 		this.stop = stop;
@@ -37,23 +37,29 @@ public class ProxyDebugSignal {
 		this.desc = desc;
 	}
 
+	public String getDescription() {
+		return desc;
+	}
+
 	public String getName() {
 		return name;
 	}
-	public boolean isStop() {
-		return stop;
-	}
-	public boolean isPrint() {
-		return print;
-	}
+
 	public boolean isPass() {
 		return pass;
 	}
-	public String getDescription(){
-		return desc;
+
+	public boolean isPrint() {
+		return print;
 	}
+
+	public boolean isStop() {
+		return stop;
+	}
+
+	@Override
 	public String toString() {
-		return getName() + " " + isStop() + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-			isPrint() + " " + isPass() + " " + getDescription(); //$NON-NLS-1$ //$NON-NLS-2$
+		return getName() + " " + isStop() + " " + //$NON-NLS-1$ //$NON-NLS-2$
+				isPrint() + " " + isPass() + " " + getDescription(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

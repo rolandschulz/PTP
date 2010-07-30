@@ -16,20 +16,24 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugOutputEvent;
 
 public class ProxyDebugOutputEvent extends AbstractProxyDebugEvent implements IProxyDebugOutputEvent {
 	private String fOutput;
-	
+
 	public ProxyDebugOutputEvent(int transID, String bits, String output) {
 		super(transID, EVENT_DBG_OUTPUT, bits);
 		fOutput = output;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.proxy.debug.event.IProxyDebugOutputEvent#getOutput()
 	 */
 	public String getOutput() {
 		return fOutput;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.proxy.event.AbstractProxyEvent#toString()
 	 */
 	@Override

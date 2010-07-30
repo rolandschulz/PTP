@@ -2,7 +2,6 @@ package org.eclipse.ptp.proxy.debug.command;
 
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 
-
 public interface IProxyDebugCommand extends IProxyCommand {
 
 	/*
@@ -37,11 +36,13 @@ public interface IProxyDebugCommand extends IProxyCommand {
 	/**
 	 * @deprecated
 	 */
+	@Deprecated
 	public static final int SIGNALINFO = 27;
 	public static final int CLIHANDLE = 28;
 	/**
 	 * @deprecated
 	 */
+	@Deprecated
 	public static final int DATAEVALUATEEXPRESSION = 29;
 	public static final int EVALUATEPARTIALEXPRESSION = 30;
 	public static final int DELETEPARTIALEXPRESSION = 31;

@@ -23,17 +23,18 @@ import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugExitEvent;
 
 public class ProxyDebugExitEvent extends AbstractProxyDebugEvent implements IProxyDebugExitEvent {
-	private int		exitStatus;
-	
+	private int exitStatus;
+
 	public ProxyDebugExitEvent(int transID, String bits, int code) {
 		super(transID, EVENT_DBG_EXIT, bits);
 		this.exitStatus = code;
 	}
-	
+
 	public int getExitStatus() {
 		return this.exitStatus;
 	}
-	
+
+	@Override
 	public String toString() {
 		return "EVENT_DBG_EXIT transid=" + getTransactionID() + " " + this.getBitSet().toString() + " " + this.exitStatus; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}

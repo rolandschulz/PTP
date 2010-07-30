@@ -20,6 +20,7 @@
 package org.eclipse.ptp.proxy.debug.event;
 
 public interface IProxyDebugSignalExitEvent extends IProxyDebugEvent {
-	public String getSignalName();
 	public String getSignalMeaning();
+
+	public String getSignalName();
 }

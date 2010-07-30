@@ -13,13 +13,13 @@ package org.eclipse.ptp.internal.proxy.runtime.command;
 import org.eclipse.ptp.proxy.command.AbstractProxyCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
 
-public class ProxyRuntimeModelDefCommand 
-	extends AbstractProxyCommand implements IProxyRuntimeModelDefCommand {
-	
+public class ProxyRuntimeModelDefCommand
+		extends AbstractProxyCommand implements IProxyRuntimeModelDefCommand {
+
 	public ProxyRuntimeModelDefCommand() {
 		super(MODEL_DEF);
 	}
-	
+
 	public ProxyRuntimeModelDefCommand(int transID, String[] args) {
 		super(MODEL_DEF, transID, args);
 	}

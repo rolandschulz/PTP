@@ -16,7 +16,7 @@ import org.eclipse.ptp.proxy.runtime.event.AbstractProxyRuntimeEvent;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeRMChangeEvent;
 
 public class ProxyRuntimeRMChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeRMChangeEvent {
-	
+
 	public ProxyRuntimeRMChangeEvent(int transID, String[] args) {
 		super(RM_CHANGE, transID, args);
 	}

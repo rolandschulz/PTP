@@ -24,23 +24,24 @@ import org.eclipse.ptp.proxy.debug.event.AbstractProxyDebugEvent;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugBreakpointSetEvent;
 
 public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implements IProxyDebugBreakpointSetEvent {
-	private int						bpId;
-	private ProxyDebugBreakpoint	bpt;
-	
+	private int bpId;
+	private ProxyDebugBreakpoint bpt;
+
 	public ProxyDebugBreakpointSetEvent(int transID, String bits, int id, ProxyDebugBreakpoint bpt) {
 		super(transID, EVENT_DBG_BPSET, bits);
 		this.bpId = id;
 		this.bpt = bpt;
 	}
-	
-	public int getBreakpointId() {
-		return this.bpId;
-	}
-	
+
 	public ProxyDebugBreakpoint getBreakpoint() {
 		return this.bpt;
 	}
 
+	public int getBreakpointId() {
+		return this.bpId;
+	}
+
+	@Override
 	public String toString() {
 		return "EVENT_DBG_BPSET transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}

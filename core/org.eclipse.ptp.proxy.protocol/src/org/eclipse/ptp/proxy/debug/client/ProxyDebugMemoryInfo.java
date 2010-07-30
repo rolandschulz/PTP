@@ -28,9 +28,9 @@ public class ProxyDebugMemoryInfo {
 	private long numBytes;
 	private long totalBytes;
 	private ProxyDebugMemory[] memories;
-	
-	public ProxyDebugMemoryInfo(String addr, String nextRow, String prevRow, 
-			String nextPage, String prevPage, String numBytes, String totalBytes, 
+
+	public ProxyDebugMemoryInfo(String addr, String nextRow, String prevRow,
+			String nextPage, String prevPage, String numBytes, String totalBytes,
 			ProxyDebugMemory[] memories) {
 		this.addr = addr;
 		this.nextRow = Long.parseLong(nextRow);
@@ -41,36 +41,36 @@ public class ProxyDebugMemoryInfo {
 		this.totalBytes = Long.parseLong(totalBytes);
 		this.memories = memories;
 	}
-	
+
 	public String getAddress() {
 		return addr;
 	}
-	
-	public long getNextRow() {
-		return nextRow;
+
+	public ProxyDebugMemory[] getMemories() {
+		return memories;
 	}
-	
-	public long getPrevRow() {
-		return prevRow;
-	}
-	
+
 	public long getNextPage() {
 		return nextPage;
 	}
-	
-	public long getPrevPage() {
-		return prevPage;
+
+	public long getNextRow() {
+		return nextRow;
 	}
-	
+
 	public long getNumBytes() {
 		return numBytes;
 	}
-	
+
+	public long getPrevPage() {
+		return prevPage;
+	}
+
+	public long getPrevRow() {
+		return prevRow;
+	}
+
 	public long getTotalBytes() {
 		return totalBytes;
-	}
-	
-	public ProxyDebugMemory[] getMemories() {
-		return memories;
 	}
 }

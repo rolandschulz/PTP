@@ -22,18 +22,17 @@ package org.eclipse.ptp.internal.proxy.event;
 import org.eclipse.ptp.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent;
 
-
 public class ProxyMessageEvent extends AbstractProxyEvent implements IProxyMessageEvent {
 	public static final int EVENT_ERR_EVENT = 11;
-	
+
 	public ProxyMessageEvent(int transactionID, String[] args) {
 		super(MESSAGE, transactionID, args);
 	}
 
 	public ProxyMessageEvent(Level level, String message) {
 		super(MESSAGE, 0, new String[] {
-			LEVEL_ATTR + "=" + level.name(), //$NON-NLS-1$
-			TEXT_ATTR + "=" + message //$NON-NLS-1$
+				LEVEL_ATTR + "=" + level.name(), //$NON-NLS-1$
+				TEXT_ATTR + "=" + message //$NON-NLS-1$
 		});
 	}
 }

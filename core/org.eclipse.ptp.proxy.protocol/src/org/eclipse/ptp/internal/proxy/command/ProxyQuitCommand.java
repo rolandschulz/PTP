@@ -18,11 +18,12 @@ public class ProxyQuitCommand extends AbstractProxyCommand implements IProxyQuit
 	public ProxyQuitCommand() {
 		super(QUIT);
 	}
-	
+
 	public ProxyQuitCommand(int transID, String[] args) {
 		super(QUIT, transID, args);
 	}
-	
+
+	@Override
 	public String toString() {
 		return "ProxyQuitCommand tid=" + getTransactionID(); //$NON-NLS-1$
 	}

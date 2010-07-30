@@ -26,28 +26,29 @@ import org.eclipse.ptp.proxy.debug.event.IProxyDebugDataEvent;
 public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IProxyDebugDataEvent {
 	private ProxyDebugAIF data;
 	private String name;
-	
+
 	public ProxyDebugDataEvent(int transID, String bits, ProxyDebugAIF data, String name) {
 		super(transID, EVENT_DBG_DATA, bits);
 		this.data = data;
 		this.name = name;
 	}
-	
+
 	public ProxyDebugAIF getData() {
 		return this.data;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
+	@Override
 	public String toString() {
 		String res = "EVENT_DBG_DATA transid=" + getTransactionID() + " " + this.getBitSet().toString(); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.data != null)
 			res += " " + this.data.toString(); //$NON-NLS-1$
 		else
 			res += " AIFNULL"; //$NON-NLS-1$
-		
+
 		res += ", name: " + name; //$NON-NLS-1$
 		return res;
 	}

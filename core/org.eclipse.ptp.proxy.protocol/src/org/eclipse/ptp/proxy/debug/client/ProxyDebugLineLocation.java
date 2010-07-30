@@ -20,23 +20,24 @@
 package org.eclipse.ptp.proxy.debug.client;
 
 public class ProxyDebugLineLocation {
-	private String	file;
-	private int		line;
-	
+	private String file;
+	private int line;
+
 	public ProxyDebugLineLocation(String file, String line) {
 		this.file = file;
 		this.line = Integer.parseInt(line);
 	}
-	
+
 	public String getFile() {
 		return file;
 	}
-	
+
 	public int getLineNumber() {
 		return line;
 	}
 
+	@Override
 	public String toString() {
-		return file + ":" + ":" + line;	 //$NON-NLS-1$ //$NON-NLS-2$
+		return file + ":" + ":" + line; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
