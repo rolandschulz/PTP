@@ -102,7 +102,8 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: error code [2]: error message
+		 * [1]: error code
+		 * [2]: error message
 		 */
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			int errCode = Integer.parseInt(args[1]);
@@ -122,8 +123,11 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 		case IProxyDebugEvent.EVENT_DBG_SUSPEND:
 			switch (Integer.parseInt(args[1])) {
 			/*
-			 * [2]: bpt id [3]: thread id [4]: depth [5]: var changed list ->
-			 * length [6]: var changed list -> name
+			 * [2]: bpt id
+			 * [3]: thread id
+			 * [4]: depth
+			 * [5]: var changed list -> length
+			 * [6]: var changed list -> name
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_BPHIT:
 				int hitId = Integer.parseInt(args[2]);
@@ -138,13 +142,20 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				break;
 
 			/*
-			 * [2]: signal info -> name [3]: signal info -> sig_stop [4]: signal
-			 * info -> sig_print [5]: signal info -> sig_pass [6]: signal info
-			 * -> description [7]: frame -> level [8]: frame -> location -> file
-			 * [9]: frame -> location -> function [10]: frame -> location ->
-			 * address [11]: frame -> location -> line number [12]: thread id
-			 * [13]: depth [14]: var changed list -> length [15]: var changed
-			 * list -> name
+			 * [2]: signal info -> name
+			 * [3]: signal info -> sig_stop
+			 * [4]: signal info -> sig_print
+			 * [5]: signal info -> sig_pass
+			 * [6]: signal info -> description
+			 * [7]: frame -> level
+			 * [8]: frame -> location -> file
+			 * [9]: frame -> location -> function
+			 * [10]: frame -> location -> address
+			 * [11]: frame -> location -> line number
+			 * [12]: thread id
+			 * [13]: depth
+			 * [14]: var changed list -> length
+			 * [15]: var changed list -> name
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_SIGNAL:
 				int sigTid = Integer.parseInt(args[12]);
@@ -165,10 +176,15 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				break;
 
 			/*
-			 * [2]: frame -> level [3]: frame -> location -> file [4]: frame ->
-			 * location -> function [5]: frame -> location -> address [6]: frame
-			 * -> location -> line number [7]: thread id [8]: depth [9]: var
-			 * changed list -> length [10]: var changed list -> name
+			 * [2]: frame -> level
+			 * [3]: frame -> location -> file
+			 * [4]: frame -> location -> function
+			 * [5]: frame -> location -> address
+			 * [6]: frame -> location -> line number
+			 * [7]: thread id
+			 * [8]: depth
+			 * [9]: var changed list -> length
+			 * [10]: var changed list -> name
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_STEP:
 				ProxyDebugStackFrame frame = toFrame(args[2], args[3], args[4], args[6], args[5]);
@@ -183,10 +199,15 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				break;
 
 			/*
-			 * [2]: frame -> level [3]: frame -> location -> file [4]: frame ->
-			 * location -> function [5]: frame -> location -> address [6]: frame
-			 * -> location -> line number [7]: thread id [8]: depth [9]: var
-			 * changed list -> length [10]: var changed list -> name
+			 * [2]: frame -> level
+			 * [3]: frame -> location -> file
+			 * [4]: frame -> location -> function
+			 * [5]: frame -> location -> address
+			 * [6]: frame -> location -> line number
+			 * [7]: thread id
+			 * [8]: depth
+			 * [9]: var changed list -> length
+			 * [10]: var changed list -> name
 			 */
 			case IProxyDebugEvent.EVENT_DBG_SUSPEND_INT:
 				ProxyDebugStackFrame suspendFrame = toFrame(args[2], args[3], args[4], args[6], args[5]);
@@ -203,11 +224,17 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: bpt id [2]: breakpoint -> bpt id [3]: breakpoint -> ignore [4]:
-		 * breakpoint -> special [5]: breakpoint -> deleted [6]: breakpoint ->
-		 * type [7]: breakpoint -> location -> file [8]: breakpoint -> location
-		 * -> function [9]: breakpoint -> location -> address [10]: breakpoint
-		 * -> location -> line number [11]: breakpoint -> hit count
+		 * [1]: bpt id
+		 * [2]: breakpoint -> bpt id
+		 * [3]: breakpoint -> ignore
+		 * [4]: breakpoint -> special
+		 * [5]: breakpoint -> deleted
+		 * [6]: breakpoint -> type
+		 * [7]: breakpoint -> location -> file
+		 * [8]: breakpoint -> location -> function
+		 * [9]: breakpoint -> location -> address
+		 * [10]: breakpoint -> location -> line number
+		 * [11]: breakpoint -> hit count
 		 */
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
 			int bpId = Integer.parseInt(args[1]);
@@ -217,9 +244,12 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: signal info list -> length [2]: signal info list -> name [3]:
-		 * signal info list -> sig_stop [4]: signal info list -> sig_print [5]:
-		 * signal info list -> sig_pass [6]: signal info list -> description
+		 * [1]: signal info list -> length
+		 * [2]: signal info list -> name
+		 * [3]: signal info list -> sig_stop
+		 * [4]: signal info list -> sig_print
+		 * [5]: signal info list -> sig_pass
+		 * [6]: signal info list -> description
 		 */
 		case IProxyDebugEvent.EVENT_DBG_SIGNALS:
 			int numSignals = Integer.parseInt(args[1]);
@@ -244,9 +274,11 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 				evt = new ProxyDebugExitEvent(packet.getTransID(), bits, status);
 				break;
 			/*
-			 * [2]: signal info -> name [3]: signal info -> sig_stop [4]: signal
-			 * info -> sig_print [5]: signal info -> sig_pass [6]: signal info
-			 * -> description
+			 * [2]: signal info -> name
+			 * [3]: signal info -> sig_stop
+			 * [4]: signal info -> sig_print
+			 * [5]: signal info -> sig_pass
+			 * [6]: signal info -> description
 			 */
 			case IProxyDebugEvent.EVENT_DBG_EXIT_SIGNAL:
 				evt = new ProxyDebugSignalExitEvent(packet.getTransID(), bits, args[2], args[6]);
@@ -255,10 +287,12 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: frame list -> length [2]: frame list -> level [3]: frame list ->
-		 * location -> file [4]: frame list -> location -> function [5]: frame
-		 * list -> location -> address [6]: frame list -> location -> line
-		 * number
+		 * [1]: frame list -> length
+		 * [2]: frame list -> level
+		 * [3]: frame list -> location -> file
+		 * [4]: frame list -> location -> function
+		 * [5]: frame list -> location -> address
+		 * [6]: frame list -> location -> line number
 		 */
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
 			int numFrames = Integer.parseInt(args[1]);
@@ -270,8 +304,11 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: thread id [2]: frame -> level [3]: frame -> location -> file
-		 * [4]: frame -> location -> function [5]: frame -> location -> address
+		 * [1]: thread id
+		 * [2]: frame -> level
+		 * [3]: frame -> location -> file
+		 * [4]: frame -> location -> function
+		 * [5]: frame -> location -> address
 		 * [6]: frame -> location -> line number
 		 */
 		case IProxyDebugEvent.EVENT_DBG_THREAD_SELECT:
@@ -281,8 +318,9 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: current thread id [2]: thread ids list -> length [3]: thread ids
-		 * list -> thread id
+		 * [1]: current thread id
+		 * [2]: thread ids list -> length
+		 * [3]: thread ids list -> thread id
 		 */
 		case IProxyDebugEvent.EVENT_DBG_THREADS:
 			int numThreads = Integer.parseInt(args[2]);
@@ -303,10 +341,18 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: address [2]: next row [3]: prev row [4]: next page [5]: prev
-		 * page [6]: number of bytes [7]: total bytes [8]: memory list -> length
-		 * [9]: memory list -> address [10]: memory list -> ascii [11]: memory
-		 * list -> data list -> length [12]: memory list -> data list -> value
+		 * [1]: address
+		 * [2]: next row
+		 * [3]: prev row
+		 * [4]: next page
+		 * [5]: prev page
+		 * [6]: number of bytes
+		 * [7]: total bytes
+		 * [8]: memory list -> length
+		 * [9]: memory list -> address
+		 * [10]: memory list -> ascii
+		 * [11]: memory list -> data list -> length
+		 * [12]: memory list -> data list -> value
 		 */
 		case IProxyDebugEvent.EVENT_DBG_DATA_READ_MEMORY:
 			int numMemories = Integer.parseInt(args[8]);
@@ -328,7 +374,8 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: var list -> length [2]: var list -> name
+		 * [1]: var list -> length
+		 * [2]: var list -> name
 		 */
 		case IProxyDebugEvent.EVENT_DBG_VARS:
 			numVars = Integer.parseInt(args[1]);
@@ -340,7 +387,8 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: arg list -> length [2]: arg list -> name
+		 * [1]: arg list -> length
+		 * [2]: arg list -> name
 		 */
 		case IProxyDebugEvent.EVENT_DBG_ARGS:
 			int numArgs = Integer.parseInt(args[1]);
@@ -359,7 +407,10 @@ public class ProxyDebugEventFactory extends ProxyEventFactory implements IProxyD
 			break;
 
 		/*
-		 * [1]: aif format [2]: aif data [3]: type description [4]: name
+		 * [1]: aif format
+		 * [2]: aif data
+		 * [3]: type description
+		 * [4]: name
 		 */
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			ProxyDebugAIF data = new ProxyDebugAIF(args[1], args[2], args[3]);
