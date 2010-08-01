@@ -20,6 +20,7 @@
                 <attribute name="Class-Path" value="."/>
 			</manifest>
             <zipfileset src="${jar-with-dependencies}"/>
+			<fileset file="about.html"/>
 		</jar>
 		<delete file="${jar-with-dependencies}"/>
 	</target>
