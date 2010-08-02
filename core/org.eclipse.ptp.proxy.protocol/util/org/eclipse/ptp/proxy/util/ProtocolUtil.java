@@ -150,6 +150,7 @@ public class ProtocolUtil {
 	 *      The value is the actual string without the trailing x'00' byte.
 	 * Length > 0
 	 * 		is a string index identifying a previously processed string. Value is omitted.
+	 *      Indexes are numbered from 0, so the actual index value is (length - 1).
 	 * </pre>
 	 * 
 	 * Lengths are always represented as VarInts.
