@@ -16,7 +16,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
-import java.util.ArrayList;
 
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.util.messages.Messages;
@@ -35,8 +34,6 @@ public class ProtocolUtil {
 	public final static int CHAR = 13;
 	public final static int STRING = 14;
 	public final static int UNSIGNED = 15;
-
-	private final static ArrayList<String> fStringTable = new ArrayList<String>();
 
 	/**
 	 * Decode a string into a BigInteger
@@ -103,14 +100,14 @@ public class ProtocolUtil {
 	 *             if decoding failed
 	 * @since 5.0
 	 */
-	public static String decodeAttribute(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
+	public static String decodeAttribute(ByteBuffer buf, CharsetDecoder decoder, StringTable stringTable) throws IOException {
 		String result = ""; //$NON-NLS-1$
 
-		String key = decodeString(buf, decoder);
+		String key = decodeString(buf, decoder, stringTable);
 		if (key != null) {
 			result = key;
 		}
-		String value = decodeString(buf, decoder);
+		String value = decodeString(buf, decoder, stringTable);
 		if (value != null) {
 			if (result.length() > 0) {
 				result += "="; //$NON-NLS-1$
@@ -172,7 +169,7 @@ public class ProtocolUtil {
 	 * 
 	 * @since 5.0
 	 */
-	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
+	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder, StringTable stringTable) throws IOException {
 		String result = ""; //$NON-NLS-1$
 		VarInt strLen = new VarInt(buf);
 		if (!strLen.isValid()) {
@@ -207,12 +204,12 @@ public class ProtocolUtil {
 					throw new IOException(e.getMessage());
 				}
 			}
-			fStringTable.add(result);
+			stringTable.put(result);
 		} else {
 			/*
 			 * String table entry
 			 */
-			result = fStringTable.get(len - 1);
+			result = stringTable.get(len - 1);
 		}
 		return result;
 	}
