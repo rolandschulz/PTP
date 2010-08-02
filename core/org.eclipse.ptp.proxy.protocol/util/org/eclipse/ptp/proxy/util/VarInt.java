@@ -27,10 +27,11 @@ public class VarInt {
 	private ByteBuffer fBytes = null;
 
 	public VarInt(ByteBuffer buffer) {
+		int shift = 0;
 		while (buffer.hasRemaining()) {
 			byte b = buffer.get();
-			fValue <<= 7;
-			fValue |= (b & 0x7f);
+			fValue |= (b & 0x7f) << shift;
+			shift += 7;
 			if ((b & 0x80) == 0) {
 				fValid = true;
 				break;
