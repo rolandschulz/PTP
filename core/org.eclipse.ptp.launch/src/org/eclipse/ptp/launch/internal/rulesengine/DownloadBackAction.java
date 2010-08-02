@@ -17,6 +17,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
@@ -29,91 +30,67 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
  */
 public class DownloadBackAction implements IRuleAction {
 
-	private final ILaunchProcessCallback process;
-	private final DownloadBackRule rule;
-	private final ILaunchConfiguration configuration;
-	private final IProgressMonitor monitor;
+	private final ILaunchProcessCallback fProcess;
+	private final DownloadBackRule fRule;
+	private final ILaunchConfiguration fConfiguration;
+	private final IProgressMonitor fMonitor;
 
 	public DownloadBackAction(ILaunchProcessCallback process, ILaunchConfiguration configuration,
 			DownloadBackRule downloadBackRule, IProgressMonitor monitor) {
 		super();
-		this.process = process;
-		this.rule = downloadBackRule;
-		this.configuration = configuration;
-		this.monitor = monitor;
+		fProcess = process;
+		fRule = downloadBackRule;
+		fConfiguration = configuration;
+		fMonitor = monitor;
 
 	}
 
 	public void run() throws CoreException {
-		Assert.isNotNull(process);
-		Assert.isNotNull(rule);
-		Assert.isNotNull(configuration);
+		Assert.isNotNull(fProcess);
+		Assert.isNotNull(fRule);
+		Assert.isNotNull(fConfiguration);
 
-		// Get managers
-		IRemoteFileManager remoteFileManager = process.getRemoteFileManager(configuration);
-		IRemoteFileManager localFileManager = process.getLocalFileManager(configuration);
+		SubMonitor progress = SubMonitor.convert(fMonitor, 10);
 
-		/*
-		 * Process files in list.
-		 */
-		for (int i = 0; i < rule.count(); i++) {
-			IFileStore remoteFileStore = null;
-			IFileStore localFileStore = null;
+		try {
+			// Get managers
+			IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(2));
+			IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
 
-			remoteFileStore = remoteFileManager.getResource(rule.getRemoteFile(i).toString());
-			localFileStore = localFileManager.getResource(rule.getLocalFile(i).getAbsolutePath());
+			/*
+			 * Process files in list.
+			 */
+			for (int i = 0; i < fRule.count(); i++) {
+				IFileStore remoteFileStore = null;
+				IFileStore localFileStore = null;
 
-			doDownload(remoteFileStore, localFileStore);
+				remoteFileStore = remoteFileManager.getResource(fRule.getRemoteFile(i).toString());
+				localFileStore = localFileManager.getResource(fRule.getLocalFile(i).getAbsolutePath());
+
+				doDownload(remoteFileStore, localFileStore, progress.newChild(8));
+			}
+		} finally {
+			progress.done();
 		}
 	}
 
-	private void doDownload(IFileStore remoteFileStore, IFileStore localFileStore) throws CoreException {
+	private void doDownload(IFileStore remoteFileStore, IFileStore localFileStore, IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
 
-		// Get remote and local file infos
-		IFileInfo remoteFileInfo = remoteFileStore.fetchInfo(EFS.NONE, monitor);
-		// IFileInfo localFileInfo = localFileStore.fetchInfo();
+		try {
+			// Get remote and local file infos
+			IFileInfo remoteFileInfo = remoteFileStore.fetchInfo(EFS.NONE, progress.newChild(5));
 
-		if (!remoteFileInfo.exists()) {
-			// Warn user that file doesn`t exist
-			return;
+			if (!remoteFileInfo.exists()) {
+				// Warn user that file doesn`t exist
+				return;
+			}
+
+			remoteFileStore.copy(localFileStore, EFS.OVERWRITE, progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-
-		remoteFileStore.copy(localFileStore, EFS.OVERWRITE, monitor);
 	}
-
-	/*
-	 * private void downloadFile(File localFile, IPath remotePath) throws
-	 * CoreException, CancelException, RemoteConnectionException { String
-	 * remotePathAsString = LinuxPath.toString(remotePath);
-	 * 
-	 * 
-	 * IRemoteFile remoteFile = null; try { remoteFile =
-	 * fileTools.getFile(remotePathAsString); } catch (RemoteOperationException
-	 * e) { errorWriter.println(NLS.bind(Messages.
-	 * DownloadBackAction_FailedFetchRemoteProperties, e.getMessage())); return;
-	 * }
-	 * 
-	 * if (! remoteFile.exists()) { errorWriter.println(NLS.bind(Messages.
-	 * DownloadBackAction_FailedFiledDoesNotExist, remotePathAsString)); return;
-	 * }
-	 * 
-	 * 
-	 * Test if file has been changed.
-	 * 
-	 * long difference = remoteFile.getModificationTime() -
-	 * localFile.lastModified(); if (difference < 1000 && remoteFile.getSize()
-	 * == localFile.length()) { outputWriter.println(NLS.bind(Messages.
-	 * DownloadBackAction_NotifyFileNotChanged, remotePath)); return; }
-	 * 
-	 * 
-	 * Download file
-	 * 
-	 * try {
-	 * outputWriter.println(NLS.bind(Messages.DownloadBackAction_NotifyDonwloadBack
-	 * , remotePathAsString)); copyTools.downloadFileToFile(remotePathAsString,
-	 * localFile); } catch (RemoteOperationException e) {
-	 * errorWriter.println(NLS
-	 * .bind(Messages.DownloadBackAction_FailedDownloadBack, e.getMessage()));
-	 * return; } }
-	 */
 }

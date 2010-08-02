@@ -19,7 +19,6 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
@@ -39,7 +38,7 @@ public class UploadRule implements ISynchronizationRule {
 	private boolean asExecutable = false;
 
 	private boolean preserveTimeStamp = false;
-	
+
 	private boolean downloadBack = false;
 
 	private boolean defaultRemoteDirectory = false;
@@ -47,8 +46,8 @@ public class UploadRule implements ISynchronizationRule {
 	private String remoteDirectory = null;
 
 	/*
-	 * List of local paths, represented as strings.
-	 * They may be files or directories.
+	 * List of local paths, represented as strings. They may be files or
+	 * directories.
 	 */
 	private List<String> localFileList = new ArrayList<String>();
 
@@ -68,16 +67,16 @@ public class UploadRule implements ISynchronizationRule {
 		 */
 		String list[] = data.split("\n"); //$NON-NLS-1$
 		/*
-		 * Check if the first token is the proper identifier. If not, the string does not represent a rule that
-		 * can be parsed by this class.
+		 * Check if the first token is the proper identifier. If not, the string
+		 * does not represent a rule that can be parsed by this class.
 		 */
 		{
 			if (list.length < 1) {
-				throwError(Messages.UploadRule_0+this.getClass().getName());
+				throwError(Messages.UploadRule_0 + this.getClass().getName());
 			}
 			String s = list[0];
-			if (! s.equalsIgnoreCase(SerializationKeys.TYPE_UPLOAD)) {
-				throwError(Messages.UploadRule_0+this.getClass().getName());
+			if (!s.equalsIgnoreCase(SerializationKeys.TYPE_UPLOAD)) {
+				throwError(Messages.UploadRule_0 + this.getClass().getName());
 			}
 		}
 		for (int i = 1; i < list.length; i++) {
@@ -87,7 +86,7 @@ public class UploadRule implements ISynchronizationRule {
 			 */
 			int p = s.indexOf(' ');
 			if (p == -1) {
-				logError(Messages.UploadRule_1+s);
+				logError(Messages.UploadRule_1 + s);
 				continue;
 			}
 			String key = s.substring(0, p);
@@ -95,7 +94,7 @@ public class UploadRule implements ISynchronizationRule {
 			parseEntry(key, value);
 		}
 	}
-	
+
 	public UploadRule(UploadRule rule) {
 		this.overwritePolicy = rule.overwritePolicy;
 		this.asReadOnly = rule.asReadOnly;
@@ -112,7 +111,7 @@ public class UploadRule implements ISynchronizationRule {
 	}
 
 	private void throwError(String string) {
-		throw new RuntimeException(string);		
+		throw new RuntimeException(string);
 	}
 
 	private void parseEntry(String key, String value) {
@@ -128,7 +127,7 @@ public class UploadRule implements ISynchronizationRule {
 			} else if (value.equalsIgnoreCase(SerializationKeys.KEY_OVERWRITE_POLICY_SKIP)) {
 				overwritePolicy = OverwritePolicies.SKIP;
 			} else {
-				logError(Messages.UploadRule_2+value);
+				logError(Messages.UploadRule_2 + value);
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_FLAGS)) {
 			String flags[] = value.split(" "); //$NON-NLS-1$
@@ -141,7 +140,7 @@ public class UploadRule implements ISynchronizationRule {
 				} else if (flag.equalsIgnoreCase(SerializationKeys.KEY_FLAGS_DOWNLOAD_BACK)) {
 					downloadBack = true;
 				} else {
-					logError(Messages.UploadRule_3+flag);
+					logError(Messages.UploadRule_3 + flag);
 				}
 			}
 		} else if (key.equalsIgnoreCase(SerializationKeys.KEY_LOCAL_PATH)) {
@@ -155,11 +154,11 @@ public class UploadRule implements ISynchronizationRule {
 				} else if (flag.equalsIgnoreCase(SerializationKeys.KEY_PERMISSIONS_READONLY)) {
 					asReadOnly = true;
 				} else {
-					logError(Messages.UploadRule_4+flag);
+					logError(Messages.UploadRule_4 + flag);
 				}
-			}			
+			}
 		} else {
-			logError(Messages.UploadRule_5+key);
+			logError(Messages.UploadRule_5 + key);
 		}
 	}
 
@@ -170,19 +169,20 @@ public class UploadRule implements ISynchronizationRule {
 	/*
 	 * The rule as a serialized string.
 	 */
+	@Override
 	public String toString() {
 		List<String> l = new ArrayList<String>();
 		if (remoteDirectory != null) {
-			l.add(SerializationKeys.KEY_REMOTE_PATH+" "+remoteDirectory.trim()); //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_REMOTE_PATH + " " + remoteDirectory.trim()); //$NON-NLS-1$
 		}
 		if (overwritePolicy == OverwritePolicies.ALWAYS) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_ALWAYS);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_ALWAYS); //$NON-NLS-1$
 		} else if (overwritePolicy == OverwritePolicies.ASK) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_ASK);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_ASK); //$NON-NLS-1$
 		} else if (overwritePolicy == OverwritePolicies.NEWER) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_NEWER);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_NEWER); //$NON-NLS-1$
 		} else if (overwritePolicy == OverwritePolicies.SKIP) {
-			l.add(SerializationKeys.KEY_OVERWRITE_POLICY+" "+SerializationKeys.KEY_OVERWRITE_POLICY_SKIP);			 //$NON-NLS-1$
+			l.add(SerializationKeys.KEY_OVERWRITE_POLICY + " " + SerializationKeys.KEY_OVERWRITE_POLICY_SKIP); //$NON-NLS-1$
 		}
 		if (asExecutable || asReadOnly) {
 			String s = SerializationKeys.KEY_PERMISSIONS;
@@ -203,20 +203,22 @@ public class UploadRule implements ISynchronizationRule {
 				s += " " + SerializationKeys.KEY_FLAGS_TIMESTAMP; //$NON-NLS-1$
 			}
 			if (downloadBack) {
-				s += " " + SerializationKeys.KEY_FLAGS_DOWNLOAD_BACK;				 //$NON-NLS-1$
+				s += " " + SerializationKeys.KEY_FLAGS_DOWNLOAD_BACK; //$NON-NLS-1$
 			}
-			l.add(s);			
+			l.add(s);
 		}
 		for (Iterator<String> iter = localFileList.iterator(); iter.hasNext();) {
-			String localpath = (String) iter.next();
-			if (localpath == null) continue;
-			if (localpath.trim().length() == 0) continue;
-			
-			l.add(SerializationKeys.KEY_LOCAL_PATH+" "+localpath.trim());  //$NON-NLS-1$
+			String localpath = iter.next();
+			if (localpath == null)
+				continue;
+			if (localpath.trim().length() == 0)
+				continue;
+
+			l.add(SerializationKeys.KEY_LOCAL_PATH + " " + localpath.trim()); //$NON-NLS-1$
 		}
 		String result = new String(SerializationKeys.TYPE_UPLOAD);
 		for (Iterator<String> iter = l.iterator(); iter.hasNext();) {
-			String element = (String) iter.next();
+			String element = iter.next();
 			result += "\n" + element; //$NON-NLS-1$
 		}
 		return result;
@@ -264,12 +266,12 @@ public class UploadRule implements ISynchronizationRule {
 
 	public String getRemoteDirectory() {
 		if (remoteDirectory != null) {
-				return remoteDirectory.trim();
+			return remoteDirectory.trim();
 		} else {
 			return null;
 		}
 	}
-	
+
 	public void setRemoteDirectory(String remoteDirectory) {
 		if (remoteDirectory != null) {
 			this.remoteDirectory = remoteDirectory.trim();
@@ -277,46 +279,46 @@ public class UploadRule implements ISynchronizationRule {
 			this.remoteDirectory = null;
 		}
 	}
-	
+
 	public void setDownloadBack(boolean downloadBack) {
 		this.downloadBack = downloadBack;
 	}
-	
+
 	public boolean isDownloadBack() {
 		return downloadBack;
 	}
-	
+
 	public int getRemoteFileCount() {
 		return localFileList.size();
 	}
-	
-	public String [] getLocalFilesAsStringArray() {
-		String result [] = new String [localFileList.size()];
+
+	public String[] getLocalFilesAsStringArray() {
+		String result[] = new String[localFileList.size()];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = (String) localFileList.get(i);
+			result[i] = localFileList.get(i);
 		}
 		return result;
 	}
 
-	public IPath [] getLocalFilesAsPathArray() {
-		IPath result [] = new IPath [localFileList.size()];
+	public IPath[] getLocalFilesAsPathArray() {
+		IPath result[] = new IPath[localFileList.size()];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = new Path((String) localFileList.get(i));
+			result[i] = new Path(localFileList.get(i));
 		}
 		return result;
 	}
 
-	public File [] getLocalFilesAsFileArray() {
-		File result [] = new File [localFileList.size()];
+	public File[] getLocalFilesAsFileArray() {
+		File result[] = new File[localFileList.size()];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = new File((String) localFileList.get(i));
+			result[i] = new File(localFileList.get(i));
 		}
 		return result;
 	}
-	
+
 	public class LocalFileIteratorAsString implements Iterator<Object> {
 		Iterator<String> iteratorref = localFileList.iterator();
-		
+
 		public boolean hasNext() {
 			return iteratorref.hasNext();
 		}
@@ -327,18 +329,20 @@ public class UploadRule implements ISynchronizationRule {
 
 		public void remove() {
 			iteratorref.remove();
-		}		
+		}
 	}
 
 	public class LocalFileIteratorAsPath extends LocalFileIteratorAsString {
+		@Override
 		public Object next() {
-			return new Path((String)iteratorref.next());
+			return new Path(iteratorref.next());
 		}
 	}
 
 	public class LocalFileIteratorAsFile extends LocalFileIteratorAsString {
+		@Override
 		public Object next() {
-			return new File((String)iteratorref.next());
+			return new File(iteratorref.next());
 		}
 	}
 
@@ -383,26 +387,26 @@ public class UploadRule implements ISynchronizationRule {
 		System.out.println(r);
 		r.setOverwritePolicy(OverwritePolicies.ASK);
 		System.out.println(r);
-		
+
 		String s = "upload\nremote-directory /tmp/a\npermissions executable readonly\nflags default-remote-directory"; //$NON-NLS-1$
 		r = new UploadRule(s);
 		System.out.println(r);
-		
+
 	}
 
 	public void removeLocalFile(String entry) {
 		for (Iterator<String> iter = localFileList.iterator(); iter.hasNext();) {
-			String element = (String) iter.next();
+			String element = iter.next();
 			if (element.equals(entry)) {
 				iter.remove();
 			}
 		}
 	}
-	
+
 	public void removeLocalFile(IPath entry) {
 		removeLocalFile(entry.toOSString());
 	}
-	
+
 	public void removeLocalFile(File entry) {
 		removeLocalFile(entry.getPath());
 	}
@@ -416,7 +420,7 @@ public class UploadRule implements ISynchronizationRule {
 			}
 		}
 	}
-	
+
 	public void setLocalFiles(IPath[] items) {
 		clearLocalFiles();
 		for (int i = 0; i < items.length; i++) {
@@ -426,7 +430,7 @@ public class UploadRule implements ISynchronizationRule {
 			}
 		}
 	}
-	
+
 	public void setLocalFiles(File[] items) {
 		clearLocalFiles();
 		for (int i = 0; i < items.length; i++) {
@@ -453,24 +457,22 @@ public class UploadRule implements ISynchronizationRule {
 		return true;
 	}
 
-	public String toLabel() {
-		String result = NLS.bind(Messages.UploadRule_6, new Object[]{Integer.toString(localFileList.size()), remoteDirectory});
-		return result;
-	}
-	
 	// FIXME: Exceptions not thrown
 	public void validate() throws CoreException {
 		if (overwritePolicy == OverwritePolicies.UNKNOWN) {
-			//RemoteLauncherPlugin.throwCoreException(Messages.UploadRule_Validate_MissingOverwritePolicy, IRemoteLaunchErrors.INVALID_RULE);
+			// RemoteLauncherPlugin.throwCoreException(Messages.UploadRule_Validate_MissingOverwritePolicy,
+			// IRemoteLaunchErrors.INVALID_RULE);
 		}
 		if (defaultRemoteDirectory == false) {
 			if (remoteDirectory == null) {
-				//RemoteLauncherPlugin.throwCoreException(Messages.UploadRule_Validate_MissingRemotedirectory, IRemoteLaunchErrors.INVALID_RULE);
+				// RemoteLauncherPlugin.throwCoreException(Messages.UploadRule_Validate_MissingRemotedirectory,
+				// IRemoteLaunchErrors.INVALID_RULE);
 			}
-//			IPath remotePath = LinuxPath.fromString(remoteDirectory);
-//			if (! remotePath.isAbsolute()) {
-//				RemoteLauncherPlugin.throwCoreException("Remote directory must be an absolute path.", IRemoteLaunchErrors.INVALID_RULE);				
-//			}
+			// IPath remotePath = LinuxPath.fromString(remoteDirectory);
+			// if (! remotePath.isAbsolute()) {
+			// RemoteLauncherPlugin.throwCoreException("Remote directory must be an absolute path.",
+			// IRemoteLaunchErrors.INVALID_RULE);
+			// }
 		}
 	}
 }

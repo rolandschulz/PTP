@@ -24,12 +24,14 @@ import org.eclipse.ptp.launch.internal.rulesengine.UploadRuleAction;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED
+ * 
+ * @since 5.0
  */
 public class RuleActionFactory {
-	
-	private ILaunchProcessCallback process;
-	private ILaunchConfiguration configuration;
-	private IProgressMonitor monitor;
+
+	private final ILaunchProcessCallback process;
+	private final ILaunchConfiguration configuration;
+	private final IProgressMonitor monitor;
 
 	public RuleActionFactory(ILaunchConfiguration configuration, ILaunchProcessCallback process, IProgressMonitor monitor) {
 		super();

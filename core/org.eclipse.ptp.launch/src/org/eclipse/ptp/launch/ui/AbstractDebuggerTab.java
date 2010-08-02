@@ -76,6 +76,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		return fWorkingCopy;
 	}
 
+	@Override
 	public void setLaunchConfiguration(ILaunchConfiguration launchConfiguration) {
 		super.setLaunchConfiguration(launchConfiguration);
 		setLaunchConfigurationWorkingCopy(null);
@@ -91,9 +92,10 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	 * 
 	 * @see ILaunchConfigurationTab#getErrorMessage()
 	 */
+	@Override
 	public String getErrorMessage() {
 		ILaunchConfigurationTab tab = getDynamicTab();
-		if ( (super.getErrorMessage() != null) || (tab == null)) {
+		if ((super.getErrorMessage() != null) || (tab == null)) {
 			return super.getErrorMessage();
 		}
 		return tab.getErrorMessage();
@@ -111,17 +113,17 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 			// remove any debug specfic args from the config
 			if (wc == null) {
 				if (getLaunchConfiguration().isWorkingCopy()) {
-					wc = (ILaunchConfigurationWorkingCopy)getLaunchConfiguration();
+					wc = (ILaunchConfigurationWorkingCopy) getLaunchConfiguration();
 				}
 			}
 			if (wc != null) {
-				wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP, (Map)null);
+				wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP, (Map<String, String>) null);
 			}
 		} else {
 			if (wc == null) {
 				try {
 					if (getLaunchConfiguration().isWorkingCopy()) {
-						setLaunchConfigurationWorkingCopy((ILaunchConfigurationWorkingCopy)getLaunchConfiguration());
+						setLaunchConfigurationWorkingCopy((ILaunchConfigurationWorkingCopy) getLaunchConfiguration());
 					} else {
 						setLaunchConfigurationWorkingCopy(getLaunchConfiguration().getWorkingCopy());
 					}
@@ -175,6 +177,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 
 	abstract public void createControl(Composite parent);
 
+	@Override
 	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
 		ILaunchConfigurationTab dynamicTab = getDynamicTab();
 		if (dynamicTab != null) {
@@ -182,6 +185,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		}
 	}
 
+	@Override
 	public void initializeFrom(ILaunchConfiguration config) {
 		setLaunchConfiguration(config);
 		ILaunchConfigurationTab dynamicTab = getDynamicTab();
@@ -195,7 +199,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 			config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, getDebugConfig().getID());
 			ILaunchConfigurationTab dynamicTab = getDynamicTab();
 			if (dynamicTab == null) {
-				config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP, (Map)null);
+				config.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP, (Map<String, String>) null);
 			} else {
 				dynamicTab.performApply(config);
 			}
@@ -211,6 +215,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		}
 	}
 
+	@Override
 	public boolean isValid(ILaunchConfiguration config) {
 		setErrorMessage(null);
 		setMessage(null);
@@ -226,6 +231,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		return true;
 	}
 
+	@Override
 	public boolean canSave() {
 		setErrorMessage(null);
 		setMessage(null);
@@ -240,7 +246,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		}
 		return true;
 	}
-	
+
 	protected void setInitializeDefault(boolean init) {
 		fInitDefaults = init;
 	}
@@ -249,6 +255,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		return fInitDefaults;
 	}
 
+	@Override
 	public Image getImage() {
 		return LaunchImages.getImage(LaunchImages.IMG_DEBUGGER_TAB);
 	}
@@ -293,7 +300,8 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 		if (select != -1) {
 			fDCombo.select(select);
 		}
-		//The behaviour is undefined for if the callbacks should be triggered for this, so force page update if needed.
+		// The behaviour is undefined for if the callbacks should be triggered
+		// for this, so force page update if needed.
 		if (!fPageUpdated) {
 			updateComboFromSelection();
 		}
@@ -336,7 +344,7 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	 */
 	protected IPDebugConfiguration getConfigForCurrentDebugger() {
 		int selectedIndex = fDCombo.getSelectionIndex();
-		return (IPDebugConfiguration)fDCombo.getData(Integer.toString(selectedIndex));
+		return (IPDebugConfiguration) fDCombo.getData(Integer.toString(selectedIndex));
 	}
 
 }
