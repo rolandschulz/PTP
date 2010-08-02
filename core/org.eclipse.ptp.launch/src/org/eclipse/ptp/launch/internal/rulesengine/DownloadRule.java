@@ -19,7 +19,6 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
@@ -27,7 +26,7 @@ import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
 /*
  * TODO: NEEDS TO BE DOCUMENTED!
  * 
- * Represents an upload rule.
+ * Represents a download rule.
  * It describes how to copy a list of local files or local directories into a single remote directory.
  * A local file is copied into the remote directory.
  * A local directory has its content copied recursively into the remote directory.
@@ -59,7 +58,7 @@ public class DownloadRule implements ISynchronizationRule {
 	}
 
 	/*
-	 * Creates de rule from a serialized string.
+	 * Creates the rule from a serialized string.
 	 */
 	public DownloadRule(String data) {
 		/*
@@ -403,11 +402,6 @@ public class DownloadRule implements ISynchronizationRule {
 			// RemoteLauncherPlugin.throwCoreException(Messages.DownloadRule_Validation_MissingRemoteDirectory,
 			// IRemoteLaunchErrors.INVALID_RULE);
 		}
-	}
-
-	public String toLabel() {
-		String result = NLS.bind(Messages.DownloadRule_6, new Object[] { Integer.toString(remoteFileList.size()), localDirectory });
-		return result;
 	}
 
 }

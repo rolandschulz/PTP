@@ -19,7 +19,6 @@
 package org.eclipse.ptp.launch;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,10 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.IBinaryParser;
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
@@ -44,7 +39,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -55,7 +49,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -625,20 +618,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Get the name of the application to launch
-	 * 
-	 * @deprecated
-	 * 
-	 * @param configuration
-	 * @return
-	 * @throws CoreException
-	 */
-	@Deprecated
-	protected static String getProgramName(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String) null);
-	}
-
-	/**
 	 * Get the name of the project
 	 * 
 	 * @param configuration
@@ -727,7 +706,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * addSynchronizationRule(org.eclipse.ptp.launch.data.ISynchronizationRule)
 	 */
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public void addSynchronizationRule(ISynchronizationRule rule) {
 		extraSynchronizationRules.add(rule);
@@ -779,13 +758,19 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.rulesengine.ILaunchProcessCallback#
-	 * getRemoteFileManager(org.eclipse.debug.core.ILaunchConfiguration)
+	 * getRemoteFileManager(org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration) throws CoreException {
+	/**
+	 * @since 5.0
+	 */
+	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException {
 		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
-			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
+					.getRemoteServices(conf.getRemoteServicesId(), monitor);
 			if (remoteServices != null) {
 				IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
 				if (rconnMgr != null) {
@@ -837,23 +822,30 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected void copyFileFromRemoteHost(String remotePath, String localPath, ILaunchConfiguration configuration,
 			IProgressMonitor monitor) throws CoreException {
-		IRemoteFileManager localFileManager = getLocalFileManager(configuration);
-		IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);
-		if (remoteFileManager == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_0));
-		}
+		SubMonitor progress = SubMonitor.convert(monitor, 15);
+		try {
+			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+			if (remoteFileManager == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.AbstractParallelLaunchConfigurationDelegate_0));
+			}
 
-		IFileStore rres = remoteFileManager.getResource(remotePath);
-		if (!rres.fetchInfo(EFS.NONE, monitor).exists()) {
-			// Local file not found!
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
-		}
-		IFileStore lres = localFileManager.getResource(localPath);
+			IFileStore rres = remoteFileManager.getResource(remotePath);
+			if (!rres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
+			}
+			IFileStore lres = localFileManager.getResource(localPath);
 
-		// Copy file
-		rres.copy(lres, EFS.OVERWRITE, monitor);
+			// Copy file
+			rres.copy(lres, EFS.OVERWRITE, progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
@@ -867,23 +859,30 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected void copyFileToRemoteHost(String localPath, String remotePath, ILaunchConfiguration configuration,
 			IProgressMonitor monitor) throws CoreException {
-		IRemoteFileManager localFileManager = getLocalFileManager(configuration);
-		IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration);
-		if (remoteFileManager == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_0));
-		}
+		SubMonitor progress = SubMonitor.convert(monitor, 15);
+		try {
+			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+			if (remoteFileManager == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.AbstractParallelLaunchConfigurationDelegate_0));
+			}
 
-		IFileStore lres = localFileManager.getResource(localPath);
-		if (!lres.fetchInfo(EFS.NONE, monitor).exists()) {
-			// Local file not found!
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
-		}
-		IFileStore rres = remoteFileManager.getResource(remotePath);
+			IFileStore lres = localFileManager.getResource(localPath);
+			if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+				// Local file not found!
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+						Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
+			}
+			IFileStore rres = remoteFileManager.getResource(remotePath);
 
-		// Copy file
-		lres.copy(rres, EFS.OVERWRITE, monitor);
+			// Copy file
+			lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
@@ -1076,50 +1075,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * Get the path of the program to launch. No longer used since the program
-	 * may not be on the local machine.
-	 * 
-	 * @deprecated
-	 * 
-	 * @param configuration
-	 *            launch configuration
-	 * @return IPath corresponding to program executable
-	 * @throws CoreException
-	 */
-	@Deprecated
-	protected IPath getProgramFile(ILaunchConfiguration configuration) throws CoreException {
-		IProject project = verifyProject(configuration);
-		String fileName = getProgramName(configuration);
-		if (fileName == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_not_specified));
-
-		IPath programPath = new Path(fileName);
-		if (!programPath.isAbsolute()) {
-			programPath = project.getFile(programPath).getLocation();
-		}
-		if (!programPath.toFile().exists()) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST,
-					Messages.AbstractParallelLaunchConfigurationDelegate_Application_file_does_not_exist,
-					new FileNotFoundException(NLS.bind(Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found,
-							new Object[] { programPath.toString() }))));
-		}
-		/*
-		 * --old IFile programPath = project.getFile(fileName); if (programPath
-		 * == null || !programPath.exists() ||
-		 * !programPath.getLocation().toFile().exists())
-		 * abort(LaunchMessages.getResourceString(
-		 * "AbstractParallelLaunchConfigurationDelegate.Application_file_does_not_exist"
-		 * ), new
-		 * FileNotFoundException(LaunchMessages.getFormattedResourceString
-		 * ("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found"
-		 * , programPath.getLocation().toString())), IStatus.INFO);
-		 */
-		return programPath;
-	}
-
-	/**
 	 * Get the IProject object from the project name.
 	 * 
 	 * @param project
@@ -1190,7 +1145,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * Returns the (possible empty) list of synchronization rule objects
 	 * according to the rules described in the configuration.
 	 * 
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	protected ISynchronizationRule[] getSynchronizeRules(ILaunchConfiguration configuration) throws CoreException {
 		List<?> ruleStrings = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES, new ArrayList<String>());
@@ -1307,43 +1262,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/**
-	 * @param project
-	 * @param exePath
-	 * @return
-	 * @throws CoreException
-	 * @deprecated
-	 */
-	@Deprecated
-	protected IBinaryObject verifyBinary(IProject project, IPath exePath) throws CoreException {
-		ICExtensionReference[] parserRef = CCorePlugin.getDefault().getBinaryParserExtensions(project);
-		for (int i = 0; i < parserRef.length; i++) {
-			try {
-				IBinaryParser parser = (IBinaryParser) parserRef[i].createExtension();
-				IBinaryObject exe = (IBinaryObject) parser.getBinary(exePath);
-				if (exe != null) {
-					return exe;
-				}
-			} catch (ClassCastException e) {
-			} catch (IOException e) {
-			}
-		}
-		IBinaryParser parser = CCorePlugin.getDefault().getDefaultBinaryParser();
-		try {
-			return (IBinaryObject) parser.getBinary(exePath);
-		} catch (ClassCastException e) {
-		} catch (IOException e) {
-		}
-		Throwable exception = new FileNotFoundException(
-				Messages.AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable);
-		int code = IPTPLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
-		MultiStatus status = new MultiStatus(PTPCorePlugin.getUniqueIdentifier(), code,
-				Messages.AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable, exception);
-		status.add(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), code,
-				exception == null ? "" : exception.getLocalizedMessage(), exception)); //$NON-NLS-1$
-		throw new CoreException(status);
-	}
-
-	/**
 	 * @param path
 	 * @throws CoreException
 	 */
@@ -1379,22 +1297,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						new FileNotFoundException(e.getLocalizedMessage())));
 			}
 		}
-	}
-
-	// Methods below implement the ILaunchProcessCallback interface
-
-	/**
-	 * @param path
-	 * @return
-	 * @deprecated
-	 */
-	@Deprecated
-	protected boolean verifyPath(String path) {
-		IPath programPath = new Path(path);
-		if (programPath == null || programPath.isEmpty() || !programPath.toFile().exists()) {
-			return false;
-		}
-		return true;
 	}
 
 	/**

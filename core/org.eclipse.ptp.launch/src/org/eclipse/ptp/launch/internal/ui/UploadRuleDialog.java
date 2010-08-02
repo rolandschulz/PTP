@@ -9,8 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.launch.ui;
-
+package org.eclipse.ptp.launch.internal.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +26,7 @@ import org.eclipse.ptp.launch.internal.rulesengine.UploadRule;
 import org.eclipse.ptp.launch.messages.Messages;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
+import org.eclipse.ptp.launch.ui.IRuleDialog;
 import org.eclipse.ptp.utils.ui.swt.ComboGroup;
 import org.eclipse.ptp.utils.ui.swt.ComboMold;
 import org.eclipse.ptp.utils.ui.swt.ControlsRelationshipHandler;
@@ -66,42 +66,37 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 	Button addDirectoriesFromFilesystemButton;
 	Button addFilesFromWorkspaceButton;
 	List fileList;
-	
+
 	UploadRule uploadRule;
-	
+
 	IPath lastSelectedDirectory = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 	private int listenersEnabled = 0;
-	
+
+	/**
+	 * @since 5.0
+	 */
 	public UploadRuleDialog(Shell parentShell, UploadRule rule) {
 		super(parentShell);
-		
+
 		uploadRule = rule;
 	}
-	
-//	public UploadRuleDialog(Shell shell) {
-//		super(shell);
-//		uploadRule = new UploadRule();
-//		// set defaults
-//		uploadRule.setDefaultRemoteDirectory(true);
-//		uploadRule.setRemoteDirectory(null);
-//		uploadRule.setOverwritePolicy(OverwritePolicies.ALWAYS);
-//	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		content = new Composite(parent, SWT.BORDER);
 		GridLayout layout = new GridLayout();
 		content.setLayout(layout);
-//		Layout l = content.getParent().getLayout();
-		content.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+		content.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL
+				| GridData.GRAB_VERTICAL));
 		setTitle(Messages.UploadRuleDialog_Title);
 		setMessage(Messages.UploadRuleDialog_Message);
-		
+
 		createRemoteDirectoryComposite(content);
 		createFilesComposite(content);
 		createOptionsComposite(content);
-		
+
 		putFieldContents();
-		
+
 		return content;
 	}
 
@@ -114,9 +109,9 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		} else {
 			remoteDirectoryText.setString(""); //$NON-NLS-1$
 		}
-		asReadOnlyButton.setSelection(uploadRule.isAsReadOnly()); 
+		asReadOnlyButton.setSelection(uploadRule.isAsReadOnly());
 		asExecutableButton.setSelection(uploadRule.isAsExecutable());
-		downloadBackButton.setSelection(uploadRule.isDownloadBack()); 
+		downloadBackButton.setSelection(uploadRule.isDownloadBack());
 		preserveTimeStampButton.setSelection(uploadRule.isPreserveTimeStamp());
 		overwritePolicyCombo.selectIndexUsingID(Integer.toString(uploadRule.getOverwritePolicy()));
 		String items[] = uploadRule.getLocalFilesAsStringArray();
@@ -124,9 +119,9 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		fileList.setItems(items);
 		enableListeners();
 	}
-	
+
 	private void enableListeners() {
-		listenersEnabled ++;		
+		listenersEnabled++;
 	}
 
 	private void disableListeners() {
@@ -143,7 +138,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		uploadRule.setPreserveTimeStamp(preserveTimeStampButton.getSelection());
 		uploadRule.setOverwritePolicy(Integer.parseInt(overwritePolicyCombo.getSelectionId()));
 		uploadRule.setLocalFiles(fileList.getItems());
-		String path =remoteDirectoryText.getString().trim();
+		String path = remoteDirectoryText.getString().trim();
 		if (path.length() > 0) {
 			uploadRule.setRemoteDirectory(path);
 		} else {
@@ -151,7 +146,8 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		}
 		enableListeners();
 	}
-	
+
+	@Override
 	protected void okPressed() {
 		fetchFieldContents();
 		super.okPressed();
@@ -164,10 +160,12 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		defaultRemoteDirectoryButton = new Button(contents, SWT.CHECK);
 		defaultRemoteDirectoryButton.setText(Messages.UploadRuleDialog_RemoteDirectoryFrame_LabelDefaultButton);
 		defaultRemoteDirectoryButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		TextMold mold = new TextMold(TextMold.GRID_DATA_GRAB_EXCESS_SPACE | TextMold.GRID_DATA_ALIGNMENT_FILL, Messages.UploadRuleDialog_RemoteDirectoryFrame_LabelDirectory);
+		TextMold mold = new TextMold(TextMold.GRID_DATA_GRAB_EXCESS_SPACE | TextMold.GRID_DATA_ALIGNMENT_FILL,
+				Messages.UploadRuleDialog_RemoteDirectoryFrame_LabelDirectory);
 		remoteDirectoryText = new TextGroup(contents, mold);
 
-		remoteDirectoryRelationshipHandler = new ControlsRelationshipHandler(defaultRemoteDirectoryButton, new Control[] {remoteDirectoryText}, false);
+		remoteDirectoryRelationshipHandler = new ControlsRelationshipHandler(defaultRemoteDirectoryButton,
+				new Control[] { remoteDirectoryText }, false);
 		return remoteDirectoryText;
 	}
 
@@ -177,22 +175,25 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		frameMold.setTitle(Messages.UploadRuleDialog_FileButtonsFrame_Title);
 		Frame frame = new Frame(parent, frameMold);
 		frame.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		
+
 		Frame filesFrame = new Frame(frame.getComposite());
 		fileList = new List(filesFrame, SWT.MULTI | SWT.V_SCROLL);
-		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-		gridData.heightHint=200;
+		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL
+				| GridData.GRAB_VERTICAL);
+		gridData.heightHint = 200;
 		fileList.setLayoutData(gridData);
 		fileList.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
+
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0) return;
+				if (listenersEnabled < 0)
+					return;
 				removeFilesButton.setEnabled(fileList.getSelectionCount() != 0);
 			}
 		});
 		fileList.deselectAll();
-		
+
 		Frame buttonFrame = new Frame(frame.getComposite());
 		Label label = new Label(buttonFrame, SWT.NONE);
 		label.setText(Messages.UploadRuleDialog_FileButtonsFrame_Description);
@@ -203,10 +204,12 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		addFilesFromFilesystemButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
+
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0) return;
+				if (listenersEnabled < 0)
+					return;
 				handleFilesFromFilesystemButtonEvent();
-			}			
+			}
 		});
 		addDirectoriesFromFilesystemButton = new Button(buttonFrame, SWT.PUSH);
 		addDirectoriesFromFilesystemButton.setText(Messages.UploadRuleDialog_FileButtonsFrame_AddDirectoryButton);
@@ -214,10 +217,12 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		addDirectoriesFromFilesystemButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
+
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0) return;
+				if (listenersEnabled < 0)
+					return;
 				handleDirectoryFromFilesystemButtonEvent();
-			}			
+			}
 		});
 		addFilesFromWorkspaceButton = new Button(buttonFrame, SWT.PUSH);
 		addFilesFromWorkspaceButton.setText(Messages.UploadRuleDialog_FileButtonsFrame_AddWorkspaceButton);
@@ -225,8 +230,10 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		addFilesFromWorkspaceButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
+
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0) return;
+				if (listenersEnabled < 0)
+					return;
 				handleFilesFromWorkspaceButtonEvent();
 			}
 		});
@@ -240,18 +247,19 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		removeFilesButton.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
+
 			public void widgetSelected(SelectionEvent e) {
 				if (listenersEnabled < 0)
 					return;
 				handleRemoveFilesButtonEvent();
 			}
-			
+
 		});
 		GridData gridData2 = new GridData();
 		gridData2.grabExcessVerticalSpace = true;
 		gridData2.verticalAlignment = SWT.TOP;
 		buttonFrame.setLayoutData(gridData2);
-		
+
 		return frame;
 	}
 
@@ -262,7 +270,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		frameMold.setTitle(Messages.UploadRuleDialog_OptionsFrame_Title);
 		Frame frame = new Frame(parent, frameMold);
 		frame.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		
+
 		Composite contents = frame.getComposite();
 		asReadOnlyButton = new Button(contents, SWT.CHECK);
 		asReadOnlyButton.setText(Messages.UploadRuleDialog_OptionsFrame_ReadonlyCheck);
@@ -272,13 +280,15 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		downloadBackButton.setText(Messages.UploadRuleDialog_OptionsFrame_DownloadBackCheck);
 		preserveTimeStampButton = new Button(contents, SWT.CHECK);
 		preserveTimeStampButton.setText(Messages.UploadRuleDialog_OptionsFrame_PreserveTimeStampCheck);
-		
+
 		ComboMold mold = new ComboMold(ComboMold.GRID_DATA_SPAN);
 		mold.setLabel(Messages.UploadRuleDialog_OptionsFrame_OverwriteLabel);
 		mold.setTextFieldWidth(40);
 		mold.addItem(Integer.toString(OverwritePolicies.SKIP), Messages.UploadRuleDialog_OptionsFrame_OverwriteCombo_SkipOption);
-		mold.addItem(Integer.toString(OverwritePolicies.ALWAYS), Messages.UploadRuleDialog_OptionsFrame_OverwriteCombo_OverwriteOption);
-		mold.addItem(Integer.toString(OverwritePolicies.NEWER), Messages.UploadRuleDialog_OptionsFrame_OverwriteCombo_OverwriteIfNewerOption);
+		mold.addItem(Integer.toString(OverwritePolicies.ALWAYS),
+				Messages.UploadRuleDialog_OptionsFrame_OverwriteCombo_OverwriteOption);
+		mold.addItem(Integer.toString(OverwritePolicies.NEWER),
+				Messages.UploadRuleDialog_OptionsFrame_OverwriteCombo_OverwriteIfNewerOption);
 		overwritePolicyCombo = new ComboGroup(contents, mold);
 		overwritePolicyCombo.getCombo().addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -292,59 +302,67 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 					preserveTimeStampButton.setEnabled(false);
 					preserveTimeStampButton.setSelection(true);
 				} else {
-					preserveTimeStampButton.setEnabled(true);					
+					preserveTimeStampButton.setEnabled(true);
 				}
 				enableListeners();
 			}
-			
+
 		});
 		return frame;
 	}
-	
+
 	private class PathIterable implements Iterable<IPath> {
 		private class PathIterator implements Iterator<IPath> {
-			private Iterator<String> internalIterator;
-			
-			public PathIterator(String [] array) {
-				this.internalIterator = (Iterator<String>) Arrays.asList(array).iterator();
+			private final Iterator<String> internalIterator;
+
+			public PathIterator(String[] array) {
+				this.internalIterator = Arrays.asList(array).iterator();
 			}
-	
-			/* (non-Javadoc)
+
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see java.util.Iterator#hasNext()
 			 */
 			public boolean hasNext() {
 				return internalIterator.hasNext();
 			}
-			
-			/* (non-Javadoc)
+
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see java.util.Iterator#next()
 			 */
 			public IPath next() {
-				return new Path((String)internalIterator.next());
+				return new Path(internalIterator.next());
 			}
-			
-			/* (non-Javadoc)
+
+			/*
+			 * (non-Javadoc)
+			 * 
 			 * @see java.util.Iterator#remove()
 			 */
 			public void remove() {
 				internalIterator.remove();
 			}
 		}
-		
-		private PathIterator iterator;
-		
-		public PathIterable(String [] array) {
+
+		private final PathIterator iterator;
+
+		public PathIterable(String[] array) {
 			iterator = new PathIterator(array);
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Iterable#iterator()
 		 */
 		public Iterator<IPath> iterator() {
 			return iterator;
 		}
 	}
-	
+
 	private void handleFilesFromFilesystemButtonEvent() {
 		FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN | SWT.MULTI);
 
@@ -353,27 +371,28 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		 */
 		fileDialog.setFilterPath(lastSelectedDirectory.toOSString());
 		fileDialog.setText(Messages.UploadRuleDialog_OptionsFrame_AddFileDialog_Title);
-				
+
 		String result = fileDialog.open();
 
 		if (result != null) {
 			lastSelectedDirectory = new Path(fileDialog.getFilterPath());
 			/*
-			 * Only add files that are not already in the list.
-			 * If file is inside the workspace, add relative path.
+			 * Only add files that are not already in the list. If file is
+			 * inside the workspace, add relative path.
 			 */
 			IPath workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			IPath fileRoot = new Path(fileDialog.getFilterPath());
 			HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
 			for (IPath path : new PathIterable(fileDialog.getFileNames())) {
 				/*
-				 * If not absolute, the make it absolute according to path in dialog.
-				 * This is due behaviour how FileDialog returns selected files.
+				 * If not absolute, the make it absolute according to path in
+				 * dialog. This is due behaviour how FileDialog returns selected
+				 * files.
 				 */
 				if (!path.isAbsolute()) {
 					path = fileRoot.append(path);
 				}
-				
+
 				/*
 				 * If path is inside the workspace, then make it relative.
 				 */
@@ -381,18 +400,18 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 					path = path.removeFirstSegments(workspace.segmentCount());
 					path = path.makeRelative();
 				}
-				
+
 				/*
 				 * If already in the list, the ignore.
 				 */
 				String fullPath = path.toOSString();
-				if (! fileSet.contains(fullPath)) {
+				if (!fileSet.contains(fullPath)) {
 					fileSet.add(fullPath);
 				}
 			}
-			
+
 			String items[] = new String[fileSet.size()];
-			items = (String[]) fileSet.toArray(items);
+			items = fileSet.toArray(items);
 			Arrays.sort(items);
 			fileList.setItems(items);
 		}
@@ -400,7 +419,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 
 	private void handleDirectoryFromFilesystemButtonEvent() {
 		DirectoryDialog directoryDialog = new DirectoryDialog(getShell(), SWT.OPEN);
-		
+
 		directoryDialog.setFilterPath(lastSelectedDirectory.toOSString());
 		directoryDialog.setText(Messages.UploadRuleDialog_OptionsFrame_AddDirectoryDialog_Title);
 		directoryDialog.setMessage(Messages.UploadRuleDialog_OptionsFrame_AddFileDialog_Description);
@@ -411,7 +430,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
 			IPath workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			IPath path = new Path(newPath);
-			
+
 			/*
 			 * If path is inside the workspace, then make it relative.
 			 */
@@ -419,37 +438,37 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 				path = path.removeFirstSegments(workspace.segmentCount());
 				path = path.makeRelative();
 			}
-			
+
 			/*
 			 * If already in the list, the ignore.
 			 */
 			String fullPath = path.toOSString();
-			if (! fileSet.contains(fullPath)) {
+			if (!fileSet.contains(fullPath)) {
 				fileSet.add(fullPath);
-				
+
 				String items[] = new String[fileSet.size()];
-				items = (String[]) fileSet.toArray(items);
+				items = fileSet.toArray(items);
 				Arrays.sort(items);
 				fileList.setItems(items);
 			}
-			
+
 			/*
 			 * Save lastSelectedDirectory. There is a bug in DirectoryDialog.
-			 * The method getFilterPath does not return the expected path.
-			 * The bug will be fixed in Eclipse 3.4.
-			 * The workaround takes the parent of the selected directory as lastSelectedDirectory.
+			 * The method getFilterPath does not return the expected path. The
+			 * bug will be fixed in Eclipse 3.4. The workaround takes the parent
+			 * of the selected directory as lastSelectedDirectory.
 			 */
 			lastSelectedDirectory = new Path(newPath);
 			lastSelectedDirectory = lastSelectedDirectory.removeLastSegments(1).removeTrailingSeparator();
 		}
 	}
 
-
 	ResourceSelectionDialog resourceDialog = null;
+
 	private void handleFilesFromWorkspaceButtonEvent() {
 		/*
-		 * Create a list a resource for all relative paths. The must be valid resources in the workspace.
-		 * Otherwise, they are ignored and removed.
+		 * Create a list a resource for all relative paths. The must be valid
+		 * resources in the workspace. Otherwise, they are ignored and removed.
 		 */
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		ArrayList<IResource> resourceList = new ArrayList<IResource>();
@@ -463,14 +482,14 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			}
 		}
 		Object initialSelection[] = resourceList.toArray();
-		
+
 		/*
 		 * Show the dialog.
 		 */
 		if (resourceDialog == null) {
 			resourceDialog = new ResourceSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(), null);
 		}
-		resourceDialog.setInitialSelections( initialSelection );
+		resourceDialog.setInitialSelections(initialSelection);
 		resourceDialog.setBlockOnOpen(true);
 		resourceDialog.setMessage(Messages.UploadRuleDialog_OptionsFrame_AddWorkspaceDialog_Description);
 		resourceDialog.setTitle(Messages.UploadRuleDialog_OptionsFrame_AddWorkspaceDialog_Title);
@@ -487,7 +506,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			 */
 			HashSet<String> newFileList = new HashSet<String>();
 			for (IPath path : new PathIterable(fileList.getItems())) {
-				if (! path.isAbsolute()) {
+				if (!path.isAbsolute()) {
 					continue;
 				}
 				newFileList.add(path.toOSString());
@@ -501,34 +520,36 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 				String entry = resource.getFullPath().makeRelative().toOSString();
 				newFileList.add(entry);
 			}
-			
+
 			String items[] = new String[newFileList.size()];
-			items = (String[]) newFileList.toArray(items);
+			items = newFileList.toArray(items);
 			Arrays.sort(items);
 			fileList.setItems(items);
 		}
 	}
-	
-	private void handleRemoveFilesButtonEvent() {		
-		String selection [] = fileList.getSelection();
+
+	private void handleRemoveFilesButtonEvent() {
+		String selection[] = fileList.getSelection();
 		if (selection.length == 0) {
 			return;
 		}
-		
+
 		HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
 		for (int i = 0; i < selection.length; i++) {
 			String string = selection[i];
 			fileSet.remove(string);
 		}
-		
+
 		String items[] = new String[fileSet.size()];
-		items = (String[]) fileSet.toArray(items);
+		items = fileSet.toArray(items);
 		Arrays.sort(items);
 		fileList.setItems(items);
 	}
 
+	/**
+	 * @since 5.0
+	 */
 	public ISynchronizationRule getRuleWorkingCopy() {
 		return uploadRule;
 	}
 }
-

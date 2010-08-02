@@ -12,6 +12,7 @@
 package org.eclipse.ptp.launch.rulesengine;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
@@ -23,7 +24,8 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 public interface ILaunchProcessCallback {
 	public IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException;
 
-	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration) throws CoreException;
+	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
+			throws CoreException;
 
 	public void addSynchronizationRule(ISynchronizationRule downloadBackRule);
 }

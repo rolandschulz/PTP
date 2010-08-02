@@ -14,7 +14,7 @@ package org.eclipse.ptp.launch.rulesengine;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * Identifies a synchronizatuion rule for the launch job.
+ * Identifies a synchronization rule for the launch job.
  * 
  * @author Daniel Ferber
  * @since 5.0
@@ -22,15 +22,6 @@ import org.eclipse.core.runtime.CoreException;
  */
 
 public interface ISynchronizationRule {
-	/**
-	 * A label to show the rule for debug.
-	 * 
-	 * @return The label
-	 * @deprecated
-	 */
-	@Deprecated
-	public String toLabel();
-
 	/**
 	 * Query if the rule is active and has all required information to be
 	 * applied.

@@ -428,34 +428,37 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		} catch (CoreException e) {
 			return null;
 		}
-		IWorkbenchPage page = PTPLaunchPlugin.getActivePage();
 		if (projectName != null && !projectName.equals("")) { //$NON-NLS-1$
 			IProject project = getWorkspaceRoot().getProject(projectName);
-			if (project != null && project.exists())
+			if (project != null && project.exists()) {
 				return project;
-		} else {
-			if (page != null) {
-				ISelection selection = page.getSelection();
-				if (selection instanceof IStructuredSelection) {
-					IStructuredSelection ss = (IStructuredSelection) selection;
-					if (!ss.isEmpty()) {
-						Object obj = ss.getFirstElement();
-						if (obj instanceof IAdaptable) {
-							Object o = ((IAdaptable) obj).getAdapter(IResource.class);
-							if (o instanceof IResource)
-								return ((IResource) o).getProject();
+			}
+		}
+
+		IWorkbenchPage page = PTPLaunchPlugin.getActivePage();
+		if (page != null) {
+			ISelection selection = page.getSelection();
+			if (selection instanceof IStructuredSelection) {
+				IStructuredSelection ss = (IStructuredSelection) selection;
+				if (!ss.isEmpty()) {
+					Object obj = ss.getFirstElement();
+					if (obj instanceof IAdaptable) {
+						Object o = ((IAdaptable) obj).getAdapter(IResource.class);
+						if (o instanceof IResource) {
+							return ((IResource) o).getProject();
 						}
 					}
 				}
 			}
-		}
 
-		IEditorPart part = page.getActiveEditor();
-		if (part != null) {
-			IEditorInput input = part.getEditorInput();
-			IFile file = (IFile) input.getAdapter(IFile.class);
-			if (file != null)
-				return file.getProject();
+			IEditorPart part = page.getActiveEditor();
+			if (part != null) {
+				IEditorInput input = part.getEditorInput();
+				IFile file = (IFile) input.getAdapter(IFile.class);
+				if (file != null) {
+					return file.getProject();
+				}
+			}
 		}
 		return null;
 	}
@@ -494,7 +497,8 @@ public class ApplicationTab extends LaunchConfigurationTab {
 		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(getLaunchConfiguration());
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
-			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+			IRemoteServices remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
+					getLaunchConfigurationDialog());
 			if (remoteServices != null) {
 				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 				if (remoteUIServices != null) {

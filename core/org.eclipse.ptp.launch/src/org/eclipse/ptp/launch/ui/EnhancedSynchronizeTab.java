@@ -518,6 +518,9 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		return eventHandlerEnabled > 0;
 	}
 
+	/**
+	 * @since 5.0
+	 */
 	protected void newRuleDialog(ISynchronizationRule rule) {
 		Dialog dialog = RuleDialogFactory.createDialogForRule(getShell(), rule);
 		if (dialog != null) {

@@ -17,12 +17,16 @@ import org.eclipse.ptp.launch.internal.rulesengine.UploadRule;
 
 /**
  * TODO: NEEDS TO BE DOCUMENTED
+ * 
+ * @since 5.0
  */
 public class RuleFactory {
-	
+
 	/**
 	 * Returns a new synchronization rule object for the serialized string.
-	 * @param string The serialized string
+	 * 
+	 * @param string
+	 *            The serialized string
 	 * @return The rule or null if no rule is known for the string.
 	 */
 	public static ISynchronizationRule createRuleFromString(String string) {
@@ -36,12 +40,13 @@ public class RuleFactory {
 			return null;
 		}
 	}
-	
+
 	public static ISynchronizationRule duplicateRule(ISynchronizationRule rule) {
 		if (rule instanceof DownloadRule) {
 			DownloadRule downloadRule = (DownloadRule) rule;
 			return new DownloadRule(downloadRule);
-		} if (rule instanceof UploadRule) {
+		}
+		if (rule instanceof UploadRule) {
 			UploadRule uploadRule = (UploadRule) rule;
 			return new UploadRule(uploadRule);
 		} else {
