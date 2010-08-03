@@ -73,6 +73,7 @@ PTP_C_PROJECTS="\
 	org.eclipse.ptp.rm.ibm.pe.proxy \
 	org.eclipse.ptp.rm.ibm.ll.proxy \
 	org.eclipse.ptp.rm.slurm.proxy \
+	org.eclipse.ptp.sci \
 	org.eclipse.ptp.utils"
 	
 update_feature() {
