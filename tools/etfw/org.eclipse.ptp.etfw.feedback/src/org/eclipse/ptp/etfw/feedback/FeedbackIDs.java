@@ -35,6 +35,9 @@ public interface FeedbackIDs
  	String FEEDBACK_ATTR_LOOP_ID = "LoopId";    //attr name in xml file AND attr name in marker //$NON-NLS-1$
 //    //Note: we use IMarker.LINE_NUMBER too
 
+	/**
+	 * @since 2.0
+	 */
 	String FEEDBACK_ATTR_ITEM = "item";
 
 
