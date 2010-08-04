@@ -28,9 +28,9 @@
 	
 	<!-- PLATFORM VERSIONS MUST BE UPDATED FOR NEW PLATFORM VERSION -->
 	<property name="platformBaseUrl" value="http://download.eclipse.org/eclipse/downloads/drops"/>
-	<property name="platformVersion" value="I20100608-0911"/>
-	<property name="platformBaseName" value="eclipse-platform-I20100608-0911"/>
-	<property name="icuBaseZip" value="com.ibm.icu.base-I20100608-0911.zip"/>
+	<property name="platformVersion" value="R-3.6-201006080911"/>
+	<property name="platformBaseName" value="eclipse-platform-3.6"/>
+	<property name="icuBaseZip" value="com.ibm.icu.base-3.6.zip"/>
 	<property name="icuBaseJar" value="com.ibm.icu.base_4.2.1.v20100412.jar"/>
 	
 	<property name="coreRuntimeVersion" value="3.6.0.v20100505"/>
@@ -63,8 +63,8 @@
 	
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
 	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
-	<property name="rseVersion" value="S-3.2RC4-201006051820"/>
-	<property name="dStoreBaseName" value="rseserver-3.2RC4"/>
+	<property name="rseVersion" value="R-3.2-201006071030"/>
+	<property name="dStoreBaseName" value="rseserver-3.2"/>
 	
 	<property name="defaultJVMHeapSize" value="-Xms64m -Xmx128m -Xss2m"/>
 	
