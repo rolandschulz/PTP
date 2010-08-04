@@ -30,7 +30,7 @@
 #include "config.h"
 #endif
 
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX) || defined(__APPLE__)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -53,7 +53,7 @@ class IPConverter
         struct sockaddr_in sin;
         struct sockaddr_in6 sin6;
 
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX) || defined(__APPLE__)
         struct ifaddrs *ifa;
 #else /* AIX */
         struct ifconf ifc;
@@ -70,7 +70,7 @@ class IPConverter
     private:
         int getIP(const string &ifname, bool ipv4);
 
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX) || defined(__APPLE__)
         int getIPLinux(const string &ifname, bool ipv4);
 #else /* AIX */
         #define REAL_SIZE(a) (((a).sa_len) > (sizeof(a)) ? ((a).sa_len) : (sizeof(a)))

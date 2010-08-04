@@ -128,6 +128,10 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 SYSTEM_AIX_FALSE = @SYSTEM_AIX_FALSE@
 SYSTEM_AIX_TRUE = @SYSTEM_AIX_TRUE@
+SYSTEM_DARWIN_FALSE = @SYSTEM_DARWIN_FALSE@
+SYSTEM_DARWIN_TRUE = @SYSTEM_DARWIN_TRUE@
+SYSTEM_LINUX_FALSE = @SYSTEM_LINUX_FALSE@
+SYSTEM_LINUX_TRUE = @SYSTEM_LINUX_TRUE@
 VERSION = @VERSION@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -177,10 +181,12 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 scidv1_SOURCES = extlaunch.cpp  extlisten.cpp  locker.cpp  scid.cpp
-@SYSTEM_AIX_FALSE@scidv1_CPPFLAGS = -I../common -I../secmod
 @SYSTEM_AIX_TRUE@scidv1_CPPFLAGS = -q64 -I../common -I../secmod
-@SYSTEM_AIX_FALSE@scidv1_LDFLAGS = -L../common -lcmn -lrt -lpthread -ldl
+@SYSTEM_DARWIN_TRUE@scidv1_CPPFLAGS = -I../common -I../secmod
+@SYSTEM_LINUX_TRUE@scidv1_CPPFLAGS = -I../common -I../secmod
 @SYSTEM_AIX_TRUE@scidv1_LDFLAGS = -q64 -L../common -lcmn64 -lrt -lpthread -ldl
+@SYSTEM_DARWIN_TRUE@scidv1_LDFLAGS = -L../common -lcmn -lpthread -ldl
+@SYSTEM_LINUX_TRUE@scidv1_LDFLAGS = -L../common -lcmn -lrt -lpthread -ldl
 all: all-am
 
 .SUFFIXES:

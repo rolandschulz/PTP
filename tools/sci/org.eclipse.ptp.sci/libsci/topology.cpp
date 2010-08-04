@@ -58,6 +58,10 @@
 const int ONE_KK = 1024 * 1024;
 const int SCI_DAEMON_PORT = 6688;
 
+#ifdef __APPLE__
+extern char **environ;
+#endif
+
 int BEMap::input(const char * filename, int num)
 {
     FILE *fp = NULL;

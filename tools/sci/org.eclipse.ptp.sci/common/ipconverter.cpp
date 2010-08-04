@@ -34,7 +34,7 @@ IPConverter::IPConverter()
     : ip_addr("")
 {
     int ret = 0;
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX) || defined(__APPLE__)
     ret = ::getifaddrs(&ifa);
     if (ret != 0) {
         throw Exception(Exception::SYS_CALL);
@@ -66,7 +66,7 @@ IPConverter::IPConverter()
 
 IPConverter::~IPConverter()
 {
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX) || defined(__APPLE__)
     if (ifa) {
         ::freeifaddrs(ifa);
         ifa = NULL;
@@ -108,14 +108,14 @@ int IPConverter::getIP(const string &ifname, bool ipv4, struct sockaddr_in6 *add
 
 int IPConverter::getIP(const string &ifname, bool ipv4)
 {
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX) || defined(__APPLE__)
     return getIPLinux(ifname, ipv4);
 #else
     return getIPAIX(ifname, ipv4);
 #endif
 }
 
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX) || defined(__APPLE__)
 
 int IPConverter::getIPLinux(const string &ifname, bool ipv4)
 {

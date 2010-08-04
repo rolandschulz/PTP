@@ -126,6 +126,10 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 SYSTEM_AIX_FALSE = @SYSTEM_AIX_FALSE@
 SYSTEM_AIX_TRUE = @SYSTEM_AIX_TRUE@
+SYSTEM_DARWIN_FALSE = @SYSTEM_DARWIN_FALSE@
+SYSTEM_DARWIN_TRUE = @SYSTEM_DARWIN_TRUE@
+SYSTEM_LINUX_FALSE = @SYSTEM_LINUX_FALSE@
+SYSTEM_LINUX_TRUE = @SYSTEM_LINUX_TRUE@
 VERSION = @VERSION@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -175,10 +179,12 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 scia_SOURCES = scia.cpp
-@SYSTEM_AIX_FALSE@scia_CPPFLAGS = -I../common -I../include
 @SYSTEM_AIX_TRUE@scia_CPPFLAGS = -q64 -I../common -I../include
-@SYSTEM_AIX_FALSE@scia_LDFLAGS = -L../common -lcmn -lrt -lpthread -ldl
+@SYSTEM_DARWIN_TRUE@scia_CPPFLAGS = -I../common -I../include
+@SYSTEM_LINUX_TRUE@scia_CPPFLAGS = -I../common -I../include
 @SYSTEM_AIX_TRUE@scia_LDFLAGS = -q64 -L../common -lcmn64 -lrt -lpthread -ldl
+@SYSTEM_DARWIN_TRUE@scia_LDFLAGS = -L../common -lcmn -lpthread -ldl
+@SYSTEM_LINUX_TRUE@scia_LDFLAGS = -L../common -lcmn -lrt -lpthread -ldl
 all: all-am
 
 .SUFFIXES:

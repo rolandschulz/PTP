@@ -28,6 +28,9 @@ case "${UNAME_SYSTEM}" in
     AC_DEFINE(__64BIT__, 1, "define if 64 bit")
     CC=xlc_r
     ;;
+    Darwin)
+    # Nothing required yet
+    ;;
 esac
 case "${UNAME_MACHINE}" in
     *86*)
@@ -59,8 +62,9 @@ AC_ARG_ENABLE(openssl,
   openssl=no
 ])
 AM_CONDITIONAL(OPEN_SSL, test $openssl = yes)
+AM_CONDITIONAL(SYSTEM_LINUX, test $UNAME_SYSTEM = Linux)
 AM_CONDITIONAL(SYSTEM_AIX, test $UNAME_SYSTEM = AIX)
-
+AM_CONDITIONAL(SYSTEM_DARWIN, test $UNAME_SYSTEM = Darwin)
 
 # Checks for header files.
 # AC_HEADER_STDC
