@@ -64,6 +64,7 @@ import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
 import org.eclipse.ptp.etfw.feedback.Activator;
 import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.messages.Messages;
+import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -357,8 +358,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 
 	/**
 	 * Find info from the view info in the manifest. This includes the icon
-	 * name, the view id (used as marker id if none given on ctor), and
-	 * constructs an artifact manager for this view's artifact objects
+	 * name and the view id (used as marker id if none given on ctor) 
 	 * 
 	 */
 	protected void findViewInfo() {
@@ -881,6 +881,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		 * 
 		 */
 		public String getColumnText(Object obj, int index) {
+			final boolean traceText=false;
 			if (obj == null) {
 				System.out.println("STTMV: LabelProv obj is null; index=" + index); //$NON-NLS-1$
 				return "STTMV obj null"; //$NON-NLS-1$
@@ -902,51 +903,71 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				return "!marker";// HACK //$NON-NLS-1$
 			}
 			IMarker marker = (IMarker) obj;
+			 
+			if(!marker.exists()) {
+				// probably marker is being deleted.  Ignore, and need
+				// to investigate why we aren't ignoring *that* resource change.
+				return "";
+			}
+			IFeedbackItem item = getFeedbackItem(marker);
+		
 			try {
-				// NOTE: we are changing the assumption that all users of this
-				// class specify 'arbitrary' number
-				// of columns and thus use THAT ctor. remove the others.
-				// ?? why are these all different? aren't they all just
-				// marker.getAttribute(attrname) now?
-				String attrname = markerAttrNames_[index];
+				// Get column text value from the feedback item now, via attr lookup
+				//  (not from the marker attr)
 
-				switch (index) {
-				case 0:
-					String id = (String) marker.getAttribute(attrname);
-					return id;
-				case 1:
-					String str = marker.getAttribute(attrname).toString();
-					// str="function";
-					return str;
-				case 2:
-
-					return (String) marker.getAttribute(attrname);
-				case 3:
-					return (String) marker.getAttribute(attrname);
-				case 4:
-					// assumes attrname is IMarker.LINE_NUMBER;
-					// Note: currently this restricts the attribute/column in
-					// this position
-					// to a value that resolves to an int value, presumably the
-					// line number location.
-					// This will be generalized later. Perhaps include a type
-					// for each column.
-					String line = (marker.getAttribute(IMarker.LINE_NUMBER)).toString();
-					return line;
-				case 5:
-					if (columnName_ != null) {// we're not using array
-						return getConstructStr(marker);
-					}
-					// else drop through...
-
-				default:
-					// String attrName = markerAttrNames_[index - 4];
-					String val = marker.getAttribute(attrname, ""); //$NON-NLS-1$
-					return val;
+				String itemVal=item.getAttr(attrname);
+				if (traceText) {
+					if (index == 0)	System.out.println(" ");
+					System.out.println("col " + index + " attrname=" + attrname + " markerVal=" + markerVal + " IFeedbackItem val="
+							+ itemVal);
 				}
+				 if(itemVal!=null) {
+					 if(attrname.equals("filename")) {
+						 // temporary until we find a better way.
+						 // Preference value to show full path or not???
+						 itemVal=lastSegmentOnly(itemVal);
+					 }
+					 return itemVal;
+				 }
+				 return "";
+
 			} catch (CoreException ce) {
 				return ("STTMV error"); //$NON-NLS-1$
 			}
+			
+		}
+		
+		/**
+		 * last segment of a filename full path: removes path info
+		 * for a shorter display of filename only
+		 */
+		String lastSegmentOnly(String filename) {
+			if (filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
+				IPath path = new Path(filename);
+				//String pathname = path.removeLastSegments(1).toString();
+				filename = path.segment(path.segmentCount() - 1);
+			}
+			return filename;
+		}
+
+		/**
+		 * Get the feedback item from the marker object
+		 * @param marker
+		 */
+		private IFeedbackItem getFeedbackItem(IMarker marker) {
+			IFeedbackItem item=null;
+			Object obji = null;
+			try {
+				obji = marker.getAttribute(FeedbackIDs.ITEM);
+				if(obji instanceof IFeedbackItem) {
+					item = (IFeedbackItem) obji;					
+				}
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				boolean exists=marker.exists();
+				e.printStackTrace();// happens when deleting markers. ??
+			}
+			return item;
 		}
 
 		/**

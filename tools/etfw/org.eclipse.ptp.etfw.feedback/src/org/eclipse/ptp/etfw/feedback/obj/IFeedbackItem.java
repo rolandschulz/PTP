@@ -60,6 +60,13 @@ public interface IFeedbackItem {
 	 */
 	public Object getObject();
 	
+ 
+	
+	/**  @since 2.0 	 */
+	public String getAttr(String key);
+	/**  @since 2.0 	 */
+	public Object getObject(String key);
+	
 	
 	
 }
