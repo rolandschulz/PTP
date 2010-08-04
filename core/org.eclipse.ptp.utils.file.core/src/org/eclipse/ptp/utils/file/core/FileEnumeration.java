@@ -18,7 +18,7 @@ import java.util.Enumeration;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.utils.core.messages.Messages;
+import org.eclipse.ptp.utils.file.core.messages.Messages;
 
 public class FileEnumeration implements Enumeration<File> {
 
