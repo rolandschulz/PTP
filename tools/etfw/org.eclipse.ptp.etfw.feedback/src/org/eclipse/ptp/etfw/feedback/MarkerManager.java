@@ -13,9 +13,11 @@ package org.eclipse.ptp.etfw.feedback;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -250,8 +252,7 @@ public class MarkerManager {
 	 * @param itemlist
 	 */
 	public void createMarkers(List<IFeedbackItem> itemlist, String markerID) {
-
-		boolean dbgTags = true;
+		boolean dbgTags = false;
 		if(itemlist.size()==0) {
 			IPreferenceStore pf = Activator.getDefault().getPreferenceStore();
 			boolean showDialog = pf.getBoolean(PreferenceConstants.P_SHOW_NO_ITEMS_FOUND_DIALOG);
@@ -266,18 +267,33 @@ public class MarkerManager {
 			}
 			return;
 		}
-		// HACK we need to be able to remove markers on (all?) files in the list.
-		String f1 = itemlist.get(0).getFile();
-		IResource res1 = getResource(f1);
-		try {
-			removeMarkers(res1, markerID);
-		} catch (Exception e) {
-			System.out.println("Error deleting markers on file: " + res1); //$NON-NLS-1$
-			e.printStackTrace();
+		// Will we need this list of the files elsewhere? should we keep it elsewhere?
+		Set<String> files=new HashSet<String>();
+		for (Iterator iterator = itemlist.iterator(); iterator.hasNext();) {
+			IFeedbackItem item = (IFeedbackItem) iterator.next();
+			String f1 = item.getFile();
+			if( (f1!=null) && (!files.contains(f1))  ) {
+				files.add(f1);
+				if(traceOn)System.out.println("Source file: "+f1);// print each unique one we find
+			}
+		} 
+		 
+		// remove "our" markers on all source files referenced in this file
+		IResource res = null;
+		for (Iterator iterator = files.iterator(); iterator.hasNext();) {
+			String filename = (String) iterator.next();
+			res=getResource(filename);
+			try {
+				removeMarkers(res, markerID);
+			} catch (Exception e) {
+				System.out.println("Error deleting markers on file: " + res); //$NON-NLS-1$
+				//e.printStackTrace();
+			}
 		}
+
 		// for root nodes, may have no parent ID
 		String parentID = ""; //$NON-NLS-1$
-		IFeedbackItem temp = itemlist.get(0);
+		//IFeedbackItem temp = itemlist.get(0);
 		int count = 0;
 		Map<String, Object> attrs;
 
@@ -291,7 +307,7 @@ public class MarkerManager {
 			String itemID = item.getID();
 			parentID = item.getParentID();
 			String pathname = ""; // we assume it's fully qualified filename now //$NON-NLS-1$
-			if (filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
+			if (filename!=null && filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
 				IPath path = new Path(filename);
 				pathname = path.removeLastSegments(1).toString();
 				filename = path.segment(path.segmentCount() - 1);
