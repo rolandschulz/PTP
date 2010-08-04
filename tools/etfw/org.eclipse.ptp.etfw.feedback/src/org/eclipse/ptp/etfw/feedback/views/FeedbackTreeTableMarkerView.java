@@ -34,6 +34,11 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 	 */
 	private static boolean CREATE_PARENT_NODES=false;// Hack for hpcst 10/30/09
  
+	/**
+	 * This list tells the view which marker attributes map to each column in the view.
+	 * These are the default values if we don't get one in the constructor, but I'm not sure
+	 * this works to use these. 
+	 */
 	private static String[] attrNames=new String[] {
 		FeedbackIDs.FEEDBACK_ATTR_NAME,
 		FeedbackIDs.FEEDBACK_ATTR_FILENAME,
