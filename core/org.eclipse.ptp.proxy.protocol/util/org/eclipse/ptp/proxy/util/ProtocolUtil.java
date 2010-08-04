@@ -35,6 +35,11 @@ public class ProtocolUtil {
 	public final static int STRING = 14;
 	public final static int UNSIGNED = 15;
 
+	private final static int FLAG_NORMAL = 0x80000000;
+	private final static int FLAG_NOSTORE = 0x40000000;
+	private final static int LENGTH_MASK = 0x3fffffff;
+	private final static int ID_MASK = 0x7fffffff;
+
 	/**
 	 * Decode a string into a BigInteger
 	 * 
@@ -139,26 +144,32 @@ public class ProtocolUtil {
 	/**
 	 * Convert a proxy representation of a string to a String.
 	 * 
-	 * A string is represented as a length/value pair. The length portion of the
-	 * length/value pair identifies one of the following possibilities:
+	 * In order to reduce message traffic, only the first occurrence of a string
+	 * is included in the packet. When a unique string is seen, it may be added
+	 * to a string table. Subsequent references to the same string will use the
+	 * index of the string in the string table, rather than the actual string.
+	 * 
+	 * A string is represented as a length field followed by an optional value.
+	 * The length field is an unsigned 32 bit integer encoded as a varint. The
+	 * field is interpreted as follows:
 	 * 
 	 * <pre>
-	 * Length = 0 
-	 * 		means this field is not present. Value is omitted. 
-	 * Length < 0 
-	 * 		means this is a string. The actual string length is -(length + 1).
-	 *      The value is the actual string without the trailing x'00' byte.
-	 * Length > 0
-	 * 		is a string index identifying a previously processed string. Value is omitted.
-	 *      Indexes are numbered from 0, so the actual index value is (length - 1).
+	 *       +----------------------------+
+	 * Bit # | 31 | 30 |  Remaining Bits  |
+	 *       +----------------------------+
+	 * Value | E  | S  | Depends on flags |
+	 *       +----------------------------+
+	 * 
+	 * E = 0 
+	 * 		The value is omitted. Bits 30-0 = string table ID + 1
+	 * E = 1
+	 *      The value is the actual string with bits 29-0 set to the length of 
+	 *      the string excluding any null termination.
+	 * E = 1, S = 1
+	 *      Don't add the string to the string table.
+	 *      
+	 * If all the bits are 0, the value is omitted. The string should be skipped.
 	 * </pre>
-	 * 
-	 * Lengths are always represented as VarInts.
-	 * 
-	 * In order to reduce message traffic, only the first occurrence of a string
-	 * is included in the packet. When a unique string is seen, it is added to a
-	 * string table. Subsequent references to the same string will use the index
-	 * of the string in the string table, rather than the actual string.
 	 * 
 	 * @param buf
 	 *            byte buffer containing string to be decoded
@@ -176,15 +187,15 @@ public class ProtocolUtil {
 		if (!strLen.isValid()) {
 			throw new IOException(Messages.getString("ProtocolUtil.0")); //$NON-NLS-1$
 		}
-		int len = strLen.getValue();
-		if (len == 0) {
+		int flags = strLen.getValue();
+		if (flags == 0) {
 			return null;
 		}
-		if (len < 0) {
+		if ((flags & FLAG_NORMAL) == FLAG_NORMAL) {
 			/*
-			 * Normal string. Decode and insert into string table.
+			 * Normal string. Decode and insert into string table if required.
 			 */
-			len = -(len + 1);
+			int len = flags & LENGTH_MASK;
 
 			if (len > 0) {
 				ByteBuffer strBuf = buf.slice();
@@ -205,12 +216,14 @@ public class ProtocolUtil {
 					throw new IOException(e.getMessage());
 				}
 			}
-			stringTable.put(result);
+			if ((flags & FLAG_NOSTORE) == 0) {
+				stringTable.put(result);
+			}
 		} else {
 			/*
 			 * String table entry
 			 */
-			result = stringTable.get(len - 1);
+			result = stringTable.get((flags & ID_MASK) - 1);
 		}
 		return result;
 	}
