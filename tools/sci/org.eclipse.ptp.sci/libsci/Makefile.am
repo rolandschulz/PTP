@@ -32,9 +32,16 @@ libsci64_r.o : $(OBJECTS64)
 
 %.64o: %.cpp
 	$(CXX) -q64 -c $(SCI_CPPFLAGS) -o $@ $< 
-else
+endif
+if SYSTEM_LINUX
 lib_LTLIBRARIES=libsci.la
 libsci_la_SOURCES = $(SOURCES)
 libsci_la_CPPFLAGS = -I../include -I../common -I../secmod
 libsci_la_LDFLAGS= -L../common -lcmn -lrt 
+endif
+if SYSTEM_DARWIN
+lib_LTLIBRARIES=libsci.la
+libsci_la_SOURCES = $(SOURCES)
+libsci_la_CPPFLAGS = -I../include -I../common -I../secmod
+libsci_la_LDFLAGS= -L../common -lcmn
 endif

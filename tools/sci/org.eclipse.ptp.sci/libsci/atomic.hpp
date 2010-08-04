@@ -32,7 +32,7 @@
 #include <assert.h>
 #include <pthread.h>
 
-#ifdef _SCI_LINUX // Linux
+#if defined(_SCI_LINUX) // Linux
 
 /**********************************************************************
  *
@@ -40,7 +40,6 @@
  *
  **********************************************************************/
 typedef int          *atomic_p;
-typedef long long   *atomic_l;
 typedef int          boolean_t;
 typedef unsigned int uint;
 
@@ -99,6 +98,25 @@ int fetch_and_add(atomic_p ptr, int val)
 
 #endif /* INTEL_ARCH */
 
+#elif defined(__APPLE__)
+#include <libkern/OSAtomic.h>
+typedef int *atomic_p;
+
+/*
+ * We need to implement fetch_and_add using a
+ * splinlock as the OSAtomicAdd functions return
+ * the new value, not the old value.
+ */
+static __inline__
+int fetch_and_add(atomic_p ptr, int val) {
+	int old_val;
+	OSSpinLock lock = 0;
+	OSSpinLockLock(&lock);
+	old_val = *ptr;
+	*ptr += val;
+	OSSpinLockUnlock(&lock);
+	return old_val;
+}
 #else // AIX
 
 #include <sys/atomic_op.h>

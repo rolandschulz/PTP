@@ -61,11 +61,9 @@ SshFunc::~SshFunc()
     free_id_token(&user_token);
 }
 
+#ifdef PSEC_OPEN_SSL
 int SshFunc::load(char * libPath)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     int rc = -1;
     string path = "";
     string auth_mod = "";
@@ -152,97 +150,61 @@ int SshFunc::load(char * libPath)
 
 int SshFunc::set_auth_module(char *name, char *fpath, char *opts)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return set_auth_module_hndlr(name, fpath, opts, &mdlhndl);
 }
 
 int SshFunc::get_id_token(char *tname, char *thost, psec_idbuf_t idtok)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return get_id_token_hndlr(mdlhndl, tname, thost, idtok);
 }
 
 int SshFunc::verify_id_token(char *uname, psec_idbuf_t idtok)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return verify_id_token_hndlr(mdlhndl, uname, idtok);
 }
 
 int SshFunc::get_id_from_token(psec_idbuf_t idtok, char *usrid, size_t *usridlen)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return get_id_from_token_hndlr(mdlhndl, idtok, usrid, usridlen);
 }
 
 int SshFunc::free_id_token(psec_idbuf_t id)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return free_id_token_hndlr(mdlhndl, id);
 }
 
 int SshFunc::get_key_from_token(char *uname, psec_idbuf_t idtok , char *key, size_t *keylen) 
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return get_key_from_token_hndlr(mdlhndl, uname, idtok, key, keylen);
 }
 
 int SshFunc::sign_data(char *key, size_t keylen, struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return sign_data_hndlr(mdlhndl, key, keylen, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::verify_data(char *key, size_t keylen, struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return verify_data_hndlr(mdlhndl, key, keylen, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::sign_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return sign_data_hndlr(mdlhndl, session_key, key_len, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::verify_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return verify_data_hndlr(mdlhndl, session_key, key_len, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::free_signature(struct iovec *sigbufs) 
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     return free_signature_hndlr(mdlhndl, sigbufs);
 }
 
 int SshFunc::sign_data(char *key, size_t keylen, char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
@@ -258,9 +220,6 @@ int SshFunc::sign_data(char *key, size_t keylen, char *bufs[], int sizes[], int 
 
 int SshFunc::verify_data(char *key, size_t keylen, char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
@@ -276,9 +235,6 @@ int SshFunc::verify_data(char *key, size_t keylen, char *bufs[], int sizes[], in
 
 int SshFunc::sign_data(char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
@@ -294,9 +250,6 @@ int SshFunc::sign_data(char *bufs[], int sizes[], int num_bufs, struct iovec *si
 
 int SshFunc::verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
@@ -312,9 +265,6 @@ int SshFunc::verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *
 
 int SshFunc::set_user_token(struct iovec *token)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     free_id_token(&user_token);
     user_token.iov_len = token->iov_len;
     user_token.iov_base = new char [token->iov_len];
@@ -326,11 +276,99 @@ int SshFunc::set_user_token(struct iovec *token)
 
 int SshFunc::set_session_key(struct iovec *sskey)
 {
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif
     key_len = sskey->iov_len;
     memcpy(session_key, sskey->iov_base, key_len);
 
     return 0;
 }
+#else /* PSEC_OPEN_SSL */
+int SshFunc::load(char * libPath)
+{
+    return 0;
+}
+
+int SshFunc::set_auth_module(char *name, char *fpath, char *opts)
+{
+    return 0;
+}
+
+int SshFunc::get_id_token(char *tname, char *thost, psec_idbuf_t idtok)
+{
+    return 0;
+}
+
+int SshFunc::verify_id_token(char *uname, psec_idbuf_t idtok)
+{
+    return 0;
+}
+
+int SshFunc::get_id_from_token(psec_idbuf_t idtok, char *usrid, size_t *usridlen)
+{
+    return 0;
+}
+
+int SshFunc::free_id_token(psec_idbuf_t id)
+{
+    return 0;
+}
+
+int SshFunc::get_key_from_token(char *uname, psec_idbuf_t idtok , char *key, size_t *keylen)
+{
+    return 0;
+}
+
+int SshFunc::sign_data(char *key, size_t keylen, struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::verify_data(char *key, size_t keylen, struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::sign_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::verify_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::free_signature(struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::sign_data(char *key, size_t keylen, char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::verify_data(char *key, size_t keylen, char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::sign_data(char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::set_user_token(struct iovec *token)
+{
+    return 0;
+}
+
+int SshFunc::set_session_key(struct iovec *sskey)
+{
+    return 0;
+}
+#endif /* PSEC_OPEN_SSL */

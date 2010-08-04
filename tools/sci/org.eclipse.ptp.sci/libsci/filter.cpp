@@ -102,8 +102,10 @@ void Filter::unpackMsg(Message &msg)
 
 int Filter::load()
 {
-#ifdef _SCI_LINUX // Linux
+#if defined(_SCI_LINUX) // Linux
     file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
+#elif defined(__APPLE__)
+    file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL);
 #else // aix
     file = ::dlopen(info.so_file, RTLD_NOW | RTLD_GLOBAL | RTLD_MEMBER);
 #endif

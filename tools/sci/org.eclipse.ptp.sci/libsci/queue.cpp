@@ -221,11 +221,15 @@ string MessageQueue::getName()
 int MessageQueue::sem_wait_i(sem_t *psem, int usecs)
 {
     int rc = 0;
+#ifdef __APPLE__
+    int sleep_time = usecs > 10 ? 10 : usecs;
+#endif
 
     if (usecs < 0) {
         while (((rc = ::sem_wait(psem)) != 0) && (errno == EINTR));
         return rc;
     } else { 
+#ifndef __APPLE__
         timespec ts;
         ::clock_gettime(CLOCK_REALTIME, &ts);    // get current time
         ts.tv_nsec += (usecs % 1000000) * 1000;
@@ -234,6 +238,14 @@ int MessageQueue::sem_wait_i(sem_t *psem, int usecs)
         ts.tv_sec += (usecs / 1000000) + ca;
         
         while (((rc=::sem_timedwait(psem, &ts))!=0) && (errno == EINTR));
+#else
+        while (((rc = sem_trywait(psem)) != 0)
+        		&& ((errno == EAGAIN) || (errno == EINTR))
+        		&& (usecs > 0)) {
+        	usleep(sleep_time);
+        	usecs -= sleep_time;
+        }
+#endif
         return rc;   
     }                                                 
 }

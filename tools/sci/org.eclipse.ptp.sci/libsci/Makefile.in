@@ -88,9 +88,12 @@ am__objects_1 = libsci_la-allocator.lo libsci_la-errdetector.lo \
 	libsci_la-errinjector.lo libsci_la-filterlist.lo \
 	libsci_la-listener.lo libsci_la-processor.lo \
 	libsci_la-routerproc.lo libsci_la-writerproc.lo
-@SYSTEM_AIX_FALSE@am_libsci_la_OBJECTS = $(am__objects_1)
+@SYSTEM_DARWIN_FALSE@@SYSTEM_LINUX_TRUE@am_libsci_la_OBJECTS =  \
+@SYSTEM_DARWIN_FALSE@@SYSTEM_LINUX_TRUE@	$(am__objects_1)
+@SYSTEM_DARWIN_TRUE@am_libsci_la_OBJECTS = $(am__objects_1)
 libsci_la_OBJECTS = $(am_libsci_la_OBJECTS)
-@SYSTEM_AIX_FALSE@am_libsci_la_rpath = -rpath $(libdir)
+@SYSTEM_DARWIN_TRUE@am_libsci_la_rpath = -rpath $(libdir)
+@SYSTEM_LINUX_TRUE@am_libsci_la_rpath = -rpath $(libdir)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -174,6 +177,10 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 SYSTEM_AIX_FALSE = @SYSTEM_AIX_FALSE@
 SYSTEM_AIX_TRUE = @SYSTEM_AIX_TRUE@
+SYSTEM_DARWIN_FALSE = @SYSTEM_DARWIN_FALSE@
+SYSTEM_DARWIN_TRUE = @SYSTEM_DARWIN_TRUE@
+SYSTEM_LINUX_FALSE = @SYSTEM_LINUX_FALSE@
+SYSTEM_LINUX_TRUE = @SYSTEM_LINUX_TRUE@
 VERSION = @VERSION@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -240,10 +247,14 @@ OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
 OBJECTS64 = $(addsuffix .64o, $(basename $(SOURCES)))
 @SYSTEM_AIX_TRUE@lib_LIBRARIES = libsci_r.a
 @SYSTEM_AIX_TRUE@SCI_CPPFLAGS = -g -O0 -DREENTRANT -D_SCI_DEBUG -I../include -I../common -I../libsci -I../ -I../secmod -qmkshrobj 
-@SYSTEM_AIX_FALSE@lib_LTLIBRARIES = libsci.la
-@SYSTEM_AIX_FALSE@libsci_la_SOURCES = $(SOURCES)
-@SYSTEM_AIX_FALSE@libsci_la_CPPFLAGS = -I../include -I../common -I../secmod
-@SYSTEM_AIX_FALSE@libsci_la_LDFLAGS = -L../common -lcmn -lrt 
+@SYSTEM_DARWIN_TRUE@lib_LTLIBRARIES = libsci.la
+@SYSTEM_LINUX_TRUE@lib_LTLIBRARIES = libsci.la
+@SYSTEM_DARWIN_TRUE@libsci_la_SOURCES = $(SOURCES)
+@SYSTEM_LINUX_TRUE@libsci_la_SOURCES = $(SOURCES)
+@SYSTEM_DARWIN_TRUE@libsci_la_CPPFLAGS = -I../include -I../common -I../secmod
+@SYSTEM_LINUX_TRUE@libsci_la_CPPFLAGS = -I../include -I../common -I../secmod
+@SYSTEM_DARWIN_TRUE@libsci_la_LDFLAGS = -L../common -lcmn
+@SYSTEM_LINUX_TRUE@libsci_la_LDFLAGS = -L../common -lcmn -lrt 
 all: all-am
 
 .SUFFIXES:
