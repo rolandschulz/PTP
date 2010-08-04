@@ -914,12 +914,13 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			try {
 				// Get column text value from the feedback item now, via attr lookup
 				//  (not from the marker attr)
-
-				String itemVal=item.getAttr(attrname);
+				String attrname = markerAttrNames_[index];
+				
+				String itemVal = item.getAttr(attrname);
 				if (traceText) {
-					if (index == 0)	System.out.println(" ");
-					System.out.println("col " + index + " attrname=" + attrname + " markerVal=" + markerVal + " IFeedbackItem val="
-							+ itemVal);
+					if (index == 0)
+						System.out.println(" ");
+					System.out.println("col " + index + " attrname=" + attrname + " IFeedbackItem val=" + itemVal);
 				}
 				 if(itemVal!=null) {
 					 if(attrname.equals("filename")) {
@@ -931,15 +932,13 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 				 }
 				 return "";
 
-			} catch (CoreException ce) {
+			} catch (Exception ce) {
 				return ("STTMV error"); //$NON-NLS-1$
 			}
 			
 		}
 		
 		/**
-		 * last segment of a filename full path: removes path info
-		 * for a shorter display of filename only
 		 */
 		String lastSegmentOnly(String filename) {
 			if (filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
@@ -958,7 +957,7 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			IFeedbackItem item=null;
 			Object obji = null;
 			try {
-				obji = marker.getAttribute(FeedbackIDs.ITEM);
+				obji = marker.getAttribute(FeedbackIDs.FEEDBACK_ATTR_ITEM);
 				if(obji instanceof IFeedbackItem) {
 					item = (IFeedbackItem) obji;					
 				}
