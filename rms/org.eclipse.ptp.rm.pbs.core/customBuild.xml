@@ -144,7 +144,7 @@
 
 	<target name="fetch.jar">
 		<copy todir="${target.folder}">
-			<fileset dir="${basedir}/../org.eclipse.ptp.pbs.jproxy">
+			<fileset dir="${basedir}/../org.eclipse.ptp.rm.pbs.jproxy">
 				<include name="${server.jar}"/>
 			</fileset>
 		</copy>
