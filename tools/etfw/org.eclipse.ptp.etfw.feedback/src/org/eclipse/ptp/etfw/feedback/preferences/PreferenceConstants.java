@@ -18,6 +18,10 @@ public class PreferenceConstants {
 	public static final String P_PATH = "pathPreference"; //$NON-NLS-1$
 
 	public static final String P_MAINTAIN_EXPAND_COLLAPSE_STATE = "maintainExpandCollapseState"; //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
+	public static final String P_SHOW_NO_ITEMS_FOUND_DIALOG = "showNoItemsFoundDialog";//$NON-NLS-1$
 
 	public static final String P_CHOICE = "choicePreference"; //$NON-NLS-1$
 
