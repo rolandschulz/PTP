@@ -16,6 +16,7 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.feedback.messages.messages"; //$NON-NLS-1$
 	public static String FeedbackIDs_feedback;
 	public static String FeedbackPreferencePage_maintainExpandCollapseState;
+	public static String FeedbackPreferencePage_showNoItemsFoundDialog;
 	public static String FeedbackPreferencePage_preferencesForFeedbackView;
 	public static String FeedbackTreeTableMarkerView_description;
 	public static String FeedbackTreeTableMarkerView_fileName;
@@ -23,6 +24,9 @@ public class Messages extends NLS {
 	public static String FeedbackTreeTableMarkerView_name;
 	public static String FeedbackTreeTableMarkerView_parentItemType;
 	public static String MarkerManager_solution;
+	public static String MarkerManager_dontShowMeThisAgain;
+	public static String MarkerManager_noFeedbackItemsFoundTitle;
+	public static String MarkerManager_noFeedbackItemsFoundMessage;
 	public static String PreferenceInitializer_defaultValue;
 	public static String SimpleTreeTableMarkerView_areShownInThisView;
 	public static String SimpleTreeTableMarkerView_areShownInThisViewPeriod;
