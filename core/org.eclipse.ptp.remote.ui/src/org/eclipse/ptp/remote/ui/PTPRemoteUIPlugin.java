@@ -13,8 +13,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.messages.Messages;
@@ -39,6 +39,8 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 
 	// Cache of initialized services
 	private IRemoteServices[] fInitializedServices = null;
+	// Remote service lookup result
+	private IRemoteServices fRemoteService = null;
 
 	/**
 	 * @return
@@ -148,13 +150,13 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	 * service, or, if null, the platform progress service, in order to allow
 	 * the initialization to be canceled.
 	 * 
-	 * @param container
-	 *            container with progress service, or null to use the platform
+	 * @param context
+	 *            context with progress service, or null to use the platform
 	 *            progress service
 	 * @return array containing initialized services
 	 * @since 4.1
 	 */
-	public synchronized IRemoteServices[] getRemoteServices(IWizardContainer container) {
+	public synchronized IRemoteServices[] getRemoteServices(IRunnableContext context) {
 		if (fInitializedServices == null) {
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -170,8 +172,8 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 				}
 			};
 			try {
-				if (container != null) {
-					container.run(true, true, runnable);
+				if (context != null) {
+					context.run(true, true, runnable);
 				} else {
 					PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
 				}
@@ -183,6 +185,51 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 		}
 
 		return fInitializedServices;
+	}
+
+	/**
+	 * Look up a remote service provider and ensure it is initialized. The
+	 * method will use the supplied container's progress service, or, if null,
+	 * the platform progress service, in order to allow the initialization to be
+	 * canceled.
+	 * 
+	 * @param id
+	 *            id of service to locate
+	 * @param context
+	 *            context with progress service, or null to use the platform
+	 *            progress service
+	 * @return initialized remote services or null if the service can't be
+	 *         located or the progress monitor was canceled
+	 * @since 4.1
+	 */
+	public synchronized IRemoteServices getRemoteServices(final String id, IRunnableContext context) {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				SubMonitor progress = SubMonitor.convert(monitor, Messages.PTPRemoteUIPlugin_4, 10);
+				try {
+					fRemoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(id, progress.newChild(10));
+					if (progress.isCanceled()) {
+						throw new InterruptedException();
+					}
+				} finally {
+					monitor.done();
+				}
+			}
+		};
+		try {
+			fRemoteService = null;
+			if (context != null) {
+				context.run(true, true, runnable);
+			} else {
+				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+			}
+		} catch (InvocationTargetException e) {
+			log(e);
+		} catch (InterruptedException e) {
+			// canceled
+		}
+
+		return fRemoteService;
 	}
 
 	/*
