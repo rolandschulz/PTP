@@ -13,20 +13,20 @@ package org.eclipse.ptp.etfw.feedback;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -40,13 +40,19 @@ import org.w3c.dom.Node;
 /**
  * Creates markers representing IFeedbackItem objects, to be shown in the
  * Feedback view
+ * 
+ * assumed to be a singleton; fileMap is created once
  */
 public class MarkerManager {
 	private static final boolean traceOn = false;
 
 	static String path;
 	static String filename;
-	//private static MarkerManager instance;
+	
+	/** Hash table of filenames and resources.  Since usually a single file is
+	 * used often, so don't recreate the IResource.
+	 */
+	Map<String,IResource> fileMap = new HashMap<String,IResource>();
 
 	private static final String SLASH = System.getProperty("file.separator"); //$NON-NLS-1$
 
@@ -241,48 +247,42 @@ public class MarkerManager {
 	}
 
 	/**
+	 * Create the markers for the IFeedbackItems.
 	 * Note: some Items may be parent groups and not have file, etc. info
 	 * 
-	 * Do we create markers for children that don't appear yet? think so Or not
-	 * until they are expanded? think not
-	 * 
-	 * Note: need to batch this in a single resource change event, getElements()
-	 * is being called on every marker creation.
 	 * 
 	 * @param itemlist
 	 */
-	public void createMarkers(List<IFeedbackItem> itemlist, String markerID) {
-		boolean dbgTags = false;
+	public void createMarkers(final List<IFeedbackItem> itemlist, final String markerID) {
+		//timeStart();
+		long firstStart=System.currentTimeMillis();
+		if(traceOn)System.out.println("MarkerMgr.createMarkers()...");
 		if(itemlist.size()==0) {
-			IPreferenceStore pf = Activator.getDefault().getPreferenceStore();
-			boolean showDialog = pf.getBoolean(PreferenceConstants.P_SHOW_NO_ITEMS_FOUND_DIALOG);
-			System.out.println("showDialog="+showDialog);
-			if (showDialog) {
-				String title = Messages.MarkerManager_noFeedbackItemsFoundTitle;
-				String msg = Messages.MarkerManager_noFeedbackItemsFoundMessage;
-				// MessageDialog.openInformation(null, title, msg);
-				String togMsg = Messages.MarkerManager_dontShowMeThisAgain;
-				MessageDialogWithToggle.openInformation(null, title, msg.toString(), togMsg, false, pf,
-						PreferenceConstants.P_SHOW_NO_ITEMS_FOUND_DIALOG);
-			}
+			showNoItemsFound();
 			return;
 		}
-		// Will we need this list of the files elsewhere? should we keep it elsewhere?
-		Set<String> files=new HashSet<String>();
+		// create the list of unique files found in the IFeedbackItems
+		fileMap = new HashMap<String,IResource>();
 		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
 			IFeedbackItem item = (IFeedbackItem) iterator.next();
 			String f1 = item.getFile();
-			if( (f1!=null) && (!files.contains(f1))  ) {
-				files.add(f1);
+			 
+			//if( (f1!=null) && (!files.contains(f1))  ) {
+			if( (f1!=null) && (!fileMap.containsKey(f1))  ) {
+				IResource res = getResource(f1);
+				fileMap.put(f1,res);
 				if(traceOn)System.out.println("Source file: "+f1);// print each unique one we find
 			}
 		} 
+		if(traceOn)System.out.println("MarkerMgr.createMarkers()...after file gathering, found # files: "+fileMap.size());
+		
 		 
 		// remove "our" markers on all source files referenced in this file
 		IResource res = null;
-		for (Iterator<String> iterator = files.iterator(); iterator.hasNext();) {
+		for (Iterator<String> iterator = fileMap.keySet().iterator(); iterator.hasNext();) {
 			String filename = (String) iterator.next();
-			res=getResource(filename);
+			//res=getResource(filename);
+			res=fileMap.get(filename);
 			try {
 				removeMarkers(res, markerID);
 			} catch (Exception e) {
@@ -291,11 +291,36 @@ public class MarkerManager {
 			}
 		}
 
-		// for root nodes, may have no parent ID
-		String parentID = ""; //$NON-NLS-1$
+		// BATCH all the resource changes from the marker creation in a runnable
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRunnable operation = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException{
+				loopItemsCreateMarkers(itemlist, markerID);
+			}
+		};
+		// if this takes a non-trivial amt of time we can put up a real progress monitor
+		IProgressMonitor monitor=null;
+		try {
+			workspace.run(operation, monitor);
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		if(traceOn)System.out.println("Total elapsed time in createMarkers: "+(System.currentTimeMillis()-firstStart));
+	}// end createMarkers
 
+	/**
+	 * Loop thru the IFeedbackItems and create the markers.
+	 * This can be batched within a runnable to avoid sending resource change events
+	 * until all the markers are created.
+	 * 
+	 * @param itemlist
+	 * @param markerID
+	 */
+	private void loopItemsCreateMarkers(List<IFeedbackItem> itemlist, String markerID) {
+		final boolean dbgTags=false;
+		String parentID;
 		Map<String, Object> attrs;
-
 		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
 			IFeedbackItem item = iterator.next();
 			String filename = item.getFile();
@@ -305,14 +330,15 @@ public class MarkerManager {
 			String itemID = item.getID();
 			parentID = item.getParentID();
 			String pathname = ""; // we assume it's fully qualified filename now //$NON-NLS-1$
+			IResource resource=fileMap.get(filename);
 			if (filename!=null && filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
+				// note: we could do this ONCE instead. probably re-creating it here.
 				IPath path = new Path(filename);
 				pathname = path.removeLastSegments(1).toString();
 				filename = path.segment(path.segmentCount() - 1);
 			}
 			attrs = createCommonMarkers(item, itemID, name, parentID, filename, pathname, lineNo, desc);
 
-			IResource resource = getResource(pathname, filename);
 			if (resource != null) {
 				createMarker(resource, attrs, markerID);
 			} else {
@@ -338,7 +364,7 @@ public class MarkerManager {
 					boolean gkids = kid.hasChildren();
 					// fixme make this recursive so level of hierarchy doesn't  matter
 					if (gkids) {
-						if (traceOn)
+						if (dbgTags)
 							System.out.println("grandkids"); //$NON-NLS-1$
 						List<IFeedbackItem> gkidItems = kid.getChildren();
 						for (Object gkid : gkidItems) {
@@ -349,8 +375,36 @@ public class MarkerManager {
 							createMarker(resource, attrs, markerID);
 						}
 					}
-				}
+				}			
 			}
 		}
+	}//end loopItemsCreateMarkers
+
+	/**
+	 * Put up a dialog informing the user that no items were found to be shown 
+	 * in the feedback view.  Preference value can prevent this from being shown.
+	 */
+	private void showNoItemsFound() {
+		IPreferenceStore pf = Activator.getDefault().getPreferenceStore();
+		boolean showDialog = pf.getBoolean(PreferenceConstants.P_SHOW_NO_ITEMS_FOUND_DIALOG);
+		if (showDialog) {
+			String title = Messages.MarkerManager_noFeedbackItemsFoundTitle;
+			String msg = Messages.MarkerManager_noFeedbackItemsFoundMessage;
+			// MessageDialog.openInformation(null, title, msg);
+			String togMsg = Messages.MarkerManager_dontShowMeThisAgain;
+			MessageDialogWithToggle.openInformation(null, title, msg.toString(), togMsg, false, pf,
+					PreferenceConstants.P_SHOW_NO_ITEMS_FOUND_DIALOG);
+		}
 	}
+	/*
+	long start;
+	void time(String label){
+		long time=System.currentTimeMillis();
+		System.out.println(label+"  elapsed: "+(time-start));
+		start=System.currentTimeMillis();
+	}
+	void timeStart(){
+		start=System.currentTimeMillis();
+	}
+	*/
 }
