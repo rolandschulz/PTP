@@ -9,8 +9,11 @@
  *    Roland Schulz - initial implementation
 
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.jproxy.attributes;
+package org.eclipse.ptp.rm.pbs.core.attributes.proxy;
 
+/**
+ * @since 5.0
+ */
 public class PBSNodeProtocolAttributes {
 
 	protected static final String NAME_ATTR_ID = "name"; //$NON-NLS-1$

@@ -5,5 +5,6 @@
 	<classpathentry kind="src" path="/org.eclipse.ptp.proxy.protocol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.utils.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.rm.proxy.core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.rm.pbs.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -10,7 +10,7 @@
  *    Benjamin Lindner (ben@benlabs.net)
 
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.jproxy.attributes;
+package org.eclipse.ptp.rm.pbs.core.attributes.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +22,11 @@ import org.eclipse.ptp.rm.proxy.core.attributes.IElementAttributes;
  * needs to be in the classpath of the jproxy. The proxy client defines the same
  * attribute-id constants. Obviously one shouldn't define those at two places.
  * This is only a temporary solution.
+ * 
+ * @since 5.0
  */
 
-public class PBSQueueClientAttributes extends PBSQueueProtocolAttributes
-		implements IElementAttributes {
+public class PBSQueueClientAttributes extends PBSQueueProtocolAttributes implements IElementAttributes {
 	private static final Map<String, String> xmlTag_AttributeID_Map = new HashMap<String, String>();
 	static {
 		xmlTag_AttributeID_Map.put("name", NAME_ATTR_ID); //$NON-NLS-1$
@@ -36,14 +37,10 @@ public class PBSQueueClientAttributes extends PBSQueueProtocolAttributes
 		xmlTag_AttributeID_Map.put("enabled", ENABLED_ATTR_ID); //$NON-NLS-1$
 		xmlTag_AttributeID_Map.put("started", STARTED_ATTR_ID); //$NON-NLS-1$
 
-		xmlTag_AttributeID_Map.put(
-				"resources_max__walltime", RES_MAX_WALLTIME_ATTR_ID); //$NON-NLS-1$
-		xmlTag_AttributeID_Map.put(
-				"resources_default__nodes", RES_DEFAULT_NODES_ATTR_ID); //$NON-NLS-1$
-		xmlTag_AttributeID_Map.put(
-				"resources_default__walltime", RES_DEFAULT_WALLTIME_ATTR_ID); //$NON-NLS-1$
-		xmlTag_AttributeID_Map.put(
-				"resources_assigned__nodect", RES_ASSIGNED_NODECT_ATTR_ID); //$NON-NLS-1$
+		xmlTag_AttributeID_Map.put("resources_max__walltime", RES_MAX_WALLTIME_ATTR_ID); //$NON-NLS-1$
+		xmlTag_AttributeID_Map.put("resources_default__nodes", RES_DEFAULT_NODES_ATTR_ID); //$NON-NLS-1$
+		xmlTag_AttributeID_Map.put("resources_default__walltime", RES_DEFAULT_WALLTIME_ATTR_ID); //$NON-NLS-1$
+		xmlTag_AttributeID_Map.put("resources_assigned__nodect", RES_ASSIGNED_NODECT_ATTR_ID); //$NON-NLS-1$
 	}
 	private static final String key = "name"; //$NON-NLS-1$
 

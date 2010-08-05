@@ -3,9 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.pbs.jproxy;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Export-Package: org.eclipse.ptp.rm.pbs.jproxy.attributes
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
 Bundle-Vendor: %pluginProvider
-Require-Bundle: org.eclipse.ptp.proxy.protocol,
+Require-Bundle: org.eclipse.ptp.rm.pbs.core,
  org.eclipse.ptp.rm.proxy.core

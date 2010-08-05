@@ -9,7 +9,7 @@
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
 
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.jproxy.attributes;
+package org.eclipse.ptp.rm.pbs.core.attributes.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,10 +21,11 @@ import org.eclipse.ptp.rm.proxy.core.attributes.IElementAttributes;
  * needs to be in the classpath of the jproxy. The proxy client defines the same
  * attribute-id constants. Obviously one shouldn't define those at two places.
  * This is only a temporary solution.
+ * 
+ * @since 5.0
  */
 
-public class PBSNodeClientAttributes extends PBSNodeProtocolAttributes
-		implements IElementAttributes {
+public class PBSNodeClientAttributes extends PBSNodeProtocolAttributes implements IElementAttributes {
 	private static final Map<String, String> nodeStatusMap = new HashMap<String, String>();
 	static {
 		nodeStatusMap.put("job-exclusive", "UP"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -36,8 +37,7 @@ public class PBSNodeClientAttributes extends PBSNodeProtocolAttributes
 
 	private static final Map<String, DefaultValueMap<String, String>> valueMap = new HashMap<String, DefaultValueMap<String, String>>();
 	static {
-		valueMap.put(
-				"state", new DefaultValueMap<String, String>("UNKNOWN", nodeStatusMap)); //$NON-NLS-1$ //$NON-NLS-2$
+		valueMap.put("state", new DefaultValueMap<String, String>("UNKNOWN", nodeStatusMap)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	// public static Map<String, String> getNodeStatusMap() {
