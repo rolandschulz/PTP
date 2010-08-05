@@ -10,8 +10,11 @@
 
  *******************************************************************************/
 
-package org.eclipse.ptp.rm.pbs.jproxy.attributes;
+package org.eclipse.ptp.rm.pbs.core.attributes.proxy;
 
+/**
+ * @since 5.0
+ */
 public class PBSJobProtocolAttributes {
 	protected static final String ACCOUNT_NAME_ATTR_ID = "Account_Name"; //$NON-NLS-1$
 	protected static final String CHECKPOINT_ATTR_ID = "Checkpoint"; //$NON-NLS-1$

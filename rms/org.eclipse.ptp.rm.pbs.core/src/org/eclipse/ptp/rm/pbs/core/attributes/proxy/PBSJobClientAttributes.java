@@ -9,7 +9,7 @@
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
 
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.jproxy.attributes;
+package org.eclipse.ptp.rm.pbs.core.attributes.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +21,8 @@ import org.eclipse.ptp.rm.proxy.core.attributes.IElementAttributes;
  * needs to be in the classpath of the jproxy. The proxy client defines the same
  * attribute-id constants. Obviously one shouldn't define those at two places.
  * This is only a temporary solution.
+ * 
+ * @since 5.0
  */
 
 /*
@@ -59,8 +61,7 @@ import org.eclipse.ptp.rm.proxy.core.attributes.IElementAttributes;
  * WORKING_DIR_ATTR_ID = "workingDir"; //$NON-NLS-1$
  */
 
-public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements
-		IElementAttributes {
+public class PBSJobClientAttributes extends PBSJobProtocolAttributes implements IElementAttributes {
 
 	private static final Map<String, String> xmlTag_AttributeID_Map = new HashMap<String, String>();
 

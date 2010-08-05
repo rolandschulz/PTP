@@ -9,8 +9,11 @@
  *    Roland Schulz - initial implementation
 
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.jproxy.attributes;
+package org.eclipse.ptp.rm.pbs.core.attributes.proxy;
 
+/**
+ * @since 5.0
+ */
 public class PBSQueueProtocolAttributes {
 
 	protected static final String RES_DEFAULT_ARCH_ATTR_ID = "Resource_List.default.arch"; //$NON-NLS-1$

@@ -9,10 +9,14 @@
  * 	IBM Corporation - Initial API and implementation
  * 	Albert L. Rossi (NCSA) - Updated attributes (bug 310189)
  ******************************************************************************/
-package org.eclipse.ptp.rm.pbs.core;
+package org.eclipse.ptp.rm.pbs.core.attributes;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.rm.pbs.core.Activator;
 
+/**
+ * @since 5.0
+ */
 public class PBSPreferenceManager {
 	private static final String SELECTED = "selectedAttributes"; //$NON-NLS-1$
 	private static final String TEMPLATE = "attributeConfiguration"; //$NON-NLS-1$

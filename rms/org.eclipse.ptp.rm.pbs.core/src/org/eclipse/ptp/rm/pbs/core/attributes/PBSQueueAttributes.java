@@ -10,18 +10,18 @@
  *     Dieter Krachtus, University of Heidelberg
  *     Roland Schulz, University of Tennessee
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.core;
+package org.eclipse.ptp.rm.pbs.core.attributes;
 
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
+import org.eclipse.ptp.rm.pbs.core.attributes.proxy.PBSQueueProtocolAttributes;
 import org.eclipse.ptp.rm.pbs.core.messages.Messages;
-import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSQueueProtocolAttributes;
 
 /**
  * Job attributes
  * 
- * @since 4.0
+ * @since 5.0
  */
 public class PBSQueueAttributes extends PBSQueueProtocolAttributes {
 

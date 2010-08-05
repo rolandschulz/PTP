@@ -29,9 +29,9 @@ import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 import org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer;
 import org.eclipse.ptp.proxy.runtime.server.ElementIDGenerator;
-import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSJobClientAttributes;
-import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSNodeClientAttributes;
-import org.eclipse.ptp.rm.pbs.jproxy.attributes.PBSQueueClientAttributes;
+import org.eclipse.ptp.rm.pbs.core.attributes.proxy.PBSJobClientAttributes;
+import org.eclipse.ptp.rm.pbs.core.attributes.proxy.PBSNodeClientAttributes;
+import org.eclipse.ptp.rm.pbs.core.attributes.proxy.PBSQueueClientAttributes;
 import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatJobXMLReader;
 import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatQueuesReader;
 import org.eclipse.ptp.rm.proxy.core.Controller;
@@ -236,16 +236,16 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			}
 			p.waitFor();
 			String server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-			if (server==null || server.split(" ").length<2) //$NON-NLS-1$
+			if (server == null || server.split(" ").length < 2) //$NON-NLS-1$
 				server = "UNKNOWN"; //$NON-NLS-1$
 			else
 				server = server.split(" ")[1]; //$NON-NLS-1$
 			sendEvent(getEventFactory().newProxyRuntimeNewMachineEvent(transID,
 					new String[] { Integer.toString(resourceManagerID), "1", Integer.toString(machineID), //$NON-NLS-1$
-					"2", //$NON-NLS-1$
-					"machineState=UP", //$NON-NLS-1$
-					"name=" + server //$NON-NLS-1$
-			}));
+							"2", //$NON-NLS-1$
+							"machineState=UP", //$NON-NLS-1$
+							"name=" + server //$NON-NLS-1$
+					}));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (InterruptedException e) {

@@ -39,7 +39,7 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.rm.pbs.core.PBSJobAttributes;
+import org.eclipse.ptp.rm.pbs.core.attributes.PBSJobAttributes;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;

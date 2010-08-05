@@ -7,7 +7,7 @@
  * Updated attributes (bug 310189) Updated attributes 04/30/2010
  * Updated attributes 05/11/2010
  *******************************************************************************/
-package org.eclipse.ptp.rm.pbs.core;
+package org.eclipse.ptp.rm.pbs.core.attributes;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,6 +24,7 @@ import org.eclipse.ptp.rm.pbs.core.messages.Messages;
  * API.
  * 
  * @author arossi
+ * @since 5.0
  */
 public class PBSJobAttributes {
 
