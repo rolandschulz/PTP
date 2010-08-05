@@ -143,7 +143,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcessAttributes
 	 * (java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public void addProcessAttributes(BitSet processIds,
+	public synchronized void addProcessAttributes(BitSet processIds,
 			AttributeManager attributes) {
 		// limit the addition of attributes to the current set of
 		// child processes
@@ -162,7 +162,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcesses(java.util
 	 * .BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public void addProcessesByJobRanks(BitSet newProcessJobRanks, AttributeManager attrs) {
+	public synchronized void addProcessesByJobRanks(BitSet newProcessJobRanks, AttributeManager attrs) {
 		// add the processes to the existing set of processes (via BitSets of
 		// ids)
 		currentProcessJobRanks.or(newProcessJobRanks);
@@ -331,7 +331,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elements.IPJob#getProcessAttribute(org.eclipse.ptp
 	 * .core.attributes.IAttributeDefinition, int)
 	 */
-	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getProcessAttribute(
+	public synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getProcessAttribute(
 			D attributeDefinition, int processJobRank) {
 		final BitSet processJobRanks = new BitSet();
 		processJobRanks.set(processJobRank);
@@ -349,7 +349,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elements.IPJob#getProcessAttribute(java.lang.String,
 	 * int)
 	 */
-	public IAttribute<?, ?, ?> getProcessAttribute(String attrDefId, int processJobRank) {
+	public synchronized IAttribute<?, ?, ?> getProcessAttribute(String attrDefId, int processJobRank) {
 		final BitSet processJobRanks = new BitSet();
 		processJobRanks.set(processJobRank);
 		final Set<IAttribute<?, ?, ?>> attrs = getProcessAttributes(attrDefId, processJobRanks);
@@ -404,7 +404,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elements.IPJob#getProcessAttributes(org.eclipse.
 	 * ptp.core.attributes.IAttributeDefinition, java.util.BitSet)
 	 */
-	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+	public synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
 			Set<A> getProcessAttributes(D attributeDefinition, BitSet processJobRanks) {
 		AttributeIndexSet<A> jobRanksForAttr = getAttributeIndexSet(attributeDefinition);
 		AttributeIndexSet<A> subSet = jobRanksForAttr.getSubset(processJobRanks);
@@ -432,7 +432,7 @@ public class PJob extends Parent implements IPJobControl {
 		return null;
 	}
 
-	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+	public synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
 			T getProcessAttributeValue(int processJobRank, final D def) {
 		AttributeIndexSet<A> attrIndexSet = getAttributeIndexSet(def);
 		final A attr = attrIndexSet.getAttribute(processJobRank);
@@ -447,7 +447,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * 
 	 * @see org.eclipse.ptp.core.elements.IPJob#getProcessIds()
 	 */
-	public BitSet getProcessJobRanks() {
+	public synchronized BitSet getProcessJobRanks() {
 		return (BitSet) currentProcessJobRanks.clone();
 	}
 
@@ -458,7 +458,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elements.IPJob#getProcessIds(org.eclipse.ptp.core
 	 * .attributes.IAttribute)
 	 */
-	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
+	public synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
 			BitSet getProcessJobRanks(A attribute) {
 		D def = attribute.getDefinition();
 		AttributeIndexSet<A> attrJobRanks = getAttributeIndexSet(def);
@@ -535,7 +535,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * 
 	 * @see org.eclipse.ptp.core.elements.IPJob#hasProcessById(int)
 	 */
-	public boolean hasProcessByJobRank(int processJobRank) {
+	public synchronized boolean hasProcessByJobRank(int processJobRank) {
 		return currentProcessJobRanks.get(processJobRank);
 	}
 
@@ -545,7 +545,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @see
 	 * org.eclipse.ptp.core.elements.IPJob#hasProcessesByIds(java.util.BitSet)
 	 */
-	public boolean hasProcessesByJobRanks(BitSet processJobRanks) {
+	public synchronized boolean hasProcessesByJobRanks(BitSet processJobRanks) {
 		BitSet intersection = (BitSet) currentProcessJobRanks.clone();
 		intersection.and(processJobRanks);
 		boolean containsAll = intersection.equals(processJobRanks);
