@@ -46,7 +46,7 @@ public class MarkerManager {
 
 	static String path;
 	static String filename;
-	private static MarkerManager instance;
+	//private static MarkerManager instance;
 
 	private static final String SLASH = System.getProperty("file.separator"); //$NON-NLS-1$
 
@@ -203,7 +203,7 @@ public class MarkerManager {
 	 * @param lineNo
 	 * @param desc
 	 * @return
-	 * @since 2.0
+	 * @since 3.0
 	 */
 	public Map<String, Object> createCommonMarkers(IFeedbackItem item, String itemID, String name, String parentID, String filename, String pathname,
 			int lineNo,  String desc) {
@@ -269,7 +269,7 @@ public class MarkerManager {
 		}
 		// Will we need this list of the files elsewhere? should we keep it elsewhere?
 		Set<String> files=new HashSet<String>();
-		for (Iterator iterator = itemlist.iterator(); iterator.hasNext();) {
+		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
 			IFeedbackItem item = (IFeedbackItem) iterator.next();
 			String f1 = item.getFile();
 			if( (f1!=null) && (!files.contains(f1))  ) {
@@ -280,7 +280,7 @@ public class MarkerManager {
 		 
 		// remove "our" markers on all source files referenced in this file
 		IResource res = null;
-		for (Iterator iterator = files.iterator(); iterator.hasNext();) {
+		for (Iterator<String> iterator = files.iterator(); iterator.hasNext();) {
 			String filename = (String) iterator.next();
 			res=getResource(filename);
 			try {
@@ -293,11 +293,9 @@ public class MarkerManager {
 
 		// for root nodes, may have no parent ID
 		String parentID = ""; //$NON-NLS-1$
-		//IFeedbackItem temp = itemlist.get(0);
-		int count = 0;
+
 		Map<String, Object> attrs;
 
-		int size = itemlist.size();
 		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
 			IFeedbackItem item = iterator.next();
 			String filename = item.getFile();
@@ -323,7 +321,7 @@ public class MarkerManager {
 			}
 			if (item.hasChildren()) {
 				List<IFeedbackItem> kids = item.getChildren();
-				for (Iterator iterator2 = kids.iterator(); iterator2.hasNext();) {
+				for (Iterator<IFeedbackItem> iterator2 = kids.iterator(); iterator2.hasNext();) {
 					IFeedbackItem kid = (IFeedbackItem) iterator2.next();
 					String parentid = item.getID();
 					String namePrefix = "";//"Bottleneck: ";   //$NON-NLS-1$

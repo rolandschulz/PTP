@@ -16,6 +16,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 /**
+ * 
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. We do not recommending using this API without
+ * consulting with the etfw.feedback team.
+ * 
  * @author Beth Tibbitts
  */
 public class ViewActivator

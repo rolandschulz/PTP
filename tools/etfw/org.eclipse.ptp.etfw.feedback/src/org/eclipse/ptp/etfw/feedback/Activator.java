@@ -15,6 +15,11 @@ import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This package, and subpackages and classes,
+ * have been added as part of a work in progress. There is no guarantee that the
+ * included API will work or that it will remain the same. We do not
+ * recommending using these APIs without consulting with the etfw.feedback team.
  * 
  * @author Beth Tibbitts
  */

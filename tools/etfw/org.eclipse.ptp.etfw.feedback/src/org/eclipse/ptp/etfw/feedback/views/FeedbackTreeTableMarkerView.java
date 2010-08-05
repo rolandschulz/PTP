@@ -25,7 +25,15 @@ import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
 /**
  * Expose  information (e.g. from an XML file) in an eclipse view
  * 
- * @author beth 
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. We do not recommending using this API without consulting with
+ * the etfw.feedback team.
+ * 
+ * UNUSED?
+ * 
+ * @author beth tibbitts
  * 
  */
 public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
