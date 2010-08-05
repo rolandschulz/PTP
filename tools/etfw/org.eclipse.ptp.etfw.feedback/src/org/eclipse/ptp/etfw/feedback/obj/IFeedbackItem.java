@@ -62,9 +62,9 @@ public interface IFeedbackItem {
 	
  
 	
-	/**  @since 2.0 	 */
+	/**  @since 3.0 	 */
 	public String getAttr(String key);
-	/**  @since 2.0 	 */
+	/**  @since 3.0 	 */
 	public Object getObject(String key);
 	
 	
