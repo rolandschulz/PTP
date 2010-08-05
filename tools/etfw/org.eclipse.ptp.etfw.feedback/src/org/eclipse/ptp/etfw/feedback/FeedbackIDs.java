@@ -36,7 +36,7 @@ public interface FeedbackIDs
 //    //Note: we use IMarker.LINE_NUMBER too
 
 	/**
-	 * @since 2.0
+	 * @since 3.0
 	 */
 	String FEEDBACK_ATTR_ITEM = "item";
 
