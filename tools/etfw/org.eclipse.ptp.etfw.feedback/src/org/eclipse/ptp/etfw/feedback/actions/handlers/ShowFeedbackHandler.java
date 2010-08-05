@@ -49,6 +49,12 @@ import org.xml.sax.SAXException;
  * Our sample handler extends AbstractHandler, an IHandler base class.
  * @see org.eclipse.core.commands.IHandler
  * @see org.eclipse.core.commands.AbstractHandler
+ * 
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. We do not recommending using this API without consulting with
+ * the etfw.feedback team.
  */
 public class ShowFeedbackHandler extends AbstractHandler {
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
@@ -138,9 +144,6 @@ public class ShowFeedbackHandler extends AbstractHandler {
 			//       how to read this type
 			final String pid=Activator.PLUGIN_ID;
 			final String extid=Activator.FEEDBACK_EXTENSION_ID;
-			IExtensionRegistry ier=Platform.getExtensionRegistry();
-			IExtensionPoint ixp=ier.getExtensionPoint(pid,extid);
-			IExtension[] xs =ixp.getExtensions();
 			IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pid, extid).getExtensions();
 			for (int i = 0; i < extensions.length; i++) {
 				IExtension extn=extensions[i];
@@ -155,13 +158,11 @@ public class ShowFeedbackHandler extends AbstractHandler {
 					// specifically: something that can parse this file and return
 					// things that implement the IFeedbackItem interface.
 					if(traceOn)System.out.println(ice.getAttributeNames());
-					String id=ice.getAttribute("id"); //$NON-NLS-1$
 					String nodeName=ice.getAttribute("nodeName"); //$NON-NLS-1$
 
 					if(rootNode.equals(nodeName)) {
 						// we found a match!
-						if(traceOn)System.out.println("match! "+rootNode); //$NON-NLS-1$
-					
+						if(traceOn)System.out.println("match! "+rootNode); //$NON-NLS-1$				
 						String className = ice.getAttribute(ATTR_CLASSNAME);
 						String name=ice.getAttribute(ATTR_NAME);
 						if(traceOn)System.out.println("class="+className+"   name="+name); //$NON-NLS-1$ //$NON-NLS-2$

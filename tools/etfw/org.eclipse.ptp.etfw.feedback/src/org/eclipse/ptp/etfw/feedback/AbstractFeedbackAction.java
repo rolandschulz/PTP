@@ -18,13 +18,18 @@ import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
  * Extend this class to add an action to the toolbar, an action that can be
  * performed on the selected item
  * 
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. We do not recommending using this API without consulting with
+ * the etfw.feedback team.
+ * 
  * @author beth tibbitts
  * @since 2.0
  * 
  */
 public abstract class AbstractFeedbackAction {
 	private String iconName;
-	private String tooltip;
 
 	/**
 	 * What is a better arg to run(), the IFeedbackItem, or the IMarker? We'll

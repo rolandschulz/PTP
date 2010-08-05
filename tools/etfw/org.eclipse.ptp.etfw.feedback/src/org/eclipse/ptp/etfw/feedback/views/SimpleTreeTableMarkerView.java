@@ -94,6 +94,12 @@ import org.osgi.framework.Bundle;
  * An attribute in the markers indicates the (artificial) parent node, for
  * grouping. Some actual parent markers are used in some cases.
  * 
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. We do not recommending using this API without consulting with
+ * the etfw.feedback team.
+ * 
  * 
  */
 public class SimpleTreeTableMarkerView extends ViewPart {

@@ -15,7 +15,16 @@ import java.io.File;
 import java.util.List;
 
 
-
+/**
+ * The interface for the parser that will provide IFeedbackItems for the view.
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. We do not recommending using this API without consulting with
+ * the etfw.feedback team.
+ * @author beth tibbitts
+ *
+ */
 public interface IFeedbackParser {
 	
 	public void setFile(File file);

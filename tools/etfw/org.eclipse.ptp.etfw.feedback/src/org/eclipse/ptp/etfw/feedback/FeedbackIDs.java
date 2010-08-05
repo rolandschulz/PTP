@@ -14,6 +14,12 @@ import org.eclipse.ptp.etfw.feedback.messages.Messages;
 
 /**
  * Feedback view Plugin constants
+ * 
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
+ * of a work in progress. There is no guarantee that this API will work or that
+ * it will remain the same. We do not recommending using this API without consulting with
+ * the etfw.feedback team.
  */
 public interface FeedbackIDs
 {
@@ -38,7 +44,7 @@ public interface FeedbackIDs
 	/**
 	 * @since 3.0
 	 */
-	String FEEDBACK_ATTR_ITEM = "item";
+	String FEEDBACK_ATTR_ITEM = "item"; //$NON-NLS-1$
 
 
 
