@@ -11,6 +11,7 @@
 package org.eclipse.ptp.proxy.util;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -258,6 +259,16 @@ public class ProtocolUtil {
 	}
 
 	/**
+	 * Encode a string attribute type and place the encoded bytes in buffer
+	 * list.
+	 * 
+	 * @param bufs
+	 *            list of buffers containing encoded string
+	 * @param attribute
+	 *            string attribute
+	 * @param charset
+	 *            charset to map characters into bytes
+	 * @throws IOException
 	 * @since 5.0
 	 */
 	public static void encodeStringAttributeType(List<ByteBuffer> bufs, String attribute, Charset charset) throws IOException {
@@ -272,10 +283,14 @@ public class ProtocolUtil {
 	}
 
 	/**
-	 * Encode a string and place the encoded bytes in buffer.
+	 * Encode a string type and place the encoded bytes in buffer list.
 	 * 
+	 * @param bufs
+	 *            list of buffers containing encoded string
 	 * @param str
+	 *            string to encode
 	 * @param charset
+	 *            charset to map characters into bytes
 	 * @since 5.0
 	 */
 	public static void encodeStringType(List<ByteBuffer> bufs, String str, Charset charset) {
@@ -283,9 +298,23 @@ public class ProtocolUtil {
 		encodeString(bufs, str, charset);
 	}
 
+	/**
+	 * Encode a string and place the encoded bytes in buffer list.
+	 * 
+	 * @param bufs
+	 *            list of buffers containing encoded string
+	 * @param str
+	 *            string to encode
+	 * @param charset
+	 *            charset to map characters into bytes
+	 */
 	private static void encodeString(List<ByteBuffer> bufs, String str, Charset charset) {
 		bufs.add(new VarInt(str.length()).getBytes());
-		bufs.add(ByteBuffer.wrap(str.getBytes(charset)));
+		try {
+			bufs.add(ByteBuffer.wrap(str.getBytes(charset.name())));
+		} catch (UnsupportedEncodingException e) {
+			bufs.add(ByteBuffer.wrap(str.getBytes()));
+		}
 	}
 
 }
