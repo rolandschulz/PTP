@@ -52,7 +52,7 @@ public class VarInt {
 	 */
 	public ByteBuffer getBytes() {
 		if (fBytes == null && fValid) {
-			fBytes = ByteBuffer.allocate(5); // maximum size of varint enconding
+			fBytes = ByteBuffer.allocate(5); // maximum size
 			int val = fValue;
 			while (val > 0) {
 				byte b = (byte) (val & 0x7f);
@@ -61,9 +61,11 @@ public class VarInt {
 					b |= 0x80;
 				}
 				fBytes.put(b);
+				fBytes.limit(fBytes.position()); // set limit to the size of the
+													// buffer
 			}
-			fBytes.rewind();
 		}
+		fBytes.rewind();
 		return fBytes;
 	}
 
