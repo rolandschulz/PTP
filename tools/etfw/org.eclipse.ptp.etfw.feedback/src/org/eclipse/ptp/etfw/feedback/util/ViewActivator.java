@@ -24,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
  * consulting with the etfw.feedback team.
  * 
  * @author Beth Tibbitts
+ * @since 3.0
  */
 public class ViewActivator
 {
