@@ -25,7 +25,7 @@ public class StringTable {
 
 		public StringEntry(String str, int index) {
 			fEntry = str;
-			fIndex = index;
+			fIndex = index + 1;
 		}
 
 		/**
@@ -55,21 +55,21 @@ public class StringTable {
 	}
 
 	/**
-	 * Lookup a string given it's index in the table
+	 * Look up a string given it's index in the table
 	 * 
 	 * @param index
 	 *            index returned by {@link #get(int)}
 	 * @return string at the given index position, or null if no entry exists
 	 * @throws IndexOutOfBoundsException
-	 *             if index < 0 or index >= size()
+	 *             if index < 1 or index > size()
 	 */
 	public String get(int index) throws IndexOutOfBoundsException {
-		StringEntry entry = fList.get(index);
+		StringEntry entry = fList.get(index - 1);
 		return entry.getEntry();
 	}
 
 	/**
-	 * Lookup a string's index in the table
+	 * Look up a string's index in the table
 	 * 
 	 * @param string
 	 *            string to look up
@@ -91,7 +91,8 @@ public class StringTable {
 	 * 
 	 * @param string
 	 *            string to insert
-	 * @return index of string in the table
+	 * @return index of string in the table if the string already exists, or
+	 *         -index if the string is inserted in the table for the first time
 	 */
 	public int put(String str) {
 		StringEntry entry = fMap.get(str);
@@ -99,6 +100,7 @@ public class StringTable {
 			entry = new StringEntry(str, fList.size());
 			fMap.put(str, entry);
 			fList.add(entry);
+			return -entry.getIndex();
 		}
 		return entry.getIndex();
 	}
