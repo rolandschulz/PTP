@@ -15,30 +15,38 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.List;
 
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.util.messages.Messages;
 
 public class ProtocolUtil {
-	public final static int HEXADECIMAL = 0;
-	public final static int OCTAL = 1;
-	public final static int BINARY = 2;
-	public final static int DECIMAL = 3;
-	public final static int RAW = 4;
-	public final static int NATURAL = 5;
-
-	public final static int FLOAT = 10;
-	public final static int ADDRESS = 11;
-	public final static int INSTRUCTION = 12;
-	public final static int CHAR = 13;
-	public final static int STRING = 14;
-	public final static int UNSIGNED = 15;
-
-	private final static int FLAG_NORMAL = 0x80000000;
-	private final static int FLAG_NOSTORE = 0x40000000;
-	private final static int LENGTH_MASK = 0x3fffffff;
-	private final static int ID_MASK = 0x7fffffff;
+	/**
+	 * @since 5.0
+	 */
+	public final static int TYPE_STRING_ATTR = 0;
+	/**
+	 * @since 5.0
+	 */
+	public final static int TYPE_INTEGER = 1;
+	/**
+	 * @since 5.0
+	 */
+	public final static int TYPE_BITSET = 2;
+	/**
+	 * @since 5.0
+	 */
+	public final static int TYPE_STRING = 3;
+	/**
+	 * @since 5.0
+	 */
+	public final static int TYPE_INTEGER_ATTR = 4;
+	/**
+	 * @since 5.0
+	 */
+	public final static int TYPE_BOOLEAN_ATTR = 5;
 
 	/**
 	 * Decode a string into a BigInteger
@@ -46,6 +54,7 @@ public class ProtocolUtil {
 	 * @param address
 	 * @return BigInteger
 	 */
+	@Deprecated
 	public static BigInteger decodeAddress(String address) {
 		int index = 0;
 		int radix = 10;
@@ -89,7 +98,90 @@ public class ProtocolUtil {
 	}
 
 	/**
-	 * Convert a proxy representation of an attribute into a Java String
+	 * Convert as sequence of hexadecimal values to a Java byte array.
+	 * 
+	 * @param str
+	 * @return byte array
+	 */
+	@Deprecated
+	public static byte[] decodeBytes(String str) {
+		int len = str.length() / 2;
+		byte[] strBytes = new byte[len];
+
+		for (int i = 0, p = 0; i < len; i++, p += 2) {
+			byte c = (byte) ((Character.digit(str.charAt(p), 16) & 0xf) << 4);
+			c |= (byte) ((Character.digit(str.charAt(p + 1), 16) & 0xf));
+			strBytes[i] = c;
+		}
+
+		return strBytes;
+	}
+
+	/**
+	 * Convert a proxy representation of a string to a String. A string is
+	 * represented by a length in varint format followed by the string
+	 * characters. If the characters are multibyte, then the length will reflect
+	 * this. If length is 0, then the string is null and should be skipped,
+	 * otherswise length = strlen(string) + 1;
+	 * 
+	 * @param buf
+	 *            byte buffer containing string to be decoded
+	 * @param decoder
+	 *            charset decoder
+	 * @return decoded string or null if the field should be skipped
+	 * @throws IOException
+	 *             if the string can't be decoded
+	 * 
+	 * @since 5.0
+	 */
+	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
+		String result = null;
+		VarInt strLen = new VarInt(buf);
+		if (!strLen.isValid()) {
+			throw new IOException(Messages.getString("ProtocolUtil.0")); //$NON-NLS-1$
+		}
+		int len = strLen.getValue() - 1;
+		if (len >= 0) {
+			ByteBuffer strBuf = buf.slice();
+			try {
+				strBuf.limit(len);
+			} catch (IllegalArgumentException e) {
+				throw new IOException(e.getMessage());
+			}
+			try {
+				CharBuffer chars = decoder.decode(strBuf);
+				result = chars.toString();
+			} catch (CharacterCodingException e) {
+				throw new IOException(e.getMessage());
+			}
+			try {
+				buf.position(buf.position() + len);
+			} catch (IllegalArgumentException e) {
+				throw new IOException(e.getMessage());
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Convert a proxy representation of a string into a Java String
+	 * 
+	 * @param buf
+	 * @param start
+	 * @return proxy string converted to Java String
+	 */
+	@Deprecated
+	public static String decodeString(CharBuffer buf, int start) {
+		int end = start + ProxyPacket.PACKET_ARG_LEN_SIZE;
+		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
+		start = end + 1; // Skip ':'
+		end = start + len;
+		return buf.subSequence(start, end).toString();
+	}
+
+	/**
+	 * Convert a proxy representation of a string attribute into a Java String.
+	 * Assumes that the type byte as been removed from the buffer.
 	 * 
 	 * Attributes are key/value pairs of the form "key=value". They are encoded
 	 * into a pair of length/value pairs, with the first length/value pair being
@@ -105,14 +197,14 @@ public class ProtocolUtil {
 	 *             if decoding failed
 	 * @since 5.0
 	 */
-	public static String decodeAttribute(ByteBuffer buf, CharsetDecoder decoder, StringTable stringTable) throws IOException {
+	public static String decodeStringAttributeType(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
 		String result = ""; //$NON-NLS-1$
 
-		String key = decodeString(buf, decoder, stringTable);
+		String key = decodeString(buf, decoder);
 		if (key != null) {
 			result = key;
 		}
-		String value = decodeString(buf, decoder, stringTable);
+		String value = decodeString(buf, decoder);
 		if (value != null) {
 			if (result.length() > 0) {
 				result += "="; //$NON-NLS-1$
@@ -123,133 +215,13 @@ public class ProtocolUtil {
 	}
 
 	/**
-	 * Convert as sequence of hexadecimal values to a Java byte array.
-	 * 
-	 * @param str
-	 * @return byte array
-	 */
-	public static byte[] decodeBytes(String str) {
-		int len = str.length() / 2;
-		byte[] strBytes = new byte[len];
-
-		for (int i = 0, p = 0; i < len; i++, p += 2) {
-			byte c = (byte) ((Character.digit(str.charAt(p), 16) & 0xf) << 4);
-			c |= (byte) ((Character.digit(str.charAt(p + 1), 16) & 0xf));
-			strBytes[i] = c;
-		}
-
-		return strBytes;
-	}
-
-	/**
-	 * Convert a proxy representation of a string to a String.
-	 * 
-	 * In order to reduce message traffic, only the first occurrence of a string
-	 * is included in the packet. When a unique string is seen, it may be added
-	 * to a string table. Subsequent references to the same string will use the
-	 * index of the string in the string table, rather than the actual string.
-	 * 
-	 * A string is represented as a length field followed by an optional value.
-	 * The length field is an unsigned 32 bit integer encoded as a varint. The
-	 * field is interpreted as follows:
-	 * 
-	 * <pre>
-	 *       +----------------------------+
-	 * Bit # | 31 | 30 |  Remaining Bits  |
-	 *       +----------------------------+
-	 * Value | E  | S  | Depends on flags |
-	 *       +----------------------------+
-	 * 
-	 * E = 0 
-	 * 		The value is omitted. Bits 30-0 = string table ID + 1
-	 * E = 1
-	 *      The value is the actual string with bits 29-0 set to the length of 
-	 *      the string excluding any null termination.
-	 * E = 1, S = 1
-	 *      Don't add the string to the string table.
-	 *      
-	 * If all the bits are 0, the value is omitted. The string should be skipped.
-	 * </pre>
-	 * 
-	 * @param buf
-	 *            byte buffer containing string to be decoded
-	 * @param decoder
-	 *            charset decoder
-	 * @return decoded string or null if the field should be skipped
-	 * @throws IOException
-	 *             if the string can't be decoded
-	 * 
-	 * @since 5.0
-	 */
-	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder, StringTable stringTable) throws IOException {
-		String result = ""; //$NON-NLS-1$
-		VarInt strLen = new VarInt(buf);
-		if (!strLen.isValid()) {
-			throw new IOException(Messages.getString("ProtocolUtil.0")); //$NON-NLS-1$
-		}
-		int flags = strLen.getValue();
-		if (flags == 0) {
-			return null;
-		}
-		if ((flags & FLAG_NORMAL) == FLAG_NORMAL) {
-			/*
-			 * Normal string. Decode and insert into string table if required.
-			 */
-			int len = flags & LENGTH_MASK;
-
-			if (len > 0) {
-				ByteBuffer strBuf = buf.slice();
-				try {
-					strBuf.limit(len);
-				} catch (IllegalArgumentException e) {
-					throw new IOException(e.getMessage());
-				}
-				try {
-					CharBuffer chars = decoder.decode(strBuf);
-					result = chars.toString();
-				} catch (CharacterCodingException e) {
-					throw new IOException(e.getMessage());
-				}
-				try {
-					buf.position(buf.position() + len);
-				} catch (IllegalArgumentException e) {
-					throw new IOException(e.getMessage());
-				}
-			}
-			if ((flags & FLAG_NOSTORE) == 0) {
-				stringTable.put(result);
-			}
-		} else {
-			/*
-			 * String table entry
-			 */
-			result = stringTable.get((flags & ID_MASK) - 1);
-		}
-		return result;
-	}
-
-	/**
-	 * Convert a proxy representation of a string into a Java String
-	 * 
-	 * @param buf
-	 * @param start
-	 * @return proxy string converted to Java String
-	 */
-	public static String decodeString(CharBuffer buf, int start) {
-		int end = start + ProxyPacket.PACKET_ARG_LEN_SIZE;
-		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
-		start = end + 1; // Skip ':'
-		end = start + len;
-		return buf.subSequence(start, end).toString();
-	}
-
-	/**
 	 * Convert an integer to it's proxy representation
 	 * 
 	 * @param val
 	 * @param len
 	 * @return proxy representation
 	 */
+	@Deprecated
 	public static String encodeIntVal(int val, int len) {
 		char[] res = new char[len];
 		String str = Integer.toHexString(val);
@@ -271,6 +243,7 @@ public class ProtocolUtil {
 	 * @param str
 	 * @return proxy representation
 	 */
+	@Deprecated
 	public static String encodeString(String str) {
 		int len;
 
@@ -282,6 +255,37 @@ public class ProtocolUtil {
 		}
 
 		return encodeIntVal(len, ProxyPacket.PACKET_ARG_LEN_SIZE) + ":" + str; //$NON-NLS-1$	
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public static void encodeStringAttributeType(List<ByteBuffer> bufs, String attribute, Charset charset) throws IOException {
+		String[] kv = attribute.split("="); //$NON-NLS-1$
+		bufs.add(ByteBuffer.allocate(1).put((byte) TYPE_STRING_ATTR));
+		encodeString(bufs, kv[0], charset);
+		if (kv.length == 1) {
+			bufs.add(new VarInt(0).getBytes());
+		} else {
+			encodeString(bufs, kv[1], charset);
+		}
+	}
+
+	/**
+	 * Encode a string and place the encoded bytes in buffer.
+	 * 
+	 * @param str
+	 * @param charset
+	 * @since 5.0
+	 */
+	public static void encodeStringType(List<ByteBuffer> bufs, String str, Charset charset) {
+		bufs.add(ByteBuffer.allocate(1).put((byte) TYPE_STRING));
+		encodeString(bufs, str, charset);
+	}
+
+	private static void encodeString(List<ByteBuffer> bufs, String str, Charset charset) {
+		bufs.add(new VarInt(str.length()).getBytes());
+		bufs.add(ByteBuffer.wrap(str.getBytes(charset)));
 	}
 
 }
