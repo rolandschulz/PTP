@@ -11,15 +11,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.proxy.core.event;
 
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewNodeEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNodeChangeEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveNodeEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
+import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 
 /**
  * A factory for creating NodeEvent objects.
  */
 public class NodeEventFactory implements IEventFactory {
+
+	private final ProxyRuntimeEventFactory fEventFactory = new ProxyRuntimeEventFactory();
 
 	/*
 	 * (non-Javadoc)
@@ -29,7 +29,7 @@ public class NodeEventFactory implements IEventFactory {
 	 * .lang.String[])
 	 */
 	public IProxyEvent createChangeEvent(String[] args) {
-		return new ProxyRuntimeNodeChangeEvent(-1, args);
+		return fEventFactory.newProxyRuntimeJobChangeEvent(-1, args);
 	}
 
 	/*
@@ -40,7 +40,7 @@ public class NodeEventFactory implements IEventFactory {
 	 * lang.String[])
 	 */
 	public IProxyEvent createNewEvent(String[] args) {
-		return new ProxyRuntimeNewNodeEvent(-1, args);
+		return fEventFactory.newProxyRuntimeNewNodeEvent(-1, args);
 	}
 
 	/*
@@ -51,6 +51,6 @@ public class NodeEventFactory implements IEventFactory {
 	 * .lang.String[])
 	 */
 	public IProxyEvent createRemoveEvent(String[] args) {
-		return new ProxyRuntimeRemoveNodeEvent(-1, args);
+		return fEventFactory.newProxyRuntimeRemoveNodeEvent(-1, args);
 	}
 }

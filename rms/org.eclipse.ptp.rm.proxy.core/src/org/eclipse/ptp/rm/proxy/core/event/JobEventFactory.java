@@ -11,15 +11,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.proxy.core.event;
 
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeJobChangeEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewJobEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveJobEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
+import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 
 /**
  * A factory for creating JobEvent objects.
  */
 public class JobEventFactory implements IEventFactory {
+	private final ProxyRuntimeEventFactory fEventFactory = new ProxyRuntimeEventFactory();
 
 	/*
 	 * (non-Javadoc)
@@ -29,7 +28,7 @@ public class JobEventFactory implements IEventFactory {
 	 * .lang.String[])
 	 */
 	public IProxyEvent createChangeEvent(String[] args) {
-		return new ProxyRuntimeJobChangeEvent(-1, args);
+		return fEventFactory.newProxyRuntimeJobChangeEvent(-1, args);
 	}
 
 	/*
@@ -40,7 +39,7 @@ public class JobEventFactory implements IEventFactory {
 	 * lang.String[])
 	 */
 	public IProxyEvent createNewEvent(String[] args) {
-		return new ProxyRuntimeNewJobEvent(-1, args);
+		return fEventFactory.newProxyRuntimeNewJobEvent(-1, args);
 	}
 
 	/*
@@ -51,7 +50,7 @@ public class JobEventFactory implements IEventFactory {
 	 * .lang.String[])
 	 */
 	public IProxyEvent createRemoveEvent(String[] args) {
-		return new ProxyRuntimeRemoveJobEvent(-1, args);
+		return fEventFactory.newProxyRuntimeRemoveJobEvent(-1, args);
 	}
 
 }

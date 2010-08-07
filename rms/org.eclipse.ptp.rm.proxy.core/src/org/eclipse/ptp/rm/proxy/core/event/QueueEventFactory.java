@@ -11,15 +11,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.proxy.core.event;
 
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeNewQueueEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeQueueChangeEvent;
-import org.eclipse.ptp.internal.proxy.runtime.event.ProxyRuntimeRemoveQueueEvent;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
+import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
 
 /**
  * A factory for creating QueueEvent objects.
  */
 public class QueueEventFactory implements IEventFactory {
+	private final ProxyRuntimeEventFactory fEventFactory = new ProxyRuntimeEventFactory();
 
 	/*
 	 * (non-Javadoc)
@@ -29,7 +28,7 @@ public class QueueEventFactory implements IEventFactory {
 	 * .lang.String[])
 	 */
 	public IProxyEvent createChangeEvent(String[] args) {
-		return new ProxyRuntimeQueueChangeEvent(-1, args);
+		return fEventFactory.newProxyRuntimeQueueChangeEvent(-1, args);
 	}
 
 	/*
@@ -40,7 +39,7 @@ public class QueueEventFactory implements IEventFactory {
 	 * lang.String[])
 	 */
 	public IProxyEvent createNewEvent(String[] args) {
-		return new ProxyRuntimeNewQueueEvent(-1, args);
+		return fEventFactory.newProxyRuntimeNewQueueEvent(-1, args);
 	}
 
 	/*
@@ -51,7 +50,7 @@ public class QueueEventFactory implements IEventFactory {
 	 * .lang.String[])
 	 */
 	public IProxyEvent createRemoveEvent(String[] args) {
-		return new ProxyRuntimeRemoveQueueEvent(-1, args);
+		return fEventFactory.newProxyRuntimeRemoveQueueEvent(-1, args);
 	}
 
 }
