@@ -21,8 +21,7 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeAttributeDefEvent newProxyRuntimeAttributeDefEvent(
-			int transID, String[] args);
+	public IProxyRuntimeAttributeDefEvent newProxyRuntimeAttributeDefEvent(int transID, String[] args);
 
 	/**
 	 * @return
@@ -39,135 +38,126 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeJobChangeEvent newProxyRuntimeJobChangeEvent(
-			int transID, String[] args);
+	public IProxyRuntimeJobChangeEvent newProxyRuntimeJobChangeEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeMachineChangeEvent newProxyRuntimeMachineChangeEvent(
-			int transID, String[] args);
+	public IProxyRuntimeMachineChangeEvent newProxyRuntimeMachineChangeEvent(int transID, String[] args);
 
 	/**
 	 * @param event
 	 * @return
 	 */
-	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(
-			IProxyMessageEvent event);
+	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(IProxyMessageEvent event);
 
 	/**
 	 * @param level
 	 * @param message
 	 * @return
 	 */
-	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(Level level,
-			String message);
+	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(Level level, String message);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeNewJobEvent newProxyRuntimeNewJobEvent(int transID,
-			String[] args);
+	public IProxyRuntimeNewJobEvent newProxyRuntimeNewJobEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeNewMachineEvent newProxyRuntimeNewMachineEvent(
-			int transID, String[] args);
+	public IProxyRuntimeNewMachineEvent newProxyRuntimeNewMachineEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeNewNodeEvent newProxyRuntimeNewNodeEvent(int transID,
-			String[] args);
+	public IProxyRuntimeNewNodeEvent newProxyRuntimeNewNodeEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeNewProcessEvent newProxyRuntimeNewProcessEvent(
-			int transID, String[] args);
+	public IProxyRuntimeNewProcessEvent newProxyRuntimeNewProcessEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeNewQueueEvent newProxyRuntimeNewQueueEvent(int transID,
-			String[] args);
+	public IProxyRuntimeNewQueueEvent newProxyRuntimeNewQueueEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeNodeChangeEvent newProxyRuntimeNodeChangeEvent(
-			int transID, String[] args);
+	public IProxyRuntimeNodeChangeEvent newProxyRuntimeNodeChangeEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeProcessChangeEvent newProxyRuntimeProcessChangeEvent(
-			int transID, String[] args);
+	public IProxyRuntimeProcessChangeEvent newProxyRuntimeProcessChangeEvent(int transID, String[] args);
+
+	/**
+	 * @param transID
+	 * @param args
+	 * @return
+	 * @since 5.0
+	 */
+	public IProxyRuntimeQueueChangeEvent newProxyRuntimeQueueChangeEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeRemoveAllEvent newProxyRuntimeRemoveAllEventt(
-			int transID, String[] args);
+	public IProxyRuntimeRemoveAllEvent newProxyRuntimeRemoveAllEventt(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeRemoveJobEvent newProxyRuntimeRemoveJobEvent(
-			int transID, String[] args);
+	public IProxyRuntimeRemoveJobEvent newProxyRuntimeRemoveJobEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeRemoveMachineEvent newProxyRuntimeRemoveMachineEvent(
-			int transID, String[] args);
+	public IProxyRuntimeRemoveMachineEvent newProxyRuntimeRemoveMachineEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeRemoveNodeEvent newProxyRuntimeRemoveNodeEvent(
-			int transID, String[] args);
+	public IProxyRuntimeRemoveNodeEvent newProxyRuntimeRemoveNodeEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeRemoveProcessEvent newProxyRuntimeRemoveProcessEvent(
-			int transID, String[] args);
+	public IProxyRuntimeRemoveProcessEvent newProxyRuntimeRemoveProcessEvent(int transID, String[] args);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeRemoveQueueEvent newProxyRuntimeRemoveQueueEvent(
-			int transID, String[] args);
+	public IProxyRuntimeRemoveQueueEvent newProxyRuntimeRemoveQueueEvent(int transID, String[] args);
 
 	/**
 	 * @return
@@ -183,29 +173,25 @@ public interface IProxyRuntimeEventFactory extends IProxyEventFactory {
 	 * @param message
 	 * @return
 	 */
-	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(
-			String message);
+	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(String message);
 
 	/**
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(
-			String args[]);
-
-	/**
-	 * @param transID
-	 * @param args
-	 * @return
-	 */
-	public IProxyRuntimeSubmitJobErrorEvent newProxyRuntimeSubmitJobErrorEvent(
-			int transID, String[] args);
+	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(String args[]);
 
 	/**
 	 * @param transID
 	 * @param args
 	 * @return
 	 */
-	public IProxyRuntimeTerminateJobErrorEvent newProxyRuntimeTerminateJobErrorEvent(
-			int transID, String[] args);
+	public IProxyRuntimeSubmitJobErrorEvent newProxyRuntimeSubmitJobErrorEvent(int transID, String[] args);
+
+	/**
+	 * @param transID
+	 * @param args
+	 * @return
+	 */
+	public IProxyRuntimeTerminateJobErrorEvent newProxyRuntimeTerminateJobErrorEvent(int transID, String[] args);
 }

@@ -49,16 +49,17 @@ import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.event.ProxyEventFactory;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
-public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
-		IProxyRuntimeEventFactory {
+/**
+ * @since 5.0
+ */
+public class ProxyRuntimeEventFactory extends ProxyEventFactory implements IProxyRuntimeEventFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeAttributeDefEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeAttributeDefEvent newProxyRuntimeAttributeDefEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeAttributeDefEvent newProxyRuntimeAttributeDefEvent(int transID, String[] args) {
 		return new ProxyRuntimeAttributeDefEvent(transID, args);
 	}
 
@@ -88,8 +89,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeJobChangeEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeJobChangeEvent newProxyRuntimeJobChangeEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeJobChangeEvent newProxyRuntimeJobChangeEvent(int transID, String[] args) {
 		return new ProxyRuntimeJobChangeEvent(transID, args);
 	}
 
@@ -99,8 +99,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeMachineChangeEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeMachineChangeEvent newProxyRuntimeMachineChangeEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeMachineChangeEvent newProxyRuntimeMachineChangeEvent(int transID, String[] args) {
 		return new ProxyRuntimeMachineChangeEvent(transID, args);
 	}
 
@@ -111,8 +110,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * newProxyRuntimeMessageEvent
 	 * (org.eclipse.ptp.proxy.event.IProxyMessageEvent)
 	 */
-	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(
-			IProxyMessageEvent event) {
+	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(IProxyMessageEvent event) {
 		return new ProxyRuntimeMessageEvent(event);
 	}
 
@@ -123,8 +121,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * newProxyRuntimeMessageEvent
 	 * (org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level, java.lang.String)
 	 */
-	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(Level level,
-			String message) {
+	public IProxyRuntimeMessageEvent newProxyRuntimeMessageEvent(Level level, String message) {
 		return new ProxyRuntimeMessageEvent(level, message);
 	}
 
@@ -134,8 +131,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeNewJobEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeNewJobEvent newProxyRuntimeNewJobEvent(int transID,
-			String[] args) {
+	public IProxyRuntimeNewJobEvent newProxyRuntimeNewJobEvent(int transID, String[] args) {
 		return new ProxyRuntimeNewJobEvent(transID, args);
 	}
 
@@ -145,8 +141,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeNewMachineEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeNewMachineEvent newProxyRuntimeNewMachineEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeNewMachineEvent newProxyRuntimeNewMachineEvent(int transID, String[] args) {
 		return new ProxyRuntimeNewMachineEvent(transID, args);
 	}
 
@@ -156,8 +151,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeNewNodeEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeNewNodeEvent newProxyRuntimeNewNodeEvent(int transID,
-			String[] args) {
+	public IProxyRuntimeNewNodeEvent newProxyRuntimeNewNodeEvent(int transID, String[] args) {
 		return new ProxyRuntimeNewNodeEvent(transID, args);
 	}
 
@@ -167,8 +161,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeNewProcessEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeNewProcessEvent newProxyRuntimeNewProcessEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeNewProcessEvent newProxyRuntimeNewProcessEvent(int transID, String[] args) {
 		return new ProxyRuntimeNewProcessEvent(transID, args);
 	}
 
@@ -178,8 +171,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeNewQueueEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeNewQueueEvent newProxyRuntimeNewQueueEvent(int transID,
-			String[] args) {
+	public IProxyRuntimeNewQueueEvent newProxyRuntimeNewQueueEvent(int transID, String[] args) {
 		return new ProxyRuntimeNewQueueEvent(transID, args);
 	}
 
@@ -189,8 +181,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeNodeChangeEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeNodeChangeEvent newProxyRuntimeNodeChangeEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeNodeChangeEvent newProxyRuntimeNodeChangeEvent(int transID, String[] args) {
 		return new ProxyRuntimeNodeChangeEvent(transID, args);
 	}
 
@@ -200,9 +191,21 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeProcessChangeEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeProcessChangeEvent newProxyRuntimeProcessChangeEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeProcessChangeEvent newProxyRuntimeProcessChangeEvent(int transID, String[] args) {
 		return new ProxyRuntimeProcessChangeEvent(transID, args);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
+	 * newProxyRuntimeQueueChangeEvent(int, java.lang.String[])
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IProxyRuntimeQueueChangeEvent newProxyRuntimeQueueChangeEvent(int transID, String[] args) {
+		return new ProxyRuntimeQueueChangeEvent(transID, args);
 	}
 
 	/*
@@ -211,8 +214,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeRemoveAllEventt(int, java.lang.String[])
 	 */
-	public IProxyRuntimeRemoveAllEvent newProxyRuntimeRemoveAllEventt(
-			int transID, String[] args) {
+	public IProxyRuntimeRemoveAllEvent newProxyRuntimeRemoveAllEventt(int transID, String[] args) {
 		return new ProxyRuntimeRemoveAllEvent(transID, args);
 	}
 
@@ -222,8 +224,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeRemoveJobEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeRemoveJobEvent newProxyRuntimeRemoveJobEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeRemoveJobEvent newProxyRuntimeRemoveJobEvent(int transID, String[] args) {
 		return new ProxyRuntimeRemoveJobEvent(transID, args);
 	}
 
@@ -233,8 +234,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeRemoveMachineEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeRemoveMachineEvent newProxyRuntimeRemoveMachineEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeRemoveMachineEvent newProxyRuntimeRemoveMachineEvent(int transID, String[] args) {
 		return new ProxyRuntimeRemoveMachineEvent(transID, args);
 	}
 
@@ -244,8 +244,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeRemoveNodeEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeRemoveNodeEvent newProxyRuntimeRemoveNodeEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeRemoveNodeEvent newProxyRuntimeRemoveNodeEvent(int transID, String[] args) {
 		return new ProxyRuntimeRemoveNodeEvent(transID, args);
 	}
 
@@ -255,8 +254,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeRemoveProcessEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeRemoveProcessEvent newProxyRuntimeRemoveProcessEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeRemoveProcessEvent newProxyRuntimeRemoveProcessEvent(int transID, String[] args) {
 		return new ProxyRuntimeRemoveProcessEvent(transID, args);
 	}
 
@@ -266,8 +264,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeRemoveQueueEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeRemoveQueueEvent newProxyRuntimeRemoveQueueEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeRemoveQueueEvent newProxyRuntimeRemoveQueueEvent(int transID, String[] args) {
 		return new ProxyRuntimeRemoveQueueEvent(transID, args);
 	}
 
@@ -297,8 +294,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeStartupErrorEvent(java.lang.String)
 	 */
-	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(
-			String message) {
+	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(String message) {
 		return new ProxyRuntimeStartupErrorEvent(message);
 	}
 
@@ -308,8 +304,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeStartupErrorEvent(java.lang.String[])
 	 */
-	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(
-			String[] args) {
+	public IProxyRuntimeStartupErrorEvent newProxyRuntimeStartupErrorEvent(String[] args) {
 		return new ProxyRuntimeStartupErrorEvent(args);
 	}
 
@@ -319,8 +314,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeSubmitJobErrorEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeSubmitJobErrorEvent newProxyRuntimeSubmitJobErrorEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeSubmitJobErrorEvent newProxyRuntimeSubmitJobErrorEvent(int transID, String[] args) {
 		return new ProxyRuntimeSubmitJobErrorEvent(transID, args);
 	}
 
@@ -330,8 +324,7 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 	 * @see org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory#
 	 * newProxyRuntimeTerminateJobErrorEvent(int, java.lang.String[])
 	 */
-	public IProxyRuntimeTerminateJobErrorEvent newProxyRuntimeTerminateJobErrorEvent(
-			int transID, String[] args) {
+	public IProxyRuntimeTerminateJobErrorEvent newProxyRuntimeTerminateJobErrorEvent(int transID, String[] args) {
 		return new ProxyRuntimeTerminateJobErrorEvent(transID, args);
 	}
 
@@ -353,103 +346,83 @@ public class ProxyRuntimeEventFactory extends ProxyEventFactory implements
 
 		switch (packet.getID()) {
 		case IProxyRuntimeEvent.ATTR_DEF:
-			evt = new ProxyRuntimeAttributeDefEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeAttributeDefEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.NEW_JOB:
-			evt = new ProxyRuntimeNewJobEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeNewJobEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.NEW_MACHINE:
-			evt = new ProxyRuntimeNewMachineEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeNewMachineEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.NEW_NODE:
-			evt = new ProxyRuntimeNewNodeEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeNewNodeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.NEW_PROCESS:
-			evt = new ProxyRuntimeNewProcessEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeNewProcessEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.NEW_QUEUE:
-			evt = new ProxyRuntimeNewQueueEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeNewQueueEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.JOB_CHANGE:
-			evt = new ProxyRuntimeJobChangeEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeJobChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.MACHINE_CHANGE:
-			evt = new ProxyRuntimeMachineChangeEvent(packet.getTransID(),
-					packet.getArgs());
+			evt = new ProxyRuntimeMachineChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.NODE_CHANGE:
-			evt = new ProxyRuntimeNodeChangeEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeNodeChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.PROCESS_CHANGE:
-			evt = new ProxyRuntimeProcessChangeEvent(packet.getTransID(),
-					packet.getArgs());
+			evt = new ProxyRuntimeProcessChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.QUEUE_CHANGE:
-			evt = new ProxyRuntimeQueueChangeEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeQueueChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.REMOVE_ALL:
-			evt = new ProxyRuntimeRemoveAllEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeRemoveAllEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.REMOVE_JOB:
-			evt = new ProxyRuntimeRemoveJobEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeRemoveJobEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.REMOVE_MACHINE:
-			evt = new ProxyRuntimeRemoveMachineEvent(packet.getTransID(),
-					packet.getArgs());
+			evt = new ProxyRuntimeRemoveMachineEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.REMOVE_NODE:
-			evt = new ProxyRuntimeRemoveNodeEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeRemoveNodeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.REMOVE_PROCESS:
-			evt = new ProxyRuntimeRemoveProcessEvent(packet.getTransID(),
-					packet.getArgs());
+			evt = new ProxyRuntimeRemoveProcessEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.REMOVE_QUEUE:
-			evt = new ProxyRuntimeRemoveQueueEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeRemoveQueueEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.RM_CHANGE:
-			evt = new ProxyRuntimeRMChangeEvent(packet.getTransID(), packet
-					.getArgs());
+			evt = new ProxyRuntimeRMChangeEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.SUBMITJOB_ERROR:
-			evt = new ProxyRuntimeSubmitJobErrorEvent(packet.getTransID(),
-					packet.getArgs());
+			evt = new ProxyRuntimeSubmitJobErrorEvent(packet.getTransID(), packet.getArgs());
 			break;
 
 		case IProxyRuntimeEvent.TERMINATEJOB_ERROR:
-			evt = new ProxyRuntimeTerminateJobErrorEvent(packet.getTransID(),
-					packet.getArgs());
+			evt = new ProxyRuntimeTerminateJobErrorEvent(packet.getTransID(), packet.getArgs());
 			break;
 		}
 
