@@ -11,8 +11,12 @@
 
 package org.eclipse.ptp.etfw.feedback.sample;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 
 /**
@@ -26,6 +30,11 @@ public class SampleFeedbackItem implements IFeedbackItem {
 	private String description;
 	private String filename;
 	private int lineNo;
+	
+	/**
+	 * map of values by attribute name, that the view LabelProvider will want to ask for
+	 */
+	Map<String,String> map = new HashMap<String,String>();
 
 	public SampleFeedbackItem(String name, String parentID, String id, String filename, int lineNo, String description) {
 		this.name=name;
@@ -34,6 +43,12 @@ public class SampleFeedbackItem implements IFeedbackItem {
 		this.filename=filename;
 		this.lineNo=lineNo;
 		this.description=description;
+		
+		map.put(FeedbackIDs.FEEDBACK_ATTR_NAME, name);
+		map.put(FeedbackIDs.FEEDBACK_ATTR_FILENAME, filename);
+		map.put(FeedbackIDs.FEEDBACK_ATTR_ID, id);
+		map.put(IMarker.LINE_NUMBER, Integer.toString(lineNo));  
+		map.put(FeedbackIDs.FEEDBACK_ATTR_DESC, description);
 	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem#getChildren()
@@ -93,6 +108,13 @@ public class SampleFeedbackItem implements IFeedbackItem {
 		return false;
 	}
 	public Object getObject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public String getAttr(String key) {
+		return map.get(key);
+	}
+	public Object getObject(String key) {
 		// TODO Auto-generated method stub
 		return null;
 	}
