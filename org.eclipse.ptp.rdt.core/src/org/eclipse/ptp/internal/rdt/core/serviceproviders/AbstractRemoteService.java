@@ -11,16 +11,27 @@
 package org.eclipse.ptp.internal.rdt.core.serviceproviders;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.cdt.core.index.IIndexFileLocation;
+import org.eclipse.cdt.core.index.IndexLocationFactory;
 import org.eclipse.cdt.core.model.CModelException;
+import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.parser.IScannerInfo;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.core.RemoteIndexerInfoProviderFactory;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
+import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
+import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
 import org.eclipse.ptp.internal.rdt.core.model.ModelAdapter;
+import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.model.TranslationUnit;
 import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem;
@@ -89,6 +100,37 @@ public class AbstractRemoteService {
 			((TranslationUnit) unit).setASTContext(scannerInfo, langaugeProperties);
 		}
 		return unit;
+	}
+	
+	public boolean isIndexed(ICElement element, IProgressMonitor monitor) {
+		if (element instanceof ISourceReference) 
+		{
+			ISourceReference sf = ((ISourceReference)element);
+			ITranslationUnit tu= sf.getTranslationUnit();
+			if (tu != null) 
+			{
+				IIndexFileLocation location= IndexLocationFactory.getIFL(tu);
+				if (location != null) 
+				{
+					ICProject project = element.getCProject();
+					
+					ICIndexSubsystem subsystem = getSubSystem();
+					
+					return subsystem.isIndexed(Scope.WORKSPACE_ROOT_SCOPE, location, monitor);
+					
+				}
+			}
+		}
+		return false;
+	}
+	
+	private static AtomicBoolean showingDialog = new AtomicBoolean(false);
+
+	public static void setshowingDialog(){
+		showingDialog = new AtomicBoolean(false);
+	}
+	public void promptUserIfNoIndexed(ICElement element, IProgressMonitor monitor){
+		
 	}
 
 }
