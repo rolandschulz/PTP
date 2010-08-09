@@ -751,6 +751,20 @@
        		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment">
        </activityPatternBinding>
        
+       <activity
+       		 id="org.eclipse.ptp.rdt.ui.RemoteRebuildIndexActionActivity"
+       		 name="%RDTREBUILDINDEX.name">
+       </activity>
+       <categoryActivityBinding
+       		 activityId="org.eclipse.ptp.rdt.ui.RemoteRebuildIndexActionActivity"
+       		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
+       </categoryActivityBinding>
+       <activityPatternBinding
+       		 activityId="org.eclipse.ptp.rdt.ui.RemoteRebuildIndexActionActivity"
+       		 pattern="org.eclipse.cdt.ui/org.eclipse.cdt.ui.rebuildIndexAction">
+       </activityPatternBinding>
+       
+       
      </extension>
      <extension
            id="indexerproblemmarker"
@@ -769,5 +783,70 @@
               name="%Environment">
         </page>
      </extension>
+       <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+          id="org.eclipse.cdt.ui.cproject.contrib"
+          objectClass="org.eclipse.cdt.core.model.ICProject">
+         <action
+             class="org.eclipse.ptp.internal.rdt.ui.actions.RemoteRebuildIndexAction"
+             id="org.eclipse.ptp.internal.rdt.ui.rebuildIndexAction"
+             label="%RebuildIndex.name"
+             menubarPath="org.eclipse.cdt.ui.indexmenu/rebuild"/>
+         <!--action
+             class="org.eclipse.cdt.internal.ui.search.actions.FindUnresolvedIncludesProjectAction"
+             id="org.eclipse.cdt.ui.searchUnresolvedIncludes"
+             label="%SearchUnresolvedIncludes.name"
+             menubarPath="org.eclipse.cdt.ui.indexmenu/search"/-->
+         <menu
+               id="org.eclipse.cdt.ui.indexmenu"
+               label="%Index.menu"
+               path="buildGroup">
+            <groupMarker name="rebuild"/>
+            <separator name="update"/>
+            <separator name="search"/>
+            <separator name="log"/>
+         </menu>
+      </objectContribution>
+      
+       <!-- project explorer shows IProjects, we need to handle this -->
+      <objectContribution 
+          id="org.eclipse.cdt.ui.cproject.in.explorer.contrib"
+          objectClass="org.eclipse.core.resources.IProject">
+         <visibility>
+              <objectState
+                 name="projectNature"
+                 value="org.eclipse.cdt.core.cnature"/>
+         </visibility>          
+         <!--action
+             class="org.eclipse.cdt.internal.ui.actions.FreshenIndexAction"
+             id="org.eclipse.cdt.ui.updateIndexAction"
+             label="%FreshenIndex.name"
+             menubarPath="org.eclipse.cdt.ui.indexmenu/update"/-->
+         <!--action
+             class="org.eclipse.cdt.internal.ui.actions.UpdateIndexWithModifiedFilesAction"
+             id="org.eclipse.cdt.ui.syncIndexWithDiskAction"
+             label="%SyncIndex.name"
+             menubarPath="org.eclipse.cdt.ui.indexmenu/update"/-->
+        <action
+             class="org.eclipse.ptp.internal.rdt.ui.actions.RemoteRebuildIndexAction"
+             id="org.eclipse.ptp.internal.rdt.ui.rebuildIndexAction"
+             label="%RebuildIndex.name"
+             menubarPath="org.eclipse.cdt.ui.indexmenu/rebuild"/>
+         <!--action
+             class="org.eclipse.cdt.internal.ui.search.actions.FindUnresolvedIncludesProjectAction"
+             id="org.eclipse.cdt.ui.searchUnresolvedIncludes"
+             label="%SearchUnresolvedIncludes.name"
+             menubarPath="org.eclipse.cdt.ui.indexmenu/search"/-->
+         <menu
+               id="org.eclipse.cdt.ui.indexmenu"
+               label="%Index.menu"
+               path="buildGroup">
+            <groupMarker name="rebuild"/>
+            <separator name="update"/>
+            <separator name="search"/>
+            <separator name="log"/>
+         </menu>
+      </objectContribution>
+      </extension>
      
 </plugin>

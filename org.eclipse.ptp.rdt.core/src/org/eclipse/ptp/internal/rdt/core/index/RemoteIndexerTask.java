@@ -75,6 +75,9 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 		IProject project = fIndexer.getProject().getProject();
 
 		Scope scope = new Scope(project);
+		
+		IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(fIndexer.getProject().getProject());
+		
 		if (fUpdate) {
 			// notify listeners
 			for (IRemoteFastIndexerListener listener : RemoteFastIndexer.getRemoteFastIndexerListeners()) {
@@ -92,6 +95,7 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 			// perform the re-index
 			service.reindex(scope, fIndexServiceProvider.getIndexLocation(), Arrays.<ICElement>asList(fAdded), monitor, this);
 		}
+		projectStatus.setIndexCompleted();
 	}
 
 }

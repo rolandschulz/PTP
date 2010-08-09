@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
@@ -43,7 +44,9 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.ControlEnableState;
+import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
+import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -86,6 +89,7 @@ public class IndexerBlock extends AbstractCOptionPage {
 	private Composite 				fParent;
 	private Button 					fUseActiveBuildButton;
 	private Button 					fUseFixedBuildConfig;
+	protected Button 				fIndexAfterBuildOptionCheckbox;
 	private Combo 					fBuildConfigComboBox;
 	private ControlEnableState 		fEnableState;
     
@@ -192,6 +196,11 @@ public class IndexerBlock extends AbstractCOptionPage {
         	gd.grabExcessHorizontalSpace= true;
         	fUseActiveBuildButton= ControlFactory.createRadioButton(group, DialogsMessages.IndexerStrategyBlock_activeBuildConfig, null, null);
         	fUseFixedBuildConfig= ControlFactory.createRadioButton(group, DialogsMessages.IndexerBlock_fixedBuildConfig, null, null);
+        	if(RemoteNature.hasRemoteNature(getProject())){
+        		fIndexAfterBuildOptionCheckbox = ControlFactory.createCheckBox(group, Messages.getString("RemoteRebuildIndexOption.runIndexAfterBuild")); //$NON-NLS-1$
+        		IndexBuildSequenceController indexBuildSequenceController = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+        		fIndexAfterBuildOptionCheckbox.setSelection(indexBuildSequenceController.isIndexAfterBuildSet());
+        	}
         	fBuildConfigComboBox= ControlFactory.createSelectCombo(group, "", ""); //$NON-NLS-1$ //$NON-NLS-2$
         	final SelectionAdapter listener = new SelectionAdapter() {
         		@Override
@@ -232,6 +241,17 @@ public class IndexerBlock extends AbstractCOptionPage {
 		    	ICProjectDescriptionWorkspacePreferences prefs= prjDescMgr.getProjectDescriptionWorkspacePreferences(false);
 		    	boolean useActive= prefs.getConfigurationRelations() == ICProjectDescriptionPreferences.CONFIGS_LINK_SETTINGS_AND_ACTIVE;
 		    	setUseActiveBuildConfig(useActive);
+			}
+			if(fIndexAfterBuildOptionCheckbox !=null){
+				IndexBuildSequenceController indexBuildSequenceController = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+				if(indexBuildSequenceController!=null){
+					if(fIndexAfterBuildOptionCheckbox.getSelection()){
+	
+						indexBuildSequenceController.setIndexAfterBuildOption();
+					}else{
+						indexBuildSequenceController.unsetIndexAfterBuildOption();
+					}
+				}
 			}
 		}
 	}		
@@ -517,6 +537,17 @@ public class IndexerBlock extends AbstractCOptionPage {
     				prefs.setDefaultSettingConfiguration(config);
     			}
     		}
+    		if(fIndexAfterBuildOptionCheckbox !=null){
+				IndexBuildSequenceController indexBuildSequenceController = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+				if(indexBuildSequenceController!=null){
+					if(fIndexAfterBuildOptionCheckbox.getSelection()){
+	
+						indexBuildSequenceController.setIndexAfterBuildOption();
+					}else{
+						indexBuildSequenceController.unsetIndexAfterBuildOption();
+					}
+				}
+			}
     		prjDescMgr.setProjectDescription(getProject(), prefs);
     	}
     	CCoreInternals.savePreferences(project, scope == IndexerPreferences.SCOPE_PROJECT_SHARED);
@@ -533,6 +564,13 @@ public class IndexerBlock extends AbstractCOptionPage {
     		fCurrentProperties= IndexerPreferences.getDefaultIndexerProperties();
     		updateForNewProperties(IndexerPreferences.SCOPE_INSTANCE);
     	}
+    	if(fIndexAfterBuildOptionCheckbox !=null){
+			IndexBuildSequenceController indexBuildSequenceController = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+			fIndexAfterBuildOptionCheckbox.setSelection(true);
+			if(indexBuildSequenceController!=null){
+				indexBuildSequenceController.setIndexAfterBuildOption();
+			}
+		}
     }
 
     /**
