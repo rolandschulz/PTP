@@ -23,8 +23,10 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ErrorParserManager;
 import org.eclipse.cdt.core.envvar.IEnvironmentVariable;
 import org.eclipse.cdt.core.model.ICModelMarker;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.resources.IConsole;
 import org.eclipse.cdt.internal.core.ConsoleOutputSniffer;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.make.core.IMakeBuilderInfo;
 import org.eclipse.cdt.make.core.MakeBuilder;
 import org.eclipse.cdt.make.core.MakeCorePlugin;
@@ -62,6 +64,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.activator.Activator;
@@ -128,6 +131,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 			backgroundJob.schedule();
 		}
 	}
+	
+	
+	
 
 	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
 	
@@ -137,6 +143,13 @@ public class RemoteMakeBuilder extends MakeBuilder {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected boolean invokeMake(int kind, IMakeBuilderInfo info, IProgressMonitor progressMonitor) {
+		
+		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+		
+		if(projectStatus!=null){
+			projectStatus.setRuntimeBuildStatus(null);
+			
+		}
 		boolean isClean = false;
 		IProject currProject = getProject();
 
@@ -298,6 +311,12 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					if(!connection.isOpen())
 						connection.open(monitor);
 					
+					
+					if(projectStatus!=null){
+						if(kind != CLEAN_BUILD){
+							projectStatus.setBuildRunning();
+						}
+					}
 					List<String> command = new LinkedList<String>();
 					
 					command.add(buildCommand);
@@ -332,6 +351,12 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 					
 					final IRemoteProcess p = processBuilder.start();
+					if(kind == CLEAN_BUILD){
+						if(projectStatus!=null){
+							projectStatus.setBuildInCompletedForCleanBuild();
+						}
+						
+					}
 					
 					// create a thread to periodically check the progress monitor for cancellation and potentially
 					// terminate the process if required
@@ -347,6 +372,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 								}
 								if(monitor.isCanceled() && !p.isCompleted()) {
 									p.destroy();
+									if(projectStatus!=null){
+										projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
+									}
 								}
 							}
 							
@@ -355,8 +383,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					}, MakeMessages.getString("Remote Make Monitor Thread")); //$NON-NLS-1$
 					
 					monitorThread.start();
+					
+					
 
 					if (p != null) {
+						
 						try {
 							// Close the input of the Process explicitly.
 							// We will never write to it.
@@ -382,7 +413,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 								// just keep waiting until the process is done
 							}
 						}
-											
+														
 						try {
 							// Do not allow the cancel of the refresh, since the
 							// builder is external
@@ -438,7 +469,16 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		} finally {
 			monitor.done();
 		}
-		
+		if(kind != CLEAN_BUILD){
+			if(projectStatus!=null){
+				if(projectStatus.isIndexAfterBuildSet()){
+			
+					projectStatus.invokeIndex();
+				}else{
+					projectStatus.setFinalBuildStatus();
+				}
+			}
+		}
 		return (isClean);
 	}
 	
@@ -451,6 +491,40 @@ public class RemoteMakeBuilder extends MakeBuilder {
 			workspace.deleteMarkers(markers);
 		}
 	}
+	/*
+	private void invokeIndex(){
+		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getProjectStatus(getProject());
+		if(projectStatus!=null){
+			
+				Job job = new Job("Indexing Job"){ //$NON-NLS-1$
+					protected IStatus run(IProgressMonitor monitor) {
+						
+						if(projectStatus.isIndexAfterBuildSet() && projectStatus.shouldRunIndexFollowingBuild()){
+							projectStatus.setFinalBuildStatus();
+							if(projectStatus.isBuildCompleted()){
+								//for indexing following first time build, only run it after a completed build.
+								ICProject cProject = CModelManager.getDefault().getCModel().getCProject(getProject());
+								CCorePlugin.getIndexManager().reindex(cProject);
+								System.out.println("running invoke indexing job. "); //$NON-NLS-1$
+							}
+							
+						}else{
+							System.out.println("not running index job, just update build status. "); //$NON-NLS-1$
+							projectStatus.setFinalBuildStatus();
+						}
+				        return Status.OK_STATUS;
+				    }
+
+				};
+				ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
+	        	job.setRule(rule);
+	        	job.schedule();
+	        	
+	        	System.out.println("schedule invoke indexing job. "); //$NON-NLS-1$
+			
+		}
+	}
+	*/
 
 	// Turn the string into an array.
 	private String[] makeArray(String string) {
