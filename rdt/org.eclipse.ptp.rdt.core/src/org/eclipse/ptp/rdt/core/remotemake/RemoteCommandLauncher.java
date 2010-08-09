@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,12 +19,15 @@ import java.util.Properties;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ICommandLauncher;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
@@ -62,6 +65,8 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 
 	protected Map<String, String> remoteEnvMap;
 	
+	private boolean isCleanBuild;
+	
 	/**
 	 * The number of milliseconds to pause between polling.
 	 */
@@ -72,12 +77,28 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 	 */
 	public RemoteCommandLauncher() {
 	}
+	
+	private boolean isCleanBuild(String[] args){
+		for(int i=0; i< args.length; i++){
+			if(IBuilder.DEFAULT_TARGET_CLEAN.equals(args[i])){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.core.ICommandLauncher#execute(org.eclipse.core.runtime.IPath, java.lang.String[], java.lang.String[], org.eclipse.core.runtime.IPath)
 	 */
 	public Process execute(IPath commandPath, String[] args, String[] env,
 			IPath changeToDirectory, final IProgressMonitor monitor) throws CoreException {
+		isCleanBuild= isCleanBuild(args);
+		IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+		
+		if(projectStatus!=null){
+			projectStatus.setRuntimeBuildStatus(null);
+			
+		}
 		
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 		
@@ -120,6 +141,12 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 				}
 			}
 			
+			if(projectStatus!=null){
+				if(!isCleanBuild){
+					projectStatus.setBuildRunning();
+				}
+			}
+			
 			List<String> command = new LinkedList<String>();
 			
 			command.add(commandPath.toString());
@@ -152,12 +179,24 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			try {
 				p = processBuilder.start();
 			} catch (IOException e) {
+				if(projectStatus!=null){
+					projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
+				}
 				// rethrow as CoreException
 				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			
 			fRemoteProcess = p;
 			fProcess = new RemoteProcessAdapter(p);
+			// wait for the process to finish
+			while (!p.isCompleted()) {
+				try {
+					p.waitFor();
+				} catch (InterruptedException e) {
+					// just keep waiting until the process is done
+				}
+			}
+				
 			return fProcess;
 		}
 			
@@ -309,6 +348,37 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 		} catch (InterruptedException e) {
 			// ignore
 		}
+		
+	
+		try {
+			// Do not allow the cancel of the refresh, since the
+			// builder is external
+			// to Eclipse, files may have been created/modified
+			// and we will be out-of-sync.
+			// The caveat is that for huge projects, it may take a while
+			getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			// this should never happen because we should never be building from a
+			// state where ressource changes are disallowed
+		}
+		
+		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
+		if(isCleanBuild){
+			if(projectStatus!=null){
+				projectStatus.setBuildInCompletedForCleanBuild();
+			}
+			
+		}else{
+			if(projectStatus!=null){
+				if(projectStatus.isIndexAfterBuildSet()){
+			
+					projectStatus.invokeIndex();
+				}else{
+					projectStatus.setFinalBuildStatus();
+				}
+			}
+		}
+			
 		return state;
 	}
 

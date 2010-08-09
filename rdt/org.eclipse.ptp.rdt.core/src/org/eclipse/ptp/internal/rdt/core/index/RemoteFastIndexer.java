@@ -44,7 +44,30 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 		
 		if(serviceProvider instanceof IIndexServiceProvider) {
 			boolean update = !isReindex();
+			IndexBuildSequenceController indexBuildSequenceController = IndexBuildSequenceController.getIndexBuildSequenceController(getProject().getProject());
+			if(indexBuildSequenceController.isIndexAfterBuildSet()){
+				
+				if(update){
+					
+					if(indexBuildSequenceController.shouldSkipIndexUpdate()){
+						return null;
+					}
+					
+					if(indexBuildSequenceController.shouldTurnIndexUpdateToReindex()){
+						update = false;
+					}
+					
+					
+				}else{
+					if(indexBuildSequenceController.shouldSkipReindex()){
+						return null;
+					}
+				}
+			}
+			
+			indexBuildSequenceController.setIndexRunning();	
 			return new RemoteIndexerTask(this, (IIndexServiceProvider) serviceProvider, added, changed, removed, update);
+			
 		}
 		
 		return null;
