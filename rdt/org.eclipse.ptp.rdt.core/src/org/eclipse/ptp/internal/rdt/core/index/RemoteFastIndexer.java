@@ -52,10 +52,11 @@ public class RemoteFastIndexer extends AbstractPDOMIndexer {
 					if(indexBuildSequenceController.shouldSkipIndexUpdate()){
 						return null;
 					}
-					
+					/* we don't turn index update to reindex.
 					if(indexBuildSequenceController.shouldTurnIndexUpdateToReindex()){
 						update = false;
 					}
+					*/
 					
 					
 				}else{
