@@ -53,6 +53,6 @@ public class AIFTypeFunction extends TypeDerived implements IAIFTypeFunction {
 		int pos = fmt.indexOf(AIFFactory.FDS_FUNCTION_END);
 		String argsStr = fmt.substring(0, pos);
 		args = argsStr.split(String.valueOf(AIFFactory.FDS_FUNCTION_ARG_SEP));
-		return super.parse(fmt.substring(pos));
+		return super.parse(fmt.substring(pos + 1));
 	}
 }
