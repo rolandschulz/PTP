@@ -6,9 +6,20 @@
       <remoteServices
             class="org.eclipse.ptp.remote.rse.core.RSEServicesFactory"
             id="org.eclipse.ptp.remote.RSERemoteServices"
-            name="RSE"
+            name="%remoteServices.name.0"
             scheme="rse">
       </remoteServices>
+   </extension>
+   <extension
+         point="org.eclipse.rse.core.subsystemConfigurations">
+      <configuration
+            class="org.eclipse.ptp.internal.remote.rse.core.SpawnerSubsystemConfiguration"
+            description="%configuration.description.0"
+            id="org.eclipse.ptp.remote.rse.core.spawnerSubsystemConfiguration"
+            name="%configuration.name.0"
+            systemTypeIds="org.eclipse.rse.systemtype.unix;org.eclipse.rse.systemtype.windows;org.eclipse.rse.systemtype.linux"
+            vendor="%configuration.vendor.0">
+      </configuration>
    </extension>
 
 </plugin>
