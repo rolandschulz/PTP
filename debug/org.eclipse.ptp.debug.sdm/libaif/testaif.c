@@ -220,7 +220,7 @@ TestAllConstructors()
 
 	/* test a linked list: 1 -> 2 -> nil */
 	aAggregate = EmptyAggregateToAIF("test_aggregate");
-	aAggregate = NameAIF(aAggregate, 0);
+	NameAIF(aAggregate, 0);
 	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "value", IntToAIF(2));
 	AIFAddFieldToAggregate(aAggregate, AIF_ACCESS_PUBLIC, "next", AIFNullPointer(aAggregate));
 	aPointer = AIFNullPointer(aAggregate);

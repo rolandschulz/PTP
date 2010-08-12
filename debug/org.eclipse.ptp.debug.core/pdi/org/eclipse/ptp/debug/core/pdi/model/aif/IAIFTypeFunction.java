@@ -20,7 +20,23 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents function type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeFunction extends ITypeDerived {}
+public interface IAIFTypeFunction extends IAIFType {
+	/**
+	 * Get the return type of the function
+	 * 
+	 * @return return type
+	 * @since 5.0
+	 */
+	public IAIFType getReturnType();
+
+	/**
+	 * Get the function argument types
+	 * 
+	 * @since 5.0
+	 */
+	public IAIFType[] getArgumentTypes();
+}

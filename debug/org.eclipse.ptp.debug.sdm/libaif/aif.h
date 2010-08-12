@@ -378,7 +378,7 @@ extern AIF *		LongLongToAIF(long long);
 #endif /* CC_HAS_LONG_LONG */
 extern AIF *		LongestToAIF(AIFLONGEST);
 extern AIF *		MakeAIF(char *, char *);
-extern AIF *		NameAIF(AIF *, int);
+extern int			NameAIF(AIF *, int);
 extern AIF *		NewAIF(int, int);
 extern AIF *		PointerNameToAIF(AIF *);
 extern AIF *		PointerReferenceToAIF(AIF *);

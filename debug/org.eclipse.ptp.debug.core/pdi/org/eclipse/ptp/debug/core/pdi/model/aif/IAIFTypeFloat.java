@@ -20,25 +20,29 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents float type in this IAIFType
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFTypeFloat extends IAIFType {
 	/**
 	 * Determines whether this type is imaginary
+	 * 
 	 * @return true if this type is imaginary
 	 */
-	boolean isImaginary();
-	
+	public boolean isImaginary();
+
 	/**
 	 * Determines whether this is complex type
+	 * 
 	 * @return true if current type is complex
 	 */
-	boolean isComplex();
-	
+	public boolean isComplex();
+
 	/**
 	 * Determines whether current type is long
+	 * 
 	 * @return true if current type is long
 	 */
-	boolean isLong();
+	public boolean isLong();
 }

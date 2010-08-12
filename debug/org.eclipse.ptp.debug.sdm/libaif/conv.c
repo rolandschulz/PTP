@@ -194,23 +194,29 @@ _char_to_aif(char **rd, char val)
 }
 
 /*
- * Create an empty named AIF object.
+ * Add a name to an AIF object. The object is not modified
+ * if it is already named.
  */
-AIF *
-NameAIF(AIF *oldAIF, int name)
+int
+NameAIF(AIF *a, int name)
 {
-	AIF *	a;
+	char *	fmt;
+
+	if ( a == NULL )
+	{
+		SetAIFError(AIFERR_BADARG, NULL);
+		return -1;
+	}
 
 	ResetAIFError();
 
-	a = NewAIF(0, 0);
+	if (*AIF_FORMAT(a) != AIF_NAME) {
+		fmt = strdup(AIF_NAME_TYPE(name, AIF_FORMAT(a)));
+		_aif_free(AIF_FORMAT(a));
+		AIF_FORMAT(a) = fmt;
+	}
 
-	AIF_FORMAT(a) = strdup(AIF_NAME_TYPE(name, AIF_FORMAT(oldAIF)));
-	AIF_DATA(a) = _aif_alloc(AIF_LEN(oldAIF));
-	memcpy(AIF_DATA(a), AIF_DATA(oldAIF), AIF_LEN(oldAIF));
-	AIF_LEN(a) = AIF_LEN(oldAIF);
-
-	return a;
+	return 0;
 }
 
 int
@@ -1176,150 +1182,6 @@ AIFGetUnion(AIF *a, char *field)
 }
 
 /*
- * Create an empty AIF aggregate.
- */
-AIF *
-EmptyAggregateToAIF(char *id)
-{
-	AIF *	a;
-
-	a = NewAIF(0, 0);
-
-	AIF_FORMAT(a) = FDSAggregateInit(id);
-
-	ResetAIFError();
-
-	return a;
-}
-
-/* 
- * Add a field to an aggregate
- */
-int
-AIFAddFieldToAggregate(AIF *a, AIFAccess acc, char* field, AIF *content)
-{
-	int		data_len;
-	int		old_len;
-	int		new_len;
-	char *	new_fmt;
-	char *	new_data;
-	char *	dummy;
-
-
-	if ( !FDSAggregateFieldByName(AIF_FORMAT(a), field, &dummy) )
-	{
-		_aif_free(dummy);
-		SetAIFError(AIFERR_BADARG, NULL);
-		return -1;
-	}
-
-	/* We use FDSDataSize() instead of:
-		pubLength = _data_len_public(AIF_FORMAT(a));
-	to calculate the data length, _data_len_public cannot handle the case
-	where a string is one of the members of the struct (since the length
-	of the string is encoded in the data section).
-	Currently FDSDataSize() can only handle public members of structs, so
-	it is safe to replace _data_len_public() with FDSDataSize().
-	*/
-	data_len = FDSDataSize(AIF_FORMAT(a), AIF_DATA(a));
-	old_len = AIF_LEN(a);
-	new_len = old_len + AIF_LEN(content);
-
-	new_data = _aif_alloc(new_len);
-
-	if (data_len > 0) {
-		memcpy(new_data, AIF_DATA(a), old_len);
-	}
-	memcpy(new_data + data_len, AIF_DATA(content), AIF_LEN(content));
-	memcpy(new_data + data_len + AIF_LEN(content), AIF_DATA(a) + data_len, old_len - data_len);
-
-	if ( AIF_DATA(a) ) {
-		_aif_free(AIF_DATA(a));
-	}
-
-	AIF_DATA(a) = _aif_alloc(new_len);
-	AIF_LEN(a) = new_len;
-
-	memcpy(AIF_DATA(a), new_data, new_len);
-
-	new_fmt = FDSAddFieldToAggregate(AIF_FORMAT(a), acc, field, AIF_FORMAT(content));
-
-	_aif_free(AIF_FORMAT(a));
-	AIF_FORMAT(a) = new_fmt;
-
-	_aif_free(new_data);
-
-	ResetAIFError();
-
-	return 0;
-}
-
-/* 
- * Set the value of a field in an aggregate
- */
-int
-AIFSetAggregate(AIF *a, char* field, AIF *content)
-{
-	int	preLength;
-	char *	dummyString;
-	int	index;
-
-	if ( FDSAggregateFieldByName(AIF_FORMAT(a), field, &dummyString) )
-	{
-		SetAIFError(AIFERR_BADARG, NULL);
-		return -1;
-	}
-
-	index = FDSAggregateFieldIndex(AIF_FORMAT(a), field);
-	preLength = _data_len_index(AIF_FORMAT(a), index);
-	preLength -= FDSTypeSize(dummyString);
-	_aif_free(dummyString);
-
-	memcpy(AIF_DATA(a)+preLength, AIF_DATA(content), AIF_LEN(content));
-
-	ResetAIFError();
-
-	return(0);
-}
-
-/*
- * Get the value of a field in an aggregate
- */
-AIF *
-AIFGetAggregate(AIF *a, char *field)
-{
-	AIF  * new;
-	char * type;
-	int    len;
-	int    pre;
-	int    index;
-
-	if ( FDSAggregateFieldByName(AIF_FORMAT(a), field, &type) < 0 )
-	{
-		SetAIFError(AIFERR_FIELD, NULL);
-		return NULL;
-	}
-
-	if ( (len = FDSTypeSize(type)) < 0 )
-	{
-		_aif_free(type);
-		return NULL;
-	}
-
-	new = NewAIF(0, len);
-
-	index = FDSAggregateFieldIndex(AIF_FORMAT(a), field);
-	pre = _data_len_index(AIF_FORMAT(a), index);
-	pre -= len;
-
-	AIF_FORMAT(new) = type;
-	AIF_LEN(new) = len;
-	memcpy(AIF_DATA(new), AIF_DATA(a)+pre, len);
-
-	return new;
-}
-
-/*
  * Convert an AIF value to a native character.
  */
 int
@@ -1574,38 +1436,44 @@ _aif_int_to_doublest(char *data, int len, AIFDOUBLEST *val)
 }
 
 /*
- * Convert AIF integer to AIF float. Result is always f8.
+ * Convert AIF integer to AIF float. Result is always a do.
  */
 int
-_aif_int_to_aif_float(char **data, char *d, int l)
+_aif_int_to_aif_float(char **rf, char **rd, int *rl, char *d, int l)
 {
 	AIFDOUBLEST	vd;
 
 	_aif_int_to_doublest(d, l, &vd);
 
-	if ( _doublest_to_aif(data, sizeof(double), vd) < 0 )
+	if ( _doublest_to_aif(rd, sizeof(double), vd) < 0 )
 		return -1;
 
-	return sizeof(double);
+	*rf = strdup(AIF_FLOATING_TYPE(sizeof(double)));
+	*rl = sizeof(double);
+
+	return 0;
 }
 
 /*
  * Convert AIF float to AIF integer. Result is always is4 (for convenience).
  */
 int
-_aif_float_to_aif_int(char **f, char *d, int l)
+_aif_float_to_aif_int(char **rf, char **rd, int *rl, char *d, int l)
 {
-	int		vi;
+	int			vi;
 	AIFDOUBLEST	vd;
 
 	_aif_to_doublest(d, l, &vd);
 
 	vi = (int)vd;
 
-	if ( _longest_to_aif(f, sizeof(int), vi) < 0 )
+	if ( _longest_to_aif(rd, sizeof(int), vi) < 0 )
 		return -1;
 
-	return sizeof(int);
+	*rf = strdup(AIF_INTEGER_TYPE(FDS_INTEGER_SIGNED, sizeof(int)));
+	*rl = sizeof(int);
+
+	return 0;
 }
 
 /*
@@ -1669,11 +1537,13 @@ AIFToVoid(AIF *a, char *data, int len)
 AIF *
 AIFCoerce(AIF *a, char *t)
 {
-	int		tlen;
-	int		alen;
-	int		atype;
+	int			rl;
+	int			tlen;
+	int			alen;
+	int			atype;
 	AIFDOUBLEST	dval;
 	char *		rd = NULL;
+	char *		rf;
 	AIF *		na;
 
 	ResetAIFError();
@@ -1691,7 +1561,7 @@ AIFCoerce(AIF *a, char *t)
 			{
 				rd = (char *)_aif_alloc(tlen);
 				memcpy(rd, AIF_DATA(a), tlen);
-				return MakeAIF(strdup(t), rd);
+				return _make_aif(strdup(t), rd, tlen);
 			}
 			else if ( tlen < alen )
 			{
@@ -1702,10 +1572,10 @@ AIFCoerce(AIF *a, char *t)
 			return CopyAIF(a);
 
 		case AIF_FLOATING:
-			if ( _aif_float_to_aif_int(&rd, AIF_DATA(a), alen) < 0 )
+			if ( _aif_float_to_aif_int(&rf, &rd, &rl, AIF_DATA(a), alen) < 0 )
 				return (AIF *)NULL;
 
-			return MakeAIF(strdup("is4"), rd);
+			return _make_aif(rf, rd, rl);
 
 		default:
 			SetAIFError(AIFERR_TYPE, NULL);
@@ -2348,18 +2218,19 @@ _aif_aggregate_to_str(int depth, char **fds, char **data)
 	** past nnn=
 	*/
 
-	_fds_skipid(fds);
+	_fds_skip_typename(fds);
 
 	while ( **fds != FDS_AGGREGATE_END )
 	{
-		if ( isStruct 	&& (*fds)[0] == FDS_AGGREGATE_ACCESS_SEP
+		if ( isStruct && (*fds)[0] == FDS_AGGREGATE_ACCESS_SEP
 				&& (*fds)[1] == FDS_AGGREGATE_ACCESS_SEP
 				&& (*fds)[2] == FDS_AGGREGATE_ACCESS_SEP )
 		{
 			(*fds) += 3;
 			break;
 		}
-		else if ( **fds == FDS_AGGREGATE_ACCESS_SEP )
+
+		if ( **fds == FDS_AGGREGATE_ACCESS_SEP )
 		{
 			isStruct = 0;	/* it is a class */
 			
@@ -2548,7 +2419,7 @@ _aif_union_to_str(int depth, char **fds, char **data)
 	** past nnn=
 	*/
 
-	_fds_skipid(fds);
+	_fds_skip_typename(fds);
 
 	while ( **fds != FDS_UNION_END )
 	{

@@ -25,19 +25,19 @@
 int
 AIFPrint(FILE *fp, int depth, AIF *a)
 {
-        char *  fmt;
-        char *  data;
+	char *  fmt;
+	char *  data;
 
-        if ( a == (AIF *)NULL )
+	if ( a == (AIF *)NULL )
 	{
 		SetAIFError(AIFERR_BADARG, NULL);
-                return -1;
+		return -1;
 	}
 
-        fmt = AIF_FORMAT(a);
-        data = AIF_DATA(a);
+	fmt = AIF_FORMAT(a);
+	data = AIF_DATA(a);
 
-        return _aif_print(fp, depth, &fmt, &data);
+	return _aif_print(fp, depth, &fmt, &data);
 }
 
 /* 

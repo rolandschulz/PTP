@@ -43,7 +43,7 @@
  * Boolean bitwise and.
  */
 void
-_aif_and_bool(char *rd, char *d1, int l1, char *d2, int l2)
+_aif_and_bool(char *rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	b1;
 	AIFLONGEST	b2;
@@ -52,14 +52,15 @@ _aif_and_bool(char *rd, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &b1);
 	_aif_to_longest(d2, l2, &b2);
 	res = b1 && b2; /* not bitwise! */
-	_longest_to_aif(&rd, MAX(l1, l2), res);
+	*rl = MAX(l1, l2);
+	_longest_to_aif(&rd, *rl, res);
 }
 
 /*
  * Boolean bitwise or.
  */
 void
-_aif_or_bool(char *rd, char *d1, int l1, char *d2, int l2)
+_aif_or_bool(char *rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	b1;
 	AIFLONGEST	b2;
@@ -68,7 +69,8 @@ _aif_or_bool(char *rd, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &b1);
 	_aif_to_longest(d2, l2, &b2);
 	res = b1 || b2; /* not bitwise! */
-	_longest_to_aif(&rd, MAX(l1, l2), res);
+	*rl = MAX(l1, l2);
+	_longest_to_aif(&rd, *rl, res);
 }
 
 /*
@@ -115,7 +117,7 @@ _aif_neg_int(char *rd, char *data, int len)
  * Integer addition.
  */
 void
-_aif_add_int(char *rd, char *d1, int l1, char *d2, int l2)
+_aif_add_int(char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	val1;
 	AIFLONGEST	val2;
@@ -124,14 +126,15 @@ _aif_add_int(char *rd, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &val1);
 	_aif_to_longest(d2, l2, &val2);
 	val = val1 + val2;
-	_longest_to_aif(&rd, MAX(l1, l2), val);
+	*rl = MAX(l1, l2);
+	_longest_to_aif(rd, *rl, val);
 }
 
 /*
  * Integer bitwise and.
  */
 void
-_aif_and_int(char *rd, char *d1, int l1, char *d2, int l2)
+_aif_and_int(char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	val1;
 	AIFLONGEST	val2;
@@ -140,14 +143,15 @@ _aif_and_int(char *rd, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &val1);
 	_aif_to_longest(d2, l2, &val2);
 	val = val1 & val2;
-	_longest_to_aif(&rd, MAX(l1, l2), val);
+	*rl = MAX(l1, l2);
+	_longest_to_aif(rd, *rl, val);
 }
 
 /*
  * Integer bitwise or.
  */
 void
-_aif_or_int(char *rd, char *d1, int l1, char *d2, int l2)
+_aif_or_int(char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	val1;
 	AIFLONGEST	val2;
@@ -156,14 +160,15 @@ _aif_or_int(char *rd, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &val1);
 	_aif_to_longest(d2, l2, &val2);
 	val = val1 | val2;
-	_longest_to_aif(&rd, MAX(l1, l2), val);
+	*rl = MAX(l1, l2);
+	_longest_to_aif(rd, *rl, val);
 }
 
 /*
  * Integer subtraction.
  */
 void
-_aif_sub_int(char *rd, char *d1, int l1, char *d2, int l2)
+_aif_sub_int(char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	val1;
 	AIFLONGEST	val2;
@@ -172,7 +177,8 @@ _aif_sub_int(char *rd, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &val1);
 	_aif_to_longest(d2, l2, &val2);
 	val = val1 - val2;
-	_longest_to_aif(&rd, MAX(l1, l2), val);
+	*rl = MAX(l1, l2);
+	_longest_to_aif(rd, *rl, val);
 }
 
 /*
@@ -180,7 +186,7 @@ _aif_sub_int(char *rd, char *d1, int l1, char *d2, int l2)
  * argument. 
  */
 void
-_aif_mul_int(char *rd, char *d1, int l1, char *d2, int l2)
+_aif_mul_int(char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	val1;
 	AIFLONGEST	val2;
@@ -189,7 +195,8 @@ _aif_mul_int(char *rd, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &val1);
 	_aif_to_longest(d2, l2, &val2);
 	val = val1 * val2;
-	_longest_to_aif(&rd, MAX(l1, l2), val);
+	*rl = MAX(l1, l2);
+	_longest_to_aif(rd, *rl, val);
 } 
 
 /*
@@ -270,7 +277,7 @@ rshift_int(unsigned char *r, unsigned char *d, int l, int s)
  * XXX need to check remainder for correct sign.
  */
 void
-_aif_div_int(char *rq, char *rr, char *d1, int l1, char *d2, int l2)
+_aif_div_int(char **rq, int *lq, char **rr, int *lr, char *d1, int l1, char *d2, int l2)
 {
 	AIFLONGEST	val1;
 	AIFLONGEST	val2;
@@ -279,19 +286,22 @@ _aif_div_int(char *rq, char *rr, char *d1, int l1, char *d2, int l2)
 	_aif_to_longest(d1, l1, &val1);
 	_aif_to_longest(d2, l2, &val2);
 	val = val1 / val2;
-	_longest_to_aif(&rq, MAX(l1, l2), val);
+	*lq = MAX(l1, l2);
+	_longest_to_aif(rq, *lq, val);
 	val = val1 % val2;
-	_longest_to_aif(&rr, MAX(l1, l2), val);
+	*lr = MAX(l1, l2);
+	_longest_to_aif(rr, *lr, val);
 } 
 
 /*
- * Perform a binary integer operation.
+ * Perform a binary integer operation. If rd points to NULL, space will automatically
+ * be allocated for the result, and the length returned in rl.
  */
 int
-_aif_binary_op_int(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
+_aif_binary_op_int(aifop op, char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
-	char *	rt=NULL;
-
+	int		lt;
+	char *	rt = NULL;
 
 	if ( l1 > sizeof(AIFLONGEST) )
 		fprintf(stderr, "binary int operation: arg1 exceeds precision\n");
@@ -302,50 +312,23 @@ _aif_binary_op_int(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 	switch ( op )
 	{
 	case AIFOP_ADD:
-	case AIFOP_SUB:
-	case AIFOP_MUL:
-	case AIFOP_AND:
-	case AIFOP_OR:
-		if ( *rd == NULL )
-			*rd = (char *)_aif_alloc(MAX(l1, l2));
-		break;
-
-	case AIFOP_DIV:
-	case AIFOP_REM:
-		if ( *rd == NULL )
-			*rd = (char *)_aif_alloc(l1);
-
-		/*
-		** Temp for quotient.
-		*/
-		rt = (char *)_aif_alloc(l1);
-		break;
-
-	default:
-		SetAIFError(AIFERR_TYPE, NULL);
-		return -1;
-	}
-
-	switch ( op )
-	{
-	case AIFOP_ADD:
-		_aif_add_int(*rd, d1, l1, d2, l2);
+		_aif_add_int(rd, rl, d1, l1, d2, l2);
 		break;
 
 	case AIFOP_SUB:
-		_aif_sub_int(*rd, d1, l1, d2, l2);
+		_aif_sub_int(rd, rl, d1, l1, d2, l2);
 		break;
 
 	case AIFOP_MUL:
-		_aif_mul_int(*rd, d1, l1, d2, l2);
+		_aif_mul_int(rd, rl, d1, l1, d2, l2);
 		break;
 
 	case AIFOP_AND:
-		_aif_and_int(*rd, d1, l1, d2, l2);
+		_aif_and_int(rd, rl, d1, l1, d2, l2);
 		break;
 
 	case AIFOP_OR:
-		_aif_or_int(*rd, d1, l1, d2, l2);
+		_aif_or_int(rd, rl, d1, l1, d2, l2);
 		break;
 
 	case AIFOP_DIV:
@@ -355,7 +338,7 @@ _aif_binary_op_int(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 			return -1;
 		}
 
-		_aif_div_int(*rd, rt, d1, l1, d2, l2);
+		_aif_div_int(rd, rl, &rt, &lt, d1, l1, d2, l2);
 
 		_aif_free(rt);
 		break;
@@ -367,7 +350,7 @@ _aif_binary_op_int(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 			return -1;
 		}
 
-		_aif_div_int(rt, *rd, d1, l1, d2, l2);
+		_aif_div_int(&rt, &lt, rd, rl, d1, l1, d2, l2);
 
 		_aif_free(rt);
 		break;
@@ -384,7 +367,7 @@ _aif_binary_op_int(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
  * Perform a binary boolean operation.
  */
 int
-_aif_binary_op_bool(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
+_aif_binary_op_bool(aifop op, char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	if ( *rd == NULL )
 		*rd = (char *)_aif_alloc(MAX(l1, l2));
@@ -392,11 +375,11 @@ _aif_binary_op_bool(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 	switch ( op )
 	{
 	case AIFOP_AND:
-		_aif_and_bool(*rd, d1, l1, d2, l2);
+		_aif_and_bool(*rd, rl, d1, l1, d2, l2);
 		break;
 
 	case AIFOP_OR:
-		_aif_or_bool(*rd, d1, l1, d2, l2);
+		_aif_or_bool(*rd, rl, d1, l1, d2, l2);
 		break;
 
 	default:
@@ -461,7 +444,7 @@ _aif_unary_op_int(aifop op, char **rd, char *d, int l)
  * Perform a binary floating point operation.
  */
 int
-_aif_binary_op_float(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
+_aif_binary_op_float(aifop op, char **rd, int *rl, char *d1, int l1, char *d2, int l2)
 {
 	AIFDOUBLEST	v;
 	AIFDOUBLEST	v1;
@@ -503,8 +486,9 @@ _aif_binary_op_float(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 		return -1;
 	}
 
-	if ( MAX(l1, l2) > sizeof(float) )
-		return _doublest_to_aif(rd, MAX(l1, l2), v);
+	*rl = MAX(l1, l2);
+	if ( *rl > sizeof(float) )
+		return _doublest_to_aif(rd, *rl, v);
 	else
 		return _doublest_to_aif(rd, l1, v);
 }
@@ -547,14 +531,14 @@ _aif_unary_op_float(aifop op, char **rd, char *d1, int l1)
  */
 int
 _aif_binary_op(aifop op, 
-	char **rf, char **rd, 
+	char **rf, char **rd, int *rl,
 	char **f1, char **d1,
 	char **f2, char **d2)
 {
-	int	i;
-	int	bytes1;
-	int	bytes2;
-	int	bytes3;
+	int		i;
+	int		bytes1;
+	int		bytes2;
+	int		bytes3;
 	char *	d;
 	char *	fmt;
 	char *	d3 = NULL;
@@ -568,13 +552,13 @@ _aif_binary_op(aifop op,
 	if ( FDSType(*f1) == AIF_REFERENCE )
 	{
 		fmt = _fds_lookup(f1);
-		return _aif_binary_op(op, rf, rd, &fmt, d1, f2, d2);
+		return _aif_binary_op(op, rf, rd, rl, &fmt, d1, f2, d2);
 	}
 
 	if ( FDSType(*f2) == AIF_REFERENCE )
 	{
 		fmt = _fds_lookup(f2);
-		return _aif_binary_op(op, rf, rd, f1, d1, &fmt, d2);
+		return _aif_binary_op(op, rf, rd, rl, f1, d1, &fmt, d2);
 	}
 
 	switch ( FDSType(*f1) )
@@ -588,7 +572,7 @@ _aif_binary_op(aifop op,
 		case AIF_INTEGER:
 			bytes2 = _fds_count_bytes_na(f2);
 
-			if ( _aif_binary_op_int(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+			if ( _aif_binary_op_int(op, rd, rl, *d1, bytes1, *d2, bytes2) < 0 )
 				return -1;
 
 			(*d1) += bytes1;
@@ -622,10 +606,12 @@ _aif_binary_op(aifop op,
 		case AIF_FLOATING:
 			bytes2 = _fds_count_bytes_na(f2);
 
-			if ( (bytes3 = _aif_int_to_aif_float(&d3, *d1, bytes1)) < 0 )
+			if ( _aif_int_to_aif_float(&fmt, &d3, &bytes3, *d1, bytes1) < 0 )
 				return -1;
 
-			if ( _aif_binary_op_float(op, rd, d3, bytes3, *d2, bytes2) < 0 )
+			_aif_free(fmt);
+
+			if ( _aif_binary_op_float(op, rd, rl, d3, bytes3, *d2, bytes2) < 0 )
 			{
 				_aif_free(d3);
 				return -1;
@@ -681,7 +667,7 @@ _aif_binary_op(aifop op,
 		case AIF_ENUM:
 			bytes2 = _fds_count_bytes_na(f2);
 
-			if ( _aif_binary_op_int(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+			if ( _aif_binary_op_int(op, rd, rl, *d1, bytes1, *d2, bytes2) < 0 )
 				return -1;
 
 			(*d1) += bytes1;
@@ -700,10 +686,12 @@ _aif_binary_op(aifop op,
 		case AIF_FLOATING:
 			bytes2 = _fds_count_bytes_na(f2);
 
-			if ( (bytes3 = _aif_int_to_aif_float(&d3, *d1, bytes1)) < 0 )
+			if ( _aif_int_to_aif_float(&fmt, &d3, &bytes3, *d1, bytes1) < 0 )
 				return -1;
 
-			if ( _aif_binary_op_float(op, rd, d3, bytes3, *d2, bytes2) < 0 )
+			_aif_free(fmt);
+
+			if ( _aif_binary_op_float(op, rd, rl, d3, bytes3, *d2, bytes2) < 0 )
 			{
 				_aif_free(d3);
 				return -1;
@@ -729,6 +717,7 @@ _aif_binary_op(aifop op,
 				return -1;
 
 			*rd = d;
+			*rl = sizeof(int);
 
 			if ( *rf == NULL )
 				*rf = strdup(AIF_INTEGER_TYPE(1, sizeof(int)));
@@ -752,10 +741,12 @@ _aif_binary_op(aifop op,
 		case AIF_INTEGER:
 			bytes2 = _fds_count_bytes_na(f2);
 
-			if ( (bytes3 = _aif_int_to_aif_float(&d3, *d2, bytes2)) < 0 )
+			if ( _aif_int_to_aif_float(&fmt, &d3, &bytes3, *d2, bytes2) < 0 )
 				return -1;
 
-			if ( _aif_binary_op_float(op, rd, *d1, bytes1, d3, bytes3) < 0 )
+			_aif_free(fmt);
+
+			if ( _aif_binary_op_float(op, rd, rl, *d1, bytes1, d3, bytes3) < 0 )
 			{
 				_aif_free(d3);
 				return -1;
@@ -777,7 +768,7 @@ _aif_binary_op(aifop op,
 		case AIF_FLOATING:
 			bytes2 = _fds_count_bytes_na(f2);
 
-			if ( _aif_binary_op_float(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+			if ( _aif_binary_op_float(op, rd, rl, *d1, bytes1, *d2, bytes2) < 0 )
 				return -1;
 
 			(*d1) += bytes1;
@@ -798,6 +789,7 @@ _aif_binary_op(aifop op,
 				return -1;
 
 			*rd = d;
+			*rl = sizeof(int);
 
 			if ( *rf == NULL )
 				*rf = strdup(AIF_INTEGER_TYPE(1, sizeof(int)));
@@ -817,7 +809,7 @@ _aif_binary_op(aifop op,
 		switch ( FDSType(*f2) )
 		{
 		case AIF_BOOLEAN:
-			if ( _aif_binary_op_bool(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+			if ( _aif_binary_op_bool(op, rd, rl, *d1, bytes1, *d2, bytes2) < 0 )
 				return -1;
 
 			if ( *rf == NULL )
@@ -844,7 +836,7 @@ _aif_binary_op(aifop op,
 		switch ( FDSType(*f2) )
 		{
 		case AIF_INTEGER:
-			if ( _aif_binary_op_int(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+			if ( _aif_binary_op_int(op, rd, rl, *d1, bytes1, *d2, bytes2) < 0 )
 				return -1;
 
 			*d1 += bytes1;
@@ -861,7 +853,7 @@ _aif_binary_op(aifop op,
 			return 0;
 
 		case AIF_CHARACTER:
-			if ( _aif_binary_op_int(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+			if ( _aif_binary_op_int(op, rd, rl, *d1, bytes1, *d2, bytes2) < 0 )
 				return -1;
 
 			if ( *rf == NULL )
@@ -882,6 +874,7 @@ _aif_binary_op(aifop op,
 				return -1;
 
 			*rd = d;
+			*rl = sizeof(int);
 
 			if ( *rf == NULL )
 				*rf = strdup(AIF_INTEGER_TYPE(1, sizeof(int)));
@@ -913,6 +906,7 @@ _aif_binary_op(aifop op,
 						return -1;
 
 					*rd = d;
+					*rl = sizeof(int);
 
 					if ( *rf == NULL )
 						*rf = strdup(AIF_INTEGER_TYPE(1, sizeof(int)));
@@ -954,8 +948,7 @@ _aif_binary_op(aifop op,
 
 			for ( i = 0 ; i < ix1->i_nel ; i++ )
 			{
-				char * tmp1;
-				char * tmp2;
+				int		dl;
 
 				if ( dres != NULL) 
 				{
@@ -972,7 +965,7 @@ _aif_binary_op(aifop op,
 				fmt1 = ix1->i_btype;
 				fmt2 = ix2->i_btype;
 
-				if ( _aif_binary_op(op, &fres, &dres, &fmt1, d1, &fmt2, d2 ) < 0 )
+				if ( _aif_binary_op(op, &fres, &dres, &dl, &fmt1, d1, &fmt2, d2 ) < 0 )
 				{
 					AIFArrayIndexFree(ix1);
 					AIFArrayIndexFree(ix2);
@@ -982,12 +975,11 @@ _aif_binary_op(aifop op,
 				AIFArrayIndexInc(ix1);
 				AIFArrayIndexInc(ix2);
 
-				tmp1 = fres;
-				tmp2 = dres;
-				_fds_skip_data(&tmp1, &tmp2);
-				memcpy(d, dres, tmp2-dres);
-				d += (tmp2-dres);
+				memcpy(d, dres, dl);
+				d += dl;
 			}
+
+			*rl = d - *rd;
 
 			{
 				char *t1, *t2;
@@ -1057,16 +1049,14 @@ _aif_binary_op(aifop op,
 		(*f1)++; /* past open brace */
 		(*f2)++; /* past open brace */
 
-		_fds_skipid(f1);
-		_fds_skipid(f2);
+		_fds_skip_typename(f1);
+		_fds_skip_typename(f2);
 
 		while ( **f1 != ';' )
 		{ /* do one field */
-
+			int		dl;
 			char * dres = NULL;
 			char * fres = NULL;
-			char * tmp1;
-			char * tmp2;
 
 			if (**f2 == ';') { /* f1 has more fields */
 				SetAIFError(AIFERR_TYPE, NULL);
@@ -1078,14 +1068,11 @@ _aif_binary_op(aifop op,
 			
 			fmt = *f1;
 
-			if ( _aif_binary_op(op, &fres, &dres, f1, d1, f2, d2 ) < 0 )
+			if ( _aif_binary_op(op, &fres, &dres, &dl, f1, d1, f2, d2 ) < 0 )
 				return -1; /* non-zero res means no need to look further */
 
-			tmp1 = fres;
-			tmp2 = dres;
-			_fds_skip_data(&tmp1, &tmp2);
-			memcpy(d, dres, tmp2-dres);
-			d += (tmp2-dres);
+			memcpy(d, dres, dl);
+			d += dl;
 
 			{
 				char *t1, *t2;
@@ -1121,6 +1108,8 @@ _aif_binary_op(aifop op,
 			SetAIFError(AIFERR_TYPE, NULL);
 			return -1;
 		}
+
+		*rl = d - *rd;
 
 		fmt = *rf;
 		_fds_advance(&fmt);
@@ -1169,6 +1158,7 @@ _aif_binary_op(aifop op,
 				if ( *rd != NULL )
 					_aif_free(*rd);
 				*rd = _aif_alloc(1);
+				*rl = 1;
 				**rd = (char) 0;
 
 				_fds_advance(f1);
@@ -1182,7 +1172,7 @@ _aif_binary_op(aifop op,
 			{
 				if ( *rf == NULL )
 				{
-					tmp2 = (*ptr_type_1==AIF_PTR_REFERENCE)?						 	*f1 : *f2;
+					tmp2 = (*ptr_type_1==AIF_PTR_REFERENCE) ? *f1 : *f2;
 
 					tmp1 = tmp2;
 					_fds_advance(&tmp1);
@@ -1195,6 +1185,7 @@ _aif_binary_op(aifop op,
 				if ( *rd != NULL )
 					_aif_free(*rd);
 				*rd = _aif_alloc(5); /* 1 + 4 (ptr name) */
+				*rl = 5;
 				
 				if (*ptr_type_1 == AIF_PTR_REFERENCE)
 				{
@@ -1216,78 +1207,80 @@ _aif_binary_op(aifop op,
 			if ( target1 == 0 )     /* target1 is null, make
 									target2 as the result */
 			{
-					if ( *rf == NULL )
-					{
-							tmp2 = *f2;
-							tmp1 = tmp2;
-							_fds_advance(&tmp1);
-							len = tmp1 - tmp2;
-							*rf = _aif_alloc(sizeof(char)*len + 1);
-							strncpy(*rf, tmp2, len);
-							(*rf)[len] = '\0';
-					}
+				if ( *rf == NULL )
+				{
+					tmp2 = *f2;
+					tmp1 = tmp2;
+					_fds_advance(&tmp1);
+					len = tmp1 - tmp2;
+					*rf = _aif_alloc(sizeof(char)*len + 1);
+					strncpy(*rf, tmp2, len);
+					(*rf)[len] = '\0';
+				}
 
-					if ( *rd != NULL )
-							_aif_free(*rd);
+				if ( *rd != NULL )
+					_aif_free(*rd);
 
-					{
-							char * _d1;
-							char * _d2;
+				{
+					char * _d1;
+					char * _d2;
 
-							_d2 = ptr_type_2;
-							_d1 = _d2;
-							tmp2 = *f2;
-							tmp1 = tmp2;
-							_fds_skip_data(&tmp1, &_d1);
-							len = _d1 - _d2;
-							*rd = _aif_alloc(sizeof(char)*len);
-							memcpy(*rd, _d2, len);
-					}
+					_d2 = ptr_type_2;
+					_d1 = _d2;
+					tmp2 = *f2;
+					tmp1 = tmp2;
+					_fds_skip_data(&tmp1, &_d1);
+					len = _d1 - _d2;
+					*rd = _aif_alloc(sizeof(char)*len);
+					*rl = len;
+					memcpy(*rd, _d2, len);
+				}
 
-					_fds_advance(f1);
-					(*f2)++;
-					_fds_skip_data(f2, d2);
+				_fds_advance(f1);
+				(*f2)++;
+				_fds_skip_data(f2, d2);
 
-					return 0;
+				return 0;
 			}
 
 			if ( target2 == 0 )     /* target2 is null, make
 									target1 as the result */
 			{
-					if ( *rf == NULL )
-					{
-							tmp2 = *f1;
-							tmp1 = tmp2;
-							_fds_advance(&tmp1);
-							len = tmp1 - tmp2;
-							*rf = _aif_alloc(sizeof(char)*len + 1);
-							strncpy(*rf, tmp2, len);
-							(*rf)[len] = '\0';
-					}
+				if ( *rf == NULL )
+				{
+					tmp2 = *f1;
+					tmp1 = tmp2;
+					_fds_advance(&tmp1);
+					len = tmp1 - tmp2;
+					*rf = _aif_alloc(sizeof(char)*len + 1);
+					strncpy(*rf, tmp2, len);
+					(*rf)[len] = '\0';
+				}
 
-					if ( *rd != NULL )
-							_aif_free(*rd);
+				if ( *rd != NULL )
+					_aif_free(*rd);
 
-					{
-							char * _d1;
-							char * _d2;
+				{
+					char * _d1;
+					char * _d2;
 
-							_d2 = ptr_type_1;
-							_d1 = _d2;
-							_d1 = _d2;
-							tmp2 = *f1;
-							tmp1 = tmp2;
-							_fds_skip_data(&tmp1, &_d1);
-							len = _d1 - _d2;
-							*rd = _aif_alloc(sizeof(char)*len);
-							memcpy(*rd, _d2, len);
-					}
+					_d2 = ptr_type_1;
+					_d1 = _d2;
+					_d1 = _d2;
+					tmp2 = *f1;
+					tmp1 = tmp2;
+					_fds_skip_data(&tmp1, &_d1);
+					len = _d1 - _d2;
+					*rd = _aif_alloc(sizeof(char)*len);
+					*rl = len;
+					memcpy(*rd, _d2, len);
+				}
 
-					_fds_advance(f2);
-					(*f1)++;
-					_fds_skip_data(f1, d1);
+				_fds_advance(f2);
+				(*f1)++;
+				_fds_skip_data(f1, d1);
 
-					return 0;
+				return 0;
 			}
 
 			(*f1)++;
@@ -1318,7 +1311,7 @@ _aif_binary_op(aifop op,
 			fds_type = FDSType(*f1);
 			tmp1 = *f1;
 
-			ret = _aif_binary_op(op, &fres, &dres, f1, d1, f2, d2);
+			ret = _aif_binary_op(op, &fres, &dres, rl, f1, d1, f2, d2);
 
 			{
 				char * ff = fres;
@@ -1372,7 +1365,7 @@ _aif_binary_op(aifop op,
 		bytes2 += *(*d2)++ & 0xff;
 
 		if ( *rd != NULL )
-				_aif_free(*rd);
+			_aif_free(*rd);
 
 		d = _aif_alloc(bytes1 + bytes2 + 2);
 
@@ -1386,6 +1379,7 @@ _aif_binary_op(aifop op,
 		*d2 += bytes2;
 
 		*rd = d;
+		*rl = bytes1 + bytes2 + 2;
 
 		if ( *rf == NULL )
 			*rf = strdup(AIF_STRING_TYPE());
@@ -1400,7 +1394,7 @@ _aif_binary_op(aifop op,
 		case AIF_ADDRESS:
 			bytes2 = _fds_count_bytes_na(f2);
 
-			if ( _aif_binary_op_int(op, rd, *d1, bytes1, *d2, bytes2) < 0 )
+			if ( _aif_binary_op_int(op, rd, rl, *d1, bytes1, *d2, bytes2) < 0 )
 				return -1;
 
 			(*d1) += bytes1;
@@ -1429,6 +1423,7 @@ _aif_binary_op(aifop op,
 				return -1;
 
 			*rd = d;
+			*rl = sizeof(int);
 
 			if ( *rf == NULL )
 				*rf = strdup(AIF_INTEGER_TYPE(1, sizeof(int)));
@@ -1443,6 +1438,7 @@ _aif_binary_op(aifop op,
 				return -1;
 
 			*rd = d;
+			*rl = sizeof(int);
 
 			if ( *rf == NULL )
 				*rf = strdup(AIF_INTEGER_TYPE(1, sizeof(int)));
@@ -1627,7 +1623,7 @@ _aif_unary_op(aifop op, char **rf, char **rd, char **fds, char **data)
 			*rf = strdup(*fds);
 
 		(*fds)++; /* past open brace */
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		dp = *rd;
 
@@ -1702,7 +1698,7 @@ _aif_unary(AIF *a, aifop op)
 	if ( _aif_unary_op(op, &rf, &rd, &f, &d) < 0 )
 		return (AIF *)NULL;
 
-	return MakeAIF(rf, rd);
+	return _make_aif(rf, rd, AIF_LEN(a));
 }
 
 AIF *
@@ -1720,8 +1716,9 @@ AIFNeg(AIF *a)
 AIF *
 _aif_binary(AIF *a1, AIF *a2, aifop op)
 {
-	char *	rd;
-	char *	rf;
+	int		rl;
+	char *	rd = NULL;
+	char *	rf = NULL;
 	char *	f1;
 	char *	f2;
 	char *	d1;
@@ -1738,13 +1735,10 @@ _aif_binary(AIF *a1, AIF *a2, aifop op)
 	d1 = AIF_DATA(a1);
 	d2 = AIF_DATA(a2);
 
-	rf = NULL; /* we don't know result so let _aif_binary_op work it out */
-	rd = NULL;
-
-	if ( _aif_binary_op(op, &rf, &rd, &f1, &d1, &f2, &d2) < 0 )
+	if ( _aif_binary_op(op, &rf, &rd, &rl, &f1, &d1, &f2, &d2) < 0 )
 		return (AIF *)NULL;
 
-	return MakeAIF(rf, rd);
+	return _make_aif(rf, rd, rl);
 }
 AIF *
 AIFAdd(AIF *a1, AIF *a2)

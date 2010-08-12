@@ -22,6 +22,9 @@
 #include	"aiferr.h"
 #include	"aifint.h"
 
+/*
+ * Find the rank of the array.
+ */
 int
 AIFArrayRank(AIF *a)
 {
@@ -40,6 +43,10 @@ AIFArrayRank(AIF *a)
 	return FDSArrayRank(AIF_FORMAT(a));
 }
 
+/*
+ * Find the total number of elements in an array. This
+ * will count all the elements in a nested array.
+ */
 int
 AIFArraySize(AIF *a)
 {
@@ -164,7 +171,7 @@ _aif_array_slice_post(char **fds, char **data, char **rdata, char **res)
 
 	case AIF_AGGREGATE:
 		(*fds)++;
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		while ( **fds != FDS_AGGREGATE_ACCESS_SEP )
 		{
@@ -285,7 +292,7 @@ _aif_array_slice_pre(char **fds, char **data, char **res)
 
 	case AIF_AGGREGATE:
 		(*fds)++;
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		while ( **fds != FDS_AGGREGATE_ACCESS_SEP )
 		{
@@ -889,7 +896,7 @@ AIFArrayElementToLongest(AIF *a, AIFIndex *ix, AIFLONGEST *val)
 int
 AIFArrayElementToInt(AIF *a, AIFIndex *ix, int *val)
 {
-	int		res;
+	int			res;
 	AIFLONGEST	l;
 
 	res = AIFArrayElementToLongest(a, ix, &l);
@@ -903,29 +910,27 @@ AIFArrayElementToInt(AIF *a, AIFIndex *ix, int *val)
 AIF *
 _aif_array_ref(AIF *a, int rank, int *index, int *min, int *size, char *btype, int bsize)
 {
-	AIF *	ae;
-	int	counter;
-	int	offset;
-	char *	theFormat;
-	char *	dataStart;
-	char *	dataEnd;
-
-	ae = MakeAIF(strdup(btype), NULL);
+	int		counter;
+	int		offset;
+	char *	fds;
+	char *	data;
+	char *	data_start;
+	char *	data_end;
 
 	offset = AIFIndexOffset(rank, index, min, size, (int *)NULL);
-	dataStart = dataEnd = AIF_DATA(a);
+	data_start = data_end = AIF_DATA(a);
 
 	for ( counter = 0 ; counter <= offset ; counter++ )
 	{
-		theFormat = btype;
-		dataStart = dataEnd;
-		_fds_skip_data(&theFormat, &dataEnd);
+		fds = btype;
+		data_start = data_end;
+		_fds_skip_data(&fds, &data_end);
 	}
 
-	AIF_DATA(ae) = _aif_alloc(dataEnd - dataStart + 1);
-	memcpy(AIF_DATA(ae), dataStart, dataEnd - dataStart);
+	data = _aif_alloc(data_end - data_start);
+	memcpy(data, data_start, data_end - data_start);
 
-	return ae;
+	return _make_aif(strdup(btype), data, data_end - data_start);
 }
 
 /*

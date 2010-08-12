@@ -20,7 +20,16 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents function value of IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFValueFunction extends IValueDerived {}
+public interface IAIFValueFunction extends IAIFValue {
+	/**
+	 * Get the function name
+	 * 
+	 * @return function name or null if the function has no name
+	 * @since 5.0
+	 */
+	public String getName();
+}

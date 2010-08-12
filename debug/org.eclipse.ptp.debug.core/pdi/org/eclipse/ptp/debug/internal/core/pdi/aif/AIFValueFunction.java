@@ -27,10 +27,32 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFunction;
  * @author Clement chu
  * 
  */
-public class AIFValueFunction extends ValueDerived implements IAIFValueFunction {
+public class AIFValueFunction extends AIFValue implements IAIFValueFunction {
+	private String fName = null;
+
 	public AIFValueFunction(IAIFTypeFunction type, SimpleByteBuffer buffer) {
 		super(type);
 		parse(buffer);
+		((AIFTypeFunction) type).setSizeof(sizeof());
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValueFunction#getName()
+	 */
+	public String getName() {
+		return fName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
+	 */
+	public String getValueString() throws AIFException {
+		return String.valueOf(""); //$NON-NLS-1$
 	}
 
 	/*
@@ -42,15 +64,12 @@ public class AIFValueFunction extends ValueDerived implements IAIFValueFunction 
 	 */
 	@Override
 	protected void parse(SimpleByteBuffer buffer) {
-		setSize(getType().sizeof());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue#getValueString()
-	 */
-	public String getValueString() throws AIFException {
-		return String.valueOf(""); //$NON-NLS-1$
+		StringBuilder name = new StringBuilder();
+		byte b;
+		while (!buffer.end() && (b = buffer.get()) != 0) {
+			name.append(b);
+		}
+		fName = name.toString();
+		setSize(fName.length());
 	}
 }
