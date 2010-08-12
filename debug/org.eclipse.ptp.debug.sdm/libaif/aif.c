@@ -151,34 +151,39 @@ NewAIF(int fmt_len, int data_len)
 	return a;
 }
 
+/*
+ * Create a new AIF object given a format string and data. A new
+ * copy is made of both the format string and the data.
+ */
 AIF *
 MakeAIF(char *fmt, char *data)
 {
-	AIF *	a;
+	int		new_len;
+	char *	new_fmt;
+	char *	new_data;
 
-	if ( fmt == NULL )
-	{
+	if (fmt == NULL || data == NULL) {
 		SetAIFError(AIFERR_BADARG, NULL);
 		return (AIF *)NULL;
 	}
 
-	if ( data == NULL )
-	{
-		a = NewAIF(0, FDSTypeSize(fmt));
-		AIF_FORMAT(a) = fmt;
-	}
-	else
-	{
-		char * tmp1;
-		char * tmp2;
-		tmp1 = fmt;
-		tmp2 = data;
-		_fds_skip_data(&tmp1, &tmp2);
-		a = NewAIF(0, 0);
-		AIF_FORMAT(a) = fmt;
-		AIF_LEN(a) = tmp2-data;
-		AIF_DATA(a) = data;
-	}
+	new_fmt = strdup(fmt);
+	new_len = _fds_type_size(fmt, data);
+	new_data = (char *)_aif_alloc(new_len);
+	memcpy(new_data, data, new_len);
+
+	return _make_aif(new_fmt, new_data, new_len);
+}
+
+AIF *
+_make_aif(char *fmt, char *data, int len)
+{
+	AIF *	a;
+
+	a = NewAIF(0, 0);
+	AIF_FORMAT(a) = fmt;
+	AIF_LEN(a) = len;
+	AIF_DATA(a) = data;
 
 	return a;
 }

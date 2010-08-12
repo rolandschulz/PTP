@@ -78,54 +78,78 @@ static char _fds_aggregate_field_end[] = { FDS_AGGREGATE_ACCESS_SEP, FDS_AGGREGA
 static char _fds_union_field_name_end[] = {FDS_UNION_FIELD_NAME_END, '\0' };
 static char _fds_union_field_end[] = { FDS_UNION_FIELD_SEP, FDS_UNION_END, '\0' };
 
-#define MAX_CALLS	2
+#define MAX_CALLS	4
 
 static char *	_fds_buf[MAX_CALLS];
 static int		_fds_pos = 0;
 
 char *
-_fds_skipnum(char *str)
+_fds_skipnum(char *fds)
 {
-	if ( str == NULL )
+	if ( fds == NULL )
 		return NULL;
 
-	while ( *str != '\0' && isdigit((int)*str) )
-		str++;
+	while ( *fds != '\0' && isdigit((int)*fds) )
+		fds++;
 
-	return str;
+	return fds;
 }
 
+/*
+ * Skip the name field. Leaves fds pointing
+ * at the first character after the end of name.
+ * Does nothing if there is no name field.
+ */
+void
+_fds_skip_name(char **fds)
+{
+	if (**fds == FDS_NAME) {
+		*fds = _fds_skipto(*fds, _fds_name_end);
+		(*fds)++;
+	}
+}
+
+/*
+ * Skip to the location of a character from 'set' in the supplied
+ * type string.
+ *
+ * Returns a pointer to the character if located, or
+ * to the NULL character if not.
+ *
+ * Only searches the "top level" of the type. If the type contains
+ * nested structured types, these will be skipped.
+ */
 char *
-_fds_skipto(char *str, char *set)
+_fds_skipto(char *fds, char *set)
 {
 	char *	s;
 
-	if ( str == NULL )
+	if ( fds == NULL )
 		return NULL;
 
-	for ( ; *str != '\0' ; str++ )
+	for ( ; *fds != '\0' ; fds++ )
 	{
 		if
 		(
-			*str == FDS_AGGREGATE_START
+			*fds == FDS_AGGREGATE_START
 			|| 
-			*str == FDS_UNION_START 
+			*fds == FDS_UNION_START
 			|| 
-			*str == FDS_ARRAY_START 
+			*fds == FDS_ARRAY_START
 			|| 
-			*str == FDS_ENUM_START
+			*fds == FDS_ENUM_START
 		)
 		{
-			str = _fds_skiptomatch(str);
-			str++;
+			fds = _fds_skiptomatch(fds);
+			fds++;
 		}
 
 		for ( s = set ; *s != '\0' ; s++ )
-			if ( *s == *str )
-				return str;
+			if ( *s == *fds )
+				return fds;
 	}
 
-	return str;
+	return fds;
 }
 
 /* 
@@ -136,25 +160,26 @@ _fds_skipto(char *str, char *set)
 int
 _fds_getnum(char *str)
 {
-	int	n;
-	char *	p;
-	char *	t;
-
-	p = _fds_skipnum(str);
-
-	if ( *p == '\0' )
-		return strtoul(str, NULL, 10);
-
-	n = p - str;
-	t = (char *)_aif_alloc(n + 1);
-	memcpy(t, str, n);
-	t[n] = '\0';
-
-	n = strtoul(t, NULL, 10);
-
-	_aif_free(t);
-
-	return n;
+//	int	n;
+//	char *	p;
+//	char *	t;
+//
+//	p = _fds_skipnum(str);
+//
+//	if ( *p == '\0' )
+//		return strtoul(str, NULL, 10);
+//
+//	n = p - str;
+//	t = (char *)_aif_alloc(n + 1);
+//	memcpy(t, str, n);
+//	t[n] = '\0';
+//
+//	n = strtoul(t, NULL, 10);
+//
+//	_aif_free(t);
+//
+//	return n;
+	return strtoul(str, NULL, 10);
 }
 
 int
@@ -396,7 +421,7 @@ FDSTypeSize(char *type)
 		size = 0;
 		subsize = 0;
 
-		_fds_skipid(&type);
+		_fds_skip_typename(&type);
 		
 		while ( *type != FDS_AGGREGATE_END )
 		{
@@ -426,7 +451,7 @@ FDSTypeSize(char *type)
 		size = 0;
 		subsize = 0;
 		
-		_fds_skipid(&type);
+		_fds_skip_typename(&type);
 		
 		while ( *type != FDS_UNION_END )
 		{
@@ -603,7 +628,7 @@ TypeToFDS(int type, ...)
 
 	va_end(args);
 
-	if (_fds_pos > MAX_CALLS) {
+	if (_fds_pos >= MAX_CALLS) {
 		_fds_pos = 0;
 	}
 	if (_fds_buf[_fds_pos] != NULL) {
@@ -852,7 +877,8 @@ FDSArrayRank(char *fds)
 }
 
 /*
- * Calculate the total size of an array
+ * Calculate the total number of elements in an array.
+ * This will count elements in nested arrays.
  */
 int
 FDSArraySize(char *fds)
@@ -906,13 +932,9 @@ FDSArrayBounds(char *fds, int rank, int **min, int **size)
 	sz = *size;
 
 	for ( i = 0 ; i < rank ; i++) {
-		*mn = _fds_array_min_index(fds);
-		*sz = _fds_array_size(fds);
-
+		*mn++ = _fds_array_min_index(fds);
+		*sz++ = _fds_array_size(fds);
 		fds = _fds_base_type(fds);
-
-		mn++;
-		sz++;
 	}
 }
 
@@ -990,7 +1012,7 @@ FDSArrayIndexInit(char *fmt)
  *  name is the name of the aggregate, or empty for an unnamed type
  *  each entry has the format "name=type"
  *  a aggregate comprises 4 sections separated by ';', corresponding
- *    to public, private, protected and hidden members 
+ *    to public, private, protected and package members
  */
 
 #define AGGREGATE_START(fds, res) \
@@ -1010,14 +1032,18 @@ FDSArrayIndexInit(char *fmt)
 	if ( *(fds) == FDS_AGGREGATE_END ) \
 		return (res);
 
+/*
+ * Skip to matching end of type character.
+ *
+ * If the fds is not a structured type, skip to end of string.
+ *
+ * Returns pointer to end of type character or end of string
+ * if no match can be found.
+ */
 char *
 _fds_skiptomatch(char *fds)
 {
 	char	ender = 0;
-
-	/*
-	** assert *fds == '{' or '['; find the matching '}' or ']'
-	*/
 
 	switch ( *fds )
 	{
@@ -1043,7 +1069,7 @@ _fds_skiptomatch(char *fds)
 	for ( ;; )
 	{
 		if ( *fds == ender )
-			return fds;
+			break;
 
 		if
 		(
@@ -1059,6 +1085,8 @@ _fds_skiptomatch(char *fds)
 
 		fds++;
 	}
+
+	return fds;
 }
 
 /*
@@ -1069,21 +1097,26 @@ _fds_skiptofield(char *fds, int n)
 {
 	AGGREGATE_START(fds, NULL);
 
-	while ( *fds != '\0' && *fds != FDS_AGGREGATE_END && n > 0 )
+	for ( ; *fds != '\0' && *fds != FDS_AGGREGATE_END && n > 0 ; fds++)
 	{
-		if ( *fds == FDS_AGGREGATE_FIELD_SEP )
+		if ( *fds == FDS_AGGREGATE_FIELD_SEP ) {
 			n--;
-		else if ( *fds == FDS_AGGREGATE_ACCESS_SEP )
-		{
+			continue;
+		}
+
+		if ( *fds == FDS_AGGREGATE_ACCESS_SEP ) {
 			if 
 			( 
 			 	*(fds+1) != FDS_AGGREGATE_ACCESS_SEP
 				&&
 				*(fds+1) != FDS_AGGREGATE_END
-			)
+			) {
 				n--;
+			}
+			continue;
 		}
-		else if
+
+		if
 		(
 			*fds == FDS_AGGREGATE_START
 			|| 
@@ -1092,11 +1125,9 @@ _fds_skiptofield(char *fds, int n)
 			*fds == FDS_ARRAY_START 
 			|| 
 			*fds == FDS_ENUM_START
-		)
+		) {
 			fds = _fds_skiptomatch(fds);
-
-		fds++;
-
+		}
 	}
 
 	if ( *fds == '\0' || *fds == FDS_AGGREGATE_END )
@@ -1894,6 +1925,10 @@ FDSUnionAdd(char **fds, char *name, char *type)
 	return 0;
 }
 
+/*
+ * Add the field to the end of the section specified by the access
+ * qualifier.
+ */
 char *
 FDSAddFieldToAggregate(char *fds, AIFAccess acc, char *name, char *type)
 {
@@ -1916,14 +1951,14 @@ FDSAddFieldToAggregate(char *fds, AIFAccess acc, char *name, char *type)
 
 	temp = nfmt;
 
-	if (*(fds) == FDS_NAME) { 
-        	(fds) = _fds_skipto((fds), _fds_name_end); 
-        	(fds)++; 
+	if (*fds == FDS_NAME) {
+        	fds = _fds_skipto(fds, _fds_name_end);
+        	fds++;
 	} 
 
-	if (*(temp) == FDS_NAME) {
-        	(temp) = _fds_skipto((temp), _fds_name_end);
-        	(temp)++;
+	if (*temp == FDS_NAME) {
+        	temp = _fds_skipto(temp, _fds_name_end);
+        	temp++;
 	}
 
 	if
@@ -2108,7 +2143,7 @@ _fds_advance(char **fds)
 		break;
 
 	case AIF_ENUM:
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		*fds = _fds_skipto(*fds, _fds_enum_end);
 		(*fds) += 2;
@@ -2140,7 +2175,7 @@ _fds_advance(char **fds)
 
 	case AIF_UNION:
 	case AIF_AGGREGATE:
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		for ( ;; ) {
 
@@ -2380,9 +2415,9 @@ _get_pointer_name(char *data)
 
 /* 
  * Skip over one full data unit, specified by the fds,
- * At return, fds should be at its end, and data is advanced.
+ * At return, fds should be at its end, and data is advanced
+ * to point to the next byte following the end of the data.
  */
-
 void
 _fds_skip_data(char **fds, char **data)
 {
@@ -2433,7 +2468,7 @@ _fds_skip_data(char **fds, char **data)
 
 	case AIF_AGGREGATE:
 		(*fds)++; /* past FDS_AGGREGATE_START */
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		while ( **fds != FDS_AGGREGATE_END )
 		{
@@ -2456,7 +2491,7 @@ _fds_skip_data(char **fds, char **data)
 
 	case AIF_UNION:
 		(*fds)++; /* past FDS_UNION_START */
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		while ( **fds != FDS_UNION_END )
 		{
@@ -2487,6 +2522,11 @@ _fds_skip_data(char **fds, char **data)
 		return;
 
 	case AIF_FUNCTION:
+		while ( *(*fds)++ != FDS_FUNCTION_ARG_END )
+			;
+
+		_fds_advance(fds);
+
 		while ( **data != '\0' )
 			(*data)++;
 		(*data)++; /* past null */
@@ -2498,12 +2538,35 @@ _fds_skip_data(char **fds, char **data)
 	}
 }
 
-void
-_fds_skipid(char **fds)
+/*
+ * Correctly calculate the actual size of a type.
+ * Requires the data in order to be able to deal
+ * with variable length types.
+ */
+int
+_fds_type_size(char *fds, char *data)
 {
-	if (**fds != FDS_TYPENAME_END)
+	char *	f = fds;
+	char *	d = data;
+
+	_fds_skip_data(&f, &d);
+	return d - data;
+}
+
+/*
+ * Skip the typename field. On return, fds will point
+ * to the character after '|' or NULL if the
+ * '|' is not found.
+ */
+void
+_fds_skip_typename(char **fds)
+{
+	if (**fds != FDS_TYPENAME_END) {
 		*fds = strchr(*fds, FDS_TYPENAME_END);
-	*fds += 1;
+	}
+	if (*fds != NULL) {
+		(*fds)++;
+	}
 }
 
 char *

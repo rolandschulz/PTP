@@ -36,7 +36,6 @@ extern int		GetAIFVar(MISession *session, char *var, AIF **val, char **type);
 extern AIF *	GetAIFPointer(MISession *session, char *addr, AIF *i);
 extern AIF *	GetCharPointerAIF(MISession *session, char *res);
 extern AIF *	GetSimpleAIF(MISession *session, MIVar *var);
-extern AIF *	GetNamedAIF(AIF *a, int named);
 extern AIF *	GetStructAIF(MISession *session, MIVar *var, int named);
 extern AIF *	GetClassAIF(MISession *session, MIVar *var, int named);
 extern AIF *	GetUnionAIF(MISession *session, MIVar *var, int named);

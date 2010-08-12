@@ -516,7 +516,10 @@ GetSimpleAIF(MISession *session, MIVar *var)
 	}
 	switch (id) {
 	case T_FUNCTION:
-		return MakeAIF("&/is4", strdup(var->exp));
+		ac = MakeAIF(AIF_FUNCTION_TYPE("is4"), ""); /* TODO: get real type */
+		v = GetVarValue(session, var->name);
+		a = GetAIFPointer(session, v, ac);
+		return a;
 	case T_VOID_PTR:
 		ac = VoidToAIF(0, 0);
 		v = GetVarValue(session, var->name);
@@ -536,15 +539,6 @@ GetSimpleAIF(MISession *session, MIVar *var)
 	}
 }
 
-AIF*
-GetNamedAIF(AIF *a, int named)
-{
-	if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
-		return NameAIF(a, named);
-	}
-	return a;
-}
-
 AIF *
 GetStructAIF(MISession *session, MIVar *var, int named)
 {
@@ -561,7 +555,7 @@ GetStructAIF(MISession *session, MIVar *var, int named)
 		v = var->children[i];
 		//check whether child contains parent
 		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			a = GetNamedAIF(a, named);
+			NameAIF(a, named);
 			ac = AIFNullPointer(a);
 		} else if ((ac = GetAIF(session, v, named)) == NULL) {
 			AIFFree(a);
@@ -612,7 +606,7 @@ GetUnionAIF(MISession *session, MIVar *var, int named)
 		v = var->children[i];
 		//check whether child contains parent
 		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			a = GetNamedAIF(a, named);
+			NameAIF(a, named);
 			ac = AIFNullPointer(a);
 		} else if ((ac = GetAIF(session, v, named)) == NULL) {
 			AIFFree(a);

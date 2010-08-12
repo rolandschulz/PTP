@@ -18,27 +18,38 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.aif;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
+import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFunction;
 
-public class AIFTypeFunction extends TypeDerived implements IAIFTypeFunction {
-	private String[] args = new String[0];
+public class AIFTypeFunction extends AIFType implements IAIFTypeFunction {
+	private IAIFType[] fArgTypes;
+	private IAIFType fReturnType;
+	private int fSize = AIFFactory.SIZE_INVALID;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#toString()
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFunction#getArgumentTypes
+	 * ()
 	 */
-	@Override
-	public String toString() {
-		String content = String.valueOf(AIFFactory.FDS_FUNCTION);
-		for (int i = 0; i < args.length; i++) {
-			content += args[i];
-			if (i < args.length - 1)
-				content += AIFFactory.FDS_FUNCTION_ARG_SEP;
-		}
-		return content + AIFFactory.FDS_FUNCTION_END + super.toString();
+	public IAIFType[] getArgumentTypes() {
+		return fArgTypes;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeFunction#getReturnType()
+	 */
+	public IAIFType getReturnType() {
+		return fReturnType;
 	}
 
 	/*
@@ -50,9 +61,48 @@ public class AIFTypeFunction extends TypeDerived implements IAIFTypeFunction {
 	 */
 	@Override
 	public String parse(String fmt) throws AIFFormatException {
+		List<IAIFType> argTypes = new ArrayList<IAIFType>();
 		int pos = fmt.indexOf(AIFFactory.FDS_FUNCTION_END);
-		String argsStr = fmt.substring(0, pos);
-		args = argsStr.split(String.valueOf(AIFFactory.FDS_FUNCTION_ARG_SEP));
-		return super.parse(fmt.substring(pos + 1));
+		if (pos > 0) {
+			String argsStr = fmt.substring(0, pos);
+			String[] args = argsStr.split(String.valueOf(AIFFactory.FDS_FUNCTION_ARG_SEP));
+			for (String arg : args) {
+				AIFFactory.parseType(arg);
+				argTypes.add(AIFFactory.getType());
+			}
+		}
+		fArgTypes = argTypes.toArray(new IAIFType[0]);
+		String res = AIFFactory.parseType(fmt.substring(pos + 1));
+		fReturnType = AIFFactory.getType();
+		return res;
+	}
+
+	public void setSizeof(int size) {
+		fSize = size;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType#sizeof()
+	 */
+	public int sizeof() {
+		return fSize;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.core.pdi.aif.TypeDerived#toString()
+	 */
+	@Override
+	public String toString() {
+		String content = String.valueOf(AIFFactory.FDS_FUNCTION);
+		for (int i = 0; i < fArgTypes.length; i++) {
+			content += fArgTypes[i].toString();
+			if (i < fArgTypes.length - 1)
+				content += AIFFactory.FDS_FUNCTION_ARG_SEP;
+		}
+		return content + AIFFactory.FDS_FUNCTION_END + getReturnType().toString();
 	}
 }

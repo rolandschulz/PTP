@@ -66,7 +66,7 @@ _aif_is_zero(char **fds, char **data, int len, int *val)
 
 		(*fds)++; /* past open brace */
 
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		while ( **fds != FDS_UNION_END )
 		{
@@ -171,7 +171,7 @@ _aif_is_zero(char **fds, char **data, int len, int *val)
 		*val = 1; /* zero unless shown otherwise */
 
 		(*fds)++; /* past open brace */
-		_fds_skipid(fds);
+		_fds_skip_typename(fds);
 
 		while ( **fds != FDS_AGGREGATE_ACCESS_SEP )
 		{
@@ -254,17 +254,16 @@ AIFCompare(int depth, AIF *a1, AIF *a2, int *res)
 int
 _aif_cmp_int(int *res, char *d1, int l1, char *d2, int l2)
 {
-	int	i;
+	int		i;
+	int		l;
 	char *	r1;
-	char *	r2;
+	char *	r2 = NULL;
 
 	r1 = (char *)_aif_alloc(l2);
 
 	_aif_neg_int(r1, d2, l2);
 
-	r2 = (char *)_aif_alloc(MAX(l1, l2));
-
-	_aif_add_int(r2, d1, l1, r1, l2);
+	_aif_add_int(&r2, &l, d1, l1, r1, l2);
 
 	_aif_free(r1);
 
@@ -511,8 +510,8 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 
 		(*f1)++; /* past open brace */
 		(*f2)++; /* past open brace */
-		_fds_skipid(f1);
-		_fds_skipid(f2);
+		_fds_skip_typename(f1);
+		_fds_skip_typename(f2);
 
 		*res = 0; /* first assumption, they are equal */
 
@@ -621,7 +620,7 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 
 		case AIF_FLOATING:
 			bytes1 = _fds_count_bytes(f1);
-			l3 = _aif_int_to_aif_float(&d3, *d1, bytes1);
+			_aif_int_to_aif_float(&fmt, &d3, &l3, *d1, bytes1);
 			*d1 += bytes1;
 
 			if ( l3 < 0 )
@@ -633,6 +632,8 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 			bytes2 = _fds_count_bytes(f2);
 			success = _aif_cmp_float(res, d3, l3, *d2, bytes2);
 			*d2 += bytes2;
+			_aif_free(fmt);
+			_aif_free(d3);
 
 			return success;
 
@@ -648,7 +649,7 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 		{
 		case AIF_INTEGER:
 			bytes2 = _fds_count_bytes(f2);
-			l3 = _aif_int_to_aif_float(&d3, *d2, bytes2);
+			_aif_int_to_aif_float(&fmt, &d3, &l3, *d2, bytes2);
 			*d2 += bytes2;
 
 			if ( l3 < 0 )
@@ -660,6 +661,8 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 			bytes1 = _fds_count_bytes(f1);
 			success = _aif_cmp_float(res, *d1, bytes1, d3, l3);
 			*d1 += bytes1;
+			_aif_free(fmt);
+			_aif_free(d3);
 
 			return success;
 			
@@ -807,8 +810,8 @@ _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 
 		(*f1)++; /* past open brace */
 		(*f2)++; /* past open brace */
-		_fds_skipid(f1);
-		_fds_skipid(f2);
+		_fds_skip_typename(f1);
+		_fds_skip_typename(f2);
 
 		*res = 0; /* first assumption, they are equal */
 
@@ -1177,7 +1180,7 @@ _aif_eps(char *lo_fds, char *lo_data, int lo_len, char *hi_fds, char *hi_data, i
 			int		t_len;
 
 			a_fds++;
-			_fds_skipid(&a_fds);
+			_fds_skip_typename(&a_fds);
 
 			t_dt1 = a_data;
 			t_ft1 = a_fds;
@@ -1276,32 +1279,29 @@ AIFEPS(AIF *lo, AIF *hi, AIF *a, int *val)
 AIF *
 AIFDiff(int depth, AIF *a1, AIF *a2)
 {
-        char *  rd;
-        char *  rf;
-        char *  f1;
-        char *  f2;
-        char *  d1;
-        char *  d2;
+	int		rl;
+	char *  rd = NULL;
+	char *  rf = NULL;
+	char *  f1;
+	char *  f2;
+	char *  d1;
+	char *  d2;
 
-        if ( a1 == (AIF *)NULL || a2 == (AIF *)NULL )
-        {
-                SetAIFError(AIFERR_BADARG, NULL);
-                return NULL;
-        }
+	if ( a1 == (AIF *)NULL || a2 == (AIF *)NULL )
+	{
+			SetAIFError(AIFERR_BADARG, NULL);
+			return NULL;
+	}
 
-        f1 = AIF_FORMAT(a1);
-        f2 = AIF_FORMAT(a2);
-        d1 = AIF_DATA(a1);
-        d2 = AIF_DATA(a2);
+	f1 = AIF_FORMAT(a1);
+	f2 = AIF_FORMAT(a2);
+	d1 = AIF_DATA(a1);
+	d2 = AIF_DATA(a2);
 
-        rf = NULL; /* we don't know result so let _aif_binary_op work it out */
-        rd = NULL;
-        //rd = _aif_alloc(MAX(AIF_LEN(a1), AIF_LEN(a2)));
+	if ( _aif_diff(depth, &rf, &rd, &rl, &f1, &d1, &f2, &d2) < 0 )
+			return (AIF *)NULL;
 
-        if ( _aif_diff(depth, &rf, &rd, &f1, &d1, &f2, &d2) < 0 )
-                return (AIF *)NULL;
-
-	return MakeAIF(rf, rd);
+	return _make_aif(rf, rd, rl);
 }
 
 /*
@@ -1318,7 +1318,7 @@ AIFDiff(int depth, AIF *a1, AIF *a2)
  * applied to each field or element in the object.
  */
 int
-_aif_diff(int depth, char **rf, char **rd,
+_aif_diff(int depth, char **rf, char **rd, int *rl,
 	  	     char **f1, char **d1,
 	  	     char **f2, char **d2)
 {
@@ -1344,13 +1344,13 @@ _aif_diff(int depth, char **rf, char **rd,
 	if ( FDSType(*f1) == AIF_REFERENCE )
 	{
 		fmt = _fds_lookup(f1);
-		return _aif_diff(depth, rf, rd, &fmt, d1, f2, d2);
+		return _aif_diff(depth, rf, rd, rl, &fmt, d1, f2, d2);
 	}
 
 	if ( FDSType(*f2) == AIF_REFERENCE )
 	{
 		fmt = _fds_lookup(f2);
-		return _aif_diff(depth, rf, rd, f1, d1, &fmt, d2);
+		return _aif_diff(depth, rf, rd, rl, f1, d1, &fmt, d2);
 	}
 
 	switch ( FDSType(*f1) )
@@ -1359,7 +1359,7 @@ _aif_diff(int depth, char **rf, char **rd,
 	case AIF_FLOATING:
 	case AIF_CHARACTER:
 	case AIF_ADDRESS:
-		return _aif_binary_op(AIFOP_SUB, rf, rd, f1, d1, f2, d2);
+		return _aif_binary_op(AIFOP_SUB, rf, rd, rl, f1, d1, f2, d2);
 
 	/* returns FALSE if they are the same */	
 	case AIF_BOOLEAN:
@@ -1370,21 +1370,22 @@ _aif_diff(int depth, char **rf, char **rd,
 		{
 		case AIF_BOOLEAN:
 			{
-			
 				AIFLONGEST	val1;
 				AIFLONGEST	val2;
 				AIFLONGEST	val3;
 			
+				*rl = MAX(bytes1, bytes2);
+
 				if ( *rd == NULL )
-					*rd = (char *)_aif_alloc(MAX(bytes1, bytes2));
+					*rd = (char *)_aif_alloc(*rl);
 
 				_aif_to_longest(*d1, bytes1, &val1);
 				_aif_to_longest(*d2, bytes2, &val2);
 				val3 = val1 ^ val2;
-				_longest_to_aif(rd, MAX(bytes1, bytes2), val3);
+				_longest_to_aif(rd, *rl, val3);
 
 				if ( *rf == NULL )
-					*rf = strdup(AIF_BOOLEAN_TYPE(MAX(bytes1, bytes2)));
+					*rf = strdup(AIF_BOOLEAN_TYPE(*rl));
 
 				*d1 += bytes1;
 				*d2 += bytes2;
@@ -1463,8 +1464,7 @@ _aif_diff(int depth, char **rf, char **rd,
 
 			for ( i = 0 ; i < ix1->i_nel ; i++ )
 			{
-				char * tmp1;
-				char * tmp2;
+				int	dl;
 
 				if ( dres != NULL )
 				{
@@ -1481,7 +1481,7 @@ _aif_diff(int depth, char **rf, char **rd,
 				fmt1 = ix1->i_btype;
 				fmt2 = ix2->i_btype;
 
-				if ( _aif_diff(depth, &fres, &dres, &fmt1, d1, &fmt2, d2) < 0 )
+				if ( _aif_diff(depth, &fres, &dres, &dl, &fmt1, d1, &fmt2, d2) < 0 )
 				{
 					AIFArrayIndexFree(ix1);
 					AIFArrayIndexFree(ix2);
@@ -1491,20 +1491,18 @@ _aif_diff(int depth, char **rf, char **rd,
 				AIFArrayIndexInc(ix1);
 				AIFArrayIndexInc(ix2);
 
-				tmp1 = fres;
-				tmp2 = dres;
-				_fds_skip_data(&tmp1, &tmp2);
-
 				/* Is the *rd large enough? */
-				if (datalen < (currentlen + (tmp2 - dres)))
+				if (datalen < (currentlen + dl))
 				{
 					*rd = _aif_resize(*rd, datalen + BUFSIZ);
 					datalen += BUFSIZ;
 				}
 
-				memcpy(*rd + currentlen, dres, tmp2-dres);
-				currentlen += (tmp2-dres);
+				memcpy(*rd + currentlen, dres, dl);
+				currentlen += dl;
 			}
+
+			*rl = currentlen;
 
 			{
 				/* we need to modify 'rf' because it is
@@ -1619,16 +1617,14 @@ _aif_diff(int depth, char **rf, char **rd,
 
 		(*f1)++; /* past open brace */
 		(*f2)++; /* past open brace */
-		_fds_skipid(f1);
-		_fds_skipid(f2);
+		_fds_skip_typename(f1);
+		_fds_skip_typename(f2);
 
 		while ( **f1 != ';' )
 		{ /* do one field */
-
-			char * dres = NULL;
-			char * fres = NULL;
-			char * tmp1;
-			char * tmp2;
+			int		dl;
+			char *	dres = NULL;
+			char *	fres = NULL;
 
 			if (**f2 == ';') { /* f1 has more fields */
 				SetAIFError(AIFERR_TYPE, NULL);
@@ -1647,7 +1643,7 @@ _aif_diff(int depth, char **rf, char **rd,
 
 			fmt = *f1;
 
-			if ( _aif_diff(depth, &fres, &dres, f1, d1, f2, d2) < 0 )
+			if ( _aif_diff(depth, &fres, &dres, &dl, f1, d1, f2, d2) < 0 )
 			{
 				if (cmp_by_name == 1)
 				{
@@ -1659,19 +1655,15 @@ _aif_diff(int depth, char **rf, char **rd,
 				return -1; /* non-zero res means no need to look further */
 			}
 
-			tmp1 = fres;
-			tmp2 = dres;
-			_fds_skip_data(&tmp1, &tmp2);
-
 			/* Is the *rd large enough? */
-			if (datalen < (currentlen + (tmp2 - dres)))
+			if (datalen < (currentlen + dl))
 			{
 				*rd = _aif_resize(*rd, datalen + BUFSIZ);
 				datalen += BUFSIZ;
 			}
 
-			memcpy(*rd + currentlen, dres, tmp2-dres);
-			currentlen += (tmp2-dres);
+			memcpy(*rd + currentlen, dres, dl);
+			currentlen += dl;
 
 			{
 				char *t1, *t2;
@@ -1701,6 +1693,8 @@ _aif_diff(int depth, char **rf, char **rd,
 			if ( **f2 == ',' )
 				(*f2)++;
 		} /* one field */
+
+		*rl = currentlen;
 
 		if ( **f2 != ';' )
 		{ /* f2 has more fields */
@@ -1761,6 +1755,7 @@ _aif_diff(int depth, char **rf, char **rd,
 				if ( *rd != NULL )
 					_aif_free(*rd);
 				*rd = _aif_alloc(1);
+				*rl = 1;
 				**rd = AIF_PTR_NIL;
 
 				_fds_skip_data(f1, d1);
@@ -1804,6 +1799,7 @@ _aif_diff(int depth, char **rf, char **rd,
 				if ( *rd != NULL )
 					_aif_free(*rd);
 				*rd = _aif_alloc(5); /* 1 + 4 (ptr name) */
+				*rl = 5;
 
 				if (t1 == AIF_PTR_REFERENCE) {
 					memcpy(*rd, d1, 5);
@@ -1840,6 +1836,7 @@ _aif_diff(int depth, char **rf, char **rd,
 					_fds_skip_data(f2, d2);
 					len = *d2 - tmp_d;
 					*rd = _aif_alloc(sizeof(char)*len);
+					*rl = len;
 					memcpy(*rd, tmp_d, len);
 				}
 
@@ -1871,6 +1868,7 @@ _aif_diff(int depth, char **rf, char **rd,
 					_fds_skip_data(f1, d1);
 					len = *d1 - tmp_d;
 					*rd = _aif_alloc(sizeof(char)*len);
+					*rl = len;
 					memcpy(*rd, tmp_d, len);
 				}
 
@@ -1911,7 +1909,7 @@ _aif_diff(int depth, char **rf, char **rd,
 			/*
 			 * Calculate address difference
 			 */
-			ret = _aif_diff(0, &addr_fr, &addr_dr, f1, d1, f2, d2);
+			ret = _aif_diff(0, &addr_fr, &addr_dr, &addr_len, f1, d1, f2, d2);
 			if (ret < 0)
 				return ret;
 
@@ -1919,7 +1917,6 @@ _aif_diff(int depth, char **rf, char **rd,
 			 * Copy address fds and data to result
 			 */
 			strcat(*rf, addr_fr);
-			addr_len = _fds_count_bytes(&addr_fr);
 			memcpy(res_data, addr_dr, addr_len);
 			res_data += addr_len;
 
@@ -1929,7 +1926,7 @@ _aif_diff(int depth, char **rf, char **rd,
 			/*
 			 * Now calculate difference of target
 			 */
-			ret = _aif_diff(depth, &target_f, &target_d, f1, d1, f2, d2);
+			ret = _aif_diff(depth, &target_f, &target_d, rl, f1, d1, f2, d2);
 			if (ret < 0)
 				return ret;
 
@@ -1937,12 +1934,7 @@ _aif_diff(int depth, char **rf, char **rd,
 			 * Copy target fds and result to result
 			 */
 			strcat(*rf, target_f);
-
-			char * tmp_f = target_f;
-			char * tmp_d = target_d;
-
-			_fds_skip_data(&tmp_f, &tmp_d);
-			memcpy(res_data, target_d, tmp_d - target_d);
+			memcpy(res_data, target_d, *rl);
 
 			return ret;
 
@@ -1967,6 +1959,7 @@ _aif_diff(int depth, char **rf, char **rd,
 			_aif_free(*rd);
 
 		*rd = _aif_alloc(bytes1 + bytes2 + 2);
+		*rl = bytes1 + bytes2 + 2;
 
 		if ( bytes1 == bytes2 )
 		{
