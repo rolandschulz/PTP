@@ -12,6 +12,7 @@ package org.eclipse.ptp.rdt.core.remotemake;
 
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.cdt.core.CCorePlugin;
@@ -138,6 +139,16 @@ public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvide
 
 		// set the working directory for the process to be the config directory
 		processBuilder.directory(workingDir);
+		
+		// merge environments
+		Map<String, String> remoteEnv = processBuilder.environment();
+		for(Object varNameObj : env.keySet()) {
+			if(varNameObj instanceof String) {
+				String varName = (String) varNameObj;
+				String value = env.getProperty(varName);
+				remoteEnv.put(varName, value);
+			}
+		}
 
 		monitor.worked(1);
 

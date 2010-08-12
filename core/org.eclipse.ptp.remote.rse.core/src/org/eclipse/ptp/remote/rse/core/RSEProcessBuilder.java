@@ -18,11 +18,15 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.ptp.internal.remote.rse.core.SpawnerSubsystem;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.rse.core.messages.Messages;
+import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
+import org.eclipse.rse.core.subsystems.IConnectorService;
+import org.eclipse.rse.core.subsystems.ISubSystem;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
@@ -84,11 +88,6 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	 */
 	@Override
 	public IRemoteProcess start() throws IOException {
-		// The exit command is called to force the remote shell to close after
-		// our command
-		// is executed. This is to prevent a running process at the end of the
-		// debug session.
-		// See Bug 158786.
 		List<String> cmdArgs = command();
 		if (cmdArgs.size() < 1) {
 			throw new IndexOutOfBoundsException();
@@ -103,22 +102,28 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			remoteCmd += spaceEscapify(cmdArgs.get(i));
 		}
 
-		remoteCmd += CMD_DELIMITER + EXIT_CMD;
-
-		IShellService shellService = fConnection.getRemoteShellService();
-		if (shellService == null) {
-			throw new IOException(Messages.RSEProcessBuilder_0);
-		}
-
-		// This is necessary because runCommand does not actually run the
-		// command right now.
 		IHostShell hostShell = null;
 		try {
 			String initialDir = ""; //$NON-NLS-1$
 			if (directory() != null) {
 				initialDir = directory().toURI().getPath();
 			}
-			hostShell = shellService.runCommand(initialDir, remoteCmd, getEnvironment(), new NullProgressMonitor());
+			
+			SpawnerSubsystem subsystem = getSpawnerSubsystem();
+			
+			if(subsystem != null) {
+				hostShell = subsystem.spawnRedirected(remoteCmd, initialDir, null, getEnvironment(), new NullProgressMonitor());
+				
+				if(hostShell == null) {
+					// fall back to old method of using RSE
+					hostShell = launchCommandWithRSE(remoteCmd, initialDir);
+				}
+			}
+			
+			else {
+				// fall back to old method of using RSE
+				hostShell = launchCommandWithRSE(remoteCmd, initialDir);
+			}
 		} catch (SystemMessageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -128,6 +133,44 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		return new RSEProcess(hostShell, redirectErrorStream());
 	}
 
+
+	private IHostShell launchCommandWithRSE(String remoteCmd, String initialDir) throws IOException, SystemMessageException {
+		// The exit command is called to force the remote shell to close after
+		// our command
+		// is executed. This is to prevent a running process at the end of the
+		// debug session.
+		// See Bug 158786.
+		IHostShell hostShell;
+		remoteCmd += CMD_DELIMITER + EXIT_CMD;
+
+		IShellService shellService = fConnection.getRemoteShellService();
+		if (shellService == null) {
+			throw new IOException(Messages.RSEProcessBuilder_0);
+		}
+		hostShell = shellService.runCommand(initialDir, remoteCmd, getEnvironment(), new NullProgressMonitor());
+		return hostShell;
+	}
+
+	private SpawnerSubsystem getSpawnerSubsystem() {
+		ISubSystem subsystems[] = getDStoreConnectorService().getSubSystems();
+		
+		for(ISubSystem subsystem : subsystems) {
+			if(subsystem instanceof SpawnerSubsystem)
+				return (SpawnerSubsystem) subsystem;
+		}
+		
+		return null;
+	}
+	
+	private DStoreConnectorService getDStoreConnectorService() {
+		for(IConnectorService service : fConnection.getHost().getConnectorServices()) {
+			if(service instanceof DStoreConnectorService)
+				return (DStoreConnectorService) service;
+		}
+		
+		return null;
+	}
+	
 	private String spaceEscapify(String inputString) {
 		if (inputString == null)
 			return null;
