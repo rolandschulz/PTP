@@ -23,11 +23,9 @@ import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -796,13 +794,12 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	private void initializePreferences() {
 		Preferences.addPreferenceChangeListener(PTPDebugUIPlugin.getUniqueIdentifier(), fPreferenceChangeListener);
-		IPreferencesService preferences = Platform.getPreferencesService();
-		prefRegisterProc0 = preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, IPDebugConstants.DEFAULT_DEBUG_REGISTER_PROC_0, null);
-		prefAutoUpdateVarOnSuspend = preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_SUSPEND, null);
-		prefAutoUpdateVarOnChange = preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_CHANGE, null);
+		prefRegisterProc0 = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
+				IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, IPDebugConstants.DEFAULT_DEBUG_REGISTER_PROC_0);
+		prefAutoUpdateVarOnSuspend = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
+				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_SUSPEND);
+		prefAutoUpdateVarOnChange = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
+				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_CHANGE);
 	}
 
 }

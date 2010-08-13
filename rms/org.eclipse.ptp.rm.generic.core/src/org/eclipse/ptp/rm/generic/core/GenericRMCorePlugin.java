@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.core;
 
+import org.eclipse.core.resources.ISaveContext;
+import org.eclipse.core.resources.ISaveParticipant;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.generic.core.messages.Messages;
 import org.osgi.framework.BundleContext;
@@ -24,13 +28,13 @@ public class GenericRMCorePlugin extends Plugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.generic.core"; //$NON-NLS-1$
 
 	// The shared instance
-	private static GenericRMCorePlugin plugin;
+	private static GenericRMCorePlugin fPlugin;
 
 	/**
 	 * The constructor
 	 */
 	public GenericRMCorePlugin() {
-		// Nothing to do
+		fPlugin = this;
 	}
 
 	/*
@@ -42,7 +46,23 @@ public class GenericRMCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
+			public void saving(ISaveContext saveContext) throws CoreException {
+				Preferences.savePreferences(getUniqueIdentifier());
+			}
+
+			public void rollback(ISaveContext saveContext) {
+				// Nothing
+			}
+
+			public void prepareToSave(ISaveContext saveContext) throws CoreException {
+				// Nothing
+			}
+
+			public void doneSaving(ISaveContext saveContext) {
+				// Nothing
+			}
+		});
 	}
 
 	/*
@@ -53,8 +73,13 @@ public class GenericRMCorePlugin extends Plugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
+		try {
+			Preferences.savePreferences(getUniqueIdentifier());
+			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
+		} finally {
+			super.stop(context);
+			fPlugin = null;
+		}
 	}
 
 	/**
@@ -63,7 +88,7 @@ public class GenericRMCorePlugin extends Plugin {
 	 * @return the shared instance
 	 */
 	public static GenericRMCorePlugin getDefault() {
-		return plugin;
+		return fPlugin;
 	}
 
 	/**
@@ -120,11 +145,9 @@ public class GenericRMCorePlugin extends Plugin {
 	 * @return unique identifier string
 	 */
 	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
-			// If the default instance is not yet initialized,
-			// return a static identifier. This identifier must
-			// match the plugin id defined in plugin.xml
+		if (getDefault() == null) {
 			return PLUGIN_ID;
+		}
 		return getDefault().getBundle().getSymbolicName();
 	}
 }

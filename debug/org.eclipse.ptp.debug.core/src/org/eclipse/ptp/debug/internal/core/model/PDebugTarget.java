@@ -34,10 +34,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -537,11 +535,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * isInstructionSteppingEnabled()
 	 */
 	public boolean isInstructionSteppingEnabled() {
-		IPreferencesService preferences = Platform.getPreferencesService();
-		return preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), PREF_INSTRUCTION_STEPPING_MODE,
-				IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE, null)
-				|| preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON,
-						IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE, null);
+		return Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), PREF_INSTRUCTION_STEPPING_MODE,
+				IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE)
+				|| Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON,
+						IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE);
 	}
 
 	/*

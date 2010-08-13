@@ -43,13 +43,13 @@ public class PTPCorePlugin extends Plugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.core"; //$NON-NLS-1$
 
 	// The shared instance.
-	private static PTPCorePlugin plugin;
+	private static PTPCorePlugin fPlugin;
 
 	/**
 	 * Returns the shared instance.
 	 */
 	public static PTPCorePlugin getDefault() {
-		return plugin;
+		return fPlugin;
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class PTPCorePlugin extends Plugin {
 	 */
 	public PTPCorePlugin() {
 		super();
-		plugin = this;
+		fPlugin = this;
 		try {
 			resourceBundle = ResourceBundle.getBundle(PLUGIN_ID + ".ParallelPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
@@ -247,9 +247,14 @@ public class PTPCorePlugin extends Plugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		modelManager.shutdown();
-		Preferences.savePreferences(getUniqueIdentifier());
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
+		try {
+			modelManager.shutdown();
+			Preferences.savePreferences(getUniqueIdentifier());
+			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
+		} finally {
+			super.stop(context);
+			fPlugin = null;
+		}
 	}
 
 }

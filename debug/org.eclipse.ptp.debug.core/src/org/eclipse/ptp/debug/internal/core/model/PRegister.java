@@ -18,10 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPRegister;
@@ -401,16 +400,14 @@ public class PRegister extends PVariable implements IPRegister {
 
 	protected PRegister(PRegisterGroup parent, IPRegisterDescriptor descriptor) {
 		super(parent, ((PRegisterDescriptor) descriptor).getPDIDescriptor());
-		IPreferencesService preferences = Platform.getPreferencesService();
-		setFormat(PVariableFormat.getFormat(preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT, IPDIFormat.NATURAL, null)));
+		setFormat(PVariableFormat.getFormat(Preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
+				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT, IPDIFormat.NATURAL)));
 	}
 
 	protected PRegister(PRegisterGroup parent, IPRegisterDescriptor descriptor, String message) {
 		super(parent, ((PRegisterDescriptor) descriptor).getPDIDescriptor(), message);
-		IPreferencesService preferences = Platform.getPreferencesService();
-		setFormat(PVariableFormat.getFormat(preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT, IPDIFormat.NATURAL, null)));
+		setFormat(PVariableFormat.getFormat(Preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
+				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT, IPDIFormat.NATURAL)));
 	}
 
 	/*
