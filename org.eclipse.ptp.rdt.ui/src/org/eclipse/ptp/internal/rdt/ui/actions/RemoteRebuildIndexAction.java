@@ -49,6 +49,8 @@ public class RemoteRebuildIndexAction implements IObjectActionDelegate {
 					if(indexBuildSequenceController.isOptionalIndex()){
 						boolean continueIndex = MessageDialog.openQuestion(shell, Messages.getString("RemoteRebuildIndexOption.question"), Messages.getString("RemoteRebuildIndexOption.message")); //$NON-NLS-1$ //$NON-NLS-2$
 				        if(continueIndex){
+				        	//in case build is not completed normally
+				        	indexBuildSequenceController.setBuildIncompleteIfItIsRunning();
 				        	indexBuildSequenceController.setIndexRunning();
 				        	CCorePlugin.getIndexManager().reindex((ICProject) elem);
 				        }
