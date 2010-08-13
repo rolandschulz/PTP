@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 
 /**
  * @author clement
@@ -35,7 +35,7 @@ public interface ITargetProperties {
 	 *            a property change listener
 	 * @since 5.0
 	 */
-	public void addPreferenceChangeListener(IEclipsePreferences.IPreferenceChangeListener listener);
+	public void addPreferenceChangeListener(IPreferenceChangeListener listener);
 
 	/**
 	 * Removes the given listener from this target. Has no affect if the
@@ -45,5 +45,5 @@ public interface ITargetProperties {
 	 *            a property change listener
 	 * @since 5.0
 	 */
-	public void removePreferenceChangeListener(IEclipsePreferences.IPreferenceChangeListener listener);
+	public void removePreferenceChangeListener(IPreferenceChangeListener listener);
 }

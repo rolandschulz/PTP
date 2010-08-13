@@ -23,6 +23,10 @@ import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.resources.ISaveContext;
+import org.eclipse.core.resources.ISaveParticipant;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -122,8 +126,7 @@ public class PTPCorePlugin extends Plugin {
 		super();
 		plugin = this;
 		try {
-			resourceBundle = ResourceBundle.getBundle(PLUGIN_ID
-					+ ".ParallelPluginResources"); //$NON-NLS-1$
+			resourceBundle = ResourceBundle.getBundle(PLUGIN_ID + ".ParallelPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
@@ -221,6 +224,20 @@ public class PTPCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
+		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
+			public void saving(ISaveContext saveContext) throws CoreException {
+				Preferences.savePreferences(getUniqueIdentifier());
+			}
+
+			public void rollback(ISaveContext saveContext) {
+			}
+
+			public void prepareToSave(ISaveContext saveContext) throws CoreException {
+			}
+
+			public void doneSaving(ISaveContext saveContext) {
+			}
+		});
 		modelManager = new ModelManager();
 		modelManager.start();
 	}
@@ -231,6 +248,8 @@ public class PTPCorePlugin extends Plugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		modelManager.shutdown();
+		Preferences.savePreferences(getUniqueIdentifier());
+		ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
 	}
 
 }

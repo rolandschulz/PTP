@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.sdm.internal.ui.preferences;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
@@ -84,7 +85,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 
 	public SDMPreferencePage() {
 		super();
-		setPreferenceStore(new PreferencesAdapter(SDMDebugCorePlugin.getDefault().getPluginPreferences()));
+		setPreferenceStore(new PreferencesAdapter(SDMDebugCorePlugin.getUniqueIdentifier()));
 		setDescription(Messages.SDMPreferencePage_0);
 	}
 
@@ -127,7 +128,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	@Override
 	public boolean performOk() {
 		storeValues();
-		SDMDebugCorePlugin.getDefault().savePluginPreferences();
+		Preferences.savePreferences(SDMDebugCorePlugin.getUniqueIdentifier());
 		return true;
 	}
 
