@@ -310,13 +310,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					
 					if(!connection.isOpen())
 						connection.open(monitor);
-					
-					
-					if(projectStatus!=null){
-						if(kind != CLEAN_BUILD){
-							projectStatus.setBuildRunning();
-						}
-					}
+										
 					List<String> command = new LinkedList<String>();
 					
 					command.add(buildCommand);
@@ -351,13 +345,14 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 					
 					final IRemoteProcess p = processBuilder.start();
-					if(kind == CLEAN_BUILD){
-						if(projectStatus!=null){
+					if(projectStatus!=null){
+						if(kind == CLEAN_BUILD){
 							projectStatus.setBuildInCompletedForCleanBuild();
+						}else{
+							projectStatus.setBuildRunning();
 						}
-						
 					}
-					
+										
 					// create a thread to periodically check the progress monitor for cancellation and potentially
 					// terminate the process if required
 					
