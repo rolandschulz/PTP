@@ -12,10 +12,8 @@
 package org.eclipse.ptp.debug.ui;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -52,8 +50,6 @@ public class PreferencesAdapter implements IPreferenceStore {
 
 	/** Listener on the adapted Preferences */
 	private final PreferenceChangeListener fListener = new PreferenceChangeListener();
-
-	private final IPreferencesService fPreferences = Platform.getPreferencesService();
 
 	private final String fPrefsQualifier;
 
@@ -113,7 +109,7 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 * {@inheritDoc}
 	 */
 	public boolean getBoolean(String name) {
-		return fPreferences.getBoolean(fPrefsQualifier, name, false, null);
+		return Preferences.getBoolean(fPrefsQualifier, name, false);
 	}
 
 	/**
@@ -162,35 +158,35 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 * {@inheritDoc}
 	 */
 	public double getDouble(String name) {
-		return fPreferences.getDouble(fPrefsQualifier, name, 0.0, null);
+		return Preferences.getDouble(fPrefsQualifier, name, 0.0);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public float getFloat(String name) {
-		return fPreferences.getFloat(fPrefsQualifier, name, 0.0f, null);
+		return Preferences.getFloat(fPrefsQualifier, name, 0.0f);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getInt(String name) {
-		return fPreferences.getInt(fPrefsQualifier, name, 0, null);
+		return Preferences.getInt(fPrefsQualifier, name, 0);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getLong(String name) {
-		return fPreferences.getLong(fPrefsQualifier, name, 0L, null);
+		return Preferences.getLong(fPrefsQualifier, name, 0L);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public String getString(String name) {
-		return fPreferences.getString(fPrefsQualifier, name, "", null); //$NON-NLS-1$
+		return Preferences.getString(fPrefsQualifier, name, ""); //$NON-NLS-1$
 	}
 
 	/**

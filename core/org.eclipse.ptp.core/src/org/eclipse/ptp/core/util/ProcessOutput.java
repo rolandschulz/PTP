@@ -9,10 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.utils.core.BitSetIterable;
@@ -122,11 +121,10 @@ public class ProcessOutput {
 	 * Create a local cache for process output.
 	 */
 	private void setOutputStore() {
-		IPreferencesService preferences = Platform.getPreferencesService();
-		outputDirPath = preferences.getString(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_OUTPUT_DIR,
-				PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME, null);
-		storeLines = preferences.getInt(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_STORE_LINES,
-				PreferenceConstants.DEFAULT_STORE_LINES, null);
+		outputDirPath = Preferences.getString(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_OUTPUT_DIR,
+				PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME);
+		storeLines = Preferences.getInt(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_STORE_LINES,
+				PreferenceConstants.DEFAULT_STORE_LINES);
 		if (outputDirPath == null || outputDirPath.length() == 0) {
 			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation()
 					.append(PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME).toOSString();

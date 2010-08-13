@@ -18,10 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IExpression;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
@@ -60,9 +59,8 @@ public class PExpression extends PLocalVariable implements IExpression {
 	 */
 	public PExpression(PStackFrame frame, IPDITargetExpression pdiExpression, IPDIVariableDescriptor varObject) {
 		super(frame, varObject);
-		IPreferencesService preferences = Platform.getPreferencesService();
-		setFormat(PVariableFormat.getFormat(preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL, null)));
+		setFormat(PVariableFormat.getFormat(Preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
+				IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL)));
 		fText = pdiExpression.getExpressionText();
 		fPDIExpression = pdiExpression;
 		fStackFrame = frame;

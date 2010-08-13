@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -53,6 +54,36 @@ public final class Preferences {
 	public static boolean contains(String qualifier, String name) {
 		return (contexts[INSTANCE_CONTEXT].getNode(qualifier).get(name, null) != null || contexts[DEFAULT_CONTEXT].getNode(
 				qualifier).get(name, null) != null);
+	}
+
+	/**
+	 * Returns the value in the preference store for the given key. If the key
+	 * is not defined then return the specified default value. Use the canonical
+	 * scope lookup order for finding the preference value.
+	 * 
+	 * @param qualifier
+	 * @param key
+	 * @param defaultvalue
+	 * 
+	 * @return the value of the preference or the given default value
+	 */
+	public static boolean getBoolean(String qualifier, String key, boolean defaultvalue) {
+		return Platform.getPreferencesService().getBoolean(qualifier, key, defaultvalue, null);
+	}
+
+	/**
+	 * Returns the value in the preference store for the given key. If the key
+	 * is not defined then return the specified default value. Use the canonical
+	 * scope lookup order for finding the preference value.
+	 * 
+	 * @param qualifier
+	 * @param key
+	 * @param defaultvalue
+	 * 
+	 * @return the value of the preference or the given default value
+	 */
+	public static byte[] getByteArray(String qualifier, String key, byte[] defaultvalue) {
+		return Platform.getPreferencesService().getByteArray(qualifier, key, defaultvalue, null);
 	}
 
 	/**
@@ -165,6 +196,81 @@ public final class Preferences {
 	 */
 	public static synchronized String getDefaultString(String qualifier, String key, String defaultvalue) {
 		return contexts[DEFAULT_CONTEXT].getNode(qualifier).get(key, defaultvalue);
+	}
+
+	/**
+	 * Returns the value in the preference store for the given key. If the key
+	 * is not defined then return the specified default value. Use the canonical
+	 * scope lookup order for finding the preference value.
+	 * 
+	 * @param qualifier
+	 * @param key
+	 * @param defaultvalue
+	 * 
+	 * @return the value of the preference or the given default value
+	 */
+	public static double getDouble(String qualifier, String key, double defaultvalue) {
+		return Platform.getPreferencesService().getDouble(qualifier, key, defaultvalue, null);
+	}
+
+	/**
+	 * Returns the value in the preference store for the given key. If the key
+	 * is not defined then return the specified default value. Use the canonical
+	 * scope lookup order for finding the preference value.
+	 * 
+	 * @param qualifier
+	 * @param key
+	 * @param defaultvalue
+	 * 
+	 * @return the value of the preference or the given default value
+	 */
+	public static float getFloat(String qualifier, String key, float defaultvalue) {
+		return Platform.getPreferencesService().getFloat(qualifier, key, defaultvalue, null);
+	}
+
+	/**
+	 * Returns the value in the preference store for the given key. If the key
+	 * is not defined then return the specified default value. Use the canonical
+	 * scope lookup order for finding the preference value.
+	 * 
+	 * @param qualifier
+	 * @param key
+	 * @param defaultvalue
+	 * 
+	 * @return the value of the preference or the given default value
+	 */
+	public static int getInt(String qualifier, String key, int defaultvalue) {
+		return Platform.getPreferencesService().getInt(qualifier, key, defaultvalue, null);
+	}
+
+	/**
+	 * Returns the value in the preference store for the given key. If the key
+	 * is not defined then return the specified default value. Use the canonical
+	 * scope lookup order for finding the preference value.
+	 * 
+	 * @param qualifier
+	 * @param key
+	 * @param defaultvalue
+	 * 
+	 * @return the value of the preference or the given default value
+	 */
+	public static long getLong(String qualifier, String key, long defaultvalue) {
+		return Platform.getPreferencesService().getLong(qualifier, key, defaultvalue, null);
+	}
+
+	/**
+	 * Returns the value in the preference store for the given key. If the key
+	 * is not defined then return the specified default value. Use the canonical
+	 * scope lookup order for finding the preference value.
+	 * 
+	 * @param qualifier
+	 * @param key
+	 * @param defaultvalue
+	 * 
+	 * @return the value of the preference or the given default value
+	 */
+	public static String getString(String qualifier, String key, String defaultvalue) {
+		return Platform.getPreferencesService().getString(qualifier, key, defaultvalue, null);
 	}
 
 	/**

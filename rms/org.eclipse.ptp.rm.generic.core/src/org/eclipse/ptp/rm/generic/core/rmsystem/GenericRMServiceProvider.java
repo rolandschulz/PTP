@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.generic.core.rmsystem;
 
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
@@ -29,13 +29,12 @@ public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
 	public GenericRMServiceProvider() {
 		super(CAPABILITIES);
 
-		IPreferencesService prefs = GenericRMPreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_LAUNCH_CMD,
-				EMPTY_STR, null));
-		setDebugCmd(prefs.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_DEBUG_CMD,
-				EMPTY_STR, null));
-		setRemoteInstallPath(prefs.getString(GenericRMCorePlugin.getUniqueIdentifier(),
-				GenericRMPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null));
+		setLaunchCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_LAUNCH_CMD,
+				EMPTY_STR));
+		setDebugCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_DEBUG_CMD,
+				EMPTY_STR));
+		setRemoteInstallPath(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(),
+				GenericRMPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR));
 
 		setUseInstallDefaults(true);
 		setUseToolDefaults(true);

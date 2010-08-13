@@ -38,7 +38,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
@@ -238,18 +237,16 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * @return
 	 */
 	public int getCommandTimeout() {
-		IPreferencesService preferences = Platform.getPreferencesService();
-		return preferences.getInt(getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT,
-				IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT, null);
+		return Preferences.getInt(getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT,
+				IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
 	}
 
 	/**
 	 * @return
 	 */
 	public IPSourceLocation[] getCommonSourceLocations() {
-		IPreferencesService preferences = Platform.getPreferencesService();
-		return SourceUtils.getCommonSourceLocationsFromMemento(preferences.getString(getUniqueIdentifier(),
-				IPDebugConstants.PREF_SOURCE_LOCATIONS, "", null)); //$NON-NLS-1$
+		return SourceUtils.getCommonSourceLocationsFromMemento(Preferences.getString(getUniqueIdentifier(),
+				IPDebugConstants.PREF_SOURCE_LOCATIONS, "")); //$NON-NLS-1$
 	}
 
 	/**
@@ -397,9 +394,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private void initializeCommonSourceLookupDirector() {
 		if (fCommonSourceLookupDirector == null) {
 			fCommonSourceLookupDirector = new CommonSourceLookupDirector();
-			IPreferencesService preferences = Platform.getPreferencesService();
-			String newMemento = preferences.getString(getUniqueIdentifier(), IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, "", //$NON-NLS-1$
-					null);
+			String newMemento = Preferences.getString(getUniqueIdentifier(), IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, ""); //$NON-NLS-1$
 			if (newMemento.length() == 0) {
 				// Convert source locations to source containers
 				fCommonSourceLookupDirector.setSourceContainers(SourceUtils.convertSourceLocations(getCommonSourceLocations()));
