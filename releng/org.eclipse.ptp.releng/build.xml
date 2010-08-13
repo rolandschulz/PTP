@@ -148,6 +148,7 @@
 		<delete file="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" followsymlinks="false" failonerror="false"/>
 		<!--symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/-->
 		<symlink link="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
+		<symlink link="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-aix-${ptpBranchVersion}.tar" overwrite="true"/>
 	</target>
 	
 	<target name="p2" depends="init" unless="hasErrors">
