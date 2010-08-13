@@ -141,12 +141,6 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 				}
 			}
 			
-			if(projectStatus!=null){
-				if(!isCleanBuild){
-					projectStatus.setBuildRunning();
-				}
-			}
-			
 			List<String> command = new LinkedList<String>();
 			
 			command.add(commandPath.toString());
@@ -184,6 +178,12 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 				}
 				// rethrow as CoreException
 				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
+			if(projectStatus!=null){
+				if(!isCleanBuild){
+					projectStatus.setBuildRunning();
+				}
 			}
 			
 			fRemoteProcess = p;
@@ -335,12 +335,15 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 		}
 
 		int state = OK;
-
+		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
 		// Operation canceled by the user, terminate abnormally.
 		if (monitor.isCanceled()) {
 			closure.terminate();
 			state = COMMAND_CANCELED;
 			setErrorMessage(CCorePlugin.getResourceString("CommandLauncher.error.commandCanceled")); //$NON-NLS-1$
+			if(projectStatus!=null){
+				projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
+			}
 		}
 
 		try {
@@ -362,20 +365,22 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			// state where ressource changes are disallowed
 		}
 		
-		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
-		if(isCleanBuild){
-			if(projectStatus!=null){
-				projectStatus.setBuildInCompletedForCleanBuild();
-			}
+		
+		if(projectStatus!=null){
+			if(isCleanBuild){
 			
-		}else{
-			if(projectStatus!=null){
-				if(projectStatus.isIndexAfterBuildSet()){
+					projectStatus.setBuildInCompletedForCleanBuild();
 			
-					projectStatus.invokeIndex();
-				}else{
-					projectStatus.setFinalBuildStatus();
-				}
+				
+			}else{
+			
+					if(projectStatus.isIndexAfterBuildSet()){
+				
+						projectStatus.invokeIndex();
+					}else{
+						projectStatus.setFinalBuildStatus();
+					}
+				
 			}
 		}
 			
