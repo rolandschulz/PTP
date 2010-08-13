@@ -363,15 +363,15 @@
          </toolChain>
       </configuration>
    </projectType>
-      <projectType
-         buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"
+    <projectType
+         buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
          id="org.eclipse.ptp.rdt.managedbuild.target.xlc.lib"
          isAbstract="false"
          name="%projectType.so.name"
          projectEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteProjectEnvironmentSupplier"
          projectMacroSupplier="org.eclipse.cdt.managedbuilder.xlc.ui.XLCProjectMacroSupplier">
       <configuration
-            artifactExtension="lib"
+            artifactExtension="a"
             cleanCommand="rm -rf"
             errorParsers="org.eclipse.cdt.errorparsers.xlc.XlcErrorParser"
             id="org.eclipse.ptp.rdt.managedbuild.config.xlc.lib.debug"
@@ -428,8 +428,9 @@
             </tool>
          </toolChain>
       </configuration>
+      
       <configuration
-            artifactExtension="lib"
+            artifactExtension="a"
             cleanCommand="rm -rf"
             errorParsers="org.eclipse.cdt.errorparsers.xlc.XlcErrorParser"
             id="org.eclipse.ptp.rdt.managedbuild.config.xlc.lib.release"
@@ -486,7 +487,7 @@
             </tool>
          </toolChain>
       </configuration>
-   </projectType>        		
+   </projectType>        		      		
    </extension>
    <extension
          id="RemoteXLCPerProjectProfile"
