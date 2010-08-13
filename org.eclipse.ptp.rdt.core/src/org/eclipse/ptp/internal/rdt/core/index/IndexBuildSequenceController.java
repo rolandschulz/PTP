@@ -369,6 +369,16 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 	}
 	
 	/**
+	 * this is called from reindex autio after user choose to continue index after an optional index prompt.
+	 * the build must be failed at the time.
+	 */
+	public void setBuildIncompleteIfItIsRunning(){
+		if(isBuildRunning()){
+			//todo check if build is still running.
+			setBuildInCompleted();
+		}
+	}
+	/**
 	 * skip reindex during the first time build, when build is never run and index is never run.
 	 * 
 	 * this case would alos match if user run an optional reindex(build is never run and index is never run) and select to 
