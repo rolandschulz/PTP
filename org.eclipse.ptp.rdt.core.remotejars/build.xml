@@ -384,7 +384,7 @@
 		<replace file="${remoteServerTempDir}/server.pl">
 			<replacetoken>$ENV{CLASSPATH}=$oldClasspath;</replacetoken>
 			<replacevalue>$ENV{CLASSPATH}=$oldClasspath;
-$ENV{LD_LIBRARY_PATH}=$dir:$LD_LIBRARY_PATH;
+$ENV{LD_LIBRARY_PATH}="$dir:$LD_LIBRARY_PATH";
 			</replacevalue>
 		</replace>
 		
@@ -395,7 +395,7 @@ $ENV{LD_LIBRARY_PATH}=$dir:$LD_LIBRARY_PATH;
 		
 		<replace file="${remoteServerTempDir}/daemon.pl">
 			<replacetoken>if (defined ($oldClasspath))</replacetoken>
-			<replacevalue>$ENV{LD_LIBRARY_PATH}=$dir:$LD_LIBRARY_PATH;
+			<replacevalue>$ENV{LD_LIBRARY_PATH}="$dir:$LD_LIBRARY_PATH";
 		if (defined ($oldClasspath))
 			</replacevalue>
 		</replace>
@@ -437,7 +437,7 @@ export serverpath CLASSPATH LIBPATH
 		
 		<replace file="${remoteServerTempDir}/daemon.pl">
 			<replacetoken>if (defined ($oldClasspath))</replacetoken>
-			<replacevalue>$ENV{LD_LIBRARY_PATH}=$dir:$LD_LIBRARY_PATH;
+			<replacevalue>$ENV{LIBPATH}="$dir:$LIBPATH";
 		if (defined ($oldClasspath))
 			</replacevalue>
 		</replace>
