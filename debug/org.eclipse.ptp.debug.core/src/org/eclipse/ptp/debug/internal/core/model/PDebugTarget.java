@@ -36,10 +36,8 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -63,7 +61,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.DirectorySourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PDebugUtils;
@@ -123,7 +121,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	private ArrayList<IThread> fThreads;
 	private final IPDITarget pdiTarget;
 	private Boolean fIsLittleEndian = null;
-	private IEclipsePreferences fPreferences = null;
 
 	public PDebugTarget(IPSession session, IPDITarget pdiTarget, boolean allowTerminate, boolean allowDisconnect) {
 		super(session, pdiTarget.getTasks());
@@ -155,9 +152,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * .IPreferenceChangeListener)
 	 */
 	public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
-		if (fPreferences != null) {
-			fPreferences.addPreferenceChangeListener(listener);
-		}
+		Preferences.addPreferenceChangeListener(PTPDebugCorePlugin.getUniqueIdentifier(), listener);
 	}
 
 	/*
@@ -313,7 +308,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * enableInstructionStepping(boolean)
 	 */
 	public void enableInstructionStepping(boolean enabled) {
-		fPreferences.putBoolean(PREF_INSTRUCTION_STEPPING_MODE, enabled);
+		Preferences.setBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), PREF_INSTRUCTION_STEPPING_MODE, enabled);
 	}
 
 	/*
@@ -542,11 +537,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * isInstructionSteppingEnabled()
 	 */
 	public boolean isInstructionSteppingEnabled() {
-		if (fPreferences == null) {
-			return false;
-		}
 		IPreferencesService preferences = Platform.getPreferencesService();
-		return fPreferences.getBoolean(PREF_INSTRUCTION_STEPPING_MODE, IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE)
+		return preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), PREF_INSTRUCTION_STEPPING_MODE,
+				IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE, null)
 				|| preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON,
 						IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE, null);
 	}
@@ -648,9 +641,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * .IPreferenceChangeListener)
 	 */
 	public void removePreferenceChangeListener(IPreferenceChangeListener listener) {
-		if (fPreferences != null) {
-			fPreferences.removePreferenceChangeListener(listener);
-		}
+		Preferences.removePreferenceChangeListener(PTPDebugCorePlugin.getUniqueIdentifier(), listener);
 	}
 
 	/*
@@ -846,14 +837,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		// disposeSourceManager();
 		disposeSourceLookupPath();
 		removeAllExpressions();
-		disposePreferences();
-	}
-
-	/**
-	 * 
-	 */
-	private void disposePreferences() {
-		fPreferences = null;
 	}
 
 	/**
@@ -1079,8 +1062,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * 
 	 */
 	private void initializePreferences() {
-		fPreferences = new InstanceScope().getNode(PTPCorePlugin.getUniqueIdentifier());
-		fPreferences.putBoolean(PREF_INSTRUCTION_STEPPING_MODE, IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE);
+		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), PREF_INSTRUCTION_STEPPING_MODE,
+				IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE);
 	}
 
 	/**

@@ -12,10 +12,14 @@
 package org.eclipse.ptp.debug.ui;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.core.Preferences;
 
 /**
  * Adapts {@link org.eclipse.core.runtime.Preferences} to
@@ -27,53 +31,54 @@ public class PreferencesAdapter implements IPreferenceStore {
 
 	/**
 	 * Property change listener. Listens for events of type
-	 * {@link org.eclipse.core.runtime.Preferences.PropertyChangeEvent} and fires
-	 * a {@link org.eclipse.jface.util.PropertyChangeEvent} on the
-	 * adapter with arguments from the received event.
+	 * {@link org.eclipse.core.runtime.Preferences.PropertyChangeEvent} and
+	 * fires a {@link org.eclipse.jface.util.PropertyChangeEvent} on the adapter
+	 * with arguments from the received event.
 	 */
-	private class PropertyChangeListener implements Preferences.IPropertyChangeListener {
+	private class PreferenceChangeListener implements IPreferenceChangeListener {
 
 		/*
-		 * @see org.eclipse.core.runtime.Preferences.IPropertyChangeListener#propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent)
+		 * @see org.eclipse.core.runtime.Preferences.IPropertyChangeListener#
+		 * propertyChange
+		 * (org.eclipse.core.runtime.Preferences.PropertyChangeEvent)
 		 */
-		public void propertyChange(Preferences.PropertyChangeEvent event) {
-			firePropertyChangeEvent(event.getProperty(), event.getOldValue(), event.getNewValue());
+		public void preferenceChange(IEclipsePreferences.PreferenceChangeEvent event) {
+			firePropertyChangeEvent(event.getKey(), event.getOldValue(), event.getNewValue());
 		}
 	}
-	
+
 	/** Listeners on the adapter */
-	private ListenerList fListeners= new ListenerList(ListenerList.IDENTITY);
-	
+	private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
+
 	/** Listener on the adapted Preferences */
-	private PropertyChangeListener fListener= new PropertyChangeListener();
-	
-	/** Adapted Preferences */
-	private Preferences fPreferences;
+	private final PreferenceChangeListener fListener = new PreferenceChangeListener();
+
+	private final IPreferencesService fPreferences = Platform.getPreferencesService();
+
+	private final String fPrefsQualifier;
 
 	/** True iff no events should be forwarded */
 	private boolean fSilent;
-	
-	/**
-	 * Initialize with empty Preferences.
-	 */
-	public PreferencesAdapter() {
-		this(new Preferences());
-	}
+
+	/** True if any preferences have changed */
+	private boolean fNeedsSaving = false;
+
 	/**
 	 * Initialize with the given Preferences.
 	 * 
-	 * @param preferences The preferences to wrap.
+	 * @param preferences
+	 *            The preferences to wrap.
+	 * @since 4.0
 	 */
-	public PreferencesAdapter(Preferences preferences) {
-		fPreferences= preferences;
+	public PreferencesAdapter(String qualifier) {
+		fPrefsQualifier = qualifier;
+		Preferences.addPreferenceChangeListener(fPrefsQualifier, fListener);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
-		if (fListeners.size() == 0)
-			fPreferences.addPropertyChangeListener(fListener);
 		fListeners.add(listener);
 	}
 
@@ -82,25 +87,24 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 */
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		fListeners.remove(listener);
-		if (fListeners.size() == 0)
-			fPreferences.removePropertyChangeListener(fListener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean contains(String name) {
-		return fPreferences.contains(name);
+		return Preferences.contains(fPrefsQualifier, name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void firePropertyChangeEvent(String name, Object oldValue, Object newValue) {
+		fNeedsSaving = true;
 		if (!fSilent) {
-			PropertyChangeEvent event= new PropertyChangeEvent(this, name, oldValue, newValue);
-			Object[] listeners= fListeners.getListeners();
-			for (int i= 0; i < listeners.length; i++)
+			PropertyChangeEvent event = new PropertyChangeEvent(this, name, oldValue, newValue);
+			Object[] listeners = fListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++)
 				((IPropertyChangeListener) listeners[i]).propertyChange(event);
 		}
 	}
@@ -109,98 +113,98 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 * {@inheritDoc}
 	 */
 	public boolean getBoolean(String name) {
-		return fPreferences.getBoolean(name);
+		return fPreferences.getBoolean(fPrefsQualifier, name, false, null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean getDefaultBoolean(String name) {
-		return fPreferences.getDefaultBoolean(name);
+		return Preferences.getDefaultBoolean(fPrefsQualifier, name, false);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public double getDefaultDouble(String name) {
-		return fPreferences.getDefaultDouble(name);
+		return Preferences.getDefaultDouble(fPrefsQualifier, name, 0.0);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public float getDefaultFloat(String name) {
-		return fPreferences.getDefaultFloat(name);
+		return Preferences.getDefaultFloat(fPrefsQualifier, name, 0.0f);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getDefaultInt(String name) {
-		return fPreferences.getDefaultInt(name);
+		return Preferences.getDefaultInt(fPrefsQualifier, name, 0);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getDefaultLong(String name) {
-		return fPreferences.getDefaultLong(name);
+		return Preferences.getDefaultLong(fPrefsQualifier, name, 0L);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public String getDefaultString(String name) {
-		return fPreferences.getDefaultString(name);
+		return Preferences.getDefaultString(fPrefsQualifier, name, ""); //$NON-NLS-1$
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public double getDouble(String name) {
-		return fPreferences.getDouble(name);
+		return fPreferences.getDouble(fPrefsQualifier, name, 0.0, null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public float getFloat(String name) {
-		return fPreferences.getFloat(name);
+		return fPreferences.getFloat(fPrefsQualifier, name, 0.0f, null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getInt(String name) {
-		return fPreferences.getInt(name);
+		return fPreferences.getInt(fPrefsQualifier, name, 0, null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getLong(String name) {
-		return fPreferences.getLong(name);
+		return fPreferences.getLong(fPrefsQualifier, name, 0L, null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public String getString(String name) {
-		return fPreferences.getString(name);
+		return fPreferences.getString(fPrefsQualifier, name, "", null); //$NON-NLS-1$
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isDefault(String name) {
-		return fPreferences.isDefault(name);
+		return Preferences.isDefault(fPrefsQualifier, name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean needsSaving() {
-		return fPreferences.needsSaving();
+		return fNeedsSaving;
 	}
 
 	/**
@@ -208,10 +212,10 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 */
 	public void putValue(String name, String value) {
 		try {
-			fSilent= true;
-			fPreferences.setValue(name, value);
+			fSilent = true;
+			Preferences.setString(fPrefsQualifier, name, value);
 		} finally {
-			fSilent= false;
+			fSilent = false;
 		}
 	}
 
@@ -219,90 +223,90 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 * {@inheritDoc}
 	 */
 	public void setDefault(String name, double value) {
-		fPreferences.setDefault(name, value);
+		Preferences.setDefaultDouble(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setDefault(String name, float value) {
-		fPreferences.setDefault(name, value);
+		Preferences.setDefaultFloat(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setDefault(String name, int value) {
-		fPreferences.setDefault(name, value);
+		Preferences.setDefaultInt(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setDefault(String name, long value) {
-		fPreferences.setDefault(name, value);
+		Preferences.setDefaultLong(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setDefault(String name, String defaultObject) {
-		fPreferences.setDefault(name, defaultObject);
+		Preferences.setDefaultString(fPrefsQualifier, name, defaultObject);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setDefault(String name, boolean value) {
-		fPreferences.setDefault(name, value);
+		Preferences.setDefaultBoolean(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setToDefault(String name) {
-		fPreferences.setToDefault(name);
+		Preferences.setToDefault(fPrefsQualifier, name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setValue(String name, double value) {
-		fPreferences.setValue(name, value);
+		Preferences.setDouble(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setValue(String name, float value) {
-		fPreferences.setValue(name, value);
+		Preferences.setFloat(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setValue(String name, int value) {
-		fPreferences.setValue(name, value);
+		Preferences.setInt(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setValue(String name, long value) {
-		fPreferences.setValue(name, value);
+		Preferences.setLong(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setValue(String name, String value) {
-		fPreferences.setValue(name, value);
+		Preferences.setString(fPrefsQualifier, name, value);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setValue(String name, boolean value) {
-		fPreferences.setValue(name, value);
+		Preferences.setBoolean(fPrefsQualifier, name, value);
 	}
 }

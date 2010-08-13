@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.resources.ISaveContext;
+import org.eclipse.core.resources.ISaveParticipant;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -38,6 +40,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.messages.Messages;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
@@ -326,6 +329,20 @@ public class PTPDebugCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
+			public void saving(ISaveContext saveContext) throws CoreException {
+				Preferences.savePreferences(getUniqueIdentifier());
+			}
+
+			public void rollback(ISaveContext saveContext) {
+			}
+
+			public void prepareToSave(ISaveContext saveContext) throws CoreException {
+			}
+
+			public void doneSaving(ISaveContext saveContext) {
+			}
+		});
 		debugModel = new PDebugModel();
 		initializeCommonSourceLookupDirector();
 	}
@@ -345,6 +362,8 @@ public class PTPDebugCorePlugin extends Plugin {
 			disposeCommonSourceLookupDirector();
 			disposeDebugConfigurations();
 			DebugJobStorage.removeDebugStorages();
+			Preferences.savePreferences(getUniqueIdentifier());
+			ResourcesPlugin.getWorkspace().removeSaveParticipant(getUniqueIdentifier());
 		} finally {
 			super.stop(context);
 		}

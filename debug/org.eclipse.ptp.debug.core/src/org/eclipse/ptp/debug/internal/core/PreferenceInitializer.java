@@ -19,11 +19,10 @@
 package org.eclipse.ptp.debug.internal.core;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
-import org.osgi.service.prefs.Preferences;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public PreferenceInitializer() {
@@ -38,15 +37,19 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		Preferences preferences = new DefaultScope().getNode(PTPCorePlugin.getUniqueIdentifier());
-		preferences.putInt(IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, IPDIFormat.NATURAL);
-		preferences.putInt(IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL);
-		preferences.putBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS, IPDebugConstants.DEFAULT_SHOW_FULL_PATHS);
-		preferences.putBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, IPDebugConstants.DEFAULT_DEBUG_REGISTER_PROC_0);
-		preferences.putInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
-		preferences.putBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND,
+		Preferences.setDefaultInt(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT,
+				IPDIFormat.NATURAL);
+		Preferences.setDefaultInt(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT,
+				IPDIFormat.NATURAL);
+		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_SHOW_FULL_PATHS,
+				IPDebugConstants.DEFAULT_SHOW_FULL_PATHS);
+		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0,
+				IPDebugConstants.DEFAULT_DEBUG_REGISTER_PROC_0);
+		Preferences.setDefaultInt(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT,
+				IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
+		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND,
 				IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_SUSPEND);
-		preferences.putBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE,
+		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE,
 				IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_CHANGE);
 	}
 }
