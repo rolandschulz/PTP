@@ -25,61 +25,56 @@
 package org.eclipse.ptp.rm.ibm.pe.core;
 
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 
-public class PEPreferenceManager
-{
-    private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmpe_proxy"; //$NON-NLS-1$
-    private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
-    private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
+public class PEPreferenceManager extends AbstractPreferenceInitializer {
+	private static final String PROXY_EXECUTABLE_NAME = "ptp_ibmpe_proxy"; //$NON-NLS-1$
+	private static final String PROXY_EXECUTABLE_PATH = null; // use local
+																// fragment
+																// directory
+	private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
 
-    public static int getDefaultOptions()
-    {
-	return OPTIONS;
-    }
-
-    public static String getDefaultProxyExecutablePath()
-    {
-	return PROXY_EXECUTABLE_PATH;
-    }
-
-    public static Preferences getPreferences()
-    {
-	return Activator.getDefault().getPluginPreferences();
-    }
-
-    public static void savePreferences()
-    {
-	Activator.getDefault().savePluginPreferences();
-    }
-
-    public static void initializePreferences()
-    {
-	Preferences preferences = Activator.getDefault().getPluginPreferences();
-
-	String server = ""; //$NON-NLS-1$
-
-	if (PROXY_EXECUTABLE_PATH != null) {
-	    server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
-	} else {
-	    server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME); //$NON-NLS-1$
-	    if (server == null) {
-		server = ""; //$NON-NLS-1$
-	    }
+	public static int getDefaultOptions() {
+		return OPTIONS;
 	}
 
-	preferences.setDefault(RMPreferenceConstants.PROXY_PATH, server);
-	preferences.setDefault(RMPreferenceConstants.OPTIONS, OPTIONS);
-	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_OPTION, PEPreferenceConstants.OPTION_NO);
-	preferences.setDefault(PEPreferenceConstants.LOAD_LEVELER_MODE, "d"); //$NON-NLS-1$
-	preferences.setDefault(PEPreferenceConstants.JOB_POLL_INTERVAL, "30"); //$NON-NLS-1$
-	preferences.setDefault(PEPreferenceConstants.NODE_MIN_POLL_INTERVAL, "30"); //$NON-NLS-1$
-	preferences.setDefault(PEPreferenceConstants.NODE_MAX_POLL_INTERVAL, "120"); //$NON-NLS-1$
-	preferences.setDefault(PEPreferenceConstants.LIBRARY_OVERRIDE, ""); //$NON-NLS-1$
-	preferences.setDefault(PEPreferenceConstants.RUN_MINIPROXY, PEPreferenceConstants.OPTION_YES);
-	preferences.setDefault(PEPreferenceConstants.TRACE_LEVEL, PEPreferenceConstants.TRACE_NOTHING);
-    }
+	public static String getDefaultProxyExecutablePath() {
+		return PROXY_EXECUTABLE_PATH;
+	}
+
+	public static void savePreferences() {
+		Preferences.savePreferences(PECorePlugin.getUniqueIdentifier());
+	}
+
+	@Override
+	public void initializeDefaultPreferences() {
+		String server = ""; //$NON-NLS-1$
+
+		if (PROXY_EXECUTABLE_PATH != null) {
+			server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
+		} else {
+			server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME); //$NON-NLS-1$
+			if (server == null) {
+				server = ""; //$NON-NLS-1$
+			}
+		}
+
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), RMPreferenceConstants.PROXY_PATH, server);
+		Preferences.setDefaultInt(PECorePlugin.getUniqueIdentifier(), RMPreferenceConstants.OPTIONS, OPTIONS);
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LOAD_LEVELER_OPTION,
+				PEPreferenceConstants.OPTION_NO);
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LOAD_LEVELER_MODE, "d"); //$NON-NLS-1$
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.JOB_POLL_INTERVAL, "30"); //$NON-NLS-1$
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.NODE_MIN_POLL_INTERVAL, "30"); //$NON-NLS-1$
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.NODE_MAX_POLL_INTERVAL, "120"); //$NON-NLS-1$
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LIBRARY_OVERRIDE, ""); //$NON-NLS-1$
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.RUN_MINIPROXY,
+				PEPreferenceConstants.OPTION_YES);
+		Preferences.setDefaultString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.TRACE_LEVEL,
+				PEPreferenceConstants.TRACE_NOTHING);
+	}
 }

@@ -32,7 +32,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.ISLURMResourceManagerConfiguration;
-import org.eclipse.ptp.rm.slurm.ui.Activator;
+import org.eclipse.ptp.rm.slurm.ui.SLURMUIPlugin;
 import org.eclipse.ptp.rm.slurm.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -51,22 +51,22 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
-	
-	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
-	{
+
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && (source == pathText || source == argsText)) {
+			if (!loading && (source == pathText || source == argsText)) {
 				updatePage();
 			}
 		}
-	
+
 		public void propertyChange(PropertyChangeEvent event) {
 			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePage();
 			}
 		}
-	
+
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
 			if (source == browseButton) {
@@ -93,8 +93,8 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	private Text argsText = null;
 	private Button browseButton = null;
 	private Button defaultButton = null;
-	private WidgetListener listener = new WidgetListener();
-	
+	private final WidgetListener listener = new WidgetListener();
+
 	public SLURMConfigurationWizardPage(IRMConfigurationWizard wizard) {
 		super(wizard, Messages.SLURMConfigurationWizardPage_name);
 		setTitle(Messages.SLURMConfigurationWizardPage_title);
@@ -103,13 +103,18 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		isValid = true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org
+	 * .eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
-	    composite.setLayout(topLayout);
+		composite.setLayout(topLayout);
 		createContents(composite);
 		setControl(composite);
 	}
@@ -120,8 +125,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 * 
 	 * @return
 	 */
-	public boolean performOk() 
-	{
+	public boolean performOk() {
 		store();
 		config.setUseDefaults(useDefaults);
 		if (!useDefaults) {
@@ -130,8 +134,10 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		}
 		return true;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
 	 */
 	@Override
@@ -141,7 +147,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		}
 		super.setVisible(visible);
 	}
-	
+
 	/**
 	 * Create the contents of the wizard page.
 	 * 
@@ -182,16 +188,16 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		gd.widthHint = 60;
 		pathText.setLayoutData(gd);
 		pathText.addModifyListener(listener);
-		
+
 		browseButton = SWTUtil.createPushButton(contents, Messages.SLURMConfigurationWizardPage_browseButton, null);
 		browseButton.addSelectionListener(listener);
-		
+
 		/*
 		 * SLURMD args
 		 */
 		label = new Label(contents, SWT.NONE);
 		label.setText(Messages.SLURMConfigurationWizardPage_arguments);
-		
+
 		argsText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
@@ -204,24 +210,23 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 */
 	private void initContents() {
 		loading = true;
-		config = (ISLURMResourceManagerConfiguration)getConfigurationWizard().getConfiguration();
+		config = (ISLURMResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
 		loadSaved();
 		updateSettings();
 		defaultSetting();
 		loading = false;
-		updatePage();	
+		updatePage();
 	}
-	
+
 	/**
 	 * Load the initial wizard state from the configuration settings.
 	 */
-	private void loadSaved()
-	{
+	private void loadSaved() {
 		useDefaults = config.getUseDefaults();
 		slurmdPath = config.getSlurmdPath();
 		slurmdArgs = config.getSlurmdArgs();
 	}
-	
+
 	/**
 	 * @param b
 	 */
@@ -229,12 +234,11 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		isValid = b;
 		setPageComplete(isValid);
 	}
-	
+
 	/**
 	 * 
 	 */
-	private void store() 
-	{
+	private void store() {
 		if (!loading) {
 			if (defaultButton != null) {
 				useDefaults = defaultButton.getSelection();
@@ -247,10 +251,10 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 			}
 		}
 	}
-	
+
 	/**
-	 * Update wizard UI selections from settings. This should be called whenever any
-	 * settings are changed.
+	 * Update wizard UI selections from settings. This should be called whenever
+	 * any settings are changed.
 	 */
 	private void updateSettings() {
 		store();
@@ -274,7 +278,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		button.setLayoutData(data);
 		return button;
 	}
-	
+
 	/**
 	 * Convenience method for creating a check button widget.
 	 * 
@@ -295,7 +299,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 * @param mw
 	 * @return the new grid layout
 	 */
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -303,16 +307,18 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		gridLayout.marginWidth = mw;
 		return gridLayout;
 	}
-	
+
 	/**
-	 * Creates an new radio button instance and sets the default
-	 * layout data.
-	 *
-	 * @param group  the composite in which to create the radio button
-	 * @param label  the string to set into the radio button
-	 * @param value  the string to identify radio button
+	 * Creates an new radio button instance and sets the default layout data.
+	 * 
+	 * @param group
+	 *            the composite in which to create the radio button
+	 * @param label
+	 *            the string to set into the radio button
+	 * @param value
+	 *            the string to identify radio button
 	 * @return the new radio button
-	 */ 
+	 */
 	protected Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
 		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
 		button.setData((null == value) ? label : value);
@@ -320,17 +326,16 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.BEGINNING;
 		button.setLayoutData(data);
-		if(null != listener) {
+		if (null != listener) {
 			button.addSelectionListener(listener);
 		}
 		return button;
 	}
-	
+
 	/**
 	 * 
 	 */
-	protected void defaultSetting() 
-	{
+	protected void defaultSetting() {
 		defaultButton.setSelection(useDefaults);
 		pathText.setText(slurmdPath);
 		argsText.setText(slurmdArgs);
@@ -342,22 +347,20 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 * @param text
 	 * @return cleaned up text.
 	 */
-	protected String getFieldContent(String text) 
-	{
+	protected String getFieldContent(String text) {
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
 			return null;
-	
+
 		return text;
 	}
 
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
-	protected void handlePathBrowseButtonSelected() 
-	{
+	protected void handlePathBrowseButtonSelected() {
 		/*
-		 * Need to do this here because the connection may have been changed 
-		 * by the previous wizard page
+		 * Need to do this here because the connection may have been changed by
+		 * the previous wizard page
 		 */
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
@@ -367,40 +370,39 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
 			}
 		}
-		
+
 		if (connection != null) {
 			if (!connection.isOpen()) {
 				IRunnableWithProgress op = new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor)
-							throws InvocationTargetException,
-							InterruptedException {
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 						try {
 							connection.open(monitor);
 						} catch (RemoteConnectionException e) {
 							ErrorDialog.openError(getShell(), Messages.SLURMConfigurationWizardPage_connection_error,
-									Messages.SLURMConfigurationWizardPage_connection_error_msg,
-									new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+									Messages.SLURMConfigurationWizardPage_connection_error_msg, new Status(IStatus.ERROR,
+											SLURMUIPlugin.getUniqueIdentifier(), e.getMessage()));
 						}
 					}
-					
+
 				};
 				try {
 					new ProgressMonitorDialog(getShell()).run(true, true, op);
 				} catch (InvocationTargetException e) {
 					ErrorDialog.openError(getShell(), Messages.SLURMConfigurationWizardPage_connection_error,
 							Messages.SLURMConfigurationWizardPage_connection_error_msg,
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+							new Status(IStatus.ERROR, SLURMUIPlugin.getUniqueIdentifier(), e.getMessage()));
 				} catch (InterruptedException e) {
 					ErrorDialog.openError(getShell(), Messages.SLURMConfigurationWizardPage_connection_error,
 							Messages.SLURMConfigurationWizardPage_connection_error_msg,
-							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage()));
+							new Status(IStatus.ERROR, SLURMUIPlugin.getUniqueIdentifier(), e.getMessage()));
 				}
 			}
 			IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
 			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
-			
+
 			String initialPath = "//"; // Start at root since SLURMD is probably installed in the system somewhere //$NON-NLS-1$
-			String selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.SLURMConfigurationWizardPage_select, initialPath, IRemoteUIConstants.OPEN);
+			String selectedPath = fileMgr.browseFile(getControl().getShell(), Messages.SLURMConfigurationWizardPage_select,
+					initialPath, IRemoteUIConstants.OPEN);
 			if (selectedPath != null) {
 				pathText.setText(selectedPath);
 			}
@@ -410,20 +412,19 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	/**
 	 * @return
 	 */
-	protected boolean isValidSetting() 
-	{
+	protected boolean isValidSetting() {
 		if (defaultButton != null && defaultButton.getSelection()) {
 			return true;
 		}
-		
+
 		if (pathText != null) {
 			String name = getFieldContent(pathText.getText());
 			if (name == null) {
-				setErrorMessage(Messages.SLURMConfigurationWizardPage_invalid); 
+				setErrorMessage(Messages.SLURMConfigurationWizardPage_invalid);
 				return false;
 			}
 		}
-	
+
 		return true;
 	}
 
@@ -432,8 +433,7 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	 * @param space
 	 * @return
 	 */
-	protected GridData spanGridData(int style, int space) 
-	{
+	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
 		if (style == -1)
 			gd = new GridData();
@@ -446,14 +446,13 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 	/**
 	 * 
 	 */
-	protected void updatePage() 
-	{
+	protected void updatePage() {
 		setErrorMessage(null);
 		setMessage(null);
-	
+
 		if (!isValidSetting()) {
 			setValid(false);
-		} else {	
+		} else {
 			performOk();
 			setValid(true);
 		}

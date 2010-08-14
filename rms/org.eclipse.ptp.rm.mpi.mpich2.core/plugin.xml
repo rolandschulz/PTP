@@ -10,4 +10,10 @@
             serviceId="org.eclipse.ptp.core.LaunchService">
       </provider>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager">
+      </initializer>
+   </extension>
 </plugin>

@@ -12,21 +12,30 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.ui.preferences;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.rm.slurm.core.SLURMCorePlugin;
 import org.eclipse.ptp.rm.slurm.core.SLURMPreferenceManager;
 import org.eclipse.ptp.rm.ui.preferences.AbstractRemoteRMPreferencePage;
 
 public class SLURMPreferencePage extends AbstractRemoteRMPreferencePage {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#getPreferences()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.preferences.AbstractRemoteRMPreferencePage#
+	 * getPreferenceQualifier()
 	 */
-	public Preferences getPreferences() {
-		return SLURMPreferenceManager.getPreferences();
+	@Override
+	public String getPreferenceQualifier() {
+		return SLURMCorePlugin.getUniqueIdentifier();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#savePreferences()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.ui.preferences.AbstractRemotePreferencePage#
+	 * savePreferences()
 	 */
+	@Override
 	public void savePreferences() {
 		SLURMPreferenceManager.savePreferences();
 	}

@@ -20,11 +20,11 @@ package org.eclipse.ptp.rm.ui.preferences;
 
 import java.io.File;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 import org.eclipse.ptp.rm.ui.messages.Messages;
@@ -47,13 +47,12 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public abstract class AbstractRemoteRMPreferencePage extends PreferencePage implements IWorkbenchPreferencePage, RMPreferenceConstants 
-{
-	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
-	{
+public abstract class AbstractRemoteRMPreferencePage extends PreferencePage implements IWorkbenchPreferencePage,
+		RMPreferenceConstants {
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && source == serverText)
+			if (!loading && source == serverText)
 				updatePreferencePage();
 		}
 
@@ -62,6 +61,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 				updatePreferencePage();
 		}
 
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
 			if (source == browseButton)
@@ -96,50 +96,58 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		// Empty
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
 	 */
-	public void dispose() 
-	{
+	@Override
+	public void dispose() {
 		super.dispose();
 	}
 
 	/**
-	 * Gets the preference settings to use for the RM. Each RM should supply
-	 * different preference settings.
+	 * Gets the preference qualifier used to access settings for the RM. Each RM
+	 * should supply different preference qualifier (usually the plugin ID).
 	 * 
-	 * @return table of prefence settings
+	 * @return preference qualifier
+	 * @since 2.0
 	 */
-	public abstract Preferences getPreferences();
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	public abstract String getPreferenceQualifier();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	public void init(IWorkbench workbench) 
-	{
+	public void init(IWorkbench workbench) {
 		// Nothing to do
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
-	public void performDefaults() 
-	{
+	@Override
+	public void performDefaults() {
 		loadDefaults();
 		defaultSetting();
 		updateApplyButton();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
-	public boolean performOk() 
-	{
+	@Override
+	public boolean performOk() {
 		store();
-		Preferences preferences = getPreferences();
 
-		preferences.setValue(RMPreferenceConstants.PROXY_PATH, serverFile);
-		
+		Preferences.setString(getPreferenceQualifier(), RMPreferenceConstants.PROXY_PATH, serverFile);
+
 		int options = 0;
 		if (fStdioButton.getSelection()) {
 			options |= IRemoteProxyOptions.STDIO;
@@ -150,13 +158,13 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		if (fManualButton.getSelection()) {
 			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
 		}
-		preferences.setValue(RMPreferenceConstants.OPTIONS, options);
+		Preferences.setInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS, options);
 
 		savePreferences();
 
 		return true;
 	}
-	
+
 	/**
 	 * Called to save the current preferences to the store.
 	 */
@@ -182,50 +190,41 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 			fManualButton.setEnabled(false);
 			fManualButton.setSelection(false);
 		} else {
-			fManualButton.setSelection(
-				(options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH);
+			fManualButton.setSelection((options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH);
 		}
-		
 
 	}
-	
+
 	/**
 	 * Load values from preference store
 	 */
-	private void loadSaved()
-	{
+	private void loadSaved() {
 		loading = true;
-		
-		Preferences preferences = getPreferences();
-		
-		serverFile = preferences.getString(RMPreferenceConstants.PROXY_PATH);
+
+		serverFile = Preferences.getString(getPreferenceQualifier(), RMPreferenceConstants.PROXY_PATH);
 		serverText.setText(serverFile);
-		
-		updateOptions(preferences.getInt(RMPreferenceConstants.OPTIONS));
+
+		updateOptions(Preferences.getInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS));
 		loading = false;
 	}
-	
+
 	/**
 	 * Load default values from preference store
 	 */
-	private void loadDefaults()
-	{
+	private void loadDefaults() {
 		loading = true;
-		
-		Preferences preferences = getPreferences();
-		
-		serverFile = preferences.getDefaultString(RMPreferenceConstants.PROXY_PATH);
+
+		serverFile = Preferences.getDefaultString(getPreferenceQualifier(), RMPreferenceConstants.PROXY_PATH, ""); //$NON-NLS-1$
 		serverText.setText(serverFile);
-		
-		updateOptions(preferences.getDefaultInt(RMPreferenceConstants.OPTIONS));
+
+		updateOptions(Preferences.getDefaultInt(getPreferenceQualifier(), RMPreferenceConstants.OPTIONS, 0));
 		loading = false;
 	}
-	
+
 	/**
 	 * 
 	 */
-	private void store() 
-	{
+	private void store() {
 		serverFile = serverText.getText();
 	}
 
@@ -253,14 +252,16 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	}
 
 	/**
-	 * Creates an new radiobutton instance and sets the default
-	 * layout data.
-	 *
-	 * @param group  the composite in which to create the radiobutton
-	 * @param label  the string to set into the radiobutton
-	 * @param value  the string to identify radiobutton
+	 * Creates an new radiobutton instance and sets the default layout data.
+	 * 
+	 * @param group
+	 *            the composite in which to create the radiobutton
+	 * @param label
+	 *            the string to set into the radiobutton
+	 * @param value
+	 *            the string to identify radiobutton
 	 * @return the new checkbox
-	 */ 
+	 */
 	private Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
 		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
 		button.setData((null == value) ? label : value);
@@ -268,16 +269,20 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.BEGINNING;
 		button.setLayoutData(data);
-		if(null != listener)
+		if (null != listener)
 			button.addSelectionListener(listener);
 		return button;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
-	protected Control createContents(Composite parent) 
-	{
+	@Override
+	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
@@ -286,25 +291,25 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		bGroup.setText(Messages.AbstractRemotePreferencePage_0);
-		
+
 		new Label(bGroup, SWT.WRAP).setText(Messages.AbstractRemotePreferencePage_1);
-		
+
 		Composite orteserver = new Composite(bGroup, SWT.NONE);
 		orteserver.setLayout(createGridLayout(3, false, 0, 0));
 		orteserver.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		
+
 		new Label(orteserver, SWT.NONE).setText(Messages.AbstractRemotePreferencePage_2);
 		serverText = new Text(orteserver, SWT.SINGLE | SWT.BORDER);
 		serverText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		serverText.addModifyListener(listener);
 		browseButton = SWTUtil.createPushButton(orteserver, Messages.AbstractRemotePreferencePage_3, null);
 		browseButton.addSelectionListener(listener);
-		
+
 		Group mxGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		mxGroup.setLayout(createGridLayout(1, true, 10, 10));
 		mxGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		mxGroup.setText(Messages.AbstractRemotePreferencePage_4);
-		
+
 		fNoneButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_5, "mxGroup", listener); //$NON-NLS-1$
 		fPortForwardingButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_6, "mxGroup", listener); //$NON-NLS-1$
 		fStdioButton = createRadioButton(mxGroup, Messages.AbstractRemotePreferencePage_7, "mxGroup", listener); //$NON-NLS-1$
@@ -320,7 +325,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 		defaultSetting();
 		return composite;
 	}
-	
+
 	/**
 	 * @param columns
 	 * @param isEqual
@@ -328,7 +333,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 * @param mw
 	 * @return
 	 */
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -340,8 +345,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	/**
 	 * 
 	 */
-	protected void defaultSetting() 
-	{
+	protected void defaultSetting() {
 		serverText.setText(serverFile);
 	}
 
@@ -349,27 +353,24 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 * @param text
 	 * @return
 	 */
-	protected String getFieldContent(String text) 
-	{
+	protected String getFieldContent(String text) {
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
 			return null;
 
 		return text;
 	}
-	
+
 	/**
 	 * Show a dialog that lets the user select a file
 	 */
-	protected void handlePathBrowseButtonSelected() 
-	{
+	protected void handlePathBrowseButtonSelected() {
 		FileDialog dialog = new FileDialog(getShell());
 		dialog.setText(Messages.AbstractRemotePreferencePage_10);
 		String correctPath = getFieldContent(serverText.getText());
 		if (correctPath != null) {
 			File path = new File(correctPath);
 			if (path.exists())
-				dialog.setFilterPath(path.isFile() ? correctPath : path
-						.getParent());
+				dialog.setFilterPath(path.isFile() ? correctPath : path.getParent());
 		}
 
 		String selectedPath = dialog.open();
@@ -380,20 +381,19 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	/**
 	 * @return
 	 */
-	protected boolean isValidSetting() 
-	{
+	protected boolean isValidSetting() {
 		String name = getFieldContent(serverText.getText());
 		if (name == null) {
 			setErrorMessage(Messages.AbstractRemotePreferencePage_11);
 			setValid(false);
 			return false;
-		} else {
-			File path = new File(name);
-			if (!path.exists() || !path.isFile()) {
-				setErrorMessage(Messages.AbstractRemotePreferencePage_11);
-				setValid(false);
-				return false;
-			}
+		}
+
+		File path = new File(name);
+		if (!path.exists() || !path.isFile()) {
+			setErrorMessage(Messages.AbstractRemotePreferencePage_11);
+			setValid(false);
+			return false;
 		}
 
 		return true;
@@ -404,8 +404,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	 * @param space
 	 * @return
 	 */
-	protected GridData spanGridData(int style, int space) 
-	{
+	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
 		if (style == -1)
 			gd = new GridData();
@@ -418,8 +417,7 @@ public abstract class AbstractRemoteRMPreferencePage extends PreferencePage impl
 	/**
 	 * 
 	 */
-	protected void updatePreferencePage() 
-	{
+	protected void updatePreferencePage() {
 		setErrorMessage(null);
 		setMessage(null);
 

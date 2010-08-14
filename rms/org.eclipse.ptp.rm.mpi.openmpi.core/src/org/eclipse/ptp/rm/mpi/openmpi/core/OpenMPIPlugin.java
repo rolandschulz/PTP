@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.messages.Messages;
 import org.osgi.framework.BundleContext;
@@ -26,7 +27,7 @@ import org.osgi.framework.BundleContext;
 public class OpenMPIPlugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.openmpi.core"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.openmpi.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static OpenMPIPlugin plugin;
@@ -58,8 +59,12 @@ public class OpenMPIPlugin extends Plugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
+		try {
+			Preferences.savePreferences(getUniqueIdentifier());
+		} finally {
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**

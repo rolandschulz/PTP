@@ -18,12 +18,12 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.OpenMPIUIPlugin;
 
 /**
- *
+ * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class OpenMPILaunchConfiguration {
-	public static final String ATTR_BASE = OpenMPIUIPlugin.PLUGIN_ID + ".launchAttributes"; //$NON-NLS-1$
+	public static final String ATTR_BASE = OpenMPIUIPlugin.getUniqueIdentifier() + ".launchAttributes"; //$NON-NLS-1$
 	public static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs"; //$NON-NLS-1$
 	public static final String ATTR_BYNODE = ATTR_BASE + ".byNode"; //$NON-NLS-1$
 	public static final String ATTR_BYSLOT = ATTR_BASE + ".bySlot"; //$NON-NLS-1$
@@ -40,6 +40,7 @@ public class OpenMPILaunchConfiguration {
 	public static final String ATTR_PARAMETERS = ATTR_BASE + ".parameters"; //$NON-NLS-1$
 	public static final String ATTR_USEDEFAULTPARAMETERS = ATTR_BASE + ".useDefaultParameters"; //$NON-NLS-1$
 
+	@SuppressWarnings("unchecked")
 	static String calculateArguments(ILaunchConfiguration configuration) throws CoreException {
 		if (configuration.getAttribute(ATTR_USEDEFAULTARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS)) {
 			String launchArgs = "-np " + Integer.toString(configuration.getAttribute(ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS)); //$NON-NLS-1$
@@ -65,8 +66,10 @@ public class OpenMPILaunchConfiguration {
 				launchArgs += " -host " + fixString(configuration.getAttribute(ATTR_HOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_HOSTLIST)); //$NON-NLS-1$
 			}
 
-			if (! configuration.getAttribute(ATTR_USEDEFAULTPARAMETERS, OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS)) {
-				Map<String, String> params = configuration.getAttribute(ATTR_PARAMETERS, OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
+			if (!configuration
+					.getAttribute(ATTR_USEDEFAULTPARAMETERS, OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS)) {
+				Map<String, String> params = configuration.getAttribute(ATTR_PARAMETERS,
+						OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
 				for (Entry<String, String> param : params.entrySet()) {
 					launchArgs += " -mca " + param.getKey() + " " + fixString(param.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -79,7 +82,7 @@ public class OpenMPILaunchConfiguration {
 
 	/**
 	 * Make string suitable for passing as an argument
-	 *
+	 * 
 	 * @param s
 	 * @return
 	 */

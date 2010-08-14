@@ -10,238 +10,310 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.ui;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProvider;
+import org.eclipse.ptp.rm.ibm.pe.core.PECorePlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.PEResourceManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
-
 /**
  * Service provider for IBM Parallel Environment
  */
-public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPEResourceManagerConfiguration{
-    private static final String TAG_USE_LOADLEVELER = "PE_UseLoadLeveler"; //$NON-NLS-1$
-    private static final String TAG_DEBUG_LEVEL = "PE_DebugLevel"; //$NON-NLS-1$
-    private static final String TAG_RUN_MINIPROXY = "PE_RunMiniproxy"; //$NON-NLS-1$
-    private static final String TAG_SUSPEND_PROXY = "PE_SuspendProxy"; //$NON-NLS-1$
-    private static final String TAG_LOADLEVELER_MODE = "PE_LoadLevelerMode"; //$NON-NLS-1$
-    private static final String TAG_MIN_NODE_POLL_INTERVAL = "PE_NodeMinPollInterval"; //$NON-NLS-1$
-    private static final String TAG_MAX_NODE_POLL_INTERVAL = "PE_NodeMaxPollInterval"; //$NON-NLS-1$
-    private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
-    private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
-    
-    private Preferences preferences = PEPreferenceManager.getPreferences();
-	
+public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPEResourceManagerConfiguration {
+	private static final String TAG_USE_LOADLEVELER = "PE_UseLoadLeveler"; //$NON-NLS-1$
+	private static final String TAG_DEBUG_LEVEL = "PE_DebugLevel"; //$NON-NLS-1$
+	private static final String TAG_RUN_MINIPROXY = "PE_RunMiniproxy"; //$NON-NLS-1$
+	private static final String TAG_SUSPEND_PROXY = "PE_SuspendProxy"; //$NON-NLS-1$
+	private static final String TAG_LOADLEVELER_MODE = "PE_LoadLevelerMode"; //$NON-NLS-1$
+	private static final String TAG_MIN_NODE_POLL_INTERVAL = "PE_NodeMinPollInterval"; //$NON-NLS-1$
+	private static final String TAG_MAX_NODE_POLL_INTERVAL = "PE_NodeMaxPollInterval"; //$NON-NLS-1$
+	private static final String TAG_JOB_POLL_INTERVAL = "PE_JobPollInterval"; //$NON-NLS-1$
+	private static final String TAG_LIBRARY_OVERRIDE = "PE_LibraryOverride"; //$NON-NLS-1$
+
 	public PEServiceProvider() {
 		super();
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Constructor for creating a working copy of the service provider
 	 * 
-	 * @param provider provider we are making a copy from
+	 * @param provider
+	 *            provider we are making a copy from
 	 */
 	public PEServiceProvider(IServiceProvider provider) {
 		super(provider);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.services.core.ServiceProvider#copy()
 	 */
 	@Override
 	public IServiceProviderWorkingCopy copy() {
 		return new PEServiceProvider(this);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#createResourceManager()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
+	 * createResourceManager()
 	 */
 	@Override
 	public IResourceManagerControl createResourceManager() {
 		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
 		return new PEResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getDebugLevel()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getDebugLevel()
 	 */
-	public String getDebugLevel()
-	{
-		return getString(TAG_DEBUG_LEVEL, preferences.getString(PEPreferenceConstants.TRACE_LEVEL));
-	}
-	
-    /* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getJobPollInterval()
-	 */
-	public String getJobPollInterval()
-	{
-		return getString(TAG_JOB_POLL_INTERVAL, preferences.getString(PEPreferenceConstants.JOB_POLL_INTERVAL));
-	}
-    
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getLibraryOverride()
-	 */
-	public String getLibraryOverride()
-	{
-		return getString(TAG_LIBRARY_OVERRIDE, preferences.getString(PEPreferenceConstants.LIBRARY_OVERRIDE));
+	public String getDebugLevel() {
+		return getString(TAG_DEBUG_LEVEL,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.TRACE_LEVEL));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getLoadLevelerMode()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getJobPollInterval()
 	 */
-	public String getLoadLevelerMode()
-	{
-		return getString(TAG_LOADLEVELER_MODE, preferences.getString(PEPreferenceConstants.LOAD_LEVELER_MODE));
+	public String getJobPollInterval() {
+		return getString(TAG_JOB_POLL_INTERVAL,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.JOB_POLL_INTERVAL));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getNodeMaxPollInterval()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getLibraryOverride()
 	 */
-	public String getNodeMaxPollInterval()
-	{
-		return getString(TAG_MAX_NODE_POLL_INTERVAL, preferences.getString(PEPreferenceConstants.NODE_MAX_POLL_INTERVAL));
+	public String getLibraryOverride() {
+		return getString(TAG_LIBRARY_OVERRIDE,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LIBRARY_OVERRIDE));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getNodeMinPollInterval()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getLoadLevelerMode()
 	 */
-	public String getNodeMinPollInterval()
-	{
-		return getString(TAG_MIN_NODE_POLL_INTERVAL, preferences.getString(PEPreferenceConstants.NODE_MIN_POLL_INTERVAL));
+	public String getLoadLevelerMode() {
+		return getString(TAG_LOADLEVELER_MODE,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LOAD_LEVELER_MODE));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#getResourceManagerId()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getNodeMaxPollInterval()
+	 */
+	public String getNodeMaxPollInterval() {
+		return getString(TAG_MAX_NODE_POLL_INTERVAL,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.NODE_MAX_POLL_INTERVAL));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getNodeMinPollInterval()
+	 */
+	public String getNodeMinPollInterval() {
+		return getString(TAG_MIN_NODE_POLL_INTERVAL,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.NODE_MIN_POLL_INTERVAL));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
+	 * getResourceManagerId()
 	 */
 	@Override
 	public String getResourceManagerId() {
 		return getId();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getRunMiniproxy()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getRunMiniproxy()
 	 */
-	public String getRunMiniproxy()
-	{
-		return getString(TAG_RUN_MINIPROXY, preferences.getString(PEPreferenceConstants.RUN_MINIPROXY));
+	public String getRunMiniproxy() {
+		return getString(TAG_RUN_MINIPROXY,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.RUN_MINIPROXY));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getSuspendProxy()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getSuspendProxy()
 	 */
-	public String getSuspendProxy()
-	{
+	public String getSuspendProxy() {
 		return getString(TAG_SUSPEND_PROXY, "n"); //$NON-NLS-1$
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#getUseLoadLeveler()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #getUseLoadLeveler()
 	 */
-	public String getUseLoadLeveler()
-	{
-		return getString(TAG_USE_LOADLEVELER, preferences.getString(PEPreferenceConstants.LOAD_LEVELER_OPTION));
+	public String getUseLoadLeveler() {
+		return getString(TAG_USE_LOADLEVELER,
+				Preferences.getString(PECorePlugin.getUniqueIdentifier(), PEPreferenceConstants.LOAD_LEVELER_OPTION));
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */
+	@Override
 	public boolean isConfigured() {
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setDebugLevel(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setDebugLevel(java.lang.String)
 	 */
-	public void setDebugLevel(String debugLevel)
-	{
+	public void setDebugLevel(String debugLevel) {
 		putString(TAG_DEBUG_LEVEL, debugLevel);
 	}
 
 	/*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc()
-     */
-    public void setDefaultNameAndDesc()
-    {
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc
+	 * ()
+	 */
+	public void setDefaultNameAndDesc() {
 		String name = "IBM PE"; //$NON-NLS-1$
 		String conn = getConnectionName();
 		if (conn != null && !conn.equals("")) { //$NON-NLS-1$
-		    name += "@" + conn; //$NON-NLS-1$
+			name += "@" + conn; //$NON-NLS-1$
 		}
 		setName(name);
 		setDescription("IBM PE Resource Manager"); //$NON-NLS-1$
-    }
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setJobPollInterval(java.lang.String)
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setJobPollInterval(java.lang.String)
 	 */
-	public void setJobPollInterval(String interval)
-	{
+	public void setJobPollInterval(String interval) {
 		putString(TAG_JOB_POLL_INTERVAL, interval);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setLibraryOverride(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setLibraryOverride(java.lang.String)
 	 */
-	public void setLibraryOverride(String override)
-	{
+	public void setLibraryOverride(String override) {
 		putString(TAG_LIBRARY_OVERRIDE, override);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setLoadLevelerMode(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setLoadLevelerMode(java.lang.String)
 	 */
-	public void setLoadLevelerMode(String mode)
-	{
+	public void setLoadLevelerMode(String mode) {
 		putString(TAG_LOADLEVELER_MODE, mode);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setNodeMaxPollInterval(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setNodeMaxPollInterval(java.lang.String)
 	 */
-	public void setNodeMaxPollInterval(String interval)
-	{
+	public void setNodeMaxPollInterval(String interval) {
 		putString(TAG_MAX_NODE_POLL_INTERVAL, interval);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setNodeMinPollInterval(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setNodeMinPollInterval(java.lang.String)
 	 */
-	public void setNodeMinPollInterval(String interval)
-	{
+	public void setNodeMinPollInterval(String interval) {
 		putString(TAG_MIN_NODE_POLL_INTERVAL, interval);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setRunMiniproxy(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setRunMiniproxy(java.lang.String)
 	 */
-	public void setRunMiniproxy(String flag)
-	{
+	public void setRunMiniproxy(String flag) {
 		putString(TAG_RUN_MINIPROXY, flag);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setSuspendProxy(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setSuspendProxy(java.lang.String)
 	 */
-	public void setSuspendProxy(String flag)
-	{
+	public void setSuspendProxy(String flag) {
 		putString(TAG_SUSPEND_PROXY, flag);
 	}
-	
-    /* (non-Javadoc)
-     * @see org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration#setUseLoadLeveler(java.lang.String)
-     */
-    public void setUseLoadLeveler(String flag)
-	{
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration
+	 * #setUseLoadLeveler(java.lang.String)
+	 */
+	public void setUseLoadLeveler(String flag) {
 		putString(TAG_USE_LOADLEVELER, flag);
 	}
 }

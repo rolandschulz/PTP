@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.ll.ui;singleton:=true
 Bundle-Version: 5.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.rm.ibm.ll.ui.Activator
+Bundle-Activator: org.eclipse.ptp.rm.ibm.ll.ui.LLUIPlugin
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,

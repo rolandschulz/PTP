@@ -9,26 +9,55 @@
 package org.eclipse.ptp.rm.ibm.ll.ui;
 
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
+ * @since 5.0
  */
-public class Activator extends AbstractUIPlugin {
+public class LLUIPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.ibm.ll.ui"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.rm.ibm.ll.ui"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static LLUIPlugin fPlugin;
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static LLUIPlugin getDefault() {
+		return fPlugin;
+	}
+
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null) {
+			return PLUGIN_ID;
+		}
+		return getDefault().getBundle().getSymbolicName();
+	}
 
 	/**
 	 * The constructor
 	 */
-	public Activator() {
-		plugin = this;
+	public LLUIPlugin() {
+		fPlugin = this;
+	}
+
+	/**
+	 * @since 4.0
+	 */
+	public void logError(String message) {
+		getLog().log(new Status(Status.ERROR, getUniqueIdentifier(), message));
 	}
 
 	/*
@@ -41,7 +70,6 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		IBMLLPreferenceManager.initializePreferences();
 	}
 
 	/*
@@ -53,24 +81,8 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		fPlugin = null;
 		super.stop(context);
-	}
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
-
-	/**
-	 * @since 4.0
-	 */
-	public void logError(String message) {
-		getLog().log(new Status(Status.ERROR, "org.eclipse.ptp.rm.ibm.ll.ui", message)); //$NON-NLS-1$
 	}
 
 }

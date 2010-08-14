@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem;
 
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
@@ -22,24 +22,22 @@ import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider implements IMPICH2ResourceManagerConfiguration {
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
-	private static final String EMPTY_STR = ""; //$NON-NLS-1$
 
 	public MPICH2ServiceProvider() {
 		super(MPICH2_CAPABILITIES);
 
-		IPreferencesService prefs = MPICH2PreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null));
-		setDebugCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null));
-		setDiscoverCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null));
-		setPeriodicMonitorCmd(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_CMD, EMPTY_STR, null));
-		setPeriodicMonitorTime(prefs.getInt(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME, 0, null));
-		setRemoteInstallPath(prefs.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null));
+		setLaunchCmd(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD));
+		setDebugCmd(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD));
+		setDiscoverCmd(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD));
+		setPeriodicMonitorCmd(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
+		setPeriodicMonitorTime(Preferences.getInt(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME));
+		setRemoteInstallPath(Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 	}
 
 	/**

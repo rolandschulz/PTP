@@ -34,9 +34,9 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.attributes.BigIntegerAttribute;
 import org.eclipse.ptp.core.attributes.BigIntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -59,8 +59,8 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.rm.ibm.ll.core.IBMLLCorePlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.rmsystem.AbstractResourceManager;
@@ -79,8 +79,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class IBMLLRMLaunchConfigurationDynamicTab extends
-		AbstractRMLaunchConfigurationDynamicTab {
+public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigurationDynamicTab {
 	/**
 	 * Internal class which handles events of interest to this panel
 	 */
@@ -146,13 +145,11 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 				switch (((Integer) widgetData).intValue()) {
 				case LL_PTP_JOB_COMMAND_FILE_SELECTOR:
-					getInputFile(llJobCommandFile,
-							"File.llJobCommandFileTitle", //$NON-NLS-1$
+					getInputFile(llJobCommandFile, "File.llJobCommandFileTitle", //$NON-NLS-1$
 							"llJobCommandFilePath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR:
-					getInputFile(llJobCommandFileTemplate,
-							"File.llJobCommandFileTemplateTitle", //$NON-NLS-1$
+					getInputFile(llJobCommandFileTemplate, "File.llJobCommandFileTemplateTitle", //$NON-NLS-1$
 							"llJobCommandFileTemplatePath"); //$NON-NLS-1$
 					break;
 				case LL_PTP_STDERR_SELECTOR:
@@ -193,6 +190,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 					+ ":widgetSelected returning."); //$NON-NLS-1$
 		}
 	}
+
 	/**
 	 * Exception class intended for use in validating fields within this panel.
 	 * When a validation error occurs, the validation code should create and
@@ -207,8 +205,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 		@SuppressWarnings("unused")
 		private ValidationException() {
-			throw new IllegalAccessError(
-					Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.32")); //$NON-NLS-1$
+			throw new IllegalAccessError(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.32")); //$NON-NLS-1$
 		}
 
 		/**
@@ -221,6 +218,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			super(message);
 		}
 	}
+
 	private static final int INFO_MESSAGE = 0;
 	private static final int TRACE_MESSAGE = 1;
 	private static final int WARNING_MESSAGE = 2;
@@ -275,8 +273,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * End of attribute name list.
 	 */
 	private static final String ENABLE_STATE = "ENABLE_STATE"; //$NON-NLS-1$
-	private static final RMLaunchValidation success = new RMLaunchValidation(
-			true, ""); //$NON-NLS-1$
+	private static final RMLaunchValidation success = new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	private static final int LL_PTP_JOB_COMMAND_FILE_SELECTOR = 18;
 	private static final int LL_PTP_SUBMIT_MODE_RADIOBOX = 100;
 	private static final int LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR = 19;
@@ -369,53 +366,45 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 	private TextRowWidget llWallClockLimitSoft = null;
 
-	Preferences myPreferences = null;
-
 	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManager rm) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":IBMLLRMLaunchConfigurationDynamicTab entered."); //$NON-NLS-1$
-		myPreferences = IBMLLPreferenceManager.getPreferences();
-
-		if ((myPreferences
-				.getString(IBMLLPreferenceConstants.GUI_TRACE_MESSAGE))
+		if ((Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.GUI_TRACE_MESSAGE))
 				.equals(IBMLLPreferenceConstants.LL_YES)) {
 			state_trace = 1;
 		} else {
 			state_trace = 0;
 		}
 
-		if ((myPreferences.getString(IBMLLPreferenceConstants.GUI_INFO_MESSAGE))
+		if ((Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.GUI_INFO_MESSAGE))
 				.equals(IBMLLPreferenceConstants.LL_YES)) {
 			state_info = 1;
 		} else {
 			state_info = 0;
 		}
 
-		if ((myPreferences
-				.getString(IBMLLPreferenceConstants.GUI_WARNING_MESSAGE))
+		if ((Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.GUI_WARNING_MESSAGE))
 				.equals(IBMLLPreferenceConstants.LL_YES)) {
 			state_warning = 1;
 		} else {
 			state_warning = 0;
 		}
 
-		if ((myPreferences
-				.getString(IBMLLPreferenceConstants.GUI_ERROR_MESSAGE))
+		if ((Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.GUI_ERROR_MESSAGE))
 				.equals(IBMLLPreferenceConstants.LL_YES)) {
 			state_error = 1;
 		} else {
 			state_error = 0;
 		}
 
-		if ((myPreferences.getString(IBMLLPreferenceConstants.GUI_ARGS_MESSAGE))
+		if ((Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.GUI_ARGS_MESSAGE))
 				.equals(IBMLLPreferenceConstants.LL_YES)) {
 			state_args = 1;
 		} else {
 			state_args = 0;
 		}
 
-		if ((myPreferences
-				.getString(IBMLLPreferenceConstants.GUI_FATAL_MESSAGE))
+		if ((Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.GUI_FATAL_MESSAGE))
 				.equals(IBMLLPreferenceConstants.LL_YES)) {
 			state_fatal = 1;
 		} else {
@@ -440,8 +429,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param attrName
 	 *            The name of the attribute to be added to launch attributes
 	 */
-	private void addAttribute(IResourceManager rm, ILaunchConfiguration config,
-			Vector<StringAttribute> attrs, String attrName) {
+	private void addAttribute(IResourceManager rm, ILaunchConfiguration config, Vector<StringAttribute> attrs, String attrName) {
 		String attrValue;
 		String defaultValue;
 		StringAttribute attr;
@@ -458,19 +446,16 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 			defaultValue = getAttrDefaultValue(rm, attrName);
 
-			if ((attrValue.trim().length() > 0)
-					&& ((!attrValue.equals(defaultValue))
-							|| (attrName.equals("LL_PTP_JOB_TYPE")) //$NON-NLS-1$
-							|| (attrName
-									.equals("LL_PTP_JOB_COMMAND_FILE_TEMPLATE")) //$NON-NLS-1$
-							|| (attrName.equals("LL_PTP_SUBMIT_MODE")) //$NON-NLS-1$
-							|| (attrName.equals("LL_PTP_CLASS")) //$NON-NLS-1$
-							|| (attrName.equals("LL_PTP_INPUT")) //$NON-NLS-1$
-							|| (attrName.equals("LL_PTP_OUTPUT")) //$NON-NLS-1$
-							|| (attrName.equals("LL_PTP_ERROR")) //$NON-NLS-1$
-							|| (attrName.equals("LL_PTP_ENVIRONMENT")) //$NON-NLS-1$
-							|| (attrName.equals("LL_PTP_JOB_TYPE")) || (attrName //$NON-NLS-1$
-							.equals("LL_PTP_JOB_COMMAND_FILE")))) { //$NON-NLS-1$
+			if ((attrValue.trim().length() > 0) && ((!attrValue.equals(defaultValue)) || (attrName.equals("LL_PTP_JOB_TYPE")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_JOB_COMMAND_FILE_TEMPLATE")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_SUBMIT_MODE")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_CLASS")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_INPUT")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_OUTPUT")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_ERROR")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_ENVIRONMENT")) //$NON-NLS-1$
+					|| (attrName.equals("LL_PTP_JOB_TYPE")) || (attrName //$NON-NLS-1$
+					.equals("LL_PTP_JOB_COMMAND_FILE")))) { //$NON-NLS-1$
 				attrDef = new StringAttributeDefinition(attrName, "", "", //$NON-NLS-1$ //$NON-NLS-2$
 						false, ""); //$NON-NLS-1$
 				attr = new StringAttribute(attrDef, attrValue);
@@ -491,8 +476,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":canSave entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -561,8 +545,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private BooleanRowWidget createBooleanOption(Composite parent,
-			IResourceManager rm, String id) {
+	private BooleanRowWidget createBooleanOption(Composite parent, IResourceManager rm, String id) {
 		BooleanRowWidget widget;
 		StringSetAttributeDefinition attrDef;
 
@@ -571,8 +554,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		widget = null;
 		attrDef = (StringSetAttributeDefinition) rm.getAttributeDefinition(id);
 		if (attrDef != null) {
-			widget = new BooleanRowWidget(parent, id, attrDef,
-					LL_PTP_SUBMIT_MODE_RADIOBOX);
+			widget = new BooleanRowWidget(parent, id, attrDef, LL_PTP_SUBMIT_MODE_RADIOBOX);
 			widget.setValidationRequired();
 			widget.addSelectionListener(eventMonitor);
 			activeWidgets.add(widget);
@@ -596,8 +578,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private CheckboxRowWidget createCheckbox(Composite parent,
-			IResourceManager rm, String id) {
+	private CheckboxRowWidget createCheckbox(Composite parent, IResourceManager rm, String id) {
 		CheckboxRowWidget widget;
 		StringAttributeDefinition attrDef;
 
@@ -628,8 +609,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createCombobox(Composite parent,
-			IResourceManager rm, String id, int selector_id) {
+	private ComboRowWidget createCombobox(Composite parent, IResourceManager rm, String id, int selector_id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -659,19 +639,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IResourceManager rm,
-			IPQueue queue) {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createControl entered."); //$NON-NLS-1$
 		IIBMLLResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 
-		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm)
-				.getConfiguration();
-		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-				config.getRemoteServicesId());
-		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
-				remoteService);
+		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
+		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
+		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
 		connMgr = remoteService.getConnectionManager();
 		remoteConnection = connMgr.getConnection(config.getConnectionName());
 		parentShell = parent.getShell();
@@ -709,8 +685,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for second rm attribute this widget represents
 	 * @return Text entry widget
 	 */
-	private DualFieldRowWidget createDualField(Composite parent,
-			IResourceManager rm, String id1, String id2) {
+	private DualFieldRowWidget createDualField(Composite parent, IResourceManager rm, String id1, String id2) {
 		DualFieldRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr1;
 		IAttributeDefinition<?, ?, ?> attr2;
@@ -744,8 +719,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Editable ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createEditableCombobox(Composite parent,
-			IResourceManager rm, String id, int selector_id) {
+	private ComboRowWidget createEditableCombobox(Composite parent, IResourceManager rm, String id, int selector_id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -785,8 +759,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            this widget
 	 * @return Text entry field for this attribute
 	 */
-	private FileSelectorRowWidget createFileSelector(Composite parent,
-			IResourceManager rm, String id, int selectorID) {
+	private FileSelectorRowWidget createFileSelector(Composite parent, IResourceManager rm, String id, int selectorID) {
 		FileSelectorRowWidget widget;
 		StringAttributeDefinition attr;
 
@@ -825,8 +798,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		generalTabPane.setLayout(createTabPaneLayout());
 		llComment = createTextWidget(generalTabPane, rm, LL_PTP_COMMENT);
 		llJobName = createTextWidget(generalTabPane, rm, LL_PTP_JOB_NAME);
-		llJobType = createCombobox(generalTabPane, rm, LL_PTP_JOB_TYPE,
-				LL_PTP_JOB_TYPE_SELECTOR);
+		llJobType = createCombobox(generalTabPane, rm, LL_PTP_JOB_TYPE, LL_PTP_JOB_TYPE_SELECTOR);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createGeneralTab returning."); //$NON-NLS-1$
@@ -849,10 +821,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		tab.setControl(limitsTabPane);
 		tab.setText(Messages.getString("LimitsTab.title")); //$NON-NLS-1$
 		limitsTabPane.setLayout(createTabPaneLayout());
-		llWallClockLimitHard = createTextWidget(limitsTabPane, rm,
-				LL_PTP_WALLCLOCK_HARD);
-		llWallClockLimitSoft = createTextWidget(limitsTabPane, rm,
-				LL_PTP_WALLCLOCK_SOFT);
+		llWallClockLimitHard = createTextWidget(limitsTabPane, rm, LL_PTP_WALLCLOCK_HARD);
+		llWallClockLimitSoft = createTextWidget(limitsTabPane, rm, LL_PTP_WALLCLOCK_SOFT);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createLimitsTab returning."); //$NON-NLS-1$
@@ -882,10 +852,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		llSubmitMode = createBooleanOption(pane, rm, LL_PTP_SUBMIT_MODE);
 		if (llSubmitMode != null) {
 			llSubmitMode.addSelectionListener(eventMonitor);
-			llJobCommandFile = createFileSelector(pane, rm,
-					LL_PTP_JOB_COMMAND_FILE, LL_PTP_JOB_COMMAND_FILE_SELECTOR);
-			llJobCommandFileTemplate = createFileSelector(pane, rm,
-					LL_PTP_JOB_COMMAND_FILE_TEMPLATE,
+			llJobCommandFile = createFileSelector(pane, rm, LL_PTP_JOB_COMMAND_FILE, LL_PTP_JOB_COMMAND_FILE_SELECTOR);
+			llJobCommandFileTemplate = createFileSelector(pane, rm, LL_PTP_JOB_COMMAND_FILE_TEMPLATE,
 					LL_PTP_JOB_COMMAND_FILE_TEMPLATE_SELECTOR);
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
@@ -910,22 +878,15 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		tab.setText(Messages.getString("NodesNetworkTab.title")); //$NON-NLS-1$
 		nodesNetworkTabPane.setLayout(createTabPaneLayout());
 		llBlocking = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_BLOCKING);
-		llBulkxfer = createCombobox(nodesNetworkTabPane, rm, LL_PTP_BULK_XFER,
-				0);
-		llNetwork_mpi = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_NETWORK_MPI);
-		llNetwork_lapi = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_NETWORK_LAPI);
-		llNetwork_mpi_lapi = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_NETWORK_MPI_LAPI);
+		llBulkxfer = createCombobox(nodesNetworkTabPane, rm, LL_PTP_BULK_XFER, 0);
+		llNetwork_mpi = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NETWORK_MPI);
+		llNetwork_lapi = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NETWORK_LAPI);
+		llNetwork_mpi_lapi = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NETWORK_MPI_LAPI);
 		llNodeMin = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NODE_MIN);
 		llNodeMax = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_NODE_MAX);
-		llTaskGeometry = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_TASK_GEOMETRY);
-		llTasksPerNode = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_TASKS_PER_NODE);
-		llTotalTasks = createTextWidget(nodesNetworkTabPane, rm,
-				LL_PTP_TOTAL_TASKS);
+		llTaskGeometry = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_TASK_GEOMETRY);
+		llTasksPerNode = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_TASKS_PER_NODE);
+		llTotalTasks = createTextWidget(nodesNetworkTabPane, rm, LL_PTP_TOTAL_TASKS);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createNodesNetworkTab returning."); //$NON-NLS-1$
@@ -947,19 +908,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		tab.setControl(runtimeTabPane);
 		tab.setText(Messages.getString("RuntimeTab.title")); //$NON-NLS-1$
 		runtimeTabPane.setLayout(createTabPaneLayout());
-		llError = createFileSelector(runtimeTabPane, rm, LL_PTP_ERROR,
-				LL_PTP_STDERR_SELECTOR);
-		llOutput = createFileSelector(runtimeTabPane, rm, LL_PTP_OUTPUT,
-				LL_PTP_STDOUT_SELECTOR);
-		llInput = createFileSelector(runtimeTabPane, rm, LL_PTP_INPUT,
-				LL_PTP_STDIN_SELECTOR);
-		llExecutable = createFileSelector(runtimeTabPane, rm,
-				LL_PTP_EXECUTABLE, LL_PTP_EXECUTABLE_SELECTOR);
-		llInitialDir = createFileSelector(runtimeTabPane, rm,
-				LL_PTP_INITIALDIR, LL_PTP_INITIALDIR_SELECTOR);
+		llError = createFileSelector(runtimeTabPane, rm, LL_PTP_ERROR, LL_PTP_STDERR_SELECTOR);
+		llOutput = createFileSelector(runtimeTabPane, rm, LL_PTP_OUTPUT, LL_PTP_STDOUT_SELECTOR);
+		llInput = createFileSelector(runtimeTabPane, rm, LL_PTP_INPUT, LL_PTP_STDIN_SELECTOR);
+		llExecutable = createFileSelector(runtimeTabPane, rm, LL_PTP_EXECUTABLE, LL_PTP_EXECUTABLE_SELECTOR);
+		llInitialDir = createFileSelector(runtimeTabPane, rm, LL_PTP_INITIALDIR, LL_PTP_INITIALDIR_SELECTOR);
 		llEnvironment = createTextWidget(runtimeTabPane, rm, LL_PTP_ENVIRONMENT);
-		llShell = createFileSelector(runtimeTabPane, rm, LL_PTP_SHELL,
-				LL_PTP_SHELL_SELECTOR);
+		llShell = createFileSelector(runtimeTabPane, rm, LL_PTP_SHELL, LL_PTP_SHELL_SELECTOR);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createRuntimeTab returning."); //$NON-NLS-1$
@@ -982,8 +937,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		tab.setText(Messages.getString("SchedulingBasicTab.title")); //$NON-NLS-1$
 		schedulingBasicTabPane.setLayout(createTabPaneLayout());
 		llClass = createTextWidget(schedulingBasicTabPane, rm, LL_PTP_CLASS);
-		llLargePage = createCombobox(schedulingBasicTabPane, rm,
-				LL_PTP_LARGE_PAGE, 0);
+		llLargePage = createCombobox(schedulingBasicTabPane, rm, LL_PTP_LARGE_PAGE, 0);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createSchedulingBasicTab returning."); //$NON-NLS-1$
@@ -1005,8 +959,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		tab.setControl(schedulingRequirementsTabPane);
 		tab.setText(Messages.getString("SchedulingRequirementsTab.title")); //$NON-NLS-1$
 		schedulingRequirementsTabPane.setLayout(createTabPaneLayout());
-		llRequirements = createTextWidget(schedulingRequirementsTabPane, rm,
-				LL_PTP_REQUIREMENTS);
+		llRequirements = createTextWidget(schedulingRequirementsTabPane, rm, LL_PTP_REQUIREMENTS);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createSchedulingRequirementsTab returning."); //$NON-NLS-1$
@@ -1028,8 +981,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		tab.setControl(schedulingResourcesTabPane);
 		tab.setText(Messages.getString("SchedulingResourcesTab.title")); //$NON-NLS-1$
 		schedulingResourcesTabPane.setLayout(createTabPaneLayout());
-		llResources = createTextWidget(schedulingResourcesTabPane, rm,
-				LL_PTP_RESOURCES);
+		llResources = createTextWidget(schedulingResourcesTabPane, rm, LL_PTP_RESOURCES);
 
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":createSchedulingResourcesTab returning."); //$NON-NLS-1$
@@ -1067,8 +1019,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return TextRowWidget entry widget
 	 */
-	private TextRowWidget createTextWidget(Composite parent,
-			IResourceManager rm, String id) {
+	private TextRowWidget createTextWidget(Composite parent, IResourceManager rm, String id) {
 		TextRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -1193,10 +1144,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param configuration
 	 *            The current launch configuration
 	 */
-	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(
-			IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration, String mode)
-			throws CoreException {
+	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManager rm, IPQueue queue,
+			ILaunchConfiguration configuration, String mode) throws CoreException {
 		Vector<StringAttribute> attrs;
 		StringAttribute attrArray[];
 
@@ -1238,8 +1187,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrInitialValue(ILaunchConfiguration config,
-			IResourceManager rm, String attrName) {
+	private String getAttrInitialValue(ILaunchConfiguration config, IResourceManager rm, String attrName) {
 		String value;
 		IAttributeDefinition<?, ?, ?> rmAttrDef;
 
@@ -1267,8 +1215,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		// string
 		// value is returned in thecase of a NumberFormatException
 		rmAttrDef = rm.getAttributeDefinition(attrName);
-		if (rmAttrDef instanceof IntegerAttributeDefinition
-				|| rmAttrDef instanceof BigIntegerAttributeDefinition) {
+		if (rmAttrDef instanceof IntegerAttributeDefinition || rmAttrDef instanceof BigIntegerAttributeDefinition) {
 			long intVal;
 
 			try {
@@ -1276,20 +1223,17 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				if (intVal != 0) {
 					if ((intVal % GBYTE) == 0) {
 						print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
-								+ this.getClass().getName()
-								+ ":getAttrInitialValue returning."); //$NON-NLS-1$
+								+ this.getClass().getName() + ":getAttrInitialValue returning."); //$NON-NLS-1$
 						return String.valueOf(intVal / GBYTE) + "G"; //$NON-NLS-1$
 					} else {
 						if ((intVal % MBYTE) == 0) {
 							print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
-									+ this.getClass().getName()
-									+ ":getAttrInitialValue returning."); //$NON-NLS-1$
+									+ this.getClass().getName() + ":getAttrInitialValue returning."); //$NON-NLS-1$
 							return String.valueOf(intVal / MBYTE) + "M"; //$NON-NLS-1$
 						} else {
 							if ((intVal % KBYTE) == 0) {
 								print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
-										+ this.getClass().getName()
-										+ ":getAttrInitialValue returning."); //$NON-NLS-1$
+										+ this.getClass().getName() + ":getAttrInitialValue returning."); //$NON-NLS-1$
 								return String.valueOf(intVal / KBYTE) + "K"; //$NON-NLS-1$
 							}
 						}
@@ -1381,8 +1325,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param pathAttrID
 	 *            Launch configuration attribute id for saving path info
 	 */
-	protected void getDirectory(FileSelectorRowWidget selector, String titleID,
-			String pathAttrID) {
+	protected void getDirectory(FileSelectorRowWidget selector, String titleID, String pathAttrID) {
 		String selectedFile = null;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1390,9 +1333,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseDirectory(parentShell,
-					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0).toString();
+			selectedFile = fmgr.browseDirectory(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0)
+					.toString();
 		}
 		if (selectedFile != null) {
 			String parentDir;
@@ -1447,16 +1389,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param pathAttrID
 	 *            Launch configuration attribute id for saving path info
 	 */
-	protected void getInputFile(FileSelectorRowWidget selector, String titleID,
-			String pathAttrID) {
+	protected void getInputFile(FileSelectorRowWidget selector, String titleID, String pathAttrID) {
 		String selectedFile = null;
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":getInputFile entered."); //$NON-NLS-1$
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell, Messages
-					.getString(titleID), getFileDialogPath(pathAttrID), 0);
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
@@ -1505,8 +1445,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 						testValue = testValue * KBYTE;
 					} else {
 						print_message(TRACE_MESSAGE, "<<< " //$NON-NLS-1$
-								+ this.getClass().getName()
-								+ ":getIntegerValue returning."); //$NON-NLS-1$
+								+ this.getClass().getName() + ":getIntegerValue returning."); //$NON-NLS-1$
 						return ""; //$NON-NLS-1$
 					}
 				}
@@ -1529,8 +1468,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param pathAttrID
 	 *            Launch configuration attribute id for saving path info
 	 */
-	protected void getOutputFile(FileSelectorRowWidget selector,
-			String titleID, String pathAttrID) {
+	protected void getOutputFile(FileSelectorRowWidget selector, String titleID, String pathAttrID) {
 		String selectedFile = null;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1538,8 +1476,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell, Messages
-					.getString(titleID), getFileDialogPath(pathAttrID), 0);
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
@@ -1559,9 +1496,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control,
-			IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":initializeFrom entered."); //$NON-NLS-1$
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
@@ -1582,8 +1517,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration,
-			IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":isValid entered."); //$NON-NLS-1$
 		if (allFieldsValid) {
@@ -1614,8 +1548,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":isValidListSelection entered."); //$NON-NLS-1$
-		attrDef = (StringSetAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
+		attrDef = (StringSetAttributeDefinition) currentRM.getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				attr = attrDef.create(widget.getValue());
@@ -1669,9 +1602,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(
-			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":performApply entered."); //$NON-NLS-1$
 		currentLaunchConfig = configuration;
@@ -1765,8 +1696,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * 
 	 * @param config
 	 */
-	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config,
-			IResourceManager rm) {
+	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IResourceManager rm) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -1776,27 +1706,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		while (i.hasNext()) {
 			widget = i.next();
 			if (widget instanceof TextRowWidget) {
-				setConfigAttr(config, rm, ((TextRowWidget) widget)
-						.getData(WidgetAttributes.ATTR_NAME),
-						(TextRowWidget) widget);
+				setConfigAttr(config, rm, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (TextRowWidget) widget);
 			} else if (widget instanceof ComboRowWidget) {
-				setConfigAttr(config, (String) ((ComboRowWidget) widget)
-						.getData(WidgetAttributes.ATTR_NAME),
-						(ComboRowWidget) widget);
+				setConfigAttr(config, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (ComboRowWidget) widget);
 			} else if (widget instanceof CheckboxRowWidget) {
-				setConfigAttr(config, (String) ((CheckboxRowWidget) widget)
-						.getData(WidgetAttributes.ATTR_NAME),
-						(CheckboxRowWidget) widget, "yes", "no"); //$NON-NLS-1$ //$NON-NLS-2$
+				setConfigAttr(config, ((CheckboxRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (CheckboxRowWidget) widget,
+						"yes", "no"); //$NON-NLS-1$ //$NON-NLS-2$
 			} else if (widget instanceof BooleanRowWidget) {
-				setConfigAttr(config, (String) ((BooleanRowWidget) widget)
-						.getData(), (BooleanRowWidget) widget);
+				setConfigAttr(config, ((BooleanRowWidget) widget).getData(), (BooleanRowWidget) widget);
 			} else if (widget instanceof FileSelectorRowWidget) {
-				setConfigAttr(config, (String) ((FileSelectorRowWidget) widget)
-						.getData(), (FileSelectorRowWidget) widget);
+				setConfigAttr(config, (String) ((FileSelectorRowWidget) widget).getData(), (FileSelectorRowWidget) widget);
 			} else if (widget instanceof DualFieldRowWidget) {
-				setConfigAttr(config, (String) ((DualFieldRowWidget) widget)
-						.getData1(), (String) ((DualFieldRowWidget) widget)
-						.getData2(), (DualFieldRowWidget) widget);
+				setConfigAttr(config, (String) ((DualFieldRowWidget) widget).getData1(),
+						(String) ((DualFieldRowWidget) widget).getData2(), (DualFieldRowWidget) widget);
 			}
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
@@ -1835,8 +1757,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			IResourceManager rm, String attr, TextRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, IResourceManager rm, String attr, TextRowWidget control) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1846,8 +1767,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 
 			attrDef = rm.getAttributeDefinition(attr);
 			try {
-				if ((attrDef instanceof IntegerAttributeDefinition)
-						|| (attrDef instanceof BigIntegerAttributeDefinition)) {
+				if ((attrDef instanceof IntegerAttributeDefinition) || (attrDef instanceof BigIntegerAttributeDefinition)) {
 					attrValue = getIntegerValue(control.getValue());
 				} else {
 					attrValue = control.getValue();
@@ -1862,8 +1782,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":setConfigAttr returning."); //$NON-NLS-1$
 	}
 
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, BooleanRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, BooleanRowWidget control) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
@@ -1886,14 +1805,12 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param trueVal
 	 *            The value to set if the button is selected
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, CheckboxRowWidget control, String trueVal,
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, CheckboxRowWidget control, String trueVal,
 			String falseVal) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
-			config.setAttribute(attr, (control.getSelection() ? trueVal
-					: falseVal));
+			config.setAttribute(attr, (control.getSelection() ? trueVal : falseVal));
 		}
 		print_message(TRACE_MESSAGE, "<<< " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setConfigAttr returning."); //$NON-NLS-1$
@@ -1910,8 +1827,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, ComboRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, ComboRowWidget control) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
@@ -1932,8 +1848,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, FileSelectorRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, FileSelectorRowWidget control) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
@@ -1954,8 +1869,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr1, String attr2, DualFieldRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr1, String attr2, DualFieldRowWidget control) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setConfigAttr entered."); //$NON-NLS-1$
 		if (control != null) {
@@ -1977,9 +1891,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(
-			ILaunchConfigurationWorkingCopy config, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rm, IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1988,8 +1900,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		rmAttrs = rm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {
-				config.setAttribute(rmAttrs[i].getDefinition().getId(),
-						rmAttrs[i].getDefinition().create().getValueAsString());
+				config.setAttribute(rmAttrs[i].getDefinition().getId(), rmAttrs[i].getDefinition().create().getValueAsString());
 			} catch (IllegalValueException e) {
 			}
 		}
@@ -2065,8 +1976,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            The resource manager currently associated with the launch
 	 *            configuration
 	 */
-	private void setInitialValues(ILaunchConfiguration config,
-			IResourceManager rm) {
+	private void setInitialValues(ILaunchConfiguration config, IResourceManager rm) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -2094,29 +2004,23 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		while (i.hasNext()) {
 			widget = i.next();
 			if (widget instanceof FileSelectorRowWidget) {
-				setValue((FileSelectorRowWidget) widget, getAttrInitialValue(
-						config, rm, (String) ((FileSelectorRowWidget) widget)
-								.getData()));
+				setValue((FileSelectorRowWidget) widget,
+						getAttrInitialValue(config, rm, (String) ((FileSelectorRowWidget) widget).getData()));
 			} else if (widget instanceof DualFieldRowWidget) {
-				setValue((DualFieldRowWidget) widget, getAttrInitialValue(
-						config, rm, (String) ((DualFieldRowWidget) widget)
-								.getData1()), getAttrInitialValue(config, rm,
-						(String) ((DualFieldRowWidget) widget).getData2()));
+				setValue((DualFieldRowWidget) widget,
+						getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData1()),
+						getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData2()));
 			} else if (widget instanceof TextRowWidget) {
-				setValue((TextRowWidget) widget, getAttrInitialValue(config,
-						rm, ((TextRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)));
+				setValue((TextRowWidget) widget,
+						getAttrInitialValue(config, rm, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 			} else if (widget instanceof ComboRowWidget) {
-				setValue((ComboRowWidget) widget, getAttrInitialValue(config,
-						rm, ((ComboRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)));
+				setValue((ComboRowWidget) widget,
+						getAttrInitialValue(config, rm, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 			} else if (widget instanceof BooleanRowWidget) {
-				setValue((BooleanRowWidget) widget, getAttrInitialValue(config,
-						rm, ((BooleanRowWidget) widget).getData()));
+				setValue((BooleanRowWidget) widget, getAttrInitialValue(config, rm, ((BooleanRowWidget) widget).getData()));
 			} else if (widget instanceof CheckboxRowWidget) {
-				setValue((CheckboxRowWidget) widget, getAttrInitialValue(
-						config, rm, ((CheckboxRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
+				setValue((CheckboxRowWidget) widget,
+						getAttrInitialValue(config, rm, ((CheckboxRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
 			}
 
 		}
@@ -2200,8 +2104,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param checkValue
 	 *            The value corresponding to a checked checkbox
 	 */
-	private void setValue(CheckboxRowWidget checkbox, String attrValue,
-			String checkValue) {
+	private void setValue(CheckboxRowWidget checkbox, String attrValue, String checkValue) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setValue entered."); //$NON-NLS-1$
 		if (checkbox != null) {
@@ -2245,8 +2148,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @param value2
 	 *            The value to be set in field 2
 	 */
-	private void setValue(DualFieldRowWidget widget, String value1,
-			String value2) {
+	private void setValue(DualFieldRowWidget widget, String value1, String value2) {
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":setValue entered."); //$NON-NLS-1$
 		if (widget != null) {
@@ -2326,12 +2228,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":validateAllFields entered."); //$NON-NLS-1$
 		try {
-			if (llSubmitMode != null
-					&& llSubmitMode.getValue().equals("Advanced")) { //$NON-NLS-1$
+			if (llSubmitMode != null && llSubmitMode.getValue().equals("Advanced")) { //$NON-NLS-1$
 				validateInputPath(llJobCommandFile, "Invalid.llJobCommandFile"); //$NON-NLS-1$
 			} else {
-				validateInputPath(llJobCommandFileTemplate,
-						"Invalid.llJobCommandFileTemplate"); //$NON-NLS-1$
+				validateInputPath(llJobCommandFileTemplate, "Invalid.llJobCommandFileTemplate"); //$NON-NLS-1$
 				validateGeneralTab();
 				validateSchedulingBasicTab();
 				validateSchedulingRequirementsTab();
@@ -2350,8 +2250,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validateAllFields returning."); //$NON-NLS-1$
 	}
 
-	private void validateAlphaNumeric(String value, String errorID)
-			throws ValidationException {
+	private void validateAlphaNumeric(String value, String errorID) throws ValidationException {
 		int i;
 		String stripped = value.trim();
 
@@ -2367,8 +2266,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validateAlphaNumeric returning."); //$NON-NLS-1$
 	}
 
-	private void validateAlphaNumeric(TextRowWidget control, String errorID)
-			throws ValidationException {
+	private void validateAlphaNumeric(TextRowWidget control, String errorID) throws ValidationException {
 		String value;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2383,8 +2281,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validateAlphaNumeric returning."); //$NON-NLS-1$
 	}
 
-	private void validateClockValue(String value, String errorID)
-			throws ValidationException {
+	private void validateClockValue(String value, String errorID) throws ValidationException {
 		int i;
 		String stripped = value.trim();
 
@@ -2400,8 +2297,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validateClockValue returning."); //$NON-NLS-1$
 	}
 
-	private void validateClockValue(TextRowWidget control, String errorID)
-			throws ValidationException {
+	private void validateClockValue(TextRowWidget control, String errorID) throws ValidationException {
 		String value;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2426,15 +2322,13 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 * @throws IOException
 	 */
-	private void validateDirectory(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException {
+	private void validateDirectory(FileSelectorRowWidget selector, String errorID) throws ValidationException {
 		String path;
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
 
-		if ((selector != null) && selector.isEnabled()
-				&& selector.isValidationRequired()) {
+		if ((selector != null) && selector.isEnabled() && selector.isValidationRequired()) {
 			path = selector.getValue();
 			try {
 				if (path.length() == 0) {
@@ -2446,8 +2340,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				if (!testPath.isValidPath(path)) {
 					throw new ValidationException(Messages.getString(errorID));
 				}
-				remoteResource = remoteService.getFileManager(remoteConnection)
-						.getResource(testPath.toString());
+				remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 				fileInfo = remoteResource.fetchInfo();
 				if (!fileInfo.isDirectory()) {
 					throw new ValidationException(Messages.getString(errorID));
@@ -2512,12 +2405,10 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            id of the error string used if file is inaccessible
 	 * @throws ValidationException
 	 */
-	private void validateInputPath(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException {
+	private void validateInputPath(FileSelectorRowWidget selector, String errorID) throws ValidationException {
 		String path;
 
-		if ((selector != null) && selector.isEnabled()
-				&& selector.isValidationRequired()) {
+		if ((selector != null) && selector.isEnabled() && selector.isValidationRequired()) {
 			path = selector.getValue();
 			if (path.length() == 0) {
 				selector.resetValidationState();
@@ -2543,8 +2434,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 * @throws IOException
 	 */
-	private void validateInputPath(String path, String errorID)
-			throws ValidationException {
+	private void validateInputPath(String path, String errorID) throws ValidationException {
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
@@ -2553,8 +2443,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath.toString());
+		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
 		if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
 			throw new ValidationException(Messages.getString(errorID));
@@ -2590,16 +2479,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateLongNumericRange(String value, String attrName,
-			String errorID) throws ValidationException {
+	private void validateLongNumericRange(String value, String attrName, String errorID) throws ValidationException {
 		BigIntegerAttributeDefinition attrDef;
 		@SuppressWarnings("unused")
 		BigIntegerAttribute attr;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":validateLongNumericRange entered."); //$NON-NLS-1$
-		attrDef = (BigIntegerAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
+		attrDef = (BigIntegerAttributeDefinition) currentRM.getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {
@@ -2683,45 +2570,32 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 			}
 		}
 
-		if ((tpn.equals(tpn_default) == false)
-				&& (tt.equals(tt_default) == false)) {
-			throw new ValidationException(Messages
-					.getString("Invalid.llTasksPerNode_llTotalTasks")); //$NON-NLS-1$
+		if ((tpn.equals(tpn_default) == false) && (tt.equals(tt_default) == false)) {
+			throw new ValidationException(Messages.getString("Invalid.llTasksPerNode_llTotalTasks")); //$NON-NLS-1$
 		}
 
-		if ((tg.equals(tg_default) == false)
-				&& (jt.equalsIgnoreCase("Parallel") == false)) { //$NON-NLS-1$
-			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llJobType")); //$NON-NLS-1$
+		if ((tg.equals(tg_default) == false) && (jt.equalsIgnoreCase("Parallel") == false)) { //$NON-NLS-1$
+			throw new ValidationException(Messages.getString("Invalid.llTaskGeometry_llJobType")); //$NON-NLS-1$
 		}
 
-		if ((tg.equals(tg_default) == false)
-				&& (tpn.equals(tpn_default) == false)) {
-			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llTasksPerNode")); //$NON-NLS-1$
+		if ((tg.equals(tg_default) == false) && (tpn.equals(tpn_default) == false)) {
+			throw new ValidationException(Messages.getString("Invalid.llTaskGeometry_llTasksPerNode")); //$NON-NLS-1$
 		}
 
-		if ((tg.equals(tg_default) == false)
-				&& (tt.equals(tt_default) == false)) {
-			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llTotalTasks")); //$NON-NLS-1$
+		if ((tg.equals(tg_default) == false) && (tt.equals(tt_default) == false)) {
+			throw new ValidationException(Messages.getString("Invalid.llTaskGeometry_llTotalTasks")); //$NON-NLS-1$
 		}
 
-		if ((tg.equals(tg_default) == false)
-				&& (nm.equals(nm_default) == false)) {
-			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llNodeMin")); //$NON-NLS-1$
+		if ((tg.equals(tg_default) == false) && (nm.equals(nm_default) == false)) {
+			throw new ValidationException(Messages.getString("Invalid.llTaskGeometry_llNodeMin")); //$NON-NLS-1$
 		}
 
-		if ((tg.equals(tg_default) == false)
-				&& (nmx.equals(nmx_default) == false)) {
-			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llNodeMax")); //$NON-NLS-1$
+		if ((tg.equals(tg_default) == false) && (nmx.equals(nmx_default) == false)) {
+			throw new ValidationException(Messages.getString("Invalid.llTaskGeometry_llNodeMax")); //$NON-NLS-1$
 		}
 
 		if ((tg.equals(tg_default) == false) && (b.equals(b_default) == false)) {
-			throw new ValidationException(Messages
-					.getString("Invalid.llTaskGeometry_llBlocking")); //$NON-NLS-1$
+			throw new ValidationException(Messages.getString("Invalid.llTaskGeometry_llBlocking")); //$NON-NLS-1$
 		}
 
 		validatePositiveOrUnlimitedNumeric(llBlocking, "Invalid.llBlocking"); //$NON-NLS-1$
@@ -2770,8 +2644,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericMinMax(TextRowWidget controlMin,
-			String attrNameMin, String errorIDMin, TextRowWidget controlMax,
+	private void validateNumericMinMax(TextRowWidget controlMin, String attrNameMin, String errorIDMin, TextRowWidget controlMax,
 			String attrNameMax, String errorIDMax) throws ValidationException {
 		String strMin = "", strMax = ""; //$NON-NLS-1$ //$NON-NLS-2$
 		int iMin = 0, iMax = 0;
@@ -2793,8 +2666,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		}
 		if ((strMin.length() > 0) && (strMax.length() > 0)) {
 			if (iMin > iMax) {
-				throw new ValidationException(Messages
-						.getString("Invalid.llNodeMinMax")); //$NON-NLS-1$
+				throw new ValidationException(Messages.getString("Invalid.llNodeMinMax")); //$NON-NLS-1$
 			}
 		}
 
@@ -2815,16 +2687,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(int value, String attrName, String errorID)
-			throws ValidationException {
+	private void validateNumericRange(int value, String attrName, String errorID) throws ValidationException {
 		IntegerAttributeDefinition attrDef;
 		@SuppressWarnings("unused")
 		IntegerAttribute attr;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":validateNumericRange entered."); //$NON-NLS-1$
-		attrDef = (IntegerAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
+		attrDef = (IntegerAttributeDefinition) currentRM.getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {
@@ -2848,8 +2718,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 *            range
 	 * @throws ValidationException
 	 */
-	private void validateNumericRange(String value, int lowLimit,
-			int highLimit, String errorID) throws ValidationException {
+	private void validateNumericRange(String value, int lowLimit, int highLimit, String errorID) throws ValidationException {
 		int n;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2879,8 +2748,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(String value, String attrName,
-			String errorID) throws ValidationException {
+	private void validateNumericRange(String value, String attrName, String errorID) throws ValidationException {
 		int testValue;
 		int len;
 		char suffix;
@@ -2929,8 +2797,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(TextRowWidget control, String attrName,
-			String errorID) throws ValidationException {
+	private void validateNumericRange(TextRowWidget control, String attrName, String errorID) throws ValidationException {
 		String value;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2955,8 +2822,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 * @throws IOException
 	 */
-	private void validateOutputPath(String path, String errorID)
-			throws ValidationException {
+	private void validateOutputPath(String path, String errorID) throws ValidationException {
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
@@ -2965,16 +2831,14 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath.toString());
+		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
 		if (fileInfo.isDirectory()) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
 	}
 
-	private int validatePositiveNumeric(String value, String errorID)
-			throws ValidationException {
+	private int validatePositiveNumeric(String value, String errorID) throws ValidationException {
 		int n = 0;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2993,8 +2857,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 		return n;
 	}
 
-	private void validatePositiveNumeric(TextRowWidget control, String errorID)
-			throws ValidationException {
+	private void validatePositiveNumeric(TextRowWidget control, String errorID) throws ValidationException {
 		String value;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -3009,8 +2872,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validatePositiveNumeric returning."); //$NON-NLS-1$
 	}
 
-	private void validatePositiveOrUnlimitedNumeric(String value, String errorID)
-			throws ValidationException {
+	private void validatePositiveOrUnlimitedNumeric(String value, String errorID) throws ValidationException {
 		int n;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -3028,8 +2890,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends
 				+ ":validatePositiveOrUnlimitedNumeric returning."); //$NON-NLS-1$
 	}
 
-	private void validatePositiveOrUnlimitedNumeric(TextRowWidget control,
-			String errorID) throws ValidationException {
+	private void validatePositiveOrUnlimitedNumeric(TextRowWidget control, String errorID) throws ValidationException {
 		String value;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$

@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 import org.osgi.framework.BundleContext;
@@ -26,10 +27,10 @@ import org.osgi.framework.BundleContext;
 public class MPICH2Plugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.mpich2.core"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.mpich2.core"; //$NON-NLS-1$
 
 	// The shared instance
-	private static MPICH2Plugin plugin;
+	private static MPICH2Plugin fPlugin;
 
 	/**
 	 * The constructor
@@ -47,7 +48,7 @@ public class MPICH2Plugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		fPlugin = this;
 		MPICH2Defaults.loadDefaults();
 	}
 
@@ -59,8 +60,12 @@ public class MPICH2Plugin extends Plugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
+		try {
+			Preferences.savePreferences(getUniqueIdentifier());
+		} finally {
+			fPlugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**
@@ -69,7 +74,7 @@ public class MPICH2Plugin extends Plugin {
 	 * @return the shared instance
 	 */
 	public static MPICH2Plugin getDefault() {
-		return plugin;
+		return fPlugin;
 	}
 
 	/**
@@ -126,11 +131,9 @@ public class MPICH2Plugin extends Plugin {
 	 * @return unique identifier string
 	 */
 	public static String getUniqueIdentifier() {
-		if (getDefault() == null)
-			// If the default instance is not yet initialized,
-			// return a static identifier. This identifier must
-			// match the plugin id defined in plugin.xml
+		if (getDefault() == null) {
 			return PLUGIN_ID;
+		}
 		return getDefault().getBundle().getSymbolicName();
 	}
 }

@@ -20,10 +20,10 @@ import org.eclipse.ptp.rm.mpi.mpich2.ui.MPICH2UIPlugin;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class MPICH2LaunchConfiguration {
-	public static final String ATTR_BASE = MPICH2UIPlugin.PLUGIN_ID + ".launchAttributes"; //$NON-NLS-1$
+	public static final String ATTR_BASE = MPICH2UIPlugin.getUniqueIdentifier() + ".launchAttributes"; //$NON-NLS-1$
 	public static final String ATTR_NUMPROCS = ATTR_BASE + ".numProcs"; //$NON-NLS-1$
 	public static final String ATTR_NOLOCAL = ATTR_BASE + ".noLocal"; //$NON-NLS-1$
 	public static final String ATTR_PREFIX = ATTR_BASE + ".prefix"; //$NON-NLS-1$
@@ -53,22 +53,22 @@ public class MPICH2LaunchConfiguration {
 				launchArgs += " -host " + fixString(configuration.getAttribute(ATTR_HOSTLIST, MPICH2LaunchConfigurationDefaults.ATTR_HOSTLIST)); //$NON-NLS-1$
 			}
 
-			if (! configuration.getAttribute(ATTR_USEDEFAULTPARAMETERS, MPICH2LaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS)) {
-				Map<String, String> params = configuration.getAttribute(ATTR_PARAMETERS, MPICH2LaunchConfigurationDefaults.ATTR_PARAMETERS);
+			if (!configuration.getAttribute(ATTR_USEDEFAULTPARAMETERS, MPICH2LaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS)) {
+				Map<String, String> params = configuration.getAttribute(ATTR_PARAMETERS,
+						MPICH2LaunchConfigurationDefaults.ATTR_PARAMETERS);
 				for (Entry<String, String> param : params.entrySet()) {
 					launchArgs += " -mca " + param.getKey() + " " + fixString(param.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			return launchArgs;
-		} else {
-			String launchArgs = configuration.getAttribute(ATTR_ARGUMENTS, MPICH2LaunchConfigurationDefaults.ATTR_ARGUMENTS);
-			return launchArgs;
 		}
+
+		return configuration.getAttribute(ATTR_ARGUMENTS, MPICH2LaunchConfigurationDefaults.ATTR_ARGUMENTS);
 	}
 
 	/**
 	 * Make string suitable for passing as an argument
-	 *
+	 * 
 	 * @param s
 	 * @return
 	 */

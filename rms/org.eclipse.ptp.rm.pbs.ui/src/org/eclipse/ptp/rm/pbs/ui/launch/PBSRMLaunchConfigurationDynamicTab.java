@@ -499,7 +499,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			template.configure();
 			attrs.add(templateManager.getCurrent().createScriptAttribute());
 		} catch (IllegalValueException t) {
-			IStatus status = new Status(Status.ERROR, PBSUIPlugin.PLUGIN_ID, "getAttributes", t); //$NON-NLS-1$
+			IStatus status = new Status(Status.ERROR, PBSUIPlugin.getUniqueIdentifier(), "getAttributes", t); //$NON-NLS-1$
 			throw new CoreException(status);
 		}
 		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
