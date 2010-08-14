@@ -27,10 +27,10 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public final class Preferences {
 
-	static final IScopeContext[] contexts = new IScopeContext[] { new DefaultScope(), new InstanceScope() };
+	private static final IScopeContext[] contexts = new IScopeContext[] { new DefaultScope(), new InstanceScope() };
 
-	static final int DEFAULT_CONTEXT = 0;
-	static final int INSTANCE_CONTEXT = 1;
+	private static final int DEFAULT_CONTEXT = 0;
+	private static final int INSTANCE_CONTEXT = 1;
 
 	/**
 	 * Adds the given preference listener to the {@link DefaultScope} and the
