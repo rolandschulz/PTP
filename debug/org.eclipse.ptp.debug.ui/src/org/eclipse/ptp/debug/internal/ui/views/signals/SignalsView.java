@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.signals;
 
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
-import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.internal.ui.views.IDebugExceptionHandler;
@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPSignal;
@@ -52,11 +53,16 @@ import org.eclipse.ui.IWorkbenchPart;
 /**
  * @author Clement Chu
  */
-public class SignalsView extends AbstractDebugEventHandlerView implements ISelectionListener, INullSelectionListener, IPropertyChangeListener, IDebugExceptionHandler {
+public class SignalsView extends AbstractDebugEventHandlerView implements ISelectionListener, INullSelectionListener,
+		IPreferenceChangeListener, IDebugExceptionHandler {
 	public class SignalsViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java
+		 * .lang.Object, int)
 		 */
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 0)
@@ -64,39 +70,48 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 			return null;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.
+		 * lang.Object, int)
 		 */
 		public String getColumnText(Object element, int columnIndex) {
 			if (element instanceof IPSignal) {
 				try {
-					switch(columnIndex) {
-						case 0:
-							return ((IPSignal)element).getName();
-						case 1:
-							return (((IPSignal)element).isPassEnabled()) ? SignalsViewer.YES_VALUE : SignalsViewer.NO_VALUE;
-						case 2:
-							return (((IPSignal)element).isStopEnabled()) ? SignalsViewer.YES_VALUE : SignalsViewer.NO_VALUE;
-						case 3:
-							return ((IPSignal)element).getDescription();
+					switch (columnIndex) {
+					case 0:
+						return ((IPSignal) element).getName();
+					case 1:
+						return (((IPSignal) element).isPassEnabled()) ? SignalsViewer.YES_VALUE : SignalsViewer.NO_VALUE;
+					case 2:
+						return (((IPSignal) element).isStopEnabled()) ? SignalsViewer.YES_VALUE : SignalsViewer.NO_VALUE;
+					case 3:
+						return ((IPSignal) element).getDescription();
 					}
-				} catch(DebugException e) {
+				} catch (DebugException e) {
 				}
 			}
 			return null;
 		}
-		
+
 		private IDebugModelPresentation getModelPresentation() {
 			return PTPDebugUIPlugin.getDebugModelPresentation();
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractDebugView#createViewer(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractDebugView#createViewer(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
+	@Override
 	protected Viewer createViewer(Composite parent) {
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(this);
-		
+		Preferences.addPreferenceChangeListener(PTPDebugCorePlugin.getUniqueIdentifier(), this);
+
 		// add tree viewer
 		final SignalsViewer vv = new SignalsViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		vv.setContentProvider(createContentProvider());
@@ -110,36 +125,55 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 		return vv;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractDebugView#createActions()
 	 */
+	@Override
 	protected void createActions() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractDebugView#getHelpContextId()
 	 */
+	@Override
 	protected String getHelpContextId() {
-		//return IPDebugHelpContextIds.SIGNALS_VIEW;
+		// return IPDebugHelpContextIds.SIGNALS_VIEW;
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractDebugView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractDebugView#fillContextMenu(org.eclipse.jface
+	 * .action.IMenuManager)
 	 */
+	@Override
 	protected void fillContextMenu(IMenuManager menu) {
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		updateObjects();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractDebugView#configureToolBar(org.eclipse.jface.action.IToolBarManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractDebugView#configureToolBar(org.eclipse.jface
+	 * .action.IToolBarManager)
 	 */
+	@Override
 	protected void configureToolBar(IToolBarManager tbm) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.
+	 * IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (!isAvailable() || !isVisible())
@@ -147,17 +181,24 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 		if (selection == null)
 			setViewerInput(new StructuredSelection());
 		else if (selection instanceof IStructuredSelection)
-			setViewerInput((IStructuredSelection)selection);
+			setViewerInput((IStructuredSelection) selection);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse
+	 * .jface.util.PropertyChangeEvent)
 	 */
-	public void propertyChange(PropertyChangeEvent event) {
+	public void preferenceChange(PreferenceChangeEvent event) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.ui.views.IDebugExceptionHandler#handleException(org.eclipse.debug.core.DebugException)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.internal.ui.views.IDebugExceptionHandler#
+	 * handleException(org.eclipse.debug.core.DebugException)
 	 */
 	public void handleException(DebugException e) {
 		showMessage(e.getMessage());
@@ -178,8 +219,8 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 		IPDebugTarget target = null;
 		if (ssel != null && ssel.size() == 1) {
 			Object input = ssel.getFirstElement();
-			if (input instanceof IDebugElement && ((IDebugElement)input).getDebugTarget() instanceof IPDebugTarget)
-				target = (IPDebugTarget)((IDebugElement)input).getDebugTarget();
+			if (input instanceof IDebugElement && ((IDebugElement) input).getDebugTarget() instanceof IPDebugTarget)
+				target = (IPDebugTarget) ((IDebugElement) input).getDebugTarget();
 		}
 
 		if (getViewer() == null)
@@ -190,23 +231,29 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 			updateObjects();
 			return;
 		}
-		
+
 		showViewer();
 		getViewer().setInput(target);
 		updateObjects();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractDebugView#becomesHidden()
 	 */
+	@Override
 	protected void becomesHidden() {
 		setViewerInput(new StructuredSelection());
 		super.becomesHidden();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.AbstractDebugView#becomesVisible()
 	 */
+	@Override
 	protected void becomesVisible() {
 		super.becomesVisible();
 		IViewPart part = getSite().getPage().findView(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -216,12 +263,15 @@ public class SignalsView extends AbstractDebugEventHandlerView implements ISelec
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
+	@Override
 	public void dispose() {
 		getSite().getPage().removeSelectionListener(IDebugUIConstants.ID_DEBUG_VIEW, this);
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().removePropertyChangeListener(this);
+		Preferences.removePreferenceChangeListener(PTPDebugCorePlugin.getUniqueIdentifier(), this);
 		super.dispose();
 	}
 }
