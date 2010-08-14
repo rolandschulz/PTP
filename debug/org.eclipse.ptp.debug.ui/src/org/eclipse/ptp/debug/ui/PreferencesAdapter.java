@@ -109,7 +109,7 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 * {@inheritDoc}
 	 */
 	public boolean getBoolean(String name) {
-		return Preferences.getBoolean(fPrefsQualifier, name, false);
+		return Preferences.getBoolean(fPrefsQualifier, name);
 	}
 
 	/**
@@ -158,35 +158,35 @@ public class PreferencesAdapter implements IPreferenceStore {
 	 * {@inheritDoc}
 	 */
 	public double getDouble(String name) {
-		return Preferences.getDouble(fPrefsQualifier, name, 0.0);
+		return Preferences.getDouble(fPrefsQualifier, name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public float getFloat(String name) {
-		return Preferences.getFloat(fPrefsQualifier, name, 0.0f);
+		return Preferences.getFloat(fPrefsQualifier, name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getInt(String name) {
-		return Preferences.getInt(fPrefsQualifier, name, 0);
+		return Preferences.getInt(fPrefsQualifier, name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public long getLong(String name) {
-		return Preferences.getLong(fPrefsQualifier, name, 0L);
+		return Preferences.getLong(fPrefsQualifier, name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public String getString(String name) {
-		return Preferences.getString(fPrefsQualifier, name, ""); //$NON-NLS-1$
+		return Preferences.getString(fPrefsQualifier, name);
 	}
 
 	/**

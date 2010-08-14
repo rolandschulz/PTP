@@ -41,15 +41,21 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				IPDIFormat.NATURAL);
 		Preferences.setDefaultInt(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT,
 				IPDIFormat.NATURAL);
+		Preferences.setDefaultInt(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT,
+				IPDIFormat.NATURAL);
 		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_SHOW_FULL_PATHS,
 				IPDebugConstants.DEFAULT_SHOW_FULL_PATHS);
-		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0,
+		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_DEBUG_REGISTER_PROC_0,
 				IPDebugConstants.DEFAULT_DEBUG_REGISTER_PROC_0);
-		Preferences.setDefaultInt(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT,
+		Preferences.setDefaultInt(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT,
 				IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
 		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND,
 				IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_SUSPEND);
 		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE,
 				IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_CHANGE);
+		Preferences.setDefaultBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON,
+				IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE);
+		Preferences.setDefaultString(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, ""); //$NON-NLS-1$
+		Preferences.setDefaultString(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_SOURCE_LOCATIONS, ""); //$NON-NLS-1$
 	}
 }

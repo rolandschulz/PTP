@@ -8,9 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-package org.eclipse.ptp.core;
+package org.eclipse.ptp.internal.core;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.Preferences;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 

@@ -70,11 +70,15 @@ public interface IPDebugConstants {
 
 	public static final String PREF_SHOW_FULL_PATHS = PLUGIN_ID + ".pDebug.show_full_paths"; //$NON-NLS-1$
 
-	public static final String PREF_PTP_DEBUGGER = PLUGIN_ID + ".pDebug.debuggers"; //$NON-NLS-1$
+	/**
+	 * @since 5.0
+	 */
+	public static final String PREF_DEBUG_COMM_TIMEOUT = PLUGIN_ID + ".pDebug.timeout"; //$NON-NLS-1$
 
-	public static final String PREF_PTP_DEBUG_COMM_TIMEOUT = PLUGIN_ID + ".pDebug.timeout"; //$NON-NLS-1$
-
-	public static final String PREF_PTP_DEBUG_REGISTER_PROC_0 = PLUGIN_ID + ".pDebug.regPro0"; //$NON-NLS-1$
+	/**
+	 * @since 5.0
+	 */
+	public static final String PREF_DEBUG_REGISTER_PROC_0 = PLUGIN_ID + ".pDebug.regPro0"; //$NON-NLS-1$
 
 	public static final String PREF_DEFAULT_DEBUGGER_TYPE = PLUGIN_ID + ".pDebug.defaultDebugger"; //$NON-NLS-1$
 
@@ -110,5 +114,4 @@ public interface IPDebugConstants {
 	public static final int DEFAULT_DEBUG_COMM_TIMEOUT = 60000;
 	public static final int MIN_REQUEST_TIMEOUT = 10000;
 	public static final int MAX_REQUEST_TIMEOUT = Integer.MAX_VALUE;
-
 }

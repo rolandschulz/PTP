@@ -312,8 +312,7 @@ public class ModelManager implements IModelManager {
 			}
 		}
 
-		if (Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS,
-				PreferenceConstants.DEFAULT_AUTO_START)) {
+		if (Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS)) {
 			startResourceManagers(rmsNeedStarting.toArray(new IResourceManagerControl[0]));
 		}
 	}
