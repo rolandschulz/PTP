@@ -31,11 +31,10 @@ public class EffectiveGenericRMConfiguration extends AbstractEffectiveToolRMConf
 
 		if (configuration.getUseToolDefaults()) {
 			launchCmd = Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(),
-					GenericRMPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR);
-			debugCmd = Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_DEBUG_CMD,
-					EMPTY_STR);
+					GenericRMPreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_DEBUG_CMD);
 			remoteInstallPath = Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(),
-					GenericRMPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR);
+					GenericRMPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		} else {
 			launchCmd = configuration.getLaunchCmd();
 			debugCmd = configuration.getDebugCmd();
