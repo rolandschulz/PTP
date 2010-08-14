@@ -12,15 +12,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.slurm.core;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
 import org.eclipse.ptp.rm.core.RMPreferenceConstants;
 
-public class SLURMPreferenceManager {
-	//private static final String PROXY_EXECUTABLE_NAME = "ptp_slurm_proxy.py";
-	private static final String PROXY_EXECUTABLE_PATH = null; // use local fragment directory
+public class SLURMPreferenceManager extends AbstractPreferenceInitializer {
+	// private static final String PROXY_EXECUTABLE_NAME = "ptp_slurm_proxy.py";
+	private static final String PROXY_EXECUTABLE_PATH = null;
 	private static final int OPTIONS = IRemoteProxyOptions.PORT_FORWARDING;
-	
+
 	public static int getDefaultOptions() {
 		return OPTIONS;
 	}
@@ -29,29 +30,13 @@ public class SLURMPreferenceManager {
 		return PROXY_EXECUTABLE_PATH;
 	}
 
-	public static Preferences getPreferences() {
-		return Activator.getDefault().getPluginPreferences();
-	}
-	
 	public static void savePreferences() {
-		Activator.getDefault().savePluginPreferences();
+		Preferences.savePreferences(SLURMCorePlugin.getUniqueIdentifier());
 	}
-	
-	public static void initializePreferences() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		
-		String server = ""; //$NON-NLS-1$
-			
-		if (PROXY_EXECUTABLE_PATH != null) {
-			//server = new Path(PROXY_EXECUTABLE_PATH).append(PROXY_EXECUTABLE_NAME).toOSString();
-		} else {
-			//server = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp", PROXY_EXECUTABLE_NAME);
-			if (server == null) {
-				server = ""; //$NON-NLS-1$
-			}
-       }
-		
-		preferences.setDefault(RMPreferenceConstants.PROXY_PATH, server);
-		preferences.setDefault(RMPreferenceConstants.OPTIONS, OPTIONS);
+
+	@Override
+	public void initializeDefaultPreferences() {
+		Preferences.setDefaultString(SLURMCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.PROXY_PATH, ""); //$NON-NLS-1$
+		Preferences.setDefaultInt(SLURMCorePlugin.getUniqueIdentifier(), RMPreferenceConstants.OPTIONS, OPTIONS);
 	}
 }

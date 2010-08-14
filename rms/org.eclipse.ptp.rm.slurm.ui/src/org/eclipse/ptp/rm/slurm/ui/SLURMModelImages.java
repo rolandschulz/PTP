@@ -26,9 +26,9 @@ import org.eclipse.swt.graphics.Image;
 public class SLURMModelImages {
 	// ==== URLs for Icon Folders ====
 
-	public final static URL PROCESS_URL = Activator.getDefault().getBundle().getEntry("icons/process/"); //$NON-NLS-1$
-	public final static URL JOB_URL = Activator.getDefault().getBundle().getEntry("icons/job/"); //$NON-NLS-1$
-	public final static URL NODE_URL = Activator.getDefault().getBundle().getEntry("icons/node/"); //$NON-NLS-1$
+	public final static URL PROCESS_URL = SLURMUIPlugin.getDefault().getBundle().getEntry("icons/process/"); //$NON-NLS-1$
+	public final static URL JOB_URL = SLURMUIPlugin.getDefault().getBundle().getEntry("icons/job/"); //$NON-NLS-1$
+	public final static URL NODE_URL = SLURMUIPlugin.getDefault().getBundle().getEntry("icons/node/"); //$NON-NLS-1$
 
 	// ===== Icon Files =====
 

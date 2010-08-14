@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractEffectiveToolRMConfiguration;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
@@ -44,33 +44,29 @@ public class EffectiveOpenMPIResourceManagerConfiguration extends AbstractEffect
 			String version = conf.getDetectedVersion();
 			if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_UNKNOWN)
 					&& conf.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
-				IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-				discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
+				discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
 			} else if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
-				IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-				launchCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
-						+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-				debugCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
-						+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-				discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
-						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
+				launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
+						+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
+				debugCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
+						+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
+				discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
+						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
 			} else if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_13)) {
-				IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-				launchCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
-						+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-				debugCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
-						+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-				discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
-						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
+				launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
+						+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
+				debugCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
+						+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
+				discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
+						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
 			} else if (version.equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
-				IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-				launchCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
-						+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-				debugCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
-						+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-				discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
-						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
+				launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
+						+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
+				debugCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
+						+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
+				discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
+						+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
 			} else {
 				assert false;
 			}

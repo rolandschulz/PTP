@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.openmpi.ui.wizards;
 
-import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPlugin;
 import org.eclipse.ptp.rm.mpi.openmpi.core.OpenMPIPreferenceManager;
 import org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.IOpenMPIResourceManagerConfiguration;
@@ -197,46 +197,42 @@ public class OpenMPIConfigurationWizardPage extends AbstractToolRMConfigurationW
 		String remoteInstallPath = null;
 		boolean enabled = true;
 		if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_AUTO)) {
-			IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-			launchCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-			debugCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-			discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
-			remoteInstallPath = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null);
+			launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
+			discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
+			remoteInstallPath = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 			enabled = false;
 		} else if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
-			IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-			launchCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
-					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-			debugCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
-					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-			discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
-					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
-			remoteInstallPath = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
-					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null);
+			launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
+					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
+					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
+			discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
+					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
+			remoteInstallPath = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_12
+					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		} else if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_13)) {
-			IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-			launchCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
-					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-			debugCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
-					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-			discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
-					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
-			remoteInstallPath = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
-					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null);
+			launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
+					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
+					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
+			discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
+					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
+			remoteInstallPath = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_13
+					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		} else if (dataSource.getVersionId().equals(IOpenMPIResourceManagerConfiguration.VERSION_14)) {
-			IPreferencesService preferences = OpenMPIPreferenceManager.getPreferences();
-			launchCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
-					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-			debugCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
-					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-			discoverCmd = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
-					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
-			remoteInstallPath = preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
-					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null);
+			launchCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
+					+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD);
+			debugCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
+					+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD);
+			discoverCmd = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
+					+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD);
+			remoteInstallPath = Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_14
+					+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		} else {
 			assert false;
 		}

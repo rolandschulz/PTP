@@ -13,7 +13,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -22,7 +21,6 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceManager;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -75,9 +73,9 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 	private Label nodePollMinLabel;
 	private Label nodePollMaxLabel;
 	private Label jobPollLabel;
-	private Shell parentShell;
+	private final Shell parentShell;
 	private String proxyOptions;
-	private IPEResourceManagerConfiguration config;
+	private final IPEResourceManagerConfiguration config;
 	private IRemoteServices remoteService;
 	private IRemoteUIServices remoteUIService;
 	private IRemoteConnection remoteConnection;
@@ -104,14 +102,10 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				String selectedFile = null;
 
 				if (remoteUIService != null) {
-					IRemoteUIFileManager fmgr = remoteUIService
-							.getUIFileManager();
+					IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 					fmgr.setConnection(remoteConnection);
 					selectedFile = fmgr
-							.browseDirectory(
-									parentShell,
-									Messages
-											.getString("PEDialogs.librarySelectorTitle"), "/", 0).toString(); //$NON-NLS-1$ //$NON-NLS-2$
+							.browseDirectory(parentShell, Messages.getString("PEDialogs.librarySelectorTitle"), "/", 0).toString(); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				if (selectedFile != null) {
 					libOverridePath.setText(selectedFile);
@@ -126,22 +120,12 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		}
 	}
 
-	public PEResourceManagerOptionDialog(Shell parent,
-			IPEResourceManagerConfiguration config, String initialOptions) {
+	public PEResourceManagerOptionDialog(Shell parent, IPEResourceManagerConfiguration config, String initialOptions) {
 		super(parent);
 		this.parentShell = parent;
 		this.config = config;
 		setInitialOptions(initialOptions);
 		create();
-	}
-
-	/**
-	 * Get the preferences object for the PE implementation
-	 * 
-	 * @return the preferences object
-	 */
-	public Preferences getPreferences() {
-		return PEPreferenceManager.getPreferences();
 	}
 
 	/**
@@ -151,17 +135,16 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 	 * @param parent
 	 *            - The parent widget for this class
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		GridLayout layout;
 		GridLayout libPathLayout;
 		GridLayout modeLayout;
 		GridData gd;
-		Preferences preferences;
 		String preferenceValue;
 
 		setTitle(Messages.getString("PEDialogs.InvocationOptionsTitle")); //$NON-NLS-1$
 		eventMonitor = new EventMonitor();
-		preferences = getPreferences();
 		optionsPane = new Composite(parent, SWT.NONE);
 		layout = new GridLayout(2, true);
 		optionsPane.setLayout(layout);
@@ -170,8 +153,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		llLabel.setText(Messages.getString("PEDialogs.LoadLevelerOptionLabel")); //$NON-NLS-1$
 		loadLevelerOption = new Button(optionsPane, SWT.CHECK);
 		preferenceValue = config.getUseLoadLeveler();
-		if ((preferenceValue != null)
-				&& (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
+		if ((preferenceValue != null) && (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
 			loadLevelerOption.setSelection(true);
 		}
 		llModeLabel = new Label(optionsPane, SWT.NONE);
@@ -185,8 +167,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		llModeLocal = new Button(llModeGroup, SWT.RADIO);
 		llModeLocal.setText(Messages.getString("PEDialogs.llModeLocal")); //$NON-NLS-1$
 		llModeMulticluster = new Button(llModeGroup, SWT.RADIO);
-		llModeMulticluster.setText(Messages
-				.getString("PEDialogs.llModeMulticluster")); //$NON-NLS-1$
+		llModeMulticluster.setText(Messages.getString("PEDialogs.llModeMulticluster")); //$NON-NLS-1$
 		llModeDefault = new Button(llModeGroup, SWT.RADIO);
 		llModeDefault.setText(Messages.getString("PEDialogs.llModeDefault")); //$NON-NLS-1$
 		llModeDefault.setSelection(false);
@@ -206,8 +187,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		}
 
 		nodePollMinLabel = new Label(optionsPane, SWT.NONE);
-		nodePollMinLabel.setText(Messages
-				.getString("PEDialogs.minNodePollInterval")); //$NON-NLS-1$
+		nodePollMinLabel.setText(Messages.getString("PEDialogs.minNodePollInterval")); //$NON-NLS-1$
 		nodePollMinInterval = new Text(optionsPane, SWT.NONE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
@@ -218,8 +198,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		}
 
 		nodePollMaxLabel = new Label(optionsPane, SWT.NONE);
-		nodePollMaxLabel.setText(Messages
-				.getString("PEDialogs.maxNodePollInterval")); //$NON-NLS-1$
+		nodePollMaxLabel.setText(Messages.getString("PEDialogs.maxNodePollInterval")); //$NON-NLS-1$
 		nodePollMaxInterval = new Text(optionsPane, SWT.NONE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
@@ -241,8 +220,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		}
 
 		libOverrideLabel = new Label(optionsPane, SWT.NONE);
-		libOverrideLabel.setText(Messages
-				.getString("PEDialogs.libOverrideLabel")); //$NON-NLS-1$
+		libOverrideLabel.setText(Messages.getString("PEDialogs.libOverrideLabel")); //$NON-NLS-1$
 
 		llOverrideBox = new Composite(optionsPane, SWT.NONE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -268,12 +246,10 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		}
 
 		runMiniproxyLabel = new Label(optionsPane, SWT.NONE);
-		runMiniproxyLabel.setText(Messages
-				.getString("PEDialogs.MiniproxyLabel")); //$NON-NLS-1$
+		runMiniproxyLabel.setText(Messages.getString("PEDialogs.MiniproxyLabel")); //$NON-NLS-1$
 		runMiniproxy = new Button(optionsPane, SWT.CHECK);
 		preferenceValue = config.getRunMiniproxy();
-		if ((preferenceValue != null)
-				&& (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
+		if ((preferenceValue != null) && (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
 			runMiniproxy.setSelection(true);
 		}
 
@@ -298,8 +274,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		// aid, there is no
 		// preferences setting for this flag (proxies should never suspend at
 		// startup by default)
-		if ((preferenceValue != null)
-				&& (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
+		if ((preferenceValue != null) && (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
 			suspendOption.setSelection(true);
 		}
 
@@ -377,12 +352,10 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				try {
 					interval = Integer.valueOf(widgetValue);
 				} catch (NumberFormatException e) {
-					setErrorMessage(Messages
-							.getString("PEDialogs.invalidMinPollInterval")); //$NON-NLS-1$
+					setErrorMessage(Messages.getString("PEDialogs.invalidMinPollInterval")); //$NON-NLS-1$
 					return false;
 				}
-				proxyOptions = proxyOptions + NODE_POLL_MIN_OPTION
-						+ "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
+				proxyOptions = proxyOptions + NODE_POLL_MIN_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			config.setNodeMinPollInterval(widgetValue);
 			widgetValue = nodePollMaxInterval.getText().trim();
@@ -390,12 +363,10 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				try {
 					interval = Integer.valueOf(widgetValue);
 				} catch (NumberFormatException e) {
-					setErrorMessage(Messages
-							.getString("PEDialogs.invalidMaxPollInterval")); //$NON-NLS-1$
+					setErrorMessage(Messages.getString("PEDialogs.invalidMaxPollInterval")); //$NON-NLS-1$
 					return false;
 				}
-				proxyOptions = proxyOptions + NODE_POLL_MAX_OPTION
-						+ "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
+				proxyOptions = proxyOptions + NODE_POLL_MAX_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			config.setNodeMaxPollInterval(widgetValue);
 			widgetValue = jobPollInterval.getText().trim();
@@ -403,12 +374,10 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				try {
 					interval = Integer.valueOf(widgetValue);
 				} catch (NumberFormatException e) {
-					setErrorMessage(Messages
-							.getString("PEDialogs.invalidJobPollInterval")); //$NON-NLS-1$
+					setErrorMessage(Messages.getString("PEDialogs.invalidJobPollInterval")); //$NON-NLS-1$
 					return false;
 				}
-				proxyOptions = proxyOptions + JOB_POLL_OPTION
-						+ "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
+				proxyOptions = proxyOptions + JOB_POLL_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			config.setJobPollInterval(widgetValue);
 			widgetValue = libOverridePath.getText().trim();
@@ -417,25 +386,19 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				IFileInfo fileInfo;
 				IPath testPath;
 
-				remoteService = PTPRemoteCorePlugin.getDefault()
-						.getRemoteServices(config.getRemoteServicesId());
+				remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
 				connMgr = remoteService.getConnectionManager();
-				remoteConnection = connMgr.getConnection(config
-						.getConnectionName());
+				remoteConnection = connMgr.getConnection(config.getConnectionName());
 				testPath = new Path(widgetValue);
 				if (!testPath.isValidPath(widgetValue)) {
-					setErrorMessage(Messages
-							.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
+					setErrorMessage(Messages.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
 				}
-				remoteResource = remoteService.getFileManager(
-						remoteConnection).getResource(testPath.toString());
+				remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 				fileInfo = remoteResource.fetchInfo();
 				if ((!fileInfo.exists()) || (!fileInfo.isDirectory())) {
-					setErrorMessage(Messages
-							.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
+					setErrorMessage(Messages.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
 				}
-				proxyOptions = proxyOptions + LIB_OVERRIDE_OPTION
-						+ "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
+				proxyOptions = proxyOptions + LIB_OVERRIDE_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			config.setLibraryOverride(widgetValue);
 		} else {

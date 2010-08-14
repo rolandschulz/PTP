@@ -11,13 +11,10 @@
  */
 package org.eclipse.ptp.remotetools.preferences;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.remotetools.preferences.events.IPreferencesChangeListener;
-import org.eclipse.ptp.remotetools.preferences.events.PreferencesChangeEvent;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -29,37 +26,67 @@ import org.osgi.framework.BundleContext;
  */
 public class PreferencesPlugin extends AbstractUIPlugin {
 
+	private static String PLUGIN_ID = "org.eclipse.ptp.remotetools.preferences"; //$NON-NLS-1$
+
 	// The shared instance.
-	private static PreferencesPlugin plugin;
+	private static PreferencesPlugin fPlugin;
 
-	private final List propertiesListeners;
+	private static final IScopeContext[] contexts = new IScopeContext[] { new DefaultScope(), new InstanceScope() };
 
-	private Preferences.IPropertyChangeListener propertyListener;
+	private static final int DEFAULT_CONTEXT = 0;
+	private static final int INSTANCE_CONTEXT = 1;
+
+	/**
+	 * Returns the shared instance.
+	 */
+	public static PreferencesPlugin getDefault() {
+		return fPlugin;
+	}
+
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 * @since 2.0
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null) {
+			return PLUGIN_ID;
+		}
+		return getDefault().getBundle().getSymbolicName();
+	}
 
 	/**
 	 * The constructor.
 	 */
 	public PreferencesPlugin() {
-		plugin = this;
-		propertiesListeners = new ArrayList();
+		fPlugin = this;
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	public void addListener(IPreferenceChangeListener listener) {
+		contexts[DEFAULT_CONTEXT].getNode(getUniqueIdentifier()).addPreferenceChangeListener(listener);
+		contexts[INSTANCE_CONTEXT].getNode(getUniqueIdentifier()).addPreferenceChangeListener(listener);
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	public void removeListener(IPreferenceChangeListener listener) {
+		contexts[DEFAULT_CONTEXT].getNode(getUniqueIdentifier()).removePreferenceChangeListener(listener);
+		contexts[INSTANCE_CONTEXT].getNode(getUniqueIdentifier()).removePreferenceChangeListener(listener);
 	}
 
 	/**
 	 * This method is called upon plug-in activation
+	 * 
+	 * @since 2.0
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		propertyListener = new Preferences.IPropertyChangeListener() {
-
-			public void propertyChange(Preferences.PropertyChangeEvent event) {
-
-				fireValueChanged(event.getProperty(), event.getOldValue(), event.getNewValue());
-
-			}
-
-		};
-		this.getPluginPreferences().addPropertyChangeListener(propertyListener);
 	}
 
 	/**
@@ -67,37 +94,12 @@ public class PreferencesPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
-		this.getPluginPreferences().removePropertyChangeListener(propertyListener);
-		this.savePluginPreferences();
-		plugin = null;
-	}
-
-	/**
-	 * Returns the shared instance.
-	 */
-	public static PreferencesPlugin getDefault() {
-		return plugin;
-	}
-
-	public void addListener(IPreferencesChangeListener listener) {
-
-		propertiesListeners.add(listener);
-	}
-
-	public void removeListener(IPreferencesChangeListener listener) {
-
-		propertiesListeners.remove(listener);
-	}
-
-	public void fireValueChanged(String property, Object oldValue, Object newValue) {
-		if (propertiesListeners.size() == 0)
-			return;
-		Iterator i = propertiesListeners.iterator();
-
-		while (i.hasNext()) {
-			IPreferencesChangeListener listener = (IPreferencesChangeListener) i.next();
-			listener.propertyChange(new PreferencesChangeEvent(this, property, oldValue, newValue));
+		try {
+			contexts[DEFAULT_CONTEXT].getNode(getUniqueIdentifier()).flush();
+			contexts[INSTANCE_CONTEXT].getNode(getUniqueIdentifier()).flush();
+		} finally {
+			super.stop(context);
+			fPlugin = null;
 		}
 	}
 }

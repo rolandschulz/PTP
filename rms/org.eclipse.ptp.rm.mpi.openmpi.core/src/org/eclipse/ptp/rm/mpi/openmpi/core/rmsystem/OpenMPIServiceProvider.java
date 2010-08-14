@@ -13,8 +13,8 @@ package org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rm.core.rmsystem.AbstractToolRMServiceProvider;
@@ -44,15 +44,14 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 		/*
 		 * By default, assume openmpi auto configuration.
 		 */
-		IPreferencesService prefs = OpenMPIPreferenceManager.getPreferences();
-		setLaunchCmd(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-				+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null));
-		setDebugCmd(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-				+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null));
-		setDiscoverCmd(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-				+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null));
-		setRemoteInstallPath(prefs.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
-				+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null));
+		setLaunchCmd(Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_LAUNCH_CMD));
+		setDebugCmd(Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_DEBUG_CMD));
+		setDiscoverCmd(Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_DISCOVER_CMD));
+		setRemoteInstallPath(Preferences.getString(OpenMPIPlugin.getUniqueIdentifier(), OpenMPIPreferenceManager.PREFIX_AUTO
+				+ OpenMPIPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 		setVersionId(VERSION_AUTO);
 		setUseInstallDefaults(true);
 		setUseToolDefaults(true);

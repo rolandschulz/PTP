@@ -14,22 +14,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.rm.core.RMCorePlugin;
-import org.eclipse.ptp.rm.mpi.openmpi.ui.launch.OpenMPILaunchConfigurationDefaults;
 import org.eclipse.ptp.rm.mpi.openmpi.ui.messages.Messages;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
  * @author Daniel Felix Ferber
  */
 public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.openmpi.ui"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.rm.mpi.openmpi.ui"; //$NON-NLS-1$
 
 	// The shared instance
-	private static OpenMPIUIPlugin plugin;
+	private static OpenMPIUIPlugin fPlugin;
 
 	/**
 	 * The constructor
@@ -40,36 +40,42 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
-		OpenMPILaunchConfigurationDefaults.loadDefaults();
+		fPlugin = this;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		fPlugin = null;
 		super.stop(context);
 	}
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static OpenMPIUIPlugin getDefault() {
-		return plugin;
+		return fPlugin;
 	}
 
 	/**
 	 * Raise core exception.
+	 * 
 	 * @param message
 	 * @return
 	 */
@@ -79,6 +85,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Raise core exception.
+	 * 
 	 * @param message
 	 * @param t
 	 * @return
@@ -89,7 +96,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Create log entry from an IStatus
-	 *
+	 * 
 	 * @param status
 	 */
 	public static void log(IStatus status) {
@@ -98,7 +105,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Create log entry from a string
-	 *
+	 * 
 	 * @param msg
 	 */
 	public static void log(String msg) {
@@ -107,7 +114,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Create log entry from a Throwable
-	 *
+	 * 
 	 * @param e
 	 */
 	public static void log(Throwable e) {
@@ -116,7 +123,7 @@ public class OpenMPIUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Generate a unique identifier
-	 *
+	 * 
 	 * @return unique identifier string
 	 */
 	public static String getUniqueIdentifier() {

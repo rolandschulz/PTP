@@ -6,5 +6,11 @@
 <!-- which accompanies this distribution, and is available at                -->
 <!-- http://www.eclipse.org/legal/epl-v10.html                               -->
 <plugin>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager">
+      </initializer>
+   </extension>
 
 </plugin>

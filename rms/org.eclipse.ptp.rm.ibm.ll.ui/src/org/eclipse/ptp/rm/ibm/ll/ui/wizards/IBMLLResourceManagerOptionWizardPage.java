@@ -12,7 +12,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -22,9 +21,8 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceConstants;
-import org.eclipse.ptp.rm.ibm.ll.core.IBMLLPreferenceManager;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IIBMLLResourceManagerConfiguration;
-import org.eclipse.ptp.rm.ibm.ll.ui.Activator;
+import org.eclipse.ptp.rm.ibm.ll.ui.LLUIPlugin;
 import org.eclipse.ptp.rm.ibm.ll.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
@@ -505,15 +503,6 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 	}
 
 	/**
-	 * Get the preferences object for the IBMLL implementation
-	 * 
-	 * @return the preferences object
-	 */
-	public Preferences getPreferences() {
-		return IBMLLPreferenceManager.getPreferences();
-	}
-
-	/**
 	 * Prompt the user to select a directory on the remote system
 	 * 
 	 * @param message
@@ -531,22 +520,22 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 
 		serviceID = config.getRemoteServicesId();
 		if (serviceID == null) {
-			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
 		if (services == null) {
-			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		connectionManager = services.getConnectionManager();
 		if (connectionManager == null) {
-			Activator.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		connection = connectionManager.getConnection(config.getConnectionName());
 		if (connection == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
@@ -557,7 +546,7 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 				return fileMgr.browseDirectory(getShell(), message, currentPath, 0);
 			}
 		}
-		Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.21")); //$NON-NLS-1$ //$NON-NLS-2$
+		LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.21")); //$NON-NLS-1$ //$NON-NLS-2$
 		return null;
 	}
 
@@ -579,22 +568,22 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 
 		serviceID = config.getRemoteServicesId();
 		if (serviceID == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
 		if (services == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		connectionManager = services.getConnectionManager();
 		if (connectionManager == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		connection = connectionManager.getConnection(config.getConnectionName());
 		if (connection == null) {
-			Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
 		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
@@ -605,7 +594,7 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 				return fileMgr.browseFile(getShell(), message, currentPath, 0);
 			}
 		}
-		Activator.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.11")); //$NON-NLS-1$ //$NON-NLS-2$
+		LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.11")); //$NON-NLS-1$ //$NON-NLS-2$
 		return null;
 	}
 
@@ -824,27 +813,27 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 		}
 		serviceID = config.getRemoteServicesId();
 		if (serviceID == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
 		if (services == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		connectionManager = services.getConnectionManager();
 		if (connectionManager == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.7")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		connection = connectionManager.getConnection(config.getConnectionName());
 		if (connection == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.9")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		fileManager = services.getFileManager(connection);
 		if (fileManager == null) {
-			Activator.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.31")); //$NON-NLS-1$ //$NON-NLS-2$
+			LLUIPlugin.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.31")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		file = fileManager.getResource(path);

@@ -1,4 +1,5 @@
 package org.eclipse.ptp.rm.ibm.pe.core;
+
 /*******************************************************************************
  * Copyright (c) 2005 The Regents of the University of California. 
  * This material was produced under U.S. Government contract W-7405-ENG-36 
@@ -23,52 +24,77 @@ package org.eclipse.ptp.rm.ibm.pe.core;
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-    
+
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.ptp.core.Preferences;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * 
+ * @since 5.0
  */
-public class Activator extends Plugin {
+public class PECorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.ibm.pe.core"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
-	
+	private static PECorePlugin fPlugin;
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static PECorePlugin getDefault() {
+		return fPlugin;
+	}
+
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null) {
+			return PLUGIN_ID;
+		}
+		return getDefault().getBundle().getSymbolicName();
+	}
+
 	/**
 	 * The constructor
 	 */
-	public Activator() {
-		plugin = this;
+	public PECorePlugin() {
+		fPlugin = this;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
-
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
+		try {
+			Preferences.savePreferences(getUniqueIdentifier());
+		} finally {
+			super.stop(context);
+			fPlugin = null;
+		}
 	}
 
 }

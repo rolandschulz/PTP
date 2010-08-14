@@ -253,7 +253,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		if (hostFilePath == null) {
 			if (rmConfiguration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
 				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Missing mandatory hostfile for Open MPI 1.2."); //$NON-NLS-1$
-				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID,
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
 						Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandMissingHostFilePath));
 			}
 
@@ -269,7 +269,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 
 		if (!hostFilePath.isAbsolute()) {
 			if (rmConfiguration.getDetectedVersion().equals(IOpenMPIResourceManagerConfiguration.VERSION_12)) {
-				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
 						Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFilePathNotAbsolute, hostFilePath)));
 			}
 
@@ -289,7 +289,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		try {
 			is = hostFile.openInputStream(EFS.NONE, monitor);
 		} catch (CoreException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
 					Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandFailedReadHostFile, hostFileName), e));
 		}
 
@@ -298,7 +298,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			hostMap = OpenMPIHostMapParser.parse(reader);
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
 					Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandFailedParseHostFile, hostFileName), e));
 		}
 
@@ -324,7 +324,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 						"Hostfile is empty. Added default host {0} for Open MPI 1.2.", hostname); //$NON-NLS-1$
 			} else {
 				DebugUtil.error(DebugUtil.RTS_DISCOVER_TRACING, "Empty hostfile is not allowed."); //$NON-NLS-1$
-				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(
+				throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
 						Messages.OpenMPIDiscoverJob_Exception_DiscoverCommandHostFileEmpty, hostFileName)));
 			}
 		}
@@ -338,7 +338,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		try {
 			process = processBuilder.start();
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID,
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
 					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailed, e));
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -348,11 +348,11 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 			// Ignore
 		}
 		if (process.exitValue() != 0)
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID, NLS.bind(
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(), NLS.bind(
 					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedWithCode, Integer.valueOf(process.exitValue()))));
 		String hostname = br.readLine();
 		if (hostname == null)
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.PLUGIN_ID,
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIPlugin.getUniqueIdentifier(),
 					Messages.OpenMPIDiscoverJob_Exception_HostnameCommandFailedParse));
 		return hostname;
 	}

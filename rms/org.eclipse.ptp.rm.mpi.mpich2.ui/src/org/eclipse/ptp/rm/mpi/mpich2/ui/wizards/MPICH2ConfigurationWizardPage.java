@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.mpi.mpich2.ui.wizards;
 
-import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2Plugin;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2PreferenceManager;
 import org.eclipse.ptp.rm.mpi.mpich2.core.rmsystem.IMPICH2ResourceManagerConfiguration;
@@ -36,9 +36,7 @@ import org.eclipse.swt.widgets.Label;
  * 
  */
 public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWizardPage {
-	private static final String EMPTY_STR = ""; //$NON-NLS-1$
 
-	private final String versionIds[] = new String[] {};
 	private final String versionsNames[] = new String[] { Messages.MPICH2ConfigurationWizardPage_VersionCombo_Version12,
 			Messages.MPICH2ConfigurationWizardPage_VersionCombo_Version13 };
 
@@ -166,15 +164,14 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 		String debugCmd = null;
 		String discoverCmd = null;
 		String remoteInstallPath = null;
-		IPreferencesService preferences = MPICH2PreferenceManager.getPreferences();
-		launchCmd = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD, EMPTY_STR, null);
-		debugCmd = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD, EMPTY_STR, null);
-		discoverCmd = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD, EMPTY_STR, null);
-		remoteInstallPath = preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR, null);
+		launchCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD);
+		debugCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD);
+		discoverCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD);
+		remoteInstallPath = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
 		resetErrorMessages();
 		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
 		dataSource.setUseDefaults(true);
