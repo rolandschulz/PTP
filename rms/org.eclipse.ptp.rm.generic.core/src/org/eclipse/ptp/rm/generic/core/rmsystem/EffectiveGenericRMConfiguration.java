@@ -21,8 +21,6 @@ import org.eclipse.ptp.rm.generic.core.GenericRMPreferenceManager;
  */
 public class EffectiveGenericRMConfiguration extends AbstractEffectiveToolRMConfiguration {
 
-	private static final String EMPTY_STR = ""; //$NON-NLS-1$
-
 	public EffectiveGenericRMConfiguration(IToolRMConfiguration configuration) {
 		super(configuration);
 		String launchCmd = null;

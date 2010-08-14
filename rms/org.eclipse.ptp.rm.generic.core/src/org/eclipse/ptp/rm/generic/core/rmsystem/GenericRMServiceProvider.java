@@ -24,17 +24,13 @@ public class GenericRMServiceProvider extends AbstractToolRMServiceProvider {
 
 	public static int CAPABILITIES = CAP_LAUNCH | CAP_REMOTE_INSTALL_PATH;
 
-	private static final String EMPTY_STR = ""; //$NON-NLS-1$
-
 	public GenericRMServiceProvider() {
 		super(CAPABILITIES);
 
-		setLaunchCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_LAUNCH_CMD,
-				EMPTY_STR));
-		setDebugCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_DEBUG_CMD,
-				EMPTY_STR));
+		setLaunchCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_LAUNCH_CMD));
+		setDebugCmd(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(), GenericRMPreferenceManager.PREFS_DEBUG_CMD));
 		setRemoteInstallPath(Preferences.getString(GenericRMCorePlugin.getUniqueIdentifier(),
-				GenericRMPreferenceManager.PREFS_REMOTE_INSTALL_PATH, EMPTY_STR));
+				GenericRMPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
 
 		setUseInstallDefaults(true);
 		setUseToolDefaults(true);
