@@ -237,8 +237,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * @return
 	 */
 	public int getCommandTimeout() {
-		return Preferences.getInt(getUniqueIdentifier(), IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT,
-				IPDebugConstants.DEFAULT_DEBUG_COMM_TIMEOUT);
+		return Preferences.getInt(getUniqueIdentifier(), IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT);
 	}
 
 	/**
@@ -246,7 +245,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	public IPSourceLocation[] getCommonSourceLocations() {
 		return SourceUtils.getCommonSourceLocationsFromMemento(Preferences.getString(getUniqueIdentifier(),
-				IPDebugConstants.PREF_SOURCE_LOCATIONS, "")); //$NON-NLS-1$
+				IPDebugConstants.PREF_SOURCE_LOCATIONS));
 	}
 
 	/**
@@ -394,7 +393,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private void initializeCommonSourceLookupDirector() {
 		if (fCommonSourceLookupDirector == null) {
 			fCommonSourceLookupDirector = new CommonSourceLookupDirector();
-			String newMemento = Preferences.getString(getUniqueIdentifier(), IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS, ""); //$NON-NLS-1$
+			String newMemento = Preferences.getString(getUniqueIdentifier(), IPDebugConstants.PREF_COMMON_SOURCE_CONTAINERS);
 			if (newMemento.length() == 0) {
 				// Convert source locations to source containers
 				fCommonSourceLookupDirector.setSourceContainers(SourceUtils.convertSourceLocations(getCommonSourceLocations()));

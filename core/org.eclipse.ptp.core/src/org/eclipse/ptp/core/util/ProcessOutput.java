@@ -121,10 +121,8 @@ public class ProcessOutput {
 	 * Create a local cache for process output.
 	 */
 	private void setOutputStore() {
-		outputDirPath = Preferences.getString(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_OUTPUT_DIR,
-				PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME);
-		storeLines = Preferences.getInt(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_STORE_LINES,
-				PreferenceConstants.DEFAULT_STORE_LINES);
+		outputDirPath = Preferences.getString(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_OUTPUT_DIR);
+		storeLines = Preferences.getInt(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_STORE_LINES);
 		if (outputDirPath == null || outputDirPath.length() == 0) {
 			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation()
 					.append(PreferenceConstants.DEFAULT_OUTPUT_DIR_NAME).toOSString();

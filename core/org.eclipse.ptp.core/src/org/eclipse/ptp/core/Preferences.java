@@ -58,8 +58,8 @@ public final class Preferences {
 
 	/**
 	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the specified default value. Use the canonical
-	 * scope lookup order for finding the preference value.
+	 * is not defined then return the default value. Use the canonical scope
+	 * lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -67,14 +67,14 @@ public final class Preferences {
 	 * 
 	 * @return the value of the preference or the given default value
 	 */
-	public static boolean getBoolean(String qualifier, String key, boolean defaultvalue) {
-		return Platform.getPreferencesService().getBoolean(qualifier, key, defaultvalue, null);
+	public static boolean getBoolean(String qualifier, String key) {
+		return Platform.getPreferencesService().getBoolean(qualifier, key, false, null);
 	}
 
 	/**
 	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the specified default value. Use the canonical
-	 * scope lookup order for finding the preference value.
+	 * is not defined then return the default value. Use the canonical scope
+	 * lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -82,8 +82,8 @@ public final class Preferences {
 	 * 
 	 * @return the value of the preference or the given default value
 	 */
-	public static byte[] getByteArray(String qualifier, String key, byte[] defaultvalue) {
-		return Platform.getPreferencesService().getByteArray(qualifier, key, defaultvalue, null);
+	public static byte[] getByteArray(String qualifier, String key) {
+		return Platform.getPreferencesService().getByteArray(qualifier, key, null, null);
 	}
 
 	/**
@@ -200,8 +200,8 @@ public final class Preferences {
 
 	/**
 	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the specified default value. Use the canonical
-	 * scope lookup order for finding the preference value.
+	 * is not defined then return the default value. Use the canonical scope
+	 * lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -209,14 +209,14 @@ public final class Preferences {
 	 * 
 	 * @return the value of the preference or the given default value
 	 */
-	public static double getDouble(String qualifier, String key, double defaultvalue) {
-		return Platform.getPreferencesService().getDouble(qualifier, key, defaultvalue, null);
+	public static double getDouble(String qualifier, String key) {
+		return Platform.getPreferencesService().getDouble(qualifier, key, 0.0, null);
 	}
 
 	/**
 	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the specified default value. Use the canonical
-	 * scope lookup order for finding the preference value.
+	 * is not defined then return the default value. Use the canonical scope
+	 * lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -224,14 +224,14 @@ public final class Preferences {
 	 * 
 	 * @return the value of the preference or the given default value
 	 */
-	public static float getFloat(String qualifier, String key, float defaultvalue) {
-		return Platform.getPreferencesService().getFloat(qualifier, key, defaultvalue, null);
+	public static float getFloat(String qualifier, String key) {
+		return Platform.getPreferencesService().getFloat(qualifier, key, 0.0f, null);
 	}
 
 	/**
 	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the specified default value. Use the canonical
-	 * scope lookup order for finding the preference value.
+	 * is not defined then return the default value. Use the canonical scope
+	 * lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -239,14 +239,14 @@ public final class Preferences {
 	 * 
 	 * @return the value of the preference or the given default value
 	 */
-	public static int getInt(String qualifier, String key, int defaultvalue) {
-		return Platform.getPreferencesService().getInt(qualifier, key, defaultvalue, null);
+	public static int getInt(String qualifier, String key) {
+		return Platform.getPreferencesService().getInt(qualifier, key, 0, null);
 	}
 
 	/**
 	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the specified default value. Use the canonical
-	 * scope lookup order for finding the preference value.
+	 * is not defined then return the default value. Use the canonical scope
+	 * lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -254,14 +254,14 @@ public final class Preferences {
 	 * 
 	 * @return the value of the preference or the given default value
 	 */
-	public static long getLong(String qualifier, String key, long defaultvalue) {
-		return Platform.getPreferencesService().getLong(qualifier, key, defaultvalue, null);
+	public static long getLong(String qualifier, String key) {
+		return Platform.getPreferencesService().getLong(qualifier, key, 0L, null);
 	}
 
 	/**
 	 * Returns the value in the preference store for the given key. If the key
-	 * is not defined then return the specified default value. Use the canonical
-	 * scope lookup order for finding the preference value.
+	 * is not defined then return the default value. Use the canonical scope
+	 * lookup order for finding the preference value.
 	 * 
 	 * @param qualifier
 	 * @param key
@@ -269,8 +269,8 @@ public final class Preferences {
 	 * 
 	 * @return the value of the preference or the given default value
 	 */
-	public static String getString(String qualifier, String key, String defaultvalue) {
-		return Platform.getPreferencesService().getString(qualifier, key, defaultvalue, null);
+	public static String getString(String qualifier, String key) {
+		return Platform.getPreferencesService().getString(qualifier, key, "", null); //$NON-NLS-1$
 	}
 
 	/**

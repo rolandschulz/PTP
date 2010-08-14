@@ -28,7 +28,6 @@ import org.eclipse.ptp.debug.core.model.IPRegisterDescriptor;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.model.PVariableFormat;
-import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIChangedEvent;
@@ -401,13 +400,13 @@ public class PRegister extends PVariable implements IPRegister {
 	protected PRegister(PRegisterGroup parent, IPRegisterDescriptor descriptor) {
 		super(parent, ((PRegisterDescriptor) descriptor).getPDIDescriptor());
 		setFormat(PVariableFormat.getFormat(Preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT, IPDIFormat.NATURAL)));
+				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT)));
 	}
 
 	protected PRegister(PRegisterGroup parent, IPRegisterDescriptor descriptor, String message) {
 		super(parent, ((PRegisterDescriptor) descriptor).getPDIDescriptor(), message);
 		setFormat(PVariableFormat.getFormat(Preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT, IPDIFormat.NATURAL)));
+				IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT)));
 	}
 
 	/*

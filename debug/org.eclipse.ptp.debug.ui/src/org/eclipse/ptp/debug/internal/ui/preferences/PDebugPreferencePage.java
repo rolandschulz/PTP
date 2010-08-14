@@ -150,7 +150,7 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 2;
 		spacingComposite.setLayoutData(data);
-		commandTimeoutField = new IntegerFieldEditor(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, Messages.PDebugPreferencePage_7,
+		commandTimeoutField = new IntegerFieldEditor(IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT, Messages.PDebugPreferencePage_7,
 				spacingComposite);
 		commandTimeoutField.setPreferenceStore(getPreferenceStore());
 		commandTimeoutField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
@@ -183,8 +183,8 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 	public void performDefaults() {
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
-		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
-		commandTimeoutField.setStringValue(String.valueOf(store.getDefaultInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
+		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_DEBUG_REGISTER_PROC_0));
+		commandTimeoutField.setStringValue(String.valueOf(store.getDefaultInt(IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT)));
 		updateVariableOnSuspendButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND));
 		updateVariableOnChangeButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
 		commandTimeoutField.loadDefault();
@@ -213,8 +213,8 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
 		fPathsButton.setSelection(store.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
-		fRegisteredProcessButton.setSelection(store.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
-		commandTimeoutField.setStringValue(String.valueOf(store.getInt(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)));
+		fRegisteredProcessButton.setSelection(store.getBoolean(IPDebugConstants.PREF_DEBUG_REGISTER_PROC_0));
+		commandTimeoutField.setStringValue(String.valueOf(store.getInt(IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT)));
 		updateVariableOnSuspendButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND));
 		updateVariableOnChangeButton.setSelection(store.getBoolean(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE));
 	}
@@ -243,8 +243,8 @@ public class PDebugPreferencePage extends AbstractPreferencePage {
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
-		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
-		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, commandTimeoutField.getIntValue());
+		store.setValue(IPDebugConstants.PREF_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
+		store.setValue(IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT, commandTimeoutField.getIntValue());
 		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, updateVariableOnSuspendButton.getSelection());
 		store.setValue(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, updateVariableOnChangeButton.getSelection());
 		commandTimeoutField.store();

@@ -535,10 +535,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * isInstructionSteppingEnabled()
 	 */
 	public boolean isInstructionSteppingEnabled() {
-		return Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), PREF_INSTRUCTION_STEPPING_MODE,
-				IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE)
-				|| Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON,
-						IPDebugConstants.DEFAULT_INSTRUCTION_STEP_MODE);
+		return Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), PREF_INSTRUCTION_STEPPING_MODE)
+				|| Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON);
 	}
 
 	/*

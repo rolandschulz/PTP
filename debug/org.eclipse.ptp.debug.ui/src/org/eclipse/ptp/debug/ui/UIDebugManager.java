@@ -102,13 +102,13 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		public void preferenceChange(PreferenceChangeEvent event) {
 			String preferenceType = event.getKey();
 			String value = (String) event.getNewValue();
-			if (preferenceType.equals(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
+			if (preferenceType.equals(IPDebugConstants.PREF_DEBUG_REGISTER_PROC_0)) {
 				prefRegisterProc0 = new Boolean(value).booleanValue();
 			} else if (preferenceType.equals(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND)) {
 				prefAutoUpdateVarOnSuspend = new Boolean(value).booleanValue();
 			} else if (preferenceType.equals(IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE)) {
 				prefAutoUpdateVarOnChange = new Boolean(value).booleanValue();
-			} else if (preferenceType.equals(IPDebugConstants.PREF_PTP_DEBUG_COMM_TIMEOUT)) {
+			} else if (preferenceType.equals(IPDebugConstants.PREF_DEBUG_COMM_TIMEOUT)) {
 				for (IPJob job : getJobs()) {
 					IPSession session = getDebugSession(job);
 					if (session != null) {
@@ -795,11 +795,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	private void initializePreferences() {
 		Preferences.addPreferenceChangeListener(PTPDebugUIPlugin.getUniqueIdentifier(), fPreferenceChangeListener);
 		prefRegisterProc0 = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, IPDebugConstants.DEFAULT_DEBUG_REGISTER_PROC_0);
+				IPDebugConstants.PREF_DEBUG_REGISTER_PROC_0);
 		prefAutoUpdateVarOnSuspend = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND, IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_SUSPEND);
+				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
 		prefAutoUpdateVarOnChange = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE, IPDebugConstants.DEFAULT_UPDATE_VARIABLES_ON_CHANGE);
+				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE);
 	}
 
 }

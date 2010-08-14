@@ -26,7 +26,6 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPValue;
 import org.eclipse.ptp.debug.core.model.PVariableFormat;
-import org.eclipse.ptp.debug.core.pdi.IPDIFormat;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIChangedEvent;
@@ -60,7 +59,7 @@ public class PExpression extends PLocalVariable implements IExpression {
 	public PExpression(PStackFrame frame, IPDITargetExpression pdiExpression, IPDIVariableDescriptor varObject) {
 		super(frame, varObject);
 		setFormat(PVariableFormat.getFormat(Preferences.getInt(PTPDebugCorePlugin.getUniqueIdentifier(),
-				IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, IPDIFormat.NATURAL)));
+				IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT)));
 		fText = pdiExpression.getExpressionText();
 		fPDIExpression = pdiExpression;
 		fStackFrame = frame;
