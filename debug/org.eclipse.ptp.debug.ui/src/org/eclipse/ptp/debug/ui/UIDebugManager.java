@@ -794,11 +794,11 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	 */
 	private void initializePreferences() {
 		Preferences.addPreferenceChangeListener(PTPDebugUIPlugin.getUniqueIdentifier(), fPreferenceChangeListener);
-		prefRegisterProc0 = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
+		prefRegisterProc0 = Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(),
 				IPDebugConstants.PREF_DEBUG_REGISTER_PROC_0);
-		prefAutoUpdateVarOnSuspend = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
+		prefAutoUpdateVarOnSuspend = Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(),
 				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_SUSPEND);
-		prefAutoUpdateVarOnChange = Preferences.getBoolean(PTPDebugUIPlugin.getUniqueIdentifier(),
+		prefAutoUpdateVarOnChange = Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(),
 				IPDebugConstants.PREF_UPDATE_VARIABLES_ON_CHANGE);
 	}
 
