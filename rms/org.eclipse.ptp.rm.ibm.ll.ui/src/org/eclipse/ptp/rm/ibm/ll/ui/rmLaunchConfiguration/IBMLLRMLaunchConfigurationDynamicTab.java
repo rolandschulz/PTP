@@ -658,11 +658,17 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		IRemoteConnectionManager connMgr;
 
 		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
-		remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
-				getLaunchConfigurationDialog());
-		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
-		connMgr = remoteService.getConnectionManager();
-		remoteConnection = connMgr.getConnection(config.getConnectionName());
+		if (config != null) {
+			remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
+					getLaunchConfigurationDialog());
+			if (remoteService != null) {
+				remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
+				connMgr = remoteService.getConnectionManager();
+				if (connMgr != null) {
+					remoteConnection = connMgr.getConnection(config.getConnectionName());
+				}
+			}
+		}
 		parentShell = parent.getShell();
 		clearAllWidgets();
 		activeWidgets = new Vector<Object>();
@@ -2359,6 +2365,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 				if (!testPath.isValidPath(path)) {
 					throw new ValidationException(Messages.getString(errorID));
 				}
+				if (remoteService == null || remoteConnection == null) {
+					throw new ValidationException(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.0")); //$NON-NLS-1$
+				}
 				remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 				fileInfo = remoteResource.fetchInfo();
 				if (!fileInfo.isDirectory()) {
@@ -2461,6 +2470,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		testPath = new Path(path);
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
+		}
+		if (remoteService == null || remoteConnection == null) {
+			throw new ValidationException(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.0")); //$NON-NLS-1$
 		}
 		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
@@ -2852,6 +2864,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		testPath = new Path(path);
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
+		}
+		if (remoteService == null || remoteConnection == null) {
+			throw new ValidationException(Messages.getString("IBMLLRMLaunchConfigurationDynamicTab.0")); //$NON-NLS-1$
 		}
 		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
