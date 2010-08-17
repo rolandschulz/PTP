@@ -15,7 +15,6 @@ Export-Package: org.eclipse.ptp.etfw.feedback,
  org.eclipse.ptp.etfw.feedback.actions.handlers,
  org.eclipse.ptp.etfw.feedback.obj,
  org.eclipse.ptp.etfw.feedback.preferences,
- org.eclipse.ptp.etfw.feedback.util,
  org.eclipse.ptp.etfw.feedback.views
 Bundle-Vendor: %bundle_provider
 Bundle-Localization: plugin
