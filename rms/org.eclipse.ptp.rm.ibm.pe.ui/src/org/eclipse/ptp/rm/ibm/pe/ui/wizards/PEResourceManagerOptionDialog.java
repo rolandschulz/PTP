@@ -17,12 +17,13 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.rm.ibm.pe.core.PEPreferenceConstants;
 import org.eclipse.ptp.rm.ibm.pe.core.rmsystem.IPEResourceManagerConfiguration;
 import org.eclipse.ptp.rm.ibm.pe.ui.messages.Messages;
+import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -75,7 +76,8 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 	private Label jobPollLabel;
 	private final Shell parentShell;
 	private String proxyOptions;
-	private final IPEResourceManagerConfiguration config;
+	private final IPEResourceManagerConfiguration fConfig;
+	private final IRMConfigurationWizard fWizard;
 	private IRemoteServices remoteService;
 	private IRemoteUIServices remoteUIService;
 	private IRemoteConnection remoteConnection;
@@ -120,10 +122,11 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		}
 	}
 
-	public PEResourceManagerOptionDialog(Shell parent, IPEResourceManagerConfiguration config, String initialOptions) {
+	public PEResourceManagerOptionDialog(Shell parent, IRMConfigurationWizard wizard, String initialOptions) {
 		super(parent);
-		this.parentShell = parent;
-		this.config = config;
+		parentShell = parent;
+		fWizard = wizard;
+		fConfig = (IPEResourceManagerConfiguration) wizard.getConfiguration();
 		setInitialOptions(initialOptions);
 		create();
 	}
@@ -152,7 +155,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		llLabel = new Label(optionsPane, SWT.NONE);
 		llLabel.setText(Messages.getString("PEDialogs.LoadLevelerOptionLabel")); //$NON-NLS-1$
 		loadLevelerOption = new Button(optionsPane, SWT.CHECK);
-		preferenceValue = config.getUseLoadLeveler();
+		preferenceValue = fConfig.getUseLoadLeveler();
 		if ((preferenceValue != null) && (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
 			loadLevelerOption.setSelection(true);
 		}
@@ -173,7 +176,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		llModeDefault.setSelection(false);
 		llModeLocal.setSelection(false);
 		llModeMulticluster.setSelection(false);
-		preferenceValue = config.getLoadLevelerMode();
+		preferenceValue = fConfig.getLoadLevelerMode();
 		if (preferenceValue != null) {
 			if (preferenceValue.equals("y")) { //$NON-NLS-1$
 				llModeMulticluster.setSelection(true);
@@ -192,7 +195,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		nodePollMinInterval.setLayoutData(gd);
-		preferenceValue = config.getNodeMinPollInterval();
+		preferenceValue = fConfig.getNodeMinPollInterval();
 		if (preferenceValue != null) {
 			nodePollMinInterval.setText(preferenceValue);
 		}
@@ -203,7 +206,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		nodePollMaxInterval.setLayoutData(gd);
-		preferenceValue = config.getNodeMaxPollInterval();
+		preferenceValue = fConfig.getNodeMaxPollInterval();
 		if (preferenceValue != null) {
 			nodePollMaxInterval.setText(preferenceValue);
 		}
@@ -214,7 +217,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		jobPollInterval.setLayoutData(gd);
-		preferenceValue = config.getJobPollInterval();
+		preferenceValue = fConfig.getJobPollInterval();
 		if (preferenceValue != null) {
 			jobPollInterval.setText(preferenceValue);
 		}
@@ -240,7 +243,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = false;
 		libOverrideBrowse.setLayoutData(gd);
-		preferenceValue = config.getLibraryOverride();
+		preferenceValue = fConfig.getLibraryOverride();
 		if (preferenceValue != null) {
 			libOverridePath.setText(preferenceValue);
 		}
@@ -248,7 +251,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		runMiniproxyLabel = new Label(optionsPane, SWT.NONE);
 		runMiniproxyLabel.setText(Messages.getString("PEDialogs.MiniproxyLabel")); //$NON-NLS-1$
 		runMiniproxy = new Button(optionsPane, SWT.CHECK);
-		preferenceValue = config.getRunMiniproxy();
+		preferenceValue = fConfig.getRunMiniproxy();
 		if ((preferenceValue != null) && (preferenceValue.equals(PEPreferenceConstants.OPTION_YES))) {
 			runMiniproxy.setSelection(true);
 		}
@@ -259,7 +262,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		debugLevel.add(PEPreferenceConstants.TRACE_NOTHING);
 		debugLevel.add(PEPreferenceConstants.TRACE_FUNCTION);
 		debugLevel.add(PEPreferenceConstants.TRACE_DETAIL);
-		preferenceValue = config.getDebugLevel();
+		preferenceValue = fConfig.getDebugLevel();
 		if (preferenceValue != null) {
 			debugLevel.setText(preferenceValue);
 		}
@@ -267,7 +270,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		suspendLabel = new Label(optionsPane, SWT.NULL);
 		suspendLabel.setText(Messages.getString("PEDialogs.SuspendLabel")); //$NON-NLS-1$
 		suspendOption = new Button(optionsPane, SWT.CHECK);
-		preferenceValue = config.getSuspendProxy();
+		preferenceValue = fConfig.getSuspendProxy();
 		// suspendOption is used to specify that the proxy should suspend after
 		// it has recognized this
 		// option so that a debugger can attach to it. Since this is a debugging
@@ -325,6 +328,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 	 * 
 	 * @return Status indicating successful completion
 	 */
+	@SuppressWarnings("unused")
 	protected boolean validateInput(Object eventSource) {
 		String traceOpt;
 
@@ -336,7 +340,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 			int interval;
 
 			proxyOptions = proxyOptions + USE_LOADLEVELER_OPTION + " "; //$NON-NLS-1$
-			config.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
+			fConfig.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
 			proxyOptions = proxyOptions + MULTICLUSTER_OPTION + "="; //$NON-NLS-1$
 			if (llModeDefault.getSelection()) {
 				multiclusterMode = "d"; //$NON-NLS-1$
@@ -346,7 +350,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				multiclusterMode = "y"; //$NON-NLS-1$
 			}
 			proxyOptions = proxyOptions + multiclusterMode + " "; //$NON-NLS-1$
-			config.setLoadLevelerMode(multiclusterMode);
+			fConfig.setLoadLevelerMode(multiclusterMode);
 			widgetValue = nodePollMinInterval.getText().trim();
 			if (widgetValue.length() > 0) {
 				try {
@@ -357,7 +361,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				}
 				proxyOptions = proxyOptions + NODE_POLL_MIN_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			config.setNodeMinPollInterval(widgetValue);
+			fConfig.setNodeMinPollInterval(widgetValue);
 			widgetValue = nodePollMaxInterval.getText().trim();
 			if (widgetValue.length() > 0) {
 				try {
@@ -368,7 +372,7 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				}
 				proxyOptions = proxyOptions + NODE_POLL_MAX_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			config.setNodeMaxPollInterval(widgetValue);
+			fConfig.setNodeMaxPollInterval(widgetValue);
 			widgetValue = jobPollInterval.getText().trim();
 			if (widgetValue.length() > 0) {
 				try {
@@ -379,16 +383,16 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				}
 				proxyOptions = proxyOptions + JOB_POLL_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			config.setJobPollInterval(widgetValue);
+			fConfig.setJobPollInterval(widgetValue);
 			widgetValue = libOverridePath.getText().trim();
 			if ((widgetValue.length() > 0) && (eventSource == libOverridePath)) {
 				IFileStore remoteResource;
 				IFileInfo fileInfo;
 				IPath testPath;
-
-				remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
+				remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(fConfig.getRemoteServicesId(),
+						fWizard.getContainer());
 				connMgr = remoteService.getConnectionManager();
-				remoteConnection = connMgr.getConnection(config.getConnectionName());
+				remoteConnection = connMgr.getConnection(fConfig.getConnectionName());
 				testPath = new Path(widgetValue);
 				if (!testPath.isValidPath(widgetValue)) {
 					setErrorMessage(Messages.getString("PEDialogs.invalidLibraryPath")); //$NON-NLS-1$
@@ -400,28 +404,28 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 				}
 				proxyOptions = proxyOptions + LIB_OVERRIDE_OPTION + "=" + widgetValue + " "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			config.setLibraryOverride(widgetValue);
+			fConfig.setLibraryOverride(widgetValue);
 		} else {
-			config.setUseLoadLeveler(PEPreferenceConstants.OPTION_NO);
+			fConfig.setUseLoadLeveler(PEPreferenceConstants.OPTION_NO);
 		}
 		traceOpt = debugLevel.getText();
 		if (traceOpt.length() > 0) {
 			proxyOptions = proxyOptions + TRACE_OPTION + "=" + traceOpt + " "; //$NON-NLS-1$ //$NON-NLS-2$
-			config.setDebugLevel(traceOpt);
+			fConfig.setDebugLevel(traceOpt);
 		}
 		if (suspendOption.getSelection()) {
 			proxyOptions = proxyOptions + SUSPEND_AT_STARTUP_OPTION;
-			config.setSuspendProxy(PEPreferenceConstants.OPTION_YES);
+			fConfig.setSuspendProxy(PEPreferenceConstants.OPTION_YES);
 		} else {
-			config.setSuspendProxy(PEPreferenceConstants.OPTION_NO);
+			fConfig.setSuspendProxy(PEPreferenceConstants.OPTION_NO);
 		}
 		if (runMiniproxy.getSelection()) {
 			proxyOptions = proxyOptions + RUN_MINIPROXY_OPTION + " "; //$NON-NLS-1$
-			config.setRunMiniproxy(PEPreferenceConstants.OPTION_YES);
+			fConfig.setRunMiniproxy(PEPreferenceConstants.OPTION_YES);
 		} else {
-			config.setRunMiniproxy(PEPreferenceConstants.OPTION_NO);
+			fConfig.setRunMiniproxy(PEPreferenceConstants.OPTION_NO);
 		}
-		config.setInvocationOptions(proxyOptions);
+		fConfig.setInvocationOptions(proxyOptions);
 		return true;
 	}
 
@@ -433,33 +437,33 @@ public class PEResourceManagerOptionDialog extends TitleAreaDialog {
 		StringTokenizer options;
 
 		options = new StringTokenizer(initialOptions, " "); //$NON-NLS-1$
-		config.setSuspendProxy(PEPreferenceConstants.OPTION_NO);
-		config.setRunMiniproxy(PEPreferenceConstants.OPTION_NO);
+		fConfig.setSuspendProxy(PEPreferenceConstants.OPTION_NO);
+		fConfig.setRunMiniproxy(PEPreferenceConstants.OPTION_NO);
 		while (options.hasMoreTokens()) {
 			String currentToken[];
 
 			currentToken = options.nextToken().split("="); //$NON-NLS-1$
 			if (currentToken.length == 1) {
 				if (currentToken[0].equals(SUSPEND_AT_STARTUP_OPTION)) {
-					config.setSuspendProxy(PEPreferenceConstants.OPTION_YES);
+					fConfig.setSuspendProxy(PEPreferenceConstants.OPTION_YES);
 				} else if (currentToken[0].equals(RUN_MINIPROXY_OPTION)) {
-					config.setRunMiniproxy(PEPreferenceConstants.OPTION_YES);
+					fConfig.setRunMiniproxy(PEPreferenceConstants.OPTION_YES);
 				} else if (currentToken[0].equals(USE_LOADLEVELER_OPTION)) {
-					config.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
+					fConfig.setUseLoadLeveler(PEPreferenceConstants.OPTION_YES);
 				}
 			} else {
 				if (currentToken[0].equals(MULTICLUSTER_OPTION)) {
-					config.setLoadLevelerMode(currentToken[1]);
+					fConfig.setLoadLevelerMode(currentToken[1]);
 				} else if (currentToken[0].equals(NODE_POLL_MIN_OPTION)) {
-					config.setNodeMinPollInterval(currentToken[1]);
+					fConfig.setNodeMinPollInterval(currentToken[1]);
 				} else if (currentToken[0].equals(NODE_POLL_MAX_OPTION)) {
-					config.setNodeMaxPollInterval(currentToken[1]);
+					fConfig.setNodeMaxPollInterval(currentToken[1]);
 				} else if (currentToken[0].equals(JOB_POLL_OPTION)) {
-					config.setJobPollInterval(currentToken[1]);
+					fConfig.setJobPollInterval(currentToken[1]);
 				} else if (currentToken[0].equals(LIB_OVERRIDE_OPTION)) {
-					config.setLibraryOverride(currentToken[1]);
+					fConfig.setLibraryOverride(currentToken[1]);
 				} else if (currentToken[0].equals(TRACE_OPTION)) {
-					config.setDebugLevel(currentToken[1]);
+					fConfig.setDebugLevel(currentToken[1]);
 				}
 			}
 		}

@@ -12,23 +12,37 @@
 package org.eclipse.ptp.rm.pbs.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
-import org.eclipse.ptp.rm.pbs.ui.launch.PBSRMLaunchConfigurationDynamicTab;
 
-public class PBSRMLaunchConfigurationFactory extends
-		AbstractRMLaunchConfigurationFactory {
+public class PBSRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #getResourceManagerClass()
+	 */
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return PBSResourceManager.class;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #doCreate(org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
+	 */
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
-		return new PBSRMLaunchConfigurationDynamicTab(rm);
+		return new PBSRMLaunchConfigurationDynamicTab(rm, dialog);
 	}
 }

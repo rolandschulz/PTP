@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.attributes.BigIntegerAttribute;
 import org.eclipse.ptp.core.attributes.BigIntegerAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IAttribute;
@@ -60,7 +61,6 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -89,8 +89,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class PERMLaunchConfigurationDynamicTab extends
-		AbstractRMLaunchConfigurationDynamicTab {
+public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigurationDynamicTab {
 	// TODO
 	// 8) popup 'notepad' editor to create host file
 	/*
@@ -187,8 +186,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * End of attribute name list.
 	 */
 	private static final String ENABLE_STATE = "ENABLE_STATE"; //$NON-NLS-1$
-	private static final RMLaunchValidation success = new RMLaunchValidation(
-			true, ""); //$NON-NLS-1$
+	private static final RMLaunchValidation success = new RMLaunchValidation(true, ""); //$NON-NLS-1$
 	private static final int MP_IONODEFILE_SELECTOR = 1;
 	private static final int PE_STDIN_PATH_SELECTOR = 2;
 	private static final int PE_STDOUT_PATH_SELECTOR = 3;
@@ -205,6 +203,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	private static final int PE_ENV_SCRIPT_SELECTOR = 14;
 	private static final int MP_PROFDIR_SELECTOR = 15;
 	private static final int MP_PRIORITY_LOG_DIR_SELECTOR = 16;
+	@SuppressWarnings("unused")
 	private static final int MP_PRIORITY_LOG_NAME_SELECTOR = 17;
 	private static final int MP_CKPTFILE_SELECTOR = 18;
 	private static final int MP_CKPTDIR_SELECTOR = 19;
@@ -269,7 +268,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	private boolean ignoreModifyEvents = false;
 	private EventMonitor eventMonitor;
 	private Composite mainPanel;
-	private boolean useLoadLeveler = false;
+	private final boolean useLoadLeveler = false;
 	private TabFolder tabbedPane;
 	private ILaunchConfigurationWorkingCopy currentLaunchConfig;
 	private IResourceManager currentRM;
@@ -343,14 +342,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 	/*
 	 * Widgets for system resources tab
 	 */
-	@SuppressWarnings("unused")
 	private BooleanRowWidget mpAdapterUse;
-	@SuppressWarnings("unused")
 	private BooleanRowWidget mpCpuUse;
-	@SuppressWarnings("unused")
 	private ComboRowWidget mpEuiDevice;
 	private ComboRowWidget mpInstances;
-	@SuppressWarnings("unused")
 	private ComboRowWidget mpEuiLib;
 	/*
 	 * Widgets for node allocation tab
@@ -364,9 +359,8 @@ public class PERMLaunchConfigurationDynamicTab extends
 	private FileSelectorRowWidget mpRemoteDir;
 	private TextRowWidget mpTasksPerNode;
 	private FileSelectorRowWidget mpLLFile;
-	@SuppressWarnings( { "unused", "unused" })
-	private BooleanRowWidget mpNewJob;
 	@SuppressWarnings("unused")
+	private BooleanRowWidget mpNewJob;
 	private TextRowWidget mpRMPool;
 	private ComboRowWidget mpRetry;
 	private TextRowWidget mpRetryCount;
@@ -392,13 +386,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 	private BooleanRowWidget mpSharedMemory;
 	@SuppressWarnings("unused")
 	private BooleanRowWidget mpSingleThread;
-	@SuppressWarnings("unused")
 	private ComboRowWidget mpTaskAffinity;
 	private TextRowWidget mpUDPPacketSize;
 
 	@SuppressWarnings("unused")
 	private ComboRowWidget mpWaitMode;
-	@SuppressWarnings("unused")
 	private BooleanRowWidget mpUseBulkXfer;
 	private TextRowWidget mpBulkMinMsgSize;
 	/*
@@ -442,8 +434,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 		@SuppressWarnings("unused")
 		private ValidationException() {
-			throw new IllegalAccessError(
-					Messages.getString("PERMLaunchConfigurationDynamicTab.230")); //$NON-NLS-1$
+			throw new IllegalAccessError(Messages.getString("PERMLaunchConfigurationDynamicTab.230")); //$NON-NLS-1$
 		}
 
 		/**
@@ -550,8 +541,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 							"mpProfDirPath"); //$NON-NLS-1$
 					break;
 				case MP_PRIORITY_LOG_DIR_SELECTOR:
-					getDirectory(mpPriorityLogDir,
-							"File.mpPriorityLogDirTitle", //$NON-NLS-1$
+					getDirectory(mpPriorityLogDir, "File.mpPriorityLogDirTitle", //$NON-NLS-1$
 							"mpPriorityLogDirPath"); //$NON-NLS-1$
 					break;
 				case MP_CKPTDIR_SELECTOR:
@@ -595,14 +585,14 @@ public class PERMLaunchConfigurationDynamicTab extends
 				setPriorityDependentsState();
 			} else if (e.getSource() == mpRetry) {
 				setRetryDependentsState();
-			} else if ((mpLLFile != null)
-					&& (mpLLFile.isMatchingWidget((Widget) e.getSource()))) {
+			} else if ((mpLLFile != null) && (mpLLFile.isMatchingWidget((Widget) e.getSource()))) {
 				setLLFileDependentState();
 			}
 		}
 	}
 
-	public PERMLaunchConfigurationDynamicTab(IResourceManager rm) {
+	public PERMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
+		super(dialog);
 	}
 
 	/*
@@ -613,8 +603,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		if (allFieldsValid) {
 			return success;
 		}
@@ -668,16 +657,13 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param pathAttrID
 	 *            Launch configuration attribute id for saving path info
 	 */
-	protected void getInputFile(FileSelectorRowWidget selector, String titleID,
-			String pathAttrID) {
+	protected void getInputFile(FileSelectorRowWidget selector, String titleID, String pathAttrID) {
 		String selectedFile = null;
 
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell,
-					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0);
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
@@ -698,16 +684,13 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param pathAttrID
 	 *            Launch configuration attribute id for saving path info
 	 */
-	protected void getOutputFile(FileSelectorRowWidget selector,
-			String titleID, String pathAttrID) {
+	protected void getOutputFile(FileSelectorRowWidget selector, String titleID, String pathAttrID) {
 		String selectedFile = null;
 
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell,
-					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0);
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
@@ -728,16 +711,14 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param pathAttrID
 	 *            Launch configuration attribute id for saving path info
 	 */
-	protected void getDirectory(FileSelectorRowWidget selector, String titleID,
-			String pathAttrID) {
+	protected void getDirectory(FileSelectorRowWidget selector, String titleID, String pathAttrID) {
 		String selectedFile = null;
 
 		if (remoteUIService != null) {
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseDirectory(parentShell,
-					Messages.getString(titleID), getFileDialogPath(pathAttrID),
-					0).toString();
+			selectedFile = fmgr.browseDirectory(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0)
+					.toString();
 		}
 		if (selectedFile != null) {
 			String parentDir;
@@ -931,8 +912,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return TextRowWidget entry widget
 	 */
-	private TextRowWidget createTextWidget(Composite parent,
-			IResourceManager rm, String id) {
+	private TextRowWidget createTextWidget(Composite parent, IResourceManager rm, String id) {
 		TextRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -961,8 +941,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for second rm attribute this widget represents
 	 * @return Text entry widget
 	 */
-	private DualFieldRowWidget createDualField(Composite parent,
-			IResourceManager rm, String id1, String id2) {
+	private DualFieldRowWidget createDualField(Composite parent, IResourceManager rm, String id1, String id2) {
 		DualFieldRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr1;
 		IAttributeDefinition<?, ?, ?> attr2;
@@ -992,8 +971,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private CheckboxRowWidget createCheckbox(Composite parent,
-			IResourceManager rm, String id) {
+	private CheckboxRowWidget createCheckbox(Composite parent, IResourceManager rm, String id) {
 		CheckboxRowWidget widget;
 		StringAttributeDefinition attrDef;
 
@@ -1018,8 +996,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private BooleanRowWidget createBooleanOption(Composite parent,
-			IResourceManager rm, String id) {
+	private BooleanRowWidget createBooleanOption(Composite parent, IResourceManager rm, String id) {
 		BooleanRowWidget widget;
 		StringSetAttributeDefinition attrDef;
 
@@ -1053,8 +1030,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            this widget
 	 * @return Text entry field for this attribute
 	 */
-	private FileSelectorRowWidget createFileSelector(Composite parent,
-			IResourceManager rm, String id, int selectorID) {
+	private FileSelectorRowWidget createFileSelector(Composite parent, IResourceManager rm, String id, int selectorID) {
 		FileSelectorRowWidget widget;
 		StringAttributeDefinition attr;
 
@@ -1083,8 +1059,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createCombobox(Composite parent,
-			IResourceManager rm, String id) {
+	private ComboRowWidget createCombobox(Composite parent, IResourceManager rm, String id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -1111,8 +1086,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Editable ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createEditableCombobox(Composite parent,
-			IResourceManager rm, String id) {
+	private ComboRowWidget createEditableCombobox(Composite parent, IResourceManager rm, String id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -1223,8 +1197,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 */
 	private void setPriorityDependentsState() {
 		if ((mpPriority.getValue().length() == 0)
-				|| (mpPriority.getValue().equals(getDefaultAttributeValue(
-						currentRM, MP_PRIORITY)))) {
+				|| (mpPriority.getValue().equals(getDefaultAttributeValue(currentRM, MP_PRIORITY)))) {
 			if (mpPriorityLog != null) {
 				mpPriorityLog.setEnabled(false);
 			}
@@ -1373,8 +1346,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab.setControl(tasksTabPane);
 		tab.setText(Messages.getString("TasksTab.title")); //$NON-NLS-1$
 		tasksTabPane.setLayout(createTabPaneLayout());
-		mpHostFile = createFileSelector(tasksTabPane, rm, MP_HOSTFILE,
-				MP_HOSTFILE_SELECTOR);
+		mpHostFile = createFileSelector(tasksTabPane, rm, MP_HOSTFILE, MP_HOSTFILE_SELECTOR);
 		mpProcs = createTextWidget(tasksTabPane, rm, MP_PROCS);
 		mpNodes = createTextWidget(tasksTabPane, rm, MP_NODES);
 		mpTasksPerNode = createTextWidget(tasksTabPane, rm, MP_TASKS_PER_NODE);
@@ -1414,8 +1386,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab.setControl(diagTabPane);
 		tab.setText(Messages.getString("DIAGTab.title")); //$NON-NLS-1$
 		diagTabPane.setLayout(createTabPaneLayout());
-		mpPmdLogDir = createFileSelector(diagTabPane, rm, MP_PMDLOG_DIR,
-				MP_PMDLOG_DIR_SELECTOR);
+		mpPmdLogDir = createFileSelector(diagTabPane, rm, MP_PMDLOG_DIR, MP_PMDLOG_DIR_SELECTOR);
 		mpInfoLevel = createCombobox(diagTabPane, rm, MP_INFOLEVEL);
 		mpPrintEnv = createEditableCombobox(diagTabPane, rm, MP_PRINTENV);
 		mpPMDLog = createBooleanOption(diagTabPane, rm, MP_PMDLOG);
@@ -1438,18 +1409,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab.setText(Messages.getString("DEBUGTab.title")); //$NON-NLS-1$
 		debugTabPane.setLayout(createTabPaneLayout());
 		mpEuiDevelop = createCombobox(debugTabPane, rm, MP_EUIDEVELOP);
-		mpCorefileFormat = createEditableCombobox(debugTabPane, rm,
-				MP_COREFILE_FORMAT);
-		mpCoreDir = createFileSelector(debugTabPane, rm, MP_COREDIR,
-				MP_COREDIR_SELECTOR);
-		mpProfDir = createFileSelector(debugTabPane, rm, MP_PROFDIR,
-				MP_PROFDIR_SELECTOR);
-		mpDebugInitialStop = createTextWidget(debugTabPane, rm,
-				MP_DEBUG_INITIAL_STOP);
-		mpDebugNotimeout = createBooleanOption(debugTabPane, rm,
-				MP_DEBUG_NOTIMEOUT);
-		mpCorefileSigterm = createBooleanOption(debugTabPane, rm,
-				MP_COREFILE_SIGTERM);
+		mpCorefileFormat = createEditableCombobox(debugTabPane, rm, MP_COREFILE_FORMAT);
+		mpCoreDir = createFileSelector(debugTabPane, rm, MP_COREDIR, MP_COREDIR_SELECTOR);
+		mpProfDir = createFileSelector(debugTabPane, rm, MP_PROFDIR, MP_PROFDIR_SELECTOR);
+		mpDebugInitialStop = createTextWidget(debugTabPane, rm, MP_DEBUG_INITIAL_STOP);
+		mpDebugNotimeout = createBooleanOption(debugTabPane, rm, MP_DEBUG_NOTIMEOUT);
+		mpCorefileSigterm = createBooleanOption(debugTabPane, rm, MP_COREFILE_SIGTERM);
 	}
 
 	/**
@@ -1487,12 +1452,9 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab.setControl(nodeTabPane);
 		tab.setText(Messages.getString("NODETab.title")); //$NON-NLS-1$
 		nodeTabPane.setLayout(createTabPaneLayout());
-		mpCmdFile = createFileSelector(nodeTabPane, rm, MP_CMDFILE,
-				MP_CMDFILE_SELECTOR);
-		mpRemoteDir = createFileSelector(nodeTabPane, rm, MP_REMOTEDIR,
-				MP_REMOTEDIR_SELECTOR);
-		mpLLFile = createFileSelector(nodeTabPane, rm, MP_LLFILE,
-				MP_LLFILE_SELECTOR);
+		mpCmdFile = createFileSelector(nodeTabPane, rm, MP_CMDFILE, MP_CMDFILE_SELECTOR);
+		mpRemoteDir = createFileSelector(nodeTabPane, rm, MP_REMOTEDIR, MP_REMOTEDIR_SELECTOR);
+		mpLLFile = createFileSelector(nodeTabPane, rm, MP_LLFILE, MP_LLFILE_SELECTOR);
 		mpRMPool = createTextWidget(nodeTabPane, rm, MP_RMPOOL);
 		mpRetryCount = createTextWidget(nodeTabPane, rm, MP_RETRY_COUNT);
 		mpPgmModel = createCombobox(nodeTabPane, rm, MP_PGMMODEL);
@@ -1519,24 +1481,16 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab.setText(Messages.getString("PERFTab1.title")); //$NON-NLS-1$
 		performanceTab1Pane.setLayout(createTabPaneLayout());
 		mpAckThresh = createTextWidget(performanceTab1Pane, rm, MP_ACK_THRESH);
-		mpPollingInterval = createTextWidget(performanceTab1Pane, rm,
-				MP_POLLING_INTERVAL);
+		mpPollingInterval = createTextWidget(performanceTab1Pane, rm, MP_POLLING_INTERVAL);
 		mpPriority = createTextWidget(performanceTab1Pane, rm, MP_PRIORITY);
-		mpBulkMinMsgSize = createTextWidget(performanceTab1Pane, rm,
-				MP_BULK_MIN_MSG_SIZE);
-		mpUDPPacketSize = createTextWidget(performanceTab1Pane, rm,
-				MP_UDP_PACKET_SIZE);
-		peRDMACount = createDualField(performanceTab1Pane, rm, PE_RDMA_COUNT,
-				PE_RDMA_COUNT_2);
+		mpBulkMinMsgSize = createTextWidget(performanceTab1Pane, rm, MP_BULK_MIN_MSG_SIZE);
+		mpUDPPacketSize = createTextWidget(performanceTab1Pane, rm, MP_UDP_PACKET_SIZE);
+		peRDMACount = createDualField(performanceTab1Pane, rm, PE_RDMA_COUNT, PE_RDMA_COUNT_2);
 		mpWaitMode = createCombobox(performanceTab1Pane, rm, MP_WAIT_MODE);
-		mpPriorityNTP = createBooleanOption(performanceTab1Pane, rm,
-				MP_PRIORITY_NTP);
-		mpCCScratchBuf = createBooleanOption(performanceTab1Pane, rm,
-				MP_CC_SCRATCH_BUF);
-		mpCSSInterrupt = createBooleanOption(performanceTab1Pane, rm,
-				MP_CSS_INTERRUPT);
-		mpUseBulkXfer = createBooleanOption(performanceTab1Pane, rm,
-				MP_USE_BULK_XFER);
+		mpPriorityNTP = createBooleanOption(performanceTab1Pane, rm, MP_PRIORITY_NTP);
+		mpCCScratchBuf = createBooleanOption(performanceTab1Pane, rm, MP_CC_SCRATCH_BUF);
+		mpCSSInterrupt = createBooleanOption(performanceTab1Pane, rm, MP_CSS_INTERRUPT);
+		mpUseBulkXfer = createBooleanOption(performanceTab1Pane, rm, MP_USE_BULK_XFER);
 	}
 
 	/**
@@ -1553,23 +1507,15 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab.setControl(performanceTab2Pane);
 		tab.setText(Messages.getString("PERFTab2.title")); //$NON-NLS-1$
 		performanceTab2Pane.setLayout(createTabPaneLayout());
-		peBufferMem = createDualField(performanceTab2Pane, rm, PE_BUFFER_MEM,
-				PE_BUFFER_MEM_MAX);
-		mpMsgEnvelopeBuf = createTextWidget(performanceTab2Pane, rm,
-				MP_MSG_ENVELOPE_BUF);
+		peBufferMem = createDualField(performanceTab2Pane, rm, PE_BUFFER_MEM, PE_BUFFER_MEM_MAX);
+		mpMsgEnvelopeBuf = createTextWidget(performanceTab2Pane, rm, MP_MSG_ENVELOPE_BUF);
 		mpEagerLimit = createTextWidget(performanceTab2Pane, rm, MP_EAGER_LIMIT);
-		mpRetransmitInterval = createTextWidget(performanceTab2Pane, rm,
-				MP_RETRANSMIT_INTERVAL);
-		mpRexmitBufCnt = createTextWidget(performanceTab2Pane, rm,
-				MP_REXMIT_BUF_CNT);
-		mpRexmitBufSize = createTextWidget(performanceTab2Pane, rm,
-				MP_REXMIT_BUF_SIZE);
-		mpTaskAffinity = createEditableCombobox(performanceTab2Pane, rm,
-				MP_TASK_AFFINITY);
-		mpSharedMemory = createBooleanOption(performanceTab2Pane, rm,
-				MP_SHARED_MEMORY);
-		mpSingleThread = createBooleanOption(performanceTab2Pane, rm,
-				MP_SINGLE_THREAD);
+		mpRetransmitInterval = createTextWidget(performanceTab2Pane, rm, MP_RETRANSMIT_INTERVAL);
+		mpRexmitBufCnt = createTextWidget(performanceTab2Pane, rm, MP_REXMIT_BUF_CNT);
+		mpRexmitBufSize = createTextWidget(performanceTab2Pane, rm, MP_REXMIT_BUF_SIZE);
+		mpTaskAffinity = createEditableCombobox(performanceTab2Pane, rm, MP_TASK_AFFINITY);
+		mpSharedMemory = createBooleanOption(performanceTab2Pane, rm, MP_SHARED_MEMORY);
+		mpSingleThread = createBooleanOption(performanceTab2Pane, rm, MP_SINGLE_THREAD);
 	}
 
 	/**
@@ -1591,32 +1537,21 @@ public class PERMLaunchConfigurationDynamicTab extends
 		mpTLPRequired = createCombobox(miscTabPane, rm, MP_TLP_REQUIRED);
 		mpDevType = createCombobox(miscTabPane, rm, MP_DEVTYPE);
 		mpLAPITraceLevel = createCombobox(miscTabPane, rm, MP_LAPI_TRACE_LEVEL);
-		mpEuiLibPath = createFileSelector(miscTabPane, rm, MP_EUILIBPATH,
-				MP_EUILIBPATH_SELECTOR);
-		mpSaveLLFile = createFileSelector(miscTabPane, rm, MP_SAVE_LLFILE,
-				MP_SAVE_LLFILE_SELECTOR);
-		mpSaveHostFile = createFileSelector(miscTabPane, rm, MP_SAVEHOSTFILE,
-				MP_SAVEHOSTFILE_SELECTOR);
-		mpPriorityLogDir = createFileSelector(miscTabPane, rm,
-				MP_PRIORITY_LOG_DIR, MP_PRIORITY_LOG_DIR_SELECTOR);
-		mpPriorityLogName = createTextWidget(miscTabPane, rm,
-				MP_PRIORITY_LOG_NAME);
-		mpCkptDir = createFileSelector(miscTabPane, rm, MP_CKPTDIR,
-				MP_CKPTDIR_SELECTOR);
-		mpCkptFile = createFileSelector(miscTabPane, rm, MP_CKPTFILE,
-				MP_CKPTFILE_SELECTOR);
-		mpIONodeFile = createFileSelector(miscTabPane, rm, MP_IONODEFILE,
-				MP_IONODEFILE_SELECTOR);
+		mpEuiLibPath = createFileSelector(miscTabPane, rm, MP_EUILIBPATH, MP_EUILIBPATH_SELECTOR);
+		mpSaveLLFile = createFileSelector(miscTabPane, rm, MP_SAVE_LLFILE, MP_SAVE_LLFILE_SELECTOR);
+		mpSaveHostFile = createFileSelector(miscTabPane, rm, MP_SAVEHOSTFILE, MP_SAVEHOSTFILE_SELECTOR);
+		mpPriorityLogDir = createFileSelector(miscTabPane, rm, MP_PRIORITY_LOG_DIR, MP_PRIORITY_LOG_DIR_SELECTOR);
+		mpPriorityLogName = createTextWidget(miscTabPane, rm, MP_PRIORITY_LOG_NAME);
+		mpCkptDir = createFileSelector(miscTabPane, rm, MP_CKPTDIR, MP_CKPTDIR_SELECTOR);
+		mpCkptFile = createFileSelector(miscTabPane, rm, MP_CKPTFILE, MP_CKPTFILE_SELECTOR);
+		mpIONodeFile = createFileSelector(miscTabPane, rm, MP_IONODEFILE, MP_IONODEFILE_SELECTOR);
 		mpPulse = createTextWidget(miscTabPane, rm, MP_PULSE);
-		mpThreadStackSize = createTextWidget(miscTabPane, rm,
-				MP_THREAD_STACKSIZE);
+		mpThreadStackSize = createTextWidget(miscTabPane, rm, MP_THREAD_STACKSIZE);
 		mpTimeout = createTextWidget(miscTabPane, rm, MP_TIMEOUT);
 		mpIOBufferSize = createTextWidget(miscTabPane, rm, MP_IO_BUFFER_SIZE);
-		mpHintsFiltered = createBooleanOption(miscTabPane, rm,
-				MP_HINTS_FILTERED);
+		mpHintsFiltered = createBooleanOption(miscTabPane, rm, MP_HINTS_FILTERED);
 		mpIOErrLog = createBooleanOption(miscTabPane, rm, MP_IO_ERRLOG);
-		mpCkptDirPerTask = createBooleanOption(miscTabPane, rm,
-				MP_CKPTDIR_PERTASK);
+		mpCkptDirPerTask = createBooleanOption(miscTabPane, rm, MP_CKPTDIR_PERTASK);
 	}
 
 	/**
@@ -1633,8 +1568,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		tab.setControl(alternateRMTabPane);
 		tab.setText(Messages.getString("RMTab.title")); //$NON-NLS-1$
 		alternateRMTabPane.setLayout(createTabPaneLayout());
-		mpRMLib = createFileSelector(alternateRMTabPane, rm, MP_RMLIB,
-				MP_RMLIB_SELECTOR);
+		mpRMLib = createFileSelector(alternateRMTabPane, rm, MP_RMLIB, MP_RMLIB_SELECTOR);
 	}
 
 	/**
@@ -1660,12 +1594,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 		pane.setLayoutData(gd);
 		peAdvancedMode = createCheckbox(pane, rm, PE_ADVANCED_MODE);
 		if (peAdvancedMode != null) {
-			peAdvancedMode.setData(WidgetAttributes.BUTTON_ID,
-					(Object) new Integer(PE_ADVANCED_MODE_CHECKBOX));
+			peAdvancedMode.setData(WidgetAttributes.BUTTON_ID, new Integer(PE_ADVANCED_MODE_CHECKBOX));
 			peAdvancedMode.addSelectionListener(eventMonitor);
 		}
-		peEnvScript = createFileSelector(pane, rm, PE_ENV_SCRIPT,
-				PE_ENV_SCRIPT_SELECTOR);
+		peEnvScript = createFileSelector(pane, rm, PE_ENV_SCRIPT, PE_ENV_SCRIPT_SELECTOR);
 	}
 
 	/**
@@ -1688,12 +1620,9 @@ public class PERMLaunchConfigurationDynamicTab extends
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.grabExcessHorizontalSpace = true;
 		pane.setLayoutData(gd);
-		peStdinPath = createFileSelector(pane, rm, PE_STDIN_PATH,
-				PE_STDIN_PATH_SELECTOR);
-		peStdoutPath = createFileSelector(pane, rm, PE_STDOUT_PATH,
-				PE_STDOUT_PATH_SELECTOR);
-		peStderrPath = createFileSelector(pane, rm, PE_STDERR_PATH,
-				PE_STDERR_PATH_SELECTOR);
+		peStdinPath = createFileSelector(pane, rm, PE_STDIN_PATH, PE_STDIN_PATH_SELECTOR);
+		peStdoutPath = createFileSelector(pane, rm, PE_STDOUT_PATH, PE_STDOUT_PATH_SELECTOR);
+		peStderrPath = createFileSelector(pane, rm, PE_STDERR_PATH, PE_STDERR_PATH_SELECTOR);
 	}
 
 	/**
@@ -1707,17 +1636,14 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IResourceManager rm,
-			IPQueue queue) {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
 		IPEResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 
-		config = (IPEResourceManagerConfiguration) ((AbstractResourceManager) rm)
-				.getConfiguration();
-		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-				config.getRemoteServicesId());
-		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
-				remoteService);
+		config = (IPEResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
+		remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
+				getLaunchConfigurationDialog());
+		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
 		connMgr = remoteService.getConnectionManager();
 		remoteConnection = connMgr.getConnection(config.getConnectionName());
 		parentShell = parent.getShell();
@@ -1759,8 +1685,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param attrName
 	 *            The name of the attribute to be added to launch attributes
 	 */
-	private void addAttribute(IResourceManager rm, ILaunchConfiguration config,
-			Vector<StringAttribute> attrs, String attrName) {
+	private void addAttribute(IResourceManager rm, ILaunchConfiguration config, Vector<StringAttribute> attrs, String attrName) {
 		String attrValue;
 		String defaultValue;
 		StringAttribute attr;
@@ -1796,10 +1721,9 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param configuration
 	 *            The current launch configuration
 	 */
-	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(
-			IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration, String mode)
-			throws CoreException {
+	@SuppressWarnings("unchecked")
+	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManager rm, IPQueue queue,
+			ILaunchConfiguration configuration, String mode) throws CoreException {
 		Vector<StringAttribute> attrs;
 		StringAttribute attrArray[];
 
@@ -1824,8 +1748,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 						tokens = envData.split("="); //$NON-NLS-1$
 						if (tokens.length == 2) {
-							attrDef = new StringAttributeDefinition(tokens[0],
-									"", "", false, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							attrDef = new StringAttributeDefinition(tokens[0], "", "", false, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							attr = new StringAttribute(attrDef, tokens[1]);
 							attrs.add(attr);
 						}
@@ -1947,8 +1870,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrInitialValue(ILaunchConfiguration config,
-			IResourceManager rm, String attrName) {
+	private String getAttrInitialValue(ILaunchConfiguration config, IResourceManager rm, String attrName) {
 		String value;
 		IAttributeDefinition<?, ?, ?> rmAttrDef;
 
@@ -1974,8 +1896,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		// string
 		// value is returned in thecase of a NumberFormatException
 		rmAttrDef = rm.getAttributeDefinition(attrName);
-		if (rmAttrDef instanceof IntegerAttributeDefinition
-				|| rmAttrDef instanceof BigIntegerAttributeDefinition) {
+		if (rmAttrDef instanceof IntegerAttributeDefinition || rmAttrDef instanceof BigIntegerAttributeDefinition) {
 			long intVal;
 
 			try {
@@ -2011,8 +1932,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param checkValue
 	 *            The value corresponding to a checked checkbox
 	 */
-	private void setValue(CheckboxRowWidget checkbox, String attrValue,
-			String checkValue) {
+	private void setValue(CheckboxRowWidget checkbox, String attrValue, String checkValue) {
 		if (checkbox != null) {
 			if (attrValue.equals(checkValue)) {
 				checkbox.setSelection(true);
@@ -2054,8 +1974,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param value2
 	 *            The value to be set in field 2
 	 */
-	private void setValue(DualFieldRowWidget widget, String value1,
-			String value2) {
+	private void setValue(DualFieldRowWidget widget, String value1, String value2) {
 		if (widget != null) {
 			widget.setValue(value1, value2);
 		}
@@ -2099,8 +2018,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            The resource manager currently associated with the launch
 	 *            configuration
 	 */
-	private void setInitialValues(ILaunchConfiguration config,
-			IResourceManager rm) {
+	private void setInitialValues(ILaunchConfiguration config, IResourceManager rm) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -2126,29 +2044,23 @@ public class PERMLaunchConfigurationDynamicTab extends
 		while (i.hasNext()) {
 			widget = i.next();
 			if (widget instanceof FileSelectorRowWidget) {
-				setValue((FileSelectorRowWidget) widget, getAttrInitialValue(
-						config, rm, (String) ((FileSelectorRowWidget) widget)
-								.getData()));
+				setValue((FileSelectorRowWidget) widget,
+						getAttrInitialValue(config, rm, (String) ((FileSelectorRowWidget) widget).getData()));
 			} else if (widget instanceof DualFieldRowWidget) {
-				setValue((DualFieldRowWidget) widget, getAttrInitialValue(
-						config, rm, (String) ((DualFieldRowWidget) widget)
-								.getData1()), getAttrInitialValue(config, rm,
-						(String) ((DualFieldRowWidget) widget).getData2()));
+				setValue((DualFieldRowWidget) widget,
+						getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData1()),
+						getAttrInitialValue(config, rm, (String) ((DualFieldRowWidget) widget).getData2()));
 			} else if (widget instanceof TextRowWidget) {
-				setValue((TextRowWidget) widget, getAttrInitialValue(config,
-						rm, ((TextRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)));
+				setValue((TextRowWidget) widget,
+						getAttrInitialValue(config, rm, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 			} else if (widget instanceof ComboRowWidget) {
-				setValue((ComboRowWidget) widget, getAttrInitialValue(config,
-						rm, ((ComboRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)));
+				setValue((ComboRowWidget) widget,
+						getAttrInitialValue(config, rm, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)));
 			} else if (widget instanceof BooleanRowWidget) {
-				setValue((BooleanRowWidget) widget, getAttrInitialValue(config,
-						rm, ((BooleanRowWidget) widget).getData()));
+				setValue((BooleanRowWidget) widget, getAttrInitialValue(config, rm, ((BooleanRowWidget) widget).getData()));
 			} else if (widget instanceof CheckboxRowWidget) {
-				setValue((CheckboxRowWidget) widget, getAttrInitialValue(
-						config, rm, ((CheckboxRowWidget) widget)
-								.getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
+				setValue((CheckboxRowWidget) widget,
+						getAttrInitialValue(config, rm, ((CheckboxRowWidget) widget).getData(WidgetAttributes.ATTR_NAME)), "yes"); //$NON-NLS-1$
 			}
 
 		}
@@ -2173,9 +2085,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		boolean enableState;
 
 		mpPriorityDefaultValue = getDefaultAttributeValue(rm, MP_PRIORITY);
-		if ((mpPriority != null)
-				&& ((mpPriority.getValue().length() == 0) || mpPriority
-						.getValue().equals(mpPriorityDefaultValue))) {
+		if ((mpPriority != null) && ((mpPriority.getValue().length() == 0) || mpPriority.getValue().equals(mpPriorityDefaultValue))) {
 			enableState = false;
 		} else {
 			enableState = true;
@@ -2214,8 +2124,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @return The default attribute value or empty string if value cannot be
 	 *         retrieved
 	 */
-	private String getDefaultAttributeValue(IResourceManager rm,
-			String attributeName) {
+	private String getDefaultAttributeValue(IResourceManager rm, String attributeName) {
 		String defaultValue;
 
 		try {
@@ -2242,9 +2151,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control,
-			IResourceManager rm, IPQueue queue,
-			ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
 			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
 		}
@@ -2261,8 +2168,8 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration,
-			IResourceManager rm, IPQueue queue) {
+	@SuppressWarnings("unchecked")
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
 		// If running in basic mode, then any PE command line options and
 		// environment variables are disallowed since those settings may
 		// conflict with what is specified in the resources tab panel.
@@ -2275,14 +2182,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 			try {
 				Iterator<String> iter;
-				environment = configuration.getAttribute(
-						"org.eclipse.debug.core.environmentVariables", //$NON-NLS-1$
+				environment = configuration.getAttribute("org.eclipse.debug.core.environmentVariables", //$NON-NLS-1$
 						new HashMap<String, String>());
 				iter = environment.keySet().iterator();
 				while (iter.hasNext()) {
 					if (Arrays.binarySearch(PEEnvVars, iter.next()) >= 0) {
-						return new RMLaunchValidation(false, Messages
-								.getString("Invalid.disallowedEnvVar")); //$NON-NLS-1$
+						return new RMLaunchValidation(false, Messages.getString("Invalid.disallowedEnvVar")); //$NON-NLS-1$
 					}
 				}
 				// If MP_NOARGLIST or MP_FENCE environment variables are set
@@ -2294,8 +2199,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 					if (optionsFence == null) {
 						optionsFence = ""; //$NON-NLS-1$
 					}
-					commandOptions = configuration.getAttribute(
-							"org.eclipse.ptp.launch.ARGUMENT_ATTR", ""); //$NON-NLS-1$ //$NON-NLS-2$
+					commandOptions = configuration.getAttribute("org.eclipse.ptp.launch.ARGUMENT_ATTR", ""); //$NON-NLS-1$ //$NON-NLS-2$
 					tokenizedOptions = new StringTokenizer(commandOptions, " "); //$NON-NLS-1$
 					while (tokenizedOptions.hasMoreTokens()) {
 						String option;
@@ -2305,8 +2209,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 							break;
 						}
 						if (Arrays.binarySearch(PEOptions, option) >= 0) {
-							return new RMLaunchValidation(false, Messages
-									.getString("Invalid.disallowedOption")); //$NON-NLS-1$
+							return new RMLaunchValidation(false, Messages.getString("Invalid.disallowedOption")); //$NON-NLS-1$
 						}
 					}
 				}
@@ -2333,8 +2236,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			IResourceManager rm, String attr, TextRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, IResourceManager rm, String attr, TextRowWidget control) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
 		if (control != null) {
@@ -2342,8 +2244,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 			attrDef = rm.getAttributeDefinition(attr);
 			try {
-				if ((attrDef instanceof IntegerAttributeDefinition)
-						|| (attrDef instanceof BigIntegerAttributeDefinition)) {
+				if ((attrDef instanceof IntegerAttributeDefinition) || (attrDef instanceof BigIntegerAttributeDefinition)) {
 					attrValue = getIntegerValue(control.getValue());
 				} else {
 					attrValue = control.getValue();
@@ -2367,8 +2268,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr1, String attr2, DualFieldRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr1, String attr2, DualFieldRowWidget control) {
 		if (control != null) {
 			String value[];
 
@@ -2389,8 +2289,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, ComboRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, ComboRowWidget control) {
 		if (control != null) {
 			config.setAttribute(attr, control.getValue());
 		}
@@ -2407,8 +2306,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, FileSelectorRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, FileSelectorRowWidget control) {
 		if (control != null) {
 			config.setAttribute(attr, control.getValue());
 		}
@@ -2427,17 +2325,14 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @param trueVal
 	 *            The value to set if the button is selected
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, CheckboxRowWidget control, String trueVal,
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, CheckboxRowWidget control, String trueVal,
 			String falseVal) {
 		if (control != null) {
-			config.setAttribute(attr, (control.getSelection() ? trueVal
-					: falseVal));
+			config.setAttribute(attr, (control.getSelection() ? trueVal : falseVal));
 		}
 	}
 
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config,
-			String attr, BooleanRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, String attr, BooleanRowWidget control) {
 		if (control != null) {
 			config.setAttribute(attr, control.getValue());
 		}
@@ -2448,8 +2343,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * 
 	 * @param config
 	 */
-	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config,
-			IResourceManager rm) {
+	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IResourceManager rm) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -2458,30 +2352,19 @@ public class PERMLaunchConfigurationDynamicTab extends
 			while (i.hasNext()) {
 				widget = i.next();
 				if (widget instanceof TextRowWidget) {
-					setConfigAttr(config, rm, ((TextRowWidget) widget)
-							.getData(WidgetAttributes.ATTR_NAME),
-							(TextRowWidget) widget);
+					setConfigAttr(config, rm, ((TextRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (TextRowWidget) widget);
 				} else if (widget instanceof ComboRowWidget) {
-					setConfigAttr(config, (String) ((ComboRowWidget) widget)
-							.getData(WidgetAttributes.ATTR_NAME),
-							(ComboRowWidget) widget);
+					setConfigAttr(config, ((ComboRowWidget) widget).getData(WidgetAttributes.ATTR_NAME), (ComboRowWidget) widget);
 				} else if (widget instanceof CheckboxRowWidget) {
-					setConfigAttr(config, (String) ((CheckboxRowWidget) widget)
-							.getData(WidgetAttributes.ATTR_NAME),
+					setConfigAttr(config, ((CheckboxRowWidget) widget).getData(WidgetAttributes.ATTR_NAME),
 							(CheckboxRowWidget) widget, "yes", "no"); //$NON-NLS-1$ //$NON-NLS-2$
 				} else if (widget instanceof BooleanRowWidget) {
-					setConfigAttr(config, (String) ((BooleanRowWidget) widget)
-							.getData(), (BooleanRowWidget) widget);
+					setConfigAttr(config, ((BooleanRowWidget) widget).getData(), (BooleanRowWidget) widget);
 				} else if (widget instanceof FileSelectorRowWidget) {
-					setConfigAttr(
-							config,
-							(String) ((FileSelectorRowWidget) widget).getData(),
-							(FileSelectorRowWidget) widget);
+					setConfigAttr(config, (String) ((FileSelectorRowWidget) widget).getData(), (FileSelectorRowWidget) widget);
 				} else if (widget instanceof DualFieldRowWidget) {
-					setConfigAttr(config,
-							(String) ((DualFieldRowWidget) widget).getData1(),
-							(String) ((DualFieldRowWidget) widget).getData2(),
-							(DualFieldRowWidget) widget);
+					setConfigAttr(config, (String) ((DualFieldRowWidget) widget).getData1(),
+							(String) ((DualFieldRowWidget) widget).getData2(), (DualFieldRowWidget) widget);
 				}
 			}
 		}
@@ -2495,9 +2378,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(
-			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		currentLaunchConfig = configuration;
 		saveConfigurationData(configuration, rm);
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
@@ -2511,17 +2392,14 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(
-			ILaunchConfigurationWorkingCopy config, IResourceManager rm,
-			IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rm, IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		currentLaunchConfig = config;
 		rmAttrs = rm.getAttributes();
 		for (int i = 0; i < rmAttrs.length; i++) {
 			try {
-				config.setAttribute(rmAttrs[i].getDefinition().getId(),
-						rmAttrs[i].getDefinition().create().getValueAsString());
+				config.setAttribute(rmAttrs[i].getDefinition().getId(), rmAttrs[i].getDefinition().create().getValueAsString());
 			} catch (IllegalValueException e) {
 			}
 		}
@@ -2597,8 +2475,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(String value, String attrName,
-			String errorID) throws ValidationException {
+	private void validateNumericRange(String value, String attrName, String errorID) throws ValidationException {
 		int testValue;
 		int len;
 		char suffix;
@@ -2650,8 +2527,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		validateInputPath(mpHostFile, "Invalid.mpHostFile"); //$NON-NLS-1$
 		validateNumericRange(mpProcs, MP_PROCS, "Invalid.mpProcs"); //$NON-NLS-1$
 		validateNumericRange(mpNodes, MP_NODES, "Invalid.mpNodes"); //$NON-NLS-1$
-		validateNumericRange(mpTasksPerNode, MP_TASKS_PER_NODE,
-				"Invalid.mpTasksPerNode"); //$NON-NLS-1$
+		validateNumericRange(mpTasksPerNode, MP_TASKS_PER_NODE, "Invalid.mpTasksPerNode"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2703,14 +2579,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateNodeTab() throws ValidationException {
-		validateNumericRange(mpTasksPerNode, MP_TASKS_PER_NODE,
-				"Invalid.mpTasksPerNode"); //$NON-NLS-1$
+		validateNumericRange(mpTasksPerNode, MP_TASKS_PER_NODE, "Invalid.mpTasksPerNode"); //$NON-NLS-1$
 		validateInputPath(mpRemoteDir, "Invalid.mpRemoteDir"); //$NON-NLS-1$
 		validateInputPath(mpCmdFile, "Invalid.mpCmdFile"); //$NON-NLS-1$
 		validateInputPath(mpLLFile, "Invalid.mpLLFile"); //$NON-NLS-1$
 		validateRetry();
-		validateNumericRange(mpRetryCount, MP_RETRY_COUNT,
-				"Invalid.mpRetryCount"); //$NON-NLS-1$
+		validateNumericRange(mpRetryCount, MP_RETRY_COUNT, "Invalid.mpRetryCount"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2721,13 +2595,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 */
 	private void validatePerformanceTab1() throws ValidationException {
 		validateNumericRange(mpAckThresh, MP_ACK_THRESH, "Invalid.mpAckThresh"); //$NON-NLS-1$
-		validateNumericRange(mpPollingInterval, MP_POLLING_INTERVAL,
-				"Invalid.mpPollingInterval"); //$NON-NLS-1$
+		validateNumericRange(mpPollingInterval, MP_POLLING_INTERVAL, "Invalid.mpPollingInterval"); //$NON-NLS-1$
 		validateRDMACount();
-		validateNumericRange(mpUDPPacketSize, MP_UDP_PACKET_SIZE,
-				"Invalid.mpUDPPacketSize"); //$NON-NLS-1$
-		validateNumericRange(mpBulkMinMsgSize, MP_BULK_MIN_MSG_SIZE,
-				"Invalid.mpBulkMinMsgSize"); //$NON-NLS-1$
+		validateNumericRange(mpUDPPacketSize, MP_UDP_PACKET_SIZE, "Invalid.mpUDPPacketSize"); //$NON-NLS-1$
+		validateNumericRange(mpBulkMinMsgSize, MP_BULK_MIN_MSG_SIZE, "Invalid.mpBulkMinMsgSize"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2738,16 +2609,11 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 */
 	private void validatePerformanceTab2() throws ValidationException {
 		validateBufferMem();
-		validateNumericRange(mpMsgEnvelopeBuf, MP_MSG_ENVELOPE_BUF,
-				"Invalid.mpMsgEnvelopeBuf"); //$NON-NLS-1$
-		validateNumericRange(mpEagerLimit, MP_EAGER_LIMIT,
-				"Invalid.mpEagerLimit"); //$NON-NLS-1$
-		validateNumericRange(mpRetransmitInterval, MP_RETRANSMIT_INTERVAL,
-				"Invalid.mpRetransmitInterval"); //$NON-NLS-1$
-		validateNumericRange(mpRexmitBufCnt, MP_REXMIT_BUF_CNT,
-				"Invalid.mpRexmitBufCnt"); //$NON-NLS-1$
-		validateNumericRange(mpRexmitBufSize, MP_REXMIT_BUF_SIZE,
-				"Invalid.mpRexmitBufSize"); //$NON-NLS-1$
+		validateNumericRange(mpMsgEnvelopeBuf, MP_MSG_ENVELOPE_BUF, "Invalid.mpMsgEnvelopeBuf"); //$NON-NLS-1$
+		validateNumericRange(mpEagerLimit, MP_EAGER_LIMIT, "Invalid.mpEagerLimit"); //$NON-NLS-1$
+		validateNumericRange(mpRetransmitInterval, MP_RETRANSMIT_INTERVAL, "Invalid.mpRetransmitInterval"); //$NON-NLS-1$
+		validateNumericRange(mpRexmitBufCnt, MP_REXMIT_BUF_CNT, "Invalid.mpRexmitBufCnt"); //$NON-NLS-1$
+		validateNumericRange(mpRexmitBufSize, MP_REXMIT_BUF_SIZE, "Invalid.mpRexmitBufSize"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2769,11 +2635,9 @@ public class PERMLaunchConfigurationDynamicTab extends
 	private void validateMiscTab() throws ValidationException {
 		validateInputPath(mpEuiLibPath, "Invalid.mpEuiLibPath"); //$NON-NLS-1$
 		validateNumericRange(mpPulse, MP_PULSE, "Invalid.mpPulse"); //$NON-NLS-1$
-		validateNumericRange(mpThreadStackSize, MP_THREAD_STACKSIZE,
-				"Invalid.mpThreadStackSize"); //$NON-NLS-1$
+		validateNumericRange(mpThreadStackSize, MP_THREAD_STACKSIZE, "Invalid.mpThreadStackSize"); //$NON-NLS-1$
 		validateNumericRange(mpTimeout, MP_TIMEOUT, "Invalid.mpTimeout"); //$NON-NLS-1$
-		validateNumericRange(mpIOBufferSize, MP_IO_BUFFER_SIZE,
-				"Invalid.mpIOBufferSize"); //$NON-NLS-1$
+		validateNumericRange(mpIOBufferSize, MP_IO_BUFFER_SIZE, "Invalid.mpIOBufferSize"); //$NON-NLS-1$
 		validateOutputPath(mpSaveLLFile, "Invalid.mpSaveLLFile"); //$NON-NLS-1$
 		validateOutputPath(mpSaveHostFile, "Invalid.mpSaveHostFile"); //$NON-NLS-1$
 		validateDirectory(mpPriorityLogDir, "Invalid.mpPriorityLogDir"); //$NON-NLS-1$
@@ -2789,12 +2653,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            id of the error string used if file is inaccessible
 	 * @throws ValidationException
 	 */
-	private void validateInputPath(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException {
+	private void validateInputPath(FileSelectorRowWidget selector, String errorID) throws ValidationException {
 		String path;
 
-		if ((selector != null) && selector.isEnabled()
-				&& selector.isValidationRequired()) {
+		if ((selector != null) && selector.isEnabled() && selector.isValidationRequired()) {
 			path = selector.getValue();
 			if (path.length() == 0) {
 				selector.resetValidationState();
@@ -2819,12 +2681,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            id of the error string used if the file is inaccessible
 	 * @throws ValidationException
 	 */
-	private void validateOutputPath(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException {
+	private void validateOutputPath(FileSelectorRowWidget selector, String errorID) throws ValidationException {
 		String path;
 
-		if ((selector != null) && selector.isEnabled()
-				&& selector.isValidationRequired()) {
+		if ((selector != null) && selector.isEnabled() && selector.isValidationRequired()) {
 			path = selector.getValue();
 			if (path.length() == 0) {
 				selector.resetValidationState();
@@ -2849,8 +2709,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            id of the error string used if the file is inaccessible
 	 * @throws ValidationException
 	 */
-	private void validateInputPath(String path, String errorID)
-			throws ValidationException {
+	private void validateInputPath(String path, String errorID) throws ValidationException {
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
@@ -2859,13 +2718,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath.toString());
+		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
 		if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-}
+	}
 
 	/**
 	 * Validate that an output file is accessible
@@ -2876,8 +2734,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            id of the error string used if the file is not accessible
 	 * @throws ValidationException
 	 */
-	private void validateOutputPath(String path, String errorID)
-			throws ValidationException {
+	private void validateOutputPath(String path, String errorID) throws ValidationException {
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
@@ -2886,8 +2743,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
-		remoteResource = remoteService.getFileManager(remoteConnection)
-				.getResource(testPath.toString());
+		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
 		if (fileInfo.isDirectory()) {
 			throw new ValidationException(Messages.getString(errorID));
@@ -2903,15 +2759,13 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            id of the error string used if the directory is invalid
 	 * @throws ValidationException
 	 */
-	private void validateDirectory(FileSelectorRowWidget selector,
-			String errorID) throws ValidationException {
+	private void validateDirectory(FileSelectorRowWidget selector, String errorID) throws ValidationException {
 		String path;
 		IPath testPath;
 		IFileStore remoteResource;
 		IFileInfo fileInfo;
 
-		if ((selector != null) && selector.isEnabled()
-				&& selector.isValidationRequired()) {
+		if ((selector != null) && selector.isEnabled() && selector.isValidationRequired()) {
 			path = selector.getValue();
 			try {
 				if (path.length() == 0) {
@@ -2923,12 +2777,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 				if (!testPath.isValidPath(path)) {
 					throw new ValidationException(Messages.getString(errorID));
 				}
-				remoteResource = remoteService.getFileManager(
-						remoteConnection).getResource(testPath.toString());
+				remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 				fileInfo = remoteResource.fetchInfo();
 				if (!fileInfo.isDirectory()) {
-					throw new ValidationException(Messages
-							.getString(errorID));
+					throw new ValidationException(Messages.getString(errorID));
 				}
 				selector.resetValidationState();
 			} catch (ValidationException e) {
@@ -2958,11 +2810,9 @@ public class PERMLaunchConfigurationDynamicTab extends
 			try {
 				numProcs = Integer.valueOf(mpProcs.getValue());
 			} catch (NumberFormatException e) {
-				throw new ValidationException(Messages
-						.getString("Invalid.mpStdinMode")); //$NON-NLS-1$
+				throw new ValidationException(Messages.getString("Invalid.mpStdinMode")); //$NON-NLS-1$
 			}
-			validateNumericRange(widgetValue, 0, numProcs,
-					"Invalid.mpStdinMode"); //$NON-NLS-1$
+			validateNumericRange(widgetValue, 0, numProcs, "Invalid.mpStdinMode"); //$NON-NLS-1$
 		}
 	}
 
@@ -2986,18 +2836,15 @@ public class PERMLaunchConfigurationDynamicTab extends
 			try {
 				numProcs = Integer.valueOf(mpProcs.getValue());
 			} catch (NumberFormatException e) {
-				throw new ValidationException(Messages
-						.getString("Invalid.mpStdoutMode")); //$NON-NLS-1$
+				throw new ValidationException(Messages.getString("Invalid.mpStdoutMode")); //$NON-NLS-1$
 			}
-			validateNumericRange(widgetValue, 0, numProcs - 1,
-					"Invalid.mpStdoutMode"); //$NON-NLS-1$
+			validateNumericRange(widgetValue, 0, numProcs - 1, "Invalid.mpStdoutMode"); //$NON-NLS-1$
 		}
 	}
 
 	private void validateCorefileFormat() throws ValidationException {
 
-		if ((mpCorefileFormat != null) && mpCorefileFormat.isEnabled()
-				&& mpCorefileFormat.isValidationRequired()) {
+		if ((mpCorefileFormat != null) && mpCorefileFormat.isEnabled() && mpCorefileFormat.isValidationRequired()) {
 			String widgetValue;
 			widgetValue = mpCorefileFormat.getValue();
 			try {
@@ -3032,8 +2879,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 			if (isValidListSelection(mpInstances, MP_INSTANCES)) {
 				return;
 			}
-			validateNumericRange(widgetValue, MP_INSTANCES_INT,
-					"Invalid.mpInstances"); //$NON-NLS-1$
+			validateNumericRange(widgetValue, MP_INSTANCES_INT, "Invalid.mpInstances"); //$NON-NLS-1$
 		}
 	}
 
@@ -3068,16 +2914,13 @@ public class PERMLaunchConfigurationDynamicTab extends
 
 			widgetValue = peRDMACount.getValue();
 			if ((widgetValue[0].length() == 0) && (widgetValue[1].length() > 0)) {
-				throw new ValidationException(Messages
-						.getString("Invalid.peRDMACountPair")); //$NON-NLS-1$
+				throw new ValidationException(Messages.getString("Invalid.peRDMACountPair")); //$NON-NLS-1$
 			}
 			if (widgetValue[0].length() > 0) {
-				validateNumericRange(widgetValue[0], PE_BUFFER_MEM,
-						"Invalid.peRDMACount"); //$NON-NLS-1$
+				validateNumericRange(widgetValue[0], PE_BUFFER_MEM, "Invalid.peRDMACount"); //$NON-NLS-1$
 			}
 			if (widgetValue[1].length() > 0) {
-				validateLongNumericRange(widgetValue[1], PE_BUFFER_MEM_MAX,
-						"Invalid.peRDMACount"); //$NON-NLS-1$
+				validateLongNumericRange(widgetValue[1], PE_BUFFER_MEM_MAX, "Invalid.peRDMACount"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -3088,19 +2931,16 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 */
 	private void validateBufferMem() throws ValidationException {
-		if (peBufferMem != null && peBufferMem.isEnabled()
-				&& peBufferMem.isValidationRequired()) {
+		if (peBufferMem != null && peBufferMem.isEnabled() && peBufferMem.isValidationRequired()) {
 			String widgetValue[];
 
 			widgetValue = peBufferMem.getValue();
 			try {
 				if (widgetValue[0].length() > 0) {
-					validateNumericRange(widgetValue[0], PE_BUFFER_MEM,
-							"Invalid.peBufferMem"); //$NON-NLS-1$
+					validateNumericRange(widgetValue[0], PE_BUFFER_MEM, "Invalid.peBufferMem"); //$NON-NLS-1$
 				}
 				if (widgetValue[1].length() > 0) {
-					validateLongNumericRange(widgetValue[1], PE_BUFFER_MEM_MAX,
-							"Invalid.peBufferMem2"); //$NON-NLS-1$
+					validateLongNumericRange(widgetValue[1], PE_BUFFER_MEM_MAX, "Invalid.peBufferMem2"); //$NON-NLS-1$
 				}
 				peBufferMem.resetValidationState();
 			} catch (ValidationException e) {
@@ -3126,8 +2966,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 		@SuppressWarnings("unused")
 		StringSetAttribute attr;
 
-		attrDef = (StringSetAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
+		attrDef = (StringSetAttributeDefinition) currentRM.getAttributeDefinition(attrName);
 		if (attrDef != null) {
 			try {
 				attr = attrDef.create(widget.getValue());
@@ -3152,12 +2991,10 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(TextRowWidget control, String attrName,
-			String errorID) throws ValidationException {
+	private void validateNumericRange(TextRowWidget control, String attrName, String errorID) throws ValidationException {
 		String value;
 
-		if ((control != null) && control.isEnabled()
-				&& control.isValidationRequired()) {
+		if ((control != null) && control.isEnabled() && control.isValidationRequired()) {
 			value = control.getValue();
 			if (value.length() > 0) {
 				try {
@@ -3184,14 +3021,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateNumericRange(int value, String attrName, String errorID)
-			throws ValidationException {
+	private void validateNumericRange(int value, String attrName, String errorID) throws ValidationException {
 		IntegerAttributeDefinition attrDef;
 		@SuppressWarnings("unused")
 		IntegerAttribute attr;
 
-		attrDef = (IntegerAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
+		attrDef = (IntegerAttributeDefinition) currentRM.getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {
@@ -3251,14 +3086,12 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
-	private void validateLongNumericRange(String value, String attrName,
-			String errorID) throws ValidationException {
+	private void validateLongNumericRange(String value, String attrName, String errorID) throws ValidationException {
 		BigIntegerAttributeDefinition attrDef;
 		@SuppressWarnings("unused")
 		BigIntegerAttribute attr;
 
-		attrDef = (BigIntegerAttributeDefinition) currentRM
-				.getAttributeDefinition(attrName);
+		attrDef = (BigIntegerAttributeDefinition) currentRM.getAttributeDefinition(attrName);
 		try {
 			attr = attrDef.create(value);
 		} catch (IllegalValueException e) {
@@ -3280,8 +3113,7 @@ public class PERMLaunchConfigurationDynamicTab extends
 	 *            range
 	 * @throws ValidationException
 	 */
-	private void validateNumericRange(String value, int lowLimit,
-			int highLimit, String errorID) throws ValidationException {
+	private void validateNumericRange(String value, int lowLimit, int highLimit, String errorID) throws ValidationException {
 		int n;
 
 		try {

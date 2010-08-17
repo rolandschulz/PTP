@@ -840,7 +840,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
-			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
+			IWizardContainer container = null;
+			if (getControl().isVisible()) {
+				container = getWizard().getContainer();
+			}
+			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null)
 				connection = remoteServices.getConnectionManager().getConnection(conn);

@@ -23,68 +23,94 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 
-
 /**
  * Abstract class that is the extension point for contributing
  * ConfigurationWizardPages to this plug-in.
- *
+ * 
  * @author rsqrd
- *
+ * 
  */
 public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaunchConfigurationDynamicTab {
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
-	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
-	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();
 
 	/**
 	 * @param string
 	 * @return
 	 */
 	protected static CoreException makeCoreException(String string) {
-		IStatus status = new Status(Status.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-				Status.ERROR, string, null);
+		IStatus status = new Status(Status.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), Status.ERROR, string, null);
 		return new CoreException(status);
 	}
 
+	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
+	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();
+
+	private final ILaunchConfigurationDialog fLaunchDialog;
+
 	private final ListenerList listenerList = new ListenerList();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#addContentsChangedListener(org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener)
+	/**
+	 * @since 5.0
+	 */
+	public AbstractRMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
+		fLaunchDialog = dialog;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #addContentsChangedListener(org.eclipse.ptp.launch.ui.extensions.
+	 * IRMLaunchConfigurationContentsChangedListener)
 	 */
 	public void addContentsChangedListener(IRMLaunchConfigurationContentsChangedListener listener) {
 		listenerList.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#removeContentsChangedListener(org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener)
+	/**
+	 * @param queue
+	 * @param index
 	 */
-	public void removeContentsChangedListener(IRMLaunchConfigurationContentsChangedListener listener) {
-		listenerList.remove(listener);
+	public void addQueue(IPQueue queue, int index) {
+		queues.put(index, queue);
+		queueIndices.put(queue, index);
 	}
 
 	/**
-	 * This should be called when GUI elements are modified by the user,
-	 * e.g. a Text widget should have its ModifyListener's
-	 * modifyText method set up to notify all of the contents
-	 * changed listeners.
+	 *
 	 */
-	protected void fireContentsChanged() {
-		Object[] listeners = listenerList.getListeners();
-		for (Object listener : listeners) {
-			((IRMLaunchConfigurationContentsChangedListener) listener).handleContentsChanged(this);
-		}
+	public void clearQueues() {
+		queues.clear();
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
+		return fLaunchDialog;
+	}
+
+	/**
+	 * @param index
+	 * @return
+	 */
+	public IPQueue getQueue(int index) {
+		return queues.get(index);
 	}
 
 	/**
 	 * Get the queue with the corresponding name
-	 *
-	 * @param rm resource manager
-	 * @param queueName queue name
+	 * 
+	 * @param rm
+	 *            resource manager
+	 * @param queueName
+	 *            queue name
 	 * @return queue
 	 */
 	public IPQueue getQueueFromName(IResourceManager rm, String queueName) {
@@ -102,34 +128,34 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 	}
 
 	/**
-	 *
-	 */
-	public void clearQueues() {
-		queues.clear();
-	}
-
-	/**
-	 * @param queue
-	 * @param index
-	 */
-	public void addQueue(IPQueue queue, int index) {
-		queues.put(index, queue);
-		queueIndices.put(queue, index);
-	}
-
-	/**
-	 * @param index
-	 * @return
-	 */
-	public IPQueue getQueue(int index) {
-		return queues.get(index);
-	}
-
-	/**
 	 * @param queue
 	 * @return
 	 */
 	public Integer getQueueIndex(IPQueue queue) {
 		return queueIndices.get(queue);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #removeContentsChangedListener(org.eclipse.ptp.launch.ui.extensions.
+	 * IRMLaunchConfigurationContentsChangedListener)
+	 */
+	public void removeContentsChangedListener(IRMLaunchConfigurationContentsChangedListener listener) {
+		listenerList.remove(listener);
+	}
+
+	/**
+	 * This should be called when GUI elements are modified by the user, e.g. a
+	 * Text widget should have its ModifyListener's modifyText method set up to
+	 * notify all of the contents changed listeners.
+	 */
+	protected void fireContentsChanged() {
+		Object[] listeners = listenerList.getListeners();
+		for (Object listener : listeners) {
+			((IRMLaunchConfigurationContentsChangedListener) listener).handleContentsChanged(this);
+		}
 	}
 }

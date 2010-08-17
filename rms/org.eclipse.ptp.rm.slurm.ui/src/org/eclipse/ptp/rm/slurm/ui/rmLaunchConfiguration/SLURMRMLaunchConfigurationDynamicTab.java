@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
@@ -83,8 +84,8 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 	private Composite control;
 
-	public SLURMRMLaunchConfigurationDynamicTab(IResourceManager rm) {
-		// TODO Auto-generated constructor stub
+	public SLURMRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
+		super(dialog);
 	}
 
 	/*
@@ -339,7 +340,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 			sattr5 = new StringAttribute(jobExcNodeListAttrDef, jobExcNodeList);
 		}
 
-		ArrayList int_al = new ArrayList();
+		ArrayList<IAttribute<?, ?, ?>> int_al = new ArrayList<IAttribute<?, ?, ?>>();
 		if (iattr0 != null)
 			int_al.add(iattr0);
 		if (iattr1 != null)
@@ -347,7 +348,7 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		if (iattr2 != null)
 			int_al.add(iattr2);
 
-		ArrayList str_al = new ArrayList();
+		ArrayList<IAttribute<?, ?, ?>> str_al = new ArrayList<IAttribute<?, ?, ?>>();
 		if (sattr3 != null)
 			str_al.add(sattr3);
 		if (sattr4 != null)
@@ -358,13 +359,13 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		int size1 = int_al.size();
 		int size2 = str_al.size();
 		int size = size1 + size2;
-		IAttribute[] attr = new IAttribute[size];
+		IAttribute<?, ?, ?>[] attr = new IAttribute<?, ?, ?>[size];
 		int i;
 		for (i = 0; i < size1; i++) {
-			attr[i] = (IntegerAttribute) int_al.get(i);
+			attr[i] = int_al.get(i);
 		}
 		for (i = 0; i < size2; i++) {
-			attr[size1 + i] = (StringAttribute) str_al.get(i);
+			attr[size1 + i] = str_al.get(i);
 		}
 
 		return attr;
@@ -481,7 +482,6 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		try {
 			IntegerAttributeDefinition numProcsAttrDef = getJobNumProcsAttrDef(rm, queue);
-			@SuppressWarnings("unused")
 			IntegerAttribute iattr = new IntegerAttribute(numProcsAttrDef, nProcsString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_numProcsInvalid);
@@ -492,7 +492,6 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		try {
 			IntegerAttributeDefinition jobNumNodesAttrDef = getJobNumNodesAttrDef(rm, queue);
-			@SuppressWarnings("unused")
 			IntegerAttribute iattr = new IntegerAttribute(jobNumNodesAttrDef, nNodesString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_numNodesInvalid);
@@ -503,7 +502,6 @@ public class SLURMRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 		try {
 			IntegerAttributeDefinition jobTimeLimitAttrDef = getJobTimeLimitAttrDef(rm, queue);
-			@SuppressWarnings("unused")
 			IntegerAttribute iattr = new IntegerAttribute(jobTimeLimitAttrDef, tLimitString);
 			if (iattr.getValue() < 1) {
 				return new RMLaunchValidation(false, Messages.SLURMConfigurationWizardPage_timeLimitInvalid);

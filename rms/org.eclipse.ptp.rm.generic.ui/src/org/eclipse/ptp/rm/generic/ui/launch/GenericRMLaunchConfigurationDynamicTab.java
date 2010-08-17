@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -24,8 +25,8 @@ import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
 
 public class GenericRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab {
 
-	public GenericRMLaunchConfigurationDynamicTab(IResourceManager rm) {
-		super();
+	public GenericRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
+		super(dialog);
 	}
 
 	/*

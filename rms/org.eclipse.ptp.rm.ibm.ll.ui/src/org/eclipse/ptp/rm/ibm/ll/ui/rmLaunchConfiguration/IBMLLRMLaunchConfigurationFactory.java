@@ -23,19 +23,35 @@
 package org.eclipse.ptp.rm.ibm.ll.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ibm.ll.core.rmsystem.IBMLLResourceManager;
 
-public class IBMLLRMLaunchConfigurationFactory extends
-		AbstractRMLaunchConfigurationFactory {
+public class IBMLLRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #doCreate(org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
+	 */
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm) throws CoreException {
-		return new IBMLLRMLaunchConfigurationDynamicTab(rm);
+	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
+			throws CoreException {
+		return new IBMLLRMLaunchConfigurationDynamicTab(rm, dialog);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
+	 * #getResourceManagerClass()
+	 */
 	@Override
 	public Class<? extends IResourceManager> getResourceManagerClass() {
 		return IBMLLResourceManager.class;

@@ -1116,7 +1116,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		if (rmFactory == null) {
 			return new IAttribute[0];
 		}
-		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm);
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm, null);
 		return rmDynamicTab.getAttributes(rm, null, configuration, mode);
 	}
 

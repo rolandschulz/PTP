@@ -23,9 +23,9 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -364,7 +364,11 @@ public class SLURMConfigurationWizardPage extends RMConfigurationWizardPage {
 		 */
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
-			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
+			IWizardContainer container = null;
+			if (getControl().isVisible()) {
+				container = getWizard().getContainer();
+			}
+			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);

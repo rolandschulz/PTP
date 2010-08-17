@@ -358,7 +358,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		if (rmFactory == null) {
 			return null;
 		}
-		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm);
+		IRMLaunchConfigurationDynamicTab rmDynamicTab = rmFactory.create(rm, getLaunchConfigurationDialog());
 		if (rmDynamicTab == null) {
 			return null;
 		}

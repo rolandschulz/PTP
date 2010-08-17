@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -49,54 +50,93 @@ import org.eclipse.swt.widgets.Text;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * @since 2.0
+ * 
  */
-public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends
-BaseRMLaunchConfigurationDynamicTab {
+public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
 
-	Composite control;
-	Spinner numProcsSpinner;
-	Button byNodeButton;
-	Button bySlotButton;
-	Button noOversubscribeButton;
-	Button noLocalButton;
-	Button usePrefixButton;
-	Text prefixText;
-	Text hostFileText;
-	Button hostFileButton;
-	Text hostListText;
-	Button hostListButton;
-	Button browseButton;
+	/**
+	 * @since 2.0
+	 */
+	public BasicOpenMpiRMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
+		super(dialog);
+	}
 
-	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
+	/**
+	 * @since 2.0
+	 */
+	protected Composite control;
+	/**
+	 * @since 2.0
+	 */
+	protected Spinner numProcsSpinner;
+	/**
+	 * @since 2.0
+	 */
+	protected Button byNodeButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Button bySlotButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Button noOversubscribeButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Button noLocalButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Button usePrefixButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Text prefixText;
+	/**
+	 * @since 2.0
+	 */
+	protected Text hostFileText;
+	/**
+	 * @since 2.0
+	 */
+	protected Button hostFileButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Text hostListText;
+	/**
+	 * @since 2.0
+	 */
+	protected Button hostListButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Button browseButton;
+
+	private class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
 		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
 
 		@Override
 		protected void doModifyText(ModifyEvent e) {
-			if (e.getSource() == numProcsSpinner 
-					|| e.getSource() == prefixText 
-					|| e.getSource() == hostFileText 
+			if (e.getSource() == numProcsSpinner || e.getSource() == prefixText || e.getSource() == hostFileText
 					|| e.getSource() == hostListText) {
-				//				getDataSource().justValidate();
-			} else{
+				// getDataSource().justValidate();
+			} else {
 				super.doModifyText(e);
 			}
 		}
 
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
-			if (e.getSource() == byNodeButton 
-					|| e.getSource() == bySlotButton 
-					|| e.getSource() == noOversubscribeButton 
-					|| e.getSource() == noLocalButton 
-					|| e.getSource() == usePrefixButton) {
-				//				getDataSource().justValidate();
-			} else if (e.getSource() == usePrefixButton 
-					|| e.getSource() == hostFileButton 
-					|| e.getSource() == hostListButton) {
-				//				getDataSource().justValidate();
+			if (e.getSource() == byNodeButton || e.getSource() == bySlotButton || e.getSource() == noOversubscribeButton
+					|| e.getSource() == noLocalButton || e.getSource() == usePrefixButton) {
+				// getDataSource().justValidate();
+			} else if (e.getSource() == usePrefixButton || e.getSource() == hostFileButton || e.getSource() == hostListButton) {
+				// getDataSource().justValidate();
 				updateControls();
 			} else {
 				super.doWidgetSelected(e);
@@ -104,7 +144,7 @@ BaseRMLaunchConfigurationDynamicTab {
 		}
 	}
 
-	class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
+	private class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
 
 		private int numProcs;
 		private boolean byNode;
@@ -186,17 +226,28 @@ BaseRMLaunchConfigurationDynamicTab {
 		@Override
 		protected void loadFromStorage() {
 			try {
-				numProcs = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
-				byNode = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE);
-				bySlot = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_BYSLOT, OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT);
-				noOversubscribe = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NOOVERSUBSCRIBE, OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE);
-				noLocal = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NOLOCAL, OpenMPILaunchConfigurationDefaults.ATTR_NOLOCAL);
-				usePrefix = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEPREFIX, OpenMPILaunchConfigurationDefaults.ATTR_USEPREFIX);
-				prefix = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_PREFIX, OpenMPILaunchConfigurationDefaults.ATTR_PREFIX);
-				hostFile = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_HOSTFILE, OpenMPILaunchConfigurationDefaults.ATTR_HOSTFILE);
-				useHostFile = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTFILE, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTFILE);
-				hostList = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_HOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_HOSTLIST);
-				useHostList = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTLIST);
+				numProcs = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS,
+						OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
+				byNode = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE,
+						OpenMPILaunchConfigurationDefaults.ATTR_BYNODE);
+				bySlot = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_BYSLOT,
+						OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT);
+				noOversubscribe = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NOOVERSUBSCRIBE,
+						OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE);
+				noLocal = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_NOLOCAL,
+						OpenMPILaunchConfigurationDefaults.ATTR_NOLOCAL);
+				usePrefix = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEPREFIX,
+						OpenMPILaunchConfigurationDefaults.ATTR_USEPREFIX);
+				prefix = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_PREFIX,
+						OpenMPILaunchConfigurationDefaults.ATTR_PREFIX);
+				hostFile = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_HOSTFILE,
+						OpenMPILaunchConfigurationDefaults.ATTR_HOSTFILE);
+				useHostFile = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTFILE,
+						OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTFILE);
+				hostList = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_HOSTLIST,
+						OpenMPILaunchConfigurationDefaults.ATTR_HOSTLIST);
+				useHostList = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTLIST,
+						OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTLIST);
 			} catch (CoreException e) {
 				// TODO handle exception?
 				OpenMPIUIPlugin.log(e);
@@ -221,7 +272,7 @@ BaseRMLaunchConfigurationDynamicTab {
 
 		/**
 		 * Convert a comma separated list into one host per line
-		 *
+		 * 
 		 * @param list
 		 * @return
 		 */
@@ -269,7 +320,7 @@ BaseRMLaunchConfigurationDynamicTab {
 		layout.numColumns = 3;
 		control.setLayout(layout);
 
-		Label label  = new Label(control, SWT.NONE);
+		Label label = new Label(control, SWT.NONE);
 		label.setText(Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Label_NumberProcesses);
 
 		numProcsSpinner = new Spinner(control, SWT.BORDER);
@@ -342,49 +393,48 @@ BaseRMLaunchConfigurationDynamicTab {
 		hostListText.setLayoutData(gd);
 		hostListText.addModifyListener(getListener());
 
-
 	}
 
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm,
-			IPQueue queue, ILaunchConfiguration configuration, String mode)
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 
-		List<IAttribute<?,?,?>> attrs = new ArrayList<IAttribute<?,?,?>>();
+		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
 
-		int numProcs = configuration.getAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
+		int numProcs = configuration.getAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS,
+				OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
 		try {
-			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(numProcs));
+			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(Integer.valueOf(numProcs)));
 		} catch (IllegalValueException e) {
-			throw new CoreException(new Status(IStatus.ERROR, OpenMPIUIPlugin.getDefault().getBundle().getSymbolicName(), Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Exception_InvalidConfiguration, e));
+			throw new CoreException(new Status(IStatus.ERROR, OpenMPIUIPlugin.getDefault().getBundle().getSymbolicName(),
+					Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Exception_InvalidConfiguration, e));
 		}
 
-		attrs.add(OpenMPILaunchAttributes.getLaunchArgumentsAttributeDefinition().create(OpenMPILaunchConfiguration.calculateArguments(configuration)));
+		attrs.add(OpenMPILaunchAttributes.getLaunchArgumentsAttributeDefinition().create(
+				OpenMPILaunchConfiguration.calculateArguments(configuration)));
 
-		return attrs.toArray(new IAttribute<?,?,?>[attrs.size()]);
+		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
 	}
 
 	public Control getControl() {
 		return control;
 	}
 
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration,
-			IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_BYSLOT, OpenMPILaunchConfigurationDefaults.ATTR_BYSLOT);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NOOVERSUBSCRIBE, OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE);
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NOOVERSUBSCRIBE,
+				OpenMPILaunchConfigurationDefaults.ATTR_NOOVERSUBSCRIBE);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NOLOCAL, OpenMPILaunchConfigurationDefaults.ATTR_NOLOCAL);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEPREFIX, OpenMPILaunchConfigurationDefaults.ATTR_USEPREFIX);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_PREFIX, OpenMPILaunchConfigurationDefaults.ATTR_PREFIX);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTFILE, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTFILE);
+		configuration
+				.setAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTFILE, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTFILE);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_HOSTFILE, OpenMPILaunchConfigurationDefaults.ATTR_HOSTFILE);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTLIST);
+		configuration
+				.setAttribute(OpenMPILaunchConfiguration.ATTR_USEHOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTLIST);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_HOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_HOSTLIST);
 		return new RMLaunchValidation(true, null);
-	}
-
-	private DataSource getBasicDataSource() {
-		return (DataSource)getDataSource();
 	}
 
 	@Override
@@ -393,9 +443,5 @@ BaseRMLaunchConfigurationDynamicTab {
 		browseButton.setEnabled(hostFileButton.getSelection());
 		hostFileText.setEnabled(hostFileButton.getSelection());
 		hostListText.setEnabled(hostListButton.getSelection());
-	}
-
-	private DataSource getLocalDataSource() {
-		return (DataSource)super.getDataSource();
 	}
 }

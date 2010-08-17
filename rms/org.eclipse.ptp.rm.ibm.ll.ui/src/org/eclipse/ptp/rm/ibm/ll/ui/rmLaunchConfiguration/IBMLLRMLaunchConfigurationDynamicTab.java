@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.attributes.BigIntegerAttribute;
 import org.eclipse.ptp.core.attributes.BigIntegerAttributeDefinition;
@@ -55,7 +56,6 @@ import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -267,6 +267,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	private static final String LL_PTP_EXECUTABLE = "LL_PTP_EXECUTABLE"; //$NON-NLS-1$
 
 	private static final String LL_PTP_ENVIRONMENT = "LL_PTP_ENVIRONMENT"; //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private static final String LL_PTP_MAX_INT = "LL_PTP_MAX_INT"; //$NON-NLS-1$
 
 	/*
@@ -318,6 +319,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	/*
 	 * Widgets for General Tab
 	 */
+	@SuppressWarnings("unused")
 	private TextRowWidget llComment = null;
 	private TextRowWidget llJobName = null;
 	private ComboRowWidget llJobType = null;
@@ -325,14 +327,17 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * Widgets for Scheduling (Basic) Tab
 	 */
 	private TextRowWidget llClass = null;
+	@SuppressWarnings("unused")
 	private ComboRowWidget llLargePage = null;
 	/*
 	 * Widgets for Scheduling (Requirements) Tab
 	 */
+	@SuppressWarnings("unused")
 	private TextRowWidget llRequirements = null;
 	/*
 	 * Widgets for Scheduling (Resources) Tab
 	 */
+	@SuppressWarnings("unused")
 	private TextRowWidget llResources = null;
 	/*
 	 * Widgets for Runtime
@@ -343,14 +348,19 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	private FileSelectorRowWidget llInitialDir = null;
 	private FileSelectorRowWidget llShell = null;
 	private FileSelectorRowWidget llExecutable = null;
+	@SuppressWarnings("unused")
 	private TextRowWidget llEnvironment = null;
 	/*
 	 * Widgets for Nodes/Network Tab
 	 */
 	private TextRowWidget llBlocking = null;
+	@SuppressWarnings("unused")
 	private ComboRowWidget llBulkxfer = null;
+	@SuppressWarnings("unused")
 	private TextRowWidget llNetwork_mpi = null;
+	@SuppressWarnings("unused")
 	private TextRowWidget llNetwork_lapi = null;
+	@SuppressWarnings("unused")
 	private TextRowWidget llNetwork_mpi_lapi = null;
 	private TextRowWidget llNodeMin = null;
 	private TextRowWidget llNodeMax = null;
@@ -366,7 +376,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 
 	private TextRowWidget llWallClockLimitSoft = null;
 
-	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManager rm) {
+	public IBMLLRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
+		super(dialog);
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
 				+ ":IBMLLRMLaunchConfigurationDynamicTab entered."); //$NON-NLS-1$
 		if ((Preferences.getString(IBMLLCorePlugin.getUniqueIdentifier(), IBMLLPreferenceConstants.GUI_TRACE_MESSAGE))
@@ -578,6 +589,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
+	@SuppressWarnings("unused")
 	private CheckboxRowWidget createCheckbox(Composite parent, IResourceManager rm, String id) {
 		CheckboxRowWidget widget;
 		StringAttributeDefinition attrDef;
@@ -646,7 +658,8 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		IRemoteConnectionManager connMgr;
 
 		config = (IIBMLLResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
-		remoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(config.getRemoteServicesId());
+		remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
+				getLaunchConfigurationDialog());
 		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
 		connMgr = remoteService.getConnectionManager();
 		remoteConnection = connMgr.getConnection(config.getConnectionName());
@@ -685,6 +698,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            Attribute id for second rm attribute this widget represents
 	 * @return Text entry widget
 	 */
+	@SuppressWarnings("unused")
 	private DualFieldRowWidget createDualField(Composite parent, IResourceManager rm, String id1, String id2) {
 		DualFieldRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr1;
@@ -719,6 +733,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Editable ComboRowWidget used by this attribute
 	 */
+	@SuppressWarnings("unused")
 	private ComboRowWidget createEditableCombobox(Composite parent, IResourceManager rm, String id, int selector_id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
@@ -1079,7 +1094,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 */
 	private void enableTabPaneWidgetState(Control widget) {
 		Control children[];
+		@SuppressWarnings("unused")
 		Boolean state;
+		@SuppressWarnings("unused")
 		boolean enableFlag;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1144,6 +1161,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param configuration
 	 *            The current launch configuration
 	 */
+	@SuppressWarnings("unchecked")
 	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration, String mode) throws CoreException {
 		Vector<StringAttribute> attrs;
@@ -1541,9 +1559,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            The attribute name
 	 * @return true if the value is a valid selection, false otherwise
 	 */
+	@SuppressWarnings("unused")
 	private boolean isValidListSelection(ComboRowWidget widget, String attrName) {
 		StringSetAttributeDefinition attrDef;
-		@SuppressWarnings("unused")
 		StringSetAttribute attr;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -1660,6 +1678,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @param widget
 	 *            The widget whose state is to be restored.
 	 */
+	@SuppressWarnings("unused")
 	private void restoreTabPaneWidgetState(Control widget) {
 		Control children[];
 		Boolean state;
@@ -2479,9 +2498,9 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
+	@SuppressWarnings("unused")
 	private void validateLongNumericRange(String value, String attrName, String errorID) throws ValidationException {
 		BigIntegerAttributeDefinition attrDef;
-		@SuppressWarnings("unused")
 		BigIntegerAttribute attr;
 
 		print_message(TRACE_MESSAGE, ">>> " + this.getClass().getName() //$NON-NLS-1$
@@ -2509,6 +2528,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 		String tt = ""; //$NON-NLS-1$
 		String tt_default = ""; //$NON-NLS-1$
 		String jt = ""; //$NON-NLS-1$
+		@SuppressWarnings("unused")
 		String jt_default = ""; //$NON-NLS-1$
 		String nm = ""; //$NON-NLS-1$
 		String nm_default = ""; //$NON-NLS-1$
@@ -2718,6 +2738,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 *            range
 	 * @throws ValidationException
 	 */
+	@SuppressWarnings("unused")
 	private void validateNumericRange(String value, int lowLimit, int highLimit, String errorID) throws ValidationException {
 		int n;
 
@@ -2797,6 +2818,7 @@ public class IBMLLRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfig
 	 * @throws ValidationException
 	 *             Indicates that Text widget failed validation
 	 */
+	@SuppressWarnings("unused")
 	private void validateNumericRange(TextRowWidget control, String attrName, String errorID) throws ValidationException {
 		String value;
 
