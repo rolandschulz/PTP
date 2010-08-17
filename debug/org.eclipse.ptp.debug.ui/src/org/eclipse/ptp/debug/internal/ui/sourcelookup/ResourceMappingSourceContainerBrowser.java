@@ -26,7 +26,7 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceCon
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -37,62 +37,82 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * @since 4.0
  */
 public class ResourceMappingSourceContainerBrowser extends AbstractSourceContainerBrowser {
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.internal.ui.sourcelookup.ISourceContainerBrowser#createSourceContainers(org.eclipse.swt.widgets.Shell, org.eclipse.debug.core.ILaunchConfiguration)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.internal.ui.sourcelookup.ISourceContainerBrowser#
+	 * createSourceContainers(org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public ISourceContainer[] addSourceContainers(Shell shell, ISourceLookupDirector director) {
 		IRemoteConnection conn = getRemoteConnection(director.getLaunchConfiguration());
 		if (conn != null) {
-			ResourceMappingSourceContainerDialog dialog = new ResourceMappingSourceContainerDialog(shell,  new WorkbenchLabelProvider(), new WorkbenchContentProvider(), conn);
-			
+			ResourceMappingSourceContainerDialog dialog = new ResourceMappingSourceContainerDialog(shell,
+					new WorkbenchLabelProvider(), new WorkbenchContentProvider(), conn);
+
 			if (dialog.open() == Window.OK) {
-				ArrayList<ResourceMappingSourceContainer> containers = new ArrayList<ResourceMappingSourceContainer>();			
+				ArrayList<ResourceMappingSourceContainer> containers = new ArrayList<ResourceMappingSourceContainer>();
 				containers.add(new ResourceMappingSourceContainer(dialog.getPath(), dialog.getContainer()));
-				return (ISourceContainer[])containers.toArray(new ISourceContainer[containers.size()]);	
-			}			
-		}
-		return new ISourceContainer[0];
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser#canEditSourceContainers(org.eclipse.debug.core.sourcelookup.ISourceLookupDirector, org.eclipse.debug.core.sourcelookup.ISourceContainer[])
-	 */
-	public boolean canEditSourceContainers(ISourceLookupDirector director, ISourceContainer[] containers) {
-		return containers.length == 1 && containers[0].getType().getId().equals(FolderSourceContainer.TYPE_ID);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser#editSourceContainers(org.eclipse.swt.widgets.Shell, org.eclipse.debug.core.sourcelookup.ISourceLookupDirector, org.eclipse.debug.core.sourcelookup.ISourceContainer[])
-	 */
-	public ISourceContainer[] editSourceContainers(Shell shell, ISourceLookupDirector director, ISourceContainer[] containers) {
-		IRemoteConnection conn = getRemoteConnection(director.getLaunchConfiguration());
-		if (conn != null) {
-			ResourceMappingSourceContainerDialog dialog = new ResourceMappingSourceContainerDialog(shell,  new WorkbenchLabelProvider(), new WorkbenchContentProvider(), conn);
-			ResourceMappingSourceContainer container = (ResourceMappingSourceContainer) containers[0];
-			dialog.setInitialSelection(container.getContainer());
-			if (dialog.open() == Window.OK) {
-				container.dispose();
-				ArrayList<ResourceMappingSourceContainer> list = new ArrayList<ResourceMappingSourceContainer>();			
-				list.add(new ResourceMappingSourceContainer(dialog.getPath(), dialog.getContainer()));
-				return (ISourceContainer[])list.toArray(new ISourceContainer[list.size()]);	
+				return containers.toArray(new ISourceContainer[containers.size()]);
 			}
 		}
 		return new ISourceContainer[0];
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser#
+	 * canEditSourceContainers
+	 * (org.eclipse.debug.core.sourcelookup.ISourceLookupDirector,
+	 * org.eclipse.debug.core.sourcelookup.ISourceContainer[])
+	 */
+	@Override
+	public boolean canEditSourceContainers(ISourceLookupDirector director, ISourceContainer[] containers) {
+		return containers.length == 1 && containers[0].getType().getId().equals(FolderSourceContainer.TYPE_ID);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.sourcelookup.AbstractSourceContainerBrowser#
+	 * editSourceContainers(org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.debug.core.sourcelookup.ISourceLookupDirector,
+	 * org.eclipse.debug.core.sourcelookup.ISourceContainer[])
+	 */
+	@Override
+	public ISourceContainer[] editSourceContainers(Shell shell, ISourceLookupDirector director, ISourceContainer[] containers) {
+		IRemoteConnection conn = getRemoteConnection(director.getLaunchConfiguration());
+		if (conn != null) {
+			ResourceMappingSourceContainerDialog dialog = new ResourceMappingSourceContainerDialog(shell,
+					new WorkbenchLabelProvider(), new WorkbenchContentProvider(), conn);
+			ResourceMappingSourceContainer container = (ResourceMappingSourceContainer) containers[0];
+			dialog.setInitialSelection(container.getContainer());
+			if (dialog.open() == Window.OK) {
+				container.dispose();
+				ArrayList<ResourceMappingSourceContainer> list = new ArrayList<ResourceMappingSourceContainer>();
+				list.add(new ResourceMappingSourceContainer(dialog.getPath(), dialog.getContainer()));
+				return list.toArray(new ISourceContainer[list.size()]);
+			}
+		}
+		return new ISourceContainer[0];
+	}
+
 	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration) {
 		String rmName = null;
 		try {
-			rmName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
+			rmName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String) null);
 		} catch (CoreException e) {
 		}
 		if (rmName != null) {
-			IResourceManagerControl rm = (IResourceManagerControl)PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmName);
+			IResourceManagerControl rm = (IResourceManagerControl) PTPCorePlugin.getDefault().getModelManager()
+					.getResourceManagerFromUniqueName(rmName);
 			if (rm != null) {
 				String remId = rm.getConfiguration().getRemoteServicesId();
 				String connName = rm.getConfiguration().getConnectionName();
-				IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId);
+				IRemoteServices rsrv = PTPRemoteUIPlugin.getDefault().getRemoteServices(remId, null);
 				if (rsrv != null) {
 					IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
 					if (connMgr != null) {
@@ -103,5 +123,5 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 		}
 		return null;
 	}
-	
+
 }

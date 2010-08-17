@@ -12,11 +12,11 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
@@ -523,7 +523,11 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 			LLUIPlugin.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
+		IWizardContainer container = null;
+		if (getControl().isVisible()) {
+			container = getWizard().getContainer();
+		}
+		services = PTPRemoteUIPlugin.getDefault().getRemoteServices(serviceID, container);
 		if (services == null) {
 			LLUIPlugin.getDefault().logError("getRemoteDirectory: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
@@ -571,7 +575,11 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 			LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
-		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
+		IWizardContainer container = null;
+		if (getControl().isVisible()) {
+			container = getWizard().getContainer();
+		}
+		services = PTPRemoteUIPlugin.getDefault().getRemoteServices(serviceID, container);
 		if (services == null) {
 			LLUIPlugin.getDefault().logError("getRemotePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
@@ -816,7 +824,11 @@ public class IBMLLResourceManagerOptionWizardPage extends RMConfigurationWizardP
 			LLUIPlugin.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.3")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
-		services = PTPRemoteCorePlugin.getDefault().getRemoteServices(serviceID);
+		IWizardContainer container = null;
+		if (getControl().isVisible()) {
+			container = getWizard().getContainer();
+		}
+		services = PTPRemoteUIPlugin.getDefault().getRemoteServices(serviceID, container);
 		if (services == null) {
 			LLUIPlugin.getDefault().logError("validatePath: " + Messages.getString("IBMLLResourceManagerOptionWizardPage.5")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;

@@ -73,7 +73,7 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 	 */
 	@Override
 	public void startup(IProgressMonitor monitor) throws IOException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 12);
+		SubMonitor subMon = SubMonitor.convert(monitor, 15);
 
 		if (getDebugOptions().CLIENT_TRACING) {
 			System.out.println(toString()
@@ -89,7 +89,7 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 			 * and the saved remote services provider is no longer available...
 			 */
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
-					getConfiguration().getRemoteServicesId());
+					getConfiguration().getRemoteServicesId(), subMon.newChild(3));
 			if (remoteServices == null)
 				throw new IOException(NLS.bind(Messages.PBSProxyRuntimeClient_1, getConfiguration().getRemoteServicesId()));
 

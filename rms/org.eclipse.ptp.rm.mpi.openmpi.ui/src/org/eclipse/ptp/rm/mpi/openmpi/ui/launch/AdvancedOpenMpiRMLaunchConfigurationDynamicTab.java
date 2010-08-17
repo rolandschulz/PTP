@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -67,10 +68,9 @@ import org.eclipse.swt.widgets.Text;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
-public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends
-BaseRMLaunchConfigurationDynamicTab {
+public class AdvancedOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
 
 	protected Composite control;
 	protected Button useArgsDefaultsButton;
@@ -78,15 +78,17 @@ BaseRMLaunchConfigurationDynamicTab {
 	protected Button useParamsDefaultsButton;
 	protected CheckboxTableViewer paramsViewer;
 	protected Table paramsTable;
-
 	protected OmpiInfo info;
 
-	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm) {
+	/**
+	 * @since 2.0
+	 */
+	public AdvancedOpenMpiRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
+		super(dialog);
 		info = ((OpenMPIResourceManager) rm).getOmpiInfo();
 	}
 
-	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener
-	implements ICheckStateListener {
+	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener implements ICheckStateListener {
 		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
 			super(dynamicTab);
 		}
@@ -156,16 +158,10 @@ BaseRMLaunchConfigurationDynamicTab {
 
 		@Override
 		protected void copyToStorage() {
-			getConfigurationWorkingCopy().setAttribute(
-					OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
-					useDefArgs);
-			getConfigurationWorkingCopy().setAttribute(
-					OpenMPILaunchConfiguration.ATTR_ARGUMENTS, args);
-			getConfigurationWorkingCopy().setAttribute(
-					OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
-					useDefParams);
-			getConfigurationWorkingCopy().setAttribute(
-					OpenMPILaunchConfiguration.ATTR_PARAMETERS, params);
+			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS, useDefArgs);
+			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS, args);
+			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS, useDefParams);
+			getConfigurationWorkingCopy().setAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS, params);
 		}
 
 		@Override
@@ -177,22 +173,17 @@ BaseRMLaunchConfigurationDynamicTab {
 
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void loadFromStorage() {
 			try {
-				args = getConfiguration().getAttribute(
-						OpenMPILaunchConfiguration.ATTR_ARGUMENTS,
+				args = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS,
 						OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
-				useDefArgs = getConfiguration()
-				.getAttribute(
-						OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
+				useDefArgs = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
 						OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
-				useDefParams = getConfiguration()
-				.getAttribute(
-						OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
+				useDefParams = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
 						OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS);
-				params = getConfiguration().getAttribute(
-						OpenMPILaunchConfiguration.ATTR_PARAMETERS,
+				params = getConfiguration().getAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS,
 						OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
 			} catch (CoreException e) {
 				// TODO handle exception?
@@ -203,8 +194,7 @@ BaseRMLaunchConfigurationDynamicTab {
 		@Override
 		protected void validateLocal() throws ValidationException {
 			if (!useDefArgs && args == null)
-				throw new ValidationException(
-						Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyArguments);
+				throw new ValidationException(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Validation_EmptyArguments);
 			if (!useDefParams) {
 				for (Object object : paramsViewer.getCheckedElements()) {
 					if (object instanceof Parameter) {
@@ -238,23 +228,19 @@ BaseRMLaunchConfigurationDynamicTab {
 		return Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Title;
 	}
 
-	public void createControl(Composite parent, IResourceManager rm,
-			IPQueue queue) throws CoreException {
+	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout());
 
 		final Group argumentsGroup = new Group(control, SWT.NONE);
-		argumentsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-				false));
+		argumentsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		argumentsGroup.setLayout(layout);
-		argumentsGroup
-		.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_LaunchArguments);
+		argumentsGroup.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_LaunchArguments);
 
 		useArgsDefaultsButton = new Button(argumentsGroup, SWT.CHECK);
-		useArgsDefaultsButton
-		.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultArguments);
+		useArgsDefaultsButton.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultArguments);
 		// useArgsDefaultsButton.setSelection(true);
 		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
 		useArgsDefaultsButton.setLayoutData(gd);
@@ -262,32 +248,27 @@ BaseRMLaunchConfigurationDynamicTab {
 
 		Label label = new Label(argumentsGroup, SWT.NONE);
 		label.setLayoutData(new GridData());
-		label
-		.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_Arguments);
+		label.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_Arguments);
 
 		argsText = new Text(argumentsGroup, SWT.BORDER);
 		argsText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		// argsText.setEnabled(false);
 
 		final Group ompiParameteresGroup = new Group(control, SWT.NONE);
-		ompiParameteresGroup
-		.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_MCAParameters);
+		ompiParameteresGroup.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_MCAParameters);
 		layout = new GridLayout();
 		layout.numColumns = 2;
 		ompiParameteresGroup.setLayout(layout);
-		ompiParameteresGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-				true, true));
+		ompiParameteresGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		useParamsDefaultsButton = new Button(ompiParameteresGroup, SWT.CHECK);
 		useParamsDefaultsButton.addSelectionListener(getListener());
-		useParamsDefaultsButton
-		.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultMCAParameters);
+		useParamsDefaultsButton.setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_Label_DefaultMCAParameters);
 		gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
 		useParamsDefaultsButton.setLayoutData(gd);
 		// useParamsDefaultsButton.setSelection(true);
 
-		paramsViewer = CheckboxTableViewer.newCheckList(ompiParameteresGroup,
-				SWT.CHECK | SWT.FULL_SELECTION);
+		paramsViewer = CheckboxTableViewer.newCheckList(ompiParameteresGroup, SWT.CHECK | SWT.FULL_SELECTION);
 		paramsViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {
 				// Empty implementation.
@@ -301,39 +282,33 @@ BaseRMLaunchConfigurationDynamicTab {
 				return null;
 			}
 
-			public void inputChanged(Viewer viewer, Object oldInput,
-					Object newInput) {
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 				// Empty implementation.
 			}
 		});
 		paramsViewer.setSorter(new ViewerSorter() {
 			@Override
 			public int compare(Viewer viewer, Object j1, Object j2) {
-				return ((Parameter) j1).getName().compareTo(
-						((Parameter) j2).getName());
+				return ((Parameter) j1).getName().compareTo(((Parameter) j2).getName());
 			}
 		});
 		paramsViewer.addCheckStateListener(getLocalListener());
 		paramsViewer.setAllChecked(false);
 
 		// Enable cursor keys in table
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
-				paramsViewer, new FocusCellOwnerDrawHighlighter(paramsViewer));
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
-				paramsViewer) {
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(paramsViewer,
+				new FocusCellOwnerDrawHighlighter(paramsViewer));
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(paramsViewer) {
 			@Override
-			protected boolean isEditorActivationEvent(
-					ColumnViewerEditorActivationEvent event) {
+			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-				|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-				|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-				|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
 			}
 		};
-		TableViewerEditor.create(paramsViewer, focusCellManager, actSupport,
-				ColumnViewerEditor.TABBING_HORIZONTAL
-				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
-				| ColumnViewerEditor.TABBING_VERTICAL
+		TableViewerEditor.create(paramsViewer, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
+				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
 				| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 
 		paramsTable = paramsViewer.getTable();
@@ -372,8 +347,7 @@ BaseRMLaunchConfigurationDynamicTab {
 		/*
 		 * Name column
 		 */
-		final TableViewerColumn column1 = new TableViewerColumn(paramsViewer,
-				SWT.NONE);
+		final TableViewerColumn column1 = new TableViewerColumn(paramsViewer, SWT.NONE);
 		column1.setLabelProvider(new ColumnLabelProvider() {
 			/*
 			 * (non-Javadoc)
@@ -393,16 +367,12 @@ BaseRMLaunchConfigurationDynamicTab {
 
 		});
 		column1.getColumn().setResizable(true);
-		column1
-		.getColumn()
-		.setText(
-				Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_PArameterTable_Column_Name);
+		column1.getColumn().setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_PArameterTable_Column_Name);
 
 		/*
 		 * Value column
 		 */
-		final TableViewerColumn column2 = new TableViewerColumn(paramsViewer,
-				SWT.NONE);
+		final TableViewerColumn column2 = new TableViewerColumn(paramsViewer, SWT.NONE);
 		column2.setLabelProvider(new ColumnLabelProvider() {
 			/*
 			 * (non-Javadoc)
@@ -422,8 +392,7 @@ BaseRMLaunchConfigurationDynamicTab {
 		column2.setEditingSupport(new EditingSupport(paramsViewer) {
 			@Override
 			protected boolean canEdit(Object element) {
-				return !((Parameter) element).isReadOnly()
-				&& paramsViewer.getChecked(element);
+				return !((Parameter) element).isReadOnly() && paramsViewer.getChecked(element);
 			}
 
 			@Override
@@ -445,10 +414,7 @@ BaseRMLaunchConfigurationDynamicTab {
 			}
 		});
 		column2.getColumn().setResizable(true);
-		column2
-		.getColumn()
-		.setText(
-				Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_ParameterTable_Column_Value);
+		column2.getColumn().setText(Messages.AdvancedOpenMpiRMLaunchConfigurationDynamicTab_ParameterTable_Column_Value);
 
 		paramsTable.addControlListener(new ControlAdapter() {
 			@Override
@@ -457,19 +423,15 @@ BaseRMLaunchConfigurationDynamicTab {
 				// Point size = paramsTable.computeSize(SWT.DEFAULT,
 				// SWT.DEFAULT);
 				ScrollBar vBar = paramsTable.getVerticalBar();
-				int width = area.width
-				- paramsTable.computeTrim(0, 0, 0, 0).width
-				- vBar.getSize().x;
+				int width = area.width - paramsTable.computeTrim(0, 0, 0, 0).width - vBar.getSize().x;
 				paramsTable.getColumn(1).setWidth(width / 3);
-				paramsTable.getColumn(0).setWidth(
-						width - paramsTable.getColumn(1).getWidth());
+				paramsTable.getColumn(0).setWidth(width - paramsTable.getColumn(1).getWidth());
 			}
 		});
 
 	}
 
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm,
-			IPQueue queue, ILaunchConfiguration configuration, String mode)
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 		return null;
 	}
@@ -478,19 +440,13 @@ BaseRMLaunchConfigurationDynamicTab {
 		return control;
 	}
 
-	public RMLaunchValidation setDefaults(
-			ILaunchConfigurationWorkingCopy configuration, IResourceManager rm,
-			IPQueue queue) {
-		configuration.setAttribute(
-				OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
 				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS,
-				OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
-		configuration.setAttribute(
-				OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_ARGUMENTS, OpenMPILaunchConfigurationDefaults.ATTR_ARGUMENTS);
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_USEDEFAULTPARAMETERS,
 				OpenMPILaunchConfigurationDefaults.ATTR_USEDEFAULTPARAMETERS);
-		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS,
-				OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
+		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_PARAMETERS, OpenMPILaunchConfigurationDefaults.ATTR_PARAMETERS);
 		return new RMLaunchValidation(true, null);
 	}
 

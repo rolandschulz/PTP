@@ -566,7 +566,11 @@ public abstract class AbstractRemoteResourceManagerConfigurationWizardPage exten
 	 */
 	protected IRemoteServices getRemoteServices(String id) {
 		if (id != null && !id.equals(EMPTY_STRING)) {
-			return PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
+			IWizardContainer container = null;
+			if (getControl().isVisible()) {
+				container = getWizard().getContainer();
+			}
+			return PTPRemoteUIPlugin.getDefault().getRemoteServices(id, container);
 		}
 		return null;
 	}

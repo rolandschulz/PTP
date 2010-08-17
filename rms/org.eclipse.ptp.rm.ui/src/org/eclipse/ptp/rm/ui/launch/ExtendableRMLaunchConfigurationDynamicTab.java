@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -36,8 +37,25 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		IRMLaunchConfigurationContentsChangedListener {
 
 	private final List<BaseRMLaunchConfigurationDynamicTab> tabControllers = new ArrayList<BaseRMLaunchConfigurationDynamicTab>();
+
 	private Composite control;
 
+	/**
+	 * @since 2.0
+	 */
+	public ExtendableRMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
+		super(dialog);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #canSave(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
@@ -47,6 +65,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		return new RMLaunchValidation(true, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -64,6 +91,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #getAttributes(org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue,
+	 * org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 */
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 		List<IAttribute<?, ?, ?>> attributes = new ArrayList<IAttribute<?, ?, ?>>();
@@ -77,14 +113,39 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		return attributes.toArray(new IAttribute<?, ?, ?>[attributes.size()]);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #getControl()
+	 */
 	public Control getControl() {
 		return control;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.extensions.
+	 * IRMLaunchConfigurationContentsChangedListener
+	 * #handleContentsChanged(org.eclipse
+	 * .ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab)
+	 */
 	public void handleContentsChanged(IRMLaunchConfigurationDynamicTab factory) {
 		fireContentsChanged();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #initializeFrom(org.eclipse.swt.widgets.Control,
+	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
@@ -95,6 +156,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		return resultValidation;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.isValid(launchConfig, rm, queue);
@@ -104,6 +174,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		return new RMLaunchValidation(true, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
@@ -114,6 +193,15 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		return resultValidation;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
+	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
@@ -124,11 +212,17 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 		return resultValidation;
 	}
 
+	/**
+	 * Update controls on the tab
+	 */
 	public void updateControls() {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers)
 			tabControl.updateControls();
 	}
 
+	/**
+	 * @param tabController
+	 */
 	protected void addDynamicTab(BaseRMLaunchConfigurationDynamicTab tabController) {
 		tabControllers.add(tabController);
 		tabController.addContentsChangedListener(this);

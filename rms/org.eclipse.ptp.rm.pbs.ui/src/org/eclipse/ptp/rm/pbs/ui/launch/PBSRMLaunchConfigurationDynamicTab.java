@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -127,10 +128,12 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 					value = ((Spinner) c).getSelection();
 				else if (c instanceof Button)
 					value = ((Button) c).getSelection();
-				try {
-					ap.getAttribute().setValueAsString(value.toString());
-				} catch (IllegalValueException t) {
-					throw new ValidationException(t.toString());
+				if (value != null) {
+					try {
+						ap.getAttribute().setValueAsString(value.toString());
+					} catch (IllegalValueException t) {
+						throw new ValidationException(t.toString());
+					}
 				}
 			}
 
@@ -455,8 +458,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * 
 	 * @param resourceManager
 	 */
-	public PBSRMLaunchConfigurationDynamicTab(IResourceManager resourceManager) {
-		super();
+	public PBSRMLaunchConfigurationDynamicTab(IResourceManager resourceManager, ILaunchConfigurationDialog dialog) {
+		super(dialog);
 		try {
 			templateChangeListener = new TemplateChangeListener();
 			templateManager = new PBSBatchScriptTemplateManager();

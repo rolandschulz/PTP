@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
@@ -49,49 +50,11 @@ import org.eclipse.swt.widgets.Text;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
 
-	Composite control;
-	Spinner numProcsSpinner;
-	Button noLocalButton;
-	Button usePrefixButton;
-	Text prefixText;
-	Text hostFileText;
-	Button hostFileButton;
-	Text hostListText;
-	Button hostListButton;
-	Button browseButton;
-
-	class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
-		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
-			super(dynamicTab);
-		}
-
-		@Override
-		protected void doModifyText(ModifyEvent e) {
-			if (e.getSource() == numProcsSpinner || e.getSource() == prefixText || e.getSource() == hostFileText || e.getSource() == hostListText) {
-				//				getDataSource().justValidate();
-			} else{
-				super.doModifyText(e);
-			}
-		}
-
-		@Override
-		protected void doWidgetSelected(SelectionEvent e) {
-			if (e.getSource() == noLocalButton || e.getSource() == usePrefixButton) {
-				//				getDataSource().justValidate();
-			} else if (e.getSource() == usePrefixButton || e.getSource() == hostFileButton || e.getSource() == hostListButton) {
-				//				getDataSource().justValidate();
-				updateControls();
-			} else {
-				super.doWidgetSelected(e);
-			}
-		}
-	}
-
-	class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
+	private class DataSource extends RMLaunchConfigurationDynamicTabDataSource {
 
 		private int numProcs;
 		private boolean noLocal;
@@ -104,6 +67,29 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 
 		protected DataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
+		}
+
+		/**
+		 * Convert a comma separated list into one host per line
+		 * 
+		 * @param list
+		 * @return
+		 */
+		private String hostListToText(String list) {
+			if (list == null) {
+				return ""; //$NON-NLS-1$
+			}
+			String result = ""; //$NON-NLS-1$
+			String[] values = list.split(","); //$NON-NLS-1$
+			for (int i = 0; i < values.length; i++) {
+				if (!values[i].equals("")) { //$NON-NLS-1$
+					if (i > 0) {
+						result += "\r"; //$NON-NLS-1$
+					}
+					result += values[i];
+				}
+			}
+			return result;
 		}
 
 		@Override
@@ -158,14 +144,22 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 		@Override
 		protected void loadFromStorage() {
 			try {
-				numProcs = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS, MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
-				noLocal = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_NOLOCAL, MPICH2LaunchConfigurationDefaults.ATTR_NOLOCAL);
-				usePrefix = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_USEPREFIX, MPICH2LaunchConfigurationDefaults.ATTR_USEPREFIX);
-				prefix = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_PREFIX, MPICH2LaunchConfigurationDefaults.ATTR_PREFIX);
-				hostFile = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_HOSTFILE, MPICH2LaunchConfigurationDefaults.ATTR_HOSTFILE);
-				useHostFile = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_USEHOSTFILE, MPICH2LaunchConfigurationDefaults.ATTR_USEHOSTFILE);
-				hostList = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_HOSTLIST, MPICH2LaunchConfigurationDefaults.ATTR_HOSTLIST);
-				useHostList = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_USEHOSTLIST, MPICH2LaunchConfigurationDefaults.ATTR_USEHOSTLIST);
+				numProcs = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS,
+						MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
+				noLocal = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_NOLOCAL,
+						MPICH2LaunchConfigurationDefaults.ATTR_NOLOCAL);
+				usePrefix = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_USEPREFIX,
+						MPICH2LaunchConfigurationDefaults.ATTR_USEPREFIX);
+				prefix = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_PREFIX,
+						MPICH2LaunchConfigurationDefaults.ATTR_PREFIX);
+				hostFile = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_HOSTFILE,
+						MPICH2LaunchConfigurationDefaults.ATTR_HOSTFILE);
+				useHostFile = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_USEHOSTFILE,
+						MPICH2LaunchConfigurationDefaults.ATTR_USEHOSTFILE);
+				hostList = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_HOSTLIST,
+						MPICH2LaunchConfigurationDefaults.ATTR_HOSTLIST);
+				useHostList = getConfiguration().getAttribute(MPICH2LaunchConfiguration.ATTR_USEHOSTLIST,
+						MPICH2LaunchConfigurationDefaults.ATTR_USEHOSTLIST);
 			} catch (CoreException e) {
 				// TODO handle exception?
 				MPICH2UIPlugin.log(e);
@@ -187,49 +181,82 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 				throw new ValidationException(Messages.BasicMPICH2RMLaunchConfigurationDynamicTab_Validation_EmptyHostList);
 			}
 		}
+	}
 
-		/**
-		 * Convert a comma separated list into one host per line
-		 *
-		 * @param list
-		 * @return
-		 */
-		private String hostListToText(String list) {
-			if (list == null) {
-				return ""; //$NON-NLS-1$
+	private class WidgetListener extends RMLaunchConfigurationDynamicTabWidgetListener {
+		public WidgetListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+			super(dynamicTab);
+		}
+
+		@Override
+		protected void doModifyText(ModifyEvent e) {
+			if (e.getSource() == numProcsSpinner || e.getSource() == prefixText || e.getSource() == hostFileText
+					|| e.getSource() == hostListText) {
+				// getDataSource().justValidate();
+			} else {
+				super.doModifyText(e);
 			}
-			String result = ""; //$NON-NLS-1$
-			String[] values = list.split(","); //$NON-NLS-1$
-			for (int i = 0; i < values.length; i++) {
-				if (!values[i].equals("")) { //$NON-NLS-1$
-					if (i > 0) {
-						result += "\r"; //$NON-NLS-1$
-					}
-					result += values[i];
-				}
+		}
+
+		@Override
+		protected void doWidgetSelected(SelectionEvent e) {
+			if (e.getSource() == noLocalButton || e.getSource() == usePrefixButton) {
+				// getDataSource().justValidate();
+			} else if (e.getSource() == usePrefixButton || e.getSource() == hostFileButton || e.getSource() == hostListButton) {
+				// getDataSource().justValidate();
+				updateControls();
+			} else {
+				super.doWidgetSelected(e);
 			}
-			return result;
 		}
 	}
 
-	@Override
-	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
-		return new DataSource(this);
-	}
+	/**
+	 * @since 2.0
+	 */
+	protected Composite control;
+	/**
+	 * @since 2.0
+	 */
+	protected Spinner numProcsSpinner;
+	/**
+	 * @since 2.0
+	 */
+	protected Button noLocalButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Button usePrefixButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Text prefixText;
+	/**
+	 * @since 2.0
+	 */
+	protected Text hostFileText;
+	/**
+	 * @since 2.0
+	 */
+	protected Button hostFileButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Text hostListText;
+	/**
+	 * @since 2.0
+	 */
+	protected Button hostListButton;
+	/**
+	 * @since 2.0
+	 */
+	protected Button browseButton;
 
-	@Override
-	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
-		return new WidgetListener(this);
-	}
-
-	@Override
-	public Image getImage() {
-		return null;
-	}
-
-	@Override
-	public String getText() {
-		return Messages.BasicMPICH2RMLaunchConfigurationDynamicTab_Title;
+	/**
+	 * @since 2.0
+	 */
+	public BasicMPICH2RMLaunchConfigurationDynamicTab(ILaunchConfigurationDialog dialog) {
+		super(dialog);
 	}
 
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
@@ -238,7 +265,7 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 		layout.numColumns = 3;
 		control.setLayout(layout);
 
-		Label label  = new Label(control, SWT.NONE);
+		Label label = new Label(control, SWT.NONE);
 		label.setText(Messages.BasicMPICH2RMLaunchConfigurationDynamicTab_Label_NumberProcesses);
 
 		numProcsSpinner = new Spinner(control, SWT.BORDER);
@@ -300,30 +327,41 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 		hostListText.addModifyListener(getListener());
 	}
 
-	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm,
-			IPQueue queue, ILaunchConfiguration configuration, String mode)
+	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 
-		List<IAttribute<?,?,?>> attrs = new ArrayList<IAttribute<?,?,?>>();
+		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
 
-		int numProcs = configuration.getAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS, MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
+		int numProcs = configuration.getAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS,
+				MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
 		try {
-			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(numProcs));
+			attrs.add(JobAttributes.getNumberOfProcessesAttributeDefinition().create(Integer.valueOf(numProcs)));
 		} catch (IllegalValueException e) {
-			throw new CoreException(new Status(IStatus.ERROR, MPICH2UIPlugin.getDefault().getBundle().getSymbolicName(), Messages.BasicMPICH2RMLaunchConfigurationDynamicTab_Exception_InvalidConfiguration, e));
+			throw new CoreException(new Status(IStatus.ERROR, MPICH2UIPlugin.getDefault().getBundle().getSymbolicName(),
+					Messages.BasicMPICH2RMLaunchConfigurationDynamicTab_Exception_InvalidConfiguration, e));
 		}
 
-		attrs.add(MPICH2LaunchAttributes.getLaunchArgumentsAttributeDefinition().create(MPICH2LaunchConfiguration.calculateArguments(configuration)));
+		attrs.add(MPICH2LaunchAttributes.getLaunchArgumentsAttributeDefinition().create(
+				MPICH2LaunchConfiguration.calculateArguments(configuration)));
 
-		return attrs.toArray(new IAttribute<?,?,?>[attrs.size()]);
+		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
 	}
 
 	public Control getControl() {
 		return control;
 	}
 
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration,
-			IResourceManager rm, IPQueue queue) {
+	@Override
+	public Image getImage() {
+		return null;
+	}
+
+	@Override
+	public String getText() {
+		return Messages.BasicMPICH2RMLaunchConfigurationDynamicTab_Title;
+	}
+
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_NUMPROCS, MPICH2LaunchConfigurationDefaults.ATTR_NUMPROCS);
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_NOLOCAL, MPICH2LaunchConfigurationDefaults.ATTR_NOLOCAL);
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_USEPREFIX, MPICH2LaunchConfigurationDefaults.ATTR_USEPREFIX);
@@ -341,5 +379,15 @@ public class BasicMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchConf
 		browseButton.setEnabled(hostFileButton.getSelection());
 		hostFileText.setEnabled(hostFileButton.getSelection());
 		hostListText.setEnabled(hostListButton.getSelection());
+	}
+
+	@Override
+	protected RMLaunchConfigurationDynamicTabDataSource createDataSource() {
+		return new DataSource(this);
+	}
+
+	@Override
+	protected RMLaunchConfigurationDynamicTabWidgetListener createListener() {
+		return new WidgetListener(this);
 	}
 }

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.ui.wizards;
 
+import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
@@ -61,7 +61,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		private int periodicMonitorTime = 0;
 		private String continuousMonitorCmd = null;
 		private String remoteInstallPath = null;
-		
+
 		protected DataSource(AbstractConfigurationWizardPage page) {
 			super(page);
 		}
@@ -106,9 +106,8 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			return useToolDefaults;
 		}
 
-		public void setCommandFields(String launchCmd, String debugCmd, String discoverCmd, 
-				String periodicMonitorCmd, int periodicMonitorTime, String continuousMonitorCmd, 
-				String remoteInstallPath) {
+		public void setCommandFields(String launchCmd, String debugCmd, String discoverCmd, String periodicMonitorCmd,
+				int periodicMonitorTime, String continuousMonitorCmd, String remoteInstallPath) {
 			this.launchCmd = launchCmd;
 			this.debugCmd = debugCmd;
 			this.discoverCmd = discoverCmd;
@@ -128,11 +127,11 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		public void setCommandsEnabled(boolean enable) {
 			this.commandsEnabled = enable;
 		}
-		
+
 		public void setInstallDefaults(boolean useInstallDefaults) {
 			this.useInstallDefaults = useInstallDefaults;
 		}
-		
+
 		public void setUseDefaults(boolean useToolDefaults) {
 			this.useToolDefaults = useToolDefaults;
 		}
@@ -255,12 +254,13 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		@Override
 		protected void validateGlobal() throws ValidationException {
-			// Nothing yet. Would validate the entire GenericMPIResourceManagerConfiguration.
+			// Nothing yet. Would validate the entire
+			// GenericMPIResourceManagerConfiguration.
 		}
 
 		@Override
 		protected void validateLocal() throws ValidationException {
-			if (! useToolDefaults) {
+			if (!useToolDefaults) {
 				if (launchCmdText != null && launchCmd == null) {
 					throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingLaunchCommand);
 				}
@@ -269,10 +269,12 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 				}
 				if (discoverCmdText != null) {
 					if (discoverCmd == null) {
-						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDiscoverCommand);
+						throw new ValidationException(
+								Messages.AbstractToolRMConfigurationWizardPage_Validation_MissingDiscoverCommand);
 					}
 					if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
-						throw new ValidationException(Messages.AbstractToolRMConfigurationWizardPage_Validation_InvalidPeriodicMonitorCommandTimeRange);
+						throw new ValidationException(
+								Messages.AbstractToolRMConfigurationWizardPage_Validation_InvalidPeriodicMonitorCommandTimeRange);
 					}
 				}
 			}
@@ -283,13 +285,9 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		@Override
 		protected void doModifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(source == launchCmdText ||
-					source == debugCmdText ||
-					source == discoverCmdText ||
-					source == periodicMonitorCmdText ||
-					source == continuousMonitorCmdText ||
-					source == periodicMonitorTimeSpinner ||
-					source == remoteInstallPathText) {
+			if (source == launchCmdText || source == debugCmdText || source == discoverCmdText || source == periodicMonitorCmdText
+					|| source == continuousMonitorCmdText || source == periodicMonitorTimeSpinner
+					|| source == remoteInstallPathText) {
 				resetErrorMessages();
 				getDataSource().storeAndValidate();
 			} else {
@@ -302,7 +300,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			Object source = e.getSource();
 			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
-			} else if (source == defaultCmdButton || source == defaultInstallButton)  {
+			} else if (source == defaultCmdButton || source == defaultInstallButton) {
 				resetErrorMessages();
 				getDataSource().storeAndValidate();
 				updateControls();
@@ -312,9 +310,9 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		}
 	}
 
-	//	protected boolean listenerEnabled = false;
+	// protected boolean listenerEnabled = false;
 	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	
+
 	private IRemoteServices remoteServices = null;
 	private IRemoteConnection connection = null;
 
@@ -328,12 +326,13 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 	protected Button browseButton = null;
 	protected Button defaultCmdButton = null;
 	protected Button defaultInstallButton = null;
-	
+
 	protected boolean isEnabled;
 
 	protected int capabilities = IToolRMConfiguration.NO_CAP_SET;
 
-	public AbstractToolRMConfigurationWizardPage(IRMConfigurationWizard wizard, int capabilities, String pageName, String title, String description) {
+	public AbstractToolRMConfigurationWizardPage(IRMConfigurationWizard wizard, int capabilities, String pageName, String title,
+			String description) {
 		super(wizard, pageName);
 		this.capabilities = capabilities;
 		setTitle(title);
@@ -341,13 +340,13 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 	}
 
 	/**
-	 * Update wizard UI selections from settings. This should be called whenever any
-	 * settings are changed.
+	 * Update wizard UI selections from settings. This should be called whenever
+	 * any settings are changed.
 	 */
 	@Override
 	public void updateControls() {
-		boolean enabled = ((DataSource)getDataSource()).getCommandsEnabled();
-		
+		boolean enabled = ((DataSource) getDataSource()).getCommandsEnabled();
+
 		defaultCmdButton.setEnabled(enabled);
 
 		if (enabled) {
@@ -372,7 +371,7 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		if (continuousMonitorCmdText != null) {
 			continuousMonitorCmdText.setEnabled(enabled);
 		}
-		
+
 		enabled = !defaultInstallButton.getSelection();
 
 		if (remoteInstallPathText != null) {
@@ -380,12 +379,11 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		}
 	}
 
-
 	protected void createContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
 		contents.setLayout(new GridLayout(4, false));
 		contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
+
 		Group cmdGroup = new Group(contents, SWT.SHADOW_ETCHED_IN);
 		cmdGroup.setLayout(new GridLayout(4, false));
 		cmdGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
@@ -469,7 +467,8 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			pathGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 			pathGroup.setText(Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationGroup);
 
-			defaultInstallButton = createCheckButton(pathGroup, Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationDefault);
+			defaultInstallButton = createCheckButton(pathGroup,
+					Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationDefault);
 			defaultInstallButton.addSelectionListener(getWidgetListener());
 			defaultInstallButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 
@@ -480,7 +479,8 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			remoteInstallPathText.addModifyListener(getWidgetListener());
 			remoteInstallPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-			browseButton = SWTUtil.createPushButton(pathGroup, Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationButton, null);
+			browseButton = SWTUtil.createPushButton(pathGroup,
+					Messages.AbstractToolRMConfigurationWizardPage_Label_InstallationButton, null);
 			browseButton.addSelectionListener(getWidgetListener());
 			browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		}
@@ -513,21 +513,25 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		return contents;
 	}
-	
+
 	/**
 	 * Show a dialog that lets the user select a file.
 	 */
 	protected void handlePathBrowseButtonSelected() {
 		/*
-		 * Need to do this here because the connection may have been changed
-		 * by the previous wizard page
+		 * Need to do this here because the connection may have been changed by
+		 * the previous wizard page
 		 */
 
 		IRemoteUIServices remUIServices = null;
-		IRemoteResourceManagerConfiguration config = (IRemoteResourceManagerConfiguration)getDataSource().getConfig();
+		IRemoteResourceManagerConfiguration config = (IRemoteResourceManagerConfiguration) getDataSource().getConfig();
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
-			remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rmID);
+			IWizardContainer container = null;
+			if (getControl().isVisible()) {
+				container = getWizard().getContainer();
+			}
+			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null) {
 				connection = remoteServices.getConnectionManager().getConnection(conn);
@@ -540,9 +544,11 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			if (connection.isOpen()) {
 				IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
 				fileMgr.setConnection(connection);
-	
+
 				String initialPath = "//"; // Start at root since OMPI is probably installed in the system somewhere //$NON-NLS-1$
-				String selectedPath = fileMgr.browseDirectory(getControl().getShell(), Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath, IRemoteUIConstants.OPEN);
+				String selectedPath = fileMgr.browseDirectory(getControl().getShell(),
+						Messages.AbstractToolRMConfigurationWizardPage_Title_PathSelectionDialog, initialPath,
+						IRemoteUIConstants.OPEN);
 				if (selectedPath != null) {
 					remoteInstallPathText.setText(selectedPath);
 				}

@@ -19,49 +19,64 @@ package org.eclipse.ptp.launch.ui.extensions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 
-
 /**
- * Abstract class that is the extension point for contributing
- * Dynamic configuration tabs to this plug-in.
+ * Abstract class that is the extension point for contributing Dynamic
+ * configuration tabs to this plug-in.
  * 
  * @author rsqrd
- *
+ * 
  */
 public abstract class AbstractRMLaunchConfigurationFactory {
 
 	protected static CoreException makeCoreException(String string) {
-		IStatus status = new Status(Status.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-				Status.ERROR, string, null);
+		IStatus status = new Status(Status.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), Status.ERROR, string, null);
 		return new CoreException(status);
 	}
-	
+
 	/**
+	 * Create a new launch configuration dynamic tab.
+	 * 
 	 * @param rm
-	 * @return
+	 *            resource manager this tab is for
+	 * @param dialog
+	 *            dialog that is creating the tab
+	 * @return new dynamic tab
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	public IRMLaunchConfigurationDynamicTab create(IResourceManager rm) throws CoreException {
+	public IRMLaunchConfigurationDynamicTab create(IResourceManager rm, ILaunchConfigurationDialog dialog) throws CoreException {
 		if (!getResourceManagerClass().isInstance(rm)) {
 			throw makeCoreException(NLS.bind(Messages.AbstractRMLaunchConfigurationFactory_0, rm.getName()));
 		}
-		return doCreate(rm);
+		return doCreate(rm, dialog);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#getResourceManagerClass()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
+	 * #getResourceManagerClass()
 	 */
 	public abstract Class<? extends IResourceManager> getResourceManagerClass();
 
 	/**
+	 * Method to actually create the tab.
+	 * 
 	 * @param rm
-	 * @return
+	 *            resource manager this tab is for
+	 * @param dialog
+	 *            dialog that is creating the tab
+	 * @return new dynamic tab
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	protected abstract IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm)
-	throws CoreException;
+	protected abstract IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
+			throws CoreException;
 }
