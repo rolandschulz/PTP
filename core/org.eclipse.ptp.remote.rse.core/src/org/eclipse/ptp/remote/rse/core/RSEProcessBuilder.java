@@ -152,7 +152,13 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	}
 
 	private SpawnerSubsystem getSpawnerSubsystem() {
-		ISubSystem subsystems[] = getDStoreConnectorService().getSubSystems();
+		DStoreConnectorService dstoreConnectorService = getDStoreConnectorService();
+		
+		if(dstoreConnectorService == null) {
+			return null;
+		}
+		
+		ISubSystem subsystems[] = dstoreConnectorService.getSubSystems();
 		
 		for(ISubSystem subsystem : subsystems) {
 			if(subsystem instanceof SpawnerSubsystem)
