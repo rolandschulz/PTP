@@ -1641,11 +1641,17 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		IRemoteConnectionManager connMgr;
 
 		config = (IPEResourceManagerConfiguration) ((AbstractResourceManager) rm).getConfiguration();
-		remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
-				getLaunchConfigurationDialog());
-		remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
-		connMgr = remoteService.getConnectionManager();
-		remoteConnection = connMgr.getConnection(config.getConnectionName());
+		if (config != null) {
+			remoteService = PTPRemoteUIPlugin.getDefault().getRemoteServices(config.getRemoteServicesId(),
+					getLaunchConfigurationDialog());
+			if (remoteService != null) {
+				remoteUIService = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteService);
+				connMgr = remoteService.getConnectionManager();
+				if (connMgr != null) {
+					remoteConnection = connMgr.getConnection(config.getConnectionName());
+				}
+			}
+		}
 		parentShell = parent.getShell();
 		clearAllWidgets();
 		activeWidgets = new Vector<Object>();
@@ -2718,6 +2724,9 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
 		}
+		if (remoteService == null || remoteConnection == null) {
+			throw new ValidationException(Messages.getString("PERMLaunchConfigurationDynamicTab.0")); //$NON-NLS-1$
+		}
 		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
 		if ((!fileInfo.exists()) || (fileInfo.isDirectory())) {
@@ -2742,6 +2751,9 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		testPath = new Path(path);
 		if (!testPath.isValidPath(path)) {
 			throw new ValidationException(Messages.getString(errorID));
+		}
+		if (remoteService == null || remoteConnection == null) {
+			throw new ValidationException(Messages.getString("PERMLaunchConfigurationDynamicTab.0")); //$NON-NLS-1$
 		}
 		remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 		fileInfo = remoteResource.fetchInfo();
@@ -2776,6 +2788,9 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 				testPath = new Path(path);
 				if (!testPath.isValidPath(path)) {
 					throw new ValidationException(Messages.getString(errorID));
+				}
+				if (remoteService == null || remoteConnection == null) {
+					throw new ValidationException(Messages.getString("PERMLaunchConfigurationDynamicTab.0")); //$NON-NLS-1$
 				}
 				remoteResource = remoteService.getFileManager(remoteConnection).getResource(testPath.toString());
 				fileInfo = remoteResource.fetchInfo();
