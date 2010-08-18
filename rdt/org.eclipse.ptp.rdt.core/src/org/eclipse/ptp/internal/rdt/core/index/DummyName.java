@@ -30,14 +30,26 @@ public class DummyName implements IIndexName, Serializable {
 	SourceRange fRange;
 	boolean fIsDeclaration;
 	boolean fIsDefinition;
+	boolean fIsReference;
 	String fName;
 
 	IIndexFile fFile;
+
+	private boolean fCouldBePolymorphicMethodCall;
+
+	private boolean fIsReadAccess;
+
+	private boolean fIsWriteAccess;
+
+	private boolean fIsInlineNamespaceDefinition;
 	
-	public DummyName(String name, IIndexFileLocation location, ISourceRange range, boolean isDefinition, boolean isDeclaration) {
+	public DummyName(String name, IIndexFileLocation location, ISourceRange range, boolean isDefinition,
+			boolean isDeclaration, boolean isReference, boolean couldBePolymorphicMethodCall, boolean isReadAccess,
+			boolean isWriteAccess, boolean isInlineNamespaceDefinition) {
 		fName = name;
 		fFile = new DummyFile(location);
 		fRange = new SourceRange(range);
+		fIsReference = isReference;
 	}
 	
 	public DummyName(ISourceReference element) throws CModelException {
@@ -81,11 +93,13 @@ public class DummyName implements IIndexName, Serializable {
 	}
 	
 	public DummyName(IASTName name, IASTFileLocation location, IIndexFileLocation fileLocation) {
-		this(name.toString(), fileLocation, new SourceRange(name, location), name.isDefinition(), name.isDeclaration());
+		this(name.toString(), fileLocation, new SourceRange(name, location), name.isDefinition(), name.isDeclaration(), name.isReference(),
+				false, false, false, false);
 	}
 	
-	public DummyName(IIndexName name, IASTFileLocation location, IIndexFileLocation fileLocation) {
-		this(name.toString(), fileLocation, new SourceRange(name, location), name.isDefinition(), name.isDeclaration());
+	public DummyName(IIndexName name, IASTFileLocation location, IIndexFileLocation fileLocation) throws CoreException {
+		this(name.toString(), fileLocation, new SourceRange(name, location), name.isDefinition(), name.isDeclaration(), name.isReference(),
+				name.couldBePolymorphicMethodCall(), name.isReadAccess(), name.isWriteAccess(), name.isInlineNamespaceDefinition());
 	}
 
 	public DummyName(IIndexName name) throws CoreException {
@@ -137,18 +151,15 @@ public class DummyName implements IIndexName, Serializable {
 	}
 
 	public boolean couldBePolymorphicMethodCall() throws CoreException {
-		// TODO Auto-generated method stub
-		return false;
+		return fCouldBePolymorphicMethodCall;
 	}
 
 	public boolean isReadAccess() throws CoreException {
-		// TODO Auto-generated method stub
-		return false;
+		return fIsReadAccess;
 	}
 
 	public boolean isWriteAccess() throws CoreException {
-		// TODO Auto-generated method stub
-		return false;
+		return fIsWriteAccess;
 	}
 
 	@Override
@@ -158,5 +169,10 @@ public class DummyName implements IIndexName, Serializable {
 
 	public char[] getSimpleID() {
 		return fName.toCharArray();
+	}
+
+	@Override
+	public boolean isInlineNamespaceDefinition() throws CoreException {
+		return fIsInlineNamespaceDefinition;
 	}
 }
