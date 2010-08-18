@@ -171,7 +171,6 @@ public class DummyName implements IIndexName, Serializable {
 		return fName.toCharArray();
 	}
 
-	@Override
 	public boolean isInlineNamespaceDefinition() throws CoreException {
 		return fIsInlineNamespaceDefinition;
 	}
