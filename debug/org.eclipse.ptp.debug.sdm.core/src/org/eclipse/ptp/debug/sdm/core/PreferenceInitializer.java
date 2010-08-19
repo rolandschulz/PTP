@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.core;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.ptp.core.Preferences;
 
 /**
  * @author Clement chu
@@ -27,14 +27,17 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#
+	 * initializeDefaultPreferences()
 	 */
+	@Override
 	public void initializeDefaultPreferences() {
-		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
-
-		store.setDefault(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE, 
+		Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE,
 				SDMPreferenceConstants.SDM_DEBUGGER_BACKENDS[SDMPreferenceConstants.SDM_DEFAULT_DEDUGGER_BACKEND_INDEX]);
-		store.setDefault(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH, SDMPreferenceConstants.SDM_DEFAULT_DEDUGGER_BACKEND_PATH);
+		Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH,
+				SDMPreferenceConstants.SDM_DEFAULT_DEDUGGER_BACKEND_PATH);
 	}
 }

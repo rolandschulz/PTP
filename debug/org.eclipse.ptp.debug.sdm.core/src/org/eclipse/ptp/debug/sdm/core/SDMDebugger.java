@@ -34,13 +34,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.attributes.ArrayAttribute;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.StringAttribute;
@@ -188,10 +188,8 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	public synchronized void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
-		Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
-
-		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
-			int level = store.getInt(SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
+		if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
+			int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
 			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING) {
 				DebugUtil.SDM_MASTER_TRACING = true;
 			}
@@ -221,20 +219,22 @@ public class SDMDebugger implements IPDebugger {
 		String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
 
 		dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
-		dbgArgs.add("--debugger=" + store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
+		dbgArgs.add("--debugger=" + Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
 
-		String dbgPath = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);
+		String dbgPath = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+				SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);
 		if (dbgPath.length() > 0) {
 			dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
 		}
 
-		String dbgExtraArgs = store.getString(SDMPreferenceConstants.SDM_DEBUGGER_ARGS);
+		String dbgExtraArgs = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+				SDMPreferenceConstants.SDM_DEBUGGER_ARGS);
 		if (dbgExtraArgs.length() > 0) {
 			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
 		}
 
-		if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
-			dbgArgs.add("--debug=" + store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
+		if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
+			dbgArgs.add("--debug=" + Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
 		}
 
 		// remote setting
@@ -301,7 +301,7 @@ public class SDMDebugger implements IPDebugger {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
 		}
 		IResourceManagerConfiguration conf = rm.getConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), null);
 		if (remoteServices == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_0));
 		}
@@ -461,26 +461,27 @@ public class SDMDebugger implements IPDebugger {
 			Random random = new Random();
 			for (Integer processIndex : new BitSetIterable(processJobRanks)) {
 				String nodeId = pJob.getProcessNodeId(processIndex);
-				IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
-				if (node == null) {
+				if (nodeId == null) {
 					subMon.subTask(Messages.SDMDebugger_10);
-				}
-				while (node == null && !subMon.isCanceled()) {
-					try {
-						wait(3000);
-					} catch (InterruptedException e) {
-						// ignore
+					while (nodeId == null && !subMon.isCanceled()) {
+						try {
+							wait(3000);
+						} catch (InterruptedException e) {
+							// ignore
+						}
+						nodeId = pJob.getProcessNodeId(processIndex);
+						subMon.worked(1);
 					}
-					node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
 				}
+				IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
 				if (node == null) {
 					throw newCoreException(Messages.SDMDebugger_15);
 				}
 				String nodeName = node.getName();
 				int portNumber = base + random.nextInt(range);
 				pw.format("%s %s %d\n", processIndex, nodeName, portNumber); //$NON-NLS-1$
-				subMon.setWorkRemaining(100);
-				subMon.worked(1);
+				subMon.setWorkRemaining(60);
+				subMon.worked(10);
 			}
 			pw.close();
 			try {
