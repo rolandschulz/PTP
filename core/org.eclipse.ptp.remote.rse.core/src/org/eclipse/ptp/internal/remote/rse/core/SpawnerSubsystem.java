@@ -33,10 +33,10 @@ import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IShell
 
 /**
  * @author crecoskie
- *
+ * 
  */
 @SuppressWarnings("restriction")
-public class SpawnerSubsystem extends SubSystem implements ISubSystem {
+public class SpawnerSubsystem extends SubSystem {
 
 	private boolean fIsInitializing;
 
@@ -45,25 +45,27 @@ public class SpawnerSubsystem extends SubSystem implements ISubSystem {
 		setHidden(true);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.rse.core.subsystems.SubSystem#initializeSubSystem(org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.rse.core.subsystems.SubSystem#initializeSubSystem(org.eclipse
+	 * .core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public synchronized void initializeSubSystem(IProgressMonitor monitor)
-			throws SystemMessageException {
-		
+	public synchronized void initializeSubSystem(IProgressMonitor monitor) throws SystemMessageException {
+
 		boolean isFirstCall = false;
-		if(!fIsInitializing) {
+		if (!fIsInitializing) {
 			fIsInitializing = true;
 			isFirstCall = true;
 		}
-		
+
 		try {
 			super.initializeSubSystem(monitor);
 			DataStore dataStore = getDataStore(monitor);
-			DataElement status = dataStore
-					.activateMiner("org.eclipse.ptp.internal.remote.rse.core.miners.SpawnerMiner"); //$NON-NLS-1$
-			
+			DataElement status = dataStore.activateMiner("org.eclipse.ptp.internal.remote.rse.core.miners.SpawnerMiner"); //$NON-NLS-1$
+
 			if (status != null) {
 				DStoreStatusMonitor statusMonitor = new DStoreStatusMonitor(dataStore);
 
@@ -81,25 +83,24 @@ public class SpawnerSubsystem extends SubSystem implements ISubSystem {
 				fIsInitializing = false;
 		}
 	}
-	
-	protected synchronized DataStore getDataStore(IProgressMonitor monitor)
-	{
-		if(monitor == null) {
+
+	protected synchronized DataStore getDataStore(IProgressMonitor monitor) {
+		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-			
+
 		try {
 			RSECorePlugin.waitForInitCompletion();
 		} catch (InterruptedException e) {
 			RSEAdapterCorePlugin.log(e);
 			return null;
 		}
-			
+
 		IConnectorService connectorService = getConnectorService();
-		
-		if(connectorService instanceof DStoreConnectorService) {
+
+		if (connectorService instanceof DStoreConnectorService) {
 			DStoreConnectorService dstoreConnectorService = (DStoreConnectorService) connectorService;
-			if(!fIsInitializing && !dstoreConnectorService.isConnected()) {
+			if (!fIsInitializing && !dstoreConnectorService.isConnected()) {
 				try {
 					dstoreConnectorService.connect(monitor);
 				} catch (Exception e) {
@@ -111,60 +112,58 @@ public class SpawnerSubsystem extends SubSystem implements ISubSystem {
 		}
 		return null;
 	}
-	
-	@SuppressWarnings("restriction")
-	public synchronized IHostShell spawnRedirected(String cmd, String workingDirectory, String encoding, String[] envp, IProgressMonitor monitor) {
+
+	public synchronized IHostShell spawnRedirected(String cmd, String workingDirectory, String encoding, String[] envp,
+			IProgressMonitor monitor) {
 		DataStore dataStore = getDataStore(monitor);
-		   
-	    if (dataStore != null)
-	    {	     	
-	    	
-	    	monitor.beginTask("Launching command: " + cmd, 100); //$NON-NLS-1$
-	   
-	        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), SpawnerMiner.C_SPAWN_REDIRECTED);
-            if (queryCmd != null)
-            {
-            	
-            	ArrayList<Object> args = new ArrayList<Object>();
-            	
-            	DataElement dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, cmd);
-            	args.add(dataElement);
-            	
-            	dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, workingDirectory);
-            	args.add(dataElement);
-            	
-            	for(String envVar : envp) {
-            		dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, envVar);
-                	args.add(dataElement);
-            	}
-            	
-            	// execute the command
-            	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
-            	
-            	IShellService shellService = getShellServiceSubSystem().getShellService();
-            	
-            	DStoreStatusMonitor statusMonitor;
-            	
-            	// should be the DStoreShellService
-            	if(shellService instanceof DStoreShellService) {
-            		statusMonitor = ((DStoreShellService)shellService).getStatusMonitor(dataStore);
-            		return new DStoreHostShell(statusMonitor, status, dataStore, workingDirectory, cmd, encoding, envp);
-            	}
-            }
-	    }
-	    
-	    return null;
-	}
-	
-	public IShellServiceSubSystem getShellServiceSubSystem() {
-		ISubSystem[] subsystems = getConnectorService().getSubSystems();
-		
-		for(ISubSystem subsystem : subsystems) {
-			if(subsystem instanceof IShellServiceSubSystem)
-				return (IShellServiceSubSystem) subsystem;
+
+		if (dataStore != null) {
+
+			monitor.beginTask("Launching command: " + cmd, 100); //$NON-NLS-1$
+
+			DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), SpawnerMiner.C_SPAWN_REDIRECTED);
+			if (queryCmd != null) {
+
+				ArrayList<Object> args = new ArrayList<Object>();
+
+				DataElement dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, cmd);
+				args.add(dataElement);
+
+				dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, workingDirectory);
+				args.add(dataElement);
+
+				for (String envVar : envp) {
+					dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, envVar);
+					args.add(dataElement);
+				}
+
+				// execute the command
+				DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+
+				IShellService shellService = getShellServiceSubSystem().getShellService();
+
+				DStoreStatusMonitor statusMonitor;
+
+				// should be the DStoreShellService
+				if (shellService instanceof DStoreShellService) {
+					statusMonitor = ((DStoreShellService) shellService).getStatusMonitor(dataStore);
+					return new DStoreHostShell(statusMonitor, status, dataStore, workingDirectory, cmd, encoding, envp);
+				}
+			}
 		}
-		
+
 		return null;
 	}
-            
+
+	public IShellServiceSubSystem getShellServiceSubSystem() {
+		ISubSystem[] subsystems = getConnectorService().getSubSystems();
+
+		for (ISubSystem subsystem : subsystems) {
+			if (subsystem instanceof IShellServiceSubSystem)
+				return (IShellServiceSubSystem) subsystem;
+		}
+
+		return null;
+	}
+
 }
