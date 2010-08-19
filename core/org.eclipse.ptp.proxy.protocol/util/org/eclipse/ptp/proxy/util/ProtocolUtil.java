@@ -273,7 +273,7 @@ public class ProtocolUtil {
 	 */
 	public static void encodeStringAttributeType(List<ByteBuffer> bufs, String attribute, Charset charset) throws IOException {
 		String[] kv = attribute.split("="); //$NON-NLS-1$
-		bufs.add(ByteBuffer.allocate(1).put((byte) TYPE_STRING_ATTR));
+		bufs.add(encodeType(TYPE_STRING_ATTR));
 		encodeString(bufs, kv[0], charset);
 		if (kv.length == 1) {
 			bufs.add(new VarInt(0).getBytes());
@@ -294,7 +294,7 @@ public class ProtocolUtil {
 	 * @since 5.0
 	 */
 	public static void encodeStringType(List<ByteBuffer> bufs, String str, Charset charset) {
-		bufs.add(ByteBuffer.allocate(1).put((byte) TYPE_STRING));
+		bufs.add(encodeType(TYPE_STRING));
 		encodeString(bufs, str, charset);
 	}
 
@@ -315,6 +315,18 @@ public class ProtocolUtil {
 		} catch (UnsupportedEncodingException e) {
 			bufs.add(ByteBuffer.wrap(str.getBytes()));
 		}
+	}
+
+	/**
+	 * Encode an attribute type in a byte buffer
+	 * 
+	 * @param type
+	 * @return
+	 */
+	private static ByteBuffer encodeType(int type) {
+		ByteBuffer b = ByteBuffer.allocate(1).put((byte) type);
+		b.rewind();
+		return b;
 	}
 
 }
