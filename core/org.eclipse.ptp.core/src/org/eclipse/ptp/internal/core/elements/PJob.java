@@ -66,7 +66,7 @@ public class PJob extends Parent implements IPJobControl {
 	private final ListenerList elementListeners = new ListenerList();
 	private final ProcessOutput processOutput;
 	private final Map<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> processAttributesMap =
-			new HashMap<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>>();
+		new HashMap<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>>();
 
 	public PJob(String id, IPQueueControl queue, IAttribute<?, ?, ?>[] attrs) {
 		super(id, queue, P_JOB, attrs);
@@ -143,15 +143,15 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcessAttributes
 	 * (java.util.BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public synchronized void addProcessAttributes(BitSet processIds,
-			AttributeManager attributes) {
-		// limit the addition of attributes to the current set of
-		// child processes
-		processIds = (BitSet) processIds.clone();
-		processIds.and(currentProcessJobRanks);
+	public void addProcessAttributes(BitSet processIds,	AttributeManager attributes) {
+		synchronized (this) {
+			// limit the addition of attributes to the current set of
+			// child processes
+			processIds = (BitSet) processIds.clone();
+			processIds.and(currentProcessJobRanks);
 
-		addAttributesForJobRanks(processIds, attributes);
-
+			addAttributesForJobRanks(processIds, attributes);
+		}
 		fireChangedProcesses(processIds, attributes);
 	}
 
@@ -162,43 +162,47 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPJobControl#addProcesses(java.util
 	 * .BitSet, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
-	public synchronized void addProcessesByJobRanks(BitSet newProcessJobRanks, AttributeManager attrs) {
-		// add the processes to the existing set of processes (via BitSets of
-		// ids)
-		currentProcessJobRanks.or(newProcessJobRanks);
+	public void addProcessesByJobRanks(BitSet newProcessJobRanks, AttributeManager attrs) {
+		synchronized (this) {
 
-		// add the attributes from the AttributeManager to these processes.
-		addAttributesForJobRanks(newProcessJobRanks, attrs);
+			// add the processes to the existing set of processes (via BitSets of
+			// ids)
+			currentProcessJobRanks.or(newProcessJobRanks);
 
-		// add some that may have been overlooked, that will be needed
-		List<IAttribute<?, ?, ?>> requiredAttributes = new ArrayList<IAttribute<?, ?, ?>>(5);
-		/*
-		 * Create required attributes.
-		 */
-		EnumeratedAttribute<ProcessAttributes.State> procState = getAttribute(attrs,
-				ProcessAttributes.getStateAttributeDefinition());
-		if (procState == null) {
-			procState = ProcessAttributes.getStateAttributeDefinition().create();
-			requiredAttributes.add(procState);
-		}
-		IntegerAttribute exitCode = getAttribute(attrs, ProcessAttributes.getExitCodeAttributeDefinition());
-		if (exitCode == null) {
-			try {
-				exitCode = ProcessAttributes.getExitCodeAttributeDefinition().create();
-				requiredAttributes.add(exitCode);
-			} catch (IllegalValueException e) {
+			// add the attributes from the AttributeManager to these processes.
+			addAttributesForJobRanks(newProcessJobRanks, attrs);
+
+			// add some that may have been overlooked, that will be needed
+			List<IAttribute<?, ?, ?>> requiredAttributes = new ArrayList<IAttribute<?, ?, ?>>(5);
+			/*
+			 * Create required attributes.
+			 */
+			EnumeratedAttribute<ProcessAttributes.State> procState = getAttribute(attrs,
+					ProcessAttributes.getStateAttributeDefinition());
+			if (procState == null) {
+				procState = ProcessAttributes.getStateAttributeDefinition().create();
+				requiredAttributes.add(procState);
 			}
-		}
-		StringAttribute signalName = getAttribute(attrs,
-				ProcessAttributes.getSignalNameAttributeDefinition());
-		if (signalName == null) {
-			signalName = ProcessAttributes.getSignalNameAttributeDefinition().create();
-			requiredAttributes.add(signalName);
-		}
+			IntegerAttribute exitCode = getAttribute(attrs, ProcessAttributes.getExitCodeAttributeDefinition());
+			if (exitCode == null) {
+				try {
+					exitCode = ProcessAttributes.getExitCodeAttributeDefinition().create();
+					requiredAttributes.add(exitCode);
+				} catch (IllegalValueException e) {
+				}
+			}
+			StringAttribute signalName = getAttribute(attrs,
+					ProcessAttributes.getSignalNameAttributeDefinition());
+			if (signalName == null) {
+				signalName = ProcessAttributes.getSignalNameAttributeDefinition().create();
+				requiredAttributes.add(signalName);
+			}
 
-		final IAttribute<?, ?, ?>[] requiredAttrs =
+			final IAttribute<?, ?, ?>[] requiredAttrs =
 				requiredAttributes.toArray(new IAttribute<?, ?, ?>[0]);
-		addAttributesForJobRanks(newProcessJobRanks, new AttributeManager(requiredAttrs));
+			addAttributesForJobRanks(newProcessJobRanks, new AttributeManager(requiredAttrs));
+
+		} // end synchronized (this)
 
 		fireNewProcesses(newProcessJobRanks);
 	}
@@ -209,7 +213,7 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	private void clearOutput(BitSet processJobRanks) {
 		final AttributeIndexSet<StringAttribute> outAttrs =
-				getAttributeIndexSet(ProcessAttributes.getStdoutAttributeDefinition());
+			getAttributeIndexSet(ProcessAttributes.getStdoutAttributeDefinition());
 
 		// if all of the processes have had their output cleared
 		// then delete the output file
@@ -253,8 +257,8 @@ public class PJob extends Parent implements IPJobControl {
 	private void fireChangedProcesses(BitSet processes,
 			AttributeManager attributes) {
 		IChangedProcessEvent e =
-				new ChangedProcessEvent(this, this, processes,
-						attributes);
+			new ChangedProcessEvent(this, this, processes,
+					attributes);
 
 		for (Object listener : childListeners.getListeners()) {
 			((IJobChildListener) listener).handleEvent(e);
@@ -268,7 +272,7 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	private void fireNewProcesses(BitSet processes) {
 		INewProcessEvent e =
-				new NewProcessEvent(this, this, processes);
+			new NewProcessEvent(this, this, processes);
 
 		for (Object listener : childListeners.getListeners()) {
 			((IJobChildListener) listener).handleEvent(e);
@@ -283,7 +287,7 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	private void fireRemoveProcesses(BitSet processes) {
 		IRemoveProcessEvent e =
-				new RemoveProcessEvent(this, this, processes);
+			new RemoveProcessEvent(this, this, processes);
 
 		for (Object listener : childListeners.getListeners()) {
 			((IJobChildListener) listener).handleEvent(e);
@@ -296,7 +300,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * @return
 	 */
 	private <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
-			A getAttribute(AttributeManager attrs, D def) {
+	A getAttribute(AttributeManager attrs, D def) {
 		return attrs.getAttribute(def);
 	}
 
@@ -306,7 +310,7 @@ public class PJob extends Parent implements IPJobControl {
 	 */
 	@SuppressWarnings("unchecked")
 	private synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
-			AttributeIndexSet<A> getAttributeIndexSet(D def) {
+	AttributeIndexSet<A> getAttributeIndexSet(D def) {
 		AttributeIndexSet<A> attributeIndexSet = (AttributeIndexSet<A>) processAttributesMap.get(def);
 		if (attributeIndexSet == null) {
 			attributeIndexSet = new AttributeIndexSet<A>();
@@ -371,7 +375,7 @@ public class PJob extends Parent implements IPJobControl {
 		final Set<IAttributeDefinition<?, ?, ?>> results = new HashSet<IAttributeDefinition<?, ?, ?>>();
 		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
 			final Set<IAttribute<?, ?, ?>> attrs =
-					(Set<IAttribute<?, ?, ?>>) ais.getSubset(processJobRanks).getAttributes();
+				(Set<IAttribute<?, ?, ?>>) ais.getSubset(processJobRanks).getAttributes();
 			for (IAttribute<?, ?, ?> attr : attrs) {
 				results.add(attr.getDefinition());
 			}
@@ -391,7 +395,7 @@ public class PJob extends Parent implements IPJobControl {
 		final Set<IAttribute<?, ?, ?>> results = new HashSet<IAttribute<?, ?, ?>>();
 		for (AttributeIndexSet<?> ais : processAttributesMap.values()) {
 			final Set<IAttribute<?, ?, ?>> attrs =
-					(Set<IAttribute<?, ?, ?>>) ais.getSubset(processJobRanks).getAttributes();
+				(Set<IAttribute<?, ?, ?>>) ais.getSubset(processJobRanks).getAttributes();
 			results.addAll(attrs);
 		}
 		return results;
@@ -405,7 +409,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * ptp.core.attributes.IAttributeDefinition, java.util.BitSet)
 	 */
 	public synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
-			Set<A> getProcessAttributes(D attributeDefinition, BitSet processJobRanks) {
+	Set<A> getProcessAttributes(D attributeDefinition, BitSet processJobRanks) {
 		AttributeIndexSet<A> jobRanksForAttr = getAttributeIndexSet(attributeDefinition);
 		AttributeIndexSet<A> subSet = jobRanksForAttr.getSubset(processJobRanks);
 		return subSet.getAttributes();
@@ -433,7 +437,7 @@ public class PJob extends Parent implements IPJobControl {
 	}
 
 	public synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
-			T getProcessAttributeValue(int processJobRank, final D def) {
+	T getProcessAttributeValue(int processJobRank, final D def) {
 		AttributeIndexSet<A> attrIndexSet = getAttributeIndexSet(def);
 		final A attr = attrIndexSet.getAttribute(processJobRank);
 		if (attr == null) {
@@ -459,7 +463,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * .attributes.IAttribute)
 	 */
 	public synchronized <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
-			BitSet getProcessJobRanks(A attribute) {
+	BitSet getProcessJobRanks(A attribute) {
 		D def = attribute.getDefinition();
 		AttributeIndexSet<A> attrJobRanks = getAttributeIndexSet(def);
 		return attrJobRanks.getIndexSet(attribute);
@@ -591,17 +595,21 @@ public class PJob extends Parent implements IPJobControl {
 	 * .util.BitSet)
 	 */
 	public synchronized void removeProcessesByJobRanks(BitSet processJobRanks) {
-		// remove these processes from the master set
-		currentProcessJobRanks.andNot(processJobRanks);
+		synchronized (this) {
 
-		// remove these processes from each AttributeIndexSet
-		final List<AttributeIndexSet<?>> values = new ArrayList<AttributeIndexSet<?>>(processAttributesMap.values());
-		for (AttributeIndexSet<?> ais : values) {
-			ais.clearIndices(processJobRanks);
+			// remove these processes from the master set
+			currentProcessJobRanks.andNot(processJobRanks);
+
+			// remove these processes from each AttributeIndexSet
+			final List<AttributeIndexSet<?>> values = new ArrayList<AttributeIndexSet<?>>(processAttributesMap.values());
+			for (AttributeIndexSet<?> ais : values) {
+				ais.clearIndices(processJobRanks);
+			}
+
+			// clear the output file for the processes
+			clearOutput(processJobRanks);
+
 		}
-
-		// clear the output file for the processes
-		clearOutput(processJobRanks);
 
 		fireRemoveProcesses(processJobRanks);
 	}
