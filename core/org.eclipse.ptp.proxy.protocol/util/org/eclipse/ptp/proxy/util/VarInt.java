@@ -54,16 +54,17 @@ public class VarInt {
 		if (fBytes == null && fValid) {
 			fBytes = ByteBuffer.allocate(5); // maximum size
 			int val = fValue;
-			while (val > 0) {
+			do {
 				byte b = (byte) (val & 0x7f);
 				val >>= 7;
-				if (val > 0) {
+				if (val != 0) {
 					b |= 0x80;
 				}
 				fBytes.put(b);
-				fBytes.limit(fBytes.position()); // set limit to the size of the
-													// buffer
-			}
+			} while (val != 0);
+
+			fBytes.limit(fBytes.position()); // set limit to the size of the
+												// buffer
 		}
 		fBytes.rewind();
 		return fBytes;
