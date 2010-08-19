@@ -46,4 +46,7 @@ public final class RDTHelpContextIds {
 	public static final String SERVICE_MODEL_PROPERTY_PAGE = PREFIX + "service_model_properties_context"; //$NON-NLS-1$
 	public static final String REMOTE_INCLUDE_TAB = PREFIX + "remote_include_tab_context"; //$NON-NLS-1$
 	public static final String REMOTE_SYMBOL_TAB = PREFIX + "remote_symbol_tab_context"; //$NON-NLS-1$
+
+	public static final String REMOTE_C_CPP_OUTLINE = PREFIX + "remote_C_CPP_outline_view_context"; //$NON-NLS-1$
+	
 }
