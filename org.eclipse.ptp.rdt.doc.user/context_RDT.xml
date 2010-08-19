@@ -47,6 +47,10 @@
       <description>Click below for help</description>
       <topic href="html/reference/remote_c_editor.html" label="Remote C/C++ Editor"/>
    </context>
+   <context id ="remote_C_CPP_outline_view_context">
+	   <description>Click below to see help.</description>
+	   <topic href="html/reference/outline_view.html" label="Remote C/C++ Editor Outline view"/>
+	</context>
    <context id="remote_C_CPP_search_context">
       <topic href="html/reference/remote_c_search.html" label="Remote C/C++ Search"/>
    </context>
