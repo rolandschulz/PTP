@@ -594,7 +594,7 @@ public class PJob extends Parent implements IPJobControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPJobControl#removeProcesses(java
 	 * .util.BitSet)
 	 */
-	public synchronized void removeProcessesByJobRanks(BitSet processJobRanks) {
+	public void removeProcessesByJobRanks(BitSet processJobRanks) {
 		synchronized (this) {
 
 			// remove these processes from the master set
