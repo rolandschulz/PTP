@@ -92,7 +92,7 @@ public class Messages extends NLS {
 	public static String RunAnalyseHandlerBase_28;
 	public static String RunAnalyseHandlerBase_29;
 	public static String RunAnalyseHandlerBase_42;
-	public static String RunAnalyseHandlerBase_44;
+	public static String RunAnalyseHandlerBase_on;
 	public static String RunAnalyseHandlerBase_60;
 	public static String RunAnalyseHandlerBase_61;
 	public static String RunAnalyseHandlerBase_62;
