@@ -11,19 +11,17 @@
  */
 package org.eclipse.ptp.remote.remotetools.core.environment;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
 import org.eclipse.ptp.remote.remotetools.core.environment.conf.AttributeNames;
 import org.eclipse.ptp.remote.remotetools.core.environment.conf.DefaultValues;
 import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 import org.eclipse.ptp.remotetools.utils.verification.IllegalAttributeException;
-
 
 /**
  * Defines rules to build the target configuration from an attribute hash map.
@@ -34,9 +32,9 @@ import org.eclipse.ptp.remotetools.utils.verification.IllegalAttributeException;
 public class ConfigFactory {
 	Map<String, String> currentMap = null;
 	Map<String, String> defaultMap = null;
-	
+
 	ControlAttributes attributes = null;
-	
+
 	private static final String PREFIX = "ptp."; //$NON-NLS-1$
 	public static final String ATTR_LOCALHOST_SELECTION = PREFIX + "localhost-selection"; //$NON-NLS-1$
 	public static final String ATTR_LOGIN_USERNAME = PREFIX + "login-username"; //$NON-NLS-1$
@@ -48,20 +46,18 @@ public class ConfigFactory {
 	public static final String ATTR_IS_PASSWORD_AUTH = PREFIX + "is-passwd-auth"; //$NON-NLS-1$
 	public static final String ATTR_CONNECTION_TIMEOUT = PREFIX + "connection-timeout"; //$NON-NLS-1$
 	public static final String ATTR_CIPHER_TYPE = PREFIX + "cipher-type"; //$NON-NLS-1$
-	
-	public final static String[] KEY_ARRAY = { ATTR_LOCALHOST_SELECTION,
-			ATTR_LOGIN_USERNAME, ATTR_CONNECTION_PORT, ATTR_CONNECTION_ADDRESS,
-			ATTR_KEY_PATH, ATTR_IS_PASSWORD_AUTH, ATTR_CONNECTION_TIMEOUT};
-	
-	public final static String[] KEY_CIPHERED_ARRAY = { ATTR_KEY_PASSPHRASE,
-			ATTR_LOGIN_PASSWORD };
-	
+
+	public final static String[] KEY_ARRAY = { ATTR_LOCALHOST_SELECTION, ATTR_LOGIN_USERNAME, ATTR_CONNECTION_PORT,
+			ATTR_CONNECTION_ADDRESS, ATTR_KEY_PATH, ATTR_IS_PASSWORD_AUTH, ATTR_CONNECTION_TIMEOUT };
+
+	public final static String[] KEY_CIPHERED_ARRAY = { ATTR_KEY_PASSPHRASE, ATTR_LOGIN_PASSWORD };
+
 	public ConfigFactory() {
 		createDefaultMap();
 		createCurrentMapFromPreferences();
 		attributes = new ControlAttributes(currentMap, defaultMap);
 	}
-	
+
 	public ConfigFactory(Map<String, String> newMap) {
 		createDefaultMap();
 		if (newMap == null) {
@@ -71,15 +67,15 @@ public class ConfigFactory {
 		}
 		attributes = new ControlAttributes(currentMap, defaultMap);
 	}
-	
+
 	public Map<String, String> getMap() {
 		return currentMap;
 	}
-	
+
 	public ControlAttributes getAttributes() {
 		return attributes;
 	}
-	
+
 	private void createDefaultMap() {
 		defaultMap = new HashMap<String, String>();
 		defaultMap.put(ATTR_LOCALHOST_SELECTION, DefaultValues.LOCALHOST_SELECTION);
@@ -93,15 +89,17 @@ public class ConfigFactory {
 		defaultMap.put(ATTR_CONNECTION_TIMEOUT, DefaultValues.CONNECTION_TIMEOUT);
 		defaultMap.put(ATTR_CIPHER_TYPE, PTPTargetControl.DEFAULT_CIPHER);
 	}
-	
+
 	private void createCurrentMapFromPreferences() {
 		currentMap = new HashMap<String, String>();
-		Preferences store = RemoteToolsAdapterCorePlugin.getDefault().getPluginPreferences();
-		currentMap.put(ATTR_LOGIN_USERNAME, store.getString(ATTR_LOGIN_USERNAME));
-		currentMap.put(ATTR_CONNECTION_ADDRESS, store.getString(ATTR_CONNECTION_ADDRESS));
-		currentMap.put(ATTR_CONNECTION_PORT, store.getString(ATTR_CONNECTION_PORT));
+		currentMap.put(ATTR_LOGIN_USERNAME,
+				Preferences.getString(RemoteToolsAdapterCorePlugin.getUniqueIdentifier(), ATTR_LOGIN_USERNAME));
+		currentMap.put(ATTR_CONNECTION_ADDRESS,
+				Preferences.getString(RemoteToolsAdapterCorePlugin.getUniqueIdentifier(), ATTR_CONNECTION_ADDRESS));
+		currentMap.put(ATTR_CONNECTION_PORT,
+				Preferences.getString(RemoteToolsAdapterCorePlugin.getUniqueIdentifier(), ATTR_CONNECTION_PORT));
 	}
-	
+
 	public TargetConfig createTargetConfig() throws CoreException {
 		try {
 			TargetConfig config = new TargetConfig();
@@ -120,7 +118,8 @@ public class ConfigFactory {
 			config.setCipherType(attributes.getString(ATTR_CIPHER_TYPE));
 			return config;
 		} catch (IllegalAttributeException e) {
-			throw new CoreException(new Status(Status.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle().getSymbolicName(), 0, e.getMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+					.getSymbolicName(), 0, e.getMessage(), e));
 		}
 	}
 }
