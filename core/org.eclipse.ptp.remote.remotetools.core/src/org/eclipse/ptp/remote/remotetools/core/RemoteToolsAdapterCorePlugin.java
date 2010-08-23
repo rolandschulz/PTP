@@ -9,14 +9,14 @@ import org.osgi.framework.BundleContext;
 public class RemoteToolsAdapterCorePlugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.core.remotetools"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.remote.core.remotetools"; //$NON-NLS-1$
 
 	// The remote services ID
 	public static final String SERVICES_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
 
 	// The shared instance
 	private static RemoteToolsAdapterCorePlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -25,8 +25,12 @@ public class RemoteToolsAdapterCorePlugin extends Plugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -34,8 +38,12 @@ public class RemoteToolsAdapterCorePlugin extends Plugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -43,11 +51,23 @@ public class RemoteToolsAdapterCorePlugin extends Plugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static RemoteToolsAdapterCorePlugin getDefault() {
 		return plugin;
 	}
 
+	/**
+	 * Get unique identifier
+	 * 
+	 * @return
+	 * @since 5.0
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null) {
+			return PLUGIN_ID;
+		}
+		return getDefault().getBundle().getSymbolicName();
+	}
 }
