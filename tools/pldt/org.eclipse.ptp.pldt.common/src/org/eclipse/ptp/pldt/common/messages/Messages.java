@@ -92,7 +92,6 @@ public class Messages extends NLS {
 	public static String RunAnalyseHandlerBase_28;
 	public static String RunAnalyseHandlerBase_29;
 	public static String RunAnalyseHandlerBase_42;
-	public static String RunAnalyseHandlerBase_on;
 	public static String RunAnalyseHandlerBase_60;
 	public static String RunAnalyseHandlerBase_61;
 	public static String RunAnalyseHandlerBase_62;
@@ -103,6 +102,7 @@ public class Messages extends NLS {
 	public static String RunAnalyseHandlerBase_incl_paths_in_pref_page;
 	public static String RunAnalyseHandlerBase_include_paths_not_found;
 	public static String RunAnalyseHandlerBase_no_files_selected;
+	public static String RunAnalyseHandlerBase_on;
 	public static String RunAnalyseHandlerBase_partial_analysis_complete;
 	public static String RunAnalyseHandlerBase_please_first_specify;
 	public static String RunAnalyseHandlerBase_please_select;
