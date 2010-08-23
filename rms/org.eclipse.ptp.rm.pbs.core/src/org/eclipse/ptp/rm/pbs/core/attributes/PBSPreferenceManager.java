@@ -11,50 +11,59 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.core.attributes;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.pbs.core.Activator;
 
 /**
  * @since 5.0
  */
-public class PBSPreferenceManager {
+public class PBSPreferenceManager extends AbstractPreferenceInitializer {
 	private static final String SELECTED = "selectedAttributes"; //$NON-NLS-1$
 	private static final String TEMPLATE = "attributeConfiguration"; //$NON-NLS-1$
-
-	public static Preferences getPreferences() {
-		return Activator.getDefault().getPluginPreferences();
-	}
 
 	/**
 	 * @since 4.0
 	 */
 	public static String getSelectedAttributes() {
-		return getPreferences().getString(SELECTED);
+		return Preferences.getString(Activator.getUniqueIdentifier(), SELECTED);
 	}
 
 	/**
 	 * @since 4.0
 	 */
 	public static String getTemplatePreference() {
-		return getPreferences().getString(TEMPLATE);
+		return Preferences.getString(Activator.getUniqueIdentifier(), TEMPLATE);
 	}
 
 	public static void savePreferences() {
-		Activator.getDefault().savePluginPreferences();
+		Preferences.savePreferences(Activator.getUniqueIdentifier());
 	}
 
 	/**
 	 * @since 4.0
 	 */
 	public static void setSelectedAttributes(String selected) {
-		getPreferences().setValue(SELECTED, selected);
+		Preferences.setString(Activator.getUniqueIdentifier(), SELECTED, selected);
 	}
 
 	/**
 	 * @since 4.0
 	 */
 	public static void setTemplatePreference(String attrConfig) {
-		getPreferences().setValue(TEMPLATE, attrConfig);
+		Preferences.setString(Activator.getUniqueIdentifier(), TEMPLATE, attrConfig);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#
+	 * initializeDefaultPreferences()
+	 */
+	@Override
+	public void initializeDefaultPreferences() {
+		Preferences.setDefaultString(Activator.getUniqueIdentifier(), SELECTED, ""); //$NON-NLS-1$
+		Preferences.setDefaultString(Activator.getUniqueIdentifier(), TEMPLATE, ""); //$NON-NLS-1$
 	}
 
 }
