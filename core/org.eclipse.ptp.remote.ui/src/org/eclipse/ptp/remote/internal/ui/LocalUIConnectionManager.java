@@ -26,52 +26,59 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
-
 public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteUIConnectionManager#newConnection()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteUIConnectionManager#newConnection()
 	 */
 	public IRemoteConnection newConnection(Shell shell) {
-		MessageDialog.openInformation(shell,Messages.LocalUIConnectionManager_2,Messages.LocalUIConnectionManager_3);
+		MessageDialog.openInformation(shell, Messages.LocalUIConnectionManager_2, Messages.LocalUIConnectionManager_3);
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#openConnectionWithProgress(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.core.IRemoteConnection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#
+	 * openConnectionWithProgress(org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
-	public void openConnectionWithProgress(final Shell shell,
-			final IRemoteConnection connection) {
+	public void openConnectionWithProgress(final Shell shell, final IRemoteConnection connection) {
 		if (!connection.isOpen()) {
 			IRunnableWithProgress op = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						connection.open(monitor);
 					} catch (RemoteConnectionException e) {
-						ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0,
-								Messages.LocalUIConnectionManager_1,
-								new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, e.getMessage()));
+						ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0, Messages.LocalUIConnectionManager_1,
+								new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage()));
 					}
 				}
 			};
 			try {
 				new ProgressMonitorDialog(shell).run(true, true, op);
 			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0,
-						Messages.LocalUIConnectionManager_1,
-						new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, e.getMessage()));
+				ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0, Messages.LocalUIConnectionManager_1, new Status(
+						IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage()));
 			} catch (InterruptedException e) {
-				ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0,
-						Messages.LocalUIConnectionManager_1,
-						new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, e.getMessage()));
+				ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0, Messages.LocalUIConnectionManager_1, new Status(
+						IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage()));
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#updateConnection(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.core.IRemoteConnection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#updateConnection
+	 * (org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public void updateConnection(Shell shell, IRemoteConnection connection) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
