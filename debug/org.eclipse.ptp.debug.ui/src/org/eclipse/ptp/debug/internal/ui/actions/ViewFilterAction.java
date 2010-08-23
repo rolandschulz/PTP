@@ -18,15 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IViewActionDelegate;
@@ -34,32 +33,41 @@ import org.eclipse.ui.IViewPart;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public abstract class ViewFilterAction extends ViewerFilter implements IViewActionDelegate, IActionDelegate2 {
 	private IViewPart view = null;
 	private IAction action = null;
 
-	/** Constructor
+	/**
+	 * Constructor
 	 * 
 	 */
 	public ViewFilterAction() {
 		super();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate2#dispose()
 	 */
-	public void dispose() {}
+	public void dispose() {
+	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
 	 */
 	public void init(IAction action) {
 		this.action = action;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
 	public void init(IViewPart view) {
@@ -68,7 +76,9 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 		run(action);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
@@ -85,40 +95,42 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 			viewer.addFilter(this);
 		}
 		viewer.refresh();
-		Preferences store = getPreferences();
 		String key = getView().getSite().getId() + "." + getPreferenceKey(); //$NON-NLS-1$
-		store.setValue(key, action.isChecked());
-		PTPDebugUIPlugin.getDefault().savePluginPreferences();
+		Preferences.setBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), key, action.isChecked());
+		Preferences.savePreferences(PTPDebugCorePlugin.getUniqueIdentifier());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action
+	 * .IAction, org.eclipse.swt.widgets.Event)
 	 */
 	public void runWithEvent(IAction action, Event event) {
 		run(action);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
+	 * .IAction, org.eclipse.jface.viewers.ISelection)
 	 */
-	public void selectionChanged(IAction action, ISelection selection) {}
+	public void selectionChanged(IAction action, ISelection selection) {
+	}
 
-	/** 
+	/**
 	 * Get preference key
+	 * 
 	 * @return
 	 */
 	protected abstract String getPreferenceKey();
-	
-	/** 
-	 * Get preference store
-	 * @return
-	 */
-	protected Preferences getPreferences() {
-		return PTPDebugCorePlugin.getDefault().getPluginPreferences();
-	}
-	
-	/** 
+
+	/**
 	 * Get preference value
+	 * 
 	 * @param part
 	 * @return
 	 */
@@ -126,41 +138,43 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 		String baseKey = getPreferenceKey();
 		String viewKey = part.getSite().getId();
 		String compositeKey = viewKey + "." + baseKey; //$NON-NLS-1$
-		Preferences store = getPreferences();
 		boolean value = false;
-		if (store.contains(compositeKey)) {
-			value = store.getBoolean(compositeKey);
+		if (Preferences.contains(PTPDebugCorePlugin.getUniqueIdentifier(), compositeKey)) {
+			value = Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), compositeKey);
 		} else {
-			value = store.getBoolean(baseKey);
+			value = Preferences.getBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), baseKey);
 		}
-		return value;		
-	} 
+		return value;
+	}
 
-	/** 
+	/**
 	 * Get structured viewer
+	 * 
 	 * @return
 	 */
 	protected StructuredViewer getStructuredViewer() {
-		IDebugView view = (IDebugView)getView().getAdapter(IDebugView.class);
+		IDebugView view = (IDebugView) getView().getAdapter(IDebugView.class);
 		if (view != null) {
 			Viewer viewer = view.getViewer();
 			if (viewer instanceof StructuredViewer) {
-				return (StructuredViewer)viewer;
+				return (StructuredViewer) viewer;
 			}
-		}		
+		}
 		return null;
 	}
-	
-	/** 
+
+	/**
 	 * Check if action is checked
+	 * 
 	 * @return true is action is checked
 	 */
 	protected boolean getValue() {
 		return action.isChecked();
 	}
-	
-	/** 
+
+	/**
 	 * Get view
+	 * 
 	 * @return
 	 */
 	protected IViewPart getView() {
