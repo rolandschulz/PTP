@@ -44,8 +44,8 @@ public class RemoteServerManager {
 	private static AbstractRemoteServerRunner createServer(String id) {
 		AbstractRemoteServerRunner server = null;
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry
-				.getExtensionPoint(PTPRemoteCorePlugin.PLUGIN_ID, REMOTE_SERVER_EXTENSION_POINT_ID);
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPRemoteCorePlugin.getUniqueIdentifier(),
+				REMOTE_SERVER_EXTENSION_POINT_ID);
 		final IExtension[] extensions = extensionPoint.getExtensions();
 
 		for (IExtension ext : extensions) {

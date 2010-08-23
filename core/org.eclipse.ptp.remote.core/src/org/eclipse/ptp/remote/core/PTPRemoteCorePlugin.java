@@ -49,7 +49,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 		}
 	}
 
-	public static final String PLUGIN_ID = "org.eclipse.ptp.remote.core"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.remote.core"; //$NON-NLS-1$
 	/**
 	 * @since 4.0
 	 */
@@ -207,7 +207,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 * implementations.
 	 * 
 	 * @return remote services
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public synchronized IRemoteServices[] getAllRemoteServices(IProgressMonitor monitor) {
 		retrieveRemoteServices();
@@ -279,7 +279,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 *            progress monitor to allow user to cancel operation
 	 * @return initialized remote services, or null if the services cannot be
 	 *         found or initialized
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public IRemoteServices getRemoteServices(String id, IProgressMonitor monitor) {
 		IRemoteServices services = getRemoteServices(id);
@@ -321,7 +321,7 @@ public class PTPRemoteCorePlugin extends Plugin {
 	 *            progress monitor to allow user to cancel operation
 	 * @return initialized remote services, or null if the services cannot be
 	 *         found or initialized
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public IRemoteServices getRemoteServices(URI uri, IProgressMonitor monitor) {
 		IRemoteServices services = getRemoteServices(uri);
