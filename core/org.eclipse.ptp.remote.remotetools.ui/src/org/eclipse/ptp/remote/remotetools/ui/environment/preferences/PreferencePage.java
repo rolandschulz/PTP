@@ -22,9 +22,9 @@ import org.eclipse.ptp.remotetools.preferences.ui.SpacerFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-
 /**
  * Preference page for the Remote Host default values for new targets.
+ * 
  * @author Richard Maciel, Daniel Felix Ferber
  * @since 1.2.1
  */
@@ -33,17 +33,19 @@ public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
 	public PreferencePage() {
 		super(GRID);
 
-		ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), RemoteToolsAdapterCorePlugin.PLUGIN_ID);
+		ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(),
+				RemoteToolsAdapterCorePlugin.getUniqueIdentifier());
 		setPreferenceStore(store);
-		
+
 		// setDescription must be called here or it wont work
 		setDescription(Messages.PreferencePage_Description);
 	}
 
+	@Override
 	protected void createFieldEditors() {
 		// setTitle must be called here or it wont work
 		setTitle(Messages.PreferencePage_Title);
-		
+
 		addField(new LabelFieldEditor(Messages.PreferencePage_HeaderConnection, getFieldEditorParent()));
 
 		StringFieldEditor addrfield = new StringFieldEditor(ConfigFactory.ATTR_CONNECTION_ADDRESS,
@@ -64,6 +66,7 @@ public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
 		addField(new LabelFieldEditor(Messages.PreferencePage_HeaderLaunch, getFieldEditorParent()));
 	}
 
+	@Override
 	public void init(IWorkbench workbench) {
 	}
 
