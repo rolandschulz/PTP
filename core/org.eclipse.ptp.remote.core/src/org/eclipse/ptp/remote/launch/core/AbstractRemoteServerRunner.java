@@ -176,7 +176,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * @since 4.1 Gets the verify command.
+	 * @since 5.0 Gets the verify command.
 	 * 
 	 * @return the verify command
 	 */
@@ -185,7 +185,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * @since 4.1 Gets the verify fail message.
+	 * @since 5.0 Gets the verify fail message.
 	 * 
 	 * @return the verify fail message
 	 */
@@ -194,7 +194,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * @since 4.1 Gets the verify pattern.
+	 * @since 5.0 Gets the verify pattern.
 	 * 
 	 * @return the verify pattern
 	 */
@@ -367,8 +367,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
 									setServerState(ServerState.RUNNING);
 								}
-								PTPRemoteCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, 
-										fServerName + ": " + output	)); //$NON-NLS-1$
+								PTPRemoteCorePlugin
+										.getDefault()
+										.getLog()
+										.log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), fServerName
+												+ ": " + output)); //$NON-NLS-1$
 							}
 						}
 					} catch (IOException e) {
@@ -407,16 +410,17 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				// Check if the valid java version is installed on the server
 				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
 					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
-						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, getVerifyFailMessage()));
+						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(),
+								getVerifyFailMessage()));
 					} else {
-						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID,
+						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(),
 								Messages.AbstractRemoteServerRunner_12));
 					}
 
 				}
 
 				if (!subMon.isCanceled()) {
-					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, NLS.bind(
+					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), NLS.bind(
 							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue())));
 				}
 			}
@@ -424,7 +428,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		} catch (CoreException e) {
 			return e.getStatus();
 		} catch (IOException e) {
-			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.PLUGIN_ID, e.getMessage(), null);
+			return new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage(), null);
 		} finally {
 			synchronized (this) {
 				fRemoteProcess = null;
@@ -547,7 +551,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * @since 4.1 Sets the verify command.
+	 * @since 5.0 Sets the verify command.
 	 * 
 	 * @param fVerifyCommand
 	 *            the new verify command
@@ -557,7 +561,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * @since 4.1 Sets the verify fail message.
+	 * @since 5.0 Sets the verify fail message.
 	 * 
 	 * @param fVerifyFailMessage
 	 *            the new verify fail message
@@ -567,7 +571,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
-	 * @since 4.1 Sets the verify pattern.
+	 * @since 5.0 Sets the verify pattern.
 	 * 
 	 * @param fVerifyPattern
 	 *            the new verify pattern
