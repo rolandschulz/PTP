@@ -18,55 +18,68 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.custom.BusyIndicator;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class ShowFullPathsAction extends ViewFilterAction {
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
+	@Override
 	public void run(IAction action) {
 		final StructuredViewer viewer = getStructuredViewer();
-		IDebugView view = (IDebugView)getView().getAdapter(IDebugView.class);
+		IDebugView view = (IDebugView) getView().getAdapter(IDebugView.class);
 		if (view != null) {
 			IDebugModelPresentation pres = view.getPresentation(PTPDebugUIPlugin.getUniqueIdentifier());
 			if (pres != null) {
-				pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, (getValue()?Boolean.TRUE:Boolean.FALSE));
+				pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, (getValue() ? Boolean.TRUE : Boolean.FALSE));
 				BusyIndicator.showWhile(viewer.getControl().getDisplay(), new Runnable() {
 					public void run() {
 						viewer.refresh();
-						Preferences store = getPreferences();
 						String key = getView().getSite().getId() + "." + getPreferenceKey(); //$NON-NLS-1$
-						store.setValue(key, getValue());
-						PTPDebugUIPlugin.getDefault().savePluginPreferences();						
+						Preferences.setBoolean(PTPDebugCorePlugin.getUniqueIdentifier(), key, getValue());
+						Preferences.savePreferences(PTPDebugCorePlugin.getUniqueIdentifier());
 					}
-				} );
+				});
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers
+	 * .Viewer, java.lang.Object, java.lang.Object)
 	 */
+	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.ui.actions.ViewFilterAction#getPreferenceKey()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.ui.actions.ViewFilterAction#getPreferenceKey
+	 * ()
 	 */
+	@Override
 	protected String getPreferenceKey() {
 		return IPDebugConstants.PREF_SHOW_FULL_PATHS;
 	}
