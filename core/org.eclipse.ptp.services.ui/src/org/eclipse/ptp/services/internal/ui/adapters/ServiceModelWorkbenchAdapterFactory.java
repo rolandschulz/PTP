@@ -20,17 +20,12 @@ import org.eclipse.ui.model.IWorkbenchAdapter2;
 
 public class ServiceModelWorkbenchAdapterFactory implements IAdapterFactory {
 
-	private static final ServiceModelWorkbenchAdapter SERVICE_MODEL_WORKBENCH_ADAPTER =
-		new ServiceModelWorkbenchAdapter();
-	private static final ServiceConfigurationWorkbenchAdapter SERVICE_CONFIGURATION_WORKBENCH_ADAPTER =
-		new ServiceConfigurationWorkbenchAdapter();
-	private static final ServiceProviderWorkbenchAdapter SERVICE_PROVIDER_WORKBENCH_ADAPTER =
-		new ServiceProviderWorkbenchAdapter();
-	private static final ServiceWorkbenchAdapter SERVICE_WORKBENCH_ADAPTER =
-		new ServiceWorkbenchAdapter();
+	private static final ServiceModelWorkbenchAdapter SERVICE_MODEL_WORKBENCH_ADAPTER = new ServiceModelWorkbenchAdapter();
+	private static final ServiceConfigurationWorkbenchAdapter SERVICE_CONFIGURATION_WORKBENCH_ADAPTER = new ServiceConfigurationWorkbenchAdapter();
+	private static final ServiceProviderWorkbenchAdapter SERVICE_PROVIDER_WORKBENCH_ADAPTER = new ServiceProviderWorkbenchAdapter();
+	private static final ServiceWorkbenchAdapter SERVICE_WORKBENCH_ADAPTER = new ServiceWorkbenchAdapter();
 
-	public Object getAdapter(Object adaptableObject, 
-			@SuppressWarnings("unchecked") Class adapterType) {
+	public Object getAdapter(Object adaptableObject, @SuppressWarnings("rawtypes") Class adapterType) {
 		if (adapterType == IWorkbenchAdapter.class || adapterType == IWorkbenchAdapter2.class) {
 			if (adaptableObject instanceof IServiceModelManager) {
 				return SERVICE_MODEL_WORKBENCH_ADAPTER;
@@ -48,9 +43,9 @@ public class ServiceModelWorkbenchAdapterFactory implements IAdapterFactory {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
-		return new Class[] {IWorkbenchAdapter.class, IWorkbenchAdapter2.class};
+		return new Class[] { IWorkbenchAdapter.class, IWorkbenchAdapter2.class };
 	}
 
 }

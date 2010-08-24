@@ -7,9 +7,8 @@
  *
  * Contributors:
  *    IBM Corporation - initial API and implementation
- *******************************************************************************/ 
+ *******************************************************************************/
 package org.eclipse.ptp.services.ui.widgets;
-
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -40,81 +39,88 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * A widget that allows the user to create a new service configuration or select an
- * existing service configuration. The widget also provides an "Advanced" button to
- * perform any additional configuration that may be required.
+ * A widget that allows the user to create a new service configuration or select
+ * an existing service configuration. The widget also provides an "Advanced"
+ * button to perform any additional configuration that may be required.
  */
 public class AddServiceConfigurationWidget extends Composite implements ISelectionProvider {
 	private class ConfigurationSelectionEvent implements IStructuredSelection {
-		private Object selection = getServiceConfiguration();
+		private final Object selection = getServiceConfiguration();
+
 		public Object getFirstElement() {
 			return isEmpty() ? null : toArray()[0];
 		}
+
 		public boolean isEmpty() {
 			return toArray().length == 0;
 		}
-		@SuppressWarnings("unchecked")
+
+		@SuppressWarnings("rawtypes")
 		public Iterator iterator() {
 			return toList().iterator();
 		}
+
 		public int size() {
 			return toArray().length;
 		}
+
 		public Object[] toArray() {
-			return (selection == null) ? new Object[0] : new Object[] {selection};
+			return (selection == null) ? new Object[0] : new Object[] { selection };
 		}
-		@SuppressWarnings("unchecked")
+
+		@SuppressWarnings("rawtypes")
 		public List toList() {
 			return Arrays.asList(selection);
 		}
 	}
-		
-	private Text fNewConfigNameText;
-	private Button fNewConfigButton;
-	private Button fExistingConfigButton;
-	private Button fAdvancedButton;
-	
+
+	private final Text fNewConfigNameText;
+	private final Button fNewConfigButton;
+	private final Button fExistingConfigButton;
+	private final Button fAdvancedButton;
+
 	private ISelection fSelection = null;
 	private IServiceConfiguration fDefaultConfig = null;
 	private IServiceConfiguration fServiceConfig = null;
-	private ServiceConfigurationSelectionWidget fServiceConfigWidget;
-	
+	private final ServiceConfigurationSelectionWidget fServiceConfigWidget;
+
 	private final ListenerList fSelectionListeners = new ListenerList();
-	
+
 	public AddServiceConfigurationWidget(Composite parent, int style) {
 		this(parent, style, null, null, false);
 	}
-	
-	public AddServiceConfigurationWidget(Composite parent, int style,
-			Set<IServiceConfiguration> excluded, Set<IService> services, boolean enableButtons) {
+
+	public AddServiceConfigurationWidget(Composite parent, int style, Set<IServiceConfiguration> excluded, Set<IService> services,
+			boolean enableButtons) {
 		super(parent, style);
-		
+
 		GridLayout bodyLayout = new GridLayout(1, false);
 		bodyLayout.marginHeight = 0;
 		bodyLayout.marginWidth = 0;
 		setLayout(bodyLayout);
 
 		fNewConfigButton = new Button(this, SWT.RADIO);
-		fNewConfigButton.setText(Messages.AddServiceConfigurationWidget_0); 
+		fNewConfigButton.setText(Messages.AddServiceConfigurationWidget_0);
 		fNewConfigButton.setLayoutData(new GridData());
 		fNewConfigButton.addSelectionListener(new SelectionAdapter() {
-			@Override public void widgetSelected(SelectionEvent e) {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
 				doSelectionUpdate();
 				notifySelection(new ConfigurationSelectionEvent());
 			}
 		});
 		fNewConfigButton.setEnabled(false);
-		
+
 		Composite newComp = new Composite(this, SWT.NONE);
 		newComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		GridLayout layout = new GridLayout(2, false);
 		layout.marginLeft = 10;
 		newComp.setLayout(layout);
-		
+
 		final Label label = new Label(newComp, SWT.NONE);
-		label.setText(Messages.AddServiceConfigurationWidget_1); 
+		label.setText(Messages.AddServiceConfigurationWidget_1);
 		label.setLayoutData(new GridData());
-		
+
 		fNewConfigNameText = new Text(newComp, SWT.BORDER);
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		fNewConfigNameText.setLayoutData(data);
@@ -123,45 +129,47 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 				fDefaultConfig.setName(fNewConfigNameText.getText());
 			}
 		});
-		
+
 		fExistingConfigButton = new Button(this, SWT.RADIO);
-		fExistingConfigButton.setText(Messages.AddServiceConfigurationWidget_2); 
+		fExistingConfigButton.setText(Messages.AddServiceConfigurationWidget_2);
 		fExistingConfigButton.setLayoutData(new GridData());
 		fExistingConfigButton.setEnabled(configurationCount(excluded) != 0);
-		
+
 		Composite existingComp = new Composite(this, SWT.NONE);
 		layout = new GridLayout(1, false);
 		layout.marginLeft = 10;
 		existingComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		existingComp.setLayout(layout);
-		
+
 		fServiceConfigWidget = new ServiceConfigurationSelectionWidget(existingComp, SWT.NONE, excluded, services, enableButtons);
-        data = new GridData(SWT.FILL, SWT.FILL, true, true);
-        data.heightHint = 200;
-        fServiceConfigWidget.setLayoutData(data);
-        fServiceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
+		data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		data.heightHint = 200;
+		fServiceConfigWidget.setLayoutData(data);
+		fServiceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				fServiceConfig = fServiceConfigWidget.getSelectedConfiguration();
 				fAdvancedButton.setEnabled(!event.getSelection().isEmpty());
 				notifySelection(event.getSelection());
 			}
-        });
-        fServiceConfigWidget.setEnabled(false);
-		
+		});
+		fServiceConfigWidget.setEnabled(false);
+
 		fAdvancedButton = new Button(this, SWT.PUSH);
 		data = new GridData(SWT.END, SWT.TOP, true, true);
 		fAdvancedButton.setLayoutData(data);
-		fAdvancedButton.setText(Messages.AddServiceConfigurationWidget_3); 
+		fAdvancedButton.setText(Messages.AddServiceConfigurationWidget_3);
 		fAdvancedButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				ServiceProviderConfigurationDialog dialog = new ServiceProviderConfigurationDialog(getShell(), getServiceConfiguration());
+				ServiceProviderConfigurationDialog dialog = new ServiceProviderConfigurationDialog(getShell(),
+						getServiceConfiguration());
 				dialog.open();
 			}
 		});
-		
+
 		updateButtons(true);
 	}
-	
+
 	private int configurationCount(Set<IServiceConfiguration> excluded) {
 		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
 		if (excluded != null) {
@@ -169,15 +177,21 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 		}
 		return configs.size();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener
+	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		fSelectionListeners.add(listener);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
 	 */
 	public ISelection getSelection() {
@@ -192,20 +206,24 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 	public IServiceConfiguration getServiceConfiguration() {
 		return fServiceConfig;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener
+	 * (org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
-	public void removeSelectionChangedListener(
-			ISelectionChangedListener listener) {
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		fSelectionListeners.remove(listener);
 	}
-	
+
 	/**
-	 * Set the configuration that will be returned if the "New" radio button is selected.
-	 * The name of the configuration is displayed in the text box.
+	 * Set the configuration that will be returned if the "New" radio button is
+	 * selected. The name of the configuration is displayed in the text box.
 	 * 
-	 * @param config default new configuration
+	 * @param config
+	 *            default new configuration
 	 */
 	public void setDefaultConfiguration(IServiceConfiguration config) {
 		if (config != null) {
@@ -215,11 +233,12 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 			doSelectionUpdate();
 		}
 	}
-	
+
 	/**
 	 * Set the selected status of the buttons.
 	 * 
-	 * @param newButtonSelected if true, the new button will be selected
+	 * @param newButtonSelected
+	 *            if true, the new button will be selected
 	 */
 	public void setSelection(boolean newButtonSelected) {
 		if (fDefaultConfig != null) {
@@ -228,14 +247,18 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 			notifySelection(new ConfigurationSelectionEvent());
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse
+	 * .jface.viewers.ISelection)
 	 */
 	public void setSelection(ISelection selection) {
 		fSelection = selection;
 	}
-	
+
 	/**
 	 * Update widgets when a radio button is selected.
 	 */
@@ -250,11 +273,12 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 			fAdvancedButton.setEnabled(fServiceConfigWidget.getSelectedConfiguration() != null);
 		}
 	}
-	
+
 	/**
 	 * Notify all listeners of the selection.
 	 * 
-	 * @param e event that was generated by the selection
+	 * @param e
+	 *            event that was generated by the selection
 	 */
 	private void notifySelection(ISelection selection) {
 		setSelection(selection);
@@ -263,12 +287,13 @@ public class AddServiceConfigurationWidget extends Composite implements ISelecti
 			((ISelectionChangedListener) listener).selectionChanged(event);
 		}
 	}
-	
+
 	/**
-	 * Update the button selection status. If the existing config button
-	 * is disabled, then this always sets the new config button.
+	 * Update the button selection status. If the existing config button is
+	 * disabled, then this always sets the new config button.
 	 * 
-	 * @param newSelected new config button status
+	 * @param newSelected
+	 *            new config button status
 	 */
 	private void updateButtons(boolean newSelected) {
 		if (fExistingConfigButton.isEnabled()) {
