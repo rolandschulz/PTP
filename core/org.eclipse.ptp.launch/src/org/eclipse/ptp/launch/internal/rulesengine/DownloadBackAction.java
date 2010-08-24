@@ -42,7 +42,6 @@ public class DownloadBackAction implements IRuleAction {
 		fRule = downloadBackRule;
 		fConfiguration = configuration;
 		fMonitor = monitor;
-
 	}
 
 	public void run() throws CoreException {
@@ -52,25 +51,21 @@ public class DownloadBackAction implements IRuleAction {
 
 		SubMonitor progress = SubMonitor.convert(fMonitor, 10);
 
-		try {
-			// Get managers
-			IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(2));
-			IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
+		// Get managers
+		IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(2));
+		IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
 
-			/*
-			 * Process files in list.
-			 */
-			for (int i = 0; i < fRule.count(); i++) {
-				IFileStore remoteFileStore = null;
-				IFileStore localFileStore = null;
+		/*
+		 * Process files in list.
+		 */
+		for (int i = 0; i < fRule.count(); i++) {
+			IFileStore remoteFileStore = null;
+			IFileStore localFileStore = null;
 
-				remoteFileStore = remoteFileManager.getResource(fRule.getRemoteFile(i).toString());
-				localFileStore = localFileManager.getResource(fRule.getLocalFile(i).getAbsolutePath());
+			remoteFileStore = remoteFileManager.getResource(fRule.getRemoteFile(i).toString());
+			localFileStore = localFileManager.getResource(fRule.getLocalFile(i).getAbsolutePath());
 
-				doDownload(remoteFileStore, localFileStore, progress.newChild(8));
-			}
-		} finally {
-			progress.done();
+			doDownload(remoteFileStore, localFileStore, progress.newChild(8));
 		}
 	}
 

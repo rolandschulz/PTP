@@ -33,110 +33,106 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
  */
 public class UploadRuleAction implements IRuleAction {
 
-	private final ILaunchProcessCallback process;
-	private final UploadRule rule;
-	private final ILaunchConfiguration configuration;
-	private DownloadBackRule downloadBackRule;
-	private final IProgressMonitor monitor;
+	private final ILaunchProcessCallback fProcess;
+	private final UploadRule fRule;
+	private final ILaunchConfiguration fConfiguration;
+	private DownloadBackRule fDownloadBackRule;
+	private final IProgressMonitor fMonitor;
 
 	public UploadRuleAction(ILaunchProcessCallback process, ILaunchConfiguration configuration, UploadRule uploadRule,
 			IProgressMonitor monitor) {
 		super();
-		this.process = process;
-		this.rule = uploadRule;
-		this.configuration = configuration;
-		this.monitor = monitor;
+		fProcess = process;
+		fRule = uploadRule;
+		fConfiguration = configuration;
+		fMonitor = monitor;
 	}
 
 	public void run() throws CoreException {
-		Assert.isNotNull(process);
-		Assert.isNotNull(rule);
-		Assert.isNotNull(configuration);
+		Assert.isNotNull(fProcess);
+		Assert.isNotNull(fRule);
+		Assert.isNotNull(fConfiguration);
 
-		SubMonitor progress = SubMonitor.convert(monitor, 40);
+		SubMonitor progress = SubMonitor.convert(fMonitor, 40);
 
-		try {
-			/*
-			 * Determine the first part of the remote path. Make it absolute.
-			 */
-			String execPath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String) null);
+		/*
+		 * Determine the first part of the remote path. Make it absolute.
+		 */
+		String execPath = fConfiguration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String) null);
 
-			IPath defaultRemotePath = new Path(execPath).removeLastSegments(1);// configuration.getRemoteDirectoryPath();
-			IPath remotePathParent = null;
-			if (rule.isDefaultRemoteDirectory()) {
-				remotePathParent = defaultRemotePath;
-			} else {
-				remotePathParent = new Path(rule.getRemoteDirectory());
-				if (!remotePathParent.isAbsolute()) {
-					remotePathParent = defaultRemotePath.append(remotePathParent);
-				}
+		IPath defaultRemotePath = new Path(execPath).removeLastSegments(1);// fConfiguration.getRemoteDirectoryPath();
+		IPath remotePathParent = null;
+		if (fRule.isDefaultRemoteDirectory()) {
+			remotePathParent = defaultRemotePath;
+		} else {
+			remotePathParent = new Path(fRule.getRemoteDirectory());
+			if (!remotePathParent.isAbsolute()) {
+				remotePathParent = defaultRemotePath.append(remotePathParent);
 			}
-			remotePathParent = remotePathParent.removeTrailingSeparator();
-			Assert.isTrue(remotePathParent.isAbsolute(), "remotePathWoLastSegment.isAbsolute()"); //$NON-NLS-1$
+		}
+		remotePathParent = remotePathParent.removeTrailingSeparator();
+		Assert.isTrue(remotePathParent.isAbsolute(), "remotePathWoLastSegment.isAbsolute()"); //$NON-NLS-1$
 
-			// Retrieve the local working dir (workspace path)
-			IPath workingDir = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+		// Retrieve the local working dir (workspace path)
+		IPath workingDir = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 
-			/*
-			 * Determine list of local paths. Make them absolute.
-			 */
-			IPath localPaths[] = rule.getLocalFilesAsPathArray();
+		/*
+		 * Determine list of local paths. Make them absolute.
+		 */
+		IPath localPaths[] = fRule.getLocalFilesAsPathArray();
 
-			for (int i = 0; i < localPaths.length; i++) {
-				IPath localPath = localPaths[i];
-				if (!localPath.isAbsolute()) {
-					localPath = workingDir.append(localPath);
-				}
-				localPath = localPath.removeTrailingSeparator();
-				Assert.isTrue(localPath.isAbsolute(), "localPath.isAbsolute()"); //$NON-NLS-1$
-				localPaths[i] = localPath;
+		for (int i = 0; i < localPaths.length; i++) {
+			IPath localPath = localPaths[i];
+			if (!localPath.isAbsolute()) {
+				localPath = workingDir.append(localPath);
 			}
+			localPath = localPath.removeTrailingSeparator();
+			Assert.isTrue(localPath.isAbsolute(), "localPath.isAbsolute()"); //$NON-NLS-1$
+			localPaths[i] = localPath;
+		}
 
-			/*
-			 * Process paths.
-			 */
-			for (int i = 0; i < localPaths.length; i++) {
-				progress.setWorkRemaining(100);
+		/*
+		 * Process paths.
+		 */
+		for (int i = 0; i < localPaths.length; i++) {
+			progress.setWorkRemaining(100);
 
-				IPath localPath = localPaths[i];
+			IPath localPath = localPaths[i];
 
-				IRemoteFileManager localFileManager = process.getLocalFileManager(configuration);
-				IFileStore localFileStore = localFileManager.getResource(localPath.toString());
-				IFileInfo localFileInfo = localFileStore.fetchInfo(EFS.NONE, progress.newChild(5));
+			IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
+			IFileStore localFileStore = localFileManager.getResource(localPath.toString());
+			IFileInfo localFileInfo = localFileStore.fetchInfo(EFS.NONE, progress.newChild(5));
 
-				if (!localFileInfo.exists()) {
-					// Warn user and go to the next file
-					// TODO Warn users that file doesn't exist
-					continue;
-				}
-
-				// Generate the entire path from the combination of the
-				// remotePathParent
-				// and the name of the file or directory which will be copied.
-				IPath remotePath = remotePathParent.append(localPath.lastSegment());
-
-				// Generate the FileStore for the remote path
-				IRemoteFileManager remoteFileManager = process.getRemoteFileManager(configuration, progress.newChild(5));
-				IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
-
-				/*
-				 * Assure the remote path exists.
-				 */
-				IFileStore parentFileStore = remoteFileManager.getResource(remotePathParent.toString());
-				parentFileStore.mkdir(EFS.NONE, progress.newChild(5));
-
-				doUpload(localFileStore, localPath, remoteFileStore, remotePath, progress.newChild(25));
+			if (!localFileInfo.exists()) {
+				// Warn user and go to the next file
+				// TODO Warn users that file doesn't exist
+				continue;
 			}
 
+			// Generate the entire path from the combination of the
+			// remotePathParent
+			// and the name of the file or directory which will be copied.
+			IPath remotePath = remotePathParent.append(localPath.lastSegment());
+
+			// Generate the FileStore for the remote path
+			IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(5));
+			IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
+
 			/*
-			 * If a download back rule was created during the upload, the add
-			 * this rule the the list of synchronize rules.
+			 * Assure the remote path exists.
 			 */
-			if (downloadBackRule != null) {
-				process.addSynchronizationRule(downloadBackRule);
-			}
-		} finally {
-			progress.done();
+			IFileStore parentFileStore = remoteFileManager.getResource(remotePathParent.toString());
+			parentFileStore.mkdir(EFS.NONE, progress.newChild(5));
+
+			doUpload(localFileStore, localPath, remoteFileStore, remotePath, progress.newChild(25));
+		}
+
+		/*
+		 * If a download back fRule was created during the upload, the add this
+		 * fRule the the list of synchronize rules.
+		 */
+		if (fDownloadBackRule != null) {
+			fProcess.addSynchronizationRule(fDownloadBackRule);
 		}
 	}
 
@@ -152,7 +148,7 @@ public class UploadRuleAction implements IRuleAction {
 
 			// Find if file already exists on the remote machine
 			if (remoteFileInfo.exists()) {
-				switch (rule.getOverwritePolicy()) {
+				switch (fRule.getOverwritePolicy()) {
 				case OverwritePolicies.ALWAYS:
 					// Always copy anyway...
 					break;
@@ -178,20 +174,20 @@ public class UploadRuleAction implements IRuleAction {
 
 			// Add remote path to list of files to download back,
 			// if this feature was enabled.
-			if (rule.isDownloadBack()) {
-				if (downloadBackRule == null) {
-					downloadBackRule = new DownloadBackRule();
+			if (fRule.isDownloadBack()) {
+				if (fDownloadBackRule == null) {
+					fDownloadBackRule = new DownloadBackRule();
 				}
-				downloadBackRule.add(localPath.toFile(), remotePath);
+				fDownloadBackRule.add(localPath.toFile(), remotePath);
 			}
 
 			/* Set remote file permissions from the local */
 			boolean changedAttr = false;
-			if (rule.isAsReadOnly()) {
+			if (fRule.isAsReadOnly()) {
 				remoteFileInfo.setAttribute(EFS.ATTRIBUTE_READ_ONLY, true);
 				changedAttr = true;
 			}
-			if (rule.isAsExecutable()) {
+			if (fRule.isAsExecutable()) {
 				remoteFileInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
 				changedAttr = true;
 			}
@@ -200,7 +196,7 @@ public class UploadRuleAction implements IRuleAction {
 			}
 
 			// Set date/time, if required
-			if (rule.isPreserveTimeStamp()) {
+			if (fRule.isPreserveTimeStamp()) {
 				remoteFileInfo.setLastModified(localFileInfo.getLastModified());
 				remoteFileStore.putInfo(remoteFileInfo, EFS.SET_LAST_MODIFIED, progress.newChild(5));
 			}

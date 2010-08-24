@@ -56,71 +56,66 @@ public class DownloadRuleAction implements IRuleAction {
 
 		SubMonitor progress = SubMonitor.convert(fMonitor, 40);
 
-		try {
+		/*
+		 * Determine local path. Make it absolute.
+		 */
+		IPath localParentPath = new Path(fRule.getLocalDirectory());
+		if (!localParentPath.isAbsolute()) {
+			IPath defaultPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+			localParentPath = defaultPath.append(localParentPath);
 			/*
-			 * Determine local path. Make it absolute.
+			 * IPath workspace =
+			 * ResourcesPlugin.getWorkspace().getRoot().getLocation(); localPath
+			 * = workspace.append(localPath);
 			 */
-			IPath localParentPath = new Path(fRule.getLocalDirectory());
-			if (!localParentPath.isAbsolute()) {
-				IPath defaultPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
-				localParentPath = defaultPath.append(localParentPath);
-				/*
-				 * IPath workspace =
-				 * ResourcesPlugin.getWorkspace().getRoot().getLocation();
-				 * localPath = workspace.append(localPath);
-				 */
+		}
+		localParentPath.removeTrailingSeparator();
+		Assert.isTrue(localParentPath.isAbsolute(), "localPath.isAbsolute()"); //$NON-NLS-1$
+
+		// Get the file store of the parent dir.
+		IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
+		IFileStore localFileParentResource = localFileManager.getResource(localParentPath.toString());
+		IFileInfo localFileParentInfo = localFileParentResource.fetchInfo(EFS.NONE, progress.newChild(5));
+
+		// Create the localpath if necessary
+		if (!localFileParentInfo.exists()) {
+			localFileParentResource.mkdir(EFS.NONE, progress.newChild(5));
+		}
+
+		// Download all remote paths
+		IPath remotePaths[] = fRule.getRemoteFilesAsPathArray();
+		IPath remoteWorkingPath = new Path(fConfiguration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, "")).removeLastSegments(1); //$NON-NLS-1$
+		for (int i = 0; i < remotePaths.length; i++) {
+			progress.setWorkRemaining(100);
+
+			IPath remotePath = remotePaths[i];
+
+			// Make paths absolute
+			if (!remotePath.isAbsolute()) {
+				remotePath = remoteWorkingPath.append(remotePath);
 			}
-			localParentPath.removeTrailingSeparator();
-			Assert.isTrue(localParentPath.isAbsolute(), "localPath.isAbsolute()"); //$NON-NLS-1$
 
-			// Get the file store of the parent dir.
-			IRemoteFileManager localFileManager = fProcess.getLocalFileManager(fConfiguration);
-			IFileStore localFileParentResource = localFileManager.getResource(localParentPath.toString());
-			IFileInfo localFileParentInfo = localFileParentResource.fetchInfo(EFS.NONE, progress.newChild(5));
+			IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(5));
+			IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
 
-			// Create the localpath if necessary
-			if (!localFileParentInfo.exists()) {
-				localFileParentResource.mkdir(EFS.NONE, progress.newChild(5));
+			// Check if the remote resource exists
+			IFileInfo remoteFileInfo = remoteFileStore.fetchInfo(EFS.NONE, progress.newChild(5));
+
+			if (!remoteFileInfo.exists()) {
+				// Warn the user and continue processing the next file
+				// FIXME Warn the user that the resource doesn't exist
+				continue;
 			}
 
-			// Download all remote paths
-			IPath remotePaths[] = fRule.getRemoteFilesAsPathArray();
-			IPath remoteWorkingPath = new Path(fConfiguration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-					"")).removeLastSegments(1); //$NON-NLS-1$
-			for (int i = 0; i < remotePaths.length; i++) {
-				progress.setWorkRemaining(100);
+			// Generate the entire path from the combination of the
+			// localPathParent
+			// and the name of the file or directory which will be copied.
+			IPath localPath = localParentPath.append(remotePath.lastSegment());
 
-				IPath remotePath = remotePaths[i];
+			// Generate the file store for the local path
+			IFileStore localFileStore = localFileManager.getResource(localPath.toString());
 
-				// Make paths absolute
-				if (!remotePath.isAbsolute()) {
-					remotePath = remoteWorkingPath.append(remotePath);
-				}
-
-				IRemoteFileManager remoteFileManager = fProcess.getRemoteFileManager(fConfiguration, progress.newChild(5));
-				IFileStore remoteFileStore = remoteFileManager.getResource(remotePath.toString());
-
-				// Check if the remote resource exists
-				IFileInfo remoteFileInfo = remoteFileStore.fetchInfo(EFS.NONE, progress.newChild(5));
-
-				if (!remoteFileInfo.exists()) {
-					// Warn the user and continue processing the next file
-					// FIXME Warn the user that the resource doesn't exist
-					continue;
-				}
-
-				// Generate the entire path from the combination of the
-				// localPathParent
-				// and the name of the file or directory which will be copied.
-				IPath localPath = localParentPath.append(remotePath.lastSegment());
-
-				// Generate the file store for the local path
-				IFileStore localFileStore = localFileManager.getResource(localPath.toString());
-
-				doDownload(remoteFileStore, remotePath, localFileStore, localPath, progress.newChild(20));
-			}
-		} finally {
-			progress.done();
+			doDownload(remoteFileStore, remotePath, localFileStore, localPath, progress.newChild(20));
 		}
 	}
 

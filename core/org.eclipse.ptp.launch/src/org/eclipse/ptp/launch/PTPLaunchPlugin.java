@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
@@ -65,13 +66,14 @@ import org.osgi.framework.BundleContext;
  * The main plugin class to be used in the desktop.
  */
 public class PTPLaunchPlugin extends AbstractUIPlugin {
-    public static final String PLUGIN_ID = "org.eclipse.ptp.launch"; //$NON-NLS-1$
-    public static final String EXTENSION_POINT_ID = "rmLaunchConfigurations"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.launch"; //$NON-NLS-1$
+
+	public static final String EXTENSION_POINT_ID = "rmLaunchConfigurations"; //$NON-NLS-1$
 	public static final String RESOURCE_BUNDLE = PLUGIN_ID + ".LaunchPluginResources"; //$NON-NLS-1$
 
-	//The shared instance.
+	// The shared instance.
 	private static PTPLaunchPlugin plugin;
-	
+
 	/**
 	 * Convenience method to create an error dialog given an IStatus.
 	 * 
@@ -87,7 +89,8 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Convenience method to create an error dialog given a message and Throwable.
+	 * Convenience method to create an error dialog given a message and
+	 * Throwable.
 	 * 
 	 * @param message
 	 * @param t
@@ -113,7 +116,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns the active workbench shell or <code>null</code> if none
 	 * 
@@ -126,7 +129,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Convenience method to get the currently active workbench window
 	 * 
@@ -142,12 +145,13 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	public static PTPLaunchPlugin getDefault() {
 		return plugin;
 	}
-	
+
 	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path.
-	 *
-	 * @param path the path
+	 * Returns an image descriptor for the image file at the given plug-in
+	 * relative path.
+	 * 
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
@@ -155,8 +159,8 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle,
-	 * or 'key' if not found.
+	 * Returns the string from the plugin's resource bundle, or 'key' if not
+	 * found.
 	 */
 	public static String getResourceString(String key) {
 		ResourceBundle bundle = PTPLaunchPlugin.getDefault().getResourceBundle();
@@ -191,7 +195,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
-	
+
 	/**
 	 * Logs an internal error with the specified throwable
 	 * 
@@ -200,7 +204,7 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
-	}    
+	}
 
 	/**
 	 * Logs an internal error with the specified message.
@@ -215,32 +219,32 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	/*
 	 * Launch notification listeners
 	 */
-	private ListenerList listeners = new ListenerList();
+	private final ListenerList listeners = new ListenerList();
 
 	// Resource bundle.
 	private ResourceBundle resourceBundle;
-	
+
 	// Map of resource managers to launch configuration factories
-	private final Map<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories =
-		new HashMap<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory>();	
-	
+	private final Map<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory> rmLaunchConfigurationFactories = new HashMap<Class<? extends IResourceManager>, AbstractRMLaunchConfigurationFactory>();
+
 	/**
 	 * The constructor.
 	 */
 	public PTPLaunchPlugin() {
 		super();
 		plugin = this;
-	}	
-	
+	}
+
 	/**
 	 * Add a listener for ILaunchNotification events
 	 * 
-	 * @param listener listener to add
+	 * @param listener
+	 *            listener to add
 	 */
 	public void addLaunchNotificationListener(ILaunchNotification listener) {
 		listeners.add(listener);
 	}
-	
+
 	/**
 	 * Returns the plugin's resource bundle,
 	 */
@@ -256,19 +260,21 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Find the resource manager that corresponds to the unique name specified in the configuration
+	 * Find the resource manager that corresponds to the unique name specified
+	 * in the configuration
 	 * 
-	 * @param configuration launch configuration
+	 * @param configuration
+	 *            launch configuration
 	 * @return resource manager
 	 * @throws CoreException
 	 */
 	public IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
 		IResourceManager[] rms = universe.getResourceManagers();
-		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, (String)null);
+		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+				(String) null);
 		for (IResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED &&
-					rm.getUniqueName().equals(rmUniqueName)) {
+			if (rm.getState() == ResourceManagerAttributes.State.STARTED && rm.getUniqueName().equals(rmUniqueName)) {
 				return rm;
 			}
 		}
@@ -278,7 +284,8 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	/**
 	 * Find the launch configuration factory for a resource manager
 	 * 
-	 * @param rm resource manager
+	 * @param rm
+	 *            resource manager
 	 * @return launch configuration factory
 	 */
 	public AbstractRMLaunchConfigurationFactory getRMLaunchConfigurationFactory(IResourceManager rm) {
@@ -291,7 +298,8 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	/**
 	 * Notify listeners when a job changes status
 	 * 
-	 * @param job job that has changed status
+	 * @param job
+	 *            job that has changed status
 	 */
 	public void notifyJobStateChange(IPJob job, JobAttributes.State state) {
 		for (Object listener : listeners.getListeners()) {
@@ -306,23 +314,26 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	/**
 	 * Remove a listener for ILaunchNotification events
 	 * 
-	 * @param listener listener to remove
+	 * @param listener
+	 *            listener to remove
 	 */
 	public void removeLaunchNotificationListener(ILaunchNotification listener) {
 		listeners.remove(listener);
 	}
-	
+
 	/**
 	 * This method is called upon plug-in activation
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		retrieveRMLaunchConfigurationFactories();
 	}
-	
+
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		rmLaunchConfigurationFactories.clear();
@@ -331,68 +342,74 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Verify that the resource "path" actually exists. This just checks
-	 * that the path references something real.
+	 * Verify that the resource "path" actually exists. This just checks that
+	 * the path references something real.
 	 * 
 	 * @param path
+	 *            path to check
 	 * @param configuration
-	 * @return IPath
+	 *            launch configuration
+	 * @param monitor
+	 *            progress monitor
+	 * @return IPath representation of path
 	 * @throws CoreException
+	 *             if the resource doesn't exist or the monitor is cancelled
+	 * @since 5.0
 	 */
-	public IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
-		IResourceManagerControl rm = (IResourceManagerControl)getResourceManager(configuration);
+	public IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
 		if (rm == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.PTPLaunchPlugin_4));
+			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_4));
 		}
 		IResourceManagerConfiguration conf = rm.getConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId());
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
+		if (monitor.isCanceled()) {
+			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(),
+					Messages.PTPLaunchPlugin_Operation_cancelled_by_user));
+		}
 		if (remoteServices == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.PTPLaunchPlugin_0));
+			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_0));
 		}
 		IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 		if (connMgr == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
-					Messages.PTPLaunchPlugin_1));
+			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_1));
 		}
 		IRemoteConnection conn = connMgr.getConnection(conf.getConnectionName());
 		if (conn == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.PTPLaunchPlugin_2));
+			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_2));
 		}
 		IRemoteFileManager fileManager = remoteServices.getFileManager(conn);
 		if (fileManager == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID, 
-					Messages.PTPLaunchPlugin_3));
+			throw new CoreException(new Status(IStatus.ERROR, getUniqueIdentifier(), Messages.PTPLaunchPlugin_3));
 		}
 		if (!fileManager.getResource(path).fetchInfo().exists()) {
-			throw new CoreException(new Status(IStatus.INFO, PTPLaunchPlugin.PLUGIN_ID,
-					NLS.bind(Messages.PTPLaunchPlugin_5, new Object[] {path})));
+			throw new CoreException(new Status(IStatus.INFO, getUniqueIdentifier(), NLS.bind(Messages.PTPLaunchPlugin_5,
+					new Object[] { path })));
 		}
 		return new Path(path);
 	}
 
 	/**
-	 * Find all launch configuration factory extensions that have been registered
+	 * Find all launch configuration factory extensions that have been
+	 * registered
 	 */
 	private void retrieveRMLaunchConfigurationFactories() {
-    	rmLaunchConfigurationFactories.clear();
-    	
-    	IExtensionRegistry registry = Platform.getExtensionRegistry();
+		rmLaunchConfigurationFactories.clear();
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(PLUGIN_ID, EXTENSION_POINT_ID);
 		final IExtension[] extensions = extensionPoint.getExtensions();
-		
+
 		for (int iext = 0; iext < extensions.length; ++iext) {
 			final IExtension ext = extensions[iext];
-			
+
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
-		
-			for (int i=0; i< elements.length; i++)
-			{
+
+			for (int i = 0; i < elements.length; i++) {
 				IConfigurationElement ce = elements[i];
 				try {
-					AbstractRMLaunchConfigurationFactory factory = (AbstractRMLaunchConfigurationFactory) ce.createExecutableExtension("class"); //$NON-NLS-1$
+					AbstractRMLaunchConfigurationFactory factory = (AbstractRMLaunchConfigurationFactory) ce
+							.createExecutableExtension("class"); //$NON-NLS-1$
 					Class<? extends IResourceManager> resourceManagerClass = factory.getResourceManagerClass();
 					rmLaunchConfigurationFactories.put(resourceManagerClass, factory);
 				} catch (CoreException e) {
@@ -400,5 +417,5 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 				}
 			}
 		}
-    }
+	}
 }

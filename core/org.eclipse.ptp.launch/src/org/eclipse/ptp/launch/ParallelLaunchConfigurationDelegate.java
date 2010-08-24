@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -73,10 +72,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			throws CoreException {
 		try {
 			if (!(launch instanceof IPLaunch)) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.PLUGIN_ID,
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
 			}
-			SubMonitor progress = SubMonitor.convert(monitor, 100);
+			SubMonitor progress = SubMonitor.convert(monitor, 110);
 			//		progress.beginTask("", 25); //$NON-NLS-1$
 			progress.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
 			progress.setWorkRemaining(90);
@@ -84,12 +83,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				return;
 			}
 
-			IPDebugger debugger = null;
-
 			progress.worked(10);
 			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
 
-			AttributeManager attrManager = getAttributeManager(configuration, mode);
+			AttributeManager attrManager = getAttributeManager(configuration, mode, progress.newChild(10));
 
 			// All copy pre-"job submission" occurs here
 			copyExecutable(configuration, progress.newChild(10));
@@ -97,6 +94,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 			// switch perspective
 			switchPerspective(DebugUITools.getLaunchPerspective(configuration.getType(), mode));
+
+			IPDebugger debugger = null;
+
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 					// show ptp debug view
@@ -192,7 +192,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			try {
 				setDefaultSourceLocator(launch, configuration);
 				final IProject project = verifyProject(configuration);
-				final IPath execPath = verifyExecutablePath(configuration);
 
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
@@ -202,7 +201,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 								SubMonitor subMon = SubMonitor.convert(monitor, 10);
 								try {
 									IPSession session = PTPDebugCorePlugin.getDebugModel().createDebugSession(debugger, launch,
-											project, execPath, subMon.newChild(2));
+											project, subMon.newChild(2));
 
 									String app = job.getAttribute(JobAttributes.getExecutableNameAttributeDefinition())
 											.getValueAsString();
