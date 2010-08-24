@@ -20,7 +20,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.Preferences;
 
 /**
- * Adapts {@link org.eclipse.core.runtime.Preferences} to
+ * Adapts {@link org.eclipse.core.runtime.IEclipsePreferences} to
  * {@link org.eclipse.jface.preference.IPreferenceStore}
  * 
  * @since 3.0
@@ -29,9 +29,9 @@ public class PreferencesAdapter implements IPreferenceStore {
 
 	/**
 	 * Property change listener. Listens for events of type
-	 * {@link org.eclipse.core.runtime.Preferences.PropertyChangeEvent} and
-	 * fires a {@link org.eclipse.jface.util.PropertyChangeEvent} on the adapter
-	 * with arguments from the received event.
+	 * {@link org.eclipse.core.runtime.IEclipsePreferences.PreferenceChangeEvent}
+	 * and fires a {@link org.eclipse.jface.util.PropertyChangeEvent} on the
+	 * adapter with arguments from the received event.
 	 */
 	private class PreferenceChangeListener implements IPreferenceChangeListener {
 
