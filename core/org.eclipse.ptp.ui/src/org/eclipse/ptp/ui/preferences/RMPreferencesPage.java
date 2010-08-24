@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.preferences;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -39,22 +39,27 @@ import org.eclipse.swt.widgets.Control;
 public class RMPreferencesPage extends AbstractPreferencePage {
 	protected Combo remoteServicesCombo;
 	protected Button startRMsButton;
-	
 	protected boolean startRMs = true;
-	protected Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		
-	/** Constructor
+
+	/**
+	 * Constructor
 	 * 
 	 */
 	public RMPreferencesPage() {
 		super();
 		setDescription(Messages.RMPreferencesPage_0);
-		preferences.setDefault(PreferenceConstants.PREFS_AUTO_START_RMS, PreferenceConstants.DEFAULT_AUTO_START);
+		Preferences.setDefaultBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS,
+				PreferenceConstants.DEFAULT_AUTO_START);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
+	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout(1, false);
@@ -66,53 +71,71 @@ public class RMPreferencesPage extends AbstractPreferencePage {
 		data.verticalAlignment = GridData.FILL;
 		data.horizontalAlignment = GridData.FILL;
 		composite.setLayoutData(data);
-		
+
 		startRMsButton = createCheckButton(composite, Messages.RMPreferencesPage_1);
 		startRMsButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-			}			
+			}
 		});
 		startRMsButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 4, 1));
-		startRMsButton.setSelection(preferences.getBoolean(PreferenceConstants.PREFS_AUTO_START_RMS));
+		startRMsButton.setSelection(Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(),
+				PreferenceConstants.PREFS_AUTO_START_RMS));
 
 		return composite;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
-	public void performDefaults() { 
+	@Override
+	public void performDefaults() {
 		startRMsButton.setSelection(PreferenceConstants.DEFAULT_AUTO_START);
 		super.performDefaults();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
+	@Override
 	public boolean performOk() {
-		preferences.setValue(PreferenceConstants.PREFS_AUTO_START_RMS, startRMsButton.getSelection());
-		PTPCorePlugin.getDefault().savePluginPreferences();
+		Preferences.setBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS,
+				startRMsButton.getSelection());
+		Preferences.savePreferences(PTPCorePlugin.getUniqueIdentifier());
 		return true;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#setValues()
 	 */
+	@Override
 	protected void setValues() {
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.preferences.AbstractPreferencePage#storeValues()
 	 */
+	@Override
 	protected void storeValues() {
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.preference.IPreferencePage#isValid()
 	 */
+	@Override
 	public boolean isValid() {
 		setErrorMessage(null);
 		setMessage(null);
 		return true;
-	}	
+	}
 }
