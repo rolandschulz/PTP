@@ -12,6 +12,7 @@
 package org.eclipse.ptp.pldt.common.actions;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
@@ -488,25 +489,12 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 
 		monitor.subTask(Messages.RunAnalyseHandlerBase_42);
 
-		// fully qualified file location
-		// String rawPath = tu.getRawLocation().toString();
-		String rawPath = tu.getLocation().toString();// cdt40
+		String rawPath = tu.getLocationURI().toString();
 		if (traceOn)
-			println("RunAnalyseBase:              file = " + tu.getLocation()); //$NON-NLS-1$
+			println("RunAnalyseBase:              file = " + rawPath); //$NON-NLS-1$
 
-		monitor.subTask(Messages.RunAnalyseHandlerBase_44 + rawPath);
-		// did tu parse w/o errors?  If we can determine that, we can
-		// warn user; otherwise OpenMP analysis will, for example, "finish with errors"
-		// e.g. if header file can't be found.
-		/*
-		try {
-      IASTProblem[] problems  = CPPVisitor.getProblems(tu.getAST());
-      IASTProblem[] problems2 = CVisitor.getProblems(tu.getAST());
-    } catch (CoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-		*/
+		monitor.subTask(Messages.RunAnalyseHandlerBase_on + rawPath);
+
 		ScanReturn scanReturn = doArtifactAnalysis(tu, includes);
 		monitor.worked(1);
 		if (traceOn)
