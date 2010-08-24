@@ -36,7 +36,6 @@ public class Messages extends NLS {
 	public static String ApplicationTab_11;
 	public static String ApplicationTab_12;
 	public static String ApplicationTab_13;
-
 	public static String ApplicationTab_14;
 
 	public static String ApplicationTab_Main;
@@ -124,6 +123,7 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_No_ResourceManager;
 	public static String AbstractParallelLaunchConfigurationDelegate_Debugger_path_not_found;
 	public static String AbstractParallelLaunchConfigurationDelegate_Program_is_not_a_recongnized_executable;
+	public static String AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user;
 	public static String AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist;
 	public static String AbstractParallelLaunchConfigurationDelegate_Could_not_retrieve_local_resource_info;
 	public static String AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist;
@@ -139,6 +139,8 @@ public class Messages extends NLS {
 	public static String PTPLaunchPlugin_4;
 	public static String PTPLaunchPlugin_5;
 	public static String PTPLaunchPlugin_6;
+
+	public static String PTPLaunchPlugin_Operation_cancelled_by_user;
 
 	public static String LauncherExecutionTab_ArgumentsFrame_CommandLineLabel;
 	public static String LauncherExecutionTab_ArgumentsFrame_Title;

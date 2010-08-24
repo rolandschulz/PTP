@@ -28,60 +28,61 @@ import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.swt.graphics.Image;
 
 public class LaunchImages {
-	private static final String NAME_PREFIX= PTPLaunchPlugin.PLUGIN_ID + '.';
-	private static final int NAME_PREFIX_LENGTH= NAME_PREFIX.length();
+	private static final String NAME_PREFIX = PTPLaunchPlugin.getUniqueIdentifier() + '.';
+	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
 
 	// The plugin registry
 	private static ImageRegistry imageRegistry = new ImageRegistry();
 
-	// Subdirectory (under the package containing this class) where 16 color images are
+	// Subdirectory (under the package containing this class) where 16 color
+	// images are
 	private static URL fgIconBaseURL;
 	static {
-		fgIconBaseURL= Platform.getBundle(PTPLaunchPlugin.getUniqueIdentifier()).getEntry("/icons/"); //$NON-NLS-1$
-	}	
+		fgIconBaseURL = Platform.getBundle(PTPLaunchPlugin.getUniqueIdentifier()).getEntry("/icons/"); //$NON-NLS-1$
+	}
 
 	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif"; //$NON-NLS-1$
 	public static final String IMG_ARGUMENTS_TAB = NAME_PREFIX + "arguments_tab.gif"; //$NON-NLS-1$
 	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif"; //$NON-NLS-1$
 	public static final String IMG_DEBUGGER_TAB = NAME_PREFIX + "debugger_tab.gif"; //$NON-NLS-1$
-	
+
 	public static final ImageDescriptor DESC_PARALLEL_TAB = createManaged(IMG_PARALLEL_TAB);
 	public static final ImageDescriptor DESC_ARGUMENTS_TAB = createManaged(IMG_ARGUMENTS_TAB);
-	public static final ImageDescriptor DESC_MAIN_TAB = createManaged(IMG_MAIN_TAB);	
-	public static final ImageDescriptor DESC_DEBUGGER_TAB = createManaged(IMG_DEBUGGER_TAB);	
-	
+	public static final ImageDescriptor DESC_MAIN_TAB = createManaged(IMG_MAIN_TAB);
+	public static final ImageDescriptor DESC_DEBUGGER_TAB = createManaged(IMG_DEBUGGER_TAB);
+
 	/**
 	 * Returns the image managed under the given key in this registry.
 	 * 
-	 * @param key the image's key
+	 * @param key
+	 *            the image's key
 	 * @return the image managed under the given key
-	 */ 
+	 */
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);
 	}
-	
+
 	public static ImageDescriptor getDescriptor(String key) {
 		return getImageRegistry().getDescriptor(key);
 	}
 
-	
 	/**
 	 * Helper method to access the image registry from the JavaPlugin class.
 	 */
 	static ImageRegistry getImageRegistry() {
 		return imageRegistry;
 	}
-	
+
 	private static ImageDescriptor createManaged(String name) {
 		return createManaged(imageRegistry, name);
 	}
-	
+
 	private static ImageDescriptor createManaged(ImageRegistry registry, String name) {
-		ImageDescriptor result= ImageDescriptor.createFromURL(makeIconFileURL(name.substring(NAME_PREFIX_LENGTH)));
+		ImageDescriptor result = ImageDescriptor.createFromURL(makeIconFileURL(name.substring(NAME_PREFIX_LENGTH)));
 		registry.put(name, result);
 		return result;
 	}
-	
+
 	public static Image get(String key) {
 		return imageRegistry.get(key);
 	}
@@ -93,5 +94,5 @@ public class LaunchImages {
 			PTPLaunchPlugin.log(e);
 			return null;
 		}
-	}	
+	}
 }
