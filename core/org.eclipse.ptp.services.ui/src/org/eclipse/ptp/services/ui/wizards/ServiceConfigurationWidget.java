@@ -57,13 +57,13 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
- * Wizard to configure service providers using the wizard supplied by
- * the providerContributer extension point. 
+ * Wizard to configure service providers using the wizard supplied by the
+ * providerContributer extension point.
  * 
  * NOT CURRENTLY USED AND MAY BE DEPRECATED
  */
 public class ServiceConfigurationWidget extends Wizard implements INewWizard {
-	
+
 	public class AddListener implements Listener {
 		public void handleEvent(Event event) {
 			Set<IService> displaySet = new HashSet<IService>();
@@ -73,15 +73,16 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 					displaySet.add(service);
 				}
 			}
-			
+
 			ServiceSelectionDialog dialog = new ServiceSelectionDialog(getShell(), displaySet.toArray(new IService[0]));
 			if (dialog.open() == Dialog.OK) {
 				IService[] selectedServices = dialog.getSelectedServices();
 				for (IService service : selectedServices) {
 					SortedSet<IServiceProviderDescriptor> providers = getProvidersByPriority(service);
 					if (providers.size() > 0) {
-						IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(providers.iterator().next());
-//						addTableRow(service, provider);
+						IServiceProvider provider = ServiceModelManager.getInstance().getServiceProvider(
+								providers.iterator().next());
+						// addTableRow(service, provider);
 						getServiceConfiguration().setServiceProvider(service, provider);
 					} else {
 						ServicesUIPlugin.getDefault().log(NLS.bind(Messages.ServiceModelWidget_8, service.getId()));
@@ -91,7 +92,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 			}
 		}
 	}
-	
+
 	public class ConfigureListener implements Listener {
 		public void handleEvent(Event event) {
 			// launch the configuration UI for the service provider
@@ -106,21 +107,22 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 			IWizard wizard = contrib.getWizard(provider, null);
 			WizardDialog dialog = new WizardDialog(getShell(), wizard);
 			dialog.open();
-			
+
 			String configString = provider.getConfigurationString();
-			// column 2 holds the configuration string of the provider's current configuration 
+			// column 2 holds the configuration string of the provider's current
+			// configuration
 			if (configString == null) {
 				configString = Messages.ServiceModelWidget_4;
 			}
 			item.setText(2, configString);
-			
+
 			// allow container page to check if configurations are set
 			if (fConfigChangeListener != null) {
 				fConfigChangeListener.handleEvent(null);
 			}
 		}
 	}
-	
+
 	public class RemoveListener implements Listener {
 		public void handleEvent(Event event) {
 			TableItem[] items = fTable.getSelection();
@@ -137,7 +139,7 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 			updateAddRemoveButtons();
 		}
 	}
-	
+
 	protected static final String PROVIDER_KEY = "provider-id"; //$NON-NLS-1$
 	protected static final String SERVICE_KEY = "service-id"; //$NON-NLS-1$
 
@@ -152,30 +154,31 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	protected Listener fConfigChangeListener = null;
 	protected IWorkbench fWorkbench = null;
 	protected IStructuredSelection fSelection = null;
-	
+
 	public ServiceConfigurationWidget(Set<IServiceConfiguration> serviceConfigurations) {
 		fServiceConfigurations = serviceConfigurations;
 	}
-	
+
 	public Control createContents(Composite parent) {
 		Composite canvas = new Composite(parent, SWT.NONE);
 		GridLayout canvasLayout = new GridLayout(2, false);
 		canvas.setLayout(canvasLayout);
-		
+
 		Composite tableParent = new Composite(canvas, SWT.NONE);
 		tableParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		
-		fTable = new Table (tableParent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL);
-		fTable.setLinesVisible (true);
-		fTable.setHeaderVisible (true);
-		
+
+		fTable = new Table(tableParent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL);
+		fTable.setLinesVisible(true);
+		fTable.setHeaderVisible(true);
+
 		TableColumnLayout layout = new TableColumnLayout();
-		String[] titles = {Messages.ServiceConfigurationWidget_0, Messages.ServiceConfigurationWidget_1, Messages.ServiceConfigurationWidget_2};
-		for (int i=0; i<titles.length; i++) {
-			TableColumn column = new TableColumn (fTable, SWT.NONE);
-			column.setText (titles [i]);
+		String[] titles = { Messages.ServiceConfigurationWidget_0, Messages.ServiceConfigurationWidget_1,
+				Messages.ServiceConfigurationWidget_2 };
+		for (int i = 0; i < titles.length; i++) {
+			TableColumn column = new TableColumn(fTable, SWT.NONE);
+			column.setText(titles[i]);
 			int width = ColumnWeightData.MINIMUM_WIDTH;
-			
+
 			// set the column widths
 			switch (i) {
 			case 0: // Project name... usually short
@@ -191,18 +194,17 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 				break;
 
 			}
-			
+
 			layout.setColumnData(column, new ColumnWeightData(1, width, true));
-			
 
 		}
 		tableParent.setLayout(layout);
 		fTable.setLayout(new FillLayout());
-		
+
 		createTableContent();
-		
+
 		fTable.setVisible(true);
-		
+
 		Composite buttonParent = new Composite(canvas, SWT.NONE);
 		GridLayout buttonLayout = new GridLayout(1, true);
 		buttonParent.setLayout(buttonLayout);
@@ -214,14 +216,14 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 		fConfigureButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Listener configureListener = getConfigureListener();
 		fConfigureButton.addListener(SWT.Selection, configureListener);
-		
+
 		fAddButton = new Button(buttonParent, SWT.PUSH);
 		fAddButton.setEnabled(true);
 		fAddButton.setText(Messages.ServiceModelWidget_6);
 		fAddButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Listener addListener = getAddListener();
 		fAddButton.addListener(SWT.Selection, addListener);
-		
+
 		fRemoveButton = new Button(buttonParent, SWT.PUSH);
 		fRemoveButton.setEnabled(false);
 		fRemoveButton.setText(Messages.ServiceModelWidget_7);
@@ -230,21 +232,21 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 		fRemoveButton.addListener(SWT.Selection, removeListener);
 
 		updateAddRemoveButtons();
-		
+
 		return canvas;
 	}
-	
+
 	/**
 	 * @return the configuration change listener
 	 */
 	public Listener getConfigChangeListener() {
 		return fConfigChangeListener;
 	}
-	
+
 	public Map<String, IServiceProvider> getProviderIDToProviderMap() {
 		return fProviderIDToProviderMap;
 	}
-	
+
 	/**
 	 * Get the service configuration for this widget
 	 * 
@@ -253,32 +255,38 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	public IServiceConfiguration getServiceConfiguration() {
 		return fServiceConfiguration;
 	}
-	
+
 	public Map<String, String> getServiceIDToSelectedProviderID() {
 		return fServiceIDToSelectedProviderID;
 	}
-	
+
 	public Table getTable() {
 		return fTable;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
+	 * org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		fWorkbench = workbench;
 		fSelection = selection;
 	}
-	
+
 	/**
 	 * Sub-class may override behaviour
+	 * 
 	 * @return true if all available services have been configured
 	 */
 	public boolean isConfigured() {
 		return isConfigured(null, fServiceIDToSelectedProviderID, getProviderIDToProviderMap());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
@@ -288,19 +296,19 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 
 	/**
 	 * Listens for changes in service provider configuration
-	 * @param configChangeListener the configuration change listener to set
+	 * 
+	 * @param configChangeListener
+	 *            the configuration change listener to set
 	 */
 	public void setConfigChangeListener(Listener configChangeListener) {
 		fConfigChangeListener = configChangeListener;
 	}
 
-	public void setProviderIDToProviderMap(
-			Map<String, IServiceProvider> providerIDToProviderMap) {
+	public void setProviderIDToProviderMap(Map<String, IServiceProvider> providerIDToProviderMap) {
 		fProviderIDToProviderMap = providerIDToProviderMap;
 	}
 
-	public void setServiceIDToSelectedProviderID(
-			Map<String, String> serviceIDToSelectedProviderID) {
+	public void setServiceIDToSelectedProviderID(Map<String, String> serviceIDToSelectedProviderID) {
 		fServiceIDToSelectedProviderID = serviceIDToSelectedProviderID;
 	}
 
@@ -309,11 +317,11 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	}
 
 	private void addTableRow(IServiceConfiguration config) {
-		TableItem item = new TableItem (fTable, SWT.NONE);
+		TableItem item = new TableItem(fTable, SWT.NONE);
 
 		// column 0 lists the name of the configuration
-		item.setText (0, config.getName());
-		
+		item.setText(0, config.getName());
+
 		// column 1 holds the status string
 		item.setText(1, Messages.ServiceConfigurationWidget_3);
 
@@ -324,86 +332,91 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 			fConfigChangeListener.handleEvent(null);
 		}
 	}
-	
+
 	/**
 	 * Return the set of providers sorted by priority
 	 * 
-	 * @param service service containing providers
+	 * @param service
+	 *            service containing providers
 	 * @return sorted providers
 	 */
 	private SortedSet<IServiceProviderDescriptor> getProvidersByPriority(IService service) {
-		SortedSet<IServiceProviderDescriptor> sortedProviders = 
-			new TreeSet<IServiceProviderDescriptor>(new Comparator<IServiceProviderDescriptor>() {
-				public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
-					return o2.getPriority().compareTo(o1.getPriority());
-				}
-			});
+		SortedSet<IServiceProviderDescriptor> sortedProviders = new TreeSet<IServiceProviderDescriptor>(
+				new Comparator<IServiceProviderDescriptor>() {
+					public int compare(IServiceProviderDescriptor o1, IServiceProviderDescriptor o2) {
+						return o2.getPriority().compareTo(o1.getPriority());
+					}
+				});
 		for (IServiceProviderDescriptor p : service.getProviders()) {
 			sortedProviders.add(p);
 		}
-		
+
 		return sortedProviders;
 	}
-	
+
 	/**
-	 * Get a the service provider for the descriptor. Keeps a cache of service providers.
+	 * Get a the service provider for the descriptor. Keeps a cache of service
+	 * providers.
 	 * 
-	 * @param descriptor descriptor for the service provider
+	 * @param descriptor
+	 *            descriptor for the service provider
 	 * @return service provider
 	 */
+	@SuppressWarnings("unused")
 	private IServiceProvider getServiceProvider(IServiceProviderDescriptor descriptor) {
 		IServiceProvider serviceProvider = getProviderIDToProviderMap().get(descriptor.getId());
-		
+
 		if (serviceProvider == null) {
 			serviceProvider = ServiceModelManager.getInstance().getServiceProvider(descriptor);
 			getProviderIDToProviderMap().put(descriptor.getId(), serviceProvider);
 		}
-		
+
 		return serviceProvider;
 	}
-	
+
 	/**
 	 * Generate the services, providers and provider configuration available for
 	 * the given configuration in the table
 	 * 
 	 * Sub-classes may override its behaviour
+	 * 
 	 * @param project
 	 */
 	protected void createTableContent() {
 		fTable.removeAll();
-		
+
 		for (IServiceConfiguration config : fServiceConfigurations) {
 			addTableRow(config);
 		}
 	}
-	
-	//sub class may override to change behaviour
+
+	// sub class may override to change behaviour
 	protected Listener getAddListener() {
-		return new AddListener();		
+		return new AddListener();
 	}
-	
-	//sub class may override to change behaviour
+
+	// sub class may override to change behaviour
 	protected Listener getConfigureListener() {
-		return new ConfigureListener();		
+		return new ConfigureListener();
 	}
 
 	/**
 	 * Find available remote services and service providers for a given project
 	 */
-	protected Set<IService> getContributedServices(IProject project) {		
+	protected Set<IService> getContributedServices(IProject project) {
 		IServiceModelManager modelManager = ServiceModelManager.getInstance();
 		Set<IService> allApplicableServices = new LinkedHashSet<IService>();
-		
+
 		if (project != null) {
-		
-			String[] natureIds = new String[] {};			
+
+			String[] natureIds = new String[] {};
 			try {
-				//get the project natures of the project
-				natureIds = project.getDescription().getNatureIds();			
+				// get the project natures of the project
+				natureIds = project.getDescription().getNatureIds();
 			} catch (CoreException e) {
 				e.printStackTrace();
-			}		
-	
+			}
+
 			for (int i = 0; i < natureIds.length; i++) {
 				String natureId = natureIds[i];
 				Set<IService> services = modelManager.getServices(natureId);
@@ -413,20 +426,22 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 		}
 		return allApplicableServices;
 	}
-		
-	//sub class may override to change behaviour
+
+	// sub class may override to change behaviour
 	protected Listener getRemoveListener() {
-		return new RemoveListener();		
+		return new RemoveListener();
 	}
-	
+
 	/**
 	 * Determine if all service providers have been configured
+	 * 
 	 * @param project
 	 * @param serviceIDToSelectedProviderID
 	 * @param providerIDToProviderMap
 	 * @return true if all service providers have been configured
 	 */
-	protected boolean isConfigured(IProject project, Map<String, String> serviceIDToSelectedProviderID, Map<String, IServiceProvider> providerIDToProviderMap) {
+	protected boolean isConfigured(IProject project, Map<String, String> serviceIDToSelectedProviderID,
+			Map<String, IServiceProvider> providerIDToProviderMap) {
 		Set<IService> allApplicableServices = getContributedServices(project);
 		Iterator<IService> iterator = allApplicableServices.iterator();
 		boolean configured = true;
@@ -452,7 +467,9 @@ public class ServiceConfigurationWidget extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * Enable/disable the configure button in this widget based on the service provider descriptor selected
+	 * Enable/disable the configure button in this widget based on the service
+	 * provider descriptor selected
+	 * 
 	 * @param enabled
 	 */
 	protected void updateConfigureButton(IServiceProviderDescriptor descriptor) {

@@ -15,38 +15,46 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceModelManager;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 
 public class AddServiceConfigurationAction implements IViewActionDelegate {
-	
-	private IServiceModelManager fManager = ServiceModelManager.getInstance();
+
+	@SuppressWarnings("unused")
 	private IServiceConfiguration fConfiguration = null;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
+	 * .IAction, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
-		IStructuredSelection structSel = (IStructuredSelection)selection;
+		IStructuredSelection structSel = (IStructuredSelection) selection;
 		if (structSel.size() == 1) {
 			Object selected = structSel.getFirstElement();
 			if (selected instanceof IServiceConfiguration) {
-				fConfiguration = (IServiceConfiguration)selected;
+				fConfiguration = (IServiceConfiguration) selected;
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
+	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
 	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// Nothing
@@ -54,6 +62,6 @@ public class AddServiceConfigurationAction implements IViewActionDelegate {
 
 	public void init(IViewPart view) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
