@@ -40,38 +40,37 @@ public class ServiceConfigurationExportWizard extends Wizard implements IImportW
 
 		public MainExportWizardPage(String pageName, String title, ImageDescriptor titleImage) {
 			super(pageName, title, titleImage);
-			setDescription(Messages.ServiceConfigurationExportWizard_0); 
+			setDescription(Messages.ServiceConfigurationExportWizard_0);
 		}
 
 		public void createControl(Composite parent) {
 			Composite workArea = new Composite(parent, SWT.NONE);
 			setControl(workArea);
 
-	        workArea.setFont(parent.getFont());
-	        workArea.setLayout(new GridLayout());
-			workArea.setLayoutData(new GridData(GridData.FILL_BOTH
-					| GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+			workArea.setFont(parent.getFont());
+			workArea.setLayout(new GridLayout());
+			workArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
 			createFileSelectionArea(workArea);
 			createConfigurationsSelectionArea(workArea);
-			
+
 			setControl(workArea);
 			Dialog.applyDialogFont(parent);
 			updateEnablement();
 			messageType = ERROR;
 		}
-		
+
 		public void createFileSelectionArea(Composite workArea) {
-	        Composite composite = new Composite(workArea, SWT.NULL);
-	        composite.setFont(workArea.getFont());
-	        composite.setLayout(new GridLayout());
-	        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			Composite composite = new Composite(workArea, SWT.NULL);
+			composite.setFont(workArea.getFont());
+			composite.setLayout(new GridLayout());
+			composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			GridLayout layout = new GridLayout();
 			layout.numColumns = 3;
 			layout.marginHeight = 0;
 			layout.marginWidth = 0;
 			composite.setLayout(layout);
-			
+
 			Label label = new Label(composite, SWT.NONE);
 			label.setText(Messages.ServiceConfigurationExportWizard_4);
 
@@ -86,13 +85,13 @@ public class ServiceConfigurationExportWizard extends Wizard implements IImportW
 			fileCombo.setText(file);
 			fileCombo.addListener(SWT.Modify, new Listener() {
 				public void handleEvent(Event event) {
-					file = fileCombo.getText();				
+					file = fileCombo.getText();
 					updateEnablement();
 				}
 			});
 
 			browseButton = new Button(composite, SWT.PUSH);
-			browseButton.setText(Messages.ServiceConfigurationExportWizard_5); 
+			browseButton.setText(Messages.ServiceConfigurationExportWizard_5);
 			GridData data = new GridData();
 			data.horizontalAlignment = GridData.FILL;
 			int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
@@ -101,8 +100,8 @@ public class ServiceConfigurationExportWizard extends Wizard implements IImportW
 			browseButton.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
 					FileDialog d = new FileDialog(getShell(), SWT.SAVE);
-					d.setFilterExtensions(new String[] {"*.cfg"}); //$NON-NLS-1$
-					d.setFilterNames(new String[] {Messages.ServiceConfigurationExportWizard_6});
+					d.setFilterExtensions(new String[] { "*.cfg" }); //$NON-NLS-1$
+					d.setFilterNames(new String[] { Messages.ServiceConfigurationExportWizard_6 });
 					d.setFileName(Messages.ServiceConfigurationExportWizard_7);
 					String fileName = getFileName();
 					if (fileName != null) {
@@ -120,57 +119,58 @@ public class ServiceConfigurationExportWizard extends Wizard implements IImportW
 				}
 			});
 		}
-		
+
 		public String getFileName() {
 			return file;
 		}
-		
+
 		public IServiceConfiguration[] getServiceConfigurations() {
 			return serviceConfigWidget.getCheckedServiceConfigurations();
 		}
 
+		@Override
 		public void setVisible(boolean visible) {
 			super.setVisible(visible);
 			if (visible) {
 				fileCombo.setFocus();
 			}
 		}
-		
+
 		private void createConfigurationsSelectionArea(Composite workArea) {
-	        Composite composite = new Composite(workArea, SWT.NULL);
-	        composite.setFont(workArea.getFont());
-	        composite.setLayout(new GridLayout());
-	        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+			Composite composite = new Composite(workArea, SWT.NULL);
+			composite.setFont(workArea.getFont());
+			composite.setLayout(new GridLayout());
+			composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 			GridLayout layout = new GridLayout();
 			layout.numColumns = 1;
 			layout.marginHeight = 0;
 			layout.marginWidth = 0;
 			composite.setLayout(layout);
-			
+
 			Label label = new Label(composite, SWT.NONE);
 			label.setText(Messages.ServiceConfigurationExportWizard_1);
-			
+
 			serviceConfigWidget = new ServiceConfigurationSelectionWidget(composite, SWT.CHECK, null, null, true);
-	        GridData data = new GridData(GridData.FILL_BOTH);
-	        data.heightHint = 100;
-	        serviceConfigWidget.setLayoutData(data);
+			GridData data = new GridData(GridData.FILL_BOTH);
+			data.heightHint = 100;
+			serviceConfigWidget.setLayoutData(data);
 			serviceConfigWidget.addSelectionChangedListener(new ISelectionChangedListener() {
 				public void selectionChanged(SelectionChangedEvent event) {
 					updateEnablement();
 				}
 			});
 		}
-		
+
 		private void updateEnablement() {
 			boolean complete = false;
 			setMessage(null);
 			setPageComplete(false);
-			
-			if (getServiceConfigurations().length == 0) {			
+
+			if (getServiceConfigurations().length == 0) {
 				setPageComplete(false);
 				return;
 			}
-			
+
 			if (file.length() == 0) {
 				setMessage(Messages.ServiceConfigurationExportWizard_8, messageType);
 				setPageComplete(false);
@@ -179,57 +179,62 @@ public class ServiceConfigurationExportWizard extends Wizard implements IImportW
 				// See if the file exists
 				File f = new File(file);
 				if (f.isDirectory()) {
-					setMessage(Messages.ServiceConfigurationExportWizard_9, messageType); 
+					setMessage(Messages.ServiceConfigurationExportWizard_9, messageType);
 					setPageComplete(false);
 					return;
 				}
 				complete = true;
 			}
-			
+
 			if (complete) {
 				setErrorMessage(null);
 				setDescription(Messages.ServiceConfigurationExportWizard_10);
 			}
-				
-			setPageComplete(complete);		
+
+			setPageComplete(complete);
 		}
 	}
-	
-	private MainExportWizardPage mainPage = 
-			new MainExportWizardPage("exportWizardPage",  //$NON-NLS-1$
-					Messages.ServiceConfigurationExportWizard_11, null); //$NON-NLS-1$;
-	
+
+	private final MainExportWizardPage mainPage = new MainExportWizardPage("exportWizardPage", //$NON-NLS-1$
+			Messages.ServiceConfigurationExportWizard_11, null);
+
 	public ServiceConfigurationExportWizard() {
 		setNeedsProgressMonitor(true);
-		setWindowTitle(Messages.ServiceConfigurationExportWizard_13); 
+		setWindowTitle(Messages.ServiceConfigurationExportWizard_13);
 	}
-	
+
+	@Override
 	public void addPages() {
 		addPage(mainPage);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
+	 * org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		FilenameStore.setDefaultFromSelection(workbench);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
 	public boolean performFinish() {
 		File f = new File(mainPage.getFileName());
 		if (f.exists()) {
-			boolean result = MessageDialog.openQuestion(getShell(), Messages.ServiceConfigurationExportWizard_14, Messages.ServiceConfigurationExportWizard_15);		
+			boolean result = MessageDialog.openQuestion(getShell(), Messages.ServiceConfigurationExportWizard_14,
+					Messages.ServiceConfigurationExportWizard_15);
 			if (!result) {
 				return false;
 			}
 		}
 		try {
-			ServiceModelManager.getInstance().exportConfigurations(mainPage.getFileName(), 
-					mainPage.getServiceConfigurations());
+			ServiceModelManager.getInstance().exportConfigurations(mainPage.getFileName(), mainPage.getServiceConfigurations());
 		} catch (InvocationTargetException e) {
 			// TODO: error dialog?
 			return false;
