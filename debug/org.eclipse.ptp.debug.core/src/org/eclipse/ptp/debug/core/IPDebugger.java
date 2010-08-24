@@ -27,7 +27,6 @@
 package org.eclipse.ptp.debug.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
@@ -51,16 +50,13 @@ public interface IPDebugger {
 	 *            timeout value for debug commands
 	 * @param launch
 	 *            debugger launch configuration
-	 * @param corefile
-	 *            path to core file (not used)
 	 * @param monitor
 	 *            progress monitor
 	 * @return new debug session
 	 * @throws CoreException
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public IPDISession createDebugSession(long timeout, IPLaunch launch, IPath corefile, IProgressMonitor monitor)
-			throws CoreException;
+	public IPDISession createDebugSession(long timeout, IPLaunch launch, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Initialize the debugger. This does whatever is necessary to get the
