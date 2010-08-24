@@ -61,6 +61,8 @@ public class Messages extends NLS {
 	public static String PDIDebugger_43;
 	public static String PDIDebugger_44;
 	public static String PDIDebugger_45;
+
+	public static String PDIDebugger_Operation_canceled_by_user;
 	public static String ProxyDebugClient_0;
 	public static String ProxyDebugClient_1;
 	public static String SDMDebugger_0;
@@ -81,6 +83,8 @@ public class Messages extends NLS {
 	public static String SDMDebugger_15;
 
 	public static String SDMDebugger_6;
+
+	public static String SDMDebugger_Operation_canceled_by_user;
 	public static String SDMEvaluateExpressionRequest_0;
 	public static String SDMEvaluatePartialExpressionRequest_0;
 	public static String SDMEventManager_0;

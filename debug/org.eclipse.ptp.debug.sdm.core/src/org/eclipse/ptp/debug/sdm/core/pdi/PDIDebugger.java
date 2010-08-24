@@ -27,11 +27,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IResourceManager;
@@ -302,6 +302,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 					if (remConf.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 						IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(
 								remConf.getRemoteServicesId(), progress.newChild(5));
+						if (progress.isCanceled()) {
+							throw new PDIException(null, Messages.PDIDebugger_Operation_canceled_by_user);
+						}
 						if (remoteServices != null) {
 							IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
 							if (connMgr != null) {
@@ -324,7 +327,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 										throw new PDIException(null, e.getMessage());
 									}
 									if (progress.isCanceled()) {
-										return;
+										throw new PDIException(null, Messages.PDIDebugger_Operation_canceled_by_user);
 									}
 								} else {
 									throw new PDIException(null, Messages.PDIDebugger_8);
@@ -342,10 +345,8 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				throw new PDIException(null, Messages.PDIDebugger_11);
 			}
 
-			Preferences store = SDMDebugCorePlugin.getDefault().getPluginPreferences();
-
-			if (store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
-				int level = store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL);
+			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
+				int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL);
 				if ((level & SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) == SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) {
 					getDebugOptions().PROTOCOL_TRACING = true;
 				}

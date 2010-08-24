@@ -142,9 +142,9 @@ public class SDMDebugger implements IPDebugger {
 	 * org.eclipse.core.runtime.IPath)
 	 */
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IPath corefile, IProgressMonitor monitor)
+	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IProgressMonitor monitor)
 			throws CoreException {
 		if (fModelFactory == null) {
 			fModelFactory = new SDMModelFactory();
@@ -159,7 +159,7 @@ public class SDMDebugger implements IPDebugger {
 			fRequestFactory = new SDMRequestFactory();
 		}
 
-		IPDISession session = createSession(timeout, launch, corefile);
+		IPDISession session = createSession(timeout, launch);
 
 		if (fRoutingFileStore != null) {
 			/*
@@ -188,100 +188,108 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	public synchronized void initialize(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
-		if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
-			int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
-			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING) {
-				DebugUtil.SDM_MASTER_TRACING = true;
-			}
-			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) {
-				DebugUtil.SDM_MASTER_TRACING_MORE = true;
-			}
-			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) == SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) {
-				DebugUtil.SDM_MASTER_OUTPUT_TRACING = true;
-			}
-		}
-
-		ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
-
-		if (dbgArgsAttr == null) {
-			dbgArgsAttr = JobAttributes.getDebuggerArgumentsAttributeDefinition().create();
-			attrMgr.addAttribute(dbgArgsAttr);
-		}
-
-		List<String> dbgArgs = dbgArgsAttr.getValue();
-
+		SubMonitor progress = SubMonitor.convert(monitor, 30);
 		try {
-			getPDIDebugger().initialize(configuration, dbgArgs, monitor);
-		} catch (PDIException e) {
-			throw newCoreException(e.getLocalizedMessage());
-		}
-
-		String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
-
-		dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
-		dbgArgs.add("--debugger=" + Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
-
-		String dbgPath = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-				SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);
-		if (dbgPath.length() > 0) {
-			dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
-		}
-
-		String dbgExtraArgs = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-				SDMPreferenceConstants.SDM_DEBUGGER_ARGS);
-		if (dbgExtraArgs.length() > 0) {
-			dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
-		}
-
-		if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
-			dbgArgs.add("--debug=" + Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
-		}
-
-		// remote setting
-		String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
-		IPath path = verifyResource(dbgExePath, configuration);
-		attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
-		attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(
-				path.removeLastSegments(1).toString()));
-
-		StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
-		String dbgWD = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String) null);
-		if (dbgWD != null) {
-			if (wdAttr != null) {
-				wdAttr.setValueAsString(dbgWD);
-			} else {
-				wdAttr = JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD);
-				attrMgr.addAttribute(wdAttr);
+			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
+				int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(),
+						SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
+				if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING) {
+					DebugUtil.SDM_MASTER_TRACING = true;
+				}
+				if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) {
+					DebugUtil.SDM_MASTER_TRACING_MORE = true;
+				}
+				if ((level & SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) == SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) {
+					DebugUtil.SDM_MASTER_OUTPUT_TRACING = true;
+				}
 			}
-		}
 
-		/*
-		 * Prepare the Master SDM controller thread if required by the RM.
-		 */
-		IResourceManagerControl rm = null;
-		rm = (IResourceManagerControl) getResourceManager(configuration);
+			ArrayAttribute<String> dbgArgsAttr = attrMgr.getAttribute(JobAttributes.getDebuggerArgumentsAttributeDefinition());
 
-		if (rm.getConfiguration().needsDebuggerLaunchHelp()) {
+			if (dbgArgsAttr == null) {
+				dbgArgsAttr = JobAttributes.getDebuggerArgumentsAttributeDefinition().create();
+				attrMgr.addAttribute(dbgArgsAttr);
+			}
+
+			List<String> dbgArgs = dbgArgsAttr.getValue();
+
+			try {
+				getPDIDebugger().initialize(configuration, dbgArgs, progress.newChild(10));
+			} catch (PDIException e) {
+				throw newCoreException(e.getLocalizedMessage());
+			}
+
+			String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
+
+			dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
+			dbgArgs.add("--debugger=" + Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
+
+			String dbgPath = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+					SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);
+			if (dbgPath.length() > 0) {
+				dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
+			}
+
+			String dbgExtraArgs = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+					SDMPreferenceConstants.SDM_DEBUGGER_ARGS);
+			if (dbgExtraArgs.length() > 0) {
+				dbgArgs.addAll(Arrays.asList(dbgExtraArgs.split(" "))); //$NON-NLS-1$
+			}
+
+			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
+				dbgArgs.add("--debug=" + Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
+			}
+
+			// remote setting
+			String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
+			IPath path = verifyResource(dbgExePath, configuration, progress.newChild(10));
+			attrMgr.addAttribute(JobAttributes.getDebuggerExecutableNameAttributeDefinition().create(path.lastSegment()));
+			attrMgr.addAttribute(JobAttributes.getDebuggerExecutablePathAttributeDefinition().create(
+					path.removeLastSegments(1).toString()));
+
+			StringAttribute wdAttr = attrMgr.getAttribute(JobAttributes.getWorkingDirectoryAttributeDefinition());
+			String dbgWD = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_WORKING_DIR, (String) null);
+			if (dbgWD != null) {
+				if (wdAttr != null) {
+					wdAttr.setValueAsString(dbgWD);
+				} else {
+					wdAttr = JobAttributes.getWorkingDirectoryAttributeDefinition().create(dbgWD);
+					attrMgr.addAttribute(wdAttr);
+				}
+			}
+
 			/*
-			 * Store information to create routing file later.
+			 * Prepare the Master SDM controller thread if required by the RM.
 			 */
-			prepareRoutingFile(configuration, attrMgr, monitor);
+			IResourceManagerControl rm = null;
+			rm = (IResourceManagerControl) getResourceManager(configuration);
 
-			/*
-			 * Create SDM master thread
-			 */
-			fSdmRunner = new SDMRunner(rm);
+			if (rm.getConfiguration().needsDebuggerLaunchHelp()) {
+				/*
+				 * Store information to create routing file later.
+				 */
+				prepareRoutingFile(configuration, attrMgr, progress.newChild(10));
 
-			/*
-			 * Set SDM command line.
-			 */
-			List<String> sdmCommand = new ArrayList<String>();
-			sdmCommand.add(dbgExePath);
-			sdmCommand.add("--master"); //$NON-NLS-1$
-			sdmCommand.addAll(dbgArgs);
-			fSdmRunner.setCommand(sdmCommand);
-			if (wdAttr != null) {
-				fSdmRunner.setWorkDir(wdAttr.getValue());
+				/*
+				 * Create SDM master thread
+				 */
+				fSdmRunner = new SDMRunner(rm);
+
+				/*
+				 * Set SDM command line.
+				 */
+				List<String> sdmCommand = new ArrayList<String>();
+				sdmCommand.add(dbgExePath);
+				sdmCommand.add("--master"); //$NON-NLS-1$
+				sdmCommand.addAll(dbgArgs);
+				fSdmRunner.setCommand(sdmCommand);
+				if (wdAttr != null) {
+					fSdmRunner.setWorkDir(wdAttr.getValue());
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
 	}
@@ -291,17 +299,25 @@ public class SDMDebugger implements IPDebugger {
 	 * the path references something real.
 	 * 
 	 * @param path
+	 *            path to verify
 	 * @param configuration
-	 * @return IPath
+	 *            launch configuration
+	 * @return IPath representing the path
 	 * @throws CoreException
+	 *             is thrown if the verification fails or the user cancels the
+	 *             progress monitor
+	 * @since 5.0
 	 */
-	public IPath verifyResource(String path, ILaunchConfiguration configuration) throws CoreException {
+	public IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
 		if (rm == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_4));
 		}
 		IResourceManagerConfiguration conf = rm.getConfiguration();
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), null);
+		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(), monitor);
+		if (monitor.isCanceled()) {
+			throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
+		}
 		if (remoteServices == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_0));
 		}
@@ -409,6 +425,9 @@ public class SDMDebugger implements IPDebugger {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(conf.getRemoteServicesId(),
 					progress.newChild(5));
+			if (progress.isCanceled()) {
+				throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
+			}
 			IRemoteConnectionManager rconnMgr = remoteServices.getConnectionManager();
 			IRemoteConnection rconn = rconnMgr.getConnection(conf.getConnectionName());
 			IRemoteFileManager remoteFileManager = remoteServices.getFileManager(rconn);
@@ -443,15 +462,15 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	private void writeRoutingFile(IPLaunch launch, IProgressMonitor monitor) throws CoreException {
 		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMDebugger_12);
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			OutputStream os = null;
 			try {
-				os = fRoutingFileStore.openOutputStream(0, subMon.newChild(10));
+				os = fRoutingFileStore.openOutputStream(0, progress.newChild(10));
 			} catch (CoreException e) {
 				throw newCoreException(e.getLocalizedMessage());
 			}
-			subMon.subTask(Messages.SDMDebugger_6);
+			progress.subTask(Messages.SDMDebugger_6);
 			PrintWriter pw = new PrintWriter(os);
 			final IPJob pJob = launch.getPJob();
 			BitSet processJobRanks = pJob.getProcessJobRanks();
@@ -462,16 +481,19 @@ public class SDMDebugger implements IPDebugger {
 			for (Integer processIndex : new BitSetIterable(processJobRanks)) {
 				String nodeId = pJob.getProcessNodeId(processIndex);
 				if (nodeId == null) {
-					subMon.subTask(Messages.SDMDebugger_10);
-					while (nodeId == null && !subMon.isCanceled()) {
+					progress.subTask(Messages.SDMDebugger_10);
+					while (nodeId == null && !progress.isCanceled()) {
 						try {
-							wait(3000);
+							wait(1000);
 						} catch (InterruptedException e) {
 							// ignore
 						}
 						nodeId = pJob.getProcessNodeId(processIndex);
-						subMon.worked(1);
+						progress.worked(1);
 					}
+				}
+				if (progress.isCanceled()) {
+					throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 				}
 				IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
 				if (node == null) {
@@ -480,8 +502,8 @@ public class SDMDebugger implements IPDebugger {
 				String nodeName = node.getName();
 				int portNumber = base + random.nextInt(range);
 				pw.format("%s %s %d\n", processIndex, nodeName, portNumber); //$NON-NLS-1$
-				subMon.setWorkRemaining(60);
-				subMon.worked(10);
+				progress.setWorkRemaining(60);
+				progress.worked(10);
 			}
 			pw.close();
 			try {
@@ -500,13 +522,14 @@ public class SDMDebugger implements IPDebugger {
 	 * Create a PDI session
 	 * 
 	 * @param timeout
+	 *            timeout for debugger commands
 	 * @param launch
-	 * @param corefile
-	 * @param monitor
+	 *            launch configuration
 	 * @return Session
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	protected Session createSession(long timeout, IPLaunch launch, IPath corefile) throws CoreException {
+	protected Session createSession(long timeout, IPLaunch launch) throws CoreException {
 		IPJob job = launch.getPJob();
 		int job_size = getJobSize(job);
 		try {
