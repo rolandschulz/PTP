@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.ui.preferences;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.rm.core.AbstractToolsPreferenceManager;
 import org.eclipse.ptp.rm.core.rmsystem.IToolRMConfiguration;
 import org.eclipse.ptp.rm.ui.messages.Messages;
@@ -36,30 +36,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage implements IWorkbenchPreferencePage {
 
-	class WidgetListener extends PreferenceWidgetListener implements ModifyListener {
-		@Override
-		public void doModifyText(ModifyEvent evt) {
-			Object source = evt.getSource();
-			if(source == launchCmdText ||
-					source == debugCmdText ||
-					source == discoverCmdText ||
-					source == periodicMonitorCmdText ||
-					source == continuousMonitorCmdText ||
-					source == periodicMonitorTimeSpinner ||
-					source == remoteInstallPathText) {
-				resetErrorMessages();
-				getDataSource().justValidate();
-			} else {
-				assert false;
-			}
-		}
-	}
-
 	class DataSource extends PreferenceDataSource {
-		DataSource(AbstractPreferencePage page) {
-			super(page);
-		}
-
 		String launchCmd = null;
 		String debugCmd = null;
 		String discoverCmd = null;
@@ -67,6 +44,10 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		int periodicMonitorTime = 0;
 		String continuousMonitorCmd = null;
 		String remoteInstallPath = null;
+
+		DataSource(AbstractPreferencePage page) {
+			super(page);
+		}
 
 		@Override
 		protected void copyFromFields() throws ValidationException {
@@ -94,108 +75,6 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		}
 
 		@Override
-		protected void validateLocal() throws ValidationException {
-			if (launchCmdText != null && launchCmd == null) {
-				throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingLaunchCommand);
-			}
-			if (debugCmdText != null && debugCmd == null) {
-				throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingMissingDebugCommand);
-			}
-			if (discoverCmdText != null) {
-				if (discoverCmd == null) {
-					throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingDiscoverCommand);
-				}
-			}
-			if (periodicMonitorCmdText != null) {
-				//				if (periodicMonitorCmd == null) {
-				//					throw new ValidationException("Periodic monitor command is missing");
-				//				}
-				if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
-					throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_InvalidPeriodicMonitorCommandTimeRange);
-				}
-			}
-		}
-
-		@Override
-		protected void copyToStorage() {
-			Preferences config = getPreferences();
-			if (launchCmdText != null) {
-				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, toPreference(launchCmd));
-			}
-			if (debugCmdText != null) {
-				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD, toPreference(debugCmd));
-			}
-			if (discoverCmdText != null) {
-				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD, toPreference(discoverCmd));
-			}
-			if (periodicMonitorCmdText != null) {
-				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD, toPreference(periodicMonitorCmd));
-			}
-			if (periodicMonitorTimeSpinner != null) {
-				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME, periodicMonitorTime);
-			}
-			if (continuousMonitorCmdText != null) {
-				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD, toPreference(continuousMonitorCmd));
-			}
-			if (remoteInstallPathText != null) {
-				config.setValue(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH, toPreference(remoteInstallPath));
-			}
-			savePreferences();
-		}
-
-		@Override
-		protected void loadFromStorage() {
-			Preferences config = getPreferences();
-			if (launchCmdText != null) {
-				launchCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
-			}
-			if (debugCmdText != null) {
-				debugCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD));
-			}
-			if (discoverCmdText != null) {
-				discoverCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
-			}
-			if (periodicMonitorCmdText != null) {
-				periodicMonitorCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
-			}
-			if (periodicMonitorTimeSpinner != null) {
-				periodicMonitorTime = config.getInt(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
-			}
-			if (continuousMonitorCmdText != null) {
-				continuousMonitorCmd = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD));
-			}
-			if (remoteInstallPathText != null) {
-				remoteInstallPath = fromPreference(config.getString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-			}
-		}
-
-		@Override
-		protected void loadDefault() {
-			Preferences config = getPreferences();
-			if (launchCmdText != null) {
-				launchCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
-			}
-			if (debugCmdText != null) {
-				debugCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_DEBUG_CMD));
-			}
-			if (discoverCmdText != null) {
-				discoverCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
-			}
-			if (periodicMonitorCmdText != null) {
-				periodicMonitorCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
-			}
-			if (periodicMonitorTimeSpinner != null) {
-				periodicMonitorTime = config.getDefaultInt(prefix + AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
-			}
-			if (continuousMonitorCmdText != null) {
-				continuousMonitorCmd = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD));
-			}
-			if (remoteInstallPathText != null) {
-				remoteInstallPath = fromPreference(config.getDefaultString(prefix + AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
-			}
-		}
-
-		@Override
 		protected void copyToFields() {
 			if (launchCmdText != null) {
 				applyText(launchCmdText, launchCmd);
@@ -219,36 +98,193 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 				applyText(remoteInstallPathText, remoteInstallPath);
 			}
 		}
+
+		@Override
+		protected void copyToStorage() {
+			if (launchCmdText != null) {
+				Preferences.setString(getQualifier(), AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, toPreference(launchCmd));
+			}
+			if (debugCmdText != null) {
+				Preferences.setString(getQualifier(), AbstractToolsPreferenceManager.PREFS_DEBUG_CMD, toPreference(debugCmd));
+			}
+			if (discoverCmdText != null) {
+				Preferences.setString(getQualifier(), AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD, toPreference(discoverCmd));
+			}
+			if (periodicMonitorCmdText != null) {
+				Preferences.setString(getQualifier(), AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD,
+						toPreference(periodicMonitorCmd));
+			}
+			if (periodicMonitorTimeSpinner != null) {
+				Preferences.setInt(getQualifier(), AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME, periodicMonitorTime);
+			}
+			if (continuousMonitorCmdText != null) {
+				Preferences.setString(getQualifier(), AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD,
+						toPreference(continuousMonitorCmd));
+			}
+			if (remoteInstallPathText != null) {
+				Preferences.setString(getQualifier(), AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH,
+						toPreference(remoteInstallPath));
+			}
+			savePreferences();
+		}
+
+		@Override
+		protected void loadDefault() {
+			if (launchCmdText != null) {
+				launchCmd = fromPreference(Preferences.getDefaultString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD, "")); //$NON-NLS-1$
+			}
+			if (debugCmdText != null) {
+				debugCmd = fromPreference(Preferences.getDefaultString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_DEBUG_CMD, "")); //$NON-NLS-1$
+			}
+			if (discoverCmdText != null) {
+				discoverCmd = fromPreference(Preferences.getDefaultString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD, "")); //$NON-NLS-1$
+			}
+			if (periodicMonitorCmdText != null) {
+				periodicMonitorCmd = fromPreference(Preferences.getDefaultString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD, "")); //$NON-NLS-1$
+			}
+			if (periodicMonitorTimeSpinner != null) {
+				periodicMonitorTime = Preferences.getDefaultInt(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME, 0);
+			}
+			if (continuousMonitorCmdText != null) {
+				continuousMonitorCmd = fromPreference(Preferences.getDefaultString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD, "")); //$NON-NLS-1$
+			}
+			if (remoteInstallPathText != null) {
+				remoteInstallPath = fromPreference(Preferences.getDefaultString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH, "")); //$NON-NLS-1$
+			}
+		}
+
+		@Override
+		protected void loadFromStorage() {
+			if (launchCmdText != null) {
+				launchCmd = fromPreference(Preferences.getString(getQualifier(), AbstractToolsPreferenceManager.PREFS_LAUNCH_CMD));
+			}
+			if (debugCmdText != null) {
+				debugCmd = fromPreference(Preferences.getString(getQualifier(), AbstractToolsPreferenceManager.PREFS_DEBUG_CMD));
+			}
+			if (discoverCmdText != null) {
+				discoverCmd = fromPreference(Preferences.getString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_DISCOVER_CMD));
+			}
+			if (periodicMonitorCmdText != null) {
+				periodicMonitorCmd = fromPreference(Preferences.getString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_CMD));
+			}
+			if (periodicMonitorTimeSpinner != null) {
+				periodicMonitorTime = Preferences
+						.getInt(getQualifier(), AbstractToolsPreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
+			}
+			if (continuousMonitorCmdText != null) {
+				continuousMonitorCmd = fromPreference(Preferences.getString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_CONTINUOUS_MONITOR_CMD));
+			}
+			if (remoteInstallPathText != null) {
+				remoteInstallPath = fromPreference(Preferences.getString(getQualifier(),
+						AbstractToolsPreferenceManager.PREFS_REMOTE_INSTALL_PATH));
+			}
+		}
+
+		@Override
+		protected void validateLocal() throws ValidationException {
+			if (launchCmdText != null && launchCmd == null) {
+				throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingLaunchCommand);
+			}
+			if (debugCmdText != null && debugCmd == null) {
+				throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingMissingDebugCommand);
+			}
+			if (discoverCmdText != null) {
+				if (discoverCmd == null) {
+					throw new ValidationException(Messages.AbstractToolsPreferencePage_Validation_MissingDiscoverCommand);
+				}
+			}
+			if (periodicMonitorCmdText != null) {
+				// if (periodicMonitorCmd == null) {
+				// throw new
+				// ValidationException("Periodic monitor command is missing");
+				// }
+				if (periodicMonitorTimeSpinner != null && periodicMonitorTime < 1) {
+					throw new ValidationException(
+							Messages.AbstractToolsPreferencePage_Validation_InvalidPeriodicMonitorCommandTimeRange);
+				}
+			}
+		}
 	}
 
-	public static final String EMPTY_STRING = "";  //$NON-NLS-1$
-	Text launchCmdText = null;
-	Text debugCmdText = null;
-	Text discoverCmdText = null;
-	Text continuousMonitorCmdText = null;
-	Text periodicMonitorCmdText = null;
-	Spinner periodicMonitorTimeSpinner = null;
-	Text remoteInstallPathText = null;
+	class WidgetListener extends PreferenceWidgetListener implements ModifyListener {
+		@Override
+		public void doModifyText(ModifyEvent evt) {
+			Object source = evt.getSource();
+			if (source == launchCmdText || source == debugCmdText || source == discoverCmdText || source == periodicMonitorCmdText
+					|| source == continuousMonitorCmdText || source == periodicMonitorTimeSpinner
+					|| source == remoteInstallPathText) {
+				resetErrorMessages();
+				getDataSource().justValidate();
+			} else {
+				assert false;
+			}
+		}
+	}
 
-	private int capabilities = IToolRMConfiguration.NO_CAP_SET;
-	final String prefix; // to get preferences
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-	public AbstractToolsPreferencePage(String prefix, int capabilities) {
+	/**
+	 * @since 2.0
+	 */
+	protected Text launchCmdText = null;
+	/**
+	 * @since 2.0
+	 */
+	protected Text debugCmdText = null;
+	/**
+	 * @since 2.0
+	 */
+	protected Text discoverCmdText = null;
+	/**
+	 * @since 2.0
+	 */
+	protected Text continuousMonitorCmdText = null;
+	/**
+	 * @since 2.0
+	 */
+	protected Text periodicMonitorCmdText = null;
+	/**
+	 * @since 2.0
+	 */
+	protected Spinner periodicMonitorTimeSpinner = null;
+	/**
+	 * @since 2.0
+	 */
+	protected Text remoteInstallPathText = null;
+
+	private int fCapabilities = IToolRMConfiguration.NO_CAP_SET;
+	private final String fQualifier; // to get preferences
+
+	public AbstractToolsPreferencePage(String qualifier, int capabilities) {
 		super();
-		this.capabilities = capabilities;
-		this.prefix = prefix;
+		fCapabilities = capabilities;
+		fQualifier = qualifier;
 	}
 
-	public AbstractToolsPreferencePage(String prefix, int capabilities, String title, ImageDescriptor image) {
-		super(title, image);
-		this.capabilities = capabilities;
-		this.prefix = prefix;
-	}
-
-	public AbstractToolsPreferencePage(String prefix, int capabilities, String title) {
+	public AbstractToolsPreferencePage(String qualifier, int capabilities, String title) {
 		super(title);
-		this.capabilities = capabilities;
-		this.prefix = prefix;
+		fCapabilities = capabilities;
+		fQualifier = qualifier;
+	}
+
+	public AbstractToolsPreferencePage(String qualifier, int capabilities, String title, ImageDescriptor image) {
+		super(title, image);
+		fCapabilities = capabilities;
+		fQualifier = qualifier;
+	}
+
+	public void init(IWorkbench workbench) {
+		// Nothing to do.
 	}
 
 	@Override
@@ -261,10 +297,6 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		return new WidgetListener();
 	}
 
-	public void init(IWorkbench workbench) {
-		// Nothing to do.
-	}
-
 	@Override
 	protected Composite doCreateContents(Composite parent) {
 		Composite contents = new Composite(parent, SWT.NONE);
@@ -275,7 +307,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * launch cmd
 		 */
-		if ((capabilities & IToolRMConfiguration.CAP_LAUNCH) != 0) {
+		if ((fCapabilities & IToolRMConfiguration.CAP_LAUNCH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_LaunchCommand);
 
@@ -288,13 +320,13 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 
 			debugCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			debugCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
-			debugCmdText.addModifyListener(getListener() );
+			debugCmdText.addModifyListener(getListener());
 		}
 
 		/*
 		 * discover cmd
 		 */
-		if ((capabilities & IToolRMConfiguration.CAP_DISCOVER) != 0) {
+		if ((fCapabilities & IToolRMConfiguration.CAP_DISCOVER) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_DiscoverCommand);
 
@@ -306,13 +338,13 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * Periodic monitor cmd and time
 		 */
-		if ((capabilities & IToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
+		if ((fCapabilities & IToolRMConfiguration.CAP_PERIODIC_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_PeriodicMonitorCommand);
 
 			periodicMonitorCmdText = new Text(contents, SWT.SINGLE | SWT.BORDER);
 			periodicMonitorCmdText.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 1, 1));
-			periodicMonitorCmdText.addModifyListener(getListener() );
+			periodicMonitorCmdText.addModifyListener(getListener());
 
 			label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_PeriodicMonitorCommandPeriod);
@@ -324,7 +356,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * Continuous monitor cmd
 		 */
-		if ((capabilities & IToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
+		if ((fCapabilities & IToolRMConfiguration.CAP_CONTINUOUS_MONITOR) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_ContinuosMonitorCommand);
 
@@ -336,7 +368,7 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 		/*
 		 * Installation path
 		 */
-		if ((capabilities & IToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
+		if ((fCapabilities & IToolRMConfiguration.CAP_REMOTE_INSTALL_PATH) != 0) {
 			Label label = new Label(contents, SWT.NONE);
 			label.setText(Messages.AbstractToolsPreferencePage_Label_InstallationPath);
 
@@ -348,6 +380,13 @@ public abstract class AbstractToolsPreferencePage extends AbstractPreferencePage
 			remoteInstallPathText.addModifyListener(getListener());
 		}
 		return contents;
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	protected String getQualifier() {
+		return fQualifier;
 	}
 
 	@Override

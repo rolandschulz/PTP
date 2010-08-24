@@ -10,16 +10,17 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.ui.preferences;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * A preference page already prepared to inter-operate with {@link PreferenceDataSource} and {@link PreferenceWidgetListener}.
+ * A preference page already prepared to inter-operate with
+ * {@link PreferenceDataSource} and {@link PreferenceWidgetListener}.
+ * 
  * @author dfferber
- *
+ * 
  */
 public abstract class AbstractPreferencePage extends PreferencePage {
 
@@ -47,53 +48,51 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 	}
 
 	/**
-	 * Get storage for preferences.
-	 * @return The storage for preferences.
-	 */
-	public abstract Preferences getPreferences();
-
-	/**
 	 * Called when the preferences storage should be saved.
 	 */
 	public abstract void savePreferences();
 
 	/**
-	 * Create listener for the preference page. The listener must extend {@link PreferenceWidgetListener} and add
-	 * specific behavior for widgets of the the preference page.
+	 * Create listener for the preference page. The listener must extend
+	 * {@link PreferenceWidgetListener} and add specific behavior for widgets of
+	 * the the preference page.
+	 * 
 	 * @return the listener
 	 */
 	protected abstract PreferenceWidgetListener createListener();
 
 	/**
-	 * Create data source to handle page content. The listener must extend {@link PreferenceDataSource} and add
-	 * specific behavior for widgets of the the preference page.
+	 * Create data source to handle page content. The listener must extend
+	 * {@link PreferenceDataSource} and add specific behavior for widgets of the
+	 * the preference page.
+	 * 
 	 * @return the listener
 	 */
 	protected abstract PreferenceDataSource createDataSource();
 
 	@Override
 	public boolean performOk() {
-			resetErrorMessages();
-			dataSource.storeAndValidate();
-			return true;
-	//		return super.performOk();
-		}
+		resetErrorMessages();
+		dataSource.storeAndValidate();
+		return true;
+		// return super.performOk();
+	}
 
 	@Override
 	protected void performDefaults() {
-			resetErrorMessages();
-			listener.disable();
-			dataSource.loadDefaultsAndUpdate();
-			listener.enable();
-	//		super.performDefaults();
-		}
+		resetErrorMessages();
+		listener.disable();
+		dataSource.loadDefaultsAndUpdate();
+		listener.enable();
+		// super.performDefaults();
+	}
 
 	@Override
 	protected void performApply() {
-			resetErrorMessages();
-			dataSource.storeAndValidate();
-	//		super.performApply();
-		}
+		resetErrorMessages();
+		dataSource.storeAndValidate();
+		// super.performApply();
+	}
 
 	protected void resetErrorMessages() {
 		setErrorMessage(null);
@@ -116,6 +115,7 @@ public abstract class AbstractPreferencePage extends PreferencePage {
 
 	/**
 	 * Create contents for the preference page.
+	 * 
 	 * @param parent
 	 * @return
 	 */
