@@ -64,7 +64,7 @@ import org.eclipse.ptp.utils.core.RangeSet;
 public class Controller {
 
 	/**
-	 * @since 1.1
+	 * @since 2.0
 	 */
 	public static interface ErrorHandler {
 		void handle(Level level, String msg);
@@ -237,7 +237,7 @@ public class Controller {
 	}
 
 	/**
-	 * @since 1.1
+	 * @since 2.0
 	 */
 	public void setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
