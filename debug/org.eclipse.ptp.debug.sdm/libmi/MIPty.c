@@ -27,7 +27,7 @@ int
 get_master_pty(char **name)
 {
 	int i,j;
-	int master = -1;
+	int master;
 	char *slavename;
 
 #ifdef __APPLE__
@@ -41,17 +41,14 @@ get_master_pty(char **name)
 			&& unlockpt(master) >= 0 )
 	{
 		slavename = ptsname(master);
-		if (!slavename) {
-			close(master);
-			master = -1;
-		} else {
+		if (slavename != NULL) {
 			*name = strdup(slavename);
 			return master;
 		}
+		close(master);
 	}
 	
-	fprintf(stderr, "failed to have master\n");
-	return master;	
+	return -1;
 }
 
 int
