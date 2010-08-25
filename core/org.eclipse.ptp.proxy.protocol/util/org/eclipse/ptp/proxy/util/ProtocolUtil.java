@@ -50,6 +50,10 @@ public class ProtocolUtil {
 
 	private final static String EMPTY_STRING = ""; //$NON-NLS-1$
 
+	private final static int PACKET_ARG_LEN_SIZE = 8; // remove once protocol
+														// changes have been
+														// implemented
+
 	/**
 	 * Decode a string into a BigInteger
 	 * 
@@ -165,6 +169,22 @@ public class ProtocolUtil {
 	}
 
 	/**
+	 * Convert a proxy representation of a string into a Java String
+	 * 
+	 * @param buf
+	 * @param start
+	 * @return proxy string converted to Java String
+	 */
+	@Deprecated
+	public static String decodeString(CharBuffer buf, int start) {
+		int end = start + PACKET_ARG_LEN_SIZE;
+		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
+		start = end + 1; // Skip ':'
+		end = start + len;
+		return buf.subSequence(start, end).toString();
+	}
+
+	/**
 	 * Convert a proxy representation of a string attribute into a Java String.
 	 * Assumes that the type byte as been removed from the buffer.
 	 * 
@@ -197,6 +217,49 @@ public class ProtocolUtil {
 			result += value;
 		}
 		return result;
+	}
+
+	/**
+	 * Convert an integer to it's proxy representation
+	 * 
+	 * @param val
+	 * @param len
+	 * @return proxy representation
+	 */
+	@Deprecated
+	public static String encodeIntVal(int val, int len) {
+		char[] res = new char[len];
+		String str = Integer.toHexString(val);
+		int rem = len - str.length();
+
+		for (int i = 0; i < len; i++) {
+			if (i < rem) {
+				res[i] = '0';
+			} else {
+				res[i] = str.charAt(i - rem);
+			}
+		}
+		return String.valueOf(res);
+	}
+
+	/**
+	 * Encode a string into it's proxy representation
+	 * 
+	 * @param str
+	 * @return proxy representation
+	 */
+	@Deprecated
+	public static String encodeString(String str) {
+		int len;
+
+		if (str == null) {
+			len = 0;
+			str = ""; //$NON-NLS-1$
+		} else {
+			len = str.length();
+		}
+
+		return encodeIntVal(len, PACKET_ARG_LEN_SIZE) + ":" + str; //$NON-NLS-1$	
 	}
 
 	/**
