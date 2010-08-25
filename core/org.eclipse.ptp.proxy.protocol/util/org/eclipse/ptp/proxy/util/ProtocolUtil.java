@@ -20,7 +20,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.List;
 
-import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.util.messages.Messages;
 
 public class ProtocolUtil {
@@ -48,6 +47,8 @@ public class ProtocolUtil {
 	 * @since 5.0
 	 */
 	public final static int TYPE_BOOLEAN_ATTR = 5;
+
+	private final static String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	/**
 	 * Decode a string into a BigInteger
@@ -122,8 +123,7 @@ public class ProtocolUtil {
 	 * Convert a proxy representation of a string to a String. A string is
 	 * represented by a length in varint format followed by the string
 	 * characters. If the characters are multibyte, then the length will reflect
-	 * this. If length is 0, then the string is null and should be skipped,
-	 * otherswise length = strlen(string) + 1;
+	 * this.
 	 * 
 	 * @param buf
 	 *            byte buffer containing string to be decoded
@@ -136,13 +136,13 @@ public class ProtocolUtil {
 	 * @since 5.0
 	 */
 	public static String decodeString(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
-		String result = null;
+		String result = EMPTY_STRING;
 		VarInt strLen = new VarInt(buf);
 		if (!strLen.isValid()) {
 			throw new IOException(Messages.getString("ProtocolUtil.0")); //$NON-NLS-1$
 		}
-		int len = strLen.getValue() - 1;
-		if (len >= 0) {
+		int len = strLen.getValue();
+		if (len > 0) {
 			ByteBuffer strBuf = buf.slice();
 			try {
 				strBuf.limit(len);
@@ -165,22 +165,6 @@ public class ProtocolUtil {
 	}
 
 	/**
-	 * Convert a proxy representation of a string into a Java String
-	 * 
-	 * @param buf
-	 * @param start
-	 * @return proxy string converted to Java String
-	 */
-	@Deprecated
-	public static String decodeString(CharBuffer buf, int start) {
-		int end = start + ProxyPacket.PACKET_ARG_LEN_SIZE;
-		int len = Integer.parseInt(buf.subSequence(start, end).toString(), 16);
-		start = end + 1; // Skip ':'
-		end = start + len;
-		return buf.subSequence(start, end).toString();
-	}
-
-	/**
 	 * Convert a proxy representation of a string attribute into a Java String.
 	 * Assumes that the type byte as been removed from the buffer.
 	 * 
@@ -199,63 +183,20 @@ public class ProtocolUtil {
 	 * @since 5.0
 	 */
 	public static String decodeStringAttributeType(ByteBuffer buf, CharsetDecoder decoder) throws IOException {
-		String result = ""; //$NON-NLS-1$
+		String result = EMPTY_STRING;
 
 		String key = decodeString(buf, decoder);
-		if (key != null) {
+		if (key.length() > 0) {
 			result = key;
 		}
 		String value = decodeString(buf, decoder);
-		if (value != null) {
+		if (value.length() > 0) {
 			if (result.length() > 0) {
 				result += "="; //$NON-NLS-1$
 			}
 			result += value;
 		}
 		return result;
-	}
-
-	/**
-	 * Convert an integer to it's proxy representation
-	 * 
-	 * @param val
-	 * @param len
-	 * @return proxy representation
-	 */
-	@Deprecated
-	public static String encodeIntVal(int val, int len) {
-		char[] res = new char[len];
-		String str = Integer.toHexString(val);
-		int rem = len - str.length();
-
-		for (int i = 0; i < len; i++) {
-			if (i < rem) {
-				res[i] = '0';
-			} else {
-				res[i] = str.charAt(i - rem);
-			}
-		}
-		return String.valueOf(res);
-	}
-
-	/**
-	 * Encode a string into it's proxy representation
-	 * 
-	 * @param str
-	 * @return proxy representation
-	 */
-	@Deprecated
-	public static String encodeString(String str) {
-		int len;
-
-		if (str == null) {
-			len = 0;
-			str = ""; //$NON-NLS-1$
-		} else {
-			len = str.length();
-		}
-
-		return encodeIntVal(len, ProxyPacket.PACKET_ARG_LEN_SIZE) + ":" + str; //$NON-NLS-1$	
 	}
 
 	/**
