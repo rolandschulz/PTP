@@ -264,7 +264,8 @@ public class ProtocolUtil {
 
 	/**
 	 * Encode a string attribute type and place the encoded bytes in buffer
-	 * list.
+	 * list. The string must be of the form "key=value" where key cannot contain
+	 * an '=' character. The value can contain any characters.
 	 * 
 	 * @param bufs
 	 *            list of buffers containing encoded string
@@ -276,12 +277,13 @@ public class ProtocolUtil {
 	 * @since 5.0
 	 */
 	public static void encodeStringAttributeType(List<ByteBuffer> bufs, String attribute, Charset charset) throws IOException {
-		String[] kv = attribute.split("="); //$NON-NLS-1$
+		String[] kv = attribute.split("=", 2); //$NON-NLS-1$
 		bufs.add(encodeType(TYPE_STRING_ATTR));
-		encodeString(bufs, kv[0], charset);
 		if (kv.length == 1) {
 			bufs.add(new VarInt(0).getBytes());
+			encodeString(bufs, kv[0], charset);
 		} else {
+			encodeString(bufs, kv[0], charset);
 			encodeString(bufs, kv[1], charset);
 		}
 	}
