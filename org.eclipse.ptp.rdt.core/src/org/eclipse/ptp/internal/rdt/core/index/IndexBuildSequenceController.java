@@ -449,14 +449,9 @@ public class IndexBuildSequenceController implements IResourceChangeListener {
 		if (event.getSource() instanceof IWorkspace) {
 			
 			IResource resource = event.getResource();
-			if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
-				if (resource.getType() == IResource.PROJECT
-						&& RemoteNature.hasRemoteNature((IProject) resource)) {
+			if (event.getType() == IResourceChangeEvent.PRE_DELETE && resource.getType() == IResource.PROJECT) {
 					deleteProjectStaus(resource.getName());
-				}
 			}
-			
-
 		}
 	}
 
