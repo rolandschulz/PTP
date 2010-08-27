@@ -1012,9 +1012,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		if (muxPortFwd && !portFwdSupported)
 			muxPortFwd = false;
 
-		if (muxPortFwd && manualLaunch)
-			manualLaunch = false;
-
 		/*
 		 * Update UI to display correct settings
 		 */
@@ -1030,8 +1027,7 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 			localAddrCombo.setEnabled(!muxPortFwd);
 
 		if (manualButton != null) {
-			manualButton.setSelection(manualLaunch && !muxPortFwd);
-			manualButton.setEnabled(!muxPortFwd);
+			manualButton.setSelection(manualLaunch);
 		}
 	}
 

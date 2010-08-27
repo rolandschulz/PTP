@@ -44,7 +44,6 @@ import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 
 public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRuntimeClient {
 
-	private IRemoteConnection fConnection = null;
 	private IProgressMonitor fStartupMonitor = null;
 	private final IRemoteResourceManagerConfiguration fConfig;
 
@@ -132,11 +131,40 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				args.add(getConfiguration().getProxyServerPath());
 				args.add("--proxy=tcp"); //$NON-NLS-1$
 				if (getConfiguration().testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
+					IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
+					IRemoteConnection connection = connMgr.getConnection(getConfiguration().getConnectionName());
+					if (connection == null) {
+						throw new IOException(NLS.bind(Messages.AbstractRemoteProxyRuntimeClient_11, getConfiguration()
+								.getConnectionName()));
+					}
+
+					subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_4);
+
+					if (!connection.isOpen()) {
+						connection.open(subMon.newChild(4));
+					}
+					if (subMon.isCanceled()) {
+						connection.close();
+						return;
+					}
+
+					subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_5);
+					int remotePort;
+					try {
+						remotePort = connection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
+					} catch (RemoteConnectionException e) {
+						throw new IOException(e.getMessage());
+					}
+					if (subMon.isCanceled()) {
+						sessionFinish();
+						return;
+					}
 					args.add("--host=localhost"); //$NON-NLS-1$
+					args.add("--port=" + remotePort); //$NON-NLS-1$
 				} else {
 					args.add("--host=" + getConfiguration().getLocalAddress()); //$NON-NLS-1$
+					args.add("--port=" + getSessionPort()); //$NON-NLS-1$
 				}
-				args.add("--port=" + getSessionPort()); //$NON-NLS-1$
 				if (getDebugOptions().SERVER_DEBUG_LEVEL > 0) {
 					args.add("--debug=" + getDebugOptions().SERVER_DEBUG_LEVEL); //$NON-NLS-1$
 				}
@@ -154,19 +182,19 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				PTPCorePlugin.log(info);
 			} else {
 				IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-				fConnection = connMgr.getConnection(getConfiguration().getConnectionName());
-				if (fConnection == null) {
+				IRemoteConnection connection = connMgr.getConnection(getConfiguration().getConnectionName());
+				if (connection == null) {
 					throw new IOException(NLS.bind(Messages.AbstractRemoteProxyRuntimeClient_11, getConfiguration()
 							.getConnectionName()));
 				}
 
 				subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_4);
 
-				if (!fConnection.isOpen()) {
-					fConnection.open(subMon.newChild(4));
+				if (!connection.isOpen()) {
+					connection.open(subMon.newChild(4));
 				}
 				if (subMon.isCanceled()) {
-					fConnection.close();
+					connection.close();
 					return;
 				}
 
@@ -175,7 +203,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				/*
 				 * Check the remote proxy exists
 				 */
-				IRemoteFileManager fileManager = remoteServices.getFileManager(fConnection);
+				IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
 				if (fileManager == null) {
 					throw new IOException(Messages.AbstractRemoteProxyRuntimeClient_9);
 				}
@@ -192,7 +220,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				}
 
 				if (subMon.isCanceled()) {
-					fConnection.close();
+					connection.close();
 					return;
 				}
 
@@ -209,7 +237,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 				if (getConfiguration().testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 					int remotePort;
 					try {
-						remotePort = fConnection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
+						remotePort = connection.forwardRemotePort("localhost", getSessionPort(), subMon.newChild(1)); //$NON-NLS-1$
 					} catch (RemoteConnectionException e) {
 						throw new IOException(e.getMessage());
 					}
@@ -235,7 +263,7 @@ public abstract class AbstractRemoteProxyRuntimeClient extends AbstractProxyRunt
 
 				subMon.subTask(Messages.AbstractRemoteProxyRuntimeClient_7);
 
-				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(fConnection, args);
+				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, args);
 				IRemoteProcess process = processBuilder.start();
 
 				subMon.worked(2);
