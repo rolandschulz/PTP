@@ -4,7 +4,10 @@
 <toc label="Parallel Tools Platform (PTP) User Guide">
       <topic href="html/toc.html" label="Contents"/>
       <topic label="Overview"  href="html/00overview.html"/> 
-      <topic label="PTP Prerequisites"  href="html/00prereqs.html"/> 
+      <topic href="html/00prereqs.html" label="PTP Prerequisites"/>
+
+       <topic label="Local vs. Remote Projects"  href="html/localVsRemote.html"/>
+
       <topic label="Creating an MPI Project" href="html/01buildMPIprog.html"/> 
       <topic label="Resource Managers">
       	<topic label="Configuring Resource Managers" href="html/02resMgrSetup.html"/>

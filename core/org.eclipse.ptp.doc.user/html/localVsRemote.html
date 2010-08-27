@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Local vs Remote Projects</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head> 
+<body>
+<h1>Local vs Remote Projects</h1>
+<p>PTP can operate on both local and remote projects.
+<p>
+Local projects exist on the local machine (the same machine on which Eclipse is installed).
+The files of a remote project exist on a remote target machine, which may be the same machine
+on which the remote build, run, and debug happens, although this can vary.
+
+<p>
+Remote projects can use at least two different types of Remote Providers:
+<ul>
+<li>Remote Tools
+</li>
+<li>Remote Systems Explorer (RSE)
+</ul>
+<p><a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote
+	Development Tools</a> requires a "Remote Provider" for its Remote C/C++ projects.
+You choose which of these your projects uses in the "Remote Provider" selection box of the New Remote Project dialog.
+<p>
+<img src="images/rm-new-project-provider.png">
+
+<p>
+<ul>
+<li>
+<a href="http://www.eclipse.org/dsdp/tm">Remote Systems Explorer</a> (RSE) is  is part of the DSDP Target   
+Management project. It's a complete remote environment that supports a   
+variety of protocols.  RSE must be installed separately from PTP. 
+(PTP pre-reqs should pull in RSE requirements.  Need to confirm.)
+The section on 
+<a href="PLUGINS_ROOT/org.eclipse.ptp.rdt.doc.user/html/toc.html">Remote Development Tools</a> 
+is written describing the use of RSE as the remote service provider.
+</li>
+&nbsp;
+<li>
+Remote Tools is a light-weight ssh-only set of tools for communicating   
+with remote systems. It is part of PTP. 
+More information about Remote Tools as a remote service provider is in the section about
+<a href="02resMgrSetup.html#remote">remote Resource Managers</a>.
+</li>
+</ul>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+</body>
+
+</html>
