@@ -32,7 +32,6 @@ import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 import org.eclipse.ptp.remotetools.environment.wizard.EnvironmentWizard;
 import org.eclipse.swt.widgets.Shell;
 
-
 public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManager {
 	private final TargetTypeElement remoteHost;
 	private final IRemoteConnectionManager connMgr;
@@ -41,30 +40,33 @@ public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManage
 		connMgr = services.getConnectionManager();
 		remoteHost = RemoteToolsServices.getTargetTypeElement();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteUIConnectionManager#newConnection()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteUIConnectionManager#newConnection()
 	 */
 	public IRemoteConnection newConnection(Shell shell) {
 		if (remoteHost != null) {
 			IRemoteConnection[] oldConns = connMgr.getConnections();
-			
+
 			EnvironmentWizard wizard = new EnvironmentWizard(remoteHost);
 			WizardDialog dialog = new WizardDialog(shell, wizard);
 			dialog.create();
 			dialog.setBlockOnOpen(true);
-			
+
 			if (dialog.open() == WizardDialog.OK) {
 				/*
-				 * Locate the new connection and return it. Assumes connections can
-				 * only be created by the wizard, NOT removed.
+				 * Locate the new connection and return it. Assumes connections
+				 * can only be created by the wizard, NOT removed.
 				 */
 				IRemoteConnection[] newConns = connMgr.getConnections();
-				
+
 				if (newConns.length <= oldConns.length) {
 					return null;
 				}
-				
+
 				Arrays.sort(oldConns, new Comparator<IRemoteConnection>() {
 					public int compare(IRemoteConnection c1, IRemoteConnection c2) {
 						return c1.getName().compareToIgnoreCase(c2.getName());
@@ -80,48 +82,55 @@ public class RemoteToolsUIConnectionManager implements IRemoteUIConnectionManage
 						return newConns[i];
 					}
 				}
-				return newConns[newConns.length-1];
+				return newConns[newConns.length - 1];
 			}
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#openConnectionWithProgress(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.core.IRemoteConnection)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#
+	 * openConnectionWithProgress(org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
-	public void openConnectionWithProgress(final Shell shell,
-			final IRemoteConnection connection) {
+	public void openConnectionWithProgress(final Shell shell, final IRemoteConnection connection) {
 		if (!connection.isOpen()) {
 			IRunnableWithProgress op = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						connection.open(monitor);
 					} catch (RemoteConnectionException e) {
-						ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1,
-								Messages.RemoteToolsUIConnectionManager_2,
-								new Status(IStatus.ERROR, RemoteToolsAdapterUIPlugin.PLUGIN_ID, e.getMessage()));
+						throw new InvocationTargetException(e);
+					}
+					if (monitor.isCanceled()) {
+						throw new InterruptedException();
 					}
 				}
 			};
 			try {
 				new ProgressMonitorDialog(shell).run(true, true, op);
 			} catch (InvocationTargetException e) {
-				ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1,
-						Messages.RemoteToolsUIConnectionManager_2,
-						new Status(IStatus.ERROR, RemoteToolsAdapterUIPlugin.PLUGIN_ID, e.getMessage()));
+				ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1, Messages.RemoteToolsUIConnectionManager_2,
+						new Status(IStatus.ERROR, RemoteToolsAdapterUIPlugin.PLUGIN_ID, e.getCause().getMessage()));
 			} catch (InterruptedException e) {
-				ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1,
-						Messages.RemoteToolsUIConnectionManager_2,
+				ErrorDialog.openError(shell, Messages.RemoteToolsUIConnectionManager_1, Messages.RemoteToolsUIConnectionManager_2,
 						new Status(IStatus.ERROR, RemoteToolsAdapterUIPlugin.PLUGIN_ID, e.getMessage()));
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#updateConnection(org.eclipse.swt.widgets.Shell, org.eclipse.ptp.remote.core.IRemoteConnection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#updateConnection
+	 * (org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public void updateConnection(Shell shell, IRemoteConnection connection) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
