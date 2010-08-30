@@ -155,6 +155,12 @@ public class Connection implements IRemoteConnection {
 		}
 	}
 
+	/**
+	 * By default the Jsch connect method ignores the timeout argument which
+	 * prevents any way of interrupting the connection (e.g. with a progress
+	 * monitor). We use a proxy so that we can connect to a remote host with a
+	 * timeout.
+	 */
 	private class SSHProxy implements Proxy {
 		private final Socket fSocket = new Socket();
 
