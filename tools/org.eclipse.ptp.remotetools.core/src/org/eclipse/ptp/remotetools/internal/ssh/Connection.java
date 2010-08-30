@@ -12,6 +12,11 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +25,9 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jsch.core.IJSchService;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.AuthToken;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
@@ -38,7 +45,9 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Proxy;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SocketFactory;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 
@@ -146,6 +155,69 @@ public class Connection implements IRemoteConnection {
 		}
 	}
 
+	private class SSHProxy implements Proxy {
+		private final Socket fSocket = new Socket();
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.jcraft.jsch.Proxy#connect(com.jcraft.jsch.SocketFactory,
+		 * java.lang.String, int, int)
+		 */
+		public void connect(SocketFactory socket_factory, String host, int port, int timeout) throws Exception {
+			InetSocketAddress addr = new InetSocketAddress(host, port);
+			fSocket.connect(addr, timeout);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.jcraft.jsch.Proxy#getInputStream()
+		 */
+		public InputStream getInputStream() {
+			try {
+				return fSocket.getInputStream();
+			} catch (IOException e) {
+				return null;
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.jcraft.jsch.Proxy#getOutputStream()
+		 */
+		public OutputStream getOutputStream() {
+			try {
+				return fSocket.getOutputStream();
+			} catch (IOException e) {
+				return null;
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.jcraft.jsch.Proxy#getSocket()
+		 */
+		public Socket getSocket() {
+			return fSocket;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.jcraft.jsch.Proxy#close()
+		 */
+		public void close() {
+			try {
+				fSocket.close();
+			} catch (IOException e) {
+				// do nothing
+			}
+		}
+	}
+
 	/**
 	 * Data structure to access the ssh library.
 	 */
@@ -226,133 +298,159 @@ public class Connection implements IRemoteConnection {
 	 */
 	public synchronized void connect(AuthToken authToken, String hostname, int port, String cipherType, int timeout,
 			IProgressMonitor monitor) throws RemoteConnectionException {
-		this.nextInternalPID = 0;
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
-		fUsername = authToken.getUsername();
-
-		// Convert information for the UserInfo class used by JSch
-		if (authToken instanceof PasswdAuthToken) {
-			sshuserinfo.setUsePassword(true);
-			sshuserinfo.setPassword(((PasswdAuthToken) authToken).getPassword());
-		} else if (authToken instanceof KeyAuthToken) {
-			KeyAuthToken token = (KeyAuthToken) authToken;
-			sshuserinfo.setUsePassword(false);
-			sshuserinfo.setPassphrase(token.getPassphrase());
-			try {
-				jsch.getJSch().addIdentity(token.getKeyPath().getAbsolutePath());
-			} catch (JSchException e) {
-				throw new RemoteConnectionException(Messages.Connection_Connect_InvalidPrivateKey, e);
-			}
-		} else {
-			throw new RuntimeException(Messages.Connection_AuthenticationTypeNotSupported);
-		}
-
-		fHostname = hostname;
-
-		fPort = port;
-		if (fPort == 0) {
-			fPort = ConnectionProperties.defaultPort;
-		}
-
-		fCipherType = cipherType;
-		if (fCipherType == null) {
-			fCipherType = CipherTypes.CIPHER_DEFAULT;
-		}
-
-		fTimeout = timeout;
-		if (fTimeout == 0) {
-			fTimeout = ConnectionProperties.defaultTimeout;
-		}
-
-		/*
-		 * Create session.
-		 */
 		try {
-			defaultSession = jsch.createSession(fHostname, fPort, fUsername);
-			sshuserinfo.reset();
-			defaultSession.setUserInfo(sshuserinfo);
-			defaultSession.setServerAliveInterval(300000);
-			defaultSession.setServerAliveCountMax(6);
-		} catch (JSchException e) {
-			disconnect();
-			throw new RemoteConnectionException(Messages.Connection_Connect_FailedCreateSession, e);
-		}
+			this.nextInternalPID = 0;
 
-		setSessionCipherType(defaultSession);
+			fUsername = authToken.getUsername();
 
-		/*
-		 * Connect to remote host.
-		 */
-		try {
-			defaultSession.connect(fTimeout);
-		} catch (JSchException e) {
-			disconnect();
-			throw new RemoteConnectionException(Messages.Connection_Connect_FailedConnect, e);
-		} catch (Exception e) {
-			disconnect();
-			throw new RemoteConnectionException(Messages.Connection_Connect_FailedUnsupportedKeySize, e);
-		}
-
-		/*
-		 * Create control execution channel.
-		 */
-		if (controlChannel == null) {
-			controlChannel = new ControlChannel(this);
-		}
-		try {
-			controlChannel.open(monitor);
-		} catch (RemoteConnectionException e) {
-			disconnect();
-			throw new RemoteConnectionException(Messages.Connection_Connect_FailedCreateControlChannel, e);
-		}
-
-		/*
-		 * Create sft pool.
-		 */
-		try {
-			for (int i = 0; i < SFTP_POOLSIZE; i++) {
-				ChannelSftp sftp = (ChannelSftp) defaultSession.openChannel("sftp"); //$NON-NLS-1$
-				sftp.connect();
-				boolean bInterrupted = Thread.interrupted();
-				while (sftp != null) {
-					try {
-						sftpChannelPool.put(sftp);
-						sftp = null;
-					} catch (InterruptedException e) {
-						// System.out.println("Connection.connect: InterruptedException ignored");
-						bInterrupted = true;
-					}
+			// Convert information for the UserInfo class used by JSch
+			if (authToken instanceof PasswdAuthToken) {
+				sshuserinfo.setUsePassword(true);
+				sshuserinfo.setPassword(((PasswdAuthToken) authToken).getPassword());
+			} else if (authToken instanceof KeyAuthToken) {
+				KeyAuthToken token = (KeyAuthToken) authToken;
+				sshuserinfo.setUsePassword(false);
+				sshuserinfo.setPassphrase(token.getPassphrase());
+				try {
+					jsch.getJSch().addIdentity(token.getKeyPath().getAbsolutePath());
+				} catch (JSchException e) {
+					throw new RemoteConnectionException(e.getMessage());
 				}
-				if (bInterrupted)
-					Thread.currentThread().interrupt(); // set interrupt state
+			} else {
+				throw new RuntimeException(Messages.Connection_AuthenticationTypeNotSupported);
 			}
-		} catch (JSchException e) {
-			throw new RemoteConnectionException(Messages.Connection_Connect_FailedCreateSFTPConnection, e);
+
+			fHostname = hostname;
+
+			fPort = port;
+			if (fPort == 0) {
+				fPort = ConnectionProperties.defaultPort;
+			}
+
+			fCipherType = cipherType;
+			if (fCipherType == null) {
+				fCipherType = CipherTypes.CIPHER_DEFAULT;
+			}
+
+			fTimeout = timeout;
+			if (fTimeout == 0) {
+				fTimeout = ConnectionProperties.defaultTimeout;
+			}
+
+			/*
+			 * Create session.
+			 */
+			try {
+				defaultSession = jsch.createSession(fHostname, fPort, fUsername);
+				sshuserinfo.reset();
+				defaultSession.setUserInfo(sshuserinfo);
+				defaultSession.setServerAliveInterval(300000);
+				defaultSession.setServerAliveCountMax(6);
+				defaultSession.setProxy(new SSHProxy());
+			} catch (JSchException e) {
+				disconnect();
+				throw new RemoteConnectionException(e.getMessage());
+			}
+
+			setSessionCipherType(defaultSession);
+
+			/*
+			 * Connect to remote host. Try connecting at 1 sec intervals to
+			 * allow the connection to be cancelled. Note that a timeout of 0
+			 * implies infinite (or until cancelled).
+			 */
+			int connTimeout = fTimeout;
+			int tryTimeout = connTimeout > 0 ? 1000 : connTimeout;
+
+			while (!defaultSession.isConnected() && !progress.isCanceled() && connTimeout >= 0) {
+				try {
+					defaultSession.connect(1000);
+				} catch (JSchException e) {
+					connTimeout -= tryTimeout;
+				} catch (Exception e) {
+					disconnect();
+					throw new RemoteConnectionException(e.getMessage());
+				}
+			}
+
+			if (connTimeout < 0) {
+				disconnect();
+				throw new RemoteConnectionException(NLS.bind(Messages.Connection_Connect_FailedConnect, fHostname));
+			}
+
+			if (progress.isCanceled()) {
+				disconnect();
+				throw new RemoteConnectionException(Messages.Connection_Operation_cancelled_by_user);
+			}
+
+			/*
+			 * Create control execution channel.
+			 */
+			if (controlChannel == null) {
+				controlChannel = new ControlChannel(this);
+			}
+			try {
+				controlChannel.open(progress.newChild(10));
+			} catch (RemoteConnectionException e) {
+				disconnect();
+				throw new RemoteConnectionException(e.getMessage());
+			}
+
+			/*
+			 * Create sft pool.
+			 */
+			try {
+				for (int i = 0; i < SFTP_POOLSIZE; i++) {
+					ChannelSftp sftp = (ChannelSftp) defaultSession.openChannel("sftp"); //$NON-NLS-1$
+					sftp.connect();
+					boolean bInterrupted = Thread.interrupted();
+					while (sftp != null) {
+						try {
+							sftpChannelPool.put(sftp);
+							sftp = null;
+						} catch (InterruptedException e) {
+							// System.out.println("Connection.connect: InterruptedException ignored");
+							bInterrupted = true;
+						}
+					}
+					if (bInterrupted)
+						Thread.currentThread().interrupt(); // set interrupt
+															// state
+				}
+			} catch (JSchException e) {
+				throw new RemoteConnectionException(e.getMessage());
+			}
+
+			/*
+			 * The default session cannot be fully used for connection pool,
+			 * since some channels are already using pty.
+			 */
+			ConnectionSlot slot = new ConnectionSlot(defaultSession, ConnectionProperties.initialDefaultSessionLoad);
+			connectionPool.add(slot);
+
+			if (forwardingPool == null) {
+				forwardingPool = new RemotePortForwardingPool(this);
+			}
+
+			/*
+			 * Reset cancel flag
+			 */
+			if (executionManager != null) {
+				executionManager.resetCancel();
+			}
+
+			/*
+			 * Create observer thread and start it
+			 */
+			executionObserver = new ExecutionObserver(this);
+			executionObserver.start();
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-
-		/*
-		 * The default session cannot be fully used for connection pool, since
-		 * some channels are already using pty.
-		 */
-		ConnectionSlot slot = new ConnectionSlot(defaultSession, ConnectionProperties.initialDefaultSessionLoad);
-		connectionPool.add(slot);
-
-		if (forwardingPool == null) {
-			forwardingPool = new RemotePortForwardingPool(this);
-		}
-
-		/*
-		 * Reset cancel flag
-		 */
-		if (executionManager != null) {
-			executionManager.resetCancel();
-		}
-
-		/*
-		 * Create observer thread and start it
-		 */
-		executionObserver = new ExecutionObserver(this);
-		executionObserver.start();
 	}
 
 	/*
