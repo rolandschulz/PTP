@@ -424,7 +424,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				try {
 					fTargetControl.create(progress.newChild(1));
 				} catch (CoreException e) {
-					throw new RemoteConnectionException(e);
+					throw new RemoteConnectionException(e.getMessage());
 				}
 			}
 		} finally {
