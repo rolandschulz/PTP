@@ -38,6 +38,7 @@ public class Messages extends NLS {
 	public static String Connection_CreateExecChannel_FailedCreateNewExecChannel;
 	public static String Connection_CreateTunnel_FailedCreateTunnel;
 	public static String Connection_CreateTunnel_TunnelPortAlreadyAlloced;
+	public static String Connection_Operation_cancelled_by_user;
 	public static String Connection_ReleaseTunnel_FailedRemoveTunnel;
 	public static String Connection_ReleaseTunnel_PortNotAllocedForTunnel;
 	public static String Connection_SetCipherType_CipherNotSupported;
