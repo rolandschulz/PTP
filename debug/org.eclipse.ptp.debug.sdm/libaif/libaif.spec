@@ -11,7 +11,7 @@ Summary: libaif: Architecture Independent Format Library
 Name: libaif
 Version: 1.0.5
 Release: 1
-Copyright: GPL
+Copyright: EPL
 Group: System Environment/Libraries
 Source: libaif-%{version}.tar.gz
 Buildroot: /var/tmp/libaif
