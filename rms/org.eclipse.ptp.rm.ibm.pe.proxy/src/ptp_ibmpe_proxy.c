@@ -309,6 +309,7 @@ static int load_load_leveler_library(int trans_id);
 #endif
 
 extern char **environ;
+static volatile int debug;
 static int events_enabled = 0;
 static int shutdown_requested;
 static int ptp_signal_exit;
@@ -388,13 +389,20 @@ static struct option longopts[] = {
     {   "runMiniproxy", no_argument, NULL, 'M'},
     {   NULL, 0, NULL, 0}
 };
-static char *libpath[] = {NULL, "/opt/ibmll/LoadL/full/lib/",
-    "/opt/ibmll/LoadL/so/lib/", (char *) -1
+static char *libpath[] = {NULL,
+		"/opt/ibmll/LoadL/full/lib/",
+		"/opt/ibmll/LoadL/scheduler/full/lib",
+		"/opt/ibmll/LoadL/so/lib/", 
+		(char *) -1
 };
 static char *libname = "libllapi.so";
 #else
-static char *libpath[] = { NULL, "/usr/lpp/LoadL/full/lib", "/usr/lpp/LoadL/so/lib", "/opt/ibmll/LoadL/full/lib/",
-        "/opt/ibmll/LoadL/so/lib/", (char *) -1 };
+static char *libpath[] = { NULL,
+		"/usr/lpp/LoadL/full/lib",
+		"/usr/lpp/LoadL/so/lib",
+		"/opt/ibmll/LoadL/full/lib/",
+        	"/opt/ibmll/LoadL/so/lib/",
+		(char *) -1 };
 static char *libname = "libllapi.a";
 #endif
 
@@ -2579,6 +2587,7 @@ monitor_LoadLeveler_nodes(void *job_ident)
                             "Setting access for LoadLeveler local cluster (single cluster).\n");
                     cluster_parm.action = CLUSTER_UNSET;
                     cluster_parm.cluster_list = NULL;
+
                     rc = my_ll_cluster(LL_API_VERSION, &errObj, &cluster_parm);
                 }
 
@@ -5743,7 +5752,6 @@ int main(int argc, char *argv[])
     int ch;
     int port = PTP_PROXY_TCP_PORT;
     int rc;
-    int debug;
     char *cp;
 
     strcpy(miniproxy_path, argv[0]);
