@@ -278,6 +278,7 @@ public class SpawnerMiner extends Miner {
 			
 					
 		} catch (IOException e) {
+			statusDone(status);
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		}
 		
