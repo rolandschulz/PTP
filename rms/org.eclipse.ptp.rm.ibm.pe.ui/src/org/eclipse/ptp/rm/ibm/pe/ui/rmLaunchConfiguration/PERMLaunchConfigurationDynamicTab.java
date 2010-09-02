@@ -620,12 +620,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	private String getFileDialogPath(String attrName) {
 		String dir;
 
-		dir = "/"; //$NON-NLS-1$
+		dir = "";
 		if (currentLaunchConfig != null) {
 			try {
-				dir = currentLaunchConfig.getAttribute(attrName, "/"); //$NON-NLS-1$
+				dir = currentLaunchConfig.getAttribute(attrName, "");
 			} catch (CoreException e) {
-				dir = "/"; //$NON-NLS-1$
+				dir = "";
 			}
 		}
 		return dir;
@@ -661,9 +661,23 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		String selectedFile = null;
 
 		if (remoteUIService != null) {
+			File inputFile;
+			String inputDir;
+			
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0);
+			inputDir = getFileDialogPath(pathAttrID);
+			if (inputDir.length() == 0) {
+				inputDir = remoteConnection.getWorkingDirectory();
+			}
+			else {
+				inputFile = new File(inputDir);
+				inputDir = inputFile.getParent();
+				if (inputDir == null) {
+					inputDir = remoteConnection.getWorkingDirectory();
+				}
+			}
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), inputDir, 0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
@@ -688,9 +702,23 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		String selectedFile = null;
 
 		if (remoteUIService != null) {
+			String outputPath;
+			File outputDir;
+			
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0);
+			outputPath = getFileDialogPath(pathAttrID);
+			if (outputPath.length() == 0) {
+				outputPath = remoteConnection.getWorkingDirectory();
+			}
+			else {
+				outputDir = new File(outputPath);
+				outputPath = outputDir.getParent();
+				if (outputPath == null) {
+					outputPath = remoteConnection.getWorkingDirectory();
+				}
+			}
+			selectedFile = fmgr.browseFile(parentShell, Messages.getString(titleID), outputPath, 0);
 		}
 		if (selectedFile != null) {
 			saveFileDialogPath(pathAttrID, selectedFile);
@@ -715,9 +743,15 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		String selectedFile = null;
 
 		if (remoteUIService != null) {
+			String dirName;
+			
 			IRemoteUIFileManager fmgr = remoteUIService.getUIFileManager();
 			fmgr.setConnection(remoteConnection);
-			selectedFile = fmgr.browseDirectory(parentShell, Messages.getString(titleID), getFileDialogPath(pathAttrID), 0)
+			dirName = getFileDialogPath(pathAttrID);
+			if (dirName.length() == 0) {
+				dirName = remoteConnection.getWorkingDirectory();
+			}
+			selectedFile = fmgr.browseDirectory(parentShell, Messages.getString(titleID), dirName, 0)
 					.toString();
 		}
 		if (selectedFile != null) {
