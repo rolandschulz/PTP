@@ -48,7 +48,7 @@ import org.eclipse.ptp.rm.proxy.core.parser.XMLReader;
 public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
 	private static final boolean debugReadFromFiles = false;
-	private static final String debugFolder = "helics"; //$NON-NLS-1$
+	private static final String debugFolder =  "helics" + File.separator; //$NON-NLS-1$
 	// static final String debugUser = "alizade1";
 	private static final String debugUser = "xli"; //$NON-NLS-1$
 
@@ -142,12 +142,12 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		);
 
 		if (debugReadFromFiles) {
-			nodeController.setDebug(debugFolder + "/pbsnodes_1.xml", //$NON-NLS-1$
-					debugFolder + "/pbsnodes_2.xml"); //$NON-NLS-1$
-			queueController.setDebug(debugFolder + "/qstat_Q_1.xml", //$NON-NLS-1$
-					debugFolder + "/qstat_Q_2.xml"); //$NON-NLS-1$
-			jobController.setDebug(debugFolder + "/qstat_1.xml", debugFolder //$NON-NLS-1$
-					+ "/qstat_2.xml"); //$NON-NLS-1$
+			nodeController.setDebug(debugFolder + "pbsnodes_1.xml", //$NON-NLS-1$
+					debugFolder + "pbsnodes_2.xml"); //$NON-NLS-1$
+			queueController.setDebug(debugFolder + "qstat_Q_1.xml", //$NON-NLS-1$
+					debugFolder + "qstat_Q_2.xml"); //$NON-NLS-1$
+			jobController.setDebug(debugFolder + "qstat_1.xml", debugFolder //$NON-NLS-1$
+					+ "qstat_2.xml"); //$NON-NLS-1$
 		}
 
 	}
@@ -228,14 +228,17 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
 		try {
 			Process p = null;
-			try {
-				p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$
-			} catch (IOException e1) {
-				sendEvent(getEventFactory().newProxyRuntimeMessageEvent(Level.ERROR, e1.getMessage()));
-				return;
+			String server = null;
+			if (!debugReadFromFiles) {
+				try {
+					p = Runtime.getRuntime().exec("qstat -B -f -1");//$NON-NLS-1$
+				} catch (IOException e1) {
+					sendEvent(getEventFactory().newProxyRuntimeMessageEvent(Level.ERROR, e1.getMessage()));
+					return;
+				}
+				p.waitFor();
+				server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
 			}
-			p.waitFor();
-			String server = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
 			if (server == null || server.split(" ").length < 2) //$NON-NLS-1$
 				server = "UNKNOWN"; //$NON-NLS-1$
 			else
