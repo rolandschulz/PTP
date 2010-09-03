@@ -32,15 +32,25 @@
 #include "list.h"
 #include "serdes.h"
 #include "compat.h"
+#include "varint.h"
 
 #ifdef __linux__
 extern int digittoint(int c);
 #endif /* __linux__ */
 
 #define ARG_SIZE	100
+#define PACKET_SIZE_INCREMENT 1024
 
-static int proxy_flow_control = 0;
+static int				packet_allocation;
+static int 				packet_size;
+static unsigned char *	packet;
+static int				proxy_flow_control = 0;
+
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+static void packet_append_varint(int val);
+static void packet_append_bytes(int length, char *data);
+static void packet_append_type(int attr_type);
 
 /*
  * Convert a message to a packet ready to send over the wire.
@@ -48,13 +58,9 @@ static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B
  * Note: packet length is added when the packet is transmitted.
  */
 int
-proxy_serialize_msg(proxy_msg *m, char **result, int *result_len)
+proxy_serialize_msg(proxy_msg *m, unsigned char **result, int *result_len)
 {
 	int		i;
-	int		hdr_len;
-	int		arg_len;
-	int		len = 0;
-	char *	packet;
 	char *	p;
 
 	if (m == NULL) {
@@ -62,44 +68,120 @@ proxy_serialize_msg(proxy_msg *m, char **result, int *result_len)
 	}
 
 	/*
-	 * Compute packet length.
-	 *
-	 * Header length includes leading space and separators.
-	 * Body length include encoded strings and separators.
+	 * Allocate the packet
 	 */
-	hdr_len = PTP_MSG_ID_SIZE + PTP_MSG_TRANS_ID_SIZE + PTP_MSG_NARGS_SIZE + 3;
-
-	for (i = 0; i < m->num_args; i++) {
-		len += strlen(m->args[i]) + PTP_MSG_ARG_LEN_SIZE + 2;
-	}
+	packet_allocation = PACKET_SIZE_INCREMENT;
+	packet = (unsigned char *) malloc(packet_allocation);
+	assert(packet != NULL);
+	packet_size = 0;
 
 	/*
-	 * Allocate packet
+	 * Compression flag byte is first byte in buffer.
+	 * For now, there is no compression. If the buffer is compressed,
+	 * the compression code will set the flag.
 	 */
-	packet = p = (char *)malloc(hdr_len + len);
+	packet_append_varint(0);
+	
+	/*
+	 * Copy message id, transaction id and parameter count into buffer
+	 * There is no need to check if the packet buffer is full at this point
+	 * since the buffer is guaranteed to be large enough to hold three
+	 * varints.
+	 */
+	packet_append_varint(m->msg_id);
+	packet_append_varint(m->trans_id);
+	packet_append_varint(m->num_args);
 
-	*p++ = ' ';
-	int_to_hex_str(m->msg_id, p, PTP_MSG_ID_SIZE, &p);
-	*p++ = ':';
-	int_to_hex_str(m->trans_id, p, PTP_MSG_TRANS_ID_SIZE, &p);
-	*p++ = ':';
-	int_to_hex_str(m->num_args, p, PTP_MSG_NARGS_SIZE, &p);
-
+	/*
+	 * Iterate thru the message paremeters, copying them to the packet
+	 * buffer. Message parameters in the message's arg's array are either
+	 * a single string or a key=value string pair.
+	 * Paremeters are converted into a pair of length/value pairs when
+	 * they are copied to the packet buffer, with the first length/value
+	 * pair being the key of a key=value pair and the second length/value
+	 * pair being the value of a key=value pair or a stand-alone string's
+	 * value.
+	 */
 	for (i = 0; i < m->num_args; i++) {
-		arg_len = strlen(m->args[i]);
-		*p++ = ' ';
-		int_to_hex_str(arg_len, p, PTP_MSG_ARG_LEN_SIZE, &p);
-		*p++ = ':';
-		memcpy(p, m->args[i], arg_len);
-		p += arg_len;
+		/*
+		 * Split key=value pair at '='. If there is no '=' then
+		 * key is omitted.
+		 */
+		packet_append_type(STRING_ATTR);
+		p = strchr(m->args[i], '=');
+		if (p == NULL) {
+			/* Key is omitted, so set it's length to zero then
+			 * append the length and data for the value
+			 */
+			packet_append_varint(0);
+			packet_append_varint(strlen(m->args[i]));
+			packet_append_bytes(strlen(m->args[i]), m->args[i]);
+		}
+		else {
+			char *key;
+			char *value;
+
+			/*
+			 * Parameter is key=value pair. Append fields for
+			 * key and value to buffer. 
+			 */
+			key = strtok(m->args[i], "=");
+			packet_append_varint(strlen(key));
+			packet_append_bytes(strlen(key), key);
+			value = strtok(NULL, "=");
+			packet_append_varint(strlen(value));
+			packet_append_bytes(strlen(value), value);
+		}
 	}
-
-	assert(p - packet == hdr_len + len);
-
 	*result = packet;
-	*result_len = hdr_len + len;
+	*result_len = packet_size;
 
 	return 0;
+}
+
+/*
+ * Append a length field in varint format to the packet buffer
+ */
+void
+packet_append_varint(int value)
+{
+	if ((packet_allocation - packet_size) < MAX_VARINT_LENGTH) {
+		packet_allocation = packet_allocation + PACKET_SIZE_INCREMENT;
+		packet = (unsigned char *) realloc(packet, packet_allocation);
+		assert(packet != NULL);
+	}
+	packet_size += varint_encode(value, &packet[packet_size], NULL);
+}
+
+/*
+ * Append 'length' bytes to the end of the packet buffer, reallocating the
+ * buffer if necessary
+ */
+void
+packet_append_bytes(int length, char *data)
+{
+	if ((packet_allocation - packet_size) < length) {
+		packet_allocation = packet_allocation + PACKET_SIZE_INCREMENT;
+		packet = (unsigned char *) realloc(packet, packet_allocation);
+		assert(packet != NULL);
+	}
+	memcpy(&packet[packet_size], data, length);
+	packet_size += length;
+}
+
+/*
+ * Append the attribute type for the following message argument to the packet
+ * buffer.
+ */
+void
+packet_append_type(int attr_type)
+{
+	if ((packet_allocation - packet_size) <= 0) {
+		packet_allocation = packet_allocation + PACKET_SIZE_INCREMENT;
+		packet = (unsigned char *) realloc(packet, packet_allocation);
+		assert(packet != NULL);
+	}
+	packet[packet_size++] = attr_type;
 }
 
 void
@@ -130,9 +212,9 @@ proxy_get_int(char *str, int *val)
 }
 
 void
-proxy_get_bitset(char *str, bitset **b)
+proxy_get_bitset(unsigned char *str, bitset **b)
 {
-	*b = str_to_bitset(str, NULL);
+	*b = bitset_decode(str, NULL);
 }
 
 /*
@@ -141,57 +223,48 @@ proxy_get_bitset(char *str, bitset **b)
  * Packet length has already been removed.
  */
 int
-proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
+proxy_deserialize_msg(unsigned char *packet, int packet_len, proxy_msg **msg)
 {
-	int			i;
-	int			msg_id;
-	int			trans_id;
-	int			num_args;
-	proxy_msg *	m = NULL;
-	char *		arg;
-	char *		end;
+	int					i;
+	int					flags;
+	int					msg_id;
+	int					trans_id;
+	int					num_args;
+	proxy_msg *			m = NULL;
+	char *				arg;
 
-	if (packet == NULL ||
-			*packet != ' ' ||
-			packet_len < PTP_MSG_ID_SIZE + PTP_MSG_TRANS_ID_SIZE + PTP_MSG_NARGS_SIZE + 3) {
+	if (packet == NULL) {
 		return -1;
 	}
 
 	/*
+	 * flags
+	 */
+	varint_decode(&flags, packet, &packet);
+
+	/*
 	 * message ID
 	 */
-	packet++; /* Skip space */
-	msg_id = hex_str_to_int(packet, PTP_MSG_ID_SIZE, &end);
-	end++; /* Skip separator */
+	varint_decode(&msg_id, packet, &packet);
 
 	/*
 	 * transaction ID
 	 */
-	packet = end;
-	trans_id = hex_str_to_int(packet, PTP_MSG_TRANS_ID_SIZE, &end);
-	end++;
+	varint_decode(&trans_id, packet, &packet);
 
 	/*
 	 * number of args
 	 */
-	packet = end;
-	num_args = hex_str_to_int(packet, PTP_MSG_NARGS_SIZE, &end);
-	end++;
+	varint_decode(&num_args, packet, &packet);
 
 	m = new_proxy_msg(msg_id, trans_id);
 
-	packet = end;
-	packet_len -= (PTP_MSG_ID_SIZE + PTP_MSG_TRANS_ID_SIZE + PTP_MSG_NARGS_SIZE + 3);
-
 	for (i = 0; i < num_args; i++) {
-		if (proxy_msg_decode_string(packet, packet_len, &arg, &end) < 0) {
+		if (proxy_msg_decode_string(packet, &arg, &packet) < 0) {
 			free_proxy_msg(m);
 			return -1;
 		}
 		proxy_msg_add_string_nocopy(m, arg);
-		end++; /* skip space */
-		packet_len -= (end - packet);
-		packet = end;
 	}
 
 	*msg = m;
@@ -204,30 +277,49 @@ proxy_deserialize_msg(char *packet, int packet_len, proxy_msg **msg)
  * the end of the string in 'end'
  */
 int
-proxy_msg_decode_string(char *str, int len, char **arg, char **end)
+proxy_msg_decode_string(unsigned char *packet, char **arg, unsigned char **end)
 {
-	int		arg_len;
-	char *	ep;
-	char *	p;
+	char *			buf = NULL;
+	char *			p;
+	unsigned char *	key_str;
+	unsigned char *	val_str;
+	char			arg_type;
+	int				key_length;
+	int				val_length;
 
-	if (len < PTP_MSG_ARG_LEN_SIZE + 1) {
-		return -1;
+	arg_type = *packet++;
+	switch (arg_type) {
+	case '\0':
+		varint_decode(&key_length, packet, &packet);
+		key_str = packet;
+		packet += key_length;
+
+		varint_decode(&val_length, packet, &packet);
+		val_str = packet;
+		packet += val_length;
+
+		if ((key_length < 0) || (val_length < 0)) {
+			return -1;
+		}
+
+		buf = (char *) malloc(((key_length + val_length + 2) *
+				    sizeof(char)));
+		assert(buf != NULL);
+
+		p = buf;
+		*p = '\0';
+		if (key_length > 0) {
+			memcpy(p, key_str, key_length);
+			p += key_length;
+			*p++ = '=';
+		}
+		if (val_length > 0) {
+			memcpy(p, val_str, val_length);
+		}
+		p[val_length] = '\0';
+		*end = packet;
 	}
-
-	arg_len = hex_str_to_int(str, PTP_MSG_ARG_LEN_SIZE, &ep);
-	ep++;
-
-	if (len < PTP_MSG_ARG_LEN_SIZE + arg_len + 1) {
-		return -1;
-	}
-
-	p = (char *)malloc(arg_len + 1);
-	memcpy(p, ep, arg_len);
-	p[arg_len] = '\0';
-
-	*arg = p;
-	*end = ep + arg_len;
-
+	*arg = buf;
 	return 0;
 }
 
@@ -431,7 +523,7 @@ proxy_process_msgs(List *msg_list, void (*callback)(proxy_msg *, void *), void *
 	if (msg_list == NULL)
 		return;
 
-	if (! proxy_get_flow_control()) {
+	if (!proxy_get_flow_control()) {
 		while ((m = (proxy_msg *)RemoveFirst(msg_list)) != NULL) {
 			callback(m, data);
 			free_proxy_msg(m);
@@ -445,7 +537,7 @@ proxy_process_msgs(List *msg_list, void (*callback)(proxy_msg *, void *), void *
 void
 proxy_set_flow_control(int flag)
 {
-        proxy_flow_control = flag;
+	proxy_flow_control = flag;
 }
 
 /*

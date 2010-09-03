@@ -171,7 +171,7 @@ dbg_add_aif(proxy_msg *m, AIF *a)
  * added just prior to sending back to the client.
  */
 int
-DbgSerializeEvent(dbg_event *e, char **result, int *len)
+DbgSerializeEvent(dbg_event *e, unsigned char **result, int *len)
 {
 	int			res = 0;
 	proxy_msg *	p = NULL;
@@ -620,7 +620,7 @@ DbgDeserializeEvent(int id, int nargs, char **args, dbg_event **ev)
 	dbg_event *	e = NULL;
 	bitset *	procs = NULL;
 
-	proxy_get_bitset(*args++, &procs);
+	proxy_get_bitset((unsigned char *)*args++, &procs);
 	nargs--;
 
 	e = NewDbgEvent(id);

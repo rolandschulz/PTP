@@ -109,8 +109,8 @@ test_str(char *name)
 {
 	char *		str2;
 	char * 		str1 = "17:6411eda";
-	char *		end;
-	bitset *	b = str_to_bitset(str1, &end);
+	unsigned char *		end;
+	bitset *	b = bitset_decode((unsigned char *)str1, &end);
 	str2 = bitset_to_str(b);
 	if (strncmp(str1, str2, 9) != 0) {
 		printf("TEST(%s)_1 FAIL: %s != %s\n", name, str1, str2);
@@ -121,7 +121,7 @@ test_str(char *name)
 	}
 
 	str1 = "3:07";
-	b = str_to_bitset(str1, NULL);
+	b = bitset_decode((unsigned char *)str1, NULL);
 	str2 = bitset_to_str(b);
 	if (strncmp(str1, str2, 9) != 0) {
 		printf("TEST(%s)_2 FAIL: %s != %s\n", name, str1, str2);
@@ -161,8 +161,7 @@ test_boundary(char *name)
 	char * 		str1 = "8:7f";
 	char *		str2;
 	char *		str3 = "8:ff";
-	char *		end;
-	bitset *	b = str_to_bitset(str1, &end);
+	bitset *	b = bitset_decode((unsigned char *)str1, NULL);
 	bitset_set(b, 7);
 	str2 = bitset_to_str(b);
 	if (strncmp(str3, str2, 4) != 0) {
@@ -178,8 +177,7 @@ test_nine(char *name)
 	char *		str1 = "9:0001";
 	char *		str2;
 	char *		str3;
-	char *		end;
-	bitset *	b1 = str_to_bitset(str1, &end);
+	bitset *	b1 = bitset_decode((unsigned char *)str1, NULL);
 	bitset *	b2 = bitset_new(9);
 	bitset_set(b2, 0);
 	str2 = bitset_to_str(b1);
@@ -197,8 +195,7 @@ test_144(char *name)
 	char *		str1 = "90:800000000000000000000000000000000001";
 	char *		str2;
 	char *		str3;
-	char *		end;
-	bitset *	b1 = str_to_bitset(str1, &end);
+	bitset *	b1 = bitset_decode((unsigned char *)str1, NULL);
 	bitset *	b2 = bitset_new(144);
 	bitset_set(b2, 0);
 	bitset_set(b2, 143);
@@ -217,8 +214,7 @@ test_2048(char *name)
 	char *		str1 = "800:80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001";
 	char *		str2;
 	char *		str3;
-	char *		end;
-	bitset *	b1 = str_to_bitset(str1, &end);
+	bitset *	b1 = bitset_decode((unsigned char *)str1, NULL);
 	bitset *	b2 = bitset_new(2048);
 	bitset_set(b2, 0);
 	bitset_set(b2, 2047);

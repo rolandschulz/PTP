@@ -20,7 +20,6 @@ import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.command.IProxyCommandListener;
 import org.eclipse.ptp.proxy.command.IProxyQuitCommand;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
-import org.eclipse.ptp.proxy.packet.ProxyPacket;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
@@ -193,31 +192,6 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				break;
 			}
 		}
-	}
-
-	/**
-	 * @param event
-	 * @since 4.0
-	 */
-	public void sendEvent(IProxyEvent event) throws IOException {
-		// if (!isReady()) {
-		// throw new IOException(Messages.AbstractProxyClient_0);
-		// }
-		// if (event.getTransactionID()==-1) { /* event without known TransID
-		// gets eventLoopTransID */
-		// if (state == ServerState.NORMAL) {
-		// event.setTransactionID(eventLoopTransID);
-		// } else {
-		// System.err.println("Not allowed to send events without TransID outside of EventLoop (state: normal)");
-		// return;
-		// }
-		// }
-		ProxyPacket packet = new ProxyPacket(event);
-
-		// if (getDebugOptions().PROTOCOL_TRACING) {
-		// packet.setDebug(true);
-		// }
-		packet.send(sessOutput);
 	}
 
 	/**

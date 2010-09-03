@@ -149,7 +149,7 @@ svr_shutdown(dbg_backend *db)
 }
 
 int
-svr_dispatch(dbg_backend *db, char *cmd_str, int len, int data)
+svr_dispatch(dbg_backend *db, unsigned char *buf, int len, int data)
 {
 	int			idx;
 	proxy_msg *	msg;
@@ -157,7 +157,7 @@ svr_dispatch(dbg_backend *db, char *cmd_str, int len, int data)
 
 	event_data = data;
 
-	if (proxy_deserialize_msg(cmd_str, len, &msg) < 0) {
+	if (proxy_deserialize_msg(buf, len, &msg) < 0) {
 		svr_res = DBGRES_ERR;
 		DbgSetError(DBGERR_DEBUGGER, "bad debug message format");
 		return 0;

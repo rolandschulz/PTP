@@ -20,16 +20,11 @@
 package org.eclipse.ptp.proxy.client;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
-import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +67,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		WAITING, CONNECTED, RUNNING, SHUTTING_DOWN, SHUTDOWN
 	}
 
-	private FlowControlState flowState = FlowControlState.NORMAL_FLOW;
 	private static final int LOW_EVENT_THRESHOLD = 0;
 	private static final int HIGH_EVENT_THRESHOLD = 100;
 	private static final int SHUTDOWN_THRESHOLD = 5000;
@@ -83,19 +77,17 @@ public abstract class AbstractProxyClient implements IProxyClient {
 	private ServerSocketChannel sessSvrSock = null;
 	private SocketChannel sessSock = null;
 	private IProxyEventFactory proxyEventFactory;
-
-	private ReadableByteChannel sessInput;
-	private WritableByteChannel sessOutput;
+	private FlowControlState flowState = FlowControlState.NORMAL_FLOW;
 
 	private Thread eventThread;
 	private Thread acceptThread;
 	private Thread packetThread;
 
-	private final DebugOptions debugOptions;
 	private SessionState state;
-
-	private final List<IProxyEventListener> listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 	private ProxyEventQueue eventQueue;
+
+	private final DebugOptions debugOptions;
+	private final List<IProxyEventListener> listeners = Collections.synchronizedList(new ArrayList<IProxyEventListener>());
 	private final Vector<AbstractProxyCommand> pendingCommands;
 
 	public AbstractProxyClient() {
@@ -253,7 +245,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		if (getDebugOptions().PROTOCOL_TRACING) {
 			packet.setDebug(true);
 		}
-		if (!packet.read(sessInput)) {
+		if (!packet.read(sessSock)) {
 			return;
 		}
 
@@ -402,7 +394,7 @@ public abstract class AbstractProxyClient implements IProxyClient {
 		if (getDebugOptions().PROTOCOL_TRACING) {
 			packet.setDebug(true);
 		}
-		packet.send(sessOutput);
+		packet.send(sessSock);
 	}
 
 	/**
@@ -534,8 +526,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 						System.out.println("accept thread starting..."); //$NON-NLS-1$
 					}
 					sessSock = sessSvrSock.accept();
-					sessInput = sessSock;
-					sessOutput = sessSock;
 				} catch (SocketTimeoutException e) {
 					error = true;
 					fireProxyTimeoutEvent(new ProxyTimeoutEvent());
@@ -572,29 +562,6 @@ public abstract class AbstractProxyClient implements IProxyClient {
 			}
 		};
 		acceptThread.start();
-	}
-
-	/**
-	 * Create a proxy session that will read from InputStream and write to
-	 * OutputStream
-	 * 
-	 * Generates a ProxyConnectedEvent
-	 * 
-	 * @param output
-	 *            stream to write to
-	 * @param input
-	 *            stream to read from
-	 */
-	public void sessionCreate(OutputStream output, InputStream input) {
-		if (getDebugOptions().CLIENT_TRACING) {
-			System.out.println("sessionCreate(stdin, stdout)"); //$NON-NLS-1$
-		}
-		sessInput = Channels.newChannel(input);
-		sessOutput = Channels.newChannel(output);
-		synchronized (state) {
-			state = SessionState.CONNECTED;
-		}
-		fireProxyConnectedEvent(new ProxyConnectedEvent());
 	}
 
 	/*

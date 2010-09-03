@@ -15,9 +15,7 @@ package org.eclipse.ptp.proxy.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +23,7 @@ import java.util.List;
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.command.IProxyCommandFactory;
 import org.eclipse.ptp.proxy.command.IProxyCommandListener;
+import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.packet.ProxyPacket;
 
 public abstract class AbstractProxyServer implements IProxyServer {
@@ -41,15 +40,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 
 	private final String sessHost;
 	private final int sessPort;
-	// private Socket sessSocket;
-	/**
-	 * @since 4.0
-	 */
-	protected ReadableByteChannel sessInput;
-	/**
-	 * @since 4.0
-	 */
-	protected WritableByteChannel sessOutput;
+	private SocketChannel sessSocket;
 	private final IProxyCommandFactory proxyCommandFactory;
 	private Thread commandThread;
 	/**
@@ -79,11 +70,20 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	 * @throws IOException
 	 */
 	public void connect() throws IOException {
-		// sessSocket = new Socket(sessHost, sessPort);
-		SocketChannel channel = SocketChannel.open();
-		channel.connect(new InetSocketAddress(sessHost, sessPort));
-		sessInput = channel;
-		sessOutput = channel;
+		sessSocket = SocketChannel.open();
+		sessSocket.connect(new InetSocketAddress(sessHost, sessPort));
+	}
+
+	/**
+	 * Send event to server
+	 * 
+	 * @param event
+	 *            event to send
+	 * @since 5.0
+	 */
+	protected void sendEvent(IProxyEvent event) throws IOException {
+		ProxyPacket packet = new ProxyPacket(event);
+		packet.send(sessSocket);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 	private boolean sessionProgress() throws IOException {
 		ProxyPacket packet = new ProxyPacket();
 		System.out.print("sessionProgress: "); //$NON-NLS-1$
-		if (!packet.read(sessInput)) {
+		if (!packet.read(sessSocket)) {
 			System.out.println("false"); //$NON-NLS-1$
 			return false;
 		}
@@ -182,7 +182,7 @@ public abstract class AbstractProxyServer implements IProxyServer {
 				}
 
 				try {
-					sessInput.close();
+					sessSocket.close();
 				} catch (IOException e) {
 				}
 

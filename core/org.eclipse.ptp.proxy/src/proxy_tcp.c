@@ -55,7 +55,7 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	c->port = 0;
 	c->connected = 0;
 	c->buf_size = BUFSIZ;
-	c->buf = (char *)malloc(c->buf_size);
+	c->buf = (unsigned char *)malloc(c->buf_size);
 	c->buf_pos = 0;
 	c->total_read = 0;
 	c->msg_len = 0;
@@ -79,12 +79,16 @@ tcp_recv(proxy_tcp_conn *conn)
 {
 	int	n;
 
-	if (conn->total_read == conn->buf_size) {
+	if (conn->total_read >= conn->buf_size) {
 		conn->buf_size += BUFSIZ;
-		conn->buf = (char *)realloc(conn->buf, conn->buf_size);
+		conn->buf = (unsigned char *)realloc(conn->buf, conn->buf_size);
 	}
 
-	n = recv(conn->sess_sock, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read, 0);
+	  /*
+	   * Limit recv to number of bytes remaining in buffer
+	   */
+	n = recv(conn->sess_sock, &conn->buf[conn->buf_pos],
+		 conn->buf_size - conn->buf_pos, 0);
 	if (n <= 0) {
 		if (n < 0)
 			proxy_set_error(PTP_PROXY_ERR_SYSTEM, strerror(errno));
@@ -103,7 +107,7 @@ tcp_recv(proxy_tcp_conn *conn)
 }
 
 static int
-tcp_send(proxy_tcp_conn *conn, char *buf, int len)
+tcp_send(proxy_tcp_conn *conn, unsigned char *buf, int len)
 {
 	int		n;
 
@@ -131,16 +135,22 @@ tcp_send(proxy_tcp_conn *conn, char *buf, int len)
  * Silently truncates length to a maximum of 32 bits.
  */
 int
-proxy_tcp_send_msg(proxy_tcp_conn *conn, char *message, int len)
+proxy_tcp_send_msg(proxy_tcp_conn *conn, unsigned char *message, int len)
 {
-	char 	buf[PTP_MSG_LEN_SIZE+1];
+	unsigned char 	buf[PTP_MSG_LEN_SIZE+1];
+	int				num;
+	int				i;
 
 	/*
-	 * Send message length first
+	 * Format message length as big-endian integer then send it prior to
+	 * sending message body
 	 */
-	sprintf(buf, "%0*x", PTP_MSG_LEN_SIZE, len & PTP_MSG_LENGTH_MASK);
-
-	if (tcp_send(conn, buf, strlen(buf)) < 0) {
+	num = len;
+	for (i = sizeof(int) - 1; i >= 0; i--) {
+		buf[i] = num & 0xff;
+		num = num >> 8;
+	}
+	if (tcp_send(conn, buf, sizeof(int)) < 0) {
 		return -1;
 	}
 
@@ -151,36 +161,37 @@ proxy_tcp_send_msg(proxy_tcp_conn *conn, char *message, int len)
 	return tcp_send(conn, message, len);
 }
 
+/*
+ * Message length is in the message buffer as 4 bytes in big-endian format.
+ * Convert length to an integer and return the result.
+ */
 static int
 proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
 {
-	char *	end;
+	int value;
+	int i;
 
-	/*
-	 * If we haven't read enough then return for more...
-	 */
-	if (conn->total_read < PTP_MSG_LEN_SIZE)
+	if (conn->total_read < PTP_MSG_LEN_SIZE) {
 		return 0;
-
-	conn->msg_len = strtol(conn->buf, &end, 16);
-
-	/*
-	 * check if we've received the length
-	 */
-	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
-		proxy_set_error(PTP_PROXY_ERR_PROTO, "could not understand message");
-		return -1;
 	}
 
-	return conn->msg_len;
+	/*
+	 * Deserialize length
+	 */
+	for (value = 0, i = 0; i < PTP_MSG_LEN_SIZE; i++) {
+		value = (value << 8) | (conn->buf[i] & 0xff);
+	}
+
+	conn->msg_len = value;
+	return value;
 }
 
 static int
-proxy_tcp_copy_msg(proxy_tcp_conn *conn, char **result)
+proxy_tcp_copy_msg(proxy_tcp_conn *conn, unsigned char **result)
 {
 	int	n = conn->msg_len;
 
-	*result = (char *)malloc(conn->msg_len + 1);
+	*result = (unsigned char *)malloc(conn->msg_len + 1);
 	memcpy(*result, &conn->buf[PTP_MSG_LEN_SIZE], conn->msg_len);
 	(*result)[conn->msg_len] = '\0';
 
@@ -188,8 +199,10 @@ proxy_tcp_copy_msg(proxy_tcp_conn *conn, char **result)
 	 * Move rest of buffer down if necessary
 	 */
 	if (conn->total_read > conn->msg_len + PTP_MSG_LEN_SIZE) {
+		conn->buf_pos -= conn->msg_len + PTP_MSG_LEN_SIZE;
 		conn->total_read -= conn->msg_len + PTP_MSG_LEN_SIZE;
-		memmove(conn->buf, &conn->buf[conn->msg_len + PTP_MSG_LEN_SIZE], conn->total_read);
+		memmove(conn->buf, &conn->buf[conn->msg_len + PTP_MSG_LEN_SIZE],
+			conn->total_read);
 	} else {
 		conn->buf_pos = 0;
 		conn->total_read = 0;
@@ -201,14 +214,13 @@ proxy_tcp_copy_msg(proxy_tcp_conn *conn, char **result)
 }
 
 static int
-proxy_tcp_get_msg_body(proxy_tcp_conn *conn, char **result)
+proxy_tcp_get_msg_body(proxy_tcp_conn *conn, unsigned char **result)
 {
 	/*
 	 * If we haven't read enough then return for more...
 	 */
 	if (conn->total_read - PTP_MSG_LEN_SIZE < conn->msg_len)
 		return 0;
-
 	return proxy_tcp_copy_msg(conn, result);
 }
 
@@ -238,7 +250,7 @@ proxy_tcp_recv_msgs(proxy_tcp_conn *conn)
  * 			-1	error
  */
 int
-proxy_tcp_get_msg(proxy_tcp_conn *conn, char **result, int *len)
+proxy_tcp_get_msg(proxy_tcp_conn *conn, unsigned char **result, int *len)
 {
 	int	n;
 

@@ -11,6 +11,7 @@ libutils_a_SOURCES =	src/bitset.c \
 						src/compat.c \
 						src/rangeset.c \
 						src/serdes.c \
+						src/varint.c \
 						src/varstr.c
 						
 libutils_a_CFLAGS =		-I./include $(AM_CFLAGS) -g 

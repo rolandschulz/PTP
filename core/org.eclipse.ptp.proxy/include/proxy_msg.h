@@ -31,6 +31,7 @@
 #define PTP_MSG_NARGS_MASK		0xffffffff
 #define PTP_MSG_ARG_LEN_SIZE	8
 #define PTP_MSG_ARG_LEN_MASK	0xffffffff
+#define STRING_ATTR 0
 
 /*
  * Proxy errors
@@ -49,10 +50,10 @@ typedef struct proxy_msg proxy_msg;
 extern int 			proxy_list_to_str(List *, int (*)(void *, char **), char **);
 extern void			proxy_get_data(char *, char **, int *);
 extern void			proxy_get_int(char *, int *);
-extern void			proxy_get_bitset(char *, bitset **);
-extern int 			proxy_deserialize_msg(char *, int len, proxy_msg **);
-extern int 			proxy_serialize_msg(proxy_msg *, char **, int *);
-extern int			proxy_msg_decode_string(char *, int, char **, char **);
+extern void			proxy_get_bitset(unsigned char *, bitset **);
+extern int 			proxy_deserialize_msg(unsigned char *, int len, proxy_msg **);
+extern int 			proxy_serialize_msg(proxy_msg *, unsigned char **, int *);
+extern int			proxy_msg_decode_string(unsigned char *, char **, unsigned char **);
 extern void			proxy_msg_add_int(proxy_msg *, int);
 extern void			proxy_msg_add_string(proxy_msg *, char *);
 extern void			proxy_msg_add_string_nocopy(proxy_msg *, char *);
@@ -67,6 +68,6 @@ extern proxy_msg *	new_proxy_msg(int, int);
 extern void			free_proxy_msg(proxy_msg *);
 extern int			proxy_queue_msg(List *, proxy_msg *);
 extern void 		proxy_process_msgs(List *, void (*)(proxy_msg*, void *), void *);
-extern void             proxy_set_flow_control(int flag);
-extern int              proxy_get_flow_control();
+extern void			proxy_set_flow_control(int flag);
+extern int			proxy_get_flow_control();
 #endif /* !_PROXY_MSG_H_ */

@@ -322,11 +322,11 @@ proxy_tcp_clnt_progress(proxy_clnt *clnt)
 static void
 proxy_tcp_clnt_event_callback(void *ev_data, void *data)
 {
-	int						len;
-	char *					result;
-	proxy_msg *				m;
-	proxy_clnt *			clnt = (proxy_clnt *)ev_data;
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)clnt->clnt_data;
+	int					len;
+	unsigned char *		result;
+	proxy_msg *			m;
+	proxy_clnt *		clnt = (proxy_clnt *)ev_data;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)clnt->clnt_data;
 
 	if (proxy_tcp_get_msg(conn, &result, &len) <= 0 ||
 		clnt->clnt_helper_funcs->eventhandler == NULL)
@@ -352,13 +352,13 @@ proxy_tcp_clnt_event_callback(void *ev_data, void *data)
 static void
 proxy_tcp_clnt_cmd_callback(void *cmd_data, void *data)
 {
-	int						len;
-	char *					str;
-	proxy_clnt *			clnt = (proxy_clnt *)cmd_data;
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)clnt->clnt_data;
-	proxy_msg *				msg = (proxy_msg *)data;
+	int					len;
+	unsigned char *		buf;
+	proxy_clnt *		clnt = (proxy_clnt *)cmd_data;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)clnt->clnt_data;
+	proxy_msg *			msg = (proxy_msg *)data;
 
-	if (proxy_serialize_msg(msg, &str, &len) < 0) {
+	if (proxy_serialize_msg(msg, &buf, &len) < 0) {
 		/*
 		 * TODO should send an error back to proxy peer
 		 */
@@ -366,6 +366,6 @@ proxy_tcp_clnt_cmd_callback(void *cmd_data, void *data)
 		return;
 	}
 
-	(void)proxy_tcp_send_msg(conn, str, len);
-	free(str);
+	(void)proxy_tcp_send_msg(conn, buf, len);
+	free(buf);
 }

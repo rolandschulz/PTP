@@ -45,7 +45,7 @@
 #include "sdm.h"
 
 extern int	svr_init(dbg_backend *, void (*)(dbg_event *, int));
-extern int	svr_dispatch(dbg_backend *, char *, int, int);
+extern int	svr_dispatch(dbg_backend *, unsigned char *, int, int);
 extern int	svr_progress(dbg_backend *);
 extern int	svr_isshutdown(void);
 extern int	svr_shutdown(dbg_backend *);
@@ -53,7 +53,7 @@ extern int	svr_shutdown(dbg_backend *);
 static dbg_backend *	backend;
 
 char *
-stringify(char *buf, int len)
+stringify(unsigned char *buf, int len)
 {
 	static char *	str_buf = NULL;
 
@@ -75,9 +75,9 @@ stringify(char *buf, int len)
 static void
 event_callback(dbg_event *e, int data)
 {
-	int			len;
-	char *		buf;
-	sdm_message	msg;
+	int				len;
+	unsigned char *	buf;
+	sdm_message		msg;
 
 	if (DbgSerializeEvent(e, &buf, &len) < 0) {
 		return;
@@ -97,9 +97,9 @@ event_callback(dbg_event *e, int data)
 static void
 deliver_callback(const sdm_message msg)
 {
-	int		id;
-	int		len;
-	char *	buf;
+	int				id;
+	int				len;
+	unsigned char *	buf;
 
 	DEBUG_PRINTF(DEBUG_LEVEL_SERVER, "[%d] Enter deliver_callback\n", sdm_route_get_id());
 
