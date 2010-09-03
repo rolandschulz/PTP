@@ -14,52 +14,56 @@
 package org.eclipse.ptp.proxy.packet;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.util.ArrayList;
 
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.messages.Messages;
 import org.eclipse.ptp.proxy.util.ProtocolUtil;
+import org.eclipse.ptp.proxy.util.VarInt;
 
+/**
+ * @since 5.0
+ */
 public class ProxyPacket {
-	public static final int PACKET_LENGTH_SIZE = 8;
-	public static final int PACKET_CHANNEL_SIZE = 2;
-	public static final int PACKET_ID_SIZE = 4;
-	public static final int PACKET_TRANS_ID_SIZE = 8;
-	public static final int PACKET_NARGS_SIZE = 8;
-	public static final int PACKET_ARG_LEN_SIZE = 8;
+	private static final int PACKET_LENGTH_SIZE = 4;
 
 	private boolean debug = false;
 
-	private int packetID;
-	private int packetTransID;
-	private String[] packetArgs;
+	private int fPacketFlags;
+	private int fPacketID;
+	private int fPacketTransID;
+	private String[] fPacketArgs;
 
-	private final Charset charset = Charset.forName("US-ASCII"); //$NON-NLS-1$
-	private final CharsetEncoder encoder = charset.newEncoder();
-	private final CharsetDecoder decoder = charset.newDecoder();
+	private final Charset fCharset = Charset.forName("US-ASCII"); //$NON-NLS-1$
+	private final CharsetEncoder encoder = fCharset.newEncoder();
+	private final CharsetDecoder decoder = fCharset.newDecoder();
 
 	public ProxyPacket() {
+		fPacketFlags = 0;
 	}
 
 	public ProxyPacket(IProxyCommand cmd) {
-		this.packetID = cmd.getCommandID();
-		this.packetTransID = cmd.getTransactionID();
-		this.packetArgs = cmd.getArguments();
+		this();
+		fPacketID = cmd.getCommandID();
+		fPacketTransID = cmd.getTransactionID();
+		fPacketArgs = cmd.getArguments();
 	}
 
 	public ProxyPacket(IProxyEvent event) {
-		this.packetID = event.getEventID();
-		this.packetTransID = event.getTransactionID();
-		this.packetArgs = event.getAttributes();
-		if (this.packetArgs == null) {
-			this.packetArgs = new String[0];
+		this();
+		fPacketID = event.getEventID();
+		fPacketTransID = event.getTransactionID();
+		fPacketArgs = event.getAttributes();
+		if (fPacketArgs == null) {
+			fPacketArgs = new String[0];
 		}
 	}
 
@@ -89,6 +93,8 @@ public class ProxyPacket {
 	 * so, then there should be some kind of timeout to prevent the UI from
 	 * hanging.
 	 * 
+	 * @param buf
+	 *            buffer containing the result of the read
 	 * @throws IOException
 	 *             if EOF
 	 */
@@ -104,21 +110,25 @@ public class ProxyPacket {
 	}
 
 	/**
-	 * Write a full buffer to the socket. Guaranteed to write buf.remaingin()
-	 * bytes to the channel.
+	 * Write an array of buffers to the socket. Guarantees to write the whole
+	 * buffer array.
 	 * 
 	 * FIXME: Can this block? If so, then there should be some kind of timeout
 	 * to prevent the UI from hanging.
 	 * 
-	 * @param buf
+	 * @param bufs
+	 *            array of buffers to write
+	 * @param len
+	 *            total number of bytes to write
 	 * @throws IOException
 	 */
-	private void fullWrite(WritableByteChannel channel, ByteBuffer buf) throws IOException {
-		while (buf.hasRemaining()) {
-			int n = channel.write(buf);
+	private void fullWrite(GatheringByteChannel channel, ByteBuffer[] bufs, long len) throws IOException {
+		long n;
+		while ((n = channel.write(bufs)) < len) {
 			if (n < 0) {
-				throw new IOException(Messages.getString("ProxyPacket_3")); //$NON-NLS-1$
+				throw new IOException(Messages.getString("ProxyPacket_2")); //$NON-NLS-1$
 			}
+			len -= n;
 		}
 	}
 
@@ -128,7 +138,7 @@ public class ProxyPacket {
 	 * @return arguments
 	 */
 	public String[] getArgs() {
-		return packetArgs;
+		return fPacketArgs;
 	}
 
 	/**
@@ -137,7 +147,7 @@ public class ProxyPacket {
 	 * @return packet type
 	 */
 	public int getID() {
-		return packetID;
+		return fPacketID;
 	}
 
 	/**
@@ -146,42 +156,11 @@ public class ProxyPacket {
 	 * @return transaction ID
 	 */
 	public int getTransID() {
-		return packetTransID;
+		return fPacketTransID;
 	}
 
 	/**
-	 * Process packets from the wire. Each packet comprises a length, header and
-	 * a body formatted as follows:
-	 * 
-	 * LENGTH HEADER BODY
-	 * 
-	 * where:
-	 * 
-	 * LENGTH is an PACKET_LENGTH_SIZE hexadecimal number representing the total
-	 * length of the HEADER and BODY sections.
-	 * 
-	 * HEADER consists of the following fields:
-	 * 
-	 * ' ' CMD_ID ':' TRANS_ID ':' NUM_ARGS
-	 * 
-	 * where:
-	 * 
-	 * CMD_ID is an PACKET_ID_SIZE hexadecimal number representing the type of
-	 * this command. TRANS_ID is an PACKET_TRANS_ID_SIZE hexadecimal number
-	 * representing the transaction ID of the command. NUM_ARGS is an
-	 * PACKET_ARGS_LEN_SIZE hexadecimal number representing the number of
-	 * arguments.
-	 * 
-	 * The command body is formatted as a list of NUM_ARGS string arguments,
-	 * each preceded by a space (0x20) characters as follows:
-	 * 
-	 * ' ' LENGTH ':' BYTES ... ' ' LENGTH ':' BYTES
-	 * 
-	 * where:
-	 * 
-	 * LENGTH is an PACKET_ARGS_LEN_SIZE hexadecimal number representing the
-	 * length of the string. BYTES are LENGTH bytes of the string. Any
-	 * characters are permitted, including spaces
+	 * Process packets from the wire.
 	 * 
 	 * @return false if a protocol error occurs
 	 * @throws IOException
@@ -190,22 +169,15 @@ public class ProxyPacket {
 	 */
 	public boolean read(ReadableByteChannel channel) throws IOException {
 		/*
-		 * First EVENT_LENGTH_SIZE bytes are the length of the event
+		 * First PACKET_LENGTH_SIZE bytes are the length of the event
 		 */
 		ByteBuffer lengthBytes = ByteBuffer.allocate(PACKET_LENGTH_SIZE);
 		fullRead(channel, lengthBytes);
-		CharBuffer len_str = decoder.decode(lengthBytes);
-
 		int len;
 		try {
-			len = Integer.parseInt(len_str.subSequence(0, PACKET_LENGTH_SIZE)
-					.toString(), 16);
-		} catch (NumberFormatException e) {
-			if (debug) {
-				System.out.println("] BAD PACKET LENGTH"); //$NON-NLS-1$
-			} else {
-				System.out.println("BAD PACKET LENGTH: \"" + len_str + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+			len = lengthBytes.getInt();
+		} catch (BufferUnderflowException e) {
+			System.out.println("BAD PACKET LENGTH"); //$NON-NLS-1$
 			throw new IOException(Messages.getString("ProxyPacket_0")); //$NON-NLS-1$
 		}
 
@@ -214,75 +186,100 @@ public class ProxyPacket {
 		 */
 		ByteBuffer packetBytes = ByteBuffer.allocate(len);
 		fullRead(channel, packetBytes);
-		CharBuffer packetBuf = decoder.decode(packetBytes);
 
 		if (debug) {
-			System.out.println("RECEIVE:[" + len_str + " -> " + packetBuf + "] -> " + Thread.currentThread().getName()); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+			System.out.println("RECEIVE:[" + len + "] -> " + Thread.currentThread().getName()); //$NON-NLS-1$//$NON-NLS-2$
 		}
 
 		/*
-		 * Extract transaction ID and event type
+		 * Get flags (not currently used)
+		 */
+		VarInt val = new VarInt(packetBytes);
+		if (!val.isValid()) {
+			throw new IOException(Messages.getString("ProxyPacket_1")); //$NON-NLS-1$
+		}
+		fPacketFlags = val.getValue();
+
+		/*
+		 * Extract event type
+		 */
+		val = new VarInt(packetBytes);
+		if (!val.isValid()) {
+			throw new IOException(Messages.getString("ProxyPacket_1")); //$NON-NLS-1$
+		}
+		fPacketID = val.getValue();
+
+		/*
+		 * Get transaction ID
+		 */
+		val = new VarInt(packetBytes);
+		if (!val.isValid()) {
+			throw new IOException(Messages.getString("ProxyPacket_3")); //$NON-NLS-1$
+		}
+		fPacketTransID = val.getValue();
+
+		val = new VarInt(packetBytes);
+		if (!val.isValid()) {
+			throw new IOException(Messages.getString("ProxyPacket_4")); //$NON-NLS-1$
+		}
+
+		/*
+		 * Extract rest of the arguments. Each argument is a 1 byte type
+		 * followed by the argument value.
+		 * 
+		 * XXX: all arguments are assumed to be string attributes for now
 		 */
 
-		int idStart = 1; // Skip ' '
-		int idEnd = idStart + PACKET_ID_SIZE;
-		int transStart = idEnd + 1; // Skip ':'
-		int transEnd = transStart + PACKET_TRANS_ID_SIZE;
-		int numArgsStart = transEnd + 1; // Skip ':'
-		int numArgsEnd = numArgsStart + PACKET_NARGS_SIZE;
+		int packetNumArgs = val.getValue();
+		fPacketArgs = new String[packetNumArgs];
 
-		try {
-			packetID = Integer.parseInt(packetBuf.subSequence(idStart, idEnd)
-					.toString(), 16);
-			packetTransID = Integer.parseInt(packetBuf.subSequence(transStart,
-					transEnd).toString(), 16);
-			int packetNumArgs = Integer.parseInt(packetBuf.subSequence(
-					numArgsStart, numArgsEnd).toString(), 16);
-
-			/*
-			 * Extract rest of the arguments. Each argument is an 8 byte hex
-			 * length, ':' and then the characters of the argument.
-			 */
-
-			packetArgs = new String[packetNumArgs];
-			int argPos = numArgsEnd + 1;
-
-			for (int i = 0; i < packetNumArgs; i++) {
-				packetArgs[i] = ProtocolUtil.decodeString(packetBuf, argPos);
-				argPos += packetArgs[i].length() + PACKET_ARG_LEN_SIZE + 2;
+		for (int i = 0; i < packetNumArgs; i++) {
+			switch (packetBytes.get()) {
+			case ProtocolUtil.TYPE_STRING_ATTR:
+			case ProtocolUtil.TYPE_INTEGER:
+			case ProtocolUtil.TYPE_BITSET:
+			case ProtocolUtil.TYPE_STRING:
+			case ProtocolUtil.TYPE_INTEGER_ATTR:
+			case ProtocolUtil.TYPE_BOOLEAN_ATTR:
+			default: // ignore argument type for now
+				fPacketArgs[i] = ProtocolUtil.decodeStringAttributeType(packetBytes, decoder);
+				break;
 			}
-		} catch (NumberFormatException e) {
-			System.out.println("BAD PACKET FORMAT: \"" + packetBuf + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-			throw new IOException(Messages.getString("ProxyPacket_1")); //$NON-NLS-1$
-		} catch (IndexOutOfBoundsException e1) {
-			return false;
 		}
 
 		return true;
 	}
 
-	public void send(WritableByteChannel channel) throws IOException {
-		String body = ProtocolUtil.encodeIntVal(packetID, PACKET_ID_SIZE)
-				+ ":" + ProtocolUtil.encodeIntVal(packetTransID, PACKET_TRANS_ID_SIZE) //$NON-NLS-1$
-				+ ":" + ProtocolUtil.encodeIntVal(packetArgs.length, PACKET_ARG_LEN_SIZE); //$NON-NLS-1$
+	/**
+	 * @since 5.0
+	 */
+	public void send(GatheringByteChannel channel) throws IOException {
+		ArrayList<ByteBuffer> buffers = new ArrayList<ByteBuffer>();
 
-		for (String arg : packetArgs) {
-			body += " " + ProtocolUtil.encodeString(arg); //$NON-NLS-1$
+		buffers.add(ByteBuffer.allocate(4)); // buffer for len
+		buffers.add(new VarInt(fPacketFlags).getBytes());
+		buffers.add(new VarInt(fPacketID).getBytes());
+		buffers.add(new VarInt(fPacketTransID).getBytes());
+		buffers.add(new VarInt(fPacketArgs.length).getBytes());
+
+		for (String arg : fPacketArgs) {
+			ProtocolUtil.encodeStringAttributeType(buffers, arg, fCharset);
 		}
 
 		/*
-		 * Note: command length includes the first space!
+		 * Calculate length of output buffer
 		 */
-		String packet = ProtocolUtil.encodeIntVal(body.length() + 1,
-				PACKET_LENGTH_SIZE)
-				+ " " + body; //$NON-NLS-1$
+		int len = 0;
+		for (ByteBuffer b : buffers) {
+			len += b.remaining();
+		}
+		buffers.get(0).putInt(len - 4).rewind();
 
 		if (debug) {
-			System.out
-					.println("SEND:[" + packet + "] -> " + Thread.currentThread().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println("SEND -> " + Thread.currentThread().getName()); //$NON-NLS-1$
 		}
 
-		fullWrite(channel, encoder.encode(CharBuffer.wrap(packet)));
+		fullWrite(channel, buffers.toArray(new ByteBuffer[0]), len);
 	}
 
 	/**

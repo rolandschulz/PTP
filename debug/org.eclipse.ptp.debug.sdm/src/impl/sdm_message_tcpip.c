@@ -29,18 +29,18 @@
 #include "serdes.h"
 #include "sdm.h"
 #include "helloproto.h"
+#include "varint.h"
 
-#define MESSAGE_LENGTH_SIZE	8
-#define MESSAGE_ID_SIZE		8
+#define MESSAGE_LENGTH_SIZE	4
 
 struct sdm_message {
 	unsigned int	id;				/* ID of the message */
 	sdm_idset		dest; 			/* Destinations of the message */
 	sdm_idset		src; 			/* Sources of the message */
 	sdm_aggregate	aggregate;		/* Message aggregation */
-	char *			payload;		/* Payload */
+	unsigned char *	payload;		/* Payload */
 	int				payload_len;	/* Payload length */
-	char *			buf;			/* Receive buffer */
+	unsigned char *	buf;			/* Receive buffer */
 	int				buf_len;		/* Receive buffer length */
 	void 			(*send_complete)(sdm_message msg);
 };
@@ -475,7 +475,6 @@ sdm_get_active_sock_desc()
 	}
 
 	if (selrv == 0) { // No socket has data. Return appropriated code
-//		printf("The sockets listened dont have data!\n");
 		return -2;
 	}
 
@@ -505,10 +504,12 @@ sdm_get_active_sock_desc()
 int
 sdm_tcpip_msgheader_receive(int sockfd, int *length)
 {
-	int		n;
-	int		len;
-	char *	p;
-	char	length_str[MESSAGE_LENGTH_SIZE];
+	int				i;
+	int				n;
+	int				len;
+	int				msg_len = 0;
+	unsigned char *	p;
+	unsigned char	length_str[MESSAGE_LENGTH_SIZE];
 
 	p = length_str;
 	len = MESSAGE_LENGTH_SIZE;
@@ -519,7 +520,7 @@ sdm_tcpip_msgheader_receive(int sockfd, int *length)
 				if (errno == EINTR) {
 					continue;
 				}
-				perror("Status on read syscall");
+				perror("read");
 			}
 			return -1;
 		}
@@ -528,17 +529,23 @@ sdm_tcpip_msgheader_receive(int sockfd, int *length)
 		len -= n;
 	}
 
-	DEBUG_PRINTF(DEBUG_LEVEL_PROTOCOL, "HEADER:<%.*s>\n", MESSAGE_LENGTH_SIZE, length_str);
+    for (i = 0; i < MESSAGE_LENGTH_SIZE; i++) {
+    	msg_len = (msg_len << 8) | (length_str[i] & 0xff);
+    }
 
-	*length = hex_str_to_int(length_str, MESSAGE_LENGTH_SIZE, NULL) - MESSAGE_LENGTH_SIZE;
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "MESSAGE_LEN:%d\n", msg_len);
+
+	*length = msg_len;
 
 	return 0;
 }
 
 int
-sdm_tcpip_msgbody_receive(int sockfd, char *buf, int length)
+sdm_tcpip_msgbody_receive(int sockfd, unsigned char *buf, int length)
 {
 	int n;
+
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] About to recv %d\n", sdm_route_get_id(), length);
 
 	while ((n = read(sockfd, buf, length)) < length) {
 		if (n <= 0) {
@@ -546,7 +553,7 @@ sdm_tcpip_msgbody_receive(int sockfd, char *buf, int length)
 				if (errno == EINTR) {
 					continue;
 				}
-				perror("Status on read syscall");
+				perror("read");
 			}
 			return -1;
 		}
@@ -554,31 +561,30 @@ sdm_tcpip_msgbody_receive(int sockfd, char *buf, int length)
 		length -= n;
 	}
 
-	DEBUG_PRINTF(DEBUG_LEVEL_PROTOCOL, "BODY:<%*s>\n", length, buf);
-
 	return 0;
 }
 
 int
-sdm_tcpip_send(int sockd, char *buf, int length)
+sdm_tcpip_send(int sockd, unsigned char *buf, int length)
 {
-	int wcount;
+	int n;
 
-	// Write all message to the socket
-	do {
-		wcount = write(sockd, (void *)buf, length);
+	DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] About to send %d\n", sdm_route_get_id(), length);
 
-		if (wcount <= 0) {
-			if (wcount < 0) {
-				perror("write syscall status");
+	while ((n = write(sockd, (void *)buf, length)) < length) {
+		if (n <= 0) {
+			if (n < 0) {
+				if (errno == EINTR) {
+					continue;
+				}
+				perror("writes");
 			}
-			DEBUG_PRINTS(DEBUG_LEVEL_MESSAGES, "Could not send message data - write syscall failed!\n");
 			return -1;
 		}
 
-		buf += wcount;
-		length -= wcount;
-	} while(length > 0);
+		buf += n;
+		length -= n;
+	}
 
 	return 0;
 }
@@ -625,14 +631,14 @@ sdm_message_finalize()
 int
 sdm_message_send(const sdm_message msg)
 {
-	int			len;
-	int			maxlen; // effective and maximum length of the message
-							 // these two vars must have the same size!
-	char *		p;
-	char *		header_addr; // Pointer to the header of the message
-	char *		buf;
-	sdm_id		dest_id;
-	sdm_idset	route;
+	int					i;
+	int					len;
+	int					msglen;
+	int					maxlen;
+	unsigned char *		p;
+	unsigned char *		buf;
+	sdm_id				dest_id;
+	sdm_idset			route;
 
 	/*
 	 * Remove our id from the destination of the message before forwarding.
@@ -659,34 +665,36 @@ sdm_message_send(const sdm_message msg)
 		 */
 
 		maxlen = MESSAGE_LENGTH_SIZE
-			+ MESSAGE_ID_SIZE
+			+ MAX_VARINT_LENGTH
 			+ sdm_aggregate_serialized_length(msg->aggregate)
 			+ sdm_set_serialized_length(msg->src)
 			+ sdm_set_serialized_length(msg->dest)
 			+ msg->payload_len;
 
-		p = buf = (char *)malloc(maxlen);
+		buf = (unsigned char *)malloc(maxlen);
 
-		// Saves the address of the header
-		header_addr = p;
-
-		p += MESSAGE_LENGTH_SIZE; // Points to the body of the message
+		p = buf + MESSAGE_LENGTH_SIZE; // Points to the body of the message
 
 		/*
 		 * Note: maxlen was the maximum length of the serialized buffer, we
-		 * now calculate the actual length for the send.
+		 * now serialize the buffer and calculate the actual length of the message.
 		 */
-		len = MESSAGE_LENGTH_SIZE;
-		len += MESSAGE_ID_SIZE;
-		int_to_hex_str(msg->id, p, MESSAGE_ID_SIZE, &p);
-		len += sdm_aggregate_serialize(msg->aggregate, p, &p);
-		len += sdm_set_serialize(msg->src, p, &p);
-		len += sdm_set_serialize(msg->dest, p, &p);
+		msglen = varint_encode(msg->id, p, &p);
+		msglen += sdm_aggregate_serialize(msg->aggregate, p, &p);
+		msglen += sdm_set_serialize(msg->src, p, &p);
+		msglen += sdm_set_serialize(msg->dest, p, &p);
 		memcpy(p, msg->payload, msg->payload_len);
-		len += msg->payload_len;
+		msglen += msg->payload_len;
 
-		// Copies the actual length to the header of the message
-		int_to_hex_str(len, header_addr, MESSAGE_LENGTH_SIZE, NULL);
+		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Sending len %d\n", sdm_route_get_id(), msglen);
+
+		/*
+		 * Add body length to the start of the buffer
+		 */
+        for (len = msglen, i = MESSAGE_LENGTH_SIZE - 1; i >= 0; i--) {
+        	buf[i] = len & 0xff;
+        	len = len >> 8;
+        }
 
 		/*
 		 * Send the message to each destination, converting the
@@ -696,7 +704,7 @@ sdm_message_send(const sdm_message msg)
 		for (dest_id = sdm_set_first(route); !sdm_set_done(route); dest_id = sdm_set_next(route)) {
 			int sockd;
 
-			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Sending len %d to %d\n", sdm_route_get_id(), len, dest_id);
+			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Sending to %d\n", sdm_route_get_id(), dest_id);
 
 			// Get socket descriptor corresponding to the node where the message will be sent
 			sockd = sdm_fetch_sockd(dest_id);
@@ -706,7 +714,7 @@ sdm_message_send(const sdm_message msg)
 			}
 
 			// Write all message to the socket
-			if (sdm_tcpip_send(sockd, buf, len) < 0) {
+			if (sdm_tcpip_send(sockd, buf, msglen + MESSAGE_LENGTH_SIZE) < 0) {
 				DEBUG_PRINTS(DEBUG_LEVEL_MESSAGES, "Error sending message!\n");
 				return -1;
 			}
@@ -740,10 +748,10 @@ sdm_message_send(const sdm_message msg)
 int
 sdm_message_progress(void)
 {
-	int		n;
-	int		err;
-	int		len;
-	char *	buf;
+	int				n;
+	int				err;
+	int				len;
+	unsigned char *	buf;
 
 	// Retrieve the active socket descriptor
 	int sockfd = sdm_get_active_sock_desc();
@@ -758,16 +766,15 @@ sdm_message_progress(void)
 
 		err = sdm_tcpip_msgheader_receive(sockfd, &len);
 
-		if(err != 0) {
+		if (err != 0) {
 			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Error retrieving message size!\n", sdm_route_get_id());
 			return -1;
 		}
 
-		buf = (char *)malloc(len);
-
+		buf = (unsigned char *)malloc(len);
 		sdm_message msg = sdm_message_new(buf, len);
 
-		if(sdm_tcpip_msgbody_receive(sockfd, buf, len) < 0) {
+		if (sdm_tcpip_msgbody_receive(sockfd, buf, len) < 0) {
 			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] Error retrieving message!\n", sdm_route_get_id());
 			return -1;
 		}
@@ -775,8 +782,8 @@ sdm_message_progress(void)
 		DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] sdm_message_progress received len %d from %d\n",
 				sdm_route_get_id(), len, sdm_fetch_nodeid(sockfd));
 
-		msg->id = hex_str_to_int(buf, MESSAGE_ID_SIZE, &buf);
-		len -= MESSAGE_ID_SIZE;
+		n = varint_decode((int *)&msg->id, buf, &buf);
+		len -= n;
 
 		if ((n = sdm_aggregate_deserialize(msg->aggregate, buf, &buf)) < 0) {
 			DEBUG_PRINTF(DEBUG_LEVEL_MESSAGES, "[%d] invalid header\n", sdm_route_get_id());
@@ -830,7 +837,7 @@ sdm_message_set_recv_callback(void (*callback)(sdm_message msg))
 }
 
 sdm_message
-sdm_message_new(char *buf, int len)
+sdm_message_new(unsigned char *buf, int len)
 {
 	static unsigned int ids = 0;
 	sdm_message	msg = (sdm_message)malloc(sizeof(struct sdm_message));
@@ -896,7 +903,7 @@ sdm_message_get_source(const sdm_message msg)
 }
 
 void
-sdm_message_get_payload(const sdm_message msg, char **buf, int *len)
+sdm_message_get_payload(const sdm_message msg, unsigned char **buf, int *len)
 {
 	*buf = msg->payload;
 	*len = msg->payload_len;

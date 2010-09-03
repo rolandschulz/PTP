@@ -186,7 +186,7 @@ struct dbg_event {
 typedef struct dbg_event dbg_event;
 
 extern int 			DbgDeserializeEvent(int, int, char **, dbg_event **);
-extern int 			DbgSerializeEvent(dbg_event *, char **, int *);
+extern int 			DbgSerializeEvent(dbg_event *, unsigned char **, int *);
 extern dbg_event *	NewDbgEvent(int);
 extern void			FreeDbgEvent(dbg_event *);
 extern dbg_event *	DbgErrorEvent(int, char *);

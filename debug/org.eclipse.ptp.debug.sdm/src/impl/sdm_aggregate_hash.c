@@ -24,10 +24,10 @@
 #include "list.h"
 #include "hash.h"
 #include "serdes.h"
+#include "varint.h"
 #include "sdm.h"
 
 #define SDM_EVENT_WAIT_TIME 100000
-#define AGGREGATE_VALUE_LEN	8
 
 struct sdm_aggregate {
 	unsigned int	value;	/* Timeout or hash value */
@@ -78,11 +78,11 @@ sdm_aggregate_init(int argc, char *argv[])
 }
 
 int
-sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
+sdm_aggregate_serialize(const sdm_aggregate a, unsigned char *buf, unsigned char **end)
 {
-	char *	e;
+	unsigned char *	e;
 
-	int_to_hex_str(a->value, buf, AGGREGATE_VALUE_LEN, &e);
+	varint_encode(a->value, buf, &e);
 	if (end != NULL) {
 		*end = e;
 	}
@@ -92,15 +92,15 @@ sdm_aggregate_serialize(const sdm_aggregate a, char *buf, char **end)
 int
 sdm_aggregate_serialized_length(const sdm_aggregate a)
 {
-	return AGGREGATE_VALUE_LEN;
+	return varint_length(a->value);
 }
 
 int
-sdm_aggregate_deserialize(sdm_aggregate a, char *str, char **end)
+sdm_aggregate_deserialize(sdm_aggregate a, unsigned char *str, unsigned char **end)
 {
-	char *	e;
+	unsigned char *	e;
 
-	a->value = hex_str_to_int(str, AGGREGATE_VALUE_LEN, &e);
+	varint_decode((int *)&a->value, str, &e);
 	if (end != NULL) {
 		*end = e;
 	}
@@ -129,11 +129,11 @@ sdm_aggregate_message(sdm_message msg, unsigned int flags)
 		request *		req;
 
 		if (flags & SDM_AGGREGATE_INIT) {
-			int		len;
-			char *	buf;
+			int				len;
+			unsigned char *	buf;
 
 			sdm_message_get_payload(msg, &buf, &len);
-			a->value = HashCompute(buf, len);
+			a->value = HashCompute((char *)buf, len);
 		}
 
 		id = sdm_message_get_id(msg);
@@ -258,9 +258,12 @@ sdm_aggregate_copy(const sdm_aggregate a1, const sdm_aggregate a2)
 char *
 _aggregate_to_str(sdm_aggregate a)
 {
-	static char res[AGGREGATE_VALUE_LEN+1];
+	static char * res = NULL;
 
-	int_to_hex_str(a->value, res, AGGREGATE_VALUE_LEN, NULL);
+	if (res != NULL) {
+		free(res);
+	}
+	asprintf(&res, "0x%0x", a->value);
 	return res;
 }
 

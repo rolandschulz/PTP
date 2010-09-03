@@ -58,7 +58,7 @@ void		bitset_invert(bitset *b);					/* compute ~b */
 int			bitset_eq(bitset *b1, bitset *b2);			/* test if (b1 & b2) == b1 */
 int			bitset_compare(bitset *b1, bitset *b2);		/* test if (b1 & b2) != 0 */
 char *		bitset_to_str(bitset *b);					/* convert b to a portable string representation */
-bitset *	str_to_bitset(char *str, char **end);		/* convert a portable string represetation to a bitset */
+bitset *	bitset_decode(unsigned char *str, unsigned char **end);		/* convert a portable string represetation to a bitset */
 int			bitset_count(bitset *b);					/* return the number of bits in the set */
 int			bitset_size(bitset *b);						/* number of bits this bitset can represent */
 char *		bitset_to_set(bitset *b);					/* convert b to set notation */

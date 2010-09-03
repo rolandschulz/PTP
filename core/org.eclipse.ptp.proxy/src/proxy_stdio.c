@@ -73,12 +73,16 @@ stdio_read(proxy_stdio_conn *conn)
 {
 	int	n;
 
-	if (conn->total_read == conn->buf_size) {
+	if (conn->total_read >= conn->buf_size) {
 		conn->buf_size += BUFSIZ;
 		conn->buf = (char *)realloc(conn->buf, conn->buf_size);
 	}
 
-	n = read(conn->sess_in, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read);
+	    /*
+	     * Limit read to number of bytes remaining in buffer
+	     */
+	n = read(conn->sess_in, &conn->buf[conn->buf_pos],
+		 conn->buf_size - conn->buf_pos);
 fprintf(stderr, " read %d \"%s\"\n", n, &conn->buf[conn->buf_pos]);
 	if (n <= 0) {
 		if (n < 0)
@@ -144,28 +148,22 @@ proxy_stdio_send_msg(proxy_stdio_conn *conn, char *message, int len)
 	return stdio_write(conn, message, len);
 }
 
+/*
+ * Message length is in the buffer as 4 bytes in big endian format. Convert to
+ * integer and return the result.
+ */
 static int
 proxy_stdio_get_msg_len(proxy_stdio_conn *conn)
 {
-	char *	end;
+        int value;
+        int i;
 
-	/*
-	 * If we haven't read enough then return for more...
-	 */
-	if (conn->total_read < PTP_MSG_LEN_SIZE)
-		return 0;
-
-	conn->msg_len = strtol(conn->buf, &end, 16);
-
-	/*
-	 * check if we've received the length
-	 */
-	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
-		proxy_set_error(PTP_PROXY_ERR_PROTO, "could not understand message");
-		return -1;
-	}
-
-	return conn->msg_len;
+        value = 0;
+        for (i = 0; i < sizeof(int); i++) {
+                value = (value << 8) | conn->buf[i];
+        }
+        conn->msg_len = value;
+        return value;
 }
 
 static int
@@ -181,6 +179,7 @@ proxy_stdio_copy_msg(proxy_stdio_conn *conn, char **result)
 	 * Move rest of buffer down if necessary
 	 */
 	if (conn->total_read > conn->msg_len + PTP_MSG_LEN_SIZE) {
+		conn->buf_pos -= conn->msg_len + PTP_MSG_LEN_SIZE;
 		conn->total_read -= conn->msg_len + PTP_MSG_LEN_SIZE;
 		memmove(conn->buf, &conn->buf[conn->msg_len + PTP_MSG_LEN_SIZE], conn->total_read);
 	} else {

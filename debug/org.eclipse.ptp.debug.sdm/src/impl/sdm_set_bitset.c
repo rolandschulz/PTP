@@ -164,7 +164,7 @@ sdm_set_max(const sdm_idset set)
 }
 
 int
-sdm_set_serialize(const sdm_idset set, char *buf, char **end)
+sdm_set_serialize(const sdm_idset set, unsigned char *buf, unsigned char **end)
 {
 	char *	str = bitset_to_str(set->set);
 	int		len = strlen(str);
@@ -184,10 +184,10 @@ sdm_set_serialized_length(const sdm_idset set)
 }
 
 int
-sdm_set_deserialize(sdm_idset set, char *buf, char **end)
+sdm_set_deserialize(sdm_idset set, unsigned char *buf, unsigned char **end)
 {
-	char *		e;
-	bitset *	b = str_to_bitset(buf, &e);
+	unsigned char *	e;
+	bitset *		b = bitset_decode(buf, &e);
 
 	bitset_copy(set->set, b);
 	bitset_free(b);

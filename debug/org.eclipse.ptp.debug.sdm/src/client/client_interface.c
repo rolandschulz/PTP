@@ -75,11 +75,11 @@ idset_to_bitset(sdm_idset ids)
 static int
 session_event_handler(sdm_message msg, void *data)
 {
-	int			len;
-	char *		buf;
-	dbg_event *	ev;
-	proxy_msg *	pmsg;
-	session *	s = (session *)data;
+	int				len;
+	unsigned char *	buf;
+	dbg_event *		ev;
+	proxy_msg *		pmsg;
+	session *		s = (session *)data;
 
 	sdm_message_get_payload(msg, &buf, &len);
 
@@ -105,7 +105,7 @@ session_event_handler(sdm_message msg, void *data)
 }
 
 static int
-send_command(bitset *procs, int timeout, char *cmd, int len, void *cbdata)
+send_command(bitset *procs, int timeout, unsigned char *cmd, int len, void *cbdata)
 {
 	sdm_message 	msg;
 	sdm_idset		dest = bitset_to_idset(procs);
@@ -161,11 +161,11 @@ DbgCreate(session *s)
 int
 DbgStartSession(session *s, char *dir, char *prog, char *args)
 {
-	int			res;
-	int			len;
-	char *		buf;
-	bitset *	procs = bitset_new(s->sess_procs);
-	proxy_msg *	msg = new_proxy_msg(DBG_STARTSESSION_CMD, 0);
+	int				res;
+	int				len;
+	unsigned char *	buf;
+	bitset *		procs = bitset_new(s->sess_procs);
+	proxy_msg *		msg = new_proxy_msg(DBG_STARTSESSION_CMD, 0);
 
 	proxy_msg_add_int(msg, SERVER_TIMEOUT);
 	proxy_msg_add_string(msg, dir);
@@ -192,10 +192,10 @@ DbgStartSession(session *s, char *dir, char *prog, char *args)
 int 
 DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line)
 {
-	int			res;
-	int			len;
-	char *		buf;
-	proxy_msg *	msg = new_proxy_msg(DBG_SETLINEBREAKPOINT_CMD, 0);
+	int				res;
+	int				len;
+	unsigned char *	buf;
+	proxy_msg *		msg = new_proxy_msg(DBG_SETLINEBREAKPOINT_CMD, 0);
 
 	proxy_msg_add_int(msg, bpid);
 	proxy_msg_add_string(msg, file);
@@ -329,10 +329,10 @@ DbgSetWatchpoint(session *s, bitset *set, int bpid, char *expr, int access, int 
 int 
 DbgGo(session *s, bitset *set)
 {
-	int			res;
-	int			len;
-	char *		buf;
-	proxy_msg *	msg = new_proxy_msg(DBG_GO_CMD, 0);
+	int				res;
+	int				len;
+	unsigned char *	buf;
+	proxy_msg *		msg = new_proxy_msg(DBG_GO_CMD, 0);
 
 	proxy_serialize_msg(msg, &buf, &len);
 
@@ -346,10 +346,10 @@ DbgGo(session *s, bitset *set)
 int 
 DbgStep(session *s, bitset *set, int count, int type)
 {
-	int			res;
-	int			len;
-	char *		buf;
-	proxy_msg *	msg = new_proxy_msg(DBG_STEP_CMD, 0);
+	int				res;
+	int				len;
+	unsigned char *	buf;
+	proxy_msg *		msg = new_proxy_msg(DBG_STEP_CMD, 0);
 	
 	proxy_msg_add_int(msg, count);
 	proxy_msg_add_int(msg, type);
@@ -395,10 +395,10 @@ DbgSuspend(session *s, bitset *set)
 int 
 DbgListStackframes(session *s, bitset *set, int low, int depth)
 {
-	int			res;
-	int			len;
-	char *		buf;
-	proxy_msg *	msg = new_proxy_msg(DBG_LISTSTACKFRAMES_CMD, 0);
+	int				res;
+	int				len;
+	unsigned char *	buf;
+	proxy_msg *		msg = new_proxy_msg(DBG_LISTSTACKFRAMES_CMD, 0);
 	
 	proxy_msg_add_int(msg, low);
 	proxy_msg_add_int(msg, depth);
@@ -430,10 +430,10 @@ DbgSetCurrentStackframe(session *s, bitset *set, int level)
 int 
 DbgEvaluateExpression(session *s, bitset *set, char *exp)
 {
-	int			res;
-	int			len;
-	char *		buf;
-	proxy_msg *	msg = new_proxy_msg(DBG_EVALUATEEXPRESSION_CMD, 0);
+	int				res;
+	int				len;
+	unsigned char *	buf;
+	proxy_msg *		msg = new_proxy_msg(DBG_EVALUATEEXPRESSION_CMD, 0);
 
 	proxy_msg_add_string(msg, exp);
 	proxy_serialize_msg(msg, &buf, &len);
@@ -620,11 +620,11 @@ DbgCLIHandle(session *s, bitset *set, char *arg)
 int
 DbgQuit(session *s)
 {
-	int			res;
-	int			len;
-	char *		buf;
-	bitset *	procs = bitset_new(s->sess_procs);
-	proxy_msg *	msg = new_proxy_msg(DBG_QUIT_CMD, 0);
+	int				res;
+	int				len;
+	unsigned char *	buf;
+	bitset *		procs = bitset_new(s->sess_procs);
+	proxy_msg *		msg = new_proxy_msg(DBG_QUIT_CMD, 0);
 
 	proxy_serialize_msg(msg, &buf, &len);
 

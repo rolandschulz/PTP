@@ -51,7 +51,7 @@ static void	proxy_tcp_svr_finish(proxy_svr *);
 
 static int	proxy_tcp_svr_recv_msgs(int, void *);
 static int	proxy_tcp_svr_accept(int, void *);
-static int	proxy_tcp_svr_dispatch(proxy_svr *, char *, int);
+static int	proxy_tcp_svr_dispatch(proxy_svr *, unsigned char *, int);
 
 proxy_svr_funcs proxy_tcp_svr_funcs =
 {
@@ -73,9 +73,9 @@ proxy_tcp_svr_event_callback(void *ev_data, void *data)
 	proxy_svr *			svr = (proxy_svr *)ev_data;
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)svr->svr_data;
 	proxy_msg *			msg = (proxy_msg *)data;
-	char *				str;
+	unsigned char *		buf;
 
-	if (proxy_serialize_msg(msg, &str, &len) < 0) {
+	if (proxy_serialize_msg(msg, &buf, &len) < 0) {
 		/*
 		 * TODO should send an error back to proxy peer
 		 */
@@ -83,8 +83,8 @@ proxy_tcp_svr_event_callback(void *ev_data, void *data)
 		return;
 	}
 
-	(void)proxy_tcp_send_msg(conn, str, len);
-	free(str);
+	(void)proxy_tcp_send_msg(conn, buf, len);
+	free(buf);
 }
 
 /*
@@ -93,14 +93,16 @@ proxy_tcp_svr_event_callback(void *ev_data, void *data)
 static void
 proxy_tcp_svr_cmd_callback(void *cmd_data, void *data)
 {
-	int						len;
-	char *					msg = NULL;
-	proxy_svr *				svr = (proxy_svr *)cmd_data;
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)svr->svr_data;
+	int					len;
+	unsigned char *		msg = NULL;
+	proxy_svr *			svr = (proxy_svr *)cmd_data;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)svr->svr_data;
 
 	if (proxy_tcp_get_msg(conn, &msg, &len) > 0) {
 		proxy_tcp_svr_dispatch(svr, msg, len);
-		if (msg != NULL) free(msg);
+		if (msg != NULL) {
+			free(msg);
+		}
 	}
 }
 
@@ -365,7 +367,7 @@ proxy_tcp_svr_progress(proxy_svr *svr)
  * client.
  */
 static int
-proxy_tcp_svr_dispatch(proxy_svr *svr, char *msg, int len)
+proxy_tcp_svr_dispatch(proxy_svr *svr, unsigned char *msg, int len)
 {
 	int					idx;
 	char *				err_str;
@@ -403,7 +405,9 @@ proxy_tcp_svr_dispatch(proxy_svr *svr, char *msg, int len)
 		proxy_msg_add_keyval_string(err, PTP_MSG_LEVEL_ATTR, PTP_MSG_LEVEL_FATAL);
 		proxy_msg_add_keyval_int(err, PTP_MSG_CODE_ATTR, PTP_PROXY_ERR_PROTO);
 		proxy_msg_add_int(err, PTP_ERROR_MALFORMED_COMMAND);
-		asprintf(&err_str, "malformed command, len is %d", len);
+		asprintf(&err_str,
+			"malformed command, len is %d (invalid idx %d)",
+			len, idx);
 		proxy_msg_add_keyval_string(err, PTP_MSG_TEXT_ATTR, err_str);
 		free(err_str);
 		rc = proxy_queue_msg(svr->svr_events, err);

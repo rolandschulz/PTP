@@ -362,11 +362,11 @@ bitset_to_str(bitset *b)
 }
 
 /**
- * Convert string into a bitset. Inverse of bitset_to_str().
+ * Convert serialized buffer into a bitset. Inverse of bitset_to_str().
  *
  */
 bitset *
-str_to_bitset(char *str, char **end)
+bitset_decode(unsigned char *str, unsigned char **end)
 {
 	int			nbits;
 	int			bytes;

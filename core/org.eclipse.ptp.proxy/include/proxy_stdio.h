@@ -22,7 +22,7 @@
 
 #include "compat.h"
 
-#define PTP_MSG_LEN_SIZE		8
+#define PTP_MSG_LEN_SIZE		4
 #define PTP_MSG_LENGTH_MASK		0xffffffff
 
 struct proxy_stdio_conn {
