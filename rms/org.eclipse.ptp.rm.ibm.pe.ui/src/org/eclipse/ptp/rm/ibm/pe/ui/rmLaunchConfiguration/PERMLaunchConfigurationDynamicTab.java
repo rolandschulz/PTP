@@ -620,12 +620,12 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	private String getFileDialogPath(String attrName) {
 		String dir;
 
-		dir = "";
+		dir = ""; //$NON-NLS-1$
 		if (currentLaunchConfig != null) {
 			try {
-				dir = currentLaunchConfig.getAttribute(attrName, "");
+				dir = currentLaunchConfig.getAttribute(attrName, ""); //$NON-NLS-1$
 			} catch (CoreException e) {
-				dir = "";
+				dir = ""; //$NON-NLS-1$
 			}
 		}
 		return dir;
