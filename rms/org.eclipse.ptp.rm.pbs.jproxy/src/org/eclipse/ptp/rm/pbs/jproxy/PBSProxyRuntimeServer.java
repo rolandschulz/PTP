@@ -52,18 +52,18 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 	// static final String debugUser = "alizade1";
 	private static final String debugUser = "xli"; //$NON-NLS-1$
 
-	public static void main(String[] args) {
+	public static int main(String[] args) {
 		Map<String, Object> params = parseArguments(args);
 		String host = (String) params.get("host"); //$NON-NLS-1$
 		if (host == null) {
 			System.err.println(Messages.getString("PBSProxyRuntimeServer.1")); //$NON-NLS-1$
-			return;
+			return 1;
 		}
 		int port = 0;
 		Integer portVal = ((Integer) params.get("port")); //$NON-NLS-1$
 		if (portVal == null) {
 			System.err.println(Messages.getString("PBSProxyRuntimeServer.3")); //$NON-NLS-1$
-			return;
+			return 1;
 		}
 		port = portVal.intValue();
 
@@ -75,8 +75,9 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 			server.start();
 		} catch (IOException e) {
 			System.err.println(Messages.getString("PBSProxyRuntimeServer.5") + e.getMessage()); //$NON-NLS-1$
-			return;
+			return 1;
 		}
+		return 0;
 	}
 
 	private static String normalize(String content) {
