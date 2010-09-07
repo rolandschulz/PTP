@@ -132,6 +132,9 @@ public class SpawnerSubsystem extends SubSystem {
 				dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, workingDirectory);
 				args.add(dataElement);
 
+            	dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, new Integer(envp.length).toString());
+            	args.add(dataElement);
+				
 				for (String envVar : envp) {
 					dataElement = dataStore.createObject(null, SpawnerMiner.T_SPAWNER_STRING_DESCRIPTOR, envVar);
 					args.add(dataElement);
