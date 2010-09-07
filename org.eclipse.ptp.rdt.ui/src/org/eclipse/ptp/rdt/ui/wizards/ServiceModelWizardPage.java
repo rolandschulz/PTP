@@ -196,30 +196,35 @@ public class ServiceModelWizardPage extends MBSCustomPage {
 				IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
 				IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
 				RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
-				rbsp.setRemoteToolsProviderID(remoteServices.getId());
-				rbsp.setRemoteToolsConnection(remoteConnection);
-				fNewConfig.setServiceProvider(buildService, rbsp);
+				if (rbsp != null) {
+					rbsp.setRemoteToolsProviderID(remoteServices.getId());
+					rbsp.setRemoteToolsConnection(remoteConnection);
+					fNewConfig.setServiceProvider(buildService, rbsp);
+				}
 
 				IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
 				if (remoteServices.getId().equals("org.eclipse.ptp.remote.RSERemoteServices")) { //$NON-NLS-1$
 					descriptor = indexingService.getProviderDescriptor(RSECIndexServiceProvider.ID);
 					RSECIndexServiceProvider provider = (RSECIndexServiceProvider) smm.getServiceProvider(descriptor);
-
-					String hostName = remoteConnection.getAddress();
-					IHost host = RSEUtils.getConnection(hostName);
-					String configPath = RSEUtils.getDefaultConfigDirectory(host);
-
-					provider.setConnection(host, getDStoreConnectorService(host));
-					provider.setIndexLocation(configPath);
-					provider.setConfigured(true);
-					fNewConfig.setServiceProvider(indexingService, provider);
+					if (provider != null) {
+							String hostName = remoteConnection.getAddress();
+							IHost host = RSEUtils.getConnection(hostName);
+							String configPath = RSEUtils.getDefaultConfigDirectory(host);
+		
+							provider.setConnection(host, getDStoreConnectorService(host));
+							provider.setIndexLocation(configPath);
+							provider.setConfigured(true);
+							fNewConfig.setServiceProvider(indexingService, provider);
+					}
 				} else if (remoteServices.getId().equals("org.eclipse.ptp.remote.RemoteTools")) { //$NON-NLS-1$
 					descriptor = indexingService
 							.getProviderDescriptor("org.eclipse.ptp.rdt.server.dstore.RemoteToolsCIndexServiceProvider"); //$NON-NLS-1$
 					IRemoteToolsIndexServiceProvider provider = (IRemoteToolsIndexServiceProvider) smm
 							.getServiceProvider(descriptor);
-					provider.setConnection(remoteConnection);
-					fNewConfig.setServiceProvider(indexingService, provider);
+					if (provider != null) {
+						provider.setConnection(remoteConnection);
+						fNewConfig.setServiceProvider(indexingService, provider);
+					}
 				}
 			}
 		}
