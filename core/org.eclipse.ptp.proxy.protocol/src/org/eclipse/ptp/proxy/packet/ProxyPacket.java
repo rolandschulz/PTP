@@ -16,12 +16,13 @@ package org.eclipse.ptp.proxy.packet;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.ptp.proxy.command.IProxyCommand;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
@@ -113,6 +114,9 @@ public class ProxyPacket {
 	 * Write an array of buffers to the socket. Guarantees to write the whole
 	 * buffer array.
 	 * 
+	 * NOTE: Originally used GatherByteChannel but the performance is pathetic.
+	 * This implementation requires a buffer copy, which should be eliminated.
+	 * 
 	 * FIXME: Can this block? If so, then there should be some kind of timeout
 	 * to prevent the UI from hanging.
 	 * 
@@ -122,13 +126,17 @@ public class ProxyPacket {
 	 *            total number of bytes to write
 	 * @throws IOException
 	 */
-	private void fullWrite(GatheringByteChannel channel, ByteBuffer[] bufs, long len) throws IOException {
+	private void fullWrite(WritableByteChannel channel, List<ByteBuffer> bufs, long len) throws IOException {
 		long n;
-		while ((n = channel.write(bufs)) < len) {
+		ByteBuffer bb = ByteBuffer.allocate((int) len);
+		for (ByteBuffer b : bufs) {
+			bb.put(b);
+		}
+		bb.flip();
+		while ((n = channel.write(bb)) < len) {
 			if (n < 0) {
 				throw new IOException(Messages.getString("ProxyPacket_2")); //$NON-NLS-1$
 			}
-			len -= n;
 		}
 	}
 
@@ -253,7 +261,7 @@ public class ProxyPacket {
 	/**
 	 * @since 5.0
 	 */
-	public void send(GatheringByteChannel channel) throws IOException {
+	public void send(WritableByteChannel channel) throws IOException {
 		ArrayList<ByteBuffer> buffers = new ArrayList<ByteBuffer>();
 
 		buffers.add(ByteBuffer.allocate(4)); // buffer for len
@@ -279,7 +287,7 @@ public class ProxyPacket {
 			System.out.println("SEND -> " + Thread.currentThread().getName()); //$NON-NLS-1$
 		}
 
-		fullWrite(channel, buffers.toArray(new ByteBuffer[0]), len);
+		fullWrite(channel, buffers, len);
 	}
 
 	/**
