@@ -193,9 +193,11 @@ public class SpawnerMiner extends Miner {
 			String directory = getString(theCommand, 2);
 			File dir = new File(directory);
 			
-			String[] envp = new String[theCommand.getNestedSize() -2];
-			for (int i = 3; i < theCommand.getNestedSize() - 1; i++) {
-				envp[i-3] = getString(theCommand, i);
+			int envSize = getInt(theCommand, 3);
+			
+			String[] envp = new String[envSize];
+			for (int i = 0; i < envSize; i++) {
+				envp[i] = getString(theCommand, i+4);
 			}
 			
 			
@@ -297,6 +299,12 @@ public class SpawnerMiner extends Miner {
 	private String getString(DataElement command, int index) {
 		DataElement element = getCommandArgument(command, index);
 		return element.getName();
+	}
+	
+	private int getInt(DataElement command, int index) {
+		DataElement element = getCommandArgument(command, index);
+		Integer i = new Integer(element.getName());
+		return i.intValue();
 	}
 
 	/* (non-Javadoc)
