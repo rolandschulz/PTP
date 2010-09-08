@@ -196,17 +196,13 @@ public abstract class CElement implements ICElement, Serializable, IHasManagedLo
 	protected ASTAccessVisibility getVisibility(IBinding binding) {
 		if (binding instanceof ICPPMember) {
 			ICPPMember member= (ICPPMember) binding;
-			try {
-				switch (member.getVisibility()) {
-				case ICPPMember.v_private:
-					return ASTAccessVisibility.PRIVATE;
-				case ICPPMember.v_protected:
-					return ASTAccessVisibility.PROTECTED;
-				case ICPPMember.v_public:
-					return ASTAccessVisibility.PUBLIC;
-				}
-			} catch (DOMException e) {
-				RDTLog.logError(e);
+			switch (member.getVisibility()) {
+			case ICPPMember.v_private:
+				return ASTAccessVisibility.PRIVATE;
+			case ICPPMember.v_protected:
+				return ASTAccessVisibility.PROTECTED;
+			case ICPPMember.v_public:
+				return ASTAccessVisibility.PUBLIC;
 			}
 		}
 		return ASTAccessVisibility.PUBLIC;

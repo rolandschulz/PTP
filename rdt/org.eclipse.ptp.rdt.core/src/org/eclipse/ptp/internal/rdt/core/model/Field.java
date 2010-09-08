@@ -40,20 +40,16 @@ public class Field extends VariableDeclaration implements IField {
 		super(parent, ICElement.C_FIELD, binding);
 		if (binding instanceof ICPPMember) {
 			ICPPMember member= (ICPPMember) binding;
-			try {
-				switch (member.getVisibility()) {
-				case ICPPMember.v_private:
-					fVisibility = ASTAccessVisibility.PRIVATE;
-					break;
-				case ICPPMember.v_protected:
-					fVisibility = ASTAccessVisibility.PROTECTED;
-					break;
-				case ICPPMember.v_public:
-					fVisibility = ASTAccessVisibility.PUBLIC;
-					break;
-				}
-			} catch (DOMException e) {
-				RDTLog.logError(e);
+			switch (member.getVisibility()) {
+			case ICPPMember.v_private:
+				fVisibility = ASTAccessVisibility.PRIVATE;
+				break;
+			case ICPPMember.v_protected:
+				fVisibility = ASTAccessVisibility.PROTECTED;
+				break;
+			case ICPPMember.v_public:
+				fVisibility = ASTAccessVisibility.PUBLIC;
+				break;
 			}
 		}
 	}
