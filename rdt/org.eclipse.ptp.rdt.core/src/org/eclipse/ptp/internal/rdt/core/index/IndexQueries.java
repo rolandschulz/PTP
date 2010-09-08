@@ -98,57 +98,53 @@ public class IndexQueries {
 	}
 
 	private static boolean checkBinding(IIndexBinding binding, ICElement element) {
-		try {
-			switch(element.getElementType()) {
-			case ICElement.C_ENUMERATION:
-				return binding instanceof IEnumeration;
-			case ICElement.C_NAMESPACE:
-				return binding instanceof ICPPNamespace;
-			case ICElement.C_STRUCT_DECLARATION:
-			case ICElement.C_STRUCT:
-				return binding instanceof ICompositeType && 
-					((ICompositeType) binding).getKey() == ICompositeType.k_struct;
-			case ICElement.C_CLASS:
-			case ICElement.C_CLASS_DECLARATION:
-				return binding instanceof ICPPClassType && 
-					((ICompositeType) binding).getKey() == ICPPClassType.k_class;
-			case ICElement.C_UNION:
-			case ICElement.C_UNION_DECLARATION:
-				return binding instanceof ICompositeType && 
-					((ICompositeType) binding).getKey() == ICompositeType.k_union;
-			case ICElement.C_TYPEDEF:
-				return binding instanceof ITypedef;
-			case ICElement.C_METHOD:	
-			case ICElement.C_METHOD_DECLARATION:
-				return binding instanceof ICPPMethod;
-			case ICElement.C_FIELD:
-				return binding instanceof IField;
-			case ICElement.C_FUNCTION:	
-			case ICElement.C_FUNCTION_DECLARATION:
-				return binding instanceof ICPPFunction && !(binding instanceof ICPPMethod);
-			case ICElement.C_VARIABLE:
-			case ICElement.C_VARIABLE_DECLARATION:
-				return binding instanceof IVariable;
-			case ICElement.C_ENUMERATOR:
-				return binding instanceof IEnumerator;
-			case ICElement.C_TEMPLATE_CLASS:
-			case ICElement.C_TEMPLATE_CLASS_DECLARATION:
-			case ICElement.C_TEMPLATE_STRUCT:
-			case ICElement.C_TEMPLATE_STRUCT_DECLARATION:
-			case ICElement.C_TEMPLATE_UNION:
-			case ICElement.C_TEMPLATE_UNION_DECLARATION:
-				return binding instanceof ICPPClassTemplate;
-			case ICElement.C_TEMPLATE_FUNCTION:
-			case ICElement.C_TEMPLATE_FUNCTION_DECLARATION:
-				return binding instanceof ICPPFunctionTemplate && !(binding instanceof ICPPMethod);
-			case ICElement.C_TEMPLATE_METHOD_DECLARATION:
-			case ICElement.C_TEMPLATE_METHOD:
-				return binding instanceof ICPPFunctionTemplate && binding instanceof ICPPMethod;
-			case ICElement.C_TEMPLATE_VARIABLE:
-				return binding instanceof ICPPTemplateParameter;
-			}
-		} catch (DOMException e) {
-			// index bindings don't throw the DOMException.
+		switch(element.getElementType()) {
+		case ICElement.C_ENUMERATION:
+			return binding instanceof IEnumeration;
+		case ICElement.C_NAMESPACE:
+			return binding instanceof ICPPNamespace;
+		case ICElement.C_STRUCT_DECLARATION:
+		case ICElement.C_STRUCT:
+			return binding instanceof ICompositeType && 
+				((ICompositeType) binding).getKey() == ICompositeType.k_struct;
+		case ICElement.C_CLASS:
+		case ICElement.C_CLASS_DECLARATION:
+			return binding instanceof ICPPClassType && 
+				((ICompositeType) binding).getKey() == ICPPClassType.k_class;
+		case ICElement.C_UNION:
+		case ICElement.C_UNION_DECLARATION:
+			return binding instanceof ICompositeType && 
+				((ICompositeType) binding).getKey() == ICompositeType.k_union;
+		case ICElement.C_TYPEDEF:
+			return binding instanceof ITypedef;
+		case ICElement.C_METHOD:	
+		case ICElement.C_METHOD_DECLARATION:
+			return binding instanceof ICPPMethod;
+		case ICElement.C_FIELD:
+			return binding instanceof IField;
+		case ICElement.C_FUNCTION:	
+		case ICElement.C_FUNCTION_DECLARATION:
+			return binding instanceof ICPPFunction && !(binding instanceof ICPPMethod);
+		case ICElement.C_VARIABLE:
+		case ICElement.C_VARIABLE_DECLARATION:
+			return binding instanceof IVariable;
+		case ICElement.C_ENUMERATOR:
+			return binding instanceof IEnumerator;
+		case ICElement.C_TEMPLATE_CLASS:
+		case ICElement.C_TEMPLATE_CLASS_DECLARATION:
+		case ICElement.C_TEMPLATE_STRUCT:
+		case ICElement.C_TEMPLATE_STRUCT_DECLARATION:
+		case ICElement.C_TEMPLATE_UNION:
+		case ICElement.C_TEMPLATE_UNION_DECLARATION:
+			return binding instanceof ICPPClassTemplate;
+		case ICElement.C_TEMPLATE_FUNCTION:
+		case ICElement.C_TEMPLATE_FUNCTION_DECLARATION:
+			return binding instanceof ICPPFunctionTemplate && !(binding instanceof ICPPMethod);
+		case ICElement.C_TEMPLATE_METHOD_DECLARATION:
+		case ICElement.C_TEMPLATE_METHOD:
+			return binding instanceof ICPPFunctionTemplate && binding instanceof ICPPMethod;
+		case ICElement.C_TEMPLATE_VARIABLE:
+			return binding instanceof ICPPTemplateParameter;
 		}
 		return false;
 	}
