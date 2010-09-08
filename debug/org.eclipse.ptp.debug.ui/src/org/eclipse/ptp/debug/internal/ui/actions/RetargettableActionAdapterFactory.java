@@ -24,29 +24,32 @@ import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class RetargettableActionAdapterFactory implements IAdapterFactory {
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
+	 * java.lang.Class)
 	 */
-	public Object getAdapter( Object adaptableObject, Class adapterType) {
-		if (adapterType == IToggleBreakpointsTarget.class) {
-			return new ToggleBreakpointAdapter();
-		}
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == IRunToLineTarget.class) {
 			return new RunToLineAdapter();
-		} 
+		}
 		if (adapterType == IResumeAtLineTarget.class) {
 			return new ResumeAtLineAdapter();
-		} 
+		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
 	public Class[] getAdapterList() {
-		return new Class[]{IRunToLineTarget.class, IToggleBreakpointsTarget.class, IResumeAtLineTarget.class};
+		return new Class[] { IRunToLineTarget.class, IToggleBreakpointsTarget.class, IResumeAtLineTarget.class };
 	}
 }
