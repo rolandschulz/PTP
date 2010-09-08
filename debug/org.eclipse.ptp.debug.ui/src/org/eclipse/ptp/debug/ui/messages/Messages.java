@@ -163,6 +163,8 @@ public class Messages extends NLS {
 	public static String PTabItem_0;
 	public static String PTPDebugUIPlugin_1;
 	public static String PTPDebugUIPlugin_2;
+	public static String EditorToggleBreakpointsTargetFactory_0;
+	public static String EditorToggleBreakpointsTargetFactory_1;
 	public static String EditPExpressionAction_0;
 	public static String EditPExpressionAction_1;
 	public static String EditPExpressionAction_2;

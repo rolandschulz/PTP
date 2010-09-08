@@ -642,6 +642,25 @@
                menubarPath="add"
                id="org.eclipse.ui.texteditor.BookmarkRulerAction">
          </action>
+         <action
+               class="org.eclipse.debug.ui.actions.RulerBreakpointTypesActionDelegate"
+               id="org.eclipse.ptp.rdt.ui.editors.BreakpointTypesAction"
+               label="%BreakpointTypes.name"
+               menubarPath="debug"
+               style="pulldown">
+         </action>
+         <action
+               class="org.eclipse.cdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+               id="org.eclipse.ptp.rdt.ui.editors.EnableDisableBreakpointRulerActionDelegate"
+               label="%DisableBreakpoint.name"
+               menubarPath="debug">
+         </action>
+         <action
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               id="org.eclipse.ptp.rdt.ui.editors.RulerToggleBreakpointAction"
+               label="%ToggleBreakpoint.name"
+               menubarPath="debug">
+         </action>
          <!-- requires org.eclipse.cdt.internal.ui.text.correction package
          <action
                class="org.eclipse.cdt.internal.ui.text.correction.CSelectRulerAction"
@@ -782,6 +801,20 @@
               id="org.eclipse.ptp.rdt.ui.preferences.RemotePrefPage_Env"
               name="%Environment">
         </page>
+     </extension>
+     <extension
+           point="org.eclipse.ui.editorActions">
+        <editorContribution
+              id="org.eclipse.ptp.rdt.ui.editors.RemoteCEditor.BreakpointRulerActions"
+              targetID="org.eclipse.ptp.rdt.ui.editor.CEditor">
+           <action
+                 actionID="RulerDoubleClick"
+                 class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+                 id="org.eclipse.ptp.rdt.ui.editors.RemoteCEditor.RulerToggleBreakpointAction"
+                 label="%ToggleBreakpointAction.name"
+                 style="push">
+           </action>
+        </editorContribution>
      </extension>
        <extension point="org.eclipse.ui.popupMenus">
       <objectContribution

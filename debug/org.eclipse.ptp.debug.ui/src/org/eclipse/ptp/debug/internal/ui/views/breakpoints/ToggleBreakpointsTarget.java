@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 The Regents of the University of California. 
+ * Copyright (c) 2005, 2010 The Regents of the University of California and others. 
  * This material was produced under U.S. Government contract W-7405-ENG-36 
  * for Los Alamos National Laboratory, which is operated by the University 
  * of California for the U.S. Department of Energy. The U.S. Government has 
@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.actions;
+package org.eclipse.ptp.debug.internal.ui.views.breakpoints;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
+import org.eclipse.debug.ui.actions.IToggleBreakpointsTargetExtension;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -53,30 +53,128 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
+public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtension {
+	private class BreakpointLocationVerifier {
+		/**
+		 * Get valid address breakpoint location
+		 * 
+		 * @param doc
+		 * @param lineNumber
+		 * @return
+		 */
+		public int getValidAddressBreakpointLocation(IDocument doc, int lineNumber) {
+			return lineNumber + 1;
+		}
+
+		/**
+		 * Get valid line breakpoint location
+		 * 
+		 * @param doc
+		 * @param lineNumber
+		 * @return
+		 */
+		public int getValidLineBreakpointLocation(IDocument doc, int lineNumber) {
+			return lineNumber + 1;
+		}
+	}
+
+	/**
+	 * Get resource
+	 * 
+	 * @param part
+	 * @return
+	 */
+	protected static IResource getResource(IWorkbenchPart part) {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		if (part instanceof IEditorPart) {
+			IEditorInput editorInput = ((IEditorPart) part).getEditorInput();
+			if (editorInput instanceof IFileEditorInput) {
+				return ((IFileEditorInput) editorInput).getFile();
+			}
+			ILocationProvider provider = (ILocationProvider) editorInput.getAdapter(ILocationProvider.class);
+			if (provider != null) {
+				IPath location = provider.getPath(editorInput);
+				IFile[] files = root.findFilesForLocation(location);
+				if (files.length > 0)
+					return files[0];
+			}
+		}
+		return root;
+	}
+
 	private UIDebugManager uiDebugManager = null;
-	/** Constructor
+
+	/**
+	 * Constructor
 	 * 
 	 */
-	public ToggleBreakpointAdapter() {
+	public ToggleBreakpointsTarget() {
 		uiDebugManager = PTPDebugUIPlugin.getUIDebugManager();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+
+	public boolean canToggleBreakpoints(IWorkbenchPart part, ISelection selection) {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#
+	 * canToggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart,
+	 * org.eclipse.jface.viewers.ISelection)
+	 */
+	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
+		/*
+		 * TODO DisassemblyView
+		 */
+		return (selection instanceof ITextSelection);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#
+	 * canToggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart,
+	 * org.eclipse.jface.viewers.ISelection)
+	 */
+	public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleWatchpoints
+	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
+	public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection) {
+		// FIXME: not implemented yet
+		return false;
+	}
+
+	public void toggleBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
+		toggleLineBreakpoints(part, selection);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleLineBreakpoints
+	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 		String errorMessage = null;
 		if (part instanceof ITextEditor) {
-			ITextEditor textEditor = (ITextEditor)part;
+			ITextEditor textEditor = (ITextEditor) part;
 			IEditorInput input = textEditor.getEditorInput();
 			if (input == null) {
 				errorMessage = Messages.ToggleBreakpointAdapter_Empty_editor_1;
-			}
-			else {
-				IDocument document = textEditor.getDocumentProvider().getDocument( input );
+			} else {
+				IDocument document = textEditor.getDocumentProvider().getDocument(input);
 				if (document == null) {
 					errorMessage = Messages.ToggleBreakpointAdapter_Missing_document_1;
 				} else {
@@ -85,20 +183,23 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 						errorMessage = Messages.ToggleBreakpointAdapter_Missing_resource_1;
 					} else {
 						BreakpointLocationVerifier bv = new BreakpointLocationVerifier();
-						int lineNumber = bv.getValidLineBreakpointLocation(document, ((ITextSelection)selection).getStartLine());
+						int lineNumber = bv.getValidLineBreakpointLocation(document, ((ITextSelection) selection).getStartLine());
 						if (lineNumber == -1) {
 							errorMessage = Messages.ToggleBreakpointAdapter_Invalid_line_1;
 						} else {
 							IPJob job = uiDebugManager.getJob();
 							String sid = uiDebugManager.getCurrentSetId();
-							sid = (sid == null || sid.length() == 0)?IElementHandler.SET_ROOT_ID:sid;
+							sid = (sid == null || sid.length() == 0) ? IElementHandler.SET_ROOT_ID : sid;
 							String sourceHandle = getSourceHandle(input);
 							IPLineBreakpoint[] breakpoints = PDebugModel.lineBreakpointsExists(sourceHandle, resource, lineNumber);
-							if (breakpoints.length > 0) {// remove breakpoint if found any breakpoint in current job
+							if (breakpoints.length > 0) {// remove breakpoint if
+															// found any
+															// breakpoint in
+															// current job
 								IPLineBreakpoint breakpoint = PDebugModel.lineBreakpointExists(breakpoints, job);
 								if (breakpoint != null) {
 									if (breakpoint.isGlobal() && job == null) {
-										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);												
+										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 									} else {
 										IPSession session = PTPDebugCorePlugin.getDebugModel().getSession(job);
 										if (session != null) {
@@ -106,7 +207,8 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 										}
 									}
 								} else {// create a new breakpoint
-									PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job); //$NON-NLS-1$
+									PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0,
+											"", true, sid, job); //$NON-NLS-1$
 								}
 							} else {// no breakpoint found and create a new one
 								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, job); //$NON-NLS-1$
@@ -116,58 +218,63 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			errorMessage = Messages.ToggleBreakpointAdapter_Operation_is_not_supported_1;
 		}
-		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
+		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR,
+				errorMessage, null));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-	 */
-	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
-		/*
-		 * TODO DisassemblyView
-		 */
-		return (selection instanceof ITextSelection);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleMethodBreakpoints
+	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 		PDebugUtils.println("*** Not Implemented YET ***"); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-	 */
-	public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleWatchpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleWatchpoints
+	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 		// FIXME: not implemented yet
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleWatchpoints(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	/**
+	 * Get source handle
+	 * 
+	 * @param input
+	 * @return
+	 * @throws CoreException
 	 */
-	public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection) {
-		// FIXME: not implemented yet
-		return false;
+	private String getSourceHandle(IEditorInput input) throws CoreException {
+		if (input instanceof IFileEditorInput) {
+			return ((IFileEditorInput) input).getFile().getProjectRelativePath().toOSString();
+		}
+		if (input instanceof IStorageEditorInput) {
+			return ((IStorageEditorInput) input).getStorage().getFullPath().toOSString();
+		}
+		/*
+		 * TODO DisassemblyView
+		 */
+		return ""; //$NON-NLS-1$
 	}
 
-	/** report
+	/**
+	 * report
+	 * 
 	 * @param message
 	 * @param part
 	 */
 	protected void report(String message, IWorkbenchPart part) {
-		IEditorStatusLine statusLine = (IEditorStatusLine)part.getAdapter(IEditorStatusLine.class);
+		IEditorStatusLine statusLine = (IEditorStatusLine) part.getAdapter(IEditorStatusLine.class);
 		if (statusLine != null) {
 			if (message != null)
 				statusLine.setMessage(true, message, null);
@@ -176,64 +283,6 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		}
 		if (message != null && PTPDebugUIPlugin.getActiveWorkbenchShell() != null) {
 			PTPDebugUIPlugin.getActiveWorkbenchShell().getDisplay().beep();
-		}
-	}
-	/** Get resource
-	 * @param part
-	 * @return
-	 */
-	protected static IResource getResource(IWorkbenchPart part) {
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		if ( part instanceof IEditorPart ) {
-			IEditorInput editorInput = ((IEditorPart)part).getEditorInput();
-			if ( editorInput instanceof IFileEditorInput ) {
-				return ((IFileEditorInput)editorInput).getFile();
-			}
-			ILocationProvider provider = (ILocationProvider)editorInput.getAdapter( ILocationProvider.class );
-			if ( provider != null ) {
-				IPath location = provider.getPath( editorInput );
-				IFile[] files = root.findFilesForLocation( location );
-				if ( files.length > 0 )
-					return files[0];
-			}
-		}
-		return root;
-	}
-
-	/** Get source handle
-	 * @param input
-	 * @return
-	 * @throws CoreException
-	 */
-	private String getSourceHandle(IEditorInput input) throws CoreException {
-		if (input instanceof IFileEditorInput) {
-			return ((IFileEditorInput)input).getFile().getProjectRelativePath().toOSString();
-		}
-		if (input instanceof IStorageEditorInput) {
-			return ((IStorageEditorInput)input).getStorage().getFullPath().toOSString();
-		}
-		/*
-		 * TODO DisassemblyView
-		 */
-		return ""; //$NON-NLS-1$
-	}
-
-	private class BreakpointLocationVerifier {
-		/** Get valid line breakpoint location
-		 * @param doc
-		 * @param lineNumber
-		 * @return
-		 */
-		public int getValidLineBreakpointLocation(IDocument doc, int lineNumber) {
-			return lineNumber + 1;
-		}
-		/** Get valid address breakpoint location
-		 * @param doc
-		 * @param lineNumber
-		 * @return
-		 */
-		public int getValidAddressBreakpointLocation(IDocument doc, int lineNumber) {
-			return lineNumber + 1;
 		}
 	}
 }

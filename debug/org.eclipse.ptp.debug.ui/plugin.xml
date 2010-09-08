@@ -209,78 +209,10 @@
 			</action>
 		</actionSet>
 	</extension>
+	
 	<!-- poupup menus //-->
 	<extension
 		point="org.eclipse.ui.popupMenus">
-		<viewerContribution
-			targetID="#CEditorRulerContext"
-			id="org.eclipse.ptp.debug.ui.CEditorRulerActions">
-			<menu
-				label="%EditorRulerAction.label"
-				path="debug"
-				id="org.eclipse.ptp.debug.ui.popupmenu.submenu">
-				<groupMarker
-					name="ptpGroup">
-				</groupMarker>
-			</menu>
-			<action
-				label="%PBreakpointProperties.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
-				menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup"
-				id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate">
-			</action>
-			<action
-				label="%EnableDisableBreakpoint.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-				menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup"
-				id="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
-			</action>
-			<action
-				label="%ToggleBreakpoint.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-				menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup"
-				id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
-			</action>
-		</viewerContribution>
-		<!--//
-		<viewerContribution
-			targetID="#CEditorContext"
-			id="org.eclipse.cdt.debug.ui.CEditorPopupActions">
-			<visibility>
-				<and>
-					<systemProperty
-						value="true"
-						name="org.eclipse.ptp.debug.ui.debuggerActive"/>
-					<objectClass name="org.eclipse.jface.text.ITextSelection"/>
-				</and>
-			</visibility>
-			<action
-				label="%AddExpressionAction.label"
-				icon="icons/debug/ptp_bpt_set.gif"
-				helpContextId="add_expression_action_context"
-				class="org.eclipse.ptp.debug.internal.ui.actions.AddExpressionEditorActionDelegate"
-				menubarPath="additions"
-				id="org.eclipse.ptp.debug.internal.ui.actions.AddExpressionActionDelegate">
-			</action>
-			<action
-				label="%JumpToLineAction.label"
-				icon="icons/debug/ptp_bpt_set.gif"
-				helpContextId="jump_to_line_action_context"
-				class="org.eclipse.ptp.debug.internal.ui.actions.ResumeAtLineActionDelegate"
-				menubarPath="additions"
-				enablesFor="1"
-				id="org.eclipse.ptp.debug.internal.ui.actions.JumpToLineActionDelegate">
-			</action>
-			<action
-				helpContextId="run_to_line_action_context"
-				label="%RunToLineAction.label"
-				definitionId="org.eclipse.debug.ui.commands.RunToLine"
-				class="org.eclipse.debug.ui.actions.RunToLineActionDelegate"
-				menubarPath="additions"
-				id="org.eclipse.ptp.debug.ui.actions.popup.RunToLine">
-			</action>
-		</viewerContribution>
-		//-->
 		<viewerContribution
 			targetID="org.eclipse.debug.ui.BreakpointView"
 			id="org.eclipse.ptp.debug.ui.breakpointview.popupMenu">
@@ -304,32 +236,6 @@
 				id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesAction">
 			</action>
 		</objectContribution>      
-		<!-- variable start -->
-		<!--
-		<objectContribution
-			objectClass="org.eclipse.ptp.debug.core.model.IPVariable"
-			id="org.eclipse.ptp.debug.ui.PVariableActions">
-			<menu
-				label="PVariableMenu"
-				id="org.eclipse.ptp.debug.ui.PVariableMenu">
-				<separator
-					name="pVarGroup">
-				</separator>
-			</menu>
-			<action
-				helpContextId="ptp_add_variable_action_context"
-				label="%AddPVariableAction.label"
-				tooltip="%AddPVariableAction.tooltip"
-				icon="icons/debug/ptp_bpt_set.gif"
-				menubarPath="pVarGroup"
-				enablesFor="1"
-				class="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate"
-				id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
-			</action>
-		</objectContribution>
-		//-->
-		<!-- variable end -->
-		<!-- signal start -->
 		<objectContribution
 			objectClass="org.eclipse.ptp.debug.core.model.IPSignal"
 			id="org.eclipse.ptp.debug.ui.SignalActions">
@@ -367,8 +273,6 @@
 			objectClass="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"
 			id="org.eclipse.ptp.debug.ui.DebugTargetActions">
 		</objectContribution>
-		<!-- signal end -->
-		<!-- debug view start -->
 		<viewerContribution
 			targetID="org.eclipse.debug.ui.DebugView"
 			id="org.eclipse.ptp.debug.ui.debugview.popupMenu">
@@ -411,211 +315,8 @@
 				<selection class="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"/>
 			</action>
 		</viewerContribution>
-	  	<viewerContribution
-	        id="org.eclipse.ptp.debug.ui.RemoteCEditorRulerActions"
-	        targetID="#RemoteCEditorRulerContext">
-	    	<menu
-				id="org.eclipse.ptp.debug.ui.popupmenu.submenu"
-				label="%EditorRulerAction.label"
-				path="debug">
-				<groupMarker
-					name="ptpGroup">
-		        </groupMarker>
-	     	</menu>
-	     	<action
-	           class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
-	           id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
-	           label="%PBreakpointProperties.label"
-	           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
-	    	</action>
-	     	<action
-	           class="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-	           id="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-	           label="%EnableDisableBreakpoint.label"
-	           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
-	     	</action>
-	     	<action
-	           class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-	           id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-	           label="%ToggleBreakpoint.label"
-	           menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup">
-	     	</action>
-	  	</viewerContribution>
-		<!-- debug view end -->
-		<!-- variable view start -->
-		<!--//
-		<viewerContribution
-			targetID="org.eclipse.debug.ui.VariableView"
-			id="org.eclipse.ptp.debug.ui.variablesView.popupMenu">
-			<action
-				helpContextId="remove_all_globals_action_context"
-				enablesFor="*"
-				label="%RemoveAllGlobalsAction.label"
-				tooltip="%RemoveAllGlobalsAction.tooltip"
-				icon="icons/rem_all_co.gif"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate"
-				menubarPath="additions"org.eclipse.cdt.debug.core.model.ICastToType
-				id="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui"/>
-				</enablement>
-			</action>
-			<action
-				helpContextId="remove_globals_action_context"
-				enablesFor="+"
-				label="%RemoveGlobalsAction.label"
-				tooltip="%RemoveGlobalsAction.tooltip"
-				icon="icons/rem_co.gif"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RemoveGlobalsActionDelegate"
-				menubarPath="additions"
-				id="org.eclipse.ptp.debug.internal.ui.actions.RemoveGlobalsActionDelegate">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui"/>
-				</enablement>
-			</action>
-			<action
-				helpContextId="add_globals_action_context"
-				enablesFor="1"
-				label="%AddGlobalsAction.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.AddGlobalsActionDelegate"
-				icon="icons/watch_globals.gif"
-				menubarPath="additions"
-				id="org.eclipse.ptp.debug.internal.ui.actions.AddGlobalsActionDelegate">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui"/>
-				</enablement>
-			</action>
-			<action
-				label="%DisableVariablesAction.label"
-				helpContextId="disable_variables_action_context"
-				tooltip="%DisableVariablesAction.tooltip"
-				class="org.eclipse.ptp.debug.internal.ui.actions.DisableVariablesActionDelegate"
-				menubarPath="variableGroup"
-				enablesFor="2+"
-				id="org.eclipse.ptp.debug.internal.ui.actions.DisableVariablesActionDelegate">
-				<selection
-					class="org.eclipse.ptp.debug.core.model.IPVariable">
-				</selection>
-			</action>
-			<action
-				label="%EnableVariablesAction.label"
-				helpContextId="enable_variables_action_context"
-				tooltip="%EnableVariablesAction.tooltip"
-				class="org.eclipse.ptp.debug.internal.ui.actions.EnableVariablesActionDelegate"
-				menubarPath="variableGroup"
-				enablesFor="2+"
-				id="org.eclipse.ptp.debug.internal.ui.actions.EnableVariablesActionDelegate">
-				<selection
-					class="org.eclipse.ptp.debug.core.model.IPVariable">
-				</selection>
-			</action>
-		</viewerContribution>
-		//-->
-		<!-- variable view end -->      
 	</extension>
 	
-	<!--
-	<extension
-		point="org.eclipse.ui.viewActions">
-	//-->
-		<!-- variable toolbar start //-->
-		<!--
-		<viewContribution
-			targetID="org.eclipse.debug.ui.VariableView"
-			id="org.eclipse.debug.ui.variablesView.toolbar">
-			<menu
-				label="PVariableMenu"
-				id="org.eclipse.ptp.debug.ui.PVariableMenu"
-				path="additions">
-				<separator name="pVarGroup" />
-			</menu>
-			<action
-				helpContextId="ptp_variables_dialog_action_context"
-				label="%OpenPVariableDialogAction.label"
-				tooltip="%OpenPVariableDialogAction.tooltip"
-				icon="icons/debug/ptp_bpt_set.gif"
-				toolbarPath="Normal/pVarGroup"
-				state="true"
-				class="org.eclipse.ptp.debug.internal.ui.actions.OpenPVariableDialogActionDelegate"
-				id="org.eclipse.ptp.debug.internal.ui.actions.OpenPVariableDialogActionDelegate">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui"/>
-				</enablement>
-			</action>
-			<action
-				helpContextId="ptp_update_all_variables_action_context"
-				label="%UpdateAllPVariableAction.label"
-				tooltip="%UpdateAllPVariableAction.tooltip"
-				icon="icons/debug/ptp_bpt_set.gif"
-				toolbarPath="Normal/pVarGroup"
-				class="org.eclipse.ptp.debug.internal.ui.actions.UpdateVariablesActionDelegate"
-				id="org.eclipse.ptp.debug.internal.ui.actions.UpdateVariablesActionDelegate">
-			</action>
-			<action
-				helpContextId="ptp_remove_all_variables_action_context"
-				label="%RemoveAllPVariableAction.label"
-				tooltip="%RemoveAllPVariableAction.tooltip"
-				icon="icons/debug/ptp_bpt_set.gif"
-				toolbarPath="Normal/pVarGroup"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate"
-				id="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate">
-			</action>
-			<action
-				helpContextId="ptp_add_variable_action_context"
-				label="%AddPVariableAction.label"
-				tooltip="%AddPVariableAction.tooltip"
-				icon="icons/debug/ptp_bpt_set.gif"
-				toolbarPath="Normal/pVarGroup"
-				enablesFor="1"
-				class="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate"
-				id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
-			</action>
-		</viewContribution>
-		//-->
-		<!-- variable toolbar end //-->
-		<!--
-		<viewContribution
-			targetID="org.eclipse.debug.ui.BreakpointView"
-			id="org.eclipse.ptp.debug.ui.breakpointView.menu">
-			<action
-				label="%ShowFullPathsAction.label"
-				icon="icons/tool/show_paths.gif"
-				style="toggle"
-				tooltip="%ShowFullPathsAction.tooltip"
-				class="org.eclipse.ptp.debug.internal.ui.actions.ShowFullPathsAction"
-				menubarPath="pDebugActions"
-				id="org.eclipse.ptp.debug.internal.ui.actions.ShowFullPathsAction">
-			</action>
-		</viewContribution>
-		//-->
-	<!--
-	</extension>
-	//-->
-	
-	<!-- editor actions //-->
-	<!--
-	<extension
-		point="org.eclipse.ui.editorActions">
-		<editorContribution
-			targetID="org.eclipse.cdt.ui.editor.CEditor"
-			id="org.eclipse.ptp.debug.ui.CEditor.BreakpointRulerActions">
-			<action
-				label="%ToggleBreakpoint.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-				actionID="RulerDoubleClick"
-				id="org.eclipse.ptp.debug.ui.CEditor.ManageBreakpointRulerAction">
-			</action>
-		</editorContribution>
-	</extension>
-	//-->
 	<!-- text hovers //-->
 	<extension
 		point="org.eclipse.cdt.ui.textHovers">
@@ -640,14 +341,6 @@
 				</adapt>
 			</enabledWhen>
 		</page>
-		<!--
-		<page
-			adaptable="true"
-			objectClass="org.eclipse.ptp.debug.core.model.IPBreakpoint"
-			class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointFilteringPage"
-			name="%FilteringBreakpointPage.label"
-			id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.filtering"/>
-		//-->
 		<page
 			class="org.eclipse.ptp.debug.internal.ui.propertypages.SignalPropertyPage"
 			name="%CommonSignalPage.label"
@@ -805,23 +498,6 @@
 
 	<!-- runtime adapters //-->
 	<extension point="org.eclipse.core.runtime.adapters">
-		<!--factory 
-			class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
-			adaptableType="org.eclipse.cdt.internal.ui.editor.CEditor">
-			<adapter
-				type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
-			</adapter>
-			<adapter
-				type="org.eclipse.debug.ui.actions.IRunToLineTarget">
-			</adapter>
-		</factory>
-		<factory
-			class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory"
-			adaptableType="org.eclipse.ui.views.contentoutline.ContentOutline">
-			<adapter
-				type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
-			</adapter>
-		</factory-->
 		<factory
 			class="org.eclipse.ptp.debug.internal.ui.PBreakpointWorkbenchAdapterFactory"
 			adaptableType="org.eclipse.ptp.debug.core.model.IPBreakpoint">
@@ -867,5 +543,29 @@
 			icon="icons/obj16/mapping_obj.gif"
 			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.resourceMapping"/>
 	</extension>
+ <extension
+       point="org.eclipse.debug.ui.toggleBreakpointsTargetFactories">
+    <toggleTargetFactory
+          class="org.eclipse.ptp.debug.internal.ui.views.breakpoints.EditorToggleBreakpointsTargetFactory"
+          id="org.eclipse.ptp.debug.ui.views.breakpoints.toggleBreakpointsTargetFactory">
+       <enablement>
+          <with
+                variable="debugContext">
+             <iterate>
+                <or>
+                   <test
+                         property="org.eclipse.debug.ui.getModelIdentifier"
+                         value="org.eclipse.ptp.debug.core">
+                   </test>
+                   <test
+                         property="org.eclipse.debug.ui.getModelIdentifier"
+                         value="">
+                   </test>
+                </or>
+             </iterate>
+          </with>
+       </enablement>
+    </toggleTargetFactory>
+ </extension>
 
 </plugin>
