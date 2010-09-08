@@ -253,9 +253,6 @@ public class THGraph implements Serializable {
 						}
 					}
 				}
-			} catch (DOMException e) {
-				// index bindings should not throw this kind of exception, might as well log it.
-				RDTLog.logError(e);
 			} catch (CoreException e) {
 				RDTLog.logError(e);
 			}
