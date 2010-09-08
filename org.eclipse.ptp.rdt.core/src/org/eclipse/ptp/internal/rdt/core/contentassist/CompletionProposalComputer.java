@@ -254,28 +254,22 @@ public class CompletionProposalComputer {
 
 	private void handleClass(ICPPClassType classType, IASTCompletionContext astContext, RemoteContentAssistInvocationContext context, int baseRelevance, List<Proposal> proposals) {
 		if (context.isContextInformationStyle()) {
-			try {
-				ICPPConstructor[] constructors = classType.getConstructors();
-				for (ICPPConstructor constructor : constructors) {
-					handleFunction(constructor, context, baseRelevance, proposals);
-				}
-			} catch (DOMException e) {
+			ICPPConstructor[] constructors = classType.getConstructors();
+			for (ICPPConstructor constructor : constructors) {
+				handleFunction(constructor, context, baseRelevance, proposals);
 			}
 		} else {
 			int relevance= 0;
-			try {
-				switch(classType.getKey()) {
-				case ICPPClassType.k_class:
-					relevance= RelevanceConstants.CLASS_TYPE_RELEVANCE;
-					break;
-				case ICompositeType.k_struct:
-					relevance= RelevanceConstants.STRUCT_TYPE_RELEVANCE;
-					break;
-				case ICompositeType.k_union:
-					relevance= RelevanceConstants.UNION_TYPE_RELEVANCE;
-					break;
-				}
-			} catch (DOMException exc) {
+			switch(classType.getKey()) {
+			case ICPPClassType.k_class:
+				relevance= RelevanceConstants.CLASS_TYPE_RELEVANCE;
+				break;
+			case ICompositeType.k_struct:
+				relevance= RelevanceConstants.STRUCT_TYPE_RELEVANCE;
+				break;
+			case ICompositeType.k_union:
+				relevance= RelevanceConstants.UNION_TYPE_RELEVANCE;
+				break;
 			}
 			if (astContext instanceof IASTName && !(astContext instanceof ICPPASTQualifiedName)) {
 				IASTName name= (IASTName)astContext;
@@ -484,54 +478,51 @@ public class CompletionProposalComputer {
 	}
 
 	private CompletionType getElementType(IBinding binding) {
-		try {
-			if (binding instanceof ITypedef) {
-				return new CompletionType(ICElement.C_TYPEDEF);
-			} else if (binding instanceof ICompositeType) {
-				if (((ICompositeType)binding).getKey() == ICPPClassType.k_class || binding instanceof ICPPClassTemplate)
-					return new CompletionType(ICElement.C_CLASS);
-				else if (((ICompositeType)binding).getKey() == ICompositeType.k_struct)
-					return new CompletionType(ICElement.C_STRUCT);
-				else if (((ICompositeType)binding).getKey() == ICompositeType.k_union)
-					return new CompletionType(ICElement.C_UNION);
-			} else if (binding instanceof ICPPMethod) {
-				switch (((ICPPMethod)binding).getVisibility()) {
-				case ICPPMember.v_private:
-					return new CompletionType(ICElement.C_METHOD, Visibility.Private);
-				case ICPPMember.v_protected:
-					return new CompletionType(ICElement.C_METHOD, Visibility.Protected);
-				default:
-					return new CompletionType(ICElement.C_METHOD, Visibility.Public);
-				}
-			} else if (binding instanceof IFunction) {
-				return new CompletionType(ICElement.C_FUNCTION);
-			} else if (binding instanceof ICPPField) {
-				switch (((ICPPField)binding).getVisibility()) {
-				case ICPPMember.v_private:
-					return new CompletionType(ICElement.C_FIELD, Visibility.Private);
-				case ICPPMember.v_protected:
-					return new CompletionType(ICElement.C_FIELD, Visibility.Protected);
-				default:
-					return new CompletionType(ICElement.C_FIELD, Visibility.Public);
-				}
-			} else if (binding instanceof IField) {
-				return new CompletionType(ICElement.C_FIELD, Visibility.Public);
-			} else if (binding instanceof IVariable) {
-				return new CompletionType(ICElement.C_VARIABLE);
-			} else if (binding instanceof IEnumeration) {
-				return new CompletionType(ICElement.C_ENUMERATION);
-            } else if (binding instanceof IEnumerator) {
-				return new CompletionType(ICElement.C_ENUMERATOR);
-            } else if (binding instanceof ICPPNamespace) {
-				return new CompletionType(ICElement.C_NAMESPACE);
-			} else if (binding instanceof ICPPFunctionTemplate) {
-				return new CompletionType(ICElement.C_FUNCTION);
-			} else if (binding instanceof ICPPUsingDeclaration) {
-				IBinding[] delegates = ((ICPPUsingDeclaration)binding).getDelegates();
-				if (delegates.length > 0)
-					return getElementType(delegates[0]);
+		if (binding instanceof ITypedef) {
+			return new CompletionType(ICElement.C_TYPEDEF);
+		} else if (binding instanceof ICompositeType) {
+			if (((ICompositeType)binding).getKey() == ICPPClassType.k_class || binding instanceof ICPPClassTemplate)
+				return new CompletionType(ICElement.C_CLASS);
+			else if (((ICompositeType)binding).getKey() == ICompositeType.k_struct)
+				return new CompletionType(ICElement.C_STRUCT);
+			else if (((ICompositeType)binding).getKey() == ICompositeType.k_union)
+				return new CompletionType(ICElement.C_UNION);
+		} else if (binding instanceof ICPPMethod) {
+			switch (((ICPPMethod)binding).getVisibility()) {
+			case ICPPMember.v_private:
+				return new CompletionType(ICElement.C_METHOD, Visibility.Private);
+			case ICPPMember.v_protected:
+				return new CompletionType(ICElement.C_METHOD, Visibility.Protected);
+			default:
+				return new CompletionType(ICElement.C_METHOD, Visibility.Public);
 			}
-		} catch (DOMException e) {
+		} else if (binding instanceof IFunction) {
+			return new CompletionType(ICElement.C_FUNCTION);
+		} else if (binding instanceof ICPPField) {
+			switch (((ICPPField)binding).getVisibility()) {
+			case ICPPMember.v_private:
+				return new CompletionType(ICElement.C_FIELD, Visibility.Private);
+			case ICPPMember.v_protected:
+				return new CompletionType(ICElement.C_FIELD, Visibility.Protected);
+			default:
+				return new CompletionType(ICElement.C_FIELD, Visibility.Public);
+			}
+		} else if (binding instanceof IField) {
+			return new CompletionType(ICElement.C_FIELD, Visibility.Public);
+		} else if (binding instanceof IVariable) {
+			return new CompletionType(ICElement.C_VARIABLE);
+		} else if (binding instanceof IEnumeration) {
+			return new CompletionType(ICElement.C_ENUMERATION);
+		} else if (binding instanceof IEnumerator) {
+			return new CompletionType(ICElement.C_ENUMERATOR);
+		} else if (binding instanceof ICPPNamespace) {
+			return new CompletionType(ICElement.C_NAMESPACE);
+		} else if (binding instanceof ICPPFunctionTemplate) {
+			return new CompletionType(ICElement.C_FUNCTION);
+		} else if (binding instanceof ICPPUsingDeclaration) {
+			IBinding[] delegates = ((ICPPUsingDeclaration)binding).getDelegates();
+			if (delegates.length > 0)
+				return getElementType(delegates[0]);
 		}
 		return null;
 	}

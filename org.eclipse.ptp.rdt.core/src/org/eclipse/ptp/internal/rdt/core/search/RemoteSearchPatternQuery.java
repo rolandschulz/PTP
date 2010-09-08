@@ -190,8 +190,6 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 			}
 		} catch (CoreException e) {
 			return e.getStatus();
-		} catch (DOMException e) {
-			return Util.createStatus(e);
 		}
 		
 		return Status.OK_STATUS;
