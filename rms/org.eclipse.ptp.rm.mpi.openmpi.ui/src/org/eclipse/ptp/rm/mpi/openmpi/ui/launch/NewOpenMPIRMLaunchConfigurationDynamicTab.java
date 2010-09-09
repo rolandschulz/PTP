@@ -21,6 +21,9 @@ import org.eclipse.ptp.rm.ui.launch.ExtendableRMLaunchConfigurationDynamicTab;
  */
 public class NewOpenMPIRMLaunchConfigurationDynamicTab extends ExtendableRMLaunchConfigurationDynamicTab {
 
+	/**
+	 * @since 2.0
+	 */
 	public NewOpenMPIRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		addDynamicTab(new BasicOpenMpiRMLaunchConfigurationDynamicTab(dialog));
