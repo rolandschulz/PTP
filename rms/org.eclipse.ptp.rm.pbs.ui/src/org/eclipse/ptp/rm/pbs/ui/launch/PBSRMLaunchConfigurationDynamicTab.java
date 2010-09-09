@@ -440,6 +440,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 
 	private static final String TAG_CURRENT_TEMPLATE = Messages.PBSRMLaunchConfigCurrentTemplate;
 
+	private ScrolledComposite parent;
 	private Composite childControl;
 	private Composite control;
 	private PBSRMLaunchDataSource dataSource;
@@ -484,15 +485,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * basis of the PBS Job Attributes present in the template.
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
-		if (parent instanceof ScrolledComposite) {
-			/*
-			 * turn off the expansion, else the dynamic repopulation will fail
-			 * to show the scroll bar
-			 */
-			ScrolledComposite scrolled = (ScrolledComposite) parent;
-			scrolled.setExpandHorizontal(false);
-			scrolled.setExpandVertical(false);
-		}
+		if (parent instanceof ScrolledComposite)
+			this.parent = (ScrolledComposite) parent;
 		control = WidgetUtils.createComposite(parent, 2);
 		populateControl();
 	}
@@ -722,7 +716,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 * We need to repeat this (the ResourcesTab does it when it initially
 		 * builds the control) because this method is called on updates as well.
 		 */
-		control.setSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		if (parent != null)
+			parent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	/*
