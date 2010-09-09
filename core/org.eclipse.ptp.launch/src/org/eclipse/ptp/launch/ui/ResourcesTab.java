@@ -470,7 +470,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				final Control dynControl = rmDynamicTab.getControl();
 				launchAttrsScrollComp.setContent(dynControl);
 				Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				dynControl.setSize(size);
+				launchAttrsScrollComp.setMinSize(size);
 				rmDynamicTab.initializeFrom(launchAttrsScrollComp, rm, queue, launchConfiguration);
 			} catch (CoreException e) {
 				setErrorMessage(e.getMessage());
