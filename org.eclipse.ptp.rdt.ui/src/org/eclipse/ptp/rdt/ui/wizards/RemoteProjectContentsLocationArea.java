@@ -18,6 +18,7 @@ import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -85,6 +86,8 @@ public class RemoteProjectContentsLocationArea {
 	private IProject fExistingProject;
 
 	private final IErrorMessageReporter fErrorReporter;
+	
+	private final IRunnableContext fContext;
 
 	private RemoteBuildServiceProvider fProvider;
 
@@ -116,8 +119,12 @@ public class RemoteProjectContentsLocationArea {
 	// throw new IllegalArgumentException(); // should never happen
 	// createContents(composite);
 	// }
-	public RemoteProjectContentsLocationArea(IErrorMessageReporter reporter, Composite composite) {
+	/**
+	 * @since 3.0
+	 */
+	public RemoteProjectContentsLocationArea(IErrorMessageReporter reporter, Composite composite, IRunnableContext context) {
 		fErrorReporter = reporter;
+		fContext = context;
 		createContents(composite);
 	}
 
@@ -357,7 +364,7 @@ public class RemoteProjectContentsLocationArea {
 		// IRemoteServices providerSelected = fProvider.getRemoteServices();
 
 		// populate the combo with a list of providers
-		IRemoteServices[] providers = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(fContext);
 		int toSelect = 0;
 
 		for (int k = 0; k < providers.length; k++) {
