@@ -63,11 +63,6 @@ public class PreferencePage extends AbstractBaseFieldEditorPreferencePage {
 		addField(userfield);
 
 		addField(new LabelFieldEditor(Messages.PreferencePage_HeaderLaunch, getFieldEditorParent()));
-
-		StringFieldEditor systemWorkspaceDir = new StringFieldEditor(ConfigFactory.ATTR_SYSTEM_WORKSPACE,
-				Messages.PreferencePage_LabelSystemWorkspace, getFieldEditorParent());
-		systemWorkspaceDir.setEmptyStringAllowed(false);
-		addField(systemWorkspaceDir);
 	}
 
 	@Override

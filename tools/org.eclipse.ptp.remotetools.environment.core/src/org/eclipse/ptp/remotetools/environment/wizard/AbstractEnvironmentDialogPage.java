@@ -11,9 +11,8 @@
  */
 package org.eclipse.ptp.remotetools.environment.wizard;
 
-import java.util.Map;
-
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -30,14 +29,16 @@ public abstract class AbstractEnvironmentDialogPage extends WizardPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+	 * @see
+	 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
-	abstract public void createControl(Composite parent);
+	public abstract void createControl(Composite parent);
 
-	final public boolean canFinish() {
+	public final boolean canFinish() {
 		String name = getName();
 		if (name != null) {
-			if (!name.equals("")) {  //$NON-NLS-1$
+			if (!name.equals("")) { //$NON-NLS-1$
 				return isValid();
 			}
 
@@ -50,15 +51,17 @@ public abstract class AbstractEnvironmentDialogPage extends WizardPage {
 	 * page. null is not allowed.
 	 * 
 	 * @return the configuration attributes map
+	 * @since 2.0
 	 */
-	abstract public Map getAttributes();
+	public abstract ControlAttributes getAttributes();
 
 	/**
 	 * Provides this configuration instance key name.
 	 * 
 	 * @returns the configuration's name
 	 */
-	abstract public String getName();
+	@Override
+	public abstract String getName();
 
 	/**
 	 * Returns weather this current page information represents a valid state of
@@ -66,6 +69,6 @@ public abstract class AbstractEnvironmentDialogPage extends WizardPage {
 	 * 
 	 * @return true if valid, false otherwise.
 	 */
-	abstract public boolean isValid();
+	public abstract boolean isValid();
 
 }

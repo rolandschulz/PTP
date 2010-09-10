@@ -15,13 +15,11 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @author Richard Maciel
- *
+ * 
  * @since 1.2.1
  */
-public class DefaultValues extends NLS
-{
+public class DefaultValues extends NLS {
 	private static final String BUNDLE_ID = "org.eclipse.ptp.remotetools.environment.generichost.conf.defaults"; //$NON-NLS-1$
-
 
 	public static String LOCALHOST_SELECTION;
 	public static String LOGIN_USERNAME;
@@ -32,8 +30,7 @@ public class DefaultValues extends NLS
 	public static String KEY_PATH;
 	public static String KEY_PASSPHRASE;
 	public static String IS_PASSWORD_AUTH;
-	public static String SYSTEM_WORKSPACE;
-	
+
 	static {
 		// load message values from bundle file
 		NLS.initializeMessages(BUNDLE_ID, DefaultValues.class);
@@ -43,5 +40,3 @@ public class DefaultValues extends NLS
 		// cannot create new instance
 	}
 }
-
-	

@@ -5,7 +5,7 @@
          point="org.eclipse.ptp.remotetools.environment.core.remoteEnvironmentControlDelegate">
       <control
             class="org.eclipse.ptp.remotetools.environment.generichost.core.Environment"
-            name="Generic Host"/>
+            name="Remote Host"/>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

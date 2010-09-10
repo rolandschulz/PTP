@@ -11,58 +11,50 @@
  */
 package org.eclipse.ptp.remotetools.environment.generichost.core;
 
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
+import org.eclipse.ptp.remotetools.core.IAuthInfo;
+import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
+import org.eclipse.ptp.remotetools.environment.control.ITargetConfig;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.environment.control.SSHTargetControl;
-import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
-import org.eclipse.ptp.remotetools.environment.extension.ITargetVariables;
 import org.eclipse.ptp.remotetools.environment.generichost.Activator;
 import org.eclipse.ptp.remotetools.environment.generichost.messages.Messages;
+import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
 /**
  * Controls an instance of a target created from the Environment.
+ * 
  * @author Daniel Felix Ferber
- * @since 1.2
+ * @since 1.4
  */
-public class TargetControl extends SSHTargetControl implements ITargetControl, ITargetVariables {
-
+public class TargetControl extends SSHTargetControl implements ITargetControl {
 	/**
 	 * Configuration provided to the target control.
 	 */
-	ConfigFactory configFactory;
-	TargetConfig currentTargetConfig;
-	
-	/**
-	 * Name of the target.
-	 */
-	//String name;
-	
+	private final ITargetConfig fTargetConfig;
+
 	/**
 	 * BackReference to the target element
 	 */
-	ITargetElement targetElement;
-	
+	private IRemoteExecutionManager executionManager;
+
 	/**
 	 * Current connection state.
 	 */
 	private int state;
+
 	private static final int NOT_OPERATIONAL = 1;
 	private static final int CONNECTING = 2;
 	private static final int CONNECTED = 3;
 	private static final int DISCONNECTING = 4;
-	
-	/**
-	 * Default cipher id
-	 */
-	public static final String DEFAULT_CIPHER = RemotetoolsPlugin.CIPHER_DEFAULT;
-	
+
+	private final IAuthInfo fAuthInfo;
+
 	/**
 	 * Creates a target control.
 	 * 
@@ -73,71 +65,137 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 	 * @throws CoreException
 	 *             Some attribute is not valid
 	 */
-	public TargetControl(ITargetElement element) throws CoreException {
+	public TargetControl(ITargetConfig config, IAuthInfo authInfo) throws CoreException {
 		super();
 		state = NOT_OPERATIONAL;
-		targetElement = element;
-		configFactory = new ConfigFactory(targetElement.getAttributes());
-		currentTargetConfig = configFactory.createTargetConfig();
+		fTargetConfig = config;
+		fAuthInfo = authInfo;
 	}
 
 	/**
-	 * Connect to the remote target.. On every error or possible failure, an exception
-	 * (CoreException) is thrown, whose (multi)status describe the error(s) that prevented creating the target control.
+	 * Connect to the remote target.. On every error or possible failure, an
+	 * exception (CoreException) is thrown, whose (multi)status describe the
+	 * error(s) that prevented creating the target control.
 	 * 
 	 * @param monitor
 	 *            Progress indicator or <code>null</code>
 	 * @return Always true.
 	 * @throws CoreException
-	 *             Some attribute is not valid, the simulator cannot be launched, the ssh failed to connect.
+	 *             Some attribute is not valid, the simulator cannot be
+	 *             launched, the ssh failed to connect.
 	 */
+	@Override
 	public boolean create(IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.TargetControl_create_MonitorConnecting, 1);
 		/*
-		 *  Connect to the remote temote target
+		 * Connect to the remote temote target
 		 */
-		if(currentTargetConfig.isPasswordAuth()) {
-			setConnectionParameters(
-					new SSHParameters(
-							currentTargetConfig.getConnectionAddress(),
-							currentTargetConfig.getConnectionPort(),
-							currentTargetConfig.getLoginUserName(),
-							currentTargetConfig.getLoginPassword(),
-							currentTargetConfig.getCipherType(),
-							currentTargetConfig.getConnectionTimeout()*1000
-					)
-				);
-		} else {
-			setConnectionParameters(
-					new SSHParameters(
-							currentTargetConfig.getConnectionAddress(),
-							currentTargetConfig.getConnectionPort(),
-							currentTargetConfig.getLoginUserName(),
-							currentTargetConfig.getKeyPath(),
-							currentTargetConfig.getKeyPassphrase(),
-							currentTargetConfig.getCipherType(),
-							currentTargetConfig.getConnectionTimeout()*1000
-					)
-				);
-		}
-		
+		setConnectionParameters(fTargetConfig, fAuthInfo);
+
 		try {
 			setState(CONNECTING);
+
 			super.create(monitor);
+
+			if (monitor.isCanceled()) {
+				disconnect();
+				setState(NOT_OPERATIONAL);
+				monitor.done();
+				return true;
+			}
+
 			setState(CONNECTED);
+
 			monitor.worked(1);
 		} catch (CoreException e) {
 			disconnect();
 			setState(NOT_OPERATIONAL);
+			monitor.done();
+			throw e;
+		}
+		try {
+			executionManager = super.createRemoteExecutionManager();
+		} catch (RemoteConnectionException e) {
+			disconnect();
+			setState(NOT_OPERATIONAL);
+			throw new CoreException(new Status(IStatus.ERROR, Activator.getUniqueIdentifier(), e.getMessage()));
 		}
 		monitor.done();
 		return true;
 	}
 
-	private synchronized void setState(int state) {
-		this.state = state;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#
+	 * createExecutionManager()
+	 */
+	public IRemoteExecutionManager createExecutionManager() throws RemoteConnectionException {
+		if (!isConnected()) {
+			throw new RemoteConnectionException(Messages.TargetControl_Connection_is_not_open);
+		}
+		return super.createRemoteExecutionManager();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#
+	 * createTargetSocket(int)
+	 */
+	@Override
+	public TargetSocket createTargetSocket(int port) {
+		Assert.isTrue(isConnected());
+		TargetSocket socket = new TargetSocket();
+		socket.host = fTargetConfig.getConnectionAddress();
+		socket.port = port;
+		return socket;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.ITargetControl#destroy()
+	 */
+	public void destroy() throws CoreException {
+		// End all jobs, if possible, then disconnect
+		try {
+			terminateJobs(null);
+		} finally {
+			disconnect();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.ITargetControl#getConfig
+	 * ()
+	 */
+	public ITargetConfig getConfig() {
+		return fTargetConfig;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#
+	 * getExecutionManager()
+	 */
+	public IRemoteExecutionManager getExecutionManager() {
+		return executionManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.SSHTargetControl#kill
+	 * (org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
 	public boolean kill(IProgressMonitor monitor) throws CoreException {
 		try {
 			setState(DISCONNECTING);
@@ -148,6 +206,12 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.ITargetControl#query()
+	 */
 	public synchronized int query() {
 		switch (state) {
 		case NOT_OPERATIONAL:
@@ -166,50 +230,44 @@ public class TargetControl extends SSHTargetControl implements ITargetControl, I
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.ITargetControl#resume
+	 * (org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public boolean resume(IProgressMonitor monitor) throws CoreException {
-		throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
+		throw new CoreException(new Status(IStatus.ERROR, Activator.getUniqueIdentifier(), 0,
 				Messages.TargetControl_resume_CannotResume, null));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remotetools.environment.control.ITargetControl#stop(org
+	 * .eclipse.core.runtime.IProgressMonitor)
+	 */
 	public boolean stop(IProgressMonitor monitor) throws CoreException {
-		throw new CoreException(new Status(IStatus.ERROR, getPluginId(), 0,
+		throw new CoreException(new Status(IStatus.ERROR, Activator.getUniqueIdentifier(), 0,
 				Messages.TargetControl_stop_CannotPause, null));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#
+	 * updateConfiguration()
+	 */
 	public void updateConfiguration() throws CoreException {
-		//targetElement.setName(name);
-		configFactory = new ConfigFactory(targetElement.getAttributes());
-		currentTargetConfig = configFactory.createTargetConfig();
+		// Nothing required
 	}
 
-	public String getName() {
-		return targetElement.getName();
-	}
-
-	protected String getPluginId() {
-		return Activator.getDefault().getBundle().getSymbolicName();
-	}
-	
-	public TargetSocket createTargetSocket(int port) {
-		Assert.isTrue(isConnected());
-		TargetSocket socket = new TargetSocket();
-		socket.host = currentTargetConfig.getConnectionAddress();
-		socket.port = port;
-		return socket;
-	}
-
-	public String getSystemWorkspace() {
-		return currentTargetConfig.getSystemWorkspace();
-	}
-
-	public void destroy() throws CoreException {
-		// End all jobs, if possible, then disconnect
-		try {
-			terminateJobs(null);
-		} finally {
-			disconnect();
-		}
-		
-		//setState(NOT_OPERATIONAL);
+	/**
+	 * @param state
+	 */
+	private synchronized void setState(int state) {
+		this.state = state;
 	}
 }

@@ -11,30 +11,34 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.environment.core;
 
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
-
+import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 
 public interface ITargetElement {
 
-	public abstract Map<String, String> getAttributes();
-
-	public abstract void setAttributes(Map<String, String> attributes);
-
-	public abstract String getName();
-
-	public abstract void setName(String name);
+	/**
+	 * @since 2.0
+	 */
+	public abstract ControlAttributes getAttributes();
 
 	public abstract ITargetControl getControl() throws CoreException;
 
-	public abstract TargetTypeElement getType();
+	public abstract String getId();
+
+	public abstract String getName();
 
 	public abstract int getStatus();
 
-	public abstract String toString();
+	public abstract TargetTypeElement getType();
 
-	public abstract String getId();
+	/**
+	 * @since 2.0
+	 */
+	public abstract void setAttributes(ControlAttributes attributes);
+
+	public abstract void setName(String name);
+
+	public abstract String toString();
 
 }

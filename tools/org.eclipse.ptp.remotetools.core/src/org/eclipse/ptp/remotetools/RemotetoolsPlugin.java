@@ -109,9 +109,7 @@ public class RemotetoolsPlugin extends Plugin {
 	 */
 	public static final String CIPHER_DEFAULT = org.eclipse.ptp.remotetools.internal.ssh.CipherTypes.CIPHER_DEFAULT;
 
-	public static Map getCipherTypesMap() {
-		HashMap map = new HashMap(CipherTypes.getCipherTypesMap());
-
-		return map;
+	public static Map<String, String> getCipherTypesMap() {
+		return new HashMap<String, String>(CipherTypes.getCipherTypesMap());
 	}
 }

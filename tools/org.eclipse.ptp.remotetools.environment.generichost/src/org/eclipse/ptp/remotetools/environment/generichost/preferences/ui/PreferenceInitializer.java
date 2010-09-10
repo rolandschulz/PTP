@@ -17,7 +17,6 @@ import org.eclipse.ptp.remotetools.environment.generichost.Activator;
 import org.eclipse.ptp.remotetools.environment.generichost.conf.DefaultValues;
 import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 
-
 /**
  * Initializes preference values
  * 
@@ -29,15 +28,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#
+	 * initializeDefaultPreferences()
 	 */
+	@Override
 	public void initializeDefaultPreferences() {
-		IPreferenceStore store = Activator.getDefault()//PreferencesPlugin.getDefault()
+		IPreferenceStore store = Activator.getDefault()// PreferencesPlugin.getDefault()
 				.getPreferenceStore();
 		store.setDefault(ConfigFactory.ATTR_LOGIN_USERNAME, DefaultValues.LOGIN_USERNAME);
 		store.setDefault(ConfigFactory.ATTR_CONNECTION_ADDRESS, DefaultValues.CONNECTION_ADDRESS);
 		store.setDefault(ConfigFactory.ATTR_CONNECTION_PORT, DefaultValues.CONNECTION_PORT);
-		store.setDefault(ConfigFactory.ATTR_SYSTEM_WORKSPACE, DefaultValues.SYSTEM_WORKSPACE);
 	}
 
 }

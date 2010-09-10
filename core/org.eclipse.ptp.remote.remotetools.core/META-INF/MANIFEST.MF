@@ -14,8 +14,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remotetools.utils,
  org.eclipse.ptp.remotetools.preferences
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.remote.remotetools.core,
- org.eclipse.ptp.remote.remotetools.core.environment,
- org.eclipse.ptp.remote.remotetools.core.environment.conf
+Export-Package: org.eclipse.ptp.remote.remotetools.core
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
