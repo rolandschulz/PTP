@@ -11,13 +11,12 @@
  */
 package org.eclipse.ptp.remotetools.environment.wizard;
 
-import java.util.Map;
-
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
+import org.eclipse.ptp.remotetools.utils.verification.ControlAttributes;
 
 /**
  * 
@@ -77,7 +76,7 @@ public class EnvironmentWizard extends Wizard {
 	public boolean performFinish() {
 		if (!cancel) {
 			AbstractEnvironmentDialogPage page = ((AbstractEnvironmentDialogPage) getStartingPage());
-			Map attributes = page.getAttributes();
+			ControlAttributes attributes = page.getAttributes();
 
 			if (attributes == null)
 				return false;

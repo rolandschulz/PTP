@@ -22,16 +22,17 @@ import org.eclipse.ptp.remotetools.environment.wizard.AbstractEnvironmentDialogP
  * Factory for the environment.
  * 
  * @author Daniel Felix Ferber
- * @since 1.2
+ * @since 1.4
  */
 public class Environment implements ITargetTypeExtension {
-
 	public Environment() {
 		super();
 	}
 
 	public ITargetControl controlFactory(ITargetElement element) throws CoreException {
-		return new TargetControl(element);
+		ConfigFactory factory = new ConfigFactory(element.getAttributes());
+		TargetConfig config = factory.createTargetConfig();
+		return new TargetControl(config, new AuthInfo(config));
 	}
 
 	public String[] getControlAttributeNames() {
@@ -49,4 +50,5 @@ public class Environment implements ITargetTypeExtension {
 	public String[] getControlAttributeNamesForCipheredKeys() {
 		return ConfigFactory.KEY_CIPHERED_ARRAY;
 	}
+
 }

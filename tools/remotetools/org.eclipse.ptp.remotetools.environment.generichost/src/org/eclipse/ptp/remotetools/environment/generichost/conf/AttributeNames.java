@@ -14,8 +14,9 @@ package org.eclipse.ptp.remotetools.environment.generichost.conf;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Defines names of attributes. Intended for an uniform and consistent use of names for
- * attributes in GUI, error messages and configuration files across plugins.
+ * Defines names of attributes. Intended for an uniform and consistent use of
+ * names for attributes in GUI, error messages and configuration files across
+ * plugins.
  * 
  * @author Daniel Felix Ferber
  * 
@@ -30,8 +31,7 @@ public class AttributeNames extends NLS {
 	public static String KEY_PATH;
 	public static String LOGIN_PASSWORD;
 	public static String LOGIN_USERNAME;
-	public static String SYSTEM_WORKSPACE;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, AttributeNames.class);
@@ -40,4 +40,3 @@ public class AttributeNames extends NLS {
 	private AttributeNames() {
 	}
 }
-

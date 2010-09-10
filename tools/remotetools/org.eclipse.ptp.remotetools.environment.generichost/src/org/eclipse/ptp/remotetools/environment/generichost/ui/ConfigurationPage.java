@@ -25,7 +25,6 @@ import org.eclipse.ptp.utils.ui.swt.AuthenticationFrame;
 import org.eclipse.ptp.utils.ui.swt.AuthenticationFrameMold;
 import org.eclipse.ptp.utils.ui.swt.ComboGroup;
 import org.eclipse.ptp.utils.ui.swt.ComboGroupItem;
-import org.eclipse.ptp.utils.ui.swt.Frame;
 import org.eclipse.ptp.utils.ui.swt.TextGroup;
 import org.eclipse.ptp.utils.ui.swt.TextMold;
 import org.eclipse.swt.SWT;
@@ -42,30 +41,21 @@ import org.eclipse.swt.widgets.Composite;
 public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 	ConfigFactory configFactory = null;
 
-	public ConfigurationPage(String targetName, Map attributesMap) {
+	public ConfigurationPage(String targetName, ControlAttributes attributesMap) {
 		super(targetName);
-
-		/*
-		 * if (targetName == null) { this.targetName =
-		 * Messages.ConfigurationPage_DefaultTargetName; } else {
-		 */
 		this.targetName = targetName;
-		// }
-
 		configFactory = new ConfigFactory(attributesMap);
 	}
 
 	public ConfigurationPage() {
 		super(Messages.ConfigurationPage_DefaultTargetName);
 		this.targetName = Messages.ConfigurationPage_DefaultTargetName;
-
 		configFactory = new ConfigFactory();
 	}
 
 	private String targetName;
 	private TextGroup targetNameGroup;
 	private AuthenticationFrame remoteAuthFrame;
-	private TextGroup systemWorkspaceGroup;
 
 	class DataModifyListener implements ModifyListener {
 		int counter = 0;
@@ -117,14 +107,6 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 
 		createAuthControl(topControl);
 
-		/*
-		 * System workspace
-		 */
-		Frame frame = new Frame(topControl, Messages.ConfigurationPage_0);
-		mold = new TextMold(TextMold.GRID_DATA_ALIGNMENT_FILL | TextMold.GRID_DATA_GRAB_EXCESS_SPACE,
-				Messages.ConfigurationPage_LabelSystemWorkspace);
-		systemWorkspaceGroup = new TextGroup(frame.getTopUserReservedComposite(), mold);
-
 		fillControls();
 		registerListeners();
 	}
@@ -133,30 +115,28 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 		dataModifyListener = new DataModifyListener();
 		targetNameGroup.addModifyListener(dataModifyListener);
 		remoteAuthFrame.addModifyListener(dataModifyListener);
-		systemWorkspaceGroup.addModifyListener(dataModifyListener);
 	}
 
 	private void fillControls() {
 		ControlAttributes attributes = configFactory.getAttributes();
 		targetNameGroup.setString(targetName);
 		remoteAuthFrame.setLocalhostSelected(attributes.getBoolean(ConfigFactory.ATTR_LOCALHOST_SELECTION));
-		remoteAuthFrame.setHostPort(attributes.getInteger(ConfigFactory.ATTR_CONNECTION_PORT));
+		remoteAuthFrame.setHostPort(attributes.getInt(ConfigFactory.ATTR_CONNECTION_PORT));
 		remoteAuthFrame.setHostAddress(attributes.getString(ConfigFactory.ATTR_CONNECTION_ADDRESS));
 		remoteAuthFrame.setUserName(attributes.getString(ConfigFactory.ATTR_LOGIN_USERNAME));
 		remoteAuthFrame.setPassword(attributes.getString(ConfigFactory.ATTR_LOGIN_PASSWORD));
 		remoteAuthFrame.setPublicKeyPath(attributes.getString(ConfigFactory.ATTR_KEY_PATH));
 		remoteAuthFrame.setPassphrase(attributes.getString(ConfigFactory.ATTR_KEY_PASSPHRASE));
-		remoteAuthFrame.setTimeout(attributes.getInteger(ConfigFactory.ATTR_CONNECTION_TIMEOUT));
+		remoteAuthFrame.setTimeout(attributes.getInt(ConfigFactory.ATTR_CONNECTION_TIMEOUT));
 		remoteAuthFrame.setPasswordBased(attributes.getBoolean(ConfigFactory.ATTR_IS_PASSWORD_AUTH));
-		systemWorkspaceGroup.setString(attributes.getString(ConfigFactory.ATTR_SYSTEM_WORKSPACE));
 
 		// Fill the combobox with available cipher types
-		Map cipherMap = TargetControl.getCipherTypesMap();
-		Set cKeySet = cipherMap.keySet();
+		Map<String, String> cipherMap = TargetControl.getCipherTypesMap();
+		Set<String> cKeySet = cipherMap.keySet();
 		ComboGroup cipherGroup = remoteAuthFrame.getCipherTypeGroup();
-		for (Iterator it = cKeySet.iterator(); it.hasNext();) {
-			String key = (String) it.next();
-			String value = (String) cipherMap.get(key);
+		for (Iterator<String> it = cKeySet.iterator(); it.hasNext();) {
+			String key = it.next();
+			String value = cipherMap.get(key);
 
 			cipherGroup.add(new ComboGroupItem(key, value));
 		}
@@ -169,17 +149,16 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 	private void readControls() {
 		ControlAttributes attributes = configFactory.getAttributes();
 		targetName = targetNameGroup.getString();
-		attributes.setBooleanAttribute(ConfigFactory.ATTR_LOCALHOST_SELECTION, remoteAuthFrame.isLocalhostSelected());
-		attributes.setStringAttribute(ConfigFactory.ATTR_LOGIN_USERNAME, remoteAuthFrame.getUserName());
-		attributes.setStringAttribute(ConfigFactory.ATTR_LOGIN_PASSWORD, remoteAuthFrame.getPassword());
-		attributes.setStringAttribute(ConfigFactory.ATTR_CONNECTION_ADDRESS, remoteAuthFrame.getHostAddress());
-		attributes.setStringAttribute(ConfigFactory.ATTR_CONNECTION_PORT, Integer.toString(remoteAuthFrame.getHostPort()));
-		attributes.setStringAttribute(ConfigFactory.ATTR_KEY_PATH, remoteAuthFrame.getPublicKeyPath());
-		attributes.setStringAttribute(ConfigFactory.ATTR_KEY_PASSPHRASE, remoteAuthFrame.getPassphrase());
-		attributes.setStringAttribute(ConfigFactory.ATTR_CONNECTION_TIMEOUT, Integer.toString(remoteAuthFrame.getTimeout()));
-		attributes.setBooleanAttribute(ConfigFactory.ATTR_IS_PASSWORD_AUTH, remoteAuthFrame.isPasswordBased());
-		attributes.setStringAttribute(ConfigFactory.ATTR_SYSTEM_WORKSPACE, systemWorkspaceGroup.getString());
-		attributes.setStringAttribute(ConfigFactory.ATTR_CIPHER_TYPE, remoteAuthFrame.getSelectedCipherType().getId());
+		attributes.setBoolean(ConfigFactory.ATTR_LOCALHOST_SELECTION, remoteAuthFrame.isLocalhostSelected());
+		attributes.setString(ConfigFactory.ATTR_LOGIN_USERNAME, remoteAuthFrame.getUserName());
+		attributes.setString(ConfigFactory.ATTR_LOGIN_PASSWORD, remoteAuthFrame.getPassword());
+		attributes.setString(ConfigFactory.ATTR_CONNECTION_ADDRESS, remoteAuthFrame.getHostAddress());
+		attributes.setString(ConfigFactory.ATTR_CONNECTION_PORT, Integer.toString(remoteAuthFrame.getHostPort()));
+		attributes.setString(ConfigFactory.ATTR_KEY_PATH, remoteAuthFrame.getPublicKeyPath());
+		attributes.setString(ConfigFactory.ATTR_KEY_PASSPHRASE, remoteAuthFrame.getPassphrase());
+		attributes.setString(ConfigFactory.ATTR_CONNECTION_TIMEOUT, Integer.toString(remoteAuthFrame.getTimeout()));
+		attributes.setBoolean(ConfigFactory.ATTR_IS_PASSWORD_AUTH, remoteAuthFrame.isPasswordBased());
+		attributes.setString(ConfigFactory.ATTR_CIPHER_TYPE, remoteAuthFrame.getSelectedCipherType().getId());
 	}
 
 	private void createAuthControl(Composite topControl) {
@@ -203,14 +182,11 @@ public class ConfigurationPage extends AbstractEnvironmentDialogPage {
 		amold.setLabelUserName(Messages.ConfigurationPage_LabelUserName);
 
 		this.remoteAuthFrame = new AuthenticationFrame(topControl, amold);
-		// remoteAuthFrame.setLayoutData(new GridData(GridData.FILL_BOTH |
-		// GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-		// remoteAuthFrame.addModifyListener(dataModifyListener);
 	}
 
 	@Override
-	public Map getAttributes() {
-		return configFactory.getMap();
+	public ControlAttributes getAttributes() {
+		return configFactory.getAttributes();
 	}
 
 	@Override

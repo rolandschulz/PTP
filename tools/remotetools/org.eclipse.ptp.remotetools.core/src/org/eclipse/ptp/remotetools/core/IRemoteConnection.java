@@ -37,7 +37,7 @@ public interface IRemoteConnection {
 	 * Connect to the remote machine. The {@link #disconnect()} method must be
 	 * called before this method if the connection was dropped for some reason.
 	 * 
-	 * @param authToken
+	 * @param authInfo
 	 *            authentication information for connection
 	 * @param hostname
 	 *            host to connect to
@@ -50,9 +50,9 @@ public interface IRemoteConnection {
 	 * @param monitor
 	 *            progress monitor
 	 * @throws RemoteConnectionException
-	 * @since 3.0
+	 * @since 4.0
 	 */
-	public void connect(AuthToken authToken, String hostname, int port, String cipherType, int timeout, IProgressMonitor monitor)
+	public void connect(IAuthInfo authInfo, String hostname, int port, String cipherType, int timeout, IProgressMonitor monitor)
 			throws RemoteConnectionException;
 
 	/**

@@ -21,6 +21,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_ID = "org.eclipse.ptp.remotetools.environment.generichost.messages.messages"; //$NON-NLS-1$
 
+	public static String TargetControl_Connection_is_not_open;
+
 	public static String TargetControl_create_MonitorConnecting;
 	public static String TargetControl_resume_CannotResume;
 	public static String TargetControl_stop_CannotPause;
@@ -56,6 +58,18 @@ public class Messages extends NLS {
 	public static String ConfigurationPage_LabelTargetName;
 	public static String ConfigurationPage_LabelSystemWorkspace;
 	public static String ConfigurationPage_CipherType;
+	public static String Environment_Info;
+
+	public static String Environment_Warning;
+
+	public static String KeyboardInteractiveDialog_User_authentication;
+	public static String UserValidationDialog_3;
+
+	public static String UserValidationDialog_Password;
+
+	public static String UserValidationDialog_Password_required;
+
+	public static String UserValidationDialog_Save_password;
 	static {
 		// load message values from bundle file
 		NLS.initializeMessages(BUNDLE_ID, Messages.class);

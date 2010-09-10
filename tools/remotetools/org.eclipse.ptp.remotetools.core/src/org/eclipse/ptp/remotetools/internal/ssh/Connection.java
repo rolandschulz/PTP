@@ -29,12 +29,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jsch.core.IJSchService;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
-import org.eclipse.ptp.remotetools.core.AuthToken;
+import org.eclipse.ptp.remotetools.core.IAuthInfo;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteOperation;
-import org.eclipse.ptp.remotetools.core.KeyAuthToken;
-import org.eclipse.ptp.remotetools.core.PasswdAuthToken;
 import org.eclipse.ptp.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
@@ -88,70 +86,58 @@ public class Connection implements IRemoteConnection {
 	 * 
 	 */
 	private class SSHUserInfo implements UserInfo, UIKeyboardInteractive {
-		private String password;
-		private String passphrase;
-		private boolean isPasswdBased;
+		private final IAuthInfo fAuthInfo;
 		private boolean firstTry = true;
 
-		private SSHUserInfo() {
+		private SSHUserInfo(IAuthInfo authInfo) {
+			fAuthInfo = authInfo;
 		}
 
 		public String getPassphrase() {
-			return passphrase;
+			return fAuthInfo.getPassphrase();
 		}
 
 		public String getPassword() {
-			if (firstTry) {
-				firstTry = false;
-				return password;
-			}
-			return null;
+			return fAuthInfo.getPassword();
 		}
 
 		public String[] promptKeyboardInteractive(final String destination, final String name, final String instruction,
 				final String[] prompt, final boolean[] echo) {
-			if (prompt.length != 1 || echo[0] != false || password == null) {
-				return null;
-			}
-			String[] response = new String[1];
-			response[0] = password;
-			if (firstTry) {
+			// Return the provided password the first time but always
+			// prompt on subsequent tries
+			if (firstTry && !getPassword().equals("") && prompt.length == 1 && prompt[0].trim().equalsIgnoreCase("password:")) { //$NON-NLS-1$ //$NON-NLS-2$
 				firstTry = false;
-				return response;
+				return new String[] { getPassword() };
 			}
-			return null;
+			return fAuthInfo.promptKeyboardInteractive(destination, name, instruction, prompt, echo);
 		}
 
 		public boolean promptPassphrase(String message) {
-			return !isPasswdBased;
+			if (firstTry && !getPassphrase().equals("")) { //$NON-NLS-1$
+				firstTry = false;
+				return true;
+			}
+			return fAuthInfo.promptPassphrase(message);
 		}
 
 		public boolean promptPassword(String message) {
-			return isPasswdBased;
+			if (firstTry && !getPassword().equals("")) { //$NON-NLS-1$
+				firstTry = false;
+				return true;
+			}
+			return fAuthInfo.promptPassword(message);
 		}
 
 		public boolean promptYesNo(String str) {
-			// Always accept host identity
-			return true;
+			return fAuthInfo.promptYesNo(str);
 		}
 
 		public void reset() {
 			firstTry = true;
 		}
 
-		public void setPassphrase(String passphrase) {
-			this.passphrase = passphrase;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-		public void setUsePassword(boolean usePassword) {
-			this.isPasswdBased = usePassword;
-		}
-
 		public void showMessage(String message) {
+			fAuthInfo.showMessage(message);
 		}
 	}
 
@@ -235,11 +221,10 @@ public class Connection implements IRemoteConnection {
 	private Session defaultSession;
 	private String fUsername;
 	private String fHostname;
+	private SSHUserInfo fUserInfo;
 	private int fPort;
 	private int fTimeout;
 	private String fCipherType;
-
-	private final SSHUserInfo sshuserinfo = new SSHUserInfo();
 
 	/**
 	 * The execution managers created for this connection.
@@ -302,30 +287,23 @@ public class Connection implements IRemoteConnection {
 	 * .ptp.remotetools.core.AuthToken, java.lang.String, int, java.lang.String,
 	 * int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public synchronized void connect(AuthToken authToken, String hostname, int port, String cipherType, int timeout,
+	public synchronized void connect(IAuthInfo authInfo, String hostname, int port, String cipherType, int timeout,
 			IProgressMonitor monitor) throws RemoteConnectionException {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
 		try {
 			this.nextInternalPID = 0;
 
-			fUsername = authToken.getUsername();
+			fUsername = authInfo.getUsername();
+			fUserInfo = new SSHUserInfo(authInfo);
 
 			// Convert information for the UserInfo class used by JSch
-			if (authToken instanceof PasswdAuthToken) {
-				sshuserinfo.setUsePassword(true);
-				sshuserinfo.setPassword(((PasswdAuthToken) authToken).getPassword());
-			} else if (authToken instanceof KeyAuthToken) {
-				KeyAuthToken token = (KeyAuthToken) authToken;
-				sshuserinfo.setUsePassword(false);
-				sshuserinfo.setPassphrase(token.getPassphrase());
+			if (!authInfo.isPasswordAuth()) {
 				try {
-					jsch.getJSch().addIdentity(token.getKeyPath().getAbsolutePath());
+					jsch.getJSch().addIdentity(authInfo.getKeyPath());
 				} catch (JSchException e) {
 					throw new RemoteConnectionException(e.getMessage());
 				}
-			} else {
-				throw new RuntimeException(Messages.Connection_AuthenticationTypeNotSupported);
 			}
 
 			fHostname = hostname;
@@ -350,8 +328,8 @@ public class Connection implements IRemoteConnection {
 			 */
 			try {
 				defaultSession = jsch.createSession(fHostname, fPort, fUsername);
-				sshuserinfo.reset();
-				defaultSession.setUserInfo(sshuserinfo);
+				fUserInfo.reset();
+				defaultSession.setUserInfo(fUserInfo);
 				defaultSession.setServerAliveInterval(300000);
 				defaultSession.setServerAliveCountMax(6);
 				defaultSession.setProxy(new SSHProxy());
@@ -653,8 +631,8 @@ public class Connection implements IRemoteConnection {
 		Session newSession = null;
 		try {
 			newSession = jsch.createSession(fHostname, fPort, fUsername);
-			sshuserinfo.reset();
-			newSession.setUserInfo(sshuserinfo);
+			fUserInfo.reset();
+			newSession.setUserInfo(fUserInfo);
 			newSession.setServerAliveInterval(300000);
 			newSession.setServerAliveCountMax(6);
 			setSessionCipherType(newSession);

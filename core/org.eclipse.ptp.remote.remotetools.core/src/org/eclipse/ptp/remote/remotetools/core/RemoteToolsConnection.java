@@ -26,9 +26,9 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.exception.AddressInUseException;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
-import org.eclipse.ptp.remote.remotetools.core.environment.PTPTargetControl;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
+import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.exception.CancelException;
@@ -46,7 +46,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private final IRemoteServices fRemoteServices;
 
 	private final ITargetElement fTargetElement;
-	private final PTPTargetControl fTargetControl;
+	private final ITargetControl fTargetControl;
 	private final ListenerList fListeners = new ListenerList();
 
 	/**
@@ -55,7 +55,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	public RemoteToolsConnection(String name, String address, String userName, ITargetElement element, IRemoteServices services)
 			throws CoreException {
 		fTargetElement = element;
-		fTargetControl = (PTPTargetControl) element.getControl();
+		fTargetControl = element.getControl();
 		fConnName = name;
 		fAddress = address;
 		fUserName = userName;
@@ -268,7 +268,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
 	 */
 	public Map<String, String> getAttributes() {
-		return fTargetControl.getAttributes();
+		return fTargetElement.getAttributes().getAttributesAsMap();
 	}
 
 	/*

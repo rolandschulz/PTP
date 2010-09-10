@@ -25,13 +25,12 @@ import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
-
 public class RemoteToolsServices implements IRemoteServices {
-	private static final String TARGET_ELEMENT_NAME = "PTP Remote Host"; //$NON-NLS-1$
+	private static final String TARGET_ELEMENT_NAME = "Remote Host"; //$NON-NLS-1$
 	private static final String REMOTE_TOOLS_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
-	
+
 	private static RemoteToolsServices instance = null;
-	
+
 	/**
 	 * Get shared instance of this class
 	 * 
@@ -44,94 +43,122 @@ public class RemoteToolsServices implements IRemoteServices {
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Find the target type element for the PTP remote services target type.
 	 * 
-	 * @return PTP target type element or null if none can be found (shouldn't happen)
+	 * @return PTP target type element or null if none can be found (shouldn't
+	 *         happen)
 	 */
 	public static TargetTypeElement getTargetTypeElement() {
 		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
 		for (Object obj : targetMgr.getTypeElements()) {
-			TargetTypeElement element = (TargetTypeElement)obj;
+			TargetTypeElement element = (TargetTypeElement) obj;
 			if (element.getName().equals(TARGET_ELEMENT_NAME)) {
 				return element;
 			}
 		}
 		return null;
 	}
-	
+
 	private final RemoteToolsConnectionManager connMgr = new RemoteToolsConnectionManager(this);
 	private final Map<String, RemoteToolsFileManager> fileMgrs = new HashMap<String, RemoteToolsFileManager>();
 	private final IRemoteServicesDescriptor fDescriptor;
-	
+
 	public RemoteToolsServices(IRemoteServicesDescriptor descriptor) {
 		fDescriptor = descriptor;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getConnectionManager()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getConnectionManager
+	 * ()
 	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		return connMgr;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getFileManager(org.eclipse.ptp.remote.core.IRemoteConnection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getFileManager(
+	 * org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
 	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
 		RemoteToolsFileManager fileMgr = fileMgrs.get(conn.getName());
 		if (fileMgr == null) {
-			fileMgr = new RemoteToolsFileManager((RemoteToolsConnection)conn);
+			fileMgr = new RemoteToolsFileManager((RemoteToolsConnection) conn);
 			fileMgrs.put(conn.getName(), fileMgr);
 		}
 		return fileMgr;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getId()
 	 */
 	public String getId() {
 		return fDescriptor.getId();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getName()
 	 */
 	public String getName() {
 		return fDescriptor.getName();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder
+	 * (org.eclipse.ptp.remote.core.IRemoteConnection, java.util.List)
 	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String>command) {
-		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, (RemoteToolsFileManager)getFileManager(conn), command);
+	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String> command) {
+		return new RemoteToolsProcessBuilder((RemoteToolsConnection) conn, (RemoteToolsFileManager) getFileManager(conn), command);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder(org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.String[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getProcessBuilder
+	 * (org.eclipse.ptp.remote.core.IRemoteConnection, java.lang.String[])
 	 */
 	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
-		return new RemoteToolsProcessBuilder((RemoteToolsConnection)conn, (RemoteToolsFileManager)getFileManager(conn), command);
+		return new RemoteToolsProcessBuilder((RemoteToolsConnection) conn, (RemoteToolsFileManager) getFileManager(conn), command);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getScheme()
 	 */
 	public String getScheme() {
 		return fDescriptor.getScheme();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#initialize()
 	 */
 	public void initialize() {
 		// Nothing to do
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
 	 */
 	public boolean isInitialized() {
 		initialize();
