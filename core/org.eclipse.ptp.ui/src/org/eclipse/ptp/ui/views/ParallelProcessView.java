@@ -138,7 +138,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IJobChild
 	 * @since 4.0
 	 */
 	public void handleEvent(final IChangedProcessEvent e) {
-		UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+		UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 			public void run() {
 				final BitSet procRanks = e.getProcesses();
 				if (!procRanks.get(process.getJobRank())) {

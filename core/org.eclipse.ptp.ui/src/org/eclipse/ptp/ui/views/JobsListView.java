@@ -496,7 +496,7 @@ public class JobsListView extends ViewPart {
 	 */
 	private void refresh() {
 		if (!viewer.getTable().isDisposed()) {
-			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
+			PTPUIPlugin.getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					viewer.refresh();
 				}
@@ -511,7 +511,7 @@ public class JobsListView extends ViewPart {
 	 */
 	private void update(final IPJob[] jobs) {
 		if (!viewer.getTable().isDisposed()) {
-			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
+			PTPUIPlugin.getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					viewer.update(jobs, null);
 				}

@@ -808,7 +808,7 @@ public class MachinesNodesView extends ViewPart {
 		}
 		
 		public void handleEvent(final INewNodeEvent e) {
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					for (IPNode node : e.getNodes()) {
 						// create graphical representation of the node
@@ -828,7 +828,7 @@ public class MachinesNodesView extends ViewPart {
 		}
 
 		public void handleEvent(final IRemoveNodeEvent e) {
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					for (IPNode node : e.getNodes()) {
 						// delete the node graphical view on the corresponding IPMachine
@@ -948,7 +948,7 @@ public class MachinesNodesView extends ViewPart {
 			/*
 			 * Update views when a machine is removed.
 			 */
-			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() {
 					for (IPMachine machine : e.getMachines()) {
 						for (int i = 0; i < machinesGraphicalRepresentations.size(); i++) {
