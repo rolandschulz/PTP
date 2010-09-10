@@ -223,28 +223,24 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		StringBuilder sb = new StringBuilder();
 		String s;
 
-		IRemoteProcess p = runVerifyCommand(subMon); // get the remote process
-														// that runs the verify
-														// command
-
-		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream())); // get
-																									// the
-																									// buffer
-																									// reader
+		// get the remote process that runs the verify command
+		IRemoteProcess p = runVerifyCommand(subMon);
+		// get the buffer reader
+		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 		// read the output from the command
 		while ((s = stdInput.readLine()) != null) {
 			sb.append(s);
 		}
-
-		Pattern pattern = Pattern.compile(getVerifyPattern()); // compile the
-																// pattern for
-																// search
-		Matcher m = pattern.matcher(sb.toString()); // get a matcher object
+		// compile the pattern for search
+		Pattern pattern = Pattern.compile(getVerifyPattern());
+		// get a matcher object
+		Matcher m = pattern.matcher(sb.toString());
 
 		while (m.find()) {
-			return true; // return true if we find the specified pattern matched
-							// with the output stream
+			// return true if we find the specified pattern matched
+			// with the output stream
+			return true;
 		}
 
 		return false;
@@ -406,19 +402,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 * Check if process terminated successfully (if not canceled).
 			 */
 			if (fRemoteProcess.exitValue() != 0) {
-
-				// Check if the valid java version is installed on the server
-				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
-					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
-						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(),
-								getVerifyFailMessage()));
-					} else {
-						throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(),
-								Messages.AbstractRemoteServerRunner_12));
-					}
-
-				}
-
 				if (!subMon.isCanceled()) {
 					throw new CoreException(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), NLS.bind(
 							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue())));
@@ -621,6 +604,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 						throw new IOException(Messages.AbstractRemoteServerRunner_7);
 					}
 				}
+
+				// Check if the valid java version is installed on the server
+				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
+					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
+						throw new IOException(getVerifyFailMessage());
+					}
+
+					throw new IOException(Messages.AbstractRemoteServerRunner_12);
+				}
+
 				subMon.setWorkRemaining(90);
 				schedule();
 				while (!subMon.isCanceled() && getServerState() == ServerState.STARTING) {
