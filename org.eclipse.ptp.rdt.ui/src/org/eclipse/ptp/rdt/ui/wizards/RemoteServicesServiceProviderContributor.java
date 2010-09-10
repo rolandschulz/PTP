@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.ui.wizards;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -78,7 +79,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
         String providerSelected = fProviderWorkingCopy.getString(RemoteBuildServiceProvider.REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, null);
         
         // populate the combo with a list of providers
-        IRemoteServices[] providers = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+        IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(new ProgressMonitorDialog(container.getShell()));
         int toSelect = 0;
         
         for(int k = 0; k < providers.length; k++) {

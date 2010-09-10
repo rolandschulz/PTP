@@ -130,7 +130,7 @@ public class NewRemoteProjectCreationPage extends WizardNewProjectCreationPage {
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		createProjectNameGroup(composite);
-		locationArea = new RemoteProjectContentsLocationArea(getErrorReporter(), composite);
+		locationArea = new RemoteProjectContentsLocationArea(getErrorReporter(), composite, null);
 		if (initialProjectFieldValue != null) {
 			locationArea.updateProjectName(initialProjectFieldValue);
 		}
