@@ -23,7 +23,7 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_SCHEME = "scheme"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-	
+
 	private static String getAttribute(IConfigurationElement configElement, String name, String defaultValue) {
 		String value = configElement.getAttribute(name);
 		if (value != null) {
@@ -41,7 +41,7 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	private final String fScheme;
 	private IRemoteServicesFactory fFactory;
 	private IRemoteServices fDelegate = null;
-	
+
 	public RemoteServicesProxy(IConfigurationElement configElement) {
 		fConfigElement = configElement;
 		fId = getAttribute(configElement, ATTR_ID, null);
@@ -50,7 +50,7 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 		getAttribute(configElement, ATTR_CLASS, null);
 		fFactory = null;
 	}
-	
+
 	/**
 	 * Get the factory from the plugin
 	 * 
@@ -61,58 +61,62 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 			return fFactory;
 		}
 		try {
-			fFactory = (IRemoteServicesFactory)fConfigElement.createExecutableExtension(ATTR_CLASS);
+			fFactory = (IRemoteServicesFactory) fConfigElement.createExecutableExtension(ATTR_CLASS);
 		} catch (Exception e) {
-			PTPRemoteCorePlugin.log(
-					NLS.bind(Messages.RemoteServicesProxy_1, 
-							new Object[] {
-								fConfigElement.getAttribute(ATTR_CLASS),
-								fId,
-								fConfigElement.getDeclaringExtension().getNamespaceIdentifier()}));
+			PTPRemoteCorePlugin
+					.log(NLS.bind(Messages.RemoteServicesProxy_1, new Object[] { fConfigElement.getAttribute(ATTR_CLASS), fId,
+							fConfigElement.getDeclaringExtension().getNamespaceIdentifier() }));
 		}
 		return fFactory;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getId()
 	 */
 	public String getId() {
 		return fId;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getName()
 	 */
 	public String getName() {
 		return fName;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getScheme()
 	 */
 	public String getScheme() {
 		return fScheme;
 	}
-	
+
 	/**
 	 * Get the remote services implementation for this descriptor.
 	 * 
-	 * @return the remote services implementation, or null if initialization failed
+	 * @return the remote services implementation, or null if initialization
+	 *         failed
 	 */
 	public IRemoteServices getServices() {
 		loadServices();
 		return fDelegate;
 	}
-	
+
 	/**
-	 * Create and initialize the remote services fFactory
+	 * Create the remote services factory. Note that the services will not be
+	 * initialized.
 	 */
 	private void loadServices() {
 		if (fDelegate == null) {
 			IRemoteServicesFactory factory = getFactory();
 			if (factory != null) {
 				fDelegate = factory.getServices(this);
-				fDelegate.initialize();
 			}
 		}
 	}
