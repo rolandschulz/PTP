@@ -235,7 +235,14 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 		if (!isConfigured()) {
 			return null;
 		}
-		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getServiceId());
+		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getServiceId());
+		if (!services.isInitialized()) {
+			services.initialize();
+		}
+		if (!services.isInitialized()) {
+			return null;
+		}
+		return services;
 	}
 
 	/*
@@ -381,9 +388,14 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	private void initialize() {
 		if (fSubsystem == null && getServiceId() != null) {
 			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getServiceId());
-			if (services != null && getConnectionName() != null) {
-				IRemoteConnection connection = services.getConnectionManager().getConnection(getConnectionName());
-				setConnection(connection, false);
+			if (services != null) {
+				if (!services.isInitialized()) {
+					services.initialize();
+				}
+				if (services.isInitialized() && getConnectionName() != null) {
+					IRemoteConnection connection = services.getConnectionManager().getConnection(getConnectionName());
+					setConnection(connection, false);
+				}
 			}
 		}
 	}

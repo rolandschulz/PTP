@@ -94,7 +94,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 
 	@Override
 	public String getConfigurationString() {
-		if (isConfigured()) {
+		if (getRemoteServices() != null && isConfigured()) {
 			return getRemoteServices().getName() + ": " + getRemoteConnectionName(); //$NON-NLS-1$
 		}
 		return null;
@@ -147,7 +147,14 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * #getRemoteServices()
 	 */
 	public IRemoteServices getRemoteServices() {
-		return PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteToolsProviderID());
+		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteToolsProviderID());
+		if (!services.isInitialized()) {
+			services.initialize();
+		}
+		if (!services.isInitialized()) {
+			return null;
+		}
+		return services;
 	}
 
 	/**

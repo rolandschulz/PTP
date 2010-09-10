@@ -163,24 +163,31 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 					SubMonitor progress = SubMonitor.convert(monitor, Messages.PTPRemoteUIPlugin_4, 10);
 					try {
 						fInitializedServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices(progress.newChild(10));
-						if (progress.isCanceled()) {
-							throw new InterruptedException();
-						}
 					} finally {
 						monitor.done();
 					}
 				}
 			};
 			try {
-				if (context != null) {
-					context.run(true, true, runnable);
-				} else {
-					PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+				/*
+				 * See if the services have already been initialized. If any
+				 * haven't, then initialize them all.
+				 */
+				fInitializedServices = PTPRemoteCorePlugin.getDefault().getAllRemoteServices();
+				for (IRemoteServices services : fInitializedServices) {
+					if (!services.isInitialized()) {
+						if (context != null) {
+							context.run(true, false, runnable);
+						} else {
+							PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+						}
+						break;
+					}
 				}
 			} catch (InvocationTargetException e) {
 				log(e);
 			} catch (InterruptedException e) {
-				// canceled
+				// cancelled
 			}
 		}
 
@@ -208,25 +215,24 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 				SubMonitor progress = SubMonitor.convert(monitor, Messages.PTPRemoteUIPlugin_4, 10);
 				try {
 					fRemoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(id, progress.newChild(10));
-					if (progress.isCanceled()) {
-						throw new InterruptedException();
-					}
 				} finally {
 					monitor.done();
 				}
 			}
 		};
 		try {
-			fRemoteService = null;
-			if (context != null) {
-				context.run(true, true, runnable);
-			} else {
-				PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+			fRemoteService = PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
+			if (!fRemoteService.isInitialized()) {
+				if (context != null) {
+					context.run(true, false, runnable);
+				} else {
+					PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+				}
 			}
 		} catch (InvocationTargetException e) {
 			log(e);
 		} catch (InterruptedException e) {
-			// canceled
+			// cancelled
 		}
 
 		return fRemoteService;
