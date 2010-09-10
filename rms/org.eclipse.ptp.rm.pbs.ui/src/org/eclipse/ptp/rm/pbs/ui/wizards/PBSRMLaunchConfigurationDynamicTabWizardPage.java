@@ -109,7 +109,14 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage {
 			if (constraints != null) {
 				String[] items = constraints.split(","); //$NON-NLS-1$
 				c = WidgetUtils.createItemCombo(container, null, items, items[0], ConfigUtils.EMPTY_STRING, false, listener, 1);
-			} else
+			} else if (name.equals("destination")) //$NON-NLS-1$
+				/*
+				 * Should really set the queue names here, but this would
+				 * require changing the API of this class [4.0]; for the moment
+				 * the DynamicTab itself does this as a post-processing routine
+				 */
+				c = WidgetUtils.createItemCombo(container, null, new String[0], null, ConfigUtils.EMPTY_STRING, false, listener, 1);
+			else
 				c = WidgetUtils.createText(container, value, true, listener, null);
 			c.setForeground(WidgetUtils.DKRD);
 		}

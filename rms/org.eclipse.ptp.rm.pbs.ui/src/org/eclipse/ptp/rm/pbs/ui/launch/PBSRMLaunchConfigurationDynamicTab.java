@@ -440,6 +440,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 
 	private static final String TAG_CURRENT_TEMPLATE = Messages.PBSRMLaunchConfigCurrentTemplate;
 
+	private IPQueue[] queues;
 	private ScrolledComposite parent;
 	private Composite childControl;
 	private Composite control;
@@ -466,6 +467,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			templateManager = new PBSBatchScriptTemplateManager();
 			valueWidgets = new HashMap<Control, AttributePlaceholder>();
 			templateManager.loadTemplate(null, null);
+			queues = resourceManager.getQueues();
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -696,6 +698,36 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	}
 
 	/*
+	 * We do this here instead of in its properly encapsulated location (the
+	 * wizard) in order not to induce an API change [4.0].
+	 */
+	private void maybeSetQueues() {
+		if (queues == null || queues.length == 0)
+			return;
+		for (Map.Entry<Control, AttributePlaceholder> e : valueWidgets.entrySet()) {
+			AttributePlaceholder ap = e.getValue();
+			String name = ap.getName();
+			if (name.equals("destination")) { //$NON-NLS-1$
+				Combo combo = (Combo) e.getKey();
+				List<String> queueNames = new ArrayList<String>();
+				for (IPQueue q : queues) {
+					String qname = q.getName();
+					if (qname.length() > 0)
+						queueNames.add(qname);
+				}
+				String value = ap.getAttribute().getValueAsString();
+				if (value == null || value.length() == 0)
+					try {
+						ap.getAttribute().setValueAsString(queueNames.get(0));
+					} catch (IllegalValueException t) {
+						t.printStackTrace();
+					}
+				combo.setItems(queueNames.toArray(new String[0]));
+			}
+		}
+	}
+
+	/*
 	 * Nests child control which can be disposed when rebuild is called for.
 	 */
 	private void populateControl() {
@@ -711,6 +743,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			PBSRMLaunchConfigurationDynamicTabWizardPage wizardPage = new PBSRMLaunchConfigurationDynamicTabWizardPage(
 					valueWidgets, getListener(), template);
 			wizardPage.createControl(childControl);
+			maybeSetQueues();
 		}
 		/*
 		 * We need to repeat this (the ResourcesTab does it when it initially
