@@ -56,7 +56,7 @@ public class ConfigFactory {
 	 */
 	public ConfigFactory(ControlAttributes attrs) {
 		if (attrs != null) {
-			attributes = new ControlAttributes(attrs.getAttributesAsMap());
+			attributes = attrs;
 		} else {
 			attributes = new ControlAttributes();
 		}

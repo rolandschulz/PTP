@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.remotetools.core.IAuthInfo;
+import org.eclipse.ptp.remotetools.environment.control.ITargetConfig;
 import org.eclipse.ptp.remotetools.environment.generichost.messages.Messages;
 import org.eclipse.ptp.remotetools.environment.generichost.ui.KeyboardInteractiveDialog;
 import org.eclipse.ptp.remotetools.environment.generichost.ui.UserValidationDialog;
@@ -26,34 +27,62 @@ import org.eclipse.swt.widgets.Display;
  * @since 1.4
  */
 public class AuthInfo implements IAuthInfo {
-	private TargetConfig fConfig = null;
+	private class PromptSecret {
+		private String fResult = null;
+		private boolean fSaveResult = false;
 
-	public AuthInfo(TargetConfig config) {
+		public void prompt(final String message) {
+			final String finUser = fConfig.getLoginUsername();
+			getDisplay().syncExec(new Runnable() {
+				public void run() {
+					UserValidationDialog uvd = new UserValidationDialog(null, finUser, message);
+					uvd.setUsernameMutable(false);
+					if (uvd.open() == Window.OK) {
+						fResult = uvd.getPassword();
+						fSaveResult = uvd.isSavePassword();
+					}
+				}
+			});
+		}
+
+		public String getResult() {
+			return fResult;
+		}
+
+		public boolean isSaveResult() {
+			return fSaveResult;
+		}
+	}
+
+	private ITargetConfig fConfig = null;
+	/*
+	 * Password or passphrase obtained from user prompt (either
+	 * KeyboardInteractiveDialog or UserValidationDialog). These are only used
+	 * once, then we revert back to using the password or passphrase from the
+	 * configuration.
+	 */
+	private String fPassword = null;
+	private String fPassphrase = null;
+
+	public AuthInfo(ITargetConfig config) {
 		fConfig = config;
 	}
 
-	private String promptSecret(final String message) {
-		final String[] retval = new String[1];
-		final String finUser = fConfig.getLoginUsername();
-		getDisplay().syncExec(new Runnable() {
-			public void run() {
-				UserValidationDialog uvd = new UserValidationDialog(null, finUser, message);
-				uvd.setUsernameMutable(false);
-				if (uvd.open() == Window.OK) {
-					retval[0] = uvd.getPassword();
-				} else {
-					retval[0] = null;
-				}
-			}
-		});
-		return retval[0];
-	}
-
 	public String getPassphrase() {
+		if (fPassphrase != null) {
+			String res = fPassphrase;
+			fPassphrase = null;
+			return res;
+		}
 		return fConfig.getKeyPassphrase();
 	}
 
 	public String getPassword() {
+		if (fPassword != null) {
+			String res = fPassword;
+			fPassword = null;
+			return res;
+		}
 		return fConfig.getLoginPassword();
 	}
 
@@ -77,7 +106,7 @@ public class AuthInfo implements IAuthInfo {
 			if (result == null)
 				return null; // cancelled
 			if (result.length == 1 && prompt.length == 1 && prompt[0].trim().equalsIgnoreCase("password:")) { //$NON-NLS-1$
-				fConfig.setLoginPassword(result[0]);
+				fPassword = result[0];
 			}
 			return result;
 		} catch (OperationCanceledException e) {
@@ -86,21 +115,29 @@ public class AuthInfo implements IAuthInfo {
 	}
 
 	public boolean promptPassphrase(String message) {
-		String passphrase = promptSecret(message);
-		if (passphrase != null) {
-			fConfig.setKeyPassphrase(passphrase);
-			return true;
+		PromptSecret ps = new PromptSecret();
+		ps.prompt(message);
+		fPassphrase = ps.getResult();
+		if (fPassphrase == null) {
+			return false;
 		}
-		return false;
+		if (ps.isSaveResult()) {
+			fConfig.setKeyPassphrase(ps.getResult());
+		}
+		return true;
 	}
 
 	public boolean promptPassword(String message) {
-		String password = promptSecret(message);
-		if (password != null) {
-			fConfig.setLoginPassword(password);
-			return true;
+		PromptSecret ps = new PromptSecret();
+		ps.prompt(message);
+		fPassword = ps.getResult();
+		if (fPassword == null) {
+			return false;
 		}
-		return false;
+		if (ps.isSaveResult()) {
+			fConfig.setLoginPassword(ps.getResult());
+		}
+		return true;
 	}
 
 	public boolean promptYesNo(final String str) {
