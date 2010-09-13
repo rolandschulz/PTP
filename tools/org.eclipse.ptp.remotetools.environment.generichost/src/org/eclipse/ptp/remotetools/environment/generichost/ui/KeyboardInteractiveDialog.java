@@ -46,8 +46,6 @@ public class KeyboardInteractiveDialog extends TrayDialog {
 	/**
 	 * @param parentShell
 	 *            the parent shell
-	 * @param connectionId
-	 *            an id for the connection
 	 * @param destination
 	 *            the location
 	 * @param name

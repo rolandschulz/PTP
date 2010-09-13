@@ -212,7 +212,7 @@ public class UserValidationDialog extends TrayDialog {
 	 * @return <code>true</code> if the save password checkbox was selected and
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean getSavePassword() {
+	public boolean isSavePassword() {
 		return savePassword;
 	}
 
@@ -228,7 +228,6 @@ public class UserValidationDialog extends TrayDialog {
 	protected void okPressed() {
 		password = passwordField.getText();
 		username = usernameField.getText();
-
 		super.okPressed();
 	}
 

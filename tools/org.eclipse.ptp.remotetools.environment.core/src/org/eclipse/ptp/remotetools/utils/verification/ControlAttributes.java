@@ -22,14 +22,14 @@ import org.eclipse.core.runtime.Path;
 
 public class ControlAttributes implements Cloneable {
 
-	private final Map<String, String> currentMap = new HashMap<String, String>();
+	private final Map<String, String> currentMap;
 	private final Map<String, String> defaultMap = new HashMap<String, String>();
 
 	/**
 	 * Create an instance without default values.
 	 */
 	public ControlAttributes(Map<String, String> config) {
-		currentMap.putAll(config);
+		currentMap = config;
 	}
 
 	/**
@@ -38,6 +38,7 @@ public class ControlAttributes implements Cloneable {
 	 * @since 2.0
 	 */
 	public ControlAttributes() {
+		currentMap = new HashMap<String, String>();
 	}
 
 	/**
