@@ -96,6 +96,7 @@
             vendor="%configuration.vendor.0">
       </configuration>
    </extension>
+   <!-- Disable service model wizard page
    <extension
          point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
       <wizardPage
@@ -106,6 +107,7 @@
          </nature>
       </wizardPage>
    </extension>
+   -->
    <extension
          point="org.eclipse.ui.newWizards">
       <category
@@ -745,28 +747,28 @@
              pattern="org\.eclipse\.cdt\.ui/org\.eclipse\.cdt\.ui\.indexer">
        </activityPatternBinding>
        <activity
-       		 id="com.ibm.etools.aix.ui.EnvironmentPreferencePageActivity"
+       		 id="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 name="%CDTEnvironmentPref.name">
        </activity>
        <categoryActivityBinding
-       		 activityId="com.ibm.etools.aix.ui.EnvironmentPreferencePageActivity"
+       		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
        </categoryActivityBinding>
        <activityPatternBinding
-       		 activityId="com.ibm.etools.aix.ui.EnvironmentPreferencePageActivity"
+       		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.preferences.PrefPage_Env">
        </activityPatternBinding>
             
         <activity
-       		 id="com.ibm.etools.aix.ui.EnvironmentPropertiesPageActivity"
+       		 id="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 name="%CDTEnvironmentProp.name">
        </activity>
        <categoryActivityBinding
-       		 activityId="com.ibm.etools.aix.ui.EnvironmentPropertiesPageActivity"
+       		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
        </categoryActivityBinding>
        <activityPatternBinding
-       		 activityId="com.ibm.etools.aix.ui.EnvironmentPropertiesPageActivity"
+       		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment">
        </activityPatternBinding>
        

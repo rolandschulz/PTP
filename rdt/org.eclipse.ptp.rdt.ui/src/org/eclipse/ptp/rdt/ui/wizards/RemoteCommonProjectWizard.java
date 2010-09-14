@@ -18,7 +18,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.CoreModel;
@@ -56,9 +58,24 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ptp.internal.rdt.core.index.RemoteFastIndexer;
+import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
+import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
+import org.eclipse.ptp.rdt.ui.messages.Messages;
+import org.eclipse.ptp.rdt.ui.serviceproviders.IRemoteToolsIndexServiceProvider;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RSECIndexServiceProvider;
+import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
+import org.eclipse.ptp.services.core.IServiceModelManager;
+import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
+import org.eclipse.rse.core.model.IHost;
+import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.internal.connectorservice.dstore.Activator;
 import org.eclipse.ui.actions.WorkspaceModifyDelegatingOperation;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
@@ -74,6 +91,7 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 	private static final String title = CUIPlugin.getResourceString(OP_ERROR + ".title"); //$NON-NLS-1$
 	private static final String message = CUIPlugin.getResourceString(OP_ERROR + ".message"); //$NON-NLS-1$
 	private static final String[] EMPTY_ARR = new String[0];
+	private static final String DEFAULT_CONFIG = Messages.getString("ConfigureRemoteServices.0"); //$NON-NLS-1$
 
 	protected IConfigurationElement fConfigElement;
 	protected RemoteMainWizardPage fMainPage;
@@ -274,8 +292,15 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 											fMonitor, 40));
 									if (newProject != null) {
 
-										// setup the service model
-										IServiceConfiguration config = (IServiceConfiguration)getMBSProperty(CONFIG_PROPERTY);
+										/*
+										 * Setup the service model. 
+										 * 
+										 * If using the ServiceModelWizardPage, get the configuration from the MBS property as follows (this is disabled
+										 * to simplify the new project creation.)
+										 * 
+										 * IServiceConfiguration config = (IServiceConfiguration)getMBSProperty(CONFIG_PROPERTY);
+										 * */
+										IServiceConfiguration config = getNewConfiguration();
 										
 										ServiceModelManager smm = ServiceModelManager.getInstance();
 										smm.addConfiguration(newProject, config);
@@ -322,6 +347,88 @@ public abstract class RemoteCommonProjectWizard extends BasicNewResourceWizard i
 		};
 	}
 
+	private IConnectorService getDStoreConnectorService(IHost host) {
+		for (IConnectorService cs : host.getConnectorServices()) {
+			if (cs instanceof DStoreConnectorService)
+				return cs;
+		}
+		return null;
+	}
+	
+	private String getDefaultConfigName() {
+		String candidateName = DEFAULT_CONFIG;
+		IWizardPage page = getStartingPage();
+		if (page instanceof NewRemoteProjectCreationPage) {
+			NewRemoteProjectCreationPage cdtPage = (NewRemoteProjectCreationPage) page;
+			candidateName = cdtPage.getRemoteConnection().getName();
+		}
+
+		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
+		Set<String> existingNames = new HashSet<String>();
+		for (IServiceConfiguration config : configs) {
+			existingNames.add(config.getName());
+		}
+
+		int i = 2;
+		String newConfigName = candidateName;
+		while (existingNames.contains(newConfigName)) {
+			newConfigName = candidateName + " (" + (i++) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		return newConfigName;
+	}
+	
+	/**
+	 * Creates a new configuration with the RDT defaults.
+	 */
+	private IServiceConfiguration getNewConfiguration() {
+			IServiceModelManager smm = ServiceModelManager.getInstance();
+			IServiceConfiguration config = smm.newServiceConfiguration(getDefaultConfigName());
+
+			IWizardPage page = getStartingPage();
+			if (page instanceof NewRemoteProjectCreationPage) {
+				NewRemoteProjectCreationPage cdtPage = (NewRemoteProjectCreationPage) page;
+				IRemoteServices remoteServices = cdtPage.getRemoteServices();
+				IRemoteConnection remoteConnection = cdtPage.getRemoteConnection();
+
+				IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+				IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(RemoteBuildServiceProvider.ID);
+				RemoteBuildServiceProvider rbsp = (RemoteBuildServiceProvider) smm.getServiceProvider(descriptor);
+				if (rbsp != null) {
+					rbsp.setRemoteToolsProviderID(remoteServices.getId());
+					rbsp.setRemoteToolsConnection(remoteConnection);
+					config.setServiceProvider(buildService, rbsp);
+				}
+
+				IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
+				if (remoteServices.getId().equals("org.eclipse.ptp.remote.RSERemoteServices")) { //$NON-NLS-1$
+					descriptor = indexingService.getProviderDescriptor(RSECIndexServiceProvider.ID);
+					RSECIndexServiceProvider provider = (RSECIndexServiceProvider) smm.getServiceProvider(descriptor);
+					if (provider != null) {
+						String hostName = remoteConnection.getAddress();
+						IHost host = RSEUtils.getConnection(hostName);
+						String configPath = RSEUtils.getDefaultConfigDirectory(host);
+	
+						provider.setConnection(host, getDStoreConnectorService(host));
+						provider.setIndexLocation(configPath);
+						provider.setConfigured(true);
+						config.setServiceProvider(indexingService, provider);
+					}
+				} else if (remoteServices.getId().equals("org.eclipse.ptp.remote.RemoteTools")) { //$NON-NLS-1$
+					descriptor = indexingService
+							.getProviderDescriptor("org.eclipse.ptp.rdt.server.dstore.RemoteToolsCIndexServiceProvider"); //$NON-NLS-1$
+					IRemoteToolsIndexServiceProvider provider = (IRemoteToolsIndexServiceProvider) smm
+							.getServiceProvider(descriptor);
+					if (provider != null) {
+						provider.setConnection(remoteConnection);
+						config.setServiceProvider(indexingService, provider);
+					}
+				}
+			}
+
+		return config;
+	}
+	
 	public IProject createIProject(final String name, final URI location) throws CoreException {
 		return createIProject(name, location, new NullProgressMonitor());
 	}
