@@ -344,6 +344,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	private boolean fUseDefaultNameAndDesc = true;
 	private boolean fUsingWorkingCopy = false;
 	private IServiceProvider fServiceProvider = null;
+	private boolean fUseServiceConfigurationPage = false;
 
 	/*
 	 * Constructor used when creating a new resource manager.
@@ -352,6 +353,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		setForcePreviousAndNextButtons(true);
 		setNeedsProgressMonitor(true);
 		setWizardPages(null);
+		fUseServiceConfigurationPage = false;
 	}
 
 	/*
@@ -376,7 +378,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			addPage(fSelectServiceProviderPage);
 		}
 		addPage(fResourceManagerPage);
-		if (!fUsingWorkingCopy) {
+		if (!fUsingWorkingCopy && fUseServiceConfigurationPage) {
 			addPage(fSelectServiceConfigurationPage);
 		}
 		super.addPages();
@@ -452,7 +454,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			fResourceManagerPage.setNameAndDescription(getConfiguration());
 			fResourceManagerPage.setEnabled(!fUseDefaultNameAndDesc);
 			fResourceManagerPage.setAutoStart(getConfiguration().getAutoStart());
-		} else if (nextPage instanceof SelectServiceConfigurationPage) {
+		} else if (fUseServiceConfigurationPage && nextPage instanceof SelectServiceConfigurationPage) {
 			IServiceConfiguration config = fModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
 			fSelectServiceConfigurationPage.setDefaultConfiguration(config);
 		}
@@ -489,7 +491,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 		}
 		if (fUsingWorkingCopy) {
 			((IServiceProviderWorkingCopy) getServiceProvider()).save();
-		} else {
+		} else if (fUseServiceConfigurationPage) {
 			IServiceConfiguration config = fSelectServiceConfigurationPage.getServiceConfiguration();
 			IServiceProvider provider = config.getServiceProvider(fLaunchService);
 			if (provider != null) {
@@ -499,6 +501,10 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 					return false;
 				}
 			}
+			config.setServiceProvider(fLaunchService, getServiceProvider());
+			fModelManager.addConfiguration(config);
+		} else {
+			IServiceConfiguration config = fModelManager.newServiceConfiguration(fResourceManagerPage.getRMName());
 			config.setServiceProvider(fLaunchService, getServiceProvider());
 			fModelManager.addConfiguration(config);
 		}
@@ -554,7 +560,7 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 			fWizardPages.addAll(Arrays.asList(pages));
 		}
 		fWizardPages.add(fResourceManagerPage);
-		if (!fUsingWorkingCopy) {
+		if (!fUsingWorkingCopy && fUseServiceConfigurationPage) {
 			fWizardPages.add(fSelectServiceConfigurationPage);
 		}
 	}
