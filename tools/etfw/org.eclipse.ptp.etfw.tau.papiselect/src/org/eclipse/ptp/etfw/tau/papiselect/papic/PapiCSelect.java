@@ -174,11 +174,12 @@ public class PapiCSelect {
 	}
 	
 	public Set<Integer>[] getAvailable(int component,Set<String> checked){
+		@SuppressWarnings("unchecked")
 		Set<Integer>[] index=new HashSet[2];
 		pparser.reset();
 		
 		
-		ArrayList<String> cAl = new ArrayList(checked);
+		ArrayList<String> cAl = new ArrayList<String>(checked);
 		
 		cAl.add(0,component+"");
 		cAl.add(0,"-c");

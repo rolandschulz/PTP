@@ -17,25 +17,30 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw;
 
-import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
-import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.ExternalTool;
+import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
 import org.eclipse.ptp.etfw.toolopts.ToolMaker;
 import org.eclipse.ptp.etfw.toolopts.ToolPane;
@@ -202,15 +207,15 @@ public class Activator extends AbstractUIPlugin {
 		return panes;
 	}
 	
-	private static ArrayList<File> workflowList =null;
+	private static ArrayList<IFileStore> workflowList =null;
 	
-	private ArrayList<File> getInternalXMLWorkflows()
+	private ArrayList<IFileStore> getInternalXMLWorkflows()
 	{
 		if (workflowList != null) {
 			return workflowList;
 		}
 		
-		workflowList = new ArrayList<File>();
+		workflowList = new ArrayList<IFileStore>();
 	
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.workflows"); //$NON-NLS-1$
@@ -220,6 +225,8 @@ public class Activator extends AbstractUIPlugin {
 			final IExtension ext = extensions[iext];
 			
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
+			
+			IFileStore ifs = null;
 		
 			for (int i=0; i< elements.length; i++)
 			{
@@ -231,7 +238,10 @@ public class Activator extends AbstractUIPlugin {
 					//elements[i].
 					//aGetter.setId(ce.getAttribute("id"));
 					//System.out.println(plugspace+" "+aGetter);
-					workflowList.add(new File(new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString().replaceAll(" ", "%20")))); //$NON-NLS-1$ //$NON-NLS-2$
+					URI iuri = new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString().replaceAll(" ", "%20"));
+						//(Platform.getBundle(plugspace).getEntry(aGetter)).toURI();
+					ifs = EFS.getLocalFileSystem().getStore(iuri);
+					workflowList.add(ifs);//EFS.getLocalFileSystem().getStore((Platform.getBundle(plugspace).getEntry(aGetter)).toURI())  //new File(new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString().replaceAll(" ", "%20")))); //$NON-NLS-1$ //$NON-NLS-2$
 				} 
 				catch (Exception e) {
 					e.printStackTrace();
@@ -271,15 +281,23 @@ public class Activator extends AbstractUIPlugin {
 //			tauTool=ToolMaker.makeTools(tauToolXML);
 //		}
 		
+		IFileSystem loc = EFS.getLocalFileSystem();
 		
 		String fiList=getPreferenceStore().getString(IToolLaunchConfigurationConstants.XMLLOCID);
 		String[] fiLocs = fiList.split(",,,"); //$NON-NLS-1$
 		
-		ArrayList<File> files = new ArrayList<File>();
-		File fi=null;
+		List<IFileStore> files = new ArrayList<IFileStore>();
+		IFileStore fi=null;
 		for(int i=0;i<fiLocs.length;i++){
-			fi=new File(fiLocs[i]);
-			if(fi.canRead()&&fi.isFile()){
+			try {
+				fi= loc.getStore(new URI(fiLocs[i]));
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}//  new IFileStore(fiLocs[i]);
+			IFileInfo finf = fi.fetchInfo();
+			
+			if(finf.exists()&&!finf.isDirectory()){//(fi.canRead()&&fi.isFile()){
 				files.add(fi);
 			}
 		}
@@ -291,15 +309,18 @@ public class Activator extends AbstractUIPlugin {
 			String epath=BuildLaunchUtils.checkToolEnvPath("eclipse"); //$NON-NLS-1$
 			if(epath!=null)
 			{
-				File toolxml=new File(epath);
-				if(toolxml.canRead()&&toolxml.exists())
+				IFileStore toolxml=loc.getStore(new Path(epath));
+				IFileInfo finf= toolxml.fetchInfo();
+				if(finf.exists())
 				{
-					toolxml=new File(toolxml.getPath()+File.separator+"tool.xml"); //$NON-NLS-1$
-					if(toolxml.canRead()&&toolxml.isFile())
+					toolxml = toolxml.getChild("tool.xml");
+					finf=toolxml.fetchInfo();
+					//toolxml=new File(toolxml.getPath()+File.separator+"tool.xml"); //$NON-NLS-1$
+					if(finf.exists())
 					{
 						files.add(toolxml);
 						//tools=ToolMaker.makeTools(toolxml);
-						this.getPreferenceStore().setValue(IToolLaunchConfigurationConstants.XMLLOCID, toolxml.getPath());
+						this.getPreferenceStore().setValue(IToolLaunchConfigurationConstants.XMLLOCID, toolxml.toURI().toString());
 					}
 				}
 			}

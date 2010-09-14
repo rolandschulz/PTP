@@ -17,11 +17,11 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.parallel;
 
-import java.io.File;
-
-//import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -54,7 +54,11 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 		String progName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME,"defaultValue");
 		String progPath = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,"defaultValue");
 		String projName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,"defaultValue");
-		wc.setAttribute(EXTOOL_EXECUTABLE_NAME, progPath+File.separator+progName);
+		
+		IFileStore pdir = EFS.getLocalFileSystem().getStore(new Path(progPath));
+		IFileStore prog = pdir.getChild(progName);
+		
+		wc.setAttribute(EXTOOL_EXECUTABLE_NAME, prog.toURI().getPath());//Path+File.separator+progName
 		wc.setAttribute(EXTOOL_PROJECT_NAME, projName);
 		wc.setAttribute(EXTOOL_ATTR_ARGUMENTS_TAG, IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS);
 		wc.setAttribute(EXTOOL_PROJECT_NAME_TAG, IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME);

@@ -103,7 +103,7 @@ class ETItem implements IStructuredContentProvider, ITreeContentProvider {// ),I
 	// }
 }
 
-public class EventTree extends ETItem {
+class EventTree extends ETItem {
 	public EventTree() {
 		super();
 		label = Messages.EventTree_Events;

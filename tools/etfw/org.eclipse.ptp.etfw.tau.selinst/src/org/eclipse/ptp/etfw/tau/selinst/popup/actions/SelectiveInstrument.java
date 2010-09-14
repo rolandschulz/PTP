@@ -67,6 +67,7 @@ public class SelectiveInstrument implements IObjectActionDelegate {
 			return;
 		}
 		ICElement cbit=null;
+		@SuppressWarnings("unchecked")
 		Iterator<Object> selit = selection.iterator();
 		HashSet<String> selfiles=new HashSet<String>();
 		HashSet<String> selrouts=new HashSet<String>();

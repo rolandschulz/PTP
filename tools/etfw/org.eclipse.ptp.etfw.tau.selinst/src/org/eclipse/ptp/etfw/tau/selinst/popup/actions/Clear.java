@@ -68,6 +68,7 @@ public class Clear implements IObjectActionDelegate {
 		/**
 		 * The iterator over all selected elements
 		 */
+		@SuppressWarnings("unchecked")
 		Iterator<ICElement> selit = selection.iterator();
 		/**
 		 * The list of selected files

@@ -18,18 +18,20 @@
 package org.eclipse.ptp.etfw.tau;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
-//import org.eclipse.ptp.etfw.tau.options.TAUOptionsPlugin;
-//import org.eclipse.ptp.etfw.tau.Activator;
+import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ptp.etfw.Activator;
-import org.eclipse.ptp.etfw.tau.messages.Messages;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * Launches a splash screen to prompt for global and tau-specific options for building/launching applications
@@ -61,12 +63,16 @@ public class OptionSplash extends Dialog{
 		autoref= new Button(composite, SWT.CHECK);
 		autoref.setText(Messages.OptionSplash_AutoRefresh);
 		autoref.setToolTipText(Messages.OptionSplash_TauSugOn);
-		autoref.setSelection(ResourcesPlugin.getPlugin().getPluginPreferences().getBoolean(ResourcesPlugin.PREF_AUTO_REFRESH));
+		
+		IPreferencesService service = Platform.getPreferencesService();
+		
+		
+		autoref.setSelection(service.getBoolean(Activator.PLUGIN_ID, ResourcesPlugin.PREF_AUTO_REFRESH, false, null));//ResourcesPlugin.getPlugin().getPluginPreferences().getBoolean(ResourcesPlugin.PREF_AUTO_REFRESH));
 		
 		autobuild= new Button(composite, SWT.CHECK);
 		autobuild.setText(Messages.OptionSplash_AutoBuild);
 		autobuild.setToolTipText(Messages.OptionSplash_TauSugOff);
-		autobuild.setSelection(ResourcesPlugin.getPlugin().getPluginPreferences().getBoolean(ResourcesPlugin.PREF_AUTO_BUILDING));
+		autobuild.setSelection(service.getBoolean(Activator.PLUGIN_ID,ResourcesPlugin.PREF_AUTO_BUILDING,false, null));
 		
 		boolean isAIX=org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix")>=0; //$NON-NLS-1$
 		if(isAIX)
@@ -76,15 +82,15 @@ public class OptionSplash extends Dialog{
 			Messages.OptionSplash_AutoEclipseInternal
 			);
 			fixAix.setToolTipText(Messages.OptionSplash_TauSuggestsOnDesc);
-			Preferences preferences = Activator.getDefault().getPluginPreferences();
-			fixAix.setSelection(preferences.getBoolean("TAUCheckForAIXOptions")); //$NON-NLS-1$
+			//Preferences preferences = Activator.getDefault().getPluginPreferences();
+			fixAix.setSelection(service.getBoolean(Activator.PLUGIN_ID,ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT,false,null)); //$NON-NLS-1$
 			
 		}
 		
 		doagain= new Button(composite, SWT.CHECK);
 		doagain.setText(Messages.OptionSplash_ShowScreenWhenProf);
 		doagain.setToolTipText(Messages.OptionSplash_EnDisAbleTauSplash);
-		doagain.setSelection(Activator.getDefault().getPluginPreferences().getBoolean("TAUCheckForAutoOptions")); //$NON-NLS-1$
+		doagain.setSelection(service.getBoolean(Activator.PLUGIN_ID,ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,true,null)); //$NON-NLS-1$
 		
 		return composite;
 	}
@@ -94,16 +100,32 @@ public class OptionSplash extends Dialog{
 	 */
 	protected void okPressed() {
 		
+		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		
 		if(autoref!=null)
-			ResourcesPlugin.getPlugin().getPluginPreferences().setValue(ResourcesPlugin.PREF_AUTO_REFRESH, autoref.getSelection());
-		if(autobuild!=null)
-			ResourcesPlugin.getPlugin().getPluginPreferences().setValue(ResourcesPlugin.PREF_AUTO_BUILDING, autobuild.getSelection());
+		{
+			preferences.putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, autoref.getSelection());
+		}
+		if(autobuild!=null){
+			preferences.putBoolean(ResourcesPlugin.PREF_AUTO_BUILDING, autobuild.getSelection());
+		}
 		
 		if(fixAix!=null)
-			Activator.getDefault().getPluginPreferences().setValue("TAUCheckForAIXOptions", fixAix.getSelection()); //$NON-NLS-1$
+		{
+			preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT, fixAix.getSelection()); //$NON-NLS-1$
+		}
 		
 		if(doagain!=null)
-			Activator.getDefault().getPluginPreferences().setValue("TAUCheckForAutoOptions", doagain.getSelection()); //$NON-NLS-1$
+		{	
+			preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT, doagain.getSelection()); //$NON-NLS-1$
+		}
+		
+		
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 		
 		super.okPressed();
 	}

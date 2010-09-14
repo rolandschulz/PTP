@@ -17,13 +17,20 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.preferences;
 
-import java.io.File;
+//import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Preferences;
+//import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -48,6 +55,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * Provides a user-interface for and managed workspace-wide TAU settings. The
@@ -201,12 +209,12 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 	 */
 	protected void handleBinBrowseButtonSelected(Text field, String group) {
 		DirectoryDialog dialog = new DirectoryDialog(getShell());
-		File path = null;
+		IFileStore path = null;
 		String correctPath = getFieldContent(field.getText());
 		if (correctPath != null) {
-			path = new File(correctPath);
-			if (path.exists())
-				dialog.setFilterPath(path.isFile() ? correctPath : path.getParent());
+			path = EFS.getLocalFileSystem().getStore(new Path(correctPath));//new File(correctPath);
+			if (path.fetchInfo().exists())
+				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath());
 		}
 		// The specified directory previously had to contain at least one
 		// recognizable TAU makefile in its lib sub-directory to be accepted.
@@ -251,27 +259,38 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 	}
 
 	private void loadSaved() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		IPreferencesService service = Platform.getPreferencesService();
 
 		if (toolGroups != null)
 			for (int i = 0; i < toolGroups.length; i++) {
-				toolGroups[i].binDir.setText(preferences.getString(IToolLaunchConfigurationConstants.TOOL_BIN_ID
-						+ "." + toolGroups[i].group));// ITAULaunchConfigurationConstants.TAU_BIN_PATH)); //$NON-NLS-1$
+				toolGroups[i].binDir.setText(service.getString(Activator.PLUGIN_ID,IToolLaunchConfigurationConstants.TOOL_BIN_ID
+						+ "." + toolGroups[i].group,"",null));// ITAULaunchConfigurationConstants.TAU_BIN_PATH)); //$NON-NLS-1$
 			}
 
 	}
 
 	@Override
 	public boolean performOk() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		//Preferences preferences = Activator.getDefault().getPluginPreferences();
 
+		InstanceScope is = new InstanceScope();
+		
+		IEclipsePreferences preferences = is.getNode(Activator.PLUGIN_ID);
+		
 		if (toolGroups != null)
 			for (int i = 0; i < toolGroups.length; i++) {
-				preferences.setValue(
+				preferences.put(
 						IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolGroups[i].group, toolGroups[i].binDir.getText()); //$NON-NLS-1$
 			}
 
-		Activator.getDefault().savePluginPreferences();
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//Activator.getDefault().savePluginPreferences();
 		return true;
 	}
 

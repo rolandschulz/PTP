@@ -110,7 +110,7 @@ public class PerfDMFView extends ViewPart {
 			this.tt = tt;
 		}
 
-		public Object getAdapter(Class adapter) {
+		public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
 			return null;
 		}
 

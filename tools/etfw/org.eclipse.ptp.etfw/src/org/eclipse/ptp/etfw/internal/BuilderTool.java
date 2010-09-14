@@ -33,6 +33,7 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 
+@SuppressWarnings("restriction")
 public class BuilderTool extends ToolStep implements IToolLaunchConfigurationConstants {
 
 	/**
@@ -242,7 +243,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 
 		// Make a list of the configurations already within the project
 		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
-		IConfiguration selectedconf = null;
+		//IConfiguration selectedconf = null;
 		for (int i = 0; i < buildconfigs.length; i++) {
 			if ((buildconfigs[i].getName()).equals(buildConf)) {
 				selectedconf = buildconfigs[i];

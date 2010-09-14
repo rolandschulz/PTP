@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.Text;
  * @author wspear
  * 
  */
+@SuppressWarnings("restriction")
 public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationTab {
 
 	protected Combo projectCombo = null;

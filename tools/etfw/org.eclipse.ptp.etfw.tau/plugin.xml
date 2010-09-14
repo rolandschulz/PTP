@@ -22,7 +22,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.etfw.performanceToolsMainpage"
+            category="org.eclipse.ptp.etfw.preferences.ExternalToolsMainPage"
             class="org.eclipse.ptp.etfw.tau.TAUPrefPage"
             id="org.eclipse.ptp.etfw.tau.tauconfigpage"
             name="TAU Configuration">

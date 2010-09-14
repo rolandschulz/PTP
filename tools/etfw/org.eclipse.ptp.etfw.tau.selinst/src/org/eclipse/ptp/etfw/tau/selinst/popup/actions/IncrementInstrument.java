@@ -43,6 +43,7 @@ import org.eclipse.ui.IEditorPart;
 /**
  * Action for adding selective instrumentation of monotonically increasing events to a CDT source file via selection of source code in the editor 
  */
+@SuppressWarnings("restriction")
 public class IncrementInstrument implements IEditorActionDelegate {
 
 	CEditor textEditor;

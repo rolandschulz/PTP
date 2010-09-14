@@ -270,7 +270,7 @@ public class TAUPortalUploadDialog extends Dialog {
      */
     static private void trustHttpsCertificates() throws Exception {
     	
-    	Class sslProvider=null;
+    	Class<?> sslProvider=null;
     	boolean goodProvider=true;
     	try{
     	sslProvider=Class.forName("com.sun.net.ssl.internal.ssl.Provider"); //$NON-NLS-1$

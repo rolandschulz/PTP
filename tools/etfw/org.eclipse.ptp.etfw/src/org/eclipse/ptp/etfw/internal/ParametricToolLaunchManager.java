@@ -512,6 +512,7 @@ public class ParametricToolLaunchManager {
 	 * operations in this function are divided into three jobs: Building,
 	 * Running and Data collection
 	 */
+	@SuppressWarnings("unchecked")
 	public static void launch(ILaunchConfiguration configuration, LaunchConfigurationDelegate paraDel, ILaunchFactory lf,
 			String mode, ILaunch launchIn, IProgressMonitor monitor) throws CoreException // ,
 																							// TAULaunch
@@ -595,13 +596,13 @@ public class ParametricToolLaunchManager {
 		} else {
 			processorOptionString = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_NUM_PROCESSORS, "1");// "1,2";//,4,8"; //$NON-NLS-1$
 			// TODO: validate this string first?
-			argNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_NAMES, (List) null);
-			argVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_VALUES, (List) null);
-			argBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_BOOLS, (List) null);
+			argNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_NAMES, (List<String>) null);
+			argVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_VALUES, (List<String>) null);
+			argBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ARG_BOOLS, (List<String>) null);
 
-			varNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_NAMES, (List) null);
-			varVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_VALUES, (List) null);
-			varBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_BOOLS, (List) null);
+			varNames = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_NAMES, (List<String>) null);
+			varVars = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_VALUES, (List<String>) null);
+			varBools = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_VAR_BOOLS, (List<String>) null);
 			optLevStr = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_OPT_LEVELS, ""); //$NON-NLS-1$
 			allCom = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ALL_COMBO, false);
 		}
@@ -770,7 +771,7 @@ public class ParametricToolLaunchManager {
 				/* Set up environment variables for this run */
 				if (param.vars != null) {
 					Map<String, Object> envvars = null;
-					envvars = wc.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map) null);
+					envvars = wc.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, Object>) null);
 					if (envvars == null) {
 						envvars = new HashMap<String, Object>();
 					}

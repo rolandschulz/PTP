@@ -17,12 +17,19 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.ui;
 
-import java.io.File;
+//import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -226,13 +233,28 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		if (out == null)
 			return;
 
-		File test = new File(out);
-		if (!test.canRead() || !test.isFile()) {
+		IFileStore test=null;;
+		try {
+			test = EFS.getStore(new URI(out));
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//File test = new File(out);
+		if (test==null || !test.fetchInfo().exists() || test.fetchInfo().isDirectory()) {
 			return;
 		}
 
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		String fiList = preferences.getString(XMLLOCID);
+		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		
+		IPreferencesService service = Platform.getPreferencesService();
+		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);
+		
+		//String fiList = preferences.getString(XMLLOCID);
 
 		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
@@ -251,15 +273,18 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 				fiList += ",,,"; //$NON-NLS-1$
 			}
 		}
-		preferences.setValue(XMLLOCID, fiList);// XMLLoc.getText());
+		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
 		Activator.getDefault().refreshTools();
 		warnXMLChange();
 
 	}
 
 	private void removeWorkflow() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		String fiList = preferences.getString(XMLLOCID);
+		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		IPreferencesService service = Platform.getPreferencesService();
+		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);
+		//String fiList = preferences.getString(XMLLOCID);
 
 		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
@@ -297,7 +322,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 				fiList += ",,,"; //$NON-NLS-1$
 			}
 		}
-		preferences.setValue(XMLLOCID, fiList);// XMLLoc.getText());
+		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
 		Activator.getDefault().refreshTools();
 		warnXMLChange();
 	}

@@ -17,9 +17,19 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.preferences;
 
-import java.io.File;
+//import java.io.File;
 
-import org.eclipse.core.runtime.Preferences;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -43,6 +53,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * Provides a user-interface for and managed workspace-wide performance tool
@@ -164,16 +175,24 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	 */
 	protected void handleXMLBrowseButtonSelected() {
 		FileDialog dialog = new FileDialog(getShell());
-		File path = null;
+		IFileStore path = null;
 		String correctPath = null;
 		int maxXDex = XMLLocs.getItemCount() - 1;
 		if (maxXDex >= 0) {
 			correctPath = getFieldContent(XMLLocs.getItem(maxXDex));
 		}
 		if (correctPath != null) {
-			path = new File(correctPath);
-			if (path.exists())
-				dialog.setFilterPath(path.isFile() ? correctPath : path.getParent());
+			try {
+				path = EFS.getStore(new URI(correctPath));
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (path.fetchInfo().exists())
+				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toString()); //TODO: This may be bad
 		}
 
 		// String tlpath = correctPath+File.separator+"lib";
@@ -194,8 +213,8 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		String out = getFieldContent(dialog.open());
 
 		if (out != null) {
-			File test = new File(out);
-			if (test.canRead() && test.isFile()) {
+			IFileStore test = EFS.getLocalFileSystem().getStore(new Path(out));//new IFFile(out);
+			if (test.fetchInfo().exists() && !test.fetchInfo().isDirectory()) {
 				XMLLocs.add(out);
 			} else {
 				// TODO: print a warning?
@@ -226,23 +245,27 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	}
 
 	private void loadSaved() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
-		String fiList = preferences.getString(XMLLOCID);
+		
+		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		IPreferencesService service = Platform.getPreferencesService();
+		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);//.getString(XMLLOCID);
 
 		String[] files = fiList.split(",,,"); //$NON-NLS-1$
 		for (String s : files) {
 			XMLLocs.add(s);// setText(preferences.getString(XMLLOCID));
 		}
 		// TODO: Add checks
-		// checkAutoOpts.setSelection(preferences.getBoolean("TAUCheckForAutoOptions"));
+		// checkAutoOpts.setSelection(preferences.getBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT));
 		// if(checkAixOpts!=null)
-		// checkAixOpts.setSelection(preferences.getBoolean("TAUCheckForAIXOptions"));
+		// checkAixOpts.setSelection(preferences.getBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT));
 	}
 
-	@Override
 	public boolean performOk() {
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		 //Activator.getDefault().getPluginPreferences();
 
+		
+		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		
 		String fiList = ""; //$NON-NLS-1$
 
 		for (int i = 0; i < XMLLocs.getItemCount(); i++) {
@@ -251,13 +274,19 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 				fiList += ",,,"; //$NON-NLS-1$
 			}
 		}
-		preferences.setValue(XMLLOCID, fiList);// XMLLoc.getText());
+		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Activator.getDefault().refreshTools();
 		// TODO: Add checks
-		// preferences.setValue("TAUCheckForAutoOptions",
+		// preferences.setValue(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,
 		// checkAutoOpts.getSelection());
 		// if(checkAixOpts!=null)
-		// preferences.setValue("TAUCheckForAIXOptions",
+		// preferences.setValue(ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT,
 		// checkAixOpts.getSelection());
 		//
 		// Activator.getDefault().savePluginPreferences();
@@ -282,12 +311,10 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	protected void defaultSetting() {
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 	}
 
-	@Override
 	public void performDefaults() {
 		defaultSetting();
 		updateApplyButton();

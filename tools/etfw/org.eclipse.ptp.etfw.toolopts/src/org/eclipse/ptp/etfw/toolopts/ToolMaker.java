@@ -17,12 +17,16 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.toolopts;
 
-import java.io.File;
+//import java.io.File;
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.etfw.toolopts.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
@@ -52,13 +56,19 @@ public class ToolMaker {
 	 * Creates ExternalTools
 	 * @param tooldef The xml file containing the definition of one or more tool-panes
 	 * @return The array of defined but uninitialized ToolPanes defined in the provided xml file
+	 * @since 4.0
 	 */
-	public static ExternalToolProcess[] makeTools(File tooldef){
+	public static ExternalToolProcess[] makeTools(IFileStore tooldef){
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		//factory.setValidating(false);
 		ToolParser tparser = new ToolParser();
 		try {
-			factory.newSAXParser().parse(tooldef, tparser);
+			try {
+				factory.newSAXParser().parse(tooldef.openInputStream(EFS.NONE, null), tparser);
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}catch (SAXParseException e) {
 			System.err.println(Messages.ToolMaker_ErrorInWorkflowDefinition+e.getSystemId()+Messages.ToolMaker_AtLine+e.getLineNumber()+Messages.ToolMaker_Column+e.getColumnNumber());
 			e.printStackTrace();
@@ -276,10 +286,10 @@ public class ToolMaker {
 
 			String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
 			if (correctPath != null) {
-				File path = new File(correctPath);
-				if (path.exists()) {
-					dialog.setFilterPath(path.isFile() ? correctPath : path
-							.getParent());
+				IFileStore path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
+				if (path.fetchInfo().exists()) {
+					dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path
+							.getParent().toURI().getPath());
 				}
 			}
 
@@ -300,10 +310,10 @@ public class ToolMaker {
 
 			String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
 			if (correctPath != null) {
-				File path = new File(correctPath);
-				if (path.exists()) {
-					dialog.setFilterPath(path.isFile() ? correctPath : path
-							.getParent());
+				IFileStore path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
+				if (path.fetchInfo().exists()) {
+					dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path
+							.getParent().toURI().getPath());
 				}
 			}
 

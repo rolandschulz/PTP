@@ -356,7 +356,8 @@ public class BuildLaunchUtils {
 				pb.environment().putAll(env);
 			}
 
-			Process p = pb.start();
+			//Process p = 
+				pb.start();
 
 		} catch (Exception e) {
 			e.printStackTrace();

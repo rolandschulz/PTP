@@ -166,6 +166,7 @@ public class ParallelToolRecompMainTab extends ApplicationTab{
 	 * Initialize the combo box listing the available build configurations for this project
 	 *
 	 */
+	@SuppressWarnings("restriction")
 	protected void initConfCombo()
 	{
 		buildConfCombo.removeAll();

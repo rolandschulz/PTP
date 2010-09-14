@@ -112,6 +112,9 @@ public interface ITAULaunchConfigurationConstants {
 	 */
 	public static final String NODB=Messages.ITAULaunchConfigurationConstants_NoDatabasesAvailable;
 	
+	public static final String TAU_CHECK_AUTO_OPT="TAUCheckForAutoOptions";
+	public static final String TAU_CHECK_AIX_OPT="TAUCheckForAIXOptions";
+	
 	//public static final String PARA_PERF_SCRIPT="path to the perfexplorer script to use in parametric study";
 	//public static final String PARA_VAR_VALUES="env-var values to use in parametric study";
 	

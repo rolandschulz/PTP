@@ -112,6 +112,7 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 	 * @return True if the launch is attempted, false otherwise
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean performLaunch(LaunchConfigurationDelegate paraDel, ILaunch launch, IProgressMonitor monitor) throws Exception {
 		try {
 			// if(tool==null)

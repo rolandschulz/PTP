@@ -41,6 +41,7 @@ import org.eclipse.ui.internal.Workbench;
  * 
  * @see IWorkbenchWindowActionDelegate
  */
+@SuppressWarnings("restriction")
 public class TestPAPI {
 	private IWorkbenchWindow window;
 
