@@ -42,6 +42,7 @@ import org.eclipse.ui.IEditorPart;
 /**
  * Action for adding selective instrumentation of user defined events to a CDT source file via selection of source code in the editor 
  */
+@SuppressWarnings("restriction")
 public class AtomicInstrument implements IEditorActionDelegate {
 	CEditor textEditor;
 

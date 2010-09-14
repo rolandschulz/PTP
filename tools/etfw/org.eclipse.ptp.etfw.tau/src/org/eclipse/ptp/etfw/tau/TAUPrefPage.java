@@ -17,7 +17,10 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.tau;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -36,6 +39,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.osgi.service.prefs.BackingStoreException;
 
 public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferencePage{
 	protected Button checkAutoOpts=null;
@@ -100,24 +104,31 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 	/*This may be unused...*/
 	protected void loadSaved()
 	{
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		IPreferencesService service = Platform.getPreferencesService();
 		
 		//TODO: Add checks
-		checkAutoOpts.setSelection(preferences.getBoolean("TAUCheckForAutoOptions")); //$NON-NLS-1$
+		checkAutoOpts.setSelection(service.getBoolean(Activator.PLUGIN_ID,ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,true,null)); //$NON-NLS-1$
 		if(checkAixOpts!=null)
-			checkAixOpts.setSelection(preferences.getBoolean("TAUCheckForAIXOptions")); //$NON-NLS-1$
+			checkAixOpts.setSelection(service.getBoolean(Activator.PLUGIN_ID,ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT,false,null)); //$NON-NLS-1$
 	}
 	
 	public boolean performOk() 
 	{
-		Preferences preferences = Activator.getDefault().getPluginPreferences();
+		
+		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		//Preferences preferences = Activator.getDefault().getPluginPreferences();
 
 		//TODO: Add checks
-		preferences.setValue("TAUCheckForAutoOptions", checkAutoOpts.getSelection()); //$NON-NLS-1$
+		preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT, checkAutoOpts.getSelection()); //$NON-NLS-1$
 		if(checkAixOpts!=null)
-			preferences.setValue("TAUCheckForAIXOptions", checkAixOpts.getSelection()); //$NON-NLS-1$
+			preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT, checkAixOpts.getSelection()); //$NON-NLS-1$
 
-		Activator.getDefault().savePluginPreferences();
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 	

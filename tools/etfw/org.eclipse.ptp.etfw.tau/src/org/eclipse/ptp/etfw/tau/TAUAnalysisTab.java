@@ -1031,6 +1031,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	/**
 	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
 	 */
+	@SuppressWarnings("unchecked")
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 
@@ -1141,7 +1142,8 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 			varmap = archvarmap = configuration.getAttribute(
 					ITAULaunchConfigurationConstants.ENVVARS, (Map<String,Object>) null);
 
-			Activator.getDefault().getPluginPreferences().setDefault("TAUCheckForAutoOptions",true); //$NON-NLS-1$
+			
+			//Activator.getDefault().getPluginPreferences().setDefault(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,true); //$NON-NLS-1$
 
 		} catch (CoreException e) {
 			setErrorMessage(Messages.TAUAnalysisTab_CoreExceptionInitAnalysisTab
@@ -1182,6 +1184,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 	/**
 	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
 	 */
+	@SuppressWarnings("unchecked")
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		for (int i = 0; i < checks.length; i++) {
 			configuration.setAttribute(checks[i].confString,
@@ -1310,7 +1313,7 @@ public class TAUAnalysisTab extends AbstractToolConfigurationTab {
 		configuration.setAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB_NAME, PerfDMFView.extractDatabaseName(dbCombo.getItem(dbCombo.getSelectionIndex())));
 
 		configuration.setAttribute(IToolLaunchConfigurationConstants.TOOLCONFNAME+"TAU", "_"+tauMakeName.substring(tauMakeName.lastIndexOf(".")+1)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		//.setDefault("TAUCheckForAutoOptions",true);
+
 
 
 		//		if(noParallelRun.getSelection()&&makecombo.getItem(makecombo.getSelectionIndex()).indexOf("-mpi")>0)

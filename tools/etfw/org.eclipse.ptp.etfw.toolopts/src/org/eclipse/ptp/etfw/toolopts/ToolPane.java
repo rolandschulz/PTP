@@ -131,14 +131,16 @@ public class ToolPane implements IAppInput {
 	 */
 	public int paneType = -1;
 
+	@SuppressWarnings("unchecked")
 	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
+		Map<String,String> nullmap = null;
 		try {
 			return configuration.getAttribute(configVarID,
-					(Map<String, String>) null);
+					nullmap);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return nullmap;
 	}
 
 	public String getArgument(ILaunchConfiguration configuration) {
@@ -436,6 +438,7 @@ public class ToolPane implements IAppInput {
 	// toptions.toArray(options);
 	// }
 
+	@SuppressWarnings("unused")
 	private ToolPane(){
 		this.virtual=false;
 	}

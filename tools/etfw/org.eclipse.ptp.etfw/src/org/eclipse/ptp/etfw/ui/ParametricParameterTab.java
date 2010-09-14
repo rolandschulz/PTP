@@ -61,12 +61,13 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 	private Button allCom;
 
-	private Text trial;
+	//private Text trial;
 	private Text script;
 	private Button scriptBrowse;
 
 	private boolean parallel = false;
 
+	@SuppressWarnings("unused")
 	private ParametricParameterTab() {
 
 	}
@@ -341,6 +342,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		return Messages.ParametricParameterTab_ParametricStudy;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void initializeFrom(ILaunchConfiguration configuration) {
 
 		try {
