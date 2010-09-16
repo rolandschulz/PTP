@@ -52,8 +52,7 @@ mkdir -p $BUILD_DIR && cd $BUILD_DIR
 rm -fr org.eclipse.ptp_${TAG}
 
 # Check out the releng project
-export CVSROOT=:pserver:anonymous@dev.eclipse.org:/cvsroot/tools
-cvs co -r $TAG -d org.eclipse.ptp_${TAG} org.eclipse.ptp/releng/org.eclipse.ptp.releng
+cvs -d /cvsroot/tools co -r $TAG -d org.eclipse.ptp_${TAG} org.eclipse.ptp/releng/org.eclipse.ptp.releng
 
 # run the main script
 cd org.eclipse.ptp_${TAG}
