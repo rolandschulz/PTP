@@ -28,29 +28,12 @@ MICommand *
 MIExecArguments(char **argv)
 {
 	int			i;
-	int 		len = 0;
-	char *		arg_str;
 	MICommand *	cmd;
 	
+	cmd = MICommandNew("-exec-arguments", MIResultRecordDONE);
 	for (i = 0; argv[i] != NULL; i++) {
-		if (i > 0) {
-			len += 1;
-		}
-		len += strlen(argv[i]);
+		MICommandAddOption(cmd, argv[i], NULL);
 	}
-	
-	arg_str = (char *)malloc(len * sizeof(char));
-	*arg_str = '\0';
-	
-	for (i = 0; argv[i] != NULL; i++) {
-		if (i > 0) {
-			strcat(arg_str, " ");
-		}
-		strcat(arg_str, argv[i]);
-	}
-	
-	cmd = MICommandNew("-exec-arguments", MIResultRecordRUNNING);
-	MICommandAddOption(cmd, arg_str, NULL);
 	return cmd;
 }
 
