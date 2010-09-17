@@ -168,9 +168,7 @@ MICommandToString(MICommand *cmd)
 			free(str_res);
 		str_res = (char *)malloc(size);
 		str_size = size;
-
 	}
-
 
 	s = str_res;
 	memcpy(s, cmd->command, cmd_len);
