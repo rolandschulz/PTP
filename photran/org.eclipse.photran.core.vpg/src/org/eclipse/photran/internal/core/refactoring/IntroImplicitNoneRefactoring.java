@@ -25,14 +25,11 @@ import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTExecutableProgramNode;
 import org.eclipse.photran.internal.core.parser.ASTImplicitStmtNode;
-import org.eclipse.photran.internal.core.parser.ASTUseStmtNode;
-import org.eclipse.photran.internal.core.parser.GenericASTVisitor;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IBodyConstruct;
 import org.eclipse.photran.internal.core.refactoring.infrastructure.FortranResourceRefactoring;
 import org.eclipse.photran.internal.core.reindenter.Reindenter;
-import org.eclipse.photran.internal.core.util.Notification;
 
 /**
  * Refactoring to add an IMPLICIT NONE statement and explicit declarations for all
@@ -129,42 +126,6 @@ public class IntroImplicitNoneRefactoring extends FortranResourceRefactoring
         }
 
         this.addChangeFromModifiedAST(file, progressMonitor);
-    }
-
-    private ASTImplicitStmtNode findExistingImplicitStatement(final ScopingNode scope)
-    {
-        try
-        {
-            scope.accept(new GenericASTVisitor()
-            {
-                @Override
-                public void visitASTImplicitStmtNode(ASTImplicitStmtNode node)
-                {
-                    if (node.getImplicitToken().getEnclosingScope() == scope)
-                        throw new Notification(node);
-                }
-            });
-        }
-        catch (Notification n)
-        {
-            return (ASTImplicitStmtNode)n.getResult();
-        }
-        return null;
-    }
-
-    private int findIndexOfLastUseStmtIn(IASTListNode<IASTNode> body)
-    {
-        int result = -1;
-
-        for (int i = 0; i < body.size(); i++)
-        {
-            if (body.get(i) instanceof ASTUseStmtNode)
-                result = i;
-            else
-                break; // USE statements precede all other statements, so we can stop here
-        }
-
-        return result;
     }
 
     private IASTListNode<IBodyConstruct> constructDeclarations(final ScopingNode scope)

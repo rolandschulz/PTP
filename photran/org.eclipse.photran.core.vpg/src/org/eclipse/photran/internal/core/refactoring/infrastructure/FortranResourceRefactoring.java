@@ -33,6 +33,7 @@ import org.eclipse.photran.internal.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.loops.ASTProperLoopConstructNode;
+import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
 import org.eclipse.photran.internal.core.lexer.ASTLexerFactory;
 import org.eclipse.photran.internal.core.lexer.IAccumulatingLexer;
 import org.eclipse.photran.internal.core.lexer.Terminal;
@@ -253,6 +254,19 @@ public abstract class FortranResourceRefactoring
     protected static IExpr parseLiteralExpression(String string)
     {
         return ((ASTAssignmentStmtNode)parseLiteralStatement("x = " + string)).getRhs(); //$NON-NLS-1$
+    }
+    
+    /**
+     * Parses the given do-loop.
+     * <p>
+     * @see parseLiteralStatement
+     */
+    protected static ASTProperLoopConstructNode parseLiteralDoLoop(String string)
+    {
+        IASTListNode<IBodyConstruct> list = (parseLiteralStatementSequence(string));
+        ScopingNode scope = list.findNearestAncestor(ScopingNode.class);
+        LoopReplacer.replaceAllLoopsIn(scope);
+        return (ASTProperLoopConstructNode)scope.getBody().get(0);
     }
 
     /**
@@ -620,6 +634,41 @@ public abstract class FortranResourceRefactoring
         }
     }
 
+    protected ASTImplicitStmtNode findExistingImplicitStatement(final ScopingNode scope)
+    {
+        try
+        {
+            scope.accept(new GenericASTVisitor()
+            {
+                @Override
+                public void visitASTImplicitStmtNode(ASTImplicitStmtNode node)
+                {
+                    if (node.getImplicitToken().getEnclosingScope() == scope)
+                        throw new Notification(node);
+                }
+            });
+        }
+        catch (Notification n)
+        {
+            return (ASTImplicitStmtNode)n.getResult();
+        }
+        return null;
+    }
+
+    protected int findIndexOfLastUseStmtIn(IASTListNode<? extends IASTNode> body)
+    {
+        int result = -1;
+    
+        for (int i = 0; i < body.size(); i++)
+        {
+            if (body.get(i) instanceof ASTUseStmtNode)
+                result = i;
+            else
+                break; // USE statements precede all other statements, so we can stop here
+        }
+    
+        return result;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
