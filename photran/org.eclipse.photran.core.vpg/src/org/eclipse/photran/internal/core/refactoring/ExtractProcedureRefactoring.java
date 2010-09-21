@@ -25,12 +25,14 @@ import org.eclipse.photran.internal.core.analysis.binding.Definition;
 import org.eclipse.photran.internal.core.analysis.binding.ScopingNode;
 import org.eclipse.photran.internal.core.analysis.loops.GenericASTVisitorWithLoops;
 import org.eclipse.photran.internal.core.analysis.loops.LoopReplacer;
+import org.eclipse.photran.internal.core.analysis.types.Type;
 import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.lexer.Token.FakeToken;
 import org.eclipse.photran.internal.core.parser.ASTArrayDeclaratorNode;
 import org.eclipse.photran.internal.core.parser.ASTArraySpecNode;
 import org.eclipse.photran.internal.core.parser.ASTAttrSpecSeqNode;
+import org.eclipse.photran.internal.core.parser.ASTCharSelectorNode;
 import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDimensionStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEntityDeclNode;
@@ -55,6 +57,7 @@ import org.eclipse.photran.internal.core.vpg.PhotranVPG;
  * replacing the sequence with a call to that subroutine.
  *
  * @author Jeff Overbey
+ * @author Abhishek Sharma - Bug 313369
  */
 /*
  * (Eventually, this should be generalized to extract either a subroutine or function,
@@ -467,6 +470,8 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
         StringBuilder sb = new StringBuilder();
 
         sb.append(var.getType().toString());
+        if (var.getType().equals(Type.CHARACTER))
+            sb.append(getCharSelector(var));
 
         if (var.isAllocatable()) sb.append(", allocatable"); //$NON-NLS-1$
         if (var.isIntentIn() && !var.isIntentOut()) sb.append(", intent(in)"); //$NON-NLS-1$
@@ -481,6 +486,23 @@ public class ExtractProcedureRefactoring extends FortranEditorRefactoring
             sb.append(var.getArraySpec());
 
         return sb.toString();
+    }
+
+    private String getCharSelector(Definition var)
+    {
+        ASTTypeDeclarationStmtNode typeDeclStmt = var.getTokenRef().findToken().findNearestAncestor(ASTTypeDeclarationStmtNode.class);
+        if (typeDeclStmt != null)
+        {
+            ASTCharSelectorNode charSelector = typeDeclStmt.getTypeSpec().getCharSelector();
+            if (charSelector != null)
+            {
+//                sb.append("(LEN="); //$NON-NLS-1$
+//                sb.append(charSelector.getLengthExpr().toString());
+//                sb.append(")"); //$NON-NLS-1$
+                return charSelector.toString();
+            }
+        }
+        return ""; //$NON-NLS-1$
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

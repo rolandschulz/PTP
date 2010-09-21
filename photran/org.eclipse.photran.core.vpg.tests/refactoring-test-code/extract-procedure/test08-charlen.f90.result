@@ -1,0 +1,14 @@
+program refactor
+    implicit none
+    character(3) :: charvar
+    charvar = 'abc'
+    call new_procedure(charvar)
+contains
+
+    subroutine new_procedure(charvar)
+        implicit none
+        character(3) :: charvar
+        print *, charvar !<<<<<START !<<<<<END
+    end subroutine
+
+end program refactor
