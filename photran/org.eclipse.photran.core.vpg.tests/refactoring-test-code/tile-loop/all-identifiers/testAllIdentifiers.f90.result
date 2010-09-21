@@ -1,0 +1,19 @@
+program test
+
+    implicit none
+    integer :: i1, j1
+
+    integer :: i
+    integer :: j
+    integer :: n=1, m=20, p=10
+    do i1=floor(real(n-20)/3)*3+20,8,3
+        do j1=floor(real(n-20)/3)*3+20,floor(real(m-20)/3)*3+20,3
+            do i=max(n,i1),min(10,i1+2)
+                do j=max(n,j1),min(m,j1+2)
+                    print *, i
+                end do
+            end do
+        end do
+    end do
+
+end program test

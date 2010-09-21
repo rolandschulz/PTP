@@ -90,7 +90,16 @@
              class="org.eclipse.photran.internal.core.refactoring.InterchangeLoopsRefactoring"
          />
          <editorRefactoring
-             class="org.eclipse.photran.internal.core.refactoring.ReverseLoopRefactoring"
+         	class="org.eclipse.photran.internal.core.refactoring.ReverseLoopRefactoring"
+         />
+         <editorRefactoring
+         	class="org.eclipse.photran.internal.core.refactoring.UnrollLoopRefactoring"
+         />
+         <editorRefactoring
+         	class="org.eclipse.photran.internal.core.refactoring.FuseLoopsRefactoring"
+         />
+         <editorRefactoring
+         	class="org.eclipse.photran.internal.core.refactoring.TileLoopRefactoring"
          />
       </group>
       <group><!-- Refactorings that reformat code -->

@@ -60,6 +60,8 @@ public class Messages extends NLS
     public static String AddOnlyToUseStmtRefactoring_ProjectDoesNotExist;
 
     public static String AddOnlyToUseStmtRefactoring_SelectModuleName;
+
+    public static String AddUseOfNamedEntitiesToModule_refactoringName;
     public static String EncapsulateVariableRefactoring_CannotEncapsulateArrays;
 
     public static String EncapsulateVariableRefactoring_CannotEncapsulatePARAMETER;
@@ -274,6 +276,52 @@ public class Messages extends NLS
     public static String KeywordCaseRefactoring_Name;
 
     public static String KeywordCaseRefactoring_SelectedFileCannotBeParsed;
+
+    public static String LoopAlignmentRefactoring_LoopAlignmentName;
+
+    public static String LoopAlignmentRefactoring_LoopsNotCompatible;
+
+    public static String FuseLoopsRefactoring_CycleExitFails;
+
+    public static String FuseLoopsRefactoring_IncompatibleLoopErorrMessage;
+
+    public static String FuseLoopsRefactoring_InvalidLoopBounds;
+
+    public static String FuseLoopsRefactoring_InvalidStepError;
+
+    public static String FuseLoopsRefactoring_LoopFusionName;
+
+    public static String FuseLoopsRefactoring_NoSecondLoopErrorMsg;
+
+    public static String FuseLoopsRefactoring_SelectLoopsWithoutLabels;
+
+    public static String FuseLoopsRefactoring_SelectLoopWithIntegers;
+
+    public static String TileLoopRefactoring_CantTileLoopsWithStep;
+
+    public static String TileLoopRefactoring_InvalidTileSize;
+
+    public static String TileLoopRefactoring_InvalidTilingOffset;
+
+    public static String TileLoopRefactoring_LoopTilingName;
+
+    public static String TileLoopRefactoring_SelectLoopWithOnlyOneNestedLoop;
+
+    public static String TileLoopRefactoring_UnableToCreateNewIndex;
+
+    public static String UnrollLoopRefactoring_cannotUnrollLoopWithLabel;
+
+    public static String UnrollLoopRefactoring_InvalidStepError;
+
+    public static String UnrollLoopRefactoring_LoopUnrollingName;
+
+    public static String UnrollLoopRefactoring_LoopWritesToIndexVariable;
+
+    public static String UnrollLoopRefactoring_SelectLoopWithExplicitBound;
+
+    public static String UnrollLoopRefactoring_unableToCreateUpperBound;
+
+    public static String UnrollLoopRefactoring_UnableToReplaceIndexVariable;
     public static String MakePrivateEntityPublicRefactoring_DoesNotSupportExternalEntities;
 
     public static String MakePrivateEntityPublicRefactoring_DoesNotSupportInterfaceDeclarations;

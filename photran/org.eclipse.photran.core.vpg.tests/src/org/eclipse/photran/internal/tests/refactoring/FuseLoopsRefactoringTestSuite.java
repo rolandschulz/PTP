@@ -12,30 +12,36 @@ package org.eclipse.photran.internal.tests.refactoring;
 
 import junit.framework.Test;
 
-import org.eclipse.photran.internal.core.refactoring.SafeDeleteInternalSubprogramRefactoring;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.photran.internal.core.refactoring.FuseLoopsRefactoring;
 import org.eclipse.photran.internal.tests.Activator;
 import org.eclipse.photran.internal.tests.PhotranRefactoringTestSuiteFromMarkers;
 
 /**
- * Unit tests for the Safe Delete Internal Subprogram refactoring.
+ * Unit tests for the Fuse Loops refactoring.
  * 
- * @author Abhishek Sharma
+ * @author Ashley Kasza
  */
-public class SafeDeleteInternalSubprogramRefactoringTestSuite
-    extends PhotranRefactoringTestSuiteFromMarkers<SafeDeleteInternalSubprogramRefactoring>
+public class FuseLoopsRefactoringTestSuite extends PhotranRefactoringTestSuiteFromMarkers<FuseLoopsRefactoring>
 {
-    private static final String DIR = "refactoring-test-code/Safe-Delete-Internal-Subprogram" ;
-
-    public static Test suite()throws Exception
+    private static final String DIR = "refactoring-test-code/fuse-loops";
+    
+    public static Test suite() throws Exception
     {
-        return new SafeDeleteInternalSubprogramRefactoringTestSuite() ;
+        return new FuseLoopsRefactoringTestSuite();
     }
-
-    protected SafeDeleteInternalSubprogramRefactoringTestSuite() throws Exception
+    
+    public FuseLoopsRefactoringTestSuite() throws Exception
     {
         super(Activator.getDefault(),
-              "Running Safe-Delete Internal Subprogram test in",
-              DIR,
-              SafeDeleteInternalSubprogramRefactoring.class);
+            "Running Loop Fusion refactoring in",
+            DIR,
+            FuseLoopsRefactoring.class);
+    }
+
+    /** Prevents the compilation and running of tests we know don't preserve behavior */
+    @Override protected boolean shouldCompile(IFile fileContainingMarker)
+    {
+       return false;
     }
 }

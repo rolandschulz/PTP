@@ -1,0 +1,12 @@
+program test
+
+    implicit none
+
+    integer :: i, j
+    !<<<<<6,1,10,1,pass
+    do i=0,4,1
+        print *, (i*1+2)
+        print *, (i*-1+6)
+    end do
+
+end program test

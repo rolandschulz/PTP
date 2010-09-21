@@ -1,0 +1,18 @@
+program test
+
+    implicit none
+    integer :: i1, j1
+
+    integer :: i, j
+    do i1=-15,45,20
+        do j1=-15,min(floor(real(50-5)/20)*20+5,floor(real(i1-5)/20)*20+5),20
+            do i=max(1,i1),min(50,i1+19)
+                do j=max(1,j1),min(i,j1+19)
+                    print *, i
+                end do
+            end do
+        end do
+    end do
+
+
+end program test

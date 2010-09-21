@@ -12,17 +12,22 @@ package org.eclipse.photran.internal.core.analysis.loops;
 
 import java.util.HashSet;
 
+import org.eclipse.photran.internal.core.lexer.Terminal;
 import org.eclipse.photran.internal.core.lexer.Token;
 import org.eclipse.photran.internal.core.parser.ASTEndDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTExitStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTIntConstNode;
 import org.eclipse.photran.internal.core.parser.ASTLabelDoStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTListNode;
+import org.eclipse.photran.internal.core.parser.ASTLoopControlNode;
 import org.eclipse.photran.internal.core.parser.ASTNode;
+import org.eclipse.photran.internal.core.parser.ASTUnaryExprNode;
 import org.eclipse.photran.internal.core.parser.IASTListNode;
 import org.eclipse.photran.internal.core.parser.IASTNode;
 import org.eclipse.photran.internal.core.parser.IASTVisitor;
 import org.eclipse.photran.internal.core.parser.IExecutableConstruct;
 import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
+import org.eclipse.photran.internal.core.parser.IExpr;
 
 /**
  * A custom AST node for Fortran DO loops.
@@ -36,6 +41,7 @@ import org.eclipse.photran.internal.core.parser.IExecutionPartConstruct;
  * can be visited using an {@link IASTVisitorWithLoops}.
  * 
  * @author Jeff Overbey
+ * @author Ashley Kasza - added small functions for getting to the bounds of a loop easier.
  * 
  * @see LoopReplacer
  * @see IASTVisitorWithLoops
@@ -57,7 +63,7 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         return this.loopHeader;
     }
     
-    void setLoopHeader(ASTLabelDoStmtNode header)
+    public void setLoopHeader(ASTLabelDoStmtNode header)
     {
         this.loopHeader = header;
         if (header != null) header.setParent(this);
@@ -115,11 +121,109 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         }
     }
     
+    private ASTLoopControlNode getLoopControl()
+    {
+        return this.getLoopHeader().getLoopControl();
+    }
+    
     // UTILITY METHODS ////////////////////////////////////////////////////////////////////////////
     
     public boolean isDoWhileLoop()
     {
         return getLoopHeader().getLoopControl().getVariableName() == null;
+    }
+    
+    public IExpr getLowerBoundIExpr()
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        return node.getLb();
+    }
+
+    public void setLowerBoundIExpr(int newLower)
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        IExpr low = node.getLb();
+        low.replaceWith(Integer.toString(newLower));
+    }
+
+    public IExpr getUpperBoundIExpr()
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        return node.getUb();
+    }
+
+    public void setUpperBoundIExpr(int newUpper)
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        IExpr upper = node.getUb();
+        upper.replaceWith(Integer.toString(newUpper));
+    }
+
+    /**
+     * finds the number representation of the lower bound of the loop
+     * @return integer value of lower bound, -1 if its not an integer
+     */
+    public int getLowerBoundInt() throws NumberFormatException
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        IExpr expr = node.getLb();
+        if (expr instanceof ASTIntConstNode)
+        {
+            return Integer.parseInt(expr.findFirstToken().getText());
+        }
+        else
+        {
+            throw new NumberFormatException();
+        }
+    }
+
+    /**
+     * finds number representation of the upper bound
+     * @return the integer representation of upper bound, -1 if its not an integer
+     */
+    public int getUpperBoundInt()
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        IExpr expr = node.getUb();
+        if (expr instanceof ASTIntConstNode)
+        {
+            return Integer.parseInt(expr.findFirstToken().getText());
+        }
+        else
+        {
+            throw new NumberFormatException();
+        }
+    }
+
+    public int getStepInt()
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        IExpr expr = node.getStep();
+        if (expr instanceof ASTIntConstNode
+            || (expr instanceof ASTUnaryExprNode && ((ASTUnaryExprNode)expr).getOperand() instanceof ASTIntConstNode))
+            return Integer.parseInt(expr.toString());
+        else if (expr == null)
+            return 1;
+        else
+            throw new NumberFormatException();
+    }
+
+    public void setStepInt(int newStep)
+    {
+        ASTLoopControlNode node = this.getLoopControl();
+        IExpr step = node.getStep();
+        if (step == null)
+        {
+            String s = "," + Integer.toString(newStep);//$NON-NLS-1$
+            Token newVal = new Token(Terminal.T_ICON, s);
+            ASTIntConstNode newStepVar = new ASTIntConstNode();
+            newStepVar.setIntConst(newVal);
+            node.setStep(newStepVar);
+        }
+        else
+        {
+            step.replaceWith(Integer.toString(newStep));
+        }
     }
     
     public Token getIndexVariable()

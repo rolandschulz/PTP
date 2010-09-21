@@ -66,9 +66,7 @@ public class PermuteSubroutineArgsTestSuite extends PhotranRefactoringTestSuiteF
         return result;
     }
 
-    /**
-     * Method that prevents the compilation of any test we know don't compile
-     */
+    /** Prevents the compilation of tests we know don't compile */
     @Override protected boolean shouldCompile(IFile fileContainingMarker)
     {
        return false;

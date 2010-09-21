@@ -200,6 +200,8 @@ public abstract class FortranResourceRefactoring
 
     // CODE EXTRACTION ////////////////////////////////////////////////////////
 
+
+
     /**
      * Parses the given Fortran statement.
      * <p>
@@ -257,19 +259,6 @@ public abstract class FortranResourceRefactoring
     }
     
     /**
-     * Parses the given do-loop.
-     * <p>
-     * @see parseLiteralStatement
-     */
-    protected static ASTProperLoopConstructNode parseLiteralDoLoop(String string)
-    {
-        IASTListNode<IBodyConstruct> list = (parseLiteralStatementSequence(string));
-        ScopingNode scope = list.findNearestAncestor(ScopingNode.class);
-        LoopReplacer.replaceAllLoopsIn(scope);
-        return (ASTProperLoopConstructNode)scope.getBody().get(0);
-    }
-
-    /**
      * Parses the given list of Fortran statements.
      * <p>
      * @see parseLiteralStatement
@@ -278,6 +267,19 @@ public abstract class FortranResourceRefactoring
     {
         string = "program p\n" + string + "\nend program"; //$NON-NLS-1$ //$NON-NLS-2$
         return ((ASTMainProgramNode)parseLiteralProgramUnit(string)).getBody();
+    }
+
+    /**
+     * Parses the given DO-loop as a {@link ASTProperLoopConstructNode}.
+     * <p>
+     * @see parseLiteralStatement
+     */
+    protected static ASTProperLoopConstructNode parseLiteralDoLoop(String string)
+    {
+        string = "program p\n" + string + "\nend program"; //$NON-NLS-1$ //$NON-NLS-2$
+        ASTMainProgramNode prog = (ASTMainProgramNode)parseLiteralProgramUnit(string);
+        LoopReplacer.replaceAllLoopsIn(prog);
+        return (ASTProperLoopConstructNode)prog.getBody().get(0);
     }
 
     /** @return a CONTAINS statement */
@@ -504,7 +506,21 @@ public abstract class FortranResourceRefactoring
         return getLoopNode(firstToken, lastToken);*/
         return (ASTProperLoopConstructNode)getNode(ast, selection, ASTProperLoopConstructNode.class);
     }
-
+    /**start test code */
+    protected static ASTProperLoopConstructNode getLoopNodeAtIndx(IFortranAST ast, ITextSelection selection, int off)
+    {
+        return (ASTProperLoopConstructNode)getNodeAtIndx(ast, selection, ASTProperLoopConstructNode.class, off);
+    }
+    
+    protected static ASTNode getNodeAtIndx(IFortranAST ast, ITextSelection selection, Class<? extends ASTNode> node, int off)
+    {
+        Token firstToken = findFirstTokenAfter(ast, selection.getOffset()+off);
+        Token lastToken = findLastTokenBefore(ast, selection.getOffset()+selection.getLength());
+        if (firstToken == null || lastToken == null)
+            return null;
+        return getNode(firstToken, lastToken, node);
+    }
+    /**end test code*/
     protected static ASTNode getNode(IFortranAST ast, ITextSelection selection, Class<? extends ASTNode> node)
     {
         Token firstToken = findFirstTokenAfter(ast, selection.getOffset());
