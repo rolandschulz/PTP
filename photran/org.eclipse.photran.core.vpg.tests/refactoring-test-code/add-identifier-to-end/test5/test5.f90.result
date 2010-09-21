@@ -1,0 +1,28 @@
+module testmodule
+	integer :: xfromtestmodule
+end module testmodule
+
+function testfunction(A)
+	integer, intent(in) :: A
+	testfunction = 4;
+end function testfunction
+
+program fortrantest !<<<<< 1,1,pass
+
+	print *, "Main program!"
+
+contains
+	integer function testfunction(A)
+		integer, intent(in) :: A
+		testfunction = 4;
+	end function testfunction
+	subroutine do_stuff
+		print *,"Hi!"
+	end subroutine do_stuff
+end program fortrantest
+
+subroutine do_stuff
+
+	print *,"Hi!"
+
+end subroutine do_stuff

@@ -34,6 +34,11 @@ public class ASTEndProgramStmtNode extends ASTNode
     org.eclipse.photran.internal.core.lexer.Token endName; // in ASTEndProgramStmtNode
     org.eclipse.photran.internal.core.lexer.Token hiddenTEos; // in ASTEndProgramStmtNode
 
+    public boolean hasEndProgram()
+    {
+        return hiddenTProgram != null || endToken.getTerminal() == Terminal.T_ENDPROGRAM;
+    }
+    
     public org.eclipse.photran.internal.core.lexer.Token getLabel()
     {
         return this.label;

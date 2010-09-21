@@ -106,6 +106,9 @@
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.RemoveUnreferencedLabelsRefactoring"
          />         
+         <resourceRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.AddIdentifierToEndRefactoring"
+         />
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.ReplaceCharacterStarRefactoring"
          />

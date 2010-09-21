@@ -19,6 +19,10 @@ public class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.photran.internal.core.refactoring.messages"; //$NON-NLS-1$
 
+    public static String AddIdentifierToEndRefactoring_Name;
+
+    public static String AddIdentifierToEndRefactoring_SelectedFileCannotBeParsed;
+
     public static String AddOnlyToUseStmtRefactoring_AddingWouldChangeMeaningOf;
 
     public static String AddOnlyToUseStmtRefactoring_Analyzing;
