@@ -365,7 +365,7 @@ class EdgesTab
   
         private void displayEdgesAndArrows(GC gc, Rectangle sinkRect, Rectangle srcRect)
         {
-            new EdgeArrow(sinkRect,srcRect).drawOn(gc);
+            new EdgeArrow(srcRect, sinkRect).drawOn(gc);
         }
         
         private Color setColor(int type)
