@@ -36,6 +36,11 @@
              class="org.eclipse.photran.internal.core.refactoring.StandardizeStatementsRefactoring"
          />
       </group>
+      <group><!-- Refactorings that change internal subprograms -->
+         <editorRefactoring
+             class = "org.eclipse.photran.internal.core.refactoring.SafeDeleteInternalSubprogramRefactoring"
+         />
+      </group>
       <group><!-- Refactorings that change declarations in modules -->
          <editorRefactoring
              class="org.eclipse.photran.internal.core.refactoring.MakePrivateEntityPublicRefactoring"

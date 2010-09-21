@@ -1,0 +1,7 @@
+module class_test
+
+ integer :: a
+
+
+end module class_test
+program main; use class_test; a = 2; end program

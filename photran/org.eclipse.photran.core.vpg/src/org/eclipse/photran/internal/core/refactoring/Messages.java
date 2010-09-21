@@ -336,6 +336,16 @@ public class Messages extends NLS
 
     public static String ReverseLoopRefactoring_SelectDoLoop;
 
+    public static String SafeDeleteInternalSubprogramRefactoring_MultipleDefinitions;
+
+    public static String SafeDeleteInternalSubprogramRefactoring_NoDefinition;
+
+    public static String SafeDeleteInternalSubprogramRefactoring_NoSubroutineSelected;
+
+    public static String SafeDeleteInternalSubprogramRefactoring_NotAnInternalSubprogram;
+
+    public static String SafeDeleteInternalSubprogramRefactoring_SubroutineMustHaveOnlyInternalReferences;
+
     public static String StandardizeStatementsRefactoring_Name;
 
     public static String StandardizeStatementsRefactoring_SelectedFileCannotBeParsed;

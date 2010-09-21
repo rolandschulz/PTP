@@ -33,6 +33,7 @@ import org.eclipse.photran.internal.core.parser.ASTBlockDataStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockDataSubprogramNode;
 import org.eclipse.photran.internal.core.parser.ASTBlockStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTCallStmtNode;
+import org.eclipse.photran.internal.core.parser.ASTContainsStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeDefNode;
 import org.eclipse.photran.internal.core.parser.ASTDerivedTypeStmtNode;
 import org.eclipse.photran.internal.core.parser.ASTEndBlockDataStmtNode;
@@ -465,6 +466,35 @@ public abstract class ScopingNode extends ASTNode
             return new ASTListNode<IInternalSubprogram>();
     }
     
+    public ASTContainsStmtNode getContainsStmt()
+    {
+        // TODO: GET RID OF THIS MESS AFTER INDIVIDUAL NODES CAN BE CUSTOMIZED
+        // AND DYNAMICALLY DISPATCHED TO!
+
+        if (this instanceof ASTMainProgramNode)
+            return ((ASTMainProgramNode)this).getContainsStmt();
+        else if (this instanceof ASTFunctionSubprogramNode)
+            return ((ASTFunctionSubprogramNode)this).getContainsStmt();
+        else if (this instanceof ASTSubroutineSubprogramNode)
+            return ((ASTSubroutineSubprogramNode)this).getContainsStmt();
+        else if (this instanceof ASTModuleNode)
+            return getContainsStatement(((ASTModuleNode)this).getModuleBody());
+        else if (this instanceof ASTSubmoduleNode)
+            return getContainsStatement(((ASTSubmoduleNode)this).getModuleBody());
+        else
+            return new ASTContainsStmtNode();
+    }
+    
+    
+    private ASTContainsStmtNode getContainsStatement(IASTListNode<IModuleBodyConstruct> moduleBody)
+    {
+     
+        for (IModuleBodyConstruct c : moduleBody)
+            if (c instanceof ASTContainsStmtNode)
+                return (ASTContainsStmtNode)c ;
+        return null ;
+    }
+
     private IASTListNode<IInternalSubprogram> collectModuleSubprograms(IASTListNode<IModuleBodyConstruct> moduleBody)
     {
         IASTListNode<IInternalSubprogram> result = new ASTListNode<IInternalSubprogram>();

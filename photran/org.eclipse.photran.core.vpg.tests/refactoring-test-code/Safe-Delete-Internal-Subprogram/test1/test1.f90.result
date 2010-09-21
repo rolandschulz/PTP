@@ -1,0 +1,7 @@
+program p
+    a = 3
+    d = 4
+
+    stop
+
+end program
