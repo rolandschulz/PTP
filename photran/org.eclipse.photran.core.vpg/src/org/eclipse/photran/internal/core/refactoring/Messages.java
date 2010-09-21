@@ -191,6 +191,16 @@ public class Messages extends NLS
 
     public static String RenameRefactoring_StatusRenaming;
 
+    public static String PermuteSubroutineArgsRefactoring_matchingDeclarationsDoNotUniquelyBind;
+
+    public static String PermuteSubroutineArgsRefactoring_name;
+
+    public static String PermuteSubroutineArgsRefactoring_selectedTextNotSubroutine;
+
+    public static String PermuteSubroutineArgsRefactoring_selectSubroutineError;
+
+    public static String PermuteSubroutineArgsRefactoring_subroutineParameterDefinitionError;
+
     public static String CommonVarNamesRefactoring_Name;
 
     public static String CommonVarNamesRefactoring_NameConflictsWith;
@@ -285,6 +295,12 @@ public class Messages extends NLS
     public static String MoveCommonToModuleRefactoring_Name;
 
     public static String MoveCommonToModuleRefactoring_SelectVarOrBlockInCommonStmt;
+
+    public static String MoveFromModuleRefactoring_Name;
+
+    public static String MoveFromModuleRefactoring_selectionNotInsideModuleError;
+
+    public static String MoveFromModuleRefactoring_textSelectionError;
     
     public static String RemoveArithmeticIfRefactoring_Error;
 

@@ -27,6 +27,36 @@ public class Messages extends NLS
 
     public static String AddOnlyToUseStmtInputPage_SelectModuleEntitiesLabel;
 
+    public static String PermuteSubroutineArgsInputPage_alternateReturnColumnLabel;
+
+    public static String PermuteSubroutineArgsInputPage_alternateReturnErrorLabel;
+
+    public static String PermuteSubroutineArgsInputPage_downButtonLabel;
+
+    public static String PermuteSubroutineArgsInputPage_intentInLabel;
+
+    public static String PermuteSubroutineArgsInputPage_intentLabel;
+
+    public static String PermuteSubroutineArgsInputPage_intentOutLabel;
+
+    public static String PermuteSubroutineArgsInputPage_keywordedColumnLabel;
+
+    public static String PermuteSubroutineArgsInputPage_keywordErrorLabel;
+
+    public static String PermuteSubroutineArgsInputPage_nameLabel;
+
+    public static String PermuteSubroutineArgsInputPage_notEnoughArgumentsErrorLabel;
+
+    public static String PermuteSubroutineArgsInputPage_optionalArgumentErrorLabel;
+
+    public static String PermuteSubroutineArgsInputPage_optionalColumnLabel;
+
+    public static String PermuteSubroutineArgsInputPage_parameterGroupLabel;
+
+    public static String PermuteSubroutineArgsInputPage_typeLabel;
+
+    public static String PermuteSubroutineArgsInputPage_upButtonLabel;
+
     public static String CommonVarNamesInputPage_NewNameLabel;
 
     public static String CommonVarNamesInputPage_OriginalNameLabel;
@@ -42,6 +72,14 @@ public class Messages extends NLS
     public static String KeywordCaseInputPage_LowerCaseLabel;
 
     public static String KeywordCaseInputPage_UpperCaseLabel;
+
+    public static String MoveFromModuleInputPage_leftPanelMessage;
+
+    public static String MoveFromModuleInputPage_Name;
+
+    public static String MoveFromModuleInputPage_rightPanelMessage;
+
+    public static String MoveFromModuleInputPage_selectDataMessage;
 
     public static String RenameAction_MatchExternalSubprograms;
 

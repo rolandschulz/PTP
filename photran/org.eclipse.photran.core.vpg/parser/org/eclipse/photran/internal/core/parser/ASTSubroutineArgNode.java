@@ -43,7 +43,12 @@ public class ASTSubroutineArgNode extends ASTNode
     public void setName(org.eclipse.photran.internal.core.lexer.Token newValue)
     {
         this.name = newValue;
-        if (newValue != null) newValue.setParent(this);
+        if (newValue != null) 
+        {
+            newValue.setParent(this);
+            hiddenTEquals = new Token(Terminal.T_EQUALS, "=");
+            hiddenTEquals.setParent(this);
+        }
     }
 
 
