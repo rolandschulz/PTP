@@ -1,0 +1,5 @@
+program Test1 !<<<<< 1, 1, 4, 18, pass
+    do i = 1,10
+100     j=i
+    END DO
+end program Test1

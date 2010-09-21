@@ -318,6 +318,16 @@ public class Messages extends NLS
 
     public static String ReplaceCharacterToCharacterLenRefactoring_Name;
 
+    public static String ReplaceOldStyleDoLoopRefactoring_AmbiguousLabel;
+
+    public static String ReplaceOldStyleDoLoopRefactoring_EndOfLoopError;
+
+    public static String ReplaceOldStyleDoLoopRefactoring_MissingLabel;
+
+    public static String ReplaceOldStyleDoLoopRefactoring_Name;
+
+    public static String ReplaceOldStyleDoLoopRefactoring_ThereMustBeAtLeastOneOldStyleDoLoop;
+
     public static String RepObsOpersRefactoring_Name;
 
     public static String RepObsOpersRefactoring_SelectedFileCannotBeParsed;

@@ -1,0 +1,20 @@
+program Test4 !<<<<< 1, 1, 14, 18, pass
+    do i = 1,10
+        do j = 1,10
+            do k = 1,10
+                do l = 1,10
+                    do m = 1,10
+                        do n = 1,10
+150                         continue
+                        END DO
+140                     continue
+                    END DO
+130                 continue
+                END DO
+120             continue
+            END DO
+110         continue
+        END DO
+100     continue
+    END DO
+end program Test4

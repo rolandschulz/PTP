@@ -1,0 +1,60 @@
+program Test5 !<<<<< 1, 1, 46, 18, pass
+    ! Shared Do Loop Termination
+    do j=1,10
+        do w=1,10
+100         i=j+1
+        END DO
+    END DO
+       ! simple Do Loop
+       do i = 1,10
+110        j=i
+       END DO
+    ! simple Do Loop with Continue
+    do i = 1,10
+120     continue
+    END DO
+! simple f90 Do Loop
+    do i =1,100
+        w=i
+    end do
+    ! More Complex Do Loop
+    DO K=1,KM
+        DO I=1,IMT
+            USAV(I,K)=UCLIN(I,K)
+            VSAV(I,K)=VCLIN(I,K)
+            UCLIN(I,K)=UP(I,K)
+            VCLIN(I,K)=VP(I,K)
+140         CONTINUE
+        END DO
+    END DO
+ ! More Complex Do Loop
+ DO K=1,KM
+     DO I=1,IMU
+         IF(KMUP(I).GE.KAR(K)) THEN
+             UBP(I,K)=UBP(I,K)+SFUB(I)
+             VBP(I,K)=VBP(I,K)+SFVB(I)
+             UP (I,K)=UP (I,K)+SFU (I)
+             VP (I,K)=VP (I,K)+SFV (I)
+         ENDIF
+170      CONTINUE
+     END DO
+ END DO
+ ! More complex Shared Do Loop Termination
+ DO K=2,KM
+     DO I=1,IMT
+         DPDX(I,K)=RHON(I,K-1)+RHON(I,K)
+         DPDY(I,K)=RHOS(I,K-1)+RHOS(I,K)
+270      CONTINUE
+     END DO
+ END DO
+ ! Complex Shared Do Loop Termination
+ DO K=1,KM
+     DO I=1,IMT
+         DO J=1,IMT
+             DO W=1,IMT
+150              DPDX(I,K)=RHON(I,K-1)+RHON(I,K)
+             END DO
+         END DO
+     END DO
+ END DO
+end program Test5

@@ -9,7 +9,7 @@
  *    UIUC - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.photran.internal.core.analysis.loops;
-
+ 
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,6 +36,7 @@ import org.eclipse.photran.internal.core.parser.IObsoleteActionStmt;
  * {@link IASTVisitorWithLoops}.
  * 
  * @author Jeff Overbey
+ * @author Mariano Mendez
  * 
  * @see LoopReplacer
  * @see IASTVisitorWithLoops
@@ -63,14 +64,8 @@ public class LoopReplacer
         {
             @Override public void visitASTDoConstructNode(ASTDoConstructNode node)
             {
-                if (!isHeaderForOldStyleLoop(node))
+                // Collect all DoLoopsStmt 
                     queue.add(0, node);
-            }
-    
-            /** An old-style loop would be, for example, DO 100 I = 3, 5 */
-            private boolean isHeaderForOldStyleLoop(ASTDoConstructNode node)
-            {
-                return node.getLabelDoStmt().getLblRef() != null;
             }
         });
     }
@@ -111,6 +106,7 @@ public class LoopReplacer
         private final IASTNode doConstructNode;
         private final IASTNode listEnclosingDoConstructNode;
         private boolean loopHeaderFound = false;
+        private IASTNode oldStyleEndLoopRef=null;
         
         // First, save ancestor nodes, since parent pointers will be changed when we
         // manipulate the AST in the #visit methods below
@@ -119,6 +115,7 @@ public class LoopReplacer
             this.loopHeader = loopHeader;
             this.doConstructNode = loopHeader.getParent();
             this.listEnclosingDoConstructNode = doConstructNode.getParent();
+            this.oldStyleEndLoopRef=null;
         }
         
         // Start accumulating body statements when we find the loop header
@@ -147,7 +144,14 @@ public class LoopReplacer
 
         @Override public void visitIActionStmt(IActionStmt node)
         {
+            //  Obtain a reference to the end of the old Style Loop Node  
             visitIExecutionPartConstruct(node);
+            if (isOldStyleDoLoopEnd(node)) 
+            {
+                this.result.setEndDoStmt(null);
+                this.oldStyleEndLoopRef=node; 
+            }
+            //traverseChildren(node);
         }
         
         @Override public void visitIObsoleteActionStmt(IObsoleteActionStmt node)
@@ -159,9 +163,23 @@ public class LoopReplacer
         {
             return loopHeaderFound
                 && !endDoStmtFound()
+                && !oldStyleEndLoopFound()
                 && !isLoopHeader(node)
                 && isCurrentlySiblingOfLoopHeader(node);
         }
+        
+        private boolean isOldStyleDoLoopEnd( IActionStmt node  )
+        {
+            if ( (node.getLabel()!=null) && (this.loopHeader.getLblRef()!=null) )
+            {
+                return loopHeaderFound 
+                    && !endDoStmtFound()   
+                    && !(node.getParent() == this.listEnclosingDoConstructNode)  
+                    && this.loopHeader.getLblRef().getLabel().getText().equals(node.getLabel().getText()) ;
+            }
+            return false;
+        }
+
         
         private boolean isCurrentlySiblingOfLoopHeader(IExecutionPartConstruct node)
         {
@@ -177,7 +195,7 @@ public class LoopReplacer
         // Stop accumulating body statements as soon as we find an END DO stmt
         @Override public void visitASTEndDoStmtNode(ASTEndDoStmtNode node)
         {
-            if (loopHeaderFound && !endDoStmtFound() && !(node.getParent() instanceof ASTProperLoopConstructNode))
+          if (loopHeaderFound && !endDoStmtFound() && (node.getParent() == listEnclosingDoConstructNode) && !oldStyleEndLoopFound() )
             {
                 node.removeFromTree();
                 this.result.setEndDoStmt(node);
@@ -191,9 +209,29 @@ public class LoopReplacer
             return this.result.getEndDoStmt() != null;
         }
         
+        private boolean oldStyleEndLoopFound()
+        {
+            return this.oldStyleEndLoopRef != null;
+        }
+        
+        
         @Override public void visitASTProperLoopConstructNode(ASTProperLoopConstructNode node)
         {
             // Do not traverse child statements of nested loops
+            // Except if you are working with a Shared Do Loop Termination
+            // you need to know where is the ending Loop 
+            
+            if (node.getLoopHeader().getLblRef()==null) return;
+            if (this.loopHeader.getLblRef()==null) return;
+            
+            String nodeLabel=node.getLoopHeader().getLblRef().getLabel().getText();
+            String headerLabel= this.loopHeader.getLblRef().getLabel().getText();
+            
+            if ( !endDoStmtFound() && !oldStyleEndLoopFound()  && nodeLabel.equals(headerLabel) ) 
+            {
+                visitIExecutionPartConstruct(node);
+                this.oldStyleEndLoopRef=node.getLoopHeader().getLblRef();    
+            }  
         }
     }
 }

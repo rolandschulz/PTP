@@ -1,0 +1,20 @@
+program Test3 !<<<<< 1, 1, 14, 18, pass
+    do i = 1,10
+        do j = 1,10
+            do k = 1,10
+                do l = 1,10
+                    do m = 1,10
+                        do n = 1,10
+150                         x=i+j+k+l+m+n
+                        END DO
+140                     y=j+k+l+m+n
+                    END DO
+130                 z=k+l+m+n
+                END DO
+120             w=l+m+n
+            END DO
+110         t=m+n
+        END DO
+100     v=n
+    END DO
+end program Test3

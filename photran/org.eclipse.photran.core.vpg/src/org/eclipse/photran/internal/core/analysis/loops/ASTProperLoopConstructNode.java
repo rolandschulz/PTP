@@ -73,7 +73,7 @@ public class ASTProperLoopConstructNode extends ASTNode implements IExecutableCo
         return this.endDoStmt;
     }
     
-    void setEndDoStmt(ASTEndDoStmtNode endDoStmt)
+    public void setEndDoStmt(ASTEndDoStmtNode endDoStmt)
     {
         this.endDoStmt = endDoStmt;
         if (endDoStmt != null) endDoStmt.setParent(this);

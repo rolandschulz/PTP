@@ -5,8 +5,8 @@
    <!-- Refactorings -->
    <!--==============-->
 
-   <!-- NOTE: When adding refactorings, please update
-        http://wiki.eclipse.org/PTP/photran/refactorings -->
+   <!-- NOTE: When adding refactorings, please notify
+        Mariano Mendez so he can update www.fortranrefactoring.com.ar -->
 
    <extension
          point="org.eclipse.rephraserengine.ui.refactoring.refactorings">
@@ -16,6 +16,7 @@
 
       <group><!-- Rename and Move -->
          <editorRefactoring command="org.eclipse.photran.ui.RenameRefactoringCommand" />
+         <resourceRefactoring  class="edu.uiuc.photran.metrics.MetricsCalculation" />   
       </group>
       <group><!-- Extract XYZ -->
          <editorRefactoring command="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand" />
@@ -65,6 +66,9 @@
          /-->
       </group>
       <group><!-- Refactorings that eliminate old language constructs -->
+         <editorRefactoring
+             class="org.eclipse.photran.internal.core.refactoring.ReplaceOldStyleDoLoopRefactoring"
+         />
          <resourceRefactoring
          	class="org.eclipse.photran.internal.core.refactoring.RemoveArithmeticIfRefactoring"
          />
