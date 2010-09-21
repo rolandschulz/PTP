@@ -65,7 +65,6 @@ public class Messages extends NLS
 
     public static String AddOnlyToUseStmtRefactoring_SelectModuleName;
 
-    public static String AddUseOfNamedEntitiesToModule_refactoringName;
     public static String EncapsulateVariableRefactoring_CannotEncapsulateArrays;
 
     public static String EncapsulateVariableRefactoring_CannotEncapsulatePARAMETER;
@@ -325,7 +324,6 @@ public class Messages extends NLS
 
     public static String UnrollLoopRefactoring_unableToCreateUpperBound;
 
-    public static String UnrollLoopRefactoring_UnableToReplaceIndexVariable;
     public static String MakePrivateEntityPublicRefactoring_DoesNotSupportExternalEntities;
 
     public static String MakePrivateEntityPublicRefactoring_DoesNotSupportInterfaceDeclarations;
