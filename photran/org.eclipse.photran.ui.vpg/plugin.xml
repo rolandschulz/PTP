@@ -16,7 +16,6 @@
 
       <group><!-- Rename and Move -->
          <editorRefactoring command="org.eclipse.photran.ui.RenameRefactoringCommand" />
-         <resourceRefactoring  class="edu.uiuc.photran.metrics.MetricsCalculation" />   
       </group>
       <group><!-- Extract XYZ -->
          <editorRefactoring command="org.eclipse.photran.ui.ExtractProcedureRefactoringCommand" />
@@ -356,7 +355,7 @@
 	           label="%action.label.reindent.0" 
                menubarPath="edit/additions"
                definitionId="org.eclipse.photran.ui.ReindenterCommand"
-	           class="org.eclipse.photran.internal.ui.actions.ReindentAction" 
+	           class="org.eclipse.photran.internal.ui.actions.ReindentAction"
 	           id="org.eclipse.photran.ui.ReindenterAction">
 	     </action>
       </actionSet>
