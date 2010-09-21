@@ -1,0 +1,15 @@
+program test
+
+    implicit none
+
+    integer :: i
+
+    !<<<<<7,1,11,1,2,false,pass
+    do i=1,9,4
+        print *, i
+        if(i+2>9) exit
+        print *, (i+2)
+    end do
+
+
+end program

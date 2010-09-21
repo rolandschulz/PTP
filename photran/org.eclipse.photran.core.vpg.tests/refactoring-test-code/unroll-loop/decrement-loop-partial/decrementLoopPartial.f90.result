@@ -1,0 +1,13 @@
+program test
+
+    implicit none
+
+    integer :: k
+    !<<<<<6,1,9,1,2,false,pass
+    do k=9,1,-4
+        print *, k
+        print *, (k+-2)
+    end do
+
+
+end program test

@@ -1,0 +1,19 @@
+program test
+
+    implicit none
+
+    integer :: i, j=-1
+    j = j**1
+    j = j+j
+    print *, 1
+    print *, j
+    j = j**3
+    j = j+j
+    print *, 3
+    print *, j
+    j = j**5
+    j = j+j
+    print *, 5
+    print *, j
+
+end program test

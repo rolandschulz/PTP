@@ -1,0 +1,11 @@
+program test
+
+    implicit none
+    !<<<<<4,1,8,1,2,false,pass
+    DO i=1,9,2
+        print *, i
+        if(i+1>9) exit
+        print *, (i+1)
+    END DO
+
+end program test

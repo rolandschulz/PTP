@@ -1,0 +1,20 @@
+program test
+
+    implicit none
+    integer :: loopUpperBound
+
+    integer :: i
+    loopUpperBound = 3+5
+    !<<<<<6,1,10,1,4,false,pass
+    do i=1, loopUpperBound,4
+        print *, i
+        if(i+1>loopUpperBound) exit
+        print *, (i+1)
+        if(i+2>loopUpperBound) exit
+        print *, (i+2)
+        if(i+3>loopUpperBound) exit
+        print *, (i+3)
+    end do
+
+
+end program test
