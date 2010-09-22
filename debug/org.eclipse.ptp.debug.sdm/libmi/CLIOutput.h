@@ -46,9 +46,10 @@ extern void CLIGetSigHandleList(MICommand *cmd, MIList **signals);
 extern double CLIGetGDBVersion(MICommand *cmd);
 extern char *CLIGetPTypeInfo(MICommand *cmd);
 extern CLIInfoThreadsInfo *CLIInfoThreadsInfoNew(void);
+extern void CLIInfoThreadsInfoFree(CLIInfoThreadsInfo *info);
 extern CLIInfoThreadsInfo *CLIGetInfoThreadsInfo(MICommand *cmd);
-extern CLIInfoProcInfo *CLIInfoProc(MICommand *cmd);
 extern CLIInfoProcInfo *CLIInfoProcInfoNew(void);
+extern CLIInfoProcInfo *CLIGetInfoProcInfo(MICommand *cmd);
 extern void CLIInfoProcInfoFree(CLIInfoProcInfo *info);
 
 #endif /* _CLISIGHANDLE_H_ */

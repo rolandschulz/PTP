@@ -283,6 +283,14 @@ CLIInfoThreadsInfoNew(void)
 	return info;
 }
 
+void
+CLIInfoThreadsInfoFree(CLIInfoThreadsInfo *info)
+{
+	if (info->thread_ids != NULL)
+		MIListFree(info->thread_ids, free);
+	free(info);
+}
+
 CLIInfoThreadsInfo *
 CLIGetInfoThreadsInfo(MICommand *cmd)
 {
@@ -361,7 +369,7 @@ CLIInfoProcInfoFree(CLIInfoProcInfo *info)
 
 #ifdef __APPLE__
 CLIInfoProcInfo *
-MIGetInfoProcInfo(MICommand *cmd)
+CLIGetInfoProcInfo(MICommand *cmd)
 {
 	char *				str = "";
 	MIResult *			result;
@@ -387,7 +395,7 @@ MIGetInfoProcInfo(MICommand *cmd)
 }
 #else /* __APPLE__ */
 CLIInfoProcInfo *
-MIGetInfoProcInfo(MICommand *cmd)
+CLIGetInfoProcInfo(MICommand *cmd)
 {
 	int					len;
 	MIList *			oobs;
@@ -433,6 +441,6 @@ MIGetInfoProcInfo(MICommand *cmd)
 			info->exe[len] = '\0';
 		}
 	}
-	return NULL;
+	return info;
 }
 #endif /* __APPLE__ */
