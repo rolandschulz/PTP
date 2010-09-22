@@ -51,6 +51,7 @@ import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.dstore.core.model.DataStoreResources;
 import org.eclipse.dstore.core.model.DataStoreSchema;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rdt.core.IRemoteIndexerInfoProvider;
 import org.eclipse.ptp.internal.rdt.core.Serializer;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
@@ -84,6 +85,7 @@ import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.SubSystem;
+import org.eclipse.rse.services.clientserver.messages.CommonMessages;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.dstore.util.DStoreStatusMonitor;
 
@@ -211,7 +213,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             DataElement status = dataStore.command(queryCmd, args, result);   
 
             //poll for progress information until the operation is done or canceled
-            while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
+            while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled() && !smonitor.isNetworkDown()) { //$NON-NLS-1$ //$NON-NLS-2$
             	RemoteIndexerProgress progress = getIndexerProgress(status);
             	task.updateProgressInformation(progress);
             	try {
@@ -219,6 +221,13 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 				} catch (InterruptedException e) {
 					RDTLog.logError(e);	
 				}
+            }
+            
+            if (smonitor.isNetworkDown()) {
+            	cancelOperation(status.getParent());
+            	String info = NLS.bind(CommonMessages.MSG_CONNECT_UNKNOWNHOST, getConnectorService().getHost().getAliasName());
+            	String wholeMessage = MessageFormat.format(Messages.getString("RSECIndexSubsystem.12"), new Object[] {info}); //$NON-NLS-1$
+            	RDTLog.logError(wholeMessage);
             }
             
 			try {
@@ -232,7 +241,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 				RDTLog.logError(e);	
 			}
 			
-			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
+			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled() || smonitor.isNetworkDown()) { //$NON-NLS-1$//$NON-NLS-2$
 				for (int i = 0; i < status.getNestedSize(); i ++ ){
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
@@ -404,7 +413,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             DataElement status = dataStore.command(queryCmd, args, result);   
             
             //poll for progress information until the operation is done or canceled
-            while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled()) { //$NON-NLS-1$ //$NON-NLS-2$
+            while (!status.getName().equals("done") && !status.getName().equals("cancelled") && !monitor.isCanceled() && !smonitor.isNetworkDown()) { //$NON-NLS-1$ //$NON-NLS-2$
             	RemoteIndexerProgress progress = getIndexerProgress(status);
             	task.updateProgressInformation(progress);
             	try {
@@ -412,6 +421,13 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 				} catch (InterruptedException e) {
 					RDTLog.logError(e);	
 				}
+            }
+            
+            if (smonitor.isNetworkDown()) {
+            	cancelOperation(status.getParent());
+            	String info = NLS.bind(CommonMessages.MSG_CONNECT_UNKNOWNHOST, getConnectorService().getHost().getAliasName());
+            	String wholeMessage = MessageFormat.format(Messages.getString("RSECIndexSubsystem.12"), new Object[] {info}); //$NON-NLS-1$
+            	RDTLog.logError(wholeMessage);
             }
             
             try {
@@ -425,7 +441,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
             	RDTLog.logError(e);
             }
 			
-			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled()) { //$NON-NLS-1$//$NON-NLS-2$
+			if (status.getName().equals("done") || status.getName().equals("cancelled") || monitor.isCanceled() || smonitor.isNetworkDown()) { //$NON-NLS-1$//$NON-NLS-2$
 				for (int i = 0; i < status.getNestedSize(); i ++ ){
 					DataElement element = status.get(i);
 					if (element != null && CDTMiner.T_INDEXING_ERROR.equals(element.getType())) { // Error occurred on the server
