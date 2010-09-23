@@ -179,6 +179,10 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				final IBuilder builder = configuration.getBuilder();
 				IPath workingDirectory = ManagedBuildManager.getBuildLocation(configuration, builder );
 				
+				if(workingDirectory==null){
+					return false;
+				}
+				
 				String[] targets = getTargets(kind, info);
 				if (targets.length != 0 && targets[targets.length - 1].equals(info.getCleanBuildTarget()))
 					isClean = true;
