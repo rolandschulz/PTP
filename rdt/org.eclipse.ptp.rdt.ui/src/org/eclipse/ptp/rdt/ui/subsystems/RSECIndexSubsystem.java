@@ -337,8 +337,11 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			file = project.getFile(path);
 		}
 		
-		
-		if (file != null) {
+		//file could be not exist, since the way of checking if the header file is under the project(by indexof) may give an incorrect result,
+		//for example, project dir is "/home/jwsliu/defects/6721" and header file name is
+		//"/home/jwsliu/defects/6721_header/header.h", then header file will be parsed as
+		//"header/header.h" under the project location, but it could be not exist. So we have to check if the file is existed or not.
+		if (file != null && file.exists()) {
 			try {
 				IMarker marker = file.createMarker("org.eclipse.ptp.rdt.ui.indexerproblemmarker"); //$NON-NLS-1$
 				marker.setAttribute(IMarker.LINE_NUMBER, Integer.parseInt(lineNumber.replace(",", ""))); //$NON-NLS-1$ //$NON-NLS-2$
