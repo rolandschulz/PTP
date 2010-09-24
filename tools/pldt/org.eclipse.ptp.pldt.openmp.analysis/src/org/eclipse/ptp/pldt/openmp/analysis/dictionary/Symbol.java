@@ -128,15 +128,8 @@ public class Symbol {
         
         if (scope==null)  return null;
         
-        IASTNode node = null;
-        try {
-            //node = scope.getPhysicalNode(); // cdt 3.1
-            node = ASTInternal.getPhysicalNodeOfScope(scope); // cdt40
-        }
-        catch(DOMException e) { 
-            System.out.println("Symbol.getDefiningFunction exception "+e);
-            return null;
-        }
+        // cdt 8.0: no longer throws exception here
+        IASTNode node = ASTInternal.getPhysicalNodeOfScope(scope); // cdt40
         
         // keep moving up the tree until we find the node
         while(true) {
