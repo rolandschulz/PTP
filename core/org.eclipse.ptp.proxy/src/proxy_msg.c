@@ -128,9 +128,8 @@ proxy_serialize_msg(proxy_msg *m, unsigned char **result, int *result_len)
 			key = strtok(m->args[i], "=");
 			packet_append_varint(strlen(key));
 			packet_append_bytes(strlen(key), key);
-			value = strtok(NULL, "=");
-			packet_append_varint(strlen(value));
-			packet_append_bytes(strlen(value), value);
+			packet_append_varint(strlen(p + 1));
+			packet_append_bytes(strlen(p + 1), p + 1);
 		}
 	}
 	*result = packet;
