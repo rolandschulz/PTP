@@ -653,7 +653,7 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
-			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.servers.dstore"/>
+			<param name="tagmodule" value="org.eclipse.ptp/rdt/org.eclipse.ptp.rdt.server.dstore"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>
 		<antcall target="tagone">
