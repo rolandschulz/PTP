@@ -13,8 +13,8 @@
 export DISPLAY=:1
 
 # set up to use the Java 5 JRE
-JVM_1_5 = /shared/common/jdk-1.5.0_16
-export PATH = $JVM_1_5/bin:$PATH
+JVM_1_5=/shared/common/jdk-1.5.0_16
+export PATH=$JVM_1_5/bin:$PATH
 
 # make sure we're in the releng project dir 
 cd `dirname $0`
