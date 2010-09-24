@@ -53,7 +53,7 @@
 		<property name="tagname" value="v${timestamp}"/>
 		<property name="testReports" value="${zipsdir}/testReports"/>
 		<property name="junit-report-output" value="${testReports}"/>
-		<property name="jvm1.5" value="/shared/common/ibm-java-x86_64-60/bin/java"/>
+		<property name="jvm1.5" value="java"/>
 		<condition property="onWindows">
 			<os family="windows"/>
 		</condition>

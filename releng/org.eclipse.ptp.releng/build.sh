@@ -13,7 +13,8 @@
 export DISPLAY=:1
 
 # set up to use the Java 5 JRE
-export PATH=/shared/common/ibm-java-x86_64-60/bin:$PATH
+JVM_1_5 = /shared/common/jdk-1.5.0_16
+export PATH = $JVM_1_5/bin:$PATH
 
 # make sure we're in the releng project dir 
 cd `dirname $0`
@@ -28,6 +29,7 @@ cd ..
 
 # Let's go!
 java -jar tools/org.eclipse.releng.basebuilder/plugins/org.eclipse.equinox.launcher.jar \
-	-ws gtk -arch ppc -os linux -application org.eclipse.ant.core.antRunner $*
+	-Djvm1.5=$JVM_1_5/bin/java \
+	-ws gtk -arch x86_64 -os linux -application org.eclipse.ant.core.antRunner $*
 
 exit 0
