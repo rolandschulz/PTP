@@ -32,7 +32,7 @@
 		<property name="forceContextQualifier" value="${timestamp}"/>
 		<property name="buildingOSGi" value="true"/>
 		<property name="buildDirectory" value="${basedir}/results"/>
-		<property name="releaseDir" value="/home/www/tools/ptp/builds/${eclipseRelease}"/>
+		<property name="releaseDir" value="/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipseRelease}"/>
 		<property name="copyToDir" value="${releaseDir}/${buildType}.${buildId}"/>
 		<property name="testDirectory" value="${buildDirectory}/test"/>
 		<property name="baseLocation" value="${buildDirectory}/eclipse"/>
