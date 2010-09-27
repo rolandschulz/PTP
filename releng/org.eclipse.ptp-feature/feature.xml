@@ -91,6 +91,10 @@
          id="org.eclipse.ptp.pldt.lapi"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.ptp.rdt.remotetools"
+         version="0.0.0"/>
+
    <plugin
          id="org.eclipse.ptp"
          download-size="0"
