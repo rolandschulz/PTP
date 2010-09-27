@@ -108,6 +108,7 @@ done
 
 echo "Updating org.eclipse.ptp.releng..."
 sed -e "s/<property name=\"ptpBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"ptpBranchVersion\" value=\"$ptp_version\"\/>/" \
+	-e "s/<property name=\"photranBranchVersion\" value=\"[0-9]\.[0-9]\.[0-9]\"\/>/<property name=\"photranBranchVersion\" value=\"$photran_version\"\/>/" \
 	< org.eclipse.ptp.releng/build.xml > $TMP_DIR/org.eclipse.ptp.releng_build.xml
 mv $TMP_DIR/org.eclipse.ptp.releng_build.xml org.eclipse.ptp.releng/build.xml
 
