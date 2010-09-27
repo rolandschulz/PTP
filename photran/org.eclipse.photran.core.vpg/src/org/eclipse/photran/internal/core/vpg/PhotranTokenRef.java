@@ -24,7 +24,7 @@ import org.eclipse.rephraserengine.core.vpg.TokenRef;
  * 
  * @author Jeff Overbey
  */
-public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializable, Comparable<PhotranTokenRef>
+public class PhotranTokenRef extends TokenRef<Token> implements IPhotranSerializable //, Comparable<PhotranTokenRef>
 {
 	private static final long serialVersionUID = 1L;
 	

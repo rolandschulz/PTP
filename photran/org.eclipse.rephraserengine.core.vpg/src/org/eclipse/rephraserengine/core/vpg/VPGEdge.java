@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.vpg;
 
+import org.eclipse.rephraserengine.core.preservation.ReplacementList;
+
 /**
  * An edge in a VPG.
  * <a href="../../../overview-summary.html#DEA">More Information</a>
@@ -22,11 +24,23 @@ package org.eclipse.rephraserengine.core.vpg;
  *
  * @param <A> AST type
  * @param <T> token type
+ * @param <R> {@link TokenRef} type
  *
  * @since 1.0
  */
-public class VPGEdge<A, T, R extends TokenRef<T>>
+public class VPGEdge<A, T, R extends TokenRef<T>> implements Comparable<VPGEdge<?,?,?>>
 {
+    /**
+     * @since 3.0
+     */
+    public static enum Classification
+    {
+        INCOMING,
+        OUTGOING,
+        INTERNAL,
+        EXTERNAL
+    }
+    
     /** @since 2.0 */
     protected final VPG<A, T, R, ?, ?> vpg;
     /** @since 2.0 */
@@ -35,6 +49,8 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
     protected final R sink;
     /** @since 2.0 */
     protected final int type;
+    /** @since 3.0 */
+    protected VPGEdge<A, T, R> origEdge;
 
 	/**
 	 * Constructor. Creates an edge of the given type between the given tokens in the given VPG.
@@ -50,6 +66,7 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
 		this.source = source;
 		this.sink = sink;
 		this.type = type;
+		this.origEdge = this;
 	}
 
 	public VPGEdge(VPG<A, T, R, ?, ?> vpg,
@@ -61,6 +78,7 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
 		this.source = vpg.getTokenRef(source);
 		this.sink = vpg.getTokenRef(sink);
 		this.type = type;
+		this.origEdge = this;
 	}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -79,11 +97,22 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
 		return sink;
 	}
 
-	/** @return the type of this edge */
-	public int getType()
-	{
-		return type;
-	}
+    /** @return the type of this edge */
+    public int getType()
+    {
+        return type;
+    }
+
+    /**
+     * @return the original edge, if this edge is a projection created by
+     *         {@link #projectInitial(ReplacementList)} or {@link #projectFinal(ReplacementList)}
+     * 
+     * @since 3.0
+     */
+    public VPGEdge<A, T, R> getOriginalEdge()
+    {
+        return origEdge;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Utility Methods
@@ -105,8 +134,84 @@ public class VPGEdge<A, T, R extends TokenRef<T>>
 
     ///////////////////////////////////////////////////////////////////////////
 
+	/** @since 3.0 */
+    public int compareTo(VPGEdge<?,?,?> that)
+    {
+        int result = 0;
+        
+        if (this.type < that.type)
+            result = -1;
+        else if (this.type > that.type)
+            result = 1;
+        if (result != 0) return result;
+        
+        result = this.getClassification().compareTo(that.getClassification());
+        if (result != 0) return result;
+
+        if (this.source != null && that.source == null)
+            result = -1;
+        else if (this.source == null && that.source != null)
+            result = 1;
+        else if (this.source != null && that.source != null)
+            result = this.source.compareTo(that.source);
+        if (result != 0) return result;
+        
+        if (this.sink != null && that.sink == null)
+            result = -1;
+        else if (this.sink == null && that.sink != null)
+            result = 1;
+        else if (this.sink != null && that.sink != null)
+            result = this.sink.compareTo(that.sink);
+        return result;
+    }
+
 	@Override public String toString()
 	{
 		return "Edge of type " + type + " from " + source + " to " + sink; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
+
+    /**
+     * @return the initial model projection of this edge
+     * 
+     * @since 3.0
+     */
+    public VPGEdge<A, T, R> projectInitial(ReplacementList replacements)
+    {
+        R srcProj = replacements.projectInitial(source, vpg);
+        R sinkProj = replacements.projectInitial(sink, vpg);
+        VPGEdge<A, T, R> result = vpg.createEdge(srcProj, sinkProj, type);
+        result.origEdge = this;
+        return result;
+    }
+
+    /**
+     * @return the final model projection of this edge
+     * 
+     * @since 3.0
+     */
+    public VPGEdge<A, T, R> projectFinal(ReplacementList replacements)
+    {
+        R srcProj = replacements.projectFinal(source, vpg);
+        R sinkProj = replacements.projectFinal(sink, vpg);
+        VPGEdge<A, T, R> result = vpg.createEdge(srcProj, sinkProj, type);
+        result.origEdge = this;
+        return result;
+    }
+
+    /**
+     * @return the classification of this edge
+     * 
+     * @since 3.0
+     */
+    public Classification getClassification()
+    {
+        if (source != null && sink != null)
+            return Classification.EXTERNAL;
+        else if (source != null && sink == null)
+            return Classification.INCOMING;
+        else if (source == null && sink != null)
+            return Classification.OUTGOING;
+        else // (source == null && sink == null)
+            return Classification.INTERNAL;
+    }
 }

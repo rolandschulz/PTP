@@ -24,7 +24,7 @@ import java.io.Serializable;
  * 
  * @since 1.0
  */
-public class TokenRef<T> implements Serializable
+public class TokenRef<T> implements Serializable, Comparable<TokenRef<?>>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -94,7 +94,7 @@ public class TokenRef<T> implements Serializable
 
     @Override public boolean equals(Object other)
     {
-        if (!(other instanceof TokenRef<?>)) return false;
+        if (other == null || !(other instanceof TokenRef<?>)) return false;
 
         TokenRef<?> o = (TokenRef<?>)other;
         return filename.equals(o.filename)
@@ -105,5 +105,25 @@ public class TokenRef<T> implements Serializable
     @Override public int hashCode()
     {
         return offset + length + (filename == null ? 0 : filename.hashCode());
+    }
+
+    /** @since 3.0 */
+    public int compareTo(TokenRef<?> that)
+    {
+        int result = 0;
+        
+        if (this.filename != null && that.filename == null)
+            result = -1;
+        else if (this.filename == null && that.filename != null)
+            result = 1;
+        else if (this.filename != null && that.filename != null)
+            result = this.filename.compareTo(that.filename);
+        if (result != 0) return result;
+        
+        result = this.offset - that.offset;
+        if (result != 0) return result;
+        
+        result = this.length - that.length;
+        return result;
     }
 }

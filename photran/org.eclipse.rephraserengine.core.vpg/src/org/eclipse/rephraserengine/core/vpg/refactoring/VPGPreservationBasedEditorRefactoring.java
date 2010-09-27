@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.rephraserengine.core.preservation.PreservationAnalysis;
-import org.eclipse.rephraserengine.core.preservation.PreservationRule;
+import org.eclipse.rephraserengine.core.preservation.PreservationRuleset;
 import org.eclipse.rephraserengine.core.vpg.TokenRef;
 import org.eclipse.rephraserengine.core.vpg.VPGDB;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
@@ -66,7 +66,8 @@ public abstract class VPGPreservationBasedEditorRefactoring<A, T, V extends Ecli
 
     protected abstract void doValidateUserInput(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure;
 
-    protected abstract PreservationRule[] getEdgesToPreserve();
+    /** @since 3.0 */
+    protected abstract PreservationRuleset getEdgesToPreserve();
 
     protected abstract void doTransform(RefactoringStatus status, IProgressMonitor pm) throws PreconditionFailure;
 }

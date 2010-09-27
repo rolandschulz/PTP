@@ -17,9 +17,17 @@ import org.eclipse.osgi.util.NLS;
  * 
  * @since 2.0
  */
-public class Messages extends NLS
+class Messages extends NLS
 {
     private static final String BUNDLE_NAME = "org.eclipse.rephraserengine.core.preservation.messages"; //$NON-NLS-1$
+
+    public static String Model_Computing;
+
+    public static String Model_Differencing;
+
+    public static String Model_Normalizing;
+
+    public static String Model_PreparingToCompute;
 
     public static String PreservationAnalysis_EdgeWillChange;
 
@@ -40,6 +48,7 @@ public class Messages extends NLS
     public static String PreservationAnalysis_TransformationWillIntroduce;
 
     public static String PreservationAnalysis_WillPointHereInstead;
+
     static
     {
         // initialize resource bundle

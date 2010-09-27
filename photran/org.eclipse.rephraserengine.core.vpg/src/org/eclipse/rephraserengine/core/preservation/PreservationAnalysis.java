@@ -10,35 +10,33 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.preservation;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ltk.core.refactoring.FileStatusContext;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeAdded;
+import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeDeleted;
+import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeSinkChanged;
+import org.eclipse.rephraserengine.core.preservation.ModelDiff.ModelDiffProcessor;
 import org.eclipse.rephraserengine.core.util.OffsetLength;
 import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
-import org.eclipse.rephraserengine.internal.core.preservation.Model;
-import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff;
-import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeAdded;
-import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeDeleted;
-import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.EdgeSinkChanged;
-import org.eclipse.rephraserengine.internal.core.preservation.ModelDiff.ModelDiffProcessor;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Alpha;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Epsilon;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Mu;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOp.Rho;
-import org.eclipse.rephraserengine.internal.core.preservation.PrimitiveOpList;
 
 /**
  * Checks for preservation of semantic edges in a program graph modulo a sequence of primitive
@@ -57,51 +55,52 @@ public final class PreservationAnalysis
     //private IProgressMonitor progressMonitor;
 
     private Model initialModel;
-    private PrimitiveOpList primitiveOps;
-    private Set<PreservationRule> preserveEdgeTypes;
+    private ReplacementList replacements;
+    private PreservationRuleset ruleset;
 
+    /** @since 3.0 */
     public PreservationAnalysis(
         EclipseVPG vpg,
         IProgressMonitor progressMonitor, int ticks,
         IFile file,
-        PreservationRule... edgeTypes)
+        PreservationRuleset ruleset)
     {
-        this(vpg, progressMonitor, ticks, EclipseVPG.getFilenameForIFile(file), edgeTypes);
+        this(vpg, progressMonitor, ticks, EclipseVPG.getFilenameForIFile(file), ruleset);
     }
 
+    /** @since 3.0 */
     public PreservationAnalysis(
         EclipseVPG vpg,
         IProgressMonitor progressMonitor, int ticks,
         Collection<IFile> files,
-        PreservationRule... edgeTypes)
+        PreservationRuleset ruleset)
     {
-        this(vpg, progressMonitor, ticks, getFilenames(files), edgeTypes);
+        this(vpg, progressMonitor, ticks, getFilenames(files), ruleset);
     }
 
+    /** @since 3.0 */
     public PreservationAnalysis(
         EclipseVPG vpg,
         IProgressMonitor progressMonitor, int ticks,
         String filename,
-        PreservationRule... edgeTypes)
+        PreservationRuleset ruleset)
     {
-        this(vpg, progressMonitor, ticks, Collections.singletonList(filename), edgeTypes);
+        this(vpg, progressMonitor, ticks, Collections.singletonList(filename), ruleset);
     }
 
+    /** @since 3.0 */
     public PreservationAnalysis(
         EclipseVPG vpg,
         IProgressMonitor progressMonitor, int ticks,
         List<String> filenames,
-        PreservationRule... edgeTypes)
+        PreservationRuleset ruleset)
     {
         this.adapterManager = Platform.getAdapterManager();
         this.vpg = vpg;
         //this.progressMonitor = progressMonitor;
 
-        this.primitiveOps = new PrimitiveOpList();
-
-        this.preserveEdgeTypes = new HashSet<PreservationRule>(edgeTypes.length);
-        for (PreservationRule type : edgeTypes)
-            this.preserveEdgeTypes.add(type);
+        this.replacements = new ReplacementList();
+        this.ruleset = ruleset;
 
         progressMonitor.subTask(Messages.PreservationAnalysis_EnteringHypotheticalMode);
         ensureDatabaseIsInHypotheticalMode();
@@ -139,12 +138,13 @@ public final class PreservationAnalysis
         if (offsetLength == null)
             throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName()); //$NON-NLS-1$
 
-        Alpha alpha = PrimitiveOp.alpha(
+        Replacement alpha = new Replacement(
             filename,
             offsetLength.getOffset(),
-            offsetLength.getPositionPastEnd());
+            0,
+            offsetLength.getLength());
 
-        primitiveOps.add(alpha);
+        replacements.add(alpha);
         adapterManager.getAdapter(node, ResetOffsetLength.class);
     }
 
@@ -155,12 +155,13 @@ public final class PreservationAnalysis
         if (offsetLength == null)
             throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName()); //$NON-NLS-1$
 
-        Epsilon epsilon = PrimitiveOp.epsilon(
+        Replacement epsilon = new Replacement(
             filename,
             offsetLength.getOffset(),
-            offsetLength.getPositionPastEnd());
+            offsetLength.getLength(),
+            0);
 
-        primitiveOps.add(epsilon);
+        replacements.add(epsilon);
     }
 
     public void markRho(IFile file, Object node, int oldLength, int newLength)
@@ -170,56 +171,56 @@ public final class PreservationAnalysis
         if (offsetLength == null)
             throw new Error("Unable to get OffsetLength adapter for " + node.getClass().getName()); //$NON-NLS-1$
 
-        Rho rho = PrimitiveOp.rho(
+        Replacement rho = new Replacement(
             filename,
             offsetLength.getOffset(),
             oldLength,
             newLength);
 
-        primitiveOps.add(rho);
+        replacements.add(rho);
     }
 
-    /**
-     * @since 3.0
-     */
-    public void markMu(IFile file, Object oldNode, Object newNode)
-    {
-        String filename = EclipseVPG.getFilenameForIFile(file);
-
-        OffsetLength oldOffsetLength = (OffsetLength)adapterManager.getAdapter(oldNode, OffsetLength.class);
-        if (oldOffsetLength == null)
-            throw new Error("Unable to get OffsetLength adapter for " + oldNode.getClass().getName()); //$NON-NLS-1$
-
-        OffsetLength newOffsetLength = (OffsetLength)adapterManager.getAdapter(newNode, OffsetLength.class);
-        if (newOffsetLength == null)
-            throw new Error("Unable to get OffsetLength adapter for " + newNode.getClass().getName()); //$NON-NLS-1$
-
-        Mu mu = PrimitiveOp.mu(
-            filename,
-            oldOffsetLength,
-            newOffsetLength);
-
-        primitiveOps.add(mu);
-    }
-
-    /**
-     * @since 3.0
-     */
-    public void markMu(IFile file, OffsetLength oldOffsetLength, OffsetLength newOffsetLength)
-    {
-        String filename = EclipseVPG.getFilenameForIFile(file);
-
-        Mu mu = PrimitiveOp.mu(
-            filename,
-            oldOffsetLength,
-            newOffsetLength);
-
-        primitiveOps.add(mu);
-    }
+//    /**
+//     * @since 3.0
+//     */
+//    public void markMu(IFile file, Object oldNode, Object newNode)
+//    {
+//        String filename = EclipseVPG.getFilenameForIFile(file);
+//
+//        OffsetLength oldOffsetLength = (OffsetLength)adapterManager.getAdapter(oldNode, OffsetLength.class);
+//        if (oldOffsetLength == null)
+//            throw new Error("Unable to get OffsetLength adapter for " + oldNode.getClass().getName()); //$NON-NLS-1$
+//
+//        OffsetLength newOffsetLength = (OffsetLength)adapterManager.getAdapter(newNode, OffsetLength.class);
+//        if (newOffsetLength == null)
+//            throw new Error("Unable to get OffsetLength adapter for " + newNode.getClass().getName()); //$NON-NLS-1$
+//
+//        Mu mu = PrimitiveOp.mu(
+//            filename,
+//            oldOffsetLength,
+//            newOffsetLength);
+//
+//        replacements.add(mu);
+//    }
+//
+//    /**
+//     * @since 3.0
+//     */
+//    public void markMu(IFile file, OffsetLength oldOffsetLength, OffsetLength newOffsetLength)
+//    {
+//        String filename = EclipseVPG.getFilenameForIFile(file);
+//
+//        Mu mu = PrimitiveOp.mu(
+//            filename,
+//            oldOffsetLength,
+//            newOffsetLength);
+//
+//        replacements.add(mu);
+//    }
 
     @Override public String toString()
     {
-        return primitiveOps.toString();
+        return replacements.toString();
     }
 
     public void checkForPreservation(
@@ -227,9 +228,9 @@ public final class PreservationAnalysis
         IProgressMonitor progressMonitor, int ticks)
     {
         printDebug("INITIAL MODEL", initialModel); //$NON-NLS-1$
-        printDebug("NORMALIZING RELATIVE TO", primitiveOps); //$NON-NLS-1$
+        printDebug("NORMALIZING RELATIVE TO", replacements); //$NON-NLS-1$
 
-        initialModel.inormalize(primitiveOps, preserveEdgeTypes, progressMonitor);
+        initialModel.inormalize(replacements, progressMonitor);
         printDebug("NORMALIZED INITIAL MODEL", initialModel); //$NON-NLS-1$
 
         printDebug("File ordering:", initialModel.getFiles()); //$NON-NLS-1$
@@ -240,11 +241,10 @@ public final class PreservationAnalysis
             initialModel.getFiles());
         printDebug("DERIVATIVE MODEL", derivativeModel); //$NON-NLS-1$
 
-        derivativeModel.dnormalize(primitiveOps, preserveEdgeTypes, progressMonitor);
+        derivativeModel.dnormalize(replacements, progressMonitor);
         printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel); //$NON-NLS-1$
 
-        ModelDiff diff = initialModel.compareAgainst(derivativeModel, progressMonitor);
-
+        ModelDiff diff = initialModel.checkPreservation(derivativeModel, ruleset, progressMonitor);
         describeDifferences(status, diff);
 
         leaveHypotheticalMode(progressMonitor);
@@ -313,7 +313,7 @@ public final class PreservationAnalysis
                 String msg =
                     Messages.bind(
                         Messages.PreservationAnalysis_TransformationWillIntroduce,
-                        vpg.describeEdgeType(addition.edgeType).toLowerCase(),
+                        vpg.describeEdgeType(addition.edge.getType()).toLowerCase(),
                         addition);
                 status.addError(msg);
 
@@ -336,7 +336,7 @@ public final class PreservationAnalysis
                 String msg =
                     Messages.bind(
                         Messages.PreservationAnalysis_TransformationWillEliminate,
-                        vpg.describeEdgeType(deletion.edgeType).toLowerCase(),
+                        vpg.describeEdgeType(deletion.edge.getType()).toLowerCase(),
                         deletion);
                 status.addError(msg);
 
@@ -357,14 +357,14 @@ public final class PreservationAnalysis
                 String msg =
                     Messages.bind(
                         Messages.PreservationAnalysis_TransformationWillChange,
-                        vpg.describeEdgeType(change.edgeType).toLowerCase(),
+                        vpg.describeEdgeType(change.edge.getType()).toLowerCase(),
                         change);
                 status.addError(msg);
 
                 status.addError(
                     Messages.bind(
                         Messages.PreservationAnalysis_EdgeWillChange,
-                        vpg.describeEdgeType(change.edgeType).toLowerCase()),
+                        vpg.describeEdgeType(change.edge.getType()).toLowerCase()),
                     new PostTransformationContext(
                         change.getFileContainingSourceRegion(),
                         getCode(change.getFileContainingSourceRegion(), modifiedSourceCode),
@@ -382,7 +382,40 @@ public final class PreservationAnalysis
                         getCode(change.getFileContainingNewSinkRegion(), modifiedSourceCode),
                         change.getNewSinkRegion()));
             }
-
         });
     }
+    
+    /** @since 3.0 */
+    public static boolean printModelOn(PrintStream ps, IFile file, EclipseVPG<?,?,?,?,?> vpg) throws UnsupportedEncodingException, IOException, CoreException
+    {
+        String filename = EclipseVPG.getFilenameForIFile(file);
+        if (filename == null) return false;
+        
+        ArrayList<Integer> lineMap = new ArrayList<Integer>();
+        String fileContents = readStream(lineMap,
+            new BufferedReader(new InputStreamReader(file.getContents(true), file.getCharset())));
+        ps.println(filename);
+        ps.println();
+        Model model = new Model("edge model", new NullProgressMonitor(), 0, vpg, filename); //$NON-NLS-1$
+        ps.print(model.toString(filename, fileContents, lineMap));
+        return true;
+    }
+
+    private static String readStream(ArrayList<Integer> lineMap, Reader in) throws IOException
+    {
+        StringBuffer sb = new StringBuffer(4096);
+        for (int offset = 0, ch = in.read(); ch >= 0; ch = in.read())
+        {
+            sb.append((char)ch);
+            offset++;
+
+            if (ch == '\n' && lineMap != null)
+            {
+                //System.out.println("Line " + (lineMap.size()+1) + " starts at offset " + offset);
+                lineMap.add(offset);
+            }
+        }
+        in.close();
+        return sb.toString();
+}
 }
