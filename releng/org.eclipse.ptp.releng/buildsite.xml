@@ -3,100 +3,100 @@
    <description url="http://download.eclipse.org/tools/ptp/updates/helios">
       Parallel Tools Platform Helios Update Site
    </description>
-   <feature url="features/org.eclipse.ptp_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.core_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.core" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.core_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.core" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.debug.sdm_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.debug.sdm" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.debug.sdm_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.debug.sdm" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.etfw_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.etfw_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.etfw" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.external_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.external" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.external_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.external" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.pldt_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.pldt" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.pldt_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.pldt" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.remote_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.remote" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.remote_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.remote" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.remote.remotetools_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.remote.remotetools" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.remote.remotetools_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.remote.remotetools" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-    <feature url="features/org.eclipse.ptp.remotetools_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.remotetools" version="5.0.0.@timeStamp@">
+    <feature url="features/org.eclipse.ptp.remotetools_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.remotetools" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.ibm.ll_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.ibm.ll" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rm.ibm.ll_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.ibm.ll" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.ibm.pe_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.ibm.pe" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rm.ibm.pe_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.ibm.pe" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.mpich2_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.mpich2" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rm.mpich2_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.mpich2" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.openmpi_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.openmpi" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rm.openmpi_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.openmpi" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.pbs_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.pbs" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rm.pbs_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.pbs" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rm.slurm_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rm.slurm" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rm.slurm_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rm.slurm" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.services_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.services" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.services_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.services" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.utils_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.utils" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.utils_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.utils" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.pldt.lapi_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.pldt.lapi" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.pldt.lapi_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.pldt.lapi" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.gem_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.gem" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.gem_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.gem" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.remote.rse_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.remote.rse" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.remote.rse_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.remote.rse" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.pldt.upc_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.pldt.upc" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.pldt.upc_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.pldt.upc" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.etfw.tau_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.etfw.tau_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-    <feature url="features/org.eclipse.ptp.etfw.tau.fortran_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau.fortran" version="5.0.0.@timeStamp@">
+    <feature url="features/org.eclipse.ptp.etfw.tau.fortran_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.etfw.tau.fortran" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.etfw.ppw_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.etfw.ppw" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.etfw.ppw_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.etfw.ppw" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.sci_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.sci" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.sci_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.sci" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Parallel Tools Platform"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rdt_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rdt_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rdt" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rdt.xlc_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt.xlc" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rdt.xlc_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rdt.xlc" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.rdt.remotetools_5.0.0.@timeStamp@.jar" id="org.eclipse.ptp.rdt.remotetools" version="5.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.ptp.rdt.remotetools_@ptpBranchVersion@.@timeStamp@.jar" id="org.eclipse.ptp.rdt.remotetools" version="@ptpBranchVersion@.@timeStamp@">
       <category name="Remote Development Tools"/>
    </feature>
-   <feature url="features/org.eclipse.photran_7.0.0.@timeStamp@.jar" id="org.eclipse.photran" version="7.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.photran_@photranBranchVersion@.@timeStamp@.jar" id="org.eclipse.photran" version="@photranBranchVersion@.@timeStamp@">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
-   <feature url="features/org.eclipse.photran.intel_7.0.0.@timeStamp@.jar" id="org.eclipse.photran.intel" version="7.0.0.@timeStamp@" os="linux">
+   <feature url="features/org.eclipse.photran.intel_@photranBranchVersion@.@timeStamp@.jar" id="org.eclipse.photran.intel" version="@photranBranchVersion@.@timeStamp@" os="linux">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
-   <feature url="features/org.eclipse.photran.xlf_7.0.0.@timeStamp@.jar" id="org.eclipse.photran.xlf" version="7.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.photran.xlf_@photranBranchVersion@.@timeStamp@.jar" id="org.eclipse.photran.xlf" version="@photranBranchVersion@.@timeStamp@">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
-   <feature url="features/org.eclipse.rephraserengine_2.0.0.@timeStamp@.jar" id="org.eclipse.rephraserengine" version="2.0.0.@timeStamp@">
+   <feature url="features/org.eclipse.rephraserengine_@photranBranchVersion@.@timeStamp@.jar" id="org.eclipse.rephraserengine" version="@photranBranchVersion@.@timeStamp@">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
    <category-def name="Parallel Tools Platform" label="Parallel Tools Platform"/>
