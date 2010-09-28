@@ -116,16 +116,12 @@ proxy_serialize_msg(proxy_msg *m, unsigned char **result, int *result_len)
 			packet_append_varint(0);
 			packet_append_varint(strlen(m->args[i]));
 			packet_append_bytes(strlen(m->args[i]), m->args[i]);
-		}
-		else {
-			char *key;
-			char *value;
-
+		} else {
 			/*
 			 * Parameter is key=value pair. Append fields for
 			 * key and value to buffer. 
 			 */
-			key = strtok(m->args[i], "=");
+			char * key = strtok(m->args[i], "=");
 			packet_append_varint(strlen(key));
 			packet_append_bytes(strlen(key), key);
 			packet_append_varint(strlen(p + 1));
