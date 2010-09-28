@@ -26,7 +26,6 @@
 int
 get_master_pty(char **name)
 {
-	int i,j;
 	int master;
 	char *slavename;
 

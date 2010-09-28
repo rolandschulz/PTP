@@ -56,7 +56,6 @@ MIMemoryFree(MIMemory *memory)
 MIMemory *
 MIMemoryParse(MIValue *tuple)
 {
-	char *		str;
 	char *		var;
 	MIValue *	value;
 	MIResult *	result;
@@ -67,14 +66,10 @@ MIMemoryParse(MIValue *tuple)
 		var = result->variable;
 		value = result->value;
 	
-		if (value != NULL && value->type == MIValueTypeConst) {
-			str = value->cstring;
-		}
-	
 		if (strcmp(var, "addr") == 0) {
-			memory->addr = strdup(str);
+			memory->addr = strdup(value->cstring);
 		} else if (strcmp(var, "ascii") == 0) {
-			memory->ascii = strdup(str);
+			memory->ascii = strdup(value->cstring);
 		} else if (strcmp(var, "data") == 0) {
 			if (value != NULL) {
 				memory->data = MIMemoryDataParse(value);
