@@ -123,7 +123,6 @@ MISessionStartLocal(MISession *sess, char *prog)
 {
 	int			p1[2];
 	int			p2[2];
-	int			master;
 	char *		name;
 	
 	if (pipe(p1) < 0 || pipe(p2) < 0) {

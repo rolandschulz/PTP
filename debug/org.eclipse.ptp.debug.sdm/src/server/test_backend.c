@@ -197,7 +197,7 @@ static int
 TestSetLineBreakpoint(int bpid, int isTemp, int isHard, char *file, int line, char *condition, int ignoreCount, int tid)
 {
 	int		res;
-	char*	where;
+	char*	where = NULL;
 	res = SetAndCheckBreak(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
 	return res;
 }
@@ -209,7 +209,7 @@ static int
 TestSetFuncBreakpoint(int bpid, int isTemp, int isHard, char *file, char *func, char *condition, int ignoreCount, int tid)
 {
 	int		res;
-	char*	where;
+	char*	where = NULL;
 	res = SetAndCheckBreak(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
 	return res;
 }
