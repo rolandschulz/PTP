@@ -80,9 +80,9 @@ proxy_tcp_clnt_recv_msgs(int fd, void *data)
 static int
 proxy_tcp_clnt_init(proxy_clnt *pc, void **data, char *attr, va_list ap)
 {
-	int					port;
+	int					port = 0;
 	char *				host = NULL;
-	proxy_tcp_conn *		conn;
+	proxy_tcp_conn *	conn;
 
 	while (attr != NULL) {
 		if (strcmp(attr, "host") == 0)
