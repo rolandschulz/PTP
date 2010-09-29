@@ -218,227 +218,11 @@ public class PSession implements IPSession, IPDIEventListener {
 		return (PDebugTarget) launch.getDebugTarget(tasks);
 	}
 
-	/**
-	 * @param event
-	 */
-	public void fireChangeEvent(IPDIChangedEvent event) {
-		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
-		int detail = IPDebugEvent.UNSPECIFIED;
-
-		IPDISessionObject reason = event.getReason();
-		if (reason instanceof IPDIBreakpointInfo) {
-			// Nothing currently required
-		} else if (reason instanceof IPDIMemoryBlockInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDISignalInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDIVariableInfo) {
-			// Not currently implemented
-		}
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.CHANGE, detail, baseInfo));
-	}
-
-	/**
-	 * @param event
-	 */
-	public void fireCreateEvent(IPDICreatedEvent event) {
-		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
-		int detail = IPDebugEvent.UNSPECIFIED;
-
-		IPDISessionObject reason = event.getReason();
-		if (reason instanceof IPDIBreakpointInfo) {
-			// Nothing currently required
-		} else if (reason instanceof IPDIThreadInfo) {
-			// Nothing currently required
-		} else if (reason instanceof IPDIMemoryBlockInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDIRegisterInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDISharedLibraryInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDIVariableInfo) {
-			// Not currently implemented
-		}
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.CREATE, detail, baseInfo));
-	}
-
-	/**
-	 * @param type
-	 * @param details
-	 * @param tasks
-	 */
-	public void fireDebugEvent(int type, int details, TaskSet tasks) {
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, type, details, getDebugInfo(tasks)));
-	}
-
-	/**
-	 * @param type
-	 * @param details
-	 * @param info
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.debug.core.IPSession#fireDebugEvent(int, int, org.eclipse.ptp.debug.core.event.IPDebugInfo)
 	 */
 	public void fireDebugEvent(int type, int details, IPDebugInfo info) {
 		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, type, details, info));
-	}
-
-	/**
-	 * @param event
-	 */
-	public void fireDestroyEvent(IPDIDestroyedEvent event) {
-		IPDebugEvent debugEvent = null;
-		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
-		IPDISessionObject reason = event.getReason();
-
-		if (reason instanceof IPDIBreakpointInfo) {
-		} else if (reason instanceof IPDIErrorInfo) {
-			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
-			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, ((IPDIErrorInfo) reason).getMessage(),
-					((IPDIErrorInfo) reason).getDetailMessage(), ((IPDIErrorInfo) reason).getCode());
-			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.ERROR, errInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
-		} else if (reason instanceof IPDIExitInfo) {
-			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
-			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, ((IPDIExitInfo) reason).getCode(), Messages.PSession_2,
-					Messages.PSession_3);
-			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
-		} else if (reason instanceof IPDISignalInfo) {
-			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
-			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, 0, ((IPDISignalInfo) reason).getDescription(),
-					((IPDISignalInfo) reason).getName());
-			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
-			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
-		} else if (reason instanceof IPDISharedLibraryInfo) {
-			// Nothing currently required
-		} else if (reason instanceof IPDIThreadInfo) {
-			// Nothing currently required
-		} else if (reason instanceof IPDIVariableInfo) {
-			// Nothing currently required
-		} else {
-			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.UNSPECIFIED, baseInfo);
-		}
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(debugEvent);
-	}
-
-	/**
-	 * @param event
-	 */
-	public void fireErrorEvent(IPDIErrorEvent event) {
-		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
-		int detail = IPDebugEvent.UNSPECIFIED;
-		IPDISessionObject reason = event.getReason();
-		if (reason instanceof IPDIErrorInfo) {
-			int code = ((IPDIErrorInfo) reason).getCode();
-			switch (code) {
-			case IPDIErrorInfo.DBG_FATAL:
-				detail = IPDebugEvent.ERR_FATAL;
-				// only fatal error reports process error
-				changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED); // TODO:
-																							// how
-																							// to
-																							// report
-																							// error?
-				break;
-			case IPDIErrorInfo.DBG_WARNING:
-				detail = IPDebugEvent.ERR_WARNING;
-				break;
-			case IPDIErrorInfo.DBG_IGNORE:
-			case IPDIErrorInfo.DBG_NORMAL:
-				detail = IPDebugEvent.ERR_NORMAL;
-				break;
-			}
-			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, ((IPDIErrorInfo) reason).getMessage(),
-					((IPDIErrorInfo) reason).getDetailMessage(), ((IPDIErrorInfo) reason).getCode());
-			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.ERROR, detail, errInfo));
-		} else {
-			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, Messages.PSession_4, Messages.PSession_5,
-					PTPDebugCorePlugin.INTERNAL_ERROR);
-			PTPDebugCorePlugin.getDefault().fireDebugEvent(
-					new PDebugEvent(this, IPDebugEvent.ERROR, IPDebugEvent.UNSPECIFIED, errInfo));
-		}
-	}
-
-	/**
-	 * @param event
-	 */
-	public void fireResumeEvent(IPDIResumedEvent event) {
-		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
-		int detail = IPDebugEvent.UNSPECIFIED;
-
-		switch (event.getType()) {
-		case IPDIResumedEvent.STEP_INTO:
-		case IPDIResumedEvent.STEP_INTO_INSTRUCTION:
-			detail = IPDebugEvent.STEP_INTO;
-			break;
-		case IPDIResumedEvent.STEP_OVER:
-		case IPDIResumedEvent.STEP_OVER_INSTRUCTION:
-			detail = IPDebugEvent.STEP_OVER;
-			break;
-		case IPDIResumedEvent.STEP_RETURN:
-			detail = IPDebugEvent.STEP_RETURN;
-			break;
-		}
-
-		changeProcessState(event.getTasks(), ProcessAttributes.State.RUNNING);
-
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.RESUME, detail, baseInfo));
-	}
-
-	/**
-	 * @param event
-	 */
-	public void fireSuspendEvent(IPDISuspendedEvent event) {
-		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
-		int detail = IPDebugEvent.UNSPECIFIED;
-
-		int lineNumber = 0;
-		int level = event.getLevel();
-		int depth = event.getDepth();
-		String fileName = ""; //$NON-NLS-1$
-		IPDISessionObject reason = event.getReason();
-		if (reason instanceof IPDIBreakpointInfo) {
-			IPDIBreakpoint bpt = ((IPDIBreakpointInfo) reason).getBreakpoint();
-			if (bpt instanceof IPDILocationBreakpoint) {
-				IPDILocator locator = ((IPDILocationBreakpoint) bpt).getLocator();
-				if (locator != null) {
-					lineNumber = locator.getLineNumber();
-					fileName += locator.getFile();
-					detail = IPDebugEvent.BREAKPOINT;
-				}
-			}
-		} else if (reason instanceof IPDIEndSteppingRangeInfo) {
-			IPDILocator locator = ((IPDIEndSteppingRangeInfo) reason).getLocator();
-			if (locator != null) {
-				lineNumber = locator.getLineNumber();
-				fileName += locator.getFile();
-				detail = IPDebugEvent.STEP_END;
-			}
-		} else if (reason instanceof IPDILocationReachedInfo) {
-			IPDILocator locator = ((IPDILocationReachedInfo) reason).getLocator();
-			if (locator != null) {
-				lineNumber = locator.getLineNumber();
-				fileName += locator.getFile();
-				detail = IPDebugEvent.CLIENT_REQUEST;
-			}
-		} else if (reason instanceof IPDISignalInfo) {
-			IPDILocator locator = ((IPDISignalInfo) reason).getLocator();
-			if (locator != null) {
-				lineNumber = locator.getLineNumber();
-				fileName += locator.getFile();
-				detail = IPDebugEvent.CLIENT_REQUEST;
-			}
-		} else if (reason instanceof IPDIFunctionFinishedInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDISharedLibraryInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDIWatchpointScopeInfo) {
-			// Not currently implemented
-		} else if (reason instanceof IPDIWatchpointTriggerInfo) {
-			// Not currently implemented
-		}
-		changeProcessState(event.getTasks(), ProcessAttributes.State.SUSPENDED);
-		PTPDebugCorePlugin.getDefault().fireDebugEvent(
-				new PDebugEvent(getSession(), IPDebugEvent.SUSPEND, detail, new PDebugSuspendInfo(baseInfo, fileName, lineNumber,
-						level, depth)));
 	}
 
 	/*
@@ -722,6 +506,211 @@ public class PSession implements IPSession, IPDIEventListener {
 		};
 		aJob.setSystem(true);
 		aJob.schedule();
+	}
+
+	/**
+	 * @param event
+	 */
+	private void fireChangeEvent(IPDIChangedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
+		int detail = IPDebugEvent.UNSPECIFIED;
+
+		IPDISessionObject reason = event.getReason();
+		if (reason instanceof IPDIBreakpointInfo) {
+			// Nothing currently required
+		} else if (reason instanceof IPDIMemoryBlockInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDISignalInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDIVariableInfo) {
+			// Not currently implemented
+		}
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.CHANGE, detail, baseInfo));
+	}
+
+	/**
+	 * @param event
+	 */
+	private void fireCreateEvent(IPDICreatedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
+		int detail = IPDebugEvent.UNSPECIFIED;
+
+		IPDISessionObject reason = event.getReason();
+		if (reason instanceof IPDIBreakpointInfo) {
+			// Nothing currently required
+		} else if (reason instanceof IPDIThreadInfo) {
+			// Nothing currently required
+		} else if (reason instanceof IPDIMemoryBlockInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDIRegisterInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDISharedLibraryInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDIVariableInfo) {
+			// Not currently implemented
+		}
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.CREATE, detail, baseInfo));
+	}
+
+	/**
+	 * @param event
+	 */
+	private void fireDestroyEvent(IPDIDestroyedEvent event) {
+		IPDebugEvent debugEvent = null;
+		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
+		IPDISessionObject reason = event.getReason();
+
+		if (reason instanceof IPDIBreakpointInfo) {
+		} else if (reason instanceof IPDIErrorInfo) {
+			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
+			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, ((IPDIErrorInfo) reason).getMessage(),
+					((IPDIErrorInfo) reason).getDetailMessage(), ((IPDIErrorInfo) reason).getCode());
+			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.ERROR, errInfo);
+			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
+		} else if (reason instanceof IPDIExitInfo) {
+			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
+			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, ((IPDIExitInfo) reason).getCode(), Messages.PSession_2,
+					Messages.PSession_3);
+			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
+			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
+		} else if (reason instanceof IPDISignalInfo) {
+			deleteDebugTarget(baseInfo.getAllRegisteredTasks().copy(), true, true);
+			IPDebugInfo exitInfo = new PDebugExitInfo(baseInfo, 0, ((IPDISignalInfo) reason).getDescription(),
+					((IPDISignalInfo) reason).getName());
+			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.PROCESS_SPECIFIC, exitInfo);
+			changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED);
+		} else if (reason instanceof IPDISharedLibraryInfo) {
+			// Nothing currently required
+		} else if (reason instanceof IPDIThreadInfo) {
+			// Nothing currently required
+		} else if (reason instanceof IPDIVariableInfo) {
+			// Nothing currently required
+		} else {
+			debugEvent = new PDebugEvent(this, IPDebugEvent.TERMINATE, IPDebugEvent.UNSPECIFIED, baseInfo);
+		}
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(debugEvent);
+	}
+
+	/**
+	 * @param event
+	 */
+	private void fireErrorEvent(IPDIErrorEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
+		int detail = IPDebugEvent.UNSPECIFIED;
+		IPDISessionObject reason = event.getReason();
+		if (reason instanceof IPDIErrorInfo) {
+			int code = ((IPDIErrorInfo) reason).getCode();
+			switch (code) {
+			case IPDIErrorInfo.DBG_FATAL:
+				detail = IPDebugEvent.ERR_FATAL;
+				// only fatal error reports process error
+				changeProcessState(event.getTasks(), ProcessAttributes.State.COMPLETED); // TODO:
+																							// how
+																							// to
+																							// report
+																							// error?
+				break;
+			case IPDIErrorInfo.DBG_WARNING:
+				detail = IPDebugEvent.ERR_WARNING;
+				break;
+			case IPDIErrorInfo.DBG_IGNORE:
+			case IPDIErrorInfo.DBG_NORMAL:
+				detail = IPDebugEvent.ERR_NORMAL;
+				break;
+			}
+			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, ((IPDIErrorInfo) reason).getMessage(),
+					((IPDIErrorInfo) reason).getDetailMessage(), ((IPDIErrorInfo) reason).getCode());
+			PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.ERROR, detail, errInfo));
+		} else {
+			IPDebugInfo errInfo = new PDebugErrorInfo(baseInfo, Messages.PSession_4, Messages.PSession_5,
+					PTPDebugCorePlugin.INTERNAL_ERROR);
+			PTPDebugCorePlugin.getDefault().fireDebugEvent(
+					new PDebugEvent(this, IPDebugEvent.ERROR, IPDebugEvent.UNSPECIFIED, errInfo));
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	private void fireResumeEvent(IPDIResumedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
+		int detail = IPDebugEvent.UNSPECIFIED;
+
+		switch (event.getType()) {
+		case IPDIResumedEvent.STEP_INTO:
+		case IPDIResumedEvent.STEP_INTO_INSTRUCTION:
+			detail = IPDebugEvent.STEP_INTO;
+			break;
+		case IPDIResumedEvent.STEP_OVER:
+		case IPDIResumedEvent.STEP_OVER_INSTRUCTION:
+			detail = IPDebugEvent.STEP_OVER;
+			break;
+		case IPDIResumedEvent.STEP_RETURN:
+			detail = IPDebugEvent.STEP_RETURN;
+			break;
+		}
+
+		changeProcessState(event.getTasks(), ProcessAttributes.State.RUNNING);
+
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(new PDebugEvent(this, IPDebugEvent.RESUME, detail, baseInfo));
+	}
+
+	/**
+	 * @param event
+	 */
+	private void fireSuspendEvent(IPDISuspendedEvent event) {
+		IPDebugInfo baseInfo = getDebugInfo(event.getTasks());
+		int detail = IPDebugEvent.UNSPECIFIED;
+
+		int lineNumber = 0;
+		int level = event.getLevel();
+		int depth = event.getDepth();
+		String fileName = ""; //$NON-NLS-1$
+		IPDISessionObject reason = event.getReason();
+		if (reason instanceof IPDIBreakpointInfo) {
+			IPDIBreakpoint bpt = ((IPDIBreakpointInfo) reason).getBreakpoint();
+			if (bpt instanceof IPDILocationBreakpoint) {
+				IPDILocator locator = ((IPDILocationBreakpoint) bpt).getLocator();
+				if (locator != null) {
+					lineNumber = locator.getLineNumber();
+					fileName += locator.getFile();
+					detail = IPDebugEvent.BREAKPOINT;
+				}
+			}
+		} else if (reason instanceof IPDIEndSteppingRangeInfo) {
+			IPDILocator locator = ((IPDIEndSteppingRangeInfo) reason).getLocator();
+			if (locator != null) {
+				lineNumber = locator.getLineNumber();
+				fileName += locator.getFile();
+				detail = IPDebugEvent.STEP_END;
+			}
+		} else if (reason instanceof IPDILocationReachedInfo) {
+			IPDILocator locator = ((IPDILocationReachedInfo) reason).getLocator();
+			if (locator != null) {
+				lineNumber = locator.getLineNumber();
+				fileName += locator.getFile();
+				detail = IPDebugEvent.CLIENT_REQUEST;
+			}
+		} else if (reason instanceof IPDISignalInfo) {
+			IPDILocator locator = ((IPDISignalInfo) reason).getLocator();
+			if (locator != null) {
+				lineNumber = locator.getLineNumber();
+				fileName += locator.getFile();
+				detail = IPDebugEvent.CLIENT_REQUEST;
+			}
+		} else if (reason instanceof IPDIFunctionFinishedInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDISharedLibraryInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDIWatchpointScopeInfo) {
+			// Not currently implemented
+		} else if (reason instanceof IPDIWatchpointTriggerInfo) {
+			// Not currently implemented
+		}
+		changeProcessState(event.getTasks(), ProcessAttributes.State.SUSPENDED);
+		PTPDebugCorePlugin.getDefault().fireDebugEvent(
+				new PDebugEvent(getSession(), IPDebugEvent.SUSPEND, detail, new PDebugSuspendInfo(baseInfo, fileName, lineNumber,
+						level, depth)));
 	}
 
 	/**
