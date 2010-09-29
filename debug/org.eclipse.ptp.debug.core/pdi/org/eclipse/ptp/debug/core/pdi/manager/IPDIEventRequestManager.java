@@ -25,53 +25,71 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
 
 /**
  * Manages a number of EventRequests for a target debugger.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIEventRequestManager extends IPDIManager, Observer {
 	/**
+	 * Flush any pending requests.
 	 * 
+	 * @since 5.0
 	 */
-	public void cleanEventRequests();
-	
+	public void flushEventRequests();
+
 	/**
 	 * Adds an event request
-	 * @param request event request is being added
-	 * @throws PDIException on failure
+	 * 
+	 * @param request
+	 *            event request is being added
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void addEventRequest(IPDIEventRequest request) throws PDIException;
-	
+
 	/**
-	 * Determines whether this handler can execute on the elements specified
-	 * in the given request by reporting enabled state to the request.
-	 * @param request specifies elements to operate on and collects enabled state
+	 * Determines whether this handler can execute on the elements specified in
+	 * the given request by reporting enabled state to the request.
+	 * 
+	 * @param request
+	 *            specifies elements to operate on and collects enabled state
 	 * @return whether this handler can execute this request
 	 */
 	public boolean canExecute(IPDIEventRequest request);
+
 	/**
 	 * Deletes all event requests
-	 * @throws PDIException on failure
+	 * 
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void deleteAllEventRequests() throws PDIException;
-	
+
 	/**
 	 * Deletes an event request
-	 * @param request event request is being removed
-	 * @throws PDIException on failure
+	 * 
+	 * @param request
+	 *            event request is being removed
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void deleteEventRequest(IPDIEventRequest request) throws PDIException;
-	
+
 	/**
 	 * Executes this command on the elements specified in the given request
-	 * reporting status to the given request and returns whether this handler should
-	 * remain enabled while the command is executing.
-	 * @param request specifies elements to operate on and collects execution status
-	 * @throws PDIException on failure
+	 * reporting status to the given request and returns whether this handler
+	 * should remain enabled while the command is executing.
+	 * 
+	 * @param request
+	 *            specifies elements to operate on and collects execution status
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public void execute(IPDIEventRequest request) throws PDIException;
-	
+
 	/**
 	 * Returns an array of stored requests
+	 * 
 	 * @return an array of stored requests
 	 */
 	public IPDIEventRequest[] getRequests();
