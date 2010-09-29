@@ -60,29 +60,81 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStartDebuggerRequest;
  * 
  */
 public class Session implements IPDISession {
-	private IPDIBreakpointManager breakpointManager;
-	private IPDIEventManager eventManager;
-	private IPDIEventRequestManager eventRequestManager;
-	private IPDITaskManager taskManager;
-	private IPDITargetManager targetManager;
-	private IPDIThreadManager threadManager;
-	private IPDIExpressionManager expressionManager;
-	private IPDIVariableManager variableManager;
-	private IPDISourceManager sourceManager;
-	private IPDIMemoryManager memoryManager;
-	private IPDISignalManager signalManager;
-	private IPDIRegisterManager registerManager;
-	private IPDIDebugger debugger = null;
-	private final String job_id;
-	private int total_tasks = 0;
-	private int status;
-	private long timeout = 30000;
-	private NotifyJob notifyJob = null;
+	private class NotifyJob extends Job {
+		private final Vector<Runnable> fRunnables;
+
+		public NotifyJob() {
+			super(Messages.Session_15);
+			setSystem(true);
+			fRunnables = new Vector<Runnable>(10);
+		}
+
+		public void addRunnable(Runnable runnable) {
+			synchronized (fRunnables) {
+				fRunnables.add(runnable);
+			}
+			schedule();
+		}
+
+		@Override
+		public IStatus run(IProgressMonitor monitor) {
+			Runnable[] runnables;
+			synchronized (fRunnables) {
+				runnables = fRunnables.toArray(new Runnable[0]);
+				fRunnables.clear();
+			}
+			MultiStatus failed = null;
+			monitor.beginTask(getName(), runnables.length);
+			PDebugUtils.println(Messages.Session_16 + runnables.length);
+			for (Runnable runnable : runnables) {
+				try {
+					runnable.run();
+				} catch (Exception e) {
+					if (failed == null)
+						failed = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR,
+								Messages.Session_17, null);
+					failed.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(),
+							PTPDebugCorePlugin.INTERNAL_ERROR, Messages.Session_17, e));
+				}
+				monitor.worked(1);
+			}
+			monitor.done();
+			if (failed == null)
+				return Status.OK_STATUS;
+
+			return failed;
+		}
+
+		@Override
+		public boolean shouldRun() {
+			return !fRunnables.isEmpty();
+		}
+	}
+
+	private final IPDIBreakpointManager breakpointManager;
+	private final IPDIEventManager eventManager;
+	private final IPDIEventRequestManager eventRequestManager;
+	private final IPDITaskManager taskManager;
+	private final IPDITargetManager targetManager;
+	private final IPDIThreadManager threadManager;
+	private final IPDIExpressionManager expressionManager;
+	private final IPDIVariableManager variableManager;
+	private final IPDISourceManager sourceManager;
+	private final IPDIMemoryManager memoryManager;
+	private final IPDISignalManager signalManager;
+	private final IPDIRegisterManager registerManager;
+	private final IPDIDebugger debugger;
 	private final IPDIRequestFactory requestFactory;
 	private final IPDIEventFactory eventFactory;
 	private final IPDIModelFactory modelFactory;
+	private final ILaunchConfiguration config;
 	private final ReentrantLock waitLock = new ReentrantLock();
-	private ILaunchConfiguration config = null;
+	private final NotifyJob notifyJob = new NotifyJob();
+	private final String job_id;
+
+	private int total_tasks = 0;
+	private int status = DISCONNECTED;
+	private long timeout = 30000;
 
 	public Session(IPDIManagerFactory managerFactory, IPDIRequestFactory requestFactory, IPDIEventFactory eventFactory,
 			IPDIModelFactory modelFactory, ILaunchConfiguration config, long timeout, IPDIDebugger debugger, String job_id,
@@ -92,57 +144,22 @@ public class Session implements IPDISession {
 		this.debugger = debugger;
 		this.job_id = job_id;
 		this.total_tasks = total_tasks;
-		this.notifyJob = new NotifyJob();
 		this.requestFactory = requestFactory;
 		this.eventFactory = eventFactory;
 		this.modelFactory = modelFactory;
 
-		setEventRequestManager(managerFactory.newEventRequestManager(this));
-		setEventManager(managerFactory.newEventManager(this));
-		setTaskManager(managerFactory.newTaskManager(this));
-		setTargetManager(managerFactory.newTargetManager(this));
-		setThreadManager(managerFactory.newThreadManager(this));
-		setBreakpointManager(managerFactory.newBreakpointManager(this));
-		setExpressionManager(managerFactory.newExpressionManager(this));
-		setVariableManager(managerFactory.newVariableManager(this));
-		setSourceManager(managerFactory.newSourceManager(this));
-		setMemeoryManager(managerFactory.newMemoryManager(this));
-		setSignalManager(managerFactory.newSignalManager(this));
-		setRegisterManager(managerFactory.newRegisterManager(this));
-	}
-
-	/**
-	 * @return
-	 */
-	public ILaunchConfiguration getConfiguration() {
-		return config;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getRequestFactory()
-	 */
-	public IPDIRequestFactory getRequestFactory() {
-		return requestFactory;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTimeout()
-	 */
-	public long getTimeout() {
-		return timeout;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#setRequestTimeout(long)
-	 */
-	public void setRequestTimeout(long timeout) {
-		this.timeout = timeout;
+		this.eventRequestManager = managerFactory.newEventRequestManager(this);
+		this.eventManager = managerFactory.newEventManager(this);
+		this.taskManager = managerFactory.newTaskManager(this);
+		this.targetManager = managerFactory.newTargetManager(this);
+		this.threadManager = managerFactory.newThreadManager(this);
+		this.breakpointManager = managerFactory.newBreakpointManager(this);
+		this.expressionManager = managerFactory.newExpressionManager(this);
+		this.variableManager = managerFactory.newVariableManager(this);
+		this.sourceManager = managerFactory.newSourceManager(this);
+		this.memoryManager = managerFactory.newMemoryManager(this);
+		this.signalManager = managerFactory.newSignalManager(this);
+		this.registerManager = managerFactory.newRegisterManager(this);
 	}
 
 	/*
@@ -174,133 +191,45 @@ public class Session implements IPDISession {
 		}
 	}
 
-	/**
-	 * @param manager
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#exit()
 	 */
-	protected void setEventRequestManager(IPDIEventRequestManager manager) {
-		eventRequestManager = manager;
-	}
+	public void exit() throws PDIException {
+		if (status != EXITING && status != EXITED) {
+			setStatus(EXITING);
+			eventRequestManager.flushEventRequests();
+			TaskSet tasks = getTasks();
+			taskManager.getRunningTasks(tasks);
+			if (!tasks.isEmpty()) {
+				eventRequestManager.addEventRequest(getRequestFactory().getSuspendRequest(tasks, false));
+			}
+			tasks = getTasks();
+			taskManager.getNonTerminatedTasks(tasks);
+			if (!tasks.isEmpty())
+				eventRequestManager.addEventRequest(getRequestFactory().getTerminateRequest(tasks));
 
-	/**
-	 * @param manager
-	 */
-	protected void setEventManager(IPDIEventManager manager) {
-		eventManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setTaskManager(IPDITaskManager manager) {
-		taskManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setTargetManager(IPDITargetManager manager) {
-		targetManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setThreadManager(IPDIThreadManager manager) {
-		threadManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setBreakpointManager(IPDIBreakpointManager manager) {
-		breakpointManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setExpressionManager(IPDIExpressionManager manager) {
-		expressionManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setVariableManager(IPDIVariableManager manager) {
-		variableManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setSourceManager(IPDISourceManager manager) {
-		sourceManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setMemeoryManager(IPDIMemoryManager manager) {
-		memoryManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setSignalManager(IPDISignalManager manager) {
-		signalManager = manager;
-	}
-
-	/**
-	 * @param manager
-	 */
-	protected void setRegisterManager(IPDIRegisterManager manager) {
-		registerManager = manager;
+			eventRequestManager.addEventRequest(getRequestFactory().getStopDebuggerRequest(new TaskSet(total_tasks)));
+			taskManager.setPendingTasks(true, tasks);
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventRequestManager()
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDISession#findTarget(org.eclipse.ptp
+	 * .core.util.TaskSet)
 	 */
-	public IPDIEventRequestManager getEventRequestManager() {
-		return eventRequestManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventManager()
+	/**
+	 * @since 4.0
 	 */
-	public IPDIEventManager getEventManager() {
-		return eventManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTaskManager()
-	 */
-	public IPDITaskManager getTaskManager() {
-		return taskManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getThreadManager()
-	 */
-	public IPDIThreadManager getThreadManager() {
-		return threadManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTargetManager()
-	 */
-	public IPDITargetManager getTargetManager() {
-		return targetManager;
+	public IPDITarget findTarget(TaskSet qTasks) throws PDIException {
+		IPDITarget target = targetManager.getTarget(qTasks);
+		if (target == null)
+			throw new PDIException(qTasks, Messages.Session_14);
+		return target;
 	}
 
 	/*
@@ -312,391 +241,11 @@ public class Session implements IPDISession {
 		return breakpointManager;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getExpressionManager()
-	 */
-	public IPDIExpressionManager getExpressionManager() {
-		return expressionManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getVariableManager()
-	 */
-	public IPDIVariableManager getVariableManager() {
-		return variableManager;
-	}
-
 	/**
 	 * @return
 	 */
-	public IPDISourceManager getSourceManager() {
-		return sourceManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getMemoryManager()
-	 */
-	public IPDIMemoryManager getMemoryManager() {
-		return memoryManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getSignalManager()
-	 */
-	public IPDISignalManager getSignalManager() {
-		return signalManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getRegisterManager()
-	 */
-	public IPDIRegisterManager getRegisterManager() {
-		return registerManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#shutdown(boolean)
-	 */
-	public void shutdown(boolean force) {
-		try {
-			if (!force) {
-				exit();
-			} else
-				setStatus(EXITING);
-			debugger.disconnect(eventManager);
-		} catch (PDIException e) {
-			e.printStackTrace();
-		} finally {
-			variableManager.shutdown();
-			expressionManager.shutdown();
-			breakpointManager.shutdown();
-			eventManager.shutdown();
-			sourceManager.shutdown();
-			taskManager.shutdown();
-			targetManager.shutdown();
-			threadManager.shutdown();
-			memoryManager.shutdown();
-			signalManager.shutdown();
-			eventRequestManager.shutdown();
-			notifyJob.schedule();
-		}
-	}
-
-	/*
-	 * ******************************************
-	 * IPDIExecuteManagement******************************************
-	 */
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse
-	 * .ptp.core.util.TaskSet)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void restart(TaskSet tasks) throws PDIException {
-		checkStatus();
-		throw new PDIException(tasks, Messages.Session_2);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse
-	 * .ptp.core.util.TaskSet)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void start(TaskSet tasks) throws PDIException {
-		checkStatus();
-		getEventRequestManager().addEventRequest(getRequestFactory().getResumeRequest(tasks, false));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
-	 * .ptp.core.util.TaskSet, boolean)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void resume(TaskSet tasks, boolean passSignal) throws PDIException {
-		checkStatus();
-		if (passSignal)
-			throw new PDIException(tasks, Messages.Session_3);
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		getEventRequestManager().addEventRequest(getRequestFactory().getResumeRequest(tasks, passSignal));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
-	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void resume(TaskSet tasks, IPDILocation location) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		throw new PDIException(tasks, Messages.Session_5);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
-	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void resume(TaskSet tasks, IPDISignal signal) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		throw new PDIException(tasks, Messages.Session_6);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse
-	 * .ptp.core.util.TaskSet, int)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void stepInto(TaskSet tasks, int count) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		getEventRequestManager().addEventRequest(getRequestFactory().getStepIntoRequest(tasks, count));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction
-	 * (org.eclipse.ptp.core.util.TaskSet, int)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void stepIntoInstruction(TaskSet tasks, int count) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		throw new PDIException(tasks, Messages.Session_7);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse
-	 * .ptp.core.util.TaskSet, int)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void stepOver(TaskSet tasks, int count) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		getEventRequestManager().addEventRequest(getRequestFactory().getStepOverRequest(tasks, count));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction
-	 * (org.eclipse.ptp.core.util.TaskSet, int)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void stepOverInstruction(TaskSet tasks, int count) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		throw new PDIException(tasks, Messages.Session_8);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
-	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void stepReturn(TaskSet tasks, IAIF aif) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		throw new PDIException(tasks, Messages.Session_9);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
-	 * .ptp.core.util.TaskSet, int)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void stepReturn(TaskSet tasks, int count) throws PDIException {
-		checkStatus();
-		taskManager.getCanStepReturnTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		getEventRequestManager().addEventRequest(getRequestFactory().getStepFinishRequest(tasks, count));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse
-	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException {
-		checkStatus();
-		taskManager.getSuspendedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_4);
-		throw new PDIException(tasks, Messages.Session_10);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse
-	 * .ptp.core.util.TaskSet)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void suspend(TaskSet tasks) throws PDIException {
-		checkStatus();
-		taskManager.getRunningTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_11);
-		getEventRequestManager().addEventRequest(getRequestFactory().getSuspendRequest(tasks));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse
-	 * .ptp.core.util.TaskSet)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void terminate(TaskSet tasks) throws PDIException {
-		checkStatus();
-		taskManager.getNonTerminatedTasks(tasks);
-		if (tasks.isEmpty())
-			throw new PDIException(tasks, Messages.Session_12);
-
-		TaskSet nonTerTasks = tasks.copy();
-		taskManager.getRunningTasks(nonTerTasks);
-		if (!nonTerTasks.isEmpty()) {
-			getEventRequestManager().addEventRequest(getRequestFactory().getSuspendRequest(nonTerTasks, false));
-		}
-		getEventRequestManager().addEventRequest(getRequestFactory().getTerminateRequest(tasks));
-		taskManager.setPendingTasks(true, tasks);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDISession#validateStepReturn(org.eclipse
-	 * .ptp.core.util.TaskSet)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void validateStepReturn(TaskSet tasks) throws PDIException {
-		/*
-		 * taskManager.getUnregisteredTasks(tasks); if (!tasks.isEmpty()) {
-		 * getEventRequestManager
-		 * ().addEventRequest(getRequestFactory().getGetStackInfoDepthRequest
-		 * (tasks)); //FIXME: for testing
-		 * //getEventRequestManager().addEventRequest
-		 * (getRequestFactory().getTerminateRequest(tasks.copy())); }
-		 */
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#exit()
-	 */
-	public void exit() throws PDIException {
-		if (status != EXITING && status != EXITED) {
-			setStatus(EXITING);
-			eventRequestManager.cleanEventRequests();
-			TaskSet tasks = getTasks();
-			taskManager.getRunningTasks(tasks);
-			if (!tasks.isEmpty()) {
-				getEventRequestManager().addEventRequest(getRequestFactory().getSuspendRequest(tasks, false));
-			}
-			tasks = getTasks();
-			taskManager.getNonTerminatedTasks(tasks);
-			if (!tasks.isEmpty())
-				getEventRequestManager().addEventRequest(getRequestFactory().getTerminateRequest(tasks));
-
-			getEventRequestManager().addEventRequest(getRequestFactory().getStopDebuggerRequest(new TaskSet(total_tasks)));
-			taskManager.setPendingTasks(true, tasks);
-		}
+	public ILaunchConfiguration getConfiguration() {
+		return config;
 	}
 
 	/*******************************************
@@ -714,6 +263,42 @@ public class Session implements IPDISession {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventFactory()
+	 */
+	public IPDIEventFactory getEventFactory() {
+		return eventFactory;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventManager()
+	 */
+	public IPDIEventManager getEventManager() {
+		return eventManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventRequestManager()
+	 */
+	public IPDIEventRequestManager getEventRequestManager() {
+		return eventRequestManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getExpressionManager()
+	 */
+	public IPDIExpressionManager getExpressionManager() {
+		return expressionManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getJobID()
 	 */
 	public String getJobID() {
@@ -723,29 +308,94 @@ public class Session implements IPDISession {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDISession#isTerminated(org.eclipse.ptp
-	 * .core.util.TaskSet)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getMemoryManager()
 	 */
-	/**
-	 * @since 4.0
-	 */
-	public boolean isTerminated(TaskSet tasks) {
-		return taskManager.isAllTerminated(tasks);
+	public IPDIMemoryManager getMemoryManager() {
+		return memoryManager;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDISession#isSuspended(org.eclipse.ptp
-	 * .core.util.TaskSet)
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getModelFactory()
 	 */
+	public IPDIModelFactory getModelFactory() {
+		return modelFactory;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getRegisterManager()
+	 */
+	public IPDIRegisterManager getRegisterManager() {
+		return registerManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getRequestFactory()
+	 */
+	public IPDIRequestFactory getRequestFactory() {
+		return requestFactory;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISessionObject#getSession()
+	 */
+	public IPDISession getSession() {
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getSignalManager()
+	 */
+	public IPDISignalManager getSignalManager() {
+		return signalManager;
+	}
+
+	/*
+	 * ******************************************
+	 * IPDIExecuteManagement******************************************
+	 */
+
 	/**
-	 * @since 4.0
+	 * @return
 	 */
-	public boolean isSuspended(TaskSet tasks) {
-		return taskManager.isAllSuspended(tasks);
+	public IPDISourceManager getSourceManager() {
+		return sourceManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getStatus()
+	 */
+	public int getStatus() {
+		return status;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTargetManager()
+	 */
+	public IPDITargetManager getTargetManager() {
+		return targetManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTaskManager()
+	 */
+	public IPDITaskManager getTaskManager() {
+		return taskManager;
 	}
 
 	/*
@@ -765,6 +415,24 @@ public class Session implements IPDISession {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getThreadManager()
+	 */
+	public IPDIThreadManager getThreadManager() {
+		return threadManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTimeout()
+	 */
+	public long getTimeout() {
+		return timeout;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTotalTasks()
 	 */
 	public int getTotalTasks() {
@@ -774,58 +442,38 @@ public class Session implements IPDISession {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISessionObject#getSession()
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getVariableManager()
 	 */
-	public IPDISession getSession() {
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#setStatus(int)
-	 */
-	public void setStatus(int status) {
-		waitLock.lock();
-		try {
-			this.status = status;
-		} finally {
-			waitLock.unlock();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getStatus()
-	 */
-	public int getStatus() {
-		return status;
-	}
-
-	/**
-	 * @throws PDIException
-	 */
-	protected void checkStatus() throws PDIException {
-		if (status == EXITING || status == EXITED)
-			throw new PDIException(null, Messages.Session_13);
+	public IPDIVariableManager getVariableManager() {
+		return variableManager;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDISession#findTarget(org.eclipse.ptp
+	 * org.eclipse.ptp.debug.core.pdi.IPDISession#isSuspended(org.eclipse.ptp
 	 * .core.util.TaskSet)
 	 */
 	/**
 	 * @since 4.0
 	 */
-	public IPDITarget findTarget(TaskSet qTasks) throws PDIException {
-		IPDITarget target = targetManager.getTarget(qTasks);
-		if (target == null)
-			throw new PDIException(qTasks, Messages.Session_14);
-		return target;
+	public boolean isSuspended(TaskSet tasks) {
+		return taskManager.isAllSuspended(tasks);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDISession#isTerminated(org.eclipse.ptp
+	 * .core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public boolean isTerminated(TaskSet tasks) {
+		return taskManager.isAllTerminated(tasks);
 	}
 
 	/**********************************************
@@ -929,72 +577,339 @@ public class Session implements IPDISession {
 		notifyJob.addRunnable(runnable);
 	}
 
-	class NotifyJob extends Job {
-		private final Vector<Runnable> fRunnables;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#restart(org.eclipse
+	 * .ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void restart(TaskSet tasks) throws PDIException {
+		checkStatus();
+		throw new PDIException(tasks, Messages.Session_2);
+	}
 
-		public NotifyJob() {
-			super(Messages.Session_15);
-			setSystem(true);
-			fRunnables = new Vector<Runnable>(10);
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
+	 * .ptp.core.util.TaskSet, boolean)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void resume(TaskSet tasks, boolean passSignal) throws PDIException {
+		checkStatus();
+		if (passSignal)
+			throw new PDIException(tasks, Messages.Session_3);
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		eventRequestManager.addEventRequest(getRequestFactory().getResumeRequest(tasks, passSignal));
+	}
 
-		public void addRunnable(Runnable runnable) {
-			synchronized (fRunnables) {
-				fRunnables.add(runnable);
-			}
-			schedule();
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void resume(TaskSet tasks, IPDILocation location) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_5);
+	}
 
-		@Override
-		public boolean shouldRun() {
-			return !fRunnables.isEmpty();
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#resume(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDISignal)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void resume(TaskSet tasks, IPDISignal signal) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_6);
+	}
 
-		@Override
-		public IStatus run(IProgressMonitor monitor) {
-			Runnable[] runnables;
-			synchronized (fRunnables) {
-				runnables = fRunnables.toArray(new Runnable[0]);
-				fRunnables.clear();
-			}
-			MultiStatus failed = null;
-			monitor.beginTask(getName(), runnables.length);
-			PDebugUtils.println(Messages.Session_16 + runnables.length);
-			for (Runnable runnable : runnables) {
-				try {
-					runnable.run();
-				} catch (Exception e) {
-					if (failed == null)
-						failed = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), PTPDebugCorePlugin.INTERNAL_ERROR,
-								Messages.Session_17, null);
-					failed.add(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(),
-							PTPDebugCorePlugin.INTERNAL_ERROR, Messages.Session_17, e));
-				}
-				monitor.worked(1);
-			}
-			monitor.done();
-			if (failed == null)
-				return Status.OK_STATUS;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#setRequestTimeout(long)
+	 */
+	public void setRequestTimeout(long timeout) {
+		this.timeout = timeout;
+	}
 
-			return failed;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#setStatus(int)
+	 */
+	public void setStatus(int status) {
+		waitLock.lock();
+		try {
+			this.status = status;
+		} finally {
+			waitLock.unlock();
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventFactory()
+	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#shutdown(boolean)
 	 */
-	public IPDIEventFactory getEventFactory() {
-		return eventFactory;
+	public void shutdown(boolean force) {
+		try {
+			if (!force) {
+				exit();
+			} else
+				setStatus(EXITING);
+			debugger.disconnect(eventManager);
+		} catch (PDIException e) {
+			e.printStackTrace();
+		} finally {
+			variableManager.shutdown();
+			expressionManager.shutdown();
+			breakpointManager.shutdown();
+			eventManager.shutdown();
+			sourceManager.shutdown();
+			taskManager.shutdown();
+			targetManager.shutdown();
+			threadManager.shutdown();
+			memoryManager.shutdown();
+			signalManager.shutdown();
+			eventRequestManager.shutdown();
+			notifyJob.schedule();
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getModelFactory()
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#start(org.eclipse
+	 * .ptp.core.util.TaskSet)
 	 */
-	public IPDIModelFactory getModelFactory() {
-		return modelFactory;
+	/**
+	 * @since 4.0
+	 */
+	public void start(TaskSet tasks) throws PDIException {
+		checkStatus();
+		eventRequestManager.addEventRequest(getRequestFactory().getResumeRequest(tasks, false));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepInto(org.eclipse
+	 * .ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void stepInto(TaskSet tasks, int count) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		eventRequestManager.addEventRequest(getRequestFactory().getStepIntoRequest(tasks, count));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepIntoInstruction
+	 * (org.eclipse.ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void stepIntoInstruction(TaskSet tasks, int count) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_7);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOver(org.eclipse
+	 * .ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void stepOver(TaskSet tasks, int count) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		eventRequestManager.addEventRequest(getRequestFactory().getStepOverRequest(tasks, count));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepOverInstruction
+	 * (org.eclipse.ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void stepOverInstruction(TaskSet tasks, int count) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_8);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.aif.IAIF)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void stepReturn(TaskSet tasks, IAIF aif) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_9);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepReturn(org.eclipse
+	 * .ptp.core.util.TaskSet, int)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void stepReturn(TaskSet tasks, int count) throws PDIException {
+		checkStatus();
+		taskManager.getCanStepReturnTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		eventRequestManager.addEventRequest(getRequestFactory().getStepFinishRequest(tasks, count));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#stepUntil(org.eclipse
+	 * .ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.IPDILocation)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException {
+		checkStatus();
+		taskManager.getSuspendedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_4);
+		throw new PDIException(tasks, Messages.Session_10);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#suspend(org.eclipse
+	 * .ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void suspend(TaskSet tasks) throws PDIException {
+		checkStatus();
+		taskManager.getRunningTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_11);
+		eventRequestManager.addEventRequest(getRequestFactory().getSuspendRequest(tasks));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIExecuteManagement#terminate(org.eclipse
+	 * .ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void terminate(TaskSet tasks) throws PDIException {
+		checkStatus();
+		taskManager.getNonTerminatedTasks(tasks);
+		if (tasks.isEmpty())
+			throw new PDIException(tasks, Messages.Session_12);
+
+		TaskSet nonTerTasks = tasks.copy();
+		taskManager.getRunningTasks(nonTerTasks);
+		if (!nonTerTasks.isEmpty()) {
+			eventRequestManager.addEventRequest(getRequestFactory().getSuspendRequest(nonTerTasks, false));
+		}
+		eventRequestManager.addEventRequest(getRequestFactory().getTerminateRequest(tasks));
+		taskManager.setPendingTasks(true, tasks);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDISession#validateStepReturn(org.eclipse
+	 * .ptp.core.util.TaskSet)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void validateStepReturn(TaskSet tasks) throws PDIException {
+		/*
+		 * taskManager.getUnregisteredTasks(tasks); if (!tasks.isEmpty()) {
+		 * getEventRequestManager
+		 * ().addEventRequest(getRequestFactory().getGetStackInfoDepthRequest
+		 * (tasks)); //FIXME: for testing //eventRequestManager.addEventRequest
+		 * (getRequestFactory().getTerminateRequest(tasks.copy())); }
+		 */
+	}
+
+	/**
+	 * @throws PDIException
+	 */
+	protected void checkStatus() throws PDIException {
+		if (status == EXITING || status == EXITED)
+			throw new PDIException(null, Messages.Session_13);
 	}
 }
