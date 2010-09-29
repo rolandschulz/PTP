@@ -44,10 +44,32 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
  * 
  */
 public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
+	/**
+	 * @since 5.0
+	 */
+	/*
+	 * Initial session state
+	 */
+	public static final int DISCONNECTED = 0;
+	/*
+	 * Attempting to connect to the backend debugger
+	 */
 	public static final int CONNECTING = 1;
+	/*
+	 * Connected to the backend debugger
+	 */
 	public static final int CONNECTED = 2;
+	/*
+	 * Debugger has initialized and is ready to accept commands
+	 */
 	public static final int STARTED = 3;
+	/*
+	 * Debugger has started shutdown
+	 */
 	public static final int EXITING = 4;
+	/*
+	 * Debugger has completed shutdown
+	 */
 	public static final int EXITED = 5;
 
 	/**
