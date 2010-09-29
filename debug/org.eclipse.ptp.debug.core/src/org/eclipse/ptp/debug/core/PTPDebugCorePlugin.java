@@ -50,7 +50,7 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
 import org.osgi.framework.BundleContext;
 
 public class PTPDebugCorePlugin extends Plugin {
-	class EventDispatchJob extends Job {
+	private class EventDispatchJob extends Job {
 		private final EventNotifier fNotifier = new EventNotifier();
 
 		/**
@@ -89,7 +89,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 	}
 
-	class EventNotifier implements ISafeRunnable {
+	private class EventNotifier implements ISafeRunnable {
 		private IPDebugEvent fEvent;
 		private IPDebugEventListener fListener;
 
