@@ -44,9 +44,9 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	/**
 	 * @since 4.0
 	 */
-	public class EventRequestScheduledTask {
-		Timer eventTimer = null;
-		IPDIEventRequest request = null;
+	private class EventRequestScheduledTask {
+		private Timer eventTimer = null;
+		private IPDIEventRequest request = null;
 
 		public EventRequestScheduledTask(IPDIEventRequest request) {
 			this.request = request;
@@ -80,7 +80,7 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	/**
 	 * @since 4.0
 	 */
-	public class RequestNotifier extends Observable {
+	private class RequestNotifier extends Observable {
 		public void notify(IPDIEventRequest request) {
 			setChanged();
 			notifyObservers(request);
