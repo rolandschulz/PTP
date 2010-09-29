@@ -455,7 +455,9 @@ public class IndexerBlock extends AbstractCOptionPage {
                 				fIndexerConfigMap.put(id, config);
                 			}
                 		} else {
-                			fIndexerConfigMap.put(id, config);
+                			if (!(id.startsWith("org.eclipse.ptp.rdt.core.RemoteFastIndexer"))) { //$NON-NLS-1$ 
+                				fIndexerConfigMap.put(id, config);
+                			}
                 		}
                 	}
                 }
