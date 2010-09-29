@@ -141,7 +141,7 @@ void
 packet_append_varint(int value)
 {
 	if ((packet_allocation - packet_size) < MAX_VARINT_LENGTH) {
-		packet_allocation = packet_allocation + PACKET_SIZE_INCREMENT;
+		packet_allocation += PACKET_SIZE_INCREMENT;
 		packet = (unsigned char *) realloc(packet, packet_allocation);
 		assert(packet != NULL);
 	}
@@ -156,7 +156,7 @@ void
 packet_append_bytes(int length, char *data)
 {
 	if ((packet_allocation - packet_size) < length) {
-		packet_allocation = packet_allocation + PACKET_SIZE_INCREMENT;
+		packet_allocation += length;
 		packet = (unsigned char *) realloc(packet, packet_allocation);
 		assert(packet != NULL);
 	}
@@ -172,7 +172,7 @@ void
 packet_append_type(int attr_type)
 {
 	if ((packet_allocation - packet_size) <= 0) {
-		packet_allocation = packet_allocation + PACKET_SIZE_INCREMENT;
+		packet_allocation += PACKET_SIZE_INCREMENT;
 		packet = (unsigned char *) realloc(packet, packet_allocation);
 		assert(packet != NULL);
 	}
