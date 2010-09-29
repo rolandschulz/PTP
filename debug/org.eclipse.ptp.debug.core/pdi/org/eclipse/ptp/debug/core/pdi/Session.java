@@ -175,6 +175,7 @@ public class Session implements IPDISession {
 		try {
 			setStatus(CONNECTING);
 			if (!getDebugger().isConnected(progress.newChild(10))) {
+				setStatus(DISCONNECTED);
 				throw new PDIException(getTasks(), Messages.Session_0);
 			}
 			getDebugger().register(eventManager);
@@ -207,9 +208,9 @@ public class Session implements IPDISession {
 			}
 			tasks = getTasks();
 			taskManager.getNonTerminatedTasks(tasks);
-			if (!tasks.isEmpty())
+			if (!tasks.isEmpty()) {
 				eventRequestManager.addEventRequest(getRequestFactory().getTerminateRequest(tasks));
-
+			}
 			eventRequestManager.addEventRequest(getRequestFactory().getStopDebuggerRequest(new TaskSet(total_tasks)));
 			taskManager.setPendingTasks(true, tasks);
 		}
