@@ -727,15 +727,15 @@
      </extension>
      
      <extension point="org.eclipse.ui.activities">
-       <category
+       <!--<category
              id="org.eclipse.ptp.rdt.ui.rdtCategory"
              name="%rdt.category.name.0">
-       </category>
+       </category>-->
        
-       <categoryActivityBinding
+       <!--<categoryActivityBinding
              activityId="org.eclipse.ptp.rdt.ui.cdtIndexerPropertyActivity"
              categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
-       </categoryActivityBinding>
+       </categoryActivityBinding>-->
        
        <activity
              id="org.eclipse.ptp.rdt.ui.cdtIndexerPropertyActivity"
@@ -750,10 +750,10 @@
        		 id="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 name="%CDTEnvironmentPref.name">
        </activity>
-       <categoryActivityBinding
+       <!--<categoryActivityBinding
        		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
-       </categoryActivityBinding>
+       </categoryActivityBinding>-->
        <activityPatternBinding
        		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPreferencePageActivity"
        		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.preferences.PrefPage_Env">
@@ -763,10 +763,10 @@
        		 id="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 name="%CDTEnvironmentProp.name">
        </activity>
-       <categoryActivityBinding
+       <!--<categoryActivityBinding
        		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
-       </categoryActivityBinding>
+       </categoryActivityBinding>-->
        <activityPatternBinding
        		 activityId="org.eclipse.ptp.rdt.ui.EnvironmentPropertiesPageActivity"
        		 pattern="org.eclipse.cdt.managedbuilder.ui/org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment">
@@ -776,10 +776,10 @@
        		 id="org.eclipse.ptp.rdt.ui.RemoteRebuildIndexActionActivity"
        		 name="%RDTREBUILDINDEX.name">
        </activity>
-       <categoryActivityBinding
+       <!--<categoryActivityBinding
        		 activityId="org.eclipse.ptp.rdt.ui.RemoteRebuildIndexActionActivity"
        		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
-       </categoryActivityBinding>
+       </categoryActivityBinding>-->
        <activityPatternBinding
        		 activityId="org.eclipse.ptp.rdt.ui.RemoteRebuildIndexActionActivity"
        		 pattern="org.eclipse.cdt.ui/org.eclipse.cdt.ui.rebuildIndexAction">
