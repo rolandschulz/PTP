@@ -99,7 +99,7 @@
          archList="all"
          configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
          id="org.eclipse.ptp.rdt.managedbuild.toolchain.xlc.exe.release"
-         name="%ToolChainName.Dbg"
+         name="%ToolChainName.Rel"
          osList="all"
          scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteXLCPerFileProfile"
          supportsManagedBuild="true"
@@ -250,7 +250,7 @@
                configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
                id="org.eclipse.ptp.rdt.managedbuild.toolchain.xlc.so.debug"
                isAbstract="false"
-               name="%ToolChainName.Rel"
+               name="%ToolChainName.Dbg"
                osList="all"
                scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteXLCPerFileProfile"
                supportsManagedBuild="true"
@@ -381,7 +381,7 @@
                configurationEnvironmentSupplier="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.environment.RemoteConfigurationEnvironmentSupplier"
                id="org.eclipse.ptp.rdt.managedbuild.toolchain.xlc.lib.debug"
                isAbstract="false"
-               name="%ToolChainName.Rel"
+               name="%ToolChainName.Dbg"
                osList="all"
                scannerConfigDiscoveryProfileId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.RemoteXLCPerFileProfile"
                supportsManagedBuild="true"
@@ -548,18 +548,18 @@
    <!-- activity to disable the local XL Compiler path properties page extension defined in org.eclipse.cdt.managedbuilder.xlc.ui-->
     <extension point="org.eclipse.ui.activities">
     <!-- this category is redefined from the one in org.eclipse.ptp.rdt.ui, they have no different-->
-     <category
+     <!--<category
              id="org.eclipse.ptp.rdt.ui.rdtCategory"
              name="%rdt.category.name.0">
-       </category>
+       </category>-->
      <activity
        		 id="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.XLCompilerPropertiesPageActivity"
        		 name="%CDTXLCompilerProp.name">
        </activity>
-       <categoryActivityBinding
+       <!--<categoryActivityBinding
        		 activityId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.XLCompilerPropertiesPageActivity"
        		 categoryId="org.eclipse.ptp.rdt.ui.rdtCategory">
-       </categoryActivityBinding>
+       </categoryActivityBinding>-->
        <activityPatternBinding
        		 activityId="org.eclipse.ptp.rdt.managedbuilder.xlc.ui.XLCompilerPropertiesPageActivity"
        		 pattern="org.eclipse.cdt.managedbuilder.xlc.ui/org.eclipse.cdt.managedbuilder.xlc.ui.properties.samplePropertyPage">
