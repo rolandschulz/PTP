@@ -738,7 +738,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
-					PDebugModel.updatePBreakpoints(cur_sid, monitor);
+					PDebugModel.updateBreakpoints(cur_sid, monitor);
 				} catch (CoreException e) {
 					return e.getStatus();
 				}

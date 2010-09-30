@@ -192,10 +192,11 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 							sid = (sid == null || sid.length() == 0) ? IElementHandler.SET_ROOT_ID : sid;
 							String sourceHandle = getSourceHandle(input);
 							IPLineBreakpoint[] breakpoints = PDebugModel.lineBreakpointsExists(sourceHandle, resource, lineNumber);
-							if (breakpoints.length > 0) {// remove breakpoint if
-															// found any
-															// breakpoint in
-															// current job
+							/*
+							 * remove breakpoint if found any breakpoint in
+							 * current job
+							 */
+							if (breakpoints.length > 0) {
 								IPLineBreakpoint breakpoint = PDebugModel.lineBreakpointExists(breakpoints, job);
 								if (breakpoint != null) {
 									if (breakpoint.isGlobal() && job == null) {

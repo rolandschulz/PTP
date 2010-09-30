@@ -36,32 +36,41 @@ public abstract class AbstractLineBreakpoint extends PBreakpoint implements IPLi
 		super();
 	}
 
-	public AbstractLineBreakpoint(IResource resource, String markerType, Map<?, ?> attributes, boolean add) throws CoreException {
-		super(resource, markerType, attributes, add);
+	public AbstractLineBreakpoint(IResource resource, String markerType, Map<?, ?> attributes, final String jobId,
+			final String setId, boolean add) throws CoreException {
+		super(resource, markerType, attributes, jobId, setId, add);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPLineBreakpoint#getAddress()
 	 */
 	public String getAddress() throws CoreException {
 		return ensureMarker().getAttribute(IPLineBreakpoint.ADDRESS, ""); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getCharEnd()
 	 */
 	public int getCharEnd() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.CHAR_END, -1);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getCharStart()
 	 */
 	public int getCharStart() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.CHAR_START, -1);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPLineBreakpoint#getFileName()
 	 */
 	public String getFileName() throws CoreException {
@@ -70,29 +79,41 @@ public abstract class AbstractLineBreakpoint extends PBreakpoint implements IPLi
 		return (path.isValidPath(fileName)) ? path.lastSegment() : null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPLineBreakpoint#getFunction()
 	 */
 	public String getFunction() throws CoreException {
 		return ensureMarker().getAttribute(IPLineBreakpoint.FUNCTION, ""); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getLineNumber()
 	 */
 	public int getLineNumber() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.LINE_NUMBER, -1);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPLineBreakpoint#setAddress(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPLineBreakpoint#setAddress(java.lang
+	 * .String)
 	 */
 	public void setAddress(String address) throws CoreException {
 		setAttribute(IPLineBreakpoint.ADDRESS, address);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.model.IPLineBreakpoint#setFunction(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.model.IPLineBreakpoint#setFunction(java.lang
+	 * .String)
 	 */
 	public void setFunction(String function) throws CoreException {
 		setAttribute(IPLineBreakpoint.FUNCTION, function);
