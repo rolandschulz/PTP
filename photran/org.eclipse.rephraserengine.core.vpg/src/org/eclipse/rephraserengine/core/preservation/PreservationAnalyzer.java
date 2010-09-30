@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.rephraserengine.core.preservation;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeAdded;
 import org.eclipse.rephraserengine.core.preservation.ModelDiff.EdgeDeleted;
@@ -31,7 +34,7 @@ import org.eclipse.rephraserengine.core.vpg.VPGEdge.Classification;
  * 
  * @author Jeff Overbey
  */
-final class PreservationAnalyzer extends PreservationRuleset.Processor
+abstract class PreservationAnalyzer extends PreservationRuleset.Processor
 {
     @SuppressWarnings("serial")
     private static abstract class UnexpectedEdgeException extends Error
@@ -61,26 +64,30 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
         public UnexpectedFinalEdge(VPGEdge<?,?,?> edge) { super(edge); }
     }
     
-    private final List<VPGEdge<?,?,?>> initialEdges;
-    private final List<VPGEdge<?,?,?>> finalEdges;
+    private final Iterable<VPGEdge<?,?,?>> initialEdges;
+    private final Iterable<VPGEdge<?,?,?>> finalEdges;
     private final PreservationRuleset ruleset;
+    
+    private final Iterator<VPGEdge<?,?,?>> initialIterator;
+    private final Iterator<VPGEdge<?,?,?>> finalIterator;
+    private VPGEdge<?,?,?> initialEdge;
+    private VPGEdge<?,?,?> finalEdge;
     
     private int targetType;
     private Classification targetClassification;
     
-    private int initialIndex;
-    private int finalIndex;
-    
     public PreservationAnalyzer(
-        List<VPGEdge<?,?,?>> initialEdges,
-        List<VPGEdge<?,?,?>> finalEdges,
+        Collection<VPGEdge<?,?,?>> initialEdges,
+        Collection<VPGEdge<?,?,?>> finalEdges,
         PreservationRuleset ruleset)
     {
         this.initialEdges = initialEdges;
         this.finalEdges = finalEdges;
         this.ruleset = ruleset;
-        this.initialIndex = 0;
-        this.finalIndex = 0;
+        this.initialIterator = initialEdges.iterator();
+        this.finalIterator = finalEdges.iterator();
+        this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
+        this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
     }
 
     public void checkPreservation(int targetType, Classification targetClassification, ModelDiff diff) throws UnexpectedEdgeException
@@ -90,8 +97,6 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
         
         while (finalEdge() != null || initialEdge() != null)
         {
-            int oldI = initialIndex;
-            int oldF = finalIndex;
             try
             {
                 ruleset.invokeCallback(targetType, targetClassification, this);
@@ -120,20 +125,16 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
                 VPGEdge<?,?,?> edge = exception.getEdge();
                 diff.add(new EdgeAdded(edge));
             }
-            if (initialIndex <= oldI && finalIndex <= oldF)
-                throw new IllegalStateException("INTERNAL ERROR: No progress - type " + targetType + " " + targetClassification); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
     
-    private VPGEdge<?,?,?> finalEdge() { return getEdge(finalEdges, finalIndex); }
+    private VPGEdge<?,?,?> finalEdge(){ return getEdge(finalEdge); }
 
-    private VPGEdge<?,?,?> initialEdge() { return getEdge(initialEdges, initialIndex); }
+    private VPGEdge<?,?,?> initialEdge() { return getEdge(initialEdge); }
     
-    private VPGEdge<?,?,?> getEdge(List<VPGEdge<?,?,?>> edgeList, int index)
+    private VPGEdge<?,?,?> getEdge(VPGEdge<?,?,?> edge)
     {
-        if (index >= edgeList.size()) return null;
-        
-        VPGEdge<?,?,?> edge = edgeList.get(index);
+        if (edge == null) return null;
         if (edge.getType() < targetType) throw new IllegalStateException("INTERNAL ERROR: Type " + targetType + " processing terminated prematurely"); //$NON-NLS-1$ //$NON-NLS-2$
         if (edge.getType() != targetType) return null;
         if (!edge.getClassification().equals(targetClassification)) return null;
@@ -142,8 +143,8 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
     
     @Override void handleIgnore()
     {
-        if (finalEdge() != null) finalIndex++;
-        if (initialEdge() != null) initialIndex++;
+        if (finalEdge() != null) finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
+        if (initialEdge() != null) initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
     }
 
     @Override void handlePreserveAll()
@@ -153,12 +154,12 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
         
         if (finalEdge != null && initialEdge == null)
         {
-            finalIndex++;
+            this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
             throw new UnexpectedFinalEdge(finalEdge);
         }
         else if (finalEdge == null && initialEdge != null)
         {
-            initialIndex++;
+            this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
             throw new UnexpectedInitialEdge(initialEdge);
         }
         else if (finalEdge != null && initialEdge != null)
@@ -166,17 +167,17 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
             int comparison = finalEdge.compareTo(initialEdge);
             if (comparison < 0)
             {
-                finalIndex++;
+                this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
                 throw new UnexpectedFinalEdge(finalEdge);
             }
             else if (comparison == 0)
             {
-                initialIndex++;
-                finalIndex++;
+                this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
+                this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
             }
             else // (comparison > 0)
             {
-                initialIndex++;
+                this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
                 throw new UnexpectedInitialEdge(finalEdge);
             }
         }
@@ -189,7 +190,7 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
         
         if (finalEdge != null && initialEdge == null)
         {
-            finalIndex++;
+            this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
             throw new UnexpectedFinalEdge(finalEdge);
         }
         else if (finalEdge != null && initialEdge != null)
@@ -197,17 +198,17 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
             int comparison = finalEdge.compareTo(initialEdge);
             if (comparison < 0)
             {
-                finalIndex++;
+                this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
                 throw new UnexpectedFinalEdge(finalEdge);
             }
             else if (comparison == 0)
             {
-                initialIndex++;
-                finalIndex++;
+                this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
+                this.finalEdge = finalIterator.hasNext() ? finalIterator.next() : null;
             }
             else // (comparison > 0)
             {
-                initialIndex++;
+                this.initialEdge = initialIterator.hasNext() ? initialIterator.next() : null;
             }
         }
     }
@@ -219,18 +220,18 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
 
     public boolean hasEdgesRemaining()
     {
-        return initialIndex < initialEdges.size() || finalIndex < finalEdges.size();
+        return initialIterator.hasNext() || finalIterator.hasNext();
     }
 
     public void ensureNoEdgesRemaining(int type)
     {
-        if (initialIndex < initialEdges.size()
-                && initialEdges.get(initialIndex).getType() == type)
-            throw new IllegalStateException("INTERNAL ERROR: Type " + type + " processing incomplete - initial edge "+ initialEdges.get(initialIndex));  //$NON-NLS-1$//$NON-NLS-2$
+        if (initialEdge != null
+                && initialEdge.getType() == type)
+            throw new IllegalStateException("INTERNAL ERROR: Type " + type + " processing incomplete - initial edge "+ initialEdge);  //$NON-NLS-1$//$NON-NLS-2$
 
-        if (finalIndex < finalEdges.size()
-                && finalEdges.get(finalIndex).getType() == type)
-            throw new IllegalStateException("INTERNAL ERROR: Type " + type + " processing incomplete - final edge "+ finalEdges.get(finalIndex));  //$NON-NLS-1$//$NON-NLS-2$
+        if (finalEdge != null
+                && finalEdge.getType() == type)
+            throw new IllegalStateException("INTERNAL ERROR: Type " + type + " processing incomplete - final edge "+ finalEdge);  //$NON-NLS-1$//$NON-NLS-2$
     }
     
     private VPGEdge<?,?,?> findEdgeWithNewSink(VPGEdge<?,?,?> initialEdge)
@@ -247,18 +248,18 @@ final class PreservationAnalyzer extends PreservationRuleset.Processor
         return null;
     }
 
-//    public List<VPGEdge<?,?,?>> getRemainingInitialEdges()
-//    {
-//        return initialEdges.subList(initialIndex, initialEdges.size());
-//    }
-//
-//    public List<VPGEdge<?,?,?>> getRemainingFinalEdges()
-//    {
-//        return finalEdges.subList(finalIndex, finalEdges.size());
-//    }
-
+    /** @return the number of edges remaining to be processed */
+    @SuppressWarnings("rawtypes")
     public int countEdgesRemaining()
     {
-        return (initialEdges.size() - initialIndex) + (finalEdges.size() - finalIndex);
+        if (initialEdges instanceof List
+            && initialIterator instanceof ListIterator
+            && finalEdges instanceof List
+            && initialIterator instanceof ListIterator)
+        {
+            return (((List)initialEdges).size() - ((ListIterator)initialIterator).nextIndex())
+                 + (((List)finalEdges).size() - ((ListIterator)finalIterator).nextIndex());
+        }
+        else return 0;
     }
 }

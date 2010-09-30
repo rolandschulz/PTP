@@ -12,6 +12,7 @@ package org.eclipse.rephraserengine.core.preservation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,7 +38,7 @@ final class Model
     private EclipseVPG<?,?,?,?,?> vpg;
     private List<String> files;
     private Set<String> filesWithNoEdges;
-    private List<VPGEdge<?,?,?>> edges;
+    private Collection<VPGEdge<?,?,?>> edges;
 
     public Model(String name, IProgressMonitor pm, int ticks, EclipseVPG<?,?,?,?,?> vpg, String... filenames)
     {
@@ -91,16 +92,15 @@ final class Model
         pm.beginTask(Messages.bind(Messages.Model_Normalizing, name), edges.size());
 
         // Use a set to eliminate duplicates
-        TreeSet<VPGEdge<?,?,?>> newEdges = new TreeSet<VPGEdge<?,?,?>>();
+        Set<VPGEdge<?,?,?>> newEdges = createNewEdgeSet();;
         
-        for (int i = 0; i < edges.size(); i++)
+        for (VPGEdge<?,?,?> e : edges)
         {
-            newEdges.add(edges.get(i).projectInitial(replacements));
+            newEdges.add(e.projectInitial(replacements));
             pm.worked(1);
         }
         
-        edges.clear();
-        edges.addAll(newEdges);
+        edges = newEdges;
         
         pm.done();
     }
@@ -111,18 +111,22 @@ final class Model
         pm.beginTask(Messages.bind(Messages.Model_Normalizing, name), edges.size());
 
         // Use a set to eliminate duplicates
-        TreeSet<VPGEdge<?,?,?>> newEdges = new TreeSet<VPGEdge<?,?,?>>();
+        Set<VPGEdge<?,?,?>> newEdges = createNewEdgeSet();
         
-        for (int i = 0; i < edges.size(); i++)
+        for (VPGEdge<?,?,?> e : edges)
         {
-            newEdges.add(edges.get(i).projectFinal(replacements));
+            newEdges.add(e.projectFinal(replacements));
             pm.worked(1);
         }
         
-        edges.clear();
-        edges.addAll(newEdges);
+        edges = newEdges;
 
         pm.done();
+    }
+
+    protected Set<VPGEdge<?,?,?>> createNewEdgeSet()
+    {
+        return new TreeSet<VPGEdge<?,?,?>>();
     }
 
     ModelDiff checkPreservation(Model that, PreservationRuleset ruleset, IProgressMonitor pm)
@@ -135,7 +139,7 @@ final class Model
         ModelDiff diff = new ModelDiff();
 
         int type = 0;
-        PreservationAnalyzer analyzer = new PreservationAnalyzer(this.edges, that.edges, ruleset);
+        PreservationAnalyzer analyzer = new MergePreservationAnalyzer(this.edges, that.edges, ruleset);
         while (analyzer.hasEdgesRemaining())
         {
             int edgesRemainingBefore = analyzer.countEdgesRemaining();
@@ -154,7 +158,10 @@ final class Model
     
     @Override public String toString()
     {
-        return toString(null, null, null);
+        if (edges.size() > 100)
+            return "(Model contains more than 100 edges)"; //$NON-NLS-1$
+        else
+            return toString(null, null, null);
     }
 
     public String toString(String filename, String fileContents, ArrayList<Integer> lineMap)

@@ -168,7 +168,7 @@ public final class ReplacementList implements Iterable<Replacement>
         boolean first = true;
         for (Replacement op : list)
         {
-            if (first) first = false; else sb.append(' ');
+            if (first) first = false; else sb.append('\n');
             sb.append(op);
         }
         return sb.toString();

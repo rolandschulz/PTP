@@ -11,6 +11,7 @@
 package org.eclipse.rephraserengine.core.preservation;
 
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -49,6 +50,8 @@ import org.eclipse.rephraserengine.core.vpg.eclipse.EclipseVPG;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class PreservationAnalysis
 {
+    private static final String SEPARATOR = ","; //$NON-NLS-1$
+    
     private IAdapterManager adapterManager;
 
     private EclipseVPG vpg;
@@ -57,6 +60,9 @@ public final class PreservationAnalysis
     private Model initialModel;
     private ReplacementList replacements;
     private PreservationRuleset ruleset;
+    
+    private String fields;
+    private String times;
 
     /** @since 3.0 */
     public PreservationAnalysis(
@@ -102,10 +108,19 @@ public final class PreservationAnalysis
         this.replacements = new ReplacementList();
         this.ruleset = ruleset;
 
-        progressMonitor.subTask(Messages.PreservationAnalysis_EnteringHypotheticalMode);
-        ensureDatabaseIsInHypotheticalMode();
+        this.fields = "Filenames"; //$NON-NLS-1$
+        this.times = filenames.toString();
 
+        progressMonitor.subTask(Messages.PreservationAnalysis_EnteringHypotheticalMode);
+        long start = System.currentTimeMillis();
+        ensureDatabaseIsInHypotheticalMode();
+        this.fields += SEPARATOR + "Hypothetical"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
+
+        start = System.currentTimeMillis();
         this.initialModel = new Model("initial model", progressMonitor, ticks, vpg, filenames); //$NON-NLS-1$
+        this.fields += SEPARATOR + "Init Model"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
     }
 
     private static List<String> getFilenames(Collection<IFile> files)
@@ -230,24 +245,60 @@ public final class PreservationAnalysis
         printDebug("INITIAL MODEL", initialModel); //$NON-NLS-1$
         printDebug("NORMALIZING RELATIVE TO", replacements); //$NON-NLS-1$
 
+        long start = System.currentTimeMillis();
         initialModel.inormalize(replacements, progressMonitor);
+        this.fields += SEPARATOR + "I-Normalize"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
         printDebug("NORMALIZED INITIAL MODEL", initialModel); //$NON-NLS-1$
 
         printDebug("File ordering:", initialModel.getFiles()); //$NON-NLS-1$
+        start = System.currentTimeMillis();
         Model derivativeModel = new Model(
             "derivative model", //$NON-NLS-1$
             progressMonitor, ticks+3,
             vpg,
             initialModel.getFiles());
+        this.fields += SEPARATOR + "D-Model"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
         printDebug("DERIVATIVE MODEL", derivativeModel); //$NON-NLS-1$
 
+        start = System.currentTimeMillis();
         derivativeModel.dnormalize(replacements, progressMonitor);
+        this.fields += SEPARATOR + "D-Normalize"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
         printDebug("NORMALIZED DERIVATIVE MODEL", derivativeModel); //$NON-NLS-1$
 
+        start = System.currentTimeMillis();
         ModelDiff diff = initialModel.checkPreservation(derivativeModel, ruleset, progressMonitor);
-        describeDifferences(status, diff);
+        this.fields += SEPARATOR + "Preservation"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
 
+        start = System.currentTimeMillis();
+        describeDifferences(status, diff);
+        this.fields += SEPARATOR + "Desc Diff"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
+
+        start = System.currentTimeMillis();
         leaveHypotheticalMode(progressMonitor);
+        this.fields += SEPARATOR + "Leave Hypoth"; //$NON-NLS-1$
+        this.times += SEPARATOR + (System.currentTimeMillis()-start);
+        
+        logTimes();
+    }
+
+    private void logTimes()
+    {
+        try
+        {
+            FileWriter output = new FileWriter("/Users/joverbey/Desktop/times.csv", true); //$NON-NLS-1$
+            output.write(fields + "\n"); //$NON-NLS-1$
+            output.write(times + "\n"); //$NON-NLS-1$
+            output.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void leaveHypotheticalMode(IProgressMonitor progressMonitor) throws Error

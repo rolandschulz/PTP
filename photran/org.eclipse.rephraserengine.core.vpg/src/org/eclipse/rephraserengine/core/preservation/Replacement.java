@@ -103,7 +103,9 @@ public final class Replacement
 
     private boolean doesNotOverlap(Replacement that)
     {
-        return this.getOrigEndOffset() <= that.getOffset() || this.getOffset() >= that.getOrigEndOffset();
+        return !this.getFilename().equals(that.getFilename())
+            || this.getOrigEndOffset() <= that.getOffset()
+            || this.getOffset() >= that.getOrigEndOffset();
     }
     
     boolean origIntervalContains(TokenRef<?> tokenRef)
