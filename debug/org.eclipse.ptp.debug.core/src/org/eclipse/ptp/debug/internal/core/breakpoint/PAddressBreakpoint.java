@@ -40,12 +40,17 @@ public class PAddressBreakpoint extends AbstractLineBreakpoint implements IPAddr
 	public PAddressBreakpoint() {
 	}
 
-	public PAddressBreakpoint(IResource resource, Map<?, ?> attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
+	public PAddressBreakpoint(IResource resource, Map<?, ?> attributes, String jobId, String setId, boolean add)
+			throws CoreException {
+		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage
+	 * ()
 	 */
 	@Override
 	protected String getMarkerMessage() throws CoreException {

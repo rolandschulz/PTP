@@ -44,54 +44,71 @@ public class PWatchpoint extends PBreakpoint implements IPWatchpoint {
 	public PWatchpoint() {
 	}
 
-	public PWatchpoint(IResource resource, Map<?, ?> attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
+	public PWatchpoint(IResource resource, Map<?, ?> attributes, final String jobId, final String setId, boolean add)
+			throws CoreException {
+		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getCharEnd()
 	 */
 	public int getCharEnd() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.CHAR_END, -1);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getCharStart()
 	 */
 	public int getCharStart() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.CHAR_START, -1);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPWatchpoint#getExpression()
 	 */
 	public String getExpression() throws CoreException {
 		return ensureMarker().getAttribute(EXPRESSION, ""); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.ILineBreakpoint#getLineNumber()
 	 */
 	public int getLineNumber() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.LINE_NUMBER, -1);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPWatchpoint#isReadType()
 	 */
 	public boolean isReadType() throws CoreException {
 		return ensureMarker().getAttribute(READ, false);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.model.IPWatchpoint#isWriteType()
 	 */
 	public boolean isWriteType() throws CoreException {
 		return ensureMarker().getAttribute(WRITE, true);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage
+	 * ()
 	 */
 	@Override
 	protected String getMarkerMessage() throws CoreException {

@@ -43,12 +43,17 @@ public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFun
 	public PFunctionBreakpoint() {
 	}
 
-	public PFunctionBreakpoint(IResource resource, Map<?, ?> attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
+	public PFunctionBreakpoint(IResource resource, Map<?, ?> attributes, final String jobId, final String setId, boolean add)
+			throws CoreException {
+		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage
+	 * ()
 	 */
 	@Override
 	protected String getMarkerMessage() throws CoreException {
@@ -56,9 +61,7 @@ public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFun
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return getJobSetFormat()
-				+ " " //$NON-NLS-1$
-				+ NLS.bind(Messages.PFunctionBreakpoint_0,
-						new Object[] { fileName, getFunction(), getConditionText() });
+		return getJobSetFormat() + " " //$NON-NLS-1$
+				+ NLS.bind(Messages.PFunctionBreakpoint_0, new Object[] { fileName, getFunction(), getConditionText() });
 	}
 }

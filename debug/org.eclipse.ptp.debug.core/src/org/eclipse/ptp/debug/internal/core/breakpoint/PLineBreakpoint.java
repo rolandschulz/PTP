@@ -42,12 +42,16 @@ public class PLineBreakpoint extends AbstractLineBreakpoint {
 	public PLineBreakpoint() {
 	}
 
-	public PLineBreakpoint(IResource resource, Map<?, ?> attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
+	public PLineBreakpoint(IResource resource, Map<?, ?> attributes, String jobId, String setId, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, jobId, setId, add);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint#getMarkerMessage
+	 * ()
 	 */
 	@Override
 	protected String getMarkerMessage() throws CoreException {
@@ -55,9 +59,7 @@ public class PLineBreakpoint extends AbstractLineBreakpoint {
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return getJobSetFormat()
-				+ " " //$NON-NLS-1$
-				+ NLS.bind(Messages.PLineBreakpoint_0, new Object[] { fileName, new Integer(getLineNumber()),
-						getConditionText() });
+		return getJobSetFormat() + " " //$NON-NLS-1$
+				+ NLS.bind(Messages.PLineBreakpoint_0, new Object[] { fileName, new Integer(getLineNumber()), getConditionText() });
 	}
 }

@@ -33,16 +33,14 @@ public interface IPBreakpoint extends IBreakpoint {
 	public static final String IGNORE_COUNT = "org.eclipse.ptp.debug.core.ignoreCount"; //$NON-NLS-1$
 	public static final String SOURCE_HANDLE = "org.eclipse.ptp.debug.core.sourceHandle"; //$NON-NLS-1$
 	public static final String INSTALL_COUNT = "org.eclipse.ptp.debug.core.installCount"; //$NON-NLS-1$
-	public static final String SET_ID = "org.eclipse.ptp.debug.core.setid"; //$NON-NLS-1$
 	public static final String CUR_SET_ID = "org.eclipse.ptp.debug.core.cursetid"; //$NON-NLS-1$
-	public static final String JOB_ID = "org.eclipse.ptp.debug.core.jobid"; //$NON-NLS-1$
 	public static final String JOB_NAME = "org.eclipse.ptp.debug.core.jobname"; //$NON-NLS-1$
 
 	/**
 	 * @return
 	 * @throws CoreException
 	 */
-	public 	int decrementInstallCount() throws CoreException;
+	public int decrementInstallCount() throws CoreException;
 
 	/**
 	 * @return
@@ -60,7 +58,7 @@ public interface IPBreakpoint extends IBreakpoint {
 	 * @return
 	 * @throws CoreException
 	 */
-	public 	int getIgnoreCount() throws CoreException;
+	public int getIgnoreCount() throws CoreException;
 
 	/**
 	 * @return
@@ -90,13 +88,13 @@ public interface IPBreakpoint extends IBreakpoint {
 	 * @return
 	 * @throws CoreException
 	 */
-	public 	int incrementInstallCount() throws CoreException;
+	public int incrementInstallCount() throws CoreException;
 
 	/**
 	 * @return
 	 * @throws CoreException
 	 */
-	public 	boolean isConditional() throws CoreException;
+	public boolean isConditional() throws CoreException;
 
 	/**
 	 * @return
@@ -108,7 +106,7 @@ public interface IPBreakpoint extends IBreakpoint {
 	 * @return
 	 * @throws CoreException
 	 */
-	public 	boolean isInstalled() throws CoreException;
+	public boolean isInstalled() throws CoreException;
 
 	/**
 	 * @throws CoreException
@@ -119,7 +117,7 @@ public interface IPBreakpoint extends IBreakpoint {
 	 * @param condition
 	 * @throws CoreException
 	 */
-	public 	void setCondition(String condition) throws CoreException;
+	public void setCondition(String condition) throws CoreException;
 
 	/**
 	 * @param id
@@ -161,7 +159,7 @@ public interface IPBreakpoint extends IBreakpoint {
 	 * @throws CoreException
 	 */
 	public void updateMarkerMessage() throws CoreException;
-	
+
 	/*
 	 * TODO - Not Implemented String getThreadId() throws CoreException; void
 	 * setThreadId(String threadId) throws CoreException;
