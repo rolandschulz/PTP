@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.core.dom.IPDOMManager;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
@@ -61,6 +61,12 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 import com.ibm.icu.text.Collator;
 
+/* -- ST-Origin --
+ * Source folder: org.eclipse.cdt.ui/src
+ * Class: org.eclipse.cdt.ui.dialogs.IndexerBlock
+ * Version: 1.49
+ */	
+
 /**
  * This <code>IndexerBlock</code> is used in the <code>MakeProjectWizardOptionPage</code> and
  * the <code>NewManagedProjectOptionPage</code> to display the indexer options during the creation of
@@ -80,8 +86,10 @@ public class IndexerBlock extends AbstractCOptionPage {
 	private static final String INDEXER_COMBO_LABEL = CUIPlugin.getResourceString("BaseIndexerBlock.comboLabel"); //$NON-NLS-1$
 	
 	private PreferenceScopeBlock    fPrefScopeBlock;
+	private Button					fEnableIndexer;
     private Combo 					fIndexersComboBox;
     private HashMap<String, IndexerConfig> 				fIndexerConfigMap;
+    private String					fTheOneIndexerID;
 	private Composite 				fIndexerPageComposite;
     private AbstractIndexerPage 	fCurrentPage;
     private Properties				fCurrentProperties;
@@ -89,22 +97,43 @@ public class IndexerBlock extends AbstractCOptionPage {
 	private Composite 				fParent;
 	private Button 					fUseActiveBuildButton;
 	private Button 					fUseFixedBuildConfig;
-	protected Button 				fIndexAfterBuildOptionCheckbox;
 	private Combo 					fBuildConfigComboBox;
 	private ControlEnableState 		fEnableState;
+	private Group fBuildConfigGroup;
+	protected Button 				fIndexAfterBuildOptionCheckbox;
     
     public IndexerBlock(){
 		super(INDEXER_LABEL);
 		setDescription(INDEXER_DESCRIPTION);
     }   
+    
+	@Override
+	public boolean isValid() {
+		return super.isValid() && (fCurrentPage == null || fCurrentPage.isValid());
+	}
+
+	
+	@Override
+	public String getErrorMessage() {
+		String msg = super.getErrorMessage();
+		if (msg == null && fCurrentPage != null) {
+			msg= fCurrentPage.getErrorMessage();
+		}
+		return msg;
+	}
 
 
 	/**
      * Create a profile page only on request
      */
     private static class IndexerConfig implements IPluginContribution {
-    	private AbstractIndexerPage fPage;
+		private static final String NULL = "null"; //$NON-NLS-1$
+		private AbstractIndexerPage fPage;
         private IConfigurationElement fElement;
+
+        public IndexerConfig(NullIndexerBlock fixed) {
+        	fPage= fixed;
+        }
 
         public IndexerConfig(IConfigurationElement element) {
         	fElement= element;
@@ -126,18 +155,20 @@ public class IndexerBlock extends AbstractCOptionPage {
         }
         
         public String getName() {
+        	if (fElement == null)
+        		return NULL; 
             return fElement.getAttribute(ATTRIB_NAME); 
         }
         
-        public String getIndexerID(){
-        	return fElement.getAttribute(ATTRIB_INDEXERID); 
-        }
-
 		public String getLocalId() {
+        	if (fElement == null)
+        		return NULL; 
 			return fElement.getAttribute(ATTRIB_ID);
 		}
 
 		public String getPluginId() {
+        	if (fElement == null)
+        		return NULL; 
 			return fElement.getContributor().getName();
 		}
     }
@@ -173,17 +204,26 @@ public class IndexerBlock extends AbstractCOptionPage {
 		gd= (GridData) fPreferenceContent.getLayoutData();
 		gd.horizontalIndent= 0; 
 		
-		// add combo to select indexer
-		Group group= ControlFactory.createGroup(fPreferenceContent,INDEXER_COMBO_LABEL, 1);
-		gd= (GridData) group.getLayoutData();
-		gd.grabExcessHorizontalSpace= true;
-		fIndexersComboBox = ControlFactory.createSelectCombo(group,"", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		fIndexersComboBox.addSelectionListener(new SelectionAdapter() {
+
+		// add option to enable indexer
+		final SelectionAdapter indexerChangeListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onIndexerChange();
 			}
-		});
+		};
+		fEnableIndexer= ControlFactory.createCheckBox(fPreferenceContent, CUIPlugin.getResourceString("IndexerBlock.enable")); //$NON-NLS-1$
+		fEnableIndexer.addSelectionListener(indexerChangeListener);
+
+		// add combo to select indexer
+		Group group= ControlFactory.createGroup(fPreferenceContent,INDEXER_COMBO_LABEL, 1);
+		gd= (GridData) group.getLayoutData();
+		gd.grabExcessHorizontalSpace= true;
+
+		if (fIndexerConfigMap.size() > 2) {
+			fIndexersComboBox = ControlFactory.createSelectCombo(group,"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			fIndexersComboBox.addSelectionListener(indexerChangeListener);
+		}
 
 		// add composite for pages
         fIndexerPageComposite= ControlFactory.createComposite(group, 1);
@@ -191,7 +231,7 @@ public class IndexerBlock extends AbstractCOptionPage {
         fIndexerPageComposite.setLayout(new TabFolderLayout());
 
         if (needBuildConfigOptions()) {
-        	group= ControlFactory.createGroup(composite, DialogsMessages.IndexerStrategyBlock_buildConfigGroup, 1);
+        	fBuildConfigGroup= group= ControlFactory.createGroup(composite, DialogsMessages.IndexerStrategyBlock_buildConfigGroup, 1);
         	gd= (GridData) group.getLayoutData();
         	gd.grabExcessHorizontalSpace= true;
         	fUseActiveBuildButton= ControlFactory.createRadioButton(group, DialogsMessages.IndexerStrategyBlock_activeBuildConfig, null, null);
@@ -240,8 +280,10 @@ public class IndexerBlock extends AbstractCOptionPage {
 		    	ICProjectDescriptionManager prjDescMgr= CCorePlugin.getDefault().getProjectDescriptionManager();
 		    	ICProjectDescriptionWorkspacePreferences prefs= prjDescMgr.getProjectDescriptionWorkspacePreferences(false);
 		    	boolean useActive= prefs.getConfigurationRelations() == ICProjectDescriptionPreferences.CONFIGS_LINK_SETTINGS_AND_ACTIVE;
-		    	setUseActiveBuildConfig(useActive);
+				fUseActiveBuildButton.setSelection(useActive);
+				fUseFixedBuildConfig.setSelection(!useActive);
 			}
+			updateBuildConfigEnablement(scope);
 			if(fIndexAfterBuildOptionCheckbox !=null){
 				IndexBuildSequenceController indexBuildSequenceController = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
 				if(indexBuildSequenceController!=null){
@@ -256,6 +298,23 @@ public class IndexerBlock extends AbstractCOptionPage {
 		}
 	}		
 	
+	void updateBuildConfigEnablement(int scope) {
+		if (fBuildConfigGroup == null)
+			return;
+		
+		if (!fEnableIndexer.getSelection()) {
+			ControlEnableState.disable(fBuildConfigGroup);
+		} else {
+			final boolean notDerived = scope != IndexerPreferences.SCOPE_INSTANCE;
+			final boolean fixed = fUseFixedBuildConfig.getSelection();
+			// independent of scope
+			fBuildConfigComboBox.setEnabled(fixed);
+			fUseActiveBuildButton.setEnabled(notDerived);
+			fUseFixedBuildConfig.setEnabled(notDerived);
+			fBuildConfigGroup.setEnabled(notDerived || fixed);
+		}
+	}
+	
 	protected void setUseActiveBuildConfig(boolean useActive) {
 		if (fBuildConfigComboBox != null) {
 			if (useActive) {
@@ -265,6 +324,7 @@ public class IndexerBlock extends AbstractCOptionPage {
 				fBuildConfigComboBox.setEnabled(false);
 			}
 			else {
+				// independent of the scope
 				fBuildConfigComboBox.setEnabled(true);
 			}
 			fUseActiveBuildButton.setSelection(useActive);
@@ -275,20 +335,12 @@ public class IndexerBlock extends AbstractCOptionPage {
 	private void enablePreferenceContent(boolean enable) {
 		if (fEnableState != null) {
 			fEnableState.restore();
-			if (fUseActiveBuildButton != null) {
-				fUseActiveBuildButton.setEnabled(true);
-				fUseFixedBuildConfig.setEnabled(true);
-			}
 		}
 		if (enable) {
 			fEnableState= null;
 		}
 		else {
 			fEnableState= ControlEnableState.disable(fPreferenceContent);
-			if (fUseActiveBuildButton != null) {
-				fUseActiveBuildButton.setEnabled(false);
-				fUseFixedBuildConfig.setEnabled(false);
-			}
 		}
 	}
 
@@ -313,15 +365,27 @@ public class IndexerBlock extends AbstractCOptionPage {
 	}
 
 	private void initializeIndexerCombo() {
-		String[] names= new String[fIndexerConfigMap.size()];
-		int j= 0;
-		for (IndexerConfig config : fIndexerConfigMap.values()) {
-			names[j++]= config.getName();
-        }
-		@SuppressWarnings("unchecked")
-		final Comparator<Object> collator = Collator.getInstance();
-		Arrays.sort(names, collator);
-		fIndexersComboBox.setItems(names);
+		if (fIndexersComboBox != null) {
+			String[] names= new String[fIndexerConfigMap.size()-1];
+			int j= 0;
+			for (String id : fIndexerConfigMap.keySet()) {
+				if (!IPDOMManager.ID_NO_INDEXER.equals(id)) {
+					names[j++]= fIndexerConfigMap.get(id).getName();
+				}
+			}
+			@SuppressWarnings("unchecked")
+			final Comparator<Object> collator = Collator.getInstance();
+			Arrays.sort(names, collator);
+			fIndexersComboBox.setItems(names);
+		} else {
+			fTheOneIndexerID= IPDOMManager.ID_NO_INDEXER;
+			for (String id : fIndexerConfigMap.keySet()) {
+				if (!IPDOMManager.ID_NO_INDEXER.equals(id)) {
+					fTheOneIndexerID= id;
+					break;
+				}
+			}
+		}
 	}
 
 	private void initializeBuildConfigs() {
@@ -355,7 +419,6 @@ public class IndexerBlock extends AbstractCOptionPage {
 	
     protected void onPreferenceScopeChange() {
     	int scope= computeScope();
-    	updateBuildConfigForScope(scope);
     	if (fCurrentProperties == null || scope != IndexerPreferences.SCOPE_PROJECT_PRIVATE) {
         	Properties props= IndexerPreferences.getProperties(getProject(), scope);
 
@@ -371,18 +434,26 @@ public class IndexerBlock extends AbstractCOptionPage {
     		fCurrentProperties= props;
 		}
 		updateForNewProperties(scope);
+    	updateBuildConfigForScope(scope);
 	}
 
 	private void updateForNewProperties(int scope) {
 		String indexerId= fCurrentProperties.getProperty(IndexerPreferences.KEY_INDEXER_ID);
-		String indexerName = getIndexerName(indexerId);
-        String[] indexerList = fIndexersComboBox.getItems();
-        int selectedIndex = 0;
-        for (int i=0; i<indexerList.length; i++){
-        	if (indexerList[i].equals(indexerName))
-        		selectedIndex = i;
-        }
-        fIndexersComboBox.select(selectedIndex);
+		if (indexerId.equals(IPDOMManager.ID_NO_INDEXER)) {
+			fEnableIndexer.setSelection(false);
+		} else {
+			fEnableIndexer.setSelection(true);
+			if (fIndexersComboBox != null) {
+				String indexerName = getIndexerName(indexerId);
+				String[] indexerList = fIndexersComboBox.getItems();
+				int selectedIndex = 0;
+				for (int i=0; i<indexerList.length; i++){
+					if (indexerList[i].equals(indexerName))
+						selectedIndex = i;
+				}
+				fIndexersComboBox.select(selectedIndex);
+			}
+		}
         setPage();
         if (fPrefScopeBlock != null) {
         	enablePreferenceContent(scope != IndexerPreferences.SCOPE_INSTANCE);
@@ -397,6 +468,7 @@ public class IndexerBlock extends AbstractCOptionPage {
     		}
     	}
     	setPage();
+    	updateBuildConfigEnablement(computeScope());
     }
 
 	private int computeScope() {
@@ -463,6 +535,7 @@ public class IndexerBlock extends AbstractCOptionPage {
                 }
             }
         }
+        fIndexerConfigMap.put(IPDOMManager.ID_NO_INDEXER, new IndexerConfig(new NullIndexerBlock()));
     }
   
     private String getIndexerName(String indexerID) {
@@ -473,17 +546,6 @@ public class IndexerBlock extends AbstractCOptionPage {
         return null;
     }
 
-    private String getIndexerID(String indexerName) {
-    	for (Map.Entry<String, IndexerConfig> entry : fIndexerConfigMap.entrySet()) {
-			String id = entry.getKey();
-			IndexerConfig config = entry.getValue();
-			if (indexerName.equals(config.getName())) {
-				return id;
-			}
-    	}
-    	return null;
-    }
-    
     private AbstractIndexerPage getIndexerPage(String indexerID) {
         IndexerConfig configElement= fIndexerConfigMap.get(indexerID);
         if (configElement != null) {
@@ -584,7 +646,19 @@ public class IndexerBlock extends AbstractCOptionPage {
 	}
 
 	private String getSelectedIndexerID(){
-		return getIndexerID(fIndexersComboBox.getText());
+		if (fEnableIndexer.getSelection()) {
+			if (fIndexersComboBox == null)
+				return fTheOneIndexerID;
+
+			final String indexerName = fIndexersComboBox.getText();
+			for (Map.Entry<String, IndexerConfig> entry : fIndexerConfigMap.entrySet()) {
+				if (indexerName.equals(entry.getValue().getName())) {
+					return entry.getKey();
+				}
+			}
+			return null;
+		}
+		return IPDOMManager.ID_NO_INDEXER;
 	}
 	
 	public IProject getProject() {
