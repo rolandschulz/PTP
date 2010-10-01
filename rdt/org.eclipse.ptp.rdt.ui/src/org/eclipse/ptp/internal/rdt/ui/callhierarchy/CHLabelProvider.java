@@ -85,7 +85,7 @@ public class CHLabelProvider extends LabelProvider implements IColorProvider {
             if (decl != null) {
             	String label;
             	if (node.isMultiDef()) {
-            		int options= fCLabelProvider.getTextFlags();
+            		long options= fCLabelProvider.getTextFlags();
             		fCLabelProvider.setTextFlags(LABEL_OPTIONS_SIMPLE);
             		label= fCLabelProvider.getText(decl);
             		fCLabelProvider.setTextFlags(options);
