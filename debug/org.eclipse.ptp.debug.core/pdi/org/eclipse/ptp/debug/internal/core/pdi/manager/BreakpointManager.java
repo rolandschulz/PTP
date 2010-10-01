@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.manager;
 
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,65 +44,86 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
 
 /**
  * @author clement
- *
+ * 
  */
 public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpointManager {
 	public static IPDIBreakpoint[] EMPTY_BREAKPOINTS = {};
-	private final static String[] EXCEPTION_FUNCS = new String[] {"__cxa_throw", "__cxa_begin_catch"}; //$NON-NLS-1$ //$NON-NLS-2$
+	private final static String[] EXCEPTION_FUNCS = new String[] { "__cxa_throw", "__cxa_begin_catch" }; //$NON-NLS-1$ //$NON-NLS-2$
 
-	private List<IPDIBreakpoint> breakList = Collections.synchronizedList(new ArrayList<IPDIBreakpoint>());
-	
-	private IPDIBreakpoint[] exceptionBps = new IPDIBreakpoint[2];
-	
+	private final List<IPDIBreakpoint> breakList = Collections.synchronizedList(new ArrayList<IPDIBreakpoint>());
+
+	private final IPDIBreakpoint[] exceptionBps = new IPDIBreakpoint[2];
+
 	private final int EXCEPTION_THROW_IDX = 0;
 	private final int EXCEPTION_CATCH_IDX = 1;
-	
+
 	public BreakpointManager(IPDISession session) {
 		super(session, false);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#addSetBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#addSetBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
 	 */
 	public void addSetBreakpoint(TaskSet tasks, IPDIBreakpoint breakpoint) throws PDIException {
 		if (!isValid(breakpoint.getBreakpointID())) {
-			throw new PDIException(tasks, Messages.BreakpointManager_0);			
+			throw new PDIException(tasks, Messages.BreakpointManager_0);
 		}
 		breakpoint.getTasks().or(tasks);
 		breakpoint.getPendingTasks().or(tasks);
 		setPendingBreakpoint(breakpoint);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#createAddressLocation(java.math.BigInteger)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * createAddressLocation(java.math.BigInteger)
 	 */
 	public IPDIAddressLocation createAddressLocation(BigInteger address) {
 		return PDILocationFactory.newAddressLocation(address);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#createCondition(int, java.lang.String, java.lang.String[])
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#createCondition
+	 * (int, java.lang.String, java.lang.String[])
 	 */
 	public IPDICondition createCondition(int ignoreCount, String expression, String[] tids) {
 		return session.getModelFactory().newCondition(ignoreCount, expression, tids);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#createFunctionLocation(java.lang.String, java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * createFunctionLocation(java.lang.String, java.lang.String)
 	 */
 	public IPDIFunctionLocation createFunctionLocation(String file, String function) {
 		return PDILocationFactory.newFunctionLocation(file, function);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#createLineLocation(java.lang.String, int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * createLineLocation(java.lang.String, int)
 	 */
 	public IPDILineLocation createLineLocation(String file, int line) {
 		return PDILocationFactory.newLineLocation(file, line);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#deleteAllBreakpoints()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * deleteAllBreakpoints()
 	 */
 	public void deleteAllBreakpoints() throws PDIException {
 		IPDIBreakpoint[] pdiBreakpoints = getAllPDIBreakpoints();
@@ -111,9 +131,12 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 			deleteBreakpoint(session.getTasks(), pdiBpt);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#deleteAllBreakpoints(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * deleteAllBreakpoints(org.eclipse.ptp.core.util.TaskSet)
 	 */
 	public void deleteAllBreakpoints(TaskSet tasks) throws PDIException {
 		IPDIBreakpoint[] pdiBreakpoints = getAllPDIBreakpoints();
@@ -123,55 +146,79 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#deleteBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#deleteBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
 	 */
 	public void deleteBreakpoint(TaskSet tasks, IPDIBreakpoint breakpoint) throws PDIException {
 		if (!isValid(breakpoint.getBreakpointID())) {
-			throw new PDIException(tasks, Messages.BreakpointManager_0);			
+			throw new PDIException(tasks, Messages.BreakpointManager_0);
 		}
 		breakpoint.setDeleted();
 		deletePendingBreakpoint(breakpoint, true);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#deleteSetBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * deleteSetBreakpoint(org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
 	 */
 	public void deleteSetBreakpoint(TaskSet tasks, IPDIBreakpoint breakpoint) throws PDIException {
 		if (!isValid(breakpoint.getBreakpointID())) {
-			throw new PDIException(tasks, Messages.BreakpointManager_0);			
+			throw new PDIException(tasks, Messages.BreakpointManager_0);
 		}
 		breakpoint.getTasks().andNot(tasks);
-		breakpoint.getPendingTasks().andNot(tasks);
+		breakpoint.getPendingTasks().or(tasks);
 		breakpoint.setDeleted();
 		deletePendingBreakpoint(breakpoint, false);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#disableBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * disableBreakpoint(org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
 	 */
 	public void disableBreakpoint(TaskSet tasks, IPDIBreakpoint breakpoint) throws PDIException {
 		if (!isValid(breakpoint.getBreakpointID())) {
-			throw new PDIException(tasks, Messages.BreakpointManager_0);			
+			throw new PDIException(tasks, Messages.BreakpointManager_0);
 		}
 		breakpoint.setEnabled(false);
-		getSession().getEventRequestManager().addEventRequest(session.getRequestFactory().getDisableBreakpointRequest(tasks, breakpoint));
+		getSession().getEventRequestManager().addEventRequest(
+				session.getRequestFactory().getDisableBreakpointRequest(tasks, breakpoint));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#enableBreakpoint(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#enableBreakpoint
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint)
 	 */
 	public void enableBreakpoint(TaskSet tasks, IPDIBreakpoint breakpoint) throws PDIException {
 		if (!isValid(breakpoint.getBreakpointID())) {
-			throw new PDIException(tasks, Messages.BreakpointManager_0);			
+			throw new PDIException(tasks, Messages.BreakpointManager_0);
 		}
 		breakpoint.setEnabled(true);
-		getSession().getEventRequestManager().addEventRequest(session.getRequestFactory().getEnableBreakpointRequest(tasks, breakpoint));
+		getSession().getEventRequestManager().addEventRequest(
+				session.getRequestFactory().getEnableBreakpointRequest(tasks, breakpoint));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#getBreakpoint(int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#getBreakpoint
+	 * (int)
 	 */
 	public IPDIBreakpoint getBreakpoint(int id) {
 		IPDIBreakpoint[] pdiBreakpoints = getAllPDIBreakpoints();
@@ -182,45 +229,64 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setAddressBreakpoint(org.eclipse.ptp.core.util.TaskSet, int, org.eclipse.ptp.debug.core.pdi.IPDIAddressLocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * setAddressBreakpoint(org.eclipse.ptp.core.util.TaskSet, int,
+	 * org.eclipse.ptp.debug.core.pdi.IPDIAddressLocation,
+	 * org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, boolean)
 	 */
-	public IPDIAddressBreakpoint setAddressBreakpoint(TaskSet tasks, int type, IPDIAddressLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException {		
-		IPDIAddressBreakpoint bkpt = session.getModelFactory().newAddressBreakpoint(session, tasks, type, location, condition, enabled);
+	public IPDIAddressBreakpoint setAddressBreakpoint(TaskSet tasks, int type, IPDIAddressLocation location,
+			IPDICondition condition, boolean deferred, boolean enabled) throws PDIException {
+		IPDIAddressBreakpoint bkpt = session.getModelFactory().newAddressBreakpoint(session, tasks, type, location, condition,
+				enabled);
 		setNewLocationBreakpoint(bkpt, deferred);
 		return bkpt;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setCondition(org.eclipse.ptp.core.util.TaskSet, org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint, org.eclipse.ptp.debug.core.pdi.IPDICondition)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setCondition
+	 * (org.eclipse.ptp.core.util.TaskSet,
+	 * org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint,
+	 * org.eclipse.ptp.debug.core.pdi.IPDICondition)
 	 */
 	public void setCondition(TaskSet tasks, IPDIBreakpoint breakpoint, IPDICondition newCondition) throws PDIException {
 		deleteBreakpoint(tasks, breakpoint);
 		breakpoint.setCondition(newCondition);
 		if (breakpoint instanceof IPDILocationBreakpoint) {
-			setLocationBreakpoint((IPDILocationBreakpoint)breakpoint);
+			setLocationBreakpoint((IPDILocationBreakpoint) breakpoint);
 		} else if (breakpoint instanceof IPDIWatchpoint) {
-			setWatchpoint((IPDIWatchpoint)breakpoint);
+			setWatchpoint((IPDIWatchpoint) breakpoint);
 		} else {
 			throw new PDIException(tasks, Messages.BreakpointManager_0);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setExceptionpoint(org.eclipse.ptp.core.util.TaskSet, java.lang.String, boolean, boolean, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * setExceptionpoint(org.eclipse.ptp.core.util.TaskSet, java.lang.String,
+	 * boolean, boolean, boolean)
 	 */
-	public IPDIExceptionpoint setExceptionpoint(TaskSet tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch, boolean enabled) throws PDIException {
+	public IPDIExceptionpoint setExceptionpoint(TaskSet tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch,
+			boolean enabled) throws PDIException {
 		if (!stopOnThrow && !stopOnCatch) {
 			throw new PDIException(tasks, Messages.BreakpointManager_1);
 		}
 		List<IPDIFunctionBreakpoint> funcBptList = new ArrayList<IPDIFunctionBreakpoint>(2);
 		if (stopOnThrow) {
-			synchronized(exceptionBps) {
+			synchronized (exceptionBps) {
 				int id = EXCEPTION_THROW_IDX;
 				if (exceptionBps[EXCEPTION_THROW_IDX] == null) {
 					IPDIFunctionLocation location = PDILocationFactory.newFunctionLocation(null, EXCEPTION_FUNCS[id]);
-					IPDIFunctionBreakpoint bp = session.getModelFactory().newFunctionBreakpoint(session, tasks, IPDIBreakpoint.REGULAR, location, null, enabled);
+					IPDIFunctionBreakpoint bp = session.getModelFactory().newFunctionBreakpoint(session, tasks,
+							IPDIBreakpoint.REGULAR, location, null, enabled);
 					setLocationBreakpoint(bp);
 					exceptionBps[id] = bp;
 					funcBptList.add(bp);
@@ -228,81 +294,112 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 			}
 		}
 		if (stopOnCatch) {
-			synchronized(exceptionBps) {
+			synchronized (exceptionBps) {
 				int id = EXCEPTION_THROW_IDX;
 				if (exceptionBps[id] == null) {
 					IPDIFunctionLocation location = PDILocationFactory.newFunctionLocation(null, EXCEPTION_FUNCS[id]);
-					IPDIFunctionBreakpoint bp = session.getModelFactory().newFunctionBreakpoint(session, tasks, IPDIBreakpoint.REGULAR, location, null, enabled);
+					IPDIFunctionBreakpoint bp = session.getModelFactory().newFunctionBreakpoint(session, tasks,
+							IPDIBreakpoint.REGULAR, location, null, enabled);
 					setLocationBreakpoint(bp);
 					exceptionBps[id] = bp;
 					funcBptList.add(bp);
 				}
 			}
 		}
-		IPDIExceptionpoint excp = session.getModelFactory().newExceptionpoint(session, tasks, clazz, stopOnThrow, stopOnCatch, null, enabled, funcBptList.toArray(new IPDIFunctionBreakpoint[0]));
+		IPDIExceptionpoint excp = session.getModelFactory().newExceptionpoint(session, tasks, clazz, stopOnThrow, stopOnCatch,
+				null, enabled, funcBptList.toArray(new IPDIFunctionBreakpoint[0]));
 		addBreakpoint(excp);
 		return excp;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setFunctionBreakpoint(org.eclipse.ptp.core.util.TaskSet, int, org.eclipse.ptp.debug.core.pdi.IPDIFunctionLocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * setFunctionBreakpoint(org.eclipse.ptp.core.util.TaskSet, int,
+	 * org.eclipse.ptp.debug.core.pdi.IPDIFunctionLocation,
+	 * org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, boolean)
 	 */
-	public IPDIFunctionBreakpoint setFunctionBreakpoint(TaskSet tasks, int type, IPDIFunctionLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException {		
-		IPDIFunctionBreakpoint bkpt = session.getModelFactory().newFunctionBreakpoint(session, tasks, type, location, condition, enabled);
+	public IPDIFunctionBreakpoint setFunctionBreakpoint(TaskSet tasks, int type, IPDIFunctionLocation location,
+			IPDICondition condition, boolean deferred, boolean enabled) throws PDIException {
+		IPDIFunctionBreakpoint bkpt = session.getModelFactory().newFunctionBreakpoint(session, tasks, type, location, condition,
+				enabled);
 		setNewLocationBreakpoint(bkpt, deferred);
 		return bkpt;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setLineBreakpoint(org.eclipse.ptp.core.util.TaskSet, int, org.eclipse.ptp.debug.core.pdi.IPDILineLocation, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * setLineBreakpoint(org.eclipse.ptp.core.util.TaskSet, int,
+	 * org.eclipse.ptp.debug.core.pdi.IPDILineLocation,
+	 * org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean, boolean)
 	 */
-	public IPDILineBreakpoint setLineBreakpoint(TaskSet tasks, int type, IPDILineLocation location, IPDICondition condition, boolean deferred, boolean enabled) throws PDIException {		
+	public IPDILineBreakpoint setLineBreakpoint(TaskSet tasks, int type, IPDILineLocation location, IPDICondition condition,
+			boolean deferred, boolean enabled) throws PDIException {
 		IPDILineBreakpoint bkpt = session.getModelFactory().newLineBreakpoint(session, tasks, type, location, condition, enabled);
 		setNewLocationBreakpoint(bkpt, deferred);
 		return bkpt;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setWatchpoint(org.eclipse.ptp.core.util.TaskSet, int, int, java.lang.String, org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#setWatchpoint
+	 * (org.eclipse.ptp.core.util.TaskSet, int, int, java.lang.String,
+	 * org.eclipse.ptp.debug.core.pdi.IPDICondition, boolean)
 	 */
-	public IPDIWatchpoint setWatchpoint(TaskSet tasks, int type, int watchType, String expression, IPDICondition condition, boolean enabled) throws PDIException {
-		IPDIWatchpoint bkpt = session.getModelFactory().newWatchpoint(session, tasks, type, expression, watchType, condition, enabled);
+	public IPDIWatchpoint setWatchpoint(TaskSet tasks, int type, int watchType, String expression, IPDICondition condition,
+			boolean enabled) throws PDIException {
+		IPDIWatchpoint bkpt = session.getModelFactory().newWatchpoint(session, tasks, type, expression, watchType, condition,
+				enabled);
 		setWatchpoint(bkpt);
 		addBreakpoint(bkpt);
 		return bkpt;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#shutdown()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#shutdown()
 	 */
+	@Override
 	public void shutdown() {
-		//breakList.clear();
+		// breakList.clear();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org.eclipse.ptp.core.util.TaskSet)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.internal.core.pdi.AbstractPDIManager#update(org
+	 * .eclipse.ptp.core.util.TaskSet)
 	 */
+	@Override
 	public void update(TaskSet tasks) throws PDIException {
-		//TODO
+		// TODO
 	}
-	
+
 	/**
 	 * @param breakpoint
 	 */
 	private void addBreakpoint(IPDIBreakpoint breakpoint) {
-		synchronized(breakList) {
+		synchronized (breakList) {
 			if (!breakpoint.isTemporary()) {
 				breakList.add(breakpoint);
 			}
 		}
 	}
-	
+
 	/**
 	 * @param id
 	 */
 	private void deleteBreakpoint(int id) {
 		IPDIBreakpoint[] pdiBreakpoints = getAllPDIBreakpoints();
-		for (int i=0; i<pdiBreakpoints.length; i++) {
+		for (int i = 0; i < pdiBreakpoints.length; i++) {
 			if (pdiBreakpoints[i].getBreakpointID() == id) {
 				breakList.remove(i);
 				break;
@@ -314,11 +411,11 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 	 * @return
 	 */
 	private IPDIBreakpoint[] getAllPDIBreakpoints() {
-		synchronized(breakList) {
+		synchronized (breakList) {
 			return breakList.toArray(new IPDIBreakpoint[0]);
 		}
 	}
-	
+
 	/**
 	 * @param id
 	 * @return
@@ -326,9 +423,12 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 	private boolean isValid(int id) {
 		return (getBreakpoint(id) != null);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#updatePendingBreakpoints()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.pdi.manager.IPDIBreakpointManager#
+	 * updatePendingBreakpoints()
 	 */
 	public void updatePendingBreakpoints() throws PDIException {
 		for (IPDIBreakpoint bp : getAllPDIBreakpoints()) {
@@ -341,53 +441,53 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 			}
 		}
 	}
-	
+
 	/**
 	 * Set a breakpoint on all suspended tasks.
 	 * 
-	 * @param bp breakpoint to set
+	 * @param bp
+	 *            breakpoint to set
 	 * @throws PDIException
 	 */
 	public void setPendingBreakpoint(IPDIBreakpoint bp) throws PDIException {
 		TaskSet suspendedTasks = bp.getPendingTasks().copy();
 		if (session.getStatus() == IPDISession.STARTED) {
 			getSession().getTaskManager().getSuspendedTasks(suspendedTasks);
-		}			
+		}
 		if (!suspendedTasks.isEmpty()) {
 			IPDIEventRequest request = null;
 			if (bp instanceof IPDIFunctionBreakpoint) {
-				request = session.getRequestFactory().getSetFunctionBreakpointRequest(suspendedTasks, (IPDIFunctionBreakpoint)bp, true);
-			}
-			else if (bp instanceof IPDIAddressBreakpoint) {
-				request = session.getRequestFactory().getSetAddressBreakpointRequest(suspendedTasks, (IPDIAddressBreakpoint)bp, true);			
-			}
-			else if (bp instanceof IPDILineBreakpoint) {
-				request = session.getRequestFactory().getSetLineBreakpointRequest(suspendedTasks, (IPDILineBreakpoint)bp, true);			
-			}
-			else if (bp instanceof IPDIWatchpoint) {
-				request = session.getRequestFactory().getSetWatchpointRequest(suspendedTasks, (IPDIWatchpoint)bp, true);
-			}
-			else {
+				request = session.getRequestFactory().getSetFunctionBreakpointRequest(suspendedTasks, (IPDIFunctionBreakpoint) bp,
+						true);
+			} else if (bp instanceof IPDIAddressBreakpoint) {
+				request = session.getRequestFactory().getSetAddressBreakpointRequest(suspendedTasks, (IPDIAddressBreakpoint) bp,
+						true);
+			} else if (bp instanceof IPDILineBreakpoint) {
+				request = session.getRequestFactory().getSetLineBreakpointRequest(suspendedTasks, (IPDILineBreakpoint) bp, true);
+			} else if (bp instanceof IPDIWatchpoint) {
+				request = session.getRequestFactory().getSetWatchpointRequest(suspendedTasks, (IPDIWatchpoint) bp, true);
+			} else {
 				throw new PDIException(bp.getTasks(), Messages.BreakpointManager_2);
 			}
 			bp.getPendingTasks().andNot(suspendedTasks);
 			getSession().getEventRequestManager().addEventRequest(request);
 		}
 	}
-	
+
 	/**
 	 * FIXME work out correct usage of allowUpdate
-	 *  
+	 * 
 	 * Delete a breakpoint from all suspended tasks.
 	 * 
-	 * @param bp breakpoint to delete
+	 * @param bp
+	 *            breakpoint to delete
 	 * @throws PDIException
 	 */
 	public void deletePendingBreakpoint(IPDIBreakpoint bp, boolean allowUpdate) throws PDIException {
 		TaskSet suspendedTasks = bp.getPendingTasks().copy();
 		if (session.getStatus() == IPDISession.STARTED) {
 			getSession().getTaskManager().getSuspendedTasks(suspendedTasks);
-		}			
+		}
 		if (!suspendedTasks.isEmpty()) {
 			getSession().getEventRequestManager().addEventRequest(
 					session.getRequestFactory().getDeleteBreakpointRequest(suspendedTasks, bp, allowUpdate));
@@ -408,7 +508,7 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 			disableBreakpoint(bkpt.getTasks(), bkpt);
 		}
 	}
-	
+
 	/**
 	 * @param watchpoint
 	 * @throws PDIException
@@ -416,7 +516,7 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 	private void setWatchpoint(IPDIWatchpoint watchpoint) throws PDIException {
 		setPendingBreakpoint(watchpoint);
 	}
-	
+
 	/**
 	 * @param bkpt
 	 * @param deferred
