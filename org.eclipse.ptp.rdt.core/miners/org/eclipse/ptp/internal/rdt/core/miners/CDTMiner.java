@@ -539,12 +539,16 @@ public class CDTMiner extends Miner {
 				
 				String resultString = Serializer.serialize(result);
 				status.getDataStore().createObject(status, T_NAVIGATION_RESULT, resultString);
-				statusDone(status);
+				
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			}
+			
+			finally {
+				statusDone(status);
 			}
 			
 		}
@@ -815,8 +819,6 @@ public class CDTMiner extends Miner {
 				if (index != null)
 					index.releaseReadLock();
 				
-				statusDone(status);
-
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Released read lock", _dataStore); //$NON-NLS-1$
 				
 			}
@@ -825,6 +827,10 @@ public class CDTMiner extends Miner {
 		{
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		} 
+		
+		finally {
+			statusDone(status);
+		}
 		
 	}
 	
@@ -889,9 +895,7 @@ public class CDTMiner extends Miner {
 			{
 				if (index != null)
 					index.releaseReadLock();
-				
-				statusDone(status);
-
+								
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Released read lock", _dataStore); //$NON-NLS-1$
 				
 			}
@@ -900,6 +904,10 @@ public class CDTMiner extends Miner {
 		{
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		} 
+		
+		finally {
+			statusDone(status);
+		}
 		
 	}
 
@@ -985,9 +993,7 @@ public class CDTMiner extends Miner {
 				if (index != null)
 					index.releaseReadLock();
 				
-				statusDone(status);
-
-				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Released read lock", _dataStore); //$NON-NLS-1$
+	    		UniversalServerUtilities.logDebugMessage(LOG_TAG, "Released read lock", _dataStore); //$NON-NLS-1$
 				
 			}
 		} 
@@ -995,6 +1001,10 @@ public class CDTMiner extends Miner {
 		{
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		} 
+		
+		finally {
+			statusDone(status);
+		}
 		
 	}
 	
@@ -1021,8 +1031,6 @@ public class CDTMiner extends Miner {
 				if (index != null)
 					index.releaseReadLock();
 				
-				statusDone(status);
-
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Released read lock", _dataStore); //$NON-NLS-1$
 				
 			}
@@ -1031,6 +1039,10 @@ public class CDTMiner extends Miner {
 		{
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		} 
+		
+		finally {
+			statusDone(status);
+		}
 		
 	}
 
@@ -1077,10 +1089,13 @@ public class CDTMiner extends Miner {
 				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 			} finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 		} catch(Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		
+		finally {
+			statusDone(status);
 		}
 	}
 
@@ -1124,10 +1139,12 @@ public class CDTMiner extends Miner {
 				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 			} finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 		} catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		finally {
+			statusDone(status);
 		}
 	}
 
@@ -1158,10 +1175,13 @@ public class CDTMiner extends Miner {
 				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 			} finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 		} catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		
+		finally {
+			statusDone(status);
 		}
 	}
 
@@ -1202,10 +1222,13 @@ public class CDTMiner extends Miner {
 				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 			} finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 		} catch(Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		
+		finally {
+			statusDone(status);
 		}
 	}
 
@@ -1245,10 +1268,13 @@ public class CDTMiner extends Miner {
 				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 			} finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 		} catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		
+		finally {
+			statusDone(status);
 		}
 	}
 
@@ -1373,11 +1399,14 @@ public class CDTMiner extends Miner {
 			}
 			finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 		}
 		catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		
+		finally {
+			statusDone(status);
 		}
 	}
 
@@ -1439,11 +1468,14 @@ public class CDTMiner extends Miner {
 			}
 			finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 		}
 		catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		
+		finally {
+			statusDone(status);
 		}
 	}
 
@@ -1599,7 +1631,6 @@ public class CDTMiner extends Miner {
 
 			finally {
 				index.releaseReadLock();
-				statusDone(status);
 			}
 
 			// create the result object
@@ -1609,6 +1640,10 @@ public class CDTMiner extends Miner {
 
 		catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		
+		finally {
+			statusDone(status);
 		}
 	}
 
