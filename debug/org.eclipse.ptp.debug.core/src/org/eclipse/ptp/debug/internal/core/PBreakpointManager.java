@@ -477,10 +477,10 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 				list.add((IPBreakpoint) breakpoints[i]);
 			}
 		}
-		if (list.isEmpty())
-			return;
-		IPBreakpoint[] pBreakpoints = list.toArray(new IPBreakpoint[list.size()]);
-		setBreakpointsOnSession0(pBreakpoints);
+		if (!list.isEmpty()) {
+			IPBreakpoint[] pBreakpoints = list.toArray(new IPBreakpoint[list.size()]);
+			setBreakpointsOnSession0(pBreakpoints);
+		}
 	}
 
 	/**

@@ -217,17 +217,17 @@ public class PDebugModel {
 	public static IPFunctionBreakpoint[] functionBreakpointExists(String sourceHandle, IResource resource, String function)
 			throws CoreException {
 		IBreakpoint[] breakpoints = getBreakpoints();
-		List<IBreakpoint> foundBreakpoints = new ArrayList<IBreakpoint>(0);
+		List<IPFunctionBreakpoint> foundBreakpoints = new ArrayList<IPFunctionBreakpoint>();
 		String markerType = PFunctionBreakpoint.getMarkerType();
-		for (int i = 0; i < breakpoints.length; i++) {
-			if (!(breakpoints[i] instanceof IPFunctionBreakpoint))
-				continue;
-			IPFunctionBreakpoint breakpoint = (IPFunctionBreakpoint) breakpoints[i];
-			if (breakpoint.getMarker().getType().equals(markerType)) {
-				if (sameSourceHandle(sourceHandle, breakpoint.getSourceHandle())) {
-					if (breakpoint.getMarker().getResource().equals(resource)) {
-						if (breakpoint.getFunction() != null && breakpoint.getFunction().equals(function)) {
-							foundBreakpoints.add(breakpoint);
+		for (IBreakpoint breakpoint : breakpoints) {
+			if (breakpoint instanceof IPFunctionBreakpoint) {
+				IPFunctionBreakpoint funcBP = (IPFunctionBreakpoint) breakpoint;
+				if (funcBP.getMarker().getType().equals(markerType)) {
+					if (sameSourceHandle(sourceHandle, funcBP.getSourceHandle())) {
+						if (funcBP.getMarker().getResource().equals(resource)) {
+							if (funcBP.getFunction() != null && funcBP.getFunction().equals(function)) {
+								foundBreakpoints.add(funcBP);
+							}
 						}
 					}
 				}
@@ -283,7 +283,7 @@ public class PDebugModel {
 	public static IPLineBreakpoint[] lineBreakpointsExists(String sourceHandle, IResource resource, int lineNumber)
 			throws CoreException {
 		IBreakpoint[] breakpoints = getBreakpoints();
-		List<IPLineBreakpoint> foundBreakpoints = new ArrayList<IPLineBreakpoint>(0);
+		List<IPLineBreakpoint> foundBreakpoints = new ArrayList<IPLineBreakpoint>();
 		for (IBreakpoint breakpoint : breakpoints) {
 			if (breakpoint instanceof IPLineBreakpoint) {
 				IPLineBreakpoint lineBP = (IPLineBreakpoint) breakpoint;
@@ -300,7 +300,7 @@ public class PDebugModel {
 	}
 
 	/**
-	 * Update breakpoint when a setID changes.
+	 * Update breakpoint when a set ID changes.
 	 * 
 	 * @param setId
 	 * @param monitor
@@ -332,7 +332,7 @@ public class PDebugModel {
 	 * @throws CoreException
 	 */
 	public static IPWatchpoint[] watchpointExists(String sourceHandle, IResource resource, String expression) throws CoreException {
-		List<IPWatchpoint> foundBreakpoints = new ArrayList<IPWatchpoint>(0);
+		List<IPWatchpoint> foundBreakpoints = new ArrayList<IPWatchpoint>();
 		String markerType = PWatchpoint.getMarkerType();
 		for (IBreakpoint breakpoint : getBreakpoints()) {
 			if (breakpoint instanceof IPWatchpoint) {
@@ -359,8 +359,9 @@ public class PDebugModel {
 	 */
 	private static void deleteBreakpoint(final String jobId) throws CoreException {
 		IPBreakpoint[] breakpoints = findBreakpoints(jobId, false);
-		if (breakpoints.length > 0)
+		if (breakpoints.length > 0) {
 			DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
+		}
 	}
 
 	/**

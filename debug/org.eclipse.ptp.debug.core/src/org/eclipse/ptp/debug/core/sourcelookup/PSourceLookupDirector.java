@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -41,7 +40,7 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceCon
 
 public class PSourceLookupDirector extends AbstractSourceLookupDirector implements IPSourceLookupDirector {
 	private static Set<String> fSupportedTypes;
-	
+
 	static {
 		fSupportedTypes = new HashSet<String>();
 		fSupportedTypes.add(WorkspaceSourceContainer.TYPE_ID);
@@ -53,15 +52,17 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 	}
 
 	/**
+	 * Test if the breakpoint is in a source file in the project.
+	 * 
 	 * @param breakpoint
-	 * @return
+	 *            breakpoint to test
+	 * @return true if the breakpoint is in a source file
 	 */
 	public boolean contains(IPBreakpoint breakpoint) {
 		try {
 			final String handle = breakpoint.getSourceHandle();
-			final ISourceContainer[] containers = getSourceContainers();
-			for (int i = 0; i < containers.length; ++i) {
-				if (contains(containers[i], handle)) {
+			for (ISourceContainer container : getSourceContainers()) {
+				if (contains(container, handle)) {
 					return true;
 				}
 			}
@@ -75,9 +76,8 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 	 * @return
 	 */
 	public boolean contains(IProject project) {
-		final ISourceContainer[] containers = getSourceContainers();
-		for (int i = 0; i < containers.length; ++i) {
-			if (contains(containers[i], project)) {
+		for (ISourceContainer container : getSourceContainers()) {
+			if (contains(container, project)) {
 				return true;
 			}
 		}
@@ -92,9 +92,8 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 	 */
 	public IPath getCompilationPath(String sourceName) {
 		IPath path = null;
-		final ISourceContainer[] containers = getSourceContainers();
-		for (int i = 0; i < containers.length; ++i) {
-			final IPath cp = getCompilationPath(containers[i], sourceName);
+		for (ISourceContainer container : getSourceContainers()) {
+			final IPath cp = getCompilationPath(container, sourceName);
 			if (cp != null) {
 				path = cp;
 				break;
@@ -130,10 +129,8 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 			return true;
 		}
 		try {
-			ISourceContainer[] containers;
-			containers = container.getSourceContainers();
-			for (int i = 0; i < containers.length; ++i) {
-				if (contains(containers[i], project)) {
+			for (ISourceContainer child : container.getSourceContainers()) {
+				if (contains(child, project)) {
 					return true;
 				}
 			}
@@ -149,30 +146,20 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 		}
 		if (container instanceof ProjectSourceContainer) {
 			final IProject project = ((ProjectSourceContainer) container).getProject();
-			final IPath projPath = new Path(project.getLocationURI().getPath());
-			if (projPath.isPrefixOf(path)) {
-				final IFile file = ((ProjectSourceContainer) container).getProject().getFile(
-						path.removeFirstSegments(projPath.segmentCount()));
-				return (file != null && file.exists());
-			}
+			final IPath srcPath = new Path(sourceName);
+			return project.exists(srcPath);
 		}
 		if (container instanceof FolderSourceContainer) {
 			final IContainer folder = ((FolderSourceContainer) container).getContainer();
-			final IPath folderPath = new Path(folder.getLocationURI().getPath());
-			if (folderPath.isPrefixOf(path)) {
-				final IFile file = ((FolderSourceContainer) container).getContainer().getFile(
-						path.removeFirstSegments(folderPath.segmentCount()));
-				return (file != null && file.exists());
-			}
+			final IPath srcPath = new Path(sourceName);
+			return folder.exists(srcPath);
 		}
 		if (container instanceof ResourceMappingSourceContainer) {
 			return (((ResourceMappingSourceContainer) container).getCompilationPath(sourceName) != null);
 		}
 		try {
-			ISourceContainer[] containers;
-			containers = container.getSourceContainers();
-			for (int i = 0; i < containers.length; ++i) {
-				if (contains(containers[i], sourceName)) {
+			for (ISourceContainer child : container.getSourceContainers()) {
+				if (contains(child, sourceName)) {
 					return true;
 				}
 			}
@@ -187,10 +174,8 @@ public class PSourceLookupDirector extends AbstractSourceLookupDirector implemen
 			path = ((ResourceMappingSourceContainer) container).getCompilationPath(sourceName);
 		} else {
 			try {
-				ISourceContainer[] containers;
-				containers = container.getSourceContainers();
-				for (int i = 0; i < containers.length; ++i) {
-					path = getCompilationPath(containers[i], sourceName);
+				for (ISourceContainer child : container.getSourceContainers()) {
+					path = getCompilationPath(child, sourceName);
 					if (path != null) {
 						break;
 					}
