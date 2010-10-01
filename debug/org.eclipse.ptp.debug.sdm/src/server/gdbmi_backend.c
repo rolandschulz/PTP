@@ -1271,7 +1271,7 @@ GDBCLIListSignals(char* name)
 		s->name = strdup(sig->name);
 		s->pass = sig->pass;
 		s->print = sig->print;
-		s->desc = strdup(sig->desc);
+		s->desc = strdup(sig->desc != NULL ? sig->desc : "");
 		AddToList(e->dbg_event_u.list, s);
 	}
 	SaveEvent(e);
