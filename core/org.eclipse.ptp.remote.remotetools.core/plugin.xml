@@ -20,4 +20,11 @@
          </run>
       </filesystem>
    </extension>
+   <extension
+		point="org.eclipse.cdt.core.EFSExtensionProvider">
+		<EFSExtensionProvider
+			scheme="remotetools"
+			class="org.eclipse.ptp.remote.remotetools.internal.core.RemoteToolsExtensionProvider">
+		</EFSExtensionProvider>
+   </extension>
 </plugin>
