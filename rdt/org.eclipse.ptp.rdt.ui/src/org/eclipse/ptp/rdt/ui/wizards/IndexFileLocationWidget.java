@@ -14,12 +14,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
+import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
+import org.eclipse.rse.subsystems.files.core.model.RemoteFileUtility;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
+import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -78,6 +85,12 @@ public class IndexFileLocationWidget extends Composite {
 					((IIndexFilePathChangeListener)listener).pathChanged(path);
 				}
 			}
+		});
+		
+		text.addFocusListener(new FocusAdapter() {
+			public void focusLost(FocusEvent fe){
+				validateIndexLoc();
+				}
 		});
 		
 		browseButton = new Button(group, SWT.NONE);
@@ -151,11 +164,30 @@ public class IndexFileLocationWidget extends Composite {
 			IRemoteFile folder = (IRemoteFile)remoteObject;
 			text.setText(folder.getCanonicalPath());
 		}
+		validateIndexLoc();
 	}
 
 	
 	private void restoreDefault() {
 		text.setText(RSEUtils.getDefaultConfigDirectory(host));
+	}
+	
+	private void validateIndexLoc() {
+		String path = text.getText();
+		IRemoteFileSubSystem remoteFileSubSystem = RemoteFileUtility.getFileSubSystem(host);
+		
+		try {
+			IRemoteFile currentRemoteFolder = 
+				remoteFileSubSystem.getRemoteFileObject(path, new NullProgressMonitor());
+						
+			if (!currentRemoteFolder.canWrite()){	
+				MessageDialog.openWarning(getShell(), 
+						Messages.getString("InvalidIndexLocationTitle"), Messages.getString("InvalidIndexLocationLabel")); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
+		} catch (SystemMessageException e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 
