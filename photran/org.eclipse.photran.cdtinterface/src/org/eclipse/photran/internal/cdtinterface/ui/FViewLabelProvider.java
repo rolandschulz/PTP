@@ -31,7 +31,7 @@ public class FViewLabelProvider extends CViewLabelProvider
 
     private Image fortranFileImage;
 
-    public FViewLabelProvider(int textFlags, int imageFlags)
+    public FViewLabelProvider(long textFlags, int imageFlags)
     {
         super(textFlags, imageFlags);
     }

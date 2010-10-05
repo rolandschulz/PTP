@@ -109,7 +109,7 @@ abstract class PreprocessorMacro implements IMacroBinding {
 
     @Deprecated
     //method added to conform with CDT interface
-	public IBinding getOwner() throws DOMException {
+	public IBinding getOwner() /*throws DOMException*/ {
 		// TODO Auto-generated method stub
 		return null;
 	}
