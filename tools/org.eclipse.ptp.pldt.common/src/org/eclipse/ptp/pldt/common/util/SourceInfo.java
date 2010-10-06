@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.common.util;
 
+import org.eclipse.ptp.pldt.common.Artifact;
+
 /**
  * Class encapsulates locational information for creating  markers representing Artifacts.
  * 
@@ -106,12 +108,17 @@ public class SourceInfo
     /**
      * A string representation of the object
      */
-    public String toString(){
-    	StringBuffer s = new StringBuffer();
-    	s.append("SourceInfo line:").append(getStartingLine()); //$NON-NLS-1$
-    	s.append(" startPos:").append(getStart()); //$NON-NLS-1$
-    	s.append(" endPos:").append(getEnd()); //$NON-NLS-1$
-    	s.append(" constructType:").append(getConstructType()); //$NON-NLS-1$
-    	return s.toString();
-    }
+	public String toString() {
+		StringBuffer s = new StringBuffer();
+		s.append("SourceInfo line:").append(getStartingLine()); //$NON-NLS-1$
+		s.append(" startPos:").append(getStart()); //$NON-NLS-1$
+		s.append(" endPos:").append(getEnd()); //$NON-NLS-1$
+		int type = getConstructType();
+		s.append(" constructType:").append(type); //$NON-NLS-1$
+		try {
+			s.append(" ").append(Artifact.CONSTRUCT_TYPE_NAMES[type]);
+		} catch (Exception e) {
+		}
+		return s.toString();
+	}
 }
