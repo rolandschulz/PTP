@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.analysis.ompcfg.factory;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -126,8 +127,16 @@ public class FileConcurrencyAnalysis
         {
             if (declaration instanceof IASTFunctionDefinition) {
                 IASTFunctionDefinition fDef = (IASTFunctionDefinition)declaration;
+                
+                // If the file the functionDef is in is the same as THIS file, add it to our list.
+                // Note: 1 Sept 2010: this doesn't match even for local files now, so ... nothing is added??
+                URI uri=iFile_.getLocationURI();
+                String str2=uri.getPath();
+                            
+                // str1 will be abs path to the file on whatever file system it's on (can't tell local vs. remote)
                 String str1 = fDef.getContainingFilename();
-                String str2 = iFile_.getRawLocation().toFile().getAbsolutePath();
+                // Note: this is a best-guess if they match. Files on different systems with exactly the same path string will "match" when 
+                // in reality they probably shouldn't.              
                 if (str1.equals(str2)) {
                     FunctionConcurrencyAnalysis analysis = new FunctionConcurrencyAnalysis(fDef, pList_);
                     analysisList_.add(analysis);
