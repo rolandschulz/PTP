@@ -502,7 +502,7 @@ public class MPIBarrierExpr extends ASTVisitor {
 	
 	private BarrierExpression getInitializerBE(Stack sk, IASTInitializer init){		
 		BarrierExpression BE = null;
-		if(init instanceof IASTInitializerExpression){
+		if(init instanceof IASTEqualsInitializer){
 			BE = (BarrierExpression)sk.pop();
 		}
 		else if(init instanceof IASTInitializerList){// BRT  !will this be encountered? 
@@ -608,7 +608,8 @@ public class MPIBarrierExpr extends ASTVisitor {
 		else if(expr instanceof IASTFunctionCallExpression){
 			IASTFunctionCallExpression fExpr = (IASTFunctionCallExpression)expr;
 			IASTExpression funcname = fExpr.getFunctionNameExpression();
-			IASTExpression parameter = fExpr.getParameterExpression();
+			// IASTExpression parameter = fExpr.getParameterExpression(); // old 6.0 AST
+			IASTInitializerClause[] arguments = fExpr.getArguments();  
 			String signature = funcname.getRawSignature();
 			int id = bTable_.isBarrier(fExpr);
 			if(id != -1){ /* barrier */
@@ -618,8 +619,12 @@ public class MPIBarrierExpr extends ASTVisitor {
 					String commkey = e.nextElement();
 					// get the BarrierExpressions for this communicator
 					Stack<BarrierExpression> sk = stacks_.get(commkey);
-					if(parameter != null) sk.pop(); //parameter 
-					sk.pop(); //functionName
+					// if(parameter != null) sk.pop(); //parameter  // old 6.0 AST
+					for(int i = 0; i<arguments.length; i ++) 
+					{
+						sk.pop();
+					} 
+					sk.pop(); //functionName 
 					if(commkey.equals(comm)) sk.push(be);
 					else sk.push(new BarrierExpression(BarrierExpression.BE_bot));
 				}
@@ -632,8 +637,12 @@ public class MPIBarrierExpr extends ASTVisitor {
 						String comm = e.nextElement();
 						Stack<BarrierExpression> sk = stacks_.get(comm);
 						BarrierExpression funcBE = node.getBarrierExpr().get(comm);
-						if(parameter != null) sk.pop(); //parameter
-						sk.pop(); //functionName
+						// if(parameter != null) sk.pop(); //parameter // old 6.0 AST
+						for(int i = 0; i<arguments.length; i ++) 
+						{
+							sk.pop(); 
+						}
+						sk.pop(); //functionName 
 						if(node == currentNode_){ //recursive functions
 							be = new BarrierExpression(node.getFuncName());
 						}
@@ -649,8 +658,12 @@ public class MPIBarrierExpr extends ASTVisitor {
 					be = new BarrierExpression(BarrierExpression.BE_bot);
 					for(Enumeration<Stack<BarrierExpression>> e = stacks_.elements(); e.hasMoreElements();){
 						Stack<BarrierExpression> sk = e.nextElement();
-						if(parameter != null) sk.pop(); //parameter
-						sk.pop(); //functionName
+						// if(parameter != null) sk.pop(); //parameter // old 6.0 AST
+						for(int i = 0; i<arguments.length; i ++) 
+						{
+							sk.pop();
+						} 
+						sk.pop(); //functionName  
 						sk.push(be);
 					}
 				}
