@@ -34,7 +34,7 @@ import org.eclipse.photran.internal.tests.PhotranTestSuiteFromFiles;
  * 
  * @author Jeff Overbey
  */
-public class MultiTestSuite extends TestSuite
+public abstract class MultiTestSuite extends TestSuite
 {
     public MultiTestSuite(String directorySuffix, boolean isFixedForm, boolean mustExist) throws FileNotFoundException, IOException
     {

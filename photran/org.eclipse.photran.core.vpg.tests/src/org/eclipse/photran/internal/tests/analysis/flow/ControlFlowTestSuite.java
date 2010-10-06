@@ -103,7 +103,7 @@ public class ControlFlowTestSuite extends GeneralTestSuiteFromMarkers
 
             String actual = flowGraph.toString();
             String expected = this.readTestFile(Activator.getDefault(), javaFileDirectory(), file.getName() + ".result").replace("\r", "");
-            assertEquals(expected, actual);
+            assertEquals(expected.replace("\r", ""), actual.replace("\r", ""));
         }
         
         private static final class PhotranVPGFlowGraph extends VPGFlowGraph<PhotranTokenRef, IExecutableConstruct>
