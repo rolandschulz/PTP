@@ -262,6 +262,7 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		int count = countFilesSelected();
 
 		monitor.beginTask(Messages.RunAnalyseHandlerBase_29, count);
+		if(traceOn)System.out.println("RAHB.runResources(): using selection: "+selection);
 		// Get elements of a possible multiple selection
 		Iterator<IStructuredSelection> iter = selection.iterator();
 		while (iter.hasNext()) {
