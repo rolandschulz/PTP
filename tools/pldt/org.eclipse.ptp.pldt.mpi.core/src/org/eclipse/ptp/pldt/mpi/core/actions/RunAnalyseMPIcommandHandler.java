@@ -60,9 +60,13 @@ public class RunAnalyseMPIcommandHandler extends RunAnalyseHandlerBase
 		boolean allowPrefixOnlyMatch=MpiPlugin.getDefault().getPreferenceStore().getBoolean(MpiIDs.MPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		try {
 			lang = tu.getLanguage(); 
-			//System.out.println("RunAnalyseMPICommandHandler: attempting to to build AST for "+tu);
+            
 			//long startTime = System.currentTimeMillis();
-			IASTTranslationUnit atu = getAST(tu); // hangs w/ RemoteTools deadlock bug here sometimes
+			IASTTranslationUnit atu = getAST(tu); // use index; was tu.getAST();
+			if(atu==null) {
+				System.out.println("RunAnalyseMPICommandHandler.doArtifactAnalysis(), atu is null (testing?)");
+				return msr;
+			}
 			//long endTime = System.currentTimeMillis();
 			//System.out.println("RunAnalyseMPICommandHandler: time to build AST for "+tu+": "+(endTime-startTime)/1000.0+" sec");
 			String languageID=lang.getId();
