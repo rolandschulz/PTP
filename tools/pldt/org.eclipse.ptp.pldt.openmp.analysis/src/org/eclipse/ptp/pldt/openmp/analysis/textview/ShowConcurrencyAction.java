@@ -25,7 +25,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.pldt.common.util.Utility;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPAnalysisManager;
-import org.eclipse.ptp.pldt.openmp.analysis.OpenMpIDs;
+import org.eclipse.ptp.pldt.openmp.analysis.internal.core.OpenMpIDs;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorActionDelegate;
