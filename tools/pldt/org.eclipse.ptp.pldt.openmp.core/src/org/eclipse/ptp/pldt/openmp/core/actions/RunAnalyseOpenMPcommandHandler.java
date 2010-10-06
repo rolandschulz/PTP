@@ -30,17 +30,18 @@ import org.eclipse.ptp.pldt.common.Artifact;
 import org.eclipse.ptp.pldt.common.ScanReturn;
 import org.eclipse.ptp.pldt.common.actions.RunAnalyseHandlerBase;
 import org.eclipse.ptp.pldt.common.util.SourceInfo;
-import org.eclipse.ptp.pldt.common.util.ViewActivater;
+import org.eclipse.ptp.pldt.common.util.ViewActivator;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPAnalysisManager;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPError;
 import org.eclipse.ptp.pldt.openmp.analysis.OpenMPErrorManager;
 import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTNode;
-import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTOMPPragma;
+import org.eclipse.ptp.pldt.openmp.analysis.PAST.PASTPragma;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPArtifactMarkingVisitor;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPScanReturn;
 import org.eclipse.ptp.pldt.openmp.core.analysis.OpenMPCASTVisitor;
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
+import org.eclipse.ptp.pldt.openmp.internal.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.ui.pv.PvPlugin;
 import org.eclipse.ptp.pldt.openmp.ui.pv.views.ProblemMarkerAttrIds;
 import org.eclipse.ui.texteditor.MarkerUtilities;
@@ -75,13 +76,14 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		final String fileName = tu.getElementName();
 		IASTTranslationUnit atu = null;
 		ILanguage lang;
+		boolean allowPrefixOnlyMatch=OpenMPPlugin.getDefault().getPreferenceStore().getBoolean(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE);
 		try {
 			lang = tu.getLanguage();
 
 			atu = tu.getAST();
 			String languageID = lang.getId();
 			if (languageID.equals(GCCLanguage.ID)) {// cdt40
-				atu.accept(new OpenMPCASTVisitor(includes, fileName, msr));
+				atu.accept(new OpenMPCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			} else {
 				// Attempt to handle Fortran
 				// Instantiate using reflection to avoid static Photran
@@ -125,14 +127,25 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 		OpenMPAnalysisManager omgr = new OpenMPAnalysisManager(astTransUnit, iFile);
 		PASTNode[] pList = omgr.getPAST();
 
-		for (int i = 0; i < pList.length; i++) {
-			if (pList[i] instanceof PASTOMPPragma) {
+		for (int i = 0; i < pList.length; i++) {// length local=3271; remote 4 (!!)
+			PASTNode temp=pList[i];
+			String tempStr=temp.getRawSignature();
+			// local: will be a PASTOMPPragma node;   remote: will be a PASTPragma node.
+			// So workaround is to accept a PASTPragma node here so we can handle remote files.
+			// Need to investigate what this does to further analysis e.g. concurrency analysis.
+			if (pList[i] instanceof PASTPragma) {// was PASTOMPPragma
 
-				PASTOMPPragma pop = (PASTOMPPragma) pList[i];
+				PASTPragma pop = (PASTPragma) pList[i];
 				if (traceOn)
 					System.out.println("found #pragma, line " + pop.getStartingLine()); //$NON-NLS-1$
 				SourceInfo si = getSourceInfo(pop, Artifact.PRAGMA);
-				Artifact a = new Artifact(pop.getFilename(), pop.getStartingLine(), pop.getStartLocation(), pop.getContent(),
+				String shortName=pop.getContent();
+				if(shortName.length()==0) { 
+					shortName="#pragma"; // HACK: workaround for remote files where getContent() is always empty.
+					// The same reason why this is empty is also (I think) why it's not a PASTOMPPragma node.
+					// PASTOMPFactory.parse() always finds empty token first on a remote file, so aborts.
+				}
+				Artifact a = new Artifact(pop.getFilename(), pop.getStartingLine(), pop.getStartLocation(), shortName,
 						OPENMP_DIRECTIVE, si, pop);
 				msr.addArtifact(a);
 			}
@@ -247,12 +260,12 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 
 	@Override
 	protected void activateArtifactView() {
-		ViewActivater.activateView(OpenMPPlugin.VIEW_ID);
+		ViewActivator.activateView(OpenMPPlugin.VIEW_ID);
 	}
 
 	@Override
 	protected void activateProblemsView() {
-		ViewActivater.activateView(PvPlugin.VIEW_ID);
+		ViewActivator.activateView(PvPlugin.VIEW_ID);
 	}
 
 }

@@ -28,6 +28,7 @@ public class Messages extends NLS {
 	public static String OpenMPPlugin_OpenMP_includes;
 	public static String OpenMPPreferencePage_OpenMP_include_paths;
 	public static String OpenMPPreferencePage_PleaseChooseAdirForOpenMPincludes;
+	public static String OpenMPPreferencePage_recognizeAPISByPrefixAlone;
 	public static String RunAnalyseOpenMPcommandHandler_OpenMP_directive;
 	static {
 		// initialize resource bundle

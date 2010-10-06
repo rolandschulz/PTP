@@ -37,12 +37,13 @@ public class OpenMPCASTVisitor extends PldtAstVisitor
     }
 
 
-    public OpenMPCASTVisitor(List<String> includes, String fileName, ScanReturn msr)
+    public OpenMPCASTVisitor(List<String> includes, String fileName, boolean allowPrefixOnlyMatch, ScanReturn msr)
     {
-        super(includes, fileName, msr);
+        super(includes, fileName, allowPrefixOnlyMatch, msr);
         ARTIFACT_CALL = Messages.OpenMPCASTVisitor_OpenMP_Call;
 		ARTIFACT_CONSTANT=Messages.OpenMPCASTVisitor_OpenMP_Constant;
     }
+    public void newAPI() {}
 
 
 

@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.pldt.openmp.core.prefs;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.pldt.openmp.internal.core.OpenMPIDs;
 import org.eclipse.ptp.pldt.openmp.core.OpenMPPlugin;
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 import org.eclipse.ui.IWorkbench;
@@ -28,7 +30,9 @@ public class OpenMPPreferencePage extends FieldEditorPreferencePage implements I
 {
     private static final String INCLUDES_PREFERENCE_LABEL  = Messages.OpenMPPreferencePage_OpenMP_include_paths;
     private static final String INCLUDES_PREFERENCE_BROWSE = Messages.OpenMPPreferencePage_PleaseChooseAdirForOpenMPincludes;
+    private static final String OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.OpenMPPreferencePage_recognizeAPISByPrefixAlone; //$NON-NLS-1$
 
+    
     public OpenMPPreferencePage()
     {
         super(GRID);
@@ -68,6 +72,10 @@ public class OpenMPPreferencePage extends FieldEditorPreferencePage implements I
 
     protected void createFieldEditors()
     {
+    	 
+    	 BooleanFieldEditor bPrefix = new BooleanFieldEditor(OpenMPIDs.OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE, OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL, getFieldEditorParent());
+         addField(bPrefix);
+         
         PathEditor pathEditor = new PathEditor(OpenMPPlugin.OPEN_MP_INCLUDES, INCLUDES_PREFERENCE_LABEL,
                 INCLUDES_PREFERENCE_BROWSE, getFieldEditorParent());
         addField(pathEditor);
