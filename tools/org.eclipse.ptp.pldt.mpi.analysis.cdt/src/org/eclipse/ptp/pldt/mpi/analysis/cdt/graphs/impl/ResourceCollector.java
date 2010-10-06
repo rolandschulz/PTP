@@ -46,6 +46,7 @@ public class ResourceCollector extends ASTVisitor {
 	protected ICallGraph CG_; 
 	protected IFile file_;
 	protected int depth;
+	private static final boolean traceOn=false;
 	
 	/**
 	 * Resource collector finds all functions in a given source file,
@@ -64,27 +65,29 @@ public class ResourceCollector extends ASTVisitor {
 	public void run(){
 		this.shouldVisitDeclarations = true;
 		this.shouldVisitTranslationUnit = true;
-		System.out.println("ResourceCollector.run()  file: "+file_+"  exists? "+file_.exists()); //$NON-NLS-1$ //$NON-NLS-2$
+		if(traceOn)System.out.println("ResourceCollector.run()  file: "+file_+"  exists? "+file_.exists()); //$NON-NLS-1$ //$NON-NLS-2$
 		IASTTranslationUnit ast_ = null;
 		try {
             ast_ = CDOM.getInstance().getASTService().getTranslationUnit(file_,
                     CDOM.getInstance().getCodeReaderFactory(CDOM.PARSE_SAVED_RESOURCES));
         } catch (IASTServiceProvider.UnsupportedDialectException e) {
+        } catch (NullPointerException npe) {
+        	System.out.println("ResourceCollector: no ast available from CDOM.. remote project? will try alt. approach.");
         }
-        System.out.println("     initial ast construction: ast_="+ast_); //$NON-NLS-1$
+        if(traceOn)System.out.println("     initial ast construction: ast_="+ast_); //$NON-NLS-1$
         boolean temp=true;
         
         if(temp && ast_==null) {
         	// newer way to get ast
         	if(file_ instanceof IAdaptable) {
         		ICElement ce = (ICElement) file_.getAdapter(ICElement.class);
-        		System.out.println("     ICElement: ="+ce); //$NON-NLS-1$
+        		if(traceOn)System.out.println("     ICElement: ="+ce); //$NON-NLS-1$
         		if(ce instanceof ITranslationUnit) {
         			ITranslationUnit cetu=(ITranslationUnit)ce;
         			IASTTranslationUnit ast;
 					try {
 						ast = cetu.getAST();
-						System.out.println("ast: "+ast); //$NON-NLS-1$
+						if(traceOn)System.out.println("ast: "+ast); //$NON-NLS-1$
 					} catch (CoreException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -100,7 +103,7 @@ public class ResourceCollector extends ASTVisitor {
 				}
         	}
         }
-        System.out.println("     ast_="+ast_); //$NON-NLS-1$
+        if(traceOn)System.out.println("     ast_="+ast_); //$NON-NLS-1$
         depth = 0;
         ast_.accept(this);
 	}
