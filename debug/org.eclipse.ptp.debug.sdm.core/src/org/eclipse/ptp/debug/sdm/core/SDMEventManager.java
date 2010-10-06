@@ -23,7 +23,9 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.PDILocationFactory;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIErrorInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDIExitInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIResumedEvent;
+import org.eclipse.ptp.debug.core.pdi.event.IPDISignalInfo;
 import org.eclipse.ptp.debug.core.pdi.manager.AbstractEventManager;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIBreakpointRequest;
@@ -73,24 +75,26 @@ public class SDMEventManager extends AbstractEventManager {
 	public SDMEventManager(IPDISession session) {
 		super(session);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	public void update(Observable o, final Object arg) {
-		PDebugUtils.println("Msg: SDMEventManager - update(): Event: " + ((IProxyDebugEvent)arg).toString()); //$NON-NLS-1$
+		PDebugUtils.println("Msg: SDMEventManager - update(): Event: " + ((IProxyDebugEvent) arg).toString()); //$NON-NLS-1$
 		IProxyDebugEvent event = (IProxyDebugEvent) arg;
 		IPDIEventRequest request = getCurrentRequest();
 		fireEvent(request, event);
 		/*
-		 * IProxyDebugOutputEvent can occur at any time, so make sure
-		 * that it is not used to update a request.
+		 * IProxyDebugOutputEvent can occur at any time, so make sure that it is
+		 * not used to update a request.
 		 */
 		if (!(event instanceof IProxyDebugOutputEvent)) {
 			verifyEvent(request, event);
 		}
 	}
-	
+
 	/**
 	 * @param reason
 	 * @param thread_id
@@ -107,7 +111,7 @@ public class SDMEventManager extends AbstractEventManager {
 		session.processSupsendedEvent(reason.getTasks().copy(), thread_id, vars);
 		return session.getEventFactory().newSuspendedEvent(reason, vars, thread_id, level, depth);
 	}
-	
+
 	/**
 	 * @param request
 	 * @param event
@@ -116,9 +120,11 @@ public class SDMEventManager extends AbstractEventManager {
 		TaskSet eTasks = ProxyDebugClient.decodeTaskSet(event.getBitSet());
 
 		PDebugUtils.println("Msg: SDMEventManager - fireEvent(): event " + event); //$NON-NLS-1$
-		
+
 		List<IPDIEvent> eventList = new ArrayList<IPDIEvent>() {
 			private static final long serialVersionUID = 1L;
+
+			@Override
 			public boolean add(IPDIEvent e) {
 				PDebugUtils.println("Msg: SDMEventManager - fireEvent(): added PDIEvent: " + e); //$NON-NLS-1$
 				return super.add(e);
@@ -130,8 +136,7 @@ public class SDMEventManager extends AbstractEventManager {
 					session.getTaskManager().setSuspendTasks(false, eTasks);
 					session.processRunningEvent(eTasks.copy());
 					eventList.add(session.getEventFactory().newResumedEvent(session, eTasks, IPDIResumedEvent.CONTINUE));
-				}
-				else if (request instanceof IPDIStepRequest) {
+				} else if (request instanceof IPDIStepRequest) {
 					int details;
 					if (request instanceof IPDIStepIntoRequest)
 						details = IPDIResumedEvent.STEP_INTO;
@@ -149,27 +154,22 @@ public class SDMEventManager extends AbstractEventManager {
 					session.getTaskManager().setSuspendTasks(false, eTasks);
 					session.processRunningEvent(eTasks.copy());
 					eventList.add(session.getEventFactory().newResumedEvent(session, eTasks, details));
-				}
-				else if (request instanceof IPDIEnableBreakpointRequest) {
-				}
-				else if (request instanceof IPDIDisableBreakpointRequest) {
-				}
-				else if (request instanceof IPDIConditionBreakpointRequest) {
-				}
-				else if (request instanceof IPDIDeleteBreakpointRequest) {
-					if (((IPDIBreakpointRequest)request).isAllowUpdate()) {
-						IPDIBreakpoint bpt = ((IPDIDeleteBreakpointRequest)request).getBreakpoint();
+				} else if (request instanceof IPDIEnableBreakpointRequest) {
+				} else if (request instanceof IPDIDisableBreakpointRequest) {
+				} else if (request instanceof IPDIConditionBreakpointRequest) {
+				} else if (request instanceof IPDIDeleteBreakpointRequest) {
+					if (((IPDIBreakpointRequest) request).isAllowUpdate()) {
+						IPDIBreakpoint bpt = ((IPDIDeleteBreakpointRequest) request).getBreakpoint();
 						if (bpt == null) {
 							eventList.add(session.getEventFactory().newErrorEvent(
-									session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, Messages.SDMEventManager_0, Messages.SDMEventManager_1)));
-						}
-						else {
+									session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL,
+											Messages.SDMEventManager_0, Messages.SDMEventManager_1)));
+						} else {
 							eventList.add(session.getEventFactory().newDestroyedEvent(
 									session.getEventFactory().newBreakpointInfo(session, eTasks, bpt)));
 						}
 					}
-				}
-				else if (request instanceof IPDITerminateRequest) {
+				} else if (request instanceof IPDITerminateRequest) {
 					session.getTaskManager().setPendingTasks(false, eTasks);
 					session.getTaskManager().setTerminateTasks(true, eTasks);
 					eventList.add(session.getEventFactory().newDestroyedEvent(
@@ -177,53 +177,33 @@ public class SDMEventManager extends AbstractEventManager {
 					if (session.getTaskManager().isAllTerminated(session.getTasks())) {
 						eventList.add(session.getEventFactory().newDisconnectedEvent(session, session.getTasks()));
 					}
-				}
-				else if (request instanceof IPDIStartDebuggerRequest) {
+				} else if (request instanceof IPDIStartDebuggerRequest) {
 					eventList.add(session.getEventFactory().newConnectedEvent(session, eTasks));
-				}
-				else if (request instanceof IPDISetCurrentStackFrameRequest) {
-				}
-				else if (request instanceof IPDIDeleteVariableRequest) {
-				}
-				else if (request instanceof IPDICommandRequest) {
-				}
-				else {
+				} else if (request instanceof IPDISetCurrentStackFrameRequest) {
+				} else if (request instanceof IPDIDeleteVariableRequest) {
+				} else if (request instanceof IPDICommandRequest) {
+				} else {
 				}
 			}
-		}
-		else if (event instanceof IProxyDebugBreakpointSetEvent) {
-			if (!(request instanceof IPDIBreakpointRequest) || !((IPDIBreakpointRequest)request).isAllowUpdate())  {
-				IProxyDebugBreakpointSetEvent e = (IProxyDebugBreakpointSetEvent)event;
+		} else if (event instanceof IProxyDebugBreakpointSetEvent) {
+			if (!(request instanceof IPDIBreakpointRequest) || !((IPDIBreakpointRequest) request).isAllowUpdate()) {
+				IProxyDebugBreakpointSetEvent e = (IProxyDebugBreakpointSetEvent) event;
 				IPDIBreakpoint bpt = session.getBreakpointManager().getBreakpoint(e.getBreakpointId());
 				if (bpt == null) {
 					eventList.add(session.getEventFactory().newErrorEvent(
-							session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, Messages.SDMEventManager_2, Messages.SDMEventManager_1)));
-				}
-				else {
+							session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL,
+									Messages.SDMEventManager_2, Messages.SDMEventManager_1)));
+				} else {
 					eventList.add(session.getEventFactory().newCreatedEvent(
 							session.getEventFactory().newBreakpointInfo(session, eTasks, bpt)));
 				}
 			}
-		}
-		else if (event instanceof IProxyDebugExitEvent) {
-			IProxyDebugExitEvent e = (IProxyDebugExitEvent)event;
-			session.getTaskManager().setPendingTasks(false, eTasks);
-			session.getTaskManager().setTerminateTasks(true, eTasks);
-			eventList.add(session.getEventFactory().newDestroyedEvent(
-					session.getEventFactory().newExitInfo(session, eTasks, e.getExitStatus())));
-			if (session.getTaskManager().isAllTerminated(session.getTasks())) {
-				try {
-					session.exit();
-					eventList.add(session.getEventFactory().newDisconnectedEvent(session, session.getTasks()));
-				}
-				catch (PDIException ex) {
-					eventList.add(session.getEventFactory().newErrorEvent(
-							session.getEventFactory().newErrorInfo(session, ex.getTasks(), IPDIErrorInfo.DBG_FATAL, Messages.SDMEventManager_3, ex.getMessage())));
-				}
-			}
-		}
-		else if (event instanceof IProxyDebugErrorEvent) {
-			IProxyDebugErrorEvent e = (IProxyDebugErrorEvent)event;
+		} else if (event instanceof IProxyDebugExitEvent) {
+			IProxyDebugExitEvent e = (IProxyDebugExitEvent) event;
+			IPDIExitInfo reason = session.getEventFactory().newExitInfo(session, eTasks, e.getExitStatus());
+			checkTasksExited(eTasks, reason, eventList);
+		} else if (event instanceof IProxyDebugErrorEvent) {
+			IProxyDebugErrorEvent e = (IProxyDebugErrorEvent) event;
 			if (request != null) {
 				request.error(e.getErrorMessage());
 			}
@@ -233,83 +213,103 @@ public class SDMEventManager extends AbstractEventManager {
 				session.getTaskManager().setTerminateTasks(true, eTasks);
 			}
 			eventList.add(session.getEventFactory().newErrorEvent(
-					session.getEventFactory().newErrorInfo(session, eTasks, actionType, Messages.SDMEventManager_4, e.getErrorMessage())));
-		}
-		else if (event instanceof IProxyDebugOutputEvent) {
-			IProxyDebugOutputEvent e = (IProxyDebugOutputEvent)event;
+					session.getEventFactory().newErrorInfo(session, eTasks, actionType, Messages.SDMEventManager_4,
+							e.getErrorMessage())));
+		} else if (event instanceof IProxyDebugOutputEvent) {
+			IProxyDebugOutputEvent e = (IProxyDebugOutputEvent) event;
 			eventList.add(session.getEventFactory().newOutputEvent(session, eTasks, e.getOutput()));
-		}
-		else if (event instanceof IProxyDebugMemoryInfoEvent) {
-		}
-		else if (event instanceof IProxyDebugSignalExitEvent) {
-			IProxyDebugSignalExitEvent e = (IProxyDebugSignalExitEvent)event;
-			session.getTaskManager().setPendingTasks(false, eTasks);
-			session.getTaskManager().setTerminateTasks(true, eTasks);
-			eventList.add(session.getEventFactory().newDestroyedEvent(
-					session.getEventFactory().newSignalInfo(session, eTasks, e.getSignalName(), e.getSignalMeaning(), null, null)));
-			if (session.getTaskManager().isAllTerminated(session.getTasks())) {
-				try {
-					session.exit();
-					eventList.add(session.getEventFactory().newDisconnectedEvent(session, session.getTasks()));
-				}
-				catch (PDIException ex) {
-					eventList.add(session.getEventFactory().newErrorEvent(
-							session.getEventFactory().newErrorInfo(session, ex.getTasks(), IPDIErrorInfo.DBG_FATAL, Messages.SDMEventManager_3, ex.getMessage())));
-				}
-			}
-		}
-		else if (event instanceof IProxyDebugBreakpointHitEvent) {
-			IProxyDebugBreakpointHitEvent e = (IProxyDebugBreakpointHitEvent)event;
+		} else if (event instanceof IProxyDebugMemoryInfoEvent) {
+		} else if (event instanceof IProxyDebugSignalExitEvent) {
+			IProxyDebugSignalExitEvent e = (IProxyDebugSignalExitEvent) event;
+			IPDISignalInfo reason = session.getEventFactory().newSignalInfo(session, eTasks, e.getSignalName(),
+					e.getSignalMeaning(), null, null);
+			checkTasksExited(eTasks, reason, eventList);
+		} else if (event instanceof IProxyDebugBreakpointHitEvent) {
+			IProxyDebugBreakpointHitEvent e = (IProxyDebugBreakpointHitEvent) event;
 			IPDIBreakpoint bpt = session.getBreakpointManager().getBreakpoint(e.getBreakpointId());
 			if (bpt == null) {
 				eventList.add(session.getEventFactory().newErrorEvent(
-						session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL, Messages.SDMEventManager_5, Messages.SDMEventManager_1)));
+						session.getEventFactory().newErrorInfo(session, eTasks, IPDIErrorInfo.DBG_NORMAL,
+								Messages.SDMEventManager_5, Messages.SDMEventManager_1)));
+			} else {
+				eventList.add(createSuspendedEvent(session.getEventFactory().newBreakpointInfo(session, eTasks, bpt),
+						e.getThreadId(), 0, e.getDepth(), e.getChangedVars()));
 			}
-			else {
-				eventList.add(createSuspendedEvent(session.getEventFactory().newBreakpointInfo(session, eTasks, bpt), e.getThreadId(), 0, e.getDepth(), e.getChangedVars()));
-			}
-		}
-		else if (event instanceof IProxyDebugSignalEvent) {
-			IProxyDebugSignalEvent e = (IProxyDebugSignalEvent)event;
+		} else if (event instanceof IProxyDebugSignalEvent) {
+			IProxyDebugSignalEvent e = (IProxyDebugSignalEvent) event;
 			ProxyDebugLocator loc = e.getFrame().getLocator();
-			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
-			eventList.add(createSuspendedEvent(session.getEventFactory().newSignalInfo(session, eTasks, e.getSignalName(), e.getSignalMeaning(), null, locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
-		}
-		else if (event instanceof IProxyDebugStepEvent) {
-			IProxyDebugStepEvent e = (IProxyDebugStepEvent)event;
+			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(),
+					loc.getAddress());
+			eventList.add(createSuspendedEvent(
+					session.getEventFactory()
+							.newSignalInfo(session, eTasks, e.getSignalName(), e.getSignalMeaning(), null, locator), e
+							.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
+		} else if (event instanceof IProxyDebugStepEvent) {
+			IProxyDebugStepEvent e = (IProxyDebugStepEvent) event;
 			ProxyDebugLocator loc = e.getFrame().getLocator();
-			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
-			eventList.add(createSuspendedEvent(session.getEventFactory().newEndSteppingRangeInfo(session, eTasks,  locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
-		}
-		else if (event instanceof IProxyDebugSuspendEvent) {
-			IProxyDebugSuspendEvent e = (IProxyDebugSuspendEvent)event;
+			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(),
+					loc.getAddress());
+			eventList.add(createSuspendedEvent(session.getEventFactory().newEndSteppingRangeInfo(session, eTasks, locator),
+					e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
+		} else if (event instanceof IProxyDebugSuspendEvent) {
+			IProxyDebugSuspendEvent e = (IProxyDebugSuspendEvent) event;
 			ProxyDebugLocator loc = e.getFrame().getLocator();
-			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
-			eventList.add(createSuspendedEvent(session.getEventFactory().newLocationReachedInfo(session, eTasks, locator), e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
-		}
-		else if (event instanceof IProxyDebugTypeEvent) {
-		}
-		else if (event instanceof IProxyDebugVarsEvent) {
-		}
-		else if (event instanceof IProxyDebugDataEvent) { //bypass
-		}
-		else if (event instanceof IProxyDebugArgsEvent) { //bypass
-		}
-		else if (event instanceof IProxyDebugInfoThreadsEvent) { //bypass
-		}
-		else if (event instanceof IProxyDebugSetThreadSelectEvent) { //bypass
-		}
-		else if (event instanceof IProxyDebugSignalsEvent) { //bypass
-		}
-		else if (event instanceof IProxyDebugStackframeEvent) { //bypass
-		}
-		else if (event instanceof IProxyDebugStackInfoDepthEvent) { //bypass
-		}
-		else {
+			IPDILocator locator = PDILocationFactory.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(),
+					loc.getAddress());
+			eventList.add(createSuspendedEvent(session.getEventFactory().newLocationReachedInfo(session, eTasks, locator),
+					e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));
+		} else if (event instanceof IProxyDebugTypeEvent) {
+		} else if (event instanceof IProxyDebugVarsEvent) {
+		} else if (event instanceof IProxyDebugDataEvent) { // bypass
+		} else if (event instanceof IProxyDebugArgsEvent) { // bypass
+		} else if (event instanceof IProxyDebugInfoThreadsEvent) { // bypass
+		} else if (event instanceof IProxyDebugSetThreadSelectEvent) { // bypass
+		} else if (event instanceof IProxyDebugSignalsEvent) { // bypass
+		} else if (event instanceof IProxyDebugStackframeEvent) { // bypass
+		} else if (event instanceof IProxyDebugStackInfoDepthEvent) { // bypass
+		} else {
 		}
 		fireEvents(eventList.toArray(new IPDIEvent[0]));
 	}
-	
+
+	/**
+	 * Handle an event generated when debugged tasks have exited. If all tasks
+	 * have exited, the debugger will terminate.
+	 * 
+	 * @param tasks
+	 *            task set of processes that received the event
+	 * @param reason
+	 *            reason the tasks exited
+	 * @param eventList
+	 *            events to be propagated to client debugger
+	 */
+	private void checkTasksExited(TaskSet tasks, IPDISessionObject reason, List<IPDIEvent> eventList) {
+		/*
+		 * Set the tasks to terminated state
+		 */
+		session.getTaskManager().setPendingTasks(false, tasks);
+		session.getTaskManager().setTerminateTasks(true, tasks);
+
+		/*
+		 * Generate a destroy event to notify the cause of the tasks exiting
+		 */
+		eventList.add(session.getEventFactory().newDestroyedEvent(reason));
+
+		/*
+		 * If all tasks have exited, terminate the debug session.
+		 */
+		if (session.getTaskManager().isAllTerminated(session.getTasks())) {
+			try {
+				session.exit();
+				eventList.add(session.getEventFactory().newDisconnectedEvent(session, session.getTasks()));
+			} catch (PDIException ex) {
+				eventList.add(session.getEventFactory().newErrorEvent(
+						session.getEventFactory().newErrorInfo(session, ex.getTasks(), IPDIErrorInfo.DBG_FATAL,
+								Messages.SDMEventManager_3, ex.getMessage())));
+			}
+		}
+	}
+
 	/**
 	 * @param request
 	 * @param result
