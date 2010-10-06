@@ -18,6 +18,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -59,6 +60,10 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 							Messages.RunAnalyseMPIAnalysiscommandHandler_pleaseSelect);
 			return null;
 		} else {
+			if(isRemote(selection)) {
+				MessageDialog.openInformation(null, Messages.RunAnalyseMPIAnalysiscommandHandler_remoteProjectFound, Messages.RunAnalyseMPIAnalysiscommandHandler_remoteNotSupported);
+				return null;
+			}
 			final boolean reportErrors=true;
 			foundError = analyseBarriers(selection,reportErrors);
 		}
@@ -85,7 +90,8 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 		//int numFiles=this.countFilesSelected();
 		// BRT use numfiles for a progress monitor?
 
-		for(Iterator iter = selection.iterator(); iter.hasNext();){
+		for(@SuppressWarnings("rawtypes")
+		Iterator iter = selection.iterator(); iter.hasNext();){
 			Object obj =  iter.next();
 			// It can be a Project, Folder, File, etc...
 			if (obj instanceof IAdaptable) {
@@ -157,6 +163,53 @@ public class RunAnalyseMPIAnalysiscommandHandler extends RunAnalyseHandler  {
 		}
 
 		return foundError;
+	}
+	
+	/**
+	 * Returns true if resource(s) represented by given selection are remote.
+	 * Note that there may be some uncertainly that it's local if the returned value is false,
+	 * but a returned value of 'true' means the resource is definitely determined to be remote.
+	 * @param selection
+	 * @return
+	 */
+	private boolean isRemote (IStructuredSelection selection) {	
+		Object s1=selection.getFirstElement();
+		if(s1 instanceof IAdaptable) {
+			IAdaptable iAdaptable = (IAdaptable) s1;
+			IResource resource=(IResource) iAdaptable.getAdapter(IResource.class);
+			IProject proj = resource.getProject();
+			if(isRemote(proj)) {
+				return true;
+			}			
+		}
+		return false; 
+
+	}
+	
+
+
+	/**
+	 * should go in a more publicly reusable/accessible place after 5.0 e.g. pldt.common.util.Utility
+	 * @param project
+	 * @return
+	 */
+	private static boolean isRemote(IProject project) {
+		final String REMOTE_NATURE_ID = "org.eclipse.ptp.rdt.core.remoteNature"; //$NON-NLS-1$
+		String[] natureIDs;
+		try {
+			natureIDs = project.getDescription().getNatureIds();
+		} catch (CoreException e) {
+			e.printStackTrace();
+			return false;
+		}
+		for (int i = 0; i < natureIDs.length; i++) {
+			String id = natureIDs[i];
+			if(id.equals(REMOTE_NATURE_ID)) {
+				return true;
+			}		
+		}
+		return false;
+		
 	}
 
 }
