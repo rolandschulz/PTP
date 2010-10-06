@@ -8,21 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.pldt.openmp.core;
+package org.eclipse.ptp.pldt.openmp.internal.core;
 
 import org.eclipse.ptp.pldt.openmp.core.messages.Messages;
 
 /**
- * General IDs - moved to internal class, shouldn't be needed outside this project
  * @author Beth Tibbitts
- * @deprecated 
- * @see org.eclipse.ptp.pldt.openmp.internal.core
- * 
  *
  */
 public class OpenMPIDs {
  
 	public static final String OpenMP_INCLUDES = Messages.OpenMPIDs_OpenMP_includes;
+	// FIXME the following is used as a key?
 	public static final String OpenMP_BUILD_CMD = "gcc -fopenmp"; //$NON-NLS-1$
+	public static final String OPENMP_RECOGNIZE_APIS_BY_PREFIX_ALONE = "openmpRecognizeAPIsByPrefixAlone";//$NON-NLS-1$
 
 }
