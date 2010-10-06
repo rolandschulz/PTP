@@ -11,10 +11,12 @@
 package org.eclipse.ptp.pldt.tests;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,7 +24,11 @@ import org.eclipse.cdt.core.tests.BaseTestFramework;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.pldt.common.IDs;
+import org.osgi.framework.Bundle;
 
 /**
  * Basic Test framework for PLDT tests, extends that of CDT
@@ -35,11 +41,33 @@ public abstract class PldtBaseTestFramework extends BaseTestFramework {
 	protected IFile importFile(String srcDir, String filename) throws Exception {
 		// project.getProject().getFile(filename).delete(true, new
 		// NullProgressMonitor());
+		//testExists(srcDir,filename);
+		assertTrue("Missing file: "+filename, testExists(srcDir,filename));
 		IFile result = super.importFile(filename, readTestFile(srcDir, filename));
 		// project.refreshLocal(IResource.DEPTH_INFINITE, new
 		// NullProgressMonitor());
 		System.out.println("==========Using file: "+result);
+		if(!result.exists()){
+			System.out.println("File: "+result+" not found.");
+		}
 		return result;
+	}
+
+	private boolean testExists(String srcDir, String filename) {
+		// code to retrieve an java.io.InputStream
+
+		String fullname=srcDir+File.separator+filename;
+		IPath path = new Path(fullname);
+		Activator a=Activator.getDefault();
+		Bundle bundle = a.getBundle();
+		URL url = FileLocator.find(bundle, path, null);
+		//System.out.println(url);
+		if(url==null) {
+			//System.out.println(filename+" **NOT FOUND***");
+			return false;
+		}
+		return true;
+
 	}
 
 	protected String readTestFile(String srcDir, String filename) throws IOException, URISyntaxException {
