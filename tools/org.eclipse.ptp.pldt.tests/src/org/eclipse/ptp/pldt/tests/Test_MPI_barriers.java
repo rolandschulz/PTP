@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.pldt.common.IDs;
 import org.eclipse.ptp.pldt.mpi.analysis.actions.RunAnalyseMPIAnalysiscommandHandler;
+import org.eclipse.ptp.pldt.tests.PldtBaseTestFramework.ArtifactWithLine;
 
 
 /**
@@ -68,13 +69,19 @@ public class Test_MPI_barriers extends PldtBaseTestFramework{
 		BarrierSetBasics bsb = new BarrierSetBasics(2,2);
 		barrierBase("testMPIbarriers.c", expectedMarkerLocn, bsb);
 	}
+	public void testMPI_barriers_helloBarrierFnCall() throws Exception{
+		System.out.println("\n==> "+getMethodName()+"()...");
+		int[] expectedMarkerLocn={6,36};
+		BarrierSetBasics bsb = new BarrierSetBasics(2,2);
+		barrierBase("testMPIbarriersFnCall.c", expectedMarkerLocn, bsb);
+	}
 	public void testMPI_barriers_error() throws Exception{
 		System.out.println("\n==> "+getMethodName()+"()...");
-		int[] expectedMarkerLocn={33,42};
-		BarrierSetBasics bsb = new BarrierSetBasics(2,2,true);
+		int[] expectedMarkerLocn={33};
+		BarrierSetBasics bsb = new BarrierSetBasics(1,1,true);
 		barrierBase("testMPIbarriersErr.c", expectedMarkerLocn, bsb);
 	}
-	public void barrierBase(String filename, int[] expectedMarkerLocn, BarrierSetBasics bsb) throws Exception {	
+	public void barrierBase(String filename, int[] expectedLinenos, BarrierSetBasics bsb) throws Exception {	
 		
 		IFile file = importFile("resources", filename);
 		assertNotNull(file);
@@ -118,18 +125,36 @@ public class Test_MPI_barriers extends PldtBaseTestFramework{
 		
 		//=================================
 		IMarker[] markers=file.findMarkers(barrierMarkerID, true, IResource.DEPTH_INFINITE);
-		int expectedNumber=expectedMarkerLocn.length;
+		int expectedNumber=expectedLinenos.length;
 		assertNotNull(expectedNumber+" Barrier Markers should be found",markers);
 		System.out.println("numMarkers: "+markers.length+"    number expected: "+expectedNumber);
 		assertEquals(expectedNumber+" barrier markers should be found on "+filename,expectedNumber, markers.length);
 	
-		// will these always appear in the same order? may need to sort before testing/comparison
+		//////////////
+		ArtifactWithLine[] expectedArts = new ArtifactWithLine[expectedLinenos.length];
+		ArtifactWithLine[] markerArts = new ArtifactWithLine[markers.length];
+		for (int i = 0; i < expectedArts.length; i++) {
+			expectedArts[i]=new ArtifactWithLine(expectedLinenos[i],"barrier");		
+		}
+		for (int i = 0; i < markerArts.length; i++) {
+			markerArts[i]=new ArtifactWithLine(markers[i]);
+		}
+		Arrays.sort(expectedArts);
+		Arrays.sort(markerArts);
+		
+		assertEquals(expectedArts.length, markerArts.length);
+		
+		// Since these tests are in a loop, if one fails, must inspect the Console output to know which ones finished and which one failed.
 		for (int i = 0; i < markers.length; i++) {
-			IMarker marker = markers[i];
-			//showMarker(marker);
-			int lineNo=(Integer) marker.getAttribute(IMarker.LINE_NUMBER);
-			System.out.println(i+ " marker: lineNo "+lineNo+ " name: "+marker.getAttribute(IDs.NAME)+"   expectedLocn: "+expectedMarkerLocn[i]);
-			assertEquals("expected barrier marker locn",expectedMarkerLocn[i], lineNo);
+			// Marker should be on the line number we expect
+			System.out.println(i+". "+expectedArts[i].getLineNo()+" = "+markerArts[i].getLineNo());			
+			assertEquals(expectedArts[i].getLineNo(), markerArts[i].getLineNo());
+			///
+//			IMarker marker = markers[i];
+//			//showMarker(marker);
+//			int lineNo=(Integer) marker.getAttribute(IMarker.LINE_NUMBER);
+//			System.out.println(i+ " marker: lineNo "+lineNo+ " name: "+marker.getAttribute(IDs.NAME)+"   expectedLocn: "+expectedLinenos[i]);
+//			assertEquals("expected barrier marker locn",expectedLinenos[i], lineNo);
 		}
 		
 		barrierSetTest(filename, file, bsb);
@@ -145,7 +170,7 @@ public class Test_MPI_barriers extends PldtBaseTestFramework{
 		markers=file.findMarkers(barrierSetMarkerID, true, IResource.DEPTH_INFINITE);
 		//assertNotNull("2 Barrier Markers should be found",markers);
 		
-		int[] expectedMarkerLocn2= {7,10,7,10,7,10};
+		int[] expectedMarkerLocn2= {7,10,7,10,7,10};// actual values are unused?  6 members: 2 parents, two child nodes each?
 		
 		int expectedLen=expectedMarkerLocn2.length;
 		System.out.println("===============Barrier Sets: numMarkers: "+markers.length+"  expected: "+expectedLen);
@@ -199,7 +224,7 @@ public class Test_MPI_barriers extends PldtBaseTestFramework{
 //			
 //			//assertEquals("expected barrier marker locn",expectedMarkerLocn2[i], lineNo);
 //		}
-		System.out.println("end");
+		System.out.println("end barrier set inspection. ");
 	}
 	
 	String showMarker(IMarker marker) {
