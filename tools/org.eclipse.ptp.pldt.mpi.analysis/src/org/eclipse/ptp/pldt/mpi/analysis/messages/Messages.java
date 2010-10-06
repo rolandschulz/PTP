@@ -15,6 +15,8 @@ public class Messages extends NLS {
 	public static String MPIErrorView_matchingSetArtifacts;
 	public static String RunAnalyseMPIAnalysiscommandHandler_noFilesSelectedForAnalysis;
 	public static String RunAnalyseMPIAnalysiscommandHandler_pleaseSelect;
+	public static String RunAnalyseMPIAnalysiscommandHandler_remoteNotSupported;
+	public static String RunAnalyseMPIAnalysiscommandHandler_remoteProjectFound;
 	public static String ShowMatchSet_noBarrierAnalysisHasBeenPerformed;
 	public static String ShowMatchSet_noSelectionsMade;
 	public static String ShowMatchSet_noSelectionsMande;
