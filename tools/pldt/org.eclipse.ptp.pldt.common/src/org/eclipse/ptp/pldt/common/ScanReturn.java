@@ -46,5 +46,8 @@ public class ScanReturn
     {
         artifacts.add(a);
     }
+    public String toString() {
+    	return "ScanReturn with "+artifacts.size()+" artifacts";
+    }
 
 }
