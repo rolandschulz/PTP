@@ -72,7 +72,7 @@ void EventNotify::freeze(int id, void *ret_val)
     while (serialTest[id].notified == false) {
         ::pthread_cond_wait(&cond, &mtx);
     }
-    serialTest[id].freezed = false;
+    serialTest[id].freezed == false;
     serialTest[id].used = false;
     unlock();
 }
@@ -81,6 +81,7 @@ void EventNotify::notify(int id)
 {
     test(id);
     lock();
+    serialTest[id].used = false;
     serialTest[id].notified = true;
     ::pthread_cond_broadcast(&cond); 
     unlock();
@@ -90,6 +91,18 @@ void * EventNotify::getRetVal(int id)
 {
     test(id);
     return serialTest[id].ret;
+}
+
+bool EventNotify::getState(int id)
+{
+    bool state;
+
+    assert((id >= 0) && (id < MAX_SERIAL_NUM));
+    lock();
+    state = serialTest[id].used;
+    unlock();
+
+    return state;
 }
 
 bool EventNotify::test(int id)

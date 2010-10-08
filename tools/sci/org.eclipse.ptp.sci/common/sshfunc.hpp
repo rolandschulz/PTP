@@ -63,6 +63,7 @@ class SshFunc
         SshFunc();
         static SshFunc *instance;
         int set_auth_module(char *name, char *fpath, char *opts);
+        int getSizes(char *fmt);
         
     public:
         ~SshFunc();
@@ -88,6 +89,12 @@ class SshFunc
         int verify_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs);
         int sign_data(char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs);
         int verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs);
+        int sign_data(struct iovec *sigbufs, int num_bufs, ...);
+        int verify_data(struct iovec *sigbufs, int num_bufs, ...);
+        int sign_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...);
+        int verify_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...);
+        int sign_data(struct iovec *sigbufs, char *fmt, ...);
+        int verify_data(struct iovec *sigbufs, char *fmt, ...);
 };
 
 #define SSHFUNC SshFunc::getInstance()

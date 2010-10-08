@@ -17,7 +17,7 @@
     output: a stream
     action: relay messages from the queue to the stream.
    
- Author: Nicole Nie
+ Author: Nicole Nie, Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -34,17 +34,27 @@
 #include "socket.hpp"
 
 #include "ctrlblock.hpp"
+#include "tools.hpp"
 #include "message.hpp"
 #include "stream.hpp"
 #include "queue.hpp"
+#include "readerproc.hpp"
 
 WriterProcessor::WriterProcessor(int hndl) 
-    : Processor(hndl)
+    : Processor(hndl), peerProcessor(NULL)
 {
     name = "Writer";
 
     inQueue = NULL;
     outStream = NULL;
+}
+
+WriterProcessor::~WriterProcessor()
+{
+    if (outStream && toShutdown)
+        delete outStream;
+    if (inQueue)
+        delete inQueue;
 }
 
 Message * WriterProcessor::read()
@@ -60,7 +70,6 @@ Message * WriterProcessor::read()
 
 void WriterProcessor::process(Message * msg)
 {
-    assert(msg);
     // no action
 }
 
@@ -79,12 +88,15 @@ void WriterProcessor::seize()
 
 void WriterProcessor::clean()
 {
-    outStream->stopWrite();
-}
-
-bool WriterProcessor::isActive()
-{
-    return gCtrlBlock->isEnabled() || (inQueue->getSize() > 0);
+    if (toShutdown)
+        outStream->stopWrite();
+    if (peerProcessor) {
+        while (!peerProcessor->isLaunched()) {
+            SysUtil::sleep(1000);
+        }  
+        peerProcessor->join(); // ReaderProcessor
+        delete peerProcessor;
+    }
 }
 
 void WriterProcessor::setInQueue(MessageQueue * queue)
@@ -97,9 +109,17 @@ void WriterProcessor::setOutStream(Stream * stream)
     outStream = stream;
 }
 
-void WriterProcessor::stop()
+MessageQueue * WriterProcessor::getInQueue()
 {
-    setState(false);
-    inQueue->notify();
+    return inQueue;
 }
 
+void WriterProcessor::setPeerProcessor(ReaderProcessor * processor)
+{
+    peerProcessor =  processor;
+}
+
+ReaderProcessor *WriterProcessor::getPeerProcessor()
+{
+    return peerProcessor;
+}

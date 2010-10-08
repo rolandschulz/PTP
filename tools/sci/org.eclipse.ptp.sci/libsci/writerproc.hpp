@@ -17,7 +17,7 @@
     output: a stream
     action: relay messages from the queue to the stream.
    
- Author: Nicole Nie
+ Author: Nicole Nie, Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -33,15 +33,17 @@
 
 class Stream;
 class MessageQueue;
+class ReaderProcessor;
 
 class WriterProcessor : public Processor 
 {
     private:
-        MessageQueue        *inQueue;
         Stream              *outStream;
+        ReaderProcessor     *peerProcessor;
 
     public:
         WriterProcessor(int hndl = -1);
+        ~WriterProcessor();
 
         virtual Message * read();
         virtual void process(Message *msg);
@@ -49,12 +51,11 @@ class WriterProcessor : public Processor
         virtual void seize();
         virtual void clean();
 
-        virtual bool isActive();
-
         void setInQueue(MessageQueue *queue);
+        MessageQueue * getInQueue();
         void setOutStream(Stream *stream);
-
-        void stop();
+        void setPeerProcessor(ReaderProcessor *processor);
+        ReaderProcessor *getPeerProcessor();
 };
 
 #endif

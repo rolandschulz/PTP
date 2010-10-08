@@ -1,0 +1,1 @@
+under aix, users should install gmake first and type gmake instead of make to do the compiling

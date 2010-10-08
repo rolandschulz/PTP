@@ -33,13 +33,15 @@
 #include <assert.h>
 
 #include "log.hpp"
+#include "tools.hpp"
 #include "exception.hpp"
 #include "socket.hpp"
 
 #include "message.hpp"
+#include "queue.hpp"
 
 Processor::Processor(int hndl) 
-    : Thread(hndl)
+    : Thread(hndl), inQueue(NULL), outQueue(NULL), toShutdown(false)
 {
     name = "Processor";
 
@@ -52,7 +54,7 @@ void Processor::run()
     log_debug("Processor %s: started", name.c_str());
     
     Message *msg = NULL;
-    while (getState() && isActive()) {
+    while (getState() || isActive()) {
         try {
             // read a message
             msg = read();
@@ -64,7 +66,7 @@ void Processor::run()
             totalCount++;
             totalSize += msg->getContentLen();
             log_debug("Processor %s: processing a message, type=%d, filter ID=%d, group=%d, size=%d", 
-                name.c_str(), msg->getType(), msg->getFilterID(), msg->getGroup(), msg->getContentLen());
+                    name.c_str(), msg->getType(), msg->getFilterID(), msg->getGroup(), msg->getContentLen());
 
             // process the message
             process(msg);
@@ -100,6 +102,25 @@ void Processor::run()
     clean();
     
     log_debug("Processor %s: exited", name.c_str());
+}
+
+void Processor::release()
+{
+    while (!isLaunched()) {
+        // before join, this thread should have been launched
+        SysUtil::sleep(1000);
+    } 
+    setState(false);
+    if (inQueue)
+        inQueue->release();
+    join();
+}
+
+bool Processor::isActive()
+{
+    if (inQueue)
+        return (inQueue->getSize() > 0);
+    return false;
 }
 
 void Processor::dump()

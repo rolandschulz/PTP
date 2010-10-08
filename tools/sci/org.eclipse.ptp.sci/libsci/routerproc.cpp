@@ -27,8 +27,8 @@
 
 ****************************************************************************/
 
-#include "routerproc.hpp"
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 #include "sci.h"
@@ -37,8 +37,8 @@
 #include "exception.hpp"
 #include "socket.hpp"
 
+#include "routerproc.hpp"
 #include "ctrlblock.hpp"
-#include "statemachine.hpp"
 #include "message.hpp"
 #include "queue.hpp"
 #include "filter.hpp"
@@ -46,31 +46,37 @@
 #include "routinglist.hpp"
 #include "topology.hpp"
 #include "eventntf.hpp"
+#include "privatedata.hpp"
 
-RouterProcessor::RouterProcessor(int hndl) 
-    : Processor(hndl), curFilterID(SCI_FILTER_NULL), curGroup(SCI_GROUP_ALL)
+RouterProcessor::RouterProcessor(int hndl, RoutingList *rlist, FilterList *flist) 
+    : Processor(hndl), curFilterID(SCI_FILTER_NULL), curGroup(SCI_GROUP_ALL), inStream(NULL), routingList(rlist), filterList(flist), joinSegs(false)
 {
     name = "Router";
+    PrivateData *pData = new PrivateData(routingList, filterList, NULL, this);
+    setSpecific(pData);
+}
 
-    inQueue = NULL;
+RouterProcessor::~RouterProcessor()
+{
+    if (inQueue)
+        delete inQueue;
 }
 
 Message * RouterProcessor::read()
 {
-    assert(inQueue);
+    assert(inQueue || inStream);
 
     Message *msg = NULL;
-    msg = inQueue->consume();
-    
-    if (msg && (msg->getType() == Message::SEGMENT) && (msg->getFilterID() == SCI_JOIN_SEGMENT)) {
-        int segnum = msg->getID() - 1; // exclude the SEGMENT header
-        Message **segments = (Message **)::malloc(segnum * sizeof(Message *));
-        inQueue->remove();
-
+    if (inStream) {
         msg = new Message();
-        inQueue->multiConsume(segments, segnum);
-        msg->joinSegments(segments, segnum);
-        ::free(segments);
+        *inStream >> *msg;
+    } else {
+        msg = inQueue->consume();
+    }
+
+    if (msg && (msg->getType() == Message::SEGMENT) && (msg->getFilterID() == SCI_JOIN_SEGMENT)) {
+        joinSegs = true;
+        msg = Message::joinSegments(msg, inStream, inQueue);
     }
 
     return msg;
@@ -78,22 +84,20 @@ Message * RouterProcessor::read()
 
 void RouterProcessor::process(Message * msg)
 {
-    assert(msg);
-
     Filter *filter = NULL;
-    Topology *topo = NULL;
+    Topology *topo = routingList->getTopology();
     int rc;
     
     switch (msg->getType()) {
         case Message::SEGMENT:
-            gRoutingList->bcast(msg->getGroup(), msg);
+            routingList->bcast(msg->getGroup(), msg);
             break;
         case Message::COMMAND:
             if (msg->getFilterID() == SCI_FILTER_NULL) {
                 // bcast the message
-                gRoutingList->bcast(msg->getGroup(), msg);
+                routingList->bcast(msg->getGroup(), msg);
             } else {
-                filter = gFilterList->getFilter(msg->getFilterID());
+                filter = filterList->getFilter(msg->getFilterID());
                 if (filter != NULL) {
                     // call user's filter handler
                     curFilterID = msg->getFilterID();
@@ -101,14 +105,14 @@ void RouterProcessor::process(Message * msg)
                     filter->input(msg->getGroup(), msg->getContentBuf(), msg->getContentLen());
                 } else {
                     // bcast the message
-                    gRoutingList->bcast(msg->getGroup(), msg);
+                    routingList->bcast(msg->getGroup(), msg);
                 }
             }
             break;
         case Message::CONFIG:
-            topo = new Topology(-1);
             topo->unpackMsg(*msg);
-            gCtrlBlock->setTopology(topo);
+            topo->setRoutingList(routingList);
+            topo->setFilterList(filterList);
             
             rc = topo->deploy();
             if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
@@ -121,9 +125,9 @@ void RouterProcessor::process(Message * msg)
             if (msg->getType() == Message::FILTER_LOAD) {
                 filter = new Filter();
                 filter->unpackMsg(*msg);
-                rc = gFilterList->loadFilter(filter->getId(), filter);
+                rc = filterList->loadFilter(filter->getId(), filter);
             } else {
-                rc = gFilterList->unloadFilter(msg->getFilterID());
+                rc = filterList->unloadFilter(msg->getFilterID());
             }
 
             if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
@@ -131,10 +135,10 @@ void RouterProcessor::process(Message * msg)
                 gNotifier->notify(msg->getID());   
             }
 
-            gRoutingList->bcast(SCI_GROUP_ALL, msg);
+            routingList->bcast(SCI_GROUP_ALL, msg);
             break;
         case Message::FILTER_LIST:
-            gFilterList->loadFilterList(*msg);
+            filterList->loadFilterList(*msg);
             break;
         case Message::GROUP_CREATE:
         case Message::GROUP_FREE:
@@ -142,7 +146,7 @@ void RouterProcessor::process(Message * msg)
         case Message::GROUP_OPERATE_EXT:
         case Message::GROUP_DROP:
         case Message::GROUP_MERGE:
-            gRoutingList->parseCmd(msg);
+            routingList->parseCmd(msg);
             break;
         case Message::BE_ADD:
             rc = gCtrlBlock->getTopology()->addBE(msg);
@@ -158,15 +162,20 @@ void RouterProcessor::process(Message * msg)
                 gNotifier->notify(msg->getID());
             }
             break;
+        case Message::RELEASE:
+            toShutdown = false;
+            routingList->bcast(SCI_GROUP_ALL, msg);
+            setState(false);
+            break;
         case Message::QUIT:
-            gStateMachine->parse(StateMachine::USER_QUIT);
-            gRoutingList->bcast(SCI_GROUP_ALL, msg);
+            routingList->bcast(SCI_GROUP_ALL, msg);
+            setState(false);
             break;
         case Message::UNCLE_LIST:
         case Message::ERROR_EVENT:
         case Message::SHUTDOWN:
         case Message::KILLNODE:
-            gRoutingList->bcast(SCI_GROUP_ALL, msg);
+            routingList->bcast(SCI_GROUP_ALL, msg);
             break;
         default:
             log_error("Processor %s: received unknown command", name.c_str());
@@ -176,25 +185,31 @@ void RouterProcessor::process(Message * msg)
 
 void RouterProcessor::write(Message * msg)
 {
-    assert(msg);
-    
-    // almost no action
+    if (joinSegs || inStream) {
+        joinSegs = false;
+        if (msg->decRefCount() == 0)
+            delete msg;
+        return;
+    }
+        
     inQueue->remove();
 }
 
 void RouterProcessor::seize()
 {
-    gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
+    Message *msg = new Message();
+
+    msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::QUIT);
+    routingList->bcast(SCI_GROUP_ALL, msg);
+    setState(false);
 }
 
 void RouterProcessor::clean()
 {
-    // no action
-}
-
-bool RouterProcessor::isActive()
-{
-    return gCtrlBlock->isEnabled() || (inQueue->getSize() > 0);
+    if (inStream && toShutdown)
+        inStream->stopRead();
+    routingList->stopRouting(toShutdown);
+    gCtrlBlock->disable();
 }
 
 int RouterProcessor::getCurFilterID()
@@ -210,5 +225,20 @@ sci_group_t RouterProcessor::getCurGroup()
 void RouterProcessor::setInQueue(MessageQueue * queue)
 {
     inQueue = queue;
+}
+
+MessageQueue * RouterProcessor::getInQueue()
+{
+    return inQueue;
+}
+
+void RouterProcessor::setInStream(Stream * stream)
+{
+    inStream = stream;
+}
+
+RoutingList * RouterProcessor::getRoutingList()
+{
+    return routingList;
 }
 

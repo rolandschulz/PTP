@@ -38,34 +38,36 @@
 #include "log.hpp"
 #include "tools.hpp"
 
-#include "statemachine.hpp"
 #include "eventntf.hpp"
+#include "handlerproc.hpp"
+#include "embedagent.hpp"
+#include "purifierproc.hpp"
 #include "topology.hpp"
 #include "routinglist.hpp"
+#include "privatedata.hpp"
 #include "message.hpp"
 #include "queue.hpp"
 #include "listener.hpp"
-#include "errinjector.hpp"
 #include "processor.hpp"
 #include "routerproc.hpp"
 #include "filterproc.hpp"
 #include "observer.hpp"
-#include "parent.hpp"
 
 const long long FLOWCTL_THRESHOLD = 1024 * 1024 * 1024 * 2LL;
 
 CtrlBlock * CtrlBlock::instance = NULL;
+extern SCI_msg_hndlr *gHndlr;
+extern void *gParam;
 
 CtrlBlock::CtrlBlock()
     : role(INVALID)
 {
     endInfo = NULL;
-    topoInfo = NULL;
     
-    listener = NULL;
-    errInjector = NULL;
     routerProc = NULL;
     filterProc = NULL;
+    purifierProc = NULL;
+    handlerProc = NULL;
     observer = NULL;
 
     routerInQueue = NULL;
@@ -77,16 +79,10 @@ CtrlBlock::CtrlBlock()
     monitorInQueue = NULL;
     errorQueue = NULL;
 
+    released = false;
     parentStream = NULL;
-
-    queues.clear();
-    streams.clear();
-    processors.clear();
-
-    queueInfo.clear();
-
-    enabled = false;
-    ctrlID = gNotifier->allocate();
+    embedAgents.clear();
+    enableID = gNotifier->allocate();
 
     // flow control threshold
     thresHold = FLOWCTL_THRESHOLD;
@@ -94,15 +90,13 @@ CtrlBlock::CtrlBlock()
     if(envp != NULL) {
         thresHold = ::atoll(envp);
     } 
-
-    ::pthread_mutex_init(&mtx, NULL);
+    ::pthread_mutex_init(&mtx, NULL); 
 }
 
 CtrlBlock::~CtrlBlock()
 {
-    ::pthread_mutex_destroy(&mtx);
-
     instance = NULL;
+    ::pthread_mutex_destroy(&mtx);
 }
 
 CtrlBlock::ROLE CtrlBlock::getMyRole() 
@@ -110,9 +104,19 @@ CtrlBlock::ROLE CtrlBlock::getMyRole()
     return role; 
 }
 
+void CtrlBlock::setMyRole(CtrlBlock::ROLE ro) 
+{
+    role = ro; 
+}
+
 int CtrlBlock::getMyHandle() 
 { 
     return handle; 
+}
+
+void CtrlBlock::setMyHandle(int hndl) 
+{ 
+    handle = hndl;
 }
 
 sci_info_t * CtrlBlock::getEndInfo() 
@@ -125,149 +129,140 @@ int CtrlBlock::getJobKey()
     return jobKey; 
 }
 
-int CtrlBlock::initFE(int hndl, sci_info_t * info)
+void CtrlBlock::setJobKey(int key) 
+{ 
+    jobKey = key;
+}
+
+int CtrlBlock::init(sci_info_t * info)
 {
-    role = FRONT_END;
-    handle = hndl;
+    char *envp = NULL;
+
+    if (info == NULL) {
+        role = AGENT;
+        return SCI_SUCCESS;
+    } 
+
     endInfo = (sci_info_t *) ::malloc(sizeof(sci_info_t));
     if (NULL == endInfo) {
         return SCI_ERR_NO_MEM;
     }
-    
     ::memset(endInfo, 0, sizeof(sci_info_t));
     ::memcpy(endInfo, info, sizeof(sci_info_t));
+    gHndlr = info->be_info.hndlr;
+    gParam = info->be_info.param;
 
-    char *envp = ::getenv("SCI_JOB_KEY");
-    if (envp) {
-        // use user's job key
-        jobKey = ::atoi(envp);
-    } else {
-        // generate a random job key
-        ::srand((unsigned int) ::time(NULL));
-        jobKey = ::rand();
+    switch (info->type) {
+        case SCI_FRONT_END:
+            handle = -1;
+            role = FRONT_END;
+            envp = ::getenv("SCI_JOB_KEY");
+            if (envp) {
+                // use user's job key
+                jobKey = ::atoi(envp);
+            } else {
+                // generate a random job key
+                ::srand((unsigned int) ::time(NULL));
+                jobKey = ::rand();
+            }
+            break;
+        case SCI_BACK_END:
+            role = BACK_END;
+            envp = ::getenv("SCI_JOB_KEY");
+            if (envp != NULL)
+                jobKey = ::atoi(envp);
+            envp = ::getenv("SCI_CLIENT_ID");
+            if (envp != NULL)
+                handle = ::atoi(envp);
+            break;
+        default:
+            return SCI_ERR_INVALID_ENDTYPE;
     }
 
-    gStateMachine->reset();
     return SCI_SUCCESS;
 }
 
-int CtrlBlock::initAgent(int hndl)
+int CtrlBlock::numOfChildrenFds()
 {
-    role = AGENT;
-    handle = hndl;
+    int num = 0;
+    RoutingList *rtList = NULL;
+/*
+    if (purifierProc) {
+        while (!purifierProc->isLaunched()) {
+            // before join, this thread should have been launched
+            SysUtil::sleep(1000);
+        } 
+    } */
+    lock();
+    AGENT_MAP::iterator it;
+    for (it = embedAgents.begin(); it != embedAgents.end(); it++) {
+        rtList = it->second->getRoutingList();
+        num += rtList->numOfStreams();
+    }
+    unlock();
 
-    char *envp = ::getenv("SCI_JOB_KEY");
-    if (envp == NULL)
-        return SCI_ERR_INVALID_JOBKEY;
-    jobKey = ::atoi(envp);
-    
-    gStateMachine->reset();
-    return SCI_SUCCESS;
+    return num;
 }
 
-int CtrlBlock::initBE(int hndl, sci_info_t * info)
+int CtrlBlock::getChildrenSockfds(int *fds)
 {
-    role = BACK_END;
-    handle = hndl;
-    endInfo = (sci_info_t *) ::malloc(sizeof(sci_info_t));
-    if (NULL == endInfo) {
-        return SCI_ERR_NO_MEM;
+    int pos = 0;
+    RoutingList *rtList = NULL;
+/*
+    if (purifierProc) {
+        while (!purifierProc->isLaunched()) {
+            // before join, this thread should have been launched
+            SysUtil::sleep(1000);
+        } 
+    } */
+    lock();
+    AGENT_MAP::iterator it;
+    for (it = embedAgents.begin(); it != embedAgents.end(); it++) {
+        rtList = it->second->getRoutingList();
+        pos += rtList->getStreamsSockfds(&fds[pos]);
     }
-    
-    ::memcpy(endInfo, info, sizeof(sci_info_t));
-    
-    handle = hndl;
+    unlock();
 
-    char *envp = ::getenv("SCI_JOB_KEY");
-    if (envp == NULL)
-        return SCI_ERR_INVALID_JOBKEY;
-    jobKey = ::atoi(envp);
-
-    gStateMachine->reset();
-    return SCI_SUCCESS;
+    return pos;
 }
 
 void CtrlBlock::term()
 {
-    gNotifier->freeze(ctrlID, NULL);
-
-    // stop listener if have
-    if (listener != NULL) {
-        listener->stop();
-        listener->join();
+    gNotifier->freeze(enableID, NULL);
+    if (purifierProc) {
+        purifierProc->release();
+        delete purifierProc;
     }
-
-    // stop error injector if have
-    if (errInjector != NULL) {
-        errInjector->stop();
-        errInjector->join();
+    lock();
+    AGENT_MAP::iterator it;
+    for (it = embedAgents.begin(); it != embedAgents.end(); it++) {
+        delete it->second;
     }
-
-    // produce a NULL message in all message queues
-    QUEUE_VEC::iterator qit = queues.begin();
-    for (; qit!=queues.end(); ++qit) {
-        (*qit)->notify();
+    embedAgents.clear();
+    unlock();
+    if (handlerProc) {
+        handlerProc->release();
+        delete handlerProc;
     }
-
-    // close all streams
-    STREAM_VEC::iterator sit = streams.begin();
-    for (; sit!=streams.end(); ++sit) {
-        (*sit)->stop();
-    }
-
-    // waiting for all processor threads terminate
-    PROC_VEC::iterator pit = processors.begin();
-    for (; pit!=processors.end(); ++pit) {
-        while (!(*pit)->isLaunched()) {
-            // before join, this thread should have been launched
-            SysUtil::sleep(1000);
-        }
-        (*pit)->join();
-    }
-
     clean();
+}
+
+EmbedAgent * CtrlBlock::getAgent(int hndl)
+{
+    EmbedAgent *agent;
+    lock();
+    assert(embedAgents.find(hndl) != embedAgents.end());
+    agent = embedAgents[hndl];
+    unlock();
+
+    return agent;
 }
 
 void CtrlBlock::clean()
 {
-    // delete all registered processors
-    PROC_VEC::iterator pit = processors.begin();
-    for (; pit!=processors.end(); ++pit) {
-        (*pit)->dump();
-        delete (*pit);
-    }
-    processors.clear();
-
-    // delete all registered streams
-    STREAM_VEC::iterator sit = streams.begin();
-    for (; sit!=streams.end(); ++sit) {
-        delete (*sit);
-    }
-    streams.clear();
-
-    // delete all registered message queues
-    QUEUE_VEC::iterator qit = queues.begin();
-    for (; qit!=queues.end(); ++qit) {
-        delete (*qit);
-    }
-    queues.clear();
-
-    queueInfo.clear();
-
-    // delete listener
-    if (listener != NULL) {
-        delete listener;
-        listener = NULL;
-    }
-
-    // delete error injector
-    if (errInjector!= NULL) {
-        delete errInjector;
-        errInjector = NULL;
-    }
-
     routerProc = NULL;
     filterProc = NULL;
+    purifierProc = NULL;
 
     routerInQueue = NULL;
     filterInQueue = NULL;
@@ -285,13 +280,6 @@ void CtrlBlock::clean()
         observer = NULL;
     }
 
-    if (topoInfo) {
-        delete topoInfo;
-        topoInfo = NULL;
-    }
-
-    gStateMachine->parse(StateMachine::DATASTUCT_CLEANED);
-
     role = INVALID;
     if (endInfo) {
         ::free(endInfo);
@@ -299,27 +287,24 @@ void CtrlBlock::clean()
     }
 }
 
-
 void CtrlBlock::enable()
 {
-    enabled = true;
 }
 
 void CtrlBlock::disable()
 {
-    if (!enabled) // already disabled?
+    if (!isEnabled())
         return;
-    
-    gNotifier->notify(ctrlID);
-    enabled = false;
+
+    gNotifier->notify(enableID);
 }
 
 bool CtrlBlock::isEnabled() 
 { 
-    return enabled;
+    return gNotifier->getState(enableID);
 }
 
-void CtrlBlock::notifyPollQueue()
+void CtrlBlock::releasePollQueue()
 {
     // so far, valid for polling mode only
     assert(role != AGENT);
@@ -328,76 +313,19 @@ void CtrlBlock::notifyPollQueue()
     pollQueue->produce(msg);
 }
 
-void CtrlBlock::setTopology(Topology *topo) 
-{ 
-    topoInfo = topo; 
-}
-
-void CtrlBlock::setListener(Listener *li) 
-{
-    listener = li;
-}
-
 void CtrlBlock::setObserver(Observer *ob) 
 {
     observer = ob;
 }
 
-void CtrlBlock::setErrorInjector(ErrorInjector *injector) 
-{
-    errInjector = injector;
-}
-
 Topology * CtrlBlock::getTopology() 
 { 
-    return topoInfo;
-}
-
-Listener * CtrlBlock::getListener() 
-{
-    return listener;
+    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    return pData->getRoutingList()->getTopology();
 }
 
 Observer * CtrlBlock::getObserver() {
     return observer;
-}
-
-void CtrlBlock::registerQueue(MessageQueue *queue) 
-{
-    queues.push_back(queue);
-}
-
-void CtrlBlock::registerProcessor(Processor *proc) 
-{
-    processors.push_back(proc);
-}
-
-void CtrlBlock::registerStream(Stream *stream) 
-{
-    streams.push_back(stream);
-}
-
-/* need lock protection */
-void CtrlBlock::mapQueue(int hndl, MessageQueue *queue) 
-{
-    lock();
-    queueInfo[hndl] = queue;
-    unlock();
-}
-
-/* need lock protection */
-MessageQueue * CtrlBlock::queryQueue(int hndl) 
-{
-    MessageQueue *queue = NULL;
-
-    lock();
-    QUEUE_MAP::iterator qit = queueInfo.find(hndl);
-    if (qit != queueInfo.end()) {
-        queue = (*qit).second;
-    }
-    unlock();
-    
-    return queue;
 }
 
 void CtrlBlock::setRouterInQueue(MessageQueue * queue)
@@ -408,21 +336,6 @@ void CtrlBlock::setRouterInQueue(MessageQueue * queue)
 void CtrlBlock::setFilterInQueue(MessageQueue *queue) 
 {
     filterInQueue = queue;
-}
-
-void CtrlBlock::setFilterOutQueue(MessageQueue *queue) 
-{
-    filterOutQueue = queue;
-}
-
-void CtrlBlock::setPurifierOutQueue(MessageQueue *queue) 
-{
-    purifierOutQueue = queue;
-}
-
-void CtrlBlock::setUpQueue(MessageQueue * queue)
-{
-    upQueue = queue;
 }
 
 void CtrlBlock::setPollQueue(MessageQueue *queue) 
@@ -450,21 +363,6 @@ MessageQueue * CtrlBlock::getFilterInQueue()
     return filterInQueue;
 }
 
-MessageQueue * CtrlBlock::getFilterOutQueue() 
-{
-    return filterOutQueue;
-}
-
-MessageQueue * CtrlBlock::getPurifierOutQueue() 
-{
-    return purifierOutQueue;
-}
-
-MessageQueue * CtrlBlock::getUpQueue()
-{
-    return upQueue;
-}
-
 MessageQueue * CtrlBlock::getPollQueue() 
 {
     return pollQueue;
@@ -490,24 +388,47 @@ void CtrlBlock::setFilterProcessor(FilterProcessor *proc)
     filterProc = proc;
 }
         
+void CtrlBlock::setHandlerProcessor(HandlerProcessor *proc) 
+{
+    handlerProc = proc;
+}
+        
+void CtrlBlock::setPurifierProcessor(PurifierProcessor *proc) 
+{
+    purifierProc = proc;
+}
+        
+void CtrlBlock::setUpQueue(MessageQueue * queue)
+{
+    upQueue = queue;
+}
+
+MessageQueue * CtrlBlock::getUpQueue()
+{
+        return upQueue;
+}
+
 RouterProcessor * CtrlBlock::getRouterProcessor() 
 {
-    return routerProc;
+    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    return pData->getRouterProcessor();
 }
         
 FilterProcessor * CtrlBlock::getFilterProcessor() 
 {
-    return filterProc;
+    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    return pData->getFilterProcessor();
 }
 
-void CtrlBlock::setParentStream(Stream * stream)
+FilterList * CtrlBlock::getFilterList() 
 {
-    parentStream = stream;
+    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    return pData->getFilterList();
 }
 
-Stream * CtrlBlock::getParentStream()
+PurifierProcessor * CtrlBlock::getPurifierProcessor() 
 {
-    return parentStream;
+    return purifierProc;
 }
 
 void CtrlBlock::setFlowctlThreshold(long long th)
@@ -515,32 +436,32 @@ void CtrlBlock::setFlowctlThreshold(long long th)
     thresHold = th;
 }
 
+void CtrlBlock::setReleased(bool rel)
+{
+    released = rel;
+}
+
+bool CtrlBlock::getReleased()
+{
+    return released;
+}
+
 long long CtrlBlock::getFlowctlThreshold()
 {
     return thresHold;
 }
 
-void CtrlBlock::genSelfInfo(MessageQueue * queue, bool isUncle)
+RoutingList * CtrlBlock::getRoutingList()
 {
-    assert(queue);
+    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    return pData->getRoutingList();
+}
 
-    // generate this message only when turn on failover mechanism
-    char *envp = ::getenv("SCI_ENABLE_FAILOVER");
-    if (envp != NULL) {
-        if (::strcmp(envp, "yes") == 0) {
-            char tmp[256] = {0};
-            string envStr;
-
-            ::gethostname(tmp, sizeof(tmp));
-            string localName = SysUtil::get_hostname(tmp);
-            
-            Parent parent(handle, localName.c_str(), listener->getBindPort());
-            parent.setLevel(topoInfo->getLevel());
-
-            Message *msg = parent.packMsg(isUncle);
-            queue->produce(msg);
-        }
-    }
+void CtrlBlock::addEmbedAgent(int hndl, EmbedAgent *agent)
+{
+    lock();
+    embedAgents[hndl] = agent;
+    unlock();
 }
 
 void CtrlBlock::lock()

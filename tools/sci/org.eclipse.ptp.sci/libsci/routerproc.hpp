@@ -18,7 +18,7 @@
     output: a set of message queues
     action: route the message to the designated destination
    
- Author: Nicole Nie
+ Author: Nicole Nie     Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -35,17 +35,24 @@
 #include "processor.hpp"
 
 class MessageQueue;
+class Stream;
+class RoutingList;
+class FilterList;
 
 class RouterProcessor : public Processor 
 {
     private:
-        MessageQueue        *inQueue;
+        Stream              *inStream;
+        RoutingList         *routingList;
+        FilterList          *filterList;
 
         int                 curFilterID;
         sci_group_t         curGroup;
+        bool                joinSegs;
 
     public:
-        RouterProcessor(int hndl = -1);
+        RouterProcessor(int hndl, RoutingList *rlist, FilterList *flist);
+        ~RouterProcessor();
 
         virtual Message * read();
         virtual void process(Message *msg);
@@ -53,12 +60,13 @@ class RouterProcessor : public Processor
         virtual void seize();
         virtual void clean();
 
-        virtual bool isActive();
-
         int getCurFilterID();
         sci_group_t getCurGroup();
 
         void setInQueue(MessageQueue *queue);
+        MessageQueue * getInQueue();
+        void setInStream(Stream * stream);
+        RoutingList * getRoutingList();
 };
 
 #endif

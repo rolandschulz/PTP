@@ -32,14 +32,6 @@
 #include "filter.hpp"
 #include "packer.hpp"
 
-FilterList* FilterList::instance = NULL;
-FilterList * FilterList::getInstance()
-{
-    if (instance == NULL) {
-        instance = new FilterList();
-    }
-    return instance;
-}
 
 FilterList::FilterList()
     : flistMsg(NULL)
@@ -59,8 +51,6 @@ FilterList::~FilterList()
     filterInfo.clear();
 
     ::pthread_mutex_destroy(&mtx);
-
-    instance = NULL;
 }
 
 int FilterList::loadFilter(int filter_id, Filter * filter, bool invoke)
@@ -100,6 +90,9 @@ Message * FilterList::packMsg(sci_filter_list_t &flist)
     char *bufs[1];
     int sizes[1];
     Packer packer;
+
+    if (flist.num == 0)
+        return NULL;
 
     packer.packInt(flist.num);
     for (i = 0; i < flist.num; i++) {

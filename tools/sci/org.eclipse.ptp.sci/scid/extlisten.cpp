@@ -23,15 +23,18 @@
 
 ****************************************************************************/
 
-#include "extlisten.hpp"
 #include <assert.h>
+#include <netdb.h>
+#include <stdlib.h>
 
 #include "stream.hpp"
 #include "log.hpp"
 #include "tools.hpp"
 
+#include "extlisten.hpp"
 #include "locker.hpp"
 #include "extlaunch.hpp"
+
 
 const int SCID_PORT = 6688;
 
@@ -47,9 +50,21 @@ void ExtListener::run()
 {
     int child = -1;
     int port = SCID_PORT;
-    int sockfd = socket.listen(port);
+    int sockfd = -1;
+    struct servent *serv = NULL; 
+    char *envp = getenv("SCI_DAEMON_NAME");
 
+    if (envp != NULL) {
+        serv = getservbyname(envp, "tcp");
+    } else {
+        serv = getservbyname("scid", "tcp");
+    }
+    if (serv != NULL) {
+        port = ntohs(serv->s_port);
+    }
+    sockfd = socket.listen(port);
     log_crit("Extended listener is running");
+
     while (getState()) {
         try {
             child = socket.accept(sockfd);
@@ -68,11 +83,6 @@ void ExtListener::run()
         stream->init(child);
         ExtLauncher *launcher = new ExtLauncher(stream);
         launcher->start();
-
-        while (launcherList.size() > 128) {
-            log_info("Too much concurrency, need cleanup");
-            Locker::getLocker()->notify();
-        }
     }
 
     ::close(sockfd);

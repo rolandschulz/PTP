@@ -47,15 +47,14 @@
 #include "initializer.hpp"
 #include "observer.hpp"
 #include "filter.hpp"
+#include "listener.hpp"
 #include "filterlist.hpp"
 #include "filterproc.hpp"
 #include "routerproc.hpp"
-#include "statemachine.hpp"
 #include "allocator.hpp"
 
 SCI_msg_hndlr *gHndlr = NULL;
 void *gParam = NULL;
-
 // Initialization & Termination
 
 int SCI_Initialize(sci_info_t *info)
@@ -65,43 +64,11 @@ int SCI_Initialize(sci_info_t *info)
         return SCI_SUCCESS;
     }
 
-    int hndl = -1;
-    char *envp = ::getenv("SCI_CLIENT_ID");
-    if (envp != NULL) {
-        hndl = ::atoi(envp);
-    }
-
-    int rc;
-
-    try {
-        if (info != NULL) {
-            switch (info->type) {
-                case SCI_FRONT_END:
-                    hndl = -1;
-                    rc = gCtrlBlock->initFE(-1, info);
-                    gHndlr = info->fe_info.hndlr;
-                    gParam = info->fe_info.param;
-                    break;
-                case SCI_BACK_END:
-                    rc = gCtrlBlock->initBE(hndl, info);
-                    gHndlr = info->be_info.hndlr;
-                    gParam = info->be_info.param;
-                    break;
-                default:
-                    rc = SCI_ERR_INVALID_ENDTYPE;
-            }
-        } else {
-            rc = gCtrlBlock->initAgent(hndl);
-        }
-    } catch (std::bad_alloc) {
-        return SCI_ERR_NO_MEM;
-    }
-
-    if (rc != SCI_SUCCESS) {
+    int rc = gCtrlBlock->init(info);
+    if (rc != SCI_SUCCESS)
         return rc;
-    }
 
-    return gInitializer->init(hndl);
+    return gInitializer->init();
 }
 
 int SCI_Terminate()
@@ -117,11 +84,8 @@ int SCI_Terminate()
         }
         gCtrlBlock->term();
 
-        delete gRoutingList;
-        delete gFilterList;
         delete gNotifier;
         delete gInitializer;
-        delete gStateMachine;
         delete gCtrlBlock;
     } catch (std::bad_alloc) {
         return SCI_ERR_NO_MEM;
@@ -154,7 +118,8 @@ int SCI_Query(sci_query_t query, void *ret_val)
             *p = gCtrlBlock->getTopology()->getBENum();
             break;
         case BACKEND_ID:
-            if(gCtrlBlock->getMyRole() != CtrlBlock::BACK_END) 
+            if((gCtrlBlock->getMyRole() != CtrlBlock::BACK_END)
+                    && (gCtrlBlock->getMyRole() != CtrlBlock::BACK_AGENT)) 
                 return SCI_ERR_INVALID_CALLER;
             *p = gCtrlBlock->getMyHandle();
             break;
@@ -167,10 +132,10 @@ int SCI_Query(sci_query_t query, void *ret_val)
                 *p = gCtrlBlock->getObserver()->getPollFd();
             break;
         case NUM_FILTERS:
-            *p = gFilterList->numOfFilters();
+            *p = gCtrlBlock->getFilterList()->numOfFilters();
             break;
         case FILTER_IDLIST:
-            gFilterList->retrieveFilterList(p);
+            gCtrlBlock->getFilterList()->retrieveFilterList(p);
             break;
         case AGENT_ID:
             if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END) 
@@ -180,12 +145,12 @@ int SCI_Query(sci_query_t query, void *ret_val)
         case NUM_SUCCESSORS:
             if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
                 return SCI_ERR_INVALID_CALLER;
-            *p = gRoutingList->numOfSuccessor(SCI_GROUP_ALL);
+            *p = gCtrlBlock->getRoutingList()->numOfSuccessor(SCI_GROUP_ALL);
             break;
         case SUCCESSOR_IDLIST:
             if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
                 return SCI_ERR_INVALID_CALLER;
-            gRoutingList->retrieveSuccessorList(SCI_GROUP_ALL, p);
+            gCtrlBlock->getRoutingList()->retrieveSuccessorList(SCI_GROUP_ALL, p);
             break;
         case HEALTH_STATUS:
             if (gCtrlBlock->isEnabled()) {
@@ -198,6 +163,22 @@ int SCI_Query(sci_query_t query, void *ret_val)
             if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
                 return SCI_ERR_INVALID_CALLER;
             *p = gCtrlBlock->getTopology()->getLevel();
+            break;
+        case LISTENER_PORT:
+            if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
+                return SCI_ERR_INVALID_CALLER;
+            *p = gInitializer->getListener()->getBindPort();
+            break;
+        case PARENT_SOCKFD:
+            if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END)
+                return SCI_ERR_INVALID_CALLER;
+            *p = gInitializer->getInStream()->getSocket();
+            break;
+        case NUM_CHILDREN_FDS:
+            *p = gCtrlBlock->numOfChildrenFds();
+            break;
+        case CHILDREN_SOCKFDS:
+            gCtrlBlock->getChildrenSockfds(p);
             break;
         default:
             return SCI_ERR_UNKNOWN_INFO;
@@ -221,7 +202,7 @@ int SCI_Bcast(int filter_id, sci_group_t group, int num_bufs, void *bufs[], int 
         if (!gCtrlBlock->getTopology()->hasBE((int)group))
             return SCI_ERR_GROUP_NOTFOUND;
     } else {
-        if (!gRoutingList->isGroupExist(group))
+        if (!gCtrlBlock->getRoutingList()->isGroupExist(group))
             return SCI_ERR_GROUP_NOTFOUND;
     }
 
@@ -243,7 +224,8 @@ int SCI_Upload(int filter_id, sci_group_t group, int num_bufs, void *bufs[], int
     if (gCtrlBlock->getMyRole() == CtrlBlock::INVALID)
         return SCI_ERR_UNINTIALIZED;
     
-    if (gCtrlBlock->getMyRole() != CtrlBlock::BACK_END)
+    if ((gCtrlBlock->getMyRole() != CtrlBlock::BACK_END)
+            && (gCtrlBlock->getMyRole() != CtrlBlock::BACK_AGENT))
         return SCI_ERR_INVALID_CALLER;
 
     try {
@@ -272,20 +254,13 @@ int SCI_Poll(int timeout)
         mode = gCtrlBlock->getEndInfo()->be_info.mode;
     if (mode != SCI_POLLING)
         return SCI_ERR_MODE;
-
+/*
     if (gCtrlBlock->getPollQueue()->getSize() == 0) {
         // no messages in the polling queue
-        if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-            if (gStateMachine->getState() == StateMachine::IDLING) {
-                return SCI_ERR_POLL_INVALID;
-            }
-        } else {
-            if (gStateMachine->getState() == StateMachine::EXITING) {
-                return SCI_ERR_POLL_INVALID;
-            }
-        }
+        // TODO
+        return SCI_ERR_POLL_INVALID;
     }
-
+*/
     int rc = SCI_SUCCESS;
     Message *msg = gCtrlBlock->getPollQueue()->consume(timeout);
     if (msg) {
@@ -295,7 +270,7 @@ int SCI_Poll(int timeout)
                 try {
                     gHndlr(gParam, msg->getGroup(), msg->getContentBuf(), msg->getContentLen());
                 } catch (...) {
-                    gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
+                    // TODO
                 }
 
                 gCtrlBlock->getObserver()->unnotify();
@@ -373,7 +348,7 @@ int SCI_Group_free(sci_group_t group)
     if (group>=SCI_GROUP_ALL)
         return SCI_ERR_GROUP_PREDEFINED;
 
-    if (!gRoutingList->isGroupExist(group))
+    if (!gCtrlBlock->getRoutingList()->isGroupExist(group))
         return SCI_ERR_GROUP_NOTFOUND;
 
     int msgID;
@@ -400,10 +375,10 @@ int SCI_Group_operate(sci_group_t group1, sci_group_t group2,
     if (gCtrlBlock->getMyRole() != CtrlBlock::FRONT_END)
         return SCI_ERR_INVALID_CALLER;
 
-    if (!gRoutingList->isGroupExist(group1))
+    if (!gCtrlBlock->getRoutingList()->isGroupExist(group1))
         return SCI_ERR_GROUP_NOTFOUND;
 
-    if (!gRoutingList->isGroupExist(group2))
+    if (!gCtrlBlock->getRoutingList()->isGroupExist(group2))
         return SCI_ERR_GROUP_NOTFOUND;
 
     if ((op!=SCI_UNION) && (op!=SCI_INTERSECTION) && (op!=SCI_DIFFERENCE))
@@ -446,7 +421,7 @@ int SCI_Group_operate_ext(sci_group_t group, int num_bes, int *be_list,
     if (gCtrlBlock->getMyRole() != CtrlBlock::FRONT_END)
         return SCI_ERR_INVALID_CALLER;
 
-    if (!gRoutingList->isGroupExist(group))
+    if (!gCtrlBlock->getRoutingList()->isGroupExist(group))
         return SCI_ERR_GROUP_NOTFOUND;
 
     assert(be_list);
@@ -494,22 +469,22 @@ int SCI_Group_query(sci_group_t group, sci_group_query_t query, void *ret_val)
     if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END)
         return SCI_ERR_INVALID_CALLER;
 
-    if (!gRoutingList->isGroupExist(group))
+    if (!gCtrlBlock->getRoutingList()->isGroupExist(group))
         return SCI_ERR_GROUP_NOTFOUND;
 
     switch(query) 
     {
         case GROUP_MEMBER_NUM:
-            *((int *) ret_val) = gRoutingList->numOfBE(group);
+            *((int *) ret_val) = gCtrlBlock->getRoutingList()->numOfBE(group);
             break;
         case GROUP_MEMBER:
-            gRoutingList->retrieveBEList(group, (int *) ret_val);
+            gCtrlBlock->getRoutingList()->retrieveBEList(group, (int *) ret_val);
             break;
         case GROUP_SUCCESSOR_NUM:
-            *((int *) ret_val) = gRoutingList->numOfSuccessor(group);
+            *((int *) ret_val) = gCtrlBlock->getRoutingList()->numOfSuccessor(group);
             break;
         case GROUP_SUCCESSOR:
-            gRoutingList->retrieveSuccessorList(group, (int *) ret_val);
+            gCtrlBlock->getRoutingList()->retrieveSuccessorList(group, (int *) ret_val);
             break;
         default:
             return SCI_ERR_UNKNOWN_INFO;
@@ -587,12 +562,12 @@ int SCI_Filter_bcast(int filter_id, int num_successors, int * successor_list, in
     if (gCtrlBlock->getMyRole() == CtrlBlock::INVALID)
         return SCI_ERR_UNINTIALIZED;
     
-    if ((gCtrlBlock->getMyRole() != CtrlBlock::FRONT_END) && (gCtrlBlock->getMyRole() != CtrlBlock::AGENT)) {
+    if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END) {
         return SCI_ERR_INVALID_CALLER;
     }
 
     for (int i=0; i<num_successors; i++) {
-        if (!gRoutingList->isSuccessorExist(successor_list[i]))
+        if (!gCtrlBlock->getRoutingList()->isSuccessorExist(successor_list[i]))
             return SCI_ERR_INVALID_SUCCESSOR;
     }
 
@@ -605,7 +580,7 @@ int SCI_Filter_bcast(int filter_id, int num_successors, int * successor_list, in
         sci_group_t curGroup = gCtrlBlock->getRouterProcessor()->getCurGroup();
         msg->build(nextFilterID, curGroup, num_bufs, (char **)bufs, sizes, Message::COMMAND);
         msg->setRefCount(num_successors);
-        gRoutingList->mcast(msg, successor_list, num_successors);
+        gCtrlBlock->getRoutingList()->mcast(msg, successor_list, num_successors);
     } catch (std::bad_alloc) {
         return SCI_ERR_NO_MEM;
     }
@@ -618,14 +593,14 @@ int SCI_Filter_upload(int filter_id, sci_group_t group, int num_bufs, void *bufs
     if (gCtrlBlock->getMyRole() == CtrlBlock::INVALID)
         return SCI_ERR_UNINTIALIZED;
     
-    if ((gCtrlBlock->getMyRole() != CtrlBlock::FRONT_END) && (gCtrlBlock->getMyRole() != CtrlBlock::AGENT)) {
+    if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END) {
         return SCI_ERR_INVALID_CALLER;
     }
 
     try {
         Filter *filter = NULL;
         if (filter_id != SCI_FILTER_NULL) {
-            filter = gFilterList->getFilter(filter_id);
+            filter = gCtrlBlock->getFilterList()->getFilter(filter_id);
         }
         int curFilterID = gCtrlBlock->getFilterProcessor()->getCurFilterID();
         Message *msg = new Message();
@@ -712,3 +687,27 @@ int SCI_BE_remove(int be_id)
     return rc;
 }
 
+int SCI_Release()
+{
+    char *envp = getenv("SCI_EMBED_AGENT");
+    if (!envp || (strcasecmp(envp, "yes") != 0)) {
+        return SCI_ERR_INVALID_MODE;
+    }
+    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
+        while (!gCtrlBlock->getRoutingList()->allRouted()) {
+            SysUtil::sleep(1000);
+        } 
+        Message *msg = new Message();
+        int msgID = gNotifier->allocate();
+        msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::RELEASE, msgID);
+        gCtrlBlock->getRouterInQueue()->produce(msg);
+        gNotifier->freeze(msgID);
+        gCtrlBlock->clean();
+    } else {
+        while (!gCtrlBlock->getReleased()) {
+            SysUtil::sleep(1000);
+        } 
+    }
+
+    return 0;
+}

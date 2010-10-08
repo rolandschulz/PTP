@@ -35,13 +35,18 @@ using namespace std;
 
 class Thread 
 {
-    protected :
+    private:
+
+    protected:
         int          handle;
         bool         launched;
         bool         running;
         pthread_t    thread;
+        void        *data;
 
-    public :
+    public:
+        static pthread_key_t key;
+        static pthread_once_t once;
         Thread(int hndl = 0);
         virtual ~Thread();
 
@@ -53,7 +58,9 @@ class Thread
         
         bool isLaunched() { return launched; }
         bool getState() { return running; }
-        void setState(bool state) { running = state; }
+        void setState(bool state) { running = state; launched = true; }
+        void setSpecific(void *data);
+        void *getSpecific();
 };
 
 class ThreadException

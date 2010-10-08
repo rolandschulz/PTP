@@ -34,7 +34,6 @@
 #include "exception.hpp"
 #include "socket.hpp"
 
-#include "statemachine.hpp"
 #include "ctrlblock.hpp"
 #include "message.hpp"
 #include "stream.hpp"
@@ -44,8 +43,8 @@
 #include "eventntf.hpp"
 #include "observer.hpp"
 
-FilterProcessor::FilterProcessor(int hndl)
-    : Processor(hndl), filtered(false), curFilterID(SCI_FILTER_NULL)
+FilterProcessor::FilterProcessor(int hndl, FilterList *flist)
+    : Processor(hndl), filterList(flist), filtered(false), curFilterID(SCI_FILTER_NULL)
 {
     name = "UpstreamFilter";
 
@@ -53,6 +52,11 @@ FilterProcessor::FilterProcessor(int hndl)
     outQueue = NULL;
 
     observer = NULL;
+}
+
+FilterProcessor::~FilterProcessor()
+{
+    delete inQueue;
 }
 
 Message * FilterProcessor::read()
@@ -69,11 +73,9 @@ Message * FilterProcessor::read()
 
 void FilterProcessor::process(Message * msg)
 {
-    assert(msg);
-
     int id = msg->getFilterID();
     if (id != SCI_FILTER_NULL) {
-        Filter *filter = gFilterList->getFilter(id);
+        Filter *filter = filterList->getFilter(id);
         // call user's filter handler
         if (filter != NULL) {
             curFilterID = id;
@@ -97,7 +99,7 @@ void FilterProcessor::write(Message * msg)
         observer->notify();
     }
 
-    msg->setRefCount(msg->getRefCount() + 1);
+    msg->incRefCount();
     outQueue->produce(msg);
 
     inQueue->remove();
@@ -105,17 +107,11 @@ void FilterProcessor::write(Message * msg)
 
 void FilterProcessor::seize()
 {
-    gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
+    // TODO
 }
 
 void FilterProcessor::clean()
 {
-    // no action
-}
-
-bool FilterProcessor::isActive()
-{
-    return gCtrlBlock->isEnabled() || (inQueue->getSize() > 0);
 }
 
 void FilterProcessor::deliever(Message * msg)
@@ -146,3 +142,12 @@ void FilterProcessor::setObserver(Observer * ob)
     observer = ob;
 }
 
+MessageQueue * FilterProcessor::getInQueue()
+{
+    return inQueue;
+}
+
+MessageQueue * FilterProcessor::getOutQueue()
+{
+    return outQueue;
+}

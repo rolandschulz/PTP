@@ -35,12 +35,10 @@
 #include "socket.hpp"
 
 #include "ctrlblock.hpp"
-#include "statemachine.hpp"
 #include "routinglist.hpp"
 #include "message.hpp"
 #include "stream.hpp"
 #include "queue.hpp"
-#include "errevent.hpp"
 #include "writerproc.hpp"
 
 ReaderProcessor::ReaderProcessor(int hndl) 
@@ -52,14 +50,18 @@ ReaderProcessor::ReaderProcessor(int hndl)
     outQueue = NULL;
 
     outErrorQueue = NULL;
-    peerProcessor = NULL;
+}
+
+ReaderProcessor::~ReaderProcessor()
+{
 }
 
 Message * ReaderProcessor::read()
 {
     assert(inStream);
+    Message *msg = NULL;
 
-    Message *msg = new Message();
+    msg = new Message();
     *inStream >> *msg;
 
     return msg;
@@ -93,6 +95,10 @@ void ReaderProcessor::write(Message * msg)
                 delete msg;
             }
             break;
+        case Message::RELEASE:
+            setState(false);
+            outQueue->produce(msg);
+            break;
         default:
             outQueue->produce(msg);
             break;
@@ -101,48 +107,15 @@ void ReaderProcessor::write(Message * msg)
 
 void ReaderProcessor::seize()
 {    
-    if (handle == gCtrlBlock->getMyHandle()) {
-        gStateMachine->parse(StateMachine::PARENT_BROKEN);
-    } else {
-        gStateMachine->parse(StateMachine::CLIENT_BROKEN);
-    }
-
     // exit the peer relay processor thread related to the same socket
-    peerProcessor->stop();
-
-    if (gStateMachine->isToQuit(handle)) {
-        // if already got user's quit command, no need to generate error messages
-        return;
-    }
-
-    if (outErrorQueue) {
-        // generate an error message and put it into error message queue
-        ErrorEvent event;
-        if (handle == gCtrlBlock->getMyHandle()) {
-            event.setErrCode(SCI_ERR_PARENT_BROKEN);
-            event.setBENum(gRoutingList->numOfBE(SCI_GROUP_ALL));
-        } else {
-            event.setErrCode(SCI_ERR_CHILD_BROKEN);
-            event.setBENum(gRoutingList->numOfBEOfSuccessor(handle));
-        }
-        event.setNodeID(handle);
-
-        Message *msg = event.packMsg();
-        outErrorQueue->produce(msg);
-    } else if (handle == gCtrlBlock->getMyHandle()) {
-        // do not try to recover
-        gStateMachine->parse(StateMachine::RECOVER_FAILED);
-    }
+    setState(false);    
 }
 
 void ReaderProcessor::clean()
 {
-    inStream->stopRead();
-}
-
-bool ReaderProcessor::isActive()
-{
-    return gCtrlBlock->isEnabled();
+    if (toShutdown)
+        inStream->stopRead();
+    setState(false);    
 }
 
 void ReaderProcessor::setInStream(Stream * stream)
@@ -159,9 +132,3 @@ void ReaderProcessor::setOutErrorQueue(MessageQueue * queue)
 {
     outErrorQueue = queue;
 }
-
-void ReaderProcessor::setPeerProcessor(WriterProcessor * processor)
-{
-    peerProcessor =  processor;
-}
-

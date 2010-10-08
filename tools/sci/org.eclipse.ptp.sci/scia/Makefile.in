@@ -36,7 +36,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = scia$(EXEEXT)
+@BIT64_FALSE@bin_PROGRAMS = scia$(EXEEXT) $(am__EXEEXT_1)
+@BIT64_TRUE@bin_PROGRAMS = scia64$(EXEEXT) $(am__EXEEXT_1)
+@SYSTEM_AIX_TRUE@am__append_1 = scia
 subdir = scia
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -46,12 +48,16 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
+@SYSTEM_AIX_TRUE@am__EXEEXT_1 = scia$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_scia_OBJECTS = scia-scia.$(OBJEXT)
 scia_OBJECTS = $(am_scia_OBJECTS)
 scia_LDADD = $(LDADD)
+am_scia64_OBJECTS = scia64-scia.$(OBJEXT)
+scia64_OBJECTS = $(am_scia64_OBJECTS)
+scia64_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -63,8 +69,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(scia_SOURCES)
-DIST_SOURCES = $(scia_SOURCES)
+SOURCES = $(scia_SOURCES) $(scia64_SOURCES)
+DIST_SOURCES = $(scia_SOURCES) $(scia64_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -77,6 +83,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BIT64_FALSE = @BIT64_FALSE@
+BIT64_TRUE = @BIT64_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -97,7 +105,6 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
-GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -131,9 +138,12 @@ SYSTEM_DARWIN_TRUE = @SYSTEM_DARWIN_TRUE@
 SYSTEM_LINUX_FALSE = @SYSTEM_LINUX_FALSE@
 SYSTEM_LINUX_TRUE = @SYSTEM_LINUX_TRUE@
 VERSION = @VERSION@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_RANLIB = @ac_ct_RANLIB@
+ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -150,41 +160,39 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
-datarootdir = @datarootdir@
-docdir = @docdir@
-dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
-htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
-localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
-pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
-psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 scia_SOURCES = scia.cpp
-@SYSTEM_AIX_TRUE@scia_CPPFLAGS = -q64 -I../common -I../include
+scia64_SOURCES = scia.cpp
+@BIT64_FALSE@@SYSTEM_LINUX_TRUE@scia_CPPFLAGS = -m32 -g -O0 -I../common -I../include
+@SYSTEM_AIX_TRUE@scia_CPPFLAGS = -g -O0 -I../common -I../include
 @SYSTEM_DARWIN_TRUE@scia_CPPFLAGS = -I../common -I../include
-@SYSTEM_LINUX_TRUE@scia_CPPFLAGS = -I../common -I../include
-@SYSTEM_AIX_TRUE@scia_LDFLAGS = -q64 -L../common -lcmn64 -lrt -lpthread -ldl
+@BIT64_FALSE@@SYSTEM_LINUX_TRUE@scia_LDFLAGS = -m32 -L../common -lcmn -lrt -lpthread -ldl
+@SYSTEM_AIX_TRUE@scia_LDFLAGS = -L../common -lcmn64 -lrt -lpthread -ldl
 @SYSTEM_DARWIN_TRUE@scia_LDFLAGS = -L../common -lcmn -lpthread -ldl
-@SYSTEM_LINUX_TRUE@scia_LDFLAGS = -L../common -lcmn -lrt -lpthread -ldl
+@BIT64_TRUE@@SYSTEM_LINUX_TRUE@scia64_CPPFLAGS = -m64 -g -O0 -I../common -I../include -D__64BIT__
+@SYSTEM_AIX_TRUE@scia64_CPPFLAGS = -g -O0 -q64 -I../common -I../include -D__64BIT__
+@BIT64_TRUE@@SYSTEM_LINUX_TRUE@scia64_LDFLAGS = -m64 -L../common -lcmn -lrt -lpthread -ldl
+@SYSTEM_AIX_TRUE@scia64_LDFLAGS = -q64 -L../common -lcmn64 -lrt -lpthread -ldl
 all: all-am
 
 .SUFFIXES:
@@ -249,6 +257,9 @@ clean-binPROGRAMS:
 scia$(EXEEXT): $(scia_OBJECTS) $(scia_DEPENDENCIES) 
 	@rm -f scia$(EXEEXT)
 	$(CXXLINK) $(scia_LDFLAGS) $(scia_OBJECTS) $(scia_LDADD) $(LIBS)
+scia64$(EXEEXT): $(scia64_OBJECTS) $(scia64_DEPENDENCIES) 
+	@rm -f scia64$(EXEEXT)
+	$(CXXLINK) $(scia64_LDFLAGS) $(scia64_OBJECTS) $(scia64_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -257,6 +268,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scia-scia.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scia64-scia.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -292,6 +304,20 @@ scia-scia.obj: scia.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='scia.cpp' object='scia-scia.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(scia_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o scia-scia.obj `if test -f 'scia.cpp'; then $(CYGPATH_W) 'scia.cpp'; else $(CYGPATH_W) '$(srcdir)/scia.cpp'; fi`
+
+scia64-scia.o: scia.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(scia64_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT scia64-scia.o -MD -MP -MF "$(DEPDIR)/scia64-scia.Tpo" -c -o scia64-scia.o `test -f 'scia.cpp' || echo '$(srcdir)/'`scia.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/scia64-scia.Tpo" "$(DEPDIR)/scia64-scia.Po"; else rm -f "$(DEPDIR)/scia64-scia.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='scia.cpp' object='scia64-scia.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(scia64_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o scia64-scia.o `test -f 'scia.cpp' || echo '$(srcdir)/'`scia.cpp
+
+scia64-scia.obj: scia.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(scia64_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT scia64-scia.obj -MD -MP -MF "$(DEPDIR)/scia64-scia.Tpo" -c -o scia64-scia.obj `if test -f 'scia.cpp'; then $(CYGPATH_W) 'scia.cpp'; else $(CYGPATH_W) '$(srcdir)/scia.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/scia64-scia.Tpo" "$(DEPDIR)/scia64-scia.Po"; else rm -f "$(DEPDIR)/scia64-scia.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='scia.cpp' object='scia64-scia.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(scia64_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o scia64-scia.obj `if test -f 'scia.cpp'; then $(CYGPATH_W) 'scia.cpp'; else $(CYGPATH_W) '$(srcdir)/scia.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

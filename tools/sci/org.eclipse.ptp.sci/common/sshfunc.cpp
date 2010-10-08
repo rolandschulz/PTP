@@ -28,6 +28,9 @@
 #include <dlfcn.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <arpa/inet.h>
 
 #include "sshfunc.hpp"
 #include "tools.hpp"
@@ -213,7 +216,7 @@ int SshFunc::sign_data(char *key, size_t keylen, char *bufs[], int sizes[], int 
         tmp_bufs[i].iov_len = sizes[i];
     }
     rc = sign_data(key, keylen, tmp_bufs, num_bufs, sigbufs);
-    delete tmp_bufs;
+    delete []tmp_bufs;
 
     return rc;
 }
@@ -228,7 +231,7 @@ int SshFunc::verify_data(char *key, size_t keylen, char *bufs[], int sizes[], in
         tmp_bufs[i].iov_len = sizes[i];
     }
     rc = verify_data(key, keylen, tmp_bufs, num_bufs, sigbufs);
-    delete tmp_bufs;
+    delete []tmp_bufs;
 
     return rc;
 } 
@@ -243,7 +246,7 @@ int SshFunc::sign_data(char *bufs[], int sizes[], int num_bufs, struct iovec *si
         tmp_bufs[i].iov_len = sizes[i];
     }
     rc = sign_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
-    delete tmp_bufs;
+    delete []tmp_bufs;
 
     return rc;
 }
@@ -258,10 +261,196 @@ int SshFunc::verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *
         tmp_bufs[i].iov_len = sizes[i];
     }
     rc = verify_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
-    delete tmp_bufs;
+    delete []tmp_bufs;
 
     return rc;
 } 
+
+int SshFunc::sign_data(struct iovec *sigbufs, char *fmt, ...)
+{
+    int i, rc;
+    va_list argp;
+    char *para, *p, *pos;
+    size_t para_len;
+    int num_bufs = getSizes(fmt);
+    struct iovec *tmp_bufs = new struct iovec[num_bufs];
+    int *d_nums = new int[num_bufs];
+
+    va_start(argp, fmt);
+    pos = p = fmt;
+    i = -1;
+    while (*p != '\0') {
+        switch (*p) {
+            case 'd':
+                d_nums[i] = va_arg(argp, int);
+                d_nums[i] = htonl(d_nums[i]);
+                tmp_bufs[i].iov_len = sizeof(int);
+                tmp_bufs[i].iov_base = &d_nums[i];
+                break;
+            case 's':
+                tmp_bufs[i].iov_base = va_arg(argp, char *);
+                tmp_bufs[i].iov_len = atoi((const char *)pos);
+                tmp_bufs[i].iov_len = (tmp_bufs[i].iov_len > 0) ? tmp_bufs[i].iov_len : (strlen((char *)tmp_bufs[i].iov_base) + 1);
+                break;
+            case '%':
+                pos = p + 1;
+                i++;
+                break;
+        }
+        p++;
+    }
+    va_end(argp);
+
+    rc = sign_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
+    delete []d_nums;
+    delete []tmp_bufs;
+
+    return rc;
+}
+
+int SshFunc::getSizes(char *fmt)
+{
+    int num_bufs = 0;
+    char *p = fmt;
+
+    while (p != '\0') {
+        if (*p == '%') {
+            num_bufs++;
+        }
+        p++;
+    }
+
+    return num_bufs;
+}
+
+int SshFunc::verify_data(struct iovec *sigbufs, char *fmt, ...)
+{
+    int i, rc;
+    va_list argp;
+    char *para, *p, *pos;
+    size_t para_len;
+    int num_bufs = getSizes(fmt);
+    struct iovec *tmp_bufs = new struct iovec[num_bufs];
+    int *d_nums = new int[num_bufs];
+
+    va_start(argp, fmt);
+    pos = p = fmt;
+    i = -1;
+    while (*p != '\0') {
+        switch (*p) {
+            case 'd':
+                d_nums[i] = va_arg(argp, int);
+                d_nums[i] = htonl(d_nums[i]);
+                tmp_bufs[i].iov_len = sizeof(int);
+                tmp_bufs[i].iov_base = &d_nums[i];
+                break;
+            case 's':
+                tmp_bufs[i].iov_base = va_arg(argp, char *);
+                tmp_bufs[i].iov_len = atoi((const char *)pos);
+                tmp_bufs[i].iov_len = (tmp_bufs[i].iov_len > 0) ? tmp_bufs[i].iov_len : (strlen((char *)tmp_bufs[i].iov_base) + 1);
+                break;
+            case '%':
+                pos = p + 1;
+                i++;
+                break;
+        }
+        p++;
+    }
+    va_end(argp);
+
+    rc = verify_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
+    delete []d_nums;
+    delete []tmp_bufs;
+
+    return rc;
+}
+
+int SshFunc::sign_data(struct iovec *sigbufs, int num_bufs, ...)
+{
+    int i, rc;
+    va_list argp;
+    char *para;
+    size_t para_len;
+    struct iovec *tmp_bufs = new struct iovec[num_bufs];
+
+    va_start(argp, num_bufs);
+    for (i = 0; i < num_bufs; i++) {
+        para = va_arg(argp, char *);
+        para_len = va_arg(argp, int);
+        tmp_bufs[i].iov_base = para;
+        tmp_bufs[i].iov_len = para_len;
+    }
+    va_end(argp); 
+    rc = sign_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
+    delete []tmp_bufs;
+
+    return rc;
+}
+
+int SshFunc::verify_data(struct iovec *sigbufs, int num_bufs, ...)
+{
+    int i, rc;
+    va_list argp;
+    char *para;
+    size_t para_len;
+    struct iovec *tmp_bufs = new struct iovec[num_bufs];
+
+    va_start(argp, num_bufs);
+    for (i = 0; i < num_bufs; i++) {
+        para = va_arg(argp, char *);
+        para_len = va_arg(argp, int);
+        tmp_bufs[i].iov_base = para;
+        tmp_bufs[i].iov_len = para_len;
+    }
+    va_end(argp); 
+    rc = verify_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
+
+    return rc;
+}
+
+int SshFunc::sign_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...)
+{
+    int i, rc;
+    va_list argp;
+    char *para;
+    size_t para_len;
+    struct iovec *tmp_bufs = new struct iovec[num_bufs];
+
+    va_start(argp, num_bufs);
+    for (i = 0; i < num_bufs; i++) {
+        para = va_arg(argp, char *);
+        para_len = va_arg(argp, int);
+        tmp_bufs[i].iov_base = para;
+        tmp_bufs[i].iov_len = para_len;
+    }
+    va_end(argp); 
+    rc = sign_data(key, keylen, tmp_bufs, num_bufs, sigbufs);
+    delete []tmp_bufs;
+
+    return rc;
+}
+
+int SshFunc::verify_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...)
+{
+    int i, rc;
+    va_list argp;
+    char *para;
+    size_t para_len;
+    struct iovec *tmp_bufs = new struct iovec[num_bufs];
+
+    va_start(argp, num_bufs);
+    for (i = 0; i < num_bufs; i++) {
+        para = va_arg(argp, char *);
+        para_len = va_arg(argp, int);
+        tmp_bufs[i].iov_base = para;
+        tmp_bufs[i].iov_len = para_len;
+    }
+    va_end(argp); 
+    rc = verify_data(key, keylen, tmp_bufs, num_bufs, sigbufs);
+    delete []tmp_bufs;
+
+    return rc;
+}
 
 int SshFunc::set_user_token(struct iovec *token)
 {
@@ -281,13 +470,8 @@ int SshFunc::set_session_key(struct iovec *sskey)
 
     return 0;
 }
-#else /* PSEC_OPEN_SSL */
-int SshFunc::load(char * libPath)
-{
-    return 0;
-}
-
-int SshFunc::set_auth_module(char *name, char *fpath, char *opts)
+#else 
+int SshFunc::load(char *libPath)
 {
     return 0;
 }
@@ -327,16 +511,6 @@ int SshFunc::verify_data(char *key, size_t keylen, struct iovec *inbufs, int num
     return 0;
 }
 
-int SshFunc::sign_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
-{
-    return 0;
-}
-
-int SshFunc::verify_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
-{
-    return 0;
-}
-
 int SshFunc::free_signature(struct iovec *sigbufs)
 {
     return 0;
@@ -352,6 +526,26 @@ int SshFunc::verify_data(char *key, size_t keylen, char *bufs[], int sizes[], in
     return 0;
 }
 
+int SshFunc::set_session_key(struct iovec *sskey)
+{
+    return 0;
+}
+
+int SshFunc::set_user_token(struct iovec *token)
+{
+    return 0;
+}
+
+int SshFunc::sign_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
+int SshFunc::verify_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs)
+{
+    return 0;
+}
+
 int SshFunc::sign_data(char *bufs[], int sizes[], int num_bufs, struct iovec *sigbufs)
 {
     return 0;
@@ -362,13 +556,34 @@ int SshFunc::verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *
     return 0;
 }
 
-int SshFunc::set_user_token(struct iovec *token)
+int SshFunc::sign_data(struct iovec *sigbufs, int num_bufs, ...)
 {
     return 0;
 }
 
-int SshFunc::set_session_key(struct iovec *sskey)
+int SshFunc::verify_data(struct iovec *sigbufs, int num_bufs, ...)
 {
     return 0;
 }
-#endif /* PSEC_OPEN_SSL */
+
+int SshFunc::sign_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...)
+{
+    return 0;
+}
+
+int SshFunc::verify_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...)
+{
+    return 0;
+}
+
+int SshFunc::sign_data(struct iovec *sigbufs, char *fmt, ...)
+{
+    return 0;
+}
+
+int SshFunc::verify_data(struct iovec *sigbufs, char *fmt, ...)
+{
+    return 0;
+}
+
+#endif

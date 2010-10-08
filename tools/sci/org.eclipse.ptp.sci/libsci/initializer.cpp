@@ -29,10 +29,10 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "initializer.hpp"
 #include <assert.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -45,10 +45,12 @@
 #include "exception.hpp"
 #include "sshfunc.hpp"
 
+#include "embedagent.hpp"
+#include "initializer.hpp"
 #include "ctrlblock.hpp"
 #include "routinglist.hpp"
-#include "statemachine.hpp"
 #include "topology.hpp"
+#include "launcher.hpp"
 #include "queue.hpp"
 #include "message.hpp"
 #include "readerproc.hpp"
@@ -59,10 +61,6 @@
 #include "purifierproc.hpp"
 #include "observer.hpp"
 #include "listener.hpp"
-#include "parent.hpp"
-#include "errdetector.hpp"
-#include "errhandler.hpp"
-#include "errinjector.hpp"
 #include "eventntf.hpp"
 #include "allocator.hpp"
 #include "filterlist.hpp"
@@ -72,243 +70,137 @@
 Initializer* Initializer::instance = NULL;
 
 Initializer::Initializer()
+    : syncID(-1), listener(NULL), inStream(NULL)
 {
 }
 
 Initializer::~Initializer()
 {
     instance = NULL;
+    if (listener) {
+        listener->stop();
+        delete listener;
+    }
+    // inStream will be deleted in Writer
 }
 
-int Initializer::init(int hndl)
+int Initializer::init()
 {
     int rc = SCI_SUCCESS;
-
     int level = Log::INFORMATION;
     char dir[MAX_PATH_LEN] = "/opt/sci/log";
-    
-    char *envp = ::getenv("SCI_LOG_DIRECTORY");
-    if (envp != NULL) {
-        ::strncpy(dir, envp, sizeof(dir));
-    }
-    
-    envp = ::getenv("SCI_LOG_LEVEL"); 
-    if (envp != NULL)
-        level = ::atoi(envp);
+    char *envp = NULL; 
+    int hndl = -1;
 
-    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-        Log::getInstance()->init(dir, "fe.log", level);
-        log_debug("I am a front end, my handle is %d", hndl);
-    } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
-        Log::getInstance()->init(dir, "scia.log", level);
-        log_debug("I am an agent, my handle is %d", hndl);
-    } else {
-        Log::getInstance()->init(dir, "be.log", level);
-        log_debug("I am a back end, my handle is %d", hndl);
-    }
-    
     try {
         if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-            initListener();
-            rc = initFE(hndl);
+            rc = initFE();
         } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
-            initListener();
-            rc = initAgent(hndl);
+            rc = initAgent();
         } else {
-            rc = initBE(hndl);
+            rc = initBE();
         }
     } catch (Exception &e) {
         log_error("Initializer: exception %s", e.getErrMsg());
-        gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
         return SCI_ERR_INITIALIZE_FAILED;
     } catch (ThreadException &e) {
         log_error("Initializer: thread exception %d", e.getErrCode());
-        gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
         return SCI_ERR_INITIALIZE_FAILED;
     } catch (SocketException &e) {
         log_error("Initializer: socket exception: %s", e.getErrMsg().c_str());
-        gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
         return SCI_ERR_INITIALIZE_FAILED;
     } catch (std::bad_alloc) {
         log_error("Initializer: out of memory");
-        gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
         return SCI_ERR_INITIALIZE_FAILED;
     } catch (...) {
         log_error("Initializer: unknown exception");
-        gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
         return SCI_ERR_INITIALIZE_FAILED;
+    }
+
+    envp = ::getenv("SCI_LOG_DIRECTORY"); 
+    if (envp != NULL) {
+        ::strncpy(dir, envp, sizeof(dir));
+    }
+    envp = ::getenv("SCI_LOG_LEVEL"); 
+    if (envp != NULL)
+        level = ::atoi(envp);
+    
+    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
+        Log::getInstance()->init(dir, "fe.log", level);
+        log_debug("I am a front end, my handle is %d", gCtrlBlock->getMyHandle());
+    } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
+        Log::getInstance()->init(dir, "scia.log", level);
+        log_debug("I am an agent, my handle is %d", gCtrlBlock->getMyHandle());
+    } else {
+        Log::getInstance()->init(dir, "be.log", level);
+        log_debug("I am a back end, my handle is %d", gCtrlBlock->getMyHandle());
     }
 
     return rc;
 }
 
-void Initializer::recoverAgent(Stream * stream)
+Listener * Initializer::getListener()
 {
-    assert(stream);
-    
-    int hndl = gCtrlBlock->getMyHandle();
-
-    ReaderProcessor *reader = new ReaderProcessor(hndl);
-    reader->setName("ReaderP");
-    reader->setInStream(stream);
-    reader->setOutQueue(gCtrlBlock->getRouterInQueue());
-    reader->setOutErrorQueue(gCtrlBlock->getErrorQueue());
-    
-    WriterProcessor *writer = new WriterProcessor(hndl);
-    writer->setName("WriterP");
-    writer->setInQueue(gCtrlBlock->getFilterOutQueue());
-    writer->setOutStream(stream);
-
-    // writer is a peer processor of reader
-    reader->setPeerProcessor(writer);
-
-    gCtrlBlock->registerProcessor(reader);
-    gCtrlBlock->registerProcessor(writer);
-    
-    gRoutingList->propagateGroupInfo();
-
-    reader->start();
-    writer->start();
+    return listener;
 }
 
-void Initializer::recoverBE(Stream * stream)
+Stream * Initializer::getInStream()
 {
-    assert(stream);
-
-    int hndl = gCtrlBlock->getMyHandle();
-    
-    WriterProcessor *writer = new WriterProcessor(hndl);
-    writer->setInQueue(gCtrlBlock->getUpQueue());
-    writer->setOutStream(stream);
-
-    PurifierProcessor *purifier = new PurifierProcessor(hndl);
-    purifier->setInStream(stream);
-    purifier->setOutQueue(gCtrlBlock->getPurifierOutQueue());
-
-    // writer is a peer processor of purifier
-    purifier->setPeerProcessor(writer);
-
-    if (gCtrlBlock->getEndInfo()->be_info.mode == SCI_POLLING) {
-        // interrupt mode
-        purifier->setObserver(gCtrlBlock->getObserver());
-    }
-
-    gCtrlBlock->registerProcessor(writer);
-    gCtrlBlock->registerProcessor(purifier);
-
-    gRoutingList->propagateGroupInfo();
-
-    writer->start();
-    purifier->start();
+    return inStream;
 }
 
-int Initializer::initFE(int hndl)
+Listener * Initializer::initListener()
+{
+    if (listener)
+        return listener;
+
+    listener = new Listener(-1);
+    listener->init();
+    listener->start();
+
+    return listener;
+}
+
+int Initializer::initFE()
 {
     char *envp = NULL;
+    int hndl = gCtrlBlock->getMyHandle();
+    EmbedAgent *feAgent = NULL;
     
     Topology *topo = new Topology(hndl);
-    gCtrlBlock->setTopology(topo);
     int rc = topo->init();
     if (rc != SCI_SUCCESS)
         return rc;
-    gAllocator->reset();
+    gCtrlBlock->enable();
 
-    MessageQueue *routerInQ = new MessageQueue();
-    routerInQ->setName("routerInQ");
-    gCtrlBlock->registerQueue(routerInQ);
-    gCtrlBlock->setRouterInQueue(routerInQ);
-
-    RouterProcessor *router = new RouterProcessor();
-    gCtrlBlock->setRouterProcessor(router);
-    gCtrlBlock->registerProcessor(router);
-    router->setInQueue(routerInQ);
-
-    MessageQueue *inq = new MessageQueue();
-    inq->setName("filterInQ");
-    gCtrlBlock->registerQueue(inq);
-    gCtrlBlock->setFilterInQueue(inq);
-    
-    MessageQueue *outq = new MessageQueue();
-    outq->setName("filterOutQ");
-    gCtrlBlock->registerQueue(outq);
-    gCtrlBlock->setFilterOutQueue(outq);
-
-    FilterProcessor *filter = new FilterProcessor();
-    gCtrlBlock->registerProcessor(filter);
-    gCtrlBlock->setFilterProcessor(filter);
-    filter->setInQueue(inq);
-    filter->setOutQueue(outq);
-
-    ErrorDetector *errDetector = NULL;
-    ErrorHandler *errHandler = NULL;
-    ErrorInjector *errInjector = NULL;
-
-    envp = ::getenv("SCI_ENABLE_FAILOVER");
-    if (envp != NULL) {
-        if (::strcmp(envp, "yes") == 0) {
-            MessageQueue *errInQ = new MessageQueue();
-            errInQ->setName("errInQ");
-            gCtrlBlock->registerQueue(errInQ);
-            gCtrlBlock->setErrorQueue(errInQ);
-
-            errDetector = new ErrorDetector(hndl);
-            gCtrlBlock->registerProcessor(errDetector);
-            errDetector->setInQueue(errInQ);
-
-            if (gCtrlBlock->getEndInfo()->fe_info.err_hndlr != NULL) {
-                MessageQueue *errOutQ = new MessageQueue();
-                errOutQ->setName("errOutQ");
-                gCtrlBlock->registerQueue(errOutQ);
-                errDetector->setOutQueue(errOutQ);
-
-                errHandler = new ErrorHandler(hndl);
-                gCtrlBlock->registerProcessor(errHandler);
-                errHandler->setInQueue(errOutQ);
-            }
-
-            // see if we have error injection thread
-            envp = ::getenv("SCI_DEBUG_USE_INJECTOR");
-            if (envp != NULL) {
-                if (::strcasecmp(envp, "yes") == 0) {
-                    errInjector = new ErrorInjector();
-                    gCtrlBlock->setErrorInjector(errInjector);
-                    errInjector->setInjOutQueue(errInQ);
-                }
-            }
-        }
-    }
-
+    feAgent = new EmbedAgent();
+    feAgent->init(-1, NULL, NULL);
     HandlerProcessor *handler = NULL;
     if (gCtrlBlock->getEndInfo()->fe_info.mode == SCI_INTERRUPT) {
         // interrupt mode
         handler = new HandlerProcessor();
-        gCtrlBlock->registerProcessor(handler);
-        handler->setInQueue(outq);
+        handler->setInQueue(feAgent->getUpQueue());
+        handler->setSpecific(feAgent->genPrivateData());
+        gCtrlBlock->setHandlerProcessor(handler);
     } else {
         // polling mode
         Observer *ob = new Observer();
         gCtrlBlock->setObserver(ob);
-        gCtrlBlock->setPollQueue(outq);
-        filter->setObserver(ob);
-    }
-
-    gStateMachine->parse(StateMachine::DATASTRUC_CREATED);
-
-    router->start();
-    filter->start();
-    if (errDetector) {
-        errDetector->start();
-    }
-    if (errHandler) {
-        errHandler->start();
-    }
-    if (errInjector) {
-        errInjector->start();
+        gCtrlBlock->setPollQueue(feAgent->getFilterProcessor()->getOutQueue());
+        feAgent->getFilterProcessor()->setObserver(ob);
     }
     if (handler) {
         handler->start();
     }
-    Message *flistMsg = gFilterList->packMsg(gCtrlBlock->getEndInfo()->fe_info.filter_list);
+    feAgent->work();
+    gAllocator->reset();
+    envp = getenv("SCI_ENABLE_LISTENER");
+    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
+        initListener();
+    }
+
+    Message *flistMsg = gCtrlBlock->getFilterList()->packMsg(gCtrlBlock->getEndInfo()->fe_info.filter_list);
+    MessageQueue *routerInQ = feAgent->getRouterInQ();
     routerInQ->produce(flistMsg);
     int msgID = gNotifier->allocate();
     Message *topoMsg = topo->packMsg();
@@ -319,12 +211,15 @@ int Initializer::initFE(int hndl)
     return rc;
 }
 
-int Initializer::initAgent(int hndl)
+int Initializer::initAgent()
 { 
     string nodeAddr;
     int port = -1;
+    int hndl = -1;
+    EmbedAgent *agent = NULL;
 
     getIntToken();
+    inStream = initStream();
     // get hostname and port no from environment variable.
     char *envp = ::getenv("SCI_WORK_DIRECTORY");
     if (envp != NULL) {
@@ -341,85 +236,14 @@ int Initializer::initAgent(int hndl)
     if (envp != NULL) {
         port = ::atoi(envp);
     }
-    
+    hndl = gCtrlBlock->getMyHandle();
     log_debug("My parent host is %s, parent port id %d, my ID is %d", nodeAddr.c_str(), port, hndl);
 
-    Stream *stream = new Stream();   
-    stream->init(nodeAddr.c_str(), port);
-    *stream << gCtrlBlock->getJobKey() << hndl << endl;
-
-    gCtrlBlock->registerStream(stream);
-    gCtrlBlock->setParentStream(stream);
-    gStateMachine->parse(StateMachine::PARENT_CONNECTED);
-
-    ErrorDetector *errDetector = NULL;
-
-    // err detector need to be created before relay processor
-    envp = ::getenv("SCI_ENABLE_FAILOVER");
-    if (envp != NULL) {
-        if (::strcmp(envp, "yes") == 0) {
-            MessageQueue *errInQ = new MessageQueue();
-            errInQ->setName("errInQ");
-            gCtrlBlock->registerQueue(errInQ);
-            gCtrlBlock->setErrorQueue(errInQ);
-
-            errDetector = new ErrorDetector(hndl);
-            gCtrlBlock->registerProcessor(errDetector);
-            errDetector->setInQueue(errInQ);
-        }
-    }
-    
-    MessageQueue *routerInQ = new MessageQueue();
-    routerInQ->setName("routerInQ");
-    gCtrlBlock->registerQueue(routerInQ);
-    gCtrlBlock->setRouterInQueue(routerInQ);
-
-    ReaderProcessor *reader = new ReaderProcessor(hndl);
-    reader->setName("ReaderP");
-    gCtrlBlock->registerProcessor(reader);
-    reader->setInStream(stream);
-    reader->setOutQueue(routerInQ);
-    reader->setOutErrorQueue(gCtrlBlock->getErrorQueue());
-
-    RouterProcessor *router = new RouterProcessor();
-    gCtrlBlock->registerProcessor(router);
-    gCtrlBlock->setRouterProcessor(router);
-    router->setInQueue(routerInQ);
-
-    MessageQueue *filterInQ = new MessageQueue();
-    filterInQ->setName("filterInQ");
-    gCtrlBlock->setFilterInQueue(filterInQ);
-    gCtrlBlock->registerQueue(filterInQ);
-
-    MessageQueue *filterOutQ = new MessageQueue();
-    filterOutQ->setName("filterOutQ");
-    gCtrlBlock->setFilterOutQueue(filterOutQ);
-    gCtrlBlock->registerQueue(filterOutQ);
-
-    WriterProcessor *writer = new WriterProcessor(hndl);
-    writer->setName("WriterP");
-    gCtrlBlock->registerProcessor(writer);
-    writer->setInQueue(filterOutQ);
-    writer->setOutStream(stream);
-
-    // writer is a peer processor of reader
-    reader->setPeerProcessor(writer);
-    
-    FilterProcessor *filter = new FilterProcessor();
-    gCtrlBlock->registerProcessor(filter);
-    gCtrlBlock->setFilterProcessor(filter);
-    filter->setInQueue(filterInQ);
-    filter->setOutQueue(filterOutQ);
-
-    gStateMachine->parse(StateMachine::DATASTRUC_CREATED);
-
-    reader->start();
-    writer->start();
-    router->start();
-    filter->start();
-    if (errDetector) {
-        errDetector->start();
-    }
+    agent = new EmbedAgent();
+    agent->init(hndl, inStream, NULL);
+    gCtrlBlock->enable();
+    agent->work();
+    sendSyncRet(inStream);
 
     return SCI_SUCCESS;
 }
@@ -439,40 +263,130 @@ int Initializer::getIntToken()
     return 0;
 }
 
-int Initializer::initBE(int hndl)
-{
-    char *envp = ::getenv("SCI_USE_EXTLAUNCHER");
-    if ((envp != NULL) && (::strcasecmp(envp, "yes") == 0)) {
-        int rc = initExtBE(hndl);
-        if (rc != 0)
-            return rc;
-    } else {
-        int rc = getIntToken();
-        envp = ::getenv("SCI_SYNC_INIT");
-        if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
-            Stream stream;
-            string retStr = "OK :)";
-            try {
-                struct iovec vecs[2];
-                struct iovec sign = {0};
+typedef struct {
+    int rt;
+    char retStr[256];
+} syncResult;
 
-                vecs[0].iov_base = &rc;
-                vecs[0].iov_len = sizeof(rc);
-                vecs[1].iov_base = (char *)retStr.c_str();
-                vecs[1].iov_len = retStr.size() + 1;
-                SSHFUNC->sign_data(vecs, 2, &sign);
-                stream.init(SCI_INIT_FD);
-                stream << rc << retStr << sign << endl;
-                stream.stop();
-                SSHFUNC->free_signature(&sign);
-            } catch (SocketException &e) {
-                printf("socket exception %s", e.getErrMsg().c_str());
-            }
+int Initializer::syncRetBack(int rt, string &retStr)
+{
+    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) 
+        return 0;
+
+    syncResult *ret = (syncResult *)gNotifier->getRetVal(syncID);
+    ret->rt = rt;
+    strncpy(ret->retStr, retStr.c_str(), sizeof(ret->retStr));
+    gNotifier->notify(syncID);
+
+    return 0;
+}
+
+int Initializer::sendSyncRet(Stream *stream) 
+{
+    char *envp = ::getenv("SCI_SYNC_INIT");
+    if ((envp == NULL) || (strcasecmp(envp, "yes") != 0)) 
+        return 0;
+
+    try {
+        struct iovec sign = {0};
+        syncResult ret = { 0, "OK :)" };
+
+        if (gCtrlBlock->getMyRole() != CtrlBlock::BACK_END) {
+            syncID = gNotifier->allocate();
+            gNotifier->freeze(syncID, &ret);
+        }
+        SSHFUNC->sign_data(&sign, 2, &ret.rt, sizeof(ret.rt), ret.retStr, strlen(ret.retStr) + 1);
+        *stream << ret.rt << ret.retStr << sign << endl;
+        SSHFUNC->free_signature(&sign);
+    } catch (SocketException &e) {
+        log_error("socket exception %s", e.getErrMsg().c_str());
+    }
+
+    return 0;
+}
+
+Stream * Initializer::initStream()
+{
+    char *envp;
+    int jobkey;
+    string envStr;
+    Stream *stream = new Stream();  
+    int hndl = -1;
+
+    stream->init(STDIN_FILENO);
+    *stream >> envStr >> endl;
+    parseEnvStr(envStr);
+    envp = getenv("SCI_CLIENT_ID");
+    assert(envp != NULL);
+    hndl = atoi(envp);
+    gCtrlBlock->setMyHandle(hndl);
+    envp = getenv("SCI_JOB_KEY");
+    assert(envp != NULL);
+    jobkey = atoi(envp);
+    gCtrlBlock->setJobKey(jobkey);
+    envp = ::getenv("SCI_EMBED_AGENT");
+    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0) && (hndl < 0)) {
+        gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
+    }
+
+    return stream;
+}
+
+int Initializer::parseEnvStr(string &envStr)
+{
+    string key, val;
+    char *st = (char *) envStr.c_str();
+    char *p = st + envStr.size();
+    while (p > st) {
+        p--;
+        if ((*p) == '=') {
+            *p = '\0';
+            val = (p+1);
+        } else if ((*p) == ';') {
+            *p = '\0';
+            key = (p+1);
+            ::setenv(key.c_str(), val.c_str(), 1);
         }
     }
 
+    return 0;
+}
+
+int Initializer::initBE()
+{
     string nodeAddr;
     int port = -1;
+    int hndl = gCtrlBlock->getMyHandle();
+    bool extMode = false;
+    char *envp = ::getenv("SCI_USE_EXTLAUNCHER");
+    if ((envp != NULL) && (::strcasecmp(envp, "yes") == 0)) {
+        int pID; 
+        extMode = true;
+        if (!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID")) {
+            int rc = initExtBE(hndl);
+            if (rc != 0)
+                return rc;
+        }
+        envp = ::getenv("SCI_PARENT_HOSTNAME");
+        if (envp != NULL) {
+            nodeAddr = envp;
+        }
+        envp = ::getenv("SCI_PARENT_PORT");
+        if (envp != NULL) {
+            port = ::atoi(envp);
+        }
+        envp = ::getenv("SCI_PARENT_ID");
+        if (envp != NULL) {
+            pID = ::atoi(envp);
+        }
+        inStream = new Stream();
+        inStream->init(nodeAddr.c_str(), port);
+        *inStream << gCtrlBlock->getJobKey() << hndl << pID << endl;
+    } else {
+        getIntToken();
+        inStream = initStream();
+    }
+    gCtrlBlock->enable();
 
     // get hostname and port no from environment variable.
     envp = ::getenv("SCI_WORK_DIRECTORY");
@@ -481,106 +395,45 @@ int Initializer::initBE(int hndl)
         log_debug("Change working directory to %s", envp);
     }
 
-    envp = ::getenv("SCI_PARENT_HOSTNAME");
-    if (envp != NULL) {
-        nodeAddr = envp;
-    }
-
-    envp = ::getenv("SCI_PARENT_PORT");
-    if (envp != NULL) {
-        port = ::atoi(envp);
-    }
-    
+    hndl = gCtrlBlock->getMyHandle();
     log_debug("My parent host is %s, parent port id %d, my ID is %d", nodeAddr.c_str(), port, hndl);
 
-    Stream *stream = new Stream();   
-    stream->init(nodeAddr.c_str(), port);
-    *stream << gCtrlBlock->getJobKey() << hndl << endl;
-
-    gCtrlBlock->registerStream(stream);
-    gCtrlBlock->setParentStream(stream);
-    gStateMachine->parse(StateMachine::PARENT_CONNECTED);
-
-    ErrorDetector *errDetector = NULL;
-    ErrorHandler *errHandler = NULL;
-
-    // err detector need to be created before purifier processor
-    envp = ::getenv("SCI_ENABLE_FAILOVER");
-    if (envp != NULL) {
-        if (::strcmp(envp, "yes") == 0) {
-            MessageQueue *errInQ = new MessageQueue();
-            errInQ->setName("errInQ");
-            gCtrlBlock->registerQueue(errInQ);
-            gCtrlBlock->setErrorQueue(errInQ);
-
-            errDetector = new ErrorDetector(hndl);
-            gCtrlBlock->registerProcessor(errDetector);
-            errDetector->setInQueue(errInQ);
-
-            if (gCtrlBlock->getEndInfo()->be_info.err_hndlr != NULL) {
-                MessageQueue *errOutQ = new MessageQueue();
-                errOutQ->setName("errOutQ");
-                gCtrlBlock->registerQueue(errOutQ);
-                errDetector->setOutQueue(errOutQ);
-
-                errHandler = new ErrorHandler(hndl);
-                gCtrlBlock->registerProcessor(errHandler);
-                errHandler->setInQueue(errOutQ);
-            }
-        }
-    }
-    
-    MessageQueue *userQ = new MessageQueue();
-    userQ->setName("userQ");
-    gCtrlBlock->registerQueue(userQ);
-    gCtrlBlock->setUpQueue(userQ);
-
-    MessageQueue *sysQ = new MessageQueue();
-    sysQ->setName("sysQ");
-    gCtrlBlock->setPurifierOutQueue(sysQ);
-    gCtrlBlock->registerQueue(sysQ);
-
-    WriterProcessor *writer = new WriterProcessor(hndl);
-    gCtrlBlock->registerProcessor(writer);
-    writer->setInQueue(userQ);
-    writer->setOutStream(stream);
-
     PurifierProcessor *purifier = new PurifierProcessor(hndl);
-    gCtrlBlock->registerProcessor(purifier);
-    purifier->setInStream(stream);
-    purifier->setOutQueue(sysQ);
-    purifier->setOutErrorQueue(gCtrlBlock->getErrorQueue());
+    gCtrlBlock->setPurifierProcessor(purifier);
 
-    // writer is a peer processor of purifier
-    purifier->setPeerProcessor(writer);
-
-    HandlerProcessor *handler = NULL;
-    if (gCtrlBlock->getEndInfo()->be_info.mode == SCI_INTERRUPT) {
-        // interrupt mode
-        handler = new HandlerProcessor();
-        gCtrlBlock->registerProcessor(handler);
-        handler->setInQueue(sysQ);
-    } else {
+    if (gCtrlBlock->getEndInfo()->be_info.mode == SCI_POLLING) {
         // polling mode
+        MessageQueue *sysQ = new MessageQueue();
+        sysQ->setName("sysQ");
+
         Observer *ob = new Observer();
         gCtrlBlock->setObserver(ob);
         gCtrlBlock->setPollQueue(sysQ);
         purifier->setObserver(ob);
+        purifier->setOutQueue(sysQ);
     }
 
-    gRoutingList->addBE(SCI_GROUP_ALL, VALIDBACKENDIDS, hndl);
-    gStateMachine->parse(StateMachine::DATASTRUC_CREATED);
+    if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT) {
+        EmbedAgent *beAgent = new EmbedAgent();
+        beAgent->init(hndl, inStream, NULL);
+        beAgent->work();
+    } else {
+        MessageQueue *userQ = new MessageQueue();
+        userQ->setName("userQ");
+        gCtrlBlock->setUpQueue(userQ);
 
-    writer->start();
-    purifier->start();
-    if (errDetector) {
-        errDetector->start();
+        purifier->setInStream(inStream);
+        WriterProcessor *writer = new WriterProcessor(hndl);
+        // writer is a peer processor of purifier
+        purifier->setPeerProcessor(writer);
+
+        writer->setInQueue(userQ);
+        writer->setOutStream(inStream);
+        purifier->start();
+        writer->start();
     }
-    if (errHandler) {
-        errHandler->start();
-    }
-    if (handler) {
-        handler->start();
+    if (!extMode) {
+        sendSyncRet(inStream);
     }
 
     return SCI_SUCCESS;
@@ -597,61 +450,35 @@ int Initializer::initExtBE(int hndl)
     string username = pwd->pw_name;
     struct iovec sign = {0};
     struct iovec token = {0};
-    struct iovec vecs[3];
     int rc, tmp0, tmp1, tmp2;
+    int port = SCI_DAEMON_PORT;
     Launcher::MODE mode = Launcher::REQUEST;
     int jobKey = gCtrlBlock->getJobKey();
+    struct servent *serv = NULL;
+    char *envp = getenv("SCI_DAEMON_NAME");
 
-    tmp0 = htonl(mode);
-    vecs[0].iov_base = &tmp0;
-    vecs[0].iov_len = sizeof(tmp0);
-    tmp1 = htonl(jobKey);
-    vecs[1].iov_base = &tmp1;
-    vecs[1].iov_len = sizeof(tmp1);
-    tmp2 = htonl(hndl);
-    vecs[2].iov_base = &tmp2;
-    vecs[2].iov_len = sizeof(tmp2);
-    rc = SSHFUNC->sign_data(vecs, 3, &sign);
-
+    if (envp != NULL) {
+        serv = getservbyname(envp, "tcp");
+    } else {
+        serv = getservbyname("scid", "tcp");
+    }
+    if (serv != NULL) {
+        port = ntohs(serv->s_port);
+    }
+    rc = SSHFUNC->sign_data(&sign, 3, &mode, sizeof(mode), &jobKey, sizeof(jobKey), &hndl, sizeof(hndl));
     ::gethostname(hostname, sizeof(hostname));
-    stream.init(hostname, SCI_DAEMON_PORT);
+    stream.init(hostname, port);
     stream << username.c_str() << usertok << sign << (int)mode << jobKey << hndl << endl;
     SSHFUNC->free_signature(&sign);
     stream >> envStr >> token >> sign >> endl;
     stream.stop();
-    vecs[0].iov_base = (char *)envStr.c_str(); 
-    vecs[0].iov_len = envStr.size() + 1;
-    vecs[1] = token;
-    rc = SSHFUNC->verify_data(vecs, 2, &sign);
+    rc = SSHFUNC->verify_data(&sign, 2, (char *)envStr.c_str(), envStr.size() + 1, token.iov_base, token.iov_len);
     SSHFUNC->set_user_token(&token);
     delete [] (char *)sign.iov_base;
     if (rc != 0)
         return -1;
-
-    string key, val;
-    char *st = (char *) envStr.c_str();
-    char *p = st + envStr.size();
-    while (p > st) {
-        p--;
-        if ((*p) == '=') {
-            *p = '\0';
-            val = (p+1);
-        } else if ((*p) == ';') {
-            *p = '\0';
-            key = (p+1);
-            ::setenv(key.c_str(), val.c_str(), 1);
-        }
-    }
+    
+    parseEnvStr(envStr);
     
     return 0;
 }
-
-void Initializer::initListener()
-{
-    Listener *listener = new Listener(gCtrlBlock->getMyHandle());
-    gCtrlBlock->setListener(listener);
-    
-    listener->init();
-    listener->start();
-}
-

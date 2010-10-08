@@ -42,6 +42,7 @@
 #define SCI_ERR_LAUNCH_FAILED        (-2022)
 #define SCI_ERR_POLL_INVALID         (-2023)
 #define SCI_ERR_INVALID_USER         (-2024)
+#define SCI_ERR_INVALID_MODE         (-2025)
 
 #define SCI_ERR_PARENT_BROKEN        (-5000)
 #define SCI_ERR_CHILD_BROKEN         (-5001)
@@ -57,6 +58,7 @@ typedef int sci_group_t;
 ** SCI Bcast & Upload message handler
 */
 typedef int (SCI_msg_hndlr)(void *user_param, sci_group_t group, void *buf, int size);
+typedef int (SCI_connect_hndlr)(const char *hostname);  // hostname can be a name or an IP address
 
 /*
 ** SCI Error message handler
@@ -103,7 +105,6 @@ typedef struct {
 } sci_filter_list_t;
 
 typedef struct {
-    sci_end_type_t       type;
     sci_mode_t           mode;
     SCI_msg_hndlr        *hndlr;
     void                 *param;
@@ -112,11 +113,11 @@ typedef struct {
     char                 *bepath;
     char                 **beenvp;
     sci_filter_list_t    filter_list;    
-    char                 reserve[52];
+    char                 **host_list;
+    char                 reserve[64];
 } sci_fe_info_t;
 
 typedef struct {
-    sci_end_type_t   type;
     sci_mode_t       mode;
     SCI_msg_hndlr    *hndlr;
     void             *param;
@@ -124,15 +125,20 @@ typedef struct {
     char             reserve[64];
 } sci_be_info_t;
 
-typedef union {
-    sci_end_type_t   type;
-    sci_fe_info_t    fe_info;
-    sci_be_info_t    be_info;
+typedef struct {
+    sci_end_type_t          type;
+    SCI_connect_hndlr       *connect_hndlr;             
+    union {
+        sci_fe_info_t           fe_info;
+        sci_be_info_t           be_info;
+    } _u;
+#define fe_info _u.fe_info
+#define be_info _u.be_info
 } sci_info_t;
 
 typedef struct {
     int              id;
-    char             *hostname;
+    char             *hostname;  /* hostname can be a name or an IP address */
     int              level;
 } sci_be_t;
 
@@ -147,7 +153,11 @@ typedef enum {
     NUM_SUCCESSORS,
     SUCCESSOR_IDLIST,
     HEALTH_STATUS,
-    AGENT_LEVEL
+    AGENT_LEVEL,
+    LISTENER_PORT,
+    PARENT_SOCKFD,
+    NUM_CHILDREN_FDS,
+    CHILDREN_SOCKFDS
 } sci_query_t;
 
 typedef enum {
@@ -211,6 +221,11 @@ int SCI_Filter_upload(int filter_id, sci_group_t group, int num_bufs, void *bufs
 */
 int SCI_BE_add(sci_be_t *be);
 int SCI_BE_remove(int be_id);
+
+/*
+** SCI release sesion but keep the socket descripters to support third-party
+*/
+int SCI_Release();
 
 #ifdef __cplusplus
 }

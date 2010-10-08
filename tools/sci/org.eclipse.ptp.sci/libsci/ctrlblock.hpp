@@ -32,7 +32,6 @@
 
 #include <pthread.h>
 #include <map>
-#include <vector>
 
 #include "sci.h"
 #include "general.hpp"
@@ -42,15 +41,15 @@ using namespace std;
 class MessageQueue;
 class Processor;
 class Stream;
-
 class FilterProcessor;
 class RouterProcessor;
-
-class Listener;
+class PurifierProcessor;
 class Topology;
 class Observer;
-
-class ErrorInjector;
+class RoutingList;
+class EmbedAgent;
+class FilterList;
+class HandlerProcessor;
 
 class CtrlBlock
 {
@@ -59,58 +58,46 @@ class CtrlBlock
             INVALID,
             FRONT_END,
             AGENT,
-            BACK_END
+            BACK_END,
+            BACK_AGENT
         };
         
-        typedef map<int, MessageQueue*> QUEUE_MAP;
-
-        typedef vector<Stream*> STREAM_VEC;
-        typedef vector<Processor*> PROC_VEC;
-        typedef vector<MessageQueue*> QUEUE_VEC;
+        typedef map<int, EmbedAgent *> AGENT_MAP;
 
     private:
         // basic information
         ROLE                 role;
         int                  handle;
         int                  jobKey;
-        int                  ctrlID;
-        bool                 enabled;
+        int                  enableID;
+        pthread_mutex_t      mtx;
 
         sci_info_t           *endInfo;
-        Topology             *topoInfo;
-        Listener             *listener;
 
         Observer             *observer;
-        ErrorInjector        *errInjector;
+        AGENT_MAP            embedAgents;
 
         // flow control threshold
         long long            thresHold;
-
-        // internal queue, processor, stream information
-        QUEUE_VEC            queues;
-        PROC_VEC             processors;
-        STREAM_VEC           streams;
-
-        QUEUE_MAP            queueInfo;
+        bool                 released;
 
         // additional information for convenient purpose
         MessageQueue         *routerInQueue;
         MessageQueue         *filterInQueue;
         MessageQueue         *filterOutQueue;
         MessageQueue         *purifierOutQueue;
-        MessageQueue         *upQueue;
         MessageQueue         *pollQueue;
+        MessageQueue         *upQueue;
         
         MessageQueue         *errorQueue;
         MessageQueue         *monitorInQueue;
 
         RouterProcessor      *routerProc;
         FilterProcessor      *filterProc;
+        PurifierProcessor    *purifierProc;
+        HandlerProcessor     *handlerProc;
 
         Stream               *parentStream;
-
-        // lock
-        pthread_mutex_t      mtx;
 
         CtrlBlock();
         static CtrlBlock *instance;
@@ -124,49 +111,38 @@ class CtrlBlock
         }
 
         ROLE getMyRole();
+        void setMyRole(CtrlBlock::ROLE ro); 
         int getMyHandle();
+        void setMyHandle(int hndl);
         sci_info_t * getEndInfo();
         int getJobKey();
+        void setJobKey(int key);
+        void addEmbedAgent(int hndl, EmbedAgent *agent);
+        EmbedAgent *getAgent(int hndl);
+        void setReleased(bool rel);
+        bool getReleased();
         
-        int initFE(int hndl, sci_info_t *info);
-        int initBE(int hndl, sci_info_t *info);
-        int initAgent(int hndl);
+        int init(sci_info_t *info);
         void term();
 
         void enable();
         void disable();
         bool isEnabled();
-        void notifyPollQueue();
+        void releasePollQueue();
 
-        void setTopology(Topology *topo);
-        void setListener(Listener *li);
         void setObserver(Observer *ob);
-        void setErrorInjector(ErrorInjector *injector);
         Topology * getTopology();
-        Listener * getListener();
         Observer * getObserver();
 
         // main components in SCI
-        void registerQueue(MessageQueue *queue);
-        void registerProcessor(Processor *proc);
-        void registerStream(Stream *stream);
-
-        // only these two operations required lock protection
-        void mapQueue(int hndl, MessageQueue *queue);
-        MessageQueue * queryQueue(int hndl);
-
         void setRouterInQueue(MessageQueue *queue);
         void setFilterInQueue(MessageQueue *queue);
-        void setFilterOutQueue(MessageQueue *queue);
-        void setPurifierOutQueue(MessageQueue *queue);
-        void setUpQueue(MessageQueue *queue);
         void setPollQueue(MessageQueue *queue);
+        void setUpQueue(MessageQueue *queue);
         void setMonitorInQueue(MessageQueue *queue);
         void setErrorQueue(MessageQueue *queue);
         MessageQueue * getRouterInQueue();
         MessageQueue * getFilterInQueue();
-        MessageQueue * getFilterOutQueue();
-        MessageQueue * getPurifierOutQueue();
         MessageQueue * getPollQueue();
         MessageQueue * getUpQueue();
         MessageQueue * getErrorQueue();
@@ -174,20 +150,23 @@ class CtrlBlock
         
         void setRouterProcessor(RouterProcessor *proc);
         void setFilterProcessor(FilterProcessor *proc);
+        void setHandlerProcessor(HandlerProcessor *proc);
+        void setPurifierProcessor(PurifierProcessor *proc);
         RouterProcessor * getRouterProcessor();
         FilterProcessor * getFilterProcessor();
-
-        void setParentStream(Stream *stream);
-        Stream * getParentStream();
+        PurifierProcessor * getPurifierProcessor();
+        RoutingList * getRoutingList();
+        FilterList * getFilterList();
+        int getChildrenSockfds(int *fds);
+        int numOfChildrenFds();
 
         void setFlowctlThreshold(long long th);
         long long getFlowctlThreshold();
 
         void genSelfInfo(MessageQueue *queue, bool isUncle);
-
-    private:
         void clean();
 
+    private:
         void lock();
         void unlock();
 };

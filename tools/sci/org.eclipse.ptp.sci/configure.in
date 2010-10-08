@@ -15,7 +15,7 @@ AC_PREFIX_DEFAULT("/opt/sci")
 
 UNAME_SYSTEM=`(uname -s) 2>/dev/null`  || UNAME_SYSTEM=unknown
 UNAME_MACHINE=`(uname -m) 2>/dev/null` || UNAME_MACHINE=unknown
-CXXFLAGS=-O0
+UNAME_BIT=32
 AC_DEFINE(_SCI_DEBUG, 1, "for debugging")
 case "${UNAME_SYSTEM}" in
     Linux)
@@ -25,7 +25,7 @@ case "${UNAME_SYSTEM}" in
     AIX)
     AC_DEFINE(_AIX, 1, "define if linux")
     AC_DEFINE(POWER_ARCH, 1, "define if ppc")
-    AC_DEFINE(__64BIT__, 1, "define if 64 bit")
+    UNAME_BIT=64
     CC=xlc_r
     ;;
     Darwin)
@@ -42,8 +42,8 @@ case "${UNAME_MACHINE}" in
 esac
 case "${UNAME_MACHINE}" in
     *64*)
-    AC_DEFINE(__64BIT__, 1, "define if 64 bit")
     libdir="\${exec_prefix}/lib64" 
+    UNAME_BIT=64
     ;;
 esac
 
@@ -65,6 +65,8 @@ AM_CONDITIONAL(OPEN_SSL, test $openssl = yes)
 AM_CONDITIONAL(SYSTEM_LINUX, test $UNAME_SYSTEM = Linux)
 AM_CONDITIONAL(SYSTEM_AIX, test $UNAME_SYSTEM = AIX)
 AM_CONDITIONAL(SYSTEM_DARWIN, test $UNAME_SYSTEM = Darwin)
+AM_CONDITIONAL(BIT64, test $UNAME_BIT = 64)
+
 
 # Checks for header files.
 # AC_HEADER_STDC

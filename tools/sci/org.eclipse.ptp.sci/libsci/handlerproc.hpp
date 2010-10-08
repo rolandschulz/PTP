@@ -38,13 +38,12 @@ class MessageQueue;
 class HandlerProcessor : public Processor 
 {
     private:
-        MessageQueue        *inQueue;
-
         SCI_msg_hndlr       *hndlr;
         void                *param;
 
     public:
         HandlerProcessor(int hndl = -1);
+        ~HandlerProcessor();
 
         virtual Message * read();
         virtual void process(Message *msg);
@@ -52,8 +51,6 @@ class HandlerProcessor : public Processor
         virtual void seize();
         virtual void clean();
 
-        virtual bool isActive();
-        
         void setInQueue(MessageQueue *queue);
 };
 

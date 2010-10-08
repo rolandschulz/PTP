@@ -18,5 +18,9 @@ noinst_HEADERS = \
 if SYSTEM_AIX
 ARFLAGS += -X32_64
 libcmn64_a_SOURCES = $(SOURCES)
-libcmn64_a_CPPFLAGS = -q64 -I../secmod -fPIC
+libcmn64_a_CPPFLAGS = -q64 -I../secmod -fPIC -D__64BIT__
+else
+if BIT64
+libcmn_a_CPPFLAGS += -D__64BIT__
+endif
 endif

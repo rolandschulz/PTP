@@ -17,7 +17,7 @@
     output: a. a message queue
     action: use user-defined filter handlers to process the messages
    
- Author: Nicole Nie
+ Author: Nicole Nie, Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -34,12 +34,12 @@
 class Stream;
 class MessageQueue;
 class Observer;
+class FilterList;
 
 class FilterProcessor : public Processor 
 {
     private:
-        MessageQueue        *inQueue;
-        MessageQueue        *outQueue;
+        FilterList          *filterList;
 
         Observer            *observer;
 
@@ -47,15 +47,14 @@ class FilterProcessor : public Processor
         int                 curFilterID;
 
     public:
-        FilterProcessor(int hndl = -1);
+        FilterProcessor(int hndl = -1, FilterList *flist = NULL);
+        ~FilterProcessor();
 
         virtual Message * read();
         virtual void process(Message *msg);
         virtual void write(Message *msg);
         virtual void seize();
         virtual void clean();
-
-        virtual bool isActive();
 
         void deliever(Message *msg);
         int getCurFilterID();
@@ -64,6 +63,8 @@ class FilterProcessor : public Processor
         void setOutQueue(MessageQueue *queue);
 
         void setObserver(Observer *ob);
+        MessageQueue * getInQueue();
+        MessageQueue * getOutQueue();
 };
 
 #endif
