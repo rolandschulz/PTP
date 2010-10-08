@@ -47,7 +47,6 @@ import org.eclipse.ptp.debug.core.messages.Messages;
 public class PDebugConfiguration implements IPDebugConfiguration {
 	private String[] fCoreExt;
 	private HashSet<String> fCPUs;
-	private IPDebugger fDebugger = null;
 	private final IConfigurationElement fElement;
 	private HashSet<String> fModes;
 
@@ -55,8 +54,11 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		fElement = element;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#getCoreFileExtensions()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.IPDebugConfiguration#getCoreFileExtensions()
 	 */
 	public String[] getCoreFileExtensions() {
 		if (fCoreExt == null) {
@@ -75,43 +77,50 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return fCoreExt;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#getCPUList()
 	 */
 	public String[] getCPUList() {
 		return getCPUs().toArray(new String[0]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#getDebugger()
 	 */
 	public IPDebugger getDebugger() throws CoreException {
-		if (fDebugger == null) {
-			final Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
-			if (!(debugger instanceof IPDebugger)) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1,
-						Messages.PDebugConfiguration_1, null));
-			}
-			fDebugger = (IPDebugger) debugger;
+		final Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
+		if (!(debugger instanceof IPDebugger)) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1,
+					Messages.PDebugConfiguration_1, null));
 		}
-		return fDebugger;
+		return (IPDebugger) debugger;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#getID()
 	 */
 	public String getID() {
 		return getConfigurationElement().getAttribute("id"); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#getModeList()
 	 */
 	public String[] getModeList() {
 		return getModes().toArray(new String[0]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#getName()
 	 */
 	public String getName() {
@@ -119,7 +128,9 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return name != null ? name : ""; //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#getPlatform()
 	 */
 	public String getPlatform() {
@@ -130,8 +141,12 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return platform;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#supportsCPU(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.IPDebugConfiguration#supportsCPU(java.lang
+	 * .String)
 	 */
 	public boolean supportsCPU(String cpu) {
 		final String nativeCPU = Platform.getOSArch();
@@ -142,8 +157,12 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return ret || getCPUs().contains(cpu) || getCPUs().contains("*"); //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IPDebugConfiguration#supportsMode(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.IPDebugConfiguration#supportsMode(java.lang
+	 * .String)
 	 */
 	public boolean supportsMode(String mode) {
 		return getModes().contains(mode);
