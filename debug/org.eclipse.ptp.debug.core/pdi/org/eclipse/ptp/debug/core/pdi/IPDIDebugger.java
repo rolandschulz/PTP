@@ -19,11 +19,11 @@
 package org.eclipse.ptp.debug.core.pdi;
 
 import java.util.List;
-import java.util.Observer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.debug.core.TaskSet;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager;
 
 /**
  * Represents a number of methods to communication to a debugger
@@ -33,6 +33,18 @@ import org.eclipse.ptp.debug.core.TaskSet;
  */
 public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManagement, IPDIVariableManagement,
 		IPDISignalManagement, IPDIStackframeManagement, IPDIThreadManagement, IPDIMemoryBlockManagement {
+	/**
+	 * Adds event manager to the debugger. Debuggers can use the event manager
+	 * to pass events to upper layers.
+	 * 
+	 * @param eventManager
+	 *            event manager to add
+	 * @throws PDIException
+	 *             on failure
+	 * @since 5.0
+	 */
+	public void addEventManager(IPDIEventManager eventManager) throws PDIException;
+
 	/**
 	 * Requests a special command for specify process
 	 * 
@@ -47,16 +59,6 @@ public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManag
 	public void commandRequest(TaskSet tasks, String command) throws PDIException;
 
 	/**
-	 * Disconnects observer from debugger
-	 * 
-	 * @param observer
-	 *            disconnect observer from debugger
-	 * @throws PDIException
-	 *             on failure
-	 */
-	public void disconnect(Observer observer) throws PDIException;
-
-	/**
 	 * Returns an action when error occurred
 	 * 
 	 * @param errorCode
@@ -64,39 +66,6 @@ public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManag
 	 * @return an action when error occurred
 	 */
 	public int getErrorAction(int errorCode);
-
-	/**
-	 * Connects debugger and adds observer to debugger
-	 * 
-	 * @param monitor
-	 * @return true if connection is established
-	 * @throws PDIException
-	 *             on failure
-	 */
-	public boolean isConnected(IProgressMonitor monitor) throws PDIException;
-
-	/**
-	 * Register observer for notify event from sdm
-	 * 
-	 * @param observer
-	 */
-	public void register(Observer observer);
-
-	/**
-	 * Starts debugger
-	 * 
-	 * @throws PDIException
-	 *             on failure
-	 */
-	public void startDebugger(String app, String path, String dir, String[] args) throws PDIException;
-
-	/**
-	 * Stops debugger
-	 * 
-	 * @throws PDIException
-	 *             on failure
-	 */
-	public void stopDebugger() throws PDIException;
 
 	/**
 	 * Initialize the debugger. If args is an empty list, attempt to initialize
@@ -113,4 +82,41 @@ public interface IPDIDebugger extends IPDIBreakpointManagement, IPDIExecuteManag
 	 * @throws PDIException
 	 */
 	public void initialize(ILaunchConfiguration configuration, List<String> args, IProgressMonitor monitor) throws PDIException;
+
+	/**
+	 * Connects debugger and adds observer to debugger
+	 * 
+	 * @param monitor
+	 * @return true if connection is established
+	 * @throws PDIException
+	 *             on failure
+	 */
+	public boolean isConnected(IProgressMonitor monitor) throws PDIException;
+
+	/**
+	 * Removes event manager from debugger
+	 * 
+	 * @param eventManager
+	 *            event manager to remove
+	 * @throws PDIException
+	 *             on failure
+	 * @since 5.0
+	 */
+	public void removeEventManager(IPDIEventManager eventManager) throws PDIException;
+
+	/**
+	 * Starts debugger
+	 * 
+	 * @throws PDIException
+	 *             on failure
+	 */
+	public void startDebugger(String app, String path, String dir, String[] args) throws PDIException;
+
+	/**
+	 * Stops debugger
+	 * 
+	 * @throws PDIException
+	 *             on failure
+	 */
+	public void stopDebugger() throws PDIException;
 }

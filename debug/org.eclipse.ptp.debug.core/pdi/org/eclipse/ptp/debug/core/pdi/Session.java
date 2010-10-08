@@ -57,6 +57,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStartDebuggerRequest;
 
 /**
  * @author clement
+ * @since 5.0
  * 
  */
 public class Session implements IPDISession {
@@ -178,7 +179,7 @@ public class Session implements IPDISession {
 				setStatus(DISCONNECTED);
 				throw new PDIException(getTasks(), Messages.Session_0);
 			}
-			getDebugger().register(eventManager);
+			getDebugger().addEventManager(eventManager);
 			progress.subTask(NLS.bind(Messages.Session_1, total_tasks));
 			IPDIStartDebuggerRequest request = getRequestFactory().getStartDebuggerRequest(getTasks(), app, path, dir, args);
 			eventRequestManager.addEventRequest(request);
@@ -683,7 +684,7 @@ public class Session implements IPDISession {
 				exit();
 			} else
 				setStatus(EXITING);
-			debugger.disconnect(eventManager);
+			debugger.removeEventManager(eventManager);
 		} catch (PDIException e) {
 			e.printStackTrace();
 		} finally {

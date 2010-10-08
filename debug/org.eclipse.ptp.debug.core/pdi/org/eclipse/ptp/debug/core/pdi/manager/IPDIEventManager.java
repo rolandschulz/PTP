@@ -18,22 +18,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import java.util.Observer;
-
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIEventListener;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
 
 /**
- * Clients interested in the PDI model change notification may register with this object
+ * Clients interested in the PDI model change notification may register with
+ * this object
+ * 
  * @author clement
- *
+ * 
  */
-public interface IPDIEventManager extends IPDIManager, Observer {
+public interface IPDIEventManager extends IPDIManager {
 	/**
-	 * Adds the given listener to the collection of registered event listeners. 
-	 * Has no effect if an identical listener is already registered 
-	 * @param listener - the listener to add
+	 * Adds the given listener to the collection of registered event listeners.
+	 * Has no effect if an identical listener is already registered
+	 * 
+	 * @param listener
+	 *            - the listener to add
 	 */
 	public void addEventListener(IPDIEventListener listener);
 
@@ -41,37 +43,42 @@ public interface IPDIEventManager extends IPDIManager, Observer {
 	 * @param event
 	 */
 	public void fireEvent(IPDIEvent event);
-	
+
 	/**
 	 * @param events
 	 */
 	public void fireEvents(final IPDIEvent[] events);
-	
+
 	/**
 	 * @return
 	 */
 	public IPDIEventRequest getCurrentRequest();
-	
+
 	/**
 	 * @param request
 	 */
 	public void notifyEventRequest(IPDIEventRequest request);
-	
+
 	/**
 	 * Register a request in event manager for lookup
-	 * @param request an event request
+	 * 
+	 * @param request
+	 *            an event request
 	 */
 	public void registerEventRequest(IPDIEventRequest request);
-	
+
 	/**
 	 * 
 	 */
 	public void removeAllRegisteredEventRequests();
-	
+
 	/**
-	 * Removes the given listener from the collection of registered event listeners.
-	 * Has no effect if an identical listener is not already registered
-	 * @param listener - the listener to remove
+	 * Removes the given listener from the collection of registered event
+	 * listeners. Has no effect if an identical listener is not already
+	 * registered
+	 * 
+	 * @param listener
+	 *            - the listener to remove
 	 */
 	public void removeEventListener(IPDIEventListener listener);
 }
