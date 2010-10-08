@@ -51,8 +51,6 @@ class Processor : public Thread
         int                 totalSize;
         MessageQueue        *inQueue;
         MessageQueue        *outQueue;
-        bool                toShutdown;
-        
 
     public:
         Processor(int hndl = -1);
@@ -67,7 +65,6 @@ class Processor : public Thread
 
         virtual bool isActive();
         
-        void setShutdown(bool shut) { toShutdown = shut; }
         void dump();
         void setName(char *str) { name = str; }
         string getName() { return name; }

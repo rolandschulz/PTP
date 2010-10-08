@@ -31,7 +31,9 @@
 #include "filterproc.hpp"
 #include "handlerproc.hpp"
 #include "routerproc.hpp"
+#include "topology.hpp"
 #include "message.hpp"
+#include "eventntf.hpp"
 #include "queue.hpp"
 #include "stream.hpp"
 #include "routinglist.hpp"
@@ -126,15 +128,25 @@ MessageQueue * EmbedAgent::getUpQueue()
 
 int EmbedAgent::work()
 {
+    int rc = 0;
+
     routerProc->start();
     filterProc->start();
     if (writerProc)
         writerProc->start();
     if (gCtrlBlock->getMyRole() != CtrlBlock::BACK_AGENT) {
-        int rc = registPrivateData();
+        rc = registPrivateData();
     }
 
-    return 0;
+    return rc;
+}
+
+int EmbedAgent::syncWait()
+{
+    int rc = 0;
+    gNotifier->freeze(routingList->getTopology()->getInitID(), &rc);
+
+    return rc;
 }
 
 FilterProcessor * EmbedAgent::getFilterProcessor()

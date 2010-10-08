@@ -34,6 +34,7 @@
 #include "exception.hpp"
 #include "socket.hpp"
 
+#include "atomic.hpp"
 #include "ctrlblock.hpp"
 #include "message.hpp"
 #include "stream.hpp"
@@ -99,7 +100,7 @@ void FilterProcessor::write(Message * msg)
         observer->notify();
     }
 
-    msg->incRefCount();
+    incRefCount(msg->getRefCount());
     outQueue->produce(msg);
 
     inQueue->remove();

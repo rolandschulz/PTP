@@ -95,10 +95,6 @@ void ReaderProcessor::write(Message * msg)
                 delete msg;
             }
             break;
-        case Message::RELEASE:
-            setState(false);
-            outQueue->produce(msg);
-            break;
         default:
             outQueue->produce(msg);
             break;
@@ -113,8 +109,7 @@ void ReaderProcessor::seize()
 
 void ReaderProcessor::clean()
 {
-    if (toShutdown)
-        inStream->stopRead();
+    inStream->stopRead();
     setState(false);    
 }
 

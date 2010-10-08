@@ -37,7 +37,7 @@ class SysUtil
         static string itoa(int value);
         static string lltoa(long long value);
         static double microseconds();
-        static void sleep(int nsecs);
+        static void sleep(int usecs);
 
         static string get_hostname(const char *name);
         static char * get_path_name(const char *program);

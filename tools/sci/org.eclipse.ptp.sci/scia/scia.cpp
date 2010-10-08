@@ -60,8 +60,10 @@ int main()
     char *error = NULL;
     int rc;
 
-#if defined(_SCI_LINUX) || defined(__APPLE__)
+#if defined(_SCI_LINUX)
     dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
+#elif defined(__APPLE__)
+    dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW | RTLD_GLOBAL);
 #else  // aix
     dlopen_file = ::dlopen(SCI_LIB_PATH, RTLD_NOW|RTLD_GLOBAL|RTLD_MEMBER);
 #endif

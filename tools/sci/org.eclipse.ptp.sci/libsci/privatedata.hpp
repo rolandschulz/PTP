@@ -10,9 +10,9 @@
 * which accompanies this distribution, and is available at
 * http://www.eclipse.org/legal/epl-v10.html
 
- Classes: EmbedAgent
+ Classes: PrivateData
 
- Description: embedded agent in front-end and back-end
+ Description: thread specific data
    
  Author: Tu HongJ
 

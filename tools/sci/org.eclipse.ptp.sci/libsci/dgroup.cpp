@@ -256,18 +256,18 @@ int DistributedGroup::operate(sci_group_t group1, sci_group_t group2, sci_op_t o
         }
     } else if (op == SCI_DIFFERENCE) {
         GRP_MAP_MAP::iterator it = generalInfo.find(group1);
+        int childHndl;
+        Group *grp, *diff;
         
         GRP_MAP::iterator git = (*it).second.begin();
         for (; git!=(*it).second.end(); ++git) {
-            int childHndl = (*git).first;
-            Group *grp = (*git).second;
-            
-            if (generalInfo[group2].find(childHndl) == generalInfo[group2].end()) {
-                // if not found
-                continue;
+            childHndl = (*git).first;
+            grp = (*git).second;
+            diff = new Group(*grp);
+
+            if (generalInfo[group2].find(childHndl) != generalInfo[group2].end()) {
+                diff->Delete(*generalInfo[group2][childHndl]);
             }
-            Group *diff = new Group(*grp);
-            diff->Delete(*generalInfo[group2][childHndl]);
             if (!diff->empty()) { // if not empty
                 generalInfo[newgroup][childHndl] = diff;
                 hasMember = true;

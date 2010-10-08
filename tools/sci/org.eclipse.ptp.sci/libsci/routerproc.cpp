@@ -37,6 +37,7 @@
 #include "exception.hpp"
 #include "socket.hpp"
 
+#include "atomic.hpp"
 #include "routerproc.hpp"
 #include "ctrlblock.hpp"
 #include "message.hpp"
@@ -115,10 +116,6 @@ void RouterProcessor::process(Message * msg)
             topo->setFilterList(filterList);
             
             rc = topo->deploy();
-            if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-                *(int *)gNotifier->getRetVal(msg->getID()) = rc;
-                gNotifier->notify(msg->getID());   
-            }
             break;
         case Message::FILTER_LOAD:
         case Message::FILTER_UNLOAD:
@@ -162,11 +159,6 @@ void RouterProcessor::process(Message * msg)
                 gNotifier->notify(msg->getID());
             }
             break;
-        case Message::RELEASE:
-            toShutdown = false;
-            routingList->bcast(SCI_GROUP_ALL, msg);
-            setState(false);
-            break;
         case Message::QUIT:
             routingList->bcast(SCI_GROUP_ALL, msg);
             setState(false);
@@ -187,7 +179,7 @@ void RouterProcessor::write(Message * msg)
 {
     if (joinSegs || inStream) {
         joinSegs = false;
-        if (msg->decRefCount() == 0)
+        if (decRefCount(msg->getRefCount()) == 0)
             delete msg;
         return;
     }
@@ -206,9 +198,9 @@ void RouterProcessor::seize()
 
 void RouterProcessor::clean()
 {
-    if (inStream && toShutdown)
+    if (inStream)
         inStream->stopRead();
-    routingList->stopRouting(toShutdown);
+    routingList->stopRouting();
     gCtrlBlock->disable();
 }
 

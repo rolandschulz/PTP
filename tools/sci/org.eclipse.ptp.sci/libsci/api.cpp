@@ -177,9 +177,6 @@ int SCI_Query(sci_query_t query, void *ret_val)
         case NUM_CHILDREN_FDS:
             *p = gCtrlBlock->numOfChildrenFds();
             break;
-        case CHILDREN_SOCKFDS:
-            gCtrlBlock->getChildrenSockfds(p);
-            break;
         default:
             return SCI_ERR_UNKNOWN_INFO;
     }
@@ -685,29 +682,4 @@ int SCI_BE_remove(int be_id)
     int rc;
     gNotifier->freeze(msgID, &rc);
     return rc;
-}
-
-int SCI_Release()
-{
-    char *envp = getenv("SCI_EMBED_AGENT");
-    if (!envp || (strcasecmp(envp, "yes") != 0)) {
-        return SCI_ERR_INVALID_MODE;
-    }
-    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-        while (!gCtrlBlock->getRoutingList()->allRouted()) {
-            SysUtil::sleep(1000);
-        } 
-        Message *msg = new Message();
-        int msgID = gNotifier->allocate();
-        msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::RELEASE, msgID);
-        gCtrlBlock->getRouterInQueue()->produce(msg);
-        gNotifier->freeze(msgID);
-        gCtrlBlock->clean();
-    } else {
-        while (!gCtrlBlock->getReleased()) {
-            SysUtil::sleep(1000);
-        } 
-    }
-
-    return 0;
 }

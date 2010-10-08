@@ -52,6 +52,7 @@ class Topology
 {        
     private:
         // primary members
+        int                  initID;
         int                  agentID;
         int                  fanOut;
         int                  level;
@@ -77,6 +78,8 @@ class Topology
 
         int init(); // only called by FE
         int deploy();
+        int getInitID();
+        void setInitID();
 
         int addBE(Message *msg);
         int removeBE(Message *msg);

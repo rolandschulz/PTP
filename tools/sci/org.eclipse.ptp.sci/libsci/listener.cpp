@@ -31,6 +31,7 @@
 
 #include "log.hpp"
 #include "stream.hpp"
+#include "sshfunc.hpp"
 #include "exception.hpp"
 
 #include "listener.hpp"
@@ -89,6 +90,8 @@ void Listener::run()
     int hndl = -1;
     int pID = -1;
     int key;
+    int rc;
+    struct iovec sign = {0};
 
     while (getState()) {
         try {
@@ -122,11 +125,19 @@ void Listener::run()
                 continue;
             }
 
-            *stream >> hndl >> pID >> endl;
+            *stream >> hndl >> pID >> sign >> endl;
             if (hndl >= 0) {
                 log_debug("Listener: back end %d is connected", hndl); 
             } else {
                 log_debug("Listener: agent %d is connected", hndl); 
+            }
+            rc = psec_verify_data(&sign, "%d%d%d", key, hndl, pID);
+            delete [] (char *)sign.iov_base;
+            if (rc != 0) {
+                log_warn("Misleading message comes.");
+                stream->stop();
+                delete stream;
+                continue;
             }
             gCtrlBlock->getAgent(pID)->getRoutingList()->startRouting(hndl, stream);
         } catch (Exception &e) {

@@ -33,6 +33,7 @@
 #include "exception.hpp"
 #include "socket.hpp"
 
+#include "atomic.hpp"
 #include "ctrlblock.hpp"
 #include "routinglist.hpp"
 #include "message.hpp"
@@ -95,7 +96,7 @@ void PurifierProcessor::process(Message * msg)
         case Message::COMMAND:
             if (observer) {
                 observer->notify();
-                msg->incRefCount(); // inQueue and outQueue
+                incRefCount(msg->getRefCount()); // inQueue and outQueue
                 outQueue->produce(msg);
             } else {
                 hndlr(param, msg->getGroup(), msg->getContentBuf(), msg->getContentLen());
@@ -129,12 +130,6 @@ void PurifierProcessor::process(Message * msg)
         case Message::FILTER_LIST:
             filterList->loadFilterList(*msg, false);
             break;
-        case Message::RELEASE:
-            msg->incRefCount(); // inQueue and outQueue
-            peerProcessor->getInQueue()->produce(msg);
-            toShutdown = false;
-            setState(false);
-            break;
         case Message::BE_REMOVE:
         case Message::QUIT:
             setState(false);
@@ -148,7 +143,7 @@ void PurifierProcessor::write(Message * msg)
 {
     if (joinSegs || inStream) {
         joinSegs = false;
-        if (msg->decRefCount() == 0)
+        if (decRefCount(msg->getRefCount()) == 0)
             delete msg;
         return;
     }
@@ -162,19 +157,15 @@ void PurifierProcessor::seize()
 
 void PurifierProcessor::clean()
 {
-    if (inStream && toShutdown)
+    if (inStream)
         inStream->stopRead();
     if (observer)
         gCtrlBlock->releasePollQueue();
+    gCtrlBlock->disable();
     if (peerProcessor) {
-        peerProcessor->setShutdown(toShutdown);
         peerProcessor->release();
         delete peerProcessor;
-        if (!toShutdown) {
-            gCtrlBlock->setReleased(true);
-        }
     }
-    gCtrlBlock->disable();
 }
 
 void PurifierProcessor::setInStream(Stream * stream)

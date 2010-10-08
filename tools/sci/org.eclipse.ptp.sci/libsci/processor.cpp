@@ -41,7 +41,7 @@
 #include "queue.hpp"
 
 Processor::Processor(int hndl) 
-    : Thread(hndl), inQueue(NULL), outQueue(NULL), toShutdown(false)
+    : Thread(hndl), inQueue(NULL), outQueue(NULL)
 {
     name = "Processor";
 
@@ -76,6 +76,10 @@ void Processor::run()
 
             log_debug("Processor %s: finished", name.c_str());
         } catch (Exception &e) {
+            if (e.getErrCode() == Exception::INVALID_SIGNATURE) {
+                log_warn("Receives a misleading message");
+                continue;
+            }
             seize();
             log_error("Processor %s: exception %s", name.c_str(), e.getErrMsg());
             break;

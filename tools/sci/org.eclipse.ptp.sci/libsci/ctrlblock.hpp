@@ -79,7 +79,6 @@ class CtrlBlock
 
         // flow control threshold
         long long            thresHold;
-        bool                 released;
 
         // additional information for convenient purpose
         MessageQueue         *routerInQueue;
@@ -119,8 +118,6 @@ class CtrlBlock
         void setJobKey(int key);
         void addEmbedAgent(int hndl, EmbedAgent *agent);
         EmbedAgent *getAgent(int hndl);
-        void setReleased(bool rel);
-        bool getReleased();
         
         int init(sci_info_t *info);
         void term();

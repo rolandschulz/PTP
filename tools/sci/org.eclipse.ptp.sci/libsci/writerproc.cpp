@@ -51,7 +51,7 @@ WriterProcessor::WriterProcessor(int hndl)
 
 WriterProcessor::~WriterProcessor()
 {
-    if (outStream && toShutdown)
+    if (outStream)
         delete outStream;
     if (inQueue)
         delete inQueue;
@@ -88,8 +88,7 @@ void WriterProcessor::seize()
 
 void WriterProcessor::clean()
 {
-    if (toShutdown)
-        outStream->stopWrite();
+    outStream->stopWrite();
     if (peerProcessor) {
         while (!peerProcessor->isLaunched()) {
             SysUtil::sleep(1000);

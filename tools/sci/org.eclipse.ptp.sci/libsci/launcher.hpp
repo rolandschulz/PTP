@@ -52,7 +52,7 @@ class Launcher
         string          localName;
         int             scidPort;
         MODE            mode;
-        bool            sync;
+        bool            embedMode;
 
     public:    
         Launcher(Topology &topy);
@@ -64,7 +64,7 @@ class Launcher
         int launchAgent(int beID, const char *hostname);
 
     private:
-        int launchClient(int ID, string &path, string host, MODE m = INTERNAL);
+        int launchClient(int ID, string &path, string host, MODE m = INTERNAL, int beID = -1);
 
         int launch_tree1(); // mininum agents
         int launch_tree2(); // maximum agents

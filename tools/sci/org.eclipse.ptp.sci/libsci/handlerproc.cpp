@@ -96,10 +96,6 @@ void HandlerProcessor::process(Message * msg)
         case Message::DATA:
             hndlr(param, msg->getGroup(), msg->getContentBuf(), msg->getContentLen());
             break;
-        case Message::RELEASE:
-            gNotifier->notify(msg->getID());
-            setState(false);
-            break;
         default:
             log_error("Processor %s: received unknown command", name.c_str());
             break;
