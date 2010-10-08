@@ -21,6 +21,7 @@ import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTNodeLocation;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.gnu.c.GCCLanguage;
+import org.eclipse.cdt.core.dom.ast.gnu.cpp.GPPLanguage;
 import org.eclipse.cdt.core.model.ILanguage;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.core.resources.IFile;
@@ -82,6 +83,16 @@ public class RunAnalyseOpenMPcommandHandler extends RunAnalyseHandlerBase {
 
 			atu = tu.getAST();
 			String languageID = lang.getId();
+			
+			if(languageID.equals(GCCLanguage.ID) || languageID.equals(GPPLanguage.ID)) {
+				// null IASTTranslationUnit when we're doing C/C++ means we should quit.
+				// but want to continue to see if this is a fortran file we are analyzing.
+				if(atu==null) {// this is null for Fortran file during JUnit testing.
+					System.out.println("RunAnalyseOpenMPCommandHandler.doArtifactAnalysis(), atu is null (testing?)");
+					return msr;
+				}
+			}
+			
 			if (languageID.equals(GCCLanguage.ID)) {// cdt40
 				atu.accept(new OpenMPCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
 			} else {
