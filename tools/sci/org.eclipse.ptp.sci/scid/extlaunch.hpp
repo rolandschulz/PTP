@@ -33,6 +33,7 @@
 #include <map>
 
 #include "thread.hpp"
+
 #define FIVE_MINUTES 5000000 * 60
 
 using namespace std;
@@ -81,8 +82,6 @@ class ExtLauncher : public Thread
 typedef map<int, string> TASK_CONFIG;
 typedef struct TASK_INFO {
     string          user;
-    bool            sync;
-    Stream          *stream;
     TASK_CONFIG     config;
     double          timestamp;
     struct iovec    token;

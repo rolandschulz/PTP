@@ -23,7 +23,6 @@
 
 ****************************************************************************/
 
-#include "socket.hpp"
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
@@ -32,7 +31,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <stdio.h>
 
+#include "socket.hpp"
 #include "ipconverter.hpp"
 
 Socket::Socket(int sockfd)
@@ -69,6 +70,11 @@ int Socket::setMode(bool mode)
 
 int Socket::setFd(int fd)
 {
+    if (fd < 0) {
+        throw SocketException(SocketException::NET_ERR_SOCKET, errno);
+    }
+    int nodelay = 1;
+    ::setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
     socket = fd;
 
     return 0;
@@ -168,8 +174,13 @@ int Socket::connect(const char *hostName, in_port_t port)
     ::sprintf(service, "%d", port);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_NUMERICHOST | AI_NUMERICSERV;
 
-    ::getaddrinfo(hostName, service, &hints, &host);
+    rc = ::getaddrinfo(hostName, service, &hints, &host);
+    if (rc == EAI_NONAME) {
+        hints.ai_flags = 0;
+        rc = ::getaddrinfo(hostName, service, &hints, &host);
+    }
     if (!host) {
         throw SocketException(SocketException::NET_ERR_GETADDRINFO, errno);
     }

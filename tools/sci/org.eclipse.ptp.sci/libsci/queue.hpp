@@ -57,7 +57,7 @@ class MessageQueue
         ~MessageQueue();
 
         void produce(Message *msg);
-        void notify();
+        void release();
         int multiProduce(Message **msgs, int num);
         int multiConsume(Message **msgs, int num);
         Message *consume(int millisecs=-1);
@@ -65,7 +65,7 @@ class MessageQueue
 
         int getSize();
 
-        void setName(string str); 
+        void setName(char *str); 
         string getName();
 
     private:

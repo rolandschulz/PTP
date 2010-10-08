@@ -63,6 +63,7 @@ void Log::init(const char *directory, const char * filename, int level)
     logDir = directory;
     sprintf(logPath, "%s/%s.%s.%d" , directory, node, filename, (int)getpid());
     permitLevel = level;
+    unlink(logPath);
 }
 
 void Log::print(int level, char *srcFile, int srcLine, const char *format, ...)

@@ -28,6 +28,7 @@
 #endif
 #include <assert.h>
 #include <signal.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
@@ -44,8 +45,8 @@
 
 #include "extlaunch.hpp"
 
+
 const int MAX_FD = 256;
-const int SCI_INIT_FD = MAX_FD + 1;
 
 vector<ExtLauncher *> launcherList;
 
@@ -71,16 +72,17 @@ int ExtLauncher::verifyToken(bool suser)
 
     while (1) {
         rc = ::getpwnam_r(userName.c_str(), &pwd, pwdBuf, MAX_PWD_BUF_SIZE, &result);
-        if ((rc == EINTR) || (rc == EMFILE)) {
+        if ((rc == EINTR) || (rc == EMFILE) || (rc == ENFILE)) {
             SysUtil::sleep(1000);
             continue;
         }
         if (NULL == result) {
+            delete []pwdBuf;
             throw Exception(Exception::INVALID_USER);
         } else {
             break;
         }
-    }
+    } 
     if (suser) {
         ::setgid(pwd.pw_gid);
         ::setuid(pwd.pw_uid);
@@ -95,52 +97,29 @@ int ExtLauncher::verifyToken(bool suser)
 int ExtLauncher::verifyData(struct iovec &sign, int jobkey, int id, char *path, char *envStr)
 {
     int rc = -1;
-    int tmp0, tmp1, tmp2;
-    struct iovec vecs[6];
-    int vsize = 3;
 
     ssKeyLen = sizeof(sessionKey);
     rc = SSHFUNC->get_key_from_token(NULL, &usertok, sessionKey, &ssKeyLen);
     if (rc != 0)
         return rc;
 
-    tmp0 = htonl(mode);
-    vecs[0].iov_base = &tmp0;
-    vecs[0].iov_len = sizeof(tmp0);
-    tmp1 = htonl(jobkey);
-    vecs[1].iov_base = &tmp1;
-    vecs[1].iov_len = sizeof(tmp1);
-    tmp2 = htonl(id);
-    vecs[2].iov_base = &tmp2;
-    vecs[2].iov_len = sizeof(tmp2);
-    if (path != NULL) {
-        vecs[3].iov_base = &sync;
-        vecs[3].iov_len = sizeof(sync);
-        vecs[4].iov_base = path;
-        vecs[4].iov_len = strlen(path) + 1;
-        vecs[5].iov_base = envStr;
-        vecs[5].iov_len = strlen(envStr) + 1;
-        vsize = 6;
+    if (path == NULL) {
+        rc = SSHFUNC->verify_data(sessionKey, ssKeyLen, &sign, 3, &mode, sizeof(mode), &jobkey, sizeof(jobkey), &id, sizeof(id));
+    } else {
+        rc = SSHFUNC->verify_data(sessionKey, ssKeyLen, &sign, 6, &mode, sizeof(mode), &jobkey, sizeof(jobkey), &id, sizeof(id), &sync, sizeof(sync), path, strlen(path) + 1, envStr, strlen(envStr) + 1);
     }
-    rc = SSHFUNC->verify_data(sessionKey, ssKeyLen, vecs, vsize, &sign);
 
     return rc;
 }
 
 int ExtLauncher::sendResult(Stream &s, int rc)
 {
-    struct iovec vecs[2];
     struct iovec sign = {0};
 
     if (!sync)
         return 0;
 
-    vecs[0].iov_base = &rc;
-    vecs[0].iov_len = sizeof(rc);
-    vecs[1].iov_base = (char *)retStr.c_str();
-    vecs[1].iov_len = retStr.size() + 1;
-    SSHFUNC->sign_data(sessionKey, ssKeyLen, vecs, 2, &sign);
-
+    SSHFUNC->sign_data(sessionKey, ssKeyLen, &sign, 2, &rc, sizeof(rc), retStr.c_str(), retStr.size() + 1);
     s << rc << retStr << sign << endl;
 
     return 0;
@@ -161,7 +140,6 @@ void ExtLauncher::run()
                 rc = launchInt(jobKey, id, (char *)path.c_str(), (char *)envStr.c_str(), sign);
                 if (rc != 0)
                     sendResult(*stream, rc);
-                delete stream;
                 break;
             case REGISTER:
                 *stream >> sync >> path >> envStr >> endl;
@@ -171,8 +149,6 @@ void ExtLauncher::run()
                 if (rc == 0) {
                     rc = launchReg(jobKey, id, (char *)envStr.c_str());
                 }
-                if (rc != 0) // the result will be sent back in the launchReq thread
-                    sendResult(*stream, rc);
                 break;
             case REQUEST:
                 *stream >> endl;
@@ -187,11 +163,11 @@ void ExtLauncher::run()
                         SysUtil::sleep(1000);
                     }
                 }
-                delete stream;
                 break;
             default:
                 break;
         }
+        delete stream;
     } catch (SocketException &e) {
         log_error("socket exception %s", e.getErrMsg().c_str());
     } catch (Exception &e) {
@@ -246,13 +222,11 @@ int ExtLauncher::launchInt(int jobkey, int id, char *path, char *envStr, struct 
     int i = 0;
     int rc = 0;
     char *exename = getExename(path); // There is a new inside
-    char *params[4096];
-    char *p;
 
     if (::access(exename, F_OK | R_OK | X_OK) != 0) {
-        delete [] exename;
         retStr = string(exename) + " is not an executable file";
         log_error("%s", retStr.c_str());
+        delete [] exename;
         return -1;
     }
 #ifdef PSEC_OPEN_SSL
@@ -268,38 +242,32 @@ int ExtLauncher::launchInt(int jobkey, int id, char *path, char *envStr, struct 
         rc =  errno;
         retStr = "fork failed";
     } else if (pid == 0) { // child process
+        int sfd = stream->getSocket();
         // the child process can't ignore SIGCHLD signal
         ::sigaction(SIGCHLD, &oldSa, NULL);
-        if (sync) {
-            dup2(stream->getSocket(), SCI_INIT_FD);
-        }
 #ifdef PSEC_OPEN_SSL
-        dup2(sockfd[0], MAX_FD);
+        dup2(sockfd[0], MAX_FD); // inherited by child process
 #endif
-        rc = putSessionKey(MAX_FD, signature, jobkey, id, path, envStr, true);
-        if (rc != 0) {
-            exit(rc);
+        dup2(sfd, STDIN_FILENO);
+        for (i = STDERR_FILENO + 1; i < MAX_FD; i++) {
+            ::close(i);
         }
-
-        p = envStr;
-        for (i = 0; i < MAX_ENV_VAR_NUM-1; i++) {
-            p = ::strchr(p, ';');
-            if (NULL == p) {
-                break;
+        try {
+            rc = putSessionKey(MAX_FD, signature, jobkey, id, path, envStr, true);
+            if (rc != 0) {
+                exit(rc);
             }
-            *p = '\0';
-            params[i] = ++p;
+        } catch (Exception &e) {
+            exit(-1);
         }
-        params[i] = NULL;
-
-        rc = ::execle("/bin/sh", "/bin/sh", "-c", path, (char *)NULL, params); 
+        rc = ::execle("/bin/sh", "/bin/sh", "-c", path, (char *)NULL, NULL); 
         if (rc < 0) {
             exit(0);
         }
     } else {
 #ifdef PSEC_OPEN_SSL
-        Stream ss;
         close(sockfd[0]);
+        Stream ss;
         rc = getSessionKey(sockfd[1]);
         ss.init(sockfd[1]);
         ss << usertok << endl;
@@ -333,10 +301,8 @@ int ExtLauncher::putSessionKey(int fd, struct iovec &sign, int jobkey, int id, c
     int i, rc;
     struct iovec vecs[2];
 
-    for (i = 0; i < MAX_FD; i++) {
-        ::close(i);
-    }
     rc = verifyToken(suser);
+#ifdef PSEC_OPEN_SSL
     if (rc == 0) {
         rc = verifyData(sign, jobkey, id, path, envStr);
     }
@@ -345,6 +311,7 @@ int ExtLauncher::putSessionKey(int fd, struct iovec &sign, int jobkey, int id, c
     vecs[1].iov_base = sessionKey;
     vecs[1].iov_len = ssKeyLen;
     writev(fd, vecs, 2);
+#endif
 
     return rc;
 }
@@ -368,8 +335,12 @@ int ExtLauncher::doVerify(struct iovec &sign, int jobkey, int id, char *path, ch
         retStr = "fork failed";
         log_error("Failed to fork child!");
     } else if (pid == 0) { // child process
+        int i;
         close(sockfd[1]);
         dup2(sockfd[0], MAX_FD);
+        for (i = 0; i < MAX_FD; i++) {
+            ::close(i);
+        }
         rc = putSessionKey(MAX_FD, sign, jobkey, id, path, envStr);
         close(MAX_FD);
         exit(0);
@@ -385,16 +356,17 @@ int ExtLauncher::doVerify(struct iovec &sign, int jobkey, int id, char *path, ch
 
 int ExtLauncher::launchReg(int jobkey, int id, const char *envStr)
 {
-    TASK_INFO &task = jobInfo[jobkey];
     Locker::getLocker()->lock();
+    TASK_INFO &task = jobInfo[jobkey];
     task.user = userName;
-    task.sync = sync;
-    task.stream = stream;
     task.config[id] = envStr;
     task.timestamp = SysUtil::microseconds();
-    task.token.iov_len = usertok.iov_len;
-    task.token.iov_base = new char [usertok.iov_len];
-    memcpy(task.token.iov_base, usertok.iov_base, usertok.iov_len);
+    memset(&task.token, 0, sizeof(task.token));
+    if (usertok.iov_len > 0) {
+        task.token.iov_len = usertok.iov_len;
+        task.token.iov_base = new char [usertok.iov_len];
+        memcpy(task.token.iov_base, usertok.iov_base, usertok.iov_len);
+    }
 
     Locker::getLocker()->unlock();
 
@@ -403,7 +375,6 @@ int ExtLauncher::launchReg(int jobkey, int id, const char *envStr)
 
 int ExtLauncher::launchReq(int jobkey, int id)
 {
-    struct iovec vecs[2];
     struct iovec sign = {0};
 
     Locker::getLocker()->lock();
@@ -422,19 +393,8 @@ int ExtLauncher::launchReq(int jobkey, int id)
         return -1;
     }
 
-    vecs[0].iov_base = (char *)cfg[id].c_str();
-    vecs[0].iov_len = cfg[id].size() + 1;
-    vecs[1] = task.token;
-    SSHFUNC->sign_data(sessionKey, ssKeyLen, vecs, 2, &sign);
+    SSHFUNC->sign_data(sessionKey, ssKeyLen, &sign, 2, cfg[id].c_str(), cfg[id].size() + 1, task.token.iov_base, task.token.iov_len);
     *stream << cfg[id] << task.token << sign << endl;
-    sync = task.sync;
-    if (sync) { 
-        delete [] (char *)task.token.iov_base;
-        retStr = "OK :)";
-        sendResult(*task.stream, 0);
-        task.stream->stop();
-        delete task.stream;
-    }
 
     cfg.erase(id);
     if (cfg.size() == 0)

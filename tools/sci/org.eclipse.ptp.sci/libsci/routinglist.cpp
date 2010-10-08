@@ -14,7 +14,7 @@
 
  Description: Provide routing services for all threads.
    
- Author: Nicole Nie, Liu Wei
+ Author: Nicole Nie, Liu Wei, Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -23,14 +23,12 @@
 
 ****************************************************************************/
 
-#include "routinglist.hpp"
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include <string.h>
 
 #include <vector>
-
-using namespace std;
 
 #include "log.hpp"
 #include "packer.hpp"
@@ -38,41 +36,43 @@ using namespace std;
 #include "tools.hpp"
 #include "exception.hpp"
 #include "stream.hpp"
+#include "sshfunc.hpp"
 
+#include "routinglist.hpp"
+#include "eventntf.hpp"
+#include "initializer.hpp"
 #include "message.hpp"
 #include "queue.hpp"
 #include "ctrlblock.hpp"
+#include "filterproc.hpp"
+#include "readerproc.hpp"
+#include "topology.hpp"
+#include "writerproc.hpp"
 #include "eventntf.hpp"
 #include "dgroup.hpp"
 
+
+using namespace std;
+
 const int MAX_SUCCESSOR_NUM = 1024;
-const int TCP_ETHERNET_MTU = 1460;
+const int MAX_SEGMENT_SIZE = 11680;
+const int MIN_SEGMENT_SIZE = 1440;  // 1500 - 40 - 20 (ethernet MTU - tcp/ip header - message header)
 
-RoutingList * RoutingList::instance = NULL;
-RoutingList * RoutingList::getInstance()
+RoutingList::RoutingList(int hndl)
+    : handle(hndl), maxSegmentSize(MAX_SEGMENT_SIZE), filterProc(NULL), myDistriGroup(NULL), topology(NULL)
 {
-    if (instance == NULL) {
-        instance = new RoutingList();
-    }
-    return instance;
-}
-
-RoutingList::RoutingList()
-    : maxSegmentSize(TCP_ETHERNET_MTU * 32)
-{
-    int hndl = gCtrlBlock->getMyHandle();
     char *envp = ::getenv("SCI_SEGMENT_SIZE");
     if (envp != NULL) {
         maxSegmentSize = atoi(envp);
-        maxSegmentSize = maxSegmentSize > TCP_ETHERNET_MTU ? maxSegmentSize : TCP_ETHERNET_MTU * 32;
+        maxSegmentSize = maxSegmentSize > MIN_SEGMENT_SIZE ? maxSegmentSize : MIN_SEGMENT_SIZE;
     }
 
-    if (hndl == -1) {
+    if (handle == -1) {
         // this is a front end, not parent
         myDistriGroup = new DistributedGroup(0);
     } else {
         int pid = -1;
-        char *envp = ::getenv("SCI_PARENT_ID");
+        envp = ::getenv("SCI_PARENT_ID");
         if (envp) {
             pid = ::atoi(envp);
         } else {
@@ -81,16 +81,20 @@ RoutingList::RoutingList()
         myDistriGroup = new DistributedGroup(pid);
     }
 
+    if (gCtrlBlock->getMyRole() != CtrlBlock::BACK_END) {
+        topology = new Topology(-1);
+    }
     successorList = new int[MAX_SUCCESSOR_NUM];
-    
+    queueInfo.clear();
+    routers.clear();
+    ::pthread_mutex_init(&mtx, NULL); 
 }
 
 RoutingList::~RoutingList()
 {  
     delete myDistriGroup;
     delete [] successorList;
-    
-    instance = NULL;
+    ::pthread_mutex_destroy(&mtx);
 }
 
 void RoutingList::parseCmd(Message *msg)
@@ -161,7 +165,7 @@ void RoutingList::parseCmd(Message *msg)
         DistributedGroup subDistriGroup(-1);
         subDistriGroup.unpackMsg(*msg);
 
-        if (subDistriGroup.getPID() == gCtrlBlock->getMyHandle()) {
+        if (subDistriGroup.getPID() == handle) {
             // if this message is from my son
             myDistriGroup->merge(msg->getID(), subDistriGroup, false);
         } else if (isSuccessorExist(subDistriGroup.getPID())){
@@ -172,11 +176,11 @@ void RoutingList::parseCmd(Message *msg)
             myDistriGroup->merge(msg->getID(), subDistriGroup, true);
 
             // now update its parent id to me
-            subDistriGroup.setPID(gCtrlBlock->getMyHandle());
+            subDistriGroup.setPID(handle);
 
             // repack a message and send to my parent
             Message *newmsg = subDistriGroup.packMsg();
-            gCtrlBlock->getFilterOutQueue()->produce(newmsg);
+            filterProc->getOutQueue()->produce(newmsg);
         }
     } else {
         assert(!"should never be here");
@@ -194,7 +198,7 @@ void RoutingList::propagateGroupInfo()
     // propgate my group information to my parent
     Message *msg = myDistriGroup->packMsg();
     if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
-        gCtrlBlock->getFilterOutQueue()->produce(msg);
+        filterProc->getOutQueue()->produce(msg);
     } else if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END) {
         gCtrlBlock->getUpQueue()->produce(msg);
     } else {
@@ -227,7 +231,7 @@ int RoutingList::getSegments(Message *msg, Message ***segments, int ref)
 
     for (i = 1; i < segnum; i++) {
         segs[i] = new Message();
-        size = (i < (segnum - 1)) ? maxSegmentSize : (mlen % maxSegmentSize);
+        size = (i < (segnum - 1)) ? maxSegmentSize : ((mlen - 1) % maxSegmentSize + 1);
         segs[i]->build(mfid, gid, 1, &ptr, &size, typ, mid);
         segs[i]->setRefCount(ref);
         ptr += size;
@@ -263,52 +267,227 @@ void RoutingList::splitBcast(sci_group_t group, Message *msg)
 {
     int numSor = numOfSuccessor(group);
     retrieveSuccessorList(group, successorList);
-
-    if (msg->getContentLen() <= (maxSegmentSize * 3 / 2)) {
-        int i = 0;
-        // include the original queue
-        for (i = 0; i < numSor; i++) {
-            ucast(successorList[i], msg, numSor);
-        }
-    } else {
-        mcast(msg, successorList, numSor);
-    }
+    mcast(msg, successorList, numSor);
 }
 
 void RoutingList::mcast(Message *msg, int *sorList, int num)
 {
     int i = 0;
+
+    if (msg->getContentLen() <= maxSegmentSize) {
+        msg->setRefCount(msg->getRefCount() + num);
+        for (i = 0; i < num; i++) {
+            queryQueue(sorList[i])->produce(msg);
+        }
+        return;
+    }
+
     Message **segments;
     int segnum = getSegments(msg, &segments, num);
     for (i = 0; i < num; i++) {
-        gCtrlBlock->queryQueue(sorList[i])->multiProduce(segments, segnum);
+        queryQueue(sorList[i])->multiProduce(segments, segnum);
     }
     ::free(segments);
-    if (msg->decRefCount() == 0) {
-        delete msg;
-    }
 }
 
 void RoutingList::ucast(int successor_id, Message *msg, int refInc)
 {
     log_debug("Processor Router: send msg to successor %d", successor_id);
-    if (msg->getContentLen() <= (maxSegmentSize * 3 / 2)) {
-        msg->setRefCount(msg->getRefCount() + refInc);
-        gCtrlBlock->queryQueue(successor_id)->produce(msg);
-    } else {
-        mcast(msg, &successor_id, 1);
-    }
+    mcast(msg, &successor_id, refInc);
 
     return;
 }
 
 void RoutingList::initSubGroup(int successor_id, int start_be_id, int end_be_id)
 {
+    char qName[64] = {0};
+    MessageQueue *queue = NULL;
+
+    if (successor_id != VALIDBACKENDIDS) {
+        queue = new MessageQueue();
+        ::sprintf(qName, "Agent%d_inQ", successor_id);
+        queue->setName(qName);
+        mapQueue(successor_id, queue);
+    } else {
+        int i = 0;
+        for (i = start_be_id; i <= end_be_id; i++) {
+            queue = new MessageQueue();
+            ::sprintf(qName, "BE%d_inQ", i);
+            queue->setName(qName);
+            mapQueue(i, queue);
+        }
+    }
+
     myDistriGroup->initSubGroup(successor_id, start_be_id, end_be_id);
 }
 
-void RoutingList::addBE(sci_group_t group, int successor_id, int be_id)
+int RoutingList::startReading(int hndl)
 {
+    ROUTING_MAP::iterator it = routers.find(hndl);
+    assert(it != routers.end());
+    ReaderProcessor *reader = it->second.processor->getPeerProcessor();
+    reader->start();
+
+    return 0;
+}
+
+int RoutingList::startReaders()
+{
+    ReaderProcessor *reader = NULL;
+    ROUTING_MAP::iterator pit;
+   
+    for (pit = routers.begin(); pit != routers.end(); ++pit) {
+        reader = pit->second.processor->getPeerProcessor();
+        reader->start();
+    }
+
+    return 0;
+}
+
+int RoutingList::numOfStreams()
+{
+    return routers.size();
+}
+
+int RoutingList::getStreamsSockfds(int *fds)
+{
+    int i = 0;
+    ROUTING_MAP::iterator it;
+
+    for (it = routers.begin(); it != routers.end(); ++it) {
+        fds[i] = it->second.stream->getSocket();
+        i++;
+    }
+
+    return i;
+}
+
+int RoutingList::startRouting(int hndl, Stream *stream)
+{
+    char name[64] = {0};
+    MessageQueue *inQ = queryQueue(hndl);
+    assert(inQ != NULL);
+
+    routers[hndl].stream = stream;
+    ReaderProcessor *reader = new ReaderProcessor(hndl);
+    reader->setInStream(stream);
+    reader->setOutQueue(filterProc->getInQueue());
+    ::sprintf(name, "Reader%d", hndl);
+    reader->setName(name);
+
+    WriterProcessor *writer = new WriterProcessor(hndl);
+    writer->setInQueue(inQ);
+    writer->setOutStream(stream);
+    ::sprintf(name, "Writer%d", hndl);
+    writer->setName(name);
+
+    // reader is a peer processor of writer
+    writer->setPeerProcessor(reader);
+    routers[hndl].processor = writer;
+
+    writer->start(); 
+
+    return 0;
+}
+
+int RoutingList::syncWaiting()
+{
+    int rc = 0;
+    int sockfd = -1;
+    int maxfd = -1;
+    int count = 0;
+    string retStr;
+    string backStr("OK :)");
+    fd_set rset;
+    struct timeval tm = {300, 0};
+
+    while (rc == 0) {
+        FD_ZERO(&rset);
+        ROUTING_MAP::iterator it;
+        for (it = routers.begin(); it != routers.end(); ++it) {
+            sockfd = it->second.stream->getSocket();
+            FD_SET(sockfd, &rset);
+            maxfd = (maxfd > sockfd) ? maxfd : sockfd;
+        }
+        rc = select(maxfd+1, &rset, NULL, NULL, &tm);
+        if (rc == 0) {
+            rc = -1;
+            break;
+        }
+
+        for (it = routers.begin(); it != routers.end(); it++) {
+            sockfd = it->second.stream->getSocket();
+            if (FD_ISSET(sockfd, &rset)) {
+                count++;
+                try {
+                    int rt = -1;
+                    struct iovec sign = {0};
+
+                    *(it->second.stream) >> rc >> retStr >> sign >> endl;
+                    rt = SSHFUNC->verify_data(&sign, 2, &rc, sizeof(rc), retStr.c_str(), retStr.size() + 1);
+                    delete [] (char *)sign.iov_base;
+                    if ((rc != 0) || (rt != 0)) {
+                        rc = -1;
+                        log_error("Launching init stream error, %d - %s", rc, retStr.c_str());
+                        break;
+                    }
+                } catch (SocketException &e) {
+                    log_error("Launching init stream socket exception, %s", e.getErrMsg().c_str());
+                    rc = -1;
+                }
+            }
+        }
+        if (count >= routers.size())
+            break;
+    }
+
+    if (rc != 0) {
+        backStr = "timeout or socket error";
+    }
+    gInitializer->syncRetBack(rc, backStr);
+
+    return rc;
+}
+
+int RoutingList::stopRouting(bool shutdown)
+{
+    // waiting for all processor threads terminate
+    ROUTING_MAP::iterator pit;
+    for (pit = routers.begin(); pit != routers.end(); ++pit) {
+        pit->second.processor->setShutdown(shutdown);
+        pit->second.processor->release();
+        delete pit->second.processor;
+    }
+
+    routers.clear();
+    queueInfo.clear();
+
+    return 0;
+}
+
+bool RoutingList::allRouted()
+{
+    return (queueInfo.size() == routers.size());
+}
+
+void RoutingList::addBE(sci_group_t group, int successor_id, int be_id, bool init)
+{
+    if (init) {
+        char qName[64] = {0};
+        int qID = 0;
+        MessageQueue *queue = new MessageQueue();
+
+        if (successor_id == VALIDBACKENDIDS) {
+            qID = be_id;
+            ::sprintf(qName, "BE%d_inQ", qID);
+        } else {
+            qID = successor_id;
+            ::sprintf(qName, "Agent%d_inQ", qID);
+        }
+        queue->setName(qName);
+        mapQueue(qID, queue);
+    }
+
     myDistriGroup->addBE(group, successor_id, be_id);
 }
 
@@ -376,3 +555,48 @@ void RoutingList::retrieveSuccessorList(sci_group_t group, int * ret_val)
     myDistriGroup->retrieveSuccessorList(group, ret_val);
 }
 
+void RoutingList::mapQueue(int hndl, MessageQueue *queue)
+{
+    lock();
+    queueInfo[hndl] = queue;
+    unlock();
+}
+
+MessageQueue * RoutingList::queryQueue(int hndl)
+{       
+    MessageQueue *queue = NULL;
+
+    lock();
+    QUEUE_MAP::iterator qit = queueInfo.find(hndl);
+    if (qit != queueInfo.end()) {
+        queue = (*qit).second;
+    }
+    unlock();
+
+    return queue;
+}
+
+void RoutingList::lock()
+{
+    ::pthread_mutex_lock(&mtx);
+}
+
+void RoutingList::unlock()
+{
+    ::pthread_mutex_unlock(&mtx);
+}
+
+Topology * RoutingList::getTopology()
+{
+    return topology;
+}
+
+FilterProcessor * RoutingList::getFilterProcessor()
+{
+    return filterProc;
+}
+
+void RoutingList::setFilterProcessor(FilterProcessor *proc)
+{
+    filterProc = proc;
+}

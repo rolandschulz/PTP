@@ -23,12 +23,12 @@
 
 ****************************************************************************/
 
-#ifndef _LOG_HPP
-#define _LOG_HPP
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#ifndef _LOG_HPP
+#define _LOG_HPP
+
 #include <pthread.h>
 #include <string>
 

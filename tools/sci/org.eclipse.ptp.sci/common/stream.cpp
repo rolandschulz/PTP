@@ -31,7 +31,7 @@
 
 #include "socket.hpp"
 
-const int  BUFFER_SIZE = 4380;
+const int  BUFFER_SIZE = 5840;
 const int MAX_NETWORK_SIZE = 1024 * 1024 * 8; // Max length = 8M
 const char END_OF_LINE = '\n';
 

@@ -31,6 +31,14 @@
 
 using namespace std;
 
+pthread_key_t Thread::key = 0;
+pthread_once_t Thread::once = PTHREAD_ONCE_INIT;
+
+void makeKey()
+{
+    pthread_key_create(&(Thread::key), NULL);
+}
+
 void* init(void * pthis)
 {
     sigset_t sigs_to_block;
@@ -39,8 +47,13 @@ void* init(void * pthis)
     pthread_sigmask(SIG_SETMASK, &sigs_to_block, &old_sigs);
 
     Thread *p = (Thread *) pthis;
+    void *data = p->getSpecific();
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    int rc = pthread_once(&(Thread::once), makeKey);
+    if (data != NULL) {
+        rc = pthread_setspecific(Thread::key, data);
+    }
     p->setState(true);
     p->run();
     pthread_sigmask(SIG_SETMASK, &old_sigs, NULL);
@@ -49,7 +62,7 @@ void* init(void * pthis)
 }
 
 Thread::Thread(int hndl)
-    : handle(hndl), launched(false), running(false)
+    : handle(hndl), launched(false), running(false), data(NULL)
 {
 }
 
@@ -60,9 +73,7 @@ Thread::~Thread()
 void Thread::start()
 {
     if (!launched) {
-        if (pthread_create(&(thread), NULL, init, this) == 0) {
-            launched = true;
-        } else {
+        if (pthread_create(&(thread), NULL, init, this) != 0) {
             running = false;
             throw ThreadException(ThreadException::ERR_CREATE);
         }
@@ -92,6 +103,16 @@ void Thread::detach()
 void Thread::cancel()
 {
     pthread_cancel(thread);
+}
+
+void Thread::setSpecific(void *dat)
+{
+    data = dat;
+}
+
+void * Thread::getSpecific()
+{
+    return data;
 }
 
 ThreadException::ThreadException(int code) throw()

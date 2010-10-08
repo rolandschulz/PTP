@@ -17,7 +17,7 @@
     output: a. two message queues
     action: purify message, discarded useless messages
    
- Author: Nicole Nie
+ Author: Nicole Nie, Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -29,29 +29,35 @@
 #ifndef _PURIFERPROC_HPP
 #define _PURIFERPROC_HPP
 
+#include "sci.h"
 #include "processor.hpp"
 
 class Stream;
 class MessageQueue;
 class Observer;
-
 class WriterProcessor;
+class RoutingList;
+class FilterList;
 
 class PurifierProcessor : public Processor 
 {
     private:
         Stream              *inStream;
-        MessageQueue        *outQueue;
-        
         MessageQueue        *outErrorQueue;
         WriterProcessor     *peerProcessor;
-
+        RoutingList         *routingList;
+        FilterList          *filterList;
         Observer            *observer;
+        SCI_msg_hndlr       *hndlr;
+        void                *param;
+
         bool                isCmd;
         bool                isError;
+        bool                joinSegs;
 
     public:
         PurifierProcessor(int hndl = -1);
+        ~PurifierProcessor();
 
         virtual Message * read();
         virtual void process(Message *msg);
@@ -59,14 +65,11 @@ class PurifierProcessor : public Processor
         virtual void seize();
         virtual void clean();
 
-        virtual bool isActive();
-
         void setInStream(Stream *stream);
         void setOutQueue(MessageQueue *queue);
-
+        void setInQueue(MessageQueue *queue);
         void setOutErrorQueue(MessageQueue *queue);
         void setPeerProcessor(WriterProcessor *processor);
-
         void setObserver(Observer *ob);
 };
 

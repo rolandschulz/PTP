@@ -35,8 +35,8 @@
 #include "socket.hpp"
 
 #include "ctrlblock.hpp"
-#include "statemachine.hpp"
 #include "message.hpp"
+#include "eventntf.hpp"
 #include "stream.hpp"
 #include "queue.hpp"
 
@@ -47,15 +47,25 @@ HandlerProcessor::HandlerProcessor(int hndl)
 
     inQueue = NULL;
 
-    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-        hndlr = gCtrlBlock->getEndInfo()->fe_info.hndlr;
-        param = gCtrlBlock->getEndInfo()->fe_info.param;
-    } else if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_END) {
-        hndlr = gCtrlBlock->getEndInfo()->be_info.hndlr;
-        param = gCtrlBlock->getEndInfo()->be_info.param;
-    } else {
-        assert(!"Should never go here!");
+    switch (gCtrlBlock->getMyRole()) {
+        case CtrlBlock::FRONT_END:
+            hndlr = gCtrlBlock->getEndInfo()->fe_info.hndlr;
+            param = gCtrlBlock->getEndInfo()->fe_info.param;
+            break;
+        case CtrlBlock::BACK_END:
+        case CtrlBlock::BACK_AGENT:
+            hndlr = gCtrlBlock->getEndInfo()->be_info.hndlr;
+            param = gCtrlBlock->getEndInfo()->be_info.param;
+            break;
+        default:
+            assert(!"Should never go here!");
     }
+}
+
+HandlerProcessor::~HandlerProcessor()
+{
+    if (inQueue)
+        delete inQueue;
 }
 
 Message * HandlerProcessor::read()
@@ -81,12 +91,14 @@ Message * HandlerProcessor::read()
 
 void HandlerProcessor::process(Message * msg)
 {
-    assert(msg);
-
     switch(msg->getType()) {
         case Message::COMMAND:
         case Message::DATA:
             hndlr(param, msg->getGroup(), msg->getContentBuf(), msg->getContentLen());
+            break;
+        case Message::RELEASE:
+            gNotifier->notify(msg->getID());
+            setState(false);
             break;
         default:
             log_error("Processor %s: received unknown command", name.c_str());
@@ -102,7 +114,7 @@ void HandlerProcessor::write(Message * msg)
 
 void HandlerProcessor::seize()
 {
-    gStateMachine->parse(StateMachine::FATAL_EXCEPTION);
+    // TODO
 }
 
 void HandlerProcessor::clean()
@@ -110,13 +122,7 @@ void HandlerProcessor::clean()
     // no action
 }
 
-bool HandlerProcessor::isActive()
-{
-    return gCtrlBlock->isEnabled() || (inQueue->getSize() > 0);
-}
-
 void HandlerProcessor::setInQueue(MessageQueue * queue)
 {
     inQueue = queue;
 }
-

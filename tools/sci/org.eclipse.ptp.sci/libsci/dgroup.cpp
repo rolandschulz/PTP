@@ -29,6 +29,7 @@
 
 #include "dgroup.hpp"
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "packer.hpp"
 #include "group.hpp"

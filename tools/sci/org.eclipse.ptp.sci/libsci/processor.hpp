@@ -20,7 +20,7 @@
             c. one or multiple message queues
     action: any kind message processing actions
    
- Author: Nicole Nie
+ Author: Nicole Nie, Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -39,6 +39,7 @@ using namespace std;
 #include "thread.hpp"
 
 class Message;
+class MessageQueue;
 
 class Processor : public Thread 
 {      
@@ -48,6 +49,9 @@ class Processor : public Thread
         // for performance counting
         int                 totalCount;
         int                 totalSize;
+        MessageQueue        *inQueue;
+        MessageQueue        *outQueue;
+        bool                toShutdown;
         
 
     public:
@@ -61,11 +65,13 @@ class Processor : public Thread
         virtual void seize() = 0;
         virtual void clean() = 0;
 
-        virtual bool isActive() = 0;
+        virtual bool isActive();
         
+        void setShutdown(bool shut) { toShutdown = shut; }
         void dump();
-        void setName(string str) { name = str; }
+        void setName(char *str) { name = str; }
         string getName() { return name; }
+        virtual void release();
 };
 
 #endif

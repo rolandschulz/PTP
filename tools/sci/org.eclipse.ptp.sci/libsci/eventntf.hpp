@@ -60,6 +60,7 @@ class EventNotify
         void freeze(int id, void *ret_val = NULL);
         void notify(int id);
         void * getRetVal(int id);
+        bool getState(int id);
 
     private:
         bool test(int id);

@@ -33,7 +33,6 @@
 #include "exception.hpp"
 #include "ctrlblock.hpp"
 #include "log.hpp"
-#include "atomic.hpp"
 
 #include "message.hpp"
 #include "tools.hpp"
@@ -102,7 +101,7 @@ int MessageQueue::multiProduce(Message **msgs, int num)
     return 0;
 }
 
-void MessageQueue::notify()
+void MessageQueue::release()
 {
     ::sem_post(&sem);
 }
@@ -205,10 +204,10 @@ int MessageQueue::getSize()
     return size;
 }
 
-void MessageQueue::setName(string str)
+void MessageQueue::setName(char *str)
 {
     name = str;
-    if (getName() == "filterInQ") { 
+    if (name == "filterInQ") { 
         flowCtl = true;
     }
 }

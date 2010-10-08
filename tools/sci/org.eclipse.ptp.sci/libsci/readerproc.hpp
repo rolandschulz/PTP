@@ -41,13 +41,11 @@ class ReaderProcessor : public Processor
 {
     private:
         Stream              *inStream;
-        MessageQueue        *outQueue;
-        
         MessageQueue        *outErrorQueue;
-        WriterProcessor     *peerProcessor;
 
     public:
         ReaderProcessor(int hndl = -1);
+        ~ReaderProcessor();
 
         virtual Message * read();
         virtual void process(Message *msg);
@@ -55,13 +53,10 @@ class ReaderProcessor : public Processor
         virtual void seize();
         virtual void clean();
 
-        virtual bool isActive();
-
         void setInStream(Stream *stream);
         void setOutQueue(MessageQueue *queue);
 
         void setOutErrorQueue(MessageQueue *queue);
-        void setPeerProcessor(WriterProcessor *processor);
 };
 
 #endif

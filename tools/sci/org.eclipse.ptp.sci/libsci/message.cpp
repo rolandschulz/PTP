@@ -37,6 +37,7 @@
 #include "atomic.hpp"
 
 #include "message.hpp"
+#include "queue.hpp"
 
 Message::Message(Type t)
     : type(t)
@@ -58,6 +59,29 @@ Message::~Message()
 
     buf = NULL;
     len = 0;
+}
+
+Message * Message::joinSegments(Message *msg, Stream *inS, MessageQueue *inQ)
+{
+    int i = 0;
+    int segnum = msg->getID() - 1; // exclude the SEGMENT header
+    Message *newMsg = NULL;
+    Message **segments = (Message **)::malloc(segnum * sizeof(Message *));
+    newMsg = new Message();
+    if (inS) {
+        delete msg;
+        for (i = 0; i < segnum; i++) {
+            segments[i] = new Message();
+            *inS >> *segments[i];
+        }
+    } else {
+        inQ->remove();
+        inQ->multiConsume(segments, segnum);
+    }
+    newMsg->joinSegments(segments, segnum);
+    ::free(segments);
+
+    return newMsg;
 }
 
 int Message::joinSegments(Message **segments, int segnum)
@@ -121,17 +145,23 @@ int Message::getRefCount()
     return refCount;
 }
 
-int Message::decRefCount()
+int Message::decRefCount(int cnt)
 {
-    int cnt = fetch_and_add(&refCount, -1);
-    return (cnt - 1);
+    int count = fetch_and_add(&refCount, -cnt);
+    return (count - cnt);
+}
+
+int Message::incRefCount(int cnt)
+{
+    int count = fetch_and_add(&refCount, cnt);
+    return (count + cnt);
 }
 
 Stream & operator >> (Stream &stream, Message &msg)
 {  
+    int rc;
     struct iovec vecs[6];
     struct iovec sign = {0};
-    int rc, tmp0, tmp1, tmp2, tmp3, tmp4;
 
     // receive message header
     stream >> (int &) msg.type;
@@ -147,24 +177,7 @@ Stream & operator >> (Stream &stream, Message &msg)
         stream.read(msg.buf, msg.len);
     }
     stream >> sign;
-    tmp0 = htonl(msg.type);
-    vecs[0].iov_base = &tmp0;
-    vecs[0].iov_len = sizeof(tmp0);
-    tmp1 = htonl(msg.msgID);
-    vecs[1].iov_base = &tmp1;
-    vecs[1].iov_len = sizeof(tmp1);
-    tmp2 = htonl(msg.filterID);
-    vecs[2].iov_base = &tmp2;
-    vecs[2].iov_len = sizeof(tmp2);
-    tmp3 = htonl(msg.group);
-    vecs[3].iov_base = &tmp3;
-    vecs[3].iov_len = sizeof(tmp3);
-    tmp4 = htonl(msg.len);
-    vecs[4].iov_base = &tmp4;
-    vecs[4].iov_len = sizeof(tmp4);
-    vecs[5].iov_base = msg.buf;
-    vecs[5].iov_len = msg.len;
-    rc = SSHFUNC->verify_data(vecs, 6, &sign);
+    rc = SSHFUNC->verify_data(&sign, 6, &msg.type, sizeof(msg.type), &msg.msgID, sizeof(msg.msgID), &msg.filterID, sizeof(msg.filterID), &msg.group, sizeof(msg.group), &msg.len, sizeof(msg.len), msg.buf, msg.len);
     delete [] (char *)sign.iov_base;
     if (rc != 0) {
         throw Exception(Exception::INVALID_SIGNATURE);
@@ -177,26 +190,8 @@ Stream & operator << (Stream &stream, Message &msg)
 {
     struct iovec vecs[6];
     struct iovec sign = {0};
-    int tmp0, tmp1, tmp2, tmp3, tmp4;
 
-    tmp0 = htonl(msg.type);
-    vecs[0].iov_base = &tmp0;
-    vecs[0].iov_len = sizeof(tmp0);
-    tmp1 = htonl(msg.msgID);
-    vecs[1].iov_base = &tmp1;
-    vecs[1].iov_len = sizeof(tmp1);
-    tmp2 = htonl(msg.filterID);
-    vecs[2].iov_base = &tmp2;
-    vecs[2].iov_len = sizeof(tmp2);
-    tmp3 = htonl(msg.group);
-    vecs[3].iov_base = &tmp3;
-    vecs[3].iov_len = sizeof(tmp3);
-    tmp4 = htonl(msg.len);
-    vecs[4].iov_base = &tmp4;
-    vecs[4].iov_len = sizeof(tmp4);
-    vecs[5].iov_base = msg.buf;
-    vecs[5].iov_len = msg.len;
-    SSHFUNC->sign_data(vecs, 6, &sign);
+    SSHFUNC->sign_data(&sign, 6, &msg.type, sizeof(msg.type), &msg.msgID, sizeof(msg.msgID), &msg.filterID, sizeof(msg.filterID), &msg.group, sizeof(msg.group), &msg.len, sizeof(msg.len), msg.buf, msg.len);
     // send message header
     stream << (int) msg.type;
     stream << msg.msgID;

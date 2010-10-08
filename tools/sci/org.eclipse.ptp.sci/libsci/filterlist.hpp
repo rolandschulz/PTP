@@ -17,7 +17,7 @@
               can query filter information at runtime, so it's necessary 
               to add a lock to protect these read & write operations).
    
- Author: Nicole Nie
+ Author: Nicole Nie, Tu HongJ
 
  History:
    Date     Who ID    Description
@@ -45,15 +45,13 @@ class FilterList
         typedef map<int, Filter*> FILTER_MAP;
         
     private:
-        FilterList();
-        static FilterList    *instance;
         FILTER_MAP           filterInfo;
         pthread_mutex_t      mtx;
         Message              *flistMsg;
 
     public:
+        FilterList();
         ~FilterList();
-        static FilterList * getInstance();
 
         int loadFilter(int filter_id, Filter *filter, bool invoke = true);
         int unloadFilter(int filter_id, bool invoke = true);
@@ -69,8 +67,6 @@ class FilterList
         void lock();
         void unlock();
 };
-
-#define gFilterList FilterList::getInstance()
 
 #endif
 

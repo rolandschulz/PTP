@@ -1,15 +1,16 @@
 AUTOMAKE_OPTIONS=foreign
 SOURCES = \
-    allocator.cpp  errdetector.cpp  errmonitor.cpp  filterproc.cpp   message.cpp    purifierproc.cpp  routinglist.cpp \
-    api.cpp        errevent.cpp     eventntf.cpp    handlerproc.cpp  observer.cpp   queue.cpp         statemachine.cpp \
-    ctrlblock.cpp  errhandler.cpp   filter.cpp      initializer.cpp  parent.cpp     readerproc.cpp    topology.cpp \
-    dgroup.cpp     errinjector.cpp  filterlist.cpp  listener.cpp     processor.cpp  routerproc.cpp    writerproc.cpp 
+    allocator.cpp    filterproc.cpp   message.cpp    purifierproc.cpp  routinglist.cpp \
+    api.cpp          eventntf.cpp    handlerproc.cpp  observer.cpp   queue.cpp         \
+    ctrlblock.cpp    filter.cpp      initializer.cpp  readerproc.cpp    topology.cpp launcher.cpp \
+    dgroup.cpp       filterlist.cpp  listener.cpp     processor.cpp  routerproc.cpp    writerproc.cpp \
+    embedagent.cpp   privatedata.cpp
 
 noinst_HEADERS = \
-    allocator.hpp errdetector.hpp errmonitor.hpp filterproc.hpp listener.hpp processor.hpp routerproc.hpp writerproc.hpp \
-    atomic.hpp     errevent.hpp     eventntf.hpp    general.hpp      message.hpp   purifierproc.hpp  routinglist.hpp \
-    ctrlblock.hpp  errhandler.hpp   filter.hpp      handlerproc.hpp  observer.hpp  queue.hpp         statemachine.hpp \
-    dgroup.hpp     errinjector.hpp  filterlist.hpp  initializer.hpp  parent.hpp    readerproc.hpp    topology.hpp
+    allocator.hpp  filterproc.hpp listener.hpp processor.hpp routerproc.hpp writerproc.hpp \
+    atomic.hpp      eventntf.hpp    general.hpp      message.hpp   purifierproc.hpp  routinglist.hpp \
+    ctrlblock.hpp   filter.hpp      handlerproc.hpp  observer.hpp  queue.hpp   embedagent.hpp       \
+    dgroup.hpp      filterlist.hpp  initializer.hpp  readerproc.hpp    topology.hpp privatedata.hpp
 
 include_HEADERS = ../include/sci.h
 
@@ -31,12 +32,16 @@ libsci64_r.o : $(OBJECTS64)
 	$(CXX) -q32 -c $(SCI_CPPFLAGS) -o $@ $< 
 
 %.64o: %.cpp
-	$(CXX) -q64 -c $(SCI_CPPFLAGS) -o $@ $< 
+	$(CXX) -q64 -c $(SCI_CPPFLAGS) -o $@ $< -D__64BIT__
+
 endif
 if SYSTEM_LINUX
 lib_LTLIBRARIES=libsci.la
 libsci_la_SOURCES = $(SOURCES)
-libsci_la_CPPFLAGS = -I../include -I../common -I../secmod
+libsci_la_CPPFLAGS = -g -O0 -I../include -I../common -I../secmod
+if BIT64
+libsci_la_CPPFLAGS += -D__64BIT__
+endif
 libsci_la_LDFLAGS= -L../common -lcmn -lrt 
 endif
 if SYSTEM_DARWIN

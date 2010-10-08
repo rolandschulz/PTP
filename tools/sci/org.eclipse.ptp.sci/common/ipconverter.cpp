@@ -23,6 +23,9 @@
 
 ****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "ipconverter.hpp"
 #include <assert.h>
 #include <netinet/in.h>

@@ -44,6 +44,7 @@
 #include "extlisten.hpp"
 #include "extlaunch.hpp"
 
+
 const int MAXFD = 128;
 JOB_INFO jobInfo;
 string pidFile;
@@ -100,6 +101,7 @@ void daemonInit()
 
 void writePidFile(string &pidf)
 {
+    unlink(pidf.c_str());
     ofstream pidfile(pidf.c_str());
     if (!pidfile) {
         printf("Cann't write pid file %s", pidf.c_str());
@@ -126,18 +128,50 @@ int checkPidFile(string &pidf)
     return 0;
 }
 
-int initService(char *prog)
+void usage()
 {
-    char *p = strrchr(prog, '/');
+    printf("scidv1 [-p pidDir] [-l logDir] [-s severity]\n");
+}
+
+int initService(int argc, char *argv[])
+{
+    int i;
+    char *optpattern = "hl:p:s:";
+    char *prog = argv[0];
+    char *p = NULL;
+    string logDir = "/tmp";
+    int logLevel = -1;
+#ifdef _SCI_LINUX // Linux
+    string pidDir = "/var/run/";
+#else
+    string pidDir = "/var/opt/";
+#endif
+
+    extern char *optarg;
+    extern int  optind;
+    while ((i = getopt(argc, argv, optpattern)) != EOF) {
+        switch (i) {
+            case 'l':
+                logDir = optarg;
+                break ;
+            case 'p':
+                pidDir = optarg;
+                break;
+            case 's':
+                logLevel = atoi(optarg);
+                break;
+            case 'h':
+                usage();
+                exit(0);
+                break;
+        }
+    }
+    p = strrchr(prog, '/');
     if (p != NULL) 
         p++;
     else
         p = prog;
-#ifdef _SCI_LINUX // Linux
-    pidFile = string("/var/run/") + p + ".pid";
-#else
-    pidFile = string("/var/opt/") + p + ".pid";
-#endif
+    pidFile = pidDir + "/" + p + ".pid";
     if (checkPidFile(pidFile) < 0) {
         printf("%s is already running...\n", p);
         return -1;
@@ -146,22 +180,23 @@ int initService(char *prog)
         printf("Must running as root\n");
         return -1;
     }
-
     daemonInit();
     writePidFile(pidFile);
+
+    Log::getInstance()->init(logDir.c_str(), "scidv1.log", logLevel);
 
     return 0;
 }
 
 int main(int argc, char *argv[])
 {
-    if (initService(argv[0]) != 0)
+    if (initService(argc, argv) != 0)
         return -1;
 
-    Log::getInstance()->init("/tmp", "scidv1.log", 6);
     ExtListener *listener = new ExtListener();
     listener->start();
 
+    launcherList.clear();
     while (1) {
         Locker::getLocker()->freeze();
 
@@ -169,6 +204,10 @@ int main(int argc, char *argv[])
         Locker::getLocker()->lock();
         vector<ExtLauncher *>::iterator lc;
         for (lc = launcherList.begin(); lc != launcherList.end(); lc++) {
+            while (!(*lc)->isLaunched()) {
+                // before join, this thread should have been launched
+                SysUtil::sleep(1000);
+            }
             (*lc)->join();
             delete (*lc);
         }
@@ -180,8 +219,8 @@ int main(int argc, char *argv[])
         JOB_INFO::iterator it;
         for (it = jobInfo.begin(); it != jobInfo.end(); ) {
             if ((SysUtil::microseconds() - it->second.timestamp) > FIVE_MINUTES) {
-                jobInfo.erase(it);
                 log_crit("Erase jobInfo item %d", it->first);
+                jobInfo.erase(it++);
             } else {
                 ++it;
             }

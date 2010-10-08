@@ -26,7 +26,6 @@
 #ifndef _TOPOLOGY_HPP
 #define _TOPOLOGY_HPP
 
-#include <vector>
 #include <map>
 #include <string>
 
@@ -39,11 +38,14 @@ using namespace std;
 
 class Message;
 class Launcher;
+class RoutingList;
+class FilterList;
 
 class BEMap : public map<int, string> 
 {
     public:
         int input(const char *filename, int num);
+        int input(const char *hostlist[], int num);
 };
 
 class Topology 
@@ -60,6 +62,8 @@ class Topology
 
         // other members
         int                  nextAgentID;
+        RoutingList         *routingList;
+        FilterList          *filterList;
 
         // weight factors
         map<int, int> weightMap;
@@ -84,6 +88,10 @@ class Topology
 
         void incWeight(int id);
         void decWeight(int id);
+        RoutingList * getRoutingList();
+        void setRoutingList(RoutingList *rlist);
+        FilterList * getFilterList();
+        void setFilterList(FilterList *flist);
 
         friend class Launcher;
 
@@ -91,44 +99,7 @@ class Topology
         bool isFullTree(int beNum);
 };
 
-class Launcher 
-{
-    public:
-        enum MODE {
-            INTERNAL,
-            REGISTER,
-            REQUEST
-        };
-        
-    private:
-        Topology        &topology;
-        EnvVar          env;
-        string          shell;
-        string          localName;
-        MODE            mode;
-        bool            sync;
-        vector<Stream *> initStreams;
-
-    public:    
-        Launcher(Topology &topy);
-        ~Launcher();
-        
-        int launch();
-        
-        int launchBE(int beID, const char *hostname);
-        int launchAgent(int beID, const char *hostname);
-        int syncWaiting();
-        int sendInitRet(int rc, string &retStr);
-
-    private:
-        int launchClient(int ID, string &path, string host, MODE m = INTERNAL);
-
-        int launch_tree1(); // mininum agents
-        int launch_tree2(); // maximum agents
-};
-
 const int MAX_FD = 256;
-const int SCI_INIT_FD = MAX_FD + 1;
 
 #endif
 

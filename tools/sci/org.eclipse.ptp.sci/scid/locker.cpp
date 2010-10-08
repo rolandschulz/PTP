@@ -89,8 +89,8 @@ void Locker::freeze()
 void Locker::notify()
 {
     ::pthread_mutex_lock(&cMutex);
-    ::pthread_cond_broadcast(&cond);
     freezed= false;
+    ::pthread_cond_broadcast(&cond);
     ::pthread_mutex_unlock(&cMutex);
 }
 

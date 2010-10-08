@@ -23,9 +23,10 @@
 
 ****************************************************************************/
 
-#include "envvar.hpp"
 #include <assert.h>
+#include <stdio.h>
 
+#include "envvar.hpp"
 #include "tools.hpp"
 
 EnvVar::EnvVar()
