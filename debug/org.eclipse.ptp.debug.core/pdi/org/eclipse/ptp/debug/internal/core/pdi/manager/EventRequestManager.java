@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.pdi.manager;
 
-import java.util.Observable;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,13 +35,14 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventRequestManager;
 import org.eclipse.ptp.debug.core.pdi.messages.Messages;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestListener;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStopDebuggerRequest;
 
 /**
  * @author clement
  * 
  */
-public class EventRequestManager extends AbstractPDIManager implements IPDIEventRequestManager {
+public class EventRequestManager extends AbstractPDIManager implements IPDIEventRequestManager, IPDIEventRequestListener {
 	private class EventRequestDispatchJob extends Job {
 		private Vector<IPDIEventRequest> fRequests = null;
 
@@ -285,10 +285,8 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * 
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
-	public void update(Observable o, Object arg) {
-		if (arg instanceof IPDIEventRequest) {
-			dispatchJob.removeCurrentEventRequest();
-		}
+	public void handleEventRequestChanged(IPDIEventRequest event) {
+		dispatchJob.removeCurrentEventRequest();
 	}
 
 	/*

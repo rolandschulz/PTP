@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-import java.util.Observer;
-
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
 
@@ -29,7 +27,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
  * @author clement
  * 
  */
-public interface IPDIEventRequestManager extends IPDIManager, Observer {
+public interface IPDIEventRequestManager extends IPDIManager {
 	/**
 	 * Flush any pending requests.
 	 * 
