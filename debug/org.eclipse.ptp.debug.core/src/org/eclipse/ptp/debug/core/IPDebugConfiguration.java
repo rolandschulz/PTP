@@ -36,21 +36,27 @@ public interface IPDebugConfiguration {
 	/**
 	 * @return
 	 */
+	@Deprecated
 	public String[] getCoreFileExtensions();
 
 	/**
 	 * @return
 	 */
+	@Deprecated
 	public String[] getCPUList();
 
 	/**
-	 * @return
+	 * Get an instance of the debugger defined by this configuration.
+	 * 
+	 * @return debugger instance
 	 * @throws CoreException
 	 */
 	public IPDebugger getDebugger() throws CoreException;
 
 	/**
-	 * @return
+	 * Get the ID of the debugger
+	 * 
+	 * @return debugger ID
 	 */
 	public String getID();
 
@@ -60,24 +66,31 @@ public interface IPDebugConfiguration {
 	public String[] getModeList();
 
 	/**
-	 * @return
+	 * Get the name of the debugger.
+	 * 
+	 * @return name of the debugger
 	 */
 	public String getName();
 
 	/**
 	 * @return
 	 */
+	@Deprecated
 	public String getPlatform();
 
 	/**
 	 * @param cpu
 	 * @return
 	 */
+	@Deprecated
 	public boolean supportsCPU(String cpu);
 
 	/**
+	 * Test if the debugger support the debug launch mode (run or attach)
+	 * 
 	 * @param mode
-	 * @return
+	 *            debugger launch mode
+	 * @return true if the debugger supports the supplied mode
 	 */
 	public boolean supportsMode(String mode);
 }
