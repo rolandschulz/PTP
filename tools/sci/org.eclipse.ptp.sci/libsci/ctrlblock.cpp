@@ -79,7 +79,6 @@ CtrlBlock::CtrlBlock()
     monitorInQueue = NULL;
     errorQueue = NULL;
 
-    released = false;
     parentStream = NULL;
     embedAgents.clear();
     enableID = gNotifier->allocate();
@@ -434,16 +433,6 @@ PurifierProcessor * CtrlBlock::getPurifierProcessor()
 void CtrlBlock::setFlowctlThreshold(long long th)
 {
     thresHold = th;
-}
-
-void CtrlBlock::setReleased(bool rel)
-{
-    released = rel;
-}
-
-bool CtrlBlock::getReleased()
-{
-    return released;
 }
 
 long long CtrlBlock::getFlowctlThreshold()

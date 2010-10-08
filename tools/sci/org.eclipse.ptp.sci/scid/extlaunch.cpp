@@ -104,25 +104,12 @@ int ExtLauncher::verifyData(struct iovec &sign, int jobkey, int id, char *path, 
         return rc;
 
     if (path == NULL) {
-        rc = SSHFUNC->verify_data(sessionKey, ssKeyLen, &sign, 3, &mode, sizeof(mode), &jobkey, sizeof(jobkey), &id, sizeof(id));
+        rc = SSHFUNC->verify_data(sessionKey, ssKeyLen, &sign, "%d%d%d", mode, jobkey, id);
     } else {
-        rc = SSHFUNC->verify_data(sessionKey, ssKeyLen, &sign, 6, &mode, sizeof(mode), &jobkey, sizeof(jobkey), &id, sizeof(id), &sync, sizeof(sync), path, strlen(path) + 1, envStr, strlen(envStr) + 1);
+        rc = SSHFUNC->verify_data(sessionKey, ssKeyLen, &sign, "%d%d%d%s%s", mode, jobkey, id, path, envStr);
     }
 
     return rc;
-}
-
-int ExtLauncher::sendResult(Stream &s, int rc)
-{
-    struct iovec sign = {0};
-
-    if (!sync)
-        return 0;
-
-    SSHFUNC->sign_data(sessionKey, ssKeyLen, &sign, 2, &rc, sizeof(rc), retStr.c_str(), retStr.size() + 1);
-    s << rc << retStr << sign << endl;
-
-    return 0;
 }
 
 void ExtLauncher::run()
@@ -134,15 +121,13 @@ void ExtLauncher::run()
         *stream >> userName >> usertok >> sign >> (int &)mode >> jobKey >> id;
         switch (mode) {
             case INTERNAL:
-                *stream >> sync >> path >> envStr >> endl;
+                *stream >> path >> envStr >> endl;
                 log_crit("[%s] Launch %d.%d %s with %s internally", userName.c_str(), 
                     jobKey, id, path.c_str(), envStr.c_str());
-                rc = launchInt(jobKey, id, (char *)path.c_str(), (char *)envStr.c_str(), sign);
-                if (rc != 0)
-                    sendResult(*stream, rc);
+                launchInt(jobKey, id, (char *)path.c_str(), (char *)envStr.c_str(), sign);
                 break;
             case REGISTER:
-                *stream >> sync >> path >> envStr >> endl;
+                *stream >> path >> envStr >> endl;
                 log_crit("[%s] Receive register info %d.%d %s", userName.c_str(), jobKey, 
                         id, envStr.c_str());
                 rc = doVerify(sign, jobKey, id, (char *)path.c_str(), (char *)envStr.c_str());
@@ -171,8 +156,6 @@ void ExtLauncher::run()
     } catch (SocketException &e) {
         log_error("socket exception %s", e.getErrMsg().c_str());
     } catch (Exception &e) {
-        retStr = "invalid user";
-        sendResult(*stream, -1);
         log_error("exception %s, errno = %d", e.getErrMsg(), errno);
     } catch (...) {
         log_error("unknown exception");
@@ -229,13 +212,6 @@ int ExtLauncher::launchInt(int jobkey, int id, char *path, char *envStr, struct 
         delete [] exename;
         return -1;
     }
-#ifdef PSEC_OPEN_SSL
-    int sockfd[2];
-    if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfd) == -1) {
-        log_error("Failed to create socketpair!");
-        return -1;
-    }
-#endif
 
     pid = ::fork();
     if (pid < 0) { // fork failed
@@ -245,34 +221,34 @@ int ExtLauncher::launchInt(int jobkey, int id, char *path, char *envStr, struct 
         int sfd = stream->getSocket();
         // the child process can't ignore SIGCHLD signal
         ::sigaction(SIGCHLD, &oldSa, NULL);
-#ifdef PSEC_OPEN_SSL
-        dup2(sockfd[0], MAX_FD); // inherited by child process
-#endif
         dup2(sfd, STDIN_FILENO);
         for (i = STDERR_FILENO + 1; i < MAX_FD; i++) {
             ::close(i);
         }
         try {
-            rc = putSessionKey(MAX_FD, signature, jobkey, id, path, envStr, true);
+            rc = putSessionKey(-1, signature, jobkey, id, path, envStr, true);
             if (rc != 0) {
                 exit(rc);
             }
         } catch (Exception &e) {
             exit(-1);
         }
-        rc = ::execle("/bin/sh", "/bin/sh", "-c", path, (char *)NULL, NULL); 
+
+        char *p = envStr;
+        char *params[4096];
+        for (i = 0; i < MAX_ENV_VAR_NUM-1; i++) {
+            p = ::strchr(p, ';');
+            if (NULL == p) {
+                break;
+            }
+            *p = '\0';
+            params[i] = ++p;
+        }
+        params[i] = NULL;
+        rc = ::execle("/bin/sh", "/bin/sh", "-c", path, (char *)NULL, params); 
         if (rc < 0) {
             exit(0);
         }
-    } else {
-#ifdef PSEC_OPEN_SSL
-        close(sockfd[0]);
-        Stream ss;
-        rc = getSessionKey(sockfd[1]);
-        ss.init(sockfd[1]);
-        ss << usertok << endl;
-        close(sockfd[1]);
-#endif
     }
     delete [] exename;
 
@@ -306,6 +282,9 @@ int ExtLauncher::putSessionKey(int fd, struct iovec &sign, int jobkey, int id, c
     if (rc == 0) {
         rc = verifyData(sign, jobkey, id, path, envStr);
     }
+    if (fd < 0)
+        return rc;
+
     vecs[0].iov_base = &rc;
     vecs[0].iov_len = sizeof(rc);
     vecs[1].iov_base = sessionKey;

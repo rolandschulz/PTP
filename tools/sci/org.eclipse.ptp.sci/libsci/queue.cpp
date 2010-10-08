@@ -34,6 +34,7 @@
 #include "ctrlblock.hpp"
 #include "log.hpp"
 
+#include "atomic.hpp"
 #include "message.hpp"
 #include "tools.hpp"
 
@@ -50,7 +51,7 @@ MessageQueue::~MessageQueue()
     while (!queue.empty()) {
         msg = queue.front();
         queue.pop_front();
-        if (msg->decRefCount() == 0) {
+        if (decRefCount(msg->getRefCount()) == 0) {
             delete msg;
         }
     }
@@ -188,7 +189,7 @@ void MessageQueue::remove()
     msg = queue.front();
     queue.pop_front();
     unlock();
-    if (msg->decRefCount() == 0) {
+    if (decRefCount(msg->getRefCount()) == 0) {
         delete msg;
     }
 }

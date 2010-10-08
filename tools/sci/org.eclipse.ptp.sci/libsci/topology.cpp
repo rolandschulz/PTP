@@ -136,7 +136,7 @@ int BEMap::input(const char * filename, int num)
 }
 
 Topology::Topology(int id)
-    : agentID(id)
+    : agentID(id), initID(-1)
 {
     beMap.clear();
     weightMap.clear();
@@ -146,6 +146,16 @@ Topology::~Topology()
 {
     beMap.clear();
     weightMap.clear();
+}
+
+void Topology::setInitID()
+{
+    initID = gNotifier->allocate();
+}
+
+int Topology::getInitID()
+{
+    return initID;
 }
 
 Message * Topology::packMsg()
@@ -253,10 +263,6 @@ int Topology::init()
     const char *agentName = "scia";
 #endif
 
-    envp = ::getenv("SCI_USE_EXTLAUNCHER");
-    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
-        ::putenv("SCI_EMBED_AGENT=no");
-    }
     envp = ::getenv("SCI_EMBED_AGENT");
     if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
         agentPath = bePath;
@@ -277,6 +283,10 @@ int Topology::deploy()
     nextAgentID = (agentID + 1) * fanOut - 2; // A formular to calculate the agentID of the first child
     
     int rc = launcher.launch();
+    if (initID != -1) {
+        *(int *)gNotifier->getRetVal(initID) = rc;
+        gNotifier->notify(initID);   
+    }
 
     return rc;
 }
@@ -310,7 +320,6 @@ int Topology::addBE(Message *msg)
         } else { // if this agent has child agent(s), launch an agent
             rc = launcher.launchAgent(id, host);
         }
-        // launcher.syncWaiting();
     } else {
         if (aID == INVLIDSUCCESSORID)
             aID = weightMap.begin()->first;

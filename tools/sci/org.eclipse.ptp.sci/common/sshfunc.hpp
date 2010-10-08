@@ -63,13 +63,15 @@ class SshFunc
         SshFunc();
         static SshFunc *instance;
         int set_auth_module(char *name, char *fpath, char *opts);
-        int getSizes(char *fmt);
+        int get_sizes(char *fmt);
         
     public:
         ~SshFunc();
         static SshFunc *getInstance();
         int load(char *libPath = NULL);
 
+        char *get_session_key() { return session_key; }
+        size_t get_key_len() {return key_len; }
         int get_id_token(char *tname, char *thost, psec_idbuf_t idtok);
         int verify_id_token(char *uname, psec_idbuf_t idtok);
         int get_id_from_token(psec_idbuf_t idtok, char *usrid, size_t *usridlen);
@@ -93,11 +95,14 @@ class SshFunc
         int verify_data(struct iovec *sigbufs, int num_bufs, ...);
         int sign_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...);
         int verify_data(char *key, size_t keylen, struct iovec *sigbufs, int num_bufs, ...);
-        int sign_data(struct iovec *sigbufs, char *fmt, ...);
-        int verify_data(struct iovec *sigbufs, char *fmt, ...);
+        int sign_data(char *key, size_t klen, struct iovec *sigbufs, char *fmt, ...);
+        int verify_data(char *key, size_t klen, struct iovec *sigbufs, char *fmt, ...);
 };
 
 #define SSHFUNC SshFunc::getInstance()
+#define psec_sign_data(sigbufs, ...)        SSHFUNC->sign_data(SSHFUNC->get_session_key(), SSHFUNC->get_key_len(), sigbufs, __VA_ARGS__)
+#define psec_verify_data(sigbufs, ...)      SSHFUNC->verify_data(SSHFUNC->get_session_key(), SSHFUNC->get_key_len(), sigbufs, __VA_ARGS__)
+#define psec_free_signature(sign)           SSHFUNC->free_signature(sign)
 
 #endif
 

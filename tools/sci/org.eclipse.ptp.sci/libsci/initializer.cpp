@@ -70,7 +70,7 @@
 Initializer* Initializer::instance = NULL;
 
 Initializer::Initializer()
-    : syncID(-1), listener(NULL), inStream(NULL)
+    : listener(NULL), inStream(NULL)
 {
 }
 
@@ -91,6 +91,25 @@ int Initializer::init()
     char dir[MAX_PATH_LEN] = "/opt/sci/log";
     char *envp = NULL; 
     int hndl = -1;
+
+    envp = ::getenv("SCI_LOG_DIRECTORY"); 
+    if (envp != NULL) {
+        ::strncpy(dir, envp, sizeof(dir));
+    }
+    envp = ::getenv("SCI_LOG_LEVEL"); 
+    if (envp != NULL)
+        level = ::atoi(envp);
+    
+    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
+        Log::getInstance()->init(dir, "fe.log", level);
+        log_debug("I am a front end, my handle is %d", gCtrlBlock->getMyHandle());
+    } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
+        Log::getInstance()->init(dir, "scia.log", level);
+        log_debug("I am an agent, my handle is %d", gCtrlBlock->getMyHandle());
+    } else {
+        Log::getInstance()->init(dir, "be.log", level);
+        log_debug("I am a back end, my handle is %d", gCtrlBlock->getMyHandle());
+    }
 
     try {
         if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
@@ -115,25 +134,6 @@ int Initializer::init()
     } catch (...) {
         log_error("Initializer: unknown exception");
         return SCI_ERR_INITIALIZE_FAILED;
-    }
-
-    envp = ::getenv("SCI_LOG_DIRECTORY"); 
-    if (envp != NULL) {
-        ::strncpy(dir, envp, sizeof(dir));
-    }
-    envp = ::getenv("SCI_LOG_LEVEL"); 
-    if (envp != NULL)
-        level = ::atoi(envp);
-    
-    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) {
-        Log::getInstance()->init(dir, "fe.log", level);
-        log_debug("I am a front end, my handle is %d", gCtrlBlock->getMyHandle());
-    } else if (gCtrlBlock->getMyRole() == CtrlBlock::AGENT) {
-        Log::getInstance()->init(dir, "scia.log", level);
-        log_debug("I am an agent, my handle is %d", gCtrlBlock->getMyHandle());
-    } else {
-        Log::getInstance()->init(dir, "be.log", level);
-        log_debug("I am a back end, my handle is %d", gCtrlBlock->getMyHandle());
     }
 
     return rc;
@@ -192,21 +192,16 @@ int Initializer::initFE()
     if (handler) {
         handler->start();
     }
-    feAgent->work();
+    feAgent->getRoutingList()->getTopology()->setInitID();
+    rc = feAgent->work();
     gAllocator->reset();
-    envp = getenv("SCI_ENABLE_LISTENER");
-    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
-        initListener();
-    }
 
     Message *flistMsg = gCtrlBlock->getFilterList()->packMsg(gCtrlBlock->getEndInfo()->fe_info.filter_list);
     MessageQueue *routerInQ = feAgent->getRouterInQ();
     routerInQ->produce(flistMsg);
-    int msgID = gNotifier->allocate();
     Message *topoMsg = topo->packMsg();
-    topoMsg->setID(msgID);
     routerInQ->produce(topoMsg);
-    gNotifier->freeze(msgID, &rc);
+    feAgent->syncWait();
 
     return rc;
 }
@@ -218,7 +213,6 @@ int Initializer::initAgent()
     int hndl = -1;
     EmbedAgent *agent = NULL;
 
-    getIntToken();
     inStream = initStream();
     // get hostname and port no from environment variable.
     char *envp = ::getenv("SCI_WORK_DIRECTORY");
@@ -243,97 +237,36 @@ int Initializer::initAgent()
     agent->init(hndl, inStream, NULL);
     gCtrlBlock->enable();
     agent->work();
-    sendSyncRet(inStream);
 
     return SCI_SUCCESS;
 }
 
-int Initializer::getIntToken()
-{
-#ifndef PSEC_OPEN_SSL
-    return 0;
-#endif 
-    Stream ss;
-    struct iovec token = {0};
-    ss.init(MAX_FD);
-    ss >> token >> endl;
-    SSHFUNC->set_user_token(&token);
-    delete [] (char *)token.iov_base;
-
-    return 0;
-}
-
-typedef struct {
-    int rt;
-    char retStr[256];
-} syncResult;
-
-int Initializer::syncRetBack(int rt, string &retStr)
-{
-    if (gCtrlBlock->getMyRole() == CtrlBlock::FRONT_END) 
-        return 0;
-
-    syncResult *ret = (syncResult *)gNotifier->getRetVal(syncID);
-    ret->rt = rt;
-    strncpy(ret->retStr, retStr.c_str(), sizeof(ret->retStr));
-    gNotifier->notify(syncID);
-
-    return 0;
-}
-
-int Initializer::sendSyncRet(Stream *stream) 
-{
-    char *envp = ::getenv("SCI_SYNC_INIT");
-    if ((envp == NULL) || (strcasecmp(envp, "yes") != 0)) 
-        return 0;
-
-    try {
-        struct iovec sign = {0};
-        syncResult ret = { 0, "OK :)" };
-
-        if (gCtrlBlock->getMyRole() != CtrlBlock::BACK_END) {
-            syncID = gNotifier->allocate();
-            gNotifier->freeze(syncID, &ret);
-        }
-        SSHFUNC->sign_data(&sign, 2, &ret.rt, sizeof(ret.rt), ret.retStr, strlen(ret.retStr) + 1);
-        *stream << ret.rt << ret.retStr << sign << endl;
-        SSHFUNC->free_signature(&sign);
-    } catch (SocketException &e) {
-        log_error("socket exception %s", e.getErrMsg().c_str());
-    }
-
-    return 0;
-}
-
 Stream * Initializer::initStream()
 {
-    char *envp;
-    int jobkey;
+    int rc;
     string envStr;
     Stream *stream = new Stream();  
-    int hndl = -1;
+    struct iovec token = {0};
+    struct iovec sign = {0};
 
     stream->init(STDIN_FILENO);
-    *stream >> envStr >> endl;
+    *stream >> token >> envStr >> sign >> endl;
+    SSHFUNC->set_user_token(&token);
+    rc = psec_verify_data(&sign, "%s", envStr.c_str());
+    delete [] (char *)sign.iov_base;
+    if (rc != 0)
+        throw Exception(Exception::INVALID_SIGNATURE);
+
     parseEnvStr(envStr);
-    envp = getenv("SCI_CLIENT_ID");
-    assert(envp != NULL);
-    hndl = atoi(envp);
-    gCtrlBlock->setMyHandle(hndl);
-    envp = getenv("SCI_JOB_KEY");
-    assert(envp != NULL);
-    jobkey = atoi(envp);
-    gCtrlBlock->setJobKey(jobkey);
-    envp = ::getenv("SCI_EMBED_AGENT");
-    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0) && (hndl < 0)) {
-        gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
-    }
 
     return stream;
 }
 
 int Initializer::parseEnvStr(string &envStr)
 {
+    char *envp;
+    int hndl = -1;
+    int jobkey;
     string key, val;
     char *st = (char *) envStr.c_str();
     char *p = st + envStr.size();
@@ -349,6 +282,19 @@ int Initializer::parseEnvStr(string &envStr)
         }
     }
 
+    envp = getenv("SCI_CLIENT_ID");
+    assert(envp != NULL);
+    hndl = atoi(envp);
+    gCtrlBlock->setMyHandle(hndl);
+    envp = getenv("SCI_JOB_KEY");
+    assert(envp != NULL);
+    jobkey = atoi(envp);
+    gCtrlBlock->setJobKey(jobkey);
+    envp = ::getenv("SCI_EMBED_AGENT");
+    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0) && (hndl < 0)) {
+        gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
+    }
+
     return 0;
 }
 
@@ -357,11 +303,10 @@ int Initializer::initBE()
     string nodeAddr;
     int port = -1;
     int hndl = gCtrlBlock->getMyHandle();
-    bool extMode = false;
     char *envp = ::getenv("SCI_USE_EXTLAUNCHER");
     if ((envp != NULL) && (::strcasecmp(envp, "yes") == 0)) {
         int pID; 
-        extMode = true;
+        struct iovec sign = {0};
         if (!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID")) {
             int rc = initExtBE(hndl);
             if (rc != 0)
@@ -379,11 +324,16 @@ int Initializer::initBE()
         if (envp != NULL) {
             pID = ::atoi(envp);
         }
+        hndl = gCtrlBlock->getMyHandle();       // hndl may change
         inStream = new Stream();
         inStream->init(nodeAddr.c_str(), port);
-        *inStream << gCtrlBlock->getJobKey() << hndl << pID << endl;
+        psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, pID);
+        *inStream << gCtrlBlock->getJobKey() << hndl << pID << sign << endl;
+        psec_free_signature(&sign);
+        if (hndl < 0) {
+            gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
+        }
     } else {
-        getIntToken();
         inStream = initStream();
     }
     gCtrlBlock->enable();
@@ -416,7 +366,9 @@ int Initializer::initBE()
     if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT) {
         EmbedAgent *beAgent = new EmbedAgent();
         beAgent->init(hndl, inStream, NULL);
+        beAgent->getRoutingList()->getTopology()->setInitID();
         beAgent->work();
+        beAgent->syncWait();
     } else {
         MessageQueue *userQ = new MessageQueue();
         userQ->setName("userQ");
@@ -431,9 +383,6 @@ int Initializer::initBE()
         writer->setOutStream(inStream);
         purifier->start();
         writer->start();
-    }
-    if (!extMode) {
-        sendSyncRet(inStream);
     }
 
     return SCI_SUCCESS;
@@ -456,6 +405,7 @@ int Initializer::initExtBE(int hndl)
     int jobKey = gCtrlBlock->getJobKey();
     struct servent *serv = NULL;
     char *envp = getenv("SCI_DAEMON_NAME");
+    char fmt[32] = {0};
 
     if (envp != NULL) {
         serv = getservbyname(envp, "tcp");
@@ -465,14 +415,15 @@ int Initializer::initExtBE(int hndl)
     if (serv != NULL) {
         port = ntohs(serv->s_port);
     }
-    rc = SSHFUNC->sign_data(&sign, 3, &mode, sizeof(mode), &jobKey, sizeof(jobKey), &hndl, sizeof(hndl));
+    rc = psec_sign_data(&sign, "%d%d%d", mode, jobKey, hndl);
     ::gethostname(hostname, sizeof(hostname));
     stream.init(hostname, port);
     stream << username.c_str() << usertok << sign << (int)mode << jobKey << hndl << endl;
-    SSHFUNC->free_signature(&sign);
+    psec_free_signature(&sign);
     stream >> envStr >> token >> sign >> endl;
     stream.stop();
-    rc = SSHFUNC->verify_data(&sign, 2, (char *)envStr.c_str(), envStr.size() + 1, token.iov_base, token.iov_len);
+    sprintf(fmt, "%%s%%%ds", token.iov_len);
+    rc = psec_verify_data(&sign, fmt, envStr.c_str(), token.iov_base);
     SSHFUNC->set_user_token(&token);
     delete [] (char *)sign.iov_base;
     if (rc != 0)

@@ -79,7 +79,7 @@ void daemonInit()
     sa.sa_handler = sig_term;
     sigaction(SIGTERM, &sa, NULL);
 
-#ifdef _SCI_LINUX // Linux
+#if defined(_SCI_LINUX) || defined(__APPLE__)
     pid_t pid;
     if ((pid = fork()) < 0)
         exit(-1);
@@ -141,7 +141,7 @@ int initService(int argc, char *argv[])
     char *p = NULL;
     string logDir = "/tmp";
     int logLevel = -1;
-#ifdef _SCI_LINUX // Linux
+#if defined(_SCI_LINUX) || defined(__APPLE__)
     string pidDir = "/var/run/";
 #else
     string pidDir = "/var/opt/";

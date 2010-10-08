@@ -79,9 +79,8 @@ class RoutingList
         int startRouting(int hndl, Stream *stream);
         int startReading(int hndl);
         int startReaders();
-        int stopRouting(bool shutdown);
+        int stopRouting();
         bool allRouted();
-        int syncWaiting();
 
         void setFilterProcessor(FilterProcessor *proc);
         FilterProcessor * getFilterProcessor();

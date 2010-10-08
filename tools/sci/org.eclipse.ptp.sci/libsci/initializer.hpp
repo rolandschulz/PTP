@@ -43,7 +43,6 @@ class Initializer
     private:
         Initializer();
         static Initializer *instance;
-        int syncID;
         Listener    *listener;
         Stream      *inStream;
         
@@ -56,8 +55,6 @@ class Initializer
         }
 
         int init();
-        int syncRetBack(int rt, string &retStr);
-        int sendSyncRet(Stream *stream);
 
         Listener * initListener();
         Listener * getListener();

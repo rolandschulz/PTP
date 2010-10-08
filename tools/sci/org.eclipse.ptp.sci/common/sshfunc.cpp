@@ -73,7 +73,7 @@ int SshFunc::load(char * libPath)
     if (libPath) {
         path = libPath;
     } else {
-#ifdef _SCI_LINUX // Linux
+#if defined(_SCI_LINUX) || defined(__APPLE__)
         path = "libpsec.so"; // default library name on Linux
 #ifdef __64BIT__
         auth_mod = "/usr/lib64/libpsec_ossh.so";
@@ -91,8 +91,10 @@ int SshFunc::load(char * libPath)
 #endif
     }
 
-#ifdef _SCI_LINUX // Linux
+#if defined(_SCI_LINUX)
     dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
+#elif  || defined(__APPLE__)
+    dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 #else // aix
     dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL | RTLD_MEMBER);
 #endif
@@ -266,15 +268,22 @@ int SshFunc::verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *
     return rc;
 } 
 
-int SshFunc::sign_data(struct iovec *sigbufs, char *fmt, ...)
+int SshFunc::sign_data(char *key, size_t klen, struct iovec *sigbufs, char *fmt, ...)
 {
     int i, rc;
     va_list argp;
     char *para, *p, *pos;
     size_t para_len;
-    int num_bufs = getSizes(fmt);
+    int num_bufs = get_sizes(fmt);
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
     int *d_nums = new int[num_bufs];
+    char *skey = key;
+    size_t sklen = klen;
+
+    if (key == NULL) {
+        skey = session_key;
+        sklen = key_len;
+    }
 
     va_start(argp, fmt);
     pos = p = fmt;
@@ -289,8 +298,11 @@ int SshFunc::sign_data(struct iovec *sigbufs, char *fmt, ...)
                 break;
             case 's':
                 tmp_bufs[i].iov_base = va_arg(argp, char *);
-                tmp_bufs[i].iov_len = atoi((const char *)pos);
-                tmp_bufs[i].iov_len = (tmp_bufs[i].iov_len > 0) ? tmp_bufs[i].iov_len : (strlen((char *)tmp_bufs[i].iov_base) + 1);
+                if (*pos != 's') {
+                    tmp_bufs[i].iov_len = atoi((const char *)pos);
+                } else {
+                    tmp_bufs[i].iov_len = strlen((char *)tmp_bufs[i].iov_base) + 1;
+                }
                 break;
             case '%':
                 pos = p + 1;
@@ -301,19 +313,19 @@ int SshFunc::sign_data(struct iovec *sigbufs, char *fmt, ...)
     }
     va_end(argp);
 
-    rc = sign_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
+    rc = sign_data(skey, key_len, tmp_bufs, num_bufs, sigbufs);
     delete []d_nums;
     delete []tmp_bufs;
 
     return rc;
 }
 
-int SshFunc::getSizes(char *fmt)
+int SshFunc::get_sizes(char *fmt)
 {
     int num_bufs = 0;
     char *p = fmt;
 
-    while (p != '\0') {
+    while (*p != '\0') {
         if (*p == '%') {
             num_bufs++;
         }
@@ -323,16 +335,22 @@ int SshFunc::getSizes(char *fmt)
     return num_bufs;
 }
 
-int SshFunc::verify_data(struct iovec *sigbufs, char *fmt, ...)
+int SshFunc::verify_data(char *key, size_t klen, struct iovec *sigbufs, char *fmt, ...)
 {
     int i, rc;
     va_list argp;
     char *para, *p, *pos;
     size_t para_len;
-    int num_bufs = getSizes(fmt);
+    int num_bufs = get_sizes(fmt);
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
     int *d_nums = new int[num_bufs];
+    char *skey = key;
+    size_t sklen = klen;
 
+    if (key == NULL) {
+        skey = session_key;
+        sklen = key_len;
+    }
     va_start(argp, fmt);
     pos = p = fmt;
     i = -1;
@@ -340,14 +358,17 @@ int SshFunc::verify_data(struct iovec *sigbufs, char *fmt, ...)
         switch (*p) {
             case 'd':
                 d_nums[i] = va_arg(argp, int);
-                d_nums[i] = htonl(d_nums[i]);
+                d_nums[i] = ntohl(d_nums[i]);
                 tmp_bufs[i].iov_len = sizeof(int);
                 tmp_bufs[i].iov_base = &d_nums[i];
                 break;
             case 's':
                 tmp_bufs[i].iov_base = va_arg(argp, char *);
-                tmp_bufs[i].iov_len = atoi((const char *)pos);
-                tmp_bufs[i].iov_len = (tmp_bufs[i].iov_len > 0) ? tmp_bufs[i].iov_len : (strlen((char *)tmp_bufs[i].iov_base) + 1);
+                if (*pos != 's') {
+                    tmp_bufs[i].iov_len = atoi((const char *)pos);
+                } else {
+                    tmp_bufs[i].iov_len = strlen((char *)tmp_bufs[i].iov_base) + 1;
+                }
                 break;
             case '%':
                 pos = p + 1;
@@ -358,7 +379,7 @@ int SshFunc::verify_data(struct iovec *sigbufs, char *fmt, ...)
     }
     va_end(argp);
 
-    rc = verify_data(session_key, key_len, tmp_bufs, num_bufs, sigbufs);
+    rc = verify_data(skey, sklen, tmp_bufs, num_bufs, sigbufs);
     delete []d_nums;
     delete []tmp_bufs;
 
@@ -576,12 +597,12 @@ int SshFunc::verify_data(char *key, size_t keylen, struct iovec *sigbufs, int nu
     return 0;
 }
 
-int SshFunc::sign_data(struct iovec *sigbufs, char *fmt, ...)
+int SshFunc::sign_data(char *key, size_t klen, struct iovec *sigbufs, char *fmt, ...)
 {
     return 0;
 }
 
-int SshFunc::verify_data(struct iovec *sigbufs, char *fmt, ...)
+int SshFunc::verify_data(char *key, size_t klen, struct iovec *sigbufs, char *fmt, ...)
 {
     return 0;
 }

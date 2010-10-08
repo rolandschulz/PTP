@@ -44,6 +44,7 @@
 #include "sshfunc.hpp"
 #include "ipconverter.hpp"
 
+#include "atomic.hpp"
 #include "launcher.hpp"
 #include "topology.hpp"
 #include "ctrlblock.hpp"
@@ -62,10 +63,9 @@
 const int SCI_DAEMON_PORT = 6688;
 
 Launcher::Launcher(Topology &topo)
-	: topology(topo), shell(""), scidPort(SCI_DAEMON_PORT), mode(INTERNAL), sync(false)
+	: topology(topo), shell(""), scidPort(SCI_DAEMON_PORT), mode(INTERNAL), embedMode(false)
 {
     char *envp = NULL;
-    char tmp[256] = {0};
     string envStr;
     struct servent *serv = NULL;
 
@@ -86,6 +86,7 @@ Launcher::Launcher(Topology &topo)
 
         env.set("SCI_DEVICE_NAME", envp);
     } else {
+        char tmp[256] = {0};
         ::gethostname(tmp, sizeof(tmp));
         localName = SysUtil::get_hostname(tmp);
     }
@@ -97,16 +98,21 @@ Launcher::Launcher(Topology &topo)
     } else {
         env.set("SCI_WORK_DIRECTORY", ::getenv("SCI_WORK_DIRECTORY"));
     }
-
-    env.set("SCI_EMBED_AGENT", ::getenv("SCI_EMBED_AGENT"));
+    envp = ::getenv("SCI_EMBED_AGENT");
+    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
+        embedMode = true;
+        env.set("SCI_EMBED_AGENT", envp);
+    }
     env.set("SCI_AGENT_PATH", topo.agentPath);
     envp = ::getenv("SCI_LIB_PATH");
     if (envp) {
         env.set("SCI_LIB_PATH", envp);
         envStr = envp;
     }
-#ifdef _SCI_LINUX
+#if defined(_SCI_LINUX)
     char *library_path = "LD_LIBRARY_PATH";
+#elif defined(__APPLE__)
+    char *library_path = "DYLD_LIBRARY_PATH";
 #else
     char *library_path = "LIBPATH";
 #endif
@@ -134,12 +140,6 @@ Launcher::Launcher(Topology &topo)
     if (envp && (::strcasecmp(envp, "yes") == 0)) {
         mode = REGISTER;
         env.set("SCI_USE_EXTLAUNCHER", "yes");
-    }
-    env.set("SCI_SYNC_INIT", "no");
-    envp = ::getenv("SCI_SYNC_INIT");
-    if (envp && (::strcasecmp(envp, "yes") == 0)) {
-        sync = true;
-        env.set("SCI_SYNC_INIT", "yes");
     }
     env.set("SCI_ENABLE_FAILOVER", "no");
     envp = ::getenv("SCI_ENABLE_FAILOVER");
@@ -173,12 +173,13 @@ Launcher::Launcher(Topology &topo)
             if (::strncmp(*tool_envp, "SCI_", 4) && 
                 ::strncmp(*tool_envp, library_path, ::strlen(library_path))) 
             {
-                char *value = ::strchr(*tool_envp, '=');
+                char *envstr = strdup(*tool_envp);
+                char *value = ::strchr(envstr, '=');
                 if (value) {
                     *value = '\0';
-                    env.set(*tool_envp, value+1);
-                    *value = '=';
+                    env.set(envstr, value+1);
                 }
+                free(envstr);
             }
             tool_envp++;
         }
@@ -217,12 +218,14 @@ int Launcher::launch()
         default:
             return -1;
     }
+    envp = getenv("SCI_ENABLE_LISTENER");
+    if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
+        gInitializer->initListener();
+    }
     if (mode == REGISTER) {
         while (!topology.routingList->allRouted()) {
             SysUtil::sleep(1000);
         }
-    } else if (sync) {
-        rc = topology.routingList->syncWaiting();
     }
     if (rc == SCI_SUCCESS)
         rc = topology.routingList->startReaders();
@@ -239,7 +242,6 @@ int Launcher::launchBE(int beID, const char * hostname)
     topology.routingList->addBE(SCI_GROUP_ALL, VALIDBACKENDIDS, beID, true);
     topology.routingList->queryQueue(beID)->produce(flistMsg);
 
-    env.set("SCI_SYNC_INIT", "no");
     rc = launchClient(beID, topology.bePath, hostname, mode);
     if (rc != SCI_SUCCESS) {
         topology.routingList->removeBE(beID);
@@ -270,13 +272,12 @@ int Launcher::launchAgent(int beID, const char * hostname)
     topology.routingList->addBE(SCI_GROUP_ALL, childTopo->agentID, beID, true);
     MessageQueue *queue = topology.routingList->queryQueue(childTopo->agentID);
 
-    env.set("SCI_SYNC_INIT", "no");
     rc = launchClient(childTopo->agentID, childTopo->agentPath, hostname);
     if (rc == SCI_SUCCESS) {
         Message *flistMsg = topology.filterList->getFlistMsg();
         Message *topoMsg = childTopo->packMsg();
         if (flistMsg != NULL) {
-            flistMsg->incRefCount();
+            incRefCount(flistMsg->getRefCount());
             queue->produce(flistMsg);
         }
         queue->produce(topoMsg);
@@ -290,7 +291,7 @@ int Launcher::launchAgent(int beID, const char * hostname)
     return rc;
 }
 
-int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m)
+int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, int beID)
 {
     int rc = 0;
     Listener *listener = NULL;
@@ -298,8 +299,8 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m)
     if (m == REGISTER) {
         listener = gInitializer->initListener();
     }
+    env.set("SCI_PARENT_HOSTNAME", localName);
     if (listener != NULL) {
-        env.set("SCI_PARENT_HOSTNAME", localName);
         env.set("SCI_PARENT_PORT", listener->getBindPort());
     } 
     env.set("SCI_ENABLE_LISTENER", ::getenv("SCI_ENABLE_LISTENER"));
@@ -325,10 +326,14 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m)
             if (gCtrlBlock->getMyRole() != CtrlBlock::AGENT)
                 conn = gCtrlBlock->getEndInfo()->connect_hndlr;
             if (conn == NULL) {
-                rc = SSHFUNC->sign_data(&sign, 6, &m, sizeof(m), &jobKey, sizeof(jobKey), &ID, sizeof(ID), &sync, sizeof(sync), path.c_str(), path.size() + 1, env.getEnvString().c_str(), env.getEnvString().size() + 1);
+                int cID = ID;
+                if (embedMode && (beID >= 0)) {
+                    cID = beID;
+                }
+                rc = psec_sign_data(&sign, "%d%d%d%s%s", m, jobKey, cID, path.c_str(), env.getEnvString().c_str());
                 stream->init(host.c_str(), scidPort);
-                *stream << usernam << usertok << sign << (int)m << jobKey << ID << sync << path << env.getEnvString() << endl;
-                SSHFUNC->free_signature(&sign);
+                *stream << usernam << usertok << sign << (int)m << jobKey << cID << path << env.getEnvString() << endl;
+                psec_free_signature(&sign);
             } else {
                 int sockfd = conn(host.c_str());
                 stream->init(sockfd);
@@ -337,7 +342,9 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m)
                 stream->stop();
                 delete stream;
             } else {
-                *stream << env.getEnvString() << endl;
+                psec_sign_data(&sign, "%s", env.getEnvString().c_str());
+                *stream << usertok << env.getEnvString() << sign << endl;
+                psec_free_signature(&sign);
                 rc = topology.routingList->startRouting(hndl, stream);
             }
         } catch (SocketException &e) {
@@ -347,13 +354,6 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m)
     } else {
         string cmd = shell + " " + host + " -n '" + env.getExportcmd() + path + " >&- 2>&- <&- &'";
         rc = system(cmd.c_str());
-    }
-
-    if (rc != SCI_SUCCESS) {
-        string errStr = "Failed to launch client ";
-        errStr += host;
-        rc = SCI_ERR_LAUNCH_FAILED;
-        gInitializer->syncRetBack(rc, errStr);
     }
 
     return rc;
@@ -503,6 +503,7 @@ int Launcher::launch_tree2()
             }
             it++;
         } else {
+            int auxID = it->first;
             string &hostname = it->second;
             Topology *childTopo = new Topology(topology.nextAgentID--);
             childTopo->fanOut  = topology.fanOut;
@@ -528,7 +529,10 @@ int Launcher::launch_tree2()
                 beAgent->init(childTopo->agentID, NULL, queue, gCtrlBlock->getUpQueue());
                 rc = beAgent->work();
             } else {
-                rc = launchClient(childTopo->agentID, topology.agentPath, hostname);
+                MODE m = INTERNAL;
+                if (embedMode)
+                    m = mode;
+                rc = launchClient(childTopo->agentID, topology.agentPath, hostname, m, auxID);
             }
             if (rc == SCI_SUCCESS) {
                 Message *msg = childTopo->packMsg();

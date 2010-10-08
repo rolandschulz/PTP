@@ -71,8 +71,7 @@ class Message
             // used for polling mode
             INVALID_POLL = -4001,
             // used for message segmentation
-            SEGMENT = -5001,
-            RELEASE = -5002
+            SEGMENT = -5001
         };
         
     private:
@@ -97,9 +96,7 @@ class Message
         void build(int fid, sci_group_t g, int num_bufs, char *bufs[], int sizes[], Type t, 
             int id = DEFAULT_MSG_ID);
         void setRefCount(int cnt);
-        int getRefCount();
-        int decRefCount(int cnt = 1);
-        int incRefCount(int cnt = 1);
+        int & getRefCount();
 
         void setID(int id) { msgID = id; }
         void setFilterID(int id) { filterID = id; }

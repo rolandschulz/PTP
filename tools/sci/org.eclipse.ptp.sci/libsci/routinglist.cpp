@@ -82,7 +82,7 @@ RoutingList::RoutingList(int hndl)
     }
 
     if (gCtrlBlock->getMyRole() != CtrlBlock::BACK_END) {
-        topology = new Topology(-1);
+        topology = new Topology(0); // 0 is an impossible agent ID so it will be changed when it receives a real topology
     }
     successorList = new int[MAX_SUCCESSOR_NUM];
     queueInfo.clear();
@@ -338,6 +338,10 @@ int RoutingList::startReaders()
    
     for (pit = routers.begin(); pit != routers.end(); ++pit) {
         reader = pit->second.processor->getPeerProcessor();
+        while (reader == NULL) {
+            SysUtil::sleep(1000);
+            reader = pit->second.processor->getPeerProcessor();
+        }
         reader->start();
     }
 
@@ -366,7 +370,10 @@ int RoutingList::startRouting(int hndl, Stream *stream)
 {
     char name[64] = {0};
     MessageQueue *inQ = queryQueue(hndl);
-    assert(inQ != NULL);
+    while (inQ == NULL) {
+        SysUtil::sleep(1000);
+        inQ = queryQueue(hndl);
+    }
 
     routers[hndl].stream = stream;
     ReaderProcessor *reader = new ReaderProcessor(hndl);
@@ -390,71 +397,11 @@ int RoutingList::startRouting(int hndl, Stream *stream)
     return 0;
 }
 
-int RoutingList::syncWaiting()
-{
-    int rc = 0;
-    int sockfd = -1;
-    int maxfd = -1;
-    int count = 0;
-    string retStr;
-    string backStr("OK :)");
-    fd_set rset;
-    struct timeval tm = {300, 0};
-
-    while (rc == 0) {
-        FD_ZERO(&rset);
-        ROUTING_MAP::iterator it;
-        for (it = routers.begin(); it != routers.end(); ++it) {
-            sockfd = it->second.stream->getSocket();
-            FD_SET(sockfd, &rset);
-            maxfd = (maxfd > sockfd) ? maxfd : sockfd;
-        }
-        rc = select(maxfd+1, &rset, NULL, NULL, &tm);
-        if (rc == 0) {
-            rc = -1;
-            break;
-        }
-
-        for (it = routers.begin(); it != routers.end(); it++) {
-            sockfd = it->second.stream->getSocket();
-            if (FD_ISSET(sockfd, &rset)) {
-                count++;
-                try {
-                    int rt = -1;
-                    struct iovec sign = {0};
-
-                    *(it->second.stream) >> rc >> retStr >> sign >> endl;
-                    rt = SSHFUNC->verify_data(&sign, 2, &rc, sizeof(rc), retStr.c_str(), retStr.size() + 1);
-                    delete [] (char *)sign.iov_base;
-                    if ((rc != 0) || (rt != 0)) {
-                        rc = -1;
-                        log_error("Launching init stream error, %d - %s", rc, retStr.c_str());
-                        break;
-                    }
-                } catch (SocketException &e) {
-                    log_error("Launching init stream socket exception, %s", e.getErrMsg().c_str());
-                    rc = -1;
-                }
-            }
-        }
-        if (count >= routers.size())
-            break;
-    }
-
-    if (rc != 0) {
-        backStr = "timeout or socket error";
-    }
-    gInitializer->syncRetBack(rc, backStr);
-
-    return rc;
-}
-
-int RoutingList::stopRouting(bool shutdown)
+int RoutingList::stopRouting()
 {
     // waiting for all processor threads terminate
     ROUTING_MAP::iterator pit;
     for (pit = routers.begin(); pit != routers.end(); ++pit) {
-        pit->second.processor->setShutdown(shutdown);
         pit->second.processor->release();
         delete pit->second.processor;
     }
@@ -467,7 +414,14 @@ int RoutingList::stopRouting(bool shutdown)
 
 bool RoutingList::allRouted()
 {
-    return (queueInfo.size() == routers.size());
+    if (gCtrlBlock->getMyRole() == CtrlBlock::BACK_AGENT) {
+        char *envp = getenv("SCI_EMBED_AGENT");
+        if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
+            return (queueInfo.size() == (routers.size() + 1));  // queueInfo contains itself
+        }
+    }
+
+    return (queueInfo.size() == routers.size()); 
 }
 
 void RoutingList::addBE(sci_group_t group, int successor_id, int be_id, bool init)

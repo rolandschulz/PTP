@@ -57,6 +57,7 @@ class EmbedAgent {
         ~EmbedAgent();
         int init(int hndl, Stream *stream, MessageQueue *inQ, MessageQueue *outQ = NULL);
         int work();
+        int syncWait();
         void setParent(EmbedAgent *agent);
         void setChild(EmbedAgent *child);
         MessageQueue *getRouterInQ();

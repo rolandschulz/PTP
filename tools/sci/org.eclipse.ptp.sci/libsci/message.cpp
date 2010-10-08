@@ -24,6 +24,7 @@
 ****************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <pthread.h>
 #include <sys/time.h>
 #include <time.h>
@@ -100,9 +101,9 @@ int Message::joinSegments(Message **segments, int segnum)
     }
     build(fid, gid, segnum, bufs, sizes, typ, id);
     ::free(bufs);
-    delete sizes;
+    delete []sizes;
     for (i = 0; i < segnum; i++) {
-        if (segments[i]->decRefCount() == 0) {
+        if (decRefCount(segments[i]->getRefCount()) == 0) {
             delete segments[i];
         }
     }
@@ -140,21 +141,9 @@ void Message::setRefCount(int cnt)
     refCount = cnt;
 }
 
-int Message::getRefCount()
+int & Message::getRefCount()
 {
     return refCount;
-}
-
-int Message::decRefCount(int cnt)
-{
-    int count = fetch_and_add(&refCount, -cnt);
-    return (count - cnt);
-}
-
-int Message::incRefCount(int cnt)
-{
-    int count = fetch_and_add(&refCount, cnt);
-    return (count + cnt);
 }
 
 Stream & operator >> (Stream &stream, Message &msg)
@@ -162,6 +151,7 @@ Stream & operator >> (Stream &stream, Message &msg)
     int rc;
     struct iovec vecs[6];
     struct iovec sign = {0};
+    char fmt[32] = {0};
 
     // receive message header
     stream >> (int &) msg.type;
@@ -177,7 +167,8 @@ Stream & operator >> (Stream &stream, Message &msg)
         stream.read(msg.buf, msg.len);
     }
     stream >> sign;
-    rc = SSHFUNC->verify_data(&sign, 6, &msg.type, sizeof(msg.type), &msg.msgID, sizeof(msg.msgID), &msg.filterID, sizeof(msg.filterID), &msg.group, sizeof(msg.group), &msg.len, sizeof(msg.len), msg.buf, msg.len);
+    sprintf(fmt, "%%d%%d%%d%%d%%d%%%ds", msg.len);
+    rc = psec_verify_data(&sign, fmt, msg.type, msg.msgID, msg.filterID, msg.group, msg.len, msg.buf);
     delete [] (char *)sign.iov_base;
     if (rc != 0) {
         throw Exception(Exception::INVALID_SIGNATURE);
@@ -190,8 +181,10 @@ Stream & operator << (Stream &stream, Message &msg)
 {
     struct iovec vecs[6];
     struct iovec sign = {0};
+    char fmt[32] = {0};
 
-    SSHFUNC->sign_data(&sign, 6, &msg.type, sizeof(msg.type), &msg.msgID, sizeof(msg.msgID), &msg.filterID, sizeof(msg.filterID), &msg.group, sizeof(msg.group), &msg.len, sizeof(msg.len), msg.buf, msg.len);
+    sprintf(fmt, "%%d%%d%%d%%d%%d%%%ds", msg.len);
+    psec_sign_data(&sign, fmt, msg.type, msg.msgID, msg.filterID, msg.group, msg.len, msg.buf);
     // send message header
     stream << (int) msg.type;
     stream << msg.msgID;
@@ -204,7 +197,7 @@ Stream & operator << (Stream &stream, Message &msg)
         stream.write(msg.buf, msg.len);
     }
     stream << sign;
-    SSHFUNC->free_signature(&sign);
+    psec_free_signature(&sign);
  
     return stream.flush();
 }

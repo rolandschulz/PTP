@@ -61,11 +61,11 @@ double SysUtil::microseconds()
     return time_v.tv_sec * 1e6 + time_v.tv_usec;
 }
 
-void SysUtil::sleep(int nsecs)
+void SysUtil::sleep(int usecs)
 {
     struct timespec req;
-    req.tv_sec = nsecs / 1000000;
-    req.tv_nsec = (nsecs % 1000000) * 1000;
+    req.tv_sec = usecs / 1000000;
+    req.tv_nsec = (usecs % 1000000) * 1000;
     ::nanosleep (&req, NULL);
 }
 
@@ -73,17 +73,20 @@ string SysUtil::get_hostname(const char * name)
 {
     string uniquestring;
     
-    struct addrinfo hints, *host = NULL, *ressave = NULL;
+    struct addrinfo hints, *host = NULL;
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_flags = AI_CANONNAME;
+    hints.ai_flags = AI_CANONNAME | AI_NUMERICHOST;
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     int rc = ::getaddrinfo(name, NULL, &hints, &host);
+    if (rc == EAI_NONAME) {
+        hints.ai_flags = AI_CANONNAME;
+        rc = ::getaddrinfo(name, NULL, &hints, &host);
+    }
     if (rc < 0)
         throw Exception(Exception::GET_ADDR_INFO);
-    ressave = host;
-    uniquestring = string(host->ai_canonname);
-    ::freeaddrinfo(ressave);
+    uniquestring = host->ai_canonname;
+    ::freeaddrinfo(host);
 
     return uniquestring;
 }

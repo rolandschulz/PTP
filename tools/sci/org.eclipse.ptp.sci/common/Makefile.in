@@ -37,8 +37,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@BIT64_TRUE@am__append_1 = -D__64BIT__
-@SYSTEM_AIX_TRUE@am__append_2 = -X32_64
+@SYSTEM_AIX_TRUE@am__append_1 = -X32_64
+@BIT64_TRUE@@SYSTEM_AIX_FALSE@am__append_2 = -D__64BIT__
 subdir = common
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -203,15 +203,15 @@ SOURCES = \
     envvar.cpp     group.cpp        log.cpp     range.cpp   sshfunc.cpp  thread.cpp \
     exception.cpp  ipconverter.cpp  packer.cpp  socket.cpp  stream.cpp   tools.cpp
 
-ARFLAGS = -rv $(am__append_2)
+ARFLAGS = -rv $(am__append_1)
 libcmn_a_SOURCES = $(SOURCES)
-libcmn_a_CPPFLAGS = -I../secmod -fPIC $(am__append_1)
+libcmn_a_CPPFLAGS = -I../secmod -fPIC $(am__append_2)
 noinst_HEADERS = \
     envvar.hpp     group.hpp        log.hpp     range.hpp   sshfunc.hpp  thread.hpp \
     exception.hpp  ipconverter.hpp  packer.hpp  socket.hpp  stream.hpp   tools.hpp 
 
 @SYSTEM_AIX_TRUE@libcmn64_a_SOURCES = $(SOURCES)
-@SYSTEM_AIX_TRUE@libcmn64_a_CPPFLAGS = -q64 -I../secmod -fPIC
+@SYSTEM_AIX_TRUE@libcmn64_a_CPPFLAGS = -q64 -I../secmod -fPIC -D__64BIT__
 all: all-am
 
 .SUFFIXES:

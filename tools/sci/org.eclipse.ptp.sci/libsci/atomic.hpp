@@ -40,6 +40,7 @@
  *
  **********************************************************************/
 typedef int          *atomic_p;
+typedef long long   *atomic_l;
 typedef int          boolean_t;
 typedef unsigned int uint;
 
@@ -109,19 +110,32 @@ typedef int *atomic_p;
  */
 static __inline__
 int fetch_and_add(atomic_p ptr, int val) {
-	int old_val;
-	OSSpinLock lock = 0;
-	OSSpinLockLock(&lock);
-	old_val = *ptr;
-	*ptr += val;
-	OSSpinLockUnlock(&lock);
-	return old_val;
+    int old_val;
+    OSSpinLock lock = 0;
+    OSSpinLockLock(&lock);
+    old_val = *ptr;
+    *ptr += val;
+    OSSpinLockUnlock(&lock);
+    return old_val;
 }
+
 #else // AIX
 
 #include <sys/atomic_op.h>
 
 #endif
+
+static int decRefCount(int &refCount)
+{
+    int count = fetch_and_add(&refCount, -1);
+    return (count - 1);
+}
+
+static int incRefCount(int &refCount)
+{
+    int count = fetch_and_add(&refCount, 1);
+    return (count + 1);
+}
 
 #endif
 

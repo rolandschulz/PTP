@@ -56,7 +56,6 @@ class ExtLauncher : public Thread
         char            sessionKey[64];
         size_t          ssKeyLen;
         LAUNCH_MODE     mode;
-        bool            sync;
 
     private:
         char *getExename(char *path);
@@ -66,7 +65,6 @@ class ExtLauncher : public Thread
         int doVerify(struct iovec &sign, int jobkey, int id, char *path = NULL, char *envStr = NULL);
         int putSessionKey(int fd, struct iovec &sign, int jobkey, int id, char *path, char *envStr, bool suer = true);
         int getSessionKey(int fd);
-        int sendResult(Stream &s, int rc);
     public:
         ExtLauncher(Stream *s);
         virtual ~ExtLauncher();

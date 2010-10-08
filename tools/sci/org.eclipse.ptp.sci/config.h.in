@@ -86,6 +86,3 @@
 
 /* "define if linux" */
 #undef _SCI_LINUX
-
-/* "define if 64 bit" */
-#undef __64BIT__
