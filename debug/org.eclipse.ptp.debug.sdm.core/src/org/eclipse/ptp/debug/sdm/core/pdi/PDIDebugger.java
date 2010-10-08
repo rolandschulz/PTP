@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.sdm.core.pdi;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.core.runtime.CoreException;
@@ -43,6 +42,7 @@ import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
 import org.eclipse.ptp.debug.core.pdi.IPDILocation;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIErrorInfo;
+import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventManager;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIAddressBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIExceptionpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIFunctionBreakpoint;
@@ -54,8 +54,7 @@ import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
-import org.eclipse.ptp.proxy.debug.event.IProxyDebugEvent;
-import org.eclipse.ptp.proxy.event.IProxyExtendedEvent;
+import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteProxyOptions;
@@ -67,21 +66,27 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 /**
  * @author clement
+ * @since 5.0
  * 
  */
 public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
-	private class ProxyNotifier extends Observable {
-		/**
-		 * @param event
-		 */
-		public void notify(IProxyDebugEvent event) {
-			setChanged();
-			notifyObservers(event);
+	private int bpid = 0;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#addEventManager(org.eclipse
+	 * .ptp.debug.core.pdi.manager.IPDIEventManager)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public void addEventManager(IPDIEventManager eventManager) throws PDIException {
+		if (eventManager instanceof IProxyDebugEventListener) {
+			addProxyDebugEventListener((IProxyDebugEventListener) eventManager);
 		}
 	}
-
-	private int bpid = 0;
-	private final ProxyNotifier proxyNotifier = new ProxyNotifier();
 
 	/*
 	 * (non-Javadoc)
@@ -245,20 +250,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			return IPDIErrorInfo.DBG_IGNORE;
 		default:
 			return IPDIErrorInfo.DBG_WARNING;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.proxy.debug.client.AbstractProxyDebugClient#handleEvent
-	 * (org.eclipse.ptp.proxy.event.IProxyExtendedEvent)
-	 */
-	@Override
-	public void handleEvent(IProxyExtendedEvent e) {
-		if (e instanceof IProxyDebugEvent) {
-			proxyNotifier.notify((IProxyDebugEvent) e);
 		}
 	}
 
@@ -491,10 +482,16 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#register(java.util.Observer)
+	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#removeEventManager(org.eclipse
+	 * .ptp.debug.core.pdi.manager.IPDIEventManager)
 	 */
-	public void register(Observer observer) {
-		proxyNotifier.addObserver(observer);
+	/**
+	 * @since 5.0
+	 */
+	public void removeEventManager(IPDIEventManager eventManager) throws PDIException {
+		if (eventManager instanceof IProxyDebugEventListener) {
+			removeProxyDebugEventListener((IProxyDebugEventListener) eventManager);
+		}
 	}
 
 	/*
@@ -936,8 +933,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			doShutdown();
 		} catch (IOException e) {
 			throw new PDIException(null, Messages.PDIDebugger_43 + e.getMessage());
-		} finally {
-			proxyNotifier.deleteObservers();
 		}
 	}
 
