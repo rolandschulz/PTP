@@ -263,15 +263,36 @@ public class AttributeDefinitionManager {
 	}
 
 	/**
+	 * Get a list of all the attribute keys.
+	 * 
+	 * @since 5.0
+	 * @param attrId
+	 * @return attribute definition
+	 */
+	public String[] getAttributeDefinitionKeys() {
+		return attributeDefs.keySet().toArray(new String[0]);
+	}
+
+	/**
+	 * Get a list of all the attributes.
+	 * 
+	 * @since 5.0
+	 * @param attrId
+	 * @return attribute definition
+	 */
+	public IAttributeDefinition<?, ?, ?>[] getAttributeDefinitions() {
+		return attributeDefs.values().toArray(new IAttributeDefinition<?, ?, ?>[0]);
+	}
+
+	/**
 	 * Create an attribute definition
 	 * 
 	 * @param attr
 	 */
 	public void setAttributeDefinition(IAttributeDefinition<?, ?, ?> attrDef) {
 		synchronized (attributeDefs) {
-			if (!attributeDefs.containsKey(attrDef.getId())) {
+			if (!attributeDefs.containsKey(attrDef.getId()))
 				attributeDefs.put(attrDef.getId(), attrDef);
-			}
 		}
 	}
 
@@ -279,8 +300,7 @@ public class AttributeDefinitionManager {
 	 * @param attrDefs
 	 */
 	public void setAttributeDefinitions(IAttributeDefinition<?, ?, ?>[] attrDefs) {
-		for (IAttributeDefinition<?, ?, ?> attrDef : attrDefs) {
+		for (IAttributeDefinition<?, ?, ?> attrDef : attrDefs)
 			setAttributeDefinition(attrDef);
-		}
 	}
 }
