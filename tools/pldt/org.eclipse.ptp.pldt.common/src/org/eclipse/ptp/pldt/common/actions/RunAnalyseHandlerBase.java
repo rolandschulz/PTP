@@ -264,7 +264,9 @@ public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
 		monitor.beginTask(Messages.RunAnalyseHandlerBase_29, count);
 		if(traceOn)System.out.println("RAHB.runResources(): using selection: "+selection);
 		// Get elements of a possible multiple selection
-		Iterator<IStructuredSelection> iter = selection.iterator();
+		IStructuredSelection lastSel=AnalysisDropdownHandler.getInstance().getLastSelection();
+		Iterator<IStructuredSelection> iter=lastSel.iterator();// fix analysis selection bug 327122
+		
 		while (iter.hasNext()) {
 			if (monitor.isCanceled()) {
 				// this is usually caught here while processing
