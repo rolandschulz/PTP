@@ -74,16 +74,19 @@ import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.utils.core.BitSetIterable;
 
 /**
+ * Main SDM debugger specified using the parallelDebugger extension point.
+ * 
+ * A new instance of this class is created for each debug session.
+ * 
  * @author clement
  * 
  */
 public class SDMDebugger implements IPDebugger {
-	private IPDIDebugger fPdiDebugger = null;
-	private IPDIModelFactory fModelFactory = null;
-	private IPDIManagerFactory fManagerFactory = null;
-	private IPDIEventFactory fEventFactory = null;
-	private IPDIRequestFactory fRequestFactory = null;
-
+	private final IPDIDebugger fPdiDebugger = new PDIDebugger();
+	private final IPDIModelFactory fModelFactory = new SDMModelFactory();
+	private final IPDIManagerFactory fManagerFactory = new SDMManagerFactory();
+	private final IPDIEventFactory fEventFactory = new SDMEventFactory();
+	private final IPDIRequestFactory fRequestFactory = new SDMRequestFactory();
 	private IFileStore fRoutingFileStore = null;
 	private SDMRunner fSdmRunner = null;
 
@@ -125,13 +128,6 @@ public class SDMDebugger implements IPDebugger {
 				}
 			}.start();
 		}
-
-		fModelFactory = null;
-		fManagerFactory = null;
-		fEventFactory = null;
-		fRequestFactory = null;
-		fPdiDebugger = null;
-		fRoutingFileStore = null;
 	}
 
 	/*
@@ -146,20 +142,16 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	public synchronized IPDISession createDebugSession(long timeout, final IPLaunch launch, IProgressMonitor monitor)
 			throws CoreException {
-		if (fModelFactory == null) {
-			fModelFactory = new SDMModelFactory();
-		}
-		if (fManagerFactory == null) {
-			fManagerFactory = new SDMManagerFactory();
-		}
-		if (fEventFactory == null) {
-			fEventFactory = new SDMEventFactory();
-		}
-		if (fRequestFactory == null) {
-			fRequestFactory = new SDMRequestFactory();
-		}
+		IPJob job = launch.getPJob();
+		int job_size = getJobSize(job);
 
-		IPDISession session = createSession(timeout, launch);
+		IPDISession session;
+		try {
+			session = new Session(fManagerFactory, fRequestFactory, fEventFactory, fModelFactory, launch.getLaunchConfiguration(),
+					timeout, fPdiDebugger, job.getID(), job_size);
+		} catch (PDIException e) {
+			throw newCoreException(e.getLocalizedMessage());
+		}
 
 		if (fRoutingFileStore != null) {
 			/*
@@ -214,7 +206,7 @@ public class SDMDebugger implements IPDebugger {
 			List<String> dbgArgs = dbgArgsAttr.getValue();
 
 			try {
-				getPDIDebugger().initialize(configuration, dbgArgs, progress.newChild(10));
+				fPdiDebugger.initialize(configuration, dbgArgs, progress.newChild(10));
 			} catch (PDIException e) {
 				throw newCoreException(e.getLocalizedMessage());
 			}
@@ -354,18 +346,6 @@ public class SDMDebugger implements IPDebugger {
 			nprocs = 1;
 		}
 		return nprocs;
-	}
-
-	/**
-	 * Get the PDI debugger implementation. Creates the class if necessary.
-	 * 
-	 * @return IPDIDebugger
-	 */
-	private IPDIDebugger getPDIDebugger() {
-		if (fPdiDebugger == null) {
-			fPdiDebugger = new PDIDebugger();
-		}
-		return fPdiDebugger;
 	}
 
 	/**
@@ -515,28 +495,6 @@ public class SDMDebugger implements IPDebugger {
 			if (monitor != null) {
 				monitor.done();
 			}
-		}
-	}
-
-	/**
-	 * Create a PDI session
-	 * 
-	 * @param timeout
-	 *            timeout for debugger commands
-	 * @param launch
-	 *            launch configuration
-	 * @return Session
-	 * @throws CoreException
-	 * @since 5.0
-	 */
-	protected Session createSession(long timeout, IPLaunch launch) throws CoreException {
-		IPJob job = launch.getPJob();
-		int job_size = getJobSize(job);
-		try {
-			return new Session(fManagerFactory, fRequestFactory, fEventFactory, fModelFactory, launch.getLaunchConfiguration(),
-					timeout, getPDIDebugger(), job.getID(), job_size);
-		} catch (PDIException e) {
-			throw newCoreException(e.getLocalizedMessage());
 		}
 	}
 }
