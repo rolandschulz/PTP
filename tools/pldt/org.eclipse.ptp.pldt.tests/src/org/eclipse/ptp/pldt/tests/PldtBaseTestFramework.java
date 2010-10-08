@@ -32,38 +32,40 @@ import org.osgi.framework.Bundle;
 
 /**
  * Basic Test framework for PLDT tests, extends that of CDT
+ * 
  * @author Beth Tibbitts
  * 
  */
 public abstract class PldtBaseTestFramework extends BaseTestFramework {
 	private static HashMap<String, ArrayList<Integer>> lineMaps = new HashMap<String, ArrayList<Integer>>();
 
+	/**
+	 * Return a file imported for use in the tests. Includes determining if the
+	 * file exists
+	 */
 	protected IFile importFile(String srcDir, String filename) throws Exception {
-		// project.getProject().getFile(filename).delete(true, new
-		// NullProgressMonitor());
-		//testExists(srcDir,filename);
-		assertTrue("Missing file: "+filename, testExists(srcDir,filename));
+		assertTrue("Missing file: " + filename, testExists(srcDir, filename));
 		IFile result = super.importFile(filename, readTestFile(srcDir, filename));
-		// project.refreshLocal(IResource.DEPTH_INFINITE, new
-		// NullProgressMonitor());
-		System.out.println("==========Using file: "+result);
-		if(!result.exists()){
-			System.out.println("File: "+result+" not found.");
-		}
 		return result;
 	}
 
+	/**
+	 * Determine if a file exists
+	 * 
+	 * @param srcDir
+	 *            source directory in which the file should be located
+	 * @param filename
+	 *            file name of file to find
+	 * @return
+	 */
 	private boolean testExists(String srcDir, String filename) {
-		// code to retrieve an java.io.InputStream
-
-		String fullname=srcDir+File.separator+filename;
+		String fullname = srcDir + File.separator + filename;
 		IPath path = new Path(fullname);
-		Activator a=Activator.getDefault();
+		Activator a = Activator.getDefault();
 		Bundle bundle = a.getBundle();
 		URL url = FileLocator.find(bundle, path, null);
-		//System.out.println(url);
-		if(url==null) {
-			//System.out.println(filename+" **NOT FOUND***");
+		if (url == null) {
+			// System.out.println(filename+" **NOT FOUND***");
 			return false;
 		}
 		return true;
@@ -112,79 +114,90 @@ public abstract class PldtBaseTestFramework extends BaseTestFramework {
 	protected int getLineColOffset(String filename, int line, int col) {
 		return lineMaps.get(filename).get(line - 1) + (col - 1);
 	}
-	
+
 	/**
-	 * Convenience class for sorting artifacts so we compare them in an expected order
+	 * Convenience class for sorting artifacts so we compare them in an expected
+	 * order
+	 * 
 	 * @author beth
-	 *
+	 * 
 	 */
-	public class ArtifactWithLine implements Comparable{
+	public class ArtifactWithLine implements Comparable {
 		public int getLineNo() {
 			return lineNo;
 		}
+
 		public String getName() {
 			return name;
 		}
+
 		public IMarker getMarker() {
 			return marker;
 		}
+
 		private int lineNo;
 		private String name;
 		private IMarker marker;
-		 
+
 		public ArtifactWithLine(int line, String nam) {
-			lineNo=line;
-			name=nam;
+			lineNo = line;
+			name = nam;
 		}
 
 		public ArtifactWithLine(IMarker marker) {
 			try {
 				String nam = marker.getAttribute(IDs.NAME).toString();
-				String line=getLineNoAttr(marker );
+				String line = getLineNoAttr(marker);
 				Integer ii = Integer.decode(line);
 				int theInt = ii.intValue();
 				this.lineNo = theInt;
 				this.name = nam;
-				this.marker=marker;
+				this.marker = marker;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 		public boolean equals(ArtifactWithLine other) {
-			boolean a=this.lineNo==other.lineNo;
-			boolean b=this.name.equals(other.name);
-			return a&&b;
+			boolean a = this.lineNo == other.lineNo;
+			boolean b = this.name.equals(other.name);
+			return a && b;
 		}
 
 		public String toString() {
-			return lineNo+": "+name;
+			return lineNo + ": " + name;
 		}
-		boolean traceOn=false;
+
+		boolean traceOn = false;
+
 		public int compareTo(Object o) {
 			int result;
-			String sign="=";
-			ArtifactWithLine other=(ArtifactWithLine)o;
-			if(this.lineNo<other.lineNo) {
-				result=-1;
-				if(traceOn)sign="<";
-			}
-			else if(this.lineNo>other.lineNo) {
-				result=1;
-				if(traceOn)sign=">";
+			String sign = "=";
+			ArtifactWithLine other = (ArtifactWithLine) o;
+			if (this.lineNo < other.lineNo) {
+				result = -1;
+				if (traceOn)
+					sign = "<";
+			} else if (this.lineNo > other.lineNo) {
+				result = 1;
+				if (traceOn)
+					sign = ">";
 			}
 			// lineNo's equal, must compare name
 			else {
-				result=this.name.compareTo(other.name);		
+				result = this.name.compareTo(other.name);
 			}
-			//System.out.println("CompareTo: "+this+" -to- "+other+"; result is: "+result);
-			if(traceOn)System.out.println("ArtifactWithLine.compareTo: "+this.lineNo+sign+other.lineNo);
+			// System.out.println("CompareTo: "+this+" -to- "+other+"; result is: "+result);
+			if (traceOn)
+				System.out.println("ArtifactWithLine.compareTo: " + this.lineNo + sign + other.lineNo);
 			return result;
 		}
 	}
+
 	public String getLineNoAttr(IMarker marker) throws CoreException {
 		return marker.getAttribute(IMarker.LINE_NUMBER).toString();
 	}
+
 	public String getNameAttr(IMarker marker) throws CoreException {
 		return (String) marker.getAttribute(IDs.NAME);
 	}
