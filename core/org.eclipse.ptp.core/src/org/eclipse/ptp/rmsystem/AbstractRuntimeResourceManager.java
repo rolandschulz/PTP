@@ -27,9 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,6 +36,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.AbstractJobSubmission;
+import org.eclipse.ptp.core.AbstractJobSubmission.JobSubStatus;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
@@ -92,22 +91,17 @@ import org.eclipse.ui.statushandlers.StatusManager;
  */
 public abstract class AbstractRuntimeResourceManager extends AbstractResourceManager implements IRuntimeEventListener {
 
-	private class JobSubmission {
+	private class JobSubmission extends AbstractJobSubmission {
 		private ILaunchConfiguration configuration;
-		private final String id;
 		private IPJob job = null;
 		private String reason;
-		private JobSubState state = JobSubState.SUBMITTED;
-		private final ReentrantLock subLock = new ReentrantLock();
-		private final Condition subCondition = subLock.newCondition();;
 
-		@SuppressWarnings("unused")
 		public JobSubmission(int count) {
-			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count); //$NON-NLS-1$
+			super(count);
 		}
 
 		public JobSubmission(String id) {
-			this.id = id;
+			super(id);
 		}
 
 		/**
@@ -115,16 +109,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		 */
 		public String getErrorReason() {
 			return reason;
-		}
-
-		/**
-		 * Get the job submission ID
-		 * 
-		 * @return job submission ID
-		 */
-		@SuppressWarnings("unused")
-		public String getId() {
-			return id;
 		}
 
 		/**
@@ -142,15 +126,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		}
 
 		/**
-		 * @param reason
-		 *            the reason for the error
-		 */
-		public void setError(String reason) {
-			this.reason = reason;
-			setState(JobSubState.ERROR);
-		}
-
-		/**
 		 * @param job
 		 *            the job to set
 		 */
@@ -165,46 +140,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 			this.configuration = configuration;
 		}
-
-		/**
-		 * @param state
-		 *            the state to set
-		 */
-		public void setState(JobSubState state) {
-			subLock.lock();
-			try {
-				this.state = state;
-				subCondition.signalAll();
-			} finally {
-				subLock.unlock();
-			}
-		}
-
-		/**
-		 * Wait for the job state to change
-		 * 
-		 * @return the state
-		 */
-		public JobSubState waitFor(IProgressMonitor monitor) {
-			subLock.lock();
-			try {
-				while (!monitor.isCanceled() && state != JobSubState.SUBMITTED) {
-					try {
-						subCondition.await(100, TimeUnit.MILLISECONDS);
-					} catch (InterruptedException e) {
-						// Expect to be interrupted if monitor is canceled
-					}
-				}
-
-				return state;
-			} finally {
-				subLock.unlock();
-			}
-		}
-	}
-
-	public enum JobSubState {
-		CANCELED, COMPLETED, ERROR, SUBMITTED
 	}
 
 	private final Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
@@ -212,353 +147,6 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 
 	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id, universe, config);
-	}
-
-	/**
-	 * 
-	 */
-	protected abstract void doAfterCloseConnection();
-
-	/**
-	 * 
-	 */
-	protected abstract void doAfterOpenConnection();
-
-	/**
-	 * 
-	 */
-	protected abstract void doBeforeCloseConnection();
-
-	/**
-	 * 
-	 */
-	protected abstract void doBeforeOpenConnection();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doCleanUp()
-	 */
-	@Override
-	protected void doCleanUp() {
-		/*
-		 * Cancel any pending job submissions.
-		 */
-		for (JobSubmission sub : jobSubmissions.values()) {
-			sub.setState(JobSubState.CANCELED);
-		}
-		jobSubmissions.clear();
-	}
-
-	/**
-	 * Template pattern method to actually create the job.
-	 * 
-	 * @param queue
-	 * @param jobId
-	 * @return
-	 */
-	abstract protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually create the machine.
-	 * 
-	 * @param machineId
-	 * @return
-	 */
-	abstract protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually create the node.
-	 * 
-	 * @param machine
-	 * @param nodeId
-	 * @return
-	 */
-	abstract protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually create the queue.
-	 * 
-	 * @param queueId
-	 * @return
-	 */
-	abstract protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs);
-
-	/**
-	 * create a new runtime system
-	 * 
-	 * @return the new runtime system
-	 * @throws CoreException
-	 *             TODO
-	 */
-	protected abstract IRuntimeSystem doCreateRuntimeSystem() throws CoreException;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDisableEvents()
-	 */
-	@Override
-	protected void doDisableEvents() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
-	 */
-	@Override
-	protected void doDispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doEnableEvents()
-	 */
-	@Override
-	protected void doEnableEvents() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected List<IPJobControl> doRemoveTerminatedJobs(IPQueueControl queue) {
-		List<IPJobControl> terminatedJobs = new ArrayList<IPJobControl>();
-
-		if (queue != null) {
-			for (IPJobControl job : queue.getJobControls()) {
-				if (job.getState() == JobAttributes.State.COMPLETED) {
-					terminatedJobs.add(job);
-				}
-			}
-			queue.removeJobs(terminatedJobs);
-		}
-
-		return terminatedJobs;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doShutdown()
-	 */
-	@Override
-	protected void doShutdown() throws CoreException {
-		doBeforeCloseConnection();
-
-		runtimeSystem.shutdown();
-
-		doAfterCloseConnection();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
-	 * .core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected void doStartup(IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		monitor.subTask(Messages.AbstractRuntimeResourceManager_11);
-
-		runtimeSystem = doCreateRuntimeSystem();
-
-		if (monitor.isCanceled()) {
-			return;
-		}
-
-		monitor.worked(10);
-		monitor.subTask(Messages.AbstractRuntimeResourceManager_5);
-
-		runtimeSystem.addRuntimeEventListener(this);
-
-		try {
-			runtimeSystem.startup(subMon.newChild(90));
-		} catch (CoreException e) {
-			runtimeSystem.removeRuntimeEventListener(this);
-			throw e;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(java.lang
-	 * .String, org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.core.attributes.AttributeManager,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor) throws CoreException {
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-
-		IPJob job = null;
-
-		try {
-			JobSubmission sub = new JobSubmission(subId);
-			sub.setLaunchConfiguration(configuration);
-			jobSubmissions.put(subId, sub);
-
-			runtimeSystem.submitJob(subId, attrMgr);
-
-			/*
-			 * If subId is null then don't wait for the submission to complete.
-			 */
-			if (subId != null) {
-				return job;
-			}
-
-			JobSubState state = sub.waitFor(monitor);
-
-			switch (state) {
-			case SUBMITTED:
-			case CANCELED:
-				/*
-				 * Once a job has been sent to the RM, it can't be canceled, so
-				 * this will just cause the submitJob command to return a null.
-				 * The job will still eventually get created.
-				 */
-				break;
-
-			case COMPLETED:
-				job = sub.getJob();
-				break;
-
-			case ERROR:
-				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
-						sub.getErrorReason(), null));
-			}
-		} finally {
-			monitor.done();
-		}
-
-		return job;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doTerminateJob(org.eclipse
-	 * .ptp.core.elements.IPJob)
-	 */
-	@Override
-	protected void doTerminateJob(IPJob job) throws CoreException {
-		runtimeSystem.terminateJob(job);
-	}
-
-	/**
-	 * Template pattern method to actually update the jobs.
-	 * 
-	 * @param job
-	 * @param attrs
-	 * @return changes were made
-	 */
-	abstract protected boolean doUpdateJobs(IPQueueControl queue, Collection<IPJobControl> jobs, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the machines.
-	 * 
-	 * @param machine
-	 * @param attrs
-	 * @return changes were made
-	 */
-	abstract protected boolean doUpdateMachines(Collection<IPMachineControl> machines, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to update a collection of nodes.
-	 * 
-	 * @param machine
-	 *            parent machine
-	 * @param nodes
-	 *            collection of nodes to update
-	 * @param attrs
-	 *            new/changed attibutes for each node in the collection
-	 * @return changes were made
-	 */
-	protected abstract boolean doUpdateNodes(IPMachineControl machine, Collection<IPNodeControl> nodes, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the processes.
-	 * 
-	 * @param job
-	 *            parent job
-	 * @param processJobRanks
-	 *            collection of process job ranks representing processes to
-	 *            update
-	 * @param attrs
-	 *            new/changed attributes for each node in the collection
-	 * @return changes were made
-	 * @since 4.0
-	 */
-	protected abstract boolean doUpdateProcesses(IPJobControl job, BitSet processJobRanks, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the queues.
-	 * 
-	 * @param queue
-	 * @param attrs
-	 * @return changes were made
-	 */
-	protected abstract boolean doUpdateQueues(Collection<IPQueueControl> queues, AttributeManager attrs);
-
-	/**
-	 * Template pattern method to actually update the queues.
-	 * 
-	 * @param queue
-	 * @param attrs
-	 * @return changes were made
-	 */
-	protected abstract boolean doUpdateRM(AttributeManager attrs);
-
-	/**
-	 * @param sJobRank
-	 * @return
-	 * @since 4.0
-	 */
-	protected Integer getProcessJobRank(String sJobRank) {
-		Integer procId;
-		try {
-			procId = Integer.valueOf(sJobRank);
-		} catch (NumberFormatException e) {
-			return null;
-		}
-		return procId;
-	}
-
-	/**
-	 * @param processJobRanks
-	 * @return
-	 * @since 4.0
-	 */
-	protected BitSet getProcessJobRanks(RangeSet processJobRanks) {
-		final BitSet bitSet = new BitSet(processJobRanks.size());
-		for (String sRank : processJobRanks) {
-			Integer rank = getProcessJobRank(sRank);
-			if (rank != null) {
-				bitSet.set(rank);
-			} else {
-				PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_12 + sRank + Messages.AbstractRuntimeResourceManager_13);
-			}
-		}
-		return bitSet;
-	}
-
-	/**
-	 * @return the runtimeSystem
-	 */
-	protected IRuntimeSystem getRuntimeSystem() {
-		return runtimeSystem;
 	}
 
 	/*
@@ -700,8 +288,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		case WARNING:
 			severity = IStatus.WARNING;
 		}
-		StatusManager.getManager().handle(new Status(severity,
-				PTPCorePlugin.PLUGIN_ID, e.getText()),
+		StatusManager.getManager().handle(new Status(severity, PTPCorePlugin.PLUGIN_ID, e.getText()),
 				(severity == IStatus.ERROR) ? StatusManager.SHOW : StatusManager.LOG);
 	}
 
@@ -740,7 +327,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 							if (sub != null) {
 								sub.setJob(job);
 								job.setLaunchConfiguration(sub.getLaunchConfiguration());
-								sub.setState(JobSubState.COMPLETED);
+								sub.setStatus(JobSubStatus.SUBMITTED);
 							}
 						}
 					}
@@ -1190,6 +777,353 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			name = job.getName();
 		}
 		fireError(NLS.bind(Messages.AbstractRuntimeResourceManager_4, new Object[] { name, e.getErrorMessage() }));
+	}
+
+	/**
+	 * 
+	 */
+	protected abstract void doAfterCloseConnection();
+
+	/**
+	 * 
+	 */
+	protected abstract void doAfterOpenConnection();
+
+	/**
+	 * 
+	 */
+	protected abstract void doBeforeCloseConnection();
+
+	/**
+	 * 
+	 */
+	protected abstract void doBeforeOpenConnection();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doCleanUp()
+	 */
+	@Override
+	protected void doCleanUp() {
+		/*
+		 * Cancel any pending job submissions.
+		 */
+		for (JobSubmission sub : jobSubmissions.values()) {
+			sub.setStatus(JobSubStatus.CANCELLED);
+		}
+		jobSubmissions.clear();
+	}
+
+	/**
+	 * Template pattern method to actually create the job.
+	 * 
+	 * @param queue
+	 * @param jobId
+	 * @return
+	 */
+	abstract protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually create the machine.
+	 * 
+	 * @param machineId
+	 * @return
+	 */
+	abstract protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually create the node.
+	 * 
+	 * @param machine
+	 * @param nodeId
+	 * @return
+	 */
+	abstract protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually create the queue.
+	 * 
+	 * @param queueId
+	 * @return
+	 */
+	abstract protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs);
+
+	/**
+	 * create a new runtime system
+	 * 
+	 * @return the new runtime system
+	 * @throws CoreException
+	 *             TODO
+	 */
+	protected abstract IRuntimeSystem doCreateRuntimeSystem() throws CoreException;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDisableEvents()
+	 */
+	@Override
+	protected void doDisableEvents() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doDispose()
+	 */
+	@Override
+	protected void doDispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doEnableEvents()
+	 */
+	@Override
+	protected void doEnableEvents() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected List<IPJobControl> doRemoveTerminatedJobs(IPQueueControl queue) {
+		List<IPJobControl> terminatedJobs = new ArrayList<IPJobControl>();
+
+		if (queue != null) {
+			for (IPJobControl job : queue.getJobControls()) {
+				if (job.getState() == JobAttributes.State.COMPLETED) {
+					terminatedJobs.add(job);
+				}
+			}
+			queue.removeJobs(terminatedJobs);
+		}
+
+		return terminatedJobs;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManager#doShutdown()
+	 */
+	@Override
+	protected void doShutdown() throws CoreException {
+		doBeforeCloseConnection();
+
+		runtimeSystem.shutdown();
+
+		doAfterCloseConnection();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doStartup(org.eclipse
+	 * .core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void doStartup(IProgressMonitor monitor) throws CoreException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_11);
+
+		runtimeSystem = doCreateRuntimeSystem();
+
+		if (monitor.isCanceled()) {
+			return;
+		}
+
+		monitor.worked(10);
+		monitor.subTask(Messages.AbstractRuntimeResourceManager_5);
+
+		runtimeSystem.addRuntimeEventListener(this);
+
+		try {
+			runtimeSystem.startup(subMon.newChild(90));
+		} catch (CoreException e) {
+			runtimeSystem.removeRuntimeEventListener(this);
+			throw e;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(java.lang
+	 * .String, org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.core.attributes.AttributeManager,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+			throws CoreException {
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+
+		IPJob job = null;
+
+		try {
+			JobSubmission sub = new JobSubmission(subId);
+			sub.setLaunchConfiguration(configuration);
+			jobSubmissions.put(subId, sub);
+
+			runtimeSystem.submitJob(subId, attrMgr);
+
+			/*
+			 * If subId is null then don't wait for the submission to complete.
+			 */
+			if (subId != null) {
+				return job;
+			}
+
+			JobSubStatus state = sub.waitFor(monitor);
+
+			switch (state) {
+			case CANCELLED:
+				/*
+				 * Once a job has been sent to the RM, it can't be canceled, so
+				 * this will just cause the submitJob command to return a null.
+				 * The job will still eventually get created.
+				 */
+				break;
+
+			case SUBMITTED:
+				job = sub.getJob();
+				break;
+
+			case ERROR:
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR,
+						sub.getErrorReason(), null));
+			}
+		} finally {
+			monitor.done();
+		}
+
+		return job;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doTerminateJob(org.eclipse
+	 * .ptp.core.elements.IPJob)
+	 */
+	@Override
+	protected void doTerminateJob(IPJob job) throws CoreException {
+		runtimeSystem.terminateJob(job);
+	}
+
+	/**
+	 * Template pattern method to actually update the jobs.
+	 * 
+	 * @param job
+	 * @param attrs
+	 * @return changes were made
+	 */
+	abstract protected boolean doUpdateJobs(IPQueueControl queue, Collection<IPJobControl> jobs, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually update the machines.
+	 * 
+	 * @param machine
+	 * @param attrs
+	 * @return changes were made
+	 */
+	abstract protected boolean doUpdateMachines(Collection<IPMachineControl> machines, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to update a collection of nodes.
+	 * 
+	 * @param machine
+	 *            parent machine
+	 * @param nodes
+	 *            collection of nodes to update
+	 * @param attrs
+	 *            new/changed attibutes for each node in the collection
+	 * @return changes were made
+	 */
+	protected abstract boolean doUpdateNodes(IPMachineControl machine, Collection<IPNodeControl> nodes, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually update the processes.
+	 * 
+	 * @param job
+	 *            parent job
+	 * @param processJobRanks
+	 *            collection of process job ranks representing processes to
+	 *            update
+	 * @param attrs
+	 *            new/changed attributes for each node in the collection
+	 * @return changes were made
+	 * @since 4.0
+	 */
+	protected abstract boolean doUpdateProcesses(IPJobControl job, BitSet processJobRanks, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually update the queues.
+	 * 
+	 * @param queue
+	 * @param attrs
+	 * @return changes were made
+	 */
+	protected abstract boolean doUpdateQueues(Collection<IPQueueControl> queues, AttributeManager attrs);
+
+	/**
+	 * Template pattern method to actually update the queues.
+	 * 
+	 * @param queue
+	 * @param attrs
+	 * @return changes were made
+	 */
+	protected abstract boolean doUpdateRM(AttributeManager attrs);
+
+	/**
+	 * @param sJobRank
+	 * @return
+	 * @since 4.0
+	 */
+	protected Integer getProcessJobRank(String sJobRank) {
+		Integer procId;
+		try {
+			procId = Integer.valueOf(sJobRank);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+		return procId;
+	}
+
+	/**
+	 * @param processJobRanks
+	 * @return
+	 * @since 4.0
+	 */
+	protected BitSet getProcessJobRanks(RangeSet processJobRanks) {
+		final BitSet bitSet = new BitSet(processJobRanks.size());
+		for (String sRank : processJobRanks) {
+			Integer rank = getProcessJobRank(sRank);
+			if (rank != null) {
+				bitSet.set(rank);
+			} else {
+				PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_12 + sRank + Messages.AbstractRuntimeResourceManager_13);
+			}
+		}
+		return bitSet;
+	}
+
+	/**
+	 * @return the runtimeSystem
+	 */
+	protected IRuntimeSystem getRuntimeSystem() {
+		return runtimeSystem;
 	}
 
 }

@@ -26,9 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -49,6 +46,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.ptp.core.AbstractJobSubmission;
+import org.eclipse.ptp.core.AbstractJobSubmission.JobSubStatus;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -112,16 +111,6 @@ import org.eclipse.ptp.utils.core.ArgumentParser;
 public abstract class AbstractParallelLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements
 		ILaunchProcessCallback {
 	/**
-	 * Status of the job submission (NOT the job itself)
-	 */
-	public enum JobSubStatus {
-		/**
-		 * @since 4.0
-		 */
-		UNSUBMITTED, SUBMITTED, ERROR
-	}
-
-	/**
 	 * The JobSubmission class encapsulates all the information used in a job
 	 * submission. Once the job is created *and starts running*, this
 	 * information is used to complete the launch.
@@ -130,26 +119,21 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * restarted without losing the submission information. The persistence will
 	 * also need to deal with starting the debugger for persisted debug jobs.
 	 */
-	private class JobSubmission {
+	private class JobSubmission extends AbstractJobSubmission {
 		private final ILaunchConfiguration configuration;
 		private final String mode;
-		private final String id;
-		private String error = null;
 		private final IPLaunch launch;
 		private final AttributeManager attrMgr;
 		private final IPDebugger debugger;
-		private JobSubStatus status = JobSubStatus.UNSUBMITTED;
-		private final ReentrantLock subLock = new ReentrantLock();;
-		private final Condition subCondition = subLock.newCondition();
 
 		public JobSubmission(int count, ILaunchConfiguration configuration, String mode, IPLaunch launch, AttributeManager attrMgr,
 				IPDebugger debugger) {
+			super(count);
 			this.configuration = configuration;
 			this.mode = mode;
 			this.launch = launch;
 			this.attrMgr = attrMgr;
 			this.debugger = debugger;
-			this.id = "JOB_" + Long.toString(System.currentTimeMillis()) + Integer.toString(count); //$NON-NLS-1$
 		}
 
 		/**
@@ -174,20 +158,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		}
 
 		/**
-		 * @return the error
-		 */
-		public String getError() {
-			return error;
-		}
-
-		/**
-		 * @return the job submission id
-		 */
-		public String getId() {
-			return id;
-		}
-
-		/**
 		 * @return the launch
 		 */
 		public IPLaunch getLaunch() {
@@ -199,49 +169,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 */
 		public String getMode() {
 			return mode;
-		}
-
-		/**
-		 * set the error
-		 */
-		public void setError(String error) {
-			this.error = error;
-			setStatus(JobSubStatus.ERROR);
-		}
-
-		/**
-		 * set the current status
-		 */
-		public void setStatus(JobSubStatus status) {
-			subLock.lock();
-			try {
-				this.status = status;
-				subCondition.signalAll();
-			} finally {
-				subLock.unlock();
-			}
-		}
-
-		/**
-		 * Wait for the job state to change
-		 * 
-		 * @return the state
-		 */
-		public JobSubStatus waitFor(IProgressMonitor monitor) {
-			subLock.lock();
-			try {
-				while (!monitor.isCanceled() && status == JobSubStatus.UNSUBMITTED) {
-					try {
-						subCondition.await(100, TimeUnit.MILLISECONDS);
-					} catch (InterruptedException e) {
-						// Expect to be interrupted if monitor is canceled
-					}
-				}
-
-				return status;
-			} finally {
-				subLock.unlock();
-			}
 		}
 	}
 
@@ -263,13 +190,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				if (stateAttr != null) {
 					JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
 					if (jobSub != null) {
-						/*
-						 * The job must now be SUBMITTED as we've been called by
-						 * a job event handler. Set the status so that anyone
-						 * waiting on the job submission will be notified.
-						 */
-						jobSub.setStatus(JobSubStatus.SUBMITTED);
-
 						switch (stateAttr.getValue()) {
 						case RUNNING:
 							/*
@@ -387,6 +307,15 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 							.getStateAttributeDefinition());
 					if (stateAttr != null) {
 						PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
+					}
+					JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
+					if (jobSub != null) {
+						/*
+						 * The job must now be SUBMITTED as the job has been
+						 * created. Set the status so that anyone waiting on the
+						 * job submission will be notified.
+						 */
+						jobSub.setStatus(JobSubStatus.SUBMITTED);
 					}
 				}
 				job.addElementListener(jobListener);
