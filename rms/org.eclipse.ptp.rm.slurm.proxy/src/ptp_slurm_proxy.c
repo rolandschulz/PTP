@@ -1817,13 +1817,14 @@ job_launch_internal(void * arg)
 		}	
 	}
 
+done:
 	/*block until job step finish*/
 	slurm_step_launch_wait_finish(step_ctx);
 
 	uint32_t job_ret_code = 0;/*Mark job COMPLETE*/
 	slurm_complete_job(job->slurm_jobid, job_ret_code);
 
-done:
+//done:
 	if (job_req)
 		destroy_job_desc_msg(job_req);
 	if (job_resp)
@@ -1924,6 +1925,8 @@ job_io_handler(void * arg)
 	int cancel_type;
 	int	ret;
 	char * p = NULL;
+	int stdout_exit = 0;
+	int stderr_exit = 0;
 	
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,&cancel_state);
 	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &cancel_type);
@@ -1950,14 +1953,12 @@ job_io_handler(void * arg)
 		switch(ret)
 		{
 		case -1: /* error */
-			debug_log(logfp,"job[%d] iothread exit on select error\n", job->slurm_jobid);
+			debug_log(logfp,"job[%d] iothread exit on select error:%s\n", job->slurm_jobid, strerror(errno));
 			if (errno == EINTR) {
 				debug_log(logfp, "select got signal. Continue.\n");
-				fprintf(stderr, "select got signal. Continue.\n");
 				continue;
 			} else {	
 				debug_log(logfp, "select error. Exit.\n");
-				fprintf(stderr, "select error. Exit.\n");
 				goto done;
 			}
 			break;
@@ -1973,6 +1974,7 @@ job_io_handler(void * arg)
 						fprintf(stderr, "%s\n", buf);
 						continue;
 					}
+					fprintf(stderr,"job output: %s\n", buf);
 					p = buf;
 					/* get task id from output label */
 					task_id = atoi(p);
@@ -1990,7 +1992,7 @@ job_io_handler(void * arg)
 					}  
 				} else { /* error or EOF of pipe(write end closed) */
 					debug_log(logfp,"job[%d] iothread exit on EOF/ERROR of stdout fd\n",job->slurm_jobid);
-					goto done;
+					stdout_exit = 1;
 				}	
 			}
 
@@ -2020,12 +2022,14 @@ job_io_handler(void * arg)
 					}  
 				} else { /* error or EOF of pipe (write end closed) */
 					debug_log(logfp,"job[%d] iothread exit on Error/EOF of stderr fd.\n",job->slurm_jobid);
-					goto done;
+					stderr_exit = 1;
 				}	
 			}
 
 			break; 
-		}	
+		}
+		if (stdout_exit && stderr_exit)
+			goto done;	
 	}	
 
 	debug_log(logfp, "job[%d] iothread exit on exit_request.\n", job->slurm_jobid);
@@ -2820,7 +2824,7 @@ handle_jobstate_update(ptp_job * j)
 		RemoveFromList(gJobList, j);
 		job_destroy(j);
 	} else 
-		debug_log(logfp, "Job[%d]: slurm_load_job error.%s\n", j->slurm_jobid, slurm_strerror(rc));		
+		debug_log(logfp, "Job[%d]: slurm_load_job error:%s\n", j->slurm_jobid, slurm_strerror(rc));		
 
 	return rc;
 }
@@ -3358,7 +3362,7 @@ main(int argc, char *argv[])
 	xsignal(SIGINT, ptp_signal_handler);
 	xsignal(SIGHUP, ptp_signal_handler);
 	xsignal(SIGILL, ptp_signal_handler);
-	xsignal(SIGSEGV, ptp_signal_handler);
+	//xsignal(SIGSEGV, ptp_signal_handler);
 	xsignal(SIGTERM, ptp_signal_handler);
 	xsignal(SIGQUIT, ptp_signal_handler);
 	xsignal(SIGABRT, ptp_signal_handler);
