@@ -38,7 +38,6 @@ import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.cdt.internal.core.browser.IndexModelUtil;
-import org.eclipse.cdt.internal.core.pdom.dom.PDOMNotImplementedError;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
@@ -113,23 +112,23 @@ public class RemoteASTTypeInfo implements ITypeInfo, IFunctionInfo {
 	}
 		
 	public void addDerivedReference(ITypeReference location) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public void addReference(ITypeReference location) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean canSubstituteFor(ITypeInfo info) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean encloses(ITypeInfo info) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean exists() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public int getCElementType() {
@@ -137,19 +136,19 @@ public class RemoteASTTypeInfo implements ITypeInfo, IFunctionInfo {
 	}
 
 	public ITypeReference[] getDerivedReferences() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public ITypeInfo[] getEnclosedTypes() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public ITypeInfo[] getEnclosedTypes(int[] kinds) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public ITypeInfo getEnclosingNamespace(boolean includeGlobalNamespace) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public ICProject getEnclosingProject() {
@@ -168,7 +167,7 @@ public class RemoteASTTypeInfo implements ITypeInfo, IFunctionInfo {
 	}
 
 	public ITypeInfo getEnclosingType(int[] kinds) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public String getName() {
@@ -199,63 +198,63 @@ public class RemoteASTTypeInfo implements ITypeInfo, IFunctionInfo {
 	}
 
 	public ITypeInfo getRootNamespace(boolean includeGlobalNamespace) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public ITypeInfo[] getSubTypes() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public ASTAccessVisibility getSuperTypeAccess(ITypeInfo subType) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public ITypeInfo[] getSuperTypes() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean hasEnclosedTypes() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean hasSubTypes() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean hasSuperTypes() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isClass() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isEnclosed(ITypeInfo info) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isEnclosed(ITypeSearchScope scope) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isEnclosedType() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isEnclosingType() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isReferenced(ITypeSearchScope scope) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isUndefinedType() {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	public void setCElementType(int type) {
-		throw new PDOMNotImplementedError();
+		throw new UnsupportedOperationException();
 	}
 
 	/*

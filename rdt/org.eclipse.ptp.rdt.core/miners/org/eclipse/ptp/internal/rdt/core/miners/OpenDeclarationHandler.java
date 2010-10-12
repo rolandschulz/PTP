@@ -630,27 +630,22 @@ public class OpenDeclarationHandler {
 				// For c++ we can check the number of parameters.
 				if (binding instanceof ICPPFunction) {
 					ICPPFunction f= (ICPPFunction) binding;
-					try {
-						if (f.getRequiredArgumentCount() > funcArgCount) {
+					if (f.getRequiredArgumentCount() > funcArgCount) {
+						iterator.remove();
+						result.add(binding);
+						continue;
+					}
+					if (!f.takesVarArgs() && !f.hasParameterPack()) {
+						final IType[] parameterTypes = f.getType().getParameterTypes();
+						int maxArgs= parameterTypes.length;
+						if (maxArgs == 1 && SemanticUtil.isVoidType(parameterTypes[0])) {
+							maxArgs= 0;
+						}
+						if (maxArgs < funcArgCount) {
 							iterator.remove();
 							result.add(binding);
 							continue;
 						}
-						if (!f.takesVarArgs() && !f.hasParameterPack()) {
-							final IType[] parameterTypes = f.getType().getParameterTypes();
-							int maxArgs= parameterTypes.length;
-							if (maxArgs == 1 && SemanticUtil.isVoidType(parameterTypes[0])) {
-								maxArgs= 0;
-							}
-							if (maxArgs < funcArgCount) {
-								iterator.remove();
-								result.add(binding);
-								continue;
-							}
-						}
-					} catch (DOMException e) {
-						// Ignore problem bindings.
-						continue;
 					}
 				}
 			}
