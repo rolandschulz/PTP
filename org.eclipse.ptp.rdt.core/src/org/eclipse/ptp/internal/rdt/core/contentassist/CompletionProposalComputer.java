@@ -292,46 +292,43 @@ public class CompletionProposalComputer {
         StringBuilder idargs = new StringBuilder();   // for the idargString
         boolean hasArgs = true;
 		String returnTypeStr = null;
-		try {
-			IParameter[] params = function.getParameters();
-			if (params != null) {
-				for (int i = 0; i < params.length; ++i) {
-					IType paramType = params[i].getType();
-					if (i > 0) {
-                        dispargs.append(',');
-                        idargs.append(',');
-                    }
+		IParameter[] params = function.getParameters();
+		if (params != null) {
+			for (int i = 0; i < params.length; ++i) {
+				IType paramType = params[i].getType();
+				if (i > 0) {
+		            dispargs.append(',');
+		            idargs.append(',');
+		        }
 
-					dispargs.append(ASTTypeUtil.getType(paramType, false));
-                    idargs.append(ASTTypeUtil.getType(paramType, false));
-					String paramName = params[i].getName();
-					if (paramName != null && paramName.length() > 0) {
-						dispargs.append(' ');
-						dispargs.append(paramName);
-					}
-				}
-			
-				if (function.takesVarArgs()) {
-					if (params.length > 0) {
-						dispargs.append(',');
-						idargs.append(',');
-					}
-					dispargs.append("..."); //$NON-NLS-1$
-					idargs.append("..."); //$NON-NLS-1$
-				} else if (params.length == 0) { // force the void in
-					dispargs.append("void"); //$NON-NLS-1$
-					idargs.append("void"); //$NON-NLS-1$
+				dispargs.append(ASTTypeUtil.getType(paramType, false));
+		        idargs.append(ASTTypeUtil.getType(paramType, false));
+				String paramName = params[i].getName();
+				if (paramName != null && paramName.length() > 0) {
+					dispargs.append(' ');
+					dispargs.append(paramName);
 				}
 			}
-			IFunctionType functionType = function.getType();
-			if (functionType != null) {
-				IType returnType = functionType.getReturnType();
-				if (returnType != null)
-					returnTypeStr = ASTTypeUtil.getType(returnType, false);
+		
+			if (function.takesVarArgs()) {
+				if (params.length > 0) {
+					dispargs.append(',');
+					idargs.append(',');
+				}
+				dispargs.append("..."); //$NON-NLS-1$
+				idargs.append("..."); //$NON-NLS-1$
+			} else if (params.length == 0) { // force the void in
+				dispargs.append("void"); //$NON-NLS-1$
+				idargs.append("void"); //$NON-NLS-1$
 			}
-			hasArgs = ASTTypeUtil.functionTakesParameters(function);
-		} catch (DOMException e) {
 		}
+		IFunctionType functionType = function.getType();
+		if (functionType != null) {
+			IType returnType = functionType.getReturnType();
+			if (returnType != null)
+				returnTypeStr = ASTTypeUtil.getType(returnType, false);
+		}
+		hasArgs = ASTTypeUtil.functionTakesParameters(function);
         
         String dispargString = dispargs.toString();
         String idargString = idargs.toString();
@@ -374,12 +371,9 @@ public class CompletionProposalComputer {
 		repStringBuff.append(variable.getName());
 		
 		String returnTypeStr = "<unknown>"; //$NON-NLS-1$
-		try {
-			IType varType = variable.getType();
-			if (varType != null)
-				returnTypeStr = ASTTypeUtil.getType(varType, false);
-		} catch (DOMException e) {
-		}
+		IType varType = variable.getType();
+		if (varType != null)
+			returnTypeStr = ASTTypeUtil.getType(varType, false);
         
         StringBuilder dispStringBuff = new StringBuilder(repStringBuff.toString());
         if (returnTypeStr != null) {
