@@ -43,7 +43,7 @@
 	<property name="filesystemJar" value="org.eclipse.core.filesystem_${filesystemVersion}.jar"/>
 	
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
-	<property name="cdtVersion" value="201009100812"/>
+	<property name="cdtVersion" value="201010080805"/>
 	
 	<property name="cdtCoreVersion" value="5.3.0.${cdtVersion}"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
