@@ -59,7 +59,7 @@
       <import plugin="org.eclipse.rephraserengine.ui.refactoring"/>
       <import plugin="org.eclipse.rephraserengine.ui"/>
       <import plugin="org.eclipse.rephraserengine.ui.vpg"/>
-      <import feature="org.eclipse.cdt" version="7.0" match="equivalent"/>
+      <import feature="org.eclipse.cdt" version="8.0" match="equivalent"/>
       <import plugin="org.eclipse.text"/>
    </requires>
 
