@@ -49,6 +49,16 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 			super.createPathEditor();
 		}
 	}
+	
+	/**
+	 * Get the remote host of the given project
+	 * @param project
+	 * @return
+	 * @since 2.1
+	 */
+	protected IHost getRemoteHost(IProject project) {
+		return RSEUtils.getAnyConnection(project.getLocationURI());
+	}
 
 	/**
 	 * create a path editor for remote directory browsing.
@@ -58,7 +68,7 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 		Composite parent = getFieldEditorParent();
 		final IProject thisProject = ((IResource) (getElement().getAdapter(IResource.class))).getProject();
 
-		IHost projectHost = RSEUtils.getAnyConnection(thisProject.getLocationURI());
+		IHost projectHost = getRemoteHost(thisProject);
 
 		if (projectHost != null) {
 
@@ -75,7 +85,7 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 					// browse
 					// button, a connection dialog will be pop up if the host
 					// connection is disconnected.
-					IHost projectConnectedHost = RSEUtils.getConnection(thisProject.getLocationURI());
+					IHost projectConnectedHost = getRemoteHost(thisProject);
 					if (projectConnectedHost == null) {
 
 						setMessage(
