@@ -37,7 +37,6 @@ public class Macro extends SourceManipulation implements IMacro {
 		return null;
 	}
 
-	@Override
 	public boolean isFunctionStyle() {
 		return fFunctionStyle;
 	}
