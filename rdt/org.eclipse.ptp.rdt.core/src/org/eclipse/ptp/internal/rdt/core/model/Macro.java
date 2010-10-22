@@ -18,6 +18,7 @@ import org.eclipse.cdt.core.model.ISourceReference;
 
 public class Macro extends SourceManipulation implements IMacro {
 	private static final long serialVersionUID = 1L;
+	private boolean fFunctionStyle = false;
 
 	public Macro(Parent parent, String simpleName) {
 		super(parent, ICElement.C_MACRO, simpleName);
@@ -25,6 +26,7 @@ public class Macro extends SourceManipulation implements IMacro {
 
 	public Macro(Parent parent, IMacro element) throws CModelException {
 		super(parent, element, (ISourceReference) element);
+		setFunctionStyle(element.isFunctionStyle());
 	}
 
 	public String getIdentifierList() {
@@ -33,5 +35,14 @@ public class Macro extends SourceManipulation implements IMacro {
 
 	public String getTokenSequence() {
 		return null;
+	}
+
+	@Override
+	public boolean isFunctionStyle() {
+		return fFunctionStyle;
+	}
+	
+	public void setFunctionStyle(boolean isFunctionStyle) {
+		this.fFunctionStyle = isFunctionStyle;
 	}
 }
