@@ -58,8 +58,9 @@
       <import plugin="org.eclipse.ui.console" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.services.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.files.ui"/>
-      <import feature="org.eclipse.ptp.remote.rse" version="2.1.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.make.ui"/>
+      <import feature="org.eclipse.ptp.remote.rse" version="2.1.1" match="greaterOrEqual"/>
+      <import feature="org.eclipse.rse" version="3.3.0.qualifier"/>
    </requires>
 
    <plugin
