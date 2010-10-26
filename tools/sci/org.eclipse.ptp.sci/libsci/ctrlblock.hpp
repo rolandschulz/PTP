@@ -50,6 +50,7 @@ class RoutingList;
 class EmbedAgent;
 class FilterList;
 class HandlerProcessor;
+class PrivateData;
 
 class CtrlBlock
 {
@@ -164,6 +165,8 @@ class CtrlBlock
         void clean();
 
     private:
+        PrivateData* getPrivateData();
+
         void lock();
         void unlock();
 };

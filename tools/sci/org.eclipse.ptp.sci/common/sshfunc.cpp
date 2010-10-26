@@ -93,7 +93,7 @@ int SshFunc::load(char * libPath)
 
 #if defined(_SCI_LINUX)
     dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
-#elif  || defined(__APPLE__)
+#elif defined(__APPLE__)
     dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 #else // aix
     dlopen_file = ::dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL | RTLD_MEMBER);

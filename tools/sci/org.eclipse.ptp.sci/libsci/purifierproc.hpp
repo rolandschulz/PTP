@@ -71,6 +71,8 @@ class PurifierProcessor : public Processor
         void setOutErrorQueue(MessageQueue *queue);
         void setPeerProcessor(WriterProcessor *processor);
         void setObserver(Observer *ob);
+        RoutingList * getRoutingList();
+        FilterList * getFilterList();
 };
 
 #endif
