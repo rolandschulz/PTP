@@ -42,10 +42,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
 public class CHLabelProvider extends LabelProvider implements IColorProvider {
-	private final static int LABEL_OPTIONS_SIMPLE= CElementBaseLabels.ALL_FULLY_QUALIFIED | CElementBaseLabels.M_PARAMETER_TYPES;
+	private final static int LABEL_OPTIONS_SIMPLE = CElementBaseLabels.ALL_FULLY_QUALIFIED
+	| CElementBaseLabels.M_PARAMETER_TYPES | CElementBaseLabels.TEMPLATE_ARGUMENTS;
 	private final static int LABEL_OPTIONS_SHOW_FILES= LABEL_OPTIONS_SIMPLE | CElementBaseLabels.MF_POST_FILE_QUALIFIED;
 	
-    private CUILabelProvider fCLabelProvider= new CUILabelProvider(LABEL_OPTIONS_SIMPLE, 0);
+	 private CUILabelProvider fCLabelProvider= new CUILabelProvider(LABEL_OPTIONS_SIMPLE, CElementImageProvider.OVERLAY_ICONS);
     private CHContentProvider fContentProvider;
     private HashMap<String, Image> fCachedImages= new HashMap<String, Image>();
 	private Color fColorInactive;
