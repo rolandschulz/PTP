@@ -31,6 +31,8 @@ import org.eclipse.cdt.core.dom.ast.IEnumerator;
 import org.eclipse.cdt.core.dom.ast.IFunction;
 import org.eclipse.cdt.core.dom.ast.IVariable;
 import org.eclipse.cdt.core.dom.ast.c.ICExternalBinding;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPMethod;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPSpecialization;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexFile;
 import org.eclipse.cdt.core.index.IIndexFileLocation;
@@ -41,6 +43,7 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -1354,6 +1357,7 @@ public class CDTMiner extends Miner {
 		_dataStore.refresh(schemaRoot);
 	}
 	
+	//CallHierarchyUI -> public static ICElement[] findDefinitions(ICElement input)
 	protected void handleGetDefinitions(String scopeName, String hostName, ICElement subject, String path, DataElement status) {
 		try {
 			String scheme = subject.getLocationURI().getScheme();
@@ -1431,37 +1435,8 @@ public class CDTMiner extends Miner {
 			try {
 				ICElement[] definitions = null;
 				ICProject project = workingCopy.getCProject();
-
-				IASTName name= IndexQueries.getSelectedName(index, workingCopy, selectionStart, selectionLength);
-				if (name != null) {
-					IBinding binding= name.resolveBinding();
-					if (isRelevantForCallHierarchy(binding)) {
-						if (name.isDefinition()) {
-							IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
-							ICElement elem= IndexQueries.getCElementForName(project, index, name, converter, new RemoteCProjectFactory());
-							if (elem != null) {
-								definitions = new ICElement[]{elem};
-							}
-						}
-						else {
-							ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, getLocationConverter(scheme, hostName), project, new RemoteCProjectFactory());
-							if (elems.length == 0) {
-								ICElement elem= null;
-								if (name.isDeclaration()) {
-									elem= IndexQueries.getCElementForName(project, index, name, getLocationConverter(scheme, hostName), new RemoteCProjectFactory());
-								}
-								else {
-									elem= IndexQueries.findAnyDeclaration(index, project, binding, getLocationConverter(scheme, hostName), new RemoteCProjectFactory());
-								}
-								if (elem != null) {
-									elems= new ICElement[]{elem};
-								}
-							}
-							definitions = elems;
-						}
-					}
-				}
-
+				IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
+				definitions = findDefinitions(index, workingCopy, selectionStart, selectionLength, converter);
 				// create the result object
 				String resultString = Serializer.serialize(definitions);
 				status.getDataStore().createObject(status, T_CALL_HIERARCHY_RESULT, resultString);
@@ -1473,10 +1448,75 @@ public class CDTMiner extends Miner {
 		catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		}
-		
 		finally {
 			statusDone(status);
 		}
+	}
+	//CallHierarchyUI -> private static ICElement[] findDefinitions(ICProject project, IEditorInput editorInput, ITextSelection sel)
+	private static ICElement[] findDefinitions(IIndex index, ITranslationUnit workingCopy, int selectionStart, int selectionLength, IIndexLocationConverter converter) throws CoreException {
+		
+			ICElement[] no_elements = {};
+			ICProject project = workingCopy.getCProject();
+			
+			
+			IASTName name= IndexQueries.getSelectedName(index, workingCopy, selectionStart, selectionLength);
+			if (name != null) {
+				IBinding binding= name.resolveBinding();
+				if (isRelevantForCallHierarchy(binding)) {
+					if (name.isDefinition()) {
+						
+						ICElement elem= IndexQueries.getCElementForName(project, index, name, converter, new RemoteCProjectFactory());
+						if (elem != null) {
+							return new ICElement[]{elem};
+						}
+						return no_elements;
+					} 
+					
+					ICElement[] elems= IndexQueries.findAllDefinitions(index, binding, converter, project, new RemoteCProjectFactory());
+					if (elems.length != 0) 
+						return elems;
+						
+					if (name.isDeclaration()) {
+						ICElement elem= IndexQueries.getCElementForName(project, index, name, converter, new RemoteCProjectFactory());
+						if (elem != null) {
+							return new ICElement[] {elem};
+						}
+						return no_elements;
+					}
+
+					ICElement elem= IndexQueries.findAnyDeclaration(index, project, binding, converter, new RemoteCProjectFactory());
+					if (elem != null) {
+						return new ICElement[]{elem};
+					}
+					
+					if (binding instanceof ICPPSpecialization) {
+						return findSpecializationDeclaration(binding, project, index, converter);
+					}
+					return no_elements;
+				}
+			}
+			
+			return no_elements;
+		
+	}
+	
+	private static ICElement[] findSpecializationDeclaration(IBinding binding, ICProject project,
+			IIndex index, IIndexLocationConverter converter) throws CoreException {
+		while (binding instanceof ICPPSpecialization) {
+			IBinding original= ((ICPPSpecialization) binding).getSpecializedBinding();
+			ICElement[] elems= IndexQueries.findAllDefinitions(index, original, converter, project, new RemoteCProjectFactory());
+			if (elems.length == 0) {
+				ICElement elem= IndexQueries.findAnyDeclaration(index, project, original, converter, new RemoteCProjectFactory());
+				if (elem != null) {
+					elems= new ICElement[]{elem};
+				}
+			}
+			if (elems.length > 0) {
+				return elems;
+			}
+			binding= original;
+		}
+		return new ICElement[]{};
 	}
 
 	private static boolean needToFindDefinition(ICElement elem) {
@@ -1528,31 +1568,17 @@ public class CDTMiner extends Miner {
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Getting index", _dataStore); //$NON-NLS-1$
 			
 
-			IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
-			
-			// search the index for the name
+		    // search the index for the name
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			try {
 				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
 				
 				index.acquireReadLock();
 
-				IBinding callee= IndexQueries.elementToBinding(index, subject, path);
-				ICProject project= subject.getCProject();
 				if (subject != null) {
-					IIndexName[] names= index.findReferences(callee);
-					for (int i = 0; i < names.length; i++) {
-						IIndexName rname = names[i];
-						IIndexName caller= rname.getEnclosingDefinition();
-						if (caller != null) {
-							ICElement elem= IndexQueries.getCElementForName(project, index, caller, converter, new RemoteCProjectFactory());
-							if (elem != null) {
-								IIndexFileLocation indexLocation = createLocation(scheme, hostName, rname.getFile().getLocation());
-								IIndexName name = new DummyName(rname, rname.getFileLocation(), indexLocation);
-								result.add(elem, name);
-							} 
-						}
-					}
+					
+					findCalledBy(subject, path, index, scheme, hostName, result);
+					
 				}
 			} catch (InterruptedException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
@@ -1570,6 +1596,53 @@ public class CDTMiner extends Miner {
 		}
 		finally {
 			statusDone(status);
+		}
+	}
+	
+	//org.eclipse.cdt.internal.ui.callhierarchy -> private static void findCalledBy(ICElement callee, int linkageID, IIndex index, CalledByResult result) 
+	private void findCalledBy(ICElement callee, String path, IIndex index, String scheme, String hostName, CalledByResult result) 
+	throws CoreException, URISyntaxException {
+		final ICProject project = callee.getCProject();
+		IBinding calleeBinding=IndexQueries.elementToBinding(index, callee, path);
+		if (calleeBinding != null) {
+			findCalledBy1(index, calleeBinding, true, project, scheme, hostName, result);
+			if (calleeBinding instanceof ICPPMethod) {
+				IBinding[] overriddenBindings= ClassTypeHelper.findOverridden((ICPPMethod) calleeBinding);
+				for (IBinding overriddenBinding : overriddenBindings) {
+					findCalledBy1(index, overriddenBinding, false, project, scheme, hostName, result);
+				}
+			}
+		}
+	}
+	
+	private void findCalledBy1(IIndex index, IBinding callee, boolean includeOrdinaryCalls,
+			ICProject project, String scheme, String hostName, CalledByResult result) throws CoreException, URISyntaxException {
+		
+		findCalledBy2(index, callee, includeOrdinaryCalls, project, scheme, hostName, result);
+		List<? extends IBinding> specializations = IndexQueries.findSpecializations(callee);
+		for (IBinding spec : specializations) {
+			findCalledBy2(index, spec, includeOrdinaryCalls, project, scheme, hostName, result);
+		}
+	}
+
+	
+	
+	private void findCalledBy2(IIndex index, IBinding callee, boolean includeOrdinaryCalls, ICProject project, String scheme, String hostName, CalledByResult result) 
+		throws CoreException, URISyntaxException {
+		IIndexName[] names= index.findNames(callee, IIndex.FIND_REFERENCES | IIndex.SEARCH_ACROSS_LANGUAGE_BOUNDARIES);
+		for (IIndexName rname : names) {
+			if (includeOrdinaryCalls || rname.couldBePolymorphicMethodCall()) {
+				IIndexName caller= rname.getEnclosingDefinition();
+				if (caller != null) {
+					IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
+					ICElement elem= IndexQueries.getCElementForName(project, index, caller, converter, new RemoteCProjectFactory());
+					if (elem != null) {
+						IIndexFileLocation indexLocation = createLocation(scheme, hostName, rname.getFile().getLocation());
+						IIndexName reference = new DummyName(rname, rname.getFileLocation(), indexLocation);
+						result.add(elem, reference);
+					} 
+				}
+			}
 		}
 	}
 
