@@ -306,6 +306,9 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					}
 					
 					IRemoteServices remoteServices = executionProvider.getRemoteServices();
+					if(!remoteServices.isInitialized()) {
+						remoteServices.initialize();
+					}
 					
 					if (remoteServices == null)
 						return false;
