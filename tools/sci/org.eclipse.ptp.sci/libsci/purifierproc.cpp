@@ -68,6 +68,16 @@ PurifierProcessor::~PurifierProcessor()
         delete filterList;
 }
 
+RoutingList * PurifierProcessor::getRoutingList()
+{
+    return routingList;
+}
+
+FilterList * PurifierProcessor::getFilterList()
+{
+    return filterList;
+}
+
 Message * PurifierProcessor::read()
 {
     Message *msg = NULL;

@@ -317,9 +317,30 @@ void CtrlBlock::setObserver(Observer *ob)
     observer = ob;
 }
 
+extern void makeKey();
+PrivateData * CtrlBlock::getPrivateData()
+{
+    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    if (!pData)
+    {
+        if (!purifierProc) {
+            EmbedAgent* agent = getAgent(handle);
+            if (!agent)
+                return NULL;
+            agent->registPrivateData();
+        } else {
+            pData = new PrivateData(purifierProc->getRoutingList(), purifierProc->getFilterList(), NULL);
+            int rc = pthread_once(&(Thread::once), makeKey);
+            rc = pthread_setspecific(Thread::key, pData);
+        }
+        pData = (PrivateData *)pthread_getspecific(Thread::key);
+    }
+    return pData;
+}
+
 Topology * CtrlBlock::getTopology() 
 { 
-    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    PrivateData *pData = getPrivateData();
     return pData->getRoutingList()->getTopology();
 }
 
@@ -409,19 +430,19 @@ MessageQueue * CtrlBlock::getUpQueue()
 
 RouterProcessor * CtrlBlock::getRouterProcessor() 
 {
-    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    PrivateData *pData = getPrivateData();
     return pData->getRouterProcessor();
 }
         
 FilterProcessor * CtrlBlock::getFilterProcessor() 
 {
-    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    PrivateData *pData = getPrivateData();
     return pData->getFilterProcessor();
 }
 
 FilterList * CtrlBlock::getFilterList() 
 {
-    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    PrivateData *pData = getPrivateData();
     return pData->getFilterList();
 }
 
@@ -442,7 +463,7 @@ long long CtrlBlock::getFlowctlThreshold()
 
 RoutingList * CtrlBlock::getRoutingList()
 {
-    PrivateData *pData = (PrivateData *)pthread_getspecific(Thread::key);
+    PrivateData *pData = getPrivateData();
     return pData->getRoutingList();
 }
 
