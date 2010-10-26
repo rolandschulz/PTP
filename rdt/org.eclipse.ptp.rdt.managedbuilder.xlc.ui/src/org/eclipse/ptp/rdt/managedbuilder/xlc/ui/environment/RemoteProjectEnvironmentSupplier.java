@@ -110,9 +110,16 @@ public class RemoteProjectEnvironmentSupplier implements
 
 				IRemoteServices remoteServices = executionProvider
 						.getRemoteServices();
+				if(!remoteServices.isInitialized()) {
+					remoteServices.initialize();
+				}
 
 				IRemoteConnection connection = executionProvider
 						.getConnection();
+				
+				if(connection == null) {
+					return remoteEnvMap;
+				}
 
 				if (!connection.isOpen()) {
 					try {
@@ -127,7 +134,9 @@ public class RemoteProjectEnvironmentSupplier implements
 				IRemoteProcessBuilder processBuilder = remoteServices
 						.getProcessBuilder(connection, command);
 
-				remoteEnvMap = processBuilder.environment();
+				if(processBuilder != null) {
+					remoteEnvMap = processBuilder.environment();
+				}
 
 			}
 		} catch (ProjectNotConfiguredException e) {
