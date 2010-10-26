@@ -21,6 +21,10 @@ package org.eclipse.ptp.internal.rdt.core.index;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
@@ -33,12 +37,14 @@ import org.eclipse.cdt.core.dom.ast.IEnumerator;
 import org.eclipse.cdt.core.dom.ast.IField;
 import org.eclipse.cdt.core.dom.ast.ITypedef;
 import org.eclipse.cdt.core.dom.ast.IVariable;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassSpecialization;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassTemplate;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassType;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPFunction;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPFunctionTemplate;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPMethod;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPNamespace;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateInstance;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPTemplateParameter;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexBinding;
@@ -55,6 +61,7 @@ import org.eclipse.cdt.core.model.IInclude;
 import org.eclipse.cdt.core.model.ISourceRange;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.core.model.ITranslationUnit;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.ICPPInstanceCache;
 import org.eclipse.cdt.internal.core.index.IndexFileLocation;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -443,5 +450,46 @@ public class IndexQueries {
 		int options= ITranslationUnit.AST_SKIP_INDEXED_HEADERS;
 		IASTTranslationUnit ast = workingCopy.getAST(index, options);
 		return ast.getNodeSelector(null).findEnclosingName(selectionStart, selectionLength);
+	}
+	
+	/**
+	 * Searches for all specializations that depend on the definition of the given binding.
+	 */
+	public static List<? extends IBinding> findSpecializations(IBinding binding) throws CoreException {
+		List<IBinding> result= null;
+
+		IBinding owner = binding.getOwner();
+		if (owner != null) {
+			List<? extends IBinding> specializedOwners= findSpecializations(owner);
+			if (!specializedOwners.isEmpty()) {
+				result= new ArrayList<IBinding>(specializedOwners.size());
+
+				for (IBinding specOwner : specializedOwners) {
+					if (specOwner instanceof ICPPClassSpecialization) {
+						result.add(((ICPPClassSpecialization) specOwner).specializeMember(binding));
+					}
+				}
+			}
+		}
+		
+		if (binding instanceof ICPPInstanceCache) {
+			final List<ICPPTemplateInstance> instances= Arrays.asList(((ICPPInstanceCache) binding).getAllInstances());
+			if (!instances.isEmpty()) {
+				if (result == null)
+					result= new ArrayList<IBinding>(instances.size());
+
+
+				for (ICPPTemplateInstance inst : instances) {
+					if (!IndexFilter.ALL_DECLARED.acceptBinding(inst)) {
+						result.add(inst);
+					}
+				}
+			}
+		}
+		
+		if (result != null) {
+			return result;
+		}
+		return Collections.emptyList();
 	}
 }
