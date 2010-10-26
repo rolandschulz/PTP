@@ -55,6 +55,10 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	private IRemoteConnection fRemoteConnection = null;
 
 	private static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
+		if(!remoteServices.isInitialized()) {
+			remoteServices.initialize();
+		}
+		
 		if (remoteServices == null || connection == null) {
 			return null;
 		}
@@ -111,6 +115,9 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		if (fRemoteConnection == null && getRemoteConnectionName() != null) {
 			IRemoteServices services = getRemoteServices();
 			if (services != null) {
+				if(!services.isInitialized()) {
+					services.initialize();
+				}
 				IRemoteConnectionManager manager = services.getConnectionManager();
 				if (manager != null) {
 					fRemoteConnection = manager.getConnection(getRemoteConnectionName());
