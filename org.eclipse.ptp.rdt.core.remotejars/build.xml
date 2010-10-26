@@ -45,6 +45,9 @@
 	<!-- CDT VERSIONS MUST BE UPDATED FOR NEW CDT VERSION -->
 	<property name="cdtVersion" value="201010220808"/>
 	
+	<!-- CDT branch need to be added for PTP maintenance builds -->
+	<property name="cdtBranch" value=""/>
+	
 	<property name="cdtCoreVersion" value="5.3.0.${cdtVersion}"/>
 	<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
 	
@@ -168,7 +171,7 @@
 		<!--Get cdt.core source from CVS-->
         <cvs cvsroot=":pserver:anonymous@dev.eclipse.org:/cvsroot/tools"
                 package="org.eclipse.cdt/all/org.eclipse.cdt.core"
-                command="checkout -d org.eclipse.cdt.core"
+                command="checkout -d org.eclipse.cdt.core${cdtBranch}"
                 dest="${basedir}/.."
         />
 		<!--Get cdt.core bin from PTP build-->
