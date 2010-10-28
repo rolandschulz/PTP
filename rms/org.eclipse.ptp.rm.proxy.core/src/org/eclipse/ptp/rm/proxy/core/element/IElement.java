@@ -7,13 +7,16 @@
  *
  * Contributors:
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
-
+ *    Benjamin Lindner (ben@benlabs.net) - Attribute Definitions and Mapping (bug 316671)
+ 
  *******************************************************************************/
 
 package org.eclipse.ptp.rm.proxy.core.element;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+
 
 /**
  * The Interface IElement.
@@ -30,6 +33,14 @@ public interface IElement {
 	 * The Class UnknownValueExecption.
 	 */
 	public class UnknownValueExecption extends Exception {
+
+		String error_value;
+		/**
+		 * @since 2.0
+		 */
+		public UnknownValueExecption(String val) {
+			error_value=val;
+		}
 
 		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -6387499727989362192L;
@@ -90,8 +101,9 @@ public interface IElement {
 	 *            the value
 	 * @throws UnknownValueExecption
 	 *             the unknown value execption
+	 * @since 2.0
 	 */
-	public void setAttribute(String key, String value)
+	public void setAttribute(String key, String value,Boolean NotValidError)
 			throws UnknownValueExecption;
 
 	public void setAttributes(IElement element);
@@ -111,5 +123,10 @@ public interface IElement {
 	 * @return the collection
 	 */
 	public Collection<String> toStringArray();
+
+	/**
+	 * @since 2.0
+	 */
+	public Collection<String> toStringArrayMap(List<List<Object>> KeyMap,List<List<Object>> ValueMap,boolean preserve);
 
 }

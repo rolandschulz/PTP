@@ -9,16 +9,33 @@
  *                    This is the second version of this data structure
  *                    (05/11/2010)
  ******************************************************************************/
+
+ /*******************************************************************************
+  * Copyright (c) 2010 The University of Tennessee,
+  * All rights reserved. This program and the accompanying materials
+  * are made available under the terms of the Eclipse Public License v1.0
+  * which accompanies this distribution, and is available at
+  * http://www.eclipse.org/legal/epl-v10.html
+  *
+  * Contributors:
+ *    Benjamin Lindner (ben@benlabs.net) - Attribute Definitions and Mapping (bug 316671)
+ 
+  *******************************************************************************/
+
 package org.eclipse.ptp.rm.pbs.ui.data;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -39,7 +56,7 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.rm.pbs.core.attributes.PBSJobAttributes;
+import org.eclipse.ptp.rm.pbs.core.parser.AttributeDefinitionReader;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
@@ -70,16 +87,16 @@ public class PBSBatchScriptTemplate {
 	private static final String TAG_CHGDIR = Messages.PBSBatchScriptTemplate_chdirTag;
 	private static final String TAG_ENV = Messages.PBSBatchScriptTemplate_envTag;
 	private static final String TAG_EXECMD = Messages.PBSBatchScriptTemplate_execTag;
-	private static final String TAG_EXPORT_ENV = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_5;
+	private static final String TAG_EXPORT_ENV = Messages.PBSJobAttributeName_5;
 	private static final String TAG_INTERNAL = Messages.PBSAttributeInternalExtension;
-	private static final String TAG_MPICMD = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_39;
-	private static final String TAG_MPIOPT = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_37;
-	private static final String TAG_NCPUS = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_23;
-	private static final String TAG_NODES = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_25;
+	private static final String TAG_MPICMD = Messages.PBSJobAttributeName_39;
+	private static final String TAG_MPIOPT = Messages.PBSJobAttributeName_37;
+	private static final String TAG_NCPUS = Messages.PBSJobAttributeName_23;
+	private static final String TAG_NODES = Messages.PBSJobAttributeName_25;
 	private static final String TAG_PRARGS = Messages.PBSBatchScriptTemplate_prargsTag;
-	private static final String TAG_PRECMD = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_40;
-	private static final String TAG_PSTCMD = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_41;
-	private static final String TAG_SCRIPT = org.eclipse.ptp.rm.pbs.core.messages.Messages.PBSJobAttributeName_38;
+	private static final String TAG_PRECMD = Messages.PBSJobAttributeName_40;
+	private static final String TAG_PSTCMD = Messages.PBSJobAttributeName_41;
+	private static final String TAG_SCRIPT = Messages.PBSJobAttributeName_38;
 
 	private ILaunchConfiguration configuration;
 	private final Map<String, AttributePlaceholder> internalAttributes;
@@ -87,12 +104,39 @@ public class PBSBatchScriptTemplate {
 	private final Map<String, AttributePlaceholder> pbsJobAttributes;
 	private final StringBuffer text;
 	private Properties toolTips;
-
+	
+	private Map<String, IAttributeDefinition<?,?,?>>  AttributeDefinitionMap;
+	
 	public PBSBatchScriptTemplate() {
 		pbsJobAttributes = new TreeMap<String, AttributePlaceholder>();
 		internalAttributes = new TreeMap<String, AttributePlaceholder>();
 		text = new StringBuffer();
 		loadToolTips();
+		String USER_DIR_KEY = "user.dir";
+		String currentDir = System.getProperty(USER_DIR_KEY);
+
+		System.out.println("Working Directory: " + currentDir);
+			FileInputStream AttributeDefinitionStream = null;
+			try {
+				AttributeDefinitionStream = new FileInputStream("org.eclipse.ptp.rm.pbs.core/PBSAttributes/Definitions.txt");
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			List<IAttributeDefinition<?, ?, ?>> AttributeDefinitions = new ArrayList<IAttributeDefinition<?, ?, ?>>();
+			try {
+				AttributeDefinitions = AttributeDefinitionReader.parse(AttributeDefinitionStream);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+
+		for (IAttributeDefinition<?,?,?> attr : AttributeDefinitions) {
+			AttributeDefinitionMap.put(attr.getId(), attr);
+		}
 	}
 
 	/**
@@ -117,7 +161,8 @@ public class PBSBatchScriptTemplate {
 	 * @throws IllegalValueException
 	 */
 	public IAttribute<?, ?, ?> createScriptAttribute() throws IllegalValueException, CoreException {
-		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
+		//Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
+		Map<String, IAttributeDefinition<?, ?, ?>> defs = AttributeDefinitionMap;
 		IAttributeDefinition<?, ?, ?> def = defs.get(TAG_SCRIPT);
 		IAttribute<?, ?, ?> attr = def.create();
 		String value = denormalize(realize());
@@ -167,7 +212,8 @@ public class PBSBatchScriptTemplate {
 	 */
 	public void load(InputStream input) throws Throwable {
 		clearAll();
-		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
+		//Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
+		Map<String, IAttributeDefinition<?, ?, ?>> defs = AttributeDefinitionMap;
 		BufferedReader br = null;
 		String line = null;
 		AttributePlaceholder ap = null;
@@ -330,7 +376,8 @@ public class PBSBatchScriptTemplate {
 	public void setMPIAttributes(String command) throws IllegalValueException {
 		AttributePlaceholder mpiExec = internalAttributes.get(TAG_MPICMD);
 		AttributePlaceholder mpiOpt = internalAttributes.get(TAG_MPIOPT);
-		Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
+		//Map<String, IAttributeDefinition<?, ?, ?>> defs = PBSJobAttributes.getAttributeDefinitionMap();
+		Map<String, IAttributeDefinition<?, ?, ?>> defs = AttributeDefinitionMap;
 		if (mpiExec == null) {
 			mpiExec = ConfigUtils.getAttributePlaceholder(TAG_MPICMD, ConfigUtils.EMPTY_STRING,
 					Messages.PBSAttributeInternalExtension, defs);

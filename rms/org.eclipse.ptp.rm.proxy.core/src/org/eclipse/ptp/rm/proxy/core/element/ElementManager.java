@@ -7,8 +7,10 @@
  *
  * Contributors:
  *    Roland Schulz - initial implementation
-
+ *    Benjamin Lindner (ben@benlabs.net) - Attribute Definitions and Mapping (bug 316671)
+ 
  *******************************************************************************/
+
 package org.eclipse.ptp.rm.proxy.core.element;
 
 import java.util.ArrayList;
@@ -258,12 +260,30 @@ public class ElementManager {
 		return eventArgs;
 	}
 
+	/**
+	 * @since 2.0
+	 */
+	public List<String> serialize(List<List<Object>> ProtocolKeyMap,List<List<Object>> ProtocolValueMap) {
+		List<String> eventArgs = new ArrayList<String>();
+		// create the Args for one sendEvent (all Element Arguments with the
+		// same parent)
+		eventArgs.add(new Integer(size()).toString());// Number of Elements
+		for (IElement element : getElements()) {
+			// last bool = true: preserve original Attributes, i.e. clone the entries w/ a different key/value
+			eventArgs.addAll(element.toStringArrayMap(ProtocolKeyMap,ProtocolValueMap,true)); // Convert Element
+		}
+		return eventArgs;
+	}
+
 	/*
 	 * Serialize into List of List of Strings. The inner List contains all
 	 * Elements with the same parent In the Format: ParentKey, NumberOfElements,
 	 * Elements The outer List are these Lists for all different parents
 	 */
-	public List<List<String>> serializeSplittedByParent() {
+	/**
+	 * @since 2.0
+	 */
+	public List<List<String>> serializeSplittedByParent(List<List<Object>> ProtocolKeyMap,List<List<Object>> ProtocolValueMap) {
 		List<List<String>> result = new ArrayList<List<String>>();
 
 		// first split by Parent
@@ -277,7 +297,7 @@ public class ElementManager {
 			List<String> eventArgs = new ArrayList<String>();
 			eventArgs.add(parentKey); // This is the key not the ID (has to be
 										// changed before sending)
-			eventArgs.addAll(elements.serialize());
+			eventArgs.addAll(elements.serialize(ProtocolKeyMap,ProtocolValueMap));
 			result.add(eventArgs);
 		}
 		return result;

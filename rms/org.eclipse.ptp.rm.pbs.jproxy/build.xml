@@ -17,10 +17,13 @@
 		<jar destfile="../org.eclipse.ptp.rm.pbs.core/pbs_proxy.jar">
 			<manifest>
                 <attribute name="Main-Class" value="org.eclipse.ptp.rm.pbs.jproxy.PBSProxyRuntimeServer"/>
-                <attribute name="Class-Path" value="."/>
+				<attribute name="Class-Path" value="."/>
+				
 			</manifest>
             <zipfileset src="${jar-with-dependencies}"/>
 			<fileset file="about.html"/>
+			<fileset dir="../org.eclipse.ptp.rm.pbs.core"><include name="PBSAttributes/**"></include></fileset>
+			
 		</jar>
 		<delete file="${jar-with-dependencies}"/>
 	</target>

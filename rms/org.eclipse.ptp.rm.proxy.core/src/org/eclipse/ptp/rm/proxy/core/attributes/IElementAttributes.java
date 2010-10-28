@@ -7,7 +7,8 @@
  *
  * Contributors:
  *    Roland Schulz - initial implementation
-
+ *    Benjamin Lindner (ben@benlabs.net) - Attribute Definitions and Mapping (bug 316671)
+ 
  *******************************************************************************/
 
 package org.eclipse.ptp.rm.proxy.core.attributes;
@@ -96,13 +97,5 @@ public interface IElementAttributes {
 	 * @return the value map
 	 */
 	public abstract Map<String, DefaultValueMap<String, String>> getValueMap();
-
-	/* Map between xml-tag (key) and communication protocol keyword (value) */
-	/**
-	 * Gets the xmltag attribute i d_ map.
-	 * 
-	 * @return the xmltag attribute i d_ map
-	 */
-	public abstract Map<String, String> getXmltagAttributeID_Map();
-
+	
 }

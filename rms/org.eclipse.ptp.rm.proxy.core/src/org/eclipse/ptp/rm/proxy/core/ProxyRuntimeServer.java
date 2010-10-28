@@ -1,23 +1,22 @@
-/*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - Initial API and implementation
- *     Dieter Krachtus, University of Heidelberg
- *     Roland Schulz, University of Tennessee
- *******************************************************************************/
+ /*******************************************************************************
+  * Copyright (c) 2010 The University of Tennessee,
+  * All rights reserved. This program and the accompanying materials
+  * are made available under the terms of the Eclipse Public License v1.0
+  * which accompanies this distribution, and is available at
+  * http://www.eclipse.org/legal/epl-v10.html
+  *
+  * Contributors:
+  *    Benjamin Lindner (ben@benlabs.net) - initial implementation (bug 316671)
 
-package org.eclipse.ptp.proxy.runtime.server;
+  *******************************************************************************/
+
+package org.eclipse.ptp.rm.proxy.core;
+
 
 import java.io.IOException;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.List;
 
 import org.eclipse.ptp.proxy.command.IProxyCommand;
-import org.eclipse.ptp.proxy.command.IProxyCommandListener;
 import org.eclipse.ptp.proxy.command.IProxyQuitCommand;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeInitCommand;
@@ -25,95 +24,30 @@ import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeModelDefCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeStartEventsCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeSubmitJobCommand;
 import org.eclipse.ptp.proxy.runtime.command.IProxyRuntimeTerminateJobCommand;
-import org.eclipse.ptp.proxy.runtime.command.ProxyRuntimeCommandFactory;
 import org.eclipse.ptp.proxy.runtime.event.IProxyRuntimeEventFactory;
-import org.eclipse.ptp.proxy.server.AbstractProxyServer;
+import org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer;
+import org.eclipse.ptp.proxy.runtime.server.ElementIDGenerator;
 
-public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer implements IProxyCommandListener {
+import org.eclipse.ptp.core.attributes.*;
 
-	/*
-	 * Event queue for incoming events.
-	 */
-	/**
-	 * @since 5.0
-	 */
-	protected final LinkedBlockingQueue<IProxyCommand> fCommands = new LinkedBlockingQueue<IProxyCommand>();
 
-	/**
-	 * @since 4.0
-	 */
-	protected final IProxyRuntimeEventFactory fEventFactory;
+/**
+ * @since 2.0
+ */
+abstract public class ProxyRuntimeServer extends AbstractProxyRuntimeServer {
 
-	/**
-	 * @since 4.0
-	 */
-	public int fEventLoopTransID;
-
-	/**
-	 * @since 4.0
-	 */
-	protected Thread fEventThread;
-
-	/**
-	 * @since 4.0
-	 */
-	protected Thread eventThread;
-
-	/**
-	 * @param host
-	 * @param port
-	 * @since 4.0
-	 */
-	public AbstractProxyRuntimeServer(String host, int port, IProxyRuntimeEventFactory eventFactory) {
-		super(host, port, new ProxyRuntimeCommandFactory());
-		fEventFactory = eventFactory;
-		addListener(this);
+	public ProxyRuntimeServer(String host, int port,
+			IProxyRuntimeEventFactory eventFactory) {
+		super(host, port, eventFactory);
+		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @return
-	 * @since 4.0
-	 */
-	protected IProxyRuntimeEventFactory getEventFactory() {
-		return fEventFactory;
-	}
-
-	/**
-	 * @return
-	 * @since 4.0
-	 */
-	protected Thread getEventThread() {
-		return fEventThread;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.proxy.command.IProxyCommandListener#handleCommand(org
-	 * .eclipse.ptp.proxy.command.IProxyCommand)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void handleCommand(IProxyCommand c) {
-		fCommands.add(c);
-	}
-
-	/*
-	 * Initialize server. Throws exception if any of the requirements for the
-	 * server is not fullfilled.
-	 */
-	/**
-	 * @since 4.0
-	 */
-	protected abstract void initServer() throws Exception;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.proxy.server.AbstractProxyServer#runStateMachine()
-	 */
+	// this routine has to be implemented and is called during the DISCOVERY phase:
+	//abstract protected Map<String, IAttributeDefinition<?, ?, ?>> detectAttributes();
+	abstract protected List<IAttributeDefinition<?, ?, ?>> detectAttributeDefinitions();
+	
+	// this routine is overwritten to allow for the checkEnvironment and 
+	// detectdAttributes functionality
 	@Override
 	protected void runStateMachine() throws InterruptedException, IOException {
 		while (state != ServerState.SHUTDOWN) {
@@ -128,8 +62,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				// instead of getting the base_ID the hard way, rather implement
 				// a getBase_ID method in IProxyRuntimeInitCommand.
 				int base_ID = Integer.parseInt(command.getArguments()[1].split("=")[1]); //$NON-NLS-1$
-				ElementIDGenerator.getInstance().setBaseID(base_ID); /* initialization */
-
+				ElementIDGenerator.getInstance().setBaseID(base_ID);
 				transID = command.getTransactionID();
 				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (command instanceof IProxyRuntimeInitCommand) {
@@ -147,12 +80,23 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				} else {
 					System.err.println("unexpected command (INIT): " + command); //$NON-NLS-1$
 				}
-
+				
 				break;
 			case DISCOVERY:
 				command = fCommands.take();
 				transID = command.getTransactionID();
-				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$			
+
+				// detect Attributes
+				List<IAttributeDefinition<?,?,?>> attrDefList = detectAttributeDefinitions();
+				//iterate through attributes and send them to the client
+				for( IAttributeDefinition<?,?,?> attrDef : attrDefList ) {
+					AttributeDefinitionSerializer ads = new AttributeDefinitionSerializer(attrDef);
+					//System.err.println(ads.str()); 
+					event = fEventFactory.newProxyRuntimeAttributeDefEvent(transID, ads.strList());
+					sendEvent(event);
+				}
+				
 				if (command instanceof IProxyRuntimeModelDefCommand) {
 					event = fEventFactory.newOKEvent(transID);
 					sendEvent(event);
@@ -189,35 +133,8 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				}
 				// state = ServerState.NORMAL;
 				break;
-			case SHUTDOWN:
-				break;
-			case SUSPENDED:
-				break;
 			}
 		}
 	}
 
-	/**
-	 * @param thread
-	 * @since 4.0
-	 */
-	protected void setEventThread(Thread thread) {
-		fEventThread = thread;
-	}
-
-	/**
-	 * @param transID
-	 * @since 4.0
-	 */
-	protected abstract void startEventThread(int transID);
-
-	/**
-	 * @since 4.0
-	 */
-	protected abstract void submitJob(int transID, String[] arguments);
-
-	/**
-	 * @since 4.0
-	 */
-	protected abstract void terminateJob(int transID, String[] arguments);
 }
