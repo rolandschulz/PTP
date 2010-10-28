@@ -87,7 +87,48 @@ public class Messages extends NLS {
 	public static String PBSRMLaunchConfigTemplate_message;
 	public static String PBSRMLaunchConfigTemplate_title;
 	public static String PBSRMLaunchConfigViewScript_title;
-
+	
+	public static String PBSJobAttributeName_10;
+	public static String PBSJobAttributeName_11;
+	public static String PBSJobAttributeName_12;
+	public static String PBSJobAttributeName_13;
+	public static String PBSJobAttributeName_14;
+	public static String PBSJobAttributeName_15;
+	public static String PBSJobAttributeName_16;
+	public static String PBSJobAttributeName_17;
+	public static String PBSJobAttributeName_18;
+	public static String PBSJobAttributeName_19;
+	public static String PBSJobAttributeName_2;
+	public static String PBSJobAttributeName_20;
+	public static String PBSJobAttributeName_21;
+	public static String PBSJobAttributeName_22;
+	public static String PBSJobAttributeName_23;
+	public static String PBSJobAttributeName_24;
+	public static String PBSJobAttributeName_25;
+	public static String PBSJobAttributeName_26;
+	public static String PBSJobAttributeName_27;
+	public static String PBSJobAttributeName_28;
+	public static String PBSJobAttributeName_29;
+	public static String PBSJobAttributeName_3;
+	public static String PBSJobAttributeName_30;
+	public static String PBSJobAttributeName_31;
+	public static String PBSJobAttributeName_32;
+	public static String PBSJobAttributeName_33;
+	public static String PBSJobAttributeName_34;
+	public static String PBSJobAttributeName_35;
+	public static String PBSJobAttributeName_36;
+	public static String PBSJobAttributeName_37;
+	public static String PBSJobAttributeName_38;
+	public static String PBSJobAttributeName_39;
+	public static String PBSJobAttributeName_4;
+	public static String PBSJobAttributeName_40;
+	public static String PBSJobAttributeName_41;
+	public static String PBSJobAttributeName_5;
+	public static String PBSJobAttributeName_6;
+	public static String PBSJobAttributeName_7;
+	public static String PBSJobAttributeName_8;
+	public static String PBSJobAttributeName_9;
+	
 	public static String PBSRMLaunchDataSource_ValueNotSet;
 
 	public static String PBSServiceProvider_defaultTemplateName;

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
- *    Benjamin Lindner (ben@benlabs.net)
+ *    Benjamin Lindner (ben@benlabs.net) - initial implementation 
 
  *******************************************************************************/
 
@@ -20,11 +20,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.rm.proxy.core.element.ProxyModelElement;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.element.IElement.UnknownValueExecption;
 import org.eclipse.ptp.rm.proxy.core.parser.IParser;
@@ -38,7 +41,7 @@ public class QstatQueuesReader implements IParser {
 	/** The queues. */
 	private Set<IElement> queues;
 
-	private void _parse(InputStream in, AttributeDefinition attrDef)
+	private void _parse(List<String> requiredAttributeKeys,List<IAttributeDefinition<?,?,?>> AttributeDefinitions, List<List<Object>> ParserKeyMap,List<List<Object>> ParserValueMap , InputStream in,String keyID,String parentkeyID)
 			throws IOException, UnknownValueExecption {
 		queues = new HashSet<IElement>();
 
@@ -75,7 +78,7 @@ public class QstatQueuesReader implements IParser {
 			if (mkv.groupCount() != 2) {
 				continue;
 			}
-			String skey = mkv.group(1).trim().toLowerCase();
+			String skey = mkv.group(1).trim();
 			String svalue = mkv.group(2).trim();
 
 			thisqueue.put(skey, svalue);
@@ -83,13 +86,42 @@ public class QstatQueuesReader implements IParser {
 		if (!firstqueue) {
 			qhashes.add(thisqueue);
 		}
-
+				
 		// now convert the hashmap representation into beans
 		for (HashMap<String, String> q : qhashes) {
-			IElement e = attrDef.createElement();
-			for (String attr : attrDef.getRequiredAttributes()) {
-				e.setAttribute(attr, q.get(attr));
-			}
+			IElement e = new ProxyModelElement(requiredAttributeKeys,AttributeDefinitions,keyID,parentkeyID);
+				for (Entry<String,String> entry : q.entrySet()) {
+					// save keys as lower case! (by convention)
+					// then when matching they will be matched against the lower case of the corresponding ParserKeyMap entry
+					String newkey = entry.getKey();
+					String newvalue = entry.getValue();
+					String k = newkey;
+					String v = newvalue;
+					boolean keymatched = false;
+					
+					for (List<Object> ke : ParserKeyMap) {
+						Pattern kp = (Pattern) ke.get(0);
+						if (kp.matcher(k).matches()) {
+							newkey = (String) ke.get(1);
+							keymatched = true;
+							break;
+						}
+					}
+
+					for (List<Object> ve : ParserValueMap) {
+						Pattern kp = (Pattern) ve.get(0);
+						Pattern vp = (Pattern) ve.get(1);
+
+						if (kp.matcher(k).matches() && vp.matcher(v).matches()) {
+							newvalue = (String) ve.get(2);	
+							break;
+						}
+					}
+		
+//					System.err.println("trying to set: "+ newkey + " :: " + newvalue); 
+					if (keymatched) e.setAttribute(newkey, newvalue,false);
+				}
+			
 			// for (Entry<String, String> entry : q.entrySet()) {
 			// e.setAttribute(entry.getKey(), entry.getValue());
 			// }
@@ -108,10 +140,10 @@ public class QstatQueuesReader implements IParser {
 	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
 	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
 	 */
-	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) throws IOException, UnknownValueExecption  {
+	public Set<IElement> parse(List<String> requiredAttributeKeys,List<IAttributeDefinition<?,?,?>> AttributeDefinitions, List<List<Object>> ParserKeyMap,List<List<Object>> ParserValueMap , InputStream in,String keyID,String parentkeyID) throws IOException, UnknownValueExecption  {
 		Set<IElement> queues = new HashSet<IElement>();
 		// qstat -Q -f is not XML - specific Reader has to be used.
-		_parse(in, attrDef);
+		_parse(requiredAttributeKeys,AttributeDefinitions,ParserKeyMap,ParserValueMap,in, keyID,parentkeyID);
 		queues = getQueues();
 
 		// System.err.println("queues length -> " + queues.size());

@@ -7,7 +7,8 @@
  *
  * Contributors:
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
-
+ *    Benjamin Lindner (ben@benlabs.net) - Attribute Definitions and Mapping (bug 316671)
+ *    
  *******************************************************************************/
 
 package org.eclipse.ptp.rm.pbs.jproxy;
@@ -17,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,25 +29,28 @@ import java.util.regex.Pattern;
 import org.eclipse.ptp.proxy.event.IProxyEvent;
 import org.eclipse.ptp.proxy.event.IProxyMessageEvent.Level;
 import org.eclipse.ptp.proxy.runtime.event.ProxyRuntimeEventFactory;
-import org.eclipse.ptp.proxy.runtime.server.AbstractProxyRuntimeServer;
 import org.eclipse.ptp.proxy.runtime.server.ElementIDGenerator;
-import org.eclipse.ptp.rm.pbs.core.attributes.proxy.PBSJobClientAttributes;
-import org.eclipse.ptp.rm.pbs.core.attributes.proxy.PBSNodeClientAttributes;
-import org.eclipse.ptp.rm.pbs.core.attributes.proxy.PBSQueueClientAttributes;
+import org.eclipse.ptp.rm.pbs.core.parser.AttributeDefinitionReader;
+import org.eclipse.ptp.rm.pbs.core.parser.AttributeKeyMapReader;
+import org.eclipse.ptp.rm.pbs.core.parser.AttributeValueMapReader;
+import org.eclipse.ptp.rm.pbs.core.parser.RequiredAttributeKeyReader;
 import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatJobXMLReader;
 import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatQueuesReader;
 import org.eclipse.ptp.rm.proxy.core.Controller;
-import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.event.JobEventFactory;
 import org.eclipse.ptp.rm.proxy.core.event.NodeEventFactory;
 import org.eclipse.ptp.rm.proxy.core.event.QueueEventFactory;
 import org.eclipse.ptp.rm.proxy.core.parser.XMLReader;
 
+import org.eclipse.ptp.rm.proxy.core.ProxyRuntimeServer;
+
+import org.eclipse.ptp.core.attributes.*;
+
 /**
  * Proxy for PBS.
  */
-public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
+public class PBSProxyRuntimeServer extends ProxyRuntimeServer {
 
 	private static final boolean debugReadFromFiles = false;
 	private static final String debugFolder =  "helics" + File.separator; //$NON-NLS-1$
@@ -100,7 +105,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 					int port = new Integer(args[i].substring(7));
 					argsMap.put("port", port); //$NON-NLS-1$
 				} catch (NumberFormatException e) {
-					System.err.println(org.eclipse.ptp.proxy.messages.Messages.getString("AbstractProxyRuntimeServer_0") //$NON-NLS-1$
+					System.err.println(org.eclipse.ptp.rm.pbs.jproxy.Messages.getString("AbstractProxyRuntimeServer_0") //$NON-NLS-1$
 							+ args[i + 1].substring(7));
 				}
 			} else if (args[i].startsWith("--host")) { //$NON-NLS-1$
@@ -126,18 +131,15 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		super(host, port, new ProxyRuntimeEventFactory());
 
 		nodeController = new Controller("pbsnodes -x", // command //$NON-NLS-1$
-				new AttributeDefinition(new PBSNodeClientAttributes()), // attributes.
 				// TODO: should include a flag whether mandatory.
 				new NodeEventFactory(), new XMLReader() // Parser
 		);
-
+		
 		queueController = new Controller("qstat -Q -f -1", // command //$NON-NLS-1$
-				new AttributeDefinition(new PBSQueueClientAttributes()), // attributes
 				new QueueEventFactory(), new QstatQueuesReader() // Parser
 		);
 
 		jobController = new Controller("qstat -x", // command //$NON-NLS-1$
-				new AttributeDefinition(new PBSJobClientAttributes()), // attributes
 				new JobEventFactory(), new QstatJobXMLReader(), // Parser
 				queueController // Parent
 		);
@@ -199,12 +201,123 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 				}
 			}
 		};
+		
+		// initialize Controllers:
+		// Attribute Defintions
+		InputStream AttrDefFile = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Definitions.txt");
+		if (AttrDefFile==null) {
+			System.err.println("Unable to locate PBSAttributes/Definitions.txt");
+			throw new Exception();
+		}
+		List<IAttributeDefinition<?,?,?>> AttributeDefinitions = AttributeDefinitionReader.parse(AttrDefFile);
+		nodeController.setAttributeDefinitions(AttributeDefinitions);
+		queueController.setAttributeDefinitions(AttributeDefinitions);
+		jobController.setAttributeDefinitions(AttributeDefinitions);
+
+
+		// Required PBS Keys for an entry to be complete
+		InputStream nodeParserRequiredKeyStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/RequiredPBSKeys-node.txt");
+		InputStream queueParserRequiredKeyStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/RequiredPBSKeys-queue.txt");
+		InputStream jobParserRequiredKeyStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/RequiredPBSKeys-job.txt");
+		if (nodeParserRequiredKeyStream==null) {
+			System.err.println("Unable to locate PBSAttributes/RequiredPBSKeys-node.txt");
+			throw new Exception();
+		}
+		if (queueParserRequiredKeyStream==null) {
+			System.err.println("Unable to locate PBSAttributes/RequiredPBSKeys-queue.txt");
+			throw new Exception();
+		}
+		if (jobParserRequiredKeyStream==null) {
+			System.err.println("Unable to locate PBSAttributes/RequiredPBSKeys-job.txt");
+			throw new Exception();
+		}
+		
+		nodeController.setRequiredAttributeKeys(RequiredAttributeKeyReader.parse(nodeParserRequiredKeyStream));
+		queueController.setRequiredAttributeKeys(RequiredAttributeKeyReader.parse(queueParserRequiredKeyStream));
+		jobController.setRequiredAttributeKeys(RequiredAttributeKeyReader.parse(jobParserRequiredKeyStream));
+
+		// Parser2PBS KeyMap
+		InputStream nodeParserKeyMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Parser2PBS-KeyMap-node.txt");
+		InputStream queueParserKeyMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Parser2PBS-KeyMap-queue.txt");
+		InputStream jobParserKeyMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Parser2PBS-KeyMap-job.txt");
+		if (nodeParserKeyMapStream==null) {
+			System.err.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-node.txt");
+			throw new Exception();
+		}
+		if (queueParserKeyMapStream==null) {
+			System.err.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-queue.txt");
+			throw new Exception();
+		}
+		if (jobParserKeyMapStream==null) {
+			System.err.println("Unable to locate PBSAttributes/Parser2PBS-KeyMap-job.txt");
+			throw new Exception();
+		}
+		
+		nodeController.setParserKeyMap(AttributeKeyMapReader.parse(nodeParserKeyMapStream));
+		queueController.setParserKeyMap(AttributeKeyMapReader.parse(queueParserKeyMapStream));
+		jobController.setParserKeyMap(AttributeKeyMapReader.parse(jobParserKeyMapStream));
+
+		// Parser2PBS ValueMap
+		InputStream nodeParserValueMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Parser2PBS-ValueMap-node.txt");
+		InputStream queueParserValueMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Parser2PBS-ValueMap-queue.txt");
+		InputStream jobParserValueMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/Parser2PBS-ValueMap-job.txt");
+		if (nodeParserValueMapStream==null) {
+			System.err.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-node.txt");
+			throw new Exception();
+		}
+		if (queueParserValueMapStream==null) {
+			System.err.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-queue.txt");
+			throw new Exception();
+		}
+		if (jobParserValueMapStream==null) {
+			System.err.println("Unable to locate PBSAttributes/Parser2PBS-ValueMap-job.txt");
+			throw new Exception();
+		}
+
+		nodeController.setParserValueMap(AttributeValueMapReader.parse(nodeParserValueMapStream));
+		queueController.setParserValueMap(AttributeValueMapReader.parse(queueParserValueMapStream));
+		jobController.setParserValueMap(AttributeValueMapReader.parse(jobParserValueMapStream));
+
+		// PBS2Protocol KeyMap
+		InputStream ProtocolKeyMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/PBS2Protocol-KeyMap.txt");
+		List<List<Object>> ProtocolKeyMap = AttributeKeyMapReader.parse(ProtocolKeyMapStream);
+		if (ProtocolKeyMap==null) {
+			System.err.println("Unable to locate PBSAttributes/PBS2Protocol-KeyMap.txt");
+			throw new Exception();
+		}
+		nodeController.setProtocolKeyMap(ProtocolKeyMap);
+		queueController.setProtocolKeyMap(ProtocolKeyMap);
+		jobController.setProtocolKeyMap(ProtocolKeyMap);
+
+		// PBS2Protocol ValueMap
+		InputStream ProtocolValueMapStream = getClass().getClassLoader().getResourceAsStream("PBSAttributes/PBS2Protocol-ValueMap.txt");
+		List<List<Object>> ProtocolValueMap = AttributeValueMapReader.parse(ProtocolValueMapStream);
+		if (ProtocolValueMap==null) {
+			System.err.println("Unable to locate PBSAttributes/PBS2Protocol-ValueMap.txt");
+			throw new Exception();
+		}
+		nodeController.setProtocolValueMap(ProtocolValueMap);
+		queueController.setProtocolValueMap(ProtocolValueMap);
+		jobController.setProtocolValueMap(ProtocolValueMap);
+	
+		
+		// set key identifiers
+		nodeController.setElementKeyID("PBSNODE_NAME");
+		nodeController.setParentKeyID(null);
+
+		queueController.setElementKeyID("PBSQUEUE_NAME");
+		queueController.setParentKeyID(null);
+
+		jobController.setElementKeyID("PBSJOB_NAME");
+		jobController.setParentKeyID("PBSJOB_QUEUE");
+
 		nodeController.setErrorHandler(handler);
 		queueController.setErrorHandler(handler);
 		jobController.setErrorHandler(handler);
+
 		// Test whether all programs and parser work
-		nodeController.parse();
 		queueController.parse();
+		nodeController.parse();
 		jobController.parse();
 	}
 
@@ -260,7 +373,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		nodeController.setBaseID(machineID);
 		queueController.setBaseID(resourceManagerID);
 
-		jobController.setFilter("job_owner", Pattern.quote(getUser()) + "@.*"); //$NON-NLS-1$ //$NON-NLS-2$
+		jobController.setFilter("PBSJOB_OWNER", Pattern.quote(getUser()) + "@.*"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// TODO: the following could be moved to the abstract class.
 		if (eventThread == null) {
@@ -284,6 +397,7 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 								for (IProxyEvent e : events) {
 									e.setTransactionID(transID);
 									sendEvent(e);
+									System.err.println(e.toString());
 								}
 							} catch (IOException e1) {
 								e1.printStackTrace();
@@ -471,5 +585,21 @@ public class PBSProxyRuntimeServer extends AbstractProxyRuntimeServer {
 		// System.out.println("terminateJob: "+keyVal[1]);
 
 	}
+
+	@Override
+	protected List<IAttributeDefinition<?,?,?>> detectAttributeDefinitions() {
+		
+		// detect PBS specific attributes here 
+		// translate and add them for the attribute manager
+		List<IAttributeDefinition<?,?,?>> attrDefList = new ArrayList<IAttributeDefinition<?,?,?>>();
+
+		// query the controllers for a list of their assigned attributes
+		attrDefList.addAll(jobController.getAttributeDefinitions());
+		attrDefList.addAll(nodeController.getAttributeDefinitions());
+		attrDefList.addAll(queueController.getAttributeDefinitions());
+		
+		return attrDefList;
+	}
+		
 
 }

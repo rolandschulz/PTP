@@ -14,13 +14,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.proxy.protocol,
  org.eclipse.ptp.core,
  org.eclipse.ptp.remote.core,
- org.eclipse.ptp.rm.core,
- org.eclipse.ptp.rm.proxy.core
+ org.eclipse.ptp.rm.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.rm.pbs.core,
- org.eclipse.ptp.rm.pbs.core.attributes,
- org.eclipse.ptp.rm.pbs.core.attributes.proxy,
  org.eclipse.ptp.rm.pbs.core.messages;x-friends:="org.eclipse.ptp.rm.pbs.ui",
+ org.eclipse.ptp.rm.pbs.core.parser,
  org.eclipse.ptp.rm.pbs.core.rmsystem,
  org.eclipse.ptp.rm.pbs.core.rtsystem
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: com.ibm.icu.text;version="4.2.1.1"

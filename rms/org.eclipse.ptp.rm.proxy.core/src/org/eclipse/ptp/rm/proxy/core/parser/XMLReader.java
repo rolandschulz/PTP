@@ -7,7 +7,8 @@
  *
  * Contributors:
  *    Dieter Krachtus (dieter.krachtus@gmail.com) and Roland Schulz - initial API and implementation
-
+ *    Benjamin Lindner (ben@benlabs.net) - Attribute Definitions and Mapping (bug 316671)
+ 
  *******************************************************************************/
 
 package org.eclipse.ptp.rm.proxy.core.parser;
@@ -22,16 +23,20 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.ptp.rm.proxy.core.attributes.AttributeDefinition;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.element.IElement.UnknownValueExecption;
+import org.eclipse.ptp.rm.proxy.core.element.ProxyModelElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -144,7 +149,10 @@ public class XMLReader implements IParser {
 	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
 	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
 	 */
-	public Set<IElement> parse(AttributeDefinition attrDef, InputStream in) throws SAXException, IOException,
+	/**
+	 * @since 2.0
+	 */
+	public Set<IElement> parse(List<String> requiredAttributeKeys,List<IAttributeDefinition<?,?,?>> AttributeDefinitions,List<List<Object>> ParserKeyMap,List<List<Object>> ParserValueMap, InputStream in,String keyID,String parentkeyID) throws SAXException, IOException,
 	ParserConfigurationException, UnknownValueExecption {
 		// public <T extends IElement> Set<T> parse(Class<IElement> pojoClazz,
 		// InputStream in) {
@@ -156,7 +164,7 @@ public class XMLReader implements IParser {
 			Node node = xmlNodes.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Map<String, String> input = populateInput(node, null);
-				IElement element = populateElement(attrDef, input);
+				IElement element = populateElement(requiredAttributeKeys,AttributeDefinitions,ParserKeyMap,ParserValueMap, input,keyID,parentkeyID);
 				if (DEBUG) {
 					System.out.println(element);
 					System.out.println();
@@ -171,22 +179,41 @@ public class XMLReader implements IParser {
 		return elementList;
 	}
 
-	private IElement populateElement(AttributeDefinition attrDef, Map<String, String> input) throws UnknownValueExecption  {
-		IElement element = attrDef.createElement();
+	private IElement populateElement(List<String> requiredAttributeKeys,List<IAttributeDefinition<?,?,?>> AttributeDefinitions,List<List<Object>> ParserKeyMap,List<List<Object>> ParserValueMap, Map<String, String> input,String keyID,String parentkeyID) throws UnknownValueExecption  {
+		IElement element = new ProxyModelElement(requiredAttributeKeys,AttributeDefinitions,keyID,parentkeyID);
 
-		// PropertyDescriptor[] properties =
-		// Introspector.getBeanInfo(attrDef).getPropertyDescriptors();
-		// for (PropertyDescriptor property : properties) {
-		for (String attr : attrDef.getRequiredAttributes()) {
-			element.setAttribute(attr, input.get(attr));
-			// String name = property.getName();
-			// Method writeAccess = property.getWriteMethod();
-			// if (writeAccess != null &&
-			// !Modifier.isStatic(writeAccess.getModifiers())) {
-			// System.out.println(name + " <- " + input.get(name));
-			// writeAccess.invoke(pojo, new Object[]{input.get(name)});
-			// }
+		for (Entry<String,String> entry : input.entrySet()) {
+			// save keys as lower case! (by convention)
+			// then when matching they will be matched against the lower case of the corresponding ParserKeyMap entry
+			String newkey = entry.getKey();
+			String newvalue = entry.getValue();
+			String k = newkey;
+			String v = newvalue;
+			boolean keymatched = false;
+			
+			for (List<Object> ke : ParserKeyMap) {
+				Pattern kp = (Pattern) ke.get(0);
+				if (kp.matcher(k).matches()) {
+					newkey = (String) ke.get(1);
+					keymatched = true;
+					break;
+				}
+			}
+
+			for (List<Object> ve : ParserValueMap) {
+				Pattern kp = (Pattern) ve.get(0);
+				Pattern vp = (Pattern) ve.get(1);
+				
+				if (kp.matcher(k).matches() && vp.matcher(v).matches()) {
+					newvalue = (String) ve.get(2);	
+					break;
+				}
+			}
+				
+			//System.err.println("trying to set: "+ newkey + " :: " + newvalue); 
+			if (keymatched) element.setAttribute(newkey, newvalue,false);
 		}
+		
 		return element;
 	}
 
