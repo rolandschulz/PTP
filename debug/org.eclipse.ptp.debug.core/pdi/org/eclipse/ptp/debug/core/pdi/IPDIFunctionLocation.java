@@ -20,14 +20,15 @@ package org.eclipse.ptp.debug.core.pdi;
 
 /**
  * Represents function location in the debuggable program
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIFunctionLocation extends IPDIFileLocation {
 	/**
 	 * Returns the function of this location or null if the function is unknown
+	 * 
 	 * @return function name of this location
 	 */
-	String getFunction();
+	public String getFunction();
 }
-

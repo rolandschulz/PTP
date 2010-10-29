@@ -20,14 +20,16 @@ package org.eclipse.ptp.debug.core.pdi;
 
 /**
  * Represents file location
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIFileLocation extends IPDILocation {
 	/**
-	 * Returns the source file of this location or null if the source file is unknown
+	 * Returns the source file of this location or null if the source file is
+	 * unknown
+	 * 
 	 * @return the source file of this location
 	 */
-	String getFile();
+	public String getFile();
 }
-
