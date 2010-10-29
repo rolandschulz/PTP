@@ -903,7 +903,7 @@ EmptyArrayToAIF(int min, int size, AIF *btype)
 	AIF *	a;
 	int len = 0;
 
-	if (AIF_FORMAT(btype)[0] != FDS_CHAR_POINTER && size >= 0) {
+	if ((AIF_FORMAT(btype)[0] != FDS_CHAR_POINTER && AIF_FORMAT(btype)[0] != FDS_STRING) && size >= 0) {
 		len = size * AIFTypeSize(btype);
 	}
 
@@ -926,7 +926,7 @@ AIFAddArrayElement(AIF *a, int idx, AIF *el)
 	int	size;
 	int len = AIFTypeSize(el);
 
-	if (AIF_FORMAT(el)[0] == FDS_CHAR_POINTER) {
+	if (AIF_FORMAT(el)[0] != FDS_CHAR_POINTER && AIF_FORMAT(el)[0] != FDS_STRING) {
 		AIFAddComplexArrayElement(a, el);
 	} else {
 		min = FDSArrayMinIndex(AIF_FORMAT(a), 0);
