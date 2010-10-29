@@ -22,14 +22,15 @@ import java.math.BigInteger;
 
 /**
  * Represents the address location in the debuggable program
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIAddressLocation extends IPDILocation {
 	/**
 	 * Returns the address of this location or null if the address is unknown
+	 * 
 	 * @return the address of this location
 	 */
-	BigInteger getAddress();
+	public BigInteger getAddress();
 }
-

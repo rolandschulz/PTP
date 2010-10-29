@@ -20,15 +20,17 @@ package org.eclipse.ptp.debug.core.pdi;
 
 /**
  * Represents a location in the debuggable program
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDILocation {
 	/**
 	 * Determines whether the both locations is in the same place
-	 * @param locaiton another location to compare 
+	 * 
+	 * @param location
+	 *            another location to compare
 	 * @return true if both locations refer to the same place
 	 */
-	boolean equals(IPDILocation locaiton);
+	public boolean equals(IPDILocation locaiton);
 }
-

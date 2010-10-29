@@ -20,14 +20,16 @@ package org.eclipse.ptp.debug.core.pdi;
 
 /**
  * Represents line location in the debuggable program
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDILineLocation extends IPDIFileLocation {
 	/**
-	 * Return the line number of this location or 0 if the line number is unknown
+	 * Return the line number of this location or 0 if the line number is
+	 * unknown
+	 * 
 	 * @return line number of this location
 	 */
-	int getLineNumber();
+	public int getLineNumber();
 }
-
