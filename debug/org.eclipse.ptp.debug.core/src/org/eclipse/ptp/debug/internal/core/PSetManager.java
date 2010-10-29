@@ -26,7 +26,6 @@ import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.IPSetManager;
 import org.eclipse.ptp.debug.core.TaskSet;
-import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
 /**
  * @author clement
@@ -119,12 +118,5 @@ public class PSetManager implements IPSetManager {
 				deleteSets(sid);
 			}
 		}
-	}
-
-	/**
-	 * @return
-	 */
-	protected IPDISession getPDISession() {
-		return getSession().getPDISession();
 	}
 }
