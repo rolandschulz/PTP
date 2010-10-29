@@ -10,6 +10,9 @@
  *     Albert L. Rossi (NCSA) - full implementation (bug 310188)
  *     		                  - further modifications (04/30/2010)
  *                            - rewritten (05/11/2010)
+ *                            - modified (10/01/2010) to use non-nls interface; 
+ *                              moved the queue-name combo functionality into 
+ *                              the launch tab (5.0)
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.launch;
 
@@ -28,13 +31,16 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
 import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
 import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
@@ -43,6 +49,7 @@ import org.eclipse.ptp.rm.pbs.ui.managers.PBSBatchScriptTemplateManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
+import org.eclipse.ptp.rm.pbs.ui.wizards.PBSBatchScriptTemplateWizard;
 import org.eclipse.ptp.rm.pbs.ui.wizards.PBSRMLaunchConfigurationDynamicTabWizardPage;
 import org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.ui.launch.RMLaunchConfigurationDynamicTabDataSource;
@@ -51,6 +58,8 @@ import org.eclipse.ptp.rm.ui.utils.WidgetListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -59,6 +68,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
@@ -72,7 +82,40 @@ import org.eclipse.ui.progress.UIJob;
  * 
  * @author arossi
  */
-public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab {
+public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfigurationDynamicTab implements IPBSNonNLSConstants {
+
+	private class DestinationComboListener extends RMLaunchConfigurationDynamicTabWidgetListener implements MouseListener {
+		public DestinationComboListener(BaseRMLaunchConfigurationDynamicTab dynamicTab) {
+			super(dynamicTab);
+		}
+
+		@Override
+		public void modifyText(ModifyEvent e) {
+			if (!templateChangeListener.isEnabled())
+				return;
+			super.modifyText(e);
+		}
+
+		public void mouseDoubleClick(MouseEvent e) {
+			// unused
+		}
+
+		public void mouseDown(MouseEvent e) {
+			Combo c = (Combo) e.getSource();
+			if (c.getItemCount() != 0)
+				return;
+			disable();
+			String text = c.getText();
+			c.setItems(ConfigUtils.getCurrentQueues(getResourceManager()));
+			c.setText(text);
+			enable();
+		}
+
+		public void mouseUp(MouseEvent e) {
+			// usused
+		}
+	}
+
 	/*
 	 * (non-Javadoc) Provides communication between the template and the
 	 * underlying store (configuration) on the one hand, and the template and
@@ -81,10 +124,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	private class PBSRMLaunchDataSource extends RMLaunchConfigurationDynamicTabDataSource {
 		private String currentConfigName;
-		private String currentRMId;
-		private String currentTemplate;
-		private String defaultTemplate;
-		private String lastRMId;
 
 		protected PBSRMLaunchDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
@@ -99,8 +138,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		public void setResourceManager(IResourceManager rm) {
-			lastRMId = currentRMId;
-			currentRMId = rm.getResourceManagerId();
 			super.setResourceManager(rm);
 		}
 
@@ -109,6 +146,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void copyFromFields() throws ValidationException {
+			if (dynamicControl == null || dynamicControl.isDisposed())
+				return;
 			PBSBatchScriptTemplate template = templateManager.getCurrent();
 			if (template == null)
 				return;
@@ -138,11 +177,11 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			}
 
 			if (templateChangeListener.isEnabled() && mpiCommand != null) {
-				value = mpiCommand.getText().trim();
+				value = WidgetUtils.getSelected(mpiCommand).trim();
 				try {
 					template.setMPIAttributes((String) value);
-				} catch (IllegalValueException t) {
-					throw new ValidationException(t.getMessage() + ": " + t.getCause()); //$NON-NLS-1$
+				} catch (Throwable t) {
+					throw new ValidationException(t.getMessage() + CO + SP + t.getCause());
 				}
 			}
 		}
@@ -152,6 +191,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void copyToFields() {
+			if (dynamicControl == null || dynamicControl.isDisposed())
+				return;
 			PBSBatchScriptTemplate template = templateManager.getCurrent();
 			if (template == null)
 				return;
@@ -181,22 +222,11 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				attr = ap.getAttribute();
 				if (attr != null)
 					value = attr.getValue();
-				if (value != null) {
-					String[] items = mpiCommand.getItems();
-					for (int i = 0; i < items.length; i++)
-						if (items[i].equals(value)) {
-							mpiCommand.select(i);
-							break;
-						}
-				}
+				if (value != null)
+					WidgetUtils.select(mpiCommand, (String) value);
 			}
 
-			String[] items = templates.getItems();
-			for (int i = 0; i < items.length; i++)
-				if (items[i].equals(currentTemplate)) {
-					templates.select(i);
-					break;
-				}
+			WidgetUtils.select(templates, template.getName());
 		}
 
 		/*
@@ -210,7 +240,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 			if (config == null)
 				return;
-			config.setAttribute(TAG_CURRENT_TEMPLATE, currentTemplate);
 			PBSBatchScriptTemplate template = templateManager.getCurrent();
 			if (template != null)
 				template.saveValues(config);
@@ -221,7 +250,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void loadDefault() {
-			// UNUSED
 		}
 
 		/*
@@ -229,7 +257,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void loadFromStorage() {
-			ILaunchConfiguration config = getConfiguration();
+			ILaunchConfiguration config = getConfigurationWorkingCopy();
 			if (config != null) {
 				PBSBatchScriptTemplate template = templateManager.getCurrent();
 				if (template == null)
@@ -249,6 +277,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void validateLocal() throws ValidationException {
+			if (dynamicControl == null || dynamicControl.isDisposed())
+				return;
 			for (Iterator<Control> i = valueWidgets.keySet().iterator(); i.hasNext();) {
 				Control c = i.next();
 				if (c instanceof Text) {
@@ -259,45 +289,26 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 					/*
 					 * maybe restore default
 					 */
-					if (ConfigUtils.EMPTY_STRING.equals(value) && !ConfigUtils.EMPTY_STRING.equals(defaultString))
+					if (ZEROSTR.equals(value) && !ZEROSTR.equals(defaultString))
 						t.setText(defaultString);
 				} else if (c instanceof Combo) {
 					Combo cmb = (Combo) c;
 					String value = cmb.getText();
 					AttributePlaceholder ap = valueWidgets.get(c);
-					if (value.indexOf("?") >= 0) //$NON-NLS-1$ 
-						throw new ValidationException(ap.getName() + ": " + Messages.PBSRMLaunchDataSource_ValueNotSet); //$NON-NLS-1$ 
+					if (value.indexOf(QM) >= 0)
+						throw new ValidationException(ap.getName() + CO + SP + Messages.PBSRMLaunchDataSource_ValueNotSet);
 				}
 			}
 		}
 
+		/*
+		 * Updates static map for sharing values between templates.
+		 */
 		private void setCurrentConfiguration() {
 			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
 			if (config == null)
 				return;
 			put(config);
-		}
-
-		/*
-		 * Determines whether the template should be the default or not. Because
-		 * of the way RMs are identified, it becomes complex to try to capture
-		 * changes to their template settings which would not span across
-		 * instances of the ResourceTab, so we have just left the mapping of a
-		 * (default) template to the RM fixed. The use of an RM with a different
-		 * template only lasts for the duration of the Resource Tab's
-		 * persistence in memory; on being reopened, the default template is
-		 * restored (but with the last saved attribute values).
-		 */
-		private void setCurrentTemplate(String oldRM) {
-			try {
-				ILaunchConfiguration c = get(currentConfigName);
-				if (c == null)
-					currentTemplate = defaultTemplate;
-				else
-					currentTemplate = c.getAttribute(TAG_CURRENT_TEMPLATE, defaultTemplate);
-			} catch (CoreException ce) {
-				ce.printStackTrace();
-			}
 		}
 	}
 
@@ -322,8 +333,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		@Override
 		public void modifyText(ModifyEvent e) {
 			Object o = e.getSource();
-			if (!templateChangeListener.isEnabled())
-				if (valueWidgets.containsKey(o))
+			if (valueWidgets.containsKey(o))
+				if (!templateChangeListener.isEnabled())
 					return;
 			super.modifyText(e);
 		}
@@ -338,7 +349,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
 			Object o = e.getSource();
-			if (o == editPrepended || o == editPostpended || o == viewScript)
+			if (o == editPrepended || o == editPostpended || o == viewScript || o == editTemplates)
 				widgetSelected(e);
 			else
 				super.widgetDefaultSelected(e);
@@ -358,7 +369,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				return;
 			AttributePlaceholder ap = null;
 			Object o = e.getSource();
-			String title = ConfigUtils.EMPTY_STRING;
+			String title = ZEROSTR;
 			if (o == editPrepended) {
 				title = Messages.PBSBatchScriptTemplateEditPrepend_title;
 				ap = template.getPrependedBashCommands();
@@ -402,7 +413,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		private void openReadOnly(String script) {
 			try {
-				new ScrollingEditableMessageDialog(control.getShell(), Messages.PBSBatchScriptDislay, script, true).open();
+				new ScrollingEditableMessageDialog(control.getShell(), Messages.PBSBatchScriptDisplay, script, true).open();
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -410,18 +421,19 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	}
 
 	/*
-	 * Separate listener for template combo box.
+	 * Separate listener for template combo box and button.
 	 */
 	private class TemplateChangeListener extends WidgetListener {
-
-		/*
-		 * Updates the internal current template field and calls
-		 * fireTemplateChange.
-		 */
 		@Override
 		protected void doModifyText(ModifyEvent e) {
-			dataSource.currentTemplate = templates.getItem(templates.getSelectionIndex());
-			fireTemplateChange();
+			fireTemplateChange(WidgetUtils.getSelected(templates));
+		}
+
+		@Override
+		protected void doWidgetSelected(SelectionEvent e) {
+			Object o = e.getSource();
+			if (o == editTemplates)
+				handleEditTemplates();
 		}
 	}
 
@@ -436,80 +448,89 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	private static final Map<String, ILaunchConfiguration> configurations = new HashMap<String, ILaunchConfiguration>();
 
-	private static final String[] mpiChoices = Messages.MPICommands.split(","); //$NON-NLS-1$ 
+	private Map<Control, AttributePlaceholder> valueWidgets;
 
-	private static final String TAG_CURRENT_TEMPLATE = Messages.PBSRMLaunchConfigCurrentTemplate;
-
-	private IPQueue[] queues;
-	private ScrolledComposite parent;
-	private Composite childControl;
-	private Composite control;
 	private PBSRMLaunchDataSource dataSource;
+	private PBSBatchScriptTemplateManager templateManager;
+	private PBSBatchScriptTemplateWizard templateWizard;
+	private ScrolledComposite parent;
+	private Composite dynamicControl;
+	private Composite control;
 	private Button editPostpended;
 	private Button editPrepended;
-	private PBSRMLaunchWidgetListener listener;
-	private Combo mpiCommand;
-	private TemplateChangeListener templateChangeListener;
-	private PBSBatchScriptTemplateManager templateManager;
-	private Combo templates;
-	private Map<Control, AttributePlaceholder> valueWidgets;
 	private Button viewScript;
+	private Button editTemplates;
+	private Combo mpiCommand;
+	private Combo templates;
+	private TemplateChangeListener templateChangeListener;
+	private PBSRMLaunchWidgetListener listener;
+	private DestinationComboListener destComboListener;
+	private PBSResourceManager pbsRM;
 
 	/**
 	 * Creates the templateManager and templateChangeListener.
 	 * 
 	 * @param resourceManager
 	 */
-	public PBSRMLaunchConfigurationDynamicTab(IResourceManager resourceManager, ILaunchConfigurationDialog dialog) {
+	public PBSRMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 		try {
+			setResourceManager(rm);
+			templateManager = new PBSBatchScriptTemplateManager(this);
+			templateWizard = new PBSBatchScriptTemplateWizard(templateManager);
 			templateChangeListener = new TemplateChangeListener();
-			templateManager = new PBSBatchScriptTemplateManager();
 			valueWidgets = new HashMap<Control, AttributePlaceholder>();
-			templateManager.loadTemplate(null, null);
-			queues = resourceManager.getQueues();
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
 
 	/**
-	 * The control has two dynamic panels: <br>
+	 * The control has two panels: <br>
 	 * <br>
 	 * The first panel allows for choosing the template and inspecting the
 	 * generated script.<br>
 	 * <br>
-	 * The second is populated by MPI command configuration and buttons for
-	 * opening editors for modifying the areas of the batch script surrounding
-	 * the actual application execution command.<br>
-	 * <br>
-	 * The last panel is populated by a wizard page which adds widgets on the
-	 * basis of the PBS Job Attributes present in the template.
+	 * The second is dynamically populated, and has two sub-panels. The first
+	 * has MPI command configuration and buttons for opening editors for
+	 * modifying the areas of the batch script surrounding the actual
+	 * application execution command. The second sub-panel is a wizard page
+	 * which adds widgets on the basis of the PBS Job Attributes present in the
+	 * template.
 	 */
 	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) throws CoreException {
+		control = WidgetUtils.createComposite(parent, 1);
+		setResourceManager(rm);
 		if (parent instanceof ScrolledComposite)
 			this.parent = (ScrolledComposite) parent;
-		control = WidgetUtils.createComposite(parent, 2);
-		populateControl();
+		createSelectionGroup(control);
+		rmNotRunningWarning();
+	}
+
+	public synchronized RMLaunchConfigurationDynamicTabWidgetListener createDestinationComboListener() {
+		if (destComboListener == null)
+			destComboListener = new DestinationComboListener(this);
+		return destComboListener;
 	}
 
 	/**
-	 * We send only the realized script as attribute.<br>
+	 * Sends only the realized script as attribute.<br>
 	 */
 	public IAttribute<?, ?, ?>[] getAttributes(IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
+		setResourceManager(rm);
+		IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) getResourceManager().getConfiguration();
 		List<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
-
-		String current = configuration.getAttribute(TAG_CURRENT_TEMPLATE, ConfigUtils.EMPTY_STRING);
-
+		String current = rmConfig.getCurrentTemplateName();
 		PBSBatchScriptTemplate template = templateManager.loadTemplate(current, configuration);
 		try {
 			template.configure();
-			attrs.add(templateManager.getCurrent().createScriptAttribute());
-		} catch (IllegalValueException t) {
-			IStatus status = new Status(Status.ERROR, PBSUIPlugin.getUniqueIdentifier(), "getAttributes", t); //$NON-NLS-1$
+			attrs.add(template.createScriptAttribute());
+		} catch (Throwable t) {
+			IStatus status = new Status(Status.ERROR, PBSUIPlugin.getUniqueIdentifier(), GET_ATTRIBUTES, t);
 			throw new CoreException(status);
 		}
+		System.out.println(attrs);
 		return attrs.toArray(new IAttribute<?, ?, ?>[attrs.size()]);
 	}
 
@@ -534,6 +555,10 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	@Override
 	public Image getImage() {
 		return null;
+	}
+
+	public synchronized PBSResourceManager getResourceManager() {
+		return pbsRM;
 	}
 
 	/*
@@ -562,18 +587,9 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	@Override
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
-		// should not be null
+		setResourceManager(rm);
+		RMLaunchValidation rmv = super.performApply(configuration, getResourceManager(), queue);
 		dataSource.currentConfigName = configuration.getName();
-		String oldRM = dataSource.lastRMId;
-		RMLaunchValidation rmv = super.performApply(configuration, rm, queue);
-		if (templateChangeListener.isEnabled())
-			if (oldRM == null) {
-				PBSResourceManager pbsRM = (PBSResourceManager) rm;
-				IPBSResourceManagerConfiguration rmConfig = (IPBSResourceManagerConfiguration) pbsRM.getConfiguration();
-				dataSource.defaultTemplate = rmConfig.getDefaultTemplateName();
-				dataSource.setCurrentTemplate(oldRM);
-				fireTemplateChange();
-			}
 		dataSource.setCurrentConfiguration();
 		return rmv;
 	}
@@ -588,6 +604,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+		setResourceManager(rm);
 		return new RMLaunchValidation(true, null);
 	}
 
@@ -599,7 +616,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	@Override
 	public void updateControls() {
-		// NOT USED
 	}
 
 	/*
@@ -629,6 +645,36 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	}
 
 	/*
+	 * Nests child control which can be disposed when rebuild is called for.
+	 */
+	private void buildDynamicPart(ILaunchConfiguration lconfig) {
+		if (dynamicControl != null) {
+			dynamicControl.dispose();
+			valueWidgets.clear();
+		}
+		if (control.isDisposed())
+			return;
+		dynamicControl = WidgetUtils.createComposite(control, 1);
+		PBSBatchScriptTemplate template = templateManager.getCurrent();
+		if (template == null && lconfig != null) {
+			templateManager.loadTemplate(templateManager.getCurrentTemplateName(), lconfig);
+			template = templateManager.getCurrent();
+		}
+		if (template != null) {
+			createOptionalGroup(dynamicControl, template);
+			PBSRMLaunchConfigurationDynamicTabWizardPage wizardPage = new PBSRMLaunchConfigurationDynamicTabWizardPage(this,
+					valueWidgets, getListener(), template);
+			wizardPage.createControl(dynamicControl);
+		}
+		/*
+		 * We need to repeat this here (the ResourcesTab does it when it
+		 * initially builds the control).
+		 */
+		if (parent != null)
+			parent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
+
+	/*
 	 * Constructs lower part of control, containing combo selection for MPI
 	 * command and buttons for editing optional sections, if these are present
 	 * in the template.
@@ -646,8 +692,8 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		options.setForeground(WidgetUtils.DKMG);
 
 		if (nonNull[0])
-			mpiCommand = WidgetUtils.createItemCombo(options, Messages.PBSBatchScriptTemplateMPICommand, mpiChoices, mpiChoices[0],
-					null, true, listener, 2);
+			mpiCommand = WidgetUtils.createItemCombo(options, Messages.PBSBatchScriptTemplateMPICommand, MPICMDS, MPICMDS[0], null,
+					true, listener, 2);
 		if (nonNull[1])
 			editPrepended = WidgetUtils.createButton(options, Messages.PBSBatchScriptTemplateEditPrepend_title, null, SWT.PUSH, 1,
 					false, listener);
@@ -658,33 +704,41 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 
 	/*
 	 * Constructs upper part of control, containing combo selection for changing
-	 * template and button for viewing the script.
+	 * template and button for viewing the script. Calls set template to
+	 * establish the dynamic components.
 	 */
 	private void createSelectionGroup(Composite parent) {
-		Group selection = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigGroup1_title, 3, 3, true);
+		Composite composite = WidgetUtils.createComposite(parent, 1);
+		Group selection = WidgetUtils.createFillingGroup(composite, Messages.PBSRMLaunchConfigGroup1_title, 5, 1, false);
 		selection.setForeground(WidgetUtils.DKMG);
 		templates = WidgetUtils.createItemCombo(selection, null, templateManager.findAvailableTemplates(), null, null, true,
 				templateChangeListener, 2);
 		((GridData) templates.getLayoutData()).widthHint = 200;
+		editTemplates = WidgetUtils.createButton(selection, Messages.PBSRMLaunchConfigEditTemplates_title, null, SWT.PUSH, 1, true,
+				templateChangeListener);
 		viewScript = WidgetUtils.createButton(selection, Messages.PBSRMLaunchConfigViewScript_title, null, SWT.PUSH, 1, true,
 				listener);
+		Label l = WidgetUtils.createLabel(selection, rmNotRunningWarning(), SWT.LEFT, 1);
+		l.setForeground(WidgetUtils.DKRD);
+
+		WidgetUtils.select(templates, templateManager.getCurrentTemplateName());
 	}
 
 	/*
 	 * Saves the current template, loads a new one and reconfigures the dynamic
 	 * widgets on the basis of its placeholders.
 	 */
-	private void fireTemplateChange() {
-		new UIJob("template change") {//$NON-NLS-1$ 
+	private void fireTemplateChange(final String name) {
+		new UIJob(TEMPLATE_CHANGE) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
-					templateChangeListener.disable();
 					dataSource.copyFromFields();
+					templateChangeListener.disable();
 					dataSource.copyToStorage();
 					ILaunchConfiguration c = get(dataSource.currentConfigName);
-					templateManager.loadTemplate(dataSource.currentTemplate, c);
-					populateControl();
+					templateManager.loadTemplate(name, c);
+					buildDynamicPart(c);
 					dataSource.loadFromStorage();
 					dataSource.copyToFields();
 				} catch (Throwable t) {
@@ -698,59 +752,80 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	}
 
 	/*
-	 * We do this here instead of in its properly encapsulated location (the
-	 * wizard) in order not to induce an API change [4.0].
+	 * First checks for the base template configuration. It then brings up
+	 * wizard for editing or deleting templates.
 	 */
-	private void maybeSetQueues() {
-		if (queues == null || queues.length == 0)
-			return;
-		for (Map.Entry<Control, AttributePlaceholder> e : valueWidgets.entrySet()) {
-			AttributePlaceholder ap = e.getValue();
-			String name = ap.getName();
-			if (name.equals("destination")) { //$NON-NLS-1$
-				Combo combo = (Combo) e.getKey();
-				List<String> queueNames = new ArrayList<String>();
-				for (IPQueue q : queues) {
-					String qname = q.getName();
-					if (qname.length() > 0)
-						queueNames.add(qname);
-				}
-				String value = ap.getAttribute().getValueAsString();
-				if (value == null || value.length() == 0)
+	private void handleEditTemplates() {
+		new UIJob(EDIT_TEMPLATES) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				try {
 					try {
-						ap.getAttribute().setValueAsString(queueNames.get(0));
-					} catch (IllegalValueException t) {
+						if (!templateManager.handleBaseTemplate())
+							return Status.OK_STATUS;
+					} catch (Throwable t) {
 						t.printStackTrace();
 					}
-				combo.setItems(queueNames.toArray(new String[0]));
+					String oldTemplate = WidgetUtils.getSelected(templates);
+					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open())
+						repopulateTemplates(oldTemplate);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+				return Status.OK_STATUS;
 			}
-		}
+		}.schedule();
 	}
 
 	/*
-	 * Nests child control which can be disposed when rebuild is called for.
+	 * Called when the template wizard is closed with OK button. Updates the
+	 * template list from the template manager's list of available templates.
 	 */
-	private void populateControl() {
-		if (childControl != null) {
-			childControl.dispose();
-			valueWidgets.clear();
+	private void repopulateTemplates(final String oldTemplate) {
+		new UIJob(REPOPULATE_TEMPLATES) {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				templateChangeListener.disable();
+				String[] tempNames = templateManager.findAvailableTemplates();
+				templates.setItems(tempNames);
+				int i = 0;
+				for (; i < tempNames.length; i++)
+					if (tempNames[i].equals(oldTemplate)) {
+						templates.select(i);
+						break;
+					}
+				templateChangeListener.enable();
+				if (tempNames.length > 0 && i == tempNames.length)
+					templates.select(0);
+				else
+					fireTemplateChange(WidgetUtils.getSelected(templates));
+				return Status.OK_STATUS;
+			}
+		}.schedule();
+	}
+
+	/*
+	 * Displays warning about template configurations being out of date if the
+	 * RM is not running.
+	 */
+	private String rmNotRunningWarning() {
+		IResourceManager rm = getResourceManager();
+		StringBuffer text = new StringBuffer();
+		if (rm != null) {
+			text.append(Messages.PBSAttributeTemplateManager_rmState);
+			ResourceManagerAttributes.State state = rm.getState();
+			text.append(state);
+			if (!ResourceManagerAttributes.State.STARTED.equals(state))
+				text.append(Messages.PBSAttributeTemplateManager_rmNotStartedMessage);
 		}
-		childControl = WidgetUtils.createComposite(control, 1);
-		createSelectionGroup(childControl);
-		PBSBatchScriptTemplate template = templateManager.getCurrent();
-		if (template != null) {
-			createOptionalGroup(childControl, template);
-			PBSRMLaunchConfigurationDynamicTabWizardPage wizardPage = new PBSRMLaunchConfigurationDynamicTabWizardPage(
-					valueWidgets, getListener(), template);
-			wizardPage.createControl(childControl);
-			maybeSetQueues();
-		}
-		/*
-		 * We need to repeat this (the ResourcesTab does it when it initially
-		 * builds the control) because this method is called on updates as well.
-		 */
-		if (parent != null)
-			parent.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		return text.toString();
+	}
+
+	/*
+	 * For consistency.
+	 */
+	private synchronized void setResourceManager(IResourceManager resourceManager) {
+		pbsRM = (PBSResourceManager) resourceManager;
 	}
 
 	/*

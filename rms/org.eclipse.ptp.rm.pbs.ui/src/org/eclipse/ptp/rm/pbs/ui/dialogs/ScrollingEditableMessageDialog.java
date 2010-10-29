@@ -7,11 +7,13 @@
  * Contributors:
  * 	Albert L. Rossi (NCSA) - design and implementation
  *                           added readOnly option 05/11/2010
+ *                         - modified (09/14/2010) to use non-nls interface
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -32,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @author arossi
  */
-public class ScrollingEditableMessageDialog extends MessageDialog {
+public class ScrollingEditableMessageDialog extends MessageDialog implements IPBSNonNLSConstants {
 	public static final int DEFAULT_INDEX = 0;
 	public static final String[] DEFAULT_LABELS = { Messages.DialogClose };
 
@@ -112,8 +114,8 @@ public class ScrollingEditableMessageDialog extends MessageDialog {
 		scrollable.setEditable(!readOnly);
 		Display d = Display.getCurrent();
 		// three fonts for Mac, Linux, Windows ...
-		FontData[][] f = { d.getFontList("Courier", true), d.getFontList("Courier", false), d.getFontList("Courier", true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				d.getFontList("Courier", false), d.getFontList("Courier", true), d.getFontList("Courier", false) }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		FontData[][] f = { d.getFontList(COURIER, true), d.getFontList(COURIER, false), d.getFontList(COURIER, true),
+				d.getFontList(COURIER, false), d.getFontList(COURIER, true), d.getFontList(COURIER, false) };
 		int i = 0;
 		for (; i < f.length; i++)
 			if (f[i].length > 0) {

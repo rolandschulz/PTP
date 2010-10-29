@@ -8,6 +8,7 @@
  * Contributors:
  * 	IBM - Initial API and implementation
  * 	Albert L. Rossi (NCSA) - modification of API (04/30/2010)
+ *                         - further reworking of API (10/11/2010)
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.core.rmsystem;
 
@@ -16,12 +17,47 @@ import org.eclipse.ptp.rm.core.rmsystem.IRemoteResourceManagerConfiguration;
 public interface IPBSResourceManagerConfiguration extends IRemoteResourceManagerConfiguration {
 
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public String getDefaultTemplateName();
+	public void addTemplate(String name, String serialized);
 
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public void setDefaultTemplateName(String name);
+	public String getCurrentTemplateName();
+
+	/**
+	 * @since 5.0
+	 */
+	public String getTemplate(String name);
+
+	/**
+	 * @since 5.0
+	 */
+	public String[] getTemplateNames();
+
+	/**
+	 * @since 5.0
+	 */
+	public String getValidAttributeSet();
+
+	/**
+	 * @since 5.0
+	 */
+	public void removeTemplate(String name);
+
+	/**
+	 * @since 5.0
+	 */
+	public void removeValidAttributeSet();
+
+	/**
+	 * @since 5.0
+	 */
+	public void setCurrentTemplateName(String name);
+
+	/**
+	 * @since 5.0
+	 */
+	public void setValidAttributeSet(String serialized);
 }

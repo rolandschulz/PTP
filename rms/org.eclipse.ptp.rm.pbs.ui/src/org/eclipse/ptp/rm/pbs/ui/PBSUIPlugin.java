@@ -12,6 +12,8 @@
 package org.eclipse.ptp.rm.pbs.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -27,40 +29,6 @@ public class PBSUIPlugin extends AbstractUIPlugin {
 
 	// The shared instance
 	private static PBSUIPlugin plugin;
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static PBSUIPlugin getDefault() {
-		return plugin;
-	}
-
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	/**
-	 * Generate a unique identifier
-	 * 
-	 * @return unique identifier string
-	 * @since 5.0
-	 */
-	public static String getUniqueIdentifier() {
-		if (getDefault() == null) {
-			return PLUGIN_ID;
-		}
-		return getDefault().getBundle().getSymbolicName();
-	}
 
 	/**
 	 * The constructor
@@ -92,5 +60,61 @@ public class PBSUIPlugin extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
+	}
+
+	/**
+	 * Returns the active workbench shell or <code>null</code> if none
+	 * 
+	 * @return the active workbench shell or <code>null</code> if none
+	 * @since 5.0
+	 */
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null)
+			return window.getShell();
+		return null;
+	}
+
+	/**
+	 * Convenience method to get the currently active workbench window
+	 * 
+	 * @return currently active workbench window
+	 * @since 5.0
+	 */
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+	}
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static PBSUIPlugin getDefault() {
+		return plugin;
+	}
+
+	/**
+	 * Returns an image descriptor for the image file at the given plug-in
+	 * relative path
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 * @since 5.0
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null)
+			return PLUGIN_ID;
+		return getDefault().getBundle().getSymbolicName();
 	}
 }

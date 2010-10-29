@@ -7,17 +7,24 @@
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
  *                  - modified; eliminated unused methods 05/11/2010
+ *                  - removed all static final strings into the non-nls
+ *                    interface (09/14/2010)
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.utils;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
+import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.data.AttributePlaceholder;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 
@@ -26,7 +33,7 @@ import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
  * 
  * @author arossi
  */
-public class ConfigUtils {
+public class ConfigUtils implements IPBSNonNLSConstants {
 	public static class PrefixFilter implements FilenameFilter {
 		private final String prefix;
 
@@ -52,11 +59,6 @@ public class ConfigUtils {
 		}
 	}
 
-	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-	public static final String LINE_SEP = System.getProperty("line.separator"); //$NON-NLS-1$
-	public static String REMOTE_LINE_SEP = "\n"; //$NON-NLS-1$
-	public static String REMOTE_PATH_SEP = "/"; //$NON-NLS-1$
-
 	private ConfigUtils() {
 	}
 
@@ -80,7 +82,7 @@ public class ConfigUtils {
 			Map<String, IAttributeDefinition<?, ?, ?>> defs) throws IllegalValueException {
 		AttributePlaceholder ap = new AttributePlaceholder();
 		ap.setName(key);
-		if (!EMPTY_STRING.equals(toolTip))
+		if (!ZEROSTR.equals(toolTip))
 			ap.setToolTip(toolTip);
 		if (defs != null) {
 			IAttributeDefinition<?, ?, ?> def = defs.get(key);
@@ -94,31 +96,29 @@ public class ConfigUtils {
 			String defaultValue = attr.getValueAsString();
 			ap.setDefaultString(defaultValue);
 			if (value != null)
-				if (!EMPTY_STRING.equals(value) || (attr instanceof StringAttribute && !EMPTY_STRING.equals(defaultValue)))
+				if (!ZEROSTR.equals(value) || (attr instanceof StringAttribute && !ZEROSTR.equals(defaultValue)))
 					attr.setValueAsString(value);
 		}
 		return ap;
 	}
 
-	/*
-	 * TODO we need some way of determining this dynamically, though I would
-	 * imagine in the vast majority of cases PBS will be running on a UNIX-type
-	 * system, so it will be "\n".
-	 * 
-	 * @param rEMOTE_LINE_SEP
+	/**
+	 * For refreshing queue (destination) info from the RM Model definition
 	 */
-	public static void setREMOTE_LINE_SEP(String rEMOTE_LINE_SEP) {
-		REMOTE_LINE_SEP = rEMOTE_LINE_SEP;
-	}
-
-	/*
-	 * TODO we need some way of determining this dynamically, though I would
-	 * imagine in the vast majority of cases PBS will be running on a UNIX-type
-	 * system, so it will be "/".
-	 * 
-	 * @param rEMOTE_PATH_SEP
-	 */
-	public static void setREMOTE_PATH_SEP(String rEMOTE_PATH_SEP) {
-		REMOTE_PATH_SEP = rEMOTE_PATH_SEP;
+	public static String[] getCurrentQueues(PBSResourceManager rm) {
+		String[] items = new String[0];
+		if (rm != null) {
+			IPQueue[] queues = rm.getQueues();
+			if (queues != null && queues.length > 0) {
+				List<String> queueNames = new ArrayList<String>();
+				for (IPQueue q : queues) {
+					String qname = q.getName();
+					if (qname.length() > 0)
+						queueNames.add(qname);
+				}
+				items = queueNames.toArray(new String[0]);
+			}
+		}
+		return items;
 	}
 }
