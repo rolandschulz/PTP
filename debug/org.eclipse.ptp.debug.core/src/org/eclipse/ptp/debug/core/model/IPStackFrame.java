@@ -24,7 +24,6 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
-import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 
 /**
  * @author Clement chu
@@ -79,9 +78,4 @@ public interface IPStackFrame extends IRunToLine, IRunToAddress, IJumpToLine, IJ
 	 * @return
 	 */
 	public IPDIStackFrame getPDIStackFrame();
-
-	/**
-	 * @return
-	 */
-	public IPDIThread getPDIThread();
 }

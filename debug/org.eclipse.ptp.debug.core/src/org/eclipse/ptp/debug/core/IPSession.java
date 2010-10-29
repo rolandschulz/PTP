@@ -111,6 +111,14 @@ public interface IPSession extends IAdaptable {
 	public IPLaunch getLaunch();
 
 	/**
+	 * Get the location set manager
+	 * 
+	 * @return the location set manager
+	 * @since 5.0
+	 */
+	public IPLocationSetManager getLocationSetManager();
+
+	/**
 	 * @return
 	 */
 	public IPMemoryManager getMemoryManager();
@@ -137,6 +145,7 @@ public interface IPSession extends IAdaptable {
 
 	/**
 	 * @return
+	 * @since 5.0
 	 */
 	public IPSignalManager getSignalManager();
 

@@ -30,6 +30,7 @@ public class Messages extends NLS {
 	public static String ArrayTabItem_7;
 	public static String ArrayView_0;
 	public static String CompareValueAction_0;
+	public static String CreateLocationSetAction_0;
 	public static String DeletePExpressionAction_0;
 	public static String DialogField_3;
 	public static String DialogField_4;
@@ -43,6 +44,10 @@ public class Messages extends NLS {
 	public static String ParallelDebugView_5;
 	public static String ParallelDebugViewEventHandler_2;
 	public static String ParallelDebugViewEventHandler_3;
+	public static String PLocationView_0;
+	public static String PLocationView_1;
+	public static String PLocationView_2;
+	public static String PLocationView_3;
 	public static String PVariableCheckboxTableViewer_0;
 	public static String PVariableCheckboxTableViewer_1;
 	public static String PVariableCheckboxTableViewer_2;

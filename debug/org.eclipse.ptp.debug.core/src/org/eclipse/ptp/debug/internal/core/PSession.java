@@ -38,6 +38,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
 import org.eclipse.ptp.debug.core.IPBreakpointManager;
+import org.eclipse.ptp.debug.core.IPLocationSetManager;
 import org.eclipse.ptp.debug.core.IPMemoryManager;
 import org.eclipse.ptp.debug.core.IPRegisterManager;
 import org.eclipse.ptp.debug.core.IPSession;
@@ -100,6 +101,7 @@ public class PSession implements IPSession, IPDIEventListener {
 	private final PMemoryManager memMgr;
 	private final PRegisterManager regMgr;
 	private final PSetManager setMgr;
+	private final PLocationSetManager locMgr;
 
 	public PSession(IPDISession pdiSession, IPLaunch launch, IProject project) {
 		this.pdiSession = pdiSession;
@@ -110,6 +112,7 @@ public class PSession implements IPSession, IPDIEventListener {
 		memMgr = new PMemoryManager(this);
 		regMgr = new PRegisterManager(this);
 		setMgr = new PSetManager(this);
+		locMgr = new PLocationSetManager(this);
 		getPDISession().getEventManager().addEventListener(this);
 	}
 
@@ -290,6 +293,15 @@ public class PSession implements IPSession, IPDIEventListener {
 	 */
 	public IPLaunch getLaunch() {
 		return launch;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.IPSession#getLocationSetManager()
+	 */
+	public IPLocationSetManager getLocationSetManager() {
+		return locMgr;
 	}
 
 	/*
@@ -498,6 +510,7 @@ public class PSession implements IPSession, IPDIEventListener {
 				memMgr.dispose(monitor);
 				regMgr.dispose(monitor);
 				setMgr.dispose(monitor);
+				locMgr.dispose(monitor);
 				deleteDebugTargets(true);
 				getPDISession().getEventManager().removeEventListener(PSession.this);
 				getPDISession().shutdown(force);

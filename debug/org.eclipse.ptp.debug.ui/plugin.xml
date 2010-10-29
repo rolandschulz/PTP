@@ -43,6 +43,12 @@
 			class="org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView"
 			id="org.eclipse.ptp.debug.ui.views.PVariableView">
 		</view>
+		<view
+			category="org.eclipse.ptp.ui.views"
+			class="org.eclipse.ptp.debug.internal.ui.views.locations.PLocationView"
+			id="org.eclipse.ptp.debug.ui.views.PLocationView"
+			name="%PLocationView.name">
+		</view>
 	</extension>
 	<!-- perspective extensions //-->
 	<extension
