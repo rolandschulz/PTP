@@ -10,6 +10,8 @@
  *     Albert L. Rossi (NCSA) - full implementation (bug 310188)
  *     						  - modifications to store template and memento
  *     							(05/11/2010)
+ *                            - modifications to use new interface methods and
+ *                              constants (09/14/2010)
  *******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui;
 
@@ -20,14 +22,14 @@ import org.eclipse.ptp.rm.core.rmsystem.AbstractRemoteResourceManagerServiceProv
 import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
-import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 
 /**
- * Service provider for IBM Parallel Environment
+ * Service provider for PBS batch scheduler.
  */
-public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPBSResourceManagerConfiguration {
+public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProvider implements IPBSResourceManagerConfiguration,
+		IPBSNonNLSConstants {
 
 	public PBSServiceProvider() {
 		super();
@@ -42,6 +44,14 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	 */
 	public PBSServiceProvider(IServiceProvider provider) {
 		super(provider);
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public void addTemplate(String name, String serialized) {
+		addTemplateName(name);
+		putString(TEMPLATE_PREFIX + name, serialized);
 	}
 
 	/*
@@ -67,12 +77,12 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	}
 
 	/**
-	 * @return name of the default template (file) for this resource manager
-	 *         (set in the edit wizard).
-	 * @since 4.0
+	 * @return name of the current template for this resource manager (set in
+	 *         the edit wizard).
+	 * @since 5.0
 	 */
-	public String getDefaultTemplateName() {
-		return getString(getResourceManagerId() + Messages.PBSServiceProvider_defaultTemplateName, ConfigUtils.EMPTY_STRING);
+	public String getCurrentTemplateName() {
+		return getString(getResourceManagerId() + CURR_TEMPLATE, ZEROSTR);
 	}
 
 	/*
@@ -86,6 +96,30 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		return getId();
 	}
 
+	/**
+	 * @since 5.0
+	 */
+	public String getTemplate(String name) {
+		return getString(TEMPLATE_PREFIX + name, null);
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public String[] getTemplateNames() {
+		String nameList = getString(TEMPLATE_NAMES, null);
+		if (nameList == null)
+			return new String[0];
+		return nameList.split(CM);
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public String getValidAttributeSet() {
+		return getString(ATTRIBUTES, null);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -96,6 +130,48 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		return true;
 	}
 
+	/**
+	 * @since 5.0
+	 */
+	public void removeTemplate(String name) {
+		keySet().remove(TEMPLATE_PREFIX + name);
+		String nameList = getString(TEMPLATE_NAMES, null);
+		if (nameList != null) {
+			String[] names = nameList.split(CM);
+			for (int i = 0; i < names.length; i++)
+				if (names[i].equals(name)) {
+					names[i] = null;
+					break;
+				}
+			StringBuffer sb = new StringBuffer();
+			if (names.length > 0) {
+				if (names[0] != null)
+					sb.append(names[0]);
+				for (int i = 1; i < names.length; i++)
+					if (names[i] != null)
+						sb.append(CM).append(names[i]);
+			}
+			putString(TEMPLATE_NAMES, sb.toString());
+		}
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public void removeValidAttributeSet() {
+		keySet().remove(ATTRIBUTES);
+	}
+
+	/**
+	 * @param name
+	 *            of the current template for this resource manager (set in the
+	 *            edit wizard).
+	 * @since 5.0
+	 */
+	public void setCurrentTemplateName(String name) {
+		putString(getResourceManagerId() + CURR_TEMPLATE, name);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -104,22 +180,33 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	 * ()
 	 */
 	public void setDefaultNameAndDesc() {
-		String name = "PBS"; //$NON-NLS-1$
+		String name = PBS;
 		String conn = getConnectionName();
-		if (conn != null && !conn.equals("")) //$NON-NLS-1$
-			name += "@" + conn; //$NON-NLS-1$
+		if (conn != null && !conn.equals(ZEROSTR))
+			name += MARKER + conn;
 		setName(name);
 		setDescription(Messages.PBSResourceManager);
 	}
 
 	/**
-	 * @param name
-	 *            of the default template (file) for this resource manager (set
-	 *            in the edit wizard).
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	public void setDefaultTemplateName(String name) {
-		putString(getResourceManagerId() + Messages.PBSServiceProvider_defaultTemplateName, name);
+	public void setValidAttributeSet(String serialized) {
+		putString(ATTRIBUTES, serialized);
 	}
 
+	private void addTemplateName(String name) {
+		String nameList = getString(TEMPLATE_NAMES, null);
+		if (nameList == null) {
+			putString(TEMPLATE_NAMES, name);
+			return;
+		}
+
+		String[] names = nameList.split(CM);
+		for (String nm : names)
+			if (name.equals(nm))
+				return;
+
+		putString(TEMPLATE_NAMES, nameList + CM + name);
+	}
 }

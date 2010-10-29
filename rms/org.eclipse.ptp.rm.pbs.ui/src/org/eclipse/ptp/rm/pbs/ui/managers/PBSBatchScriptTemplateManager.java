@@ -7,31 +7,28 @@
  * Contributors: 
  * 	Albert L. Rossi - implementation
  *  				- reworked 05/11/2010
+ *                  - version 5.0: now writes to the resourceManager config
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.managers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
+import org.eclipse.ptp.rm.pbs.core.rmsystem.PBSResourceManager;
+import org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter;
+import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
 import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
+import org.eclipse.ptp.rm.pbs.ui.launch.PBSRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
-import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils.SuffixFilter;
-import org.osgi.framework.Bundle;
+import org.eclipse.ptp.rm.pbs.ui.utils.PBSAttributeToTemplateConverterFactory;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * Controls the selection and configuration of batch script templates.
@@ -41,39 +38,28 @@ import org.osgi.framework.Bundle;
  * @author arossi
  * 
  */
-public class PBSBatchScriptTemplateManager {
-	private static final String DEFAULT_TEMPLATE = Messages.PBSBatchScriptTemplateManager_defaultTemplate;
-	private static final String FULL_TEMPLATE = Messages.PBSBatchScriptTemplateManager_fullTemplate;
-	private static final String RESOURCE_PATH = Messages.PBSBatchScriptTemplateManager_resourcePath
-			+ System.getProperty("file.separator"); //$NON-NLS-1$
-	private static final String SUFFIX = Messages.PBSBatchScriptTemplateManager_templateSuffix;
+public class PBSBatchScriptTemplateManager implements IPBSNonNLSConstants {
 
 	private PBSBatchScriptTemplate current;
 
-	public PBSBatchScriptTemplateManager() throws Throwable {
-		initializeStore();
+	private final PBSRMLaunchConfigurationDynamicTab launchTab;
+	private final IPBSAttributeToTemplateConverter converter;
+
+	public PBSBatchScriptTemplateManager(PBSRMLaunchConfigurationDynamicTab launchTab) throws Throwable {
+		this.launchTab = launchTab;
+		this.converter = PBSAttributeToTemplateConverterFactory.getConverter();
+		configureConverter();
 	}
 
 	/**
-	 * Looks in the known locations for all <code>_template</code> files and
-	 * loads their names.
-	 * <p>
-	 * If the two standard files are not present in the template dir, they are
-	 * copied there.
-	 * </p>
+	 * Looks in the resource manager configuration for all
+	 * <code>_template</code> strings and loads their names.
 	 */
 	public String[] findAvailableTemplates() {
-		List<String> templateNames = new ArrayList<String>();
-		try {
-			File attrconf = PBSUIPlugin.getDefault().getStateLocation().toFile();
-			SuffixFilter filter = new SuffixFilter(SUFFIX);
-			File[] properties = attrconf.listFiles(filter);
-			for (int i = 0; i < properties.length; i++)
-				templateNames.add(properties[i].getName());
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-		return templateNames.toArray(new String[0]);
+		IPBSResourceManagerConfiguration c = getRMConfig();
+		if (c == null)
+			return new String[0];
+		return c.getTemplateNames();
 	}
 
 	public PBSBatchScriptTemplate getCurrent() {
@@ -81,9 +67,65 @@ public class PBSBatchScriptTemplateManager {
 	}
 
 	/**
-	 * Constructs and template and calls load using a stream fro the file
-	 * corresponding to the choice parameter. Sets the configuration before
-	 * loading.
+	 * Either returns the name of the loaded template, or looks in the
+	 * configuration for the last stored one; if both are undefined, it returns
+	 * "base_template".
+	 * 
+	 * @return name
+	 */
+	public String getCurrentTemplateName() {
+		if (current != null)
+			return current.getName();
+		IPBSResourceManagerConfiguration c = getRMConfig();
+		if (c != null)
+			return c.getCurrentTemplateName();
+		return BASE_TEMPLATE;
+	}
+
+	/**
+	 * The is the full template, with all valid attributes mapped to qsub flags.
+	 * 
+	 * @throws Throwable
+	 */
+	public boolean handleBaseTemplate() throws Throwable {
+		PBSResourceManager rm = getRM();
+		IPBSResourceManagerConfiguration c = getRMConfig();
+		Shell shell = PBSUIPlugin.getActiveWorkbenchShell();
+		if (rm == null || !rm.getState().equals(ResourceManagerAttributes.State.STARTED)) {
+			MessageDialog dialog = new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestStartTitle, null,
+					Messages.PBSAttributeTemplateManager_requestStartMessage, MessageDialog.QUESTION, new String[] {
+							Messages.PBSAttributeTemplateManager_requestStartContinue,
+							Messages.PBSAttributeTemplateManager_requestStartCancel }, 1);
+			if (MessageDialog.CANCEL == dialog.open())
+				return false;
+		}
+		if (!configureConverter()) {
+			new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestInitializeTitle, null,
+					Messages.PBSAttributeTemplateManager_requestInitializeMessage, MessageDialog.WARNING,
+					new String[] { Messages.PBSAttributeTemplateManager_requestStartCancel }, 0).open();
+			return false;
+		}
+		String baseTemplate = converter.generateFullBatchScriptTemplate();
+		if (baseTemplate == null || ZEROSTR.equals(baseTemplate)) {
+			if (c != null)
+				baseTemplate = c.getTemplate(BASE_TEMPLATE);
+			if (baseTemplate == null || ZEROSTR.equals(baseTemplate)) {
+				new MessageDialog(shell, Messages.PBSAttributeTemplateManager_requestInitializeTitle, null,
+						Messages.PBSAttributeTemplateManager_requestInitializeMessage, MessageDialog.WARNING,
+						new String[] { Messages.PBSAttributeTemplateManager_requestStartCancel }, 0).open();
+				return false;
+			}
+			return true;
+		}
+		if (c != null)
+			c.addTemplate(BASE_TEMPLATE, baseTemplate);
+		return true;
+	}
+
+	/**
+	 * Constructs a template and calls load using a stream from the serialized
+	 * string stored in the resource manager configuration corresponding to the
+	 * choice parameter. Sets the launch configuration before loading.
 	 * 
 	 * @param choice
 	 *            name of the template file
@@ -92,141 +134,142 @@ public class PBSBatchScriptTemplateManager {
 	 * @return populated template object
 	 */
 	public PBSBatchScriptTemplate loadTemplate(String choice, ILaunchConfiguration config) {
-		current = new PBSBatchScriptTemplate();
-		if (choice == null || ConfigUtils.EMPTY_STRING.equals(choice))
-			return current;
+		IPBSResourceManagerConfiguration c = getRMConfig();
+		if (c == null)
+			return null;
+		PBSBatchScriptTemplate template = null;
+		if (choice == null || ConfigUtils.ZEROSTR.equals(choice))
+			choice = c.getCurrentTemplateName();
 		try {
-			File f = new File(PBSUIPlugin.getDefault().getStateLocation().toFile(), choice);
-			if (!f.exists())
-				return current;
-			current.setConfiguration(config);
-			current.load(new FileInputStream(f));
-			current.setName(choice);
+			String serialized = c.getTemplate(choice);
+			if (serialized == null)
+				return null;
+			ByteArrayInputStream bais = new ByteArrayInputStream(serialized.getBytes());
+			template = new PBSBatchScriptTemplate(converter);
+			template.setConfiguration(config);
+			template.load(bais);
+			template.setName(choice);
+			if (config != null) {
+				c.setCurrentTemplateName(choice);
+				current = template;
+			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		return current;
+		return template;
 	}
 
 	/**
-	 * Checks first to make sure user is not attempting to remove one of the
-	 * fixed lists.
+	 * Checks first to make sure user is not attempting to remove the base
+	 * template.
 	 * 
 	 * @param name
 	 *            of template to remove
 	 * @throws IllegalAccessError
 	 */
 	public void removeTemplate(String name) throws IllegalAccessError {
-		if (DEFAULT_TEMPLATE.equals(name) || FULL_TEMPLATE.equals(name))
+		if (name.equals(BASE_TEMPLATE))
 			throw new IllegalAccessError(name + Messages.PBSAttributeTemplateManager_removeError);
-
-		File configFile = new File(PBSUIPlugin.getDefault().getStateLocation().toFile(), name);
-		if (configFile.exists())
-			configFile.delete();
+		IPBSResourceManagerConfiguration c = getRMConfig();
+		if (c != null)
+			c.removeTemplate(name);
 	}
 
 	/**
-	 * Called after Edit action. Validates and writes content to persistent
-	 * store location.
+	 * Called after Edit action. Writes content to resource manager
+	 * configuration.
 	 * 
 	 * @param editedContent
 	 *            of current template
-	 * @param fileName
+	 * @param name
 	 *            to which to write contents
-	 * @throws IOException
-	 * @throws NoSuchElementException
-	 * @throws IllegalAccessError
 	 */
-	public void storeTemplate(String editedContent, String fileName) throws IOException, NoSuchElementException, IllegalAccessError {
-		FileWriter fw = null;
-		try {
-			File configFile = new File(PBSUIPlugin.getDefault().getStateLocation().toFile(), fileName);
-			if (configFile.exists())
-				configFile.delete();
-			fw = new FileWriter(configFile, false);
-			fw.write(editedContent);
-			fw.flush();
-		} finally {
-			if (fw != null)
-				try {
-					fw.close();
-				} catch (IOException t) {
-					t.printStackTrace();
-				}
-		}
+	public void storeTemplate(String editedContent, String name) {
+		validateTemplateNameForEdit(name);
+		IPBSResourceManagerConfiguration c = getRMConfig();
+		if (c != null)
+			c.addTemplate(name, editedContent);
 	}
 
 	/**
-	 * Checks to make sure user is not attempting to overwrite one of the fixed
-	 * lists.
+	 * Checks to make sure user is not attempting to overwrite the base
+	 * template.
 	 * 
-	 * @param fileName
+	 * @param name
 	 *            for the template
-	 * @return the fileName if valid
+	 * @return the name if valid
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessError
 	 */
-	public String validateTemplateNameForEdit(String fileName) throws IllegalArgumentException, IllegalAccessError {
-		if (fileName.length() == 0)
+	public String validateTemplateNameForEdit(String name) throws IllegalArgumentException, IllegalAccessError {
+		if (name.length() == 0)
 			throw new IllegalArgumentException(Messages.PBSRMLaunchConfigEditChoose_illegalArgument);
-		if (!fileName.endsWith(Messages.PBSBatchScriptTemplateManager_templateSuffix))
-			fileName = fileName + Messages.PBSBatchScriptTemplateManager_templateSuffix;
-
-		if (DEFAULT_TEMPLATE.equals(fileName) || FULL_TEMPLATE.equals(fileName))
-			throw new IllegalAccessError(fileName + Messages.PBSAttributeTemplateManager_storeError);
-		return fileName;
+		if (!name.endsWith(TEMPLATE_SUFFIX))
+			name = name + TEMPLATE_SUFFIX;
+		else if (name.equals(BASE_TEMPLATE))
+			throw new IllegalAccessError(name + Messages.PBSAttributeTemplateManager_storeError);
+		return name;
 	}
 
 	/*
-	 * Instantiates the two preconfigured templates from plugin resources.
+	 * If we are offline, check for the last configuration of attributes for
+	 * this resource manager and use that.
 	 */
-	private PBSBatchScriptTemplate getResourceTemplate(String name) throws Throwable {
-		Bundle bundle = PBSUIPlugin.getDefault().getBundle();
-		URL url = FileLocator.find(bundle, new Path(RESOURCE_PATH + name), null);
-		if (url == null)
+	private boolean configureConverter() throws Throwable {
+		IAttributeDefinition<?, ?, ?>[] modelAttributes = getModelAttributeDefinitions();
+		if (modelAttributes == null) {
+			String stored = null;
+			IPBSResourceManagerConfiguration c = getRMConfig();
+			if (c != null)
+				stored = c.getValidAttributeSet();
+			if (stored == null)
+				return false;
+			ByteArrayInputStream bais = new ByteArrayInputStream(stored.getBytes());
+			converter.getData().deserialize(bais);
+		} else
+			converter.setAttributeDefinitions(modelAttributes);
+		converter.initialize();
+		storeValidAttributeSet(true);
+		return true;
+	}
+
+	private IAttributeDefinition<?, ?, ?>[] getModelAttributeDefinitions() {
+		PBSResourceManager rm = getRM();
+		if (rm == null)
 			return null;
-		InputStream s = null;
-		PBSBatchScriptTemplate template = null;
-		try {
-			s = url.openStream();
-			template = new PBSBatchScriptTemplate();
-			template.load(s);
-			template.setName(name);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				s.close();
-			} catch (IOException e) {
-			}
-		}
-		return template;
+		IAttributeDefinition<?, ?, ?>[] defs = rm.getAttributeDefinitionManager().getAttributeDefinitions();
+
+		if (defs.length == 0)
+			return null;
+		return defs;
+	}
+
+	private PBSResourceManager getRM() {
+		return launchTab.getResourceManager();
+	}
+
+	private IPBSResourceManagerConfiguration getRMConfig() {
+		PBSResourceManager rm = getRM();
+		if (rm == null)
+			return null;
+		return (IPBSResourceManagerConfiguration) rm.getConfiguration();
 	}
 
 	/*
-	 * Checks to make sure the read-only templates have been stored in the
-	 * persistent location.
+	 * This is useful for avoiding having to read in the model definition or
+	 * contact the resource manager everytime we reload the manager.
+	 * 
+	 * @param force overwrite of current list. If <code>false</code> and the
+	 * list exists, this method simply returns.
 	 */
-	private void initializeStore() throws Throwable {
-		File attrconf = PBSUIPlugin.getDefault().getStateLocation().toFile();
-		if (!attrconf.exists())
-			attrconf.mkdirs();
-		String[] found = findAvailableTemplates();
-		Set<String> readOnly = new HashSet<String>();
-		readOnly.add(DEFAULT_TEMPLATE);
-		readOnly.add(FULL_TEMPLATE);
-		for (int i = 0; i < found.length; i++)
-			if (DEFAULT_TEMPLATE.equals(found[i]) || FULL_TEMPLATE.equals(found[i])) {
-				readOnly.remove(found[i]);
-				if (readOnly.isEmpty())
-					return;
-			}
-
-		for (Iterator<String> i = readOnly.iterator(); i.hasNext();) {
-			String name = i.next();
-			PBSBatchScriptTemplate template = getResourceTemplate(name);
-			if (template != null)
-				storeTemplate(template.getText(), name);
-		}
+	private void storeValidAttributeSet(boolean force) throws Throwable {
+		IPBSResourceManagerConfiguration c = getRMConfig();
+		if (c == null)
+			return;
+		if (!force && c.getValidAttributeSet() != null)
+			return;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(16 * 1024);
+		converter.getData().serialize(baos);
+		c.setValidAttributeSet(baos.toString());
 	}
 }

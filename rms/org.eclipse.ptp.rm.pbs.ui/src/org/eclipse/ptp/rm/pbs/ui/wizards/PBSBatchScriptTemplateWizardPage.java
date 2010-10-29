@@ -8,6 +8,8 @@
  * 	IBM Corporation - initial API and implementation Contributors:
  * 	Albert L. Rossi (NCSA) - full implementation
  *                         - modifications 05/11/2010
+ *                  - modifications to use new converter class; non-nls
+ *                    constants interface (09/14/2010)
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.wizards;
 
@@ -19,19 +21,16 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.rm.pbs.ui.PBSServiceProvider;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
-import org.eclipse.ptp.rm.pbs.ui.dialogs.ComboEntryDialog;
 import org.eclipse.ptp.rm.pbs.ui.dialogs.ScrollingEditableMessageDialog;
 import org.eclipse.ptp.rm.pbs.ui.managers.PBSBatchScriptTemplateManager;
 import org.eclipse.ptp.rm.pbs.ui.messages.Messages;
 import org.eclipse.ptp.rm.pbs.ui.providers.AttributeContentProvider;
 import org.eclipse.ptp.rm.pbs.ui.providers.AttributeLabelProvider;
-import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
 import org.eclipse.ptp.rm.ui.utils.WidgetListener;
-import org.eclipse.ptp.ui.wizards.IRMConfigurationWizard;
-import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -48,7 +47,8 @@ import org.eclipse.swt.widgets.Table;
  * 
  * @author arossi
  */
-public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage {
+public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBSNonNLSConstants {
+
 	/*
 	 * Associated with the selection of a choice of configuration file.
 	 */
@@ -68,10 +68,8 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 		 */
 		@Override
 		protected void doModifyText(ModifyEvent e) {
-			if (e.getSource() == templates) {
-				String choice = templates.getText();
-				fireModifyTemplateChoice(choice);
-			}
+			if (e.getSource() == templates)
+				updateSettings();
 		}
 	}
 
@@ -90,19 +88,10 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 		 */
 		public void widgetSelected(SelectionEvent e) {
 			try {
-				Shell shell = getShell();
-				String[] availableTemplates = templateManager.findAvailableTemplates();
-				ComboEntryDialog comboDialog = new ComboEntryDialog(shell, Messages.PBSRMLaunchConfigDeleteChoose_message,
-						availableTemplates);
-				if (comboDialog.open() == Window.CANCEL)
-					return;
-				String name = comboDialog.getChoice();
+				String name = WidgetUtils.getSelected(templates);
 				templateManager.removeTemplate(name);
-				updateTemplates();
-				if (name.equals(templates.getText())) {
-					templates.deselectAll();
-					fireModifyTemplateChoice(ConfigUtils.EMPTY_STRING);
-				}
+				updateTemplates(name);
+				updateSettings();
 			} catch (Throwable t) {
 				t.printStackTrace();
 				WidgetUtils.errorMessage(getShell(), t, Messages.PBSRMLaunchConfigDeleteError_message,
@@ -129,21 +118,13 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 			try {
 				Shell shell = getShell();
 				String newName = null;
-				String oldName = null;
-				String[] availableTemplates = templateManager.findAvailableTemplates();
-				ComboEntryDialog comboDialog = new ComboEntryDialog(shell, Messages.PBSRMLaunchConfigEditChoose_message,
-						availableTemplates);
-				if (comboDialog.open() == Window.CANCEL)
-					return;
-				oldName = comboDialog.getChoice();
-
-				InputDialog nameDialog = new InputDialog(shell, Messages.PBSRMLaunchConfigEditChoose_new + "?", //$NON-NLS-1$ 
+				String oldName = WidgetUtils.getSelected(templates);
+				InputDialog nameDialog = new InputDialog(shell, Messages.PBSRMLaunchConfigEditChoose_new + QM,
 						Messages.PBSRMLaunchConfigEditChoose_new_name, null, null);
 				if (nameDialog.open() == Window.CANCEL)
 					newName = oldName;
 				else
 					newName = nameDialog.getValue();
-
 				newName = templateManager.validateTemplateNameForEdit(newName);
 
 				PBSBatchScriptTemplate template = templateManager.loadTemplate(oldName, null);
@@ -152,12 +133,9 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 				if (dialog.open() == Window.CANCEL)
 					return;
 				String edited = dialog.getValue();
-
 				templateManager.storeTemplate(edited, newName);
-				updateTemplates();
-
-				if (newName.equals(templates.getText()))
-					fireModifyTemplateChoice(newName);
+				updateTemplates(newName);
+				updateSettings();
 			} catch (Throwable t) {
 				t.printStackTrace();
 				WidgetUtils.errorMessage(getShell(), t, Messages.PBSRMLaunchConfigEditError_message,
@@ -174,63 +152,38 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	}
 
 	private boolean isValid;
+
 	private ConfigurationChangeListener listener;
-	private final PBSServiceProvider provider;
 	private TableViewer readOnlyView;
 	private final PBSBatchScriptTemplateManager templateManager;
 	private Combo templates;
 
-	public PBSBatchScriptTemplateWizardPage(IRMConfigurationWizard wizard) throws Throwable {
-		super(wizard, Messages.PBSConfigurationWizardPage_name);
+	public PBSBatchScriptTemplateWizardPage(PBSBatchScriptTemplateManager templateManager) throws Throwable {
+		super(Messages.PBSConfigurationWizardPage_name);
 		setTitle(Messages.PBSConfigurationWizardPage_title);
 		setDescription(Messages.PBSConfigurationWizardPage_description);
-		templateManager = new PBSBatchScriptTemplateManager();
-		provider = (PBSServiceProvider) wizard.getConfiguration();
+		this.templateManager = templateManager;
 		setValid(true);
 	}
 
-	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout topLayout = new GridLayout();
 		composite.setLayout(topLayout);
 		createContents(composite);
-		String last = provider.getDefaultTemplateName();
-		String[] items = templates.getItems();
-		int i = 0;
-		for (; i < items.length; i++)
-			if (items[i].equals(last)) {
-				templates.select(i);
-				break;
-			}
-		if (i == items.length)
-			templates.select(0);
+		PBSBatchScriptTemplate current = templateManager.getCurrent();
+		String last = current == null ? PBSBatchScriptTemplateManager.BASE_TEMPLATE : current.getName();
+		WidgetUtils.select(templates, last);
 		setControl(composite);
-	}
-
-	/**
-	 * Populates the table viewer with the attributes from the selected template
-	 * file.
-	 * 
-	 * @param choice
-	 *            the configuration file selected
-	 */
-	public void fireModifyTemplateChoice(String choice) {
-		templateManager.loadTemplate(choice, null);
-		provider.setDefaultTemplateName(choice);
-		updateSettings();
 	}
 
 	private void createContents(Composite parent) {
 		Group templateContainer = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigGroup0_title, 2, 1, false);
 		listener = new ConfigurationChangeListener();
 		String[] available = templateManager.findAvailableTemplates();
-		/*
-		 * There should always be at least two choices, the full and default, so
-		 * available.length will be > 0.
-		 */
-		templates = WidgetUtils.createItemCombo(templateContainer, Messages.PBSRMLaunchConfigTemplate_title, available,
-				available[0], Messages.PBSRMLaunchConfigTemplate_message, true, listener, 1);
+		String initial = available.length == 0 ? null : available[0];
+		templates = WidgetUtils.createItemCombo(templateContainer, Messages.PBSRMLaunchConfigTemplate_title, available, initial,
+				Messages.PBSRMLaunchConfigTemplate_message, true, listener, 2);
 		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigEditButton_title, null, SWT.PUSH, 1, true,
 				new EditConfigurationSelectionAdapter());
 		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigDeleteButton_title, null, SWT.PUSH, 1, true,
@@ -257,38 +210,34 @@ public class PBSBatchScriptTemplateWizardPage extends RMConfigurationWizardPage 
 	}
 
 	/*
-	 * Refreshes the viewer.
+	 * Populates the table viewer with the attributes from the selected template
+	 * file.
+	 * 
+	 * @param choice the configuration file selected
 	 */
 	private void updateSettings() {
-		Object o = templateManager.getCurrent();
-		if (o == null)
+		PBSBatchScriptTemplate template = null;
+		String choice = WidgetUtils.getSelected(templates);
+		if (!ZEROSTR.equals(choice))
+			template = templateManager.loadTemplate(choice, null);
+		if (template == null)
 			readOnlyView.setInput(this);
 		else
-			readOnlyView.setInput(o);
+			readOnlyView.setInput(template);
 	}
 
 	/*
 	 * Called after the Edit and Delete actions; refreshes the choices in the
 	 * combo box.
+	 * 
+	 * @param current the edited or deleted template
 	 */
-	private void updateTemplates() {
+	private void updateTemplates(String current) {
 		listener.disable();
-		String text = templates.getText();
-
 		templates.setItems(templateManager.findAvailableTemplates());
-		int index = 0;
-		for (int i = 0; i < templates.getItemCount(); i++)
-			if (templates.getItem(i).equals(text)) {
-				index = i;
-				break;
-			}
-		String newText = templates.getItem(index);
-		if (!newText.equals(text)) {
-			listener.enable();
-			templates.select(index);
-		} else {
-			templates.select(index);
-			listener.enable();
-		}
+		String next = WidgetUtils.select(templates, current);
+		listener.enable();
+		if (!next.equals(current))
+			WidgetUtils.select(templates, next);
 	}
 }

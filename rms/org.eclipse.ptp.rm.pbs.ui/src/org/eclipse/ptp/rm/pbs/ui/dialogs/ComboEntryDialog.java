@@ -6,11 +6,13 @@
  * 	
  * Contributors:
  * 	Albert L. Rossi (NCSA) - design and implementation
+ *                         - modified (09/14/2010) to use non-nls interface
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.ptp.rm.pbs.ui.utils.WidgetUtils;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -22,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
  * 
  * @author arossi
  */
-public class ComboEntryDialog extends Dialog {
+public class ComboEntryDialog extends Dialog implements IPBSNonNLSConstants {
 	private String[] choices;
 
 	private String chosen;
@@ -50,13 +52,9 @@ public class ComboEntryDialog extends Dialog {
 
 	@Override
 	protected void buttonPressed(int buttonId) {
-		if (buttonId == IDialogConstants.OK_ID) {
-			int index = combo.getSelectionIndex();
-			if (index >= 0)
-				chosen = combo.getItem(index);
-			else
-				chosen = combo.getText();
-		} else
+		if (buttonId == IDialogConstants.OK_ID)
+			chosen = WidgetUtils.getSelected(combo);
+		else
 			chosen = null;
 		super.buttonPressed(buttonId);
 	}
@@ -71,7 +69,7 @@ public class ComboEntryDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
-		combo = WidgetUtils.createItemCombo(composite, title, choices, "", "", true, null, 2); //$NON-NLS-1$ //$NON-NLS-2$
+		combo = WidgetUtils.createItemCombo(composite, title, choices, ZEROSTR, ZEROSTR, true, null, 2);
 		combo.setFocus();
 		applyDialogFont(composite);
 		return composite;

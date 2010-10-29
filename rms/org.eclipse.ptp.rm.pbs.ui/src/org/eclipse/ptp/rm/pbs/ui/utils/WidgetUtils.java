@@ -17,6 +17,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -42,7 +43,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @author arossi
  */
-public class WidgetUtils {
+public class WidgetUtils implements IPBSNonNLSConstants {
 	public static final Color DKBL = Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
 	public static final Color DKMG = Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA);
 	public static final Color DKRD = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
@@ -127,7 +128,6 @@ public class WidgetUtils {
 			group.setText(text);
 		group.setLayout(layout);
 		group.setLayoutData(data);
-
 		return group;
 	}
 
@@ -150,7 +150,6 @@ public class WidgetUtils {
 		for (int i = 0; i < numColumns; i++)
 			layout.addColumnData(new ColumnPixelData(suggestedWidth / numColumns));
 		t.setLayout(layout);
-
 		return t;
 	}
 
@@ -178,7 +177,6 @@ public class WidgetUtils {
 			combo.setText(initial);
 		if (listener != null)
 			combo.addModifyListener(listener);
-
 		return combo;
 	}
 
@@ -188,10 +186,9 @@ public class WidgetUtils {
 
 		Label label = new Label(container, style);
 		if (text == null)
-			text = ConfigUtils.EMPTY_STRING;
+			text = ConfigUtils.ZEROSTR;
 		label.setText(text.trim());
 		label.setLayoutData(data);
-
 		return label;
 	}
 
@@ -217,7 +214,6 @@ public class WidgetUtils {
 		s.setLayoutData(data);
 		if (listener != null)
 			s.addModifyListener(listener);
-
 		return s;
 	}
 
@@ -235,12 +231,11 @@ public class WidgetUtils {
 			text.setText(initialValue);
 		if (listener != null)
 			text.addModifyListener(listener);
-
 		return text;
 	}
 
 	public static void errorMessage(Shell s, Throwable e, String message, String title, boolean causeTrace) {
-		String append = e == null ? ConfigUtils.EMPTY_STRING : e.getMessage();
+		String append = e == null ? ConfigUtils.ZEROSTR : e.getMessage();
 		Throwable t = e == null ? null : e.getCause();
 		String lineSep = ConfigUtils.LINE_SEP;
 		if (causeTrace) {
@@ -253,5 +248,75 @@ public class WidgetUtils {
 		} else if (t != null)
 			append = t.getMessage();
 		MessageDialog.openError(s, title, message + lineSep + lineSep + append);
+	}
+
+	/**
+	 * Normalizes text for display to fit into lines of the given length,
+	 * without further tabs or breaks. This is useful for labels and read-only
+	 * text messages.
+	 * 
+	 * @param length
+	 * @param text
+	 */
+	public static String fitToLineLength(int length, String text) {
+		if (text == null)
+			return null;
+		if (length < 1)
+			length = Integer.MAX_VALUE;
+		StringBuffer newLine = new StringBuffer();
+		int strln = text.length();
+		int current = 0;
+		for (int i = 0; i < strln; i++) {
+			char c = text.charAt(i);
+			switch (c) {
+			case '\t':
+				if (current >= length) {
+					newLine.append(LINE_SEP);
+					current = 0;
+				}
+				break;
+			case ' ':
+			case '\n':
+			case '\r':
+				if (current >= length) {
+					newLine.append(LINE_SEP);
+					current = 0;
+				} else {
+					newLine.append(SP);
+					current++;
+				}
+				break;
+			default:
+				newLine.append(c);
+				current++;
+			}
+		}
+		return newLine.toString();
+	}
+
+	public static String getSelected(Combo combo) {
+		if (combo.getItemCount() == 0)
+			return combo.getText();
+		int i = combo.getSelectionIndex();
+		if (i < 0)
+			return combo.getText();
+		return combo.getItem(i);
+	}
+
+	public static String select(Combo combo, String name) {
+		String[] items = combo.getItems();
+		if (items.length == 0)
+			return ZEROSTR;
+		int i = 0;
+		for (; i < items.length; i++)
+			if (items[i].equals(name)) {
+				combo.select(i);
+				break;
+			}
+		if (i == items.length) {
+			i = 0;
+			combo.select(i);
+		}
+		return combo.getItem(i);
 	}
 }

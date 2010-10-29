@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -87,11 +87,14 @@ public class XMLReader implements IParser {
 
 		@Override
 		public int read(char cbuf[], int offset, int length) throws IOException {
-			if (emptyInput!=null)
+			if (emptyInput != null)
 				return emptyInput.read(cbuf, offset, length);
 			int ret = super.read(cbuf, offset, length);
 			int skip = 0;
-			if (totalBytesRead==0 && ret<1) {  /*Send non-empty valid XML if input stream is empty*/
+			if (totalBytesRead == 0 && ret < 1) { /*
+												 * Send non-empty valid XML if
+												 * input stream is empty
+												 */
 				emptyInput = new StringReader("<D></D>"); //$NON-NLS-1$
 				return emptyInput.read(cbuf, offset, length);
 			}
@@ -102,12 +105,11 @@ public class XMLReader implements IParser {
 					skip++;
 					continue;
 				}
-				if (skip > 0) {
+				if (skip > 0)
 					cbuf[i - skip] = cbuf[i];
-				}
 			}
-			ret-=skip;
-			totalBytesRead+=ret;
+			ret -= skip;
+			totalBytesRead += ret;
 			return ret;
 		}
 
@@ -116,18 +118,68 @@ public class XMLReader implements IParser {
 	/** The DEBUG. */
 	private static boolean DEBUG = false;
 
-	/**
-	 * Testing method
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param argv
-	 *            the arguments
+	 * @see
+	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
+	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
 	 */
-	public static void main(String argv[]) throws IntrospectionException, IllegalAccessException, InvocationTargetException,
-	InstantiationException, FileNotFoundException {
-		DEBUG = true;
-		// parseXML(ModelQstatJob.class, new File("qstat_valid.xml"));
-		// new XMLReader().parse(ModelNode.class, new FileInputStream(new
-		// File("pbsnodes.helics.xml")));
+	/**
+	 * @since 2.0
+	 */
+	public Set<IElement> parse(List<String> requiredAttributeKeys, List<IAttributeDefinition<?, ?, ?>> AttributeDefinitions,
+			List<List<Object>> ParserKeyMap, List<List<Object>> ParserValueMap, InputStream in, String keyID, String parentkeyID)
+			throws SAXException, IOException, ParserConfigurationException, UnknownValueExecption {
+		// public <T extends IElement> Set<T> parse(Class<IElement> pojoClazz,
+		// InputStream in) {
+		Set<IElement> elementList = null;
+		NodeList xmlNodes = null;
+		xmlNodes = getXMLChildren(in);
+		elementList = new HashSet<IElement>(xmlNodes.getLength());
+		for (int i = 0; i < xmlNodes.getLength(); i++) {
+			Node node = xmlNodes.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Map<String, String> input = populateInput(node, null);
+				IElement element = populateElement(requiredAttributeKeys, AttributeDefinitions, ParserKeyMap, ParserValueMap,
+						input, keyID, parentkeyID);
+				if (DEBUG) {
+					System.out.println(element);
+					System.out.println();
+				}
+				elementList.add(element);
+			}
+		}
+
+		if (DEBUG)
+			System.out.println(elementList.size());
+		return elementList;
+	}
+
+	protected Map<String, String> populateInput(Node node, Map<String, String> input) {
+		if (input == null)
+			input = new HashMap<String, String>();
+
+		// if (node.getNodeType() == Node.ELEMENT_NODE)
+		// System.out.println(node.getNodeName());
+
+		NodeList childNodes = node.getChildNodes();
+
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node childNode = childNodes.item(i);
+
+			if (childNode.getNodeType() == Node.ELEMENT_NODE)
+				if (childNode.getChildNodes().getLength() > 1)
+					populateInput(childNode, input);
+				else
+					input.put(childNode.getNodeName().toLowerCase(), childNode.getTextContent());
+
+			// if (childNode.getNodeType() == Node.ELEMENT_NODE)
+			// System.out.println("\t" + childNode.getNodeName().toLowerCase() +
+			// " -> " + childNode.getTextContent());
+		}
+
+		return input;
 	}
 
 	private NodeList getXMLChildren(InputStream in) throws SAXException, IOException, ParserConfigurationException {
@@ -142,55 +194,21 @@ public class XMLReader implements IParser {
 		return root.getChildNodes();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.proxy.core.parser.IParser#parse(org.eclipse.ptp.rm
-	 * .proxy.core.attributes.AttributeDefinition, java.io.InputStream)
-	 */
-	/**
-	 * @since 2.0
-	 */
-	public Set<IElement> parse(List<String> requiredAttributeKeys,List<IAttributeDefinition<?,?,?>> AttributeDefinitions,List<List<Object>> ParserKeyMap,List<List<Object>> ParserValueMap, InputStream in,String keyID,String parentkeyID) throws SAXException, IOException,
-	ParserConfigurationException, UnknownValueExecption {
-		// public <T extends IElement> Set<T> parse(Class<IElement> pojoClazz,
-		// InputStream in) {
-		Set<IElement> elementList = null;
-		NodeList xmlNodes = null;
-		xmlNodes = getXMLChildren(in);
-		elementList = new HashSet<IElement>(xmlNodes.getLength());
-		for (int i = 0; i < xmlNodes.getLength(); i++) {
-			Node node = xmlNodes.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Map<String, String> input = populateInput(node, null);
-				IElement element = populateElement(requiredAttributeKeys,AttributeDefinitions,ParserKeyMap,ParserValueMap, input,keyID,parentkeyID);
-				if (DEBUG) {
-					System.out.println(element);
-					System.out.println();
-				}
-				elementList.add(element);
-			}
-		}
+	private IElement populateElement(List<String> requiredAttributeKeys, List<IAttributeDefinition<?, ?, ?>> AttributeDefinitions,
+			List<List<Object>> ParserKeyMap, List<List<Object>> ParserValueMap, Map<String, String> input, String keyID,
+			String parentkeyID) throws UnknownValueExecption {
+		IElement element = new ProxyModelElement(requiredAttributeKeys, AttributeDefinitions, keyID, parentkeyID);
 
-		if (DEBUG) {
-			System.out.println(elementList.size());
-		}
-		return elementList;
-	}
-
-	private IElement populateElement(List<String> requiredAttributeKeys,List<IAttributeDefinition<?,?,?>> AttributeDefinitions,List<List<Object>> ParserKeyMap,List<List<Object>> ParserValueMap, Map<String, String> input,String keyID,String parentkeyID) throws UnknownValueExecption  {
-		IElement element = new ProxyModelElement(requiredAttributeKeys,AttributeDefinitions,keyID,parentkeyID);
-
-		for (Entry<String,String> entry : input.entrySet()) {
+		for (Entry<String, String> entry : input.entrySet()) {
 			// save keys as lower case! (by convention)
-			// then when matching they will be matched against the lower case of the corresponding ParserKeyMap entry
+			// then when matching they will be matched against the lower case of
+			// the corresponding ParserKeyMap entry
 			String newkey = entry.getKey();
 			String newvalue = entry.getValue();
 			String k = newkey;
 			String v = newvalue;
 			boolean keymatched = false;
-			
+
 			for (List<Object> ke : ParserKeyMap) {
 				Pattern kp = (Pattern) ke.get(0);
 				if (kp.matcher(k).matches()) {
@@ -203,47 +221,34 @@ public class XMLReader implements IParser {
 			for (List<Object> ve : ParserValueMap) {
 				Pattern kp = (Pattern) ve.get(0);
 				Pattern vp = (Pattern) ve.get(1);
-				
+
 				if (kp.matcher(k).matches() && vp.matcher(v).matches()) {
-					newvalue = (String) ve.get(2);	
+					newvalue = (String) ve.get(2);
 					break;
 				}
 			}
-				
-			//System.err.println("trying to set: "+ newkey + " :: " + newvalue); 
-			if (keymatched) element.setAttribute(newkey, newvalue,false);
+
+			// System.err.println("trying to set: "+ newkey + " :: " +
+			// newvalue);
+			if (keymatched)
+				element.setAttribute(newkey, newvalue, false);
 		}
-		
+
 		return element;
 	}
 
-	protected Map<String, String> populateInput(Node node, Map<String, String> input) {
-		if (input == null) {
-			input = new HashMap<String, String>();
-		}
-
-		// if (node.getNodeType() == Node.ELEMENT_NODE)
-		// System.out.println(node.getNodeName());
-
-		NodeList childNodes = node.getChildNodes();
-
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node childNode = childNodes.item(i);
-
-			if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-				if (childNode.getChildNodes().getLength() > 1) {
-					populateInput(childNode, input);
-				} else {
-					input.put(childNode.getNodeName().toLowerCase(), childNode.getTextContent());
-				}
-			}
-
-			// if (childNode.getNodeType() == Node.ELEMENT_NODE)
-			// System.out.println("\t" + childNode.getNodeName().toLowerCase() +
-			// " -> " + childNode.getTextContent());
-		}
-
-		return input;
+	/**
+	 * Testing method
+	 * 
+	 * @param argv
+	 *            the arguments
+	 */
+	public static void main(String argv[]) throws IntrospectionException, IllegalAccessException, InvocationTargetException,
+			InstantiationException, FileNotFoundException {
+		DEBUG = true;
+		// parseXML(ModelQstatJob.class, new File("qstat_valid.xml"));
+		// new XMLReader().parse(ModelNode.class, new FileInputStream(new
+		// File("pbsnodes.helics.xml")));
 	}
 
 }

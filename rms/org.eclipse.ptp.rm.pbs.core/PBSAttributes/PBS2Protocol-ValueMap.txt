@@ -18,7 +18,8 @@
 # First match (top/down) will overwrite other possible matches
 ###############################################################################
 
-PBSJOB_STATE :: E :: STARTING	
+PBSJOB_STATE :: E :: STARTING
+PBSJOB_STATE :: Q :: COMPLETED
 PBSJOB_STATE :: R :: RUNNING
 PBSJOB_STATE :: H :: SUSPENDED
 PBSJOB_STATE :: C :: COMPLETED
