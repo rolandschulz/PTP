@@ -25,14 +25,19 @@ public class PDILocatorComparator implements Comparator<IPDILocator> {
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	public int compare(IPDILocator x, IPDILocator y) {
-		if (!x.getFile().equals(y.getFile()))
+		if (x.getFile() != null && y.getFile() != null && !x.getFile().equals(y.getFile())) {
 			return x.getFile().compareTo(y.getFile());
-		else if (!x.getFunction().equals(y.getFunction()))
+		}
+		if (x.getFunction() != null && y.getFunction() != null && !x.getFunction().equals(y.getFunction())) {
 			return x.getFunction().compareTo(y.getFunction());
-		else if (x.getLineNumber() != y.getLineNumber())
+		}
+		if (x.getLineNumber() != y.getLineNumber()) {
 			return x.getLineNumber() - y.getLineNumber();
-		else
+		}
+		if (x.getAddress() != null && y.getAddress() != null) {
 			return x.getAddress().compareTo(y.getAddress());
+		}
+		return 0;
 	}
 
 }
