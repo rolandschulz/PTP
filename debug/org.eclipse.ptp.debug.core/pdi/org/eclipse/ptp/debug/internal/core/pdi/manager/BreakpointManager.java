@@ -520,7 +520,7 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 		if (!bkpt.isEnabled()) {
 			bkpt.setEnabled(false);
 			getSession().getEventRequestManager().addEventRequest(
-					session.getRequestFactory().getDisableBreakpointRequest(tasks, bkpt));
+					session.getRequestFactory().getDisableBreakpointRequest(bkpt.getTasks(), bkpt));
 		}
 	}
 
