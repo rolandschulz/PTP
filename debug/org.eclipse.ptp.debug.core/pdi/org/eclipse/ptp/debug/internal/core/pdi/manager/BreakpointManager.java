@@ -215,9 +215,7 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 		if (!isValid(breakpoint.getBreakpointID())) {
 			throw new PDIException(tasks, Messages.BreakpointManager_0);
 		}
-		breakpoint.setEnabled(false);
-		getSession().getEventRequestManager().addEventRequest(
-				session.getRequestFactory().getDisableBreakpointRequest(tasks, breakpoint));
+		disableBreakpoint0(tasks, breakpoint);
 	}
 
 	/*
@@ -489,6 +487,20 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 	}
 
 	/**
+	 * Disable breakpoint without verifying breakpoint is valid. Used to disable
+	 * breakpoint before it is added to breakpoint manager.
+	 * 
+	 * @param tasks
+	 * @param breakpoint
+	 * @throws PDIException
+	 */
+	private void disableBreakpoint0(TaskSet tasks, IPDIBreakpoint breakpoint) throws PDIException {
+		breakpoint.setEnabled(false);
+		getSession().getEventRequestManager().addEventRequest(
+				session.getRequestFactory().getDisableBreakpointRequest(tasks, breakpoint));
+	}
+
+	/**
 	 * Get all breakpoints known by this breakpoint manager
 	 * 
 	 * @return
@@ -518,9 +530,7 @@ public class BreakpointManager extends AbstractPDIManager implements IPDIBreakpo
 	private void setLocationBreakpoint(IPDILocationBreakpoint bkpt) throws PDIException {
 		setPendingBreakpoint(bkpt);
 		if (!bkpt.isEnabled()) {
-			bkpt.setEnabled(false);
-			getSession().getEventRequestManager().addEventRequest(
-					session.getRequestFactory().getDisableBreakpointRequest(bkpt.getTasks(), bkpt));
+			disableBreakpoint0(bkpt.getTasks(), bkpt);
 		}
 	}
 
