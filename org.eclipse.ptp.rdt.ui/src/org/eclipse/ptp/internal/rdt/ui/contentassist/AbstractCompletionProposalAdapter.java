@@ -79,7 +79,8 @@ public abstract class AbstractCompletionProposalAdapter extends ParsingBasedProp
 			return Collections.emptyList();
 		}
 		ITranslationUnit unit = context.getTranslationUnit();
-		Scope scope = Scope.WORKSPACE_ROOT_SCOPE; // TODO: Use local scope
+		//Scope scope = Scope.WORKSPACE_ROOT_SCOPE; // TODO: Use local scope
+		Scope scope = new Scope(project);
 		List<Proposal> rawProposals = service.computeCompletionProposals(scope, context, unit);
 		List<ICompletionProposal> proposals = adaptProposals(context, rawProposals); // TODO: Provide IScope
 		return proposals;

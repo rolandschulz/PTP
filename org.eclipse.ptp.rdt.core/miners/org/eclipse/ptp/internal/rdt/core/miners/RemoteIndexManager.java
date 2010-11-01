@@ -24,6 +24,7 @@ import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.parser.IParserLogService;
 import org.eclipse.cdt.internal.core.index.CIndex;
 import org.eclipse.cdt.internal.core.index.IIndexFragment;
+import org.eclipse.cdt.internal.core.index.IWritableIndex;
 import org.eclipse.cdt.internal.core.indexer.StandaloneFastIndexer;
 import org.eclipse.cdt.internal.core.indexer.StandaloneIndexer;
 import org.eclipse.cdt.internal.core.pdom.PDOMWriter;
@@ -226,30 +227,53 @@ public class RemoteIndexManager {
 	}
 
 	/**
-	 * Returns the index for the given projects.
+	 * Return a list of indexes, in which each element is an index of a given project (in projects)
 	 * @param projects the projects to get the index for
-	 * @return an index for the projects
 	 */
-	public IIndex getIndexForProjects(ICProject[] projects, DataStore dataStore) {
+	public IWritableIndex[] getIndexListForProjects(ICProject[] projects, DataStore dataStore) {
 		if(projects == null) {
 			throw new IllegalArgumentException("Get index for projects - projects cannot be null."); //$NON-NLS-1$
 		}
+		IWritableIndex[] indexList = new IWritableIndex[projects.length];
 		
-		Set<IIndexFragment> fragments = new HashSet<IIndexFragment>();
+		
 		
 		Set<String> allScopes = ScopeManager.getInstance().getAllScopes();
 				
+		int j = 0;
 		for (int i = 0; i < projects.length; i++) {
 			String currentScope = projects[i].getElementName();
 			if (allScopes.contains(currentScope)) {
-				IIndexFragment fragment = getIndexerForScope(currentScope, dataStore, null).getIndex().getWritableFragment();
+				IWritableIndex project_index = getIndexerForScope(currentScope, dataStore, null).getIndex();
+				indexList[j++] = project_index;
 				
-				fragments.add(fragment);
 			}
 		}
 				
-		CIndex index = new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
-		return index;
+		//CIndex scope_index = new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
+		//indexList[j]= scope_index;
+		return indexList;
+	}
+	
+	/**
+	 * Return a list of indexes, in which each element is an index of a given project in the given scope
+	 * @param scope, a scope to get indexes
+	 */
+	public IWritableIndex[] getIndexListForScope(String scope, DataStore dataStore) {
+		IWritableIndex[] indexList;
+		if(scope.equals(Scope.WORKSPACE_ROOT_SCOPE_NAME)) {
+			indexList = new IWritableIndex[ScopeManager.getInstance().getAllScopes().size()];
+			int j = 0;
+			for(String currentScope : ScopeManager.getInstance().getAllScopes()) {
+				IWritableIndex project_index = getIndexerForScope(currentScope, dataStore, null).getIndex();
+				indexList[j++] = project_index;
+			}
+		}
+		else {
+			StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore, null);
+			indexList = new IWritableIndex[]{indexer.getIndex()};
+		}
+		return indexList;
 	}
 
 	

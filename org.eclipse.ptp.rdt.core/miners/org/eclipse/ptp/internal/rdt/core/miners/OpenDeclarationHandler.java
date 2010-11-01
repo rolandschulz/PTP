@@ -147,7 +147,18 @@ public class OpenDeclarationHandler {
 	
 	private static OpenDeclarationResult doHandleOpenDeclaration(String scopeName, String scheme, ITranslationUnit workingCopy, String path, String selectedText, 
 			                                                     int selectionStart, int selectionLength, IIndex index, DataStore _dataStore) throws CoreException {
-		IASTTranslationUnit ast = workingCopy.getAST(index, PARSE_MODE_FAST);
+		
+		IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+		try {
+			project_index.acquireReadLock();
+		} catch (InterruptedException e) {
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			return OpenDeclarationResult.failureUnexpectedError();
+		}
+		finally {
+			project_index.releaseReadLock();
+		}
+		IASTTranslationUnit ast = workingCopy.getAST(project_index, PARSE_MODE_FAST);
 		
 		final IASTNodeSelector nodeSelector = ast.getNodeSelector(null);
 		
