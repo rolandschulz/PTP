@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.core.pdi.manager;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -145,8 +146,10 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	 */
 	public void notifyEventRequest(IPDIEventRequest request) {
 		synchronized (requestList) {
-			if (!requestList.isEmpty()) {
-				requestList.remove(0).cancelTimeout();
+			if (!(request instanceof IPDIStopDebuggerRequest)) {
+				if (!requestList.isEmpty()) {
+					requestList.remove(0).cancelTimeout();
+				}
 			}
 			notifyEventRequestListeners(request);
 			PDebugUtils.println(Messages.AbstractEventManager_2 + request);
@@ -212,11 +215,15 @@ public abstract class AbstractEventManager extends AbstractPDIManager implements
 	 */
 	public void removeAllRegisteredEventRequests() {
 		synchronized (requestList) {
-			EventRequestScheduledTask[] scheduledTasks = requestList.toArray(new EventRequestScheduledTask[0]);
-			for (EventRequestScheduledTask scheduledTask : scheduledTasks) {
-				scheduledTask.cancelTimeout();
+			Iterator<EventRequestScheduledTask> iter = requestList.iterator();
+			while (iter.hasNext()) {
+				EventRequestScheduledTask task = iter.next();
+
+				if (task.getRequest().getStatus() != IPDIEventRequest.RUNNING) {
+					task.cancelTimeout();
+					iter.remove();
+				}
 			}
-			requestList.clear();
 		}
 	}
 
