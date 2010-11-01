@@ -13,6 +13,7 @@
 
 package org.eclipse.ptp.internal.rdt.core.search;
 
+import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.index.IIndex;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
@@ -38,19 +39,16 @@ public class RemoteSearchElementQuery extends RemoteSearchQuery {
 		fPath = path;
 	}
 
-	public IStatus runWithIndex(IIndex index, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException {
+	public void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException {
 		fConverter = converter;
-		try {
-			if (fElement instanceof ICElement) {
-				IBinding binding= IndexQueries.elementToBinding(index, (ICElement) fElement, fPath);
-				if (binding != null) {
-					createMatches(index, binding);
-				}
+		
+		if (fElement instanceof ICElement) {
+			IBinding binding= IndexQueries.elementToBinding(parseIndex, (ICElement) fElement, fPath);
+			if (binding != null) {
+				createMatches(searchScopeindex, binding);
 			}
-			return Status.OK_STATUS;
-		} catch (CoreException e) {
-			return e.getStatus();
 		}
+	
 	}
 	
 	public ISourceReference getSourceReference() {

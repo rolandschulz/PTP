@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 QNX Software Systems and others.
+ * Copyright (c) 2006, 2010 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.browser.ITypeReference;
+import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
 import org.eclipse.cdt.core.dom.ast.IASTName;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -40,9 +42,14 @@ import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.index.IIndexName;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.internal.core.index.CIndex;
+import org.eclipse.cdt.internal.core.index.IIndexFragment;
+import org.eclipse.cdt.internal.core.index.IWritableIndex;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.core.index.DummyName;
 
 public abstract class RemoteSearchQuery implements Serializable {
@@ -152,7 +159,75 @@ public abstract class RemoteSearchQuery implements Serializable {
 		return flags;
 	}
 	
-	public abstract IStatus runWithIndex(IIndex index, IIndexLocationConverter converter, IProgressMonitor monitor);
+	public abstract void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, DOMException;
+	
+	public IStatus runWithIndex(IWritableIndex[] indexList, IIndexLocationConverter converter, IProgressMonitor monitor){
+		
+		IStatus status = null;
+		IIndex searchScopeIndex = null;
+		if(indexList.length==1){
+			searchScopeIndex = indexList[0];
+		}else if(indexList.length>1){
+			Set<IIndexFragment> fragments = new HashSet<IIndexFragment>();
+			for(IWritableIndex projectIndex :  indexList){
+				IIndexFragment fragment = projectIndex.getWritableFragment();
+				fragments.add(fragment);
+			}
+			if(!fragments.isEmpty()){
+				searchScopeIndex = new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
+			}
+		}
+		
+		if(searchScopeIndex !=null){
+			try {
+				searchScopeIndex.acquireReadLock();
+			}catch (InterruptedException e) {
+				searchScopeIndex.releaseReadLock();
+				return CCorePlugin.createStatus(e.getMessage());
+				
+				
+			}  
+			
+			for(IWritableIndex projectIndex :  indexList){
+				try{
+				projectIndex.acquireReadLock();
+				runWithIndex(projectIndex,  searchScopeIndex, converter, monitor);
+				}catch (InterruptedException e1) {
+					if(status !=null){
+						status = CCorePlugin.createStatus(status.getMessage() + "::" + e1.getMessage()); //$NON-NLS-1$
+					}else{
+						status = CCorePlugin.createStatus(e1.getMessage());
+					}
+					
+				}  catch (CoreException e2) {
+					if(status !=null){
+						status = CCorePlugin.createStatus(status.getMessage() + "::" + e2.getMessage()); //$NON-NLS-1$
+					}else{
+						status = CCorePlugin.createStatus(e2.getMessage());
+					}	
+				} catch (DOMException e3) {
+					if(status !=null){
+						status = CCorePlugin.createStatus(status.getMessage() + "::" + e3.getMessage()); //$NON-NLS-1$
+					}else{
+						status = CCorePlugin.createStatus(e3.getMessage());
+					}
+				}
+				finally{
+					projectIndex.releaseReadLock();
+				}
+
+			}
+			
+			searchScopeIndex.releaseReadLock();
+		
+		}
+		
+		if(status !=null){
+			return status;
+		}else{
+			return Status.OK_STATUS;
+		}
+	}
 
 	public List<RemoteSearchMatch> getMatches() {
 		return fMatches;

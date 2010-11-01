@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2010 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -160,8 +160,9 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 
 		if (serviceProvider instanceof IIndexServiceProvider) {
+			Scope scope = new Scope(project);
 			ICallHierarchyService chService = ((IIndexServiceProvider) serviceProvider).getCallHierarchyService();
-			result = chService.findCalledBy(Scope.WORKSPACE_ROOT_SCOPE, callee, NPM);
+			result = chService.findCalledBy(scope, callee, NPM);
 		}
 		return createNodes(parent, result);
 	}
@@ -179,8 +180,9 @@ public class CHContentProvider extends AsyncTreeContentProvider {
 		IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
 
 		if (serviceProvider instanceof IIndexServiceProvider) {
+			Scope scope = new Scope(project);
 			ICallHierarchyService chService = ((IIndexServiceProvider) serviceProvider).getCallHierarchyService();
-			result = chService.findCalls(Scope.WORKSPACE_ROOT_SCOPE, caller, NPM);
+			result = chService.findCalls(scope, caller, NPM);
 		}
 		return createNodes(parent, result);
 	}
