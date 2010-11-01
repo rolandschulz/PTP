@@ -82,7 +82,18 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 		 */
 		public void flushEventRequests() {
 			synchronized (fRequests) {
-				fRequests.clear();
+				int end = fRequests.size() - 1;
+				for (int i = end; i >= 0; i--) {
+					IPDIEventRequest request = fRequests.get(i);
+
+					if (request != null) {
+						if (request.getStatus() != IPDIEventRequest.RUNNING) {
+							request.cancel();
+							request.done();
+							fRequests.remove(i);
+						}
+					}
+				}
 			}
 		}
 
@@ -139,7 +150,6 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 				int end = fRequests.size() - 1;
 				for (int i = end; i >= 0; i--) {
 					removeEventRequest(fRequests.get(i));
-					fRequests.remove(i);
 				}
 			}
 		}
@@ -158,7 +168,12 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 				}
 
 				public void run() throws Exception {
-					execute(getCurrentEventRequest());
+					IPDIEventRequest request = null;
+					synchronized (fRequests) {
+						request = getCurrentEventRequest();
+						request.setStatus(IPDIEventRequest.RUNNING);
+					}
+					execute(request);
 				}
 			});
 			return Status.OK_STATUS;
@@ -196,6 +211,9 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 			}
 			if (session.getTaskManager().isAllPending(request.getTasks())) {
 				throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_6, request.getName()));
+			}
+			if (session.getStatus() == IPDISession.EXITING || session.getStatus() == IPDISession.EXITED) {
+				throw new PDIException(request.getTasks(), Messages.EventRequestManager_7);
 			}
 		}
 		dispatchJob.addEventRequest(request);
@@ -241,10 +259,12 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * (org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
 	 */
 	public void execute(IPDIEventRequest request) {
-		session.getEventManager().registerEventRequest(request);
-		request.execute(session.getDebugger());
-		if (request.getStatus() == IPDIEventRequest.ERROR) {
-			session.getEventManager().notifyEventRequest(request);
+		if (request != null) {
+			session.getEventManager().registerEventRequest(request);
+			request.execute(session.getDebugger());
+			if (request.getStatus() == IPDIEventRequest.ERROR) {
+				session.getEventManager().notifyEventRequest(request);
+			}
 		}
 	}
 

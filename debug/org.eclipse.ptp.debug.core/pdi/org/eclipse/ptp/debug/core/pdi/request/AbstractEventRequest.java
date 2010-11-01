@@ -110,7 +110,6 @@ public abstract class AbstractEventRequest implements IPDIEventRequest {
 	public void execute(IPDIDebugger debugger) {
 		try {
 			doExecute(debugger);
-			this.status = IPDIEventRequest.RUNNING;
 		} catch (PDIException e) {
 			error(e.getMessage());
 		}

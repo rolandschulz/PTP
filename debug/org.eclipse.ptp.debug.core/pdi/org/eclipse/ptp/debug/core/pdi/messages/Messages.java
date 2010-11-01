@@ -132,6 +132,7 @@ public class Messages extends NLS {
 	public static String EventRequestManager_4;
 	public static String EventRequestManager_5;
 	public static String EventRequestManager_6;
+	public static String EventRequestManager_7;
 	public static String Expression_0;
 	public static String ExpressionManager_0;
 	public static String Memory_1;
