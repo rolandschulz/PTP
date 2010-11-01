@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 QNX Software Systems and others.
+ * Copyright (c) 2006, 2010 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,11 +46,11 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 		this.length = length;
 	}
 
-	public IStatus runWithIndex(final IIndex index, IIndexLocationConverter converter, IProgressMonitor monitor) {
+	public void runWithIndex(final IIndex parseIndex,  final IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws CoreException {
 		fConverter = converter;
-		try {
+	
 			
-			IASTTranslationUnit ast = tu.getAST(index, ITranslationUnit.AST_SKIP_INDEXED_HEADERS);
+			IASTTranslationUnit ast = tu.getAST(parseIndex, ITranslationUnit.AST_SKIP_INDEXED_HEADERS);
 
 			if (ast != null) {
 				IASTName searchName= ast.getNodeSelector(null).findEnclosingName(offset, length);
@@ -66,21 +66,18 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 							}
 							if (scope instanceof ICPPBlockScope || scope instanceof ICFunctionScope) {
 								createLocalMatches(ast, binding);
-								return Status.OK_STATUS;
+								
 							}
 						}
-						binding = index.findBinding(searchName);
+						binding = parseIndex.findBinding(searchName);
 						if (binding != null) {
-							createMatches(index, binding);
-							return Status.OK_STATUS;
+							createMatches(searchScopeindex, binding);
+							
 						}
 					}
 				}
 			}
-			return Status.OK_STATUS;
-		} catch (CoreException e) {
-			return e.getStatus();
-		}
+			
 	}
 
 	public String getSelection() {
