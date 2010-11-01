@@ -41,12 +41,9 @@ import org.eclipse.cdt.core.index.IIndexBinding;
 import org.eclipse.cdt.core.index.IIndexLocationConverter;
 import org.eclipse.cdt.core.index.IndexFilter;
 import org.eclipse.cdt.core.model.ICElement;
-import org.eclipse.cdt.internal.core.Util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
 
 public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 	private static final long serialVersionUID = 1L;
@@ -124,75 +121,69 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 	}
 	
 	@Override
-	public IStatus runWithIndex(IIndex index, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException {
+	public void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, DOMException {
 		fConverter = converter;
-		
-		try {
-			IndexFilter filter= IndexFilter.ALL;
-			IIndexBinding[] bindings = index.findBindings(pattern, false, filter, monitor);
-			for (int i = 0; i < bindings.length; ++i) {
-				IIndexBinding pdomBinding = bindings[i];
 
-				//check for the element type of this binding and create matches if 
-				//the element type checkbox is checked in the C/C++ Search Page
+		IndexFilter filter= IndexFilter.ALL;
+		IIndexBinding[] bindings = parseIndex.findBindings(pattern, false, filter, monitor);
+		for (int i = 0; i < bindings.length; ++i) {
+			IIndexBinding pdomBinding = bindings[i];
 
-				//TODO search for macro
+			//check for the element type of this binding and create matches if 
+			//the element type checkbox is checked in the C/C++ Search Page
 
-				boolean matches= false;
-				if ((flags & FIND_ALL_TYPES) == FIND_ALL_TYPES) {
-					matches= true;
-				}
-				else if (pdomBinding instanceof ICompositeType) {
-					ICompositeType ct= (ICompositeType) pdomBinding;
-					switch (ct.getKey()) {
-					case ICompositeType.k_struct:
-					case ICPPClassType.k_class:
-						matches= (flags & FIND_CLASS_STRUCT) != 0;
-						break;
-					case ICompositeType.k_union:
-						matches= (flags & FIND_UNION) != 0;
-						break;
-					}
-				}
-				else if (pdomBinding instanceof IEnumeration) {
-					matches= (flags & FIND_ENUM) != 0;
-				}
-				else if (pdomBinding instanceof IEnumerator) {
-					matches= (flags & FIND_ENUMERATOR) != 0;
-				}
-				else if (pdomBinding instanceof IField) {
-					matches= (flags & FIND_FIELD) != 0;
-				}
-				else if (pdomBinding instanceof ICPPMethod) {
-					matches= (flags & FIND_METHOD) != 0;
-				}
-				else if (pdomBinding instanceof IVariable) {
-					matches= (flags & FIND_VARIABLE) != 0;
-				}
-				else if (pdomBinding instanceof IFunction) {
-					matches= (flags & FIND_FUNCTION) != 0;
-				}
-				else if (pdomBinding instanceof ICPPNamespace || pdomBinding instanceof ICPPNamespaceAlias) {
-					matches= (flags & FIND_NAMESPACE) != 0;
-				}
-				else if (pdomBinding instanceof ITypedef) {
-					matches= (flags & FIND_TYPEDEF) != 0;
-				}
-				if (matches) {
-					createMatches(index, pdomBinding);
+			//TODO search for macro
+
+			boolean matches= false;
+			if ((flags & FIND_ALL_TYPES) == FIND_ALL_TYPES) {
+				matches= true;
+			}
+			else if (pdomBinding instanceof ICompositeType) {
+				ICompositeType ct= (ICompositeType) pdomBinding;
+				switch (ct.getKey()) {
+				case ICompositeType.k_struct:
+				case ICPPClassType.k_class:
+					matches= (flags & FIND_CLASS_STRUCT) != 0;
+					break;
+				case ICompositeType.k_union:
+					matches= (flags & FIND_UNION) != 0;
+					break;
 				}
 			}
-			if ((flags & FIND_MACRO) != 0 && pattern.length == 1) {
-				bindings = index.findMacroContainers(pattern[0], filter, monitor);
-				for (IIndexBinding indexBinding : bindings) {
-					createMatches(index, indexBinding);
-				}
+			else if (pdomBinding instanceof IEnumeration) {
+				matches= (flags & FIND_ENUM) != 0;
 			}
-		} catch (CoreException e) {
-			return e.getStatus();
+			else if (pdomBinding instanceof IEnumerator) {
+				matches= (flags & FIND_ENUMERATOR) != 0;
+			}
+			else if (pdomBinding instanceof IField) {
+				matches= (flags & FIND_FIELD) != 0;
+			}
+			else if (pdomBinding instanceof ICPPMethod) {
+				matches= (flags & FIND_METHOD) != 0;
+			}
+			else if (pdomBinding instanceof IVariable) {
+				matches= (flags & FIND_VARIABLE) != 0;
+			}
+			else if (pdomBinding instanceof IFunction) {
+				matches= (flags & FIND_FUNCTION) != 0;
+			}
+			else if (pdomBinding instanceof ICPPNamespace || pdomBinding instanceof ICPPNamespaceAlias) {
+				matches= (flags & FIND_NAMESPACE) != 0;
+			}
+			else if (pdomBinding instanceof ITypedef) {
+				matches= (flags & FIND_TYPEDEF) != 0;
+			}
+			if (matches) {
+				createMatches(searchScopeindex, pdomBinding);
+			}
 		}
-		
-		return Status.OK_STATUS;
+		if ((flags & FIND_MACRO) != 0 && pattern.length == 1) {
+			bindings = parseIndex.findMacroContainers(pattern[0], filter, monitor);
+			for (IIndexBinding indexBinding : bindings) {
+				createMatches(searchScopeindex, indexBinding);
+			}
+		}		
 	}
 
 	@Override
