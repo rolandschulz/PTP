@@ -92,7 +92,8 @@ public abstract class FindAction extends SelectionParseAction {
 	protected ISearchQuery createQuery(ISourceReference object) {
 		IProject project = object.getTranslationUnit().getCProject().getProject();
 		ISearchService service = getSearchService(project);
-		return service.createSearchElementQuery(Scope.WORKSPACE_ROOT_SCOPE, getScope(), object, getLimitTo());
+		Scope scope = new Scope(project);
+		return service.createSearchElementQuery(scope, getScope(), object, getLimitTo());
 	}
 
 	private ISearchService getSearchService(IProject project) {
@@ -110,7 +111,8 @@ public abstract class FindAction extends SelectionParseAction {
 	protected ISearchQuery createQuery(ICElement element, ITextSelection selNode) {
 		IProject project = element.getCProject().getProject();
 		ISearchService service = getSearchService(project);
-		return service.createSearchTextSelectionQuery(Scope.WORKSPACE_ROOT_SCOPE, getScope(),
+		Scope scope = new Scope(project);
+		return service.createSearchTextSelectionQuery(scope, getScope(),
 				(ITranslationUnit)element, selNode, getLimitTo());
 	}
 	

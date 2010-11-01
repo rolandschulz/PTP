@@ -52,7 +52,9 @@ public class TypeHierarchyUtil {
 	    	input= memberInput.getParent();
 	    	if (!TypeHierarchyUI.isValidTypeInput(input)) {
 	    		IProgressMonitor monitor = new NullProgressMonitor();
-	    		ICElement[] inputs= service.findInput(Scope.WORKSPACE_ROOT_SCOPE, memberInput, monitor);
+	    		final ICProject project = input.getCProject();
+	    		Scope scope = new Scope(project.getProject());
+	    		ICElement[] inputs= service.findInput(scope, memberInput, monitor);
 	    		if (inputs != null) {
 	    			input= inputs[0];
 	    			memberInput= inputs[1];
@@ -83,7 +85,8 @@ public class TypeHierarchyUtil {
 							IWorkingCopy workingCopy = CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
 							int selectionStart = sel.getOffset();
 							int selectionLength = sel.getLength();
-							final ICElement[] elems= service.findInput(Scope.WORKSPACE_ROOT_SCOPE, project, workingCopy, selectionStart, selectionLength, monitor);
+							Scope scope = new Scope(project.getProject());
+							final ICElement[] elems= service.findInput(scope, project, workingCopy, selectionStart, selectionLength, monitor);
 							if (elems != null && elems.length == 2) {
 								display.asyncExec(new Runnable() {
 									public void run() {
