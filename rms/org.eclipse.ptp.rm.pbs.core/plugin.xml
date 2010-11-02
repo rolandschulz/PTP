@@ -14,10 +14,4 @@
               verifyFailMessage="Minimum Java 1.5 is required">
         </remoteServer>
      </extension>
-    <extension
-          point="org.eclipse.core.runtime.preferences">
-       <initializer
-             class="org.eclipse.ptp.rm.pbs.core.attributes.PBSPreferenceManager">
-       </initializer>
-    </extension>
 </plugin>
