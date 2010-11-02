@@ -926,7 +926,7 @@ AIFAddArrayElement(AIF *a, int idx, AIF *el)
 	int	size;
 	int len = AIFTypeSize(el);
 
-	if (AIF_FORMAT(el)[0] != FDS_CHAR_POINTER && AIF_FORMAT(el)[0] != FDS_STRING) {
+	if (AIF_FORMAT(el)[0] == FDS_CHAR_POINTER || AIF_FORMAT(el)[0] == FDS_STRING) {
 		AIFAddComplexArrayElement(a, el);
 	} else {
 		min = FDSArrayMinIndex(AIF_FORMAT(a), 0);
