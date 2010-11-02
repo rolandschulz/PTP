@@ -266,29 +266,27 @@ public class WidgetUtils implements IPBSNonNLSConstants {
 		StringBuffer newLine = new StringBuffer();
 		int strln = text.length();
 		int current = 0;
+		char lastChar = 0;
 		for (int i = 0; i < strln; i++) {
 			char c = text.charAt(i);
 			switch (c) {
 			case '\t':
-				if (current >= length) {
-					newLine.append(LINE_SEP);
-					current = 0;
-				}
-				break;
 			case ' ':
 			case '\n':
 			case '\r':
 				if (current >= length) {
 					newLine.append(LINE_SEP);
 					current = 0;
-				} else {
+				} else if (lastChar != SP.charAt(0)) {
 					newLine.append(SP);
 					current++;
+					lastChar = SP.charAt(0);
 				}
 				break;
 			default:
 				newLine.append(c);
 				current++;
+				lastChar = c;
 			}
 		}
 		return newLine.toString();

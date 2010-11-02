@@ -85,7 +85,7 @@ public class PBSRMLaunchConfigurationDynamicTabWizardPage extends WizardPage imp
 				String name = ap.getName();
 				String descr = WidgetUtils.fitToLineLength(-1, attr.getDefinition().getDescription());
 				Label l = WidgetUtils.createLabel(container, name, SWT.LEFT, 1);
-				l.setToolTipText(WidgetUtils.fitToLineLength(60, ap.getToolTip()));
+				l.setToolTipText(WidgetUtils.fitToLineLength(40, ap.getToolTip()));
 				valueWidgets.put(getValueWidget(container, ap.getDefaultString(), attr), ap);
 				l = WidgetUtils.createLabel(container, descr, SWT.LEFT, 1);
 				l.setForeground(WidgetUtils.DKBL);
