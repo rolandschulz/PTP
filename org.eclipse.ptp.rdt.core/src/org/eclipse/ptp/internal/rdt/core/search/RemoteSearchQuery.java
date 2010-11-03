@@ -159,7 +159,7 @@ public abstract class RemoteSearchQuery implements Serializable {
 		return flags;
 	}
 	
-	public abstract void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, DOMException;
+	public abstract void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, DOMException, InterruptedException;
 	
 	public IStatus runWithIndex(IWritableIndex[] indexList, IIndexLocationConverter converter, IProgressMonitor monitor){
 		
@@ -170,8 +170,10 @@ public abstract class RemoteSearchQuery implements Serializable {
 		}else if(indexList.length>1){
 			Set<IIndexFragment> fragments = new HashSet<IIndexFragment>();
 			for(IWritableIndex projectIndex :  indexList){
-				IIndexFragment fragment = projectIndex.getWritableFragment();
-				fragments.add(fragment);
+				if(projectIndex !=null){
+					IIndexFragment fragment = projectIndex.getWritableFragment();
+					fragments.add(fragment);
+				}
 			}
 			if(!fragments.isEmpty()){
 				searchScopeIndex = new CIndex(fragments.toArray(new IIndexFragment[fragments.size()]), fragments.size()); 
@@ -179,19 +181,12 @@ public abstract class RemoteSearchQuery implements Serializable {
 		}
 		
 		if(searchScopeIndex !=null){
-			try {
-				searchScopeIndex.acquireReadLock();
-			}catch (InterruptedException e) {
-				searchScopeIndex.releaseReadLock();
-				return CCorePlugin.createStatus(e.getMessage());
 				
-				
-			}  
-			
 			for(IWritableIndex projectIndex :  indexList){
 				try{
-				projectIndex.acquireReadLock();
-				runWithIndex(projectIndex,  searchScopeIndex, converter, monitor);
+					if(projectIndex!=null){
+						runWithIndex(projectIndex,  searchScopeIndex, converter, monitor);
+					}
 				}catch (InterruptedException e1) {
 					if(status !=null){
 						status = CCorePlugin.createStatus(status.getMessage() + "::" + e1.getMessage()); //$NON-NLS-1$
@@ -212,14 +207,9 @@ public abstract class RemoteSearchQuery implements Serializable {
 						status = CCorePlugin.createStatus(e3.getMessage());
 					}
 				}
-				finally{
-					projectIndex.releaseReadLock();
-				}
+				
 
 			}
-			
-			searchScopeIndex.releaseReadLock();
-		
 		}
 		
 		if(status !=null){
