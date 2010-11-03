@@ -46,17 +46,19 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 		this.length = length;
 	}
 
-	public void runWithIndex(final IIndex parseIndex,  final IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws CoreException {
+	public void runWithIndex(final IIndex parseIndex,  final IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws CoreException, InterruptedException {
 		fConverter = converter;
 	
-			
+		IBinding binding = null;
+		parseIndex.acquireReadLock();
+		try{
 			IASTTranslationUnit ast = tu.getAST(parseIndex, ITranslationUnit.AST_SKIP_INDEXED_HEADERS);
 
 			if (ast != null) {
 				IASTName searchName= ast.getNodeSelector(null).findEnclosingName(offset, length);
 				if (searchName != null) {
 					selection= searchName.toString();
-					IBinding binding= searchName.resolveBinding();
+					binding= searchName.resolveBinding();
 					if (binding instanceof IProblemBinding == false) {
 						if (binding != null) {
 							IScope scope= null;
@@ -70,13 +72,23 @@ public class RemoteSearchTextSelectionQuery extends RemoteSearchQuery {
 							}
 						}
 						binding = parseIndex.findBinding(searchName);
-						if (binding != null) {
-							createMatches(searchScopeindex, binding);
-							
-						}
+						
 					}
 				}
 			}
+		}finally{
+			parseIndex.releaseReadLock();
+		}
+		if (binding != null) {
+			searchScopeindex.acquireReadLock();
+			try{
+				createMatches(searchScopeindex, binding);
+			}finally{
+				searchScopeindex.releaseReadLock();
+			}
+			
+			
+		}
 			
 	}
 
