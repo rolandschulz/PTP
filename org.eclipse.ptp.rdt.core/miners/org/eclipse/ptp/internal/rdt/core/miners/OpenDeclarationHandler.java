@@ -102,26 +102,12 @@ public class OpenDeclarationHandler {
 
 		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Acquiring read lock", _dataStore); //$NON-NLS-1$
 		
-		
-		try {
-			index.acquireReadLock();
-		} catch (InterruptedException e) {
-			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
-			return OpenDeclarationResult.failureUnexpectedError();
-		}
-		
 		UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Got Read lock", _dataStore); //$NON-NLS-1$
 		
-		try {
-			return doHandleOpenDeclaration(scopeName, scheme, workingCopy, path, selectedText, selectionStart, selectionLength, index, _dataStore);
+		
+		return doHandleOpenDeclaration(scopeName, scheme, workingCopy, path, selectedText, selectionStart, selectionLength, index, _dataStore);
 			
-		} catch (CoreException e) {
-			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
-			return OpenDeclarationResult.failureUnexpectedError();
-		} finally {
-			index.releaseReadLock();
-			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Lock released", _dataStore);   //$NON-NLS-1$
-		}
+		
 	}
 
 	
@@ -146,108 +132,132 @@ public class OpenDeclarationHandler {
 	 */	
 	
 	private static OpenDeclarationResult doHandleOpenDeclaration(String scopeName, String scheme, ITranslationUnit workingCopy, String path, String selectedText, 
-			                                                     int selectionStart, int selectionLength, IIndex index, DataStore _dataStore) throws CoreException {
+			                                                     int selectionStart, int selectionLength, IIndex index, DataStore _dataStore) {
 		
 		IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+		IASTTranslationUnit ast = null;
 		try {
+			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Acquiring read lock for project_index", _dataStore); //$NON-NLS-1$
 			project_index.acquireReadLock();
-		} catch (InterruptedException e) {
+			ast = workingCopy.getAST(project_index, PARSE_MODE_FAST);
+		}catch (InterruptedException e) {
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			return OpenDeclarationResult.failureUnexpectedError();
+		}catch (CoreException e) {
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			return OpenDeclarationResult.failureUnexpectedError();
+		} finally {
+			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Releasing read lock for project_index", _dataStore); //$NON-NLS-1$
+			project_index.releaseReadLock();
+		}
+		
+		if(ast == null){
+			return OpenDeclarationResult.failureUnexpectedError();
+		}
+		
+		try{
+			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Acquiring read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+			index.acquireReadLock();
+			final IASTNodeSelector nodeSelector = ast.getNodeSelector(null);
+			
+			IASTName sourceName= nodeSelector.findEnclosingName(selectionStart, selectionLength);
+			IName[] implicitTargets = findImplicitTargets(index, ast, nodeSelector, selectionStart, selectionLength);
+			if (sourceName == null) {
+				if (implicitTargets.length > 0) {
+					ICElement[] elements = convertToCElements(workingCopy, index, implicitTargets, _dataStore);
+					return OpenDeclarationResult.resultCElements(elements);				
+				}
+			} else {
+				IASTNode parent = sourceName.getParent();
+				if (parent instanceof IASTPreprocessorIncludeStatement) {
+					String includedPath = ((IASTPreprocessorIncludeStatement) parent).getPath();
+					if (includedPath == null || includedPath.equals("")) //$NON-NLS-1$
+						return OpenDeclarationResult.failureIncludeLookup(selectedText);
+					else
+						return OpenDeclarationResult.resultIncludePath(includedPath);
+				}
+				
+				NameKind kind = getNameKind(sourceName);
+				IBinding b = sourceName.resolveBinding();
+				IBinding[] bindings = new IBinding[] { b };
+				if (b instanceof IProblemBinding) {
+					IBinding[] candidateBindings = ((IProblemBinding) b).getCandidateBindings();
+					if (candidateBindings.length != 0) {
+						bindings = candidateBindings;
+					}
+				} else if (kind == NameKind.DEFINITION && b instanceof IType) {
+					// Don't navigate away from a type definition.
+					// Select the name at the current location instead.
+					return OpenDeclarationResult.resultName(new SimpleName(sourceName));
+				}
+				IName[] targets = IName.EMPTY_ARRAY;
+				String filename = ast.getFilePath();
+				for (IBinding binding : bindings) {
+					if (binding != null && !(binding instanceof IProblemBinding)) {
+						IName[] names = findDeclNames(index, ast, kind, binding);
+						for (final IName name : names) {
+							if (name instanceof IIndexName &&
+									filename.equals(((IIndexName) name).getFileLocation().getFileName())) {
+								// Exclude index names from the current file.
+							} else if (areOverlappingNames(name, sourceName)) {
+								// Exclude the current location.
+							} else if (binding instanceof IParameter) {
+								if (isInSameFunction(sourceName, name)) {
+									targets = ArrayUtil.append(targets, name);
+								}
+							} else if (binding instanceof ICPPTemplateParameter) {
+								if (isInSameTemplate(sourceName, name)) {
+									targets = ArrayUtil.append(targets, name);			
+								}
+							} else if (name != null) {
+								targets = ArrayUtil.append(targets, name);
+							}
+						}
+					}
+					targets = ArrayUtil.trim(ArrayUtil.addAll(targets, implicitTargets));
+					ICElement[] elements = convertToCElements(workingCopy, index, targets, _dataStore);
+					if(elements != null && elements.length > 0)
+						return OpenDeclarationResult.resultCElements(elements);					
+					else if(hasAtLeastOneLocation(targets))
+						return OpenDeclarationResult.resultNames(convertNames(targets));
+					
+					return navigationFallBack(ast, index, selectedText, _dataStore, workingCopy, sourceName, kind); 
+				}
+			
+			}
+			
+			// No enclosing name, check if we're in an include statement
+			IASTNode node = nodeSelector.findEnclosingNode(selectionStart, selectionLength);
+			if (node instanceof IASTPreprocessorIncludeStatement) {
+				String includedPath = ((IASTPreprocessorIncludeStatement) node).getPath();
+				if (includedPath != "") //$NON-NLS-1$
+					return OpenDeclarationResult.resultIncludePath(includedPath);
+				else
+					return OpenDeclarationResult.failureIncludeLookup(selectedText);
+			} else if (node instanceof IASTPreprocessorFunctionStyleMacroDefinition) {
+				IASTPreprocessorFunctionStyleMacroDefinition mdef= (IASTPreprocessorFunctionStyleMacroDefinition) node;
+				for (IASTFunctionStyleMacroParameter par: mdef.getParameters()) {
+					String parName= par.getParameter();
+					if (parName.equals(selectedText)) {
+						IASTFileLocation location = par.getFileLocation();
+						if (location != null)
+							return OpenDeclarationResult.resultLocation(new SimpleASTFileLocation(par.getFileLocation()));
+					} 
+				}
+			}
+					
+			return navigationFallBack(ast, index, selectedText, _dataStore, workingCopy, sourceName, NameKind.REFERENCE); 
+		}catch (InterruptedException e) {
 			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
 			return OpenDeclarationResult.failureUnexpectedError();
 		}
-		finally {
-			project_index.releaseReadLock();
+		catch (CoreException e) {
+			UniversalServerUtilities.logError(CLASS_NAME, e.toString(), e, _dataStore);
+			return OpenDeclarationResult.failureUnexpectedError();
+		} finally {
+			UniversalServerUtilities.logDebugMessage(CLASS_NAME, "Releasing read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+			index.releaseReadLock();
 		}
-		IASTTranslationUnit ast = workingCopy.getAST(project_index, PARSE_MODE_FAST);
-		
-		final IASTNodeSelector nodeSelector = ast.getNodeSelector(null);
-		
-		IASTName sourceName= nodeSelector.findEnclosingName(selectionStart, selectionLength);
-		IName[] implicitTargets = findImplicitTargets(index, ast, nodeSelector, selectionStart, selectionLength);
-		if (sourceName == null) {
-			if (implicitTargets.length > 0) {
-				ICElement[] elements = convertToCElements(workingCopy, index, implicitTargets, _dataStore);
-				return OpenDeclarationResult.resultCElements(elements);				
-			}
-		} else {
-			IASTNode parent = sourceName.getParent();
-			if (parent instanceof IASTPreprocessorIncludeStatement) {
-				String includedPath = ((IASTPreprocessorIncludeStatement) parent).getPath();
-				if (includedPath == null || includedPath.equals("")) //$NON-NLS-1$
-					return OpenDeclarationResult.failureIncludeLookup(selectedText);
-				else
-					return OpenDeclarationResult.resultIncludePath(includedPath);
-			}
-			
-			NameKind kind = getNameKind(sourceName);
-			IBinding b = sourceName.resolveBinding();
-			IBinding[] bindings = new IBinding[] { b };
-			if (b instanceof IProblemBinding) {
-				IBinding[] candidateBindings = ((IProblemBinding) b).getCandidateBindings();
-				if (candidateBindings.length != 0) {
-					bindings = candidateBindings;
-				}
-			} else if (kind == NameKind.DEFINITION && b instanceof IType) {
-				// Don't navigate away from a type definition.
-				// Select the name at the current location instead.
-				return OpenDeclarationResult.resultName(new SimpleName(sourceName));
-			}
-			IName[] targets = IName.EMPTY_ARRAY;
-			String filename = ast.getFilePath();
-			for (IBinding binding : bindings) {
-				if (binding != null && !(binding instanceof IProblemBinding)) {
-					IName[] names = findDeclNames(index, ast, kind, binding);
-					for (final IName name : names) {
-						if (name instanceof IIndexName &&
-								filename.equals(((IIndexName) name).getFileLocation().getFileName())) {
-							// Exclude index names from the current file.
-						} else if (areOverlappingNames(name, sourceName)) {
-							// Exclude the current location.
-						} else if (binding instanceof IParameter) {
-							if (isInSameFunction(sourceName, name)) {
-								targets = ArrayUtil.append(targets, name);
-							}
-						} else if (binding instanceof ICPPTemplateParameter) {
-							if (isInSameTemplate(sourceName, name)) {
-								targets = ArrayUtil.append(targets, name);			
-							}
-						} else if (name != null) {
-							targets = ArrayUtil.append(targets, name);
-						}
-					}
-				}
-				targets = ArrayUtil.trim(ArrayUtil.addAll(targets, implicitTargets));
-				ICElement[] elements = convertToCElements(workingCopy, index, targets, _dataStore);
-				if(elements != null && elements.length > 0)
-					return OpenDeclarationResult.resultCElements(elements);					
-				else if(hasAtLeastOneLocation(targets))
-					return OpenDeclarationResult.resultNames(convertNames(targets));
-				
-				return navigationFallBack(ast, index, selectedText, _dataStore, workingCopy, sourceName, kind); 
-			}
-		}
-		
-		// No enclosing name, check if we're in an include statement
-		IASTNode node = nodeSelector.findEnclosingNode(selectionStart, selectionLength);
-		if (node instanceof IASTPreprocessorIncludeStatement) {
-			String includedPath = ((IASTPreprocessorIncludeStatement) node).getPath();
-			if (includedPath != "") //$NON-NLS-1$
-				return OpenDeclarationResult.resultIncludePath(includedPath);
-			else
-				return OpenDeclarationResult.failureIncludeLookup(selectedText);
-		} else if (node instanceof IASTPreprocessorFunctionStyleMacroDefinition) {
-			IASTPreprocessorFunctionStyleMacroDefinition mdef= (IASTPreprocessorFunctionStyleMacroDefinition) node;
-			for (IASTFunctionStyleMacroParameter par: mdef.getParameters()) {
-				String parName= par.getParameter();
-				if (parName.equals(selectedText)) {
-					IASTFileLocation location = par.getFileLocation();
-					if (location != null)
-						return OpenDeclarationResult.resultLocation(new SimpleASTFileLocation(par.getFileLocation()));
-				} 
-			}
-		}
-				
-		return navigationFallBack(ast, index, selectedText, _dataStore, workingCopy, sourceName, NameKind.REFERENCE); 
 	}
 	
 	private static boolean areOverlappingNames(IName n1, IName n2) {

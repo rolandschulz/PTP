@@ -39,13 +39,24 @@ public class RemoteSearchElementQuery extends RemoteSearchQuery {
 		fPath = path;
 	}
 
-	public void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException {
+	public void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, InterruptedException {
 		fConverter = converter;
 		
 		if (fElement instanceof ICElement) {
-			IBinding binding= IndexQueries.elementToBinding(parseIndex, (ICElement) fElement, fPath);
+			IBinding binding = null;
+			parseIndex.acquireReadLock();
+			try{
+				binding= IndexQueries.elementToBinding(parseIndex, (ICElement) fElement, fPath);
+			}finally{
+				parseIndex.releaseReadLock();
+			}
 			if (binding != null) {
-				createMatches(searchScopeindex, binding);
+				searchScopeindex.acquireReadLock();
+				try{
+					createMatches(searchScopeindex, binding);
+				}finally{
+					searchScopeindex.releaseReadLock();
+				}
 			}
 		}
 	
