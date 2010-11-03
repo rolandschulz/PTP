@@ -121,11 +121,17 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 	}
 	
 	@Override
-	public void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, DOMException {
+	public void runWithIndex(IIndex parseIndex,  IIndex searchScopeindex, IIndexLocationConverter converter, IProgressMonitor monitor) throws OperationCanceledException, CoreException, DOMException, InterruptedException {
 		fConverter = converter;
-
+		
 		IndexFilter filter= IndexFilter.ALL;
-		IIndexBinding[] bindings = parseIndex.findBindings(pattern, false, filter, monitor);
+		IIndexBinding[] bindings = new IIndexBinding[0];
+		parseIndex.acquireReadLock();
+		try{
+			bindings = parseIndex.findBindings(pattern, false, filter, monitor);
+		}finally{
+			parseIndex.releaseReadLock();
+		}
 		for (int i = 0; i < bindings.length; ++i) {
 			IIndexBinding pdomBinding = bindings[i];
 
@@ -175,13 +181,28 @@ public class RemoteSearchPatternQuery extends RemoteSearchQuery {
 				matches= (flags & FIND_TYPEDEF) != 0;
 			}
 			if (matches) {
-				createMatches(searchScopeindex, pdomBinding);
+				searchScopeindex.acquireReadLock();
+				try{
+					createMatches(searchScopeindex, pdomBinding);
+				}finally{
+					searchScopeindex.releaseReadLock();
+				}
 			}
 		}
 		if ((flags & FIND_MACRO) != 0 && pattern.length == 1) {
-			bindings = parseIndex.findMacroContainers(pattern[0], filter, monitor);
+			parseIndex.acquireReadLock();
+			try{
+				bindings = parseIndex.findMacroContainers(pattern[0], filter, monitor);
+			}finally{
+				parseIndex.releaseReadLock();
+			}
 			for (IIndexBinding indexBinding : bindings) {
-				createMatches(searchScopeindex, indexBinding);
+				searchScopeindex.acquireReadLock();
+				try{
+					createMatches(searchScopeindex, indexBinding);
+				}finally{
+					searchScopeindex.releaseReadLock();
+				}
 			}
 		}		
 	}

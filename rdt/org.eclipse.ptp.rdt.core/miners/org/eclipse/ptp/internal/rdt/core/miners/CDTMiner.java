@@ -1058,19 +1058,28 @@ public class CDTMiner extends Miner {
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "File: " + unit.getLocationURI(), _dataStore); //$NON-NLS-1$
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Element: " + unit.getElementName(), _dataStore); //$NON-NLS-1$
 
+			IASTName name = null;
 			//use the project specific index to find the selected AST name and its binding
 			IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+			
+			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for project_index", _dataStore); //$NON-NLS-1$
+			project_index.acquireReadLock();
+			try{
+				name= IndexQueries.getSelectedName(project_index, unit, selectionStart, selectionLength);
+			}finally{
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for project_index", _dataStore); //$NON-NLS-1$
+				project_index.releaseReadLock();
+			}
 			//use workspace scope index to find the 
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
-			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
 			
-			project_index.acquireReadLock();
-			index.acquireReadLock();
+			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+			index.acquireReadLock();	
 			try {
 				IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
 				ICElement[] result = null;
 				ICProject project = new CProject(projectName);
-				IASTName name= IndexQueries.getSelectedName(project_index, unit, selectionStart, selectionLength);
+				
 				if (name != null) {
 					IBinding binding= name.resolveBinding();
 					if (TypeHierarchyUtil.isValidInput(binding)) {
@@ -1098,7 +1107,7 @@ public class CDTMiner extends Miner {
 				String resultString = Serializer.serialize(result);
 				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 			} finally {
-				project_index.releaseReadLock();
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
 				index.releaseReadLock();
 			}
 		} catch(Exception e) {
@@ -1120,37 +1129,54 @@ public class CDTMiner extends Miner {
 			
 			IIndexLocationConverter converter = getLocationConverter(scheme, hostName);
 			
-			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
-			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
+			IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+			IBinding binding = null;
+			ICProject project = new CProject(projectName);
+			ICElement[] result = null;
+			ICElement member = input;
 			
-			index.acquireReadLock();
+			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for project_index", _dataStore); //$NON-NLS-1$
+			project_index.acquireReadLock();
 			try {
-				ICElement[] result = null;
-				ICProject project = new CProject(projectName);
-				ICElement member = input;
-				IIndexName name= IndexQueries.remoteElementToName(index, member, path);
+				
+				IIndexName name= IndexQueries.remoteElementToName(project_index, member, path);
 				if (name != null) {
-					member= IndexQueries.getCElementForName(project, index, name, converter, new RemoteCProjectFactory());
-					IBinding binding= index.findBinding(name);
+					member= IndexQueries.getCElementForName(project, project_index, name, converter, new RemoteCProjectFactory());
+					binding= project_index.findBinding(name);
 					binding= TypeHierarchyUtil.findTypeBinding(binding);
-					if (TypeHierarchyUtil.isValidTypeInput(binding)) {
-						ICElement definition= TypeHierarchyUtil.findDefinition(project, index, null, binding, converter, new RemoteCProjectFactory());
-						if (input != null) {
-							result = new ICElement[] {definition, member};
-						}
-					}
-				}
-
-				if (result != null) {
-					UniversalServerUtilities.logDebugMessage(LOG_TAG, "Found input.", _dataStore); //$NON-NLS-1$
 					
 				}
+
 				
-				String resultString = Serializer.serialize(result);
-				status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 			} finally {
-				index.releaseReadLock();
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for project_index", _dataStore); //$NON-NLS-1$
+				project_index.releaseReadLock();
 			}
+			
+			if (binding!=null && TypeHierarchyUtil.isValidTypeInput(binding)) {
+				IIndex workspace_scope_index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+				workspace_scope_index.acquireReadLock();
+				try{
+					
+					ICElement definition= TypeHierarchyUtil.findDefinition(project, workspace_scope_index, null, binding, converter, new RemoteCProjectFactory());
+					if (input != null) {
+						result = new ICElement[] {definition, member};
+					}
+				}finally {
+					UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+					workspace_scope_index.releaseReadLock();
+				}
+				
+				
+			}
+			if (result != null) {
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Found input.", _dataStore); //$NON-NLS-1$
+				
+			}
+			
+			String resultString = Serializer.serialize(result);
+			status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
 		} catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		}
@@ -1168,7 +1194,6 @@ public class CDTMiner extends Miner {
 	
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
-			
 			index.acquireReadLock();
 			try {
 				IProgressMonitor monitor = new NullProgressMonitor();
@@ -1267,8 +1292,8 @@ public class CDTMiner extends Miner {
 
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
 			
-
 			
+		
 			IStatus exceptionStatus = query.runWithIndex(indexList, getLocationConverter(scheme, hostName), new StdoutProgressMonitor());
 			if(exceptionStatus !=Status.OK_STATUS){
 				UniversalServerUtilities.logError(LOG_TAG, exceptionStatus.getMessage(), null, _dataStore);
@@ -1280,6 +1305,7 @@ public class CDTMiner extends Miner {
 			
 			String resultString = Serializer.serialize(matches);
 			status.getDataStore().createObject(status, T_SEARCH_RESULT, resultString);
+		
 		} catch (Exception e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 		}
@@ -1579,25 +1605,14 @@ public class CDTMiner extends Miner {
 		    // search the index for the name
 			IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			IIndex workspace_scope_index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
-			try {
-				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
-				
-				project_index.acquireReadLock();
-				workspace_scope_index.acquireReadLock();
+			
 
-				if (subject != null) {
-					
-					findCalledBy(subject, path, project_index, workspace_scope_index, scheme, hostName, result);
-					
-				}
-			} catch (InterruptedException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-				return;
+			if (subject != null) {
+				
+				findCalledBy(subject, path, project_index, workspace_scope_index, scheme, hostName, result);
+				
 			}
-			finally {
-				project_index.releaseReadLock();
-				workspace_scope_index.acquireReadLock();
-			}
+			
 
 			// create the result object
 			String resultString = Serializer.serialize(result);
@@ -1612,16 +1627,35 @@ public class CDTMiner extends Miner {
 	
 	//org.eclipse.cdt.internal.ui.callhierarchy -> private static void findCalledBy(ICElement callee, int linkageID, IIndex index, CalledByResult result) 
 	private void findCalledBy(ICElement callee, String path, IIndex project_index, IIndex serach_scope_index, String scheme, String hostName, CalledByResult result) 
-	throws CoreException, URISyntaxException {
+	throws CoreException, URISyntaxException, InterruptedException {
 		final ICProject project = callee.getCProject();
-		IBinding calleeBinding=IndexQueries.elementToBinding(project_index, callee, path);
+		IBinding calleeBinding = null;
+		
+		UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for project_index", _dataStore); //$NON-NLS-1$
+		project_index.acquireReadLock();
+		try {
+			
+			calleeBinding=IndexQueries.elementToBinding(project_index, callee, path);
+		} finally {
+			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for project_index", _dataStore); //$NON-NLS-1$
+			project_index.releaseReadLock();
+		}
+		
 		if (calleeBinding != null) {
-			findCalledBy1(serach_scope_index, calleeBinding, true, project, scheme, hostName, result);
-			if (calleeBinding instanceof ICPPMethod) {
-				IBinding[] overriddenBindings= ClassTypeHelper.findOverridden((ICPPMethod) calleeBinding);
-				for (IBinding overriddenBinding : overriddenBindings) {
-					findCalledBy1(serach_scope_index, overriddenBinding, false, project, scheme, hostName, result);
+			
+			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for serach_scope_index", _dataStore); //$NON-NLS-1$
+			serach_scope_index.acquireReadLock();
+			try{
+				findCalledBy1(serach_scope_index, calleeBinding, true, project, scheme, hostName, result);
+				if (calleeBinding instanceof ICPPMethod) {
+					IBinding[] overriddenBindings= ClassTypeHelper.findOverridden((ICPPMethod) calleeBinding);
+					for (IBinding overriddenBinding : overriddenBindings) {
+						findCalledBy1(serach_scope_index, overriddenBinding, false, project, scheme, hostName, result);
+					}
 				}
+			} finally{
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for serach_scope_index", _dataStore); //$NON-NLS-1$
+				serach_scope_index.releaseReadLock();
 			}
 		}
 	}
@@ -1685,18 +1719,30 @@ public class CDTMiner extends Miner {
 			// search the index for the name
 			IIndex project_index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			IIndex workspace_scope_index = RemoteIndexManager.getInstance().getIndexForScope(Scope.WORKSPACE_ROOT_SCOPE_NAME, _dataStore);
+			IIndexName callerName = null;
+			
+			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for project_index", _dataStore); //$NON-NLS-1$
+			project_index.acquireReadLock();
 			try {
-				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock", _dataStore); //$NON-NLS-1$
 				
-				project_index.acquireReadLock();
-				workspace_scope_index.acquireReadLock();
+				callerName= IndexQueries.remoteElementToName(project_index, subject, path);
+				
+			}
 
-				IIndexName callerName= IndexQueries.remoteElementToName(project_index, subject, path);
-				if (callerName != null) {
+			finally {
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for project_index", _dataStore); //$NON-NLS-1$
+				project_index.releaseReadLock();
+				
+			}
+			
+			if (callerName != null) {
+				UniversalServerUtilities.logDebugMessage(LOG_TAG, "Acquiring read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+				workspace_scope_index.acquireReadLock();
+				try{
 					IIndexName[] refs= callerName.getEnclosedNames();
 					for (int i = 0; i < refs.length; i++) {
 						IIndexName name = refs[i];
-						IBinding binding= project_index.findBinding(name);
+						IBinding binding= workspace_scope_index.findBinding(name);
 						if (isRelevantForCallHierarchy(binding)) {
 							ICElement[] defs = IndexQueries.findRepresentative(workspace_scope_index, binding, converter, subject.getCProject(), new RemoteCProjectFactory());
 							if (defs != null && defs.length > 0) {
@@ -1709,15 +1755,10 @@ public class CDTMiner extends Miner {
 						}
 					}
 				}
-			} catch (InterruptedException e) {
-				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-
-				return;
-			}
-
-			finally {
-				project_index.releaseReadLock();
-				workspace_scope_index.releaseReadLock();
+				finally {
+					UniversalServerUtilities.logDebugMessage(LOG_TAG, "Releasing read lock for workspace_scope_index", _dataStore); //$NON-NLS-1$
+					workspace_scope_index.releaseReadLock();
+				}
 			}
 
 			// create the result object
