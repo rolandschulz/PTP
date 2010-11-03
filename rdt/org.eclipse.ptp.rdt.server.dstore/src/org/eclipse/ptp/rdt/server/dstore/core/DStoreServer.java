@@ -18,11 +18,11 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
 
 public class DStoreServer extends AbstractRemoteServerRunner {
-	public static String SERVER_ID = "org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer"; //$NON-NLS-1$
-
 	private enum DStoreState {
 		STARTING, WAITING, STARTED
-	};
+	}
+
+	public static String SERVER_ID = "org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer"; //$NON-NLS-1$;
 
 	private DStoreState fState = DStoreState.STARTING;
 	private ClientConnection fDStoreConnection = null;
@@ -34,11 +34,27 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 		super(Messages.DStoreServer_0);
 	}
 
+	/**
+	 * Get the data store associated with the client connection.
+	 * 
+	 * @return DataStore
+	 */
 	public DataStore getDataStore() {
-		if (fDStoreConnection == null) {
+		ClientConnection conn = getClientConnection();
+		assert conn != null;
+		return conn.getDataStore();
+	}
+
+	/**
+	 * Get the client connection. Creates a new client connection on first call.
+	 * 
+	 * @return client connection
+	 */
+	private ClientConnection getClientConnection() {
+		if (fDStoreConnection == null && getRemoteConnection() != null) {
 			fDStoreConnection = new ClientConnection(getRemoteConnection().getName());
 		}
-		return fDStoreConnection.getDataStore();
+		return fDStoreConnection;
 	}
 
 	/*
@@ -101,19 +117,22 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 				}
 				return false;
 			}
-			fDStoreConnection.setHost("localhost"); //$NON-NLS-1$
-			fDStoreConnection.setPort(Integer.toString(port));
+			getClientConnection().setHost("localhost"); //$NON-NLS-1$
+			getClientConnection().setPort(Integer.toString(port));
 			if (DebugUtil.SERVER_TRACING) {
 				System.out.println(Messages.DStoreServer_2);
 			}
-			ConnectionStatus status = fDStoreConnection.connect(null, 0);
-			DataStore dataStore = fDStoreConnection.getDataStore();
-			dataStore.showTicket(null);
-			dataStore.registerLocalClassLoader(getClass().getClassLoader());
-			if (DebugUtil.SERVER_TRACING) {
-				System.out.println(Messages.DStoreServer_3);
+			ConnectionStatus status = getClientConnection().connect(null, 0);
+			if (status.isConnected()) {
+				DataStore dataStore = getClientConnection().getDataStore();
+				dataStore.showTicket(null);
+				dataStore.registerLocalClassLoader(getClass().getClassLoader());
+				if (DebugUtil.SERVER_TRACING) {
+					System.out.println(Messages.DStoreServer_3);
+				}
+				return true;
 			}
-			return status.isConnected();
+			return false;
 		} finally {
 			if (monitor != null) {
 				monitor.done();
