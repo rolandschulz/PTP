@@ -25,6 +25,7 @@ import org.eclipse.ptp.debug.core.model.IPLocationSet;
 import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
+import org.eclipse.ptp.debug.core.pdi.PDIException;
 import org.eclipse.ptp.debug.core.pdi.PDILocatorComparator;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIBreakpointInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIDestroyedEvent;
@@ -43,6 +44,8 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIWatchpointScopeInfo;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIWatchpointTriggerInfo;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDILocationBreakpoint;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
+import org.eclipse.ptp.debug.core.pdi.request.IPDIListStackFramesRequest;
 
 public class PLocationSetManager implements IPLocationSetManager, IPDIEventListener {
 	public static class PDebugLocationInfo extends PDebugInfo {
@@ -186,30 +189,30 @@ public class PLocationSetManager implements IPLocationSetManager, IPDIEventListe
 			IPDIBreakpoint bp = ((IPDIBreakpointInfo) reason).getBreakpoint();
 			if (bp instanceof IPDILocationBreakpoint) {
 				locator = ((IPDILocationBreakpoint) bp).getLocator();
-				// try {
-				// TaskSet tasks = event.getTasks();
-				// if (tasks.isEmpty())
-				// throw new AssertionError();
-				// TaskSet onetask = new TaskSet(tasks.taskSize());
-				// onetask.set(tasks.nextSetBit(0));
-				//
-				// IPDISession session = reason.getSession();
-				// IPDIListStackFramesRequest request =
-				// session.getRequestFactory().getListStackFramesRequest(session,
-				// onetask, 0,
-				// 1);
-				// session.getEventRequestManager().addEventRequest(request);
-				// Map<TaskSet, Object> map = request.getResultMap(onetask);
-				// Object value = map.get(map.keySet().iterator().next());
-				// ProxyDebugStackFrame[] frames = (ProxyDebugStackFrame[])
-				// value;
-				// ProxyDebugLocator loc = frames[0].getLocator();
-				// locator = PDILocationFactory
-				// .newLocator(loc.getFile(), loc.getFunction(),
-				// loc.getLineNumber(), loc.getAddress());
-				// } catch (PDIException e) {
-				// throw new RuntimeException(e);
-				// }
+				try {
+					/*
+					 * The IPDIBreakpointInfo associated with the
+					 * IPDISuspendedEvent can only return a single breakpoint,
+					 * so in practice separate IPDISuspendEvents are always
+					 * generated for simultaneous breakpoints. ie: suspend
+					 * events in different locations are never aggregated if
+					 * they had a different reason (breakpoint), so it seems
+					 * safe to only ask a single member of the associated
+					 * TaskSet for the location info.
+					 */
+					TaskSet tasks = event.getTasks();
+					assert !tasks.isEmpty();
+					TaskSet onetask = new TaskSet(tasks.taskSize());
+					onetask.set(tasks.nextSetBit(0));
+					IPDISession session = reason.getSession();
+					IPDIListStackFramesRequest request = session.getRequestFactory().getListStackFramesRequest(session, onetask, 0,
+							1);
+					session.getEventRequestManager().addEventRequest(request);
+					IPDIStackFrameDescriptor[] frames = request.getStackFrames(tasks);
+					locator = frames[0].getLocator();
+				} catch (PDIException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		} else if (reason instanceof IPDIEndSteppingRangeInfo)
 			locator = ((IPDIEndSteppingRangeInfo) reason).getLocator();
