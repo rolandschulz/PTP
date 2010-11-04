@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
+   <extension-point id="SDMDebugger" name="SDM Debugger Configuration" schema="schema/SDMDebugger.exsd"/>
      <extension
            point="org.eclipse.core.runtime.preferences">
         <initializer
@@ -16,6 +17,13 @@
               modes="run"
               name="%SDM.name"
               platform="*">
+        </debugger>
+     </extension>
+     <extension
+           point="org.eclipse.ptp.debug.sdm.core.SDMDebugger">
+        <debugger
+              default="true"
+              name="gdb-mi">
         </debugger>
      </extension>
 </plugin>

@@ -35,8 +35,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE,
-				SDMPreferenceConstants.SDM_DEBUGGER_BACKENDS[SDMPreferenceConstants.SDM_DEFAULT_DEDUGGER_BACKEND_INDEX]);
 		Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH,
 				SDMPreferenceConstants.SDM_DEFAULT_DEDUGGER_BACKEND_PATH);
 	}

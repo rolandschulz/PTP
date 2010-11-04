@@ -87,9 +87,6 @@ public interface SDMPreferenceConstants {
 	 * Debugger backend
 	 */
 	public static final String SDM_DEBUGGER_BACKEND_TYPE = PLUGIN_ID + ".debugger_backend"; //$NON-NLS-1$
-	public static final int SDM_DEFAULT_DEDUGGER_BACKEND_INDEX = 0;
-	public static final String[] SDM_DEBUGGER_BACKENDS = new String[] { "gdb-mi" //$NON-NLS-1$
-	};
 
 	/**
 	 * Path to backend debugger
