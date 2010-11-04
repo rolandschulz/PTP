@@ -187,7 +187,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_2);
 		sdmBackendCombo = new Combo(comp, SWT.READ_ONLY);
 		sdmBackendCombo.setLayoutData(gd);
-		sdmBackendCombo.setItems(SDMPreferenceConstants.SDM_DEBUGGER_BACKENDS);
+		sdmBackendCombo.setItems(SDMDebugCorePlugin.getDefault().getDebuggerBackends());
 		sdmBackendCombo.addSelectionListener(listener);
 
 		new Label(comp, SWT.NONE).setText(Messages.SDMPreferencePage_3);

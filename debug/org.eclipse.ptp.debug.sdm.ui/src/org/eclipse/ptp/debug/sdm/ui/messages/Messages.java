@@ -15,6 +15,7 @@ public class Messages extends NLS {
 	public static String SDMPage_8;
 	public static String SDMPage_9;
 	public static String SDMPage_10;
+	public static String SDMPage_11;
 	
 	public static String SDMPreferencePage_0;
 	public static String SDMPreferencePage_1;

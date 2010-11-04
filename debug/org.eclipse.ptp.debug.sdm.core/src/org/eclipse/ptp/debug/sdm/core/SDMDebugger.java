@@ -214,7 +214,11 @@ public class SDMDebugger implements IPDebugger {
 			String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
 
 			dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
-			dbgArgs.add("--debugger=" + Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)); //$NON-NLS-1$
+			String debuggerBackend = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+					SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE);
+			debuggerBackend = configuration
+					.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND, debuggerBackend);
+			dbgArgs.add("--debugger=" + debuggerBackend); //$NON-NLS-1$
 
 			String dbgPath = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
 					SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_PATH);

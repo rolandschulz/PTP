@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
- *     Albert L. Rossi		- modified validation check to not check
- *                            the path unless the RM is actually running (10/4/2010)
  *******************************************************************************/
 package org.eclipse.ptp.debug.sdm.internal.ui;
 
@@ -19,8 +17,11 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
+import org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin;
+import org.eclipse.ptp.debug.sdm.core.SDMLaunchConfigurationConstants;
+import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -41,6 +42,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -56,6 +58,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private boolean pathIsDirty = true;
 	private boolean pathIsValid = false;
 
+	protected Combo fSDMBackendCombo = null;
 	protected Text fRMDebuggerPathText = null;
 	protected Text fRMDebuggerAddressText = null;
 	protected Button fRMDebuggerBrowseButton = null;
@@ -73,39 +76,14 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 * Debugger tab is selected from within an existing page...
 		 */
 		try {
+			fSDMBackendCombo.setText(workingCopy.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
+					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+							SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
 			fRMDebuggerAddressText.setText(getAddress(workingCopy));
 			fRMDebuggerPathText.setText(workingCopy.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
 					EMPTY_STRING));
 		} catch (CoreException e) {
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
-	 */
-	@Override
-	public boolean canSave() {
-		setErrorMessage(null);
-		if (getFieldContent(fRMDebuggerAddressText.getText()) == null)
-			setErrorMessage(Messages.SDMPage_7);
-		else if (getFieldContent(fRMDebuggerPathText.getText()) == null)
-			setErrorMessage(Messages.SDMPage_8);
-		else {
-			if (pathIsDirty) {
-				if (!verifyPath(fRMDebuggerPathText.getText()))
-					pathIsValid = false;
-				else
-					pathIsValid = true;
-				pathIsDirty = false;
-			}
-
-			if (!pathIsValid)
-				setErrorMessage(Messages.SDMPage_9);
-		}
-		// setErrorMessage(errMsg);
-		return (getErrorMessage() == null);
 	}
 
 	/*
@@ -121,8 +99,23 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		Label label = new Label(comp, SWT.NONE);
-		label.setText(Messages.SDMPage_0);
+		label.setText(Messages.SDMPage_11);
 		GridData gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		gd.horizontalSpan = 2;
+		label.setLayoutData(gd);
+
+		fSDMBackendCombo = new Combo(comp, SWT.READ_ONLY);
+		fSDMBackendCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		fSDMBackendCombo.setItems(SDMDebugCorePlugin.getDefault().getDebuggerBackends());
+		fSDMBackendCombo.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				updateLaunchConfigurationDialog();
+			}
+		});
+
+		label = new Label(comp, SWT.NONE);
+		label.setText(Messages.SDMPage_0);
+		gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 
@@ -139,8 +132,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String file = browseFile();
-				if (file != null)
+				if (file != null) {
 					fRMDebuggerPathText.setText(file);
+				}
 			}
 		});
 
@@ -187,6 +181,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					EMPTY_STRING);
 			resourceManager = (IResourceManagerControl) PTPCorePlugin.getDefault().getModelManager()
 					.getResourceManagerFromUniqueName(rmId);
+			fSDMBackendCombo.setText(configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
+					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
+							SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
 			fRMDebuggerAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
 					EMPTY_STRING));
 			fRMDebuggerPathText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
@@ -205,28 +202,77 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
 		setErrorMessage(null);
-		if (getFieldContent(fRMDebuggerAddressText.getText()) == null)
+		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_4);
-		else if (getFieldContent(fRMDebuggerPathText.getText()) == null)
+		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
 			setErrorMessage(Messages.SDMPage_5);
-		else {
+		} else {
 			if (pathIsDirty) {
-				/*
-				 * added to prevent auto-checking of path if RM is not started
-				 * (messes up UI mouse focus) - ALR
-				 */
-				if (resourceManager.getState().equals(ResourceManagerAttributes.State.STARTED)
-						&& !verifyPath(fRMDebuggerPathText.getText()))
+				if (!verifyPath(fRMDebuggerPathText.getText())) {
 					pathIsValid = false;
-				else
+				} else {
 					pathIsValid = true;
+				}
 				pathIsDirty = false;
 			}
 
-			if (!pathIsValid)
+			if (!pathIsValid) {
 				setErrorMessage(Messages.SDMPage_6);
+			}
 		}
 		return (getErrorMessage() == null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
+	 */
+	@Override
+	public boolean canSave() {
+		setErrorMessage(null);
+		if (getFieldContent(fRMDebuggerAddressText.getText()) == null) {
+			setErrorMessage(Messages.SDMPage_7);
+		} else if (getFieldContent(fRMDebuggerPathText.getText()) == null) {
+			setErrorMessage(Messages.SDMPage_8);
+		} else {
+			if (pathIsDirty) {
+				if (!verifyPath(fRMDebuggerPathText.getText())) {
+					pathIsValid = false;
+				} else {
+					pathIsValid = true;
+				}
+				pathIsDirty = false;
+			}
+
+			if (!pathIsValid) {
+				setErrorMessage(Messages.SDMPage_9);
+			}
+		}
+		// setErrorMessage(errMsg);
+		return (getErrorMessage() == null);
+	}
+
+	/**
+	 * Verify that the supplied path exists on the remote system
+	 * 
+	 * @param path
+	 *            path to verify
+	 * @return true if path exists
+	 */
+	private boolean verifyPath(String path) {
+		IRemoteConnection rmConn = getRemoteConnection(resourceManager);
+		if (rmConn != null) {
+			IRemoteFileManager fileManager = getRemoteServices(resourceManager).getFileManager(rmConn);
+			if (fileManager != null && fileManager.getResource(path).fetchInfo().exists()) {
+				return true;
+			}
+			return false;
+		}
+		if (new Path(path).toFile().exists()) {
+			return true;
+		}
+		return false;
 	}
 
 	/*
@@ -243,6 +289,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 * things are valid.
 		 */
 		if (isValid(configuration)) {
+			configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
+					getFieldContent(fSDMBackendCombo.getText()));
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
 					getFieldContent(fRMDebuggerPathText.getText()));
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
@@ -277,30 +325,21 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					String proxyPath = remConfig.getProxyServerPath();
 					if (proxyPath == null || proxyPath.equals(EMPTY_STRING)) {
 						IRemoteConnection conn = getRemoteConnection(rm);
-						if (conn != null)
+						if (conn != null) {
 							path = new Path(conn.getWorkingDirectory()).append("sdm").toString(); //$NON-NLS-1$/
-					} else
+						}
+					} else {
 						path = new Path(proxyPath).removeLastSegments(1).append("sdm").toString(); //$NON-NLS-1$/
+					}
 				}
 			}
 		} catch (CoreException e) {
 		}
 
+		configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
+				Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE));
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, path);
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, getAddress(configuration));
-	}
-
-	/**
-	 * Get and clean content of a Text field
-	 * 
-	 * @param text
-	 *            text obtained from a Text field
-	 * @return cleaned up content
-	 */
-	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
-			return null;
-		return text;
 	}
 
 	/**
@@ -358,7 +397,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 		IResourceManagerControl rm = (IResourceManagerControl) PTPCorePlugin.getDefault().getModelManager()
 				.getResourceManagerFromUniqueName(rmId);
-		if (rm != null)
+		if (rm != null) {
 			/*
 			 * If the resource manager has been changed and this is a remote
 			 * resource manager, then update the host field
@@ -367,44 +406,18 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				resourceManager = rm;
 				IRemoteResourceManagerConfiguration config = getRemoteResourceManagerConfiguration();
 				if (config != null) {
-					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING))
+					if (config.testOption(IRemoteProxyOptions.PORT_FORWARDING)) {
 						return "localhost"; //$NON-NLS-1$
-					// return getRemoteConnection(rm).getAddress();
-					else
+						// return getRemoteConnection(rm).getAddress();
+					} else {
 						return config.getLocalAddress();
-				} else
-					return "localhost"; //$NON-NLS-1$
-			}
-		return address;
-	}
-
-	/**
-	 * Get the current remote connection selected in the RM. Will open the
-	 * connection if it is closed.
-	 * 
-	 * @return IRemoteConnection
-	 */
-	private IRemoteConnection getRemoteConnection(IResourceManagerControl rm) {
-		IRemoteServices rsrv = getRemoteServices(rm);
-		if (rsrv != null) {
-			String connName = rm.getConfiguration().getConnectionName();
-			if (connName != null) {
-				IRemoteConnectionManager mgr = rsrv.getConnectionManager();
-				if (mgr != null) {
-					IRemoteConnection conn = mgr.getConnection(connName);
-					if (conn != null && !conn.isOpen()) {
-						IRemoteUIServices uiServices = getRemoteUIServices(rm);
-						if (uiServices != null) {
-							IRemoteUIConnectionManager connMgr = uiServices.getUIConnectionManager();
-							if (connMgr != null)
-								connMgr.openConnectionWithProgress(getShell(), conn);
-						}
 					}
-					return conn;
+				} else {
+					return "localhost"; //$NON-NLS-1$
 				}
 			}
 		}
-		return null;
+		return address;
 	}
 
 	/**
@@ -415,8 +428,9 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	private IRemoteResourceManagerConfiguration getRemoteResourceManagerConfiguration() {
 		if (resourceManager != null) {
 			IResourceManagerConfiguration rmConfig = resourceManager.getConfiguration();
-			if (rmConfig instanceof IRemoteResourceManagerConfiguration)
+			if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
 				return (IRemoteResourceManagerConfiguration) rmConfig;
+			}
 		}
 		return null;
 
@@ -442,28 +456,53 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	private IRemoteUIServices getRemoteUIServices(IResourceManagerControl rm) {
 		IRemoteServices rsrv = getRemoteServices(rm);
-		if (rsrv != null)
+		if (rsrv != null) {
 			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
+		}
 		return null;
 	}
 
 	/**
-	 * Verify that the supplied path exists on the remote system
+	 * Get the current remote connection selected in the RM. Will open the
+	 * connection if it is closed.
 	 * 
-	 * @param path
-	 *            path to verify
-	 * @return true if path exists
+	 * @return IRemoteConnection
 	 */
-	private boolean verifyPath(String path) {
-		IRemoteConnection rmConn = getRemoteConnection(resourceManager);
-		if (rmConn != null) {
-			IRemoteFileManager fileManager = getRemoteServices(resourceManager).getFileManager(rmConn);
-			if (fileManager != null && fileManager.getResource(path).fetchInfo().exists())
-				return true;
-			return false;
+	private IRemoteConnection getRemoteConnection(IResourceManagerControl rm) {
+		IRemoteServices rsrv = getRemoteServices(rm);
+		if (rsrv != null) {
+			String connName = rm.getConfiguration().getConnectionName();
+			if (connName != null) {
+				IRemoteConnectionManager mgr = rsrv.getConnectionManager();
+				if (mgr != null) {
+					IRemoteConnection conn = mgr.getConnection(connName);
+					if (conn != null && !conn.isOpen()) {
+						IRemoteUIServices uiServices = getRemoteUIServices(rm);
+						if (uiServices != null) {
+							IRemoteUIConnectionManager connMgr = uiServices.getUIConnectionManager();
+							if (connMgr != null) {
+								connMgr.openConnectionWithProgress(getShell(), conn);
+							}
+						}
+					}
+					return conn;
+				}
+			}
 		}
-		if (new Path(path).toFile().exists())
-			return true;
-		return false;
+		return null;
+	}
+
+	/**
+	 * Get and clean content of a Text field
+	 * 
+	 * @param text
+	 *            text obtained from a Text field
+	 * @return cleaned up content
+	 */
+	protected String getFieldContent(String text) {
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
+			return null;
+		}
+		return text;
 	}
 }
