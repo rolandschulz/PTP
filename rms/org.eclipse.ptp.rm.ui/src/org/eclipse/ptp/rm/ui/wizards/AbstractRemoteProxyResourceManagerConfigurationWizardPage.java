@@ -294,6 +294,527 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		isValid = false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org
+	 * .eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	public void createControl(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout topLayout = new GridLayout();
+		composite.setLayout(topLayout);
+		createContents(composite);
+		setControl(composite);
+	}
+
+	/**
+	 * Initialize the contents of the local address selection combo. Host names
+	 * are obtained by performing a reverse lookup on the IP addresses of each
+	 * network interface. If DNS is configured correctly, this should add the
+	 * fully qualified domain name, otherwise it will probably be the IP
+	 * address. We also add the configuration address to the combo in case it
+	 * was specified manually.
+	 */
+	public void initializeLocalHostCombo() {
+		Set<String> addrs = new TreeSet<String>();
+		try {
+			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (netInterfaces.hasMoreElements()) {
+				NetworkInterface ni = netInterfaces.nextElement();
+				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
+				while (alladdr.hasMoreElements()) {
+					InetAddress ip = alladdr.nextElement();
+					if (ip instanceof Inet4Address)
+						addrs.add(fixHostName(ip.getCanonicalHostName()));
+				}
+			}
+		} catch (Exception e) {
+			// at least we'll still get localhost
+		}
+		if (addrs.size() == 0)
+			addrs.add("localhost"); //$NON-NLS-1$
+		localAddrCombo.removeAll();
+		int index = 0;
+		int selection = -1;
+		for (String addr : addrs) {
+			localAddrCombo.add(addr);
+			if ((localAddr.equals("") && addr.equals("localhost")) //$NON-NLS-1$ //$NON-NLS-2$
+					|| addr.equals(localAddr))
+				selection = index;
+			index++;
+		}
+		/*
+		 * localAddr is not in the list, so add it and make it the current
+		 * selection
+		 */
+		if (selection < 0) {
+			if (!localAddr.equals("")) //$NON-NLS-1$
+				localAddrCombo.add(localAddr);
+			selection = localAddrCombo.getItemCount() - 1;
+		}
+		localAddrCombo.select(selection);
+	}
+
+	/**
+	 * Save the current state in the RM configuration. This is called whenever
+	 * anything is changed.
+	 * 
+	 * @return
+	 */
+	public boolean performOk() {
+		store();
+		int options = 0;
+		if (muxPortFwd)
+			options |= IRemoteProxyOptions.PORT_FORWARDING;
+		if (manualLaunch)
+			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
+		if (remoteServices != null)
+			config.setRemoteServicesId(remoteServices.getId());
+		if (connection != null)
+			config.setConnectionName(connection.getName());
+		config.setLocalAddress(localAddr);
+		config.setProxyServerPath(proxyPath);
+		config.setInvocationOptions(proxyArgs);
+		config.setOptions(options);
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
+	 */
+	@Override
+	public void setVisible(boolean visible) {
+		if (visible)
+			initContents();
+		super.setVisible(visible);
+	}
+
+	/**
+	 * specialized implementation override this.
+	 * 
+	 * @since 2.0
+	 */
+	protected void addCustomWidgets(Composite remoteComp) {
+		// NO-OP
+	}
+
+	/**
+	 * Convenience method for creating a button widget.
+	 * 
+	 * @param parent
+	 * @param label
+	 * @param type
+	 * @return the button widget
+	 */
+	protected Button createButton(Composite parent, String label, int type) {
+		Button button = new Button(parent, type);
+		button.setText(label);
+		GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
+
+	/**
+	 * Convenience method for creating a check button widget.
+	 * 
+	 * @param parent
+	 * @param label
+	 * @return the check button widget
+	 */
+	protected Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+
+	/**
+	 * Convenience method for creating a grid layout.
+	 * 
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return the new grid layout
+	 */
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	/**
+	 * Creates the dialog when the proxy "Options..." button is selected.
+	 * Override if you want to provide your own dialog.
+	 * 
+	 * @param parent
+	 *            the parent composite to contain the dialog area
+	 * @return the proxy options string
+	 */
+	protected String createOptionsDialog(Shell shell, String initialOptions) {
+		InputDialog dialog = new InputDialog(shell, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
+				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, initialOptions, null);
+		if (dialog.open() == Dialog.OK)
+			return dialog.getValue();
+		return initialOptions;
+	}
+
+	/**
+	 * Creates an new radio button instance and sets the default layout data.
+	 * 
+	 * @param group
+	 *            the composite in which to create the radio button
+	 * @param label
+	 *            the string to set into the radio button
+	 * @param value
+	 *            the string to identify radio button
+	 * @return the new radio button
+	 */
+	protected Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
+		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
+		button.setData((null == value) ? label : value);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalAlignment = GridData.FILL;
+		data.verticalAlignment = GridData.BEGINNING;
+		button.setLayoutData(data);
+		if (null != listener)
+			button.addSelectionListener(listener);
+		return button;
+	}
+
+	/**
+	 * Transfer current settings to text fields
+	 */
+	protected void defaultSetting() {
+		if (proxyPathEnabled)
+			proxyPathText.setText(proxyPath);
+	}
+
+	/**
+	 * Clean up the content of a text field.
+	 * 
+	 * @param text
+	 * @return cleaned up text.
+	 */
+	protected String getFieldContent(String text) {
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+			return null;
+
+		return text;
+	}
+
+	/**
+	 * Handle the section of a new connection. Update connection option buttons
+	 * appropriately.
+	 */
+	protected void handleConnectionSelected() {
+		int currentSelection = connectionCombo.getSelectionIndex();
+		if (currentSelection >= 0 && connectionManager != null) {
+			String connectionName = connectionCombo.getItem(currentSelection);
+			connection = connectionManager.getConnection(connectionName);
+		}
+
+		/*
+		 * Disable port forwarding button if it's not supported. If port
+		 * forwarding was selected, switch to 'none' instead.
+		 */
+		if (connection != null)
+			portFwdSupported = connection.supportsTCPPortForwarding();
+		/*
+		 * Linux doesn't call modify handler (which calls updateSettings &
+		 * updatePage) so need to call them explicitly here
+		 */
+		updateSettings();
+		updatePage();
+	}
+
+	/**
+	 * Handle creation of a new connection by pressing the 'New...' button.
+	 * Calls handleRemoteServicesSelected() to update the connection combo with
+	 * the new connection.
+	 * 
+	 * TODO should probably select the new connection
+	 */
+	protected void handleNewRemoteConnectionSelected() {
+		if (uiConnectionManager != null)
+			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
+	}
+
+	/**
+	 * Show a dialog that lets the user select a file.
+	 */
+	protected void handlePathBrowseButtonSelected() {
+		if (!proxyPathEnabled)
+			return;
+		if (connection != null) {
+			checkConnection();
+			if (connection.isOpen()) {
+				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+				if (remoteUIServices != null) {
+					IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
+					if (fileMgr != null) {
+						fileMgr.setConnection(connection);
+						String correctPath = proxyPathText.getText();
+						String selectedPath = fileMgr.browseFile(getShell(),
+								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16, correctPath, 0);
+						if (selectedPath != null)
+							proxyPathText.setText(selectedPath.toString());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Handle selection of a new remote services provider from the remote
+	 * services combo.
+	 * 
+	 * The assumption is that this will trigger a call to the selection handler
+	 * for the connection combo.
+	 * 
+	 * @param conn
+	 *            connection to select as current. If conn is null, select the
+	 *            first item in the list.
+	 */
+	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
+		int selectionIndex = remoteCombo.getSelectionIndex();
+		if (fAllRemoteServices != null && fAllRemoteServices.length > 0 && selectionIndex >= 0) {
+			remoteServices = fAllRemoteServices[selectionIndex];
+			connectionManager = remoteServices.getConnectionManager();
+			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+			if (remUIServices != null)
+				uiConnectionManager = remUIServices.getUIConnectionManager();
+			IRemoteConnection[] connections = connectionManager.getConnections();
+			Arrays.sort(connections, new Comparator<IRemoteConnection>() {
+				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
+					return c1.getName().compareToIgnoreCase(c2.getName());
+				}
+			});
+			connectionCombo.removeAll();
+			int selected = 0;
+			for (int i = 0; i < connections.length; i++) {
+				connectionCombo.add(connections[i].getName());
+				if (conn != null && connections[i].equals(conn))
+					selected = i;
+			}
+			if (connections.length > 0) {
+				connectionCombo.select(selected);
+				/*
+				 * Linux doesn't call selection handler so need to call it
+				 * explicitly here
+				 */
+				handleConnectionSelected();
+			}
+
+			/*
+			 * Enable 'new' button if new connections are supported
+			 */
+			newConnectionButton.setEnabled(uiConnectionManager != null);
+		}
+	}
+
+	/**
+	 * Initialize the contents of the controls on the page. This is called after
+	 * the controls have been created.
+	 * 
+	 * @since 2.0
+	 */
+	protected void initContents() {
+		loading = true;
+		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
+		loadSaved();
+		updateSettings();
+		defaultSetting();
+		initializeRemoteServicesCombo();
+		initializeLocalHostCombo();
+		loading = false;
+		updatePage();
+	}
+
+	/**
+	 * Initialize the contents of the remote services combo.
+	 * 
+	 * The assumption is that this will trigger a call to the selection handling
+	 * routine when the default index is selected.
+	 */
+	protected void initializeRemoteServicesCombo() {
+		IWizardContainer container = null;
+		if (getControl().isVisible())
+			container = getWizard().getContainer();
+		fAllRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(container);
+		IRemoteServices defServices;
+		if (remoteServices != null)
+			defServices = remoteServices;
+		else
+			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		int defIndex = 0;
+		Arrays.sort(fAllRemoteServices, new Comparator<IRemoteServices>() {
+			public int compare(IRemoteServices c1, IRemoteServices c2) {
+				return c1.getName().compareToIgnoreCase(c2.getName());
+			}
+		});
+		remoteCombo.removeAll();
+		for (int i = 0; i < fAllRemoteServices.length; i++) {
+			remoteCombo.add(fAllRemoteServices[i].getName());
+			if (fAllRemoteServices[i].equals(defServices))
+				defIndex = i;
+		}
+		if (fAllRemoteServices.length > 0) {
+			remoteCombo.select(defIndex);
+			/*
+			 * Linux doesn't call selection handler so need to call it
+			 * explicitly here
+			 */
+			handleRemoteServiceSelected(connection);
+			handleConnectionSelected();
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	protected boolean isValidSetting() {
+		if (proxyPathEnabled && proxyPathText != null) {
+			String name = getFieldContent(proxyPathText.getText());
+			if (name == null || !proxyPathIsValid) {
+				setErrorMessage(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_17);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param style
+	 * @param space
+	 * @return
+	 */
+	protected GridData spanGridData(int style, int space) {
+		GridData gd = null;
+		if (style == -1)
+			gd = new GridData();
+		else
+			gd = new GridData(style);
+		gd.horizontalSpan = space;
+		return gd;
+	}
+
+	/**
+	 * Call to update page status and store any changed settings
+	 */
+	protected void updatePage() {
+		if (!loading) {
+			setErrorMessage(null);
+			setMessage(null);
+
+			if (!isValidSetting())
+				setValid(false);
+			else {
+				performOk();
+				setValid(true);
+			}
+		}
+	}
+
+	/**
+	 * Update wizard UI selections from settings. This should be called whenever
+	 * any settings are changed.
+	 * 
+	 * @since 1.1
+	 */
+	protected void updateSettings() {
+		/*
+		 * Get current settings unless we're initializing things
+		 */
+		if (!loading) {
+			muxPortFwd = portForwardingButton.getSelection();
+			if (manualButton != null)
+				manualLaunch = manualButton.getSelection();
+		}
+
+		/*
+		 * If no localAddr has been specified in the configuration, select a
+		 * default one.
+		 */
+		if (!loading || localAddr.equals("")) //$NON-NLS-1$
+			localAddr = localAddrCombo.getText();
+
+		/*
+		 * Fix settings
+		 */
+		if (muxPortFwd && !portFwdSupported)
+			muxPortFwd = false;
+
+		/*
+		 * Update UI to display correct settings
+		 */
+		if (noneButton != null)
+			noneButton.setSelection(!muxPortFwd);
+
+		if (portForwardingButton != null) {
+			portForwardingButton.setSelection(muxPortFwd);
+			portForwardingButton.setEnabled(portFwdSupported);
+		}
+
+		if (localAddrCombo != null)
+			localAddrCombo.setEnabled(!muxPortFwd);
+
+		if (manualButton != null)
+			manualButton.setSelection(manualLaunch);
+	}
+
+	/**
+	 * Check if the proxy path supplied in proxyPathText is a valid file on the
+	 * remote system.
+	 * 
+	 * @return true if valid
+	 * @since 1.1
+	 */
+	protected boolean validateProxyPath() {
+		if (!proxyPathEnabled)
+			return true;
+		proxyPathIsValid = false;
+		final String path = proxyPathText.getText();
+		if (path != null)
+			if (connection != null) {
+				checkConnection();
+				if (connection.isOpen())
+					if (remoteServices != null) {
+						final IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
+						if (fileMgr != null) {
+							IRunnableWithProgress op = new IRunnableWithProgress() {
+								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+									try {
+										IFileStore file = fileMgr.getResource(path);
+										if (!monitor.isCanceled())
+											proxyPathIsValid = file.fetchInfo(EFS.NONE, monitor).exists();
+									} catch (CoreException e) {
+										throw new InvocationTargetException(e);
+									}
+								}
+
+							};
+							try {
+								ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
+								dialog.setOpenOnRun(false);
+								dialog.run(true, true, op);
+							} catch (InvocationTargetException e) {
+								// return false
+							} catch (InterruptedException e) {
+								// return false
+							}
+						}
+					}
+			}
+		return proxyPathIsValid;
+	}
+
 	/**
 	 * Attempt to open a connection.
 	 */
@@ -323,33 +844,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 								RMUIPlugin.PLUGIN_ID, e.getMessage()));
 			}
 		}
-	}
-
-	/**
-	 * Convenience method for creating a button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @param type
-	 * @return the button widget
-	 */
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-
-	/**
-	 * Convenience method for creating a check button widget.
-	 * 
-	 * @param parent
-	 * @param label
-	 * @return the check button widget
-	 */
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
 	}
 
 	/**
@@ -437,6 +931,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		}
 
 		/*
+		 * customizable
+		 */
+		addCustomWidgets(remoteComp);
+
+		/*
 		 * Multiplexing options
 		 */
 		Group mxGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
@@ -486,88 +985,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		registerListeners();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.ui.wizards.RMConfigurationWizardPage#createControl(org
-	 * .eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout topLayout = new GridLayout();
-		composite.setLayout(topLayout);
-		createContents(composite);
-		setControl(composite);
-	}
-
-	/**
-	 * Convenience method for creating a grid layout.
-	 * 
-	 * @param columns
-	 * @param isEqual
-	 * @param mh
-	 * @param mw
-	 * @return the new grid layout
-	 */
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
-
-	/**
-	 * Creates the dialog when the proxy "Options..." button is selected.
-	 * Override if you want to provide your own dialog.
-	 * 
-	 * @param parent
-	 *            the parent composite to contain the dialog area
-	 * @return the proxy options string
-	 */
-	protected String createOptionsDialog(Shell shell, String initialOptions) {
-		InputDialog dialog = new InputDialog(shell, Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_14,
-				Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_15, initialOptions, null);
-		if (dialog.open() == Dialog.OK)
-			return dialog.getValue();
-		return initialOptions;
-	}
-
-	/**
-	 * Creates an new radio button instance and sets the default layout data.
-	 * 
-	 * @param group
-	 *            the composite in which to create the radio button
-	 * @param label
-	 *            the string to set into the radio button
-	 * @param value
-	 *            the string to identify radio button
-	 * @return the new radio button
-	 */
-	protected Button createRadioButton(Composite parent, String label, String value, SelectionListener listener) {
-		Button button = createButton(parent, label, SWT.RADIO | SWT.LEFT);
-		button.setData((null == value) ? label : value);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalAlignment = GridData.FILL;
-		data.verticalAlignment = GridData.BEGINNING;
-		button.setLayoutData(data);
-		if (null != listener)
-			button.addSelectionListener(listener);
-		return button;
-	}
-
-	/**
-	 * Transfer current settings to text fields
-	 */
-	protected void defaultSetting() {
-		if (proxyPathEnabled) {
-			proxyPathText.setText(proxyPath);
-		}
-	}
-
 	/**
 	 * In some nameserver configurations, getCanonicalHostName() will return the
 	 * inverse mapping of the IP address (e.g. 1.1.0.192.in-addr.arpa). In this
@@ -588,249 +1005,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 	}
 
 	/**
-	 * Clean up the content of a text field.
-	 * 
-	 * @param text
-	 * @return cleaned up text.
-	 */
-	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
-			return null;
-
-		return text;
-	}
-
-	/**
-	 * Handle the section of a new connection. Update connection option buttons
-	 * appropriately.
-	 */
-	protected void handleConnectionSelected() {
-		int currentSelection = connectionCombo.getSelectionIndex();
-		if (currentSelection >= 0 && connectionManager != null) {
-			String connectionName = connectionCombo.getItem(currentSelection);
-			connection = connectionManager.getConnection(connectionName);
-		}
-
-		/*
-		 * Disable port forwarding button if it's not supported. If port
-		 * forwarding was selected, switch to 'none' instead.
-		 */
-		if (connection != null)
-			portFwdSupported = connection.supportsTCPPortForwarding();
-		/*
-		 * Linux doesn't call modify handler (which calls updateSettings &
-		 * updatePage) so need to call them explicitly here
-		 */
-		updateSettings();
-		updatePage();
-	}
-
-	/**
-	 * Handle creation of a new connection by pressing the 'New...' button.
-	 * Calls handleRemoteServicesSelected() to update the connection combo with
-	 * the new connection.
-	 * 
-	 * TODO should probably select the new connection
-	 */
-	protected void handleNewRemoteConnectionSelected() {
-		if (uiConnectionManager != null)
-			handleRemoteServiceSelected(uiConnectionManager.newConnection(getShell()));
-	}
-
-	/**
-	 * Show a dialog that lets the user select a file.
-	 */
-	protected void handlePathBrowseButtonSelected() {
-		if (!proxyPathEnabled) {
-			return;
-		}
-		if (connection != null) {
-			checkConnection();
-			if (connection.isOpen()) {
-				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
-				if (remoteUIServices != null) {
-					IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
-					if (fileMgr != null) {
-						fileMgr.setConnection(connection);
-						String correctPath = proxyPathText.getText();
-						String selectedPath = fileMgr.browseFile(getShell(),
-								Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_16, correctPath, 0);
-						if (selectedPath != null)
-							proxyPathText.setText(selectedPath.toString());
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Handle selection of a new remote services provider from the remote
-	 * services combo.
-	 * 
-	 * The assumption is that this will trigger a call to the selection handler
-	 * for the connection combo.
-	 * 
-	 * @param conn
-	 *            connection to select as current. If conn is null, select the
-	 *            first item in the list.
-	 */
-	protected void handleRemoteServiceSelected(IRemoteConnection conn) {
-		int selectionIndex = remoteCombo.getSelectionIndex();
-		if (fAllRemoteServices != null && fAllRemoteServices.length > 0 && selectionIndex >= 0) {
-			remoteServices = fAllRemoteServices[selectionIndex];
-			connectionManager = remoteServices.getConnectionManager();
-			IRemoteUIServices remUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
-			if (remUIServices != null)
-				uiConnectionManager = remUIServices.getUIConnectionManager();
-			IRemoteConnection[] connections = connectionManager.getConnections();
-			Arrays.sort(connections, new Comparator<IRemoteConnection>() {
-				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
-					return c1.getName().compareToIgnoreCase(c2.getName());
-				}
-			});
-			connectionCombo.removeAll();
-			int selected = 0;
-			for (int i = 0; i < connections.length; i++) {
-				connectionCombo.add(connections[i].getName());
-				if (conn != null && connections[i].equals(conn))
-					selected = i;
-			}
-			if (connections.length > 0) {
-				connectionCombo.select(selected);
-				/*
-				 * Linux doesn't call selection handler so need to call it
-				 * explicitly here
-				 */
-				handleConnectionSelected();
-			}
-
-			/*
-			 * Enable 'new' button if new connections are supported
-			 */
-			newConnectionButton.setEnabled(uiConnectionManager != null);
-		}
-	}
-
-	/**
-	 * Initialize the contents of the controls on the page. This is called after
-	 * the controls have been created.
-	 */
-	private void initContents() {
-		loading = true;
-		config = (IRemoteResourceManagerConfiguration) getConfigurationWizard().getConfiguration();
-		loadSaved();
-		updateSettings();
-		defaultSetting();
-		initializeRemoteServicesCombo();
-		initializeLocalHostCombo();
-		loading = false;
-		updatePage();
-	}
-
-	/**
-	 * Initialize the contents of the local address selection combo. Host names
-	 * are obtained by performing a reverse lookup on the IP addresses of each
-	 * network interface. If DNS is configured correctly, this should add the
-	 * fully qualified domain name, otherwise it will probably be the IP
-	 * address. We also add the configuration address to the combo in case it
-	 * was specified manually.
-	 */
-	public void initializeLocalHostCombo() {
-		Set<String> addrs = new TreeSet<String>();
-		try {
-			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-			while (netInterfaces.hasMoreElements()) {
-				NetworkInterface ni = netInterfaces.nextElement();
-				Enumeration<InetAddress> alladdr = ni.getInetAddresses();
-				while (alladdr.hasMoreElements()) {
-					InetAddress ip = alladdr.nextElement();
-					if (ip instanceof Inet4Address)
-						addrs.add(fixHostName(ip.getCanonicalHostName()));
-				}
-			}
-		} catch (Exception e) {
-			// at least we'll still get localhost
-		}
-		if (addrs.size() == 0)
-			addrs.add("localhost"); //$NON-NLS-1$
-		localAddrCombo.removeAll();
-		int index = 0;
-		int selection = -1;
-		for (String addr : addrs) {
-			localAddrCombo.add(addr);
-			if ((localAddr.equals("") && addr.equals("localhost")) //$NON-NLS-1$ //$NON-NLS-2$
-					|| addr.equals(localAddr))
-				selection = index;
-			index++;
-		}
-		/*
-		 * localAddr is not in the list, so add it and make it the current
-		 * selection
-		 */
-		if (selection < 0) {
-			if (!localAddr.equals("")) //$NON-NLS-1$
-				localAddrCombo.add(localAddr);
-			selection = localAddrCombo.getItemCount() - 1;
-		}
-		localAddrCombo.select(selection);
-	}
-
-	/**
-	 * Initialize the contents of the remote services combo.
-	 * 
-	 * The assumption is that this will trigger a call to the selection handling
-	 * routine when the default index is selected.
-	 */
-	protected void initializeRemoteServicesCombo() {
-		IWizardContainer container = null;
-		if (getControl().isVisible()) {
-			container = getWizard().getContainer();
-		}
-		fAllRemoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(container);
-		IRemoteServices defServices;
-		if (remoteServices != null)
-			defServices = remoteServices;
-		else
-			defServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		int defIndex = 0;
-		Arrays.sort(fAllRemoteServices, new Comparator<IRemoteServices>() {
-			public int compare(IRemoteServices c1, IRemoteServices c2) {
-				return c1.getName().compareToIgnoreCase(c2.getName());
-			}
-		});
-		remoteCombo.removeAll();
-		for (int i = 0; i < fAllRemoteServices.length; i++) {
-			remoteCombo.add(fAllRemoteServices[i].getName());
-			if (fAllRemoteServices[i].equals(defServices))
-				defIndex = i;
-		}
-		if (fAllRemoteServices.length > 0) {
-			remoteCombo.select(defIndex);
-			/*
-			 * Linux doesn't call selection handler so need to call it
-			 * explicitly here
-			 */
-			handleRemoteServiceSelected(connection);
-			handleConnectionSelected();
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	protected boolean isValidSetting() {
-		if (proxyPathEnabled && proxyPathText != null) {
-			String name = getFieldContent(proxyPathText.getText());
-			if (name == null || !proxyPathIsValid) {
-				setErrorMessage(Messages.AbstractRemoteProxyResourceManagerConfigurationWizardPage_17);
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
 	 * Load the initial wizard state from the configuration settings.
 	 */
 	private void loadSaved() {
@@ -841,9 +1015,8 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		String rmID = config.getRemoteServicesId();
 		if (rmID != null) {
 			IWizardContainer container = null;
-			if (getControl().isVisible()) {
+			if (getControl().isVisible())
 				container = getWizard().getContainer();
-			}
 			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null)
@@ -854,30 +1027,6 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 
 		muxPortFwd = (options & IRemoteProxyOptions.PORT_FORWARDING) == IRemoteProxyOptions.PORT_FORWARDING;
 		manualLaunch = (options & IRemoteProxyOptions.MANUAL_LAUNCH) == IRemoteProxyOptions.MANUAL_LAUNCH;
-	}
-
-	/**
-	 * Save the current state in the RM configuration. This is called whenever
-	 * anything is changed.
-	 * 
-	 * @return
-	 */
-	public boolean performOk() {
-		store();
-		int options = 0;
-		if (muxPortFwd)
-			options |= IRemoteProxyOptions.PORT_FORWARDING;
-		if (manualLaunch)
-			options |= IRemoteProxyOptions.MANUAL_LAUNCH;
-		if (remoteServices != null)
-			config.setRemoteServicesId(remoteServices.getId());
-		if (connection != null)
-			config.setConnectionName(connection.getName());
-		config.setLocalAddress(localAddr);
-		config.setProxyServerPath(proxyPath);
-		config.setInvocationOptions(proxyArgs);
-		config.setOptions(options);
-		return true;
 	}
 
 	/**
@@ -930,151 +1079,11 @@ public abstract class AbstractRemoteProxyResourceManagerConfigurationWizardPage 
 		setPageComplete(isValid);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
-	 */
-	@Override
-	public void setVisible(boolean visible) {
-		if (visible)
-			initContents();
-		super.setVisible(visible);
-	}
-
-	/**
-	 * @param style
-	 * @param space
-	 * @return
-	 */
-	protected GridData spanGridData(int style, int space) {
-		GridData gd = null;
-		if (style == -1)
-			gd = new GridData();
-		else
-			gd = new GridData(style);
-		gd.horizontalSpan = space;
-		return gd;
-	}
-
 	/**
 	 * Store text fields
 	 */
 	private void store() {
-		if (proxyPathEnabled && proxyPathText != null) {
+		if (proxyPathEnabled && proxyPathText != null)
 			proxyPath = proxyPathText.getText();
-		}
-	}
-
-	/**
-	 * Call to update page status and store any changed settings
-	 */
-	protected void updatePage() {
-		if (!loading) {
-			setErrorMessage(null);
-			setMessage(null);
-
-			if (!isValidSetting())
-				setValid(false);
-			else {
-				performOk();
-				setValid(true);
-			}
-		}
-	}
-
-	/**
-	 * Update wizard UI selections from settings. This should be called whenever
-	 * any settings are changed.
-	 * 
-	 * @since 1.1
-	 */
-	protected void updateSettings() {
-		/*
-		 * Get current settings unless we're initializing things
-		 */
-		if (!loading) {
-			muxPortFwd = portForwardingButton.getSelection();
-			if (manualButton != null)
-				manualLaunch = manualButton.getSelection();
-		}
-
-		/*
-		 * If no localAddr has been specified in the configuration, select a
-		 * default one.
-		 */
-		if (!loading || localAddr.equals("")) //$NON-NLS-1$
-			localAddr = localAddrCombo.getText();
-
-		/*
-		 * Fix settings
-		 */
-		if (muxPortFwd && !portFwdSupported)
-			muxPortFwd = false;
-
-		/*
-		 * Update UI to display correct settings
-		 */
-		if (noneButton != null)
-			noneButton.setSelection(!muxPortFwd);
-
-		if (portForwardingButton != null) {
-			portForwardingButton.setSelection(muxPortFwd);
-			portForwardingButton.setEnabled(portFwdSupported);
-		}
-
-		if (localAddrCombo != null)
-			localAddrCombo.setEnabled(!muxPortFwd);
-
-		if (manualButton != null) {
-			manualButton.setSelection(manualLaunch);
-		}
-	}
-
-	/**
-	 * Check if the proxy path supplied in proxyPathText is a valid file on the
-	 * remote system.
-	 * 
-	 * @return true if valid
-	 * @since 1.1
-	 */
-	protected boolean validateProxyPath() {
-		if (!proxyPathEnabled) {
-			return true;
-		}
-		proxyPathIsValid = false;
-		final String path = proxyPathText.getText();
-		if (path != null)
-			if (connection != null) {
-				checkConnection();
-				if (connection.isOpen())
-					if (remoteServices != null) {
-						final IRemoteFileManager fileMgr = remoteServices.getFileManager(connection);
-						if (fileMgr != null) {
-							IRunnableWithProgress op = new IRunnableWithProgress() {
-								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-									try {
-										IFileStore file = fileMgr.getResource(path);
-										if (!monitor.isCanceled())
-											proxyPathIsValid = file.fetchInfo(EFS.NONE, monitor).exists();
-									} catch (CoreException e) {
-										throw new InvocationTargetException(e);
-									}
-								}
-
-							};
-							try {
-								ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
-								dialog.setOpenOnRun(false);
-								dialog.run(true, true, op);
-							} catch (InvocationTargetException e) {
-								// return false
-							} catch (InterruptedException e) {
-								// return false
-							}
-						}
-					}
-			}
-		return proxyPathIsValid;
 	}
 }
