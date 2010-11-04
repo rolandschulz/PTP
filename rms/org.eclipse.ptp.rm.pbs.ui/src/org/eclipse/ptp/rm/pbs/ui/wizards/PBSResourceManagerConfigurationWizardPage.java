@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Albert L. Rossi - modifications to expose proxy type configuration (2010/11/04)
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.wizards;
 
@@ -31,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 public final class PBSResourceManagerConfigurationWizardPage extends AbstractRemoteProxyResourceManagerConfigurationWizardPage
 		implements IPBSNonNLSConstants {
 
-	private String[] types = { "PBS-Torque", "PBS-Pro" };//$NON-NLS-1$ //$NON-NLS-2$
+	private String[] types;
 	private Combo proxyTypes;
 	private IPBSResourceManagerConfiguration pbsConfig;
 
@@ -52,8 +53,7 @@ public final class PBSResourceManagerConfigurationWizardPage extends AbstractRem
 
 	@Override
 	protected void addCustomWidgets(Composite parent) {
-		proxyTypes = WidgetUtils.createItemCombo(parent, Messages.PBSProxyConfigComboTitle, types, ZEROSTR, ZEROSTR, true, null,
-				2);
+		proxyTypes = WidgetUtils.createItemCombo(parent, Messages.PBSProxyConfigComboTitle, types, ZEROSTR, ZEROSTR, true, null, 2);
 		proxyTypes.addSelectionListener(listener);
 	}
 
@@ -78,6 +78,10 @@ public final class PBSResourceManagerConfigurationWizardPage extends AbstractRem
 		return super.isValidSetting();
 	}
 
+	/*
+	 * For now, uses hardcoded types. Will need to search resource(s) to find
+	 * current available proxy configurations.
+	 */
 	private void setAvailableConfigurations() {
 		types = new String[] { "PBS-Torque", "PBS-Pro" };//$NON-NLS-1$ //$NON-NLS-2$
 	}

@@ -18,6 +18,7 @@
  * Contributors:
  *    Albert L. Rossi (NCSA)  -- modified to disable proxy path for
  *    							 automatically deployed RMs
+ *    						  -- modified to allow subclasses to expose extra properties/widgets (2010/11/04)
  *******************************************************************************/
 package org.eclipse.ptp.rm.ui.wizards;
 
