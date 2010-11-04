@@ -127,6 +127,7 @@ public interface IPBSNonNLSConstants {
 	String TEMPLATE_PREFIX = "TMPL_";//$NON-NLS-1$
 	String TEMPLATE_NAMES = TEMPLATE_PREFIX + "names";//$NON-NLS-1$
 	String CURR_TEMPLATE = "_current" + TEMPLATE_SUFFIX; //$NON-NLS-1$
+	String PROXY_CONFIG_TYPE = "PROXYTYPE";//$NON-NLS-1$
 
 	/* INTERNAL JOBS */
 	String TEMPLATE_CHANGE = "template change";//$NON-NLS-1$

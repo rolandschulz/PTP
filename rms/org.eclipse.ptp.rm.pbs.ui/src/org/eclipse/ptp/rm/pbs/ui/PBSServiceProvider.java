@@ -85,6 +85,13 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		return getString(getResourceManagerId() + CURR_TEMPLATE, ZEROSTR);
 	}
 
+	/**
+	 * @since 5.0
+	 */
+	public String getProxyConfiguration() {
+		return getString(PROXY_CONFIG_TYPE, ZEROSTR);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -186,6 +193,13 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 			name += MARKER + conn;
 		setName(name);
 		setDescription(Messages.PBSResourceManager);
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public void setProxyConfiguration(String type) {
+		putString(PROXY_CONFIG_TYPE, type);
 	}
 
 	/**

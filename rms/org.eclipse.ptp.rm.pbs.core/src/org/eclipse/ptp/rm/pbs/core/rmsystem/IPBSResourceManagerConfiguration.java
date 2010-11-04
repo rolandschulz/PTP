@@ -29,6 +29,11 @@ public interface IPBSResourceManagerConfiguration extends IRemoteResourceManager
 	/**
 	 * @since 5.0
 	 */
+	public String getProxyConfiguration();
+
+	/**
+	 * @since 5.0
+	 */
 	public String getTemplate(String name);
 
 	/**
@@ -59,5 +64,11 @@ public interface IPBSResourceManagerConfiguration extends IRemoteResourceManager
 	/**
 	 * @since 5.0
 	 */
+	public void setProxyConfiguration(String type);
+
+	/**
+	 * @since 5.0
+	 */
 	public void setValidAttributeSet(String serialized);
+
 }

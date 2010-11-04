@@ -81,6 +81,8 @@ public class Messages extends NLS {
 
 	public static String PBSRMLaunchDataSource_ValueNotSet;
 
+	public static String PBSProxyConfigComboTitle;
+
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.pbs.ui.messages.messages"; //$NON-NLS-1$
 
 	static {
