@@ -63,7 +63,6 @@ extern void MISessionRegisterLogCallback(MISession *sess, void (*callback)(char 
 extern void MISessionRegisterTargetCallback(MISession *sess, void (*callback)(char *));
 extern void MISessionSetGDBPath(MISession *sess, char *path);
 extern int MISessionSendCommand(MISession *sess, MICommand *cmd);
-extern int MISessionCommandCompleted(MISession *sess);
 extern void MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds);
 extern void MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds);
 extern int MISessionProgress(MISession *sess);
