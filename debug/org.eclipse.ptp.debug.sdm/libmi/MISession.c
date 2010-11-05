@@ -40,10 +40,15 @@ static MIList *			MISessionList = NULL;
 static struct timeval	MISessionDefaultSelectTimeout = {0, 1000};
 static int				MISessionDebug = 1;
 
+
 static void DoOOBCallbacks(MISession *sess, MIList *oobs);
 static void HandleChild(int sig);
 static int WriteCommand(int fd, char *cmd);
 static char *ReadResponse(int fd);
+#ifdef __gnu_linux__
+static int IsExecAsyncStopped(MISession *sess, MIList *oobs);
+#endif /* __gnu_linux__ */
+
 
 extern int get_master_pty(char **);
 extern int get_slave_pty(char *);
@@ -434,10 +439,12 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		 
 		if (output->oobs != NULL) {
 #ifdef __gnu_linux__
-			if (sess->command != NULL && strcmp(sess->command->command, "-exec-interrupt") == 0) {
+			if (sess->command != NULL &&
+					strcmp(sess->command->command, "-exec-interrupt") == 0 &&
+					IsExecAsyncStopped(sess, output->oobs)) {
 				sess->command->completed = 1;
 			}
-#endif /* __gnu_linux__ */	
+#endif /* __gnu_linux__ */
 			DoOOBCallbacks(sess, output->oobs);
 		}
 
@@ -454,10 +461,13 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 					sess->command->callback(output->rr, sess->command->cb_data);
 				}
 				sess->command->completed = 1;
-				sess->command = NULL;
 			}
 		} else {
 			MIOutputFree(output);
+		}
+
+		if (sess->command != NULL && sess->command->completed) {
+			sess->command = NULL;
 		}
 	}
 	
@@ -472,15 +482,6 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
         	sess->pty_fd = -1;
         }
     }
-}
-
-/*
- * Check if the current command has completed.
- */
-int
-MISessionCommandCompleted(MISession *sess)
-{
-	return (sess->command == NULL);
 }
 
 /*
@@ -607,6 +608,26 @@ DoOOBCallbacks(MISession *sess, MIList *oobs)
 		}
 	}
 }
+
+#ifdef __gnu_linux__
+/*
+ * Check if there is an oob that is the result of an -exec-interrupt
+ */
+static int
+IsExecAsyncStopped(MISession *sess, MIList *oobs)
+{
+	MIOOBRecord *	oob;
+
+	for (MIListSet(oobs); (oob = (MIOOBRecord *)MIListGet(oobs)) != NULL; ) {
+		if (oob->type == MIOOBRecordTypeAsync &&
+				oob->sub_type == MIOOBRecordExecAsync &&
+				strcmp(oob->class, "stopped") == 0) {
+			return 1;
+		}
+	}
+	return 0;
+}
+#endif /* __gnu_linux__ */
 
 void
 MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)

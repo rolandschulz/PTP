@@ -35,7 +35,7 @@ sendcmd_wait(MISession *sess, MICommand *cmd)
 	MISessionSendCommand(sess, cmd);
 	do {
 		MISessionProgress(sess);
-	} while (!MISessionCommandCompleted(sess));
+	} while (!MICommandCompleted(cmd));
 }
 
 int main(int argc, char *argv[])
