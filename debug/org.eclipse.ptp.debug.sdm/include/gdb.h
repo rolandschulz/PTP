@@ -60,7 +60,7 @@ extern void			DeleteMIVar(MISession *session, char *mi_name);
 extern int			GetAddressLength(MISession *session);
 extern List *		GetChangedVariables(MISession *session);
 extern stackframe *	GetCurrentFrame(MISession *session);
-extern float		GetGDBVersion(MISession *session);
+extern int			GetGDBVersion(MISession *session, float * version);
 extern int			GetMIInfoDepth(MISession *session);
 extern MIVar *		GetMIVarClassFields(MISession *session, char *name);
 extern MIVar *		GetMIVarDetails(MISession *session, char *name, MIVar *mivar, int listChildren);

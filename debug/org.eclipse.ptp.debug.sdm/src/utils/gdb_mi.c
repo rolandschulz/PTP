@@ -32,7 +32,7 @@
 #include "dbg_error.h"
 
 static int		_address_length = 0;
-static double	_gdb_version = 0.0;
+static float	_gdb_version = 0.0;
 
 /*
  * Send command and wait for a response.
@@ -47,7 +47,7 @@ SendCommandWait(MISession *session, MICommand *cmd)
 			DEBUG_PRINTS(DEBUG_LEVEL_BACKEND, "------------------- SendCommandWait sess->out_fd = -1\n");
 			break;
 		}
-	} while (!MISessionCommandCompleted(session));
+	} while (!MICommandCompleted(cmd));
 }
 
 /*
@@ -476,17 +476,27 @@ GetMIVarDetails(MISession *session, char *name, MIVar *mivar, int listChildren)
 	return mivar;
 }
 
-float
-GetGDBVersion(MISession *session)
+int
+GetGDBVersion(MISession *session, float *version)
 {
-	MICommand *	cmd = MIGDBVersion();
-	SendCommandWait(session, cmd);
-	if (MICommandResultOK(cmd)) {
+	MICommand *	cmd;
+
+	if (_gdb_version == 0.0) {
+		cmd = MIGDBVersion();
+		SendCommandWait(session, cmd);
+		if (!MICommandResultOK(cmd)) {
+			MICommandFree(cmd);
+			DbgSetError(DBGERR_DEBUGGER, "Unable to determine gdb version");
+			MISessionFree(session);
+			return -1;
+		}
 		_gdb_version = CLIGetGDBVersion(cmd);
-		DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "------------------- gdb version: %f\n", _gdb_version);
+		MICommandFree(cmd);
 	}
-	MICommandFree(cmd);
-	return _gdb_version;
+	if (version != NULL) {
+		*version = _gdb_version;
+	}
+	return 0;
 }
 
 void
