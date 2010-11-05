@@ -89,6 +89,7 @@ plugin@org.eclipse.ptp.debug.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/c
 plugin@org.eclipse.ptp.debug.sdm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm
 plugin@org.eclipse.ptp.debug.sdm.core=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm.core
 plugin@org.eclipse.ptp.debug.sdm.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm.ui
+plugin@org.eclipse.ptp.debug.sdm.x10=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm.x10
 plugin@org.eclipse.ptp.debug.ui=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/debug/org.eclipse.ptp.debug.ui
 plugin@org.eclipse.ptp.debug.sdm=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm
 plugin@org.eclipse.ptp.proxy=@ptpTag@,:pserver:anonymous@dev.eclipse.org:/cvsroot/tools,,org.eclipse.ptp/core/org.eclipse.ptp.proxy

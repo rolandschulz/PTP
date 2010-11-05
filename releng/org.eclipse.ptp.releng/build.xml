@@ -512,6 +512,10 @@
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
 		<antcall target="tagone">
+			<param name="tagmodule" value="org.eclipse.ptp/debug/org.eclipse.ptp.debug.sdm.x10"/>
+			<param name="tagbranch" value="${ptpTagBranch}"/>
+		</antcall>		
+		<antcall target="tagone">
 			<param name="tagmodule" value="org.eclipse.ptp/debug/org.eclipse.ptp.debug.ui"/>
 			<param name="tagbranch" value="${ptpTagBranch}"/>
 		</antcall>		
