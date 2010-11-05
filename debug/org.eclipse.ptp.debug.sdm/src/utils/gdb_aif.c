@@ -34,7 +34,10 @@
 /********************************************************
  * TYPE CONVERSION
  ********************************************************/
-#define T_OTHER			0
+#define T_UNKNOWN		0
+/*
+ * Simple types
+ */
 #define T_CHAR			1
 #define T_SHORT			2
 #define T_USHORT		3
@@ -48,7 +51,9 @@
 #define T_DOUBLE		11
 #define T_STRING		12
 #define T_BOOLEAN		13
-
+/*
+ * Complex (structure) types
+ */
 #define T_CHAR_PTR		14
 #define T_FUNCTION		15
 #define T_VOID_PTR		16
@@ -122,13 +127,26 @@ GetSimpleType(char *type)
 	} else if (strncmp(t, "logical4", 8) == 0) {
  		id = T_BOOLEAN;
  	} else {
-		id =  T_OTHER;
+		id =  T_UNKNOWN;
 	}
 
 	free(t);
 	return id;
 }
 
+/*
+ * Attempt to determine the type of a variable from a type string. Assumes
+ * that the type is structured. Returns T_UNKNOWN if the type can't be determined.
+ *
+ * Possible return values:
+ * 	T_ARRAY
+ * 	T_POINTER
+ * 	T_CHAR_PTR
+ * 	T_UNION
+ * 	T_STRUCT
+ * 	T_CLASS
+ * 	T_UNKNOWN
+ */
 static int
 GetComplexType(char *type)
 {
@@ -157,7 +175,7 @@ GetComplexType(char *type)
 		if (strncmp(type, "class", 5) == 0) {
 			return T_CLASS;
 		}
-		return T_OTHER;
+		return T_UNKNOWN;
 	}
 }
 
@@ -165,7 +183,7 @@ static int
 GetType(char *type)
 {
 	int id = GetSimpleType(type);
-	if (id == T_OTHER) {
+	if (id == T_UNKNOWN) {
 		id = GetComplexType(type);
 	}
 	return id;
@@ -176,19 +194,30 @@ GetType(char *type)
  * Assumes type string is '<base type>*'
  */
 static int
-GetPointerBaseType(char *type)
+GetPointerBaseType(MISession *session, MIVar *var)
 {
 	int		id;
 	char *	p;
-	char *	str = strdup(type);
+	char *	str = strdup(var->type);
 
-	p = &str[strlen(type) - 1];
+	/*
+	 * Find first non space character before the '*'
+	 */
+	p = &str[strlen(str) - 1];
 	*p-- = '\0';
 	while (p != str && *p == ' ') {
 		*p-- = '\0';
 	}
 
 	id = GetType(str);
+	if (id == T_UNKNOWN) {
+		p = GetPtypeValue(session, NULL, var);
+		if (p != NULL) {
+			id = GetType(p);
+			free(p);
+		}
+	}
+
 	free(str);
 
 	return id;
@@ -214,7 +243,7 @@ GetArrayBaseType(MISession *session, MIVar *var)
 	}
 
 	id = GetType(str);
-	if (id == T_OTHER) {
+	if (id == T_UNKNOWN) {
 		p = GetPtypeValue(session, NULL, var);
 		if (p != NULL) {
 			id = GetType(p);
@@ -434,8 +463,12 @@ GetAIFVar(MISession *session, char *var, AIF **val, char **type)
 	return DBGRES_OK;
 }
 
+/*
+ * Create an AIF object that is a pointer to 'base'. The hexidecimal
+ * address of the pointer is passed in 'addr'.
+ */
 AIF *
-GetAIFPointer(MISession *session, char *addr, AIF *i)
+CreateAIFPointer(MISession *session, char *addr, AIF *base)
 {
 	AIF *ac;
 	AIF *a;
@@ -450,22 +483,23 @@ GetAIFPointer(MISession *session, char *addr, AIF *i)
 		addr += 2; //skip 0x
 		ac = AddressToAIF(addr, GetAddressLength(session));
 	}
-	a = PointerToAIF(ac, i);
+	a = PointerToAIF(ac, base);
 	AIFFree(ac);
 	return a;
 }
 
 /*
- * Convert an MI value to a character pointer.
+ * Create an AIF char pointer from the results of
+ * an MI -var-list-children command.
  *
- * Possible values are:
+ * Possible values for 'res' are:
  *
  * "" 				- invalid/uninitialized pointer
  * "0x0" 			- null pointer
  * "0xaddr \"str\"" - address and string
  */
 AIF *
-GetCharPointerAIF(MISession *session, char *res)
+CreateAIFCharPointer(MISession *session, char *res)
 {
 	char *	pch;
 	char *	val;
@@ -504,7 +538,7 @@ GetSimpleAIF(MISession *session, MIVar *var)
 	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetSimpleAIF (%s)\n", var->type);
 
 	int id = GetSimpleType(var->type);
-	if (id == T_OTHER) {
+	if (id == T_UNKNOWN) {
 		pt = GetPtypeValue(session, NULL, var);
 		if (pt != NULL) {
 			if (var->type != NULL) {
@@ -518,19 +552,22 @@ GetSimpleAIF(MISession *session, MIVar *var)
 	case T_FUNCTION:
 		ac = MakeAIF(AIF_FUNCTION_TYPE("is4"), ""); /* TODO: get real type */
 		v = GetVarValue(session, var->name);
-		a = GetAIFPointer(session, v, ac);
+		a = CreateAIFPointer(session, v, ac);
 		return a;
 	case T_VOID_PTR:
 		ac = VoidToAIF(0, 0);
 		v = GetVarValue(session, var->name);
-		a = GetAIFPointer(session, v, ac);
+		a = CreateAIFPointer(session, v, ac);
 		free(v);
 		AIFFree(ac);
 		return a;
 	case T_ENUM:
 		return EmptyEnumToAIF(GetTypeName(var->type));
-	case T_OTHER:
-		return NULL;
+	case T_UNKNOWN:
+		/*
+		 * Unrecognized type. Need a better way to handle this.
+		 */
+		return VoidToAIF(0, 0);
 	default:
 		v = GetVarValue(session, var->name);
 		a = CreateSimpleAIF(id, v);
@@ -656,12 +693,12 @@ GetPointerAIF(MISession *session, MIVar *var, int named)
 	char *	v;
 	int		id;
 
-	id = GetPointerBaseType(var->type);
+	id = GetPointerBaseType(session, var);
 
 	switch (id) {
 		case T_CHAR_PTR:
 			v = GetVarValue(session, var->children[0]->name);
-			a = GetCharPointerAIF(session, v);
+			a = CreateAIFCharPointer(session, v);
 			free(v);
 			return a;
 		case T_UNION:
@@ -681,7 +718,7 @@ GetPointerAIF(MISession *session, MIVar *var, int named)
 		ac = VoidToAIF(0, 0);
 	}
 	v = GetVarValue(session, var->name);
-	a = GetAIFPointer(session, v, ac);
+	a = CreateAIFPointer(session, v, ac);
 	free(v);
 	AIFFree(ac);
 	return a;
@@ -691,16 +728,28 @@ AIF *
 GetComplexAIF(MISession *session, MIVar *var, int named)
 {
 	char *	v;
+	char *	pt;
 	AIF *	a = NULL;
 
 	int id = GetComplexType(var->type);
+	if (id == T_UNKNOWN) {
+		pt = GetPtypeValue(session, NULL, var);
+		if (pt != NULL) {
+			if (var->type != NULL) {
+				free(var->type);
+			}
+			var->type = pt;
+			id = GetComplexType(var->type);
+		}
+	}
+
 	switch (id) {
 	case T_ARRAY:
 		a = GetArrayAIF(session, var, named);
 		break;
 	case T_CHAR_PTR:
 		v = GetVarValue(session, var->name);
-		a = GetCharPointerAIF(session, v);
+		a = CreateAIFCharPointer(session, v);
 		free(v);
 		break;
 	case T_POINTER:
@@ -883,19 +932,19 @@ GetPartialPointerAIF(MISession *session, char *expr, MIVar *var)
 
 	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialPointerAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
 
-	id = GetPointerBaseType(var->type);
+	id = GetPointerBaseType(session, var);
 
 	if (var->children != NULL) {
 		switch (id) {
 		case T_CHAR_PTR:
 			v = GetVarValue(session, var->children[0]->name);
-			a = GetCharPointerAIF(session, v);
+			a = CreateAIFCharPointer(session, v);
 			free(v);
 			break;
 		case T_POINTER:
 			ac = VoidToAIF(0, 0);
 			v = GetVarValue(session, var->children[0]->name);
-			a = GetAIFPointer(session, v, ac);
+			a = CreateAIFPointer(session, v, ac);
 			free(v);
 			AIFFree(ac);
 			break;
@@ -918,7 +967,7 @@ GetPartialPointerAIF(MISession *session, char *expr, MIVar *var)
 		switch (id) {
 		case T_CHAR_PTR:
 			v = GetVarValue(session, var->name);
-			a = GetCharPointerAIF(session, v);
+			a = CreateAIFCharPointer(session, v);
 			free(v);
 			break;
 		default:
@@ -927,7 +976,7 @@ GetPartialPointerAIF(MISession *session, char *expr, MIVar *var)
 		}
 	}
 	v = GetVarValue(session, var->name);
-	ac = GetAIFPointer(session, v, a);
+	ac = CreateAIFPointer(session, v, a);
 	free(v);
 	AIFFree(a);
 	return ac;
@@ -946,7 +995,7 @@ GetPartialComplexAIF(MISession *session, char *expr, MIVar *var)
 	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "---------------------- GetPartialComplexAIF (%s, %s)\n", expr != NULL ? expr : "NULL", var->type);
 
 	int id = GetComplexType(var->type);
-	if (id == T_OTHER) {
+	if (id == T_UNKNOWN) {
 		type = GetPtypeValue(session, expr, var);
 		if (type != NULL) {
 			if (var->type != NULL) {
@@ -962,7 +1011,7 @@ GetPartialComplexAIF(MISession *session, char *expr, MIVar *var)
 		break;
 	case T_CHAR_PTR:
 		v = GetVarValue(session, var->name);
-		a = GetCharPointerAIF(session, v);
+		a = CreateAIFCharPointer(session, v);
 		free(v);
 		break;
 	case T_POINTER:
