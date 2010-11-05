@@ -300,6 +300,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 {
 	char *		prog_path;
 	char **		e;
+	float		version;
 	struct stat	st;
 	MICommand *	cmd;
 	MISession *	sess;
@@ -354,6 +355,11 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 
 	free(prog_path);
 
+	if (GetGDBVersion(sess, &version) < 0) {
+		return DBGRES_ERR;
+	}
+	DEBUG_PRINTF(DEBUG_LEVEL_BACKEND, "------------------- gdb version: %f\n", version);
+
 	if (*args != NULL) {
 		cmd = MIExecArguments(args);
 		SendCommandWait(sess, cmd);
@@ -372,8 +378,6 @@ GDBMIStartSession(char *gdb_path, char *prog, char *path, char *work_dir, char *
 
 	MISessionRegisterEventCallback(sess, AsyncCallback);
 	MISessionRegisterTargetCallback(sess, StreamTargetCallback);
-
-	GetGDBVersion(sess);
 
 	DebugSession = sess;
 	Started = 0;
@@ -868,22 +872,6 @@ GDBMIInterrupt(void)
 	MICommand *	cmd;
 
 	CHECK_SESSION();
-
-	/*
-	 * Don't do anything if there's an event pending or the
-	 * target is not running.
-	 *
-	if (LastEvent != NULL || !gmi_exec_interrupt(MIHandle))
-		return DBGRES_OK;*/
-
-	/*
-	 * Must check async here due to broken MI implementation. AsyncCallback will
-	 * be called inside gmi_exec_interrupt().
-	 *
-	if (AsyncFunc != NULL) {
-		AsyncFunc(AsyncFuncData);
-		AsyncFunc = NULL;
-	}*/
 
 	/*
 	 * Ignore error if target is not running
