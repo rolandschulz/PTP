@@ -1,14 +1,14 @@
- /*******************************************************************************
-  * Copyright (c) 2010 The University of Tennessee,
-  * All rights reserved. This program and the accompanying materials
-  * are made available under the terms of the Eclipse Public License v1.0
-  * which accompanies this distribution, and is available at
-  * http://www.eclipse.org/legal/epl-v10.html
-  *
-  * Contributors:
-  *    Benjamin Lindner (ben@benlabs.net) - initial implementation (bug 316671)
-  *
-  *******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2010 The University of Tennessee,
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Benjamin Lindner (ben@benlabs.net) - initial implementation (bug 316671)
+ *
+ *******************************************************************************/
 
 package org.eclipse.ptp.rm.pbs.core.parser;
 
@@ -19,7 +19,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.core.attributes.*;
+import org.eclipse.ptp.core.attributes.BooleanAttributeDefinition;
+import org.eclipse.ptp.core.attributes.DateAttributeDefinition;
+import org.eclipse.ptp.core.attributes.DoubleAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IAttributeDefinition;
+import org.eclipse.ptp.core.attributes.IntegerAttributeDefinition;
+import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 
 import com.ibm.icu.text.DateFormat;
 
@@ -27,77 +32,78 @@ import com.ibm.icu.text.DateFormat;
  * @since 5.0
  */
 public class AttributeDefinitionReader {
-	static public List<IAttributeDefinition<?,?,?>> parse(InputStream in) 
-		throws Exception, IOException {
-		
-		List<IAttributeDefinition<?,?,?>> tmpList = new ArrayList<IAttributeDefinition<?,?,?>>();
-				
+	static public List<IAttributeDefinition<?, ?, ?>> parse(InputStream in) throws Exception, IOException {
+
+		List<IAttributeDefinition<?, ?, ?>> tmpList = new ArrayList<IAttributeDefinition<?, ?, ?>>();
+
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-		// each line is a sequence (:: separated) of entries which correspond to fields in the attribute definiton
+		// each line is a sequence (:: separated) of entries which correspond to
+		// fields in the attribute definiton
 
 		// ignore lines starting with #
 		// skip lines which are empty
-		
+
 		String line;
 
-		Integer linenumber =0;
+		Integer linenumber = 0;
 		while ((line = reader.readLine()) != null) {
-			linenumber+=1;
+			linenumber += 1;
 			String tline = line.trim();
-			if (tline.startsWith("#")) continue;
-			if (tline.equals("")) continue;
-			String[] linesplit = tline.split("::");
-			Integer linesplitlen= linesplit.length;
+			if (tline.startsWith("#"))continue; //$NON-NLS-1$
+			if (tline.equals(""))continue; //$NON-NLS-1$
+			String[] linesplit = tline.split("::"); //$NON-NLS-1$
+			Integer linesplitlen = linesplit.length;
 
-			if (linesplitlen<5) {
-				System.err.println("Attribute Definition ill-defined,"+"linenumber="+linenumber.toString());
-				System.err.println("read:"+tline);
-				for ( String lss : linesplit ) {
-					System.err.println(lss);					
+			if (linesplitlen < 5) {
+				System.err.println("Attribute Definition ill-defined," + "linenumber=" + linenumber.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+				System.err.println("read:" + tline); //$NON-NLS-1$
+				for (String lss : linesplit) {
+					System.err.println(lss);
 				}
-			} else if (linesplitlen<6) {
-				// split discarded a trailing default which was empty and thus trimed away:
+			} else if (linesplitlen < 6) {
+				// split discarded a trailing default which was empty and thus
+				// trimed away:
 				List<String> nlinesplit = new ArrayList<String>();
 				for (String lss : linesplit) {
 					nlinesplit.add(lss);
 				}
-				nlinesplit.add("");
+				nlinesplit.add(""); //$NON-NLS-1$
 				linesplit = nlinesplit.toArray(new String[nlinesplit.size()]);
 			}
 
-			
 			// format required:
-			// ID :: TYPE :: NAME :: DESCRIPTION :: DISPLAY :: DEFAULT :: CUSTOM FIELD 1 :: CUSTOM FIELD 2 :: etc
-			
-			// somebool :: BOOLEAN :: someboolname :: this is an ex. for a bool :: true :: true
-			// somedate :: DATE :: somedatename :: this is an ex. for a date :: true :: 00:30:00 :: HH:MM:SS
+			// ID :: TYPE :: NAME :: DESCRIPTION :: DISPLAY :: DEFAULT :: CUSTOM
+			// FIELD 1 :: CUSTOM FIELD 2 :: etc
 
-			if ("boolean".compareToIgnoreCase(linesplit[1].trim())==0) {
-				tmpList.add(new BooleanAttributeDefinition(
-						linesplit[0].trim(), // id
+			// somebool :: BOOLEAN :: someboolname :: this is an ex. for a bool
+			// :: true :: true
+			// somedate :: DATE :: somedatename :: this is an ex. for a date ::
+			// true :: 00:30:00 :: HH:MM:SS
+
+			if ("boolean".compareToIgnoreCase(linesplit[1].trim()) == 0) { //$NON-NLS-1$
+				tmpList.add(new BooleanAttributeDefinition(linesplit[0].trim(), // id
 						linesplit[2].trim(), // name
 						linesplit[3].trim(), // description
 						Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
 						Boolean.valueOf(linesplit[5].trim()) // default
 				));
 			}
-			if ("string".compareToIgnoreCase(linesplit[1].trim())==0) {
-				tmpList.add(new StringAttributeDefinition(
-						linesplit[0].trim(), // id
+			if ("string".compareToIgnoreCase(linesplit[1].trim()) == 0) { //$NON-NLS-1$
+				tmpList.add(new StringAttributeDefinition(linesplit[0].trim(), // id
 						linesplit[2].trim(), // name
 						linesplit[3].trim(), // description
 						Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
 						linesplit[5].trim() // default
 				));
 			}
-			if ("integer".compareToIgnoreCase(linesplit[1].trim())==0) {
+			if ("integer".compareToIgnoreCase(linesplit[1].trim()) == 0) { //$NON-NLS-1$
 				boolean minmax = false;
-				if (linesplitlen>=8) minmax = true;
-				
+				if (linesplitlen >= 8)
+					minmax = true;
+
 				if (minmax) {
-					tmpList.add(new IntegerAttributeDefinition(
-							linesplit[0].trim(), // id
+					tmpList.add(new IntegerAttributeDefinition(linesplit[0].trim(), // id
 							linesplit[2].trim(), // name
 							linesplit[3].trim(), // description
 							Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
@@ -106,8 +112,7 @@ public class AttributeDefinitionReader {
 							Integer.parseInt(linesplit[7].trim()) // max
 					));
 				} else {
-					tmpList.add(new IntegerAttributeDefinition(
-							linesplit[0].trim(), // id
+					tmpList.add(new IntegerAttributeDefinition(linesplit[0].trim(), // id
 							linesplit[2].trim(), // name
 							linesplit[3].trim(), // description
 							Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
@@ -115,13 +120,13 @@ public class AttributeDefinitionReader {
 					));
 				}
 			}
-			if ("double".compareToIgnoreCase(linesplit[1].trim())==0) {
+			if ("double".compareToIgnoreCase(linesplit[1].trim()) == 0) { //$NON-NLS-1$
 				boolean minmax = false;
-				if (linesplitlen>=8) minmax = true;
-				
+				if (linesplitlen >= 8)
+					minmax = true;
+
 				if (minmax) {
-					tmpList.add(new DoubleAttributeDefinition(
-							linesplit[0].trim(), // id
+					tmpList.add(new DoubleAttributeDefinition(linesplit[0].trim(), // id
 							linesplit[2].trim(), // name
 							linesplit[3].trim(), // description
 							Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
@@ -130,45 +135,41 @@ public class AttributeDefinitionReader {
 							Double.parseDouble(linesplit[7].trim()) // max
 					));
 				} else {
-					tmpList.add(new DoubleAttributeDefinition(
-							linesplit[0].trim(), // id
+					tmpList.add(new DoubleAttributeDefinition(linesplit[0].trim(), // id
 							linesplit[2].trim(), // name
 							linesplit[3].trim(), // description
 							Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
 							Double.parseDouble(linesplit[5].trim()) // default
 					));
 				}
-			}			
-			if ("date".compareToIgnoreCase(linesplit[1].trim())==0) {
+			}
+			if ("date".compareToIgnoreCase(linesplit[1].trim()) == 0) { //$NON-NLS-1$
 				boolean minmax = false;
-				if (linesplitlen>=9) minmax = true;
-				
+				if (linesplitlen >= 9)
+					minmax = true;
+
 				DateFormat df = DateFormat.getPatternInstance(linesplit[6].trim());
-				
+
 				if (minmax) {
-					tmpList.add(new DateAttributeDefinition(
-							linesplit[0].trim(), // id
+					tmpList.add(new DateAttributeDefinition(linesplit[0].trim(), // id
 							linesplit[2].trim(), // name
 							linesplit[3].trim(), // description
 							Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
 							df.parse(linesplit[5].trim()), // default
-							df,
-							df.parse(linesplit[7].trim()), // min
+							df, df.parse(linesplit[7].trim()), // min
 							df.parse(linesplit[8].trim()) // max
-							));
+					));
 				} else {
-					tmpList.add(new DateAttributeDefinition(
-							linesplit[0].trim(), // id
+					tmpList.add(new DateAttributeDefinition(linesplit[0].trim(), // id
 							linesplit[2].trim(), // name
 							linesplit[3].trim(), // description
 							Boolean.valueOf(linesplit[4].trim()).booleanValue(), // display
 							df.parse(linesplit[5].trim()), // default
-							df
-							));
+							df));
 				}
-			}	
+			}
 		}
-		
+
 		return tmpList;
 
 	}
