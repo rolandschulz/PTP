@@ -11,12 +11,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.core;
 
+import java.io.File;
+
 import org.eclipse.cdt.core.index.IIndexFileLocation;
 import org.eclipse.cdt.internal.core.indexer.StandaloneIndexerInputAdapter;
 import org.eclipse.cdt.internal.core.pdom.ASTFilePathResolver;
 
 public class RemoteIndexerInputAdapter extends ASTFilePathResolver {
-
+	private static final boolean CASE_INSENSITIVE_FILE_SYSTEM = new File("a").equals(new File("A")); //$NON-NLS-1$//$NON-NLS-2$
 	private final StandaloneIndexerInputAdapter adapter = new StandaloneIndexerInputAdapter(null);
 
 	@Override
@@ -58,6 +60,11 @@ public class RemoteIndexerInputAdapter extends ASTFilePathResolver {
 	@Override
 	public IIndexFileLocation resolveIncludeFile(String includePath) {
 		return adapter.resolveIncludeFile(includePath);
+	}
+
+	@Override
+	public boolean isCaseInsensitiveFileSystem() {
+		return CASE_INSENSITIVE_FILE_SYSTEM;
 	}
 
 }
