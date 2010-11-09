@@ -42,6 +42,7 @@ public class Messages extends NLS {
 	public static String Connection_ReleaseTunnel_FailedRemoveTunnel;
 	public static String Connection_ReleaseTunnel_PortNotAllocedForTunnel;
 	public static String Connection_SetCipherType_CipherNotSupported;
+	public static String Connection_Timeout;
 	public static String ControlChannel_0;
 	public static String ControlChannel_Debug_ControlConnectionReceived;
 	public static String ControlChannel_Debug_ReceivedControlTerminalPath;
