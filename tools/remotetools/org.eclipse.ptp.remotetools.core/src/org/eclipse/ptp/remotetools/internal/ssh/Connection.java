@@ -15,7 +15,6 @@ package org.eclipse.ptp.remotetools.internal.ssh;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jsch.core.IJSchService;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.RemotetoolsPlugin;
 import org.eclipse.ptp.remotetools.core.IAuthInfo;
 import org.eclipse.ptp.remotetools.core.IRemoteConnection;
@@ -148,7 +146,12 @@ public class Connection implements IRemoteConnection {
 	 * timeout.
 	 */
 	private class SSHProxy implements Proxy {
-		private final Socket fSocket = new Socket();
+		private Socket fSocket;
+		private final IProgressMonitor fMonitor;
+
+		public SSHProxy(IProgressMonitor monitor) {
+			fMonitor = monitor;
+		}
 
 		/*
 		 * (non-Javadoc)
@@ -156,9 +159,58 @@ public class Connection implements IRemoteConnection {
 		 * @see com.jcraft.jsch.Proxy#connect(com.jcraft.jsch.SocketFactory,
 		 * java.lang.String, int, int)
 		 */
-		public void connect(SocketFactory socket_factory, String host, int port, int timeout) throws Exception {
-			InetSocketAddress addr = new InetSocketAddress(host, port);
-			fSocket.connect(addr, timeout);
+		public void connect(SocketFactory socket_factory, final String host, final int port, int timeout) throws Exception {
+			final Exception[] ex = new Exception[1];
+			Thread connThread = new Thread(new Runnable() {
+				public void run() {
+					fSocket = null;
+					try {
+						fSocket = new Socket(host, port);
+					} catch (Exception e) {
+						ex[0] = e;
+						if (fSocket != null && fSocket.isConnected()) {
+							try {
+								fSocket.close();
+							} catch (Exception ee) {
+							}
+						}
+						fSocket = null;
+					}
+				}
+			});
+			connThread.setName("Connecting to " + host); //$NON-NLS-1$
+			connThread.start();
+
+			/*
+			 * Loop checking if the thread has completed. Check if the progress
+			 * monitor is cancelled every 1000 ms. If timeout is 0, we should
+			 * loop forever (or until the progress monitor is cancelled)
+			 */
+			try {
+				int tryTimeout = timeout > 1000 ? 1000 : timeout;
+				while (connThread.isAlive() && timeout >= 0 && !fMonitor.isCanceled()) {
+					connThread.join(1000);
+					timeout -= tryTimeout;
+				}
+			} catch (InterruptedException e) {
+			}
+
+			if (fMonitor.isCanceled() || timeout < 0) {
+				connThread.interrupt();
+				connThread = null;
+			}
+
+			if (fMonitor.isCanceled()) {
+				throw new JSchException(Messages.Connection_Operation_cancelled_by_user);
+			}
+
+			if (timeout < 0) {
+				throw new JSchException(Messages.Connection_Timeout);
+			}
+
+			if (fSocket == null) {
+				throw new JSchException(ex[0].getMessage());
+			}
 		}
 
 		/*
@@ -168,10 +220,12 @@ public class Connection implements IRemoteConnection {
 		 */
 		public InputStream getInputStream() {
 			try {
-				return fSocket.getInputStream();
+				if (fSocket != null) {
+					return fSocket.getInputStream();
+				}
 			} catch (IOException e) {
-				return null;
 			}
+			return null;
 		}
 
 		/*
@@ -181,10 +235,12 @@ public class Connection implements IRemoteConnection {
 		 */
 		public OutputStream getOutputStream() {
 			try {
-				return fSocket.getOutputStream();
+				if (fSocket != null) {
+					return fSocket.getOutputStream();
+				}
 			} catch (IOException e) {
-				return null;
 			}
+			return null;
 		}
 
 		/*
@@ -203,7 +259,9 @@ public class Connection implements IRemoteConnection {
 		 */
 		public void close() {
 			try {
-				fSocket.close();
+				if (fSocket != null) {
+					fSocket.close();
+				}
 			} catch (IOException e) {
 				// do nothing
 			}
@@ -332,7 +390,7 @@ public class Connection implements IRemoteConnection {
 				defaultSession.setUserInfo(fUserInfo);
 				defaultSession.setServerAliveInterval(300000);
 				defaultSession.setServerAliveCountMax(6);
-				defaultSession.setProxy(new SSHProxy());
+				defaultSession.setProxy(new SSHProxy(progress));
 			} catch (JSchException e) {
 				disconnect();
 				throw new RemoteConnectionException(e.getMessage());
@@ -340,33 +398,11 @@ public class Connection implements IRemoteConnection {
 
 			setSessionCipherType(defaultSession);
 
-			/*
-			 * Connect to remote host. Try connecting at 1 sec intervals to
-			 * allow the connection to be cancelled. Note that a timeout of 0
-			 * implies infinite (or until cancelled).
-			 */
-			int connTimeout = fTimeout;
-			int tryTimeout = connTimeout > 0 ? 1000 : connTimeout;
-
-			while (!defaultSession.isConnected() && !progress.isCanceled() && connTimeout >= 0) {
-				try {
-					defaultSession.connect(1000);
-				} catch (JSchException e) {
-					connTimeout -= tryTimeout;
-				} catch (Exception e) {
-					disconnect();
-					throw new RemoteConnectionException(e.getMessage());
-				}
-			}
-
-			if (connTimeout < 0) {
+			try {
+				defaultSession.connect(fTimeout);
+			} catch (JSchException e) {
 				disconnect();
-				throw new RemoteConnectionException(NLS.bind(Messages.Connection_Connect_FailedConnect, fHostname));
-			}
-
-			if (progress.isCanceled()) {
-				disconnect();
-				throw new RemoteConnectionException(Messages.Connection_Operation_cancelled_by_user);
+				throw new RemoteConnectionException(e.getMessage());
 			}
 
 			/*
