@@ -19,7 +19,7 @@
 ###############################################################################
 
 PBSJOB_STATE :: E :: STARTING
-PBSJOB_STATE :: Q :: COMPLETED
+PBSJOB_STATE :: Q :: SUSPENDED
 PBSJOB_STATE :: R :: RUNNING
 PBSJOB_STATE :: H :: SUSPENDED
 PBSJOB_STATE :: C :: COMPLETED

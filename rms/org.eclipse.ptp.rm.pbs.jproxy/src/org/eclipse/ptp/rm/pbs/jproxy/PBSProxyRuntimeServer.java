@@ -580,7 +580,7 @@ public class PBSProxyRuntimeServer extends ProxyRuntimeServer {
 
 		try {
 			server.connect();
-			System.err.println(PBSProxyRuntimeServer.class.getSimpleName() + Messages.getString("PBSProxyRuntimeServer.4")); //$NON-NLS-1$
+			System.out.println(PBSProxyRuntimeServer.class.getSimpleName() + Messages.getString("PBSProxyRuntimeServer.4")); //$NON-NLS-1$
 			server.start();
 		} catch (IOException e) {
 			System.err.println(Messages.getString("PBSProxyRuntimeServer.5") + e.getMessage()); //$NON-NLS-1$
