@@ -14,19 +14,16 @@
 		<taskdef name="jar-eclipse" classname="${ant.project.name}.JarEclipseProject" classpath="${ant.project.name}.jar" />
 		<jar-eclipse outjar="${jar-with-dependencies}" />
 
-		<jar destfile="../org.eclipse.ptp.rm.pbs.core/pbs_proxy.jar">
+		<jar destfile="../org.eclipse.ptp.rm.pbs.core.server/pbs_proxy.jar">
 			<manifest>
 				<attribute name="Main-Class" value="org.eclipse.ptp.rm.pbs.jproxy.PBSProxyRuntimeServer" />
 				<attribute name="Class-Path" value="." />
-
 			</manifest>
 			<zipfileset src="${jar-with-dependencies}" />
 			<fileset file="about.html" />
-			<fileset dir="../org.eclipse.ptp.rm.pbs.core">
-				<include name="PBSAttributes/**">
-				</include>
+			<fileset dir=".">
+				<include name="PBSAttributes/"/>
 			</fileset>
-
 		</jar>
 		<delete file="${jar-with-dependencies}"/>
 	</target>

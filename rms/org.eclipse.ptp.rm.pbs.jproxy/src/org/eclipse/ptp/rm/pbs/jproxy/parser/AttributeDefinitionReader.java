@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.ptp.rm.pbs.core.parser;
+package org.eclipse.ptp.rm.pbs.jproxy.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;

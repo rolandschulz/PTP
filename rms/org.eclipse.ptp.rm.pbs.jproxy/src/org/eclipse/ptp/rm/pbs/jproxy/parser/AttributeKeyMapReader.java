@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.ptp.rm.pbs.core.parser;
+package org.eclipse.ptp.rm.pbs.jproxy.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,11 +23,13 @@ import java.util.regex.Pattern;
 /**
  * @since 5.0
  */
-public class AttributeValueMapReader {
+public class AttributeKeyMapReader {
 
+	// this parser read a custom text file which
+	// maps PBS Proxy IDs to Resource Manager Model Definitions
 	static public List<List<Object>> parse(InputStream in) throws Exception, IOException {
 
-		List<List<Object>> tmpMapMap = new ArrayList<List<Object>>();
+		List<List<Object>> tmpMap = new ArrayList<List<Object>>();
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
@@ -47,29 +49,28 @@ public class AttributeValueMapReader {
 			String[] linesplit = tline.split("::"); //$NON-NLS-1$
 			Integer linesplitlen = linesplit.length;
 
-			if (linesplitlen < 3) {
-				System.err.println("Attribute Value Map ill-defined," + "linenumber=" + linenumber.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (linesplitlen < 2) {
+				System.err.println("Attribute Key Map ill-defined," + "linenumber=" + linenumber.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				System.err.println("read:" + tline); //$NON-NLS-1$
 				for (String lss : linesplit) {
 					System.err.println(lss);
 				}
 			}
 			// format required:
-			// Parsed Key Name :: Parsed Value :: PBS Proxy Value
+			// Proxy Attribute Definition :: Resource Manager Model Attribute
+			// Definition
 
-			Pattern keyname = Pattern.compile(linesplit[0].trim(), Pattern.CASE_INSENSITIVE);
-			Pattern oldvalue = Pattern.compile(linesplit[1].trim(), Pattern.CASE_INSENSITIVE);
-			String newvalue = linesplit[2].trim();
+			Pattern k = Pattern.compile(linesplit[0].trim(), Pattern.CASE_INSENSITIVE);
+			String v = linesplit[1].trim();
 
 			List<Object> newentry = new ArrayList<Object>();
-			newentry.add(keyname);
-			newentry.add(oldvalue);
-			newentry.add(newvalue);
+			newentry.add(k);
+			newentry.add(v);
 
-			tmpMapMap.add(newentry);
+			tmpMap.add(newentry);
 		}
 
-		return tmpMapMap;
+		return tmpMap;
 	}
 
 }
