@@ -177,6 +177,9 @@
 				<include name="rm_proxy_core.jar"/>
 			</fileset>
 			<fileset dir="${build.result.folder}/@dot"/>
+			<fileset dir="${build.result.folder}">
+				<include name="PBSAttributes/"/>
+			</fileset>
 		</copy>
 	</target>
 	
