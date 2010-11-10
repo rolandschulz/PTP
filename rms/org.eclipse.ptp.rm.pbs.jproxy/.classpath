@@ -4,8 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.rm.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.rm.proxy.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.rm.pbs.core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.ptp.proxy.protocol"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

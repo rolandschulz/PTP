@@ -18,7 +18,7 @@
 <project name="PBS Java Proxy Build" default="noDefault">
 	<tstamp/>
 	<property name="server.builddir" value="${build.result.folder}/pbs_proxy"/>
-	<property name="server.jar" value="${basedir}/../org.eclipse.ptp.rm.pbs.core/pbs_proxy.jar"/>
+	<property name="server.jar" value="${basedir}/../org.eclipse.ptp.rm.pbs.core.server/pbs_proxy.jar"/>
 	
 	<target name="noDefault">
 		<echo message="This file must be called with explicit targets" />

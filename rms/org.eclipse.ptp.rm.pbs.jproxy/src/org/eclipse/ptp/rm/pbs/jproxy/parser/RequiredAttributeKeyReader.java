@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.ptp.rm.pbs.core.parser;
+package org.eclipse.ptp.rm.pbs.jproxy.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,18 +18,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * @since 5.0
  */
-public class AttributeKeyMapReader {
+public class RequiredAttributeKeyReader {
 
 	// this parser read a custom text file which
 	// maps PBS Proxy IDs to Resource Manager Model Definitions
-	static public List<List<Object>> parse(InputStream in) throws Exception, IOException {
+	static public List<String> parse(InputStream in) throws Exception, IOException {
 
-		List<List<Object>> tmpMap = new ArrayList<List<Object>>();
+		List<String> tmpList = new ArrayList<String>();
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
@@ -49,8 +48,8 @@ public class AttributeKeyMapReader {
 			String[] linesplit = tline.split("::"); //$NON-NLS-1$
 			Integer linesplitlen = linesplit.length;
 
-			if (linesplitlen < 2) {
-				System.err.println("Attribute Key Map ill-defined," + "linenumber=" + linenumber.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (linesplitlen > 1) {
+				System.err.println("Required Attribute Key Reader entry ill-defined," + "linenumber=" + linenumber.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				System.err.println("read:" + tline); //$NON-NLS-1$
 				for (String lss : linesplit) {
 					System.err.println(lss);
@@ -60,17 +59,11 @@ public class AttributeKeyMapReader {
 			// Proxy Attribute Definition :: Resource Manager Model Attribute
 			// Definition
 
-			Pattern k = Pattern.compile(linesplit[0].trim(), Pattern.CASE_INSENSITIVE);
-			String v = linesplit[1].trim();
+			tmpList.add(linesplit[0].trim());
 
-			List<Object> newentry = new ArrayList<Object>();
-			newentry.add(k);
-			newentry.add(v);
-
-			tmpMap.add(newentry);
 		}
 
-		return tmpMap;
+		return tmpList;
 	}
 
 }
