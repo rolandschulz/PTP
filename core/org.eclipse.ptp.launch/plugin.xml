@@ -62,7 +62,7 @@
             class="org.eclipse.ptp.launch.ui.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.resourcesTab"
-            name="%ResourceLaunchTab.name">
+            name="%ResourcesLaunchTab.name">
       </tab>
       <tab
             class="org.eclipse.ptp.launch.ui.ApplicationTab"
