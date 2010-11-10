@@ -16,8 +16,8 @@
  * 
  * LA-CC 04-115
  * 
- * Albert L. Rossi 11/10/2010: this group is now exclusively for the
- *                             Run configuration.
+ *  * Albert L. Rossi 11/10/2010: this group is now exclusively for the
+ *                                Debug configuration.
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui;
 
@@ -31,8 +31,10 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
  * This is a placeholder for the tabs that will be displayed when a new parallel
  * launch configuration is created. Tabs are contributed using the
  * launchConfigurationTabs extension point.
+ * 
+ * @since 5.0
  */
-public class ParallelLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
+public class ParallelDebugLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		setTabs(new ILaunchConfigurationTab[0]);
 	}
