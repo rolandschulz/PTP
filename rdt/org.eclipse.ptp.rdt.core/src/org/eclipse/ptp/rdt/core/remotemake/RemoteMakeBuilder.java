@@ -333,10 +333,11 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					// set the environment for the builder
 					Map<String, String> remoteEnvMap = processBuilder.environment();
 					
-					if (!info.appendEnvironment()) {
-						// if we're replacing the environment then clear the map
-						remoteEnvMap.clear();
-					}
+					// Replace the remote environment with the one specified by the build properties.
+					// It will already be a modified list that originated with the remote environment and was then
+					// modified by the user, so we'll respect the user's edits and replace the environment entirely.
+					remoteEnvMap.clear();
+
 					remoteEnvMap.putAll(envMap);
 					
 					// set the directory in which to run the command
