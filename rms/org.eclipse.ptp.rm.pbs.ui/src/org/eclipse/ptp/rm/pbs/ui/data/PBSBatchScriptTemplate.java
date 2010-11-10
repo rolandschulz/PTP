@@ -184,7 +184,7 @@ public class PBSBatchScriptTemplate implements IPBSNonNLSConstants {
 				if (line == null)
 					break;
 				text.append(line).append(separator);
-				if (line.startsWith(PBSDIRECTIVE)) {
+				if (line.startsWith(PBSDIRECTIVE) && line.indexOf(MARKER) >= 0) {
 					ap = handlePBSJobAttribute(line, defs);
 					if (ap != null) {
 						pbsJobAttributes.put(ap.getName(), ap);
@@ -618,8 +618,8 @@ public class PBSBatchScriptTemplate implements IPBSNonNLSConstants {
 				break;
 		}
 
-		if (!firstAt || !lastAt)
-			throw new ParseException(line + Messages.PBSBatchScriptTemplate_parseError, 0);
-		return name.toString();
+		if ((!firstAt && !lastAt) || (firstAt && lastAt))
+			return name.toString();
+		throw new ParseException(line + Messages.PBSBatchScriptTemplate_parseError, 0);
 	}
 }
