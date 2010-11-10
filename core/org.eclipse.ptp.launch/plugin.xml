@@ -30,17 +30,22 @@
 			type="org.eclipse.ptp.launch.parallelLaunch"
 			class="org.eclipse.ptp.launch.ui.ParallelLaunchConfigurationTabGroup"
 			id="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup">
-			<launchMode
-               perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective"
-               description="%ParallelLaunch.debug"
-               mode="debug">
-	        </launchMode>
     	    <launchMode
                perspective="org.eclipse.ptp.ui.PTPRunPerspective"
                description="%ParallelLaunch.run"
                mode="run">
          	</launchMode>
 		</launchConfigurationTabGroup>
+    <launchConfigurationTabGroup
+          class="org.eclipse.ptp.launch.ui.ParallelDebugLaunchConfigurationTabGroup"
+          id="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
+          type="org.eclipse.ptp.launch.parallelLaunch">
+       <launchMode
+             description="%ParallelLaunch.debug"
+             mode="debug"
+             perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+       </launchMode>
+    </launchConfigurationTabGroup>
 	</extension>
 
 <!-- PDT Shortcut //-->	
@@ -61,13 +66,13 @@
       <tab
             class="org.eclipse.ptp.launch.ui.ResourcesTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.resourcesTab"
+            id="org.eclipse.ptp.launch.applicationLaunch.resourcesTabRun"
             name="%ResourcesLaunchTab.name">
       </tab>
       <tab
             class="org.eclipse.ptp.launch.ui.ApplicationTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.applicationTab"
+            id="org.eclipse.ptp.launch.applicationLaunch.applicationTabRun"
             name="%ApplicationLaunchTab.name">
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.resourcesTab">
@@ -76,7 +81,7 @@
       <tab
             class="org.eclipse.ptp.launch.ui.ArgumentsTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.argumentsTab"
+            id="org.eclipse.ptp.launch.applicationLaunch.argumentsTabRun"
             name="%ArgumentsLaunchTab.name">
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.applicationTab">
@@ -85,7 +90,7 @@
       <tab
             class="org.eclipse.ptp.launch.ui.EnvironmentTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.environmentTab"
+            id="org.eclipse.ptp.launch.applicationLaunch.environmentTabRun"
             name="%EnvironmentLaunchTab.name">
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
@@ -94,15 +99,42 @@
       <tab
             class="org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.synchronizeTab"
+            id="org.eclipse.ptp.launch.applicationLaunch.synchronizeTabRun"
             name="%SynchronizeLaunchTab.name">
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
          </placement>
       </tab>
       <tab
-            class="org.eclipse.ptp.launch.ui.ApplicationDebuggerTab"
+            class="org.eclipse.debug.ui.CommonTab"
             group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.launch.applicationLaunch.commonTabRun"
+            name="%CommonLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.synchronizeTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.launch.ui.ApplicationTab"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.launch.applicationLaunch.applicationTabDebug"
+            name="%ApplicationLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.resourcesTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.launch.ui.ArgumentsTab"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.launch.applicationLaunch.argumentsTabDebug"
+            name="%ArgumentsLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.applicationTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.launch.ui.ApplicationDebuggerTab"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.debuggerTab"
             name="%DebuggerLaunchTab.name">
          <placement
@@ -110,8 +142,32 @@
          </placement>
       </tab>
       <tab
+            class="org.eclipse.ptp.launch.ui.ResourcesTab"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.launch.applicationLaunch.resourcesTabDebug"
+            name="%ResourceLaunchTab.name">
+      </tab>
+      <tab
+            class="org.eclipse.ptp.launch.ui.EnvironmentTab"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.launch.applicationLaunch.environmentTabDebug"
+            name="%EnvironmentLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.argumentsTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.launch.ui.EnhancedSynchronizeTab"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.launch.applicationLaunch.synchronizeTabDebug"
+            name="%SynchronizeLaunchTab.name">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
+         </placement>
+      </tab>
+      <tab
             class="org.eclipse.debug.ui.sourcelookup.SourceLookupTab"
-            group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.launch.applicationLaunch.sourceLookupTab"
             name="%SourceLookupLaunchTab.name">
          <placement
@@ -120,8 +176,8 @@
       </tab>
       <tab
             class="org.eclipse.debug.ui.CommonTab"
-            group="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.launch.applicationLaunch.commonTab"
+            group="org.eclipse.ptp.launch.parallelDebugLaunchConfigurationTabGroup"
+            id="org.eclipse.ptp.launch.applicationLaunch.commonTabDebug"
             name="%CommonLaunchTab.name">
          <placement
                after="org.eclipse.debug.ui.sourceLookupTab">
