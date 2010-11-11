@@ -27,7 +27,7 @@ public class PBSProxyServerRunner extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected void doFinishServer(IProgressMonitor monitor) {
+	protected void doServerFinished(IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.done();
 		}
@@ -41,7 +41,7 @@ public class PBSProxyServerRunner extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected boolean doRestartServer(IProgressMonitor monitor) {
+	protected boolean doServerStarting(IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.done();
 		}
@@ -56,7 +56,7 @@ public class PBSProxyServerRunner extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected boolean doStartServer(IProgressMonitor monitor) {
+	protected boolean doServerStarted(IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.done();
 		}
