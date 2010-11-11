@@ -122,7 +122,8 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 				InputDialog nameDialog = new InputDialog(shell, Messages.PBSRMLaunchConfigEditChoose_new + QM,
 						Messages.PBSRMLaunchConfigEditChoose_new_name, oldName, null);
 				if (nameDialog.open() == Window.CANCEL)
-					newName = oldName;
+					return;
+				// newName = oldName;
 				else
 					newName = nameDialog.getValue();
 				newName = templateManager.validateTemplateNameForEdit(newName);
