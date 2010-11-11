@@ -1108,17 +1108,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 				fDStoreServer = (DStoreServer) RemoteServerManager.getServer(DStoreServer.SERVER_ID, fProvider.getConnection());
 			}
 			fDStoreServer.setWorkDir(fProvider.getIndexLocation());
-			DataStore dataStore = fDStoreServer.getDataStore();
-			if (dataStore != null && dataStore.isConnected()) {
-				DataElement status = dataStore.activateMiner("org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"); //$NON-NLS-1$
-				StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
-				try {
-					smonitor.waitForUpdate(status, subMon.newChild(5));
-				} catch (InterruptedException e) {
-					// Data store will be disconnected if error occurs
-				}
-			}
-			return dataStore;
+			return fDStoreServer.getDataStore();
 		} finally {
 			if (monitor != null) {
 				monitor.done();

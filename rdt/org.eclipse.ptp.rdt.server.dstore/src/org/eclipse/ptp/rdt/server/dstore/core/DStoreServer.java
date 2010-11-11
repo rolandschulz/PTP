@@ -14,9 +14,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.dstore.core.client.ClientConnection;
 import org.eclipse.dstore.core.client.ConnectionStatus;
+import org.eclipse.dstore.core.model.DataElement;
 import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.ptp.rdt.server.dstore.internal.core.DebugUtil;
 import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
+import org.eclipse.ptp.rdt.ui.subsystems.StatusMonitor;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
 
@@ -145,6 +147,14 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 				DataStore dataStore = getClientConnection().getDataStore();
 				dataStore.showTicket(null);
 				dataStore.registerLocalClassLoader(getClass().getClassLoader());
+				DataElement res = dataStore.activateMiner("org.eclipse.ptp.internal.rdt.core.miners.CDTMiner"); //$NON-NLS-1$
+				StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(getRemoteConnection(), dataStore);
+				try {
+					smonitor.waitForUpdate(res, subMon.newChild(5));
+				} catch (InterruptedException e) {
+					// Data store will be disconnected if error occurs
+					return false;
+				}
 				if (DebugUtil.SERVER_TRACING) {
 					System.out.println(Messages.DStoreServer_3);
 				}
