@@ -7,7 +7,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.server.dstore.core;
 
+import java.io.IOException;
+
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.dstore.core.client.ClientConnection;
 import org.eclipse.dstore.core.client.ConnectionStatus;
@@ -19,14 +22,15 @@ import org.eclipse.ptp.remote.launch.core.AbstractRemoteServerRunner;
 
 public class DStoreServer extends AbstractRemoteServerRunner {
 	private enum DStoreState {
-		STARTING, WAITING, STARTED
+		WAITING_FOR_SUCCESS_STRING, WAITING_FOR_PORT, COMPLETED
 	}
 
 	public static String SERVER_ID = "org.eclipse.ptp.rdt.server.dstore.RemoteToolsDStoreServer"; //$NON-NLS-1$;
 
-	private DStoreState fState = DStoreState.STARTING;
+	private DStoreState fState = DStoreState.WAITING_FOR_SUCCESS_STRING;
 	private ClientConnection fDStoreConnection = null;
 	private int fDStorePort = 0;
+	private final int TIMEOUT = 60000; // wait 60 seconds for server to start
 
 	private static final String SUCCESS_STRING = "Server Started Successfully"; //$NON-NLS-1$
 
@@ -35,14 +39,28 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	}
 
 	/**
-	 * Get the data store associated with the client connection.
+	 * Get the data store associated with the client connection. Currently, if
+	 * the server fails to start we will return a null. This may cause an NPE in
+	 * the indexer subsystem.
 	 * 
 	 * @return DataStore
 	 */
 	public DataStore getDataStore() {
-		ClientConnection conn = getClientConnection();
-		assert conn != null;
-		return conn.getDataStore();
+		if (getServerState() != ServerState.RUNNING) {
+			try {
+				if (getServerState() == ServerState.STOPPED) {
+					startServer(new NullProgressMonitor());
+				}
+				waitForServerStart(TIMEOUT);
+			} catch (IOException e) {
+			}
+		}
+		if (getServerState() == ServerState.RUNNING) {
+			ClientConnection conn = getClientConnection();
+			assert conn != null;
+			return conn.getDataStore();
+		}
+		return null;
 	}
 
 	/**
@@ -65,7 +83,7 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected void doFinishServer(IProgressMonitor monitor) {
+	protected void doServerFinished(IProgressMonitor monitor) {
 		try {
 			if (fDStoreConnection != null) {
 				fDStoreConnection.disconnect();
@@ -86,9 +104,9 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected boolean doRestartServer(IProgressMonitor monitor) {
+	protected boolean doServerStarting(IProgressMonitor monitor) {
 		try {
-			fState = DStoreState.STARTING;
+			fState = DStoreState.WAITING_FOR_SUCCESS_STRING;
 			return true;
 		} finally {
 			if (monitor != null) {
@@ -105,7 +123,7 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	 * ()
 	 */
 	@Override
-	protected boolean doStartServer(IProgressMonitor monitor) {
+	protected boolean doServerStarted(IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			int port;
@@ -149,20 +167,26 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 	@Override
 	protected boolean doVerifyServerRunningFromStderr(String output) {
 		switch (fState) {
-		case STARTING:
+		case WAITING_FOR_SUCCESS_STRING:
 			if (output.startsWith(SUCCESS_STRING)) {
-				fState = DStoreState.WAITING;
+				fState = DStoreState.WAITING_FOR_PORT;
+				if (DebugUtil.SERVER_TRACING) {
+					System.out.println(Messages.DStoreServer_4);
+				}
 			}
 			break;
 
-		case WAITING:
+		case WAITING_FOR_PORT:
 			if (output.matches("^[0-9]+$")) { //$NON-NLS-1$
 				fDStorePort = Integer.parseInt(output);
-				fState = DStoreState.STARTED;
+				fState = DStoreState.COMPLETED;
+				if (DebugUtil.SERVER_TRACING) {
+					System.out.println(Messages.DStoreServer_5 + fDStorePort);
+				}
 			}
 			break;
 
-		case STARTED:
+		case COMPLETED:
 			return true;
 		}
 
