@@ -20,6 +20,8 @@ public class Messages extends NLS {
 	public static String DStoreServer_1;
 	public static String DStoreServer_2;
 	public static String DStoreServer_3;
+	public static String DStoreServer_4;
+	public static String DStoreServer_5;
 	public static String RemoteToolsCIndexServiceProvider_0;
 	public static String RemoteToolsCIndexServiceProviderContributer_0;
 	public static String RemoteToolsCIndexServiceProviderContributer_1;

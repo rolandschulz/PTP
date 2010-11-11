@@ -48,7 +48,10 @@ import org.osgi.framework.Bundle;
  */
 public abstract class AbstractRemoteServerRunner extends Job {
 	public enum ServerState {
-		STARTING, RUNNING, FINISHED
+		/**
+		 * @since 5.0
+		 */
+		STOPPED, STARTING, RUNNING
 	}
 
 	private final boolean DEBUG = true;
@@ -60,7 +63,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 	private String fLaunchCommand;
 	private String fWorkDir = null;
-	private ServerState fServerState = ServerState.STARTING;
+	private ServerState fServerState = ServerState.STOPPED;
 	private IRemoteProcess fRemoteProcess;
 
 	private String fVerifyCommand;
@@ -73,55 +76,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		setPriority(Job.LONG);
 		setSystem(!DEBUG);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.jobs.Job#canceling()
-	 */
-	@Override
-	protected void canceling() {
-		terminateServer();
-	}
-
-	/**
-	 * Called on termination of the server process
-	 */
-	protected abstract void doFinishServer(IProgressMonitor monitor);
-
-	/**
-	 * Called if the server is restarted
-	 * 
-	 * @return false if restart should be aborted
-	 */
-	protected abstract boolean doRestartServer(IProgressMonitor monitor);
-
-	/**
-	 * Called once the server starts
-	 * 
-	 * @return false if server should be aborted
-	 */
-	protected abstract boolean doStartServer(IProgressMonitor monitor);
-
-	/**
-	 * Called with each line of stderr from the server. Implementers can use
-	 * this to determine when the server has successfully started.
-	 * 
-	 * @param output
-	 *            line of stderr output from server
-	 * @return true if the server has started
-	 */
-	protected abstract boolean doVerifyServerRunningFromStderr(String output);
-
-	/**
-	 * Called with each line of stdout from the server. Implementers can use
-	 * this to determine when the server has successfully started.
-	 * 
-	 * @param output
-	 *            line of stdout output from server
-	 * @return true if the server has started
-	 */
-	protected abstract boolean doVerifyServerRunningFromStdout(String output);
 
 	public Map<String, String> getEnv() {
 		return fEnv;
@@ -212,38 +166,253 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * Set the id of the bundle containing the remote server file.
+	 * 
+	 * @param id
+	 *            bundle id
+	 */
+	public void setBundleId(String id) {
+		fBundle = Platform.getBundle(id);
+	}
+
+	/**
+	 * Set the environment prior to launching the server.
+	 * 
+	 * @param env
+	 *            string containing environment (as returned by "env" command)
+	 */
+	public void setEnv(String env) {
+		if (env != null) {
+			for (String vars : env.split("\n")) { //$NON-NLS-1$
+				String[] envVar = vars.split("="); //$NON-NLS-1$
+				if (envVar.length == 2) {
+					fEnv.put(envVar[0], envVar[1]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Set the command used to launch the server
+	 * 
+	 * @param command
+	 *            launch command
+	 */
+	public void setLaunchCommand(String command) {
+		fLaunchCommand = command;
+	}
+
+	/**
+	 * Set the name of the payload
+	 * 
+	 * @param file
+	 *            payload name
+	 */
+	public void setPayload(String file) {
+		RemoteVariableManager.getInstance().setVariable("payload", file); //$NON-NLS-1$
+	}
+
+	/**
+	 * Set the connection used to launch the server
+	 * 
+	 * @param conn
+	 *            remote connection
+	 */
+	public void setRemoteConnection(IRemoteConnection conn) {
+		fRemoteConnection = conn;
+		setName(fServerName + " (" + conn.getName() + ")");//$NON-NLS-1$//$NON-NLS-2$
+	}
+
+	/**
+	 * Set the value of a variable that will be expended in the launch command
+	 * 
+	 * @param name
+	 *            variable name
+	 * @param value
+	 *            variable value
+	 */
+	public void setVariable(String name, String value) {
+		RemoteVariableManager.getInstance().setVariable(name, value);
+	}
+
+	/**
+	 * @since 5.0 Sets the verify command.
+	 * 
+	 * @param fVerifyCommand
+	 *            the new verify command
+	 */
+	public void setVerifyCommand(String fVerifyCommand) {
+		this.fVerifyCommand = fVerifyCommand;
+	}
+
+	/**
+	 * @since 5.0 Sets the verify fail message.
+	 * 
+	 * @param fVerifyFailMessage
+	 *            the new verify fail message
+	 */
+	public void setVerifyFailMessage(String fVerifyFailMessage) {
+		this.fVerifyFailMessage = fVerifyFailMessage;
+	}
+
+	/**
+	 * @since 5.0 Sets the verify pattern.
+	 * 
+	 * @param fVerifyPattern
+	 *            the new verify pattern
+	 */
+	public void setVerifyPattern(String fVerifyPattern) {
+		this.fVerifyPattern = fVerifyPattern;
+	}
+
+	/**
+	 * Set the working directory. This is the location of the payload on the
+	 * remote system.
+	 * 
+	 * @param workDir
+	 *            working directory
+	 */
+	public void setWorkDir(String workDir) {
+		fWorkDir = workDir;
+	}
+
+	/**
+	 * Start the server launch. Clients should check the server status with
+	 * {@link #getServerState()} or use {@link #waitForServerStart} to determine
+	 * when the server has actually started.
+	 * 
+	 * @param monitor
+	 *            progress monitor that can be used to cancel the launch
+	 * @throws IOException
+	 *             if the launch fails
+	 */
+	public synchronized void startServer(IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		try {
+			if (fRemoteConnection != null && fServerState != ServerState.RUNNING) {
+				if (!doServerStarting(subMon.newChild(10))) {
+					throw new IOException(Messages.AbstractRemoteServerRunner_6);
+				}
+				setServerState(ServerState.STARTING);
+				if (!fRemoteConnection.isOpen()) {
+					try {
+						fRemoteConnection.open(subMon.newChild(10));
+					} catch (RemoteConnectionException e) {
+						throw new IOException(e.getMessage());
+					}
+					if (subMon.isCanceled()) {
+						return;
+					}
+					if (!fRemoteConnection.isOpen()) {
+						throw new IOException(Messages.AbstractRemoteServerRunner_7);
+					}
+				}
+
+				// Check if the valid java version is installed on the server
+				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
+					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
+						throw new IOException(getVerifyFailMessage());
+					}
+					throw new IOException(Messages.AbstractRemoteServerRunner_12);
+				}
+
+				if (!subMon.isCanceled()) {
+					schedule();
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
+	 * Wait for the server to start up for at most "timeout" ms. Will do nothing
+	 * if the server is stopped.
+	 * 
+	 * @param timeout
+	 *            time (in ms) to wait for server startup. A timeout of 0 means
+	 *            wait forever.
+	 * @since 5.0
+	 */
+	public synchronized void waitForServerStart(int timeout) {
+		if (getServerState() == ServerState.STARTING) {
+			int dec = timeout > 0 ? 1000 : 0;
+			while (timeout >= 0 && getServerState() != ServerState.RUNNING) {
+				try {
+					wait(1000);
+					timeout -= dec;
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	}
+
+	/**
+	 * Wait for the server to start up. Will do nothing if the server is
+	 * stopped.
+	 * 
+	 * @param monitor
+	 *            progress monitor to cancel waiting
+	 * @since 5.0
+	 */
+	public synchronized void waitForServerStart(IProgressMonitor monitor) {
+		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		try {
+			if (getServerState() == ServerState.STARTING) {
+				while (!subMon.isCanceled() && getServerState() != ServerState.RUNNING) {
+					try {
+						wait(100);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+	}
+
+	/**
 	 * Checks if the valid version installed on the remote server. It uses a
 	 * pattern which is define in the "plugin.xml" file to match with the output
 	 * 
-	 * @param subMon
+	 * @param monitor
 	 *            monitor object
 	 * @return true, if the valid version is installed on the remote server
 	 */
-	private boolean isValidVersionInstalled(SubMonitor subMon) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		String s;
+	private boolean isValidVersionInstalled(IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor);
+		try {
+			StringBuilder sb = new StringBuilder();
+			String s;
 
-		// get the remote process that runs the verify command
-		IRemoteProcess p = runVerifyCommand(subMon);
-		// get the buffer reader
-		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			// get the remote process that runs the verify command
+			IRemoteProcess p = runVerifyCommand(subMon);
+			// get the buffer reader
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-		// read the output from the command
-		while ((s = stdInput.readLine()) != null) {
-			sb.append(s);
+			// read the output from the command
+			while ((s = stdInput.readLine()) != null) {
+				sb.append(s);
+			}
+			// compile the pattern for search
+			Pattern pattern = Pattern.compile(getVerifyPattern());
+			// get a matcher object
+			Matcher m = pattern.matcher(sb.toString());
+
+			while (m.find()) {
+				// return true if we find the specified pattern matched
+				// with the output stream
+				return true;
+			}
+
+			return false;
+		} finally {
+			monitor.done();
 		}
-		// compile the pattern for search
-		Pattern pattern = Pattern.compile(getVerifyPattern());
-		// get a matcher object
-		Matcher m = pattern.matcher(sb.toString());
-
-		while (m.find()) {
-			// return true if we find the specified pattern matched
-			// with the output stream
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -308,6 +477,84 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		}
 	}
 
+	/**
+	 * Run version verify command on the remote server.
+	 * 
+	 * @param monitor
+	 *            the monitor object
+	 * @return the IRemoteProcess object
+	 * @throws Exception
+	 *             the exception
+	 */
+	private IRemoteProcess runVerifyCommand(IProgressMonitor monitor) throws IOException {
+		SubMonitor subMon = SubMonitor.convert(monitor);
+		subMon.subTask(Messages.AbstractRemoteServerRunner_13);
+		try {
+			// specify the verify command to check the software version
+			List<String> verifyArgs = Arrays.asList(getVerifyCommand().split(" ")); //$NON-NLS-1$
+			IRemoteProcessBuilder builder = getRemoteConnection().getRemoteServices().getProcessBuilder(getRemoteConnection(),
+					verifyArgs);
+			builder.redirectErrorStream(true);
+			builder.environment().putAll(getEnv());
+			return builder.start();
+		} finally {
+			monitor.done();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.jobs.Job#canceling()
+	 */
+	@Override
+	protected void canceling() {
+		terminateServer();
+	}
+
+	/**
+	 * Called on termination of the server process
+	 * 
+	 * @since 5.0
+	 */
+	protected abstract void doServerFinished(IProgressMonitor monitor);
+
+	/**
+	 * Called just prior to the server starting
+	 * 
+	 * @return false if start should be aborted
+	 * @since 5.0
+	 */
+	protected abstract boolean doServerStarting(IProgressMonitor monitor);
+
+	/**
+	 * Called once the server starts
+	 * 
+	 * @return false if server should be aborted
+	 * @since 5.0
+	 */
+	protected abstract boolean doServerStarted(IProgressMonitor monitor);
+
+	/**
+	 * Called with each line of stderr from the server. Implementers can use
+	 * this to determine when the server has successfully started.
+	 * 
+	 * @param output
+	 *            line of stderr output from server
+	 * @return true if the server has started
+	 */
+	protected abstract boolean doVerifyServerRunningFromStderr(String output);
+
+	/**
+	 * Called with each line of stdout from the server. Implementers can use
+	 * this to determine when the server has successfully started.
+	 * 
+	 * @param output
+	 *            line of stdout output from server
+	 * @return true if the server has started
+	 */
+	protected abstract boolean doVerifyServerRunningFromStdout(String output);
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -319,7 +566,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		assert fLaunchCommand != null;
 		assert fRemoteProcess == null;
 
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
 
 		try {
 			if (subMon.isCanceled()) {
@@ -336,10 +583,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			new Thread(new Runnable() {
 				public void run() {
 					try {
-						while (getServerState() != ServerState.FINISHED) {
+						while (getServerState() != ServerState.STOPPED) {
 							String output = stdout.readLine();
 							if (output != null) {
 								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStdout(output)) {
+									if (!doServerStarted(subMon.newChild(10))) {
+										fRemoteProcess.destroy();
+									}
 									setServerState(ServerState.RUNNING);
 								}
 								if (DebugUtil.SERVER_TRACING) {
@@ -357,10 +607,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			new Thread(new Runnable() {
 				public void run() {
 					try {
-						while (getServerState() != ServerState.FINISHED) {
+						while (getServerState() != ServerState.STOPPED) {
 							String output = stderr.readLine();
 							if (output != null) {
 								if (getServerState() == ServerState.STARTING && doVerifyServerRunningFromStderr(output)) {
+									if (!doServerStarted(subMon.newChild(10))) {
+										fRemoteProcess.destroy();
+									}
 									setServerState(ServerState.RUNNING);
 								}
 								PTPRemoteCorePlugin
@@ -376,7 +629,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				}
 			}, "dstore server stderr").start(); //$NON-NLS-1$
 
-			subMon.worked(50);
+			subMon.worked(40);
 			subMon.subTask(Messages.AbstractRemoteServerRunner_1);
 
 			/*
@@ -415,94 +668,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		} finally {
 			synchronized (this) {
 				fRemoteProcess = null;
-				doFinishServer(subMon.newChild(1));
+				doServerFinished(subMon.newChild(1));
 			}
-			setServerState(ServerState.FINISHED);
+			setServerState(ServerState.STOPPED);
 			if (monitor != null) {
 				monitor.done();
 			}
 		}
-	}
-
-	/**
-	 * Run version verify command on the remote server.
-	 * 
-	 * @param subMon
-	 *            the monitor object
-	 * @return the IRemoteProcess object
-	 * @throws Exception
-	 *             the exception
-	 */
-	private IRemoteProcess runVerifyCommand(SubMonitor subMon) throws IOException {
-		/*
-		 * Now run version checker command on the server.
-		 */
-		subMon.subTask(Messages.AbstractRemoteServerRunner_13);
-		// specify the verify command to check the software version
-		List<String> verifyArgs = Arrays.asList(getVerifyCommand().split(" ")); //$NON-NLS-1$
-		IRemoteProcessBuilder builder = getRemoteConnection().getRemoteServices().getProcessBuilder(getRemoteConnection(),
-				verifyArgs);
-		builder.redirectErrorStream(true);
-		builder.environment().putAll(getEnv());
-		return builder.start();
-	}
-
-	/**
-	 * Set the id of the bundle containing the remote server file.
-	 * 
-	 * @param id
-	 *            bundle id
-	 */
-	public void setBundleId(String id) {
-		fBundle = Platform.getBundle(id);
-	}
-
-	/**
-	 * Set the environment prior to launching the server.
-	 * 
-	 * @param env
-	 *            string containing environment (as returned by "env" command)
-	 */
-	public void setEnv(String env) {
-		if (env != null) {
-			for (String vars : env.split("\n")) { //$NON-NLS-1$
-				String[] envVar = vars.split("="); //$NON-NLS-1$
-				if (envVar.length == 2) {
-					fEnv.put(envVar[0], envVar[1]);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Set the command used to launch the server
-	 * 
-	 * @param command
-	 *            launch command
-	 */
-	public void setLaunchCommand(String command) {
-		fLaunchCommand = command;
-	}
-
-	/**
-	 * Set the name of the payload
-	 * 
-	 * @param file
-	 *            payload name
-	 */
-	public void setPayload(String file) {
-		RemoteVariableManager.getInstance().setVariable("payload", file); //$NON-NLS-1$
-	}
-
-	/**
-	 * Set the connection used to launch the server
-	 * 
-	 * @param conn
-	 *            remote connection
-	 */
-	public void setRemoteConnection(IRemoteConnection conn) {
-		fRemoteConnection = conn;
-		setName(fServerName + " (" + conn.getName() + ")");//$NON-NLS-1$//$NON-NLS-2$
 	}
 
 	/**
@@ -518,137 +690,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			}
 			fServerState = state;
 			this.notifyAll();
-		}
-	}
-
-	/**
-	 * Set the value of a variable that will be expended in the launch command
-	 * 
-	 * @param name
-	 *            variable name
-	 * @param value
-	 *            variable value
-	 */
-	public void setVariable(String name, String value) {
-		RemoteVariableManager.getInstance().setVariable(name, value);
-	}
-
-	/**
-	 * @since 5.0 Sets the verify command.
-	 * 
-	 * @param fVerifyCommand
-	 *            the new verify command
-	 */
-	public void setVerifyCommand(String fVerifyCommand) {
-		this.fVerifyCommand = fVerifyCommand;
-	}
-
-	/**
-	 * @since 5.0 Sets the verify fail message.
-	 * 
-	 * @param fVerifyFailMessage
-	 *            the new verify fail message
-	 */
-	public void setVerifyFailMessage(String fVerifyFailMessage) {
-		this.fVerifyFailMessage = fVerifyFailMessage;
-	}
-
-	/**
-	 * @since 5.0 Sets the verify pattern.
-	 * 
-	 * @param fVerifyPattern
-	 *            the new verify pattern
-	 */
-	public void setVerifyPattern(String fVerifyPattern) {
-		this.fVerifyPattern = fVerifyPattern;
-	}
-
-	/**
-	 * Set the working directory. This is the location of the payload on the
-	 * remote system.
-	 * 
-	 * @param workDir
-	 *            working directory
-	 */
-	public void setWorkDir(String workDir) {
-		fWorkDir = workDir;
-	}
-
-	/**
-	 * Launch the server. The payload is first copied to the working directory
-	 * if it doesn't already exist. The server is then launched using the launch
-	 * command.
-	 * 
-	 * @param monitor
-	 *            progress monitor that can be used to cancel the launch
-	 * @throws IOException
-	 *             if the launch fails
-	 */
-	public synchronized void startServer(IProgressMonitor monitor) throws IOException {
-		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		try {
-			if (fRemoteConnection != null && fServerState != ServerState.RUNNING) {
-				if (fServerState == ServerState.FINISHED) {
-					if (!doRestartServer(subMon.newChild(10))) {
-						throw new IOException(Messages.AbstractRemoteServerRunner_6);
-					}
-					setServerState(ServerState.STARTING);
-				}
-				if (!fRemoteConnection.isOpen()) {
-					try {
-						fRemoteConnection.open(subMon.newChild(10));
-					} catch (RemoteConnectionException e) {
-						throw new IOException(e.getMessage());
-					}
-					if (!fRemoteConnection.isOpen()) {
-						throw new IOException(Messages.AbstractRemoteServerRunner_7);
-					}
-				}
-
-				// Check if the valid java version is installed on the server
-				if ((getVerifyCommand() != null && getVerifyCommand().length() != 0) && !isValidVersionInstalled(subMon)) {
-					if (getVerifyFailMessage() != null && getVerifyFailMessage().length() != 0) {
-						throw new IOException(getVerifyFailMessage());
-					}
-
-					throw new IOException(Messages.AbstractRemoteServerRunner_12);
-				}
-
-				subMon.setWorkRemaining(90);
-				schedule();
-				while (!subMon.isCanceled() && getServerState() == ServerState.STARTING) {
-					try {
-						wait(100);
-					} catch (InterruptedException e) {
-						if (DebugUtil.SERVER_TRACING) {
-							System.err.println("SERVER RUNNER: InterruptedException " + e.getLocalizedMessage()); //$NON-NLS-1$
-						}
-					}
-				}
-				if (subMon.isCanceled()) {
-					terminateServer();
-				}
-				if (getServerState() == ServerState.FINISHED) {
-					try {
-						join();
-					} catch (InterruptedException e) {
-						throw new IOException(e.getMessage());
-					}
-					if (getResult() != null) {
-						throw new IOException(getResult().getMessage());
-					}
-					throw new IOException(Messages.AbstractRemoteServerRunner_10);
-				}
-				subMon.setWorkRemaining(10);
-				if (!doStartServer(subMon.newChild(10))) {
-					terminateServer();
-					throw new IOException(Messages.AbstractRemoteServerRunner_9);
-				}
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 	}
 
