@@ -13,6 +13,8 @@
  *                            - modified (10/01/2010) to use non-nls interface; 
  *                              moved the queue-name combo functionality into 
  *                              the launch tab (5.0)
+ *                            - fixed load to get config, not working copy
+ *                            - eliminated static map (not necessary) (11/12/2010)
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.launch;
 
@@ -123,8 +125,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 * the correct options for rebuilding the controls.
 	 */
 	private class PBSRMLaunchDataSource extends RMLaunchConfigurationDynamicTabDataSource {
-		private String currentConfigName;
-
 		protected PBSRMLaunchDataSource(BaseRMLaunchConfigurationDynamicTab page) {
 			super(page);
 		}
@@ -257,7 +257,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 		 */
 		@Override
 		protected void loadFromStorage() {
-			ILaunchConfiguration config = getConfigurationWorkingCopy();
+			ILaunchConfiguration config = getConfiguration();
 			if (config != null) {
 				PBSBatchScriptTemplate template = templateManager.getCurrent();
 				if (template == null)
@@ -299,16 +299,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 						throw new ValidationException(ap.getName() + CO + SP + Messages.PBSRMLaunchDataSource_ValueNotSet);
 				}
 			}
-		}
-
-		/*
-		 * Updates static map for sharing values between templates.
-		 */
-		private void setCurrentConfiguration() {
-			ILaunchConfigurationWorkingCopy config = getConfigurationWorkingCopy();
-			if (config == null)
-				return;
-			put(config);
 		}
 	}
 
@@ -436,17 +426,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 				handleEditTemplates();
 		}
 	}
-
-	/*
-	 * The ResourceTab reconstructs a new LaunchTab object every time a
-	 * different resource manager is selected; in order to be able to maintain
-	 * the proper attribute values between resource manager choices within any
-	 * given ResourceTab, we need a static map.
-	 * 
-	 * This map more properly belongs to the ResourceTab instance, but for the
-	 * moment the static map will probably not cause semantic issues.
-	 */
-	private static final Map<String, ILaunchConfiguration> configurations = new HashMap<String, ILaunchConfiguration>();
 
 	private Map<Control, AttributePlaceholder> valueWidgets;
 
@@ -576,9 +555,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * If a new resource manager has been selected within this Resource tab, the
-	 * controls need to be rebuilt, so template change is fired.
-	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.ui.launch.BaseRMLaunchConfigurationDynamicTab#performApply
 	 * (org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
@@ -589,8 +565,6 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
 		setResourceManager(rm);
 		RMLaunchValidation rmv = super.performApply(configuration, getResourceManager(), queue);
-		dataSource.currentConfigName = configuration.getName();
-		dataSource.setCurrentConfiguration();
 		return rmv;
 	}
 
@@ -736,7 +710,7 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 					dataSource.copyFromFields();
 					templateChangeListener.disable();
 					dataSource.copyToStorage();
-					ILaunchConfiguration c = get(dataSource.currentConfigName);
+					ILaunchConfiguration c = dataSource.getConfiguration();
 					templateManager.loadTemplate(name, c);
 					buildDynamicPart(c);
 					dataSource.loadFromStorage();
@@ -826,19 +800,5 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 	 */
 	private synchronized void setResourceManager(IResourceManager resourceManager) {
 		pbsRM = (PBSResourceManager) resourceManager;
-	}
-
-	/*
-	 * For accessing the most recent configuration in memory.
-	 */
-	private static synchronized ILaunchConfiguration get(String name) {
-		return configurations.get(name);
-	}
-
-	/*
-	 * For storing the most recent configuration in memory.
-	 */
-	private static synchronized void put(ILaunchConfiguration configuration) {
-		configurations.put(configuration.getName(), configuration);
 	}
 }
