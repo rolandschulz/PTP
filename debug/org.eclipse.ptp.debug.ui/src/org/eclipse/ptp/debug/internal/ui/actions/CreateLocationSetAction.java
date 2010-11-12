@@ -16,8 +16,7 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.core.IPSession;
-import org.eclipse.ptp.debug.core.pdi.IPDILocationSet;
-import org.eclipse.ptp.debug.core.pdi.IPDILocator;
+import org.eclipse.ptp.debug.core.model.IPLocationSet;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.views.locations.PLocationView;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
@@ -84,9 +83,9 @@ public class CreateLocationSetAction extends Action {
 		String setID = null;
 		IStructuredSelection selection = (IStructuredSelection) view.getViewer().getSelection();
 		@SuppressWarnings("unchecked")
-		IPDILocationSet[] locations = (IPDILocationSet[]) selection.toList().toArray(new IPDILocationSet[0]);
+		IPLocationSet[] locations = (IPLocationSet[]) selection.toList().toArray(new IPLocationSet[0]);
 		IElementHandler setManager = parallelDebugView.getCurrentElementHandler();
-		for (IPDILocationSet locationSet : locations) {
+		for (IPLocationSet locationSet : locations) {
 			IElementSet rootSet = setManager.getSetRoot();
 			List<IElement> elementsMatchingTasks = new ArrayList<IElement>();
 			int[] tasks = locationSet.getTasks().toArray();
@@ -95,8 +94,7 @@ public class CreateLocationSetAction extends Action {
 				elementsMatchingTasks.add(element);
 			}
 
-			IPDILocator loc = locationSet.getLocator();
-			String name = loc.getFunction() + ":" + loc.getFile() + ":" + loc.getLineNumber(); //$NON-NLS-1$ //$NON-NLS-2$
+			String name = locationSet.getFunction() + ":" + locationSet.getFile() + ":" + locationSet.getLineNumber(); //$NON-NLS-1$ //$NON-NLS-2$
 			/*
 			 * The set already exists, destroy and recreate it
 			 */
