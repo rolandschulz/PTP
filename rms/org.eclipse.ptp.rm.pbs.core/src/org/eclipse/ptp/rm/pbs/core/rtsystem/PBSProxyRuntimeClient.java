@@ -52,12 +52,6 @@ public class PBSProxyRuntimeClient extends AbstractRemoteProxyRuntimeClient {
 	@Override
 	public void shutdown() throws IOException {
 		super.shutdown();
-		try {
-			sessionFinish();
-		} catch (IOException e) {
-			PTPCorePlugin.log(e);
-		}
-
 		synchronized (this) {
 			if (fServerRunner != null)
 				fServerRunner.cancel();
