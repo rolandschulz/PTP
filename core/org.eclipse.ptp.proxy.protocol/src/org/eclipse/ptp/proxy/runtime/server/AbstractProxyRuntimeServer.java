@@ -37,7 +37,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 	/**
 	 * @since 5.0
 	 */
-	protected final LinkedBlockingQueue<IProxyCommand> fCommands = new LinkedBlockingQueue<IProxyCommand>();
+	private final LinkedBlockingQueue<IProxyCommand> fCommands = new LinkedBlockingQueue<IProxyCommand>();
 
 	/**
 	 * @since 4.0
@@ -47,17 +47,7 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 	/**
 	 * @since 4.0
 	 */
-	public int fEventLoopTransID;
-
-	/**
-	 * @since 4.0
-	 */
-	protected Thread fEventThread;
-
-	/**
-	 * @since 4.0
-	 */
-	protected Thread eventThread;
+	private Thread fEventThread;
 
 	/**
 	 * @param host
@@ -83,6 +73,11 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 	public void handleCommand(IProxyCommand c) {
 		fCommands.add(c);
 	}
+
+	/**
+	 * @since 5.0
+	 */
+	protected abstract void doServerState(ServerState state, int transID, IProxyCommand command) throws IOException;
 
 	/**
 	 * @return
@@ -132,6 +127,9 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 
 				transID = command.getTransactionID();
 				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+				doServerState(state, transID, command);
+
 				if (command instanceof IProxyRuntimeInitCommand)
 					try {
 						initServer();
@@ -152,6 +150,9 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				command = fCommands.take();
 				transID = command.getTransactionID();
 				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+				doServerState(state, transID, command);
+
 				if (command instanceof IProxyRuntimeModelDefCommand) {
 					event = fEventFactory.newOKEvent(transID);
 					sendEvent(event);
@@ -164,15 +165,12 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				command = fCommands.take();
 				transID = command.getTransactionID();
 				System.out.println("runStateMachine: command: " + command.getCommandID() + " (" + transID + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				if (command instanceof IProxyRuntimeStartEventsCommand) {
-					// TODO start event loop
-					// event = eventFactory.newOKEvent(transID); //TODO: send OK
-					// here?
-					// sendEvent(event);
 
+				doServerState(state, transID, command);
+
+				if (command instanceof IProxyRuntimeStartEventsCommand) {
 					if (fEventThread == null) {
-						fEventLoopTransID = transID;
-						this.startEventThread(transID);
+						fEventThread = startEventThread(transID);
 					}
 				} else if (command instanceof IProxyQuitCommand) {
 					event = fEventFactory.newShutdownEvent(transID);
@@ -187,26 +185,20 @@ public abstract class AbstractProxyRuntimeServer extends AbstractProxyServer imp
 				// state = ServerState.NORMAL;
 				break;
 			case SHUTDOWN:
+				doServerState(state, 0, null);
 				break;
 			case SUSPENDED:
+				doServerState(state, 0, null);
 				break;
 			}
 		}
 	}
 
 	/**
-	 * @param thread
-	 * @since 4.0
-	 */
-	protected void setEventThread(Thread thread) {
-		fEventThread = thread;
-	}
-
-	/**
 	 * @param transID
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	protected abstract void startEventThread(int transID);
+	protected abstract Thread startEventThread(int transID);
 
 	/**
 	 * @since 4.0
