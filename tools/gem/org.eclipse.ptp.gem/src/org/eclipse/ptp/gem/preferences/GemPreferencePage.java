@@ -73,6 +73,8 @@ public class GemPreferencePage extends FieldEditorPreferencePage implements
 		addField(new BooleanFieldEditor(
 				PreferenceConstants.GEM_PREF_OPENMP_OPTION, "Enable OpenMP", //$NON-NLS-1$
 				prefsGroup));
+		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_UNIXSOCKETS_OPTION,
+				"Use Unix Sockets", prefsGroup)); //$NON-NLS-1$
 		addField(new BooleanFieldEditor(
 				PreferenceConstants.GEM_PREF_BLOCK_OPTION,
 				"Use Blocking sends", prefsGroup)); //$NON-NLS-1$

@@ -25,6 +25,7 @@ public class PreferenceConstants {
 	public static final String GEM_PREF_FIB_OPTION = "fibPreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_MPICALLS_OPTION = "mpicallsPreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_OPENMP_OPTION = "openmpPreference"; //$NON-NLS-1$
+	public static final String GEM_PREF_UNIXSOCKETS_OPTION = "unixSockets"; //$NON-NLS-1$
 	public static final String GEM_PREF_BLOCK_OPTION = "blockingsendsPreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_REPORT_OPTION = "reportPreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_VERBOSE = "verbosePreference"; //$NON-NLS-1$

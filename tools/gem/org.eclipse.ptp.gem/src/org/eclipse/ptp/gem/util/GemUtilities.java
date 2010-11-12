@@ -203,6 +203,8 @@ public class GemUtilities {
 				.getBoolean(PreferenceConstants.GEM_PREF_MPICALLS_OPTION);
 		boolean openmpPreference = pstore
 				.getBoolean(PreferenceConstants.GEM_PREF_OPENMP_OPTION);
+		boolean unixSocketsPreference = pstore
+				.getBoolean(PreferenceConstants.GEM_PREF_UNIXSOCKETS_OPTION);
 		boolean blockingsendsPreference = pstore
 				.getBoolean(PreferenceConstants.GEM_PREF_BLOCK_OPTION);
 		boolean reportPreference = pstore
@@ -239,6 +241,7 @@ public class GemUtilities {
 				+ ((mpicallsPreference) ? "-m " : "") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ((verbosePreference) ? "-O " : "") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ((openmpPreference) ? "-s " : "") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ((unixSocketsPreference) ? "-x " : "") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ((reportPreference) ? "-r " : "") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ((reportPreference) ? reportnum + " " : "") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ((fibPreference) ? "-f " : "") + "-l " + gemDirectory.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

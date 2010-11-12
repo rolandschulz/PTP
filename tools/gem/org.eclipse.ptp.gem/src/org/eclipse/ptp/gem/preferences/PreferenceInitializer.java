@@ -39,6 +39,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		pstore.setDefault(PreferenceConstants.GEM_PREF_FIB_OPTION, true);
 		pstore.setDefault(PreferenceConstants.GEM_PREF_MPICALLS_OPTION, false);
 		pstore.setDefault(PreferenceConstants.GEM_PREF_OPENMP_OPTION, false);
+		pstore.setDefault(PreferenceConstants.GEM_PREF_UNIXSOCKETS_OPTION, false);
 		pstore.setDefault(PreferenceConstants.GEM_PREF_BLOCK_OPTION, true);
 		pstore.setDefault(PreferenceConstants.GEM_PREF_REPORT_OPTION, false);
 		pstore.setDefault(PreferenceConstants.GEM_PREF_VERBOSE, false);
