@@ -19,10 +19,9 @@
     </tr>
 </table>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Release 1.5.0</i>
-
 <br></br>
-<p>The Graphical Explorer of MPI Programs (GEM) Eclipse plug-in, part of the 
+<p>
+Graphical Explorer of MPI Programs (GEM), part of the 
 <a href="PLUGINS_ROOT/org.eclipse.ptp.help/html/toc.html">Parallel Tools Platform</a> (PTP),  
 is a graphical front end for In-situ Partial Order (ISP), a dynamic formal
 verification tool for MPI C/C++ programs, developed at the University of Utah. GEM
@@ -34,50 +33,50 @@ behavior.
 <p>
 GEM can be used by anyone who can write simple MPI C/C++ programs, and requires no
 special training. GEM allows you to formally verify your MPI C/C++ programs automatically
-without any extra efforts on your part (apart from compiling and making your examples)
-and flags the following errors:
+without any extra efforts on your part. No code instrumentation is necessary. Gem
+will definitively flag the following errors and warnings:
 </p>
 
 <ul>
     <li>Deadlocks</li>
-    <li>Assertion violations</li>
-    <li>Object leaks</li>
+    <li>Functionally Irrelevant Barriers</li>
+    <li>MPI Object Leaks</li>
+    <li>Local Assertion Violations</li>
 </ul>
 
 <p>
 In addition, GEM helps you understand as well as step through all relevant process interleavings
 (schedules). Notice our use of the word <i>relevant</i>: even a short MPI program may have too many
-(an &quot;exponential number&quot;) of interleavings. For example, an MPI program with five processes, each
+(an &quot;exponential number&quot;) interleavings. For example, an MPI program with five processes, each
 containing five MPI calls, can have well in excess of 1000 interleavings. However, ISP generates
-a new interleaving only when it represents a truly new (as yet unexamined) behavior of your programs.
+a new interleaving only when it represents a truly new (as yet unexamined) behavior in your programs.
 </p> 
 
 <h2>Overview, Background, and Setup information</h2>
 
 <ol>
-    <li> <a href="overview.html">ISP Overview</a>
-    <li> <a href="prereqs.html">GEM Plug-in Prerequisites</a>  
+    <li><a href="overview.html">GEM Overview</a></li>
+    <li><a href="prereqs.html">GEM Prerequisites</a></li>
 </ol>
 
 <h2>Help Topics</h2>
 
 <ol>
-    <li><a href="preferences.html">GEM Plug-in Preferences</a></li>
-    <li><a href="output.html">Understanding GEM Console Output</a></li>
-    <li><a href="consoleView.html">Console View</a></li> 
     <li><a href="analyzerView.html">Analyzer View</a></li>
-    <li><a href="happensBeforeViewer.html">Happens Before Viewer</a></li>    
+    <li><a href="consoleView.html">Console View</a></li>
+    <li><a href="happensBeforeViewer.html">Happens Before (HB) Viewer</a></li>    
     <li><a href="makefiles.html">Makefile Support</a></li>
-    <li><a href="troubleshooting.html">Troubleshooting the GEM Plug-in</a></li>
+    <li><a href="preferences.html">Preferences</a></li>
+    <li><a href="troubleshooting.html">Troubleshooting</a></li>
 </ol>
 
 <p>Other related topics:</p>
 
 <ol>
-    <li><a href="http://www.eclipse.org/ptp/downloads.php">Latest Release of the GEM Eclipse Plugin</a>
-    <li><a href="http://www.cs.utah.edu/formal_verification/ISP-release/">Latest Release of ISP</a> - Including user manual and test code
-    <li><a href="http://www.cs.utah.edu/formal_verification/">Gauss Group Home</a> - All current work and publications
-    <li><a href="http://www.cs.utah.edu/">University of Utah School of Computing</a>
+    <li><a href="http://www.eclipse.org/ptp/downloads.php">Latest Release of GEM</a></li>    
+    <li><a href="http://www.cs.utah.edu/formal_verification/ISP-release/">Latest Release of ISP</a></li>    
+    <li><a href="http://www.cs.utah.edu/formal_verification/">Gauss Group Home</a> - Includes all current work and publications</li>    
+    <li><a href="http://www.cs.utah.edu/">University of Utah School of Computing</a></li>    
 </ol>
 
 <p>&nbsp;</p>
