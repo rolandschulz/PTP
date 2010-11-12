@@ -22,23 +22,25 @@
 <hr>
 
 <p>
-The GEM Plug-in supports CDT C/C++ Makefile projects with a minimum effort required on the part of the programmer.
+GEM supports CDT C/C++ Makefile projects with a minimum effort required on the part of the programmer.
 Just some minor modifications to your project's Makefiles and you'll be able to use GEM with your Makefile 
 Projects as well as your Managed Build Projects.
-
+</p>
 
 <h2>Makefile Modification Steps</h2>
+
 <p>
 The following are the necessary procedures to modify your CDT Makefile Project so that it can be verified and
-analyzed by the GEM Plug-in. If you are creating a project from scratch, make sure to start with a new <b>Makefile Project</b>
+analyzed by GEM. If you are creating a project from scratch, make sure to start with a new <b>Makefile Project</b>
 and not a <b>Managed-Build Project</b>!
 </p>
+
 <ul>
     <li>
         <b>Change the compiler to ispcc forC or ispCC for C++. This is a wrapper for mpicc that allow ISP's Profiler to intercept MPI calls at runtime</b>
         <pre>
         # Which compiler to use
-        # CC = mpicc  <-- comment this out
+        # CC = mpicc  &#60;-- comment this out
         
         # For MPI C applications
         CC = ispcc
@@ -49,7 +51,7 @@ and not a <b>Managed-Build Project</b>!
     </li>
     <li>
         <b>
-            The GEM Plug-in requires the fully qualified path to all source code in order to do the code analyzing. ISP itself uses
+            GEM requires the fully qualified path to all source code in order to do the code analyzing. ISP itself uses
             the __FILE__ and __LINE__ macros in generating a runtime log. Your Makefiles will have to pass the source files to
             ispcc/ispCC (gcc) at compile time in order to get that back in the same form. This is accomplished by the following being
             added to your Makefiles
