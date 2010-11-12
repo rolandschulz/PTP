@@ -41,8 +41,8 @@ import org.eclipse.ptp.rm.pbs.jproxy.parser.AttributeValueMapReader;
 import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatJobXMLReader;
 import org.eclipse.ptp.rm.pbs.jproxy.parser.QstatQueuesReader;
 import org.eclipse.ptp.rm.pbs.jproxy.parser.RequiredAttributeKeyReader;
-import org.eclipse.ptp.rm.proxy.core.Controller;
 import org.eclipse.ptp.rm.proxy.core.AbstractRMProxyRuntimeServer;
+import org.eclipse.ptp.rm.proxy.core.Controller;
 import org.eclipse.ptp.rm.proxy.core.element.IElement;
 import org.eclipse.ptp.rm.proxy.core.event.JobEventFactory;
 import org.eclipse.ptp.rm.proxy.core.event.NodeEventFactory;
@@ -585,6 +585,9 @@ public class PBSProxyRuntimeServer extends AbstractRMProxyRuntimeServer {
 			System.exit(1);
 		}
 		System.out.println("PBSProxyRuntimeServer exited"); //$NON-NLS-1$
+		/*
+		 * Exit required or server does not terminate.
+		 */
 		System.exit(0);
 	}
 
