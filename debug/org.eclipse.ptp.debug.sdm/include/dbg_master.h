@@ -29,90 +29,90 @@
 /*
  * Session control
  */
-int 	DbgMasterInit(int, int, char *, proxy_svr_helper_funcs *, proxy_commands *);
-int 	DbgMasterCreateSession(int, char *, int);
-int 	DbgMasterStartSession(int, int, char **);
-int 	DbgMasterQuit(int, int, char **);
-int 	DbgMasterIsShutdown(void);
-void 	DbgMasterFinish(void);
+extern int 	DbgMasterInit(int, int, char *, proxy_svr_helper_funcs *, proxy_commands *);
+extern int 	DbgMasterCreateSession(int, char *, int);
+extern int 	DbgMasterStartSession(int, int, char **);
+extern int 	DbgMasterQuit(int, int, char **);
+extern int 	DbgMasterIsShutdown(void);
+extern void DbgMasterFinish(void);
 
 /*
  * Breakpoint operations
  */
-int 	DbgMasterSetLineBreakpoint(int, int, char **);
-int 	DbgMasterSetFuncBreakpoint(int, int, char **);
-int 	DbgMasterDeleteBreakpoint(int, int, char **);
-int 	DbgMasterEnableBreakpoint(int, int, char **);
-int 	DbgMasterDisableBreakpoint(int, int, char **);
-int 	DbgMasterConditionBreakpoint(int, int, char **);
-int 	DbgMasterBreakpointAfter(int, int, char **);
-int 	DbgMasterSetWatchpoint(int, int, char **);
+extern int 	DbgMasterSetLineBreakpoint(int, int, char **);
+extern int 	DbgMasterSetFuncBreakpoint(int, int, char **);
+extern int 	DbgMasterDeleteBreakpoint(int, int, char **);
+extern int 	DbgMasterEnableBreakpoint(int, int, char **);
+extern int 	DbgMasterDisableBreakpoint(int, int, char **);
+extern int 	DbgMasterConditionBreakpoint(int, int, char **);
+extern int 	DbgMasterBreakpointAfter(int, int, char **);
+extern int 	DbgMasterSetWatchpoint(int, int, char **);
 
 /*
  * Process control operations
  */
-int 	DbgMasterGo(int, int, char **);
-int 	DbgMasterStep(int, int, char **);
-int 	DbgMasterTerminate(int, int, char **);
-int 	DbgMasterSuspend(int, int, char **);
+extern int 	DbgMasterGo(int, int, char **);
+extern int 	DbgMasterStep(int, int, char **);
+extern int 	DbgMasterTerminate(int, int, char **);
+extern int 	DbgMasterSuspend(int, int, char **);
 
 /*
  * Stack frame operations
  */
-int 	DbgMasterListStackframes(int, int, char **);
-int 	DbgMasterSetCurrentStackframe(int, int, char **);
+extern int 	DbgMasterListStackframes(int, int, char **);
+extern int 	DbgMasterSetCurrentStackframe(int, int, char **);
 
 /*
  * Expression/variable operations
  */
-int 	DbgMasterEvaluateExpression(int, int, char **);
-int 	DbgMasterGetType(int, int, char **);
-int 	DbgMasterListLocalVariables(int, int, char **);
-int 	DbgMasterListArguments(int, int, char **);
-int 	DbgMasterListGlobalVariables(int, int, char **);
-int 	DbgMasterEvaluatePartialExpression(int, int, char **);
-int 	DbgMasterDeletePartialExpression(int, int, char **);
+extern int 	DbgMasterEvaluateExpression(int, int, char **);
+extern int 	DbgMasterGetType(int, int, char **);
+extern int 	DbgMasterListLocalVariables(int, int, char **);
+extern int 	DbgMasterListArguments(int, int, char **);
+extern int 	DbgMasterListGlobalVariables(int, int, char **);
+extern int 	DbgMasterEvaluatePartialExpression(int, int, char **);
+extern int 	DbgMasterDeletePartialExpression(int, int, char **);
 
 /**
  * Thread operations
  */
-int 	DbgMasterListInfoThreads(int, int, char **);
-int 	DbgMasterSetThreadSelect(int, int, char **);
+extern int 	DbgMasterListInfoThreads(int, int, char **);
+extern int 	DbgMasterSetThreadSelect(int, int, char **);
 
-int 	DbgMasterStackInfoDepth(int, int, char **);
+extern int 	DbgMasterStackInfoDepth(int, int, char **);
 
 /**
  * Thread operations
  */
-int 	DbgMasterDataReadMemory(int, int, char **);
-int 	DbgMasterDataWriteMemory(int, int, char **);
+extern int 	DbgMasterDataReadMemory(int, int, char **);
+extern int 	DbgMasterDataWriteMemory(int, int, char **);
 
 /*
  * Event Handling
  */
-int 	DbgMasterProgress(void);
-void 	DbgMasterRegisterReadFileHandler(int, int (*)(int, void *), void *);
-void	DbgMasterRegisterWriteFileHandler(int, int (*)(int, void *), void *);
-void 	DbgMasterRegisterExceptFileHandler(int, int (*)(int, void *), void *);
-void 	DbgMasterUnregisterFileHandler(int);
-void 	DbgMasterRegisterEventHandler(void (*)(dbg_event *, void *), void *);
+extern int 	DbgMasterProgress(void);
+extern void DbgMasterRegisterReadFileHandler(int, int (*)(int, void *), void *);
+extern void	DbgMasterRegisterWriteFileHandler(int, int (*)(int, void *), void *);
+extern void DbgMasterRegisterExceptFileHandler(int, int (*)(int, void *), void *);
+extern void DbgMasterUnregisterFileHandler(int);
+extern void DbgMasterRegisterEventHandler(void (*)(dbg_event *, void *), void *);
 
 /*
  * Error Handling
  */
-void	DbgMasterSetError(int, char *);
-int		DbgMasterGetError(void);
-char *	DbgMasterGetErrorStr(void);
+extern void		DbgMasterSetError(int, char *);
+extern int		DbgMasterGetError(void);
+extern char *	DbgMasterGetErrorStr(void);
 
 /*
  * CLI Handling
  */
-int		DbgMasterCLIHandle(int, int, char **);
+extern int	DbgMasterCLIHandle(int, int, char **);
 
 /**
  * Signal operations
  */
-int 	DbgMasterListSignals(int, int, char **);
-int 	DbgMasterSignalInfo(int, int, char **);
+extern int 	DbgMasterListSignals(int, int, char **);
+extern int 	DbgMasterSignalInfo(int, int, char **);
 
 #endif /* _DBG_MASTER_H_ */
