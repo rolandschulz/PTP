@@ -367,6 +367,81 @@ CLIInfoProcInfoFree(CLIInfoProcInfo *info)
 	free(info);
 }
 
+char *
+CLIGetCurrentSourceLine(MICommand *cmd)
+{
+	MIList *				oobs;
+	MIOOBRecord *			oob;
+	char * 					text = NULL;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		return NULL;
+	}
+
+	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+		return NULL;
+	}
+
+	oobs = cmd->output->oobs;
+
+	//Skip the first record, which is "list\n"
+	MIListSet(oobs);
+	MIListGet(oobs);
+	oob = (MIOOBRecord *)MIListGet(oobs);
+	if (oob != NULL)
+	{
+		text = oob->cstring;
+
+		if (text != NULL)
+		{
+			return strdup(text);
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+	return NULL;
+}
+
+char *
+CLIGetPrintInfo(MICommand *cmd)
+{
+	MIList *				oobs;
+	MIOOBRecord *			oob;
+	char * 					text = NULL;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		return NULL;
+	}
+
+	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+		return NULL;
+	}
+
+	oobs = cmd->output->oobs;
+
+	//Skip the first record, which is "list\n"
+	MIListSet(oobs);
+	MIListGet(oobs);
+	oob = (MIOOBRecord *)MIListGet(oobs);
+	if (oob != NULL)
+	{
+		text = oob->cstring;
+
+		if (text != NULL)
+		{
+			return strdup(text);
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+	return NULL;
+}
+
+
 #ifdef __APPLE__
 CLIInfoProcInfo *
 CLIGetInfoProcInfo(MICommand *cmd)
@@ -444,3 +519,38 @@ CLIGetInfoProcInfo(MICommand *cmd)
 	return info;
 }
 #endif /* __APPLE__ */
+
+char *
+CLIGetHexValueLineFromPrintInfo(MICommand *cmd)
+{
+	MIList *				oobs;
+	MIOOBRecord *			oob;
+	char * 					text = NULL;
+
+	if (!cmd->completed || cmd->output == NULL || cmd->output->oobs == NULL) {
+		return NULL;
+	}
+
+	if (cmd->output->rr != NULL && cmd->output->rr->resultClass == MIResultRecordERROR) {
+		return NULL;
+	}
+
+	oobs = cmd->output->oobs;
+
+	//Skip the first record, which is "list\n"
+	MIListSet(oobs);
+	MIListGet(oobs);
+	oob = (MIOOBRecord *)MIListGet(oobs);
+	while (oob != NULL)
+	{
+		text = oob->cstring;
+
+		if (text != NULL && strstr(text, "0x"))
+		{
+			return strdup(text);
+		}
+		oob = (MIOOBRecord *)MIListGet(oobs);
+	}
+	return NULL;
+}
+

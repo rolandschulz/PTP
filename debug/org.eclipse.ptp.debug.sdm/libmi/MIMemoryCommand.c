@@ -64,3 +64,25 @@ MIDataWriteMemory(long offset, char* address, char* format, int wordSize, char* 
 	MICommandAddOption(cmd, value, NULL);
 	return cmd;
 }
+
+MICommand *
+MIDataReadDisassemble(char* startAddr, char* endAddr, char* format)
+{
+	MICommand * cmd;
+	cmd = MICommandNew("-data-disassemble", MIResultRecordDONE);
+	
+	if (startAddr != 0) {
+		MICommandAddOption(cmd, "-s", startAddr);
+	}
+
+	if (endAddr != 0) {
+		MICommandAddOption(cmd, "-e", endAddr);
+	}
+
+	if (format != 0) {
+		MICommandAddOption(cmd, "--", format);
+	}
+	
+	return cmd;
+}
+
