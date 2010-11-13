@@ -67,7 +67,7 @@
 static int
 GetSimpleType(char *type)
 {
-	char *t = NULL;
+	char *t = type;
 	int id;
 	int len = strlen(type);
 
@@ -83,55 +83,68 @@ GetSimpleType(char *type)
 
 	//check modifiers
 	if (strncmp(type, "const volatile", 14) == 0) {
-		t = strdup(&type[15]); //+ 1 remove whitespeace
+		t = &type[15]; //+ 1 remove whitespeace
 	} else if (strncmp(type, "volatile", 8) == 0) {
-		t = strdup(&type[9]); //+ 1 remove whitespeace
+		t = &type[9]; //+ 1 remove whitespeace
 	} else if (strncmp(type, "const", 5) == 0) {
-		t = strdup(&type[6]); //+ 1 remove whitespeace
-	} else {
-		t = strdup(type);
+		t = &type[6]; //+ 1 remove whitespeace
 	}
 
 	if (strncmp(t, "char *", 6) == 0) {
-		id = T_CHAR_PTR;
-	} else if (strncmp(t, "char", 4) == 0) {
-		id = T_CHAR;
-	} else if (strncmp(t, "unsigned char", 13) == 0) {
-		id = T_CHAR;
-	} else if (strncmp(t, "short int", 9) == 0 || strncmp(t, "int2", 4) == 0) {
-		id = T_SHORT;
-	} else if (strncmp(t, "short unsigned int", 18) == 0) {
-		id = T_USHORT;
-	} else if (strncmp(t, "int", 3) == 0 || strncmp(t, "int4", 4) == 0) {
-		id = T_INT;
-	} else if (strncmp(t, "unsigned int", 12) == 0) {
-		id = T_UINT;
-	} else if (strncmp(t, "long int", 8) == 0 || strncmp(t, "int8", 4) == 0) {
-		id = T_LONG;
-	} else if (strncmp(t, "long unsigned int", 17) == 0) {
-		id = T_ULONG;
-#ifdef CC_HAS_LONG_LONG
-	} else if (strncmp(t, "long long int", 13) == 0 || strncmp(t, "real*16", 7) == 0) {
-		id = T_LONGLONG;
-	} else if (strncmp(t, "long long unsigned int", 22) == 0) {
-		id = T_ULONGLONG;
-#endif /* CC_HAS_LONG_LONG */
-	} else if (strncmp(t, "long", 4) == 0 || strncmp(t, "real*4", 6) == 0) {
-		id = T_LONG;
-	} else if (strncmp(t, "float", 5) == 0 || strncmp(t, "real*8", 6) == 0) {
-		id = T_FLOAT;
-	} else if (strncmp(t, "double", 6) == 0) {
-		id = T_DOUBLE;
-	} else if (strncmp(t, "string", 6) == 0) {
-		id = T_STRING;
-	} else if (strncmp(t, "logical4", 8) == 0) {
- 		id = T_BOOLEAN;
- 	} else {
-		id =  T_UNKNOWN;
+		return T_CHAR_PTR;
 	}
+	if (strncmp(t, "char", 4) == 0 ||
+		strncmp(t, "unsigned char", 13) == 0) {
+		return T_CHAR;
+	}
+	if (strncmp(t, "short int", 9) == 0 ||
+		strncmp(t, "int2", 4) == 0) {
+		return T_SHORT;
+	}
+	if (strncmp(t, "short unsigned int", 18) == 0) {
+		return T_USHORT;
+	}
+	if (strncmp(t, "int", 3) == 0 ||
+		strncmp(t, "int4", 4) == 0) {
+		return T_INT;
+	}
+	if (strncmp(t, "unsigned int", 12) == 0) {
+		return T_UINT;
+	}
+	if (strncmp(t, "long int", 8) == 0 ||
+		strncmp(t, "long", 4) == 0 ||
+		strncmp(t, "real*4", 6) == 0 ||
+		strncmp(t, "int8", 4) == 0) {
+		return T_LONG;
+	}
+	if (strncmp(t, "long unsigned int", 17) == 0) {
+		return T_ULONG;
+	}
+#ifdef CC_HAS_LONG_LONG
+	if (strncmp(t, "long long int", 13) == 0 ||
+		strncmp(t, "real*16", 7) == 0) {
+		return T_LONGLONG;
+	}
+	if (strncmp(t, "long long unsigned int", 22) == 0) {
+		return T_ULONGLONG;
+	}
+#endif /* CC_HAS_LONG_LONG */
+	if (strncmp(t, "float", 5) == 0 ||
+		strncmp(t, "real*8", 6) == 0) {
+		return T_FLOAT;
+	}
+	if (strncmp(t, "double", 6) == 0) {
+		return T_DOUBLE;
+	}
+	if (strncmp(t, "string", 6) == 0) {
+		return T_STRING;
+	}
+	if (strncmp(t, "bool", 4) == 0 ||
+		strncmp(t, "logical4", 8) == 0) {
+ 		return T_BOOLEAN;
+ 	}
 
-	free(t);
-	return id;
+	return  T_UNKNOWN;
 }
 
 /*
@@ -348,6 +361,8 @@ CreateSimpleAIF(int id, char *res)
 			return FloatToAIF((float)strtod(res, NULL));
 		case T_DOUBLE:
 			return DoubleToAIF(strtod(res, NULL));
+		case T_BOOLEAN:
+			return BoolToAIF(strncmp(res, "true", 4) == 0 ? 1 : 0);
 		default://other type
 			return VoidToAIF(0, 0);
 	}
