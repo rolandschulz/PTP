@@ -67,9 +67,8 @@
 static int
 GetSimpleType(char *type)
 {
-	char *t = type;
-	int id;
-	int len = strlen(type);
+	char *	t = type;
+	int		len = strlen(type);
 
 	if (type[len - 1] == ')') { // function
 		return T_FUNCTION;
