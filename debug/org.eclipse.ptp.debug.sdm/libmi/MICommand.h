@@ -70,6 +70,7 @@ extern MICommand *MIExecNext(int);
 extern MICommand *MIExecFinish(void);
 extern MICommand *MIExecInterrupt(void);
 extern MICommand *MIExecUtil(char*);
+extern MICommand *MIExecStepInstruction(void);
 
 /*
  * -break-* commands
@@ -118,6 +119,7 @@ extern MICommand *MIThreadSelect(int threadNum);
  */
 extern MICommand *MIDataReadMemory(long, char *, char *, int, int, int, char *);
 extern MICommand *MIDataWriteMemory(long offset, char * address, char * format, int wordSize, char * value);
+extern MICommand *MIDataReadDisassemble(char* startAddr, char* endAddr, char* format);
 
 #ifdef __APPLE__
 extern MICommand *MIPidInfo(void);
@@ -134,5 +136,16 @@ extern MICommand *CLIPType(char *name);
 extern MICommand *CLIListSignals(char *);
 extern MICommand *CLISignalInfo(char *);
 extern MICommand *CLIHandle(char *);
+
+/*
+ *  List source lines command
+ */
+extern MICommand *CLIListSourceLines(void);
+
+/*
+ *  Print command
+ */
+extern MICommand *CLIPrint(char *arg);
+extern MICommand *CLIPrintHex(char *arg);
 
 #endif /* _MICOMMAND_H_ */

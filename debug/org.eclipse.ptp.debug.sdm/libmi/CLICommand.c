@@ -80,6 +80,30 @@ CLIFrame(void) {
 }
 
 MICommand *
+CLIListSourceLines(void) {
+	MICommand * cmd;
+	cmd = MICommandNew("list", MIResultRecordDONE);
+	return cmd;
+}
+
+MICommand *
+CLIPrint(char *arg) {
+	MICommand * cmd;
+	cmd = MICommandNew("print", MIResultRecordDONE);
+	MICommandAddOption(cmd, arg, NULL);
+	return cmd;
+}
+
+MICommand *
+CLIPrintHex(char *arg) {
+	MICommand * cmd;
+	cmd = MICommandNew("print/a", MIResultRecordDONE);
+	MICommandAddOption(cmd, arg, NULL);
+	return cmd;
+}
+
+
+MICommand *
 CLIInfoProc(void) {
 	MICommand * cmd;
 #ifdef __APPLE__

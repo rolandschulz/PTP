@@ -85,6 +85,13 @@ MIExecInterrupt(void)
 	return MICommandNew("-exec-interrupt", MIResultRecordDONE);
 }
 
+MICommand *
+MIExecStepInstruction(void)
+{
+	MICommand *	cmd = MICommandNew("-exec-step-instruction", MIResultRecordRUNNING);
+	return cmd;
+}
+
 #ifdef __APPLE__
 MICommand *
 MIPidInfo(void)

@@ -120,7 +120,6 @@ MIDataReadMemoryInfo *
 MIGetDataReadMemoryInfo(MICommand *cmd)
 {
 	char * var;
-	char * str;
 	MIValue * value;
 	MIResultRecord * rr;
 	MIResult * result;
@@ -135,24 +134,20 @@ MIGetDataReadMemoryInfo(MICommand *cmd)
 		var = result->variable;
 		value = result->value;
 
-		if (value != NULL || value->type == MIValueTypeConst) {
-			str = value->cstring;
-		}
-
 		if (strcmp(var, "addr") == 0) {
-			info->addr = strdup(str);
+			info->addr = strdup(value->cstring);
 		} else if (strcmp(var, "nr-bytes") == 0) {
-			info->numBytes = strtol(str, NULL, 10);
+			info->numBytes = strtol(value->cstring, NULL, 10);
 		} else if (strcmp(var, "total-bytes") == 0) {
-			info->totalBytes = strtol(str, NULL, 10);
+			info->totalBytes = strtol(value->cstring, NULL, 10);
 		} else if (strcmp(var, "next-row") == 0) {
-			info->nextRow = strtol(str, NULL, 10);
+			info->nextRow = strtol(value->cstring, NULL, 10);
 		} else if (strcmp(var, "prev-row") == 0) {
-			info->prevRow = strtol(str, NULL, 10);
+			info->prevRow = strtol(value->cstring, NULL, 10);
 		} else if (strcmp(var, "next-page") == 0) {
-			info->nextPage = strtol(str, NULL, 10);
+			info->nextPage = strtol(value->cstring, NULL, 10);
 		} else if (strcmp(var, "prev-page") == 0) {
-			info->prevPage = strtol(str, NULL, 10);
+			info->prevPage = strtol(value->cstring, NULL, 10);
 		} else if (strcmp(var, "memory") == 0) {
 			if (value->type == MIValueTypeList) {
 				info->memories = MIGetMemoryList(value);

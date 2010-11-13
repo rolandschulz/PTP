@@ -51,5 +51,8 @@ extern CLIInfoThreadsInfo *CLIGetInfoThreadsInfo(MICommand *cmd);
 extern CLIInfoProcInfo *CLIInfoProcInfoNew(void);
 extern CLIInfoProcInfo *CLIGetInfoProcInfo(MICommand *cmd);
 extern void CLIInfoProcInfoFree(CLIInfoProcInfo *info);
+extern char *CLIGetCurrentSourceLine(MICommand *cmd);
+extern char *CLIGetPrintInfo(MICommand *cmd);
+extern char *CLIGetHexValueLineFromPrintInfo(MICommand *cmd);
 
 #endif /* _CLISIGHANDLE_H_ */
