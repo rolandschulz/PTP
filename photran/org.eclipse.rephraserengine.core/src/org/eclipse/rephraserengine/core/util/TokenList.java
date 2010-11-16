@@ -178,7 +178,7 @@ public abstract class TokenList<T> implements Iterable<T>
     {
         int index = findIndexOfAnyTokenOnLine(line);
         if (index < 0) return null;
-        while (index+1 < array.length && getLine(array[index+1]) == line)
+        while (index+1 < size && getLine(array[index+1]) == line)
             index++;
         return array[index];
     }
