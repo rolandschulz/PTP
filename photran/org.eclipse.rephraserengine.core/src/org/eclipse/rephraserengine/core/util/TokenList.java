@@ -158,6 +158,20 @@ public abstract class TokenList<T> implements Iterable<T>
         return array[index];
     }
     
+    public T findFirstTokenOnOrAfterLine(int line)
+    {
+        T result = findFirstTokenOnLine(line);
+        if (result != null)
+            return result;
+        else
+        {
+            for (int index = 0; index < size; index++)
+                if (getLine(array[index]) >= line)
+                    return array[index];
+            return null;
+        }
+    }
+
     private int findIndexOfAnyTokenOnLine(int line)
     {
         int low = 0, high = size - 1;
@@ -181,6 +195,27 @@ public abstract class TokenList<T> implements Iterable<T>
         while (index+1 < size && getLine(array[index+1]) == line)
             index++;
         return array[index];
+    }
+    
+    public T findLastTokenOnOrBeforeLine(int line)
+    {
+        T result = findLastTokenOnLine(line);
+        if (result != null)
+            return result;
+        else
+        {
+            for (int index = 0; index < size; index++)
+            {
+                if (getLine(array[index]) > line)
+                {
+                    if (index == 0)
+                        return null;
+                    else
+                        return array[index-1];
+                }
+            }
+            return array[size-1];
+        }
     }
 
     public Iterator<T> iterator()

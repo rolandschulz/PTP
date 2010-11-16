@@ -35,7 +35,11 @@ public class EditorPreferencePage extends AbstractFortranPreferencePage
                                         "Enable folding rather than ruler in fixed-form Fortran editors",
                                         getFieldEditorParent()));
         */
-        
+
+        addField(new BooleanFieldEditor(FortranPreferences.CONVERT_TABS_TO_SPACES.getName(),
+            "Convert tabs to spaces",
+            getFieldEditorParent()));
+
         IntegerFieldEditor intEditor = new IntegerFieldEditor(FortranPreferences.FIXED_FORM_COMMENT_COLUMN.getName(),
                                                               Messages.EditorPreferencePage_FixedFormLineLength,
                                                                getFieldEditorParent());

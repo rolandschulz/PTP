@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.internal.ui.editor.CDocumentProvider;
+import org.eclipse.cdt.internal.ui.text.TabsToSpacesConverter;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -23,12 +25,14 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.DefaultLineTracker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension2;
+import org.eclipse.jface.text.ITextViewerExtension7;
 import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -79,12 +83,12 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.WorkbenchChainedTextFontFieldEditor;
 
 /**
- * Base class for the fixed and free-form Fortran editors
+ * Fortran editor
  *
  * @author Jeff Overbey
  * @author Kurt Hendle - folding support
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "deprecation", "restriction" })
 public class FortranEditor extends CDTBasedTextEditor implements ISelectionChangedListener
 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,6 +203,37 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Tabs to Spaces Conversion
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    // See also FortranSourceViewer
+    
+    @Override
+    protected boolean isTabsToSpacesConversionEnabled() {
+        return FortranPreferences.CONVERT_TABS_TO_SPACES.getValue();
+    }
+
+    @Override
+    protected void installTabsToSpacesConverter() {
+        ISourceViewer sourceViewer= getSourceViewer();
+        SourceViewerConfiguration config= getSourceViewerConfiguration();
+        if (config != null && sourceViewer instanceof ITextViewerExtension7) {
+            int tabWidth= config.getTabWidth(sourceViewer);
+            TabsToSpacesConverter tabToSpacesConverter= new TabsToSpacesConverter();
+            tabToSpacesConverter.setNumberOfSpacesPerTab(tabWidth);
+            IDocumentProvider provider= getDocumentProvider();
+            if (provider instanceof CDocumentProvider) {
+                CDocumentProvider cProvider= (CDocumentProvider) provider;
+                tabToSpacesConverter.setLineTracker(cProvider.createLineTracker(getEditorInput()));
+            } else {
+                tabToSpacesConverter.setLineTracker(new DefaultLineTracker());
+            }
+            ((ITextViewerExtension7) sourceViewer).setTabsToSpacesConverter(tabToSpacesConverter);
+            //updateIndentationMode();
+        }
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     // Context Menu Contribution
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -206,7 +241,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
     @Override public void editorContextMenuAboutToShow(IMenuManager menu)
     {
         super.editorContextMenuAboutToShow(menu);
-        
+
         try
         {
             // Instantiate RefactorMenu using reflection since it's in an optional dependency
@@ -237,7 +272,7 @@ public class FortranEditor extends CDTBasedTextEditor implements ISelectionChang
         //fAnnotationAccess = createAnnotationAccess();
         //fOverviewRuler = createOverviewRuler(getSharedColors());
 
-        ISourceViewer sourceViewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
+        ISourceViewer sourceViewer = new FortranSourceViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
 
         getSourceViewerDecorationSupport(sourceViewer); // Ensure decoration support has been created and configured
 

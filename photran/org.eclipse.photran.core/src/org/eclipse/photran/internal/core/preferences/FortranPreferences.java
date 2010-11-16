@@ -50,6 +50,7 @@ public final class FortranPreferences
     public static final FortranStringPreference PREFERRED_DOM_PARSER = new FortranStringPreference("domparser", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static final FortranIntegerPreference FIXED_FORM_COMMENT_COLUMN = new FortranIntegerPreference("fixedformcommentcolum", 72, FortranIntegerPreference.NO_LIMIT, 72); //$NON-NLS-1$
+    public static final FortranBooleanPreference CONVERT_TABS_TO_SPACES = new FortranBooleanPreference("converttabs", true); //$NON-NLS-1$
     
     private FortranPreferences() {}
 

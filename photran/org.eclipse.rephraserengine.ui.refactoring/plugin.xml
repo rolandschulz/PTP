@@ -16,7 +16,7 @@
       <!-- ============================= -->
       <!-- Always visible -->
       <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=edit">
+            locationURI="menu:org.eclipse.ui.main.menu?before=navigate">
          <!-- Menu mimicks org.eclipse.jdt.ui's (as does CDT's Refactor menu)
               http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.jdt.ui/plugin.xml?view=markup -->
          <menu

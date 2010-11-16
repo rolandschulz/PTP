@@ -48,6 +48,9 @@ public final class FortranStringPreference extends FortranPreference
      */
     public String getValue()
     {
-        return getPreferenceStore().getString(getName());
+        if (!getPreferenceStore().contains(getName()))
+            return defaultValue;
+        else
+            return getPreferenceStore().getString(getName());
     }
 }

@@ -98,7 +98,7 @@ public final class Reindenter
 
     public static void reindent(int fromLine, int thruLine, IFortranAST ast, Strategy strategy)
     {
-        reindent(ast.findFirstTokenOnLine(fromLine), ast.findLastTokenOnLine(thruLine), ast, strategy);
+        reindent(ast.findFirstTokenOnOrAfterLine(fromLine), ast.findLastTokenOnOrBeforeLine(thruLine), ast, strategy);
     }
     
     private static void reindent(Token firstTokenInRegion, Token lastTokenInRegion, IFortranAST ast, Strategy strategy)

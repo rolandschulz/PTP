@@ -48,6 +48,9 @@ public final class FortranBooleanPreference extends FortranPreference
      */
     public boolean getValue()
     {
-        return getPreferenceStore().getBoolean(getName());
+        if (!getPreferenceStore().contains(getName()))
+            return defaultValue;
+        else
+            return getPreferenceStore().getBoolean(getName());
     }
 }

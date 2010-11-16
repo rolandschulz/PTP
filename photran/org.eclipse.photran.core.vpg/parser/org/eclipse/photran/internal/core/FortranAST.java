@@ -130,9 +130,21 @@ public class FortranAST implements IFortranAST
         return tokenList.findFirstTokenOnLine(line);
     }
     
+    public Token findFirstTokenOnOrAfterLine(int line)
+    {
+        // Binary Search
+        return tokenList.findFirstTokenOnOrAfterLine(line);
+    }
+    
     public Token findLastTokenOnLine(int line)
     {
         // Binary Search
         return tokenList.findLastTokenOnLine(line);
+    }
+    
+    public Token findLastTokenOnOrBeforeLine(int line)
+    {
+        // Binary Search
+        return tokenList.findLastTokenOnOrBeforeLine(line);
     }
 }

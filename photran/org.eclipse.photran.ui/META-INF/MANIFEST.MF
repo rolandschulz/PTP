@@ -28,6 +28,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.debug.ui,
  org.eclipse.cdt.core,
  org.eclipse.debug.ui,
- org.eclipse.rephraserengine.ui.refactoring;resolution:=optional
+ org.eclipse.rephraserengine.ui.refactoring;resolution:=optional,
+ org.eclipse.cdt.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

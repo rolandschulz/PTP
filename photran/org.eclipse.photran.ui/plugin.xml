@@ -73,7 +73,7 @@
             id="org.eclipse.photran.ui.CommentUncomment">
 	     <action 
 	           label="%action.label.0" 
-               menubarPath="edit/additions"
+               menubarPath="org.eclipse.photran.ui.source.menu/commentActions"
                definitionId="org.eclipse.photran.ui.CommentCommand"
 	           class="org.eclipse.photran.internal.ui.actions.FortranBlockCommentActionDelegate" 
 	           id="org.eclipse.photran.ui.BlockCommentAction">
@@ -151,6 +151,40 @@
             targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
          <part id="org.eclipse.photran.ui.FortranEditor"/>
       </actionSetPartAssociation>      
+   </extension>
+
+   <!--=============-->
+   <!-- Source Menu -->
+   <!--=============-->
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=edit">
+         <menu
+               label="Source"
+               id="org.eclipse.photran.ui.source.menu">
+            <separator
+                  name="commentActions">
+            </separator>
+            <!-- SEPARATOR --><separator name="separator1" visible="true" />
+            <command
+                  commandId="org.eclipse.ui.edit.text.shiftRight"
+                  label="Shift Right"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.text.shiftLeft"
+                  label="Shift Left"
+                  style="push">
+            </command>
+            <separator
+                  name="indentationActions">
+            </separator>
+            <!-- SEPARATOR --><separator name="separator1" visible="true" />
+            <separator
+                  name="additions">
+            </separator>
+         </menu>
+      </menuContribution>
    </extension>
 
    <!--===================================-->
