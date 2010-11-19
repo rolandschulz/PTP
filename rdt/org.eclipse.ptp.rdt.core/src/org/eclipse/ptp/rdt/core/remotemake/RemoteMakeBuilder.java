@@ -14,10 +14,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ErrorParserManager;
@@ -247,6 +249,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				
 				ITool[] tools = tc.getTools();
 				
+				Set<String> all_scannerIDs = new HashSet<String>();
 				for (ITool tool : tools) {
 
 					IInputType[] inputTypes = tool.getInputTypes();
@@ -264,29 +267,39 @@ public class RemoteMakeBuilder extends MakeBuilder {
 						// IDs are delimited by the | character
 						String[] scannerIDs = scannerIDString.split("\\|"); //$NON-NLS-1$
 						
-						for (String id : scannerIDs) {
+						for (String thisScannerid : scannerIDs) {
 
-							//IScannerConfigBuilderInfo2 scBuilderInfo = ScannerConfigProfileManager
-							//		.createScannerConfigBuildInfo2(ManagedBuilderCorePlugin.getDefault()
-							//				.getPluginPreferences(), id, false);
-							IScannerConfigBuilderInfo2 scBuilderInfo = ScannerConfigProfileManager.createScannerConfigBuildInfo2(currProject, id);
-							IScannerInfoCollector collector = (IScannerInfoCollector) ScannerConfigProfileManager
-									.getInstance().getSCProfileConfiguration(id)
-									.getScannerInfoCollectorElement().createScannerInfoCollector();
-
-							if (collector instanceof IScannerInfoCollector2) {
-								IScannerInfoCollector2 s2 = (IScannerInfoCollector2) collector;
-								s2.setProject(currProject);
+							//collect all of scanner id first to reduce duplicate scanner and then create ConsoleOutputSniffer.
+							if(thisScannerid!=null){
+								all_scannerIDs.add(thisScannerid);
 							}
-
-							SCMarkerGenerator markerGenerator = new SCMarkerGenerator();
-							ConsoleOutputSniffer sniffer = ScannerInfoUtility.createBuildOutputSniffer(currentStdOut,
-									currentStdErr, currProject, configuration, workingDirectory,
-									markerGenerator, collector);
-							currentStdOut = (sniffer == null ? currentStdOut : sniffer.getOutputStream());
-							currentStdErr = (sniffer == null ? currentStdErr : sniffer.getErrorStream());
+							
 						}
 					}
+				}
+				
+				//create ConsoleOutputSniffer for each scanner id in the set.
+				for(String id : all_scannerIDs){
+					
+					//IScannerConfigBuilderInfo2 scBuilderInfo = ScannerConfigProfileManager
+					//		.createScannerConfigBuildInfo2(ManagedBuilderCorePlugin.getDefault()
+					//				.getPluginPreferences(), id, false);
+					//IScannerConfigBuilderInfo2 scBuilderInfo = ScannerConfigProfileManager.createScannerConfigBuildInfo2(currProject, id);
+					IScannerInfoCollector collector = (IScannerInfoCollector) ScannerConfigProfileManager
+							.getInstance().getSCProfileConfiguration(id)
+							.getScannerInfoCollectorElement().createScannerInfoCollector();
+
+					if (collector instanceof IScannerInfoCollector2) {
+						IScannerInfoCollector2 s2 = (IScannerInfoCollector2) collector;
+						s2.setProject(currProject);
+					}
+
+					SCMarkerGenerator markerGenerator = new SCMarkerGenerator();
+					ConsoleOutputSniffer sniffer = ScannerInfoUtility.createBuildOutputSniffer(currentStdOut,
+							currentStdErr, currProject, configuration, workingDirectory,
+							markerGenerator, collector);
+					currentStdOut = (sniffer == null ? currentStdOut : sniffer.getOutputStream());
+					currentStdErr = (sniffer == null ? currentStdErr : sniffer.getErrorStream());
 				}
 				
 				// hook the console up to the last sniffer created, or to the stdout/stderr of the process if none were created
