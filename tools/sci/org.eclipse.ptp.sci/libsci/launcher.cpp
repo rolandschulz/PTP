@@ -62,6 +62,10 @@
 
 const int SCI_DAEMON_PORT = 6688;
 
+#ifdef __APPLE__
+extern char **environ;
+#endif
+
 Launcher::Launcher(Topology &topo)
 	: topology(topo), shell(""), scidPort(SCI_DAEMON_PORT), mode(INTERNAL), embedMode(false)
 {
