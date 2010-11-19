@@ -66,6 +66,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
+import org.eclipse.ptp.internal.rdt.core.remotemake.ResourceRefreshJob;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.activator.Activator;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
@@ -419,18 +420,14 @@ public class RemoteMakeBuilder extends MakeBuilder {
 								// just keep waiting until the process is done
 							}
 						}
-														
-						try {
-							// Do not allow the cancel of the refresh, since the
-							// builder is external
-							// to Eclipse, files may have been created/modified
-							// and we will be out-of-sync.
-							// The caveat is that for huge projects, it may take a while
-							currProject.refreshLocal(IResource.DEPTH_INFINITE, null);
-						} catch (CoreException e) {
-							// this should never happen because we should never be building from a
-							// state where ressource changes are disallowed
-						}
+						
+						
+						// create a Job for the refresh
+						List<IResource> resourcesToRefresh = new LinkedList<IResource>();
+						resourcesToRefresh.add(currProject);
+						Job refreshJob = new ResourceRefreshJob(resourcesToRefresh);
+						refreshJob.schedule();
+
 					}
 				}
 				catch (ProjectNotConfiguredException e){
