@@ -92,7 +92,9 @@ public class RemoteIndexManager {
 		}
 		else {
 			StandaloneFastIndexer indexer = getIndexerForScope(scope, dataStore, null);
-			return indexer.getIndex();
+			//return indexer.getIndex();
+			//create a new CIndex wrapper each time to prevent deadlock.
+			return new CIndex(new IIndexFragment[]{indexer.getIndex().getWritableFragment()}, 1);
 		}
 	}
 	
