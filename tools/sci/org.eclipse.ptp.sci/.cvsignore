@@ -3,3 +3,4 @@ stamp-h1
 config.status
 config.h
 Makefile
+a.out.dSYM
