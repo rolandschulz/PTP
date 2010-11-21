@@ -116,7 +116,6 @@ int Socket::listen(int &port)
                 port = ::atoi(service);
 
                 binded = true;
-                break;
             }
         }
         host = host->ai_next;
@@ -207,7 +206,6 @@ int Socket::connect(const char *hostName, in_port_t port)
         ::close(sockfd);
     }
     if (rc < 0) {
-        ::freeaddrinfo(host);
         throw SocketException(SocketException::NET_ERR_CONNECT, errno);
     }
     ::freeaddrinfo(host);
