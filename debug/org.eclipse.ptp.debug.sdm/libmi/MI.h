@@ -33,7 +33,7 @@
 #include "MIError.h"
 #include "MIMemory.h"
 #include "MISignalInfo.h"
+#include "MIDisassembly.h"
 #include "CLIOutput.h"
-#include "MIDisassemble.h"
 
 #endif /* _MI_H_ */

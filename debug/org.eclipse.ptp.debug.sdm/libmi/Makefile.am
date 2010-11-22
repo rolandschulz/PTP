@@ -27,7 +27,7 @@ libmi_a_SOURCES =			CLICommand.c \
 							MIString.c \
 							MIThread.c \
 							MIThreadCommand.c \
-							MIDisassemble.c \
+							MIDisassembly.c \
 							MIValue.c \
 							MIVar.c \
 							MIVarCommand.c
