@@ -18,7 +18,7 @@
 
 struct MIAssemble {
 	char *	addr;
-	char *	funcName;
+	char *	func_name;
 	long	offset;
 	char *	inst;
 };
