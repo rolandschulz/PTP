@@ -65,9 +65,8 @@ am_libmi_a_OBJECTS = libmi_a-CLICommand.$(OBJEXT) \
 	libmi_a-MISession.$(OBJEXT) libmi_a-MISignalInfo.$(OBJEXT) \
 	libmi_a-MIStackCommand.$(OBJEXT) libmi_a-MIString.$(OBJEXT) \
 	libmi_a-MIThread.$(OBJEXT) libmi_a-MIThreadCommand.$(OBJEXT) \
-	libmi_a-MIThread.$(OBJEXT) libmi_a-MIDisassemble.$(OBJEXT) \
-	libmi_a-MIValue.$(OBJEXT) libmi_a-MIVar.$(OBJEXT) \
-	libmi_a-MIVarCommand.$(OBJEXT)
+	libmi_a-MIDisassembly.$(OBJEXT) libmi_a-MIValue.$(OBJEXT) \
+	libmi_a-MIVar.$(OBJEXT) libmi_a-MIVarCommand.$(OBJEXT)
 libmi_a_OBJECTS = $(am_libmi_a_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_mi_OBJECTS = test_mi-test_mi.$(OBJEXT)
@@ -209,7 +208,7 @@ libmi_a_SOURCES = CLICommand.c \
 							MIString.c \
 							MIThread.c \
 							MIThreadCommand.c \
-							MIDisassemble.c \
+							MIDisassembly.c \
 							MIValue.c \
 							MIVar.c \
 							MIVarCommand.c
@@ -300,6 +299,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIBreakCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIBreakpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MICommand.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIDisassembly.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIError.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIExecCommand.Po@am__quote@
@@ -320,7 +320,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIString.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIThread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIThreadCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIDisassemble.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIValue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIVar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmi_a-MIVarCommand.Po@am__quote@
@@ -704,19 +703,19 @@ libmi_a-MIThreadCommand.obj: MIThreadCommand.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MIThreadCommand.obj `if test -f 'MIThreadCommand.c'; then $(CYGPATH_W) 'MIThreadCommand.c'; else $(CYGPATH_W) '$(srcdir)/MIThreadCommand.c'; fi`
 
-libmi_a-MIDisassemble.o: MIDisassemble.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MIDisassemble.o -MD -MP -MF $(DEPDIR)/libmi_a-MIDisassemble.Tpo -c -o libmi_a-MIDisassemble.o `test -f 'MIDisassemble.c' || echo '$(srcdir)/'`MIDisassemble.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmi_a-MIDisassemble.Tpo $(DEPDIR)/libmi_a-MIDisassemble.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='MIDisassemble.c' object='libmi_a-MIDisassemble.o' libtool=no @AMDEPBACKSLASH@
+libmi_a-MIDisassembly.o: MIDisassembly.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MIDisassembly.o -MD -MP -MF $(DEPDIR)/libmi_a-MIDisassembly.Tpo -c -o libmi_a-MIDisassembly.o `test -f 'MIDisassembly.c' || echo '$(srcdir)/'`MIDisassembly.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmi_a-MIDisassembly.Tpo $(DEPDIR)/libmi_a-MIDisassembly.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='MIDisassembly.c' object='libmi_a-MIDisassembly.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MIDisassemble.o `test -f 'MIDisassemble.c' || echo '$(srcdir)/'`MIDisassemble.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MIDisassembly.o `test -f 'MIDisassembly.c' || echo '$(srcdir)/'`MIDisassembly.c
 
-libmi_a-MIDisassemble.obj: MIDisassemble.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MIDisassemble.obj -MD -MP -MF $(DEPDIR)/libmi_a-MIDisassemble.Tpo -c -o libmi_a-MIDisassemble.obj `if test -f 'MIDisassemble.c'; then $(CYGPATH_W) 'MIDisassemble.c'; else $(CYGPATH_W) '$(srcdir)/MIDisassemble.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmi_a-MIDisassemble.Tpo $(DEPDIR)/libmi_a-MIDisassemble.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='MIDisassemble.c' object='libmi_a-MIDisassemble.obj' libtool=no @AMDEPBACKSLASH@
+libmi_a-MIDisassembly.obj: MIDisassembly.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MIDisassembly.obj -MD -MP -MF $(DEPDIR)/libmi_a-MIDisassembly.Tpo -c -o libmi_a-MIDisassembly.obj `if test -f 'MIDisassembly.c'; then $(CYGPATH_W) 'MIDisassembly.c'; else $(CYGPATH_W) '$(srcdir)/MIDisassembly.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmi_a-MIDisassembly.Tpo $(DEPDIR)/libmi_a-MIDisassembly.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='MIDisassembly.c' object='libmi_a-MIDisassembly.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MIDisassemble.obj `if test -f 'MIDisassemble.c'; then $(CYGPATH_W) 'MIDisassemble.c'; else $(CYGPATH_W) '$(srcdir)/MIDisassemble.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o libmi_a-MIDisassembly.obj `if test -f 'MIDisassembly.c'; then $(CYGPATH_W) 'MIDisassembly.c'; else $(CYGPATH_W) '$(srcdir)/MIDisassembly.c'; fi`
 
 libmi_a-MIValue.o: MIValue.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT libmi_a-MIValue.o -MD -MP -MF $(DEPDIR)/libmi_a-MIValue.Tpo -c -o libmi_a-MIValue.o `test -f 'MIValue.c' || echo '$(srcdir)/'`MIValue.c
