@@ -23,7 +23,7 @@ MIAssembleNew(void)
 	MIAssemble *	assemble;
 	assemble = (MIAssemble *)malloc(sizeof(MIAssemble));
 	assemble->addr = NULL;
-	assemble->funcName = NULL;
+	assemble->func_name = NULL;
 	assemble->offset = 0;
 	assemble->inst = NULL;
 	return assemble;	
@@ -34,8 +34,8 @@ MIAssembleFree(MIAssemble *assemble)
 {
 	if (assemble->addr != NULL)
 		free(assemble->addr);
-	if (assemble->funcName != NULL)
-		free(assemble->funcName);
+	if (assemble->func_name != NULL)
+		free(assemble->func_name);
 	if (assemble->inst != NULL)
 		free(assemble->inst);
 	free(assemble);
@@ -62,7 +62,7 @@ MIAssembleParse(MIValue *tuple)
 		if (strcmp(var, "address") == 0 && NULL != str) {
 			assemble->addr = strdup(str);
 		} else if (strcmp(var, "func-name") == 0 && NULL != str) {
-			assemble->funcName = strdup(str);
+			assemble->func_name = strdup(str);
 		} else if (strcmp(var, "inst") == 0 && NULL != str) {
 			assemble->inst = strdup(str);
 		}
