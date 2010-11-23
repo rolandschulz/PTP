@@ -86,7 +86,7 @@ MIDataReadDisassemblyInfoFree(MIDataReadDisassemblyInfo *info)
 }
 
 MIDataReadDisassemblyInfo *
-MIGetDataReadDisassembleInfo(MICommand *cmd)
+MIGetDataReadDisassemblyInfo(MICommand *cmd)
 {
 	char * 						var;
 	MIValue * 					value;
