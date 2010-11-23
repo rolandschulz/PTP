@@ -9,8 +9,8 @@
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
  
-#ifndef _MIDISASSEMBLE_H_
-#define _MIDISASSEMBLE_H_
+#ifndef _MIDISASSEMBLY_H_
+#define _MIDISASSEMBLY_H_
 
 #include "MIList.h"
 #include "MICommand.h"
@@ -36,5 +36,5 @@ extern void							MIDataReadDisassemblyInfoFree(MIDataReadDisassemblyInfo *info)
 extern MIDissasemblyInfo *			MIDissasemblyInfoParse(MIValue *tuple);
 extern MIDataReadDisassemblyInfo *	MIGetDataReadDisassemblyInfo(MICommand *cmd);
 extern MIList *						MIGetDisassemblyList(MIValue *miValue);
-#endif /* _MIDISASSEMBLE_H_ */
+#endif /* _MIDISASSEMBLY_H_ */
 
