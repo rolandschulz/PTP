@@ -16,24 +16,24 @@
 #include "MICommand.h"
 #include "MIValue.h"
 
-struct MIDissasemblyInfo {
+struct MIDisassemblyInfo {
 	char *	addr;
 	char *	func_name;
 	long	offset;
 	char *	inst;
 };
-typedef struct MIDissasemblyInfo MIDissasemblyInfo;
+typedef struct MIDisassemblyInfo MIDisassemblyInfo;
 
 struct MIDataReadDisassemblyInfo {
 	MIList *asm_insns;
 };
 typedef struct MIDataReadDisassemblyInfo MIDataReadDisassemblyInfo;
 
-extern MIDissasemblyInfo *			MIDissasemblyInfoNew(void);
+extern MIDisassemblyInfo *			MIDisassemblyInfoNew(void);
 extern MIDataReadDisassemblyInfo *	MIDataReadDisassembleInfoNew(void);
-extern void							MIDissasemblyInfoFree(MIDissasemblyInfo *info);
+extern void							MIDisassemblyInfoFree(MIDisassemblyInfo *info);
 extern void							MIDataReadDisassemblyInfoFree(MIDataReadDisassemblyInfo *info);
-extern MIDissasemblyInfo *			MIDissasemblyInfoParse(MIValue *tuple);
+extern MIDisassemblyInfo *			MIDisassemblyInfoParse(MIValue *tuple);
 extern MIDataReadDisassemblyInfo *	MIGetDataReadDisassemblyInfo(MICommand *cmd);
 extern MIList *						MIGetDisassemblyList(MIValue *miValue);
 #endif /* _MIDISASSEMBLY_H_ */

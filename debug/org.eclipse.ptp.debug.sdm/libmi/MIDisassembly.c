@@ -17,11 +17,11 @@
 #include "MIResult.h"
 #include "MIDisassembly.h"
 
-MIDissasemblyInfo *
-MIDissasemblyInfoNew(void)
+MIDisassemblyInfo *
+MIDisassemblyInfoNew(void)
 {
-	MIDissasemblyInfo *	info;
-	info = (MIDissasemblyInfo *)malloc(sizeof(MIDissasemblyInfo));
+	MIDisassemblyInfo *	info;
+	info = (MIDisassemblyInfo *)malloc(sizeof(MIDisassemblyInfo));
 	info->addr = NULL;
 	info->func_name = NULL;
 	info->offset = 0;
@@ -30,7 +30,7 @@ MIDissasemblyInfoNew(void)
 }
 
 void 
-MIDissasemblyInfoFree(MIDissasemblyInfo *info)
+MIDisassemblyInfoFree(MIDisassemblyInfo *info)
 {
 	if (info->addr != NULL)
 		free(info->addr);
@@ -41,14 +41,14 @@ MIDissasemblyInfoFree(MIDissasemblyInfo *info)
 	free(info);
 }
 
-MIDissasemblyInfo *
-MIDissasemblyInfoParse(MIValue *tuple)
+MIDisassemblyInfo *
+MIDisassemblyInfoParse(MIValue *tuple)
 {
 	char *				var = NULL;
 	MIValue *			value = NULL;
 	MIResult *			result = NULL;
 	MIList *			results = tuple->results;
-	MIDissasemblyInfo *	info = MIDissasemblyInfoNew();
+	MIDisassemblyInfo *	info = MIDisassemblyInfoNew();
 	
 	for (MIListSet(results); (result = (MIResult *)MIListGet(results)) != NULL;) {
 		var = result->variable;
@@ -81,7 +81,7 @@ void
 MIDataReadDisassemblyInfoFree(MIDataReadDisassemblyInfo *info)
 {
 	if (info->asm_insns != NULL)
-		MIListFree(info->asm_insns, MIDissasemblyInfoFree);
+		MIListFree(info->asm_insns, MIDisassemblyInfoFree);
 	free(info);
 }
 
@@ -122,7 +122,7 @@ MIGetDisassemblyList(MIValue *miValue)
 	if (values != NULL) {
 		for (MIListSet(values); (value = (MIValue *)MIListGet(values)) != NULL;) {
 			if (value->type == MIValueTypeTuple) {
-				MIListAdd(list, (void *)MIDissasemblyInfoParse(value));
+				MIListAdd(list, (void *)MIDisassemblyInfoParse(value));
 			}
 		}
 	}
