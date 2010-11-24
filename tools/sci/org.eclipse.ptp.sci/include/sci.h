@@ -235,11 +235,6 @@ int SCI_Filter_upload(int filter_id, sci_group_t group, int num_bufs, void *bufs
 int SCI_BE_add(sci_be_t *be);
 int SCI_BE_remove(int be_id);
 
-/*
-** SCI release sesion but keep the socket descripters to support third-party
-*/
-int SCI_Release();
-
 #ifdef __cplusplus
 }
 #endif
