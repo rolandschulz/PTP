@@ -6,8 +6,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
  
+#include "config.h"
+
 #include "gdb.h"
-#include "x10_metadebug_info_map.h"
+#include "x10/x10_metadebug_info_map.h"
 
 //#include "x10_variable.h"
 

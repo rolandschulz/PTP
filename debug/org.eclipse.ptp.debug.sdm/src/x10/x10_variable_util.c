@@ -6,9 +6,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
  
+#include "config.h"
+
 #include <stdlib.h>
-#include "x10_variable_util.h"
-#include "x10_metadebug_info_map.h"
+
+#include "x10/x10_variable_util.h"
+#include "x10/x10_metadebug_info_map.h"
 
 /*
  * Built up the variable information of the input variable name, depending on the input context (C++ file name + line number).

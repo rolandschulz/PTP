@@ -11,8 +11,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "x10_da.h"
-#include "x10_metadebug_info_map.h"
+#include "x10/x10_da.h"
+#include "x10/x10_metadebug_info_map.h"
 
 #define FALSE 0
 #define TRUE  1

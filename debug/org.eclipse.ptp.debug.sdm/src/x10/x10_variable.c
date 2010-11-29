@@ -6,9 +6,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 
-#include "x10_variable.h"
+#include "x10/x10_variable.h"
 
 /*
  * Create a new x10variable_t

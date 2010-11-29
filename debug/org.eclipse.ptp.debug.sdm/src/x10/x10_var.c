@@ -5,10 +5,12 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
- 
+
+#include "config.h"
+
 #include <stdlib.h>
 
-#include "x10_var.h"
+#include "x10/x10_var.h"
 
 /*
  * Create a new x10_var.

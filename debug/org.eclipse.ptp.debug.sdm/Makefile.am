@@ -1,4 +1,4 @@
-SUBDIRS =					libaif libmi libx10
+SUBDIRS =					libaif libmi
 
 bin_PROGRAMS =				sdm
 noinst_PROGRAMS =			sdm_test
@@ -12,7 +12,7 @@ sdm_SOURCES =				src/master/startup.c\
 							src/server/gdbmi_backend.c \
 							src/server/test_backend.c
 sdm_CFLAGS =				-I./include -I./libaif -I./libmi $(AM_CFLAGS)
-sdm_LDADD =					libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a libx10/libx10.a @SVR_LIBS@
+sdm_LDADD =					libsdm.a libdbgutils.a libx10.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
 							
 libsdm_a_SOURCES =			src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
@@ -45,9 +45,18 @@ noinst_HEADERS =			include/backend.h \
 							include/sdm.h \
 							include/session.h \
 							include/stackframe.h \
-							include/signal_info.h
+							include/signal_info.h \
+							include/x10/metadata_header.h \
+							include/x10/x10_aif.h \
+							include/x10/x10_da.h \
+							include/x10/x10_dbg_types.h \
+							include/x10/x10_debug_line_info.h \
+							include/x10/x10_metadebug_info_map.h \
+							include/x10/x10_var.h \
+							include/x10/x10_variable.h \
+							include/x10/x10_variable_util.h
 
-noinst_LIBRARIES =			libsdm.a libdbgclnt.a libdbgutils.a
+noinst_LIBRARIES =			libsdm.a libdbgclnt.a libdbgutils.a libx10.a
 
 libdbgclnt_a_SOURCES =		src/client/client_interface.c 
 libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
@@ -67,3 +76,14 @@ libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/gdb_mi.c
 						
 libdbgutils_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
+
+
+libx10_a_SOURCES =			src/x10/x10_gdbmi_backend.c \
+							src/x10/x10_aif.c \
+							src/x10/x10_da.c \
+							src/x10/x10_var.c \
+							src/x10/x10_variable.c \
+							src/x10/x10_metadebug_info_map.c \
+							src/x10/x10_variable_util.c
+						
+libx10_a_CFLAGS =			-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
