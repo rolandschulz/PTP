@@ -27,6 +27,7 @@
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "memoryinfo.h"
+#include "disassembly.h"
 #include "dbg_error.h"
 #include "dbg_event.h"
 #include "list.h"
@@ -101,8 +102,8 @@ extern void DbgRegisterEventHandler(session *s, void (*)(dbg_event *, void *), v
 /*
  * Error Handling
  */
-extern void	DbgSetError(int, char *);
-extern int	DbgGetError(void);
+extern void		DbgSetError(int, char *);
+extern int		DbgGetError(void);
 extern char *	DbgGetErrorStr(void);
 
 /*

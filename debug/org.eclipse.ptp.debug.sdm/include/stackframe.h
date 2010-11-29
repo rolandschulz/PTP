@@ -24,6 +24,7 @@
 
 struct stackframe {
 	int		level;
+	int     gdb_level;
 	location	loc;
 };
 typedef struct stackframe stackframe;

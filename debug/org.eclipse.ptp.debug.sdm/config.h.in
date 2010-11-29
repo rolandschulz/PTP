@@ -140,3 +140,6 @@ extern void debug_printargs(int, char *, int, char **);
 
 /* Version number of package */
 #undef VERSION
+
+/* Enable X10 support */
+#undef X10_BACKEND

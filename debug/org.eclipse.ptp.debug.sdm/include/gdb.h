@@ -26,6 +26,7 @@
 
 #include "stackframe.h"
 #include "breakpoint.h"
+#include "memoryinfo.h"
 
 #define GDB_BUG_2188	__gnu_linux__ && __i386__ && __GNUC__ == 4 && __GNUC_MINOR__ == 1
 
@@ -58,6 +59,7 @@ extern breakpoint *	ConvertMIBreakpoint(MIBreakpoint *bp);
 extern MIVar *		CreateMIVar(MISession *session, char *expr);
 extern void			DeleteMIVar(MISession *session, char *mi_name);
 extern int			GetAddressLength(MISession *session);
+extern int			GetSizeOf(MISession *session, char* type);
 extern List *		GetChangedVariables(MISession *session);
 extern stackframe *	GetCurrentFrame(MISession *session);
 extern int			GetGDBVersion(MISession *session, float * version);
@@ -69,6 +71,7 @@ extern int			GetStackframes(MISession *session, int current, int low, int high, 
 extern char *		GetVarValue(MISession *session, char *var);
 extern void			SendCommandWait(MISession *session, MICommand *cmd);
 extern void			SetDebugError(MICommand * cmd);
+extern memoryinfo * GetMemoryInfo(MISession *session, long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar);
 #if GDB_BUG_2188
 extern int			CurrentFrame(MISession *session, int level, char *name);
 #endif /* GDB_BUG_2188 */

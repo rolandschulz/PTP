@@ -26,8 +26,8 @@ stackframe *
 NewStackframe(int level)
 {
 	stackframe *	sf = (stackframe *)malloc(sizeof(stackframe));
-	
 	sf->level = level;
+	sf->gdb_level = level;	/* When initializing, always make sure level and gdb_level are set to the same */
 	sf->loc.file = NULL;
 	sf->loc.func = NULL;
 	sf->loc.addr = NULL;

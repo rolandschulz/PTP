@@ -16,10 +16,11 @@ dnl Eclipse adds version number to end of package when deploying via update site
 dnl
 
 VERSION="_$PACKAGE_VERSION"
-if [ `expr "$VERSION" : "_@[^@]*@"` -gt 0 ]; then
+if test `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
 	VERSION=
 fi
-UTILS="../org.eclipse.ptp.utils"
+
+UTILS="`pwd`/../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}${VERSION}`"
 	if test ! -d $UTILS; then
@@ -27,7 +28,7 @@ if test ! -d $UTILS; then
 	fi
 fi
 
-PROXY="../org.eclipse.ptp.proxy"
+PROXY="`pwd`/../org.eclipse.ptp.proxy"
 if test ! -d $PROXY; then
 	PROXY="`echo ${PROXY}${VERSION}`"
 	if test ! -d $PROXY; then
@@ -101,6 +102,11 @@ AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gethostname select strdup strstr strtoul sigset sighold sigrelse)
 
+dnl
+dnl Enable X10 backend
+dnl
+AC_DEFINE([X10_BACKEND], [1], [Enable X10 support])
+
 AH_VERBATIM([DEBUG],
 [#define DEBUG
 #ifdef DEBUG
@@ -126,6 +132,6 @@ extern void debug_printargs(int, char *, int, char **);
 #define DEBUG_PRINTA(level,str,n,args)
 #endif /* DEBUG */])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile libx10/Makefile])
 AC_CONFIG_SUBDIRS([libaif libmi])
 AC_OUTPUT
