@@ -31,9 +31,9 @@
 
 #include "MI.h"
 
-#include "x10_aif.h"
-#include "x10_metadebug_info_map.h"
-#include "x10_variable_util.h"
+#include "x10/x10_aif.h"
+#include "x10/x10_metadebug_info_map.h"
+#include "x10/x10_variable_util.h"
 
 #define X10_DEBUG 		"_X10_DEBUG"
 #define X10_DEBUG_DATA 	"_X10_DEBUG_DATA"

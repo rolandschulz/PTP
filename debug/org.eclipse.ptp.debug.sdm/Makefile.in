@@ -86,6 +86,16 @@ am_libsdm_a_OBJECTS = src/impl/libsdm_a-sdm.$(OBJEXT) \
 	src/impl/libsdm_a-sdm_routing_table_file.$(OBJEXT) \
 	src/impl/libsdm_a-sdm_set_bitset.$(OBJEXT)
 libsdm_a_OBJECTS = $(am_libsdm_a_OBJECTS)
+libx10_a_AR = $(AR) $(ARFLAGS)
+libx10_a_LIBADD =
+am_libx10_a_OBJECTS = src/x10/libx10_a-x10_gdbmi_backend.$(OBJEXT) \
+	src/x10/libx10_a-x10_aif.$(OBJEXT) \
+	src/x10/libx10_a-x10_da.$(OBJEXT) \
+	src/x10/libx10_a-x10_var.$(OBJEXT) \
+	src/x10/libx10_a-x10_variable.$(OBJEXT) \
+	src/x10/libx10_a-x10_metadebug_info_map.$(OBJEXT) \
+	src/x10/libx10_a-x10_variable_util.$(OBJEXT)
+libx10_a_OBJECTS = $(am_libx10_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
@@ -98,8 +108,8 @@ am_sdm_OBJECTS = src/master/sdm-startup.$(OBJEXT) \
 	src/server/sdm-gdbmi_backend.$(OBJEXT) \
 	src/server/sdm-test_backend.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
-sdm_DEPENDENCIES = libsdm.a libdbgutils.a libmi/libmi.a \
-	libaif/libaif.a libmi/libmi.a libx10/libx10.a
+sdm_DEPENDENCIES = libsdm.a libdbgutils.a libx10.a libmi/libmi.a \
+	libaif/libaif.a libmi/libmi.a
 sdm_LINK = $(CCLD) $(sdm_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
 am_sdm_test_OBJECTS = src/test/sdm_test-sdm_test.$(OBJEXT)
@@ -116,9 +126,11 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(sdm_test_SOURCES)
+	$(libsdm_a_SOURCES) $(libx10_a_SOURCES) $(sdm_SOURCES) \
+	$(sdm_test_SOURCES)
 DIST_SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libsdm_a_SOURCES) $(sdm_SOURCES) $(sdm_test_SOURCES)
+	$(libsdm_a_SOURCES) $(libx10_a_SOURCES) $(sdm_SOURCES) \
+	$(sdm_test_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -235,7 +247,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = libaif libmi libx10
+SUBDIRS = libaif libmi
 sdm_SOURCES = src/master/startup.c\
 							src/master/master.c \
 							src/master/master_cmds.c \
@@ -246,7 +258,7 @@ sdm_SOURCES = src/master/startup.c\
 							src/server/test_backend.c
 
 sdm_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS)
-sdm_LDADD = libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a libx10/libx10.a @SVR_LIBS@
+sdm_LDADD = libsdm.a libdbgutils.a libx10.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
 libsdm_a_SOURCES = src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_hello_proto.c \
@@ -276,9 +288,18 @@ noinst_HEADERS = include/backend.h \
 							include/sdm.h \
 							include/session.h \
 							include/stackframe.h \
-							include/signal_info.h
+							include/signal_info.h \
+							include/x10/metadata_header.h \
+							include/x10/x10_aif.h \
+							include/x10/x10_da.h \
+							include/x10/x10_dbg_types.h \
+							include/x10/x10_debug_line_info.h \
+							include/x10/x10_metadebug_info_map.h \
+							include/x10/x10_var.h \
+							include/x10/x10_variable.h \
+							include/x10/x10_variable_util.h
 
-noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a
+noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a libx10.a
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
 libdbgclnt_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES = src/utils/error.c \
@@ -296,6 +317,15 @@ libdbgutils_a_SOURCES = src/utils/error.c \
 							src/utils/gdb_mi.c
 
 libdbgutils_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
+libx10_a_SOURCES = src/x10/x10_gdbmi_backend.c \
+							src/x10/x10_aif.c \
+							src/x10/x10_da.c \
+							src/x10/x10_var.c \
+							src/x10/x10_variable.c \
+							src/x10/x10_metadebug_info_map.c \
+							src/x10/x10_variable_util.c
+
+libx10_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -427,6 +457,30 @@ libsdm.a: $(libsdm_a_OBJECTS) $(libsdm_a_DEPENDENCIES)
 	-rm -f libsdm.a
 	$(libsdm_a_AR) libsdm.a $(libsdm_a_OBJECTS) $(libsdm_a_LIBADD)
 	$(RANLIB) libsdm.a
+src/x10/$(am__dirstamp):
+	@$(MKDIR_P) src/x10
+	@: > src/x10/$(am__dirstamp)
+src/x10/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) src/x10/$(DEPDIR)
+	@: > src/x10/$(DEPDIR)/$(am__dirstamp)
+src/x10/libx10_a-x10_gdbmi_backend.$(OBJEXT): src/x10/$(am__dirstamp) \
+	src/x10/$(DEPDIR)/$(am__dirstamp)
+src/x10/libx10_a-x10_aif.$(OBJEXT): src/x10/$(am__dirstamp) \
+	src/x10/$(DEPDIR)/$(am__dirstamp)
+src/x10/libx10_a-x10_da.$(OBJEXT): src/x10/$(am__dirstamp) \
+	src/x10/$(DEPDIR)/$(am__dirstamp)
+src/x10/libx10_a-x10_var.$(OBJEXT): src/x10/$(am__dirstamp) \
+	src/x10/$(DEPDIR)/$(am__dirstamp)
+src/x10/libx10_a-x10_variable.$(OBJEXT): src/x10/$(am__dirstamp) \
+	src/x10/$(DEPDIR)/$(am__dirstamp)
+src/x10/libx10_a-x10_metadebug_info_map.$(OBJEXT):  \
+	src/x10/$(am__dirstamp) src/x10/$(DEPDIR)/$(am__dirstamp)
+src/x10/libx10_a-x10_variable_util.$(OBJEXT): src/x10/$(am__dirstamp) \
+	src/x10/$(DEPDIR)/$(am__dirstamp)
+libx10.a: $(libx10_a_OBJECTS) $(libx10_a_DEPENDENCIES) 
+	-rm -f libx10.a
+	$(libx10_a_AR) libx10.a $(libx10_a_OBJECTS) $(libx10_a_LIBADD)
+	$(RANLIB) libx10.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -528,6 +582,13 @@ mostlyclean-compile:
 	-rm -f src/utils/libdbgutils_a-signal_info.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-stackframe.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-threadmap.$(OBJEXT)
+	-rm -f src/x10/libx10_a-x10_aif.$(OBJEXT)
+	-rm -f src/x10/libx10_a-x10_da.$(OBJEXT)
+	-rm -f src/x10/libx10_a-x10_gdbmi_backend.$(OBJEXT)
+	-rm -f src/x10/libx10_a-x10_metadebug_info_map.$(OBJEXT)
+	-rm -f src/x10/libx10_a-x10_var.$(OBJEXT)
+	-rm -f src/x10/libx10_a-x10_variable.$(OBJEXT)
+	-rm -f src/x10/libx10_a-x10_variable_util.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -562,6 +623,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-signal_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-stackframe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-threadmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/x10/$(DEPDIR)/libx10_a-x10_aif.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/x10/$(DEPDIR)/libx10_a-x10_da.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/x10/$(DEPDIR)/libx10_a-x10_gdbmi_backend.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/x10/$(DEPDIR)/libx10_a-x10_metadebug_info_map.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/x10/$(DEPDIR)/libx10_a-x10_var.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/x10/$(DEPDIR)/libx10_a-x10_variable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/x10/$(DEPDIR)/libx10_a-x10_variable_util.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -872,6 +940,104 @@ src/impl/libsdm_a-sdm_set_bitset.obj: src/impl/sdm_set_bitset.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/impl/sdm_set_bitset.c' object='src/impl/libsdm_a-sdm_set_bitset.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdm_a_CFLAGS) $(CFLAGS) -c -o src/impl/libsdm_a-sdm_set_bitset.obj `if test -f 'src/impl/sdm_set_bitset.c'; then $(CYGPATH_W) 'src/impl/sdm_set_bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/impl/sdm_set_bitset.c'; fi`
+
+src/x10/libx10_a-x10_gdbmi_backend.o: src/x10/x10_gdbmi_backend.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_gdbmi_backend.o -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_gdbmi_backend.Tpo -c -o src/x10/libx10_a-x10_gdbmi_backend.o `test -f 'src/x10/x10_gdbmi_backend.c' || echo '$(srcdir)/'`src/x10/x10_gdbmi_backend.c
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_gdbmi_backend.Tpo src/x10/$(DEPDIR)/libx10_a-x10_gdbmi_backend.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_gdbmi_backend.c' object='src/x10/libx10_a-x10_gdbmi_backend.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_gdbmi_backend.o `test -f 'src/x10/x10_gdbmi_backend.c' || echo '$(srcdir)/'`src/x10/x10_gdbmi_backend.c
+
+src/x10/libx10_a-x10_gdbmi_backend.obj: src/x10/x10_gdbmi_backend.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_gdbmi_backend.obj -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_gdbmi_backend.Tpo -c -o src/x10/libx10_a-x10_gdbmi_backend.obj `if test -f 'src/x10/x10_gdbmi_backend.c'; then $(CYGPATH_W) 'src/x10/x10_gdbmi_backend.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_gdbmi_backend.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_gdbmi_backend.Tpo src/x10/$(DEPDIR)/libx10_a-x10_gdbmi_backend.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_gdbmi_backend.c' object='src/x10/libx10_a-x10_gdbmi_backend.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_gdbmi_backend.obj `if test -f 'src/x10/x10_gdbmi_backend.c'; then $(CYGPATH_W) 'src/x10/x10_gdbmi_backend.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_gdbmi_backend.c'; fi`
+
+src/x10/libx10_a-x10_aif.o: src/x10/x10_aif.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_aif.o -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_aif.Tpo -c -o src/x10/libx10_a-x10_aif.o `test -f 'src/x10/x10_aif.c' || echo '$(srcdir)/'`src/x10/x10_aif.c
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_aif.Tpo src/x10/$(DEPDIR)/libx10_a-x10_aif.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_aif.c' object='src/x10/libx10_a-x10_aif.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_aif.o `test -f 'src/x10/x10_aif.c' || echo '$(srcdir)/'`src/x10/x10_aif.c
+
+src/x10/libx10_a-x10_aif.obj: src/x10/x10_aif.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_aif.obj -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_aif.Tpo -c -o src/x10/libx10_a-x10_aif.obj `if test -f 'src/x10/x10_aif.c'; then $(CYGPATH_W) 'src/x10/x10_aif.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_aif.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_aif.Tpo src/x10/$(DEPDIR)/libx10_a-x10_aif.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_aif.c' object='src/x10/libx10_a-x10_aif.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_aif.obj `if test -f 'src/x10/x10_aif.c'; then $(CYGPATH_W) 'src/x10/x10_aif.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_aif.c'; fi`
+
+src/x10/libx10_a-x10_da.o: src/x10/x10_da.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_da.o -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_da.Tpo -c -o src/x10/libx10_a-x10_da.o `test -f 'src/x10/x10_da.c' || echo '$(srcdir)/'`src/x10/x10_da.c
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_da.Tpo src/x10/$(DEPDIR)/libx10_a-x10_da.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_da.c' object='src/x10/libx10_a-x10_da.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_da.o `test -f 'src/x10/x10_da.c' || echo '$(srcdir)/'`src/x10/x10_da.c
+
+src/x10/libx10_a-x10_da.obj: src/x10/x10_da.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_da.obj -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_da.Tpo -c -o src/x10/libx10_a-x10_da.obj `if test -f 'src/x10/x10_da.c'; then $(CYGPATH_W) 'src/x10/x10_da.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_da.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_da.Tpo src/x10/$(DEPDIR)/libx10_a-x10_da.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_da.c' object='src/x10/libx10_a-x10_da.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_da.obj `if test -f 'src/x10/x10_da.c'; then $(CYGPATH_W) 'src/x10/x10_da.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_da.c'; fi`
+
+src/x10/libx10_a-x10_var.o: src/x10/x10_var.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_var.o -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_var.Tpo -c -o src/x10/libx10_a-x10_var.o `test -f 'src/x10/x10_var.c' || echo '$(srcdir)/'`src/x10/x10_var.c
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_var.Tpo src/x10/$(DEPDIR)/libx10_a-x10_var.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_var.c' object='src/x10/libx10_a-x10_var.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_var.o `test -f 'src/x10/x10_var.c' || echo '$(srcdir)/'`src/x10/x10_var.c
+
+src/x10/libx10_a-x10_var.obj: src/x10/x10_var.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_var.obj -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_var.Tpo -c -o src/x10/libx10_a-x10_var.obj `if test -f 'src/x10/x10_var.c'; then $(CYGPATH_W) 'src/x10/x10_var.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_var.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_var.Tpo src/x10/$(DEPDIR)/libx10_a-x10_var.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_var.c' object='src/x10/libx10_a-x10_var.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_var.obj `if test -f 'src/x10/x10_var.c'; then $(CYGPATH_W) 'src/x10/x10_var.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_var.c'; fi`
+
+src/x10/libx10_a-x10_variable.o: src/x10/x10_variable.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_variable.o -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_variable.Tpo -c -o src/x10/libx10_a-x10_variable.o `test -f 'src/x10/x10_variable.c' || echo '$(srcdir)/'`src/x10/x10_variable.c
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_variable.Tpo src/x10/$(DEPDIR)/libx10_a-x10_variable.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_variable.c' object='src/x10/libx10_a-x10_variable.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_variable.o `test -f 'src/x10/x10_variable.c' || echo '$(srcdir)/'`src/x10/x10_variable.c
+
+src/x10/libx10_a-x10_variable.obj: src/x10/x10_variable.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_variable.obj -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_variable.Tpo -c -o src/x10/libx10_a-x10_variable.obj `if test -f 'src/x10/x10_variable.c'; then $(CYGPATH_W) 'src/x10/x10_variable.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_variable.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_variable.Tpo src/x10/$(DEPDIR)/libx10_a-x10_variable.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_variable.c' object='src/x10/libx10_a-x10_variable.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_variable.obj `if test -f 'src/x10/x10_variable.c'; then $(CYGPATH_W) 'src/x10/x10_variable.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_variable.c'; fi`
+
+src/x10/libx10_a-x10_metadebug_info_map.o: src/x10/x10_metadebug_info_map.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_metadebug_info_map.o -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_metadebug_info_map.Tpo -c -o src/x10/libx10_a-x10_metadebug_info_map.o `test -f 'src/x10/x10_metadebug_info_map.c' || echo '$(srcdir)/'`src/x10/x10_metadebug_info_map.c
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_metadebug_info_map.Tpo src/x10/$(DEPDIR)/libx10_a-x10_metadebug_info_map.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_metadebug_info_map.c' object='src/x10/libx10_a-x10_metadebug_info_map.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_metadebug_info_map.o `test -f 'src/x10/x10_metadebug_info_map.c' || echo '$(srcdir)/'`src/x10/x10_metadebug_info_map.c
+
+src/x10/libx10_a-x10_metadebug_info_map.obj: src/x10/x10_metadebug_info_map.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_metadebug_info_map.obj -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_metadebug_info_map.Tpo -c -o src/x10/libx10_a-x10_metadebug_info_map.obj `if test -f 'src/x10/x10_metadebug_info_map.c'; then $(CYGPATH_W) 'src/x10/x10_metadebug_info_map.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_metadebug_info_map.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_metadebug_info_map.Tpo src/x10/$(DEPDIR)/libx10_a-x10_metadebug_info_map.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_metadebug_info_map.c' object='src/x10/libx10_a-x10_metadebug_info_map.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_metadebug_info_map.obj `if test -f 'src/x10/x10_metadebug_info_map.c'; then $(CYGPATH_W) 'src/x10/x10_metadebug_info_map.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_metadebug_info_map.c'; fi`
+
+src/x10/libx10_a-x10_variable_util.o: src/x10/x10_variable_util.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_variable_util.o -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_variable_util.Tpo -c -o src/x10/libx10_a-x10_variable_util.o `test -f 'src/x10/x10_variable_util.c' || echo '$(srcdir)/'`src/x10/x10_variable_util.c
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_variable_util.Tpo src/x10/$(DEPDIR)/libx10_a-x10_variable_util.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_variable_util.c' object='src/x10/libx10_a-x10_variable_util.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_variable_util.o `test -f 'src/x10/x10_variable_util.c' || echo '$(srcdir)/'`src/x10/x10_variable_util.c
+
+src/x10/libx10_a-x10_variable_util.obj: src/x10/x10_variable_util.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -MT src/x10/libx10_a-x10_variable_util.obj -MD -MP -MF src/x10/$(DEPDIR)/libx10_a-x10_variable_util.Tpo -c -o src/x10/libx10_a-x10_variable_util.obj `if test -f 'src/x10/x10_variable_util.c'; then $(CYGPATH_W) 'src/x10/x10_variable_util.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_variable_util.c'; fi`
+@am__fastdepCC_TRUE@	mv -f src/x10/$(DEPDIR)/libx10_a-x10_variable_util.Tpo src/x10/$(DEPDIR)/libx10_a-x10_variable_util.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/x10/x10_variable_util.c' object='src/x10/libx10_a-x10_variable_util.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libx10_a_CFLAGS) $(CFLAGS) -c -o src/x10/libx10_a-x10_variable_util.obj `if test -f 'src/x10/x10_variable_util.c'; then $(CYGPATH_W) 'src/x10/x10_variable_util.c'; else $(CYGPATH_W) '$(srcdir)/src/x10/x10_variable_util.c'; fi`
 
 src/master/sdm-startup.o: src/master/startup.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/master/sdm-startup.o -MD -MP -MF src/master/$(DEPDIR)/sdm-startup.Tpo -c -o src/master/sdm-startup.o `test -f 'src/master/startup.c' || echo '$(srcdir)/'`src/master/startup.c
@@ -1312,6 +1478,8 @@ distclean-generic:
 	-rm -f src/test/$(am__dirstamp)
 	-rm -f src/utils/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/utils/$(am__dirstamp)
+	-rm -f src/x10/$(DEPDIR)/$(am__dirstamp)
+	-rm -f src/x10/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1323,7 +1491,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-noinstLIBRARIES \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
+	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR) src/x10/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
@@ -1359,7 +1527,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
+	-rm -rf src/client/$(DEPDIR) src/impl/$(DEPDIR) src/master/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR) src/x10/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

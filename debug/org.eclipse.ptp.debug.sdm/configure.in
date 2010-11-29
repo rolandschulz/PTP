@@ -132,6 +132,6 @@ extern void debug_printargs(int, char *, int, char **);
 #define DEBUG_PRINTA(level,str,n,args)
 #endif /* DEBUG */])
 
-AC_CONFIG_FILES([Makefile libx10/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_CONFIG_SUBDIRS([libaif libmi])
 AC_OUTPUT

@@ -10,7 +10,6 @@
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
 
-#include "x10_da.h"
 #include "config.h"
 
 #include <stdlib.h>
@@ -20,8 +19,9 @@
 #include "dbg.h"
 #include "dbg_error.h"
 #include "gdb.h"
-#include "x10_aif.h"
-#include "x10_var.h"
+#include "x10/x10_da.h"
+#include "x10/x10_aif.h"
+#include "x10/x10_var.h"
 
 extern int GetArrayElementType(x10variable_t * var);
 

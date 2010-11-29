@@ -5728,7 +5728,7 @@ _ACEOF
 
 
 
-ac_config_files="$ac_config_files Makefile libx10/Makefile"
+ac_config_files="$ac_config_files Makefile"
 
 subdirs="$subdirs libaif libmi"
 
@@ -6312,7 +6312,6 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "libx10/Makefile") CONFIG_FILES="$CONFIG_FILES libx10/Makefile" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
