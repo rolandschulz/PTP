@@ -1,4 +1,4 @@
-SUBDIRS =					libaif libmi
+SUBDIRS =					libaif libmi libx10
 
 bin_PROGRAMS =				sdm
 noinst_PROGRAMS =			sdm_test
@@ -11,8 +11,8 @@ sdm_SOURCES =				src/master/startup.c\
 							src/server/backend.c \
 							src/server/gdbmi_backend.c \
 							src/server/test_backend.c
-sdm_CFLAGS =				-I./include -I./libaif -I./libmi  $(AM_CFLAGS)
-sdm_LDADD =					libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+sdm_CFLAGS =				-I./include -I./libaif -I./libmi $(AM_CFLAGS)
+sdm_LDADD =					libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a libx10/libx10.a @SVR_LIBS@
 							
 libsdm_a_SOURCES =			src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
@@ -40,6 +40,7 @@ noinst_HEADERS =			include/backend.h \
 							include/itimer.h \
 							include/location.h \
 							include/memoryinfo.h \
+							include/disassembly.h \
 							include/routing_table.h \
 							include/sdm.h \
 							include/session.h \
@@ -54,11 +55,13 @@ libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES =		src/utils/error.c \
 							src/utils/breakpoint.c \
 							src/utils/bpmap.c \
+							src/utils/threadmap.c \
 							src/utils/stackframe.c \
 							src/utils/signal_info.c \
 							src/utils/event.c \
 							src/utils/itimer.c \
 							src/utils/memoryinfo.c \
+							src/utils/disassembly.c \
 							src/utils/debug.c \
 							src/utils/gdb_aif.c \
 							src/utils/gdb_mi.c

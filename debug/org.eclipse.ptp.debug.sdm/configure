@@ -2269,10 +2269,11 @@ case $build_os in *\ *) build_os=`echo "$build_os" | sed 's/ /-/g'`;; esac
 
 
 VERSION="_$PACKAGE_VERSION"
-if  `expr "$VERSION" : "_@[^@]*@"` -gt 0 ; then
+if test `expr "$VERSION" : "_@^@*@"` -gt 0 ; then
 	VERSION=
 fi
-UTILS="../org.eclipse.ptp.utils"
+
+UTILS="`pwd`/../org.eclipse.ptp.utils"
 if test ! -d $UTILS; then
 	UTILS="`echo ${UTILS}${VERSION}`"
 	if test ! -d $UTILS; then
@@ -2282,7 +2283,7 @@ echo "$as_me: error: utils directory not found" >&2;}
 	fi
 fi
 
-PROXY="../org.eclipse.ptp.proxy"
+PROXY="`pwd`/../org.eclipse.ptp.proxy"
 if test ! -d $PROXY; then
 	PROXY="`echo ${PROXY}${VERSION}`"
 	if test ! -d $PROXY; then
@@ -5719,9 +5720,15 @@ done
 
 
 
+cat >>confdefs.h <<\_ACEOF
+#define X10_BACKEND 1
+_ACEOF
 
 
-ac_config_files="$ac_config_files Makefile"
+
+
+
+ac_config_files="$ac_config_files Makefile libx10/Makefile"
 
 subdirs="$subdirs libaif libmi"
 
@@ -6305,6 +6312,7 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "libx10/Makefile") CONFIG_FILES="$CONFIG_FILES libx10/Makefile" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

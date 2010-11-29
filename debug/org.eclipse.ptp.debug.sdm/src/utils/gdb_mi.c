@@ -348,6 +348,36 @@ GetAddressLength(MISession *session)
 	return _address_length;
 }
 
+int
+GetSizeOf(MISession *session, char* type)
+{
+	char * 		res = NULL;
+	MICommand * cmd = NULL;
+	int result = 0;
+	int inputLength = 20 + strlen(type);
+	char *input = (char*)malloc(inputLength);
+	strcpy(input, "\"sizeof(");
+	strcat(input, type);
+	strcat(input, ")\"");
+	cmd = MIDataEvaluateExpression(input);
+	SendCommandWait(session, cmd);
+	if (!MICommandResultOK(cmd)) {
+		SetDebugError(cmd);
+		MICommandFree(cmd);
+		return 0;
+	}
+	res = MIGetDataEvaluateExpressionInfo(cmd);
+	MICommandFree(cmd);
+
+	result = (int)strtol(res, NULL, 10);
+	free(input);
+	free(res);
+
+	return result;
+}
+
+
+
 /*
  * Try to find the type of a variable using the 'ptype'
  * command. First try using the type field, or if this
@@ -513,4 +543,61 @@ SetDebugError(MICommand * cmd)
 	} else {
 		DbgSetError(DBGERR_DEBUGGER, "bad response from gdb");
 	}
+}
+
+memoryinfo *
+GetMemoryInfo(MISession *session, long offset, char* address, char* format, int wordSize, int rows, int cols, char* asChar)
+{
+	MICommand *	cmd;
+	MIDataReadMemoryInfo * info;
+	MIMemory * mem;
+	memoryinfo *meminfo = NULL;
+	memory * m;
+
+	cmd = MIDataReadMemory(offset, address, format, wordSize, rows, cols, asChar);
+	SendCommandWait(session, cmd);
+	if (!MICommandResultOK(cmd)) {
+		SetDebugError(cmd);
+		MICommandFree(cmd);
+		return NULL;
+	}
+	info = MIGetDataReadMemoryInfo(cmd);
+	MICommandFree(cmd);
+
+	if (info != NULL) {
+		meminfo = NewMemoryInfo();
+		if (info->addr != NULL) {
+			meminfo->addr = strdup(info->addr);
+		}
+		meminfo->nextRow = info->nextRow;
+		meminfo->prevRow = info->prevRow;
+		meminfo->nextPage = info->nextPage;
+		meminfo->prevPage = info->prevPage;
+		meminfo->numBytes = info->numBytes;
+		meminfo->totalBytes = info->totalBytes;
+		if (info->memories != NULL ) {
+			meminfo->memories = NewList();
+			for (MIListSet(info->memories); (mem = (MIMemory *)MIListGet(info->memories)) != NULL;) {
+				m = NewMemory();
+				if (mem->addr != NULL) {
+					m->addr = strdup(mem->addr);
+				}
+				if (mem->ascii != NULL) {
+					m->ascii = strdup(mem->ascii);
+				}
+				if (mem->data != NULL) {
+					char* d;
+					m->data = NewList();
+					for (MIListSet(mem->data); (d = (char *)MIListGet(mem->data)) != NULL;) {
+						AddToList(m->data, (void *) strdup(d));
+					}
+				}
+				AddToList(meminfo->memories, (void *)m);
+			}
+		}
+	}
+	
+	MIDataReadMemoryInfoFree(info);
+	
+	return meminfo;
 }

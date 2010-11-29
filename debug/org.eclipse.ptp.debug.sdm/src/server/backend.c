@@ -22,10 +22,16 @@
 #include "backend.h"
 
 extern dbg_backend_funcs	GDBMIBackend;
+#ifdef X10_BACKEND
+extern dbg_backend_funcs	X10GDBMIBackend;
+#endif /* X10_BACKEND */
 extern dbg_backend_funcs	TestBackend;
 
 dbg_backend	dbg_backends[] = {
 	{"gdb-mi", &GDBMIBackend, "gdb"},
+#ifdef X10_BACKEND
+	{"x10-gdb-mi", &X10GDBMIBackend, "gdb"},
+#endif /* X10_BACKEND */
 	{"test", &TestBackend, NULL}
 };
 
