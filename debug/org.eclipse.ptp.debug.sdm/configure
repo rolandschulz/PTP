@@ -5727,8 +5727,8 @@ if test "${enable_x10+set}" = set; then
   enableval=$enable_x10; case "${enableval}" in
        yes) X10_BACKEND=1 ;;
        no)  X10_BACKEND=0 ;;
-       *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --disable-x10" >&5
-echo "$as_me: error: bad value ${enableval} for --disable-x10" >&2;}
+       *) { { echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-x10" >&5
+echo "$as_me: error: bad value ${enableval} for --enable-x10" >&2;}
    { (exit 1); exit 1; }; } ;;
 	esac
 else
