@@ -111,7 +111,7 @@ AC_ARG_ENABLE([x10],
 	[case "${enableval}" in
        yes) X10_BACKEND=1 ;;
        no)  X10_BACKEND=0 ;;
-       *) AC_MSG_ERROR([bad value ${enableval} for --disable-x10]) ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-x10]) ;;
 	esac], 
 	[X10_BACKEND=1])
 AC_DEFINE_UNQUOTED([X10_BACKEND], [$X10_BACKEND], [Enable X10 support])
