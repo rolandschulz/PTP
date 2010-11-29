@@ -12,7 +12,10 @@ sdm_SOURCES =				src/master/startup.c\
 							src/server/gdbmi_backend.c \
 							src/server/test_backend.c
 sdm_CFLAGS =				-I./include -I./libaif -I./libmi $(AM_CFLAGS)
-sdm_LDADD =					libsdm.a libdbgutils.a libx10.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+sdm_LDADD =					libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+if X10_BACKEND
+sdm_LDADD += libx10.a							
+endif
 							
 libsdm_a_SOURCES =			src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
@@ -56,7 +59,10 @@ noinst_HEADERS =			include/backend.h \
 							include/x10/x10_variable.h \
 							include/x10/x10_variable_util.h
 
-noinst_LIBRARIES =			libsdm.a libdbgclnt.a libdbgutils.a libx10.a
+noinst_LIBRARIES =			libsdm.a libdbgclnt.a libdbgutils.a
+if X10_BACKEND
+noinst_LIBRARIES += libx10.a							
+endif
 
 libdbgclnt_a_SOURCES =		src/client/client_interface.c 
 libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
@@ -77,7 +83,7 @@ libdbgutils_a_SOURCES =		src/utils/error.c \
 						
 libdbgutils_a_CFLAGS =		-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 
-
+if X10_BACKEND
 libx10_a_SOURCES =			src/x10/x10_gdbmi_backend.c \
 							src/x10/x10_aif.c \
 							src/x10/x10_da.c \
@@ -87,3 +93,4 @@ libx10_a_SOURCES =			src/x10/x10_gdbmi_backend.c \
 							src/x10/x10_variable_util.c
 						
 libx10_a_CFLAGS =			-I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
+endif
