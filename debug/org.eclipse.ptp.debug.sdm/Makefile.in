@@ -35,6 +35,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 bin_PROGRAMS = sdm$(EXEEXT)
 noinst_PROGRAMS = sdm_test$(EXEEXT)
+@X10_BACKEND_TRUE@am__append_1 = libx10.a							
+@X10_BACKEND_TRUE@am__append_2 = libx10.a							
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -88,13 +90,17 @@ am_libsdm_a_OBJECTS = src/impl/libsdm_a-sdm.$(OBJEXT) \
 libsdm_a_OBJECTS = $(am_libsdm_a_OBJECTS)
 libx10_a_AR = $(AR) $(ARFLAGS)
 libx10_a_LIBADD =
-am_libx10_a_OBJECTS = src/x10/libx10_a-x10_gdbmi_backend.$(OBJEXT) \
-	src/x10/libx10_a-x10_aif.$(OBJEXT) \
-	src/x10/libx10_a-x10_da.$(OBJEXT) \
-	src/x10/libx10_a-x10_var.$(OBJEXT) \
-	src/x10/libx10_a-x10_variable.$(OBJEXT) \
-	src/x10/libx10_a-x10_metadebug_info_map.$(OBJEXT) \
-	src/x10/libx10_a-x10_variable_util.$(OBJEXT)
+am__libx10_a_SOURCES_DIST = src/x10/x10_gdbmi_backend.c \
+	src/x10/x10_aif.c src/x10/x10_da.c src/x10/x10_var.c \
+	src/x10/x10_variable.c src/x10/x10_metadebug_info_map.c \
+	src/x10/x10_variable_util.c
+@X10_BACKEND_TRUE@am_libx10_a_OBJECTS = src/x10/libx10_a-x10_gdbmi_backend.$(OBJEXT) \
+@X10_BACKEND_TRUE@	src/x10/libx10_a-x10_aif.$(OBJEXT) \
+@X10_BACKEND_TRUE@	src/x10/libx10_a-x10_da.$(OBJEXT) \
+@X10_BACKEND_TRUE@	src/x10/libx10_a-x10_var.$(OBJEXT) \
+@X10_BACKEND_TRUE@	src/x10/libx10_a-x10_variable.$(OBJEXT) \
+@X10_BACKEND_TRUE@	src/x10/libx10_a-x10_metadebug_info_map.$(OBJEXT) \
+@X10_BACKEND_TRUE@	src/x10/libx10_a-x10_variable_util.$(OBJEXT)
 libx10_a_OBJECTS = $(am_libx10_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -108,8 +114,8 @@ am_sdm_OBJECTS = src/master/sdm-startup.$(OBJEXT) \
 	src/server/sdm-gdbmi_backend.$(OBJEXT) \
 	src/server/sdm-test_backend.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
-sdm_DEPENDENCIES = libsdm.a libdbgutils.a libx10.a libmi/libmi.a \
-	libaif/libaif.a libmi/libmi.a
+sdm_DEPENDENCIES = libsdm.a libdbgutils.a libmi/libmi.a \
+	libaif/libaif.a libmi/libmi.a $(am__append_1)
 sdm_LINK = $(CCLD) $(sdm_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
 am_sdm_test_OBJECTS = src/test/sdm_test-sdm_test.$(OBJEXT)
@@ -129,8 +135,8 @@ SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
 	$(libsdm_a_SOURCES) $(libx10_a_SOURCES) $(sdm_SOURCES) \
 	$(sdm_test_SOURCES)
 DIST_SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libsdm_a_SOURCES) $(libx10_a_SOURCES) $(sdm_SOURCES) \
-	$(sdm_test_SOURCES)
+	$(libsdm_a_SOURCES) $(am__libx10_a_SOURCES_DIST) \
+	$(sdm_SOURCES) $(sdm_test_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -258,7 +264,8 @@ sdm_SOURCES = src/master/startup.c\
 							src/server/test_backend.c
 
 sdm_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS)
-sdm_LDADD = libsdm.a libdbgutils.a libx10.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+sdm_LDADD = libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a \
+	libmi/libmi.a @SVR_LIBS@ $(am__append_1)
 libsdm_a_SOURCES = src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_hello_proto.c \
@@ -299,7 +306,7 @@ noinst_HEADERS = include/backend.h \
 							include/x10/x10_variable.h \
 							include/x10/x10_variable_util.h
 
-noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a libx10.a
+noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a $(am__append_2)
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
 libdbgclnt_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES = src/utils/error.c \
@@ -317,15 +324,15 @@ libdbgutils_a_SOURCES = src/utils/error.c \
 							src/utils/gdb_mi.c
 
 libdbgutils_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
-libx10_a_SOURCES = src/x10/x10_gdbmi_backend.c \
-							src/x10/x10_aif.c \
-							src/x10/x10_da.c \
-							src/x10/x10_var.c \
-							src/x10/x10_variable.c \
-							src/x10/x10_metadebug_info_map.c \
-							src/x10/x10_variable_util.c
+@X10_BACKEND_TRUE@libx10_a_SOURCES = src/x10/x10_gdbmi_backend.c \
+@X10_BACKEND_TRUE@							src/x10/x10_aif.c \
+@X10_BACKEND_TRUE@							src/x10/x10_da.c \
+@X10_BACKEND_TRUE@							src/x10/x10_var.c \
+@X10_BACKEND_TRUE@							src/x10/x10_variable.c \
+@X10_BACKEND_TRUE@							src/x10/x10_metadebug_info_map.c \
+@X10_BACKEND_TRUE@							src/x10/x10_variable_util.c
 
-libx10_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
+@X10_BACKEND_TRUE@libx10_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
