@@ -29,6 +29,9 @@
 #include <time.h>
 #include <errno.h>
 #include <assert.h>
+#ifdef __APPLE__
+#include <mach/mach.h>
+#endif /* __APPLE__ */
 
 #include "exception.hpp"
 #include "ctrlblock.hpp"
@@ -42,7 +45,12 @@ MessageQueue::MessageQueue(bool ctl)
     : thresHold(0), flowCtl(ctl)
 {
     ::pthread_mutex_init(&mtx, NULL);
+#ifndef __APPLE__
     ::sem_init(&sem, 0, 0);
+#else /* __APPLE__ */
+    task = ::mach_task_self();
+    ::semaphore_create(task, &sem, SYNC_POLICY_FIFO, 0);
+#endif /* __APPLE__ */
 }
 
 MessageQueue::~MessageQueue()
@@ -58,7 +66,11 @@ MessageQueue::~MessageQueue()
     queue.clear();
     
     ::pthread_mutex_destroy(&mtx);
+#ifndef __APPLE__
     ::sem_destroy(&sem);
+#else /* !__APPLE__ */
+    ::semaphore_destroy(task, sem);
+#endif /* !__APPLE__ */
 }
 
 int MessageQueue::flowControl(int size)
@@ -89,7 +101,7 @@ int MessageQueue::multiProduce(Message **msgs, int num)
     lock();
     for (i = 0; i < num; i++) {
         queue.push_back(msgs[i]);
-        ::sem_post(&sem);
+        release();
     }
     
     if(flowCtl) {
@@ -104,7 +116,11 @@ int MessageQueue::multiProduce(Message **msgs, int num)
 
 void MessageQueue::release()
 {
-    ::sem_post(&sem);
+#ifndef __APPLE__
+	::sem_post(&sem);
+#else /* !__APPLE__ */
+	::semaphore_signal_all(sem);
+#endif /* !__APPLE__ */
 }
 
 void MessageQueue::produce(Message *msg)
@@ -122,7 +138,7 @@ void MessageQueue::produce(Message *msg)
     }
 
     unlock();
-    ::sem_post(&sem);
+    release();
     flowControl(len);
 
     return;
@@ -134,7 +150,7 @@ int  MessageQueue::multiConsume(Message **msgs, int num)
     int len = 0;
 
     for (i = 0; i < num; i++) {
-        if (sem_wait_i(&sem, -1) != 0) {
+        if (sem_wait_i(-1) != 0) {
             return -1;
         }
     }
@@ -157,7 +173,7 @@ Message* MessageQueue::consume(int millisecs)
 {
     int len = 0;
 
-    if (sem_wait_i(&sem, millisecs*1000) != 0) {
+    if (sem_wait_i(millisecs*1000) != 0) {
         return NULL;
     }
 
@@ -218,18 +234,15 @@ string MessageQueue::getName()
     return name;
 }
 
-int MessageQueue::sem_wait_i(sem_t *psem, int usecs)
+int MessageQueue::sem_wait_i(int usecs)
 {
     int rc = 0;
-#ifdef __APPLE__
-    int sleep_time = usecs > 10 ? 10 : usecs;
-#endif
 
+#ifndef __APPLE__
     if (usecs < 0) {
-        while (((rc = ::sem_wait(psem)) != 0) && (errno == EINTR));
+        while (((rc = ::sem_wait(&sem)) != 0) && (errno == EINTR));
         return rc;
     } else { 
-#ifndef __APPLE__
         timespec ts;
         ::clock_gettime(CLOCK_REALTIME, &ts);    // get current time
         ts.tv_nsec += (usecs % 1000000) * 1000;
@@ -237,17 +250,25 @@ int MessageQueue::sem_wait_i(sem_t *psem, int usecs)
         ts.tv_nsec %= 1000000000;
         ts.tv_sec += (usecs / 1000000) + ca;
         
-        while (((rc=::sem_timedwait(psem, &ts))!=0) && (errno == EINTR));
-#else
-        while (((rc = sem_trywait(psem)) != 0)
-        		&& ((errno == EAGAIN) || (errno == EINTR))
-        		&& (usecs > 0)) {
-        	usleep(sleep_time);
-        	usecs -= sleep_time;
-        }
-#endif
-        return rc;   
-    }                                                 
+        while (((rc=::sem_timedwait(&sem, &ts))!=0) && (errno == EINTR));
+        return rc;
+    }
+#else /* !__APPLE__ */
+    if (usecs < 0) {
+        ::semaphore_wait(sem);
+    } else {
+        mach_timespec_t ts;
+        struct timeval tv;
+        ::gettimeofday(&tv, NULL);    // get current time
+        ts.tv_nsec = (tv.tv_usec + (usecs % 1000000)) * 1000;
+        int ca = (ts.tv_nsec >= 1000000000) ? 1 : 0;
+        ts.tv_nsec %= 1000000000;
+        ts.tv_sec = tv.tv_sec + (usecs / 1000000) + ca;
+
+        ::semaphore_timedwait(sem, ts);
+    }
+    return 0;
+#endif /* !__APPLE__ */
 }
 
 void MessageQueue::lock()
