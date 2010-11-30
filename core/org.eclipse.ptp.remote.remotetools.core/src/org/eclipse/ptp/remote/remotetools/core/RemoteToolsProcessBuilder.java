@@ -38,7 +38,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 		super(conn, command);
 		fConnection = conn;
 		fFileMgr = fileMgr;
-		fRemoteEnv = conn.getEnv();
+		fRemoteEnv = new HashMap<String, String>(conn.getEnv());
 	}
 
 	/**

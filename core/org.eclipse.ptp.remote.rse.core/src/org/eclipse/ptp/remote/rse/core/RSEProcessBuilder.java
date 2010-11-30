@@ -47,7 +47,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		super(conn, command);
 		fConnection = (RSEConnection) conn;
 		fFileMgr = (RSEFileManager) fileMgr;
-		fRemoteEnv = conn.getEnv();
+		fRemoteEnv = new HashMap<String, String>(conn.getEnv());
 	}
 
 	/**

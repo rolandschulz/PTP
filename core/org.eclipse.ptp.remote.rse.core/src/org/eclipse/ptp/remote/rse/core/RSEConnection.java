@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.rse.core;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -207,7 +208,7 @@ public class RSEConnection implements IRemoteConnection {
 			} catch (SystemMessageException e) {
 			}
 		}
-		return fEnv;
+		return Collections.unmodifiableMap(fEnv);
 	}
 
 	/*
