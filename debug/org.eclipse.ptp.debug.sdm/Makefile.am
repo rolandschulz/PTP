@@ -12,9 +12,10 @@ sdm_SOURCES =				src/master/startup.c\
 							src/server/gdbmi_backend.c \
 							src/server/test_backend.c
 sdm_CFLAGS =				-I./include -I./libaif -I./libmi $(AM_CFLAGS)
-sdm_LDADD =					libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
 if X10_BACKEND
-sdm_LDADD += libx10.a							
+sdm_LDADD =					libsdm.a libx10.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+else
+sdm_LDADD =					libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
 endif
 							
 libsdm_a_SOURCES =			src/impl/sdm.c \
