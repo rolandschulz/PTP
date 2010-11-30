@@ -36,7 +36,6 @@ build_triplet = @build@
 bin_PROGRAMS = sdm$(EXEEXT)
 noinst_PROGRAMS = sdm_test$(EXEEXT)
 @X10_BACKEND_TRUE@am__append_1 = libx10.a							
-@X10_BACKEND_TRUE@am__append_2 = libx10.a							
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -114,8 +113,10 @@ am_sdm_OBJECTS = src/master/sdm-startup.$(OBJEXT) \
 	src/server/sdm-gdbmi_backend.$(OBJEXT) \
 	src/server/sdm-test_backend.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
-sdm_DEPENDENCIES = libsdm.a libdbgutils.a libmi/libmi.a \
-	libaif/libaif.a libmi/libmi.a $(am__append_1)
+@X10_BACKEND_FALSE@sdm_DEPENDENCIES = libsdm.a libdbgutils.a \
+@X10_BACKEND_FALSE@	libmi/libmi.a libaif/libaif.a libmi/libmi.a
+@X10_BACKEND_TRUE@sdm_DEPENDENCIES = libsdm.a libx10.a libdbgutils.a \
+@X10_BACKEND_TRUE@	libmi/libmi.a libaif/libaif.a libmi/libmi.a
 sdm_LINK = $(CCLD) $(sdm_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
 am_sdm_test_OBJECTS = src/test/sdm_test-sdm_test.$(OBJEXT)
@@ -264,8 +265,8 @@ sdm_SOURCES = src/master/startup.c\
 							src/server/test_backend.c
 
 sdm_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS)
-sdm_LDADD = libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a \
-	libmi/libmi.a @SVR_LIBS@ $(am__append_1)
+@X10_BACKEND_FALSE@sdm_LDADD = libsdm.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
+@X10_BACKEND_TRUE@sdm_LDADD = libsdm.a libx10.a libdbgutils.a libmi/libmi.a libaif/libaif.a libmi/libmi.a @SVR_LIBS@
 libsdm_a_SOURCES = src/impl/sdm.c \
 							src/impl/sdm_aggregate_hash.c \
 							src/impl/sdm_hello_proto.c \
@@ -306,7 +307,7 @@ noinst_HEADERS = include/backend.h \
 							include/x10/x10_variable.h \
 							include/x10/x10_variable_util.h
 
-noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a $(am__append_2)
+noinst_LIBRARIES = libsdm.a libdbgclnt.a libdbgutils.a $(am__append_1)
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
 libdbgclnt_a_CFLAGS = -I./include -I./libaif -I./libmi $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES = src/utils/error.c \
