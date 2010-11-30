@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.core;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -302,7 +303,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				}
 			}
 		}
-		return fEnv;
+		return Collections.unmodifiableMap(fEnv);
 	}
 
 	/*
