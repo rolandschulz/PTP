@@ -33,6 +33,10 @@ using namespace std;
 
 #include <semaphore.h>
 #include <pthread.h>
+#ifdef __APPLE__
+#include <mach/task.h>
+#include <mach/semaphore.h>
+#endif /* __APPLE__ */
 
 #include "sci.h"
 #include "general.hpp"
@@ -46,8 +50,12 @@ class MessageQueue
     private:
         deque<Message*>                 queue;
         pthread_mutex_t                 mtx;
+#ifndef __APPLE__
         sem_t                           sem;
-
+#else /* __APPLE__ */
+        semaphore_t						sem;
+        task_t							task;
+#endif /* __APPLE__ */
         string                          name;
         volatile long long              thresHold;
         bool                            flowCtl;
@@ -69,7 +77,7 @@ class MessageQueue
         string getName();
 
     private:
-        int sem_wait_i(sem_t *psem, int usecs);
+        int sem_wait_i(int usecs);
 
         void lock();
         void unlock();
