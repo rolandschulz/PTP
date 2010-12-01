@@ -63,7 +63,7 @@ public class OpenMPILaunchConfiguration {
 				launchArgs += " -hostfile " + fixString(configuration.getAttribute(ATTR_HOSTFILE, OpenMPILaunchConfigurationDefaults.ATTR_HOSTFILE)); //$NON-NLS-1$
 			}
 			if (configuration.getAttribute(ATTR_USEHOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_USEHOSTLIST)) {
-				launchArgs += " -host " + fixString(configuration.getAttribute(ATTR_HOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_HOSTLIST)); //$NON-NLS-1$
+				launchArgs += " -host " + textToHostList(fixString(configuration.getAttribute(ATTR_HOSTLIST, OpenMPILaunchConfigurationDefaults.ATTR_HOSTLIST))); //$NON-NLS-1$
 			}
 
 			if (!configuration
@@ -86,11 +86,34 @@ public class OpenMPILaunchConfiguration {
 	 * @param s
 	 * @return
 	 */
-	static private String fixString(String s) {
+	private static String fixString(String s) {
 		// TODO is that right and escaped correctly?
 		if (s == null) {
 			return "\"\""; //$NON-NLS-1$
 		}
 		return "\"" + s + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * Convert a one-host-per-line string into a comma separated list
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private static String textToHostList(String text) {
+		if (text == null) {
+			return ""; //$NON-NLS-1$
+		}
+		String result = ""; //$NON-NLS-1$
+		String[] values = text.split("\n"); //$NON-NLS-1$
+		for (int i = 0; i < values.length; i++) {
+			if (!values[i].equals("")) { //$NON-NLS-1$
+				if (i > 0) {
+					result += ","; //$NON-NLS-1$
+				}
+				result += values[i];
+			}
+		}
+		return result;
 	}
 }
