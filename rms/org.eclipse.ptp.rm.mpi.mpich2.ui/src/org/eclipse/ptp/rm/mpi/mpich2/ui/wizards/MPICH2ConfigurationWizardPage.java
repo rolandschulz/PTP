@@ -158,24 +158,49 @@ public class MPICH2ConfigurationWizardPage extends AbstractToolRMConfigurationWi
 
 	public void handleVersionSelected() {
 		getWidgetListener().disable();
-		DataSource dataSource = (DataSource) this.getDataSource();
+		DataSource dataSource = (DataSource) getDataSource();
 		dataSource.justValidate();
-		String launchCmd = null;
-		String debugCmd = null;
-		String discoverCmd = null;
-		String remoteInstallPath = null;
-		launchCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD);
-		debugCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD);
-		discoverCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD);
-		remoteInstallPath = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
-				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
-		resetErrorMessages();
-		dataSource.setCommandFields(launchCmd, debugCmd, discoverCmd, null, 0, null, dataSource.getRemoteInstallPath());
-		dataSource.setUseDefaults(true);
+		setToolCommandDefaults();
+		setInstallPathDefaults();
 		dataSource.copyToFields();
 		getWidgetListener().enable();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage#
+	 * setToolCommandDefaults()
+	 */
+	@Override
+	protected void setToolCommandDefaults() {
+		DataSource dataSource = (DataSource) this.getDataSource();
+		String launchCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_LAUNCH_CMD);
+		String debugCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DEBUG_CMD);
+		String discoverCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_DISCOVER_CMD);
+		String monitorCmd = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_CMD);
+		int monitorTime = Preferences.getInt(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_PERIODIC_MONITOR_TIME);
+		dataSource.setCommands(launchCmd, debugCmd, discoverCmd, monitorCmd, monitorTime, null);
+		dataSource.setUseDefaults(true);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.ui.wizards.AbstractToolRMConfigurationWizardPage#
+	 * setInstallPathDefaults()
+	 */
+	@Override
+	protected void setInstallPathDefaults() {
+		DataSource dataSource = (DataSource) getDataSource();
+		String remoteInstallPath = Preferences.getString(MPICH2Plugin.getUniqueIdentifier(), MPICH2PreferenceManager.PREFIX
+				+ MPICH2PreferenceManager.PREFS_REMOTE_INSTALL_PATH);
+		dataSource.setInstallPath(remoteInstallPath);
+		dataSource.setInstallDefaults(true);
 	}
 }
