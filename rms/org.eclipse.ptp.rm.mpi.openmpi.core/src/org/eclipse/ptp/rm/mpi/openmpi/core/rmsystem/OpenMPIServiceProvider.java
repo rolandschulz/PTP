@@ -28,7 +28,6 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
 
 	private static final String TAG_VERSION_ID = "versionId"; //$NON-NLS-1$
-	private static final String EMPTY_STR = ""; //$NON-NLS-1$
 
 	/*
 	 * Actual version that is used to select correct commands. This version only
@@ -183,6 +182,14 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 		if (m.matches()) {
 			majorVersion = Integer.valueOf(m.group(1)).intValue();
 			minorVersion = Integer.valueOf(m.group(2)).intValue();
+			/*
+			 * Assume any versions above 1.4 are the same as 1.4. NOTE: this may
+			 * need to be changed in the future
+			 */
+			if (majorVersion > 1 || minorVersion > 4) {
+				majorVersion = 1;
+				minorVersion = 4;
+			}
 			if (m.group(3) != null) {
 				serviceVersion = Integer.valueOf(m.group(4)).intValue();
 			}
