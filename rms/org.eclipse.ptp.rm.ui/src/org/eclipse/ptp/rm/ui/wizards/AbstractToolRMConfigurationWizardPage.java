@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  *
  */
-public class AbstractToolRMConfigurationWizardPage extends AbstractConfigurationWizardPage {
+public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConfigurationWizardPage {
 
 	protected class DataSource extends WizardPageDataSource {
 		private IToolRMConfiguration config = null;
@@ -106,14 +106,23 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 			return useToolDefaults;
 		}
 
-		public void setCommandFields(String launchCmd, String debugCmd, String discoverCmd, String periodicMonitorCmd,
-				int periodicMonitorTime, String continuousMonitorCmd, String remoteInstallPath) {
+		/**
+		 * @since 2.0
+		 */
+		public void setCommands(String launchCmd, String debugCmd, String discoverCmd, String periodicMonitorCmd,
+				int periodicMonitorTime, String continuousMonitorCmd) {
 			this.launchCmd = launchCmd;
 			this.debugCmd = debugCmd;
 			this.discoverCmd = discoverCmd;
 			this.periodicMonitorCmd = periodicMonitorCmd;
 			this.periodicMonitorTime = periodicMonitorTime;
 			this.continuousMonitorCmd = continuousMonitorCmd;
+		}
+
+		/**
+		 * @since 2.0
+		 */
+		public void setInstallPath(String remoteInstallPath) {
 			this.remoteInstallPath = remoteInstallPath;
 		}
 
@@ -297,16 +306,31 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 
 		@Override
 		protected void doWidgetSelected(SelectionEvent e) {
+			boolean enabled = isEnabled();
+			disable();
 			Object source = e.getSource();
 			if (source == browseButton) {
 				handlePathBrowseButtonSelected();
-			} else if (source == defaultCmdButton || source == defaultInstallButton) {
+			} else if (source == defaultCmdButton) {
 				resetErrorMessages();
+				if (defaultCmdButton.getSelection()) {
+					setToolCommandDefaults();
+					getDataSource().justUpdate();
+				}
+				getDataSource().storeAndValidate();
+				updateControls();
+			} else if (source == defaultInstallButton) {
+				resetErrorMessages();
+				if (defaultInstallButton.getSelection()) {
+					setInstallPathDefaults();
+					getDataSource().justUpdate();
+				}
 				getDataSource().storeAndValidate();
 				updateControls();
 			} else {
 				assert false;
 			}
+			setEnabled(enabled);
 		}
 	}
 
@@ -512,6 +536,20 @@ public class AbstractToolRMConfigurationWizardPage extends AbstractConfiguration
 		createContents(contents);
 
 		return contents;
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	protected void setToolCommandDefaults() {
+		// Override if needed
+	}
+
+	/**
+	 * @since 2.0
+	 */
+	protected void setInstallPathDefaults() {
+		// Override if needed
 	}
 
 	/**
