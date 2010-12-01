@@ -21,13 +21,12 @@ public interface IOpenMPIResourceManagerConfiguration extends IToolRMConfigurati
 
 	public static int OPENMPI_CAPABILITIES = CAP_LAUNCH | CAP_DISCOVER | CAP_REMOTE_INSTALL_PATH;
 
-
 	/**
 	 * Get the detected Open MPI version. Only the major and minor version
 	 * numbers are used. Any point or beta release information is discarded.
 	 * 
-	 * @return string representing the detected version 
-	 *         or "unknown" if no version has been detected
+	 * @return string representing the detected version or "unknown" if no
+	 *         version has been detected
 	 */
 	public String getDetectedVersion();
 
@@ -62,16 +61,16 @@ public interface IOpenMPIResourceManagerConfiguration extends IToolRMConfigurati
 	/**
 	 * Set the detected Open MPI version. Allowable version formats are:
 	 * 
-	 * 1.3		-> major=1, minor=3, point=0
-	 * 1.2.8	-> major=1, minor=2, point=8
-	 * 1.2b1	-> major=1, minor=2, point=0
+	 * 1.3 -> major=1, minor=3, point=0 1.2.8 -> major=1, minor=2, point=8 1.2b1
+	 * -> major=1, minor=2, point=0
 	 * 
-	 * Currently only 1.2 and 1.3 versions are valid.
+	 * Currently only 1.2, 1.3 and 1.4 versions are valid.
 	 * 
-	 * If the versionId is not VERSION_AUTO, then the detected version
-	 * must match the versionId.
+	 * If the versionId is not VERSION_AUTO, then the detected version must
+	 * match the versionId.
 	 * 
-	 * @param version string representing the detected version
+	 * @param version
+	 *            string representing the detected version
 	 * @return true if version was correct
 	 */
 	public boolean setDetectedVersion(String version);
@@ -79,7 +78,8 @@ public interface IOpenMPIResourceManagerConfiguration extends IToolRMConfigurati
 	/**
 	 * Set the version that is selected when configuring the RM
 	 * 
-	 * @param versionId string representing the Open MPI version
+	 * @param versionId
+	 *            string representing the Open MPI version
 	 */
 	public void setVersionId(String versionId);
 
