@@ -174,7 +174,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 			useHostFile = hostFileButton.getSelection();
 			hostFile = extractText(hostFileText);
 			useHostList = hostListButton.getSelection();
-			hostList = extractText(hostListText);
+			hostList = textToHostList(extractText(hostListText));
 		}
 
 		@Override
@@ -188,7 +188,7 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 			applyText(prefixText, prefix);
 			applyText(hostFileText, hostFile);
 			hostFileButton.setSelection(useHostFile);
-			applyText(hostListText, hostListToText(hostList));
+			applyText(hostListText, hostList);
 			hostListButton.setSelection(useHostList);
 		}
 
@@ -271,21 +271,21 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 		}
 
 		/**
-		 * Convert a comma separated list into one host per line
+		 * Convert a one-host-per-line string into a comma separated list
 		 * 
-		 * @param list
+		 * @param text
 		 * @return
 		 */
-		private String hostListToText(String list) {
-			if (list == null) {
+		private String textToHostList(String text) {
+			if (text == null) {
 				return ""; //$NON-NLS-1$
 			}
 			String result = ""; //$NON-NLS-1$
-			String[] values = list.split(","); //$NON-NLS-1$
+			String[] values = text.split("\n"); //$NON-NLS-1$
 			for (int i = 0; i < values.length; i++) {
 				if (!values[i].equals("")) { //$NON-NLS-1$
 					if (i > 0) {
-						result += "\r"; //$NON-NLS-1$
+						result += ","; //$NON-NLS-1$
 					}
 					result += values[i];
 				}
