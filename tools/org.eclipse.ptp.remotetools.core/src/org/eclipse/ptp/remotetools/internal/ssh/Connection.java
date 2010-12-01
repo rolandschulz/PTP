@@ -440,7 +440,7 @@ public class Connection implements IRemoteConnection {
 															// state
 				}
 			} catch (JSchException e) {
-				throw new RemoteConnectionException(e.getMessage());
+				throw new RemoteConnectionException(Messages.Connection_2 + e.getMessage());
 			}
 
 			/*

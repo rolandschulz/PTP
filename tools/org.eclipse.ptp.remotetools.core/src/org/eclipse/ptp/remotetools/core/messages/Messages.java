@@ -26,6 +26,7 @@ public class Messages extends NLS {
 
 	public static String Connection_0;
 	public static String Connection_1;
+	public static String Connection_2;
 	public static String Connection_AuthenticationTypeNotSupported;
 	public static String Connection_Connect_FailedConnect;
 	public static String Connection_Connect_FailedUnsupportedKeySize;
