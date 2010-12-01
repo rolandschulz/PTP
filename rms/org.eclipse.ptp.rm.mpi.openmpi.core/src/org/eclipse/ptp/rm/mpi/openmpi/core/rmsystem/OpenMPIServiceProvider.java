@@ -171,20 +171,11 @@ public class OpenMPIServiceProvider extends AbstractToolRMServiceProvider implem
 		setDescription(Messages.OpenMPIResourceManagerConfiguration_defaultDescription);
 	}
 
-	/**
-	 * Set the detected Open MPI version. Allowable version formats are:
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * 1.3 -> major=1, minor=3, point=0 1.2.8 -> major=1, minor=2, point=8 1.2b1
-	 * -> major=1, minor=2, point=0
-	 * 
-	 * Currently only 1.2 and 1.3 versions are valid.
-	 * 
-	 * If the versionId is not VERSION_AUTO, then the detected version must
-	 * match the versionId.
-	 * 
-	 * @param version
-	 *            string representing the detected version
-	 * @return true if version was correct
+	 * @see org.eclipse.ptp.rm.mpi.openmpi.core.rmsystem.
+	 * IOpenMPIResourceManagerConfiguration#setDetectedVersion(java.lang.String)
 	 */
 	public boolean setDetectedVersion(String version) {
 		Pattern p = Pattern.compile("^(\\d+)\\.(\\d+)[^.]*(\\.(\\d+))?"); //$NON-NLS-1$
