@@ -36,9 +36,10 @@ import org.eclipse.swt.widgets.Label;
  * 
  */
 public class OpenMPIConfigurationWizardPage extends AbstractToolRMConfigurationWizardPage {
-	private static final String EMPTY_STR = ""; //$NON-NLS-1$
-
-	private final String versionIds[] = new String[] { IOpenMPIResourceManagerConfiguration.VERSION_AUTO,
+	/**
+	 * @since 2.0
+	 */
+	protected final String versionIds[] = new String[] { IOpenMPIResourceManagerConfiguration.VERSION_AUTO,
 			IOpenMPIResourceManagerConfiguration.VERSION_12, IOpenMPIResourceManagerConfiguration.VERSION_13,
 			IOpenMPIResourceManagerConfiguration.VERSION_14 };
 	private final String versionsNames[] = new String[] { Messages.OpenMPIConfigurationWizardPage_VersionCombo_Auto,
