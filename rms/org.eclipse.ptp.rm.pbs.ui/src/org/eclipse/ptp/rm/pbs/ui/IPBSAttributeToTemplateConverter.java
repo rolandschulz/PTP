@@ -21,6 +21,8 @@ public interface IPBSAttributeToTemplateConverter {
 
 	String generateFullBatchScriptTemplate() throws Throwable;
 
+	String generateMinBatchScriptTemplate() throws Throwable;
+
 	IPBSJobAttributeData getData();
 
 	void initialize() throws Throwable;

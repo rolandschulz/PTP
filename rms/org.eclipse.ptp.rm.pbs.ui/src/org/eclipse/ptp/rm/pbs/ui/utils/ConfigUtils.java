@@ -12,8 +12,11 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.utils;
 
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -120,5 +123,33 @@ public class ConfigUtils implements IPBSNonNLSConstants {
 			}
 		}
 		return items;
+	}
+
+	public static String readFull(final File file, int bffr_sz) throws Throwable {
+		int read = 0;
+		byte[] bytes = new byte[bffr_sz];
+		FileInputStream stream = null;
+		StringBuffer sb = new StringBuffer();
+		try {
+			stream = new FileInputStream(file);
+			while (true) {
+				try {
+					read = stream.read(bytes, 0, bytes.length);
+				} catch (EOFException eof) {
+					break;
+				}
+				if (read == -1)
+					break;
+				if (read > 0)
+					sb.append(new String(bytes, 0, read));
+			}
+		} finally {
+			if (stream != null)
+				try {
+					stream.close();
+				} catch (IOException t) {
+				}
+		}
+		return sb.toString();
 	}
 }

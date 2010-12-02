@@ -29,6 +29,8 @@ public interface IPBSJobAttributeData {
 
 	Map<String, String[]> getConstrained() throws Throwable;
 
+	Map<String, String> getMinSet() throws Throwable;
+
 	Properties getPBSQsubFlags() throws Throwable;
 
 	Properties getToolTips() throws Throwable;

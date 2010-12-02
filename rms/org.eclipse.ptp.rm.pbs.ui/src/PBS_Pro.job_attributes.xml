@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pbs-job-attributes>
-	<pbs-job-attribute name="Account_Name">
+	<pbs-job-attribute name="Account_Name" minSet="true">
 		<attribute-definition id="PBSJOB_Account_Name"
 			type="string" display="true">
 			<description>Account to which to charge this job.</description>
@@ -35,7 +35,7 @@
 		<tooltip>Format: "type:jobid[,jobid...]"; default value: no
 			dependencies.</tooltip>
 	</pbs-job-attribute>
-	<pbs-job-attribute name="destination">
+	<pbs-job-attribute name="destination" minSet="true">
 		<attribute-definition id="PBSJOB_destination"
 			type="string" display="true">
 			<description>Designation of the queue to which to submit the job.
@@ -70,7 +70,7 @@
 			the job number assigned when the job is submitted; default value:
 			(job_name).e(job_number).</tooltip>
 	</pbs-job-attribute>
-	<pbs-job-attribute name="export_all">
+	<pbs-job-attribute name="export_all" minSet="true">
 		<attribute-definition id="PBSJOB_export_all"
 			type="boolean" display="true">
 			<description>Declares that all environment variables in the qsub
@@ -108,7 +108,7 @@
 			takes precedence over the wait state. Format: string made up of the
 			letters 'u', 's', 'o'; default value: no hold.</tooltip>
 	</pbs-job-attribute>
-	<pbs-job-attribute name="Job_Name">
+	<pbs-job-attribute name="Job_Name" minSet="true">
 		<attribute-definition id="PBSJOB_Job_Name" type="string"
 			display="true">
 			<description>The name assigned to the job by the qsub or qalter
@@ -246,7 +246,7 @@
 			or words (word size of the host): b (bytes), w (words), kb/kw (kilo),
 			mb/mw (mega), gb/bw (giga).</tooltip>
 	</pbs-job-attribute>
-	<pbs-job-attribute name="Resource_List.ncpus">
+	<pbs-job-attribute name="Resource_List.ncpus" minSet="true">
 		<attribute-definition id="PBSJOB_Resource_List.ncpus"
 			type="integer" display="true">
 			<description>Total number of cpus/cores to be allocated to the job.
@@ -268,7 +268,7 @@
 		<qsub-flag>-l nice=</qsub-flag>
 		<tooltip>0 to 10.</tooltip>
 	</pbs-job-attribute>
-	<pbs-job-attribute name="Resource_List.nodes">
+	<pbs-job-attribute name="Resource_List.nodes" minSet="true">
 		<attribute-definition id="PBSJOB_Resource_List.nodes"
 			type="string" display="true">
 			<description>Number and/or type of nodes to be reserved for exclusive
@@ -340,7 +340,7 @@
 			or words (word size of the host): b (bytes), w (words), kb/kw (kilo),
 			mb/mw (mega), gb/bw (giga).</tooltip>
 	</pbs-job-attribute>
-	<pbs-job-attribute name="Resource_List.walltime">
+	<pbs-job-attribute name="Resource_List.walltime" minSet="true">
 		<attribute-definition id="PBSJOB_Resource_List.walltime"
 			type="string" display="true">
 			<description>Maximum amount of real time during which the job can be

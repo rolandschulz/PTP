@@ -95,6 +95,7 @@ public interface IPBSNonNLSConstants {
 	String FLAG = "qsub-flag"; //$NON-NLS-1$
 	String TOOLTIP = "tooltip"; //$NON-NLS-1$
 	String DEFAULT = "default"; //$NON-NLS-1$
+	String MINSET = "minSet"; //$NON-NLS-1$
 	String DESCRIPTION = "description"; //$NON-NLS-1$
 	String ID = "id"; //$NON-NLS-1$
 	String NAME = "name"; //$NON-NLS-1$
@@ -116,8 +117,10 @@ public interface IPBSNonNLSConstants {
 	/* FIXED PATHS & FILE NAMES */
 	String SRC = "src";//$NON-NLS-1$
 	String TEMPLATE_SUFFIX = "_template";//$NON-NLS-1$
-	String BASE_TEMPLATE = "base" + TEMPLATE_SUFFIX;//$NON-NLS-1$
+	String FULL_TEMPLATE = "full" + TEMPLATE_SUFFIX;//$NON-NLS-1$
+	String MIN_TEMPLATE = "min" + TEMPLATE_SUFFIX;//$NON-NLS-1$
 	String TMP_ATTR_XML = "all_job_attributes.xml";//$NON-NLS-1$
+	String RM_CONFIG_PROPS = "rm_configurations.properties";//$NON-NLS-1$
 
 	/* SERIALIZATION */
 	String INDENTATION = "{http://xml.apache.org/xslt}indent-amount";//$NON-NLS-1$

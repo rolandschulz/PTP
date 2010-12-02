@@ -73,7 +73,7 @@ import org.eclipse.ptp.rm.pbs.ui.utils.ConfigUtils;
  * 
  */
 public class PBSBatchScriptTemplate implements IPBSNonNLSConstants {
-	private static final int BUFFER_SIZE = 512 * 1024;
+	public static final int BUFFER_SIZE = 16 * 1024;
 
 	private ILaunchConfiguration configuration;
 	private final Map<String, AttributePlaceholder> internalAttributes;
@@ -180,6 +180,7 @@ public class PBSBatchScriptTemplate implements IPBSNonNLSConstants {
 				try {
 					line = br.readLine();
 				} catch (EOFException eof) {
+					break;
 				}
 				if (line == null)
 					break;

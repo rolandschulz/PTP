@@ -67,7 +67,19 @@ public class Messages extends NLS {
 	public static String PBSRMLaunchConfigEditChoose_new_name;
 	public static String PBSRMLaunchConfigEditError_message;
 	public static String PBSRMLaunchConfigEditError_title;
-	public static String PBSRMLaunchConfigGroup0_title;
+	public static String PBSRMLaunchConfigExportButton_title;
+	public static String PBSRMLaunchConfigExportButton_message;
+	public static String PBSRMLaunchConfigExportError_message;
+	public static String PBSRMLaunchConfigExportError_title;
+	public static String PBSRMLaunchConfigExportRename;
+	public static String PBSRMLaunchConfigExportRename_new;
+	public static String PBSRMLaunchConfigExportJobMessage0;
+	public static String PBSRMLaunchConfigExportJobMessage1;
+	public static String PBSRMLaunchConfigImportButton_title;
+	public static String PBSRMLaunchConfigImportButton_message;
+	public static String PBSRMLaunchConfigImportError_message;
+	public static String PBSRMLaunchConfigImportError_title;
+	public static String PBSRMLaunchConfigImportJobMessage;
 	public static String PBSRMLaunchConfigGroup1_title;
 	public static String PBSRMLaunchConfigGroup2_title;
 	public static String PBSRMLaunchConfigPreferences_column_0;
@@ -76,6 +88,7 @@ public class Messages extends NLS {
 	public static String PBSRMLaunchConfigPreferences_message;
 	public static String PBSRMLaunchConfigTemplate_message;
 	public static String PBSRMLaunchConfigTemplate_title;
+	public static String PBSRMLaunchConfigTemplate_zerostringError;
 	public static String PBSRMLaunchConfigViewScript_title;
 	public static String PBSRMLaunchConfigEditTemplates_title;
 

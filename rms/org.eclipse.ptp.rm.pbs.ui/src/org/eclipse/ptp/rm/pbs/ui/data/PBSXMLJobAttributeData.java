@@ -58,6 +58,7 @@ public class PBSXMLJobAttributeData implements IPBSJobAttributeData, IPBSNonNLSC
 	protected Map<String, String[]> constrained;
 	protected Properties flags;
 	protected Properties tooltips;
+	protected Map<String, String> minSet;
 
 	public void deserialize(InputStream inputStream) throws Throwable {
 		clearAll();
@@ -74,6 +75,12 @@ public class PBSXMLJobAttributeData implements IPBSJobAttributeData, IPBSNonNLSC
 
 	public Map<String, String[]> getConstrained() throws Throwable {
 		return constrained;
+	}
+
+	public Map<String, String> getMinSet() throws Throwable {
+		if (minSet == null)
+			minSet = new HashMap<String, String>();
+		return minSet;
 	}
 
 	public Properties getPBSQsubFlags() throws Throwable {
@@ -169,6 +176,8 @@ public class PBSXMLJobAttributeData implements IPBSJobAttributeData, IPBSNonNLSC
 
 		Element jobAttribute = doc.createElement(ATTRIBUTE);
 		jobAttribute.setAttribute(NAME, name);
+		if (minSet.containsKey(name))
+			jobAttribute.setAttribute(MINSET, TRUE);
 		IAttributeDefinition<?, ?, ?> attribute = definitions.get(name);
 		if (attribute instanceof BooleanAttributeDefinition)
 			appendAttributeDefinition((BooleanAttributeDefinition) attribute, doc, jobAttribute);
@@ -226,6 +235,12 @@ public class PBSXMLJobAttributeData implements IPBSJobAttributeData, IPBSNonNLSC
 			tooltips.clear();
 		if (constrained == null)
 			constrained = new HashMap<String, String[]>();
+		else
+			constrained.clear();
+		if (minSet == null)
+			minSet = new HashMap<String, String>();
+		else
+			minSet.clear();
 	}
 
 	private Element getSingletonElement(Element element, String name) {
@@ -345,6 +360,9 @@ public class PBSXMLJobAttributeData implements IPBSJobAttributeData, IPBSNonNLSC
 
 	private void handleJobAttributeDefinitionElement(Element element) throws ParseException, IllegalValueException {
 		String name = element.getAttribute(NAME);
+		String isMinSet = element.getAttribute(MINSET);
+		if (TRUE.equals(isMinSet))
+			minSet.put(name, null);
 		Element child = getSingletonElement(element, TOOLTIP);
 		if (child != null)
 			try {
