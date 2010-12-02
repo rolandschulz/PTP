@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * 
  * @author Daniel Felix Ferber
- *
+ * 
  */
 public class OpenMPIHostMap {
 	public static class Host {
@@ -89,8 +89,8 @@ public class OpenMPIHostMap {
 
 	public void addDefaultHost(String name) {
 		OpenMPIHostMap.Host host = new OpenMPIHostMap.Host(name);
-		host.numProcessors = 1;
-		host.maxNumProcessors = 0;
+		host.setNumProcessors(1);
+		host.setMaxNumProcessors(0);
 		addHost(host);
 	}
 
