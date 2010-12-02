@@ -735,14 +735,14 @@ public class PBSRMLaunchConfigurationDynamicTab extends BaseRMLaunchConfiguratio
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
 					try {
-						if (!templateManager.handleBaseTemplate())
+						if (!templateManager.handleBaseTemplates())
 							return Status.OK_STATUS;
 					} catch (Throwable t) {
 						t.printStackTrace();
 					}
-					String oldTemplate = WidgetUtils.getSelected(templates);
+					// String oldTemplate = WidgetUtils.getSelected(templates);
 					if (Window.CANCEL != new WizardDialog(control.getShell(), templateWizard).open())
-						repopulateTemplates(oldTemplate);
+						repopulateTemplates(templateWizard.getSelectedTemplate());
 				} catch (Throwable t) {
 					t.printStackTrace();
 				}

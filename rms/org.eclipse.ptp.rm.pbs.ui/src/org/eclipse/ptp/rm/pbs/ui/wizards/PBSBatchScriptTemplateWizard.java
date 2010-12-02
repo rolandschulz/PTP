@@ -31,6 +31,10 @@ public class PBSBatchScriptTemplateWizard extends Wizard {
 		}
 	}
 
+	public String getSelectedTemplate() {
+		return page.getSelectedTemplate();
+	}
+
 	@Override
 	public boolean performFinish() {
 		return true;

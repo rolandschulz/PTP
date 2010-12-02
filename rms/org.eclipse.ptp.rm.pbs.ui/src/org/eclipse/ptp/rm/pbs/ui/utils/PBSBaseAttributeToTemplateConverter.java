@@ -82,37 +82,12 @@ public abstract class PBSBaseAttributeToTemplateConverter implements IPBSAttribu
 	protected IPBSJobAttributeData data;
 	protected IAttributeDefinition<?, ?, ?>[] defs;
 
-	/*
-	 * Composes the flag translations into the space between the header and
-	 * footer of the template file.
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter#
-	 * generateFullBatchScriptTemplate()
-	 */
 	public String generateFullBatchScriptTemplate() throws Throwable {
-		Properties flags = data.getPBSQsubFlags();
-		if (flags == null)
-			return null;
+		return generateBaseTemplate(false);
+	}
 
-		String[] sorted = flags.keySet().toArray(new String[0]);
-		Arrays.sort(sorted, sorter);
-
-		StringBuffer template = new StringBuffer();
-
-		for (int i = 0; i < HEADER.length; i++)
-			template.append(HEADER[i]).append(REMOTE_LINE_SEP);
-
-		for (int i = 0; i < sorted.length; i++) {
-			String flag = flags.getProperty(sorted[i]);
-			template.append(PBSDIRECTIVE).append(flag).append(MARKER).append(sorted[i]).append(MARKER).append(REMOTE_LINE_SEP);
-		}
-
-		for (int i = 0; i < FOOTER.length; i++)
-			template.append(FOOTER[i]).append(REMOTE_LINE_SEP);
-
-		return template.toString();
+	public String generateMinBatchScriptTemplate() throws Throwable {
+		return generateBaseTemplate(true);
 	}
 
 	public IPBSJobAttributeData getData() {
@@ -149,6 +124,42 @@ public abstract class PBSBaseAttributeToTemplateConverter implements IPBSAttribu
 		ttips.setProperty(TAG_PRECMD, TAG_INTERNAL);
 		definitions.put(TAG_PSTCMD, new StringAttributeDefinition(TAG_PSTCMD, TAG_PSTCMD, ZEROSTR, true, null));
 		ttips.setProperty(TAG_PSTCMD, TAG_INTERNAL);
+	}
+
+	/*
+	 * Composes the flag translations into the space between the header and
+	 * footer of the template file.
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter#
+	 * generateFullBatchScriptTemplate()
+	 */
+	private String generateBaseTemplate(boolean minimal) throws Throwable {
+		Properties flags = data.getPBSQsubFlags();
+		if (flags == null)
+			return null;
+
+		Map<String, String> minSet = data.getMinSet();
+
+		String[] sorted = flags.keySet().toArray(new String[0]);
+		Arrays.sort(sorted, sorter);
+
+		StringBuffer template = new StringBuffer();
+
+		for (int i = 0; i < HEADER.length; i++)
+			template.append(HEADER[i]).append(REMOTE_LINE_SEP);
+
+		for (int i = 0; i < sorted.length; i++)
+			if (!minimal || minSet.containsKey(sorted[i])) {
+				String flag = flags.getProperty(sorted[i]);
+				template.append(PBSDIRECTIVE).append(flag).append(MARKER).append(sorted[i]).append(MARKER).append(REMOTE_LINE_SEP);
+			}
+
+		for (int i = 0; i < FOOTER.length; i++)
+			template.append(FOOTER[i]).append(REMOTE_LINE_SEP);
+
+		return template.toString();
 	}
 
 	public static Comparator<String> getSorter() {

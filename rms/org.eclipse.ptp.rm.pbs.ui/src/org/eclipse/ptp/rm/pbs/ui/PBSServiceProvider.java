@@ -220,7 +220,6 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 		for (String nm : names)
 			if (name.equals(nm))
 				return;
-
 		putString(TEMPLATE_NAMES, nameList + CM + name);
 	}
 }

@@ -13,9 +13,13 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.wizards;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -23,6 +27,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
+import org.eclipse.ptp.rm.pbs.ui.PBSUIPlugin;
 import org.eclipse.ptp.rm.pbs.ui.data.PBSBatchScriptTemplate;
 import org.eclipse.ptp.rm.pbs.ui.dialogs.ScrollingEditableMessageDialog;
 import org.eclipse.ptp.rm.pbs.ui.managers.PBSBatchScriptTemplateManager;
@@ -38,9 +43,12 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.progress.UIJob;
 
 /**
  * Allows the user to create or modify new templates for use in the Launch Tab.
@@ -123,10 +131,7 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 						Messages.PBSRMLaunchConfigEditChoose_new_name, oldName, null);
 				if (nameDialog.open() == Window.CANCEL)
 					return;
-				// newName = oldName;
-				else
-					newName = nameDialog.getValue();
-				newName = templateManager.validateTemplateNameForEdit(newName);
+				newName = templateManager.validateTemplateNameForEdit(nameDialog.getValue());
 
 				PBSBatchScriptTemplate template = templateManager.loadTemplate(oldName, null);
 				ScrollingEditableMessageDialog dialog = new ScrollingEditableMessageDialog(getShell(),
@@ -152,18 +157,102 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 		}
 	}
 
+	/*
+	 * Associated with the export button.
+	 */
+	private class ExportConfigurationSelectionAdapter implements SelectionListener {
+		public void widgetDefaultSelected(SelectionEvent e) {
+			widgetSelected(e);
+		}
+
+		/**
+		 * Stores the selected template to a file on the local file system.
+		 * 
+		 */
+		public void widgetSelected(SelectionEvent e) {
+			final String original = WidgetUtils.getSelected(templates);
+			String input = original;
+			if (ZEROSTR.equals(original))
+				return;
+			final String dir = handleExportBrowseButtonSelected();
+			if (ZEROSTR.equals(dir))
+				return;
+			InputDialog nameDialog = new InputDialog(PBSUIPlugin.getActiveWorkbenchShell(), Messages.PBSRMLaunchConfigExportRename,
+					Messages.PBSRMLaunchConfigExportRename_new, original, null);
+			if (nameDialog.open() != Window.CANCEL)
+				input = nameDialog.getValue();
+			final String renamed = input;
+			new UIJob(Messages.PBSRMLaunchConfigExportJobMessage0 + renamed + Messages.PBSRMLaunchConfigExportJobMessage1) {
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					try {
+						monitor.beginTask(Messages.PBSRMLaunchConfigImportJobMessage, 2);
+						templateManager.exportTemplate(dir, original, renamed);
+						monitor.worked(2);
+					} catch (Throwable t) {
+						t.printStackTrace();
+						WidgetUtils.errorMessage(getShell(), t, Messages.PBSRMLaunchConfigExportError_message,
+								Messages.PBSRMLaunchConfigExportError_title, false);
+					} finally {
+						monitor.done();
+					}
+					return Status.OK_STATUS;
+				}
+			}.schedule();
+		}
+	}
+
+	/*
+	 * Associated with the import button.
+	 */
+	private class ImportConfigurationSelectionAdapter implements SelectionListener {
+		public void widgetDefaultSelected(SelectionEvent e) {
+			widgetSelected(e);
+		}
+
+		/**
+		 * Imports a template from a file selected from the local file system.
+		 * 
+		 */
+		public void widgetSelected(SelectionEvent e) {
+			String file = handleImportBrowseButtonSelected();
+			final File imported = new File(file);
+			new UIJob(Messages.PBSRMLaunchConfigImportJobMessage + imported.getName()) {
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					try {
+						monitor.beginTask(Messages.PBSRMLaunchConfigImportJobMessage, 2);
+						templateManager.addImportedTemplate(imported);
+						monitor.worked(1);
+						updateTemplates(imported.getName());
+						updateSettings();
+					} catch (Throwable t) {
+						t.printStackTrace();
+						WidgetUtils.errorMessage(getShell(), t, Messages.PBSRMLaunchConfigImportError_message,
+								Messages.PBSRMLaunchConfigImportError_title, false);
+					} finally {
+						monitor.done();
+					}
+					return Status.OK_STATUS;
+				}
+			}.schedule();
+		}
+	}
+
 	private boolean isValid;
 
 	private ConfigurationChangeListener listener;
 	private TableViewer readOnlyView;
 	private final PBSBatchScriptTemplateManager templateManager;
 	private Combo templates;
+	private String selected;
 
 	public PBSBatchScriptTemplateWizardPage(PBSBatchScriptTemplateManager templateManager) throws Throwable {
 		super(Messages.PBSConfigurationWizardPage_name);
 		setTitle(Messages.PBSConfigurationWizardPage_title);
 		setDescription(Messages.PBSConfigurationWizardPage_description);
 		this.templateManager = templateManager;
+		selected = ZEROSTR;
 		setValid(true);
 	}
 
@@ -173,22 +262,31 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 		composite.setLayout(topLayout);
 		createContents(composite);
 		PBSBatchScriptTemplate current = templateManager.getCurrent();
-		String last = current == null ? PBSBatchScriptTemplateManager.BASE_TEMPLATE : current.getName();
+		String last = current == null ? PBSBatchScriptTemplateManager.FULL_TEMPLATE : current.getName();
 		WidgetUtils.select(templates, last);
 		setControl(composite);
 	}
 
+	public String getSelectedTemplate() {
+		return selected;
+	}
+
 	private void createContents(Composite parent) {
-		Group templateContainer = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigGroup0_title, 2, 1, false);
+		Group templateContainer = WidgetUtils.createFillingGroup(parent, ZEROSTR, 4, 1, false);
 		listener = new ConfigurationChangeListener();
 		String[] available = templateManager.findAvailableTemplates();
 		String initial = available.length == 0 ? null : available[0];
 		templates = WidgetUtils.createItemCombo(templateContainer, Messages.PBSRMLaunchConfigTemplate_title, available, initial,
 				Messages.PBSRMLaunchConfigTemplate_message, true, listener, 2);
+		WidgetUtils.createLabel(templateContainer, ZEROSTR, SWT.LEFT, 1);
 		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigEditButton_title, null, SWT.PUSH, 1, true,
 				new EditConfigurationSelectionAdapter());
 		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigDeleteButton_title, null, SWT.PUSH, 1, true,
 				new DeleteConfigurationSelectionAdapter());
+		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigImportButton_title, null, SWT.PUSH, 1, true,
+				new ImportConfigurationSelectionAdapter());
+		WidgetUtils.createButton(templateContainer, Messages.PBSRMLaunchConfigExportButton_title, null, SWT.PUSH, 1, true,
+				new ExportConfigurationSelectionAdapter());
 
 		Group preferencesContainer = WidgetUtils.createFillingGroup(parent, Messages.PBSRMLaunchConfigPreferences_message, 1, 1,
 				false);
@@ -200,6 +298,18 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 		WidgetUtils.addTableColumn(readOnlyView, Messages.PBSRMLaunchConfigPreferences_column_1, SWT.LEFT, null);
 		WidgetUtils.addTableColumn(readOnlyView, Messages.PBSRMLaunchConfigPreferences_column_2, SWT.LEFT, null);
 		readOnlyView.getTable().setHeaderVisible(true);
+	}
+
+	private String handleExportBrowseButtonSelected() {
+		DirectoryDialog dialog = new DirectoryDialog(PBSUIPlugin.getActiveWorkbenchShell());
+		dialog.setText(Messages.PBSRMLaunchConfigExportButton_message);
+		return dialog.open();
+	}
+
+	private String handleImportBrowseButtonSelected() {
+		FileDialog dialog = new FileDialog(PBSUIPlugin.getActiveWorkbenchShell(), SWT.SINGLE);
+		dialog.setText(Messages.PBSRMLaunchConfigImportButton_message);
+		return dialog.open();
 	}
 
 	/**
@@ -218,9 +328,9 @@ public class PBSBatchScriptTemplateWizardPage extends WizardPage implements IPBS
 	 */
 	private void updateSettings() {
 		PBSBatchScriptTemplate template = null;
-		String choice = WidgetUtils.getSelected(templates);
-		if (!ZEROSTR.equals(choice))
-			template = templateManager.loadTemplate(choice, null);
+		selected = WidgetUtils.getSelected(templates);
+		if (!ZEROSTR.equals(selected))
+			template = templateManager.loadTemplate(selected, null);
 		if (template == null)
 			readOnlyView.setInput(this);
 		else

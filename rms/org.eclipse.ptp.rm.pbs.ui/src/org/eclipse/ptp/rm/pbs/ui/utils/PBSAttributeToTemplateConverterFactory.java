@@ -9,14 +9,15 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.pbs.ui.utils;
 
+import org.eclipse.ptp.rm.pbs.core.rmsystem.IPBSResourceManagerConfiguration;
 import org.eclipse.ptp.rm.pbs.ui.IPBSAttributeToTemplateConverter;
 import org.eclipse.ptp.rm.pbs.ui.IPBSNonNLSConstants;
 
 public class PBSAttributeToTemplateConverterFactory implements IPBSNonNLSConstants {
 
-	public static IPBSAttributeToTemplateConverter getConverter() {
+	public static IPBSAttributeToTemplateConverter getConverter(IPBSResourceManagerConfiguration config) {
 		PBSXMLAttributeToTemplateConverter pbsConverter = new PBSXMLAttributeToTemplateConverter();
-		pbsConverter.setResourcePath(SRC + PATH_SEP + TMP_ATTR_XML);
+		pbsConverter.setResourcePath(SRC + PATH_SEP + config.getProxyConfiguration());
 		return pbsConverter;
 	}
 }
