@@ -12,10 +12,6 @@
  *****************************************************************************/
 package org.eclipse.ptp.remotetools.internal.ssh;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,9 +37,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Proxy;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SocketFactory;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 
@@ -136,135 +130,6 @@ public class Connection implements IRemoteConnection {
 
 		public void showMessage(String message) {
 			fAuthInfo.showMessage(message);
-		}
-	}
-
-	/**
-	 * By default the Jsch connect method ignores the timeout argument which
-	 * prevents any way of interrupting the connection (e.g. with a progress
-	 * monitor). We use a proxy so that we can connect to a remote host with a
-	 * timeout.
-	 */
-	private class SSHProxy implements Proxy {
-		private Socket fSocket;
-		private final IProgressMonitor fMonitor;
-
-		public SSHProxy(IProgressMonitor monitor) {
-			fMonitor = monitor;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.jcraft.jsch.Proxy#connect(com.jcraft.jsch.SocketFactory,
-		 * java.lang.String, int, int)
-		 */
-		public void connect(SocketFactory socket_factory, final String host, final int port, int timeout) throws Exception {
-			final Exception[] ex = new Exception[1];
-			Thread connThread = new Thread(new Runnable() {
-				public void run() {
-					fSocket = null;
-					try {
-						fSocket = new Socket(host, port);
-					} catch (Exception e) {
-						ex[0] = e;
-						if (fSocket != null && fSocket.isConnected()) {
-							try {
-								fSocket.close();
-							} catch (Exception ee) {
-							}
-						}
-						fSocket = null;
-					}
-				}
-			});
-			connThread.setName("Connecting to " + host); //$NON-NLS-1$
-			connThread.start();
-
-			/*
-			 * Loop checking if the thread has completed. Check if the progress
-			 * monitor is cancelled every 1000 ms. If timeout is 0, we should
-			 * loop forever (or until the progress monitor is cancelled)
-			 */
-			try {
-				int tryTimeout = timeout > 1000 ? 1000 : timeout;
-				while (connThread.isAlive() && timeout >= 0 && !fMonitor.isCanceled()) {
-					connThread.join(1000);
-					timeout -= tryTimeout;
-				}
-			} catch (InterruptedException e) {
-			}
-
-			if (fMonitor.isCanceled() || timeout < 0) {
-				connThread.interrupt();
-				connThread = null;
-			}
-
-			if (fMonitor.isCanceled()) {
-				throw new JSchException(Messages.Connection_Operation_cancelled_by_user);
-			}
-
-			if (timeout < 0) {
-				throw new JSchException(Messages.Connection_Timeout);
-			}
-
-			if (fSocket == null) {
-				throw new JSchException(ex[0].getMessage());
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.jcraft.jsch.Proxy#getInputStream()
-		 */
-		public InputStream getInputStream() {
-			try {
-				if (fSocket != null) {
-					return fSocket.getInputStream();
-				}
-			} catch (IOException e) {
-			}
-			return null;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.jcraft.jsch.Proxy#getOutputStream()
-		 */
-		public OutputStream getOutputStream() {
-			try {
-				if (fSocket != null) {
-					return fSocket.getOutputStream();
-				}
-			} catch (IOException e) {
-			}
-			return null;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.jcraft.jsch.Proxy#getSocket()
-		 */
-		public Socket getSocket() {
-			return fSocket;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.jcraft.jsch.Proxy#close()
-		 */
-		public void close() {
-			try {
-				if (fSocket != null) {
-					fSocket.close();
-				}
-			} catch (IOException e) {
-				// do nothing
-			}
 		}
 	}
 
@@ -390,7 +255,6 @@ public class Connection implements IRemoteConnection {
 				defaultSession.setUserInfo(fUserInfo);
 				defaultSession.setServerAliveInterval(300000);
 				defaultSession.setServerAliveCountMax(6);
-				defaultSession.setProxy(new SSHProxy(progress));
 			} catch (JSchException e) {
 				disconnect();
 				throw new RemoteConnectionException(e.getMessage());
@@ -399,7 +263,7 @@ public class Connection implements IRemoteConnection {
 			setSessionCipherType(defaultSession);
 
 			try {
-				defaultSession.connect(fTimeout);
+				jsch.connect(defaultSession, fTimeout, progress.newChild(90));
 			} catch (JSchException e) {
 				disconnect();
 				throw new RemoteConnectionException(e.getMessage());
