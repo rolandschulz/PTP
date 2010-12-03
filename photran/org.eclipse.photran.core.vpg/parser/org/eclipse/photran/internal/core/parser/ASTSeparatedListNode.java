@@ -74,7 +74,8 @@ public class ASTSeparatedListNode<T extends IASTNode> extends AbstractList<T> im
     {
         Token separator = this.separators.remove(index);
         T result = this.entries.remove(index);
-        if (index == 0 && separator == null) this.separators.set(0, null);
+        if (index == 0 && separator == null && !this.separators.isEmpty())
+            this.separators.set(0, null);
         // if (separator != null) separator.setParent(null);
         // if (result != null) result.setParent(null);
         return result;
