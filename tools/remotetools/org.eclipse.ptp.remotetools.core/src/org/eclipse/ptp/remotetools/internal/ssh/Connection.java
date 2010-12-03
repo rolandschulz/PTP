@@ -685,7 +685,7 @@ public class Connection implements IRemoteConnection {
 	}
 
 	protected String getKillablePrefix(KillableExecution execution) {
-		return controlChannel.getKillablePrefix(execution.getInternaID());
+		return controlChannel.getKillablePrefix(execution.getInternalID());
 	}
 
 	/**
@@ -701,7 +701,7 @@ public class Connection implements IRemoteConnection {
 		if (operation instanceof KillableExecution) {
 			KillableExecution killableExecution = (KillableExecution) operation;
 			synchronized (getActiveProcessTable()) {
-				getActiveProcessTable().put(new Integer(killableExecution.getInternaID()), killableExecution);
+				getActiveProcessTable().put(new Integer(killableExecution.getInternalID()), killableExecution);
 			}
 		}
 	}
@@ -750,7 +750,7 @@ public class Connection implements IRemoteConnection {
 		synchronized (getActiveProcessTable()) {
 			KillableExecution exec = getActiveProcessTable().get(new Integer(piid));
 			if (exec != null) {
-				// Process could be already finished and removed fro mthe table.
+				// Process could be already finished and removed from the table.
 				exec.setPID(pid);
 			}
 		}
@@ -794,7 +794,7 @@ public class Connection implements IRemoteConnection {
 		if (operation instanceof KillableExecution) {
 			KillableExecution killableExecution = (KillableExecution) operation;
 			synchronized (getActiveProcessTable()) {
-				getActiveProcessTable().remove(new Integer(killableExecution.getInternaID()));
+				getActiveProcessTable().remove(new Integer(killableExecution.getInternalID()));
 			}
 		}
 	}
