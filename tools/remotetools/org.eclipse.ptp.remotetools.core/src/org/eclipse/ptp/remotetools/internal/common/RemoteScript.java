@@ -25,7 +25,7 @@ import org.eclipse.ptp.remotetools.core.IRemoteScript;
  * @author Richard Maciel <b>Review OK</b>
  */
 public class RemoteScript implements IRemoteScript {
-	private List<String> environment = new ArrayList<String>();
+	private final List<String> environment = new ArrayList<String>();
 
 	private boolean willForwardX11;
 
@@ -99,20 +99,18 @@ public class RemoteScript implements IRemoteScript {
 		StringBuffer sb = new StringBuffer();
 
 		if (environment.size() > 0) {
-			sb.append("declare -x "); //$NON-NLS-1$
+			sb.append("export "); //$NON-NLS-1$
 		}
-
 		for (String env : environment) {
 			sb.append("\"" + env + "\" "); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-
 		if (environment.size() > 0) {
 			sb.append("; "); //$NON-NLS-1$
 		}
-
 		for (int i = 0; i < script.length; i++) {
 			sb.append(script[i] + "; "); //$NON-NLS-1$
 		}
+
 		return sb.toString();
 	}
 
