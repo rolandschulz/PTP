@@ -92,7 +92,16 @@ int Socket::listen(int &port)
 
     ::memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_flags = AI_PASSIVE;
+#ifndef __APPLE__
     hints.ai_family = AF_UNSPEC;
+#else /* !__APPLE__ */
+    /*
+     * Mac OS X comes preconfigured with IPv6 interfaces, so we need to
+     * limit binding to IPv4 only (as the code does not correctly handle binding
+     * to more than one address.)
+     */
+    hints.ai_family = PF_INET;
+#endif /* !__APPLE__ */
     hints.ai_socktype = SOCK_STREAM;
     ::sprintf(service, "%d", port);
     ::getaddrinfo(NULL, service, &hints, &host);
@@ -176,7 +185,15 @@ int Socket::connect(const char *hostName, in_port_t port)
     while (count < CONNECTING_TIMES) {
         struct addrinfo hints = {0};
         ::sprintf(service, "%d", port);
+#ifndef __APPLE__
         hints.ai_family = AF_UNSPEC;
+#else /* !__APPLE__ */
+        /*
+         * Mac OS X comes preconfigured with IPv6 interfaces, so we need to
+         * limit connecting to IPv4 only (see the issue with listen above.)
+         */
+        hints.ai_family = PF_INET;
+#endif /* !__APPLE__ */
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_flags = AI_NUMERICHOST | AI_NUMERICSERV;
 
