@@ -119,7 +119,13 @@ void MessageQueue::release()
 #ifndef __APPLE__
 	::sem_post(&sem);
 #else /* !__APPLE__ */
-	::semaphore_signal_all(sem);
+	/*
+	 * We must use semaphore_signal and not semaphore_signal_all
+	 * here as this may be called before sem_wait_i. This is
+	 * because semaphore_signal_all only sets the semaphore
+	 * to 0, it does not increment it.
+	 */
+	::semaphore_signal(sem);
 #endif /* !__APPLE__ */
 }
 
