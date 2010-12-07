@@ -87,8 +87,8 @@ sdm_routing_table_init(int argc, char *argv[])
 		char * arg = argv[ch];
 		if (strncmp(arg, "--master", 8) == 0) {
 			break;
-		} else if (strncmp(arg, "--server", 8) == 0) {
-			id = (int)strtol(arg+8, NULL, 10);
+		} else if (strncmp(arg, "--server=", 9) == 0) {
+			id = (int)strtol(arg+9, NULL, 10);
 		}
 	}
 
