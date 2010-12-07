@@ -685,6 +685,7 @@ public class Session implements IPDISession {
 			} else
 				setStatus(EXITING);
 			debugger.removeEventManager(eventManager);
+			debugger.stopDebugger();
 		} catch (PDIException e) {
 			e.printStackTrace();
 		} finally {
