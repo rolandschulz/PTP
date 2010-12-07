@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.sdm.core.pdi;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Observer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -179,17 +178,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		} catch (IOException e) {
 			throw new PDIException(tasks, Messages.PDIDebugger_4 + e.getMessage());
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.debug.core.pdi.IPDIDebugger#disconnect(java.util.Observer
-	 * )
-	 */
-	public void disconnect(Observer observer) throws PDIException {
-		stopDebugger();
 	}
 
 	/*
@@ -362,10 +350,10 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 				sessionHandleEvents();
 				return true;
 			}
-			disconnect(null);
+			stopDebugger();
 			return false;
 		} catch (IOException e) {
-			disconnect(null);
+			stopDebugger();
 			throw new PDIException(null, Messages.PDIDebugger_12 + e.getMessage());
 		}
 	}
