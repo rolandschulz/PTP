@@ -13,6 +13,8 @@ package org.eclipse.ptp.etfw.feedback.obj;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * 
  * An IFeedbackItem has some standard info, like name, file, lineNo, etc
@@ -24,6 +26,7 @@ import java.util.List;
  * it will remain the same. We do not recommending using this API without consulting with
  * the etfw.feedback team.
  * @author beth tibbitts
+ * @since 3.0
  *
  */
 public interface IFeedbackItem {
@@ -33,7 +36,15 @@ public interface IFeedbackItem {
 	public List<IFeedbackItem>  getChildren();
 	public boolean hasChildren();
 	
+	/**
+	 * Return full filename, should include project name
+	 * @return
+	 */
 	public String getFile();
+	/**
+	 * @since 3.0
+	 */
+	public IFile getIFile();
 	
 	/**
 	 * an IFeedbackItem can have either a lineno range (start/end)

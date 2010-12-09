@@ -10,10 +10,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.etfw.feedback;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackParser;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * Abstract class that may contain utility methods for parsing feedback xml
@@ -48,8 +64,79 @@ abstract public class AbstractFeedbackParser implements IFeedbackParser {
 	 * @param filename
 	 * @return fully qualified filename including path, or null if not found
 	 */
-	public String findSourceFile(String filename) {
-		return null;
+//	public String findSourceFile(String filename) {
+//		return null;
+//	}
+	/**
+	 * find file based on project and filename
+	 * @param projName
+	 * @param filename
+	 * @return
+	 * @since 3.0
+	 */
+	 public IResource getResourceInProject(String projName, String filename) {
+	       ResourcesPlugin.getWorkspace();
+	       IWorkspace workspace = ResourcesPlugin.getWorkspace();
+	       IWorkspaceRoot root = workspace.getRoot();
+	       IProject proj=root.getProject(projName);
+	       IResource res = proj.findMember(filename);
+	       boolean exists=res.exists();
+	       
+	       //IFile file=root.getFile(new Path(filename)); // works when filename contains project name
+	       return res;
+	   }
+	 /**
+	 * @since 3.0
+	 */
+	public IResource getResourceInProject(IProject proj, String filename) {
+		 IResource res = proj.findMember(filename);
+		 return res;
+	 }
+	 /*(non-Javadoc)
+	 * @see org.eclipse.ptp.etfw.feedback.AbstractFeedbackParser#findSourceFile(java.lang.String)
+	 * This is generic enough it could be pulled up to AbstractFeedbackParser -
+	 * but that does not know value of xmlSourceFile
+	 * 
+	 * xmlSourceFile could actually be any file in the project. Just used here to find the project.
+	 */
+
+	/**
+	 * @since 3.0
+	 */
+	public IFile findSourceFile(String filename, IFile xmlSourceFile) {
+		IFile f2=(IFile) getResourceInProject(xmlSourceFile.getProject(), filename);
+		return f2;
 	}
+		/**
+		 * @param file
+		 * @return
+		 * @throws ParserConfigurationException
+		 * @throws SAXException
+		 * @throws IOException
+		 * @since 3.0
+		 */
+		public Document getXMLDocument(IFile file) throws ParserConfigurationException, SAXException, IOException {
+			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+			domFactory.setNamespaceAware(true); // never forget this!
+			Document document = null;
+			DocumentBuilder builder = domFactory.newDocumentBuilder();
+			// ===
+			// look for file in same dir as xml file
+			// work ok for remote files 
+	//		IPath p = file.getFullPath();
+	//		p = p.removeLastSegments(1);
+	//		String filepath = p.toPortableString() + IPath.SEPARATOR;// +"mhd.F";
+			// ===
+			InputStream xmlIn = null;
+			try {
+				xmlIn = file.getContents();
+				document = builder.parse(xmlIn);
+			} catch (CoreException e1) {
+				System.out.println("CoreException getting inputstream from: "+file); //$NON-NLS-1$
+				e1.printStackTrace();
+				document=null;
+			}
+			return document;
+		}
 
 }
