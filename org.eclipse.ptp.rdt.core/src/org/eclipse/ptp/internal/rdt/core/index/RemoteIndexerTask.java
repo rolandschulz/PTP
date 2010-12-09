@@ -101,7 +101,6 @@ public class RemoteIndexerTask implements IPDOMIndexerTask {
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.core.dom.IPDOMIndexerTask#acceptUrgentTask(org.eclipse.cdt.core.dom.IPDOMIndexerTask)
 	 */
-	@Override
 	public boolean acceptUrgentTask(IPDOMIndexerTask task) {
 		// TODO Auto-generated method stub
 		return false;
