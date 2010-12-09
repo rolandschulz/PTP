@@ -158,6 +158,9 @@ public abstract class TokenList<T> implements Iterable<T>
         return array[index];
     }
     
+    /**
+     * @since 3.0
+     */
     public T findFirstTokenOnOrAfterLine(int line)
     {
         T result = findFirstTokenOnLine(line);
@@ -197,6 +200,9 @@ public abstract class TokenList<T> implements Iterable<T>
         return array[index];
     }
     
+    /**
+     * @since 3.0
+     */
     public T findLastTokenOnOrBeforeLine(int line)
     {
         T result = findLastTokenOnLine(line);
