@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009 IBM Corporation.
+ * Copyright (c) 2009,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.ptp.etfw.feedback.AbstractFeedbackItem;
 import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 
@@ -23,7 +30,7 @@ import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
  * @author Beth Tibbitts
  *
  */
-public class SampleFeedbackItem implements IFeedbackItem {
+public class SampleFeedbackItem extends AbstractFeedbackItem implements IFeedbackItem {
 	private String name;
 	private String parentID;
 	private String id;
