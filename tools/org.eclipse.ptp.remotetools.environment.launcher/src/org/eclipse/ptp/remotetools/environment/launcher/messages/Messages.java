@@ -9,12 +9,14 @@
  *     IBM Corporation - Initial Implementation
  *
  *****************************************************************************/
-package org.eclipse.ptp.remotetools.environment.launcher.ui;
+package org.eclipse.ptp.remotetools.environment.launcher.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.remotetools.environment.launcher.ui.messages"; //$NON-NLS-1$
+
+	public static String LauncherExecutionTab_0;
 
 	public static String LauncherExecutionTab_ArgumentsFrame_CommandLineLabel;
 
@@ -81,6 +83,8 @@ public class Messages extends NLS {
 	public static String DownloadRuleDialog_Title;
 
 	public static String DownloadRuleDialog_WorkspaceDialog_Title;
+
+	public static String EnhancedSynchronizeTab_0;
 
 	public static String EnhancedSynchronizeTab_DownloadLabel_DestinationLabel;
 

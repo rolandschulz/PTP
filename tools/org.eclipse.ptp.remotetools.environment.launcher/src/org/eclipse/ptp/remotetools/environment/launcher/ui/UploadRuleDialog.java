@@ -26,6 +26,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.ptp.remotetools.environment.launcher.data.ISynchronizationRule;
 import org.eclipse.ptp.remotetools.environment.launcher.data.OverwritePolicies;
 import org.eclipse.ptp.remotetools.environment.launcher.data.UploadRule;
+import org.eclipse.ptp.remotetools.environment.launcher.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.ComboGroup;
 import org.eclipse.ptp.utils.ui.swt.ComboMold;
 import org.eclipse.ptp.utils.ui.swt.ControlsRelationshipHandler;
