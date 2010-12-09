@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009 IBM Corporation.
+ * Copyright (c) 2009,2010 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,9 @@
 
 package org.eclipse.ptp.etfw.feedback.obj;
 
-import java.io.File;
 import java.util.List;
+
+import org.eclipse.core.resources.IFile;
 
 
 /**
@@ -27,22 +28,17 @@ import java.util.List;
  */
 public interface IFeedbackParser {
 	
-	public void setFile(File file);
+	//public void setFile(File file);
 	/**
 	 * Get the items for the feedback view.
 	 * Note that these should be highest level items, possible parent nodes,
 	 * which may have children.
 	 * @return
 	 */
-	public IFeedbackItem[] getFeedbackItems();
-	
-	/**
-	 * needs a java.io.File because the XML parser within it does.
-	 * @param file
-	 * @return
-	 */
-	public List<IFeedbackItem> getFeedbackItems(File file);
-	
+	public IFeedbackItem[] getFeedbackItems();	
+
+	public List<IFeedbackItem> getFeedbackItems(IFile file);
+		
 	public void createMarkers(List<IFeedbackItem> items, String markerID);
 	
 	/**

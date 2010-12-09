@@ -12,6 +12,7 @@
 package org.eclipse.ptp.etfw.feedback;
 
 import java.io.File;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -50,7 +52,8 @@ public class MarkerManager {
 	static String filename;
 	
 	/** Hash table of filenames and resources.  Since usually a single file is
-	 * used often, so don't recreate the IResource.
+	 * used often, we don't recreate the IResource.<br>
+	 * This is the list of unique files found in the IFeedbackItems
 	 */
 	Map<String,IResource> fileMap = new HashMap<String,IResource>();
 
@@ -191,9 +194,41 @@ public class MarkerManager {
 		ResourcesPlugin.getWorkspace();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(filename));
+		IFile file = root.getFileForLocation(new Path(filename));// local file system only (null for remote)
+		file = root.getFile(new Path(filename));
 		return file;
 	}
+	/**
+	 * @since 3.0
+	 */
+	public IResource getResource(URI location) {
+		ResourcesPlugin.getWorkspace();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile[] files = root.findFilesForLocationURI(location);
+		IFile file = files[0];//hack
+		return file;
+	}
+	/**
+	 * from SampleFeedbackParser.getResource
+	 * <br>
+	 * Works for remote projects/files too
+	 * @param projName
+	 * @param filename
+	 * @return
+	 * @since 3.0
+	 */
+	 public static IResource getResourceInProject(String projName, String filename) {
+	       ResourcesPlugin.getWorkspace();
+	       IWorkspace workspace = ResourcesPlugin.getWorkspace();
+	       IWorkspaceRoot root = workspace.getRoot();
+	       IProject proj=root.getProject(projName);
+	       IResource res = proj.findMember(filename);
+	       boolean exists=res.exists();
+	       
+	       //IFile file=root.getFile(new Path(filename)); // works when filename contains project name
+	       return res;
+	   }
 
 	private static int counter = 0;
 
@@ -254,7 +289,6 @@ public class MarkerManager {
 	 * @param itemlist
 	 */
 	public void createMarkers(final List<IFeedbackItem> itemlist, final String markerID) {
-		//timeStart();
 		long firstStart=System.currentTimeMillis();
 		if(traceOn)System.out.println("MarkerMgr.createMarkers()...");
 		if(itemlist.size()==0) {
@@ -265,13 +299,16 @@ public class MarkerManager {
 		fileMap = new HashMap<String,IResource>();
 		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
 			IFeedbackItem item = (IFeedbackItem) iterator.next();
-			String f1 = item.getFile();
-			 
+
+			String filename = item.getFile();
+			 		 
 			//if( (f1!=null) && (!files.contains(f1))  ) {
-			if( (f1!=null) && (!fileMap.containsKey(f1))  ) {
-				IResource res = getResource(f1);
-				fileMap.put(f1,res);
-				if(traceOn)System.out.println("Source file: "+f1);// print each unique one we find
+			if( (filename!=null) && (!fileMap.containsKey(filename))  ) {
+				//IResource res = getResource(f1);
+				IFile ifile=item.getIFile();// works for a remote file :)
+				System.out.println("MM: found: "+ifile.getLocationURI());
+				fileMap.put(filename,ifile);
+				if(traceOn)System.out.println("Source file: "+filename);// print each unique one we find
 			}
 		} 
 		if(traceOn)System.out.println("MarkerMgr.createMarkers()...after file gathering, found # files: "+fileMap.size());
@@ -293,7 +330,7 @@ public class MarkerManager {
 
 		// BATCH all the resource changes from the marker creation in a runnable
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRunnable operation = new IWorkspaceRunnable() {
+ 		IWorkspaceRunnable operation = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException{
 				loopItemsCreateMarkers(itemlist, markerID);
 			}
