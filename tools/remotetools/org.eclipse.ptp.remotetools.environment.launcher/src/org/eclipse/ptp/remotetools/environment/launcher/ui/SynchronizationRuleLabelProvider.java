@@ -19,6 +19,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.environment.launcher.core.LinuxPath;
 import org.eclipse.ptp.remotetools.environment.launcher.data.DownloadRule;
 import org.eclipse.ptp.remotetools.environment.launcher.data.UploadRule;
+import org.eclipse.ptp.remotetools.environment.launcher.messages.Messages;
 import org.eclipse.swt.graphics.Image;
 
 

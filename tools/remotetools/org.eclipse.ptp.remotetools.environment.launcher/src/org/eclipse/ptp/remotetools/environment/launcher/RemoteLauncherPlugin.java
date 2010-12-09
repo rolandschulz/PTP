@@ -25,7 +25,6 @@ import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -37,7 +36,7 @@ public class RemoteLauncherPlugin extends AbstractUIPlugin {
 
 	// The shared instance
 	private static RemoteLauncherPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -47,16 +46,22 @@ public class RemoteLauncherPlugin extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -64,7 +69,7 @@ public class RemoteLauncherPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static RemoteLauncherPlugin getDefault() {
@@ -80,13 +85,14 @@ public class RemoteLauncherPlugin extends AbstractUIPlugin {
 		}
 		return getDefault().getBundle().getSymbolicName();
 	}
-	
+
 	public static LaunchObserverIterator getLaunchObserverIterator() {
 		return new LaunchObserverIterator();
 	}
-	
+
 	public static ILaunchObserver getLaunchObserverByID(String id) {
-		if (id == null) return null;
+		if (id == null)
+			return null;
 		LaunchObserverIterator iterator = getLaunchObserverIterator();
 		while (iterator.hasMoreElements()) {
 			iterator.nextElement();
@@ -108,8 +114,9 @@ public class RemoteLauncherPlugin extends AbstractUIPlugin {
 		CoreException exception = new CoreException(status);
 		throw exception;
 	}
-	
-	public static ILaunchProcess createRemoteLaunchProcess(ILaunch launch, ExecutionConfiguration configuration, ILaunchIntegration launchIntegration) {
+
+	public static ILaunchProcess createRemoteLaunchProcess(ILaunch launch, ExecutionConfiguration configuration,
+			ILaunchIntegration launchIntegration) {
 		return new RemoteLaunchProcess(launch, configuration, launchIntegration);
 	}
 
@@ -117,5 +124,38 @@ public class RemoteLauncherPlugin extends AbstractUIPlugin {
 		Status status = new Status(IStatus.ERROR, PLUGIN_ID, 0, message, e);
 		CoreException exception = new CoreException(status);
 		throw exception;
+	}
+
+	/**
+	 * Logs the specified status with this plug-in's log.
+	 * 
+	 * @param status
+	 *            status to log
+	 * @since 3.0
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Logs an internal error with the specified message.
+	 * 
+	 * @param message
+	 *            the error message to log
+	 * @since 3.0
+	 */
+	public static void logErrorMessage(String message) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
+	}
+
+	/**
+	 * Logs an internal error with the specified throwable
+	 * 
+	 * @param e
+	 *            the exception to be logged
+	 * @since 3.0
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e));
 	}
 }

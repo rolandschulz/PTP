@@ -14,16 +14,16 @@ package org.eclipse.ptp.remotetools.environment.launcher.ui;
 import java.util.ArrayList;
 
 import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
-import org.eclipse.cdt.launch.internal.ui.LaunchMessages;
-import org.eclipse.cdt.launch.internal.ui.LaunchUIPlugin;
 import org.eclipse.cdt.launch.ui.CLaunchConfigurationTab;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remotetools.environment.launcher.RemoteLauncherPlugin;
 import org.eclipse.ptp.remotetools.environment.launcher.core.IRemoteLaunchAttributes;
 import org.eclipse.ptp.remotetools.environment.launcher.internal.LaunchObserverIterator;
+import org.eclipse.ptp.remotetools.environment.launcher.messages.Messages;
 import org.eclipse.ptp.utils.ui.swt.ToolKit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-
 public class LauncherExecutionTab extends CLaunchConfigurationTab {
 
 	protected Text programArgumentsText;
@@ -46,9 +45,9 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 	private ArrayList observerIDs;
 	private Text beforeCommandText;
 	private Text afterCommandText;
-	
+
 	private boolean isValid;
-	
+
 	private class TabModifyListener implements ModifyListener, SelectionListener {
 		public void modifyText(ModifyEvent e) {
 			verifyContent();
@@ -65,10 +64,15 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 			updateLaunchConfigurationDialog();
 		}
 	}
+
 	private TabModifyListener modifyListener;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
 	public void createControl(Composite parent) {
 
@@ -79,14 +83,15 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 		topControl.setLayout(topLayout);
 
 		setControl(topControl);
-		
-		//LaunchUIPlugin.getDefault().getWorkbench().getHelpSystem().setHelp(getControl(), ICDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ARGUMNETS_TAB);
+
+		// LaunchUIPlugin.getDefault().getWorkbench().getHelpSystem().setHelp(getControl(),
+		// ICDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ARGUMNETS_TAB);
 
 		modifyListener = new TabModifyListener();
 
 		createArgumentGroup(topControl);
 		createTargetObserverGroup(topControl);
-		
+
 		verifyContent();
 	}
 
@@ -95,18 +100,20 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 
 		programArgumentsText = ToolKit.createTextRow(group, Messages.LauncherExecutionTab_ArgumentsFrame_CommandLineLabel, null);
 		programArgumentsText.addModifyListener(modifyListener);
-	}	
+	}
 
 	protected void createTargetObserverGroup(Composite topControl) {
 		Group group = ToolKit.createGroup(topControl, Messages.LauncherExecutionTab_ObserverFrame_Title);
 
 		observerList = ToolKit.createShortDropDownRow(group, Messages.LauncherExecutionTab_ObserverFrame_ParserLabel);
 		observerList.addSelectionListener(modifyListener);
-		
-		beforeCommandText = ToolKit.createTextRow(group, Messages.LauncherExecutionTab_ObserverFrame_BashCommandsBeforeLAbel, null, 4);
+
+		beforeCommandText = ToolKit.createTextRow(group, Messages.LauncherExecutionTab_ObserverFrame_BashCommandsBeforeLAbel, null,
+				4);
 		beforeCommandText.addModifyListener(modifyListener);
-		
-		afterCommandText = ToolKit.createTextRow(group, Messages.LauncherExecutionTab_ObserverFrame_BashCommandsAfterLabel, null, 4);
+
+		afterCommandText = ToolKit
+				.createTextRow(group, Messages.LauncherExecutionTab_ObserverFrame_BashCommandsAfterLabel, null, 4);
 		afterCommandText.addModifyListener(modifyListener);
 	}
 
@@ -114,22 +121,28 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 		isValid = true;
 		setErrorMessage(null);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug
+	 * .core.ILaunchConfiguration)
 	 */
+	@Override
 	public boolean isValid(ILaunchConfiguration config) {
 		/*
-		 * If a observer is selected, then the DebugPlugin.ATTR_CAPTURE_OUTPUT attribute must be true.
+		 * If a observer is selected, then the DebugPlugin.ATTR_CAPTURE_OUTPUT
+		 * attribute must be true.
 		 */
 		int selection = observerList.getSelectionIndex();
 		if (selection == -1) {
 			selection = 0;
 		}
-		String selectedObserverID = (String)observerIDs.get(selection);
+		String selectedObserverID = (String) observerIDs.get(selection);
 		if (selectedObserverID != null) {
 			try {
-				if (! config.getAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, false)) {
+				if (!config.getAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, false)) {
 					isValid = false;
 					setMessage(Messages.LauncherExecutionTab_Validation_ObserverAndNoConsole);
 				}
@@ -137,19 +150,26 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 				// Nothing
 			}
 		}
-		
+
 		return super.isValid(config) && isValid;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ILaunchConfigurationTab#canSave()
 	 */
+	@Override
 	public boolean canSave() {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.
+	 * debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, (String) null);
@@ -157,18 +177,23 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 		configuration.setAttribute(IRemoteLaunchAttributes.ATTR_AFTER_COMMAND, IRemoteLaunchAttributes.DEFAULT_AFTER_COMMAND);
 		configuration.setAttribute(IRemoteLaunchAttributes.ATTR_BEFORE_COMMAND, IRemoteLaunchAttributes.DEFAULT_BEFORE_COMMAND);
 		configuration.setAttribute(IRemoteLaunchAttributes.ATTR_OUTPUT_OBSERVER, IRemoteLaunchAttributes.DEFAULT_OUTPUT_OBSERVER);
-		configuration.setAttribute(IRemoteLaunchAttributes.ATTR_USE_FORWARDED_X11, IRemoteLaunchAttributes.DEFAULT_USE_FORWARDED_X11);
-}
+		configuration.setAttribute(IRemoteLaunchAttributes.ATTR_USE_FORWARDED_X11,
+				IRemoteLaunchAttributes.DEFAULT_USE_FORWARDED_X11);
+	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 			programArgumentsText.setText(configuration.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "")); //$NON-NLS-1$
-			
+
 			/*
-			 * Generate list of all observer plug-ins 
+			 * Generate list of all observer plug-ins
 			 */
 			observerList.removeAll();
 			String current;
@@ -188,8 +213,10 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 				iterator.nextElement();
 				String name = iterator.getName();
 				String id = iterator.getID();
-				if (name == null) continue;
-				if (id == null) continue;
+				if (name == null)
+					continue;
+				if (id == null)
+					continue;
 				observerList.add(name);
 				if (current.equals(id)) {
 					selected = index;
@@ -198,7 +225,7 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 				index++;
 			}
 			observerList.select(selected);
-			
+
 			/*
 			 * Fill bash command fields
 			 */
@@ -213,21 +240,23 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 				afterCommandText.setText(null);
 			}
 
-			verifyContent();	
-		}
-		catch (CoreException e) {
-			setErrorMessage(LaunchMessages.getFormattedString("Launch.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage())); //$NON-NLS-1$
-			LaunchUIPlugin.log(e);
+			verifyContent();
+		} catch (CoreException e) {
+			setErrorMessage(NLS.bind(Messages.LauncherExecutionTab_0, e.getStatus().getMessage()));
+			RemoteLauncherPlugin.log(e);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse
+	 * .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(
-			ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS,
-			getAttributeValueFrom(programArgumentsText));
+		configuration.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS,
+				getAttributeValueFrom(programArgumentsText));
 
 		/*
 		 * Observer
@@ -236,8 +265,8 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 		if (selection == -1) {
 			selection = 0;
 		}
-		configuration.setAttribute(IRemoteLaunchAttributes.ATTR_OUTPUT_OBSERVER, (String)observerIDs.get(selection));
-		
+		configuration.setAttribute(IRemoteLaunchAttributes.ATTR_OUTPUT_OBSERVER, (String) observerIDs.get(selection));
+
 		/*
 		 * Bash command fields
 		 */
@@ -258,16 +287,21 @@ public class LauncherExecutionTab extends CLaunchConfigurationTab {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
 		return Messages.LauncherExecutionTab_Tab_Title;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getImage()
 	 */
+	@Override
 	public Image getImage() {
 		return null;
 	}
