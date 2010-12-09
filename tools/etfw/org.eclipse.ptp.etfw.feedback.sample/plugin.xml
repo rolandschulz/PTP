@@ -24,7 +24,7 @@
                id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleToolbar">
             <command
                   commandId="org.eclipse.ptp.etfw.feedback.actions.commands.sampleCommand"
-                  icon="icons/feedback_view.gif"
+                  icon="icons/feedback_action.gif"
                   tooltip="Show ETFw Feedback view for selected XML file"
                   id="org.eclipse.ptp.etfw.feedback.actions.toolbars.sampleCommand">
             </command>
