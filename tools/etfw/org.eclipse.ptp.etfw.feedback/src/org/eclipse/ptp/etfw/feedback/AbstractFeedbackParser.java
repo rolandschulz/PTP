@@ -120,13 +120,7 @@ abstract public class AbstractFeedbackParser implements IFeedbackParser {
 			domFactory.setNamespaceAware(true); // never forget this!
 			Document document = null;
 			DocumentBuilder builder = domFactory.newDocumentBuilder();
-			// ===
-			// look for file in same dir as xml file
-			// work ok for remote files 
-	//		IPath p = file.getFullPath();
-	//		p = p.removeLastSegments(1);
-	//		String filepath = p.toPortableString() + IPath.SEPARATOR;// +"mhd.F";
-			// ===
+
 			InputStream xmlIn = null;
 			try {
 				xmlIn = file.getContents();

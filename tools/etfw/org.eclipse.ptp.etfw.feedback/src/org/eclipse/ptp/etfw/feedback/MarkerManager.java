@@ -57,13 +57,15 @@ public class MarkerManager {
 	 */
 	Map<String,IResource> fileMap = new HashMap<String,IResource>();
 
+	/**
+	 * FIXME this will be valid on local file system only
+	 */
 	private static final String SLASH = System.getProperty("file.separator"); //$NON-NLS-1$
 
 	/**
-	 * Remove the markers from the files we're about to add new markers to
+	 * Remove the markers 
+	 * and remove the then-empty parent nodes too
 	 * 
-	 * @param sfList
-	 *            List of source files
 	 */
 	public void removeMarkers(IResource res, String markerID) {
 		try {
@@ -199,7 +201,7 @@ public class MarkerManager {
 		return file;
 	}
 	/**
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	public IResource getResource(URI location) {
 		ResourcesPlugin.getWorkspace();
@@ -216,7 +218,7 @@ public class MarkerManager {
 	 * @param projName
 	 * @param filename
 	 * @return
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	 public static IResource getResourceInProject(String projName, String filename) {
 	       ResourcesPlugin.getWorkspace();
@@ -244,7 +246,7 @@ public class MarkerManager {
 	 * @param lineNo
 	 * @param desc
 	 * @return
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	public Map<String, Object> createCommonMarkers(IFeedbackItem item, String itemID, String name, String parentID, String filename, String pathname,
 			int lineNo,  String desc) {
@@ -301,12 +303,11 @@ public class MarkerManager {
 			IFeedbackItem item = (IFeedbackItem) iterator.next();
 
 			String filename = item.getFile();
-			 		 
-			//if( (f1!=null) && (!files.contains(f1))  ) {
+
 			if( (filename!=null) && (!fileMap.containsKey(filename))  ) {
 				//IResource res = getResource(f1);
 				IFile ifile=item.getIFile();// works for a remote file :)
-				System.out.println("MM: found: "+ifile.getLocationURI());
+				if(traceOn)System.out.println("MM: found: "+ifile.getLocationURI());
 				fileMap.put(filename,ifile);
 				if(traceOn)System.out.println("Source file: "+filename);// print each unique one we find
 			}

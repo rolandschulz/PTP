@@ -19,7 +19,7 @@ public class PreferenceConstants {
 
 	public static final String P_MAINTAIN_EXPAND_COLLAPSE_STATE = "maintainExpandCollapseState"; //$NON-NLS-1$
 	/**
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	public static final String P_SHOW_NO_ITEMS_FOUND_DIALOG = "showNoItemsFoundDialog";//$NON-NLS-1$
 

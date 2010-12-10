@@ -32,15 +32,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.etfw.feedback.Activator;
-import org.eclipse.ptp.etfw.feedback.messages.Messages;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 import org.eclipse.ptp.etfw.feedback.obj.IFeedbackParser;
 import org.eclipse.ptp.etfw.feedback.util.ViewActivator;
@@ -82,7 +78,7 @@ public class ShowFeedbackHandler extends AbstractHandler {
 		if(isRemote(selection)) {
 			//MessageDialog.openInformation(null, Messages.ShowFeedbackHandler_remoteProjectFound, Messages.ShowFeedbackHandler_remoteNotSupported);
 			//return null;
-			System.out.println("found remote project");
+			if(traceOn)System.out.println("found remote project");
 		}
 		
 		IFeedbackParser parser=null;

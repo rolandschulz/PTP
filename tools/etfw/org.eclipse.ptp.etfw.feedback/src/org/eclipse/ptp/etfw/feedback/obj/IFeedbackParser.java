@@ -27,16 +27,13 @@ import org.eclipse.core.resources.IFile;
  *
  */
 public interface IFeedbackParser {
-	
-	//public void setFile(File file);
+
 	/**
 	 * Get the items for the feedback view.
 	 * Note that these should be highest level items, possible parent nodes,
 	 * which may have children.
 	 * @return
 	 */
-	public IFeedbackItem[] getFeedbackItems();	
-
 	public List<IFeedbackItem> getFeedbackItems(IFile file);
 		
 	public void createMarkers(List<IFeedbackItem> items, String markerID);
