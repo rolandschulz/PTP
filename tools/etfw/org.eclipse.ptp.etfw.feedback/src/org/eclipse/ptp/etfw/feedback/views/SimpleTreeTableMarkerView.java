@@ -1608,7 +1608,13 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 					public void run(IProgressMonitor monitor) throws CoreException {
 						try {
 							int depth = IResource.DEPTH_INFINITE;
+							
+							IMarker[] m=wsResource.findMarkers(markerID_, true, depth);
+							int size=m.length;
+							
+							
 							wsResource.deleteMarkers(markerID_, false, depth);
+							wsResource.findMarkers(markerID_, true, depth);
 							if (traceOn)
 								System.out.println("markers removed."); //$NON-NLS-1$
 

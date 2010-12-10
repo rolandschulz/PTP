@@ -42,7 +42,7 @@ public interface FeedbackIDs
 //    //Note: we use IMarker.LINE_NUMBER too
 
 	/**
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	String FEEDBACK_ATTR_ITEM = "item"; //$NON-NLS-1$
 

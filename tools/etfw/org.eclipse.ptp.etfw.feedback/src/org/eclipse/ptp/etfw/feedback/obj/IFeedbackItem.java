@@ -26,7 +26,7 @@ import org.eclipse.core.resources.IFile;
  * it will remain the same. We do not recommending using this API without consulting with
  * the etfw.feedback team.
  * @author beth tibbitts
- * @since 3.0
+ * @since 5.0
  *
  */
 public interface IFeedbackItem {
@@ -42,7 +42,7 @@ public interface IFeedbackItem {
 	 */
 	public String getFile();
 	/**
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	public IFile getIFile();
 	
@@ -78,9 +78,9 @@ public interface IFeedbackItem {
 	
  
 	
-	/**  @since 3.0 	 */
+	/**  @since 5.0 	 */
 	public String getAttr(String key);
-	/**  @since 3.0 	 */
+	/**  @since 5.0 	 */
 	public Object getObject(String key);
 	
 	
