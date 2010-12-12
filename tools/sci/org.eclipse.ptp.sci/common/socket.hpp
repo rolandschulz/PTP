@@ -44,19 +44,21 @@ class Socket
         
     private:
         int socket;
+		int accSockets[2];
 
     public:
         Socket(int sockfd = -1);
         ~Socket();
 
-        int setMode(bool mode); // blocking or non-blocking
+        int setNonBlock(int sockfd); // blocking or non-blocking
         int setFd(int fd);
         int getFd() { return socket; }
         
-        int listen(int &port);
-        int listen(int &port, const string &ifname);
+        int listen(int &port, char *hname = NULL);
+        int iflisten(int &port, const string &ifname);
         int connect(const char *hostName, in_port_t port);
-        int accept(int sock);
+        int accept();
+        int stopAccept();
         int send(const char *buf, int len);
         int recv(char *buf, int len);
         void close(DIRECTION how);

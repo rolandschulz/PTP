@@ -42,11 +42,16 @@
 #include "writerproc.hpp"
 #include "routinglist.hpp"
 #include "queue.hpp"
+#include "tools.hpp"
+#include "ipconverter.hpp"
 
 Listener:: Listener(int hndl)
         : Thread(hndl), bindPort(-1)
 {
+	char tmp[256] = {0};
     socket = new Socket();
+	::gethostname(tmp, sizeof(tmp));
+	bindName = SysUtil::get_hostname(tmp);
 }
 
 Listener::~Listener()
@@ -63,10 +68,12 @@ int Listener::init()
     }
     envp = ::getenv("SCI_DEVICE_NAME");
     if (envp) {
+        IPConverter converter;
         string ifname = envp;
-        sockfd = socket->listen(bindPort, ifname);
+        socket->iflisten(bindPort, ifname);
+        converter.getIP(ifname, true, bindName);
     } else {
-        sockfd = socket->listen(bindPort);
+        socket->listen(bindPort, (char *)bindName.c_str());
     }
     
     log_debug("listener binded to port %d", bindPort);
@@ -77,8 +84,7 @@ int Listener::init()
 int Listener::stop()
 {
     setState(false);
-    ::shutdown(sockfd, SHUT_RDWR);
-    ::close(sockfd);
+	socket->stopAccept();
     join();
 
     return 0;
@@ -95,7 +101,7 @@ void Listener::run()
 
     while (getState()) {
         try {
-            child = socket->accept(sockfd);
+            child = socket->accept();
         } catch (SocketException &e) {
             log_warn("Listener: socket broken: %s", e.getErrMsg().c_str());
             break;
@@ -158,7 +164,6 @@ void Listener::run()
         }
     }
 
-    ::close(sockfd);
     setState(false);
 }
 

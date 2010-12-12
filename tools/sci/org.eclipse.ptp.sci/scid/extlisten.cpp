@@ -50,7 +50,6 @@ void ExtListener::run()
 {
     int child = -1;
     int port = SCID_PORT;
-    int sockfd = -1;
     struct servent *serv = NULL; 
     char *envp = getenv("SCI_DAEMON_NAME");
 
@@ -62,12 +61,12 @@ void ExtListener::run()
     if (serv != NULL) {
         port = ntohs(serv->s_port);
     }
-    sockfd = socket.listen(port);
+    socket.listen(port);
     log_crit("Extended listener is running");
 
     while (getState()) {
         try {
-            child = socket.accept(sockfd);
+            child = socket.accept();
         } catch (SocketException &e) {
             log_error("socket exception %s", e.getErrMsg().c_str());
             break;
@@ -85,7 +84,6 @@ void ExtListener::run()
         launcher->start();
     }
 
-    ::close(sockfd);
     setState(false);
 }
 

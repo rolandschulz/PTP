@@ -55,7 +55,6 @@ class Stream
 
         int init(const char *nodeAddr, in_port_t port);
         int init(int sockfd);
-        int setAsync();
         int getSocket() { return socket->getFd(); }
 
         void read(char *buf, int size);

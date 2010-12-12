@@ -121,6 +121,7 @@ class CtrlBlock
         EmbedAgent *getAgent(int hndl);
         
         int init(sci_info_t *info);
+        int initClient(ROLE ro);
         void term();
 
         void enable();

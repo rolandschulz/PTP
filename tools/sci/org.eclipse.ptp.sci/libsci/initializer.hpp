@@ -68,6 +68,7 @@ class Initializer
         int initExtBE(int hndl);
         int getIntToken();
         int parseEnvStr(string &envStr);
+		int connectBack();
 };
 
 #define gInitializer Initializer::getInstance()
