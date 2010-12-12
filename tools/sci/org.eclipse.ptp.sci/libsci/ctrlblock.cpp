@@ -133,12 +133,25 @@ void CtrlBlock::setJobKey(int key)
     jobKey = key;
 }
 
+int CtrlBlock::initClient(ROLE ro)
+{
+	char *envp = ::getenv("SCI_JOB_KEY");
+	if (envp != NULL)
+		jobKey = ::atoi(envp);
+	envp = ::getenv("SCI_CLIENT_ID");
+	if (envp != NULL)
+		handle = ::atoi(envp);
+	role = ro;
+
+	return 0;
+}
+
 int CtrlBlock::init(sci_info_t * info)
 {
     char *envp = NULL;
 
     if (info == NULL) {
-        role = AGENT;
+		initClient(AGENT);
         return SCI_SUCCESS;
     } 
 
@@ -166,13 +179,7 @@ int CtrlBlock::init(sci_info_t * info)
             }
             break;
         case SCI_BACK_END:
-            role = BACK_END;
-            envp = ::getenv("SCI_JOB_KEY");
-            if (envp != NULL)
-                jobKey = ::atoi(envp);
-            envp = ::getenv("SCI_CLIENT_ID");
-            if (envp != NULL)
-                handle = ::atoi(envp);
+			initClient(BACK_END);
             break;
         default:
             return SCI_ERR_INVALID_ENDTYPE;

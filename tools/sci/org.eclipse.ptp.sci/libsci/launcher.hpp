@@ -49,7 +49,7 @@ class Launcher
         Topology        &topology;
         EnvVar          env;
         string          shell;
-        string          localName;
+		string			localName;
         int             scidPort;
         MODE            mode;
         bool            embedMode;

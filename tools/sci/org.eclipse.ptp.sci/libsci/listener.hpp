@@ -28,6 +28,9 @@
 
 #include "general.hpp"
 #include "thread.hpp"
+#include <string>
+
+using namespace std;
 
 class Socket;
 
@@ -35,8 +38,8 @@ class Listener : public Thread
 {
     private:
         int              bindPort;
-        int              sockfd;
         Socket           *socket;
+		string			 bindName;
     
     public:
         Listener(int hndl);
@@ -46,6 +49,7 @@ class Listener : public Thread
         int stop();
 
         int getBindPort() { return bindPort; }
+		string & getBindName() { return bindName; }
         
         virtual void run();
 };

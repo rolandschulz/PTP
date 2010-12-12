@@ -42,28 +42,27 @@
 Socket::Socket(int sockfd)
     : socket(sockfd)
 {
+	accSockets[0] = accSockets[1] = -1;
 }
 
 Socket::~Socket()
 {
+	::close(accSockets[0]);
+	::close(accSockets[1]);
     ::close(socket);
 }
 
-int Socket::setMode(bool mode)
+int Socket::setNonBlock(int sockfd)
 {
     int flags, newflags;
 
-    flags = ::fcntl(socket, F_GETFL);
+    flags = ::fcntl(sockfd, F_GETFL);
     if (flags < 0)
         throw SocketException(SocketException::NET_ERR_FCNTL, errno);
 
-    if (mode)
-        newflags = flags & ~O_NONBLOCK;
-    else
-        newflags = flags | O_NONBLOCK;
-
+	newflags = flags | O_NONBLOCK;
     if (newflags != flags) {
-        if (::fcntl(socket, F_SETFL, newflags) < 0) {
+        if (::fcntl(sockfd, F_SETFL, newflags) < 0) {
             throw SocketException(SocketException::NET_ERR_FCNTL, errno);
         }
     }
@@ -83,38 +82,35 @@ int Socket::setFd(int fd)
     return 0;
 }
 
-int Socket::listen(int &port)
+int Socket::listen(int &port, char *hname)
 {
     int sockfd;
-    int yes;
+    int yes, rc;
+	int accCount = 0;
     struct addrinfo hints, *host, *ressave;
     char service[NI_MAXSERV] = {0};
 
     ::memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_flags = AI_PASSIVE;
-#ifndef __APPLE__
+    hints.ai_flags = (hname == NULL) ? AI_PASSIVE : 0;
     hints.ai_family = AF_UNSPEC;
-#else /* !__APPLE__ */
-    /*
-     * Mac OS X comes preconfigured with IPv6 interfaces, so we need to
-     * limit binding to IPv4 only (as the code does not correctly handle binding
-     * to more than one address.)
-     */
-    hints.ai_family = PF_INET;
-#endif /* !__APPLE__ */
     hints.ai_socktype = SOCK_STREAM;
     ::sprintf(service, "%d", port);
-    ::getaddrinfo(NULL, service, &hints, &host);
+    ::getaddrinfo(hname, service, &hints, &host);
     ressave = host;
 
-    bool binded = false;
     while (host) {
-        sockfd = ::socket(host->ai_family, host->ai_socktype, host->ai_protocol);
-        yes = 1;
-        ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+		if ((host->ai_family != AF_INET) && (host->ai_family != AF_INET6))
+			continue;
 
+        sockfd = ::socket(host->ai_family, host->ai_socktype, host->ai_protocol);
         if (sockfd >= 0) {
-            int rc = ::bind(sockfd, host->ai_addr, host->ai_addrlen);
+			yes = 1;
+			rc = ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+			if (host->ai_family == AF_INET6) {
+				setsockopt(sockfd, IPPROTO_IPV6, IPV6_V6ONLY, &yes, sizeof(yes));
+			}
+			setNonBlock(sockfd);
+            rc = ::bind(sockfd, host->ai_addr, host->ai_addrlen);
             if (rc == 0) {
                 struct sockaddr_storage sockaddr;
                 socklen_t len = sizeof(sockaddr);
@@ -123,24 +119,25 @@ int Socket::listen(int &port)
                 ::getnameinfo((struct sockaddr *)&sockaddr, len, NULL, 0,
                         service, sizeof(service), NI_NUMERICSERV);
                 port = ::atoi(service);
-
-                binded = true;
-            }
+				rc = ::listen(sockfd, SOMAXCONN);
+                accSockets[accCount] = sockfd;
+				accCount++;
+            } else {
+				::close(sockfd);
+			}
         }
         host = host->ai_next;
     }
 
-    if (binded) {
-        ::listen(sockfd, SOMAXCONN);
-    } else {
+    if (accCount <= 0) {
         throw SocketException(SocketException::NET_ERR_BIND, errno);
     }
     ::freeaddrinfo(ressave);
 
-    return sockfd;
+    return accCount;
 }
 
-int Socket::listen(int & port, const string & ifname)
+int Socket::iflisten(int & port, const string & ifname)
 {
     char service[NI_MAXSERV] = {0};
     ::sprintf(service, "%d", port);
@@ -179,21 +176,14 @@ int Socket::connect(const char *hostName, in_port_t port)
     int rc = -1;
     int sockfd, nodelay;
     char service[NI_MAXSERV] = {0};
-    struct addrinfo *host = NULL;
+    struct addrinfo *host = NULL, *ressave;
     int count = 0;
+	bool connected = false;
 
     while (count < CONNECTING_TIMES) {
         struct addrinfo hints = {0};
         ::sprintf(service, "%d", port);
-#ifndef __APPLE__
         hints.ai_family = AF_UNSPEC;
-#else /* !__APPLE__ */
-        /*
-         * Mac OS X comes preconfigured with IPv6 interfaces, so we need to
-         * limit connecting to IPv4 only (see the issue with listen above.)
-         */
-        hints.ai_family = PF_INET;
-#endif /* !__APPLE__ */
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_flags = AI_NUMERICHOST | AI_NUMERICSERV;
 
@@ -206,43 +196,76 @@ int Socket::connect(const char *hostName, in_port_t port)
             throw SocketException(SocketException::NET_ERR_GETADDRINFO, errno);
         }
 
-        sockfd = ::socket(host->ai_family, host->ai_socktype, host->ai_protocol);
-        if (sockfd < 0) {
-            ::freeaddrinfo(host);
-            throw SocketException(SocketException::NET_ERR_SOCKET, errno);
-        }
-        nodelay = 1;
-        rc = ::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
+		ressave = host;
+		while (host) {
+			sockfd = ::socket(host->ai_family, host->ai_socktype, host->ai_protocol);
+			if (sockfd < 0) {
+				::freeaddrinfo(host);
+				throw SocketException(SocketException::NET_ERR_SOCKET, errno);
+			}
+			nodelay = 1;
+			rc = ::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
 
-        rc = ::connect(sockfd, host->ai_addr, host->ai_addrlen);
-        if (rc == 0)
-            break;
-        ::sleep(1);
+			rc = ::connect(sockfd, host->ai_addr, host->ai_addrlen);
+			if (rc == 0) {
+				connected = true;
+				break;
+			}
+			host = host->ai_next;
+		}
         count++;
-        ::freeaddrinfo(host);
+        ::freeaddrinfo(ressave);
+		if (connected)
+			break;
+
         ::close(sockfd);
+        ::sleep(1);
     }
     if (rc < 0) {
         throw SocketException(SocketException::NET_ERR_CONNECT, errno);
     }
-    ::freeaddrinfo(host);
     socket = sockfd;
 
     return sockfd;
 }
 
-int Socket::accept(int sockfd)
+int Socket::stopAccept()
+{
+	::shutdown(accSockets[0], SHUT_RDWR);
+	::shutdown(accSockets[1], SHUT_RDWR);
+	return 0;
+}
+
+int Socket::accept()
 {
     int client = -1;
     int nodelay = 1;
     struct sockaddr_storage sockaddr;
     socklen_t  len = sizeof(sockaddr);
+	fd_set rset;
+	int i = 0;
+	int maxfd = 0;
+	int n = 0;
 
-    client = ::accept(sockfd, (struct sockaddr *)&sockaddr, &len);
-    if (client < 0) {
-        throw (SocketException(SocketException::NET_ERR_ACCEPT, errno));
-    }
-    ::setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
+	FD_ZERO(&rset);
+	for (i = 0; i < (sizeof(accSockets) / sizeof(int)); i++) {
+		if (accSockets[i] >= 0)
+			FD_SET(accSockets[i], &rset);
+	}
+	maxfd = (accSockets[0] > accSockets[1]) ? accSockets[0] : accSockets[1];
+	n = select(maxfd + 1, &rset, NULL, NULL, NULL);
+	if (n > 0) {
+		for (i = 0; i < (sizeof(accSockets) / sizeof(int)); i++) {
+			if ((accSockets[i] >= 0) && FD_ISSET(accSockets[i], &rset)) {
+				client = ::accept(accSockets[i], (struct sockaddr *)&sockaddr, &len);
+				if (client < 0) {
+					throw (SocketException(SocketException::NET_ERR_ACCEPT, errno));
+				}
+				::setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
+				break;
+			}
+		}
+	}
 
     return client;
 }

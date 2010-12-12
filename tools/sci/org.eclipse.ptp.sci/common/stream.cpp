@@ -89,12 +89,6 @@ int Stream::init(int sockfd)
     return 0;
 }
 
-int Stream::setAsync()
-{
-    socket->setMode(false);
-    return 0;
-}
-
 void Stream::read(char *buf, int size)
 {
     int n = 0;

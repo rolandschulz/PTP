@@ -74,6 +74,7 @@ int main(int argc, char **argv)
     info.be_info.hndlr = (SCI_msg_hndlr *)&handler;
     info.be_info.param = NULL;
     
+	// sleep(20);
     rc = SCI_Initialize(&info);
     if (rc != SCI_SUCCESS) {
         exit(1);

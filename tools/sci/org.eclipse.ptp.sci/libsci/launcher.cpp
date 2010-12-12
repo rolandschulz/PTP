@@ -138,6 +138,7 @@ Launcher::Launcher(Topology &topo)
     envp = ::getenv("SCI_REMOTE_SHELL");
     if (envp) {
         shell = envp;
+		env.set("SCI_REMOTE_SHELL", shell);
     }
     env.set("SCI_USE_EXTLAUNCHER", "no");
     envp = ::getenv("SCI_USE_EXTLAUNCHER");
@@ -150,7 +151,6 @@ Launcher::Launcher(Topology &topo)
     if (envp && (::strcasecmp(envp, "yes") == 0)) {
         env.set("SCI_ENABLE_FAILOVER", "yes");
     }
-    env.set("SCI_REMOTE_SHELL", shell);
     envp = ::getenv("SCI_DEBUG_TREE");
     if (envp) {
         env.set("SCI_DEBUG_TREE", envp);
@@ -226,7 +226,7 @@ int Launcher::launch()
     if ((envp != NULL) && (strcasecmp(envp, "yes") == 0)) {
         gInitializer->initListener();
     }
-    if (mode == REGISTER) {
+    if ((mode == REGISTER) || !shell.empty()) {
         while (!topology.routingList->allRouted()) {
             SysUtil::sleep(1000);
         }
@@ -300,13 +300,14 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, 
     int rc = 0;
     Listener *listener = NULL;
     assert(!path.empty());
-    if (m == REGISTER) {
+    if ((m == REGISTER) || !shell.empty()) {
         listener = gInitializer->initListener();
     }
-    env.set("SCI_PARENT_HOSTNAME", localName);
     if (listener != NULL) {
+		localName = listener->getBindName();
         env.set("SCI_PARENT_PORT", listener->getBindPort());
     } 
+    env.set("SCI_PARENT_HOSTNAME", localName);
     env.set("SCI_ENABLE_LISTENER", ::getenv("SCI_ENABLE_LISTENER"));
     env.set("SCI_CLIENT_ID", ID);
     env.set("SCI_PARENT_ID", topology.agentID);

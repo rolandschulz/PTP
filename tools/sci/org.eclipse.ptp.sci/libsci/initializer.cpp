@@ -212,10 +212,15 @@ int Initializer::initAgent()
     int port = -1;
     int hndl = -1;
     EmbedAgent *agent = NULL;
+    char *envp = ::getenv("SCI_REMOTE_SHELL");
+    if (envp != NULL) {
+		connectBack();
+    } else {
+        inStream = initStream();
+    }
 
-    inStream = initStream();
     // get hostname and port no from environment variable.
-    char *envp = ::getenv("SCI_WORK_DIRECTORY");
+    envp = ::getenv("SCI_WORK_DIRECTORY");
     if (envp != NULL) {
         ::chdir(envp);
         log_debug("Change working directory to %s", envp);
@@ -298,41 +303,53 @@ int Initializer::parseEnvStr(string &envStr)
     return 0;
 }
 
-int Initializer::initBE()
+int Initializer::connectBack()
 {
+	int pID; 
+	struct iovec sign = {0};
+    int hndl = gCtrlBlock->getMyHandle();
     string nodeAddr;
     int port = -1;
-    int hndl = gCtrlBlock->getMyHandle();
+	char *envp = NULL;
+
+	if (!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID")) {
+		int rc = initExtBE(hndl);
+		if (rc != 0)
+			return rc;
+	}
+	envp = ::getenv("SCI_PARENT_HOSTNAME");
+	if (envp != NULL) {
+		nodeAddr = envp;
+	}
+	envp = ::getenv("SCI_PARENT_PORT");
+	if (envp != NULL) {
+		port = ::atoi(envp);
+	}
+	envp = ::getenv("SCI_PARENT_ID");
+	if (envp != NULL) {
+		pID = ::atoi(envp);
+	}
+
+	inStream = new Stream();
+	inStream->init(nodeAddr.c_str(), port);
+	psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, pID);
+	*inStream << gCtrlBlock->getJobKey() << hndl << pID << sign << endl;
+	psec_free_signature(&sign);
+    log_debug("My parent host is %s, parent port id %d", nodeAddr.c_str(), port);
+
+	return 0;
+}
+
+int Initializer::initBE()
+{
+    int hndl;
     char *envp = ::getenv("SCI_USE_EXTLAUNCHER");
-    if ((envp != NULL) && (::strcasecmp(envp, "yes") == 0)) {
-        int pID; 
-        struct iovec sign = {0};
-        if (!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID")) {
-            int rc = initExtBE(hndl);
-            if (rc != 0)
-                return rc;
-        }
-        envp = ::getenv("SCI_PARENT_HOSTNAME");
-        if (envp != NULL) {
-            nodeAddr = envp;
-        }
-        envp = ::getenv("SCI_PARENT_PORT");
-        if (envp != NULL) {
-            port = ::atoi(envp);
-        }
-        envp = ::getenv("SCI_PARENT_ID");
-        if (envp != NULL) {
-            pID = ::atoi(envp);
-        }
-        hndl = gCtrlBlock->getMyHandle();       // hndl may change
-        inStream = new Stream();
-        inStream->init(nodeAddr.c_str(), port);
-        psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, pID);
-        *inStream << gCtrlBlock->getJobKey() << hndl << pID << sign << endl;
-        psec_free_signature(&sign);
-        if (hndl < 0) {
-            gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
-        }
+    if (((envp != NULL) && (::strcasecmp(envp, "yes") == 0))
+			|| (::getenv("SCI_REMOTE_SHELL") != NULL)) {
+		connectBack();
+		if (gCtrlBlock->getMyHandle() < 0) {
+			gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
+		}
     } else {
         inStream = initStream();
     }
@@ -346,7 +363,7 @@ int Initializer::initBE()
     }
 
     hndl = gCtrlBlock->getMyHandle();
-    log_debug("My parent host is %s, parent port id %d, my ID is %d", nodeAddr.c_str(), port, hndl);
+    log_debug("My ID is %d", hndl);
 
     PurifierProcessor *purifier = new PurifierProcessor(hndl);
     gCtrlBlock->setPurifierProcessor(purifier);
