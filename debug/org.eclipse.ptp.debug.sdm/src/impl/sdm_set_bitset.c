@@ -13,6 +13,7 @@
  * ID set implementation. These routines implement a set abstraction using bitsets.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
