@@ -8,6 +8,7 @@
 
 #include "config.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "x10/x10_variable.h"

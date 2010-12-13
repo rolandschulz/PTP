@@ -21,6 +21,7 @@
   * Based on the QNX Java implementation of the MI interface
   */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "MIValue.h"
