@@ -137,7 +137,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			}
 		});
 
-		fProjButton = createPushButton(projComp, LaunchMessages.getString("Launch.common.Browse_1"), null); //$NON-NLS-1$
+		fProjButton = createPushButton(projComp, LaunchMessages.Launch_common_Browse_1,null);//.getString("Launch.common.Browse_1"), null); //$NON-NLS-1$
 		fProjButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -243,15 +243,15 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 		buildConfCombo.removeAll();
 		ICProject project = getCProject();
 		if (project == null) {
-			MessageDialog.openInformation(getShell(), LaunchMessages.getString("CMainTab.Project_required"), //$NON-NLS-1$
-					LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
+			MessageDialog.openInformation(getShell(), LaunchMessages.CMainTab_Project_required,//.getString("CMainTab.Project_required"), //$NON-NLS-1$
+					LaunchMessages.CMainTab_Enter_project_before_searching_for_program);//.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
 			return;
 		}
 
 		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
 		if (info == null) {
-			MessageDialog.openInformation(getShell(), LaunchMessages.getString("CMainTab.Project_required"), //$NON-NLS-1$
-					LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
+			MessageDialog.openInformation(getShell(), LaunchMessages.CMainTab_Project_required,//.getString("CMainTab.Project_required"), //$NON-NLS-1$
+					LaunchMessages.CMainTab_Enter_project_before_searching_for_program);//.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
 			return;
 		}
 
@@ -275,16 +275,16 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 
 		String name = fProjText.getText().trim();
 		if (name.length() == 0) {
-			setErrorMessage(LaunchMessages.getString("CMainTab.Project_not_specified")); //$NON-NLS-1$
+			setErrorMessage(LaunchMessages.CMainTab_Project_not_specified);//.getString("CMainTab.Project_not_specified")); //$NON-NLS-1$
 			return false;
 		}
 		if (!ResourcesPlugin.getWorkspace().getRoot().getProject(name).exists()) {
-			setErrorMessage(LaunchMessages.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
+			setErrorMessage(LaunchMessages.Launch_common_Project_does_not_exist);//.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
 			return false;
 		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.isOpen()) {
-			setErrorMessage(LaunchMessages.getString("CMainTab.Project_must_be_opened")); //$NON-NLS-1$
+			setErrorMessage(LaunchMessages.CMainTab_Project_must_be_opened);//.getString("CMainTab.Project_must_be_opened")); //$NON-NLS-1$
 			return false;
 		}
 
@@ -306,7 +306,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 
 				ICProject thisProject = getCProject();
 				if (thisProject == null) {
-					setErrorMessage(LaunchMessages.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
+					setErrorMessage(LaunchMessages.Launch_common_Project_does_not_exist);//.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
 					return false;
 				}
 
