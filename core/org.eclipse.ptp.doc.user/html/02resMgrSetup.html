@@ -11,6 +11,7 @@
 <p>Topics  include:
 <ul>
 <li><a href="#defn">Resource managers</a></li>
+<li><a href="#list">List of PTP-supported Resource managers</a></li>
 <li>Steps for defining a resource manager</li>
 <ol>
 <li><a href="#creat">Creating a resource manager</a></li>
@@ -39,11 +40,27 @@ controls one target system, although a particular target system may have more th
 <p>Resource managers can be <i>local</i> or <i>remote</i>. A local resource manager controls resources on the local machine running 
 Eclipse. A remote resource manager controls resources on a physically remote system. The process of configuring a local or remote 
 resource manager is the same.</p>
+<h2 id="list">List of PTP-Supported Resource Managers</h2>
+<p>
+<ul>
+<li><a href="02resMgrGenericRemoteLaunch.html">Generic Remote Launch</a></li>
+<li>Open MPI - covered in examples below
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM
+		Loadleveler</a>
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.pe.help/html/PEMainHelp.html">IBM
+		Parallel Environment</a>
+<li>MPICH2 - setup is similar to Open MPI (not covered separatly here)
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.pbs.help/html/toc.html">PBS</a>
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM</a>
 
+</ul>
+<p>More information about PTP Resource Managers and what they support can be
+found on the <a href="http://wiki.eclipse.org/PTP/release_notes">Release Notes page</a> for this version of PTP.
+<p>&nbsp;
 <h2 id="creat">Step 1: Creating a resource manager</h2>
 <p></p>
 <ol>
-<li><p>Open the <b>PTP Runtime Perspective</b> using 
+<li><p>Open the <b>Parallel Runtime Perspective</b> using 
 <b>Window &gt; Open Perspective &gt; Other...</b> and then choose <b>Parallel Runtime</b> from the 
 list of perspectives.</p><p><br></p>
 <p><img src="images/02RuntimePerspEmpty.png"></p><p><br></p>
@@ -55,6 +72,7 @@ list of perspectives.</p><p><br></p>
 <li><p>Choose the resource manager that corresponds to the target system. In this example we 
 will use the <b>Open MPI</b> resource manager, which is used to control the Open MPI Open Runtime 
 Environment.</p><p><br></p>
+ 
 <p><img src="images/02chooseResMgrType.png"></p><p><br></p></li>
 <li><p>Select <b>Next &gt;</b></p></li>
 </ol>
@@ -122,32 +140,39 @@ for more information. We will only consider Remote Tools here, but the steps for
 		<p>In the <b>Open MPI connection configuration</b> dialog,  select <b>Remote Tools</b> as the <b>Remote service provider</b>.
 		</p>
 		<p><br></p>
-		<p><img src="images/02-RM-OpenMPI-Connection-Remote0.png"></p><p><br></p>
+		<p><img src="images/02-RM-OpenMPI-Connection-Remote0.png"></p>
+		<p><br></p>
 	</li>
 	
 	<li>
 		<p>
-		At this point, you need to configure a <b>Connection name</b>.
-		This will differ depending on the remote service provider that you selected in the previous step. 
-		The following steps describe configuring a <b>Remote Tools</b> location.
+		At this point, you either need to use an existing connection or configure new a <b>Connection name</b>.
 		</p>
 		<p><br></p>
 	</li>
-	
+	<li>If you are using an existing Connection, select it here (it may be selected already).
+	<p><br></p>
+	</li>
+	<li>Configuring a new Connection name will differ depending on the remote service provider that you selected in the 
+	    previous step. 
+		The following steps describe configuring a <b>Remote Tools</b> location.  To create a new Connection,</li>
 	<ol type="a">
 		<li>
 			<p>Select <b>New...</b></p>
 			<p><br></p>
 		</li>		
 		<li>
-			<p>In the <b>Remote Host</b> dialog, enter a name for the connection in the <b>Target Name</b> field (can be anything).</p>
+			<p>In the <b>Remote Host</b> dialog, enter a name for the connection in the <b>Target Name</b> field (can be anything, but it is suggested to not use a name with spaces).</p>
+<!--  FIXME is the target name with spaces bug still a problem? if so get new screenshot-->		
 			<p><br></p>
-			<p><img src="images/02newRemoteHost.png"></p>
+			<p><img src="images/02newRemoteHost.png">rr</p>
 			<p><br></p>
 		</li>
 		<li><p>Select the <b>Remote Host</b> radio button.</p><p><br></p></li>
 		<li><p>Enter the address of the remote host in the <b>Host</b> field.</p><p><br></p></li>
+		<!--  port field no longer exists
 		<li><p>The <b>Port</b> field should be left at <code>22</code> unless your installation uses a different port for <code>ssh</code> connections.</p><p><br></p></li>
+		-->
 		<li><p>Enter your user name on the remote machine in the <b>User</b> field.</p><p><br></p></li>
 		<li><p>If you use password authentication, select the <b>Password based authentication</b> radio button and enter the password in the <b>Password</b> field.</p><p><br></p></li>
 		<li><p>If you use key based authentication, select the <b>Public key based authentication</b> radio button, select the file containing your public key, and enter the passphrase for your key (or leave blank if you don't use a passphrase).</p><p><br></p></li>
@@ -155,7 +180,8 @@ for more information. We will only consider Remote Tools here, but the steps for
 	</ol>
 
 	<li>
-		<p>The <b>Tunneling Options</b> allow communication to be tunneled over a single connection if supported by the remote service provider. 
+		<p>Back in the <b>Open MPI connection configuration</b> dialog,  
+		<b>Tunneling Options</b> allow communication to be tunneled over a single connection if supported by the remote service provider. 
 		To enable tunneling, select the <b>SSH port forwarding</b> radio button.</p>
 		<p><br></p>
 	</li>
@@ -179,7 +205,7 @@ PBS, or SLURM resource manager documentation for information on these systems.</
 In this case, the <b>Open MPI tool configuration</b> dialog is shown. 
 You will not normally need to change this information. Just leave the <b>Open MPI version</b> set to <b>Auto Detect</b>, 
 and default values will automatically loaded into the fields.</p>
-<p><img src="images/02-RM-OpenMPI-Configuration.png"></p>
+<p><img src="images/02-RM-OpenMPI-Configuration.png">r</p>
 <ol>
 <li><p>If you wish to specify the commands for the Open MPI environment, or add extra arguments, 
 select a specific Open MPI version and uncheck the <b>Use default settings</b> checkbox.</p>
@@ -206,7 +232,7 @@ would enter <code>/usr/local/openmpi-1.3.4/bin</code> for the location.</p></li>
 </ol>
 
 <h2 id="name">Step 4: Naming the resource manager configuration</h2>
-<p>The next dialog is <b>Choose Resource Manager Name and Description</b> which provides an opportunity
+<p>The next dialog is <b>Common Resource Manager Configuration</b> which provides an opportunity
 to change how the resource manager is displayed.</p>
 <p><img src="images/02ChooseResMgrNameAndDesc.png"></p>
 <ol>
@@ -220,24 +246,13 @@ description</b> checkbox.</p><p><br></p></li>
 </ol>
 <li><p>If you want the resource manager to start automatially when you start a new Eclipse session, check the <b>Automatically start resource
 manager when Eclipse starts</b> checkbox.</p><p><br></li>
-<li><p>Select <b>Next &gt;</b></p></li>
+
 </ol>
 
-<h2 id="finish">Step 5: Finishing resource manager configuration</h2>
-<p>The final dialog is the <b>Select Service Configuration</b> page. This page allows you to add the resource manager to an existing service configuration,
-or create a new service configuration for the resource manager. Service configurations can be shared with users in order to simplify the configuration
-of PTP.
-<p><img src="images/02rmServiceConfig.png"></p>
-<ol>
-<li><p>If there are no existing configurations, you will need to create a new one. You can either choose a new name or 
-leave the default.</p><p><br></p></li>
-<li><p>If there are existing configurations, you can add the resource manager to an existing configuration. Just select the 
-configuration you wish to add it to.</p><p><br></p></li>
 <li><p>Select <b>Finish</b></p><p><br></p></li>
 </ol>
-<p>The new Resource Manager should appear in the list of Resource
-Managers.</p>
-<p><img src="images/02-RM-OpenMPI-View-List.png"></p>
+The new Resource Manager should appear in the list of Resource
+Managers.<p><img src="images/02-RM-OpenMPI-View-List.png"></p>
 
 <h2 id="start">Step 6: Starting the resource manager</h2>
 <p></p>

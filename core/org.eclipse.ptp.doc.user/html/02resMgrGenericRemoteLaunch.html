@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>Generic Remote Launch Resource Manager</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head>
+<body>
+
+<h1 id="top">Generic Remote Launch Resource Manager</h1>
+<p>
+When you create a new resource manager, you are able to select a number of different types
+(Open MPI, PBS, etc.) One of these types is "Generic Remote Launch." 
+This resource manager will simply run an executable on a remote machine using ssh. 
+Using this resource manager on a simple serial program is a good way to ensure that the basic ssh functionality is working correctly.
+<p>To create a Generic Remote Launch resource manager, open the 
+Parallel Runtime Perspective and right-click in the Resource Managers view.
+<p>
+
+<p>Select the Generic Remote Launch type of Resource Manager and click Next.
+<p><img src="images/02GenericRemLaunch01.png">
+
+<p>&nbsp;
+<p>In the Connection Configuration Dialog, fill in the connection information including the 
+Remote Service Provider (e.g. Remote Tools) and the Connection name.
+If you have not already <a href="02resMgrSetup.html#remote">configured a connection,</a> 
+you can do it here.
+Tunneling Options allow communication to be tunneled over a single connection if 
+supported by the remote service provider. 
+To enable tunneling, select the SSH port forwarding radio button.
+<p>
+Click Next, or Finish.
+<p><img src="images/02GenericRemLaunch03.png">
+<p>&nbsp;
+<p>If you clicked Next, the next page allows you to change the default name etc. for
+this resource manager.  Then click Finish.
+<p><img src="images/02GenericRemLaunch04.png">
+
+
+<p>Back in the Resource Managers view, you should see the new resource manager.
+Right-click on the new resource manager and choose "Start Resource Manager" to start it.
+Its icon should turn green.
+<p>
+<img src="images/02GenericRemLaunch02.png">
+<p>&nbsp;
+<p>Now, to run a program with the Generic Remote Launch Resource Manager,
+create a simple remote project.  Create a run configuration for a Parallel Application, and select the Generic Remote Launch Resource Manager that you just created.
+When you run, your program should run on the remote machine.
+<!--  FIXME give more of an example.  e.g. from tutorial. -->
+
+
+<p>Back to <a href="02ResMgrSetup.html">Resource Managers</a>.
+<p>&nbsp;
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>
+
+
+
+
