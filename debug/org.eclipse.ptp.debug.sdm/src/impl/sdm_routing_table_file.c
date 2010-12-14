@@ -17,6 +17,7 @@ static char * MPIRankVars[] = {
 	"PMI_RANK", 					/* MPICH2 */
 	"MP_CHILD",						/* IBM PE */
 	"SLURM_PROCID",					/* SLURM */
+	"X10_PLACE",					/* X10 */
 	NULL
 };
 
