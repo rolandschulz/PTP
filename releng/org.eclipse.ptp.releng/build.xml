@@ -4,7 +4,7 @@
 	</target>
 	
 	<target name="build" depends="zips,p2,test"/>
-	<target name="nightly" depends="tag,zips,sign,p2,test,copy,check"/>
+	<target name="nightly" depends="tag,zips,sign,p2,test,update,copy,check"/>
 	<target name="testbuild" depends="zips,test,copy"/>
 	<target name="buildcopy" depends="zips,copy"/>
 	
@@ -89,8 +89,12 @@
 		<condition property="hasErrors">
 			<contains string="${compileLog}" substring=" ERROR"/>
 		</condition>
+		<copy file="buildindex.html" tofile="${zipsdir}/index.html"/>
+		<replace file="${zipsdir}/index.html">
+			<replacefilter token="@branchVersion@" value="${branchVersion}"/>
+			<replacefilter token="@buildId@" value="${buildId}"/>
+		</replace>
 		<move file="${zipsdir}/${masterFile}" todir="${buildDirectory}"/>
-		
 		<unzip src="${buildDirectory}/${masterFile}" dest="${buildDirectory}/site"/>
 		<copy file="${buildDirectory}/eclipse/epl-v10.html" todir="${buildDirectory}/site/eclipse"/>
 		<copy file="${buildDirectory}/eclipse/notice.html" todir="${buildDirectory}/site/eclipse"/>
@@ -204,6 +208,20 @@
 		<zip destfile="${p2dir}/artifacts.jar" basedir="${p2dir}" includes="artifacts.xml"/>
 		<delete file="${p2dir}/artifacts.xml"/>
 		<delete file="${p2dir}/artifacts.xml_tmp"/>
+	</target>
+	
+	<target name="update" depends="init" unless="hasErrors">
+		<replace file="${copyToDir}/index.html">
+			<replacetoken><![CDATA[  <!-- add here -->]]></replacetoken>
+			<replacevalue><![CDATA[  <!-- add here -->
+<li><a href="@buildType@.@buildId@/index.html">@buildId@</a></li>]]>
+			</replacevalue>
+		</replace>
+		<replace file="${copyToDir}/index.html">
+			<replacefilter token="@buildType@" value="${buildType}"/>
+			<replacefilter token="@buildId@" value="${buildId}"/>
+		</replace>
+		<chmod file="${copyToDir}/index.html" perm="664"/>
 	</target>
 		
 	<target name="tagone">
