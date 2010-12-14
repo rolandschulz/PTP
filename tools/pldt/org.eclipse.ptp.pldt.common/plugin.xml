@@ -54,6 +54,31 @@
                   id="org.eclipse.ptp.pldt.common.toolbar.command1"
                   style="pulldown"
                   tooltip="%command.tooltip">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <or>
+                        <with
+                              variable="activeWorkbenchWindow.activePerspective">
+                           <equals
+                                 value="org.eclipse.cdt.ui.CPerspective">
+                           </equals>
+                        </with>
+                        <with
+                              variable="activeWorkbenchWindow.activePerspective">
+                           <equals
+                                 value="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+                           </equals>
+                        </with>
+                     </or>
+                     <with
+                           variable="activeWorkbenchWindow.activePerspective">
+                        <equals
+                              value="org.eclipse.photran.ui.FortranPerspective">
+                        </equals>
+                     </with>
+                  </or>
+               </visibleWhen>
             </command>
          </toolbar>
       </menuContribution>
