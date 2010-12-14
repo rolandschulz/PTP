@@ -11,13 +11,26 @@
 
 #include "sdm.h"
 
-static char * MPIRankVars[] = {
+/*
+ * Environment variables used to supply rank information
+ */
+static char * RankVars[] = {
 	"OMPI_MCA_orte_ess_vpid", 		/* Open MPI 1.3+ */
 	"OMPI_MCA_ns_nds_vpid", 		/* Open MPI 1.2 */
 	"PMI_RANK", 					/* MPICH2 */
 	"MP_CHILD",						/* IBM PE */
 	"SLURM_PROCID",					/* SLURM */
 	"X10_PLACE",					/* X10 */
+	NULL
+};
+
+/*
+ * Environment variables used to supply number of ranks.
+ * This is not currently used as the routing table size
+ * determines the number of ranks.
+ */
+static char * NumRankVars[] = {
+	"X10_NPLACES",					/* X10 */
 	NULL
 };
 
@@ -97,7 +110,7 @@ sdm_routing_table_init(int argc, char *argv[])
 	 * If no options were set, check the environment
 	 */
 	if (id < 0) {
-		for (var = MPIRankVars; *var != NULL; var++) {
+		for (var = RankVars; *var != NULL; var++) {
 			envval = getenv(*var);
 			if (envval != NULL) {
 				id = (int)strtol(envval, NULL, 10);
