@@ -4,7 +4,7 @@
 	</target>
 	
 	<target name="build" depends="zips,p2,test"/>
-	<target name="nightly" depends="tag,zips,sign,p2,test,update,copy,check"/>
+	<target name="nightly" depends="tag,zips,sign,p2,test,copy,update,check"/>
 	<target name="testbuild" depends="zips,test,copy"/>
 	<target name="buildcopy" depends="zips,copy"/>
 	
