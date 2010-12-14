@@ -27,27 +27,27 @@ import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class RemoteConnectionTests extends TestCase {
-	private static final String USERNAME = "user"; //$NON-NLS-1$
-	private static final String PASSWORD = "password"; //$NON-NLS-1$
+	private static final String USERNAME = "greg"; //$NON-NLS-1$
+	private static final String PASSWORD = ""; //$NON-NLS-1$
 	private static final String HOST = "localhost"; //$NON-NLS-1$
-	
+
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
-	
+
 	public void testEnv() {
 		String var = fRemoteConnection.getEnv("SHELL"); //$NON-NLS-1$
 		assertNotNull(var);
-		
+
 		var = fRemoteConnection.getEnv("FOO_VAR_SHOULD_NOT_BE_DEFINED"); //$NON-NLS-1$
 		assertNull(var);
-		
+
 		assertNotNull(fRemoteConnection.getProperty("os.name")); //$NON-NLS-1$
 		assertNotNull(fRemoteConnection.getProperty("os.arch")); //$NON-NLS-1$
 		assertNotNull(fRemoteConnection.getProperty("os.version")); //$NON-NLS-1$
 		assertNotNull(fRemoteConnection.getProperty("file.separator")); //$NON-NLS-1$
 		assertNotNull(fRemoteConnection.getProperty("path.separator")); //$NON-NLS-1$
 		assertNotNull(fRemoteConnection.getProperty("line.separator")); //$NON-NLS-1$
-		
+
 		IRemoteProcessBuilder builder = fRemoteServices.getProcessBuilder(fRemoteConnection, "env"); //$NON-NLS-1$
 		builder.environment().put("FOO", "BAR"); //$NON-NLS-1$ //$NON-NLS-2$
 		builder.environment().put("USER", "FOO"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -58,15 +58,15 @@ public class RemoteConnectionTests extends TestCase {
 			while ((line = stdout.readLine()) != null) {
 				String[] kv = line.trim().split("="); //$NON-NLS-1$
 				if (kv.length == 2) {
-					if (kv[0].equals("FOO")) assertTrue(kv[1].equals("BAR")); //$NON-NLS-1$ //$NON-NLS-2$
-					if (kv[0].equals("USER")) assertTrue(kv[1].equals("FOO")); //$NON-NLS-1$ //$NON-NLS-2$
+					if (kv[0].equals("FOO"))assertTrue(kv[1].equals("BAR")); //$NON-NLS-1$ //$NON-NLS-2$
+					if (kv[0].equals("USER"))assertTrue(kv[1].equals("FOO")); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		} catch (IOException e) {
 			fail(e.getLocalizedMessage());
 		}
 	}
-	
+
 	public void testCopy() {
 		final IRemoteFileManager fileManager = fRemoteServices.getFileManager(fRemoteConnection);
 
@@ -77,7 +77,7 @@ public class RemoteConnectionTests extends TestCase {
 			srcFileStore.delete(EFS.NONE, new NullProgressMonitor());
 			dstFileStore.delete(EFS.NONE, new NullProgressMonitor());
 			OutputStream stream = srcFileStore.openOutputStream(EFS.NONE, new NullProgressMonitor());
-			stream.write(new byte[]{'f', 'o', 'o', '\n'});
+			stream.write(new byte[] { 'f', 'o', 'o', '\n' });
 			stream.close();
 			srcFileStore.copy(dstFileStore, EFS.NONE, new NullProgressMonitor());
 		} catch (CoreException e) {
@@ -103,45 +103,47 @@ public class RemoteConnectionTests extends TestCase {
 		} catch (IOException e) {
 			fail(e.getLocalizedMessage());
 		}
-		
-//		try {
-//			srcFileStore.delete(EFS.NONE, new NullProgressMonitor());
-//			dstFileStore.delete(EFS.NONE, new NullProgressMonitor());
-//		} catch (CoreException e) {
-//			fail();
-//		}
+
+		// try {
+		// srcFileStore.delete(EFS.NONE, new NullProgressMonitor());
+		// dstFileStore.delete(EFS.NONE, new NullProgressMonitor());
+		// } catch (CoreException e) {
+		// fail();
+		// }
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
 	protected void setUp() throws Exception {
 		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.RemoteTools"); //$NON-NLS-1$
 		assertNotNull(fRemoteServices);
-		
+
 		IRemoteConnectionManager connMgr = fRemoteServices.getConnectionManager();
 		assertNotNull(connMgr);
-		
+
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("ptp.localhost-selection", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("ptp.login-username", USERNAME); //$NON-NLS-1$
-		map.put("ptp.login-password", PASSWORD); //$NON-NLS-1$
-		map.put("ptp.connection-address", HOST); //$NON-NLS-1$
-		map.put("ptp.connection-port", "22"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("ptp.key-path", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("ptp.key-passphrase", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("ptp.is-passwd-auth", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("ptp.connection-timeout", "5"); //$NON-NLS-1$ //$NON-NLS-2$
-		map.put("ptp.cipher-type", "default"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.localhost-selection", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.login-username", USERNAME); //$NON-NLS-1$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.login-password", PASSWORD); //$NON-NLS-1$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.connection-address", HOST); //$NON-NLS-1$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.connection-port", "22"); //$NON-NLS-1$ //$NON-NLS-2$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.key-path", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.key-passphrase", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.is-passwd-auth", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.connection-timeout", "5"); //$NON-NLS-1$ //$NON-NLS-2$
+		map.put("org.eclipse.ptp.remotetools.environment.generichost.cipher-type", "default"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		try {
 			fRemoteConnection = connMgr.newConnection("test_connection", map); //$NON-NLS-1$
 		} catch (RemoteConnectionException e) {
 			fail(e.getLocalizedMessage());
 		}
 		assertNotNull(fRemoteConnection);
-		
+
 		try {
 			fRemoteConnection.open(new NullProgressMonitor());
 		} catch (RemoteConnectionException e) {
@@ -150,7 +152,9 @@ public class RemoteConnectionTests extends TestCase {
 		assertTrue(fRemoteConnection.isOpen());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	@Override
@@ -160,5 +164,5 @@ public class RemoteConnectionTests extends TestCase {
 		assertNotNull(connMgr);
 		connMgr.removeConnection(fRemoteConnection);
 	}
-	
+
 }
