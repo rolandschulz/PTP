@@ -91,6 +91,7 @@
 		</condition>
 		<copy file="buildindex.html" tofile="${zipsdir}/index.html"/>
 		<replace file="${zipsdir}/index.html">
+			<replacefilter token="@eclipseRelease@" value="${eclipseRelease}"/>
 			<replacefilter token="@branchVersion@" value="${ptpBranchVersion}"/>
 			<replacefilter token="@buildId@" value="${buildId}"/>
 		</replace>
@@ -228,8 +229,7 @@
 		<replace file="${releaseDir}/index.html">
 			<replacetoken><![CDATA[  <!-- add here -->]]></replacetoken>
 			<replacevalue><![CDATA[  <!-- add here -->
-<li><a href="@buildType@.@buildId@/index.html">@buildId@</a></li>]]>
-			</replacevalue>
+<li><a href="@buildType@.@buildId@/index.html">@buildId@</a></li>]]></replacevalue>
 		</replace>
 		<replace file="${releaseDir}/index.html">
 			<replacefilter token="@buildType@" value="${buildType}"/>
