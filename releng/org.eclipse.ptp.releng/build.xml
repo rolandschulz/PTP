@@ -146,16 +146,30 @@
 			<dirset dir="${copyToDir}"/>
 		</chmod>
 		<!-- Create symlink to latest build -->
-		<delete file="${releaseDir}/latest" followsymlinks="false" failonerror="false"/>
-		<!--symlink action="delete" link="${copyToDir}/latest" failonerror="false"/-->
-		<symlink link="${releaseDir}/latest" resource="${copyToDir}" overwrite="true"/>
-		<delete file="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" followsymlinks="false" failonerror="false"/>
-		<!--symlink action="delete" link="${copyToDir}/ptp-master-${ptpBranchVersion}-latest.zip" failonerror="false"/-->
-		<symlink link="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${masterFile}" overwrite="true"/>
-		<delete file="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" followsymlinks="false" failonerror="false"/>
-		<!--symlink action="delete" link="${copyToDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" failonerror="false"/-->
-		<symlink link="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true"/>
-		<symlink link="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-aix-${ptpBranchVersion}.tar" overwrite="true"/>
+		<!-- NOTE: the symlink task is broken for ant versions < 1.8.1. It should be possible to -->
+		<!-- just use overwrite="true", but this fails for dangling links. Also, the symlink "delete" -->
+		<!-- action fails with a java.io.FileNotFoundException and the delete task will not remove -->
+		<!-- symbolic links. The only option currenly is to exec the "rm" command. -->
+		<exec executable="rm">
+			<arg value="-f"/>
+			<arg value="${releaseDir}/latest"/>
+		</exec>
+		<symlink link="${releaseDir}/latest" resource="${copyToDir}" overwrite="true" failonerror="false"/>
+		<exec executable="rm">
+			<arg value="-f"/>
+			<arg value="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip"/>
+		</exec>
+		<symlink link="${releaseDir}/ptp-master-${ptpBranchVersion}-latest.zip" resource="${copyToDir}/${masterFile}" overwrite="true" failonerror="false"/>
+		<exec executable="rm">
+			<arg value="-f"/>
+			<arg value="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar"/>
+		</exec>
+		<symlink link="${releaseDir}/rdt-server-unix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-unix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
+		<exec executable="rm">
+			<arg value="-f"/>
+			<arg value="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar"/>
+		</exec>
+		<symlink link="${releaseDir}/rdt-server-aix-${ptpBranchVersion}-latest.tar" resource="${copyToDir}/rdt-server-aix-${ptpBranchVersion}.tar" overwrite="true" failonerror="false"/>
 	</target>
 	
 	<target name="p2" depends="init" unless="hasErrors">
