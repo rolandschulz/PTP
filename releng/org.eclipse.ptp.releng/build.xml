@@ -91,7 +91,7 @@
 		</condition>
 		<copy file="buildindex.html" tofile="${zipsdir}/index.html"/>
 		<replace file="${zipsdir}/index.html">
-			<replacefilter token="@branchVersion@" value="${branchVersion}"/>
+			<replacefilter token="@branchVersion@" value="${ptpBranchVersion}"/>
 			<replacefilter token="@buildId@" value="${buildId}"/>
 		</replace>
 		<move file="${zipsdir}/${masterFile}" todir="${buildDirectory}"/>
@@ -211,17 +211,17 @@
 	</target>
 	
 	<target name="update" depends="init" unless="hasErrors">
-		<replace file="${copyToDir}/index.html">
+		<replace file="${releaseDir}/index.html">
 			<replacetoken><![CDATA[  <!-- add here -->]]></replacetoken>
 			<replacevalue><![CDATA[  <!-- add here -->
 <li><a href="@buildType@.@buildId@/index.html">@buildId@</a></li>]]>
 			</replacevalue>
 		</replace>
-		<replace file="${copyToDir}/index.html">
+		<replace file="${releaseDir}/index.html">
 			<replacefilter token="@buildType@" value="${buildType}"/>
 			<replacefilter token="@buildId@" value="${buildId}"/>
 		</replace>
-		<chmod file="${copyToDir}/index.html" perm="664"/>
+		<chmod file="${releaseDir}/index.html" perm="664"/>
 	</target>
 		
 	<target name="tagone">
