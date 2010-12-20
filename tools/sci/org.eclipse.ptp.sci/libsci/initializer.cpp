@@ -330,6 +330,7 @@ int Initializer::connectBack()
 		pID = ::atoi(envp);
 	}
 
+	hndl = gCtrlBlock->getMyHandle();       // hndl may change
 	inStream = new Stream();
 	inStream->init(nodeAddr.c_str(), port);
 	psec_sign_data(&sign, "%d%d%d", gCtrlBlock->getJobKey(), hndl, pID);

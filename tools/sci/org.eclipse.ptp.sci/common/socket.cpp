@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <poll.h>
 
 #include "socket.hpp"
 #include "ipconverter.hpp"
@@ -231,8 +232,14 @@ int Socket::connect(const char *hostName, in_port_t port)
 
 int Socket::stopAccept()
 {
-	::shutdown(accSockets[0], SHUT_RDWR);
-	::shutdown(accSockets[1], SHUT_RDWR);
+	int i = 0;
+
+	for (i = 0; i < (sizeof(accSockets) / sizeof(int)); i++) {
+		::shutdown(accSockets[i], SHUT_RD);
+		::close(accSockets[i]);
+		accSockets[i] = -1;
+	}
+
 	return 0;
 }
 
@@ -241,22 +248,22 @@ int Socket::accept()
     int client = -1;
     int nodelay = 1;
     struct sockaddr_storage sockaddr;
-    socklen_t  len = sizeof(sockaddr);
-	fd_set rset;
+    socklen_t len = sizeof(sockaddr);
 	int i = 0;
-	int maxfd = 0;
 	int n = 0;
+	int in_files;
+	struct pollfd fds[2];
 
-	FD_ZERO(&rset);
-	for (i = 0; i < (sizeof(accSockets) / sizeof(int)); i++) {
-		if (accSockets[i] >= 0)
-			FD_SET(accSockets[i], &rset);
+	in_files = sizeof(accSockets) / sizeof(int);
+	for (i = 0; i < in_files; i++){
+		fds[i].fd = accSockets[i];
+		fds[i].events = POLLIN;
 	}
-	maxfd = (accSockets[0] > accSockets[1]) ? accSockets[0] : accSockets[1];
-	n = select(maxfd + 1, &rset, NULL, NULL, NULL);
+
+	n = poll(fds, in_files, -1);
 	if (n > 0) {
-		for (i = 0; i < (sizeof(accSockets) / sizeof(int)); i++) {
-			if ((accSockets[i] >= 0) && FD_ISSET(accSockets[i], &rset)) {
+		for (i = 0; i < in_files; i++) {
+			if ((accSockets[i] >= 0) && fds[i].revents) {
 				client = ::accept(accSockets[i], (struct sockaddr *)&sockaddr, &len);
 				if (client < 0) {
 					throw (SocketException(SocketException::NET_ERR_ACCEPT, errno));
