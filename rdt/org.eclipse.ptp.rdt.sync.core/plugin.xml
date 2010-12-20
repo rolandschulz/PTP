@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="languageProperties" name="Language Property Provider" schema="schema/languageProperties.exsd"/>
+   <extension
+         id="remoteMakeNature"
+         name="%RemoteMakeNature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.ptp.rdt.sync.core.resources.RemoteMakeNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="org.eclipse.ptp.rdt.sync.core.remoteMakeBuilder"
+         name="%RemoteMakeBuilder.name"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="true"
+            hasNature="true"
+            isConfigurable="true">
+         <run
+               class="org.eclipse.ptp.rdt.sync.core.make.RemoteMakeBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="RemoteGCCStandardMakePerProjectProfile"
+         name="Remote GCC Standard Make Per Project Profile"
+         point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
+      <scannerInfoCollector
+            class="org.eclipse.ptp.rdt.sync.core.make.ProjectDescriptionCollector"
+            scope="project"/>
+      <buildOutputProvider>
+         <open/>
+         <scannerInfoConsoleParser class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser"/>
+      </buildOutputProvider>
+      <scannerInfoProvider providerId="specsFile">
+         <run
+               command="gcc"
+               arguments="-E -P -v -dD ${specs_file_path}"
+               class="org.eclipse.ptp.rdt.sync.core.make.RemoteSpecsRunSIProvider"/>
+         <scannerInfoConsoleParser class="org.eclipse.cdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
+      </scannerInfoProvider>
+   </extension>
+   <extension
+         id="remoteSyncNature"
+         name="%RemoteSyncNature.name"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature">
+         </run>
+      </runtime>
+   </extension>
+</plugin>
