@@ -22,12 +22,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rm.ibm.pe.ui.rmLaunchConfiguration;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.File;import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -1770,38 +1765,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		attrs = new Vector<StringAttribute>();
 		attrArray = new StringAttribute[0];
 		if (configuration.getAttribute(PE_ADVANCED_MODE, "").equals("yes")) { //$NON-NLS-1$ //$NON-NLS-2$
-			BufferedReader rdr;
-			String setupScriptPath;
-
-			setupScriptPath = configuration.getAttribute(PE_ENV_SCRIPT, ""); //$NON-NLS-1$
-			try {
-				String envData;
-
-				rdr = new BufferedReader(new FileReader(setupScriptPath));
-				envData = rdr.readLine();
-				while (envData != null) {
-					envData = envData.trim();
-					if (envData.startsWith("MP_")) { //$NON-NLS-1$
-						String tokens[];
-						StringAttributeDefinition attrDef;
-						StringAttribute attr;
-
-						tokens = envData.split("="); //$NON-NLS-1$
-						if (tokens.length == 2) {
-							attrDef = new StringAttributeDefinition(tokens[0], "", "", false, ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							attr = new StringAttribute(attrDef, tokens[1]);
-							attrs.add(attr);
-						}
-					}
-					envData = rdr.readLine();
-				}
-			} catch (FileNotFoundException e) {
-				System.out.println(Messages.getString("PERMLaunchConfigurationDynamicTab.299") //$NON-NLS-1$
-						+ setupScriptPath + Messages.getString("PERMLaunchConfigurationDynamicTab.300")); //$NON-NLS-1$
-			} catch (IOException e) {
-				System.out.println(Messages.getString("PERMLaunchConfigurationDynamicTab.301") //$NON-NLS-1$
-						+ setupScriptPath + ": " + e.getMessage()); //$NON-NLS-1$
-			}
+			addAttribute(rm, configuration, attrs, "PE_ENV_SCRIPT"); //$NON-NLS-1$
 		} else {
 			Map<String, StringAttribute> allAttrs;
 			Set<String> attrNames;

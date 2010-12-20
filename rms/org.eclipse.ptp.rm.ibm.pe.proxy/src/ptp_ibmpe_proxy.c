@@ -65,6 +65,7 @@
 #include <limits.h>
 #include <dlfcn.h>
 #include <regex.h>
+#include <ctype.h>
 #ifdef __linux__
 #include <getopt.h>
 #endif
@@ -253,7 +254,8 @@ static char **create_exec_parmlist(char *execname, char *targetname, int arg_cou
 static char **create_child_sdm_parmlist(char *debugger_path, char *debugger_name, int debug_args_count,
         char **debug_args);
 static char **create_debug_parmlist(char *debugger_name, int debug_args_count, char **debug_args);
-static char **create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
+static char **create_env_array(char *args[], char *env_sh_path, int split_io,
+                               char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
         int is_debugger);
 static void add_environment_variable(char *env_var);
 static int setup_stdout_fd(int run_trans_id, char *subid, int pipe_fds[], char *path, char *stdio_name, int *fd,
@@ -274,7 +276,7 @@ static void delete_noderef(char *hostname);
 static void *startup_monitor(void *pid);
 static void delete_task_list(int numtasks, taskinfo * tasks);
 static void *kill_process(void *pid);
-static void update_nodes(int trans_id, FILE * hostlist);
+static void update_nodes(char *hostlist_path);
 static void malloc_check(void *p, const char *function, int line);
 static node_refcount *add_node(char *key);
 static node_refcount *find_node(char *key);
@@ -974,6 +976,7 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     char *mp_buffer_mem_max;
     char *mp_rdma_count;
     char *mp_rdma_count_2;
+    char *env_sh_path = NULL;
     char **envp;
     jobinfo *job;
     int debug_dual_poe_mode = 0;
@@ -1055,18 +1058,13 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                     }
                 }
                 else if ((!use_load_leveler) && (strcmp(args[i], "MP_HOSTFILE")) == 0) {
-                    FILE *hostlist;
                     /*
                      * Process host file, building new machine
                      * configuration if this is a unique hostfile.
                      * If LoadLeveler is used, then don't process hostfile since node status
                      * is handled by tracking Loadleveler's view of node status.
                      */
-                    hostlist = fopen((cp + 1), "r");
-                    if (hostlist != NULL) {
-                        update_nodes(trans_id, hostlist);
-                        fclose(hostlist);
-                    }
+                    update_nodes(cp + 1);
                 }
                 /*
                  * If MP_INFOLEVEL is > 1 char, then convert from label
@@ -1144,6 +1142,9 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
                 else if (strcmp(args[i], "PE_RDMA_COUNT_2") == 0) {
                     mp_rdma_count_2 = cp + 1;
                     mp_rdma_count_set = 1;
+                }
+                else if (strcmp(args[i], "PE_ENV_SCRIPT") == 0) {
+                    env_sh_path = strdup(cp + 1);
                 }
 #ifdef PE_DUAL_POE_DEBUG
                 else if (strcmp(args[i], "PE_DEBUG_MODE") == 0) {
@@ -1328,8 +1329,8 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
             debugger_args[a] = NULL;
 
             snprintf(pe_debugger_id, sizeof pe_debugger_id, "PE_DEBUGGER_ID=%d", getpid());
-            debugger_envp = create_env_array(args, 0, NULL, NULL, pe_debugger_id, 1);
-
+            debugger_envp = create_env_array(args, env_sh_path, 0, NULL, NULL,
+                                             pe_debugger_id, 1);
             max_fd = sysconf(_SC_OPEN_MAX);
             for (i = STDERR_FILENO + 1; i < max_fd; i++) {
                 close(i);
@@ -1427,7 +1428,8 @@ int PE_submit_job(int trans_id, int nargs, char *args[])
     job->discovered_job = 0;
     job->numtasks = -1;
     job->current_hostlist = current_hostlist;
-    envp = create_env_array(args, split_io, mp_buffer_mem_value, mp_rdma_count_value, pe_debugger_id, 0);
+    envp = create_env_array(args, env_sh_path, split_io, mp_buffer_mem_value,
+                            mp_rdma_count_value, pe_debugger_id, 0);
     TRACE_DETAIL("+++ Forking child process\n");
     pid = fork();
     if (pid == 0) {
@@ -3498,8 +3500,8 @@ create_child_sdm_parmlist(char *debugdir, char *debugname, int debug_args_count,
 }
 
 char **
-create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_count, char *debugger_id,
-        int is_debugger)
+create_env_array(char *args[], char *env_sh_path, int split_io, char *mp_buffer_mem,
+                 char *mp_rdma_count, char *debugger_id, int is_debugger)
 {
     /*
      * Set up the environment variable array for the target application.
@@ -3529,22 +3531,22 @@ create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_
                 char procs_str[128];
 
                 snprintf(procs_str, sizeof(procs_str), "MP_PROCS=%d", nprocs);
-                add_environment_variable(strdup(procs_str));
+                add_environment_variable(procs_str);
                 has_mp_procs = 1;
             }
             else if (is_debugger && strncmp(args[i], "MP_MSG_API=", 11) == 0) {
                 /* Strip this out and replace with PE_DEBUG_MSG_API (see below) */;
             }
             else {
-                add_environment_variable(strdup(args[i]));
+                add_environment_variable(args[i]);
             }
 #else
-            add_environment_variable(strdup(args[i]));
+            add_environment_variable(args[i]);
 #endif
         }
         else {
             if (strncmp(args[i], "env=", 4) == 0) {
-                add_environment_variable(strdup(args[i]) + 4);
+                add_environment_variable(args[i] + 4);
             }
         }
     }
@@ -3574,6 +3576,60 @@ create_env_array(char *args[], int split_io, char *mp_buffer_mem, char *mp_rdma_
     else {
         add_environment_variable("MP_RESD=no");
     }
+      /*
+       * If env_sh_path is not null, this indicates that the user has 
+       * specified a 'setup script' to run to set the PE environment variables.
+       * In this case, no environment variable settings were passed across to 
+       * the proxy in the 'run' command, and all settings are in the file
+       * specified by env_sh_path. In this case, open the file specified by
+       * env_sh_path, read the file, and for each line that does not start with
+       * '#', trim leading and trailing spaces from the line and add the
+       * resulting value, which should be in the form "env_var=value" to the
+       * environment variable array for the target process.
+       */
+    if (env_sh_path != NULL) {
+        FILE * env_sh;
+        env_sh = fopen(env_sh_path, "r");
+        free(env_sh_path);
+        env_sh_path = NULL;
+        if (env_sh != NULL) {
+            char env_data[_POSIX_PATH_MAX + 30];
+            char *bufp;
+   
+            bufp = fgets(env_data, sizeof env_data, env_sh);
+            while (bufp != NULL) {
+                char *endp;
+                while (isblank(*bufp)) {
+                    bufp = bufp + 1;
+                }
+                if (*bufp != "#") {
+
+                    endp = bufp;
+                    while ((!isblank(*endp)) && (*endp != '\n') && 
+                           (*endp != '\0')) {
+                        endp = endp + 1;
+                    }
+                    *endp = '\0';
+                    add_environment_variable(bufp);
+                }
+                  /*
+                   * The proxy needs the list of nodes specified in the file
+                   * pointed to by the MP_HOSTFILE environment variable.
+                   * When this environment variable is seen in the input text,
+                   * call update_nodes to process the hostfile
+                   */
+		        endp = strchr(bufp, '=');
+                if (endp != NULL) {
+                    *endp = '\0';
+                    if (strcmp(bufp, "MP_HOSTFILE") == NULL) {
+                        update_nodes(endp + 1);
+                    }
+                }
+                bufp = fgets(env_data, sizeof env_data, env_sh);
+            }
+        }
+        fclose(env_sh);
+    }
     add_environment_variable(NULL);
     TRACE_EXIT;
     return env_array;
@@ -3589,7 +3645,20 @@ void add_environment_variable(char *env_var)
         env_array = (char **) realloc(env_array, sizeof(char *) * env_array_size);
         malloc_check(env_array, __FUNCTION__, __LINE__);
     }
-    env_array[next_env_entry++] = env_var;
+      /*
+       * If env_var is not null, then create a new copy of the string to ensure
+       * it properly gets added to the environment space. This may appear to be
+       * a memory leak, but in reality should not be a problem since this
+       * function is only called on the child side of a fork to create a new
+       * process, and the exec() of the new process will implicitly release
+       * all memory held by the proxy in the child process address space
+       */
+    if (env_var == NULL) {
+        env_array[next_env_entry++] = NULL;
+    }
+    else {
+        env_array[next_env_entry++] = strdup(env_var);
+    }
 }
 
 /*
@@ -3724,7 +3793,7 @@ int setup_child_stderr(int run_trans_id, char *subid, int pipe_fd[])
     return status;
 }
 
-void update_nodes(int trans_id, FILE * hostlist)
+void update_nodes(char *hostlist_path)
 {
     /*
      * Create a node list, containing unique nodes, from the hostlist file.
@@ -3742,11 +3811,16 @@ void update_nodes(int trans_id, FILE * hostlist)
     char hostname[256];
     List *new_nodes;
     struct timeval current_time;
+    FILE *hostlist;
 
     TRACE_ENTRY;
     RUN_GET_TIME("Start processing host list, time from run command start", &run_start_time);
     gettimeofday(&current_time, NULL);
     valstr = NULL;
+    hostlist = fopen(hostlist_path, "r");
+    if (hostlist == NULL) {
+        return;
+    }
     res = fgets(hostname, sizeof(hostname), hostlist);
     new_nodes = NewList();
         /*
@@ -3787,6 +3861,7 @@ void update_nodes(int trans_id, FILE * hostlist)
         }
         res = fgets(hostname, sizeof(hostname), hostlist);
     }
+    fclose(hostlist);
     send_new_node_list(start_events_transid, machine_id, new_nodes);
     DestroyList(new_nodes, NULL);
     RUN_GET_TIME("End processing host list, elapsed time", &current_time);
