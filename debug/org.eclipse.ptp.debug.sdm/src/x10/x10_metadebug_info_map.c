@@ -1654,7 +1654,6 @@ GetSymbolVariable (MISession *session, char *cppFileName, int cppLineNum, char *
 					strcat(memberVar->var->cpp_full_name, CLASS_MEMBER_DEREFERENCE_STR);
 				}
 				strcat(memberVar->var->cpp_full_name, memberVar->var->cpp_name);
-				memberVar->var = memberVar->var;
 				memberVar->children = NULL;
 				//Get the location of this member 
 				memberVar->var->location = MemberLocation(session, result->var, memberVar->var);
