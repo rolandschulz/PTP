@@ -241,7 +241,7 @@ public class RemoteProjectContentsLocationArea {
 	private void checkConnection() {
 		IRemoteUIConnectionManager mgr = getUIConnectionManager();
 		if (mgr != null) {
-			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), fSelectedConnection);
+			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), fContext, fSelectedConnection);
 		}
 	}
 
