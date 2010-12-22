@@ -209,11 +209,9 @@ public class RemoteResourceBrowser extends Dialog {
 			return false;
 		}
 
+		fUIConnMgr.openConnectionWithProgress(getShell(), null, conn);
 		if (!conn.isOpen()) {
-			fUIConnMgr.openConnectionWithProgress(getShell(), conn);
-			if (!conn.isOpen()) {
-				return false;
-			}
+			return false;
 		}
 
 		fFileMgr = fServices.getFileManager(conn);

@@ -86,7 +86,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @param status
 	 *            IStatus object
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
@@ -97,7 +97,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @param msg
 	 *            message to log
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public static void log(String msg) {
 		log(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), IStatus.ERROR, msg, null));
@@ -108,7 +108,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @param e
 	 *            exception used to generate message
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), IStatus.ERROR, Messages.PTPRemoteUIPlugin_3, e));
@@ -154,7 +154,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	 *            context with progress service, or null to use the platform
 	 *            progress service
 	 * @return array containing initialized services
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public synchronized IRemoteServices[] getRemoteServices(IRunnableContext context) {
 		if (fInitializedServices == null) {
@@ -207,7 +207,7 @@ public class PTPRemoteUIPlugin extends AbstractUIPlugin {
 	 *            progress service
 	 * @return initialized remote services or null if the service can't be
 	 *         located or the progress monitor was canceled
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public synchronized IRemoteServices getRemoteServices(final String id, IRunnableContext context) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {

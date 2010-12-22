@@ -205,7 +205,7 @@ public class RemoteDirectoryWidget extends Composite {
 	private void browse() {
 		IRemoteUIConnectionManager connMgr = getUIConnectionManager();
 		if (connMgr != null) {
-			connMgr.openConnectionWithProgress(getShell(), fRemoteConnection);
+			connMgr.openConnectionWithProgress(getShell(), null, fRemoteConnection);
 			if (fRemoteConnection.isOpen()) {
 				IRemoteUIFileManager fileMgr = getUIFileManager();
 				if (fileMgr != null) {

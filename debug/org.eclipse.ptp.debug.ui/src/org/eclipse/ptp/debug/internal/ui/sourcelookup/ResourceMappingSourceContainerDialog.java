@@ -54,13 +54,12 @@ import org.eclipse.ui.views.navigator.ResourceComparator;
  * 
  * @since 4.0
  */
-public class ResourceMappingSourceContainerDialog extends
-		ElementTreeSelectionDialog {
-	
+public class ResourceMappingSourceContainerDialog extends ElementTreeSelectionDialog {
+
 	public static String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private Text fPathText;
-	
+
 	private String fPath = EMPTY_STRING;
 	private IContainer fContainer = null;
 	private final IRemoteConnection fRemoteConnection;
@@ -75,8 +74,8 @@ public class ResourceMappingSourceContainerDialog extends
 	 * @param contentProvider
 	 *            the provider of the tree content for the dialog
 	 */
-	public ResourceMappingSourceContainerDialog(Shell parent,
-			ILabelProvider labelProvider, ITreeContentProvider contentProvider, IRemoteConnection conn) {
+	public ResourceMappingSourceContainerDialog(Shell parent, ILabelProvider labelProvider, ITreeContentProvider contentProvider,
+			IRemoteConnection conn) {
 		super(parent, labelProvider, contentProvider);
 		fRemoteConnection = conn;
 		setTitle(Messages.ResourceMappingSourceContainerDialog_0);
@@ -85,26 +84,21 @@ public class ResourceMappingSourceContainerDialog extends
 		ISelectionStatusValidator validator = new ISelectionStatusValidator() {
 			public IStatus validate(Object[] selection) {
 				for (int i = 0; i < selection.length; i++) {
-					if (!(selection[i] instanceof IFolder) &&
-							!(selection[i] instanceof IProject)) {
-						return new Status(IStatus.ERROR,
-								PTPDebugUIPlugin.PLUGIN_ID, -1,
+					if (!(selection[i] instanceof IFolder) && !(selection[i] instanceof IProject)) {
+						return new Status(IStatus.ERROR, PTPDebugUIPlugin.PLUGIN_ID, -1,
 								Messages.ResourceMappingSourceContainerDialog_1, null);
 					}
 				}
 				if (selection.length == 0) {
-					return new Status(IStatus.ERROR,
-							PTPDebugUIPlugin.PLUGIN_ID, -1,
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.PLUGIN_ID, -1,
 							Messages.ResourceMappingSourceContainerDialog_2, null);
 				}
-				fContainer = (IContainer)selection[0];
+				fContainer = (IContainer) selection[0];
 				if (fPathText.getText().equals(EMPTY_STRING)) {
-					return new Status(IStatus.ERROR,
-							PTPDebugUIPlugin.PLUGIN_ID, -1,
+					return new Status(IStatus.ERROR, PTPDebugUIPlugin.PLUGIN_ID, -1,
 							Messages.ResourceMappingSourceContainerDialog_3, null);
 				}
-				return new Status(IStatus.OK, PTPDebugUIPlugin.PLUGIN_ID, 0,
-						EMPTY_STRING, null);
+				return new Status(IStatus.OK, PTPDebugUIPlugin.PLUGIN_ID, 0, EMPTY_STRING, null);
 			}
 		};
 		setValidator(validator);
@@ -114,8 +108,8 @@ public class ResourceMappingSourceContainerDialog extends
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 		// IDebugHelpContextIds.ADD_FOLDER_CONTAINER_DIALOG);
 		addFilter(new ViewerFilter() {
-			public boolean select(Viewer viewer, Object parentElement,
-					Object element) {
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (!(element instanceof IFolder)) {
 					if (element instanceof IProject) {
 						return ((IProject) element).isAccessible();
@@ -130,11 +124,11 @@ public class ResourceMappingSourceContainerDialog extends
 	public IContainer getContainer() {
 		return fContainer;
 	}
-	
+
 	public IPath getPath() {
 		return new Path(fPath);
 	}
-	
+
 	/**
 	 * Browse for a directory.
 	 * 
@@ -152,8 +146,8 @@ public class ResourceMappingSourceContainerDialog extends
 					} else {
 						fileManager.showConnections(true);
 					}
-					return fileManager.browseDirectory(getShell(),
-							Messages.ResourceMappingSourceContainerDialog_5, fPathText.getText(), 0);
+					return fileManager.browseDirectory(getShell(), Messages.ResourceMappingSourceContainerDialog_5,
+							fPathText.getText(), 0);
 				}
 			} else {
 				DirectoryDialog dialog = new DirectoryDialog(getShell());
@@ -164,38 +158,21 @@ public class ResourceMappingSourceContainerDialog extends
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Get the remote connection used for this project. Will open the
-	 * connection if it is closed.
+	 * Get the remote connection used for this project. Will open the connection
+	 * if it is closed.
 	 * 
 	 * @return IRemoteConnection
 	 */
 	private IRemoteConnection getRemoteConnection(IProject project) {
-//		IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(project.getLocationURI());
-//		if (rsrv != null) {
-//			IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
-//			if (connMgr != null) {
-//				IRemoteConnection conn = connMgr.getConnection(project.getLocationURI());
-//				if (conn != null && !conn.isOpen()) {
-//					IRemoteUIServices uiServices = getRemoteUIServices(project);
-//					if (uiServices != null) {
-//						IRemoteUIConnectionManager connUIMgr = uiServices.getUIConnectionManager();
-//						if (connUIMgr != null) {
-//							connUIMgr.openConnectionWithProgress(getShell(), conn);
-//						}
-//					}
-//				}
-//				return conn;
-//			}
-//		}
-//		return null;
 		if (!fRemoteConnection.isOpen()) {
-			IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices());
+			IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault()
+					.getRemoteUIServices(fRemoteConnection.getRemoteServices());
 			if (uiServices != null) {
 				IRemoteUIConnectionManager connUIMgr = uiServices.getUIConnectionManager();
 				if (connUIMgr != null) {
-					connUIMgr.openConnectionWithProgress(getShell(), fRemoteConnection);
+					connUIMgr.openConnectionWithProgress(getShell(), null, fRemoteConnection);
 				}
 			}
 		}
@@ -208,17 +185,19 @@ public class ResourceMappingSourceContainerDialog extends
 	 * @return IRemoteUIServices
 	 */
 	private IRemoteUIServices getRemoteUIServices(IProject project) {
-//		IRemoteServices rsrv = PTPRemoteCorePlugin.getDefault().getRemoteServices(project.getLocationURI());
-//		if (rsrv != null) {
-//			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
-//		}
-//		return null;
+		// IRemoteServices rsrv =
+		// PTPRemoteCorePlugin.getDefault().getRemoteServices(project.getLocationURI());
+		// if (rsrv != null) {
+		// return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
+		// }
+		// return null;
 		return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices());
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite parentc = (Composite) super.createDialogArea(parent);
-		
+
 		Composite composite = new Composite(parentc, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -226,16 +205,16 @@ public class ResourceMappingSourceContainerDialog extends
 		composite.setLayout(layout);
 		GridData data = new GridData(GridData.FILL_BOTH);
 		composite.setLayoutData(data);
-		
+
 		Font font = parentc.getFont();
 		composite.setFont(font);
-		
+
 		Label label = new Label(composite, SWT.NONE);
 		label.setText(Messages.ResourceMappingSourceContainerDialog_6);
 		data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 2;
 		label.setLayoutData(data);
-		
+
 		fPathText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		fPathText.setText(EMPTY_STRING);
 		fPathText.addModifyListener(new ModifyListener() {
@@ -246,11 +225,12 @@ public class ResourceMappingSourceContainerDialog extends
 		});
 		data = new GridData(GridData.FILL_HORIZONTAL);
 		fPathText.setLayoutData(data);
-		
+
 		Button button = new Button(composite, SWT.PUSH);
 		button.setFont(font);
 		button.setText("Browse..."); //$NON-NLS-1$
 		button.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String path = browseDirectory();
 				if (path != null) {
@@ -258,7 +238,7 @@ public class ResourceMappingSourceContainerDialog extends
 				}
 			}
 		});
-		
+
 		return parentc;
 	}
 }

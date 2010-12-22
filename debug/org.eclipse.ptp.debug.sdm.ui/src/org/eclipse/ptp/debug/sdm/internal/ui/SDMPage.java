@@ -481,7 +481,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 						if (uiServices != null) {
 							IRemoteUIConnectionManager connMgr = uiServices.getUIConnectionManager();
 							if (connMgr != null) {
-								connMgr.openConnectionWithProgress(getShell(), conn);
+								connMgr.openConnectionWithProgress(getShell(), null, conn);
 							}
 						}
 					}
