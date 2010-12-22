@@ -564,11 +564,11 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 		IRemoteUIServices remUIServices = null;
 		IRemoteResourceManagerConfiguration config = (IRemoteResourceManagerConfiguration) getDataSource().getConfig();
 		String rmID = config.getRemoteServicesId();
+		IWizardContainer container = null;
+		if (getControl().isVisible()) {
+			container = getWizard().getContainer();
+		}
 		if (rmID != null) {
-			IWizardContainer container = null;
-			if (getControl().isVisible()) {
-				container = getWizard().getContainer();
-			}
 			remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(rmID, container);
 			String conn = config.getConnectionName();
 			if (remoteServices != null && conn != null) {
@@ -578,7 +578,7 @@ public abstract class AbstractToolRMConfigurationWizardPage extends AbstractConf
 		}
 
 		if (remUIServices != null && connection != null) {
-			remUIServices.getUIConnectionManager().openConnectionWithProgress(getShell(), connection);
+			remUIServices.getUIConnectionManager().openConnectionWithProgress(getShell(), container, connection);
 			if (connection.isOpen()) {
 				IRemoteUIFileManager fileMgr = remUIServices.getUIFileManager();
 				fileMgr.setConnection(connection);

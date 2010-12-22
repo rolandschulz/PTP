@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
@@ -43,9 +44,10 @@ public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
 	 * 
 	 * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#
 	 * openConnectionWithProgress(org.eclipse.swt.widgets.Shell,
+	 * org.eclipse.jface.operation.IRunnableContext,
 	 * org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
-	public void openConnectionWithProgress(final Shell shell, final IRemoteConnection connection) {
+	public void openConnectionWithProgress(final Shell shell, IRunnableContext context, final IRemoteConnection connection) {
 		if (!connection.isOpen()) {
 			IRunnableWithProgress op = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -58,7 +60,11 @@ public class LocalUIConnectionManager implements IRemoteUIConnectionManager {
 				}
 			};
 			try {
-				new ProgressMonitorDialog(shell).run(true, true, op);
+				if (context != null) {
+					context.run(true, true, op);
+				} else {
+					new ProgressMonitorDialog(shell).run(true, true, op);
+				}
 			} catch (InvocationTargetException e) {
 				ErrorDialog.openError(shell, Messages.LocalUIConnectionManager_0, Messages.LocalUIConnectionManager_1, new Status(
 						IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage()));
