@@ -189,7 +189,6 @@ public class SDMRunner extends Job {
 			 * debugger.
 			 */
 			DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_19, e);
-			setSdmState(SDMMasterState.ERROR);
 			synchronized (this) {
 				DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_20, e);
 				sdmProcess.destroy();
@@ -201,10 +200,13 @@ public class SDMRunner extends Job {
 				PTPDebugCorePlugin.log(e1);
 			}
 			if (e instanceof InterruptedException) {
+				setSdmState(SDMMasterState.FINISHED);
 				return Status.CANCEL_STATUS;
 			} else if (e instanceof CoreException) {
+				setSdmState(SDMMasterState.ERROR);
 				return ((CoreException) e).getStatus();
 			} else {
+				setSdmState(SDMMasterState.ERROR);
 				return new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), Messages.SDMRunner_3, e);
 			}
 		} finally {
