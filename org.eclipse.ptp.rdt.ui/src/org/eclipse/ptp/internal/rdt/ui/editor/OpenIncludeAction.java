@@ -306,9 +306,16 @@ public class OpenIncludeAction extends
 	 */
 	private URI replacePath(URI u, String path) {
 		try {
-			return new URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(),
-			               path, // replaced! 
-			               u.getQuery(),u.getFragment());
+			if (u.getHost() != null)
+				return new URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(),
+				               path, // replaced! 
+				               u.getQuery(),u.getFragment());
+			
+			//Bug 332798: handle remote tools connection
+			return new URI(u.getScheme(), u.getAuthority(),
+							path, //replaced!
+							u.getQuery(),
+							u.getFragment());
 		} catch (URISyntaxException e) {
 			RDTLog.logError(e);
 			return null;
