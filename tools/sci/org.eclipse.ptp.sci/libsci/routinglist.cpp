@@ -94,6 +94,7 @@ RoutingList::~RoutingList()
 {  
     delete myDistriGroup;
     delete [] successorList;
+    delete topology;
     ::pthread_mutex_destroy(&mtx);
 }
 

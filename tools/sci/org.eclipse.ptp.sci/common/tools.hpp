@@ -43,5 +43,7 @@ class SysUtil
         static char * get_path_name(const char *program);
 };
 
+#define NELEMS(array) (sizeof(array) / sizeof(array[0]))
+
 #endif
 
