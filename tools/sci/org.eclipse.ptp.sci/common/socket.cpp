@@ -35,6 +35,7 @@
 #include <poll.h>
 
 #include "socket.hpp"
+#include "tools.hpp"
 #include "ipconverter.hpp"
 
 
@@ -43,13 +44,20 @@
 Socket::Socket(int sockfd)
     : socket(sockfd)
 {
-	accSockets[0] = accSockets[1] = -1;
+	int i = 0;
+
+	for (i = 0; i < NELEMS(accSockets); i++) {
+        accSockets[i] = -1;
+    }
 }
 
 Socket::~Socket()
 {
-	::close(accSockets[0]);
-	::close(accSockets[1]);
+	int i = 0;
+
+	for (i = 0; i < NELEMS(accSockets); i++) {
+        ::close(accSockets[i]);
+    }
     ::close(socket);
 }
 
@@ -99,7 +107,7 @@ int Socket::listen(int &port, char *hname)
     ::getaddrinfo(hname, service, &hints, &host);
     ressave = host;
 
-    while (host) {
+    while (host && (accCount < NELEMS(accSockets))) {
 		if ((host->ai_family != AF_INET) && (host->ai_family != AF_INET6))
 			continue;
 
@@ -109,6 +117,13 @@ int Socket::listen(int &port, char *hname)
 			rc = ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 			if (host->ai_family == AF_INET6) {
 				setsockopt(sockfd, IPPROTO_IPV6, IPV6_V6ONLY, &yes, sizeof(yes));
+				sockaddr_in6 *addr6 = (sockaddr_in6 *)host->ai_addr;
+				if (port != 0)
+					addr6->sin6_port = port;
+			} else {
+				sockaddr_in *addr4 = (sockaddr_in *)host->ai_addr;
+				if (port != 0)
+					addr4->sin_port = port;
 			}
 			setNonBlock(sockfd);
             rc = ::bind(sockfd, host->ai_addr, host->ai_addrlen);
@@ -234,8 +249,8 @@ int Socket::stopAccept()
 {
 	int i = 0;
 
-	for (i = 0; i < (sizeof(accSockets) / sizeof(int)); i++) {
-		::shutdown(accSockets[i], SHUT_RD);
+	for (i = 0; i < NELEMS(accSockets); i++) {
+		::shutdown(accSockets[i], SHUT_RDWR);
 		::close(accSockets[i]);
 		accSockets[i] = -1;
 	}
@@ -251,28 +266,31 @@ int Socket::accept()
     socklen_t len = sizeof(sockaddr);
 	int i = 0;
 	int n = 0;
-	int in_files;
-	struct pollfd fds[2];
+    struct pollfd fds[NELEMS(accSockets)] = {0};
+    int accCount = 0;
 
-	in_files = sizeof(accSockets) / sizeof(int);
-	for (i = 0; i < in_files; i++){
-		fds[i].fd = accSockets[i];
-		fds[i].events = POLLIN;
-	}
+    for (i = 0; i < NELEMS(accSockets); i++){
+        if (accSockets[i] == -1) {
+            accCount = i;
+            break;
+        }
+        fds[i].fd = accSockets[i];
+        fds[i].events = POLLIN;
+    }
 
-	n = poll(fds, in_files, -1);
-	if (n > 0) {
-		for (i = 0; i < in_files; i++) {
-			if ((accSockets[i] >= 0) && fds[i].revents) {
-				client = ::accept(accSockets[i], (struct sockaddr *)&sockaddr, &len);
-				if (client < 0) {
-					throw (SocketException(SocketException::NET_ERR_ACCEPT, errno));
-				}
-				::setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
-				break;
-			}
-		}
-	}
+    n = poll(fds, accCount, -1);
+    if (n > 0) {
+        for (i = 0; i < accCount; i++) {
+            if (fds[i].revents) {
+                client = ::accept(fds[i].fd, (struct sockaddr *)&sockaddr, &len);
+                if (client < 0) {
+                    throw (SocketException(SocketException::NET_ERR_ACCEPT, errno));
+                }
+                ::setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
+                break;
+            }
+        }
+    }
 
     return client;
 }

@@ -111,7 +111,7 @@ void Listener::run()
         }
         if (child < 0) {
             // invalid connection
-           continue;
+            continue;
         }
         if (!gCtrlBlock->isEnabled()) {
             log_debug("Listener: uninitialized, rejected this connection");

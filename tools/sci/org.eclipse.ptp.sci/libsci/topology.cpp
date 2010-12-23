@@ -109,7 +109,7 @@ int BEMap::input(const char * filename, int num)
     log_debug("Hostlist is: ");
     int index = 0;
     char *pPrev = text, *pNext = text;
-    while (pNext <= (text + len)) {
+    while (pNext < (text + len)) {
         if (index >= num) {
             break;
         }

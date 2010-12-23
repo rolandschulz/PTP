@@ -202,6 +202,7 @@ int Initializer::initFE()
     Message *topoMsg = topo->packMsg();
     routerInQ->produce(topoMsg);
     feAgent->syncWait();
+    delete topo;
 
     return rc;
 }

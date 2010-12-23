@@ -44,7 +44,7 @@ class Socket
         
     private:
         int socket;
-		int accSockets[2];
+		int accSockets[32];
 
     public:
         Socket(int sockfd = -1);
