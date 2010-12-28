@@ -4,7 +4,7 @@ CPPFLAGS =
 
 OTHER_FLAGS = -ldl -lpthread -lsci
 
-all: all_32 all_64
+all: all_64
 
 all_32: dsh_fe dsh_be dsh_filter.so dsh_tests
 

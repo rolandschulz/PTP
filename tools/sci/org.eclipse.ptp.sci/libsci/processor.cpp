@@ -82,23 +82,18 @@ void Processor::run()
             }
             seize();
             log_error("Processor %s: exception %s", name.c_str(), e.getErrMsg());
-            break;
         } catch (SocketException &e) {
             seize();
             log_error("Processor %s: socket exception %s", name.c_str(), e.getErrMsg().c_str());
-            break;
         } catch (ThreadException &e) {
             seize();
             log_error("Processor %s: thread exception %d", e.getErrCode());
-            break;
         } catch (std::bad_alloc) {
             seize();
             log_error("Processor %s: out of memory", name.c_str());
-            break;
         } catch (...) {
             seize();
             log_error("Processor %s: unknown exception", name.c_str());
-            break;
         }
     }
 

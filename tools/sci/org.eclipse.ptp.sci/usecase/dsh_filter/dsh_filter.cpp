@@ -27,6 +27,7 @@
 #include "dsh_header.hpp"
 #include "dsh_aggregator.hpp"
 
+#include <string.h>
 #include <vector>
 #include <map>
 

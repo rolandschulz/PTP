@@ -108,7 +108,7 @@ void FilterProcessor::write(Message * msg)
 
 void FilterProcessor::seize()
 {
-    // TODO
+    setState(false);
 }
 
 void FilterProcessor::clean()

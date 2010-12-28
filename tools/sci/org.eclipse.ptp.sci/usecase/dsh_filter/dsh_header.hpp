@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #include "dsh_packer.hpp"
 
