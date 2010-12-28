@@ -78,6 +78,7 @@ CtrlBlock::CtrlBlock()
     pollQueue = NULL;
     monitorInQueue = NULL;
     errorQueue = NULL;
+    recoverMode = false;
 
     parentStream = NULL;
     embedAgents.clear();
@@ -106,6 +107,16 @@ CtrlBlock::ROLE CtrlBlock::getMyRole()
 void CtrlBlock::setMyRole(CtrlBlock::ROLE ro) 
 {
     role = ro; 
+}
+
+void CtrlBlock::setRecoverMode(bool mo) 
+{
+    recoverMode = mo;
+}
+
+bool CtrlBlock::getRecoverMode() 
+{ 
+    return recoverMode; 
 }
 
 int CtrlBlock::getMyHandle() 

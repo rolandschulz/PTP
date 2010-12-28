@@ -45,6 +45,7 @@ class Initializer
         static Initializer *instance;
         Listener    *listener;
         Stream      *inStream;
+        int         handle;
         
     public:
         ~Initializer();

@@ -98,6 +98,7 @@ class CtrlBlock
         HandlerProcessor     *handlerProc;
 
         Stream               *parentStream;
+        bool                 recoverMode;
 
         CtrlBlock();
         static CtrlBlock *instance;
@@ -114,6 +115,8 @@ class CtrlBlock
         void setMyRole(CtrlBlock::ROLE ro); 
         int getMyHandle();
         void setMyHandle(int hndl);
+        void setRecoverMode(bool mo);
+        bool getRecoverMode(); 
         sci_info_t * getEndInfo();
         int getJobKey();
         void setJobKey(int key);
