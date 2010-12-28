@@ -110,7 +110,7 @@ void HandlerProcessor::write(Message * msg)
 
 void HandlerProcessor::seize()
 {
-    // TODO
+    setState(false);
 }
 
 void HandlerProcessor::clean()

@@ -271,12 +271,12 @@ int Socket::accept()
 
     for (i = 0; i < NELEMS(accSockets); i++){
         if (accSockets[i] == -1) {
-            accCount = i;
             break;
         }
         fds[i].fd = accSockets[i];
         fds[i].events = POLLIN;
     }
+    accCount = i;
 
     n = poll(fds, accCount, -1);
     if (n > 0) {

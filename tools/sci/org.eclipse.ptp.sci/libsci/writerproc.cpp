@@ -83,7 +83,7 @@ void WriterProcessor::write(Message * msg)
 
 void WriterProcessor::seize()
 {
-    // do nothing
+    setState(false);
 }
 
 void WriterProcessor::clean()
