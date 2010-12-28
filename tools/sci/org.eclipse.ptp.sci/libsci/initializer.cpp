@@ -70,7 +70,7 @@
 Initializer* Initializer::instance = NULL;
 
 Initializer::Initializer()
-    : listener(NULL), inStream(NULL)
+    : listener(NULL), inStream(NULL), handle(-1)
 {
 }
 
@@ -164,10 +164,10 @@ Listener * Initializer::initListener()
 int Initializer::initFE()
 {
     char *envp = NULL;
-    int hndl = gCtrlBlock->getMyHandle();
+    handle = gCtrlBlock->getMyHandle();
     EmbedAgent *feAgent = NULL;
     
-    Topology *topo = new Topology(hndl);
+    Topology *topo = new Topology(handle);
     int rc = topo->init();
     if (rc != SCI_SUCCESS)
         return rc;
@@ -308,13 +308,15 @@ int Initializer::connectBack()
 {
 	int pID; 
 	struct iovec sign = {0};
-    int hndl = gCtrlBlock->getMyHandle();
     string nodeAddr;
     int port = -1;
+    int hndl = -1;
 	char *envp = NULL;
 
-	if (!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID")) {
-		int rc = initExtBE(hndl);
+    handle = gCtrlBlock->getMyHandle();
+	if (gCtrlBlock->getRecoverMode() ||
+            (!getenv("SCI_PARENT_HOSTNAME") || !getenv("SCI_PARENT_PORT") || !getenv("SCI_PARENT_ID"))) {
+		int rc = initExtBE(handle);
 		if (rc != 0)
 			return rc;
 	}
@@ -349,7 +351,7 @@ int Initializer::initBE()
     if (((envp != NULL) && (::strcasecmp(envp, "yes") == 0))
 			|| (::getenv("SCI_REMOTE_SHELL") != NULL)) {
 		connectBack();
-		if (gCtrlBlock->getMyHandle() < 0) {
+		if (handle < 0) {
 			gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
 		}
     } else {
