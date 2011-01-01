@@ -119,11 +119,11 @@ int Socket::listen(int &port, char *hname)
 				setsockopt(sockfd, IPPROTO_IPV6, IPV6_V6ONLY, &yes, sizeof(yes));
 				sockaddr_in6 *addr6 = (sockaddr_in6 *)host->ai_addr;
 				if (port != 0)
-					addr6->sin6_port = port;
+					addr6->sin6_port = htons(port);
 			} else {
 				sockaddr_in *addr4 = (sockaddr_in *)host->ai_addr;
 				if (port != 0)
-					addr4->sin_port = port;
+					addr4->sin_port = htons(port);
 			}
 			setNonBlock(sockfd);
             rc = ::bind(sockfd, host->ai_addr, host->ai_addrlen);

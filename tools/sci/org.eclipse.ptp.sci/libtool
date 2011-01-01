@@ -30,10 +30,10 @@
 # the same distribution terms that you use for the rest of that program.
 
 # A sed program that does not truncate output.
-SED="/bin/sed"
+SED="/usr/bin/sed"
 
 # Sed that helps us avoid accidentally triggering echo(1) options like -n.
-Xsed="/bin/sed -e 1s/^X//"
+Xsed="/usr/bin/sed -e 1s/^X//"
 
 # The HP-UX ksh and POSIX shell print the target directory to stdout
 # if CDPATH is set.
@@ -44,7 +44,7 @@ available_tags=" CXX F77"
 
 # ### BEGIN LIBTOOL CONFIG
 
-# Libtool was configured on host Bluebird:
+# Libtool was configured on host pefvt-linux:
 
 # Shell to use when invoking shell scripts.
 SHELL="/bin/sh"
@@ -66,12 +66,12 @@ fast_install=yes
 
 # The host system.
 host_alias=
-host=x86_64-redhat-linux-gnu
+host=i686-pc-linux-gnu
 host_os=linux-gnu
 
 # The build system.
 build_alias=
-build=x86_64-redhat-linux-gnu
+build=i686-pc-linux-gnu
 build_os=linux-gnu
 
 # An echo program that does not interpret backslashes.
@@ -93,14 +93,14 @@ CC="gcc"
 # Is the compiler the GNU C compiler?
 with_gcc=yes
 
-gcc_dir=`gcc -print-file-name=. | /bin/sed 's,/\.$,,'`
+gcc_dir=`gcc -print-file-name=. | /usr/bin/sed 's,/\.$,,'`
 gcc_ver=`gcc -dumpversion`
 
 # An ERE matcher.
-EGREP="/bin/grep -E"
+EGREP="/usr/bin/grep -E"
 
 # The linker used to build libraries.
-LD="/usr/bin/ld -m elf_x86_64"
+LD="/usr/i586-suse-linux/bin/ld"
 
 # Whether we need hard or soft links.
 LN_S="ln -s"
@@ -174,7 +174,7 @@ dlopen_self=unknown
 dlopen_self_static=unknown
 
 # Compiler flag to prevent dynamic linking.
-link_static_flag=""
+link_static_flag="-static"
 
 # Compiler flag to turn off builtin functions.
 no_builtin_flag=" -fno-builtin"
@@ -328,10 +328,10 @@ variables_saved_for_relink="PATH LD_LIBRARY_PATH LD_RUN_PATH GCC_EXEC_PREFIX COM
 link_all_deplibs=unknown
 
 # Compile-time system search path for libraries
-sys_lib_search_path_spec=`echo "/lib64 /usr/lib64 /usr/local/lib64" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
+sys_lib_search_path_spec=`echo " /usr/lib/gcc/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../../i586-suse-linux/lib/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../../i586-suse-linux/lib/ /usr/lib/gcc/i586-suse-linux/4.3/../../../i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../ /lib/i586-suse-linux/4.3/ /lib/ /usr/lib/i586-suse-linux/4.3/ /usr/lib/" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
 
 # Run-time system search path for libraries
-sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /usr/lib64/atlas /usr/lib64/ctapi hwcap 0 nosegneg /usr/lib64/mysql /usr/lib64/qt-3.3/lib /usr/lib64/xulrunner-1.9.2 "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib/Xaw3d /usr/X11R6/lib /usr/lib/Xaw3d /usr/i386-suse-linux/lib /usr/local/lib /opt/kde3/lib /usr/lib/graphviz /usr/lib/graphviz/sharp /usr/lib/graphviz/java /usr/lib/graphviz/perl /usr/lib/graphviz/php /usr/lib/graphviz/ocaml /usr/lib/graphviz/python /usr/lib/graphviz/lua /usr/lib/graphviz/tcl /usr/lib/graphviz/guile /usr/lib/graphviz/ruby "
 
 # Fix the shell variable $srcfile for the compiler.
 fix_srcfile_path=""
@@ -7266,7 +7266,7 @@ disable_libs=static
 # End:
 # ### BEGIN LIBTOOL TAG CONFIG: CXX
 
-# Libtool was configured on host Bluebird:
+# Libtool was configured on host pefvt-linux:
 
 # Shell to use when invoking shell scripts.
 SHELL="/bin/sh"
@@ -7288,12 +7288,12 @@ fast_install=yes
 
 # The host system.
 host_alias=
-host=x86_64-redhat-linux-gnu
+host=i686-pc-linux-gnu
 host_os=linux-gnu
 
 # The build system.
 build_alias=
-build=x86_64-redhat-linux-gnu
+build=i686-pc-linux-gnu
 build_os=linux-gnu
 
 # An echo program that does not interpret backslashes.
@@ -7315,14 +7315,14 @@ CC="g++"
 # Is the compiler the GNU C compiler?
 with_gcc=yes
 
-gcc_dir=`gcc -print-file-name=. | /bin/sed 's,/\.$,,'`
+gcc_dir=`gcc -print-file-name=. | /usr/bin/sed 's,/\.$,,'`
 gcc_ver=`gcc -dumpversion`
 
 # An ERE matcher.
-EGREP="/bin/grep -E"
+EGREP="/usr/bin/grep -E"
 
 # The linker used to build libraries.
-LD="/usr/bin/ld -m elf_x86_64"
+LD="/usr/i586-suse-linux/bin/ld"
 
 # Whether we need hard or soft links.
 LN_S="ln -s"
@@ -7396,7 +7396,7 @@ dlopen_self=unknown
 dlopen_self_static=unknown
 
 # Compiler flag to prevent dynamic linking.
-link_static_flag=""
+link_static_flag="-static"
 
 # Compiler flag to turn off builtin functions.
 no_builtin_flag=" -fno-builtin"
@@ -7451,11 +7451,11 @@ striplib="strip --strip-unneeded"
 
 # Dependencies to place before the objects being linked to create a
 # shared library.
-predep_objects=`echo "/usr/lib/gcc/x86_64-redhat-linux/4.4.4/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.4/crtbeginS.o" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
+predep_objects=`echo "/usr/lib/gcc/i586-suse-linux/4.3/../../../crti.o /usr/lib/gcc/i586-suse-linux/4.3/crtbeginS.o" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
 
 # Dependencies to place after the objects being linked to create a
 # shared library.
-postdep_objects=`echo "/usr/lib/gcc/x86_64-redhat-linux/4.4.4/crtendS.o /usr/lib/gcc/x86_64-redhat-linux/4.4.4/../../../../lib64/crtn.o" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
+postdep_objects=`echo "/usr/lib/gcc/i586-suse-linux/4.3/crtendS.o /usr/lib/gcc/i586-suse-linux/4.3/../../../crtn.o" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
 
 # Dependencies to place before the objects being linked to create a
 # shared library.
@@ -7467,7 +7467,7 @@ postdeps="-lstdc++ -lm -lgcc_s -lc -lgcc_s"
 
 # The library search path used internally by the compiler when linking
 # a shared library.
-compiler_lib_search_path=`echo "-L/usr/lib/gcc/x86_64-redhat-linux/4.4.4 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.4 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.4/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.4/../../.." | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
+compiler_lib_search_path=`echo "-L/usr/lib/gcc/i586-suse-linux/4.3 -L/usr/lib/gcc/i586-suse-linux/4.3 -L/usr/lib/gcc/i586-suse-linux/4.3/../../../../i586-suse-linux/lib -L/usr/lib/gcc/i586-suse-linux/4.3/../../.." | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
 
 # Method to check whether dependent libraries are shared objects.
 deplibs_check_method="pass_all"
@@ -7547,10 +7547,10 @@ variables_saved_for_relink="PATH LD_LIBRARY_PATH LD_RUN_PATH GCC_EXEC_PREFIX COM
 link_all_deplibs=unknown
 
 # Compile-time system search path for libraries
-sys_lib_search_path_spec=`echo "/lib64 /usr/lib64 /usr/local/lib64" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
+sys_lib_search_path_spec=`echo " /usr/lib/gcc/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../../i586-suse-linux/lib/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../../i586-suse-linux/lib/ /usr/lib/gcc/i586-suse-linux/4.3/../../../i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../ /lib/i586-suse-linux/4.3/ /lib/ /usr/lib/i586-suse-linux/4.3/ /usr/lib/" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
 
 # Run-time system search path for libraries
-sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /usr/lib64/atlas /usr/lib64/ctapi hwcap 0 nosegneg /usr/lib64/mysql /usr/lib64/qt-3.3/lib /usr/lib64/xulrunner-1.9.2 "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib/Xaw3d /usr/X11R6/lib /usr/lib/Xaw3d /usr/i386-suse-linux/lib /usr/local/lib /opt/kde3/lib /usr/lib/graphviz /usr/lib/graphviz/sharp /usr/lib/graphviz/java /usr/lib/graphviz/perl /usr/lib/graphviz/php /usr/lib/graphviz/ocaml /usr/lib/graphviz/python /usr/lib/graphviz/lua /usr/lib/graphviz/tcl /usr/lib/graphviz/guile /usr/lib/graphviz/ruby "
 
 # Fix the shell variable $srcfile for the compiler.
 fix_srcfile_path=""
@@ -7574,7 +7574,7 @@ include_expsyms=""
 
 # ### BEGIN LIBTOOL TAG CONFIG: F77
 
-# Libtool was configured on host Bluebird:
+# Libtool was configured on host pefvt-linux:
 
 # Shell to use when invoking shell scripts.
 SHELL="/bin/sh"
@@ -7596,12 +7596,12 @@ fast_install=yes
 
 # The host system.
 host_alias=
-host=x86_64-redhat-linux-gnu
+host=i686-pc-linux-gnu
 host_os=linux-gnu
 
 # The build system.
 build_alias=
-build=x86_64-redhat-linux-gnu
+build=i686-pc-linux-gnu
 build_os=linux-gnu
 
 # An echo program that does not interpret backslashes.
@@ -7623,14 +7623,14 @@ CC="gfortran"
 # Is the compiler the GNU C compiler?
 with_gcc=yes
 
-gcc_dir=`gcc -print-file-name=. | /bin/sed 's,/\.$,,'`
+gcc_dir=`gcc -print-file-name=. | /usr/bin/sed 's,/\.$,,'`
 gcc_ver=`gcc -dumpversion`
 
 # An ERE matcher.
-EGREP="/bin/grep -E"
+EGREP="/usr/bin/grep -E"
 
 # The linker used to build libraries.
-LD="/usr/bin/ld -m elf_x86_64"
+LD="/usr/i586-suse-linux/bin/ld"
 
 # Whether we need hard or soft links.
 LN_S="ln -s"
@@ -7704,7 +7704,7 @@ dlopen_self=unknown
 dlopen_self_static=unknown
 
 # Compiler flag to prevent dynamic linking.
-link_static_flag=""
+link_static_flag="-static"
 
 # Compiler flag to turn off builtin functions.
 no_builtin_flag=""
@@ -7858,10 +7858,10 @@ variables_saved_for_relink="PATH LD_LIBRARY_PATH LD_RUN_PATH GCC_EXEC_PREFIX COM
 link_all_deplibs=unknown
 
 # Compile-time system search path for libraries
-sys_lib_search_path_spec=`echo "/lib64 /usr/lib64 /usr/local/lib64" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
+sys_lib_search_path_spec=`echo " /usr/lib/gcc/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../../i586-suse-linux/lib/i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../../i586-suse-linux/lib/ /usr/lib/gcc/i586-suse-linux/4.3/../../../i586-suse-linux/4.3/ /usr/lib/gcc/i586-suse-linux/4.3/../../../ /lib/i586-suse-linux/4.3/ /lib/ /usr/lib/i586-suse-linux/4.3/ /usr/lib/" | $SED -e "s@${gcc_dir}@\${gcc_dir}@g;s@${gcc_ver}@\${gcc_ver}@g"`
 
 # Run-time system search path for libraries
-sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /usr/lib64/atlas /usr/lib64/ctapi hwcap 0 nosegneg /usr/lib64/mysql /usr/lib64/qt-3.3/lib /usr/lib64/xulrunner-1.9.2 "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib/Xaw3d /usr/X11R6/lib /usr/lib/Xaw3d /usr/i386-suse-linux/lib /usr/local/lib /opt/kde3/lib /usr/lib/graphviz /usr/lib/graphviz/sharp /usr/lib/graphviz/java /usr/lib/graphviz/perl /usr/lib/graphviz/php /usr/lib/graphviz/ocaml /usr/lib/graphviz/python /usr/lib/graphviz/lua /usr/lib/graphviz/tcl /usr/lib/graphviz/guile /usr/lib/graphviz/ruby "
 
 # Fix the shell variable $srcfile for the compiler.
 fix_srcfile_path=""

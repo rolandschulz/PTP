@@ -189,15 +189,14 @@ void RouterProcessor::write(Message * msg)
 
 void RouterProcessor::seize()
 {
+    Message *msg = new Message();
+
     if (inStream) {
         gCtrlBlock->setRecoverMode(true);
-    } else {
-        Message *msg = new Message();
-
-        msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::QUIT);
-        routingList->bcast(SCI_GROUP_ALL, msg);
-        setState(false);
     }
+    msg->build(SCI_FILTER_NULL, SCI_GROUP_ALL, 0, NULL, NULL, Message::QUIT);
+    routingList->bcast(SCI_GROUP_ALL, msg);
+    setState(false);
 }
 
 void RouterProcessor::clean()
