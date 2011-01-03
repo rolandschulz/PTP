@@ -16,7 +16,7 @@ import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
  * Code to be shared amongst implementors of IFeedbackItem - generic stuff
  * 
  * @author beth
- * @since 3.0
+ * @since 5.0
  * 
  */
 public abstract class AbstractFeedbackItem implements IFeedbackItem {
