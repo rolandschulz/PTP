@@ -72,7 +72,7 @@ abstract public class AbstractFeedbackParser implements IFeedbackParser {
 	 * @param projName
 	 * @param filename
 	 * @return
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	 public IResource getResourceInProject(String projName, String filename) {
 	       ResourcesPlugin.getWorkspace();
@@ -86,7 +86,7 @@ abstract public class AbstractFeedbackParser implements IFeedbackParser {
 	       return res;
 	   }
 	 /**
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	public IResource getResourceInProject(IProject proj, String filename) {
 		 IResource res = proj.findMember(filename);
@@ -101,7 +101,7 @@ abstract public class AbstractFeedbackParser implements IFeedbackParser {
 	 */
 
 	/**
-	 * @since 3.0
+	 * @since 5.0
 	 */
 	public IFile findSourceFile(String filename, IFile xmlSourceFile) {
 		IFile f2=(IFile) getResourceInProject(xmlSourceFile.getProject(), filename);
@@ -113,7 +113,7 @@ abstract public class AbstractFeedbackParser implements IFeedbackParser {
 		 * @throws ParserConfigurationException
 		 * @throws SAXException
 		 * @throws IOException
-		 * @since 3.0
+		 * @since 5.0
 		 */
 		public Document getXMLDocument(IFile file) throws ParserConfigurationException, SAXException, IOException {
 			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
