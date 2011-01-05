@@ -18,12 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -32,6 +35,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -96,51 +101,76 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 
 public class ResourceManagerView extends ViewPart {
 	private final class MachineListener implements IMachineChildListener, IMachineListener {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedNodeEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IChangedNodeEvent)
 		 */
 		public void handleEvent(IChangedNodeEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IMachineChangeEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IMachineListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IMachineChangeEvent)
 		 */
 		public void handleEvent(IMachineChangeEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewNodeEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.INewNodeEvent)
 		 */
 		public void handleEvent(INewNodeEvent e) {
 			refreshViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveNodeEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IRemoveNodeEvent)
 		 */
 		public void handleEvent(IRemoveNodeEvent e) {
 			refreshViewer(e.getSource());
 		}
 	}
-	
+
 	private final class MMChildListener implements IModelManagerChildListener {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#
+		 * handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
 		 */
 		public void handleEvent(IChangedResourceManagerEvent e) {
 			updateViewer(e.getResourceManagers().toArray(new IResourceManager[0]));
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#
+		 * handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
 		 */
 		public synchronized void handleEvent(INewResourceManagerEvent e) {
 			final IResourceManager resourceManager = e.getResourceManager();
@@ -150,8 +180,12 @@ public class ResourceManagerView extends ViewPart {
 			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.events.IModelManagerResourceManagerListener#
+		 * handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 		 */
 		public synchronized void handleEvent(IRemoveResourceManagerEvent e) {
 			final IResourceManager resourceManager = e.getResourceManager();
@@ -162,31 +196,47 @@ public class ResourceManagerView extends ViewPart {
 			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 		}
 	}
-	
+
 	private final class QueueListener implements IQueueListener, IQueueChildListener {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IChangedJobEvent)
 		 */
 		public void handleEvent(IChangedJobEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(INewJobEvent e) {
 			refreshViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IQueueListener#handleEvent(org.eclipse.ptp.core.elements.events.IQueueChangeEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IQueueListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IQueueChangeEvent)
 		 */
 		public void handleEvent(IQueueChangeEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
 			refreshViewer(e.getSource());
@@ -195,19 +245,23 @@ public class ResourceManagerView extends ViewPart {
 	}
 
 	private class ResourceManagerLabelProvider extends WorkbenchLabelProvider {
-		
-		private Font selectedFont;
-		private Font unSelectedFont;
-		
+
+		private final Font selectedFont;
+		private final Font unSelectedFont;
+
 		public ResourceManagerLabelProvider(Font font) {
 			unSelectedFont = font;
 			FontData fd = font.getFontData()[0];
 			FontData selectedFontData = new FontData(fd.getName(), fd.getHeight(), SWT.BOLD);
-			selectedFont = (Font)new LocalResourceManager(JFaceResources.getResources()).get(FontDescriptor.createFrom(selectedFontData));
+			selectedFont = (Font) new LocalResourceManager(JFaceResources.getResources()).get(FontDescriptor
+					.createFrom(selectedFontData));
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.model.WorkbenchLabelProvider#getFont(java.lang.Object)
 		 */
 		@Override
 		public Font getFont(Object element) {
@@ -218,7 +272,7 @@ public class ResourceManagerView extends ViewPart {
 			}
 			return unSelectedFont;
 		}
-		
+
 		private IResourceManager getResourceManager(Object parentElement) {
 			IResourceManager rm = null;
 			if (parentElement instanceof IAdaptable) {
@@ -228,10 +282,9 @@ public class ResourceManagerView extends ViewPart {
 		}
 	}
 
-	private final class RMChildListener implements
-			IResourceManagerChildListener {
+	private final class RMChildListener implements IResourceManagerChildListener {
 		private final MachineListener machineListener = new MachineListener();
-		private QueueListener queueListener = new QueueListener();		
+		private final QueueListener queueListener = new QueueListener();
 		private final Set<IPMachine> machines = new HashSet<IPMachine>();
 		private final Set<IPQueue> queues = new HashSet<IPQueue>();
 
@@ -240,29 +293,44 @@ public class ResourceManagerView extends ViewPart {
 				removeListeners(machine);
 			}
 			machines.clear();
-			
+
 			for (IPQueue queue : queues) {
 				removeListeners(queue);
 			}
 			queues.clear();
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedMachineEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #
+		 * handleEvent(org.eclipse.ptp.core.elements.events.IChangedMachineEvent
+		 * )
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
 			updateViewer(e.getSource());
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.
+		 * IResourceManagerChangedQueueEvent)
 		 */
 		public void handleEvent(IChangedQueueEvent e) {
 			updateViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewMachineEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewMachineEvent)
 		 */
 		public synchronized void handleEvent(INewMachineEvent e) {
 			for (IPMachine machine : e.getMachines()) {
@@ -272,8 +340,12 @@ public class ResourceManagerView extends ViewPart {
 			refreshViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
 			for (IPQueue queue : e.getQueues()) {
@@ -283,8 +355,13 @@ public class ResourceManagerView extends ViewPart {
 			refreshViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveMachineEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #
+		 * handleEvent(org.eclipse.ptp.core.elements.events.IRemoveMachineEvent)
 		 */
 		public synchronized void handleEvent(IRemoveMachineEvent e) {
 			for (IPMachine machine : e.getMachines()) {
@@ -294,8 +371,13 @@ public class ResourceManagerView extends ViewPart {
 			refreshViewer(e.getSource());
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.
+		 * IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
 			for (IPQueue queue : e.getQueues()) {
@@ -315,7 +397,7 @@ public class ResourceManagerView extends ViewPart {
 				removeListeners(machine);
 			}
 			machines.removeAll(removeMachines);
-			
+
 			List<IPQueue> removeQueues = Arrays.asList(resourceManager.getQueues());
 			removeQueues.retainAll(queues);
 			for (IPQueue queue : removeQueues) {
@@ -323,7 +405,7 @@ public class ResourceManagerView extends ViewPart {
 			}
 			queues.removeAll(removeQueues);
 		}
-		
+
 		/**
 		 * @param machine
 		 */
@@ -339,7 +421,7 @@ public class ResourceManagerView extends ViewPart {
 			queue.addElementListener(queueListener);
 			queue.addChildListener(queueListener);
 		}
-		
+
 		/**
 		 * @param machine
 		 */
@@ -354,39 +436,54 @@ public class ResourceManagerView extends ViewPart {
 		private void removeListeners(IPQueue queue) {
 			queue.removeElementListener(queueListener);
 			queue.removeChildListener(queueListener);
-		}	
+		}
 	}
 
 	private final class RMListener implements IResourceManagerListener {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
+		 * handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangeEvent e) {
 			IResourceManager rm = e.getSource();
-			if (rmManager != null &&
-					rm.getState() == ResourceManagerAttributes.State.STOPPED && 
-					rm == rmManager.getSelected()) {
+			if (rmManager != null && rm.getState() == ResourceManagerAttributes.State.STOPPED && rm == rmManager.getSelected()) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
 			refreshViewer(rm);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
+		 * handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
 		 */
 		public void handleEvent(final IResourceManagerErrorEvent e) {
 			refreshViewer(e.getSource());
 			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
 				public void run() throws Exception {
 					IStatus status = new Status(IStatus.ERROR, PTPUIPlugin.PLUGIN_ID, e.getMessage());
-					ErrorDialog.openError(PTPUIPlugin.getDisplay().getActiveShell(), Messages.ResourceManagerView_0, NLS.bind(Messages.ResourceManagerView_1, e.getSource().getName()), status);
+					ErrorDialog.openError(PTPUIPlugin.getDisplay().getActiveShell(), Messages.ResourceManagerView_0,
+							NLS.bind(Messages.ResourceManagerView_1, e.getSource().getName()), status);
 				}
 			});
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
+		 * handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent
+		 * )
 		 */
 		public void handleEvent(IResourceManagerSubmitJobErrorEvent e) {
 			// Handled by launch framework
@@ -407,9 +504,14 @@ public class ResourceManagerView extends ViewPart {
 	public ResourceManagerView() {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI);
 		viewer.setContentProvider(new WorkbenchContentProvider());
@@ -423,17 +525,58 @@ public class ResourceManagerView extends ViewPart {
 		});
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
-				ITreeSelection selection = (ITreeSelection)event.getSelection();
+				ITreeSelection selection = (ITreeSelection) event.getSelection();
 				if (!selection.isEmpty()) {
 					if (selection.getFirstElement() instanceof IResourceManagerControl) {
-						IResourceManagerControl rm = (IResourceManagerControl)selection.getFirstElement();
-						if (rm.getState() == ResourceManagerAttributes.State.STOPPED) {
-							editResourceManagerAction.setResourceManager(rm);
-							editResourceManagerAction.run();
+						final IResourceManagerControl rm = (IResourceManagerControl) selection.getFirstElement();
+						if (rm.getState() == ResourceManagerAttributes.State.STOPPED
+								|| rm.getState() == ResourceManagerAttributes.State.ERROR) {
+							IRunnableWithProgress runnable = new IRunnableWithProgress() {
+								public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+									try {
+										rm.startUp(monitor);
+									} catch (CoreException e) {
+										throw new InvocationTargetException(e);
+									}
+									if (monitor.isCanceled()) {
+										throw new InterruptedException();
+									}
+								}
+							};
+							try {
+								PlatformUI.getWorkbench().getProgressService().run(true, true, runnable);
+							} catch (InvocationTargetException e) {
+								Throwable t = e.getCause();
+								IStatus status = null;
+								if (t != null && t instanceof CoreException) {
+									status = ((CoreException) t).getStatus();
+								}
+								UIUtils.showErrorDialog(Messages.ResourceManagerView_Startup, Messages.ResourceManagerView_FailedToStart, status);
+							} catch (InterruptedException e) {
+								// Do nothing. Operation has been canceled.
+							}
 							return;
+						} else {
+							boolean shutdown = true;
+							if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+								shutdown = MessageDialog.openConfirm(viewer.getControl().getShell(), Messages.ResourceManagerView_Shutdown,
+										NLS.bind(Messages.ResourceManagerView_AreYouSure, rm.getName()));
+							}
+							if (shutdown) {
+								try {
+									rm.shutdown();
+								} catch (CoreException e) {
+									final String message = NLS.bind(Messages.ResourceManagerView_UnableToStop, rm.getName());
+									Status status = new Status(Status.ERROR, PTPUIPlugin.PLUGIN_ID, 1, message, e);
+									ErrorDialog dlg = new ErrorDialog(viewer.getControl().getShell(),
+											Messages.ResourceManagerView_ErrorStopping, message, status, IStatus.ERROR);
+									dlg.open();
+									PTPUIPlugin.log(status);
+								}
+							}
 						}
 					}
-					
+
 					TreeItem item = viewer.getTree().getSelection()[0];
 					item.setExpanded(!item.getExpanded());
 					viewer.refresh(selection.getFirstElement());
@@ -455,23 +598,24 @@ public class ResourceManagerView extends ViewPart {
 		// ----------------------------------------------------------------------
 		getSite().setSelectionProvider(viewer);
 
-
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
-		
-	    /*
-	     * Add us to any existing RM's. I guess it's possible we could
-	     * miss a RM if a new event arrives while we're doing this, but is 
-	     * it a problem?
-	     */
-	    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
-	        rm.addElementListener(rmListener);
-	    }
+
+		/*
+		 * Add us to any existing RM's. I guess it's possible we could miss a RM
+		 * if a new event arrives while we're doing this, but is it a problem?
+		 */
+		for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+			rm.addElementListener(rmListener);
+		}
 		mm.addListener(mmChildListener);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
+	@Override
 	public synchronized void dispose() {
 		PTPCorePlugin.getDefault().getModelManager().removeListener(mmChildListener);
 		for (IResourceManager resourceManager : resourceManagers) {
@@ -489,9 +633,9 @@ public class ResourceManagerView extends ViewPart {
 		}
 		return viewer.getTree().getFont();
 	}
-	
+
 	public void refreshViewer() {
-		ISafeRunnable safeRunnable = new SafeRunnable(){
+		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {
 				viewer.refresh();
 			}
@@ -500,7 +644,7 @@ public class ResourceManagerView extends ViewPart {
 	}
 
 	public void refreshViewer(final IPElement element) {
-		ISafeRunnable safeRunnable = new SafeRunnable(){
+		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {
 				viewer.refresh(element);
 			}
@@ -508,28 +652,29 @@ public class ResourceManagerView extends ViewPart {
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
 
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
 	public void updateViewer(final IPElement element) {
-		ISafeRunnable safeRunnable = new SafeRunnable(){
+		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {
 				viewer.update(element, null);
 			}
 		};
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
-	
+
 	public void updateViewer(final IPElement[] elements) {
-		ISafeRunnable safeRunnable = new SafeRunnable(){
+		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {
 				viewer.update(elements, null);
 			}
 		};
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
-	
+
 	private void createContextMenu() {
 		final Shell shell = getSite().getShell();
 		addResourceManagerAction = new AddResourceManagerAction(shell);
@@ -551,6 +696,10 @@ public class ResourceManagerView extends ViewPart {
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS + "-end")); //$NON-NLS-1$
+		manager.add(new Separator());
+
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		manager.add(addResourceManagerAction);
 		Object[] selectedObjects = selection.toArray();
@@ -566,16 +715,15 @@ public class ResourceManagerView extends ViewPart {
 				inContextForRemoveRM = false;
 				inContextForSelectRM = false;
 				break;
-			}
-			else {
-                final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
-			    IResourceManagerControl rm = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
-			    if (rm.getState() != ResourceManagerAttributes.State.STOPPED) {
-			    	inContextForEditRM = false;
-			        inContextForRemoveRM = false;
-			    } else {
-			        inContextForSelectRM = false;
-			    }
+			} else {
+				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
+				IResourceManagerControl rm = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
+				if (rm.getState() != ResourceManagerAttributes.State.STOPPED) {
+					inContextForEditRM = false;
+					inContextForRemoveRM = false;
+				} else {
+					inContextForSelectRM = false;
+				}
 			}
 		}
 		manager.add(removeResourceManagerAction);
@@ -603,9 +751,6 @@ public class ResourceManagerView extends ViewPart {
 			IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
 			selectResourceManagerAction.setResourceManager(rmManager);
 		}
-		manager.add(new Separator());
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS + "-end")); //$NON-NLS-1$
 	}
 
 }

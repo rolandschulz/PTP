@@ -360,18 +360,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#disableEvents()
-	 */
-	public void disableEvents() throws CoreException {
-		if (getState().equals(ResourceManagerAttributes.State.STARTED)) {
-			doDisableEvents();
-			setState(ResourceManagerAttributes.State.SUSPENDED);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rmsystem.IResourceManager#dispose()
 	 */
 	public void dispose() {
@@ -467,18 +455,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * @throws CoreException
 	 */
 	protected abstract void doTerminateJob(IPJob job) throws CoreException;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManager#enableEvents()
-	 */
-	public void enableEvents() throws CoreException {
-		if (getState().equals(ResourceManagerAttributes.State.SUSPENDED)) {
-			doEnableEvents();
-			setState(ResourceManagerAttributes.State.STARTED);
-		}
-	}
 
 	/**
 	 * Propagate IChangedMachineEvent to listener
@@ -1095,7 +1071,6 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 			break;
 		case STARTING:
 		case STARTED:
-			setState(ResourceManagerAttributes.State.STOPPING);
 			try {
 				doShutdown();
 			} finally {
@@ -1113,7 +1088,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 */
 	public void startUp(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 10);
-		if (getState() == ResourceManagerAttributes.State.STOPPED) {
+		if (getState() == ResourceManagerAttributes.State.STOPPED || getState() == ResourceManagerAttributes.State.ERROR) {
 			setState(ResourceManagerAttributes.State.STARTING);
 			monitor.subTask(Messages.AbstractResourceManager_1 + getName());
 			try {
