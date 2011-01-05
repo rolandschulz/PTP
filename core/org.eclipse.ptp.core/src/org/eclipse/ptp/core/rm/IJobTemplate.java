@@ -12,98 +12,104 @@ package org.eclipse.ptp.core.rm;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 public interface IJobTemplate {
-	/*
-	 * Job submission state allowing job to be queued but not run
+	public enum SubmissionState {
+		/**
+		 * Job submission state allowing job to be queued but not run
+		 */
+		HOLD_STATE,
+
+		/**
+		 * Job submission state allowing job to be run
+		 */
+		ACTIVE_STATE
+	};
+
+	/**
+	 * Get the arguments to be passed to the command
+	 * 
+	 * @return list of arguments
 	 */
-	public static final int HOLD_STATE = 0;
+	public List<String> getArguments();
 
-	/*
-	 * Job submission state allowing job to be run
+	/**
+	 * Get the command to be launched. This can be an absolute or relative path.
+	 * If path is relative, it is evaluated in the context of the working
+	 * directory.
+	 * 
+	 * @return command to be launched
 	 */
-	public static final int ACTIVE_STATE = 1;
-
-	public List<String> getArgs();
-
-	public String getAttribute(String name);
-
-	public Set<String> getAttributeNames();
-
-	public boolean getBlockEmail();
-
 	public String getCommand();
 
-	public String getDeadlineTime();
+	/**
+	 * Get the arguments to be passed to the debugger command. Only valid if
+	 * {@link isDebug()} is true.
+	 * 
+	 * @return list of debugger arguments
+	 */
+	public List<String> getDebuggerArguments();
 
-	public Set<String> getEmail();
+	/**
+	 * Get the debugger command. This must be an absolute path to the debugger
+	 * command executable.Only valid if {@link isDebug()} is true.
+	 * 
+	 * @return
+	 */
+	public String getDebuggerCommand();
 
-	public String getErrorPath();
+	/**
+	 * Get any environment variables to be used for the launch. If
+	 * {@link isAppendEnvironment} is true, the variables will be appended to
+	 * the native environment, otherwise the native environment will be
+	 * replaced.
+	 * 
+	 * @return map containing environment variables
+	 */
+	public Map<String, String> getEnvironment();
 
-	public String getHardRunDurationLimit();
-
-	public String getHardWallclockTimeLimit();
-
-	public String getInputPath();
-
-	public String getJobCategory();
-
-	public Map<String, String> getJobEnvironment();
-
+	/**
+	 * Get the name of the job
+	 * 
+	 * @return name of the job
+	 */
 	public String getJobName();
 
-	public int getJobSubmissionState();
+	/**
+	 * Get the job submission state
+	 * 
+	 * @return job submission state
+	 */
+	public SubmissionState getJobSubmissionState();
 
-	public boolean getJoinFiles();
+	/**
+	 * Get the launch configuration associated with this job launch. This launch
+	 * configuration may contain additional attributes required for the launch.
+	 * 
+	 * @return launch configuration
+	 */
+	public ILaunchConfiguration getLaunchConfiguration();
 
-	public String getOutputPath();
-
-	public long getSoftRunDurationLimit();
-
-	public long getSoftWallClockTimeLimit();
-
-	public String getStartTime();
-
+	/**
+	 * Get the working directory for the job launch. Must be an absolute path.
+	 * 
+	 * @return working directory path
+	 */
 	public String getWorkingDirectory();
 
-	public void setArgs(List<String> args);
+	/**
+	 * Test if the environment should be appended or not.
+	 * 
+	 * @return true if the environment should be appended
+	 */
+	public boolean isAppendEnvironment();
 
-	public void setAttribute(String name, String value);
-
-	public void setBlockEmail(boolean blockEmail);
-
-	public void setCommand(String command);
-
-	public void setDeadlineTime(String deadline);
-
-	public void setEmail(Set<String> email);
-
-	public void setErrorPath(String errorPath);
-
-	public void setHardRunDurationLimit(String limit);
-
-	public void setHardWallclockTimeLimit(String limit);
-
-	public void setInputPath(String inputPath);
-
-	public void setJobCategory(String category);
-
-	public void setJobEnvironment(Map<String, String> env);
-
-	public void setJobName(String name);
-
-	public void setJobSubmissionState(int state);
-
-	public void setJoinFiles(boolean joinFiles);
-
-	public void setOutputPath(String outputPath);
-
-	public void setSoftRunDurationLimit(String limit);
-
-	public void setSoftWallClockTimeLimit(String limit);
-
-	public void setStartTime(String startTime);
-
-	public void setWorkingDirectory(String wd);
+	/**
+	 * Check if this is a debug launch.
+	 * 
+	 * @return true if this is a debug launch
+	 */
+	public boolean isDebug();
 }
