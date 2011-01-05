@@ -18,7 +18,6 @@ package org.eclipse.ptp.core.elementcontrols;
 
 import java.util.Collection;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
@@ -45,23 +44,9 @@ public interface IResourceManagerControl extends IResourceManager, IPElementCont
 	public void addQueueAttributes(Collection<IPQueueControl> queues, IAttribute<?, ?, ?>[] attrs);
 
 	/**
-	 * Disable event processing. The RM state will be set to SUSPENDED.
-	 * 
-	 * @throws CoreException
-	 */
-	public void disableEvents() throws CoreException;
-
-	/**
 	 * Safely dispose of this Resource Manager.
 	 */
 	public void dispose();
-
-	/**
-	 * Enable event processing. The RM state will be set to STARTING.
-	 * 
-	 * @throws CoreException
-	 */
-	public void enableEvents() throws CoreException;
 
 	/**
 	 * Get the configuration associated with this resource manager.

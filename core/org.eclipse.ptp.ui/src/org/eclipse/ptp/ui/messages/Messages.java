@@ -97,6 +97,12 @@ public class Messages extends NLS {
 	public static String RemoveSelectedJobAction_0;
 	public static String ResourceManagerView_0;
 	public static String ResourceManagerView_1;
+	public static String ResourceManagerView_AreYouSure;
+	public static String ResourceManagerView_ErrorStopping;
+	public static String ResourceManagerView_FailedToStart;
+	public static String ResourceManagerView_Shutdown;
+	public static String ResourceManagerView_Startup;
+	public static String ResourceManagerView_UnableToStop;
 	public static String ResourceManagerWorkbenchAdapter_0;
 	public static String ResourceManagerWorkbenchAdapter_1;
 	public static String RMConfigurationWizard_0;
