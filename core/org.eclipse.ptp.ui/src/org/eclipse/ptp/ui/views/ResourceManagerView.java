@@ -48,6 +48,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -280,6 +282,33 @@ public class ResourceManagerView extends ViewPart {
 			}
 			return rm;
 		}
+	}
+
+	private class ResourceManagerSorter extends ViewerComparator {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface
+		 * .viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(Viewer viewer, Object e1, Object e2) {
+			String name1 = null;
+			String name2 = null;
+			if (e1 instanceof IPElement) {
+				name1 = ((IPElement) e1).getName();
+			}
+			if (e2 instanceof IPElement) {
+				name2 = ((IPElement) e2).getName();
+			}
+			if (name1 != null && name2 != null) {
+				return name1.compareTo(name2);
+			}
+			return super.compare(viewer, e1, e2);
+		}
+
 	}
 
 	private final class RMChildListener implements IResourceManagerChildListener {
@@ -516,6 +545,7 @@ public class ResourceManagerView extends ViewPart {
 		viewer = new TreeViewer(parent, SWT.MULTI);
 		viewer.setContentProvider(new WorkbenchContentProvider());
 		viewer.setLabelProvider(new ResourceManagerLabelProvider(viewer.getTree().getFont()));
+		viewer.setComparator(new ResourceManagerSorter());
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				if (rmManager != null) {
