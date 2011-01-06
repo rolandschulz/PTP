@@ -62,13 +62,16 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * createResourceManager()
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
-	public IResourceManagerControl createResourceManager() {
-		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
-		return new SLURMResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+	public Object getAdapter(Class adapter) {
+		if (adapter == IResourceManagerControl.class) {
+			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+			return new SLURMResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+		}
+		return null;
 	}
 
 	/*
@@ -129,6 +132,17 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#
+	 * needsDebuggerLaunchHelp()
+	 */
+	@Override
+	public boolean needsDebuggerLaunchHelp() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#setDefaultNameAndDesc
 	 * ()
@@ -174,16 +188,5 @@ public class SLURMServiceProvider extends AbstractRemoteResourceManagerServicePr
 	 */
 	public void setUseDefaults(boolean useDefaults) {
 		putBoolean(TAG_SLURMD_DEFAULTS, useDefaults);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rmsystem.IResourceManagerConfiguration#
-	 * needsDebuggerLaunchHelp()
-	 */
-	@Override
-	public boolean needsDebuggerLaunchHelp() {
-		return false;
 	}
 }

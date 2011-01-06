@@ -63,13 +63,16 @@ public class MPICH2ServiceProvider extends AbstractToolRMServiceProvider impleme
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * createResourceManager()
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
-	public IResourceManagerControl createResourceManager() {
-		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
-		return new MPICH2ResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+	public Object getAdapter(Class adapter) {
+		if (adapter == IResourceManagerControl.class) {
+			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+			return new MPICH2ResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+		}
+		return null;
 	}
 
 	/*

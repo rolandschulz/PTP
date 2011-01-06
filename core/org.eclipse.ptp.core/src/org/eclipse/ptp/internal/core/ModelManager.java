@@ -99,7 +99,7 @@ public class ModelManager implements IModelManager {
 					IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
 							.getUniqueName());
 					if (rm != null) {
-						removeResourceManager(rm);
+						doRemoveResourceManager(rm);
 					}
 				}
 				break;
@@ -125,7 +125,8 @@ public class ModelManager implements IModelManager {
 						IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
 								.getUniqueName());
 						if (rm == null) {
-							addResourceManager(((IResourceManagerConfiguration) newProvider).createResourceManager());
+							addResourceManager((IResourceManagerControl) ((IResourceManagerConfiguration) newProvider)
+									.getAdapter(IResourceManagerControl.class));
 						}
 					}
 				}
@@ -177,8 +178,10 @@ public class ModelManager implements IModelManager {
 	 * org.eclipse.ptp.core.IModelManager#addResourceManager(org.eclipse.ptp
 	 * .core.elementcontrols.IResourceManagerControl)
 	 */
-	public synchronized void addResourceManager(IResourceManagerControl rm) {
-		universe.addResourceManager(rm);
+	public void addResourceManager(IResourceManagerControl rm) {
+		synchronized (universe) {
+			universe.addResourceManager(rm);
+		}
 		fireNewResourceManager(rm);
 	}
 
@@ -189,46 +192,9 @@ public class ModelManager implements IModelManager {
 	 * org.eclipse.ptp.core.IModelManager#addResourceManagers(org.eclipse.ptp
 	 * .core.elementcontrols.IResourceManagerControl[])
 	 */
-	public synchronized void addResourceManagers(IResourceManagerControl[] rms) {
+	public void addResourceManagers(IResourceManagerControl[] rms) {
 		for (IResourceManagerControl rm : rms) {
 			addResourceManager(rm);
-		}
-	}
-
-	/**
-	 * Fire a changed resource manager event.
-	 * 
-	 * @param rms
-	 *            collection of resource managers
-	 */
-	private void fireChangedResourceManager(final Collection<IResourceManager> rms) {
-		IChangedResourceManagerEvent event = new ChangedResourceManagerEvent(this, rms);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * Fire a new resource manager event.
-	 * 
-	 * @param rm
-	 */
-	private void fireNewResourceManager(final IResourceManager rm) {
-		INewResourceManagerEvent event = new NewResourceManagerEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
-		}
-	}
-
-	/**
-	 * Fire a remove resource manager event.
-	 * 
-	 * @param rm
-	 */
-	private void fireRemoveResourceManager(final IResourceManager rm) {
-		IRemoveResourceManagerEvent event = new RemoveResourceManagerEvent(this, rm);
-		for (Object listener : resourceManagerListeners.getListeners()) {
-			((IModelManagerChildListener) listener).handleEvent(event);
 		}
 	}
 
@@ -240,14 +206,14 @@ public class ModelManager implements IModelManager {
 	 * .lang.String)
 	 */
 	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
-		IPUniverse universe = getUniverse();
-		if (universe != null) {
-			IResourceManager[] rms = universe.getResourceManagers();
+		IResourceManager[] rms;
+		synchronized (universe) {
+			rms = universe.getResourceManagers();
+		}
 
-			for (IResourceManager rm : rms) {
-				if (rm.getUniqueName().equals(rmUniqueName)) {
-					return rm;
-				}
+		for (IResourceManager rm : rms) {
+			if (rm.getUniqueName().equals(rmUniqueName)) {
+				return rm;
 			}
 		}
 		return null;
@@ -335,9 +301,12 @@ public class ModelManager implements IModelManager {
 	 * org.eclipse.ptp.core.IModelManager#removeResourceManager(org.eclipse.
 	 * ptp.core.elementcontrols.IResourceManagerControl)
 	 */
-	public synchronized void removeResourceManager(IResourceManagerControl rm) {
-		universe.removeResourceManager(rm);
-		fireRemoveResourceManager(rm);
+	public void removeResourceManager(IResourceManagerControl rm) {
+		IResourceManagerConfiguration rmConf = rm.getConfiguration();
+		if (rmConf instanceof IServiceProvider) {
+			removeProviderFromConfiguration((IServiceProvider) rmConf);
+		}
+		doRemoveResourceManager(rm);
 	}
 
 	/*
@@ -347,7 +316,7 @@ public class ModelManager implements IModelManager {
 	 * org.eclipse.ptp.core.IModelManager#removeResourceManagers(org.eclipse
 	 * .ptp.core.elementcontrols.IResourceManagerControl[])
 	 */
-	public synchronized void removeResourceManagers(IResourceManagerControl[] rms) {
+	public void removeResourceManagers(IResourceManagerControl[] rms) {
 		for (IResourceManagerControl rm : rms) {
 			removeResourceManager(rm);
 		}
@@ -374,16 +343,6 @@ public class ModelManager implements IModelManager {
 		resourceManagerListeners.clear();
 	}
 
-	/**
-	 * shuts down all of the resource managers.
-	 */
-	private synchronized void shutdownResourceManagers() {
-		IResourceManagerControl[] resourceManagers = universe.getResourceManagerControls();
-		for (int i = 0; i < resourceManagers.length; ++i) {
-			resourceManagers[i].dispose();
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -393,26 +352,16 @@ public class ModelManager implements IModelManager {
 		loadResourceManagers();
 	}
 
-	/**
-	 * Start all resource managers.
-	 * 
-	 * @param rmsNeedStarting
-	 * @throws CoreException
-	 */
-	private void startResourceManagers(IResourceManagerControl[] rmsNeedStarting) throws CoreException {
-		for (final IResourceManagerControl rm : rmsNeedStarting) {
-			Job job = new RMStartupJob(rm);
-			job.schedule();
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.core.IModelManager#stopResourceManagers()
 	 */
 	public void stopResourceManagers() throws CoreException {
-		IResourceManager[] resourceManagers = universe.getResourceManagers();
+		IResourceManager[] resourceManagers;
+		synchronized (universe) {
+			resourceManagers = universe.getResourceManagers();
+		}
 		for (int i = 0; i < resourceManagers.length; ++i) {
 			resourceManagers[i].shutdown();
 		}
@@ -427,6 +376,93 @@ public class ModelManager implements IModelManager {
 	 */
 	public void updateResourceManager(IResourceManager rm) {
 		fireChangedResourceManager(Arrays.asList(rm));
+	}
+
+	private void doRemoveResourceManager(IResourceManagerControl rm) {
+		synchronized (universe) {
+			universe.removeResourceManager(rm);
+		}
+		fireRemoveResourceManager(rm);
+	}
+
+	/**
+	 * Fire a changed resource manager event.
+	 * 
+	 * @param rms
+	 *            collection of resource managers
+	 */
+	private void fireChangedResourceManager(final Collection<IResourceManager> rms) {
+		IChangedResourceManagerEvent event = new ChangedResourceManagerEvent(this, rms);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener) listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * Fire a new resource manager event.
+	 * 
+	 * @param rm
+	 */
+	private void fireNewResourceManager(final IResourceManager rm) {
+		INewResourceManagerEvent event = new NewResourceManagerEvent(this, rm);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener) listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * Fire a remove resource manager event.
+	 * 
+	 * @param rm
+	 */
+	private void fireRemoveResourceManager(final IResourceManager rm) {
+		IRemoveResourceManagerEvent event = new RemoveResourceManagerEvent(this, rm);
+		for (Object listener : resourceManagerListeners.getListeners()) {
+			((IModelManagerChildListener) listener).handleEvent(event);
+		}
+	}
+
+	/**
+	 * Remove provider from a service configurations
+	 * 
+	 * @param provider
+	 *            provider to remove
+	 */
+	private void removeProviderFromConfiguration(IServiceProvider provider) {
+		Set<IServiceConfiguration> configs = fServiceManager.getConfigurations();
+
+		for (IServiceConfiguration config : configs) {
+			if (provider == config.getServiceProvider(fLaunchService)) {
+				config.setServiceProvider(fLaunchService, null);
+				break;
+			}
+		}
+	}
+
+	/**
+	 * shuts down all of the resource managers.
+	 */
+	private void shutdownResourceManagers() {
+		IResourceManagerControl[] resourceManagers;
+		synchronized (universe) {
+			resourceManagers = universe.getResourceManagerControls();
+		}
+		for (int i = 0; i < resourceManagers.length; ++i) {
+			resourceManagers[i].dispose();
+		}
+	}
+
+	/**
+	 * Start all resource managers.
+	 * 
+	 * @param rmsNeedStarting
+	 * @throws CoreException
+	 */
+	private void startResourceManagers(IResourceManagerControl[] rmsNeedStarting) throws CoreException {
+		for (final IResourceManagerControl rm : rmsNeedStarting) {
+			Job job = new RMStartupJob(rm);
+			job.schedule();
+		}
 	}
 
 }
