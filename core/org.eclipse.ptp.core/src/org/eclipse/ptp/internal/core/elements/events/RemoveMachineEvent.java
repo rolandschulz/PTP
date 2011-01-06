@@ -13,7 +13,7 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 
 /**
@@ -23,10 +23,10 @@ import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 public class RemoveMachineEvent implements
 		IRemoveMachineEvent {
 
-	private final IResourceManager rm;
+	private final IPResourceManager rm;
 	private final Collection<IPMachine> machines;
 
-	public RemoveMachineEvent(IResourceManager manager, Collection<IPMachine> machines) {
+	public RemoveMachineEvent(IPResourceManager manager, Collection<IPMachine> machines) {
 		this.rm = manager;
 		this.machines = machines;
 	}
@@ -49,7 +49,7 @@ public class RemoveMachineEvent implements
 	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getSource
 	 * ()
 	 */
-	public IResourceManager getSource() {
+	public IPResourceManager getSource() {
 		return rm;
 	}
 

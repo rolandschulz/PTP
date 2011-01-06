@@ -15,7 +15,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes.State;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
@@ -115,7 +115,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	public void terminate() throws DebugException {
 		if (!isTerminated()) {
 			try {
-				IResourceManager rm = job.getQueue().getResourceManager();
+				IPResourceManager rm = job.getQueue().getResourceManager();
 				rm.terminateJob(job);
 			} catch (CoreException e) {
 				throw new DebugException(e.getStatus());

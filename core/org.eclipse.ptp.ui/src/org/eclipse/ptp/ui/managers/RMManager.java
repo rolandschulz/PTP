@@ -17,12 +17,12 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.internal.ui.RMSelectionPersistence;
 import org.eclipse.ptp.ui.IRMSelectionListener;
 
 public class RMManager {
-	protected IResourceManager selectedRM = null;
+	protected IPResourceManager selectedRM = null;
 	protected ListenerList rmSelectionListeners = new ListenerList();
 	protected boolean loaded = false;
 
@@ -40,7 +40,7 @@ public class RMManager {
 	 * 
 	 * @param rm selected resource manager
 	 */
-	public void fireSetDefaultRMEvent(final IResourceManager rm) {
+	public void fireSetDefaultRMEvent(final IPResourceManager rm) {
 		selectedRM = rm;
 		for (Object listener: rmSelectionListeners.getListeners()) {
 			final IRMSelectionListener rmListener = (IRMSelectionListener)listener;
@@ -73,10 +73,10 @@ public class RMManager {
 	 * 
 	 * @return an array containing the resource managers
 	 */
-	public IResourceManager[] getResourceManagers() {
+	public IPResourceManager[] getResourceManagers() {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
 		if (universe == null) {
-			return new IResourceManager[0];
+			return new IPResourceManager[0];
 		}
 		return universe.getResourceManagers();
 	}
@@ -86,7 +86,7 @@ public class RMManager {
 	 * 
 	 * @return default resource manager, or null if none are selected
 	 */
-	public IResourceManager getSelected() {
+	public IPResourceManager getSelected() {
 		restoreSelectedRM();
 		return selectedRM;
 	}

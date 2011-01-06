@@ -14,7 +14,7 @@ package org.eclipse.ptp.rm.slurm.ui.rmLaunchConfiguration;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.slurm.core.rmsystem.SLURMResourceManager;
@@ -26,11 +26,11 @@ public class SLURMRMLaunchConfigurationFactory extends AbstractRMLaunchConfigura
 	 * 
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory
-	 * #doCreate(org.eclipse.ptp.core.elements.IResourceManager,
+	 * #doCreate(org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IPResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new SLURMRMLaunchConfigurationDynamicTab(rm, dialog);
 	}
@@ -43,7 +43,7 @@ public class SLURMRMLaunchConfigurationFactory extends AbstractRMLaunchConfigura
 	 * #getResourceManagerClass()
 	 */
 	@Override
-	public Class<? extends IResourceManager> getResourceManagerClass() {
+	public Class<? extends IPResourceManager> getResourceManagerClass() {
 		return SLURMResourceManager.class;
 	}
 

@@ -11,7 +11,7 @@
 
 package org.eclipse.ptp.internal.core.elements.events;
 
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 
 /**
@@ -23,7 +23,7 @@ public class ResourceManagerSubmitJobErrorEvent extends ResourceManagerErrorEven
 
 	private final String id;
 
-	public ResourceManagerSubmitJobErrorEvent(IResourceManager rm, String id, String message) {
+	public ResourceManagerSubmitJobErrorEvent(IPResourceManager rm, String id, String message) {
 		super(rm, message);
 		this.id = id;
 	}

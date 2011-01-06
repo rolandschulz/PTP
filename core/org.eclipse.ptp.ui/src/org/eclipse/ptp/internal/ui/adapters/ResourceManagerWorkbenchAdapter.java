@@ -23,7 +23,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.IRuntimeModelPresentation;
@@ -51,22 +51,28 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 			this.children = children;
 		}
 
-		public Object getAdapter(@SuppressWarnings("unchecked") Class adapter) {
+		@SuppressWarnings("rawtypes")
+		public Object getAdapter(Class adapter) {
 			if (adapter == IWorkbenchAdapter.class || adapter == IWorkbenchAdapter2.class) {
 				return this;
 			}
 			return null;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
 		 */
 		@Override
 		public Object[] getChildren(Object object) {
 			return children.clone();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 		 */
 		@Override
@@ -74,8 +80,11 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 			return name;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.model.WorkbenchAdapter#getParent(java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.model.WorkbenchAdapter#getParent(java.lang.Object)
 		 */
 		@Override
 		public Object getParent(Object object) {
@@ -83,20 +92,21 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
 	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		IResourceManager rm = getResourceManager(parentElement);
+		IPResourceManager rm = getResourceManager(parentElement);
 		if (rm != null) {
 			if (rm.getState() != ResourceManagerAttributes.State.STARTED) {
 				return new Object[0];
 			}
 			IPMachine[] machines = rm.getMachines();
 			IPQueue[] queues = rm.getQueues();
-			return new Object[] {
-					makeChildContainer(parentElement, Messages.ResourceManagerWorkbenchAdapter_0, machines),
+			return new Object[] { makeChildContainer(parentElement, Messages.ResourceManagerWorkbenchAdapter_0, machines),
 					makeChildContainer(parentElement, Messages.ResourceManagerWorkbenchAdapter_1, queues) };
 		}
 		return null;
@@ -106,36 +116,44 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	 * @param parentElement
 	 * @return
 	 */
-	private IResourceManager getResourceManager(Object parentElement) {
-		IResourceManager rm = null;
+	private IPResourceManager getResourceManager(Object parentElement) {
+		IPResourceManager rm = null;
 		if (parentElement instanceof IAdaptable) {
-			rm = (IResourceManager) ((IAdaptable) parentElement).getAdapter(IResourceManager.class);
+			rm = (IPResourceManager) ((IAdaptable) parentElement).getAdapter(IPResourceManager.class);
 		}
 		return rm;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object
+	 * )
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(((IResourceManager)object).getResourceManagerId());
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+				((IPResourceManager) object).getResourceManagerId());
 		if (presentation != null) {
 			final Image image = presentation.getImage(object);
 			if (image != null) {
 				return new ImageImageDescriptor(image);
 			}
 		}
-		final ResourceManagerAttributes.State state = ((IResourceManager) object).getState();
+		final ResourceManagerAttributes.State state = ((IPResourceManager) object).getState();
 		return new ImageImageDescriptor(ParallelImages.rmImages[state.ordinal()]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	@Override
 	public String getLabel(Object object) {
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(((IResourceManager)object).getResourceManagerId());
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+				((IPResourceManager) object).getResourceManagerId());
 		if (presentation != null) {
 			final String label = presentation.getText(object);
 			if (label != null) {
@@ -149,8 +167,10 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 		}
 		return resourceManager.getName() + " (" + type + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getParent(java.lang.Object)
 	 */
 	@Override
@@ -162,10 +182,8 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 		return null;
 	}
 
-	private ChildContainer makeChildContainer(Object parent, String name,
-			final Object[] children) {
-		final ChildContainer container = new ChildContainer(parent, name,
-				children);
+	private ChildContainer makeChildContainer(Object parent, String name, final Object[] children) {
+		final ChildContainer container = new ChildContainer(parent, name, children);
 		return container;
 	}
 

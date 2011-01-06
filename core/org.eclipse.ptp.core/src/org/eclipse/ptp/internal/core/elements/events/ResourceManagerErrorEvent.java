@@ -16,15 +16,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core.elements.events;
 
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 
 public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
 
-	private final IResourceManager rm;
+	private final IPResourceManager rm;
 	private final String message;
 
-	public ResourceManagerErrorEvent(final IResourceManager rm, final String message) {
+	public ResourceManagerErrorEvent(final IPResourceManager rm, final String message) {
 		this.rm = rm;
 		this.message = message;
 	}
@@ -45,7 +45,7 @@ public class ResourceManagerErrorEvent implements IResourceManagerErrorEvent {
 	 * @see
 	 * org.eclipse.ptp.rmsystem.events.IResourceManagerErrorEvent#getSource()
 	 */
-	public IResourceManager getSource() {
+	public IPResourceManager getSource() {
 		return rm;
 	}
 

@@ -54,7 +54,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
@@ -196,7 +196,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 			 * Add resource manager child listener so we get notified when new
 			 * machines are added to the model.
 			 */
-			final IResourceManager rm = e.getResourceManager();
+			final IPResourceManager rm = e.getResourceManager();
 	        rm.addChildListener(resourceManagerListener);
 		}
 		
@@ -989,7 +989,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		     * miss a RM if a new event arrives while we're doing this, but is 
 		     * it a problem?
 		     */
-		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		    for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 		        rm.addChildListener(resourceManagerListener);
 		    }
 		    
@@ -1013,7 +1013,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 		/*
 		 * Add us as a child listener to any existing machines
 		 */
-		for (IResourceManager rm : universe.getResourceManagers()) {
+		for (IPResourceManager rm : universe.getResourceManagers()) {
 			for (IPMachine machine : rm.getMachines()) {
 				machine.addChildListener(machineListener);
 			}

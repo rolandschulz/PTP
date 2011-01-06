@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 
@@ -52,7 +52,7 @@ public class WorkbenchAdapterAdapterFactory implements IAdapterFactory {
 			if (adaptableObject instanceof IPUniverse) {
 				return UNIVERSE_WORKBENCH_ADAPTER;
 			}
-			if (adaptableObject instanceof IResourceManager) {
+			if (adaptableObject instanceof IPResourceManager) {
 				return RESOURCE_MANAGER_WORKBENCH_ADAPTER;
 			}
 			if (adaptableObject instanceof IPMachine) {

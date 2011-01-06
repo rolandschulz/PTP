@@ -18,7 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
@@ -44,11 +44,11 @@ public class RMSelectionPersistence
 	 * 
 	 * @return - the default resource mananger or null if no default resource mananger set
 	 */
-	public IResourceManager getDefaultRM()
+	public IPResourceManager getDefaultRM()
 	{
 		File file;
 		FileReader reader;
-		IResourceManager rm;
+		IPResourceManager rm;
 		
 		file = getPersistenceFile();
 		reader = null;
@@ -92,7 +92,7 @@ public class RMSelectionPersistence
 	 * 
 	 * @param rm - The default resource manager
 	 */
-	public void saveDefaultRM(IResourceManager rm)
+	public void saveDefaultRM(IPResourceManager rm)
 	{
 		XMLMemento memento;
 		FileWriter writer;
@@ -125,7 +125,7 @@ public class RMSelectionPersistence
 	 * @param rm - the default resource manager
 	 * @return - the persistent data object used to store the resource manager id
 	 */
-	private XMLMemento createMemento(IResourceManager rm)
+	private XMLMemento createMemento(IPResourceManager rm)
 	{
 		XMLMemento memento;
 		IMemento child;

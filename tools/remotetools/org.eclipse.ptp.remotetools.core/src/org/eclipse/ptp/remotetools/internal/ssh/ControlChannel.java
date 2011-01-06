@@ -83,7 +83,8 @@ public class ControlChannel implements ILineStreamListener {
 
 		try {
 			// Clean shell prompt.
-			outputToControlTerminalInput.write("export PS1=\n".getBytes()); //$NON-NLS-1$
+			outputToControlTerminalInput.write("PS1=\n".getBytes()); //$NON-NLS-1$
+			outputToControlTerminalInput.write("export PS1\n".getBytes()); //$NON-NLS-1$
 
 			// Write terminal path on control channel, to be read by the
 			// observer

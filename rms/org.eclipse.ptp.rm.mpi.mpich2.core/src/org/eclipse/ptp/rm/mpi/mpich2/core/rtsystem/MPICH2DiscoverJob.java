@@ -20,7 +20,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob;
 import org.eclipse.ptp.rm.mpi.mpich2.core.MPICH2MachineAttributes;
@@ -56,7 +56,7 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 		 * MPI resource manager have only one machine and one queue.
 		 * There they are implicitly "discovered".
 		 */
-		IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rts.getRmID());
+		IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rts.getRmID());
 		String machineID = rts.createMachine(rm.getName());
 		rts.setMachineID(machineID);
 		String queueID = rts.createQueue(Messages.MPICH2DiscoverJob_defaultQueueName);

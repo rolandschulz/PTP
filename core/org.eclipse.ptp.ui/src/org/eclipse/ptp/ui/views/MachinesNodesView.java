@@ -34,7 +34,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
@@ -132,7 +132,7 @@ public class MachinesNodesView extends ViewPart {
 			 * a RM if a new event arrives while we're doing this, but is it a
 			 * problem?
 			 */
-			for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				rm.addChildListener(resourceManagerListener);
 				/*
 				 * We need to get the current state of the nodes on this
@@ -845,7 +845,7 @@ public class MachinesNodesView extends ViewPart {
 
 		public void handleEvent(IChangedResourceManagerEvent e) {
 			boolean needRefresh = false;
-			for (IResourceManager rm : e.getResourceManagers()) {
+			for (IPResourceManager rm : e.getResourceManagers()) {
 				if ((rm.getState() == ResourceManagerAttributes.State.STOPPED)
 						|| (rm.getState() == ResourceManagerAttributes.State.ERROR)) {
 					/*
@@ -889,7 +889,7 @@ public class MachinesNodesView extends ViewPart {
 			 * Add resource manager child listener so we get notified when new
 			 * machines are added to the model.
 			 */
-			final IResourceManager rm = e.getResourceManager();
+			final IPResourceManager rm = e.getResourceManager();
 			rm.addChildListener(resourceManagerListener);
 		}
 

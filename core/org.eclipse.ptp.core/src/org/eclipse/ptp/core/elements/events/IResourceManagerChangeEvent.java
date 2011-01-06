@@ -17,7 +17,7 @@
 package org.eclipse.ptp.core.elements.events;
 
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 
 /**
  * This event is sent when the attributes on a resource manager change. It is
@@ -38,7 +38,8 @@ public interface IResourceManagerChangeEvent {
 	 * Get the event source.
 	 * 
 	 * @return the source of the event
+	 * @since 5.0
 	 */
-	IResourceManager getSource();
+	IPResourceManager getSource();
 
 }

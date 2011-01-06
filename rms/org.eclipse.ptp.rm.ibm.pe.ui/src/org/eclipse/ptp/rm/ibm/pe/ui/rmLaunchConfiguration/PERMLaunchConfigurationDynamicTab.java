@@ -50,7 +50,7 @@ import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringSetAttribute;
 import org.eclipse.ptp.core.attributes.StringSetAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -266,7 +266,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	private final boolean useLoadLeveler = false;
 	private TabFolder tabbedPane;
 	private ILaunchConfigurationWorkingCopy currentLaunchConfig;
-	private IResourceManager currentRM;
+	private IPResourceManager currentRM;
 	private CheckboxRowWidget peAdvancedMode;
 	private FileSelectorRowWidget peEnvScript;
 	private boolean allFieldsValid = true;
@@ -586,7 +586,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 		}
 	}
 
-	public PERMLaunchConfigurationDynamicTab(IResourceManager rm, ILaunchConfigurationDialog dialog) {
+	public PERMLaunchConfigurationDynamicTab(IPResourceManager rm, ILaunchConfigurationDialog dialog) {
 		super(dialog);
 	}
 
@@ -598,7 +598,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * #canSave(org.eclipse.swt.widgets.Control,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation canSave(Control control, IPResourceManager rm, IPQueue queue) {
 		if (allFieldsValid) {
 			return success;
 		}
@@ -941,7 +941,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            Attribute id for rm attribute this widget represents
 	 * @return TextRowWidget entry widget
 	 */
-	private TextRowWidget createTextWidget(Composite parent, IResourceManager rm, String id) {
+	private TextRowWidget createTextWidget(Composite parent, IPResourceManager rm, String id) {
 		TextRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -970,7 +970,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            Attribute id for second rm attribute this widget represents
 	 * @return Text entry widget
 	 */
-	private DualFieldRowWidget createDualField(Composite parent, IResourceManager rm, String id1, String id2) {
+	private DualFieldRowWidget createDualField(Composite parent, IPResourceManager rm, String id1, String id2) {
 		DualFieldRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr1;
 		IAttributeDefinition<?, ?, ?> attr2;
@@ -1000,7 +1000,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private CheckboxRowWidget createCheckbox(Composite parent, IResourceManager rm, String id) {
+	private CheckboxRowWidget createCheckbox(Composite parent, IPResourceManager rm, String id) {
 		CheckboxRowWidget widget;
 		StringAttributeDefinition attrDef;
 
@@ -1025,7 +1025,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Checkbox button for this attribute
 	 */
-	private BooleanRowWidget createBooleanOption(Composite parent, IResourceManager rm, String id) {
+	private BooleanRowWidget createBooleanOption(Composite parent, IPResourceManager rm, String id) {
 		BooleanRowWidget widget;
 		StringSetAttributeDefinition attrDef;
 
@@ -1059,7 +1059,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            this widget
 	 * @return Text entry field for this attribute
 	 */
-	private FileSelectorRowWidget createFileSelector(Composite parent, IResourceManager rm, String id, int selectorID) {
+	private FileSelectorRowWidget createFileSelector(Composite parent, IPResourceManager rm, String id, int selectorID) {
 		FileSelectorRowWidget widget;
 		StringAttributeDefinition attr;
 
@@ -1088,7 +1088,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            Attribute id for rm attribute this widget represents
 	 * @return ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createCombobox(Composite parent, IResourceManager rm, String id) {
+	private ComboRowWidget createCombobox(Composite parent, IPResourceManager rm, String id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -1115,7 +1115,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            Attribute id for rm attribute this widget represents
 	 * @return Editable ComboRowWidget used by this attribute
 	 */
-	private ComboRowWidget createEditableCombobox(Composite parent, IResourceManager rm, String id) {
+	private ComboRowWidget createEditableCombobox(Composite parent, IPResourceManager rm, String id) {
 		ComboRowWidget widget;
 		IAttributeDefinition<?, ?, ?> attr;
 
@@ -1367,7 +1367,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createTasksTab(IResourceManager rm) {
+	private void createTasksTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1387,7 +1387,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createIOTab(IResourceManager rm) {
+	private void createIOTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1407,7 +1407,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createDiagnosticTab(IResourceManager rm) {
+	private void createDiagnosticTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1429,7 +1429,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createDebugTab(IResourceManager rm) {
+	private void createDebugTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1452,7 +1452,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createSystemTab(IResourceManager rm) {
+	private void createSystemTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1473,7 +1473,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createNodeAllocationTab(IResourceManager rm) {
+	private void createNodeAllocationTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1501,7 +1501,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createPerformanceTab1(IResourceManager rm) {
+	private void createPerformanceTab1(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1528,7 +1528,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createPerformanceTab2(IResourceManager rm) {
+	private void createPerformanceTab2(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1553,7 +1553,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createMiscellaneousTab(IResourceManager rm) {
+	private void createMiscellaneousTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1589,7 +1589,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            resource manager associated with this launch configuration
 	 */
-	private void createOtherRMTab(IResourceManager rm) {
+	private void createOtherRMTab(IPResourceManager rm) {
 		TabItem tab;
 
 		tab = new TabItem(tabbedPane, SWT.NONE);
@@ -1607,7 +1607,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            The resource manager associated with this launch configuration
 	 */
-	private void createModeBox(IResourceManager rm) {
+	private void createModeBox(IPResourceManager rm) {
 		GridData gd;
 		GridLayout layout;
 		Composite pane;
@@ -1635,7 +1635,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param rm
 	 *            The resource manager associated with this launch configuration
 	 */
-	private void createRedirectBox(IResourceManager rm) {
+	private void createRedirectBox(IPResourceManager rm) {
 		GridData gd;
 		GridLayout layout;
 		Composite pane;
@@ -1665,7 +1665,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param queue
 	 *            Currently selected queue
 	 */
-	public void createControl(Composite parent, IResourceManager rm, IPQueue queue) {
+	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) {
 		IPEResourceManagerConfiguration config;
 		IRemoteConnectionManager connMgr;
 
@@ -1720,7 +1720,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param attrName
 	 *            The name of the attribute to be added to launch attributes
 	 */
-	private void addAttribute(IResourceManager rm, ILaunchConfiguration config, Vector<StringAttribute> attrs, String attrName) {
+	private void addAttribute(IPResourceManager rm, ILaunchConfiguration config, Vector<StringAttribute> attrs, String attrName) {
 		String attrValue;
 		String defaultValue;
 		StringAttribute attr;
@@ -1757,7 +1757,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            The current launch configuration
 	 */
 	@SuppressWarnings("unchecked")
-	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IResourceManager rm, IPQueue queue,
+	public IAttribute<String, StringAttribute, StringAttributeDefinition>[] getAttributes(IPResourceManager rm, IPQueue queue,
 			ILaunchConfiguration configuration, String mode) throws CoreException {
 		Vector<StringAttribute> attrs;
 		StringAttribute attrArray[];
@@ -1813,7 +1813,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrLocalDefaultValue(IResourceManager rm, String attrName) {
+	private String getAttrLocalDefaultValue(IPResourceManager rm, String attrName) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 		String localDefaultEnv;
 
@@ -1846,7 +1846,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrDefaultValue(IResourceManager rm, String attrName) {
+	private String getAttrDefaultValue(IPResourceManager rm, String attrName) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
 		attrDef = rm.getAttributeDefinition(attrName);
@@ -1874,7 +1874,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            The name of the attribute
 	 * @return The value of the attribute
 	 */
-	private String getAttrInitialValue(ILaunchConfiguration config, IResourceManager rm, String attrName) {
+	private String getAttrInitialValue(ILaunchConfiguration config, IPResourceManager rm, String attrName) {
 		String value;
 		IAttributeDefinition<?, ?, ?> rmAttrDef;
 
@@ -2022,7 +2022,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 *            The resource manager currently associated with the launch
 	 *            configuration
 	 */
-	private void setInitialValues(ILaunchConfiguration config, IResourceManager rm) {
+	private void setInitialValues(ILaunchConfiguration config, IPResourceManager rm) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -2084,7 +2084,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * point this method is called, all widgets are in enabled state, so it is
 	 * only necessary to disable widgets.
 	 */
-	private void setInitialWidgetState(IResourceManager rm) {
+	private void setInitialWidgetState(IPResourceManager rm) {
 		String mpPriorityDefaultValue;
 		boolean enableState;
 
@@ -2128,7 +2128,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @return The default attribute value or empty string if value cannot be
 	 *         retrieved
 	 */
-	private String getDefaultAttributeValue(IResourceManager rm, String attributeName) {
+	private String getDefaultAttributeValue(IPResourceManager rm, String attributeName) {
 		String defaultValue;
 
 		try {
@@ -2155,7 +2155,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
 		if (configuration instanceof ILaunchConfigurationWorkingCopy) {
 			currentLaunchConfig = (ILaunchConfigurationWorkingCopy) configuration;
 		}
@@ -2173,7 +2173,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
 	@SuppressWarnings("unchecked")
-	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation isValid(ILaunchConfiguration configuration, IPResourceManager rm, IPQueue queue) {
 		// If running in basic mode, then any PE command line options and
 		// environment variables are disallowed since those settings may
 		// conflict with what is specified in the resources tab panel.
@@ -2240,7 +2240,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * @param control
 	 *            The widget to obtain the value from
 	 */
-	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, IResourceManager rm, String attr, TextRowWidget control) {
+	private void setConfigAttr(ILaunchConfigurationWorkingCopy config, IPResourceManager rm, String attr, TextRowWidget control) {
 		IAttributeDefinition<?, ?, ?> attrDef;
 
 		if (control != null) {
@@ -2347,7 +2347,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * 
 	 * @param config
 	 */
-	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IResourceManager rm) {
+	private void saveConfigurationData(ILaunchConfigurationWorkingCopy config, IPResourceManager rm) {
 		Object widget;
 		Iterator<Object> i;
 
@@ -2382,7 +2382,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
 		currentLaunchConfig = configuration;
 		saveConfigurationData(configuration, rm);
 		return new RMLaunchValidation(true, ""); //$NON-NLS-1$
@@ -2396,7 +2396,7 @@ public class PERMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigura
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.rmsystem.IResourceManager, org.eclipse.ptp.core.IPQueue)
 	 */
-	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IResourceManager rm, IPQueue queue) {
+	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy config, IPResourceManager rm, IPQueue queue) {
 		IAttribute<?, ?, ?> rmAttrs[];
 
 		currentLaunchConfig = config;

@@ -29,7 +29,12 @@ import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
-public interface IResourceManager extends IPElement, IAdaptable, IResourceManagerMenuContribution {
+/**
+ * Resource manager in the IP* hierarchy
+ * 
+ * @since 5.0
+ */
+public interface IPResourceManager extends IPElement, IAdaptable, IResourceManagerMenuContribution {
 
 	/**
 	 * Add a listener for child events.

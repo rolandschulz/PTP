@@ -58,8 +58,8 @@ import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
@@ -253,7 +253,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			 * Add resource manager child listener so we get notified when new
 			 * machines are added to the model.
 			 */
-			final IResourceManager rm = e.getResourceManager();
+			final IPResourceManager rm = e.getResourceManager();
 			rm.addChildListener(resourceManagerChildListener);
 			rm.addElementListener(resourceManagerListener);
 		}
@@ -270,7 +270,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			 * Removed resource manager child listener when resource manager is
 			 * removed.
 			 */
-			final IResourceManager rm = e.getResourceManager();
+			final IPResourceManager rm = e.getResourceManager();
 			rm.removeChildListener(resourceManagerChildListener);
 			rm.removeElementListener(resourceManagerListener);
 		}
@@ -617,7 +617,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	public AbstractParallelLaunchConfigurationDelegate() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
-			for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				for (IPQueue queue : rm.getQueues()) {
 					queue.addChildListener(queueChildListener);
 				}
@@ -925,7 +925,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 
 		try {
-			IResourceManager rm = getResourceManager(configuration);
+			IPResourceManager rm = getResourceManager(configuration);
 			if (rm == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
@@ -1054,8 +1054,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @param rm
 	 *            resource manager
 	 * @return default queue
+	 * @since 5.0
 	 */
-	protected IPQueue getQueueDefault(IResourceManager rm) {
+	protected IPQueue getQueueDefault(IPResourceManager rm) {
 		final IPQueue[] queues = rm.getQueues();
 		if (queues.length == 0) {
 			return null;
@@ -1073,7 +1074,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected IAttribute<?, ?, ?>[] getResourceAttributes(ILaunchConfiguration configuration, String mode) throws CoreException {
 
-		IResourceManager rm = getResourceManager(configuration);
+		IPResourceManager rm = getResourceManager(configuration);
 
 		final AbstractRMLaunchConfigurationFactory rmFactory = PTPLaunchPlugin.getDefault().getRMLaunchConfigurationFactory(rm);
 		if (rmFactory == null) {
@@ -1091,12 +1092,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 *            launch configuration
 	 * @return resource manager
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+	protected IPResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IResourceManager[] rms = universe.getResourceManagers();
+		IPResourceManager[] rms = universe.getResourceManagers();
 		String rmUniqueName = getResourceManagerUniqueName(configuration);
-		for (IResourceManager rm : rms) {
+		for (IPResourceManager rm : rms) {
 			if (rm.getState() == ResourceManagerAttributes.State.STARTED && rm.getUniqueName().equals(rmUniqueName)) {
 				return rm;
 			}
@@ -1194,7 +1196,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			IPDebugger debugger, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
-			final IResourceManager rm = getResourceManager(configuration);
+			final IPResourceManager rm = getResourceManager(configuration);
 			if (rm == null) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));

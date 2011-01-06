@@ -56,9 +56,9 @@ public interface IPQueue extends IPElement {
 	/**
 	 * Get the resource manager that controls this queue.
 	 * 
-	 * @return IResourceManager
+	 * @return IPResourceManager
 	 */
-	public IResourceManager getResourceManager();
+	public IPResourceManager getResourceManager();
 
 	/**
 	 * Get the internal state of the process.

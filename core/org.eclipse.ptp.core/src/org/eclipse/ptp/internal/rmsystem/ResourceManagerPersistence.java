@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.core.util.DebugUtil;
@@ -126,7 +126,7 @@ public class ResourceManagerPersistence {
 		return null;
 	}
 
-	public IResourceManager getSavedCurrentResourceManager() {
+	public IPResourceManager getSavedCurrentResourceManager() {
 		return savedCurrentResourceManager;
 	}
 

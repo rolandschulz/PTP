@@ -50,7 +50,7 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
@@ -183,7 +183,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			 * Add resource manager child listener so we get notified when new
 			 * machines are added to the model.
 			 */
-			final IResourceManager rm = e.getResourceManager();
+			final IPResourceManager rm = e.getResourceManager();
 	        rm.addChildListener(resourceManagerListener);
 		}
 		
@@ -469,7 +469,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	public void dispose() {
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
-		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		    for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 				for (IPQueue queue : rm.getQueues()) {
 					for (IPJob job : queue.getJobs()) {
 						job.removeChildListener(jobChildListener);
@@ -813,7 +813,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		     * miss a RM if a new event arrives while we're doing this, but is 
 		     * it a problem?
 		     */
-		    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		    for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 		        rm.addChildListener(resourceManagerListener);
 		    }
 		    mm.addListener(modelManagerListener);
@@ -845,7 +845,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		/*
 		 * Add us as a child listener to any existing queue
 		 */
-		for (IResourceManager rm : universe.getResourceManagers()) {
+		for (IPResourceManager rm : universe.getResourceManagers()) {
 			for (IPQueue queue : rm.getQueues()) {
 				queue.addChildListener(queueChildListener);
 			}

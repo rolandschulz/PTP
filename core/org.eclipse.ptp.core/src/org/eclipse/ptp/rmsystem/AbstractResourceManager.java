@@ -57,7 +57,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.ErrorAttributes;
 import org.eclipse.ptp.core.elements.attributes.FilterAttributes;
@@ -108,7 +108,7 @@ import org.eclipse.ptp.internal.core.elements.events.ResourceManagerSubmitJobErr
  * @author rsqrd
  * 
  */
-public abstract class AbstractResourceManager extends Parent implements IResourceManager, IResourceManagerControl {
+public abstract class AbstractResourceManager extends Parent implements IPResourceManager, IResourceManagerControl {
 
 	private static IAttribute<?, ?, ?>[] getDefaultAttributes(IResourceManagerConfiguration config) {
 		ArrayList<IAttribute<?, ?, ?>> attrs = new ArrayList<IAttribute<?, ?, ?>>();
@@ -175,8 +175,8 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#addChildListener(org.eclipse
-	 * .ptp.core.elements.listeners.IResourceManagerChildListener)
+	 * org.eclipse.ptp.core.elements.IPResourceManager#addChildListener(org.
+	 * eclipse .ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
 	public void addChildListener(IResourceManagerChildListener listener) {
 		childListeners.add(listener);
@@ -657,7 +657,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#getMachineById(java.lang
+	 * org.eclipse.ptp.core.elements.IPResourceManager#getMachineById(java.lang
 	 * .String)
 	 */
 	public IPMachine getMachineById(String id) {
@@ -691,7 +691,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getMachines()
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getMachines()
 	 */
 	public IPMachine[] getMachines() {
 		return getMachineControls().toArray(new IPMachineControl[0]);
@@ -711,7 +711,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#getNodeById(java.lang.
+	 * org.eclipse.ptp.core.elements.IPResourceManager#getNodeById(java.lang.
 	 * String)
 	 */
 	/**
@@ -733,7 +733,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#getQueueById(java.lang
+	 * org.eclipse.ptp.core.elements.IPResourceManager#getQueueById(java.lang
 	 * .String)
 	 */
 	public IPQueue getQueueById(String id) {
@@ -744,7 +744,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#getQueueByName(java.lang
+	 * org.eclipse.ptp.core.elements.IPResourceManager#getQueueByName(java.lang
 	 * .String)
 	 */
 	public IPQueue getQueueByName(String name) {
@@ -779,7 +779,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getQueues()
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getQueues()
 	 */
 	public IPQueue[] getQueues() {
 		return getQueueControls().toArray(new IPQueueControl[0]);
@@ -789,7 +789,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#getResourceManagerId()
+	 * org.eclipse.ptp.core.elements.IPResourceManager#getResourceManagerId()
 	 */
 	public String getResourceManagerId() {
 		return getConfiguration().getResourceManagerId();
@@ -819,7 +819,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elements.IResourceManager#getUniqueName()
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getUniqueName()
 	 */
 	public String getUniqueName() {
 		return getConfiguration().getUniqueName();
@@ -922,7 +922,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#removeChildListener(org
+	 * org.eclipse.ptp.core.elements.IPResourceManager#removeChildListener(org
 	 * .eclipse.ptp.core.elements.listeners.IResourceManagerChildListener)
 	 */
 	public void removeChildListener(IResourceManagerChildListener listener) {
@@ -949,8 +949,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 
 	/**
 	 * @param machine
+	 * @since 5.0
 	 */
-	protected void removeMachines(IResourceManager rm, Collection<IPMachineControl> machineControls) {
+	protected void removeMachines(IPResourceManager rm, Collection<IPMachineControl> machineControls) {
 		List<IPMachine> machines = new ArrayList<IPMachine>(machineControls.size());
 
 		for (IPMachineControl machine : machineControls) {
@@ -977,8 +978,9 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 
 	/**
 	 * @param queue
+	 * @since 5.0
 	 */
-	protected void removeQueues(IResourceManager rm, Collection<IPQueueControl> queueControls) {
+	protected void removeQueues(IPResourceManager rm, Collection<IPQueueControl> queueControls) {
 		List<IPQueue> queues = new ArrayList<IPQueue>(queueControls.size());
 
 		for (IPQueueControl queue : queueControls) {
@@ -999,7 +1001,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#removeTerminatedJobs(org
+	 * org.eclipse.ptp.core.elements.IPResourceManager#removeTerminatedJobs(org
 	 * .eclipse.ptp.core.elements.IPQueue)
 	 */
 	public void removeTerminatedJobs(IPQueue queue) {
@@ -1108,7 +1110,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#submitJob(org.eclipse.
+	 * org.eclipse.ptp.core.elements.IPResourceManager#submitJob(org.eclipse.
 	 * debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.core.attributes.AttributeManager,
 	 * org.eclipse.core.runtime.IProgressMonitor)
@@ -1122,7 +1124,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#submitJob(java.lang.String
+	 * org.eclipse.ptp.core.elements.IPResourceManager#submitJob(java.lang.String
 	 * , org.eclipse.debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.core.attributes.AttributeManager,
 	 * org.eclipse.core.runtime.IProgressMonitor)
@@ -1136,7 +1138,7 @@ public abstract class AbstractResourceManager extends Parent implements IResourc
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.core.elements.IResourceManager#terminateJob(org.eclipse
+	 * org.eclipse.ptp.core.elements.IPResourceManager#terminateJob(org.eclipse
 	 * .ptp.core.elements.IPJob)
 	 */
 	public void terminateJob(IPJob job) throws CoreException {
