@@ -104,8 +104,11 @@ public final class RMModelManager {
 						IResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
 								.getUniqueName());
 						if (rm == null) {
-							addResourceManager((IResourceManager) ((IResourceManagerConfiguration) newProvider)
-									.getAdapter(IResourceManager.class));
+							rm = (IResourceManager) ((IResourceManagerConfiguration) newProvider)
+									.getAdapter(IResourceManager.class);
+							if (rm != null) {
+								addResourceManager(rm);
+							}
 						}
 					}
 				}
@@ -156,7 +159,7 @@ public final class RMModelManager {
 	 * 
 	 * @param listener
 	 */
-	public void addListener(IRMModelListener listener) {
+	public void addListener(IRMModelChangeListener listener) {
 		fResourceManagerListeners.add(listener);
 	}
 
@@ -216,7 +219,7 @@ public final class RMModelManager {
 	 * 
 	 * @param listener
 	 */
-	public void removeListener(IRMModelListener listener) {
+	public void removeListener(IRMModelChangeListener listener) {
 		fResourceManagerListeners.remove(listener);
 	}
 
@@ -262,8 +265,13 @@ public final class RMModelManager {
 	 *            collection of resource managers
 	 */
 	private void fireChangedResourceManager(final IResourceManager rm) {
+		final IRMModelChangeEvent event = new IRMModelChangeEvent() {
+			public IResourceManager getResourceManager() {
+				return rm;
+			}
+		};
 		for (Object listener : fResourceManagerListeners.getListeners()) {
-			((IRMModelListener) listener).handleResourceManagerChanged(rm);
+			((IRMModelChangeListener) listener).changed(event);
 		}
 	}
 
@@ -273,8 +281,13 @@ public final class RMModelManager {
 	 * @param rm
 	 */
 	private void fireNewResourceManager(final IResourceManager rm) {
+		final IRMModelChangeEvent event = new IRMModelChangeEvent() {
+			public IResourceManager getResourceManager() {
+				return rm;
+			}
+		};
 		for (Object listener : fResourceManagerListeners.getListeners()) {
-			((IRMModelListener) listener).handleResourceManagerAdded(rm);
+			((IRMModelChangeListener) listener).added(event);
 		}
 	}
 
@@ -284,8 +297,13 @@ public final class RMModelManager {
 	 * @param rm
 	 */
 	private void fireRemoveResourceManager(final IResourceManager rm) {
+		final IRMModelChangeEvent event = new IRMModelChangeEvent() {
+			public IResourceManager getResourceManager() {
+				return rm;
+			}
+		};
 		for (Object listener : fResourceManagerListeners.getListeners()) {
-			((IRMModelListener) listener).handleResourceManagerRemoved(rm);
+			((IRMModelChangeListener) listener).removed(event);
 		}
 	}
 
