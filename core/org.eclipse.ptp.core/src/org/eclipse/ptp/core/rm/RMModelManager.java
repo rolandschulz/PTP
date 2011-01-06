@@ -39,7 +39,7 @@ import org.eclipse.ptp.services.core.ServiceModelManager;
 /**
  * @since 5.0
  */
-public class RMModelManager {
+public final class RMModelManager {
 	private class RMStartupJob extends Job {
 		private final IResourceManager resourceManager;
 
@@ -132,16 +132,39 @@ public class RMModelManager {
 	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
 	protected IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
 
-	public RMModelManager() {
+	private static RMModelManager fInstance;
+
+	public static RMModelManager getInstance() {
+		if (fInstance == null) {
+			fInstance = new RMModelManager();
+		}
+		return fInstance;
+	}
+
+	/**
+	 * Don't allow class to be instantiated
+	 */
+	private RMModelManager() {
 		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
 				| IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED | IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
 				| IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
+		loadResourceManagers();
 	}
 
+	/**
+	 * Add a model listener
+	 * 
+	 * @param listener
+	 */
 	public void addListener(IRMModelListener listener) {
 		fResourceManagerListeners.add(listener);
 	}
 
+	/**
+	 * Add a resource manager to model
+	 * 
+	 * @param rm
+	 */
 	public void addResourceManager(IResourceManager rm) {
 		synchronized (fResourceManagers) {
 			fResourceManagers.add(rm);
@@ -149,6 +172,12 @@ public class RMModelManager {
 		fireNewResourceManager(rm);
 	}
 
+	/**
+	 * Lookup a resource manager using the unique name
+	 * 
+	 * @param rmUniqueName
+	 * @return
+	 */
 	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
 		for (IResourceManager rm : getResourceManagers()) {
 			if (rm.getUniqueName().equals(rmUniqueName)) {
@@ -158,41 +187,44 @@ public class RMModelManager {
 		return null;
 	}
 
-	public IResourceManager[] getStartedResourceManagers() {
+	/**
+	 * Get all the resource managers in the model
+	 * 
+	 * @return
+	 */
+	public synchronized IResourceManager[] getResourceManagers() {
+		return fResourceManagers.toArray(new IResourceManager[0]);
+	}
+
+	/**
+	 * Get resource managers by status
+	 * 
+	 * @return
+	 */
+	public IResourceManager[] getResourceManagers(IResourceManager.SessionStatus status) {
 		ArrayList<IResourceManager> startedRMs = new ArrayList<IResourceManager>();
 		for (IResourceManager rm : getResourceManagers()) {
-			if (rm.getSessionStatus() == IResourceManager.SessionStatus.STARTED) {
+			if (rm.getSessionStatus() == status) {
 				startedRMs.add(rm);
 			}
 		}
 		return startedRMs.toArray(new IResourceManager[startedRMs.size()]);
 	}
 
-	public void loadResourceManagers() throws CoreException {
-		Set<IResourceManager> rmsNeedStarting = new HashSet<IResourceManager>();
-
-		/*
-		 * Need to force service model to load so that the resource managers are
-		 * created.
-		 */
-		fServiceManager.getActiveConfiguration();
-
-		for (IResourceManager rm : getResourceManagers()) {
-			IResourceManager rmControl = rm;
-			if (rmControl.getConfiguration().getAutoStart()) {
-				rmsNeedStarting.add(rmControl);
-			}
-		}
-
-		if (Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS)) {
-			startResourceManagers(rmsNeedStarting.toArray(new IResourceManager[0]));
-		}
-	}
-
+	/**
+	 * Remove resource manager listener
+	 * 
+	 * @param listener
+	 */
 	public void removeListener(IRMModelListener listener) {
 		fResourceManagerListeners.remove(listener);
 	}
 
+	/**
+	 * Remove a resource manager from the model
+	 * 
+	 * @param rm
+	 */
 	public void removeResourceManager(IResourceManager rm) {
 		IResourceManagerConfiguration rmConf = rm.getConfiguration();
 		if (rmConf instanceof IServiceProvider) {
@@ -201,15 +233,21 @@ public class RMModelManager {
 		doRemoveResourceManager(rm);
 	}
 
+	/**
+	 * Shutdown the model. Should be called when the plugin stops.
+	 * 
+	 * @throws CoreException
+	 */
 	public void shutdown() throws CoreException {
 		shutdownResourceManagers();
 		fResourceManagerListeners.clear();
 	}
 
-	public void start() throws CoreException {
-		loadResourceManagers();
-	}
-
+	/**
+	 * Remove resource manager from the model and invoke the status handlers
+	 * 
+	 * @param rm
+	 */
 	private void doRemoveResourceManager(IResourceManager rm) {
 		synchronized (fResourceManagers) {
 			fResourceManagers.remove(rm);
@@ -251,8 +289,29 @@ public class RMModelManager {
 		}
 	}
 
-	private synchronized IResourceManager[] getResourceManagers() {
-		return fResourceManagers.toArray(new IResourceManager[0]);
+	/**
+	 * Load resource manager configurations and start those that require
+	 * starting.
+	 */
+	private void loadResourceManagers() {
+		Set<IResourceManager> rmsNeedStarting = new HashSet<IResourceManager>();
+
+		/*
+		 * Need to force service model to load so that the resource managers are
+		 * created.
+		 */
+		fServiceManager.getActiveConfiguration();
+
+		for (IResourceManager rm : getResourceManagers()) {
+			IResourceManager rmControl = rm;
+			if (rmControl.getConfiguration().getAutoStart()) {
+				rmsNeedStarting.add(rmControl);
+			}
+		}
+
+		if (Preferences.getBoolean(PTPCorePlugin.getUniqueIdentifier(), PreferenceConstants.PREFS_AUTO_START_RMS)) {
+			startResourceManagers(rmsNeedStarting.toArray(new IResourceManager[0]));
+		}
 	}
 
 	/**
@@ -287,7 +346,7 @@ public class RMModelManager {
 	 * @param rmsNeedStarting
 	 * @throws CoreException
 	 */
-	private void startResourceManagers(IResourceManager[] rmsNeedStarting) throws CoreException {
+	private void startResourceManagers(IResourceManager[] rmsNeedStarting) {
 		for (final IResourceManager rm : rmsNeedStarting) {
 			Job job = new RMStartupJob(rm);
 			job.schedule();

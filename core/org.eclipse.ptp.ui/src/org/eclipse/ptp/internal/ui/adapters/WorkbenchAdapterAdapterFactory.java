@@ -26,28 +26,24 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.rm.IResourceManager;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 
 public class WorkbenchAdapterAdapterFactory implements IAdapterFactory {
 
-	private static final UniverseWorkbenchAdapter UNIVERSE_WORKBENCH_ADAPTER =
-		new UniverseWorkbenchAdapter();
-	private static final ResourceManagerWorkbenchAdapter RESOURCE_MANAGER_WORKBENCH_ADAPTER =
-		new ResourceManagerWorkbenchAdapter();
-	private static final PMachineWorkbenchAdapter MACHINE_WORKBENCH_ADAPTER =
-		new PMachineWorkbenchAdapter();
-	private static final PQueueWorkbenchAdapter QUEUE_WORKBENCH_ADAPTER =
-		new PQueueWorkbenchAdapter();
-	private static final PNodeWorkbenchAdapter NODE_WORKBENCH_ADAPTER =
-		new PNodeWorkbenchAdapter();
-	private static final PJobWorkbenchAdapter JOB_WORKBENCH_ADAPTER =
-		new PJobWorkbenchAdapter();
+	private static final UniverseWorkbenchAdapter UNIVERSE_WORKBENCH_ADAPTER = new UniverseWorkbenchAdapter();
+	private static final PResourceManagerWorkbenchAdapter RESOURCE_MANAGER_WORKBENCH_ADAPTER = new PResourceManagerWorkbenchAdapter();
+	private static final PMachineWorkbenchAdapter MACHINE_WORKBENCH_ADAPTER = new PMachineWorkbenchAdapter();
+	private static final PQueueWorkbenchAdapter QUEUE_WORKBENCH_ADAPTER = new PQueueWorkbenchAdapter();
+	private static final PNodeWorkbenchAdapter NODE_WORKBENCH_ADAPTER = new PNodeWorkbenchAdapter();
+	private static final PJobWorkbenchAdapter JOB_WORKBENCH_ADAPTER = new PJobWorkbenchAdapter();
+	private static final ResourceManagerWorkbenchAdapter RM_WORKBENCH_ADAPTER = new ResourceManagerWorkbenchAdapter();
 
-	public Object getAdapter(Object adaptableObject, 
-			@SuppressWarnings("unchecked") Class adapterType) {
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == IWorkbenchAdapter.class || adapterType == IWorkbenchAdapter2.class) {
 			if (adaptableObject instanceof IPUniverse) {
 				return UNIVERSE_WORKBENCH_ADAPTER;
@@ -67,13 +63,16 @@ public class WorkbenchAdapterAdapterFactory implements IAdapterFactory {
 			if (adaptableObject instanceof IPJob) {
 				return JOB_WORKBENCH_ADAPTER;
 			}
+			if (adaptableObject instanceof IResourceManager) {
+				return RM_WORKBENCH_ADAPTER;
+			}
 		}
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
-		return new Class[] {IWorkbenchAdapter.class, IWorkbenchAdapter2.class};
+		return new Class[] { IWorkbenchAdapter.class, IWorkbenchAdapter2.class };
 	}
 
 }

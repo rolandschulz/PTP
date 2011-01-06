@@ -18,19 +18,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.adapters;
 
-import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ui.model.WorkbenchAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.ptp.core.elements.IPUniverse;
+import org.eclipse.ptp.core.rm.RMModelManager;
+import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class UniverseWorkbenchAdapter extends WorkbenchAdapter {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
 	 */
 	@Override
 	public Object[] getChildren(Object object) {
 		IPUniverse universe = (IPUniverse) object;
-		return universe.getResourceManagers();
+		List<Object> children = new ArrayList<Object>();
+		children.add(universe.getResourceManagers());
+		children.add(RMModelManager.getInstance().getResourceManagers());
+		return children.toArray();
 	}
 
 }

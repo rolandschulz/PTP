@@ -234,7 +234,7 @@ public class ParallelImages {
 			ImageManager.getImage(ParallelImages.IMG_MACHINE_ERROR), ImageManager.getImage(ParallelImages.IMG_MACHINE_UNKNOWN) };
 
 	// RESOURCE MANAGERS
-	public static Image[] rmImages = { ImageManager.getImage(ParallelImages.IMG_RM_STARTING),
-			ImageManager.getImage(ParallelImages.IMG_RM_STARTED), ImageManager.getImage(ParallelImages.IMG_RM_STOPPED),
+	public static Image[] rmImages = { ImageManager.getImage(ParallelImages.IMG_RM_STOPPED),
+			ImageManager.getImage(ParallelImages.IMG_RM_STARTED), ImageManager.getImage(ParallelImages.IMG_RM_STARTING),
 			ImageManager.getImage(ParallelImages.IMG_RM_ERROR), };
 }
