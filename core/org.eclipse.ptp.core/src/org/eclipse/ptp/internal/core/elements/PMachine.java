@@ -33,7 +33,7 @@ import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedNodeEvent;
@@ -257,8 +257,8 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * 
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
-	public IResourceManager getResourceManager() {
-		return (IResourceManager) getParent();
+	public IPResourceManager getResourceManager() {
+		return (IPResourceManager) getParent();
 	}
 
 	/*

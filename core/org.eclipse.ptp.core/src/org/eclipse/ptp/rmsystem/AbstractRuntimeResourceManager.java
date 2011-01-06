@@ -48,7 +48,7 @@ import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributeManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
@@ -595,12 +595,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeRemoveMachineEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveMachineEvent e) {
-		Map<IResourceManager, List<IPMachineControl>> map = new HashMap<IResourceManager, List<IPMachineControl>>();
+		Map<IPResourceManager, List<IPMachineControl>> map = new HashMap<IPResourceManager, List<IPMachineControl>>();
 
 		for (String elementId : e.getElementIds()) {
 			IPMachineControl machine = getMachineControl(elementId);
 			if (machine != null) {
-				IResourceManager rm = machine.getResourceManager();
+				IPResourceManager rm = machine.getResourceManager();
 				List<IPMachineControl> machines = map.get(rm);
 				if (machines == null) {
 					machines = new ArrayList<IPMachineControl>();
@@ -610,7 +610,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			}
 		}
 
-		for (Map.Entry<IResourceManager, List<IPMachineControl>> entry : map.entrySet()) {
+		for (Map.Entry<IPResourceManager, List<IPMachineControl>> entry : map.entrySet()) {
 			removeMachines(entry.getKey(), entry.getValue());
 		}
 	}
@@ -667,12 +667,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeRemoveQueueEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveQueueEvent e) {
-		Map<IResourceManager, List<IPQueueControl>> map = new HashMap<IResourceManager, List<IPQueueControl>>();
+		Map<IPResourceManager, List<IPQueueControl>> map = new HashMap<IPResourceManager, List<IPQueueControl>>();
 
 		for (String elementId : e.getElementIds()) {
 			IPQueueControl queue = getQueueControl(elementId);
 			if (queue != null) {
-				IResourceManager rm = queue.getResourceManager();
+				IPResourceManager rm = queue.getResourceManager();
 				List<IPQueueControl> queues = map.get(rm);
 				if (queues == null) {
 					queues = new ArrayList<IPQueueControl>();
@@ -682,7 +682,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			}
 		}
 
-		for (Map.Entry<IResourceManager, List<IPQueueControl>> entry : map.entrySet()) {
+		for (Map.Entry<IPResourceManager, List<IPQueueControl>> entry : map.entrySet()) {
 			removeQueues(entry.getKey(), entry.getValue());
 		}
 	}

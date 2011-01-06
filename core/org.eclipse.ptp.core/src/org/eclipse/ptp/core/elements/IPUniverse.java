@@ -24,18 +24,20 @@ package org.eclipse.ptp.core.elements;
  * Resource Managers.
  * 
  * @author Nathan DeBardeleben
- * @see IResourceManager
+ * @see IPResourceManager
  */
 public interface IPUniverse extends IPElement {
 	/**
 	 * @param id
-	 * @return IResourceManager
+	 * @return IPResourceManager
+	 * @since 5.0
 	 */
-	public IResourceManager getResourceManager(String id);
+	public IPResourceManager getResourceManager(String id);
 
 	/**
-	 * @return IResourceManager[]
+	 * @return IPResourceManager[]
+	 * @since 5.0
 	 */
-	public IResourceManager[] getResourceManagers();
+	public IPResourceManager[] getResourceManagers();
 
 }

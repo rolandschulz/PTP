@@ -19,7 +19,7 @@ package org.eclipse.ptp.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 
 /**
  * This event is generated when the attributes on one or more machines have
@@ -41,7 +41,8 @@ public interface IChangedMachineEvent {
 	 * Get the event source
 	 * 
 	 * @return the source of the event
+	 * @since 5.0
 	 */
-	public IResourceManager getSource();
+	public IPResourceManager getSource();
 
 }

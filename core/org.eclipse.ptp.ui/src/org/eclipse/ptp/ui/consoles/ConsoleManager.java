@@ -24,7 +24,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
@@ -50,7 +50,7 @@ public class ConsoleManager implements IModelManagerChildListener,
 	public ConsoleManager() {
 		imm = PTPCorePlugin.getDefault().getModelManager();
 		imm.addListener(this);
-		for (IResourceManager rm: imm.getUniverse().getResourceManagers()) {
+		for (IPResourceManager rm: imm.getUniverse().getResourceManagers()) {
 			rm.addChildListener(this);
 			for (IPQueue queue: rm.getQueues()) {
 				queue.addChildListener(this);
@@ -169,7 +169,7 @@ public class ConsoleManager implements IModelManagerChildListener,
 	 */
 	public void shutdown() {
 		imm.removeListener(this);
-		for (IResourceManager rm: imm.getUniverse().getResourceManagers()) {
+		for (IPResourceManager rm: imm.getUniverse().getResourceManagers()) {
 			rm.removeChildListener(this);
 			for (IPQueue queue: rm.getQueues()) {
 				queue.removeChildListener(this);

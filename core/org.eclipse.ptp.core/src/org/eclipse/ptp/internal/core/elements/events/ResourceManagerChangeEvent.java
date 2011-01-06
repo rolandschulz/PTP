@@ -20,7 +20,7 @@
 package org.eclipse.ptp.internal.core.elements.events;
 
 import org.eclipse.ptp.core.attributes.AttributeManager;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 
 /**
@@ -29,10 +29,10 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
  */
 public class ResourceManagerChangeEvent implements IResourceManagerChangeEvent {
 
-	private final IResourceManager rm;
+	private final IPResourceManager rm;
 	private final AttributeManager attributes;
 
-	public ResourceManagerChangeEvent(IResourceManager rm,
+	public ResourceManagerChangeEvent(IPResourceManager rm,
 			AttributeManager attrs) {
 		this.rm = rm;
 		this.attributes = attrs;
@@ -55,7 +55,7 @@ public class ResourceManagerChangeEvent implements IResourceManagerChangeEvent {
 	 * org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent#getSource
 	 * ()
 	 */
-	public IResourceManager getSource() {
+	public IPResourceManager getSource() {
 		return rm;
 	}
 

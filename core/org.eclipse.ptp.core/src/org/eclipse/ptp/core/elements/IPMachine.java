@@ -79,7 +79,7 @@ public interface IPMachine extends IPElement {
 	 * 
 	 * @return the machine's parent resource manager
 	 */
-	public IResourceManager getResourceManager();
+	public IPResourceManager getResourceManager();
 
 	/**
 	 * Get the state of the machine

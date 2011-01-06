@@ -22,7 +22,7 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 
 /**
@@ -32,10 +32,10 @@ import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 public class NewQueueEvent implements
 		INewQueueEvent {
 
-	private final IResourceManager rm;
+	private final IPResourceManager rm;
 	private final Collection<IPQueue> queues;
 
-	public NewQueueEvent(IResourceManager manager, Collection<IPQueue> queues) {
+	public NewQueueEvent(IPResourceManager manager, Collection<IPQueue> queues) {
 		this.rm = manager;
 		this.queues = queues;
 	}
@@ -55,7 +55,7 @@ public class NewQueueEvent implements
 	 * @see
 	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewQueueEvent#getSource()
 	 */
-	public IResourceManager getSource() {
+	public IPResourceManager getSource() {
 		return rm;
 	}
 

@@ -15,12 +15,15 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 
+/**
+ * @since 2.0
+ */
 public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigurationDynamicTab {
 	private final RMLaunchConfigurationDynamicTabDataSource dataSource = createDataSource();
 
@@ -39,10 +42,13 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #canSave(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	public RMLaunchValidation canSave(Control control, IResourceManager rm, IPQueue queue) {
+	/**
+	 * @since 2.0
+	 */
+	public RMLaunchValidation canSave(Control control, IPResourceManager rm, IPQueue queue) {
 		if (dataSource.canSave())
 			return new RMLaunchValidation(true, null);
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
@@ -68,11 +74,15 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #initializeFrom(org.eclipse.swt.widgets.Control,
-	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	/**
+	 * @since 2.0
+	 */
+	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue,
+			ILaunchConfiguration configuration) {
 		dataSource.setResourceManager(rm);
 		dataSource.setQueue(queue);
 		dataSource.setConfiguration(configuration);
@@ -90,10 +100,13 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IResourceManager rm, IPQueue queue) {
+	/**
+	 * @since 2.0
+	 */
+	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IPResourceManager rm, IPQueue queue) {
 		if (dataSource.canAccept())
 			return new RMLaunchValidation(true, null);
 		return new RMLaunchValidation(false, dataSource.getErrorMessage());
@@ -105,10 +118,13 @@ public abstract class BaseRMLaunchConfigurationDynamicTab extends AbstractRMLaun
 	 * @see
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
-	 * org.eclipse.ptp.core.elements.IResourceManager,
+	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
-	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IResourceManager rm, IPQueue queue) {
+	/**
+	 * @since 2.0
+	 */
+	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
 		dataSource.setResourceManager(rm);
 		dataSource.setQueue(queue);
 		dataSource.setConfigurationWorkingCopy(configuration);

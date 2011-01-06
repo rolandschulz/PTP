@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 
 /**
@@ -113,7 +113,7 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 	 *            queue name
 	 * @return queue
 	 */
-	public IPQueue getQueueFromName(IResourceManager rm, String queueName) {
+	public IPQueue getQueueFromName(IPResourceManager rm, String queueName) {
 		if (rm == null) {
 			return null;
 		}

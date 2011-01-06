@@ -23,7 +23,7 @@ package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ui.views.properties.IPropertySource;
 
@@ -32,8 +32,8 @@ public class PropertyAdapterFactory implements IAdapterFactory {
 	@SuppressWarnings("unchecked")
     public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == IPropertySource.class) {
-			if (adaptableObject instanceof IResourceManager) {
-				return new ResourceManagerPropertySource((IResourceManager)adaptableObject);
+			if (adaptableObject instanceof IPResourceManager) {
+				return new ResourceManagerPropertySource((IPResourceManager)adaptableObject);
 			}
 			if (adaptableObject instanceof IPElement) {
 				return new PElementPropertySource((IPElement)adaptableObject);

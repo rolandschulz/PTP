@@ -20,7 +20,7 @@
 package org.eclipse.ptp.internal.core.events;
 
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 
 /**
@@ -30,9 +30,9 @@ import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 public class NewResourceManagerEvent implements INewResourceManagerEvent {
 
 	private final IModelManager mm;
-	private final IResourceManager rm;
+	private final IPResourceManager rm;
 
-	public NewResourceManagerEvent(IModelManager mm, IResourceManager rm) {
+	public NewResourceManagerEvent(IModelManager mm, IPResourceManager rm) {
 		this.mm = mm;
 		this.rm = rm;
 	}
@@ -44,7 +44,7 @@ public class NewResourceManagerEvent implements INewResourceManagerEvent {
 	 * org.eclipse.ptp.rmsystem.events.IResourceManagerNewMachineEvent#getMachine
 	 * ()
 	 */
-	public IResourceManager getResourceManager() {
+	public IPResourceManager getResourceManager() {
 		return rm;
 	}
 

@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.UIUtils;
@@ -38,8 +38,8 @@ public class StartResourceManagersObjectActionDelegate extends
 	public void run(IAction action) {
 		
 		for (IResourceManagerMenuContribution menuContrib : getMenuContribs()) {
-			final IResourceManager rmManager = 
-				(IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+			final IPResourceManager rmManager = 
+				(IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
 
 			if (!isEnabledFor(rmManager)) {
 				continue;
@@ -73,7 +73,7 @@ public class StartResourceManagersObjectActionDelegate extends
 	}
 
 	@Override
-	protected boolean isEnabledFor(IResourceManager rmManager) {
+	protected boolean isEnabledFor(IPResourceManager rmManager) {
 		if (rmManager.getState() == ResourceManagerAttributes.State.STOPPED) {
 			return true;		
 		}

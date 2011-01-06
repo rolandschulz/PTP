@@ -35,7 +35,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
@@ -82,7 +82,7 @@ public class JobsListView extends ViewPart {
 			 * Add resource manager child listener so we get notified when new
 			 * machines are added to the model.
 			 */
-			final IResourceManager rm = e.getResourceManager();
+			final IPResourceManager rm = e.getResourceManager();
 	        rm.addChildListener(resourceManagerListener);
 		}
 		
@@ -185,7 +185,7 @@ public class JobsListView extends ViewPart {
 
 	private TableViewer viewer;
 	private TerminateJobFromListAction terminateAllAction;
-	private IResourceManager fSelectedRM = null;
+	private IPResourceManager fSelectedRM = null;
 	private IPQueue fSelectedQueue = null;
 	private boolean fColumnsNeedUpdating = false;
 
@@ -232,7 +232,7 @@ public class JobsListView extends ViewPart {
 				 * TODO: should probably not do this!
 				 */
 				Set<IPJob> jobs = new HashSet<IPJob>();
-				for (IResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
+				for (IPResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
 					jobs.addAll(getAllJobs(rm));
 				}
 				return jobs.toArray(new IPJob[0]);
@@ -269,7 +269,7 @@ public class JobsListView extends ViewPart {
 	     * miss a RM if a new event arrives while we're doing this, but is 
 	     * it a problem?
 	     */
-	    for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+	    for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 	        rm.addChildListener(resourceManagerListener);
 	        for (IPQueue queue : rm.getQueues()) {
 	        	queue.addChildListener(queueChildListener);
@@ -282,13 +282,13 @@ public class JobsListView extends ViewPart {
 	     */
 	    PTPUIPlugin.getDefault().getRMManager().addRMSelectionListener(new IRMSelectionListener() {
 			public void selectionChanged(ISelection selection) {
-				IResourceManager oldRM = fSelectedRM;
+				IPResourceManager oldRM = fSelectedRM;
 				fSelectedQueue = null;
 				if (selection.isEmpty()) {
 					fSelectedRM = null;
 				} else {
 					TreePath path = ((ITreeSelection)selection).getPaths()[0];
-					fSelectedRM = (IResourceManager)path.getFirstSegment();
+					fSelectedRM = (IPResourceManager)path.getFirstSegment();
 					if (path.getLastSegment() instanceof IPQueue) {
 						fSelectedQueue = (IPQueue)path.getLastSegment();
 					}
@@ -299,7 +299,7 @@ public class JobsListView extends ViewPart {
 				refresh();
 			}
 
-			public void setDefault(IResourceManager rm) {
+			public void setDefault(IPResourceManager rm) {
 				// Ignore
 			}
 	    });
@@ -429,7 +429,7 @@ public class JobsListView extends ViewPart {
 	 * @param rm
 	 * @return set of jobs
 	 */
-	private Set<IPJob> getAllJobs(IResourceManager rm) {
+	private Set<IPJob> getAllJobs(IPResourceManager rm) {
 		Set<IPJob> jobList = new HashSet<IPJob>();
 		for (IPQueue queue : rm.getQueues()) {
 			for (IPJob job : queue.getJobs()) {
@@ -464,7 +464,7 @@ public class JobsListView extends ViewPart {
 				}
 			}
 		} else {
-			for (IResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
+			for (IPResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
 				for (IPQueue queue : rm.getQueues()) {
 					IPJob job = getFirstJob(queue);
 					if (job != null) {

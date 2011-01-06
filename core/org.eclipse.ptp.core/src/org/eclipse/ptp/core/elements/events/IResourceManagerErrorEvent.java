@@ -16,7 +16,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elements.events;
 
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 
 public interface IResourceManagerErrorEvent {
 	/**
@@ -26,6 +26,7 @@ public interface IResourceManagerErrorEvent {
 
 	/**
 	 * @return
+	 * @since 5.0
 	 */
-	IResourceManager getSource();
+	IPResourceManager getSource();
 }

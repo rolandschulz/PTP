@@ -55,7 +55,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
@@ -162,7 +162,7 @@ public class ResourceManagerView extends ViewPart {
 		 * handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
 		 */
 		public void handleEvent(IChangedResourceManagerEvent e) {
-			updateViewer(e.getResourceManagers().toArray(new IResourceManager[0]));
+			updateViewer(e.getResourceManagers().toArray(new IPResourceManager[0]));
 		}
 
 		/*
@@ -173,7 +173,7 @@ public class ResourceManagerView extends ViewPart {
 		 * handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
 		 */
 		public synchronized void handleEvent(INewResourceManagerEvent e) {
-			final IResourceManager resourceManager = e.getResourceManager();
+			final IPResourceManager resourceManager = e.getResourceManager();
 			resourceManagers.add(resourceManager);
 			resourceManager.addElementListener(rmListener);
 			resourceManager.addChildListener(rmChildListener);
@@ -188,7 +188,7 @@ public class ResourceManagerView extends ViewPart {
 		 * handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 		 */
 		public synchronized void handleEvent(IRemoveResourceManagerEvent e) {
-			final IResourceManager resourceManager = e.getResourceManager();
+			final IPResourceManager resourceManager = e.getResourceManager();
 			resourceManagers.remove(resourceManager);
 			resourceManager.removeElementListener(rmListener);
 			resourceManager.removeChildListener(rmChildListener);
@@ -265,7 +265,7 @@ public class ResourceManagerView extends ViewPart {
 		 */
 		@Override
 		public Font getFont(Object element) {
-			IResourceManager rm = getResourceManager(element);
+			IPResourceManager rm = getResourceManager(element);
 			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
 			if (rm != null && rmManager != null && rm == rmManager.getSelected()) {
 				return selectedFont;
@@ -273,10 +273,10 @@ public class ResourceManagerView extends ViewPart {
 			return unSelectedFont;
 		}
 
-		private IResourceManager getResourceManager(Object parentElement) {
-			IResourceManager rm = null;
+		private IPResourceManager getResourceManager(Object parentElement) {
+			IPResourceManager rm = null;
 			if (parentElement instanceof IAdaptable) {
-				rm = (IResourceManager) ((IAdaptable) parentElement).getAdapter(IResourceManager.class);
+				rm = (IPResourceManager) ((IAdaptable) parentElement).getAdapter(IPResourceManager.class);
 			}
 			return rm;
 		}
@@ -390,7 +390,7 @@ public class ResourceManagerView extends ViewPart {
 		/**
 		 * @param resourceManager
 		 */
-		public synchronized void removeListeners(IResourceManager resourceManager) {
+		public synchronized void removeListeners(IPResourceManager resourceManager) {
 			List<IPMachine> removeMachines = Arrays.asList(resourceManager.getMachines());
 			removeMachines.retainAll(machines);
 			for (IPMachine machine : removeMachines) {
@@ -450,7 +450,7 @@ public class ResourceManagerView extends ViewPart {
 		 * (org.eclipse.ptp.core.elements.events.IResourceManagerChangedEvent)
 		 */
 		public void handleEvent(IResourceManagerChangeEvent e) {
-			IResourceManager rm = e.getSource();
+			IPResourceManager rm = e.getSource();
 			if (rmManager != null && rm.getState() == ResourceManagerAttributes.State.STOPPED && rm == rmManager.getSelected()) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
@@ -495,7 +495,7 @@ public class ResourceManagerView extends ViewPart {
 	private AddResourceManagerAction addResourceManagerAction;
 	private EditResourceManagerAction editResourceManagerAction;
 	private SelectDefaultResourceManagerAction selectResourceManagerAction;
-	private final Set<IResourceManager> resourceManagers = new HashSet<IResourceManager>();
+	private final Set<IPResourceManager> resourceManagers = new HashSet<IPResourceManager>();
 	private final MMChildListener mmChildListener = new MMChildListener();
 	private final RMListener rmListener = new RMListener();
 	private final RMChildListener rmChildListener = new RMChildListener();
@@ -551,7 +551,8 @@ public class ResourceManagerView extends ViewPart {
 								if (t != null && t instanceof CoreException) {
 									status = ((CoreException) t).getStatus();
 								}
-								UIUtils.showErrorDialog(Messages.ResourceManagerView_Startup, Messages.ResourceManagerView_FailedToStart, status);
+								UIUtils.showErrorDialog(Messages.ResourceManagerView_Startup,
+										Messages.ResourceManagerView_FailedToStart, status);
 							} catch (InterruptedException e) {
 								// Do nothing. Operation has been canceled.
 							}
@@ -559,7 +560,8 @@ public class ResourceManagerView extends ViewPart {
 						} else {
 							boolean shutdown = true;
 							if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
-								shutdown = MessageDialog.openConfirm(viewer.getControl().getShell(), Messages.ResourceManagerView_Shutdown,
+								shutdown = MessageDialog.openConfirm(viewer.getControl().getShell(),
+										Messages.ResourceManagerView_Shutdown,
 										NLS.bind(Messages.ResourceManagerView_AreYouSure, rm.getName()));
 							}
 							if (shutdown) {
@@ -604,7 +606,7 @@ public class ResourceManagerView extends ViewPart {
 		 * Add us to any existing RM's. I guess it's possible we could miss a RM
 		 * if a new event arrives while we're doing this, but is it a problem?
 		 */
-		for (IResourceManager rm : mm.getUniverse().getResourceManagers()) {
+		for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 			rm.addElementListener(rmListener);
 		}
 		mm.addListener(mmChildListener);
@@ -618,7 +620,7 @@ public class ResourceManagerView extends ViewPart {
 	@Override
 	public synchronized void dispose() {
 		PTPCorePlugin.getDefault().getModelManager().removeListener(mmChildListener);
-		for (IResourceManager resourceManager : resourceManagers) {
+		for (IPResourceManager resourceManager : resourceManagers) {
 			resourceManager.removeElementListener(rmListener);
 			resourceManager.removeChildListener(rmChildListener);
 		}

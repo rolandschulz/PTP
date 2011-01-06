@@ -31,7 +31,7 @@ import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
@@ -157,7 +157,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		if (job != null) {
 			IPQueue queue = job.getQueue();
 			if (queue != null) {
-				IResourceManager rm = queue.getResourceManager();
+				IPResourceManager rm = queue.getResourceManager();
 				if (rm != null) {
 					return rm.getName() + ": " + queue.getName() + ":" + job.getName(); //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -273,7 +273,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public Image getImage(IElement element) {
 		IPJob job = getJob();
 		if (job != null) {
-			IResourceManager rm = job.getQueue().getResourceManager();
+			IPResourceManager rm = job.getQueue().getResourceManager();
 			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
 					rm.getResourceManagerId());
 			if (presentation != null) {
@@ -313,7 +313,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * @see org.eclipse.ptp.ui.IElementManager#initial()
 	 */
 	public IPElement initial(IPUniverse universe) {
-		for (IResourceManager rm : universe.getResourceManagers()) {
+		for (IPResourceManager rm : universe.getResourceManagers()) {
 			for (IPQueue queue : rm.getQueues()) {
 				for (IPJob job : queue.getJobs()) {
 					addJob(job);

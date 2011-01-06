@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.messages.Messages;
 
@@ -50,7 +50,7 @@ public abstract class AbstractRMLaunchConfigurationFactory {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	public IRMLaunchConfigurationDynamicTab create(IResourceManager rm, ILaunchConfigurationDialog dialog) throws CoreException {
+	public IRMLaunchConfigurationDynamicTab create(IPResourceManager rm, ILaunchConfigurationDialog dialog) throws CoreException {
 		if (!getResourceManagerClass().isInstance(rm)) {
 			throw makeCoreException(NLS.bind(Messages.AbstractRMLaunchConfigurationFactory_0, rm.getName()));
 		}
@@ -64,7 +64,7 @@ public abstract class AbstractRMLaunchConfigurationFactory {
 	 * org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab
 	 * #getResourceManagerClass()
 	 */
-	public abstract Class<? extends IResourceManager> getResourceManagerClass();
+	public abstract Class<? extends IPResourceManager> getResourceManagerClass();
 
 	/**
 	 * Method to actually create the tab.
@@ -77,6 +77,6 @@ public abstract class AbstractRMLaunchConfigurationFactory {
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected abstract IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
+	protected abstract IRMLaunchConfigurationDynamicTab doCreate(IPResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException;
 }

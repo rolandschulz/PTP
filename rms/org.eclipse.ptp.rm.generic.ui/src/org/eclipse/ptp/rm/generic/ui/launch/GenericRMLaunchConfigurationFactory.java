@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.generic.ui.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationFactory;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManager;
@@ -20,13 +20,13 @@ import org.eclipse.ptp.rm.generic.core.rmsystem.GenericResourceManager;
 public class GenericRMLaunchConfigurationFactory extends AbstractRMLaunchConfigurationFactory {
 
 	@Override
-	protected IRMLaunchConfigurationDynamicTab doCreate(IResourceManager rm, ILaunchConfigurationDialog dialog)
+	protected IRMLaunchConfigurationDynamicTab doCreate(IPResourceManager rm, ILaunchConfigurationDialog dialog)
 			throws CoreException {
 		return new GenericRMLaunchConfigurationDynamicTab(rm, dialog);
 	}
 
 	@Override
-	public Class<? extends IResourceManager> getResourceManagerClass() {
+	public Class<? extends IPResourceManager> getResourceManagerClass() {
 		return GenericResourceManager.class;
 	}
 }

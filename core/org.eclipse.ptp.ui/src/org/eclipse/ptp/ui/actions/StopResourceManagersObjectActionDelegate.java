@@ -25,7 +25,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -37,7 +37,7 @@ extends AbstractResourceManagerSelectionActionDelegate {
 	public void run(IAction action) {
 		
 		for (IResourceManagerMenuContribution menuContrib : getMenuContribs()) {
-			IResourceManager rmManager = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+			IPResourceManager rmManager = (IPResourceManager) menuContrib.getAdapter(IPResourceManager.class);
 
 			if (!isEnabledFor(rmManager)) {
 				continue;
@@ -72,7 +72,7 @@ extends AbstractResourceManagerSelectionActionDelegate {
 	}
 
 	@Override
-	protected boolean isEnabledFor(IResourceManager rmManager) {
+	protected boolean isEnabledFor(IPResourceManager rmManager) {
 		ResourceManagerAttributes.State state = rmManager.getState();
 		if (state == ResourceManagerAttributes.State.STARTING ||
 				state == ResourceManagerAttributes.State.STARTED ||

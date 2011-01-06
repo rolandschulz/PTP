@@ -30,7 +30,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -38,64 +38,64 @@ import org.eclipse.swt.layout.GridLayout;
  * TODO: NEEDS TO BE DOCUMENTED
  */
 public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab {
-    public static final String DEFAULT_VALUE = "0"; //$NON-NLS-1$
-    public static final String EMPTY_STRING = ""; //$NON-NLS-1$
+	public static final String DEFAULT_VALUE = "0"; //$NON-NLS-1$
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	private ILaunchConfiguration launchConfiguration = null;
 
-    /**
-     * Utility routine to create a grid layout
-     * 
-     * @param columns
-     * @param isEqual
-     * @param mh
-     * @param mw
-     * @return
-     */
-    protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-        GridLayout gridLayout = new GridLayout();
-        gridLayout.numColumns = columns;
-        gridLayout.makeColumnsEqualWidth = isEqual;
-        gridLayout.marginHeight = mh;
-        gridLayout.marginWidth = mw;
-        return gridLayout;
-    }
-    
+	/**
+	 * Utility routine to create a grid layout
+	 * 
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
 	/**
 	 * Returns the selected workspace container,or <code>null</code>
-	 *
+	 * 
 	 * @param workspaceDir
 	 * @return workspace container
 	 */
 	protected IContainer getContainer(String workspaceDir) {
 		IResource res = getResource(workspaceDir);
 		if (res instanceof IContainer) {
-			return (IContainer)res;
+			return (IContainer) res;
 		}
 		return null;
 	}
-	
+
 	/**
-     * Utility routine to get the contents of a text field
-     * 
-     * @param text
-     * @return string
-     */
-    protected String getFieldContent(String text) {
-        if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
-            return null;
-        }
-        
-        return text;
-    }    
-    
-    /**
-     * Get the platform from the launch configuration
-     * 
-     * @param config
-     * @return platform
-     */
-    protected String getPlatform(ILaunchConfiguration config) {
+	 * Utility routine to get the contents of a text field
+	 * 
+	 * @param text
+	 * @return string
+	 */
+	protected String getFieldContent(String text) {
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
+			return null;
+		}
+
+		return text;
+	}
+
+	/**
+	 * Get the platform from the launch configuration
+	 * 
+	 * @param config
+	 * @return platform
+	 */
+	protected String getPlatform(ILaunchConfiguration config) {
 		String platform = Platform.getOS();
 		try {
 			return config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PLATFORM, platform);
@@ -103,30 +103,30 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 			return platform;
 		}
 	}
-    
-    /**
-     * Gets the project from the configuration
-     * 
-     * @param configuration
-     * @return project
-     */
-    protected IProject getProject(ILaunchConfiguration configuration) {
-        String proName = null;
-        try {
-            proName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
-        } catch (CoreException e) {
-            return null;
-        }        
-        if (proName == null) {
-            return null;
-        }
-        
-        return getWorkspaceRoot().getProject(proName);        
-    }
-    
-    /**
+
+	/**
+	 * Gets the project from the configuration
+	 * 
+	 * @param configuration
+	 * @return project
+	 */
+	protected IProject getProject(ILaunchConfiguration configuration) {
+		String proName = null;
+		try {
+			proName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+		} catch (CoreException e) {
+			return null;
+		}
+		if (proName == null) {
+			return null;
+		}
+
+		return getWorkspaceRoot().getProject(proName);
+	}
+
+	/**
 	 * Returns the selected workspace resource, or <code>null</code>
-	 *
+	 * 
 	 * @param workspaceDir
 	 * @return workspace resource
 	 */
@@ -134,56 +134,58 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		return getWorkspaceRoot().findMember(new Path(workspaceDir));
 	}
 
-    protected IWorkspaceRoot getWorkspaceRoot() {
-    	return ResourcesPlugin.getWorkspace().getRoot();
-    }    
-	
-    /**
-	 * Given a launch configuration, find the resource manager that was been selected.
+	protected IWorkspaceRoot getWorkspaceRoot() {
+		return ResourcesPlugin.getWorkspace().getRoot();
+	}
+
+	/**
+	 * Given a launch configuration, find the resource manager that was been
+	 * selected.
 	 * 
 	 * @param configuration
 	 * @return resource manager
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	protected IResourceManager getResourceManager(ILaunchConfiguration configuration) {
+	protected IPResourceManager getResourceManager(ILaunchConfiguration configuration) {
 		final String rmUniqueName;
 		try {
-			rmUniqueName = configuration
-					.getAttribute(
-							IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
-							EMPTY_STRING);
+			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+					EMPTY_STRING);
 		} catch (CoreException e) {
 			return null;
 		}
-		return PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(rmUniqueName);
+		return PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
 	}
-	
-    /**
-     * Utility routing to create a GridData
-     * 
-     * @param style
-     * @param space
-     * @return
-     */
-    protected GridData spanGridData(int style, int space) {
-        GridData gd = null;
-        if (style == -1)
-            gd = new GridData();
-        else
-            gd = new GridData(style);
-        gd.horizontalSpan = space;
-        return gd;
-    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	/**
+	 * Utility routing to create a GridData
+	 * 
+	 * @param style
+	 * @param space
+	 * @return
+	 */
+	protected GridData spanGridData(int style, int space) {
+		GridData gd = null;
+		if (style == -1)
+			gd = new GridData();
+		else
+			gd = new GridData(style);
+		gd.horizontalSpan = space;
+		return gd;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		// cache the launch configuration for updates
 		setLaunchConfiguration(configuration);
 	}
-	
 
 	/**
 	 * Cache the launch configuration
@@ -193,7 +195,6 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
 	}
-	
 
 	/**
 	 * @return the launchConfiguration

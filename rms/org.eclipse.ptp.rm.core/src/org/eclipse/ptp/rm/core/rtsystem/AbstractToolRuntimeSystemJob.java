@@ -40,7 +40,7 @@ import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -798,7 +798,7 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 
 		} finally {
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", getJobID()); //$NON-NLS-1$
-			final IResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(getRtSystem().getRmID());
+			final IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(getRtSystem().getRmID());
 			if (rm != null) {
 				final IPQueue queue = rm.getQueueById(getQueueID());
 				if (queue != null) {

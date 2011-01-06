@@ -30,7 +30,7 @@ import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.internal.ui.ParallelImages;
@@ -155,7 +155,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 		// cur_machine?
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {
-			IResourceManager rm = machine.getResourceManager();
+			IPResourceManager rm = machine.getResourceManager();
 			if (rm != null) {
 				return rm.getName() + ": " + machine.getName(); //$NON-NLS-1$
 			}
@@ -234,7 +234,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	public Image getImage(IElement element) {
 		IPMachine machine = getCurrentMachine();
 		if (machine != null) {
-			IResourceManager rm = machine.getResourceManager();
+			IPResourceManager rm = machine.getResourceManager();
 			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
 					rm.getResourceManagerId());
 			if (presentation != null) {
@@ -255,7 +255,7 @@ public class MachineManager extends AbstractElementManager implements IMachineMa
 	 * @see org.eclipse.ptp.ui.IElementManager#initial()
 	 */
 	public IPElement initial(IPUniverse universe) {
-		for (IResourceManager rm : universe.getResourceManagers()) {
+		for (IPResourceManager rm : universe.getResourceManagers()) {
 			for (IPMachine machine : rm.getMachines()) {
 				addMachine(machine);
 			}

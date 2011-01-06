@@ -22,7 +22,7 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 
 /**
@@ -32,10 +32,10 @@ import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 public class ChangedQueueEvent implements
 		IChangedQueueEvent {
 
-	private final IResourceManager rm;
+	private final IPResourceManager rm;
 	private final Collection<IPQueue> queues;
 
-	public ChangedQueueEvent(IResourceManager manager, Collection<IPQueue> queues) {
+	public ChangedQueueEvent(IPResourceManager manager, Collection<IPQueue> queues) {
 		this.rm = manager;
 		this.queues = queues;
 	}
@@ -54,7 +54,7 @@ public class ChangedQueueEvent implements
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.events.IChangedQueueEvent#getSource()
 	 */
-	public IResourceManager getSource() {
+	public IPResourceManager getSource() {
 		return rm;
 	}
 

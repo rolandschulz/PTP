@@ -20,14 +20,14 @@ package org.eclipse.ptp.internal.ui.adapters;
 
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 public class ResourceManagerPropertySource extends PElementPropertySource {
 
-	private final IResourceManager resourceManager;
+	private final IPResourceManager resourceManager;
 
-	public ResourceManagerPropertySource(IResourceManager resourceManager) {
+	public ResourceManagerPropertySource(IPResourceManager resourceManager) {
 		super(resourceManager);
 		
 		this.resourceManager = resourceManager;

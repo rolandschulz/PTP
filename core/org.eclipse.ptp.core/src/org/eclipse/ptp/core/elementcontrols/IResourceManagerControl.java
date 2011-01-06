@@ -19,10 +19,10 @@ package org.eclipse.ptp.core.elementcontrols;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
-public interface IResourceManagerControl extends IResourceManager, IPElementControl {
+public interface IResourceManagerControl extends IPResourceManager, IPElementControl {
 	/**
 	 * Add attributes to a collection of machines.
 	 * 

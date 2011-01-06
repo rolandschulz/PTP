@@ -31,7 +31,7 @@ import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes.State;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
@@ -246,8 +246,8 @@ public class PQueue extends Parent implements IPQueueControl {
 	 * 
 	 * @see org.eclipse.ptp.core.IPMachine#getResourceManager()
 	 */
-	public IResourceManager getResourceManager() {
-		return (IResourceManager) getParent();
+	public IPResourceManager getResourceManager() {
+		return (IPResourceManager) getParent();
 	}
 
 	/*

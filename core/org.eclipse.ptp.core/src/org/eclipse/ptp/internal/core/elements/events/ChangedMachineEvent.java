@@ -22,7 +22,7 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPMachine;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 
 /**
@@ -32,10 +32,10 @@ import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 public class ChangedMachineEvent implements
 		IChangedMachineEvent {
 
-	private final IResourceManager rm;
+	private final IPResourceManager rm;
 	private final Collection<IPMachine> machines;
 
-	public ChangedMachineEvent(IResourceManager manager, Collection<IPMachine> machines) {
+	public ChangedMachineEvent(IPResourceManager manager, Collection<IPMachine> machines) {
 		this.rm = manager;
 		this.machines = machines;
 	}
@@ -54,7 +54,7 @@ public class ChangedMachineEvent implements
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.events.IChangedMachineEvent#getSource()
 	 */
-	public IResourceManager getSource() {
+	public IPResourceManager getSource() {
 		return rm;
 	}
 
