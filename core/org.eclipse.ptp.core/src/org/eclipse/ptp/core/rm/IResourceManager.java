@@ -12,7 +12,6 @@ package org.eclipse.ptp.core.rm;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.rm.exceptions.ResourceManagerException;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
@@ -108,7 +107,7 @@ public interface IResourceManager {
 	 * @param listener
 	 *            listener to add to the list of listeners
 	 */
-	public void addListener(IResourceManagerListener listener);
+	public void addListener(IRMChangeListener listener);
 
 	/**
 	 * Perform a control the job. The action this takes depends on the operation
@@ -199,7 +198,7 @@ public interface IResourceManager {
 	 * @param listener
 	 *            listener to remove
 	 */
-	public void removeListener(IResourceManagerListener listener);
+	public void removeListener(IRMChangeListener listener);
 
 	/**
 	 * Submit a job. The job template must contain the appropriate attributes

@@ -10,28 +10,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm;
 
-import java.util.Set;
 
 /**
  * @since 5.0
  */
-public interface IResourceManagerListener {
+public interface IRMChangeListener {
 	/**
 	 * Accept notification when one or more jobs change status
 	 * 
-	 * @param jobStatus
-	 *            new status of each job
-	 * @param jobInfo
-	 *            job information for jobs. Only valid for jobs that have
-	 *            changed status to DONE or FAILED.
+	 * @param event
+	 *            the event details
 	 */
-	public void handleJobStatusChange(Set<IResourceManager.JobStatus> jobStatus, Set<JobInfo> jobInfo);
+	public void jobStatusChange(IRMJobChangeEvent event);
 
 	/**
 	 * Accept notification of resource manager status change
 	 * 
-	 * @param status
-	 *            new status of resource manager session
+	 * @param event
+	 *            the event details
 	 */
-	public void handleSessionStatusChange(IResourceManager.SessionStatus status);
+	public void sessionStatusChange(IRMSessionChangeEvent event);
 }
