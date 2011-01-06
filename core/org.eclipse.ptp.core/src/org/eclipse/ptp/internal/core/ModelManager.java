@@ -38,8 +38,8 @@ import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
@@ -125,8 +125,11 @@ public class ModelManager implements IModelManager {
 						IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
 								.getUniqueName());
 						if (rm == null) {
-							addResourceManager((IResourceManagerControl) ((IResourceManagerConfiguration) newProvider)
-									.getAdapter(IResourceManagerControl.class));
+							rm = (IResourceManagerControl) ((IResourceManagerConfiguration) newProvider)
+									.getAdapter(IResourceManagerControl.class);
+							if (rm != null) {
+								addResourceManager(rm);
+							}
 						}
 					}
 				}
