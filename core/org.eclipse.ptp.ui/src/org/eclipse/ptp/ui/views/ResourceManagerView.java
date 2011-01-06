@@ -86,6 +86,13 @@ import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
 import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.core.rm.IRMChangeListener;
+import org.eclipse.ptp.core.rm.IRMJobChangeEvent;
+import org.eclipse.ptp.core.rm.IRMModelChangeEvent;
+import org.eclipse.ptp.core.rm.IRMModelChangeListener;
+import org.eclipse.ptp.core.rm.IRMSessionChangeEvent;
+import org.eclipse.ptp.core.rm.IResourceManager;
+import org.eclipse.ptp.core.rm.RMModelManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIUtils;
@@ -299,9 +306,13 @@ public class ResourceManagerView extends ViewPart {
 			String name2 = null;
 			if (e1 instanceof IPElement) {
 				name1 = ((IPElement) e1).getName();
+			} else if (e1 instanceof IResourceManager) {
+				name1 = ((IResourceManager) e1).getName();
 			}
 			if (e2 instanceof IPElement) {
 				name2 = ((IPElement) e2).getName();
+			} else if (e2 instanceof IResourceManager) {
+				name2 = ((IResourceManager) e2).getName();
 			}
 			if (name1 != null && name2 != null) {
 				return name1.compareTo(name2);
@@ -519,6 +530,43 @@ public class ResourceManagerView extends ViewPart {
 		}
 	}
 
+	private final class RMChangeListener implements IRMChangeListener {
+
+		public void jobStatusChange(IRMJobChangeEvent event) {
+			// ignore
+		}
+
+		public void sessionStatusChange(IRMSessionChangeEvent event) {
+			IResourceManager rm = event.getResourceManager();
+			if (rmManager != null && rm.getSessionStatus() == IResourceManager.SessionStatus.STOPPED
+					&& rm == rmManager.getSelected()) {
+				rmManager.fireSetDefaultRMEvent(null);
+			}
+			refreshViewer(rm);
+		}
+
+	}
+
+	private final class RMModelChangeListener implements IRMModelChangeListener {
+
+		public void added(IRMModelChangeEvent event) {
+			final IResourceManager rm = event.getResourceManager();
+			rm.addListener(rmChangeListener);
+			refreshViewer();
+		}
+
+		public void changed(IRMModelChangeEvent event) {
+			updateViewer(event.getResourceManager());
+		}
+
+		public void removed(IRMModelChangeEvent event) {
+			final IResourceManager rm = event.getResourceManager();
+			rm.removeListener(rmChangeListener);
+			refreshViewer();
+		}
+
+	}
+
 	private TreeViewer viewer;
 	private RemoveResourceManagersAction removeResourceManagerAction;
 	private AddResourceManagerAction addResourceManagerAction;
@@ -528,6 +576,8 @@ public class ResourceManagerView extends ViewPart {
 	private final MMChildListener mmChildListener = new MMChildListener();
 	private final RMListener rmListener = new RMListener();
 	private final RMChildListener rmChildListener = new RMChildListener();
+	private final RMChangeListener rmChangeListener = new RMChangeListener();
+	private final RMModelChangeListener rmModelChangeListener = new RMModelChangeListener();
 	private final RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
 
 	public ResourceManagerView() {
@@ -640,6 +690,8 @@ public class ResourceManagerView extends ViewPart {
 			rm.addElementListener(rmListener);
 		}
 		mm.addListener(mmChildListener);
+
+		RMModelManager.getInstance().addListener(rmModelChangeListener);
 	}
 
 	/*
@@ -675,10 +727,19 @@ public class ResourceManagerView extends ViewPart {
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
 
-	public void refreshViewer(final IPElement element) {
+	private void refreshViewer(final IPElement element) {
 		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {
 				viewer.refresh(element);
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+	}
+
+	private void refreshViewer(final IResourceManager rm) {
+		ISafeRunnable safeRunnable = new SafeRunnable() {
+			public void run() throws Exception {
+				viewer.refresh(rm);
 			}
 		};
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
@@ -689,7 +750,7 @@ public class ResourceManagerView extends ViewPart {
 		viewer.getControl().setFocus();
 	}
 
-	public void updateViewer(final IPElement element) {
+	private void updateViewer(final IPElement element) {
 		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {
 				viewer.update(element, null);
@@ -698,10 +759,19 @@ public class ResourceManagerView extends ViewPart {
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
 	}
 
-	public void updateViewer(final IPElement[] elements) {
+	private void updateViewer(final IPElement[] elements) {
 		ISafeRunnable safeRunnable = new SafeRunnable() {
 			public void run() throws Exception {
 				viewer.update(elements, null);
+			}
+		};
+		UIUtils.safeRunAsyncInUIThread(safeRunnable);
+	}
+
+	private void updateViewer(final IResourceManager rm) {
+		ISafeRunnable safeRunnable = new SafeRunnable() {
+			public void run() throws Exception {
+				viewer.update(rm, null);
 			}
 		};
 		UIUtils.safeRunAsyncInUIThread(safeRunnable);
