@@ -20,7 +20,7 @@ import org.eclipse.ptp.core.messages.Messages;
  */
 public class ResourceManagerAttributes {
 	public enum State {
-		STARTING, STARTED, STOPPED, ERROR
+		STOPPED, STARTED, STARTING, ERROR
 	}
 
 	private final static String STATE_ATTR_ID = "rmState"; //$NON-NLS-1$
