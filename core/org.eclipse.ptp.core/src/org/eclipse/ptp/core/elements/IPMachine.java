@@ -78,6 +78,7 @@ public interface IPMachine extends IPElement {
 	 * Get the resource manager that controls this machine.
 	 * 
 	 * @return the machine's parent resource manager
+	 * @since 5.0
 	 */
 	public IPResourceManager getResourceManager();
 

@@ -36,6 +36,9 @@ import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
+/**
+ * @since 5.0
+ */
 public class RMModelManager {
 	private class RMStartupJob extends Job {
 		private final IResourceManager resourceManager;

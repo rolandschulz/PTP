@@ -12,6 +12,9 @@ package org.eclipse.ptp.core.rm;
 
 import org.eclipse.ptp.core.rm.exceptions.ResourceManagerException;
 
+/**
+ * @since 5.0
+ */
 public interface IJobTemplateFactory {
 	/**
 	 * Create a new empty job template.

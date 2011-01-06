@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class SuspendInconsistentStateException extends ResourceManagerException {
 
 	private static final long serialVersionUID = 9200676692291449230L;

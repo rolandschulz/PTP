@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.IPUniverse;
 
 /**
  * Adds the internal functionality of an IPElement to an IPUniverse
@@ -37,8 +37,14 @@ public interface IPUniverseControl extends IPUniverse, IPElementControl {
 
 	public IResourceManagerControl[] getResourceManagerControls();
 
+	/**
+	 * @since 5.0
+	 */
 	public void removeResourceManager(IPResourceManager removedManager);
 
+	/**
+	 * @since 5.0
+	 */
 	public void removeResourceManagers(IPResourceManager[] removedRMs);
 
 }

@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class DeniedByDrmException extends ResourceManagerException {
 
 	private static final long serialVersionUID = -8611607603804105081L;
