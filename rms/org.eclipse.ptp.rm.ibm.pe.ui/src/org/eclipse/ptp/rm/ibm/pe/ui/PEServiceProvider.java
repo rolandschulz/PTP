@@ -64,13 +64,16 @@ public class PEServiceProvider extends AbstractRemoteResourceManagerServiceProvi
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rmsystem.AbstractResourceManagerServiceProvider#
-	 * createResourceManager()
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
-	public IResourceManagerControl createResourceManager() {
-		IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
-		return new PEResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+	public Object getAdapter(Class adapter) {
+		if (adapter == IResourceManagerControl.class) {
+			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+			return new PEResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
+		}
+		return null;
 	}
 
 	/*
