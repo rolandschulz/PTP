@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class HoldInconsistentStateException extends ResourceManagerException {
 
 	private static final long serialVersionUID = 6936464882254998783L;

@@ -12,6 +12,9 @@ package org.eclipse.ptp.core.rm;
 
 import java.util.Set;
 
+/**
+ * @since 5.0
+ */
 public interface IResourceManagerListener {
 	/**
 	 * Accept notification when one or more jobs change status

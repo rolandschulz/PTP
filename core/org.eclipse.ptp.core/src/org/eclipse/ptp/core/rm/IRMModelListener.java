@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm;
 
+/**
+ * @since 5.0
+ */
 public interface IRMModelListener {
 	/**
 	 * Notification when a resource manager is added to the model

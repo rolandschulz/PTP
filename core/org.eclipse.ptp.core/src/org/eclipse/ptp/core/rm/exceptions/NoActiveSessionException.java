@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class NoActiveSessionException extends ResourceManagerException {
 
 	private static final long serialVersionUID = -3789540325465666991L;

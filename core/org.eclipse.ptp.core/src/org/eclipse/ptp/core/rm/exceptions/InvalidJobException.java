@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class InvalidJobException extends ResourceManagerException {
 
 	private static final long serialVersionUID = 8625185697123100200L;

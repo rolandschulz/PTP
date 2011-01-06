@@ -12,6 +12,9 @@ package org.eclipse.ptp.core.rm;
 
 import java.util.Map;
 
+/**
+ * @since 5.0
+ */
 public class JobInfo {
 	private String fJobId = null;
 	private Map<String, String> fResourceUsage = null;

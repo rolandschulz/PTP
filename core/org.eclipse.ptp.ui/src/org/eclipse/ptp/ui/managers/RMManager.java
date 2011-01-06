@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.internal.ui.RMSelectionPersistence;
 import org.eclipse.ptp.ui.IRMSelectionListener;
 
@@ -38,12 +38,14 @@ public class RMManager {
 	/**
 	 * Fire an event when the default resource manager is set.
 	 * 
-	 * @param rm selected resource manager
+	 * @param rm
+	 *            selected resource manager
+	 * @since 5.0
 	 */
 	public void fireSetDefaultRMEvent(final IPResourceManager rm) {
 		selectedRM = rm;
-		for (Object listener: rmSelectionListeners.getListeners()) {
-			final IRMSelectionListener rmListener = (IRMSelectionListener)listener;
+		for (Object listener : rmSelectionListeners.getListeners()) {
+			final IRMSelectionListener rmListener = (IRMSelectionListener) listener;
 			SafeRunner.run(new SafeRunnable() {
 				public void run() {
 					rmListener.setDefault(rm);
@@ -51,15 +53,16 @@ public class RMManager {
 			});
 		}
 	}
-	
+
 	/**
 	 * Fire an event when the selection in the resource manager view changes
 	 * 
-	 * @param selection new selection
+	 * @param selection
+	 *            new selection
 	 */
 	public void fireSelectedEvent(final ISelection selection) {
-		for (Object listener: rmSelectionListeners.getListeners()) {
-			final IRMSelectionListener rmListener = (IRMSelectionListener)listener;
+		for (Object listener : rmSelectionListeners.getListeners()) {
+			final IRMSelectionListener rmListener = (IRMSelectionListener) listener;
 			SafeRunner.run(new SafeRunnable() {
 				public void run() {
 					rmListener.selectionChanged(selection);
@@ -68,10 +71,11 @@ public class RMManager {
 		}
 	}
 
-	/** 
+	/**
 	 * Get all resource managers
 	 * 
 	 * @return an array containing the resource managers
+	 * @since 5.0
 	 */
 	public IPResourceManager[] getResourceManagers() {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
@@ -80,11 +84,12 @@ public class RMManager {
 		}
 		return universe.getResourceManagers();
 	}
-	
+
 	/**
 	 * Get the default resource manager.
 	 * 
 	 * @return default resource manager, or null if none are selected
+	 * @since 5.0
 	 */
 	public IPResourceManager getSelected() {
 		restoreSelectedRM();
@@ -99,7 +104,7 @@ public class RMManager {
 	public void removeRMSelectionListener(IRMSelectionListener listener) {
 		rmSelectionListeners.remove(listener);
 	}
-	
+
 	/**
 	 * Shut down the RM manager
 	 */
@@ -108,7 +113,7 @@ public class RMManager {
 		fireSetDefaultRMEvent(null);
 		rmSelectionListeners.clear();
 	}
-	
+
 	/**
 	 * Persist selected RM
 	 */
@@ -116,7 +121,7 @@ public class RMManager {
 		RMSelectionPersistence store = new RMSelectionPersistence();
 		store.saveDefaultRM(selectedRM);
 	}
-	
+
 	/**
 	 * Restore persisted state
 	 */

@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class ResourceManagerException extends Exception {
 
 	private static final long serialVersionUID = -6959653115261096069L;

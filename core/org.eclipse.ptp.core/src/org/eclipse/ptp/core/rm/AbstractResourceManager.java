@@ -15,6 +15,9 @@ import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.rm.exceptions.ResourceManagerException;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
+/**
+ * @since 5.0
+ */
 public abstract class AbstractResourceManager implements IResourceManager {
 	private final ListenerList fListeners = new ListenerList();
 	private final IJobTemplateFactory fJobTemplateFactory;

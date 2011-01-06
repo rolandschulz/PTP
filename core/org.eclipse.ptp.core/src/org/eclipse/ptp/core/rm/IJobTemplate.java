@@ -15,6 +15,9 @@ import java.util.Map;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 
+/**
+ * @since 5.0
+ */
 public interface IJobTemplate {
 	public enum SubmissionState {
 		/**

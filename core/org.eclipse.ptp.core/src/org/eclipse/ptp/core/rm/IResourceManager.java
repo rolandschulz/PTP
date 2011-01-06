@@ -16,6 +16,9 @@ import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.rm.exceptions.ResourceManagerException;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
+/**
+ * @since 5.0
+ */
 public interface IResourceManager {
 	public enum JobControlOperation {
 		/*

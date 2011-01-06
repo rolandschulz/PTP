@@ -20,8 +20,8 @@ package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
@@ -52,6 +52,7 @@ public interface IModelManager extends IModelPresentation {
 	 * 
 	 * @param rmUniqueName
 	 * @return resource manager
+	 * @since 5.0
 	 */
 	public IPResourceManager getResourceManagerFromUniqueName(String rmUniqueName);
 
@@ -60,6 +61,7 @@ public interface IModelManager extends IModelPresentation {
 	 * 
 	 * @param universe
 	 * @return array of resource managers
+	 * @since 5.0
 	 */
 	public IPResourceManager[] getStartedResourceManagers(IPUniverse universe);
 
@@ -129,6 +131,7 @@ public interface IModelManager extends IModelPresentation {
 	 * 
 	 * @param rm
 	 *            resource manager
+	 * @since 5.0
 	 */
 	public void updateResourceManager(IPResourceManager rm);
 }

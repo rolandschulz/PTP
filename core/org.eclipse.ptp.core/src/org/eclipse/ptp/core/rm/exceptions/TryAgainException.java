@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class TryAgainException extends ResourceManagerException {
 
 	private static final long serialVersionUID = -8167352870948380657L;

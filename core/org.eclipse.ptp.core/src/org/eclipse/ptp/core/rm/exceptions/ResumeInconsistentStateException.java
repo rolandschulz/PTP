@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.rm.exceptions;
 
+/**
+ * @since 5.0
+ */
 public class ResumeInconsistentStateException extends ResourceManagerException {
 
 	private static final long serialVersionUID = 3806158707788542028L;
