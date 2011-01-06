@@ -13,28 +13,28 @@ package org.eclipse.ptp.core.rm;
 /**
  * @since 5.0
  */
-public interface IRMModelListener {
+public interface IRMModelChangeListener {
 	/**
 	 * Notification when a resource manager is added to the model
 	 * 
-	 * @param rm
-	 *            resource manager that was added to the model
+	 * @param event
+	 *            the event details
 	 */
-	public void handleResourceManagerAdded(IResourceManager rm);
+	public void added(IRMModelChangeEvent event);
 
 	/**
 	 * Notification when a resource manager is changed
 	 * 
-	 * @param rm
-	 *            resource manager that was changed
+	 * @param event
+	 *            the event details
 	 */
-	public void handleResourceManagerChanged(IResourceManager rm);
+	public void changed(IRMModelChangeEvent event);
 
 	/**
 	 * Notification when a resource manager is removed from the model
 	 * 
-	 * @param rm
-	 *            resource manager that was removed from the model
+	 * @param event
+	 *            the event details
 	 */
-	public void handleResourceManagerRemoved(IResourceManager rm);
+	public void removed(IRMModelChangeEvent event);
 }
