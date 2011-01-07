@@ -87,7 +87,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 					IPDIEventRequest request = fRequests.get(i);
 
 					if (request != null) {
-						if (request.getStatus() != IPDIEventRequest.RUNNING) {
+						if (request.getStatus() == IPDIEventRequest.RUNNING) {
 							request.cancel();
 							request.done();
 							fRequests.remove(i);
@@ -212,7 +212,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 			if (session.getTaskManager().isAllPending(request.getTasks())) {
 				throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_6, request.getName()));
 			}
-			if (session.getStatus() == IPDISession.EXITING || session.getStatus() == IPDISession.EXITED) {
+			if (/* session.getStatus() == IPDISession.EXITING || */session.getStatus() == IPDISession.EXITED) {
 				throw new PDIException(request.getTasks(), Messages.EventRequestManager_7);
 			}
 		}
@@ -298,6 +298,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 */
 	@Override
 	public void shutdown() {
+		dispatchJob.cancel();
 	}
 
 	/*
