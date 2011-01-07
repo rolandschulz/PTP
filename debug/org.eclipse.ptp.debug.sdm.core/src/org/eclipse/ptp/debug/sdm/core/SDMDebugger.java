@@ -48,7 +48,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IResourceManager;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.IPDebugger;
@@ -361,12 +361,12 @@ public class SDMDebugger implements IPDebugger {
 	 * @return resource manager or null if none specified
 	 * @throws CoreException
 	 */
-	private IResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
+	private IPResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IResourceManager[] rms = universe.getResourceManagers();
+		IPResourceManager[] rms = universe.getResourceManagers();
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
-		for (IResourceManager rm : rms) {
+		for (IPResourceManager rm : rms) {
 			if (rm.getState() == ResourceManagerAttributes.State.STARTED && rm.getUniqueName().equals(rmUniqueName)) {
 				return rm;
 			}
