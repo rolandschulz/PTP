@@ -11,8 +11,9 @@
 package org.eclipse.ptp.core.rm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -32,7 +33,6 @@ import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceModelEvent;
 import org.eclipse.ptp.services.core.IServiceModelEventListener;
-import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
@@ -131,9 +131,8 @@ public final class RMModelManager {
 	};
 
 	private final ListenerList fResourceManagerListeners = new ListenerList();
-	private final List<IResourceManager> fResourceManagers = new ArrayList<IResourceManager>();
-	protected final IServiceModelManager fServiceManager = ServiceModelManager.getInstance();
-	protected IService fLaunchService = fServiceManager.getService(IServiceConstants.LAUNCH_SERVICE);
+	private final Map<String, IResourceManager> fResourceManagers = new HashMap<String, IResourceManager>();
+	protected IService fLaunchService = ServiceModelManager.getInstance().getService(IServiceConstants.LAUNCH_SERVICE);
 
 	private static RMModelManager fInstance;
 
@@ -148,10 +147,10 @@ public final class RMModelManager {
 	 * Don't allow class to be instantiated
 	 */
 	private RMModelManager() {
-		fServiceManager.addEventListener(fServiceEventListener, IServiceModelEvent.SERVICE_CONFIGURATION_ADDED
-				| IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED | IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED
-				| IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
-		loadResourceManagers();
+		ServiceModelManager.getInstance().addEventListener(
+				fServiceEventListener,
+				IServiceModelEvent.SERVICE_CONFIGURATION_ADDED | IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED
+						| IServiceModelEvent.SERVICE_CONFIGURATION_CHANGED | IServiceModelEvent.SERVICE_PROVIDER_CHANGED);
 	}
 
 	/**
@@ -170,7 +169,7 @@ public final class RMModelManager {
 	 */
 	public void addResourceManager(IResourceManager rm) {
 		synchronized (fResourceManagers) {
-			fResourceManagers.add(rm);
+			fResourceManagers.put(rm.getUniqueName(), rm);
 		}
 		fireNewResourceManager(rm);
 	}
@@ -181,13 +180,8 @@ public final class RMModelManager {
 	 * @param rmUniqueName
 	 * @return
 	 */
-	public IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
-		for (IResourceManager rm : getResourceManagers()) {
-			if (rm.getUniqueName().equals(rmUniqueName)) {
-				return rm;
-			}
-		}
-		return null;
+	public synchronized IResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
+		return fResourceManagers.get(rmUniqueName);
 	}
 
 	/**
@@ -196,7 +190,7 @@ public final class RMModelManager {
 	 * @return
 	 */
 	public synchronized IResourceManager[] getResourceManagers() {
-		return fResourceManagers.toArray(new IResourceManager[0]);
+		return fResourceManagers.values().toArray(new IResourceManager[0]);
 	}
 
 	/**
@@ -237,11 +231,34 @@ public final class RMModelManager {
 	}
 
 	/**
-	 * Shutdown the model. Should be called when the plugin stops.
+	 * Remove resource managers from the model using their configurations
+	 * 
+	 * @param rmConfs
+	 *            array of configurations to remove
+	 */
+	public void removeResourceManagers(IResourceManagerConfiguration[] rmConfs) {
+		for (IResourceManagerConfiguration rmConf : rmConfs) {
+			IResourceManager rm = getResourceManagerFromUniqueName(rmConf.getUniqueName());
+			if (rm != null) {
+				removeResourceManager(rm);
+			}
+		}
+	}
+
+	/**
+	 * Start the model. Loads resource managers from persistent store and starts
+	 * them if necessary.
+	 */
+	public void start() {
+		loadAndStartResourceManagers();
+	}
+
+	/**
+	 * Stop the model. Should be called when the plugin stops.
 	 * 
 	 * @throws CoreException
 	 */
-	public void shutdown() throws CoreException {
+	public void stop() throws CoreException {
 		shutdownResourceManagers();
 		fResourceManagerListeners.clear();
 	}
@@ -253,7 +270,7 @@ public final class RMModelManager {
 	 */
 	private void doRemoveResourceManager(IResourceManager rm) {
 		synchronized (fResourceManagers) {
-			fResourceManagers.remove(rm);
+			fResourceManagers.remove(rm.getUniqueName());
 		}
 		fireRemoveResourceManager(rm);
 	}
@@ -311,14 +328,23 @@ public final class RMModelManager {
 	 * Load resource manager configurations and start those that require
 	 * starting.
 	 */
-	private void loadResourceManagers() {
+	private void loadAndStartResourceManagers() {
 		Set<IResourceManager> rmsNeedStarting = new HashSet<IResourceManager>();
 
 		/*
-		 * Need to force service model to load so that the resource managers are
-		 * created.
+		 * Create any resource managers that haven't been created by service
+		 * callback
 		 */
-		fServiceManager.getActiveConfiguration();
+		for (IServiceConfiguration config : ServiceModelManager.getInstance().getConfigurations()) {
+			IServiceProvider provider = config.getServiceProvider(fLaunchService);
+			if (provider != null && getResourceManagerFromUniqueName(provider.getId()) == null) {
+				IResourceManager rm = (IResourceManager) ((IResourceManagerConfiguration) provider)
+						.getAdapter(IResourceManager.class);
+				if (rm != null) {
+					addResourceManager(rm);
+				}
+			}
+		}
 
 		for (IResourceManager rm : getResourceManagers()) {
 			IResourceManager rmControl = rm;
@@ -339,7 +365,7 @@ public final class RMModelManager {
 	 *            provider to remove
 	 */
 	private void removeProviderFromConfiguration(IServiceProvider provider) {
-		Set<IServiceConfiguration> configs = fServiceManager.getConfigurations();
+		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
 
 		for (IServiceConfiguration config : configs) {
 			if (provider == config.getServiceProvider(fLaunchService)) {

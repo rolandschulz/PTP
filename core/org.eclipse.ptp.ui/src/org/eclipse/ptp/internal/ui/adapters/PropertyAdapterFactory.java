@@ -29,25 +29,25 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 public class PropertyAdapterFactory implements IAdapterFactory {
 
-	@SuppressWarnings("unchecked")
-    public Object getAdapter(Object adaptableObject, Class adapterType) {
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == IPropertySource.class) {
 			if (adaptableObject instanceof IPResourceManager) {
-				return new ResourceManagerPropertySource((IPResourceManager)adaptableObject);
+				return new ResourceManagerPropertySource((IPResourceManager) adaptableObject);
 			}
 			if (adaptableObject instanceof IPElement) {
-				return new PElementPropertySource((IPElement)adaptableObject);
+				return new PElementPropertySource((IPElement) adaptableObject);
 			}
 			if (adaptableObject instanceof IElement) {
-				return new PElementPropertySource(((IElement)adaptableObject).getPElement());
+				return new PElementPropertySource(((IElement) adaptableObject).getPElement());
 			}
 		}
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-    public Class[] getAdapterList() {
-		return new Class[] {IPropertySource.class};
+	@SuppressWarnings("rawtypes")
+	public Class[] getAdapterList() {
+		return new Class[] { IPropertySource.class };
 	}
 
 }

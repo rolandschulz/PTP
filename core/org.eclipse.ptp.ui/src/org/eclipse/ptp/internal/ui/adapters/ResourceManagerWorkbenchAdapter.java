@@ -31,16 +31,6 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ui.model.WorkbenchAdapter#getChildren(java.lang.Object)
-	 */
-	@Override
-	public Object[] getChildren(Object parentElement) {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object
 	 * )
@@ -80,15 +70,5 @@ public class ResourceManagerWorkbenchAdapter extends WorkbenchAdapter {
 			return resourceManager.getName();
 		}
 		return resourceManager.getName() + " (" + type + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.model.WorkbenchAdapter#getParent(java.lang.Object)
-	 */
-	@Override
-	public Object getParent(Object object) {
-		return null;
 	}
 }

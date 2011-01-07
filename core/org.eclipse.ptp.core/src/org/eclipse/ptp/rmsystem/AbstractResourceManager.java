@@ -582,9 +582,11 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	public Object getAdapter(Class adapter) {
 		if (adapter.isInstance(this)) {
 			return this;
-		} else {
-			return super.getAdapter(adapter);
 		}
+		if (adapter == IResourceManagerConfiguration.class) {
+			return getConfiguration();
+		}
+		return super.getAdapter(adapter);
 	}
 
 	/**

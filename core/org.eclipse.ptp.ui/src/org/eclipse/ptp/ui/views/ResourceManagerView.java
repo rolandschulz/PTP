@@ -93,6 +93,7 @@ import org.eclipse.ptp.core.rm.IRMModelChangeListener;
 import org.eclipse.ptp.core.rm.IRMSessionChangeEvent;
 import org.eclipse.ptp.core.rm.IResourceManager;
 import org.eclipse.ptp.core.rm.RMModelManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.UIUtils;
@@ -276,7 +277,7 @@ public class ResourceManagerView extends ViewPart {
 		public Font getFont(Object element) {
 			IPResourceManager rm = getResourceManager(element);
 			RMManager rmManager = PTPUIPlugin.getDefault().getRMManager();
-			if (rm != null && rmManager != null && rm == rmManager.getSelected()) {
+			if (rm != null && rmManager != null && rm.getUniqueName().equals(rmManager.getSelected())) {
 				return selectedFont;
 			}
 			return unSelectedFont;
@@ -491,7 +492,8 @@ public class ResourceManagerView extends ViewPart {
 		 */
 		public void handleEvent(IResourceManagerChangeEvent e) {
 			IPResourceManager rm = e.getSource();
-			if (rmManager != null && rm.getState() == ResourceManagerAttributes.State.STOPPED && rm == rmManager.getSelected()) {
+			if (rmManager != null && rm.getState() == ResourceManagerAttributes.State.STOPPED
+					&& rm.getUniqueName().equals(rmManager.getSelected())) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
 			refreshViewer(rm);
@@ -539,7 +541,7 @@ public class ResourceManagerView extends ViewPart {
 		public void sessionStatusChange(IRMSessionChangeEvent event) {
 			IResourceManager rm = event.getResourceManager();
 			if (rmManager != null && rm.getSessionStatus() == IResourceManager.SessionStatus.STOPPED
-					&& rm == rmManager.getSelected()) {
+					&& rm.getUniqueName().equals(rmManager.getSelected())) {
 				rmManager.fireSetDefaultRMEvent(null);
 			}
 			refreshViewer(rm);
@@ -552,7 +554,7 @@ public class ResourceManagerView extends ViewPart {
 		public void added(IRMModelChangeEvent event) {
 			final IResourceManager rm = event.getResourceManager();
 			rm.addListener(rmChangeListener);
-			refreshViewer();
+			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 		}
 
 		public void changed(IRMModelChangeEvent event) {
@@ -562,7 +564,7 @@ public class ResourceManagerView extends ViewPart {
 		public void removed(IRMModelChangeEvent event) {
 			final IResourceManager rm = event.getResourceManager();
 			rm.removeListener(rmChangeListener);
-			refreshViewer();
+			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
 		}
 
 	}
@@ -819,39 +821,55 @@ public class ResourceManagerView extends ViewPart {
 				break;
 			} else {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
-				IResourceManagerControl rm = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
-				if (rm.getState() != ResourceManagerAttributes.State.STOPPED) {
-					inContextForEditRM = false;
-					inContextForRemoveRM = false;
+				IResourceManagerControl rmc = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
+				if (rmc != null) {
+					if (rmc.getState() != ResourceManagerAttributes.State.STOPPED) {
+						inContextForEditRM = false;
+						inContextForRemoveRM = false;
+					} else {
+						inContextForSelectRM = false;
+					}
 				} else {
-					inContextForSelectRM = false;
+					IResourceManager rm = (IResourceManager) menuContrib.getAdapter(IResourceManager.class);
+					if (rm != null) {
+						if (rm.getSessionStatus() != IResourceManager.SessionStatus.STOPPED) {
+							inContextForEditRM = false;
+							inContextForRemoveRM = false;
+						} else {
+							inContextForSelectRM = false;
+						}
+					}
 				}
 			}
 		}
 		manager.add(removeResourceManagerAction);
 		removeResourceManagerAction.setEnabled(inContextForRemoveRM);
 		if (inContextForRemoveRM) {
-			IResourceManagerControl[] rmManagers = new IResourceManagerControl[selection.size()];
-			for (int i = 0; i < rmManagers.length; ++i) {
+			IResourceManagerConfiguration[] configs = new IResourceManagerConfiguration[selection.size()];
+			for (int i = 0; i < configs.length; ++i) {
 				final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[i];
-				rmManagers[i] = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
+				configs[i] = (IResourceManagerConfiguration) menuContrib.getAdapter(IResourceManagerConfiguration.class);
 			}
-			removeResourceManagerAction.setResourceManager(rmManagers);
+			removeResourceManagerAction.setResourceManagers(configs);
 		}
 		manager.add(editResourceManagerAction);
 		editResourceManagerAction.setEnabled(inContextForEditRM);
 		if (inContextForEditRM) {
 			final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[0];
-			IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
-			editResourceManagerAction.setResourceManager(rmManager);
+			IResourceManagerConfiguration config = (IResourceManagerConfiguration) menuContrib
+					.getAdapter(IResourceManagerConfiguration.class);
+			if (config != null) {
+				editResourceManagerAction.setResourceManager(config);
+			}
 		}
 		manager.add(new Separator());
 		manager.add(selectResourceManagerAction);
 		selectResourceManagerAction.setEnabled(inContextForSelectRM);
 		if (inContextForSelectRM) {
 			final IResourceManagerMenuContribution menuContrib = (IResourceManagerMenuContribution) selectedObjects[0];
-			IResourceManagerControl rmManager = (IResourceManagerControl) menuContrib.getAdapter(IResourceManagerControl.class);
-			selectResourceManagerAction.setResourceManager(rmManager);
+			IResourceManagerConfiguration config = (IResourceManagerConfiguration) menuContrib
+					.getAdapter(IResourceManagerConfiguration.class);
+			selectResourceManagerAction.setResourceManager(config.getUniqueName());
 		}
 	}
 

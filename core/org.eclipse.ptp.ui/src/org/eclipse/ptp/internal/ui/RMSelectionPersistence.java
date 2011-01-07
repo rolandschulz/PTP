@@ -18,97 +18,82 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
-public class RMSelectionPersistence 
-{
+public class RMSelectionPersistence {
 	private final static String TAG_DEFAULT_RESOURCEMANAGER = "DefaultResourceManager"; //$NON-NLS-1$
 	private final static String TAG_RESOURCEMANAGER = "ResourceMananger"; //$NON-NLS-1$
 	private final static String TAG_RESOURCEMANAGER_ID = "ResourceManangerID"; //$NON-NLS-1$
 	private final static String MEMENTO_FILE = "defaultResourceManager.xml"; //$NON-NLS-1$
 	private final static String NULL_ID = "null"; //$NON-NLS-1$
-	
+
 	/**
 	 * Create a resource mananger selection persistence object
 	 */
-	public RMSelectionPersistence()
-	{
+	public RMSelectionPersistence() {
 	}
-	
+
 	/**
-	 * Get the default resource mananger from persistent storage
+	 * Get the default resource mananger ID from persistent storage
 	 * 
-	 * @return - the default resource mananger or null if no default resource mananger set
+	 * @return - the default resource mananger ID or null if no default resource
+	 *         mananger set
 	 */
-	public IPResourceManager getDefaultRM()
-	{
+	public String getDefaultRMID() {
 		File file;
-		FileReader reader;
-		IPResourceManager rm;
-		
+		FileReader reader = null;
+		String rmId = null;
+
 		file = getPersistenceFile();
-		reader = null;
-		rm = null;
-        try {
-        	IMemento rmSelectionInfo;
-        	IMemento child;
-        	
-            reader = new FileReader(file);
-            rmSelectionInfo = XMLMemento.createReadRoot(reader);
-            child = rmSelectionInfo.getChild(TAG_RESOURCEMANAGER);
-            if (child != null) {
-            	String rmID;
-            	
-            	rmID = child.getString(TAG_RESOURCEMANAGER_ID);
-            	if ((rmID != null) && !(rmID.equals(NULL_ID))) {
-            		rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmID);
-            	}
-            }
-        } 
-        catch (FileNotFoundException e) {
-            // ignored... Default resource manager not set yet
-        }
-        catch (WorkbenchException e) {
-            // ignored... Default resource manager not set yet
-        }
-        finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                PTPCorePlugin.log(e);
-            }
-        }
-		return rm;
+		try {
+			IMemento rmSelectionInfo;
+			IMemento child;
+
+			reader = new FileReader(file);
+			rmSelectionInfo = XMLMemento.createReadRoot(reader);
+			child = rmSelectionInfo.getChild(TAG_RESOURCEMANAGER);
+			if (child != null) {
+				rmId = child.getString(TAG_RESOURCEMANAGER_ID);
+			}
+		} catch (FileNotFoundException e) {
+			// ignored... Default resource manager not set yet
+		} catch (WorkbenchException e) {
+			// ignored... Default resource manager not set yet
+		} finally {
+			try {
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException e) {
+				PTPCorePlugin.log(e);
+			}
+		}
+		return rmId;
 	}
-	
+
 	/*
-	 * Record the identity of the current default resource manager in persistent storage
+	 * Record the identity of the current default resource manager in persistent
+	 * storage
 	 * 
 	 * @param rm - The default resource manager
 	 */
-	public void saveDefaultRM(IPResourceManager rm)
-	{
+	public void saveDefaultRMID(String rmId) {
 		XMLMemento memento;
 		FileWriter writer;
 		File file;
-		
+
 		file = getPersistenceFile();
-		memento = createMemento(rm);
+		memento = createMemento(rmId);
 		writer = null;
 		try {
 			writer = new FileWriter(file);
 			memento.save(writer);
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			PTPCorePlugin.log(e);
-		} 
-		finally {
+		} finally {
 			try {
 				if (writer != null) {
 					writer.close();
@@ -118,38 +103,39 @@ public class RMSelectionPersistence
 			}
 		}
 	}
-	
+
 	/**
-	 * Create the persistent data object which stores the identity of the default resource mananger
+	 * Create the persistent data object which stores the identity of the
+	 * default resource mananger
 	 * 
-	 * @param rm - the default resource manager
-	 * @return - the persistent data object used to store the resource manager id
+	 * @param rmId
+	 *            - the default resource manager or null if there is no default
+	 *            resource manager
+	 * @return - the persistent data object used to store the resource manager
+	 *         id
 	 */
-	private XMLMemento createMemento(IPResourceManager rm)
-	{
+	private XMLMemento createMemento(String rmId) {
 		XMLMemento memento;
 		IMemento child;
-		
+
 		memento = XMLMemento.createWriteRoot(TAG_DEFAULT_RESOURCEMANAGER);
 		child = memento.createChild(TAG_RESOURCEMANAGER);
-		if (rm == null) {
+		if (rmId == null) {
 			child.putString(TAG_RESOURCEMANAGER_ID, NULL_ID);
-		}
-		else {
-			child.putString(TAG_RESOURCEMANAGER_ID, rm.getUniqueName());
+		} else {
+			child.putString(TAG_RESOURCEMANAGER_ID, rmId);
 		}
 		return memento;
 	}
-	
+
 	/**
 	 * Get the location of the file holding the resource manager data
 	 * 
 	 * @return - file object for resource manager data
 	 */
-	private File getPersistenceFile()
-	{
+	private File getPersistenceFile() {
 		final PTPUIPlugin plugin;
-		
+
 		plugin = PTPUIPlugin.getDefault();
 		return plugin.getStateLocation().append(MEMENTO_FILE).toFile();
 	}

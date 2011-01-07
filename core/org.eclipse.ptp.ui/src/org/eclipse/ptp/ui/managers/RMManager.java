@@ -15,14 +15,11 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.internal.ui.RMSelectionPersistence;
 import org.eclipse.ptp.ui.IRMSelectionListener;
 
 public class RMManager {
-	protected IPResourceManager selectedRM = null;
+	protected String selectedRM = null;
 	protected ListenerList rmSelectionListeners = new ListenerList();
 	protected boolean loaded = false;
 
@@ -38,17 +35,17 @@ public class RMManager {
 	/**
 	 * Fire an event when the default resource manager is set.
 	 * 
-	 * @param rm
-	 *            selected resource manager
+	 * @param rmId
+	 *            selected resource manager ID
 	 * @since 5.0
 	 */
-	public void fireSetDefaultRMEvent(final IPResourceManager rm) {
-		selectedRM = rm;
+	public void fireSetDefaultRMEvent(final String rmId) {
+		selectedRM = rmId;
 		for (Object listener : rmSelectionListeners.getListeners()) {
 			final IRMSelectionListener rmListener = (IRMSelectionListener) listener;
 			SafeRunner.run(new SafeRunnable() {
 				public void run() {
-					rmListener.setDefault(rm);
+					rmListener.setDefault(rmId);
 				}
 			});
 		}
@@ -72,26 +69,12 @@ public class RMManager {
 	}
 
 	/**
-	 * Get all resource managers
+	 * Get the default resource manager ID.
 	 * 
-	 * @return an array containing the resource managers
+	 * @return default resource manager ID, or null if none are selected
 	 * @since 5.0
 	 */
-	public IPResourceManager[] getResourceManagers() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		if (universe == null) {
-			return new IPResourceManager[0];
-		}
-		return universe.getResourceManagers();
-	}
-
-	/**
-	 * Get the default resource manager.
-	 * 
-	 * @return default resource manager, or null if none are selected
-	 * @since 5.0
-	 */
-	public IPResourceManager getSelected() {
+	public String getSelected() {
 		restoreSelectedRM();
 		return selectedRM;
 	}
@@ -119,7 +102,7 @@ public class RMManager {
 	 */
 	private void saveSelectedRM() {
 		RMSelectionPersistence store = new RMSelectionPersistence();
-		store.saveDefaultRM(selectedRM);
+		store.saveDefaultRMID(selectedRM);
 	}
 
 	/**
@@ -128,7 +111,7 @@ public class RMManager {
 	private void restoreSelectedRM() {
 		if ((!loaded) && (selectedRM == null)) {
 			RMSelectionPersistence store = new RMSelectionPersistence();
-			selectedRM = store.getDefaultRM();
+			selectedRM = store.getDefaultRMID();
 			if (selectedRM != null) {
 				fireSetDefaultRMEvent(selectedRM);
 			}

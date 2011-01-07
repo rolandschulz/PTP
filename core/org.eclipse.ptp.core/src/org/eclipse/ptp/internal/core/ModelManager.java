@@ -60,6 +60,10 @@ import org.eclipse.ptp.services.core.IServiceModelManager;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
+/**
+ * @author greg
+ * 
+ */
 public class ModelManager implements IModelManager {
 	private class RMStartupJob extends Job {
 		private final IResourceManagerControl resourceManager;
@@ -317,11 +321,14 @@ public class ModelManager implements IModelManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.core.IModelManager#removeResourceManagers(org.eclipse
-	 * .ptp.core.elementcontrols.IResourceManagerControl[])
+	 * .ptp.rmsystem.IResourceManagerConfiguration[])
 	 */
-	public void removeResourceManagers(IResourceManagerControl[] rms) {
-		for (IResourceManagerControl rm : rms) {
-			removeResourceManager(rm);
+	public void removeResourceManagers(IResourceManagerConfiguration[] rms) {
+		for (IResourceManagerConfiguration rmConf : rms) {
+			IPResourceManager rm = getResourceManagerFromUniqueName(rmConf.getUniqueName());
+			if (rm != null) {
+				removeResourceManager((IResourceManagerControl) rm);
+			}
 		}
 	}
 
