@@ -32,7 +32,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IServiceConstants;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
@@ -360,11 +359,14 @@ public class RMServicesConfigurationWizard extends Wizard implements IRMConfigur
 	 * Constructor used when editing configuration of an existing resource
 	 * manager.
 	 */
-	public RMServicesConfigurationWizard(IResourceManagerControl resourceManager) {
+	/**
+	 * @since 5.0
+	 */
+	public RMServicesConfigurationWizard(IResourceManagerConfiguration config) {
 		this();
 		fUseDefaultNameAndDesc = false;
 		fUsingWorkingCopy = true;
-		setServiceProvider(((IServiceProvider) resourceManager.getConfiguration()).copy());
+		setServiceProvider(((IServiceProvider) config).copy());
 	}
 
 	/*

@@ -23,28 +23,29 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.ptp.ui.wizards.RMServicesConfigurationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public class EditResourceManagerAction extends Action {
-	
-	private IResourceManagerControl selectedRMManager;
-	private final Shell shell;
+
+	private IResourceManagerConfiguration fSelectedRM;
+	private final Shell fShell;
 
 	public EditResourceManagerAction(Shell shell) {
 		super(Messages.EditResourceManagerAction_0);
-		this.shell = shell;
+		fShell = shell;
 	}
 
 	public void dispose() {
 	}
 
+	@Override
 	public void run() {
-		final RMServicesConfigurationWizard wizard = new RMServicesConfigurationWizard(selectedRMManager);
-		
-		final WizardDialog dialog = new WizardDialog(shell, wizard);
+		final RMServicesConfigurationWizard wizard = new RMServicesConfigurationWizard(fSelectedRM);
+
+		final WizardDialog dialog = new WizardDialog(fShell, wizard);
 		int status = dialog.open();
 		if (status != Dialog.OK) {
 			return;
@@ -52,10 +53,13 @@ public class EditResourceManagerAction extends Action {
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-	
+
 	}
-	
-	public void setResourceManager(IResourceManagerControl rmManager) {
-		this.selectedRMManager = rmManager;
+
+	/**
+	 * @since 5.0
+	 */
+	public void setResourceManager(IResourceManagerConfiguration config) {
+		fSelectedRM = config;
 	}
 }

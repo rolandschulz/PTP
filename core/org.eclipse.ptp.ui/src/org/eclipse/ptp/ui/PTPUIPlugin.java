@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -33,15 +31,11 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.elements.IPElement;
-import org.eclipse.ptp.internal.ui.adapters.PropertyAdapterFactory;
-import org.eclipse.ptp.internal.ui.adapters.WorkbenchAdapterAdapterFactory;
 import org.eclipse.ptp.rmsystem.IResourceManagerFactory;
 import org.eclipse.ptp.ui.consoles.ConsoleManager;
 import org.eclipse.ptp.ui.managers.JobManager;
 import org.eclipse.ptp.ui.managers.MachineManager;
 import org.eclipse.ptp.ui.managers.RMManager;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.utils.DebugUtil;
 import org.eclipse.ptp.ui.wizards.RMConfigurationExtensionWizardPageFactory;
 import org.eclipse.ptp.ui.wizards.RMConfigurationWizardPageFactory;
@@ -55,12 +49,12 @@ import org.osgi.framework.BundleContext;
  * The main PTP user interface plugin.
  */
 public class PTPUIPlugin extends AbstractUIPlugin {
-    public static final String PLUGIN_ID = "org.eclipse.ptp.ui"; //$NON-NLS-1$
-    public static final String RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID = "runtimeModelPresentations"; //$NON-NLS-1$
-    
-	//The shared instance.
+	public static final String PLUGIN_ID = "org.eclipse.ptp.ui"; //$NON-NLS-1$
+	public static final String RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID = "runtimeModelPresentations"; //$NON-NLS-1$
+
+	// The shared instance.
 	private static PTPUIPlugin plugin;
-	
+
 	/**
 	 * Get the currently active workbench page from the active workbench window.
 	 * 
@@ -82,7 +76,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public static IWorkbenchWindow getActiveWorkbenchWindow() {
 		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
-	
+
 	/**
 	 * Returns the shared instance.
 	 */
@@ -96,13 +90,13 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 * @return the display instance
 	 */
 	public static Display getDisplay() {
-		Display display= Display.getCurrent();
+		Display display = Display.getCurrent();
 		if (display == null) {
-			display= Display.getDefault();
+			display = Display.getDefault();
 		}
-		return display;		
+		return display;
 	}
-	
+
 	/**
 	 * Get a unique identifier for this plugin (used for logging)
 	 * 
@@ -114,11 +108,12 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 
 		return getDefault().getBundle().getSymbolicName();
 	}
-	
+
 	/**
 	 * Generate a log message given an IStatus object
 	 * 
-	 * @param status IStatus object
+	 * @param status
+	 *            IStatus object
 	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
@@ -127,7 +122,8 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	/**
 	 * Generate a log message
 	 * 
-	 * @param msg message to log
+	 * @param msg
+	 *            message to log
 	 */
 	public static void log(String msg) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
@@ -136,29 +132,27 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	/**
 	 * Generate a log message for an exception
 	 * 
-	 * @param e exception used to generate message
+	 * @param e
+	 *            exception used to generate message
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e)); //$NON-NLS-1$
 	}
 
-	//Resource bundle.
-	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = 
-		new HashMap<String, RMConfigurationWizardPageFactory>();
-	private final HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>> extensionWizardPageFactories = 
-		new HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>>();
-	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations =
-		new HashMap<String, IRuntimeModelPresentation>();
-	private IMachineManager machineManager = null;	
+	// Resource bundle.
+	private final HashMap<String, RMConfigurationWizardPageFactory> configurationWizardPageFactories = new HashMap<String, RMConfigurationWizardPageFactory>();
+	private final HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>> extensionWizardPageFactories = new HashMap<String, ArrayList<RMConfigurationExtensionWizardPageFactory>>();
+	private final HashMap<String, IRuntimeModelPresentation> runtimeModelPresentations = new HashMap<String, IRuntimeModelPresentation>();
+	private IMachineManager machineManager = null;
 	private IJobManager jobManager = null;
 	private ConsoleManager consoleManager = null;
 	private RMManager rmManager = null;
-	
+
 	public PTPUIPlugin() {
 		super();
 		plugin = this;
-	}	
-	
+	}
+
 	/**
 	 * Get the console manager instance
 	 * 
@@ -167,7 +161,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public ConsoleManager getConsoleManager() {
 		return consoleManager;
 	}
-	
+
 	/**
 	 * Get the job manager instance
 	 * 
@@ -176,7 +170,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public IJobManager getJobManager() {
 		return jobManager;
 	}
-	
+
 	/**
 	 * Get the machine manager instance
 	 * 
@@ -185,31 +179,36 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public IMachineManager getMachineManager() {
 		return machineManager;
 	}
-	
+
 	/**
-	 * Get the extension wizard page factories associated with a resource manager factory
+	 * Get the extension wizard page factories associated with a resource
+	 * manager factory
 	 * 
-	 * @param factory resource manager factory
-	 * @return factories for creating extended wizard pages for this resource manager
+	 * @param factory
+	 *            resource manager factory
+	 * @return factories for creating extended wizard pages for this resource
+	 *         manager
 	 */
-	public RMConfigurationExtensionWizardPageFactory[] getRMConfigurationExtensionWizardPageFactories(IResourceManagerFactory factory) {
+	public RMConfigurationExtensionWizardPageFactory[] getRMConfigurationExtensionWizardPageFactories(
+			IResourceManagerFactory factory) {
 		List<RMConfigurationExtensionWizardPageFactory> list = extensionWizardPageFactories.get(factory.getClass().getName());
 		if (list != null) {
 			return list.toArray(new RMConfigurationExtensionWizardPageFactory[list.size()]);
 		}
 		return new RMConfigurationExtensionWizardPageFactory[0];
 	}
-	
+
 	/**
 	 * Get the wizard page factory associated with a resource manager factory
 	 * 
-	 * @param factory resource manager factory
+	 * @param factory
+	 *            resource manager factory
 	 * @return factory for creating wizard pages for this resource manager
 	 */
 	public RMConfigurationWizardPageFactory getRMConfigurationWizardPageFactory(IResourceManagerFactory factory) {
 		return configurationWizardPageFactories.get(factory.getClass().getName());
 	}
-	
+
 	/**
 	 * Get the RM manager instance
 	 * 
@@ -218,34 +217,44 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public RMManager getRMManager() {
 		return rmManager;
 	}
-	
+
 	/**
 	 * Get the runtime model presentation for the given resource manager
 	 * 
-	 * @param id resource manager ID
+	 * @param id
+	 *            resource manager ID
 	 * @return runtime model presentation
 	 */
 	public IRuntimeModelPresentation getRuntimeModelPresentation(String id) {
 		return runtimeModelPresentations.get(id);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		DebugUtil.configurePluginDebugOptions();
-		registerAdapterFactories();
 		retrieveRuntimeModelPresentations();
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
 		consoleManager = new ConsoleManager();
 		rmManager = new RMManager();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		machineManager.shutdown();
@@ -258,32 +267,20 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		rmManager = null;
 		plugin = null;
 	}
-	
-	/**
-	 * Register adapter factories
-	 */
-	private void registerAdapterFactories() {
-		IAdapterManager manager = Platform.getAdapterManager();
-		IAdapterFactory factory = new PropertyAdapterFactory();
-		manager.registerAdapters(factory, IPElement.class);
-		manager.registerAdapters(factory, IElement.class);
-		factory = new WorkbenchAdapterAdapterFactory();
-		manager.registerAdapters(factory, IPElement.class);
-	}
 
 	/**
 	 * Locate and load runtime model presentation extensions
 	 */
 	private void retrieveRuntimeModelPresentations() {
-    	runtimeModelPresentations.clear();
-    	
-    	IExtensionRegistry registry = Platform.getExtensionRegistry();
-    	IExtensionPoint extWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID);
+		runtimeModelPresentations.clear();
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extWizardPoint = registry.getExtensionPoint(PLUGIN_ID, RUNTIME_MODEL_PRESENTATION_EXTENSION_POINT_ID);
 		final IExtension[] extWizardExtensions = extWizardPoint.getExtensions();
-		
+
 		for (IExtension ext : extWizardExtensions) {
 			final IConfigurationElement[] elements = ext.getConfigurationElements();
-		
+
 			for (IConfigurationElement ce : elements) {
 				try {
 					IRuntimeModelPresentation presentation = (IRuntimeModelPresentation) ce.createExecutableExtension("class"); //$NON-NLS-1$

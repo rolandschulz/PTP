@@ -23,6 +23,7 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 public interface IModelManager extends IModelPresentation {
@@ -92,8 +93,9 @@ public interface IModelManager extends IModelPresentation {
 	 * Remove resource managers from the model.
 	 * 
 	 * @param removedRMs
+	 * @since 5.0
 	 */
-	public void removeResourceManagers(IResourceManagerControl[] removedRMs);
+	public void removeResourceManagers(IResourceManagerConfiguration[] removedRMs);
 
 	/**
 	 * Save the resource manager configurations

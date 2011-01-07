@@ -67,15 +67,23 @@ import org.eclipse.ui.part.ViewPart;
 
 public class JobsListView extends ViewPart {
 	private final class MMChildListener implements IModelManagerChildListener {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
 		 */
 		public void handleEvent(IChangedResourceManagerEvent e) {
 			// Don't need to do anything
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.INewResourceManagerEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
+		 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
 		 */
 		public void handleEvent(INewResourceManagerEvent e) {
 			/*
@@ -83,28 +91,37 @@ public class JobsListView extends ViewPart {
 			 * machines are added to the model.
 			 */
 			final IPResourceManager rm = e.getResourceManager();
-	        rm.addChildListener(resourceManagerListener);
+			rm.addChildListener(resourceManagerListener);
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent(org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
 		 */
 		// Update the button here.
 		public void handleEvent(IRemoveResourceManagerEvent e) {
 			/*
-			 * Removed resource manager child listener when resource manager is removed.
+			 * Removed resource manager child listener when resource manager is
+			 * removed.
 			 */
 			e.getResourceManager().removeChildListener(resourceManagerListener);
-		}		
+		}
 	}
-	
+
 	private final class QueueChildListener implements IQueueChildListener {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IChangedJobEvent)
 		 */
 		public void handleEvent(IChangedJobEvent e) {
 			update(e.getJobs().toArray(new IPJob[0]));
-			
+
 			// Refresh the terminate job button
 			// TODO: scalability bottleneck
 			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
@@ -112,11 +129,15 @@ public class JobsListView extends ViewPart {
 					terminateAllAction.updateTerminateJobState();
 				}
 			});
-			
+
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(final INewJobEvent e) {
 			if (fColumnsNeedUpdating) {
@@ -128,53 +149,86 @@ public class JobsListView extends ViewPart {
 			}
 			refresh();
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
 			refresh();
 		}
 	}
-	
+
 	private final class RMChildListener implements IResourceManagerChildListener {
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedMachineEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.
+		 * IResourceManagerChangedMachineEvent)
 		 */
 		public void handleEvent(IChangedMachineEvent e) {
 			// Don't need to do anything
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerChangedQueueEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.
+		 * IResourceManagerChangedQueueEvent)
 		 */
 		public void handleEvent(IChangedQueueEvent e) {
 			// Can safely ignore
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerNewMachineEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.
+		 * IResourceManagerNewMachineEvent)
 		 */
 		public void handleEvent(INewMachineEvent e) {
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
 			for (IPQueue queue : e.getQueues()) {
 				queue.addChildListener(queueChildListener);
 			}
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveMachineEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.
+		 * IResourceManagerRemoveMachineEvent)
 		 */
 		public void handleEvent(IRemoveMachineEvent e) {
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener#handleEvent(org.eclipse.ptp.core.elements.events.IResourceManagerRemoveQueueEvent)
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.
+		 * IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
 			for (IPQueue queue : e.getQueues()) {
@@ -196,17 +250,21 @@ public class JobsListView extends ViewPart {
 	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
 	private final IQueueChildListener queueChildListener = new QueueChildListener();
 
-	private final Set<IAttributeDefinition<?,?,?>> colDefs = Collections.synchronizedSet(new HashSet<IAttributeDefinition<?,?,?>>());
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	private final Set<IAttributeDefinition<?, ?, ?>> colDefs = Collections
+			.synchronizedSet(new HashSet<IAttributeDefinition<?, ?, ?>>());
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout());
-		
-		viewer = new TableViewer(parent, SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
+
+		viewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
 
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
@@ -214,6 +272,7 @@ public class JobsListView extends ViewPart {
 		viewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {
 			}
+
 			public Object[] getElements(Object inputElement) {
 				/*
 				 * Just get jobs from the queue if one is selected
@@ -228,8 +287,8 @@ public class JobsListView extends ViewPart {
 					return getAllJobs(fSelectedRM).toArray(new IPJob[0]);
 				}
 				/*
-				 * Otherwise get all jobs from all queues
-				 * TODO: should probably not do this!
+				 * Otherwise get all jobs from all queues TODO: should probably
+				 * not do this!
 				 */
 				Set<IPJob> jobs = new HashSet<IPJob>();
 				for (IPResourceManager rm : PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManagers()) {
@@ -237,60 +296,66 @@ public class JobsListView extends ViewPart {
 				}
 				return jobs.toArray(new IPJob[0]);
 			}
+
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			}
 		});
 		viewer.setSorter(new ViewerSorter() {
+			@Override
 			public int compare(Viewer viewer, Object j1, Object j2) {
-				return ((IPJob)j1).getName().compareTo(((IPJob)j2).getName());
+				return ((IPJob) j1).getName().compareTo(((IPJob) j2).getName());
 			}
 		});
 
 		createColumns(viewer);
 
 		getSite().setSelectionProvider(viewer);
-		
+
 		// Use view toolbar
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
-		
+
 		terminateAllAction = new TerminateJobFromListAction(this);
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
-		
-		
-		/*terminateAllAction = new TerminateJobAction(viewer);
-		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);*/
-		
+
+		/*
+		 * terminateAllAction = new TerminateJobAction(viewer);
+		 * toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP,
+		 * terminateAllAction);
+		 */
+
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		viewer.setInput(mm.getUniverse());
 
 		/*
-	     * Add us to any existing RM's. I guess it's possible we could
-	     * miss a RM if a new event arrives while we're doing this, but is 
-	     * it a problem?
-	     */
-	    for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-	        rm.addChildListener(resourceManagerListener);
-	        for (IPQueue queue : rm.getQueues()) {
-	        	queue.addChildListener(queueChildListener);
-	        }
-	    }
-	    mm.addListener(modelManagerListener);
+		 * Add us to any existing RM's. I guess it's possible we could miss a RM
+		 * if a new event arrives while we're doing this, but is it a problem?
+		 */
+		for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
+			rm.addChildListener(resourceManagerListener);
+			for (IPQueue queue : rm.getQueues()) {
+				queue.addChildListener(queueChildListener);
+			}
+		}
+		mm.addListener(modelManagerListener);
 
-	    /*
-	     * Link this view to the ResourceManagerView
-	     */
-	    PTPUIPlugin.getDefault().getRMManager().addRMSelectionListener(new IRMSelectionListener() {
+		/*
+		 * Link this view to the ResourceManagerView
+		 */
+		PTPUIPlugin.getDefault().getRMManager().addRMSelectionListener(new IRMSelectionListener() {
 			public void selectionChanged(ISelection selection) {
 				IPResourceManager oldRM = fSelectedRM;
 				fSelectedQueue = null;
 				if (selection.isEmpty()) {
 					fSelectedRM = null;
 				} else {
-					TreePath path = ((ITreeSelection)selection).getPaths()[0];
-					fSelectedRM = (IPResourceManager)path.getFirstSegment();
-					if (path.getLastSegment() instanceof IPQueue) {
-						fSelectedQueue = (IPQueue)path.getLastSegment();
+					TreePath path = ((ITreeSelection) selection).getPaths()[0];
+					Object segment = path.getFirstSegment();
+					if (segment instanceof IPResourceManager) {
+						fSelectedRM = (IPResourceManager) segment;
+						if (path.getLastSegment() instanceof IPQueue) {
+							fSelectedQueue = (IPQueue) path.getLastSegment();
+						}
 					}
 				}
 				if (oldRM != fSelectedRM) {
@@ -299,17 +364,19 @@ public class JobsListView extends ViewPart {
 				refresh();
 			}
 
-			public void setDefault(IPResourceManager rm) {
+			public void setDefault(Object rm) {
 				// Ignore
 			}
-	    });
+		});
 	}
-	
+
 	public TableViewer getViewer() {
 		return viewer;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
@@ -323,11 +390,15 @@ public class JobsListView extends ViewPart {
 	 */
 	private void addColumn(final IAttributeDefinition<?, ?, ?> attrDef, boolean resizable) {
 		TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
-		
-		column.setLabelProvider(new ColumnLabelProvider(){
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.ColumnLabelProvider#getImage(java.lang.Object)
+		column.setLabelProvider(new ColumnLabelProvider() {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.jface.viewers.ColumnLabelProvider#getImage(java.lang
+			 * .Object)
 			 */
 			@Override
 			public Image getImage(Object element) {
@@ -336,7 +407,8 @@ public class JobsListView extends ViewPart {
 				 * null and just use the text.
 				 */
 				if (attrDef == JobAttributes.getStateAttributeDefinition()) {
-					IWorkbenchAdapter adapter = (IWorkbenchAdapter)Platform.getAdapterManager().getAdapter(element, IWorkbenchAdapter.class);
+					IWorkbenchAdapter adapter = (IWorkbenchAdapter) Platform.getAdapterManager().getAdapter(element,
+							IWorkbenchAdapter.class);
 					if (adapter != null) {
 						return adapter.getImageDescriptor(element).createImage();
 					}
@@ -344,8 +416,12 @@ public class JobsListView extends ViewPart {
 				return null;
 			}
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang.Object)
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.jface.viewers.ColumnLabelProvider#getText(java.lang
+			 * .Object)
 			 */
 			@Override
 			public String getText(Object element) {
@@ -353,21 +429,21 @@ public class JobsListView extends ViewPart {
 				 * If this is not the state column, then use the attribute text.
 				 * If it is the state column, just return null an use the icon.
 				 */
-				IPJob job = (IPJob)element;
+				IPJob job = (IPJob) element;
 				if (attrDef != JobAttributes.getStateAttributeDefinition()) {
-					IAttribute<?,?,?> attr = job.getAttribute(attrDef.getId());
+					IAttribute<?, ?, ?> attr = job.getAttribute(attrDef.getId());
 					if (attr != null) {
 						return attr.getValueAsString();
 					}
 				}
 				return null;
 			}
-			
+
 		});
 		column.getColumn().setResizable(resizable);
 		column.getColumn().setMoveable(true);
 		// this will need to sort by the col
-		//column.getColumn().addSelectionListener(getHeaderListener());
+		// column.getColumn().addSelectionListener(getHeaderListener());
 		String name = attrDef.getName();
 		column.getColumn().setText(name);
 		PixelConverter converter = new PixelConverter(viewer.getControl());
@@ -375,30 +451,29 @@ public class JobsListView extends ViewPart {
 		column.getColumn().setWidth(colWidth);
 		colDefs.add(attrDef);
 	}
-	
+
 	/**
 	 * @param tableViewer
 	 * @param job
 	 */
 	private void addColumns(TableViewer tableViewer, IPJob job) {
 		if (job != null) {
-			for (IAttribute<?,?,?> attr : job.getAttributes()) {
-				IAttributeDefinition<?,?,?> attrDef = attr.getDefinition();
+			for (IAttribute<?, ?, ?> attr : job.getAttributes()) {
+				IAttributeDefinition<?, ?, ?> attrDef = attr.getDefinition();
 				if (!colDefs.contains(attrDef) && attrDef.getDisplay()) {
 					addColumn(attrDef, true);
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * Create the columns for the table. This is done whenever the selection
-	 * in the RM view changes.
+	 * Create the columns for the table. This is done whenever the selection in
+	 * the RM view changes.
 	 * 
-	 * 1. Always create the state and name columns.
-	 * 2. Assume that job attributes from a single RM are always constant, so only
-	 *    look at the first job from any queue.
-	 * 3. Do this for each RM (if no RM selected)
+	 * 1. Always create the state and name columns. 2. Assume that job
+	 * attributes from a single RM are always constant, so only look at the
+	 * first job from any queue. 3. Do this for each RM (if no RM selected)
 	 * 
 	 * @param tableViewer
 	 */
@@ -407,12 +482,12 @@ public class JobsListView extends ViewPart {
 			column.dispose();
 		}
 		colDefs.clear();
-		
+
 		addColumn(JobAttributes.getStateAttributeDefinition(), false);
 		addColumn(ElementAttributes.getNameAttributeDefinition(), true);
 
 		IPJob[] jobs = getFirstJobs();
-		
+
 		if (jobs.length > 0) {
 			for (IPJob job : jobs) {
 				addColumns(tableViewer, job);
@@ -422,7 +497,7 @@ public class JobsListView extends ViewPart {
 			fColumnsNeedUpdating = true;
 		}
 	}
-	
+
 	/**
 	 * Find all jobs from all queues belonging to a RM
 	 * 
@@ -438,18 +513,18 @@ public class JobsListView extends ViewPart {
 		}
 		return jobList;
 	}
-	
+
 	/**
-	 * Finds the first few jobs to use to create the table columns
-	 * If an RM queue is selected, just return the first job
-	 * If an RM is selected, return the first job from one of the queues 
-	 * If no RM is selected, return the first job from one of the queues in each RM
+	 * Finds the first few jobs to use to create the table columns If an RM
+	 * queue is selected, just return the first job If an RM is selected, return
+	 * the first job from one of the queues If no RM is selected, return the
+	 * first job from one of the queues in each RM
 	 * 
 	 * @return first job or null if there are no jobs
 	 */
 	private IPJob[] getFirstJobs() {
 		List<IPJob> jobsList = new ArrayList<IPJob>();
-		
+
 		if (fSelectedQueue != null) {
 			IPJob job = getFirstJob(fSelectedQueue);
 			if (job != null) {
@@ -476,7 +551,7 @@ public class JobsListView extends ViewPart {
 		}
 		return jobsList.toArray(new IPJob[0]);
 	}
-	
+
 	/**
 	 * Get the first job from the queue
 	 * 
@@ -490,7 +565,7 @@ public class JobsListView extends ViewPart {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Refresh the viewer from the model.
 	 */
@@ -507,7 +582,8 @@ public class JobsListView extends ViewPart {
 	/**
 	 * Update the viewer if the supplied jobs have changed
 	 * 
-	 * @param jobs array of jobs that have changed
+	 * @param jobs
+	 *            array of jobs that have changed
 	 */
 	private void update(final IPJob[] jobs) {
 		if (!viewer.getTable().isDisposed()) {

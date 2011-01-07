@@ -23,45 +23,49 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.rm.RMModelManager;
+import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoveResourceManagersAction extends Action {
-	
-	private IResourceManagerControl[] selectedRMManagers;
-	private final Shell shell;
+
+	private IResourceManagerConfiguration[] fSelectedRMs;
+	private final Shell fShell;
 
 	public RemoveResourceManagersAction(Shell shell) {
 		super(Messages.RemoveResourceManagersAction_0);
-		this.shell = shell;
+		fShell = shell;
 	}
 
+	@Override
 	public void run() {
 		String rmNames = ""; //$NON-NLS-1$
-		for (int i = 0; i < selectedRMManagers.length; i++) {
+		for (int i = 0; i < fSelectedRMs.length; i++) {
 			if (i > 0) {
 				rmNames += ","; //$NON-NLS-1$
 			}
-			rmNames += "\n\t" + selectedRMManagers[i].getName(); //$NON-NLS-1$
+			rmNames += "\n\t" + fSelectedRMs[i].getName(); //$NON-NLS-1$
 		}
-		
-		boolean remove = MessageDialog.openConfirm(shell,
-				Messages.RemoveResourceManagersAction_0,
-				Messages.RemoveResourceManagersAction_1
-				+ rmNames);
-		
+
+		boolean remove = MessageDialog.openConfirm(fShell, Messages.RemoveResourceManagersAction_0,
+				Messages.RemoveResourceManagersAction_1 + rmNames);
+
 		if (remove) {
-			PTPCorePlugin.getDefault().getModelManager().removeResourceManagers(selectedRMManagers);
+			PTPCorePlugin.getDefault().getModelManager().removeResourceManagers(fSelectedRMs);
+			RMModelManager.getInstance().removeResourceManagers(fSelectedRMs);
 		}
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-	
+
 	}
 
-	public void setResourceManager(IResourceManagerControl[] rmManagers) {
-		this.selectedRMManagers = rmManagers.clone();
+	/**
+	 * @since 5.0
+	 */
+	public void setResourceManagers(IResourceManagerConfiguration[] rms) {
+		fSelectedRMs = rms;
 	}
 
 }

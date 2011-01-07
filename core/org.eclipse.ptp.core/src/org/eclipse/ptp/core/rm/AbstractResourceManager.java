@@ -14,11 +14,12 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.rm.exceptions.ResourceManagerException;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
+import org.eclipse.ptp.rmsystem.IResourceManagerMenuContribution;
 
 /**
  * @since 5.0
  */
-public abstract class AbstractResourceManager implements IResourceManager {
+public abstract class AbstractResourceManager implements IResourceManager, IResourceManagerMenuContribution {
 	private final ListenerList fListeners = new ListenerList();
 	private final IJobTemplateFactory fJobTemplateFactory;
 	private IResourceManagerConfiguration fRMConfig;
@@ -58,6 +59,22 @@ public abstract class AbstractResourceManager implements IResourceManager {
 	 */
 	public void deleteJobTemplate(IJobTemplate jobTemplate) throws ResourceManagerException {
 		fJobTemplateFactory.deleteJobTemplate(jobTemplate);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings({ "rawtypes" })
+	public Object getAdapter(Class adapter) {
+		if (adapter.isInstance(this)) {
+			return this;
+		}
+		if (adapter == IResourceManagerConfiguration.class) {
+			return getConfiguration();
+		}
+		return null;
 	}
 
 	/*
