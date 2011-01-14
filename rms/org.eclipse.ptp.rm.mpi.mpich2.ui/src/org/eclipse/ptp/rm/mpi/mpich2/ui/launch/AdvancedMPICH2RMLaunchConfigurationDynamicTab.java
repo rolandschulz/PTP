@@ -133,6 +133,9 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 		super(dialog);
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout());
@@ -159,6 +162,9 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 		argsText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 		return null;
@@ -173,11 +179,17 @@ public class AdvancedMPICH2RMLaunchConfigurationDynamicTab extends BaseRMLaunchC
 		return null;
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	@Override
 	public String getText() {
 		return Messages.AdvancedMPICH2RMLaunchConfigurationDynamicTab_Title;
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
 		configuration.setAttribute(MPICH2LaunchConfiguration.ATTR_USEDEFAULTARGUMENTS,
 				MPICH2LaunchConfigurationDefaults.ATTR_USEDEFAULTARGUMENTS);
