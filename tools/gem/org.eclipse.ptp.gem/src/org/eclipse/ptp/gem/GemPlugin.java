@@ -16,7 +16,8 @@
 
 package org.eclipse.ptp.gem;
 
-import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,9 +27,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.service.datalocation.Location;
-import org.eclipse.ptp.gem.messages.Messages;
 import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -42,52 +41,17 @@ import org.osgi.service.prefs.Preferences;
  */
 public class GemPlugin extends AbstractUIPlugin {
 
-	// The image cache for this plug-in
-	private static Map<ImageDescriptor, Image> imageCache = new HashMap<ImageDescriptor, Image>();
+	// The shared instance
+	private static GemPlugin plugin;
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.ptp.gem"; //$NON-NLS-1$
 
-	// The shared instance
-	private static GemPlugin plugin;
-
-	// Holds the currently selected file
-	public IStructuredSelection selection;
-
 	// The configuration preferences
 	private IEclipsePreferences gemPreferences;
 
-	/**
-	 * Constructor.
-	 */
-	public GemPlugin() {
-	}
-
-	/**
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		saveConfigPrefs();
-		super.start(context);
-		plugin = this;
-	}
-
-	/**
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-
-		// Clear the image cache
-		Iterator<Image> iter = imageCache.values().iterator();
-		while (iter.hasNext()) {
-			iter.next().dispose();
-		}
-		imageCache.clear();
-		iter = null;
-		imageCache = null;
-	}
+	// The image cache for this plug-in
+	private static Map<ImageDescriptor, Image> imageCache = new HashMap<ImageDescriptor, Image>();
 
 	/**
 	 * Returns the shared instance.
@@ -100,27 +64,17 @@ public class GemPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path.
-	 * 
-	 * @param path The path to the shared resource.
-	 * @return ImageDescriptor The image descriptor.
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	/**
 	 * Gets the requested Image resource.
 	 * 
-	 * @param imageDescriptor The ImagesDescriptor mapped to its Image object.
+	 * @param imageDescriptor
+	 *            The ImagesDescriptor mapped to its Image object.
 	 * @return Image The requested Image.
 	 */
 	public static Image getImage(ImageDescriptor imageDescriptor) {
 		if (imageDescriptor == null) {
 			return null;
 		}
-		Image image = (Image) imageCache.get(imageDescriptor);
+		Image image = imageCache.get(imageDescriptor);
 		if (image == null) {
 			image = imageDescriptor.createImage();
 			imageCache.put(imageDescriptor, image);
@@ -129,23 +83,44 @@ public class GemPlugin extends AbstractUIPlugin {
 	}
 
 	/**
+	 * Returns an image descriptor for the image file at the given plug-in
+	 * relative path.
+	 * 
+	 * @param path
+	 *            The path to the shared resource.
+	 * @return ImageDescriptor The image descriptor.
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public GemPlugin() {
+		super();
+	}
+
+	/**
 	 * Answer the configuration location for this plug-in.
 	 * 
 	 * @param none
-	 * @return File The GEM plugin's configuration directory (not
+	 * @return URI The GEM plugin's configuration directory (not
 	 *         <code>null</code>)
 	 */
-	public File getConfigDir() {
-		Location location = Platform.getConfigurationLocation();
+	public URI getConfigDir() {
+		final Location location = Platform.getConfigurationLocation();
 		if (location != null) {
-			URL configURL = location.getURL();
+			final URL configURL = location.getURL();
 			if (configURL != null && configURL.getProtocol().startsWith("file")) { //$NON-NLS-1$
-				return new File(configURL.getFile(), PLUGIN_ID);
+				try {
+					return configURL.toURI();
+				} catch (final URISyntaxException e) {
+					GemUtilities.logExceptionDetail(e);
+				}
 			}
 		}
-		// If the configuration directory is read-only, then return an alternate
-		// location rather than null or throwing an Exception.
-		return getStateLocation().toFile();
+		return null;
 	}
 
 	/**
@@ -163,6 +138,16 @@ public class GemPlugin extends AbstractUIPlugin {
 	}
 
 	/**
+	 * Return the plug-in's version.
+	 * 
+	 * @param none
+	 * @return Version The current version of this plug-in.
+	 */
+	public Version getVersion() {
+		return new Version((String) getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION));
+	}
+
+	/**
 	 * Save the configuration preferences if they have been loaded.
 	 * 
 	 * @param none
@@ -172,32 +157,39 @@ public class GemPlugin extends AbstractUIPlugin {
 		if (this.gemPreferences != null) {
 			try {
 				this.gemPreferences.flush();
-			} catch (BackingStoreException bse) {
-				GemUtilities.showExceptionDialog(Messages.GemPlugin_2, bse);
-				GemUtilities.logError(Messages.GemPlugin_3, bse);
+			} catch (final BackingStoreException e) {
+				GemUtilities.logExceptionDetail(e);
 			}
 		}
 	}
 
 	/**
-	 * Return the plug-in's version.
-	 * 
-	 * @param none
-	 * @return Version The current version of this plug-in.
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public Version getVersion() {
-		return new Version((String) getBundle().getHeaders().get(
-				org.osgi.framework.Constants.BUNDLE_VERSION));
+	@Override
+	public void start(BundleContext context) throws Exception {
+		saveConfigPrefs();
+		super.start(context);
+		plugin = this;
 	}
 
 	/**
-	 * Returns the ID for this plug-in.
-	 * 
-	 * @param none
-	 * @return String The ID for this plug-in.
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public static String getPluginId() {
-		return "org.eclipse.ptp.gem"; //$NON-NLS-1$
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+
+		// Clear the image cache
+		Iterator<Image> iter = imageCache.values().iterator();
+		while (iter.hasNext()) {
+			iter.next().dispose();
+		}
+
+		imageCache.clear();
+		iter = null;
+		imageCache = null;
 	}
 
 }

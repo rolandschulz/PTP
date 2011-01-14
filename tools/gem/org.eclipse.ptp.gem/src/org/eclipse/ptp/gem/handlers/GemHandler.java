@@ -16,30 +16,29 @@
 
 package org.eclipse.ptp.gem.handlers;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.gem.GemPlugin;
 import org.eclipse.ptp.gem.messages.Messages;
+import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
+import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 
 /**
- * Handler for associated Analyzer command declared in plugin.xml.
+ * Handler for associated GEM commands declared in plugin.xml.
  * 
  * Extends AbstractHandler, an IHandler base class.
  * 
@@ -50,117 +49,97 @@ public class GemHandler extends AbstractHandler {
 
 	/**
 	 * Constructor.
+	 * 
+	 * @param none
 	 */
 	public GemHandler() {
 		super();
 	}
 
 	/**
-	 * The command has been executed, so extract extract the needed information
-	 * from the application context.
+	 * The command has been executed, so extract the needed information from the
+	 * application context.
+	 * 
+	 * @param event
+	 *            The Event to process
+	 * @return Object <code>null</code>
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		// Find the active file
-		IWorkbench wb = PlatformUI.getWorkbench();
-		IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
-		IWorkbenchPage page = window.getActivePage();
-		IEditorPart editor = page.getActiveEditor();
-		String sourceFilePath = ""; //$NON-NLS-1$
+		// Process the command associated with the event
+		final IWorkbench wb = PlatformUI.getWorkbench();
+		final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+		final IWorkbenchPage page = window.getActivePage();
+		final Command cmd = event.getCommand();
+		final String cmdString = cmd.getId();
 
-		// Get the command string
-		Command cmd = event.getCommand();
-		String cmdString = cmd.getId();
-
-		// If we are just changing numprocs then do so and break early (don't
-		// bother with curr file)
+		// If we are just changing number of processes, do so and break early
 		if (cmdString.equals("org.eclipse.ptp.gem.commands.numprocsCommand")) { //$NON-NLS-1$
-			GemUtilities.setNumProcs();
+			GemUtilities.setNumProcesses();
 			return null;
 		}
 
-		// Likewise, if we are just opening the console do so and break
+		// Likewise, if we are just opening the console, do so and break early
 		if (cmdString.equals("org.eclipse.ptp.gem.commands.consoleCommand")) { //$NON-NLS-1$
 			try {
 				page.showView(GemConsole.ID);
-			} catch (PartInitException pie) {
-				GemUtilities.showExceptionDialog(Messages.GemHandler_3, pie);
-				GemUtilities.logError(Messages.GemHandler_4, pie);
+			} catch (final PartInitException e) {
+				GemUtilities.logExceptionDetail(e);
 			}
 			return null;
 		}
 
-		// Otherwise do the prep and open the Analyzer View
-		// If no file is open get it from the one step history, if that
-		// is also null then break early.
+		// Otherwise do analysis, filter extension and do the work
+		final IEditorPart editor = page.getActiveEditor();
+		IFile inputFile = null;
+		boolean isSourceFileExtension = false;
+
 		if (editor == null) {
-			sourceFilePath = GemUtilities.getLastFile();
-			if (sourceFilePath.equals("")) { //$NON-NLS-1$
-				GemUtilities.showErrorDialog(Messages.GemHandler_6, Messages.GemHandler_7);
-				return null;
-			}
-		} else {
-			// Extract the path
-			IEditorInput input = editor.getEditorInput();
-			IPath path = ((FileEditorInput) input).getPath();
-			sourceFilePath = path.toString();
-		}
-
-		// Now that we have a valid path, save it to the one step history
-		GemUtilities.saveLastFile(sourceFilePath);
-
-		// Filter extensions
-		int dotIndex = sourceFilePath.lastIndexOf("."); //$NON-NLS-1$
-		if (dotIndex == -1) {
-			GemUtilities.showErrorDialog(Messages.GemHandler_9, Messages.GemHandler_10);
+			GemUtilities.showErrorDialog(Messages.GemHandler_0);
 			return null;
 		}
-		String extension = sourceFilePath.substring(dotIndex);
-		boolean isSourceFileExtension = extension.equals(".c") //$NON-NLS-1$
-				|| extension.equals(".cpp") || extension.equals(".c++") //$NON-NLS-1$ //$NON-NLS-2$
-				|| extension.equals(".cc") || extension.equals(".cp"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (isSourceFileExtension || extension.equals(".log")) { //$NON-NLS-1$
-			// If it was a log then don't use the path to it, use the path to
-			// the file it was created from.
-			if (extension.equals(".log")) { //$NON-NLS-1$
-				File logFile = new File(sourceFilePath);
-				try {
-					Scanner scanner = new Scanner(logFile);
 
-					// skip first line
-					scanner.nextLine();
-					sourceFilePath = scanner.nextLine();
-					int index = sourceFilePath.lastIndexOf(" "); //$NON-NLS-1$
-					sourceFilePath = sourceFilePath.substring(0, index);
-					index = sourceFilePath.lastIndexOf(" "); //$NON-NLS-1$
-					sourceFilePath = sourceFilePath.substring(index + 1, sourceFilePath.length());
-				} catch (FileNotFoundException e) {
+		final IFileEditorInput editorInput = (IFileEditorInput) editor.getEditorInput();
+		inputFile = editorInput.getFile();
+		final String extension = inputFile.getFileExtension();
+		if (extension != null) {
+			// The most common C & C++ source file extensions
+			isSourceFileExtension = extension.equals("c") //$NON-NLS-1$
+					|| extension.equals("cpp") || extension.equals("c++") //$NON-NLS-1$ //$NON-NLS-2$
+					|| extension.equals("cc") || extension.equals("cp"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		if (isSourceFileExtension) {
+			// Save most recent file reference to hidden preference as a URI
+			GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
+
+			// Open the Console View if the user wants it
+			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+			try {
+				if (pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON)) {
+					page.showView(GemConsole.ID);
 				}
+			} catch (final PartInitException e) {
+				GemUtilities.logExceptionDetail(e);
 			}
 
-			// Open the Console View
+			// Open Analyzer and Browser Views in order determined by preference
 			try {
-				page.showView(GemConsole.ID);
-			} catch (PartInitException pie) {
-				GemUtilities.showExceptionDialog(Messages.GemHandler_17, pie);
-				GemUtilities.logError(Messages.GemHandler_18, pie);
+				final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
+				if (activeView.equals("analyzer")) { //$NON-NLS-1$
+					page.showView(GemBrowser.ID);
+					page.showView(GemAnalyzer.ID);
+				} else {
+					page.showView(GemAnalyzer.ID);
+					page.showView(GemBrowser.ID);
+				}
+				GemUtilities.initGemViews(inputFile, true, true);
+			} catch (final PartInitException e) {
+				GemUtilities.logExceptionDetail(e);
 			}
-
-			String logFilePath = GemUtilities.getLogFilePathAndName(sourceFilePath);
-
-			// Open the Analyzer View
-			try {
-				page.showView(GemAnalyzer.ID);
-				GemUtilities.activateAnalyzer(sourceFilePath, logFilePath, true, false);
-			} catch (PartInitException pie) {
-				GemUtilities.showExceptionDialog(Messages.GemHandler_19, pie);
-				GemUtilities.logError(Messages.GemHandler_20, pie);
-			}
-
 		} else {
-			GemUtilities.showErrorDialog(Messages.GemHandler_21, Messages.GemHandler_22);
+			GemUtilities.showErrorDialog(Messages.GemHandler_1);
 		}
 		return null;
 	}
-
 }

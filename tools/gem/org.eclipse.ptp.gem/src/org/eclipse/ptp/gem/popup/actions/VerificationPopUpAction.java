@@ -17,18 +17,24 @@
 package org.eclipse.ptp.gem.popup.actions;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.gem.GemPlugin;
 import org.eclipse.ptp.gem.messages.Messages;
 import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.util.GemUtilities;
+import org.eclipse.ptp.gem.views.GemAnalyzer;
+import org.eclipse.ptp.gem.views.GemBrowser;
+import org.eclipse.ptp.gem.views.GemConsole;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Object action implementation for associated GEM actions declared in
@@ -39,14 +45,14 @@ import org.eclipse.ui.IWorkbenchPart;
  * 
  * @see org.eclipse.ui.IObjectActionDelegate
  */
-public class HbvLogFilePopUpAction implements IObjectActionDelegate {
+public class VerificationPopUpAction implements IObjectActionDelegate {
 
 	private IStructuredSelection selection;
 
 	/**
 	 * Constructor.
 	 */
-	public HbvLogFilePopUpAction() {
+	public VerificationPopUpAction() {
 		super();
 	}
 
@@ -60,25 +66,47 @@ public class HbvLogFilePopUpAction implements IObjectActionDelegate {
 
 		// Make sure the file selection is valid
 		if (this.selection.toString().equals("<empty selection>")) { //$NON-NLS-1$
-			GemUtilities.showErrorDialog(Messages.HbvLogFilePopUpAction_0);
+			GemUtilities.showErrorDialog(Messages.VerificationPopUpAction_0);
 		} else {
-			final IFile logFile = (IFile) this.selection.getFirstElement();
-			String hbv = GemPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.GEM_PREF_HBV_PATH);
+			final IFile inputFile = (IFile) this.selection.getFirstElement();
+			final String id = action.getId();
+			final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			final IWorkbenchPage page = window.getActivePage();
+			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
 
-			// Sync the project resources with the underlying file system
-			final String projectName = logFile.getProject().getName();
-			final IProject currentProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			GemUtilities.refreshProject(currentProject);
-
-			// Check the log file and execute the command via thread
-			if (logFile.exists()) {
-				if (hbv != "") { //$NON-NLS-1$
-					hbv += "/"; //$NON-NLS-1$
+			// Open the Console View
+			if (pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON)) {
+				try {
+					page.showView(GemConsole.ID);
+				} catch (final PartInitException e) {
+					GemUtilities.logExceptionDetail(e);
 				}
-				hbv += "ispUI " + logFile.getLocationURI().getPath(); //$NON-NLS-1$
-				GemUtilities.runCommandAsThread(hbv);
-			} else {
-				GemUtilities.showErrorDialog(Messages.HbvLogFilePopUpAction_1);
+			}
+
+			// Open GEM views
+			try {
+				final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
+				if (activeView.equals("analyzer")) { //$NON-NLS-1$
+					page.showView(GemBrowser.ID);
+					page.showView(GemAnalyzer.ID);
+				} else {
+					page.showView(GemAnalyzer.ID);
+					page.showView(GemBrowser.ID);
+				}
+				final boolean isValidSourceFile = id
+						.equals("org.eclipse.ptp.gem.verificationPopupC") //$NON-NLS-1$
+						|| id.equals("org.eclipse.ptp.gem.verificationPopupCpp") //$NON-NLS-1$
+						|| id.equals("org.eclipse.ptp.gem.verificationPopupC++") //$NON-NLS-1$
+						|| id.equals("org.eclipse.ptp.gem.verificationPopupCp") //$NON-NLS-1$
+						|| id.equals("org.eclipse.ptp.gem.verificationPopupCc"); //$NON-NLS-1$
+
+				// if !isValidSourceFile, then its a .gem profiled executable
+				if (isValidSourceFile) {
+					GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
+				}
+				GemUtilities.initGemViews(inputFile, isValidSourceFile, true);
+			} catch (final PartInitException e) {
+				GemUtilities.logExceptionDetail(e);
 			}
 		}
 	}

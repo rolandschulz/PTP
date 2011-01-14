@@ -27,30 +27,31 @@ import java.util.Comparator;
  * 
  * Returned int value has the following meanings:
  * 
- * 1. positive:  env1 is greater than env2 
- * 2. zero:      env1 equals to env2 
- * 3. negative:  env1 is less than env2
+ * 1. positive: env1 is greater than env2 2. zero: env1 equals to env2 3.
+ * negative: env1 is less than env2
  */
 public class InternalIssueOrderSorter implements Comparator<Envelope> {
 
 	/**
 	 * Compares the two Envelopes passed in by Issue Order.
 	 * 
-	 * @param Envelope env1 The first Envelope.
-	 * @param Envelope env1 The second Envelope.
-	 * @return int The comparison of the two parameters.
+	 * @param env1
+	 *            The first Envelope.
+	 * @param env2
+	 *            The second Envelope.
+	 * @return int The comparison of the two parameters... positive: env1 is
+	 *         greater than env2, zero: env1 equals to env2 negative: env1 is
+	 *         less than env2
 	 */
 	public int compare(Envelope env1, Envelope env2) {
 		if (env1.getIssueIndex() == -1 && env2.getIssueIndex() == -1) {
-			return ((Integer) env1.getOrderIndex()).compareTo((Integer) env2
-					.getOrderIndex());
+			return ((Integer) env1.getOrderIndex()).compareTo(env2.getOrderIndex());
 		} else if (env1.getIssueIndex() == -1) {
 			return 1;
 		} else if (env2.getIssueIndex() == -1) {
 			return -1;
 		} else {
-			return ((Integer) env1.getIssueIndex()).compareTo((Integer) env2
-					.getIssueIndex());
+			return ((Integer) env1.getIssueIndex()).compareTo(env2.getIssueIndex());
 		}
 	}
 
