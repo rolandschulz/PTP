@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="help.css">
+	<title>Browser View</title>
+</head>
+
+<body>
+<a name="top"></a>
+<table cellspacing="5">
+    <tr>
+        <td>
+            <img src="images/trident_transparent.png">
+        </td>
+        <td>
+            <h1>Browser View</h1>
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>Activating the Browser View</h2>
+<p>
+When you formally verify an MPI C/C++ program, the Browser View and the Analyzer View will both be
+opened and depending on what is specified in preferences either one may be brought to the foreground
+and given the active focus.
+</p>
+
+<h2>Browser Overview</h2>
+<p>
+In the menu of this view there are three buttons
+</p>
+	<ul>
+		<li>The <img src="images/terminate.gif"> Terminates the current operation</li>
+		<li>The <img src="images/save-file.gif"> Saves the results to a file</li>
+		<li>The <img src="images/help-contents.gif"> Opens this help page</li>
+	</ul>
+
+<p>
+The purpose of this view is to summarize and categorically group all of the errors and warnings found.
+At the top left is a brief summary of the results indicating the number of errors and warnings found.
+In the top right are users are provided with the ability to set the number of processes and run ISP.
+</p>
+
+<p>
+Below the summary is a section containing a tab for category of error or warning that was found in the
+code. By opening a given tab you are given detailed information on each occurrence of that type of
+error or warning in your code. Clicking on any of these occurrences will open the Eclipse editor with that line
+of code highlighted.  If there are no instances of the problem then there is a short message indicating as much.
+Furthermore, a user is shown which types of errors are presented via the icons of the tab.
+</p>
+	<ul>
+		<li>The <img src="images/no-error.gif"> indicates that there are no instances of that type of problem</li>
+		<li>The <img src="images/magnified-trident.gif"> tells the user that this problem is present in their code.</li>
+	</ul>
+
+
+<h2>Errors Tab</h2>
+This tab is reserved for problems that cause the program to crash or deadlock.
+
+<h2>Assertion Violations Tab</h2>
+This tab list all local assertion violations found.
+
+<h2>Leak Tab</h2>
+This tab list all MPI resource leaks found.
+
+<h2>Irrelevant Barriers Tab</h2>
+This tab is reserved for Irrelevant Barriers or barriers that can be safely removed without changing the runtime
+behavior of the program (aside from possibly speeding the program up a little).
+
+<p>&nbsp;</p>
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+<p>&nbsp;</p>
+
+<hr>
+<center>
+<p>
+School of Computing * 50 S. Central Campus Dr. Rm. 3190 * Salt Lake City, UT 
+84112 * <A href="mailto:isp-dev@cs.utah.edu">isp-dev@cs.utah.edu</a><br>
+<a href="http://www.eclipse.org/org/documents/epl-v10.php">License</a>
+</p>
+
+</center>
+
+</body>
+</html>
