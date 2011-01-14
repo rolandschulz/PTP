@@ -172,7 +172,7 @@ public class RemoteIncludeDialog extends Dialog {
 			} else if (pressed.equals(b_browse)) {
 				IRemoteUIConnectionManager connMgr = getUIConnectionManager();
 				if (connMgr != null) {
-					connMgr.openConnectionWithProgress(shell, fRemoteConnection);
+					connMgr.openConnectionWithProgress(shell, null, fRemoteConnection);
 					if (fRemoteConnection.isOpen()) {
 						IRemoteUIFileManager fileMgr = getUIFileManager();
 						if (fileMgr != null) {
