@@ -13,7 +13,7 @@ package org.eclipse.ptp.rdt.sync.ui.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.rdt.sync.ui.scannerinfo.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.sync.ui.messages.messages"; //$NON-NLS-1$
 	public static String RemoteIncludeDialog_browse;
 	public static String RemoteIncludeDialog_cancel;
 	public static String RemoteIncludeDialog_configurations;
@@ -26,7 +26,6 @@ public class Messages extends NLS {
 	public static String RemoteDevelopmentPropertiesPage_0;
 	public static String NullBuildServiceProvider_name;
 	public static String NullServiceProvider_config;
-	public static String ConfigureRemoteServices_0;
 	public static String NewModelProjectWizard_0;
 	public static String NewModelProjectWizard_1;
 	public static String CDTCommonProjectWizard_0;
@@ -48,8 +47,9 @@ public class Messages extends NLS {
 	public static String RemoteMakefileWizard_1;
 	public static String RemoteServicesProviderSelectionDialog_1;
 	public static String RemoteServicesProviderSelectionDialog_0;
-	public static String ServiceModelWizardPage_0;
-	public static String ServiceModelWizardPage_description;
+	public static String RemoteSyncWizardPage_0;
+	public static String RemoteSyncWizardPage_description;
+	public static String SynchronizeParticipantDescriptor_invalidClass;
 
 	static {
 		// initialize resource bundle
