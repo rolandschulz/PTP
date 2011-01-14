@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension-point id="synchronizeParticipants" name="Synchronize Participant" schema="schema/synchronizeParticipants.exsd"/>
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
             canFinishEarly="false"
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteProjectWizard"
+            class="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizard"
             finalPerspective="org.eclipse.cdt.ui.CPerspective"
             hasPages="true"
             icon="icons/etool16/newremote_c_proj.gif"
@@ -266,6 +267,14 @@
                  id="org.eclipse.cdt.core.ccnature">
            </nature>
         </service>
+     </extension>
+     <extension
+           point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
+        <wizardPage
+              ID="org.eclipse.ptp.rdt.sync.ui.remoteSyncWizardPage"
+              operationClass="org.eclipse.ptp.rdt.sync.ui.wizards.RemoteSyncWizardPageOperation"
+              pageClass="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizardPage">
+        </wizardPage>
      </extension>
      
      

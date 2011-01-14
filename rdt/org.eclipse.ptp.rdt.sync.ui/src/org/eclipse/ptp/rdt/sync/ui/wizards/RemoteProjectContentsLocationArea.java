@@ -23,7 +23,6 @@ import org.eclipse.ptp.rdt.sync.ui.serviceproviders.RemoteBuildServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
@@ -86,7 +85,7 @@ public class RemoteProjectContentsLocationArea {
 	private IProject fExistingProject;
 
 	private final IErrorMessageReporter fErrorReporter;
-	
+
 	private final IRunnableContext fContext;
 
 	private RemoteBuildServiceProvider fProvider;
@@ -241,7 +240,7 @@ public class RemoteProjectContentsLocationArea {
 	private void checkConnection() {
 		IRemoteUIConnectionManager mgr = getUIConnectionManager();
 		if (mgr != null) {
-			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), fSelectedConnection);
+			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), fContext, fSelectedConnection);
 		}
 	}
 
