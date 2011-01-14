@@ -33,6 +33,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
+/**
+ * @since 2.0
+ */
 public abstract class ExtendableRMLaunchConfigurationDynamicTab extends AbstractRMLaunchConfigurationDynamicTab implements
 		IRMLaunchConfigurationContentsChangedListener {
 
@@ -56,6 +59,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
+	/**
+	 * @since 2.0
+	 */
 	public RMLaunchValidation canSave(Control control, IPResourceManager rm, IPQueue queue) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.canSave(control, rm, queue);
@@ -73,6 +79,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * #createControl(org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
+	/**
+	 * @since 2.0
 	 */
 	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
@@ -99,6 +108,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * #getAttributes(org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration, java.lang.String)
+	 */
+	/**
+	 * @since 2.0
 	 */
 	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
@@ -146,7 +158,11 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * org.eclipse.ptp.core.elements.IPQueue,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration) {
+	/**
+	 * @since 2.0
+	 */
+	public RMLaunchValidation initializeFrom(Control control, IPResourceManager rm, IPQueue queue,
+			ILaunchConfiguration configuration) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
 			RMLaunchValidation validation = tabControl.initializeFrom(control, rm, queue, configuration);
@@ -164,6 +180,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * #isValid(org.eclipse.debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
+	/**
+	 * @since 2.0
 	 */
 	public RMLaunchValidation isValid(ILaunchConfiguration launchConfig, IPResourceManager rm, IPQueue queue) {
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
@@ -183,6 +202,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
 	 */
+	/**
+	 * @since 2.0
+	 */
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);
 		for (BaseRMLaunchConfigurationDynamicTab tabControl : tabControllers) {
@@ -201,6 +223,9 @@ public abstract class ExtendableRMLaunchConfigurationDynamicTab extends Abstract
 	 * #setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy,
 	 * org.eclipse.ptp.core.elements.IPResourceManager,
 	 * org.eclipse.ptp.core.elements.IPQueue)
+	 */
+	/**
+	 * @since 2.0
 	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
 		RMLaunchValidation resultValidation = new RMLaunchValidation(true, null);

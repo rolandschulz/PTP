@@ -314,6 +314,9 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 		return Messages.BasicOpenMpiRMLaunchConfigurationDynamicTab_Title;
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public void createControl(Composite parent, IPResourceManager rm, IPQueue queue) throws CoreException {
 		control = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -395,6 +398,9 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public IAttribute<?, ?, ?>[] getAttributes(IPResourceManager rm, IPQueue queue, ILaunchConfiguration configuration, String mode)
 			throws CoreException {
 
@@ -419,6 +425,9 @@ public class BasicOpenMpiRMLaunchConfigurationDynamicTab extends BaseRMLaunchCon
 		return control;
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration, IPResourceManager rm, IPQueue queue) {
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_NUMPROCS, OpenMPILaunchConfigurationDefaults.ATTR_NUMPROCS);
 		configuration.setAttribute(OpenMPILaunchConfiguration.ATTR_BYNODE, OpenMPILaunchConfigurationDefaults.ATTR_BYNODE);

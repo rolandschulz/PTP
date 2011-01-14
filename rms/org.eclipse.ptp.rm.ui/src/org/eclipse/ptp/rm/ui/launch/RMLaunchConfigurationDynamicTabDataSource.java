@@ -29,8 +29,8 @@ public abstract class RMLaunchConfigurationDynamicTabDataSource extends DataSour
 
 	@Override
 	protected void setErrorMessage(ValidationException e) {
-//		page.setErrorMessage(e.getLocalizedMessage());
-//		page.setValid(false);
+		// page.setErrorMessage(e.getLocalizedMessage());
+		// page.setValid(false);
 	}
 
 	@Override
@@ -46,10 +46,16 @@ public abstract class RMLaunchConfigurationDynamicTabDataSource extends DataSour
 		return queue;
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public void setResourceManager(IPResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
 	}
 
+	/**
+	 * @since 2.0
+	 */
 	public IPResourceManager getResourceManager() {
 		return resourceManager;
 	}
@@ -62,8 +68,7 @@ public abstract class RMLaunchConfigurationDynamicTabDataSource extends DataSour
 		return configuration;
 	}
 
-	public void setConfigurationWorkingCopy(
-			ILaunchConfigurationWorkingCopy configurationWorkingCopy) {
+	public void setConfigurationWorkingCopy(ILaunchConfigurationWorkingCopy configurationWorkingCopy) {
 		this.configurationWorkingCopy = configurationWorkingCopy;
 	}
 
