@@ -10,19 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.util.Map;
-
 /**
- * 
- * An optional interface for ILanguage implementations.
- *  
- * If there is an ILanguagePropertyProvider for the language
- * the properties will be given to the language instance
- * using this interface.
+ * Must be implemented by extensions to the syncProvider extension point.
  * 
  */
-public interface IConfigurableLanguage {
+public interface ISynchronizeProvider {
 
-	void setProperties(Map<String,String> properties);
-	
 }

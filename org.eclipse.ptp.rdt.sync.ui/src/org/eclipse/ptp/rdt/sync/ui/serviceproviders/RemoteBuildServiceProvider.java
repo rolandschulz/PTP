@@ -42,13 +42,10 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID = "RemoteBuildServiceProvider.remoteToolsProviderID"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME = "RemoteBuildServiceProvider.remoteToolsConnectionName"; //$NON-NLS-1$
-	/**
-	 * @since 2.0
-	 */
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION = "RemoteBuildServiceProvider.configLocation"; //$NON-NLS-1$
 
 	public static final String ID = "org.eclipse.ptp.rdt.sync.ui.RemoteBuildServiceProvider"; //$NON-NLS-1$
-	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.BuildService"; //$NON-NLS-1$
+	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.sync.core.BuildService"; //$NON-NLS-1$
 	public static final String NAME = Messages.RemoteBuildServiceProvider_0;
 
 	private IRemoteConnection fRemoteConnection = null;

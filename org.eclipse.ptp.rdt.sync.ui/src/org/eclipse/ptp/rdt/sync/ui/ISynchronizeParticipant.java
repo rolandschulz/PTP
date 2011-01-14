@@ -8,22 +8,20 @@
  * Contributors:
  *    IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.rdt.sync.ui;
 
-import java.util.Map;
-
-import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.widgets.Composite;
 
 /**
- * Must be implemented by extensions to the langaugeProperties extension point.
- * 
- * Gets invoked every time the remote indexer is triggered.
- * Supplies the remote language mapper with any additional 
- * properties it may need.
+ * Must be implemented by extensions to the syncronizeParticipant extension
+ * point.
  * 
  */
-public interface ILanguagePropertyProvider {
-
-	public Map<String, String> getProperties(String languageId, IProject project);
-	
+public interface ISynchronizeParticipant {
+	/**
+	 * Create a control to configure a synchronize provider
+	 * 
+	 * @param parent
+	 */
+	public void createConfigurationArea(final Composite parent);
 }
