@@ -16,16 +16,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.launch.ui.extensions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
-import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 
 /**
@@ -46,9 +41,6 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		IStatus status = new Status(Status.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), Status.ERROR, string, null);
 		return new CoreException(status);
 	}
-
-	private final Map<Integer, IPQueue> queues = new HashMap<Integer, IPQueue>();
-	private final Map<IPQueue, Integer> queueIndices = new HashMap<IPQueue, Integer>();
 
 	private final ILaunchConfigurationDialog fLaunchDialog;
 
@@ -74,65 +66,10 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 	}
 
 	/**
-	 * @param queue
-	 * @param index
-	 */
-	public void addQueue(IPQueue queue, int index) {
-		queues.put(index, queue);
-		queueIndices.put(queue, index);
-	}
-
-	/**
-	 *
-	 */
-	public void clearQueues() {
-		queues.clear();
-	}
-
-	/**
 	 * @since 5.0
 	 */
 	public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
 		return fLaunchDialog;
-	}
-
-	/**
-	 * @param index
-	 * @return
-	 */
-	public IPQueue getQueue(int index) {
-		return queues.get(index);
-	}
-
-	/**
-	 * Get the queue with the corresponding name
-	 * 
-	 * @param rm
-	 *            resource manager
-	 * @param queueName
-	 *            queue name
-	 * @return queue
-	 */
-	public IPQueue getQueueFromName(IPResourceManager rm, String queueName) {
-		if (rm == null) {
-			return null;
-		}
-
-		IPQueue[] queues = rm.getQueues();
-
-		for (IPQueue queue : queues) {
-			if (queue.getName().equals(queueName))
-				return queue;
-		}
-		return null;
-	}
-
-	/**
-	 * @param queue
-	 * @return
-	 */
-	public Integer getQueueIndex(IPQueue queue) {
-		return queueIndices.get(queue);
 	}
 
 	/*
