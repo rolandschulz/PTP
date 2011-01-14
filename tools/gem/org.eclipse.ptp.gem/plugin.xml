@@ -20,9 +20,9 @@
             <separator name="verificationGroup"/>
          </menu>
          <action
-               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               class="org.eclipse.ptp.gem.popup.actions.VerificationPopUpAction"
                enablesFor="1"
-               id="org.eclipse.ptp.gem.analyzerPopupC"
+               id="org.eclipse.ptp.gem.verificationPopupC"
                label="Formally Verify MPI Program"
                menubarPath="verificationMenu/verificationGroup"
                icon="icons/trident.gif">
@@ -42,9 +42,9 @@
             <separator name="verificationGroup"/>
          </menu>
          <action
-               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               class="org.eclipse.ptp.gem.popup.actions.VerificationPopUpAction"
                enablesFor="1"
-               id="org.eclipse.ptp.gem.analyzerPopupCpp"
+               id="org.eclipse.ptp.gem.verificationPopupCpp"
                label="Formally Verify MPI Program"
                menubarPath="verificationMenu/verificationGroup"
                icon="icons/trident.gif">
@@ -64,9 +64,9 @@
             <separator name="verificationGroup"/>
          </menu>
          <action
-               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               class="org.eclipse.ptp.gem.popup.actions.VerificationPopUpAction"
                enablesFor="1"
-               id="org.eclipse.ptp.gem.analyzerPopupC++"
+               id="org.eclipse.ptp.gem.verificationPopupC++"
                label="Formally Verify MPI Program"
                menubarPath="verificationMenu/verificationGroup"
                icon="icons/trident.gif">
@@ -86,9 +86,9 @@
             <separator name="verificationGroup"/>
          </menu>
          <action
-               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               class="org.eclipse.ptp.gem.popup.actions.VerificationPopUpAction"
                enablesFor="1"
-               id="org.eclipse.ptp.gem.analyzerPopupCp"
+               id="org.eclipse.ptp.gem.verificationPopupCp"
                label="Formally Verify MPI Program"
                menubarPath="verificationMenu/verificationGroup"
                icon="icons/trident.gif">
@@ -108,17 +108,17 @@
             <separator name="verificationGroup"/>
          </menu>
          <action
-               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               class="org.eclipse.ptp.gem.popup.actions.VerificationPopUpAction"
                enablesFor="1"
-               id="org.eclipse.ptp.gem.analyzerPopupCc"
+               id="org.eclipse.ptp.gem.verificationPopupCc"
                label="Formally Verify MPI Program"
                menubarPath="verificationMenu/verificationGroup"
                icon="icons/trident.gif">
          </action>
-      </objectContribution>      
+      </objectContribution>
       
-      
-      <!-- Logfile Menu Group -->        
+      <!-- Logfile Menu Group -->
+      <!-- PopUpMenus extension point and contributions (nameFilter="*.log") -->      
       <objectContribution
             adaptable="true"
             id="org.eclipse.ptp.gem.logfilePopupMenu"
@@ -139,16 +139,17 @@
                icon="icons/hbv-trident.gif">
          </action>
          <action
-               class="org.eclipse.ptp.gem.popup.actions.AnalyzerLogFilePopUpAction"
+               class="org.eclipse.ptp.gem.popup.actions.ProcessLogFilePopUpAction"
                enablesFor="1"
-               id="org.eclipse.ptp.gem.AnalyzerFromLogPopUpAction"
-               label="Analyze Log File"
+               id="org.eclipse.ptp.gem.LogFilePopUpAction"
+               label="Process GEM Log File"
                menubarPath="logfileMenu/logfileGroup"
                icon="icons/trident.gif">
          </action>
       </objectContribution>
       
-      <!-- Makefile Executable Verification Menu Group -->        
+      <!-- Makefile Verification Menu Group -->
+      <!-- PopUpMenus extension point and contributions (nameFilter="*.gem") -->
       <objectContribution
             adaptable="true"
             id="org.eclipse.ptp.gem.makefilePopupMenu"
@@ -161,10 +162,10 @@
             <separator name="executableGroup"/>
          </menu>
          <action
-               class="org.eclipse.ptp.gem.popup.actions.AnalyzerPopUpAction"
+               class="org.eclipse.ptp.gem.popup.actions.VerificationPopUpAction"
                enablesFor="1"
                id="org.eclipse.ptp.gem.executablePopup"
-               label="Formally Verify MPI Executable"
+               label="Formally Verify Profiled MPI Executable"
                menubarPath="executableMenu/executableGroup"
                icon="icons/trident.gif">
          </action>
@@ -180,6 +181,12 @@
             class="org.eclipse.ptp.gem.preferences.GemPreferencePage"
             id="org.eclipse.ptp.gem.preferences.GemPreferences"
             name="GEM">
+      </page>
+      <page
+            category="org.eclipse.ptp.gem.preferences.GemPreferences"
+            class="org.eclipse.ptp.gem.preferences.IspPreferencePage"
+            id="org.eclipse.ptp.gem.preferences.IspPreferences"
+            name="ISP Settings">
       </page>
    </extension>
    <extension
@@ -204,13 +211,13 @@
       </command>
       <command
             categoryId="org.eclipse.ptp.gem.commands.category"
-            id="org.eclipse.ptp.gem.commands.analyzerCommand"
+            id="org.eclipse.ptp.gem.commands.gemCommand"
             name="Formally Verify MPI Program">
       </command>
       <command
             categoryId="org.eclipse.ptp.gem.commands.category"
             id="org.eclipse.ptp.gem.commands.consoleCommand"
-            name="View GEM Console Output">
+            name="Show GEM Console">
       </command>
    </extension>
    
@@ -224,7 +231,7 @@
       </handler>
       <handler
             class="org.eclipse.ptp.gem.handlers.GemHandler"
-            commandId="org.eclipse.ptp.gem.commands.analyzerCommand">
+            commandId="org.eclipse.ptp.gem.commands.gemCommand">
       </handler>
       <handler
             class="org.eclipse.ptp.gem.handlers.GemHandler"
@@ -241,7 +248,7 @@
      </menuContribution>
      <menuContribution locationURI="toolbar:org.eclipse.ptp.gem.toolbar?after=additions">
             <command
-                  commandId="org.eclipse.ptp.gem.commands.analyzerCommand"
+                  commandId="org.eclipse.ptp.gem.commands.gemCommand"
                   icon="icons/trident.gif"
                   id="org.eclipse.ptp.gem.toolbar.refCommand"
                   style="pulldown"
@@ -252,17 +259,17 @@
             <command
                   commandId="org.eclipse.ptp.gem.commands.numprocsCommand"
                   icon="icons/triple-trident.gif"
-                  id="org.eclipse.ptp.gem.toolbar.menu.command1">
+                  id="org.eclipse.ptp.gem.toolbar.menu.numprocsCommand">
             </command>
             <command
-                  commandId="org.eclipse.ptp.gem.commands.analyzerCommand"
+                  commandId="org.eclipse.ptp.gem.commands.gemCommand"
                   icon="icons/trident.gif"
-                  id="org.eclipse.ptp.gem.toolbar.menu.command2">
+                  id="org.eclipse.ptp.gem.toolbar.menu.gemCommand">
             </command>
             <command
                   commandId="org.eclipse.ptp.gem.commands.consoleCommand"
                   icon="icons/magnified-trident.gif"
-                  id="org.eclipse.ptp.gem.toolbar.menu.command3">
+                  id="org.eclipse.ptp.gem.toolbar.menu.consoleCommand">
             </command>
       </menuContribution>
     </extension>
@@ -284,6 +291,13 @@
             category="org.eclipse.ptp.ui.views"
             class="org.eclipse.ptp.gem.views.GemAnalyzer"
             id="org.eclipse.ptp.gem.views.GemAnalyzer">
+      </view>
+      <view
+            name="GEM Browser"
+            icon="icons/trident.gif"
+            category="org.eclipse.ptp.ui.views"
+            class="org.eclipse.ptp.gem.views.GemBrowser"
+            id="org.eclipse.ptp.gem.views.GemBrowser">
       </view>
    </extension>
    

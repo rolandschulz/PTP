@@ -18,16 +18,20 @@ package org.eclipse.ptp.gem.util;
 
 import java.io.IOException;
 
-import org.eclipse.ptp.gem.messages.Messages;
-
+/**
+ * This class serves to execute the specified string as a command via the
+ * java.lang.Runtime instance.
+ */
 public class CommandThread implements Runnable {
 
-	private String command;
+	private final String command;
 
 	/**
-	 * Sets the command to be whatever was passed in.
+	 * Sets the command to be whatever was passed in. This thread executes the
+	 * specified command via the java.lang.Runtime instance.
 	 * 
-	 * @param String cmd The new command String.
+	 * @param cmd
+	 *            The new command String.
 	 */
 	public CommandThread(String cmd) {
 		this.command = cmd;
@@ -36,11 +40,9 @@ public class CommandThread implements Runnable {
 	public void run() {
 		try {
 			Runtime.getRuntime().exec(this.command);
-		} catch (IOException ioe) {
-			GemUtilities.showExceptionDialog(Messages.CommandThread_0, ioe);
-			GemUtilities.logError(Messages.CommandThread_1, ioe);
+		} catch (final IOException e) {
+			GemUtilities.logExceptionDetail(e);
 		}
-
 	}
 
 }

@@ -29,17 +29,17 @@ public class NumProcsValidator implements IInputValidator {
 		try {
 			num = Integer.parseInt(newText);
 
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			return Messages.NumProcsValidator_0;
 		}
 		if (num < 1) {
 			return Messages.NumProcsValidator_1;
 		}
-		if (num > 64) {
+		if (num > 32) {
 			return Messages.NumProcsValidator_2;
-		} else {
-			return null;
 		}
+
+		return null;
 	}
 
 }

@@ -16,18 +16,22 @@
 
 package org.eclipse.ptp.gem.views;
 
-import java.io.File;
-import java.text.ParseException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
@@ -36,10 +40,12 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.gem.GemPlugin;
 import org.eclipse.ptp.gem.messages.Messages;
 import org.eclipse.ptp.gem.preferences.PreferenceConstants;
@@ -77,12 +83,15 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -90,28 +99,40 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class GemAnalyzer extends ViewPart {
 
+	// Listens for double-clicks and jumps to that line of code in the editor
+	private class DoubleClickListener implements IDoubleClickListener {
+
+		public void doubleClick(DoubleClickEvent event) {
+			final ISelection selection = event.getSelection();
+			final StructuredSelection structure = (StructuredSelection) selection;
+			final ListElement element = (ListElement) structure.getFirstElement();
+			if (element != null) {
+				final IFile sourceFile = element.getFile();
+				final int lineNumber = element.getLineNumber();
+				openEditor(lineNumber, sourceFile);
+			}
+		}
+	}
+
 	// The ID for this view
 	public static final String ID = "org.eclipse.ptp.gem.views.GemAnalyzer"; //$NON-NLS-1$
 
 	// Data structures and more complex members
 	private Transitions transitions;
-	private ArrayList<String> logContents;
 	private LinkedList<Shell> activeShells;
 
-	// Container objects and Viewers
+	// Container objects and viewers
 	private Composite parent;
 	private ListViewer leftViewer;
 	private ListViewer rightViewer;
 	private Action getHelp;
+	private Action terminateButton;
 
 	// Simple members
 	private int numRanks;
 	private int lockedRank;
-	private int errorIndex;
-	private int errorCount;
-	private Object[] errorCalls;
-	private String currLeftFileName;
-	private String currRightFileName;
+	private IFile currLeftFile;
+	private IFile currRightFile;
 
 	// SWT Buttons
 	private Button firstTransitionButton;
@@ -125,11 +146,9 @@ public class GemAnalyzer extends ViewPart {
 	private Button deadlockInterleavingButton;
 	private Button internalIssueOrderButton;
 	private Button programOrderButton;
-	private Button launchIspUIButton;
+	private Button launchHpvButton;
 	private Button browseCallsButton;
-	private Button browseLeaksButton;
-	private Button examineErrorsButton;
-	private Button terminateButton;
+	private Button runGemButton;
 	private Combo lockRanksComboList;
 	private Combo setNumProcsComboList;
 
@@ -140,39 +159,33 @@ public class GemAnalyzer extends ViewPart {
 
 	// SWT Labels
 	private Label errorMessageLabel;
-	private Label resourcLeakLabel;
 	private Label leftCodeWindowLabel;
 	private Label rightCodeWindowLabel;
 	private CLabel leftCodeWindowExplenationLabel;
 	private CLabel rightCodeWindowExplenationLabel;
 
 	// Used for the transition label
-	private int transitionIndex;
-	private int transitionCount;
+	private int transitionLabelIndex;
+	private int transitionLabelCount;
 
 	// Things for highlighting the appropriate line in the code windows
 	private int leftIndex;
 	private int rightIndex;
-	private int oldLeftIndex;
+	private int previousLeftIndex;
 
-	// Listeners for the viewers
+	// Listeners for the code viewers
 	private SelectionListener singleListener;
 	private DoubleClickListener doubleListener;
 
-	// Paths needed for various operations
-	private String globalSourceFilePath;
-	private String globalLogFilePath;
-	private boolean globalCompile;
-	private boolean globalRunCommand;
+	// File resources needed for various operations
+	private IFile globalSourceFile;
 
 	// Threads
-	private Thread commandThread;
 	private Thread analyzerUpdateThread;
 	private Thread clearAnalyzer;
 	private Thread disableTerminateButton;
 
 	// Misc
-	private Shell errShell;
 	private int leftLines;
 	private int rightLines;
 	private boolean aborted;
@@ -184,56 +197,209 @@ public class GemAnalyzer extends ViewPart {
 	 */
 	public GemAnalyzer() {
 		this.lockedRank = -1;
-		this.activeShells = new LinkedList<Shell>();
-		this.errorIndex = 1;
 		this.aborted = false;
 	}
 
 	/**
-	 * Creates all the envelopes for the transition lists from the specified log
-	 * file.
+	 * Creates and runs a new thread that clears the Analyzer view.
 	 * 
-	 * @param logFilePath The absolute path to the log file to parse.
+	 * @param none
 	 * @return void
 	 */
-	public void initTransitions(String logFilePath) {
-		try {
-			this.transitions = new Transitions(logFilePath);
-		} catch (ParseException pe) {
-			GemUtilities.showExceptionDialog(Messages.GemAnalyzer_0, pe);
-			GemUtilities.logError(Messages.GemAnalyzer_0, pe);
-		}
-		// Reset local values
-		reset();
+	public void clear() {
+		Display.getDefault().syncExec(this.clearAnalyzer);
+		this.aborted = false;
+	}
+
+	/*
+	 * Calls finer grained methods, populating the view action bar.
+	 */
+	private void contributeToActionBars() {
+		final IActionBars bars = getViewSite().getActionBars();
+		fillLocalPullDown(bars.getMenuManager());
+		fillLocalToolBar(bars.getToolBarManager());
+	}
+
+	/*
+	 * Helper method called by createPartControl.
+	 */
+	private void createCodeWindowsGroup(Composite parent) {
+		// Get images for buttons from image cache
+		final Image sourceCallImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/source-call.gif")); //$NON-NLS-1$
+		final Image matchCallImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/match-call.gif")); //$NON-NLS-1$
+
+		// Create the layout for the Analyzer windows and call info labels
+		final Group codeWindowsGroup = new Group(parent, SWT.NONE | SWT.SHADOW_IN);
+		codeWindowsGroup.setText(Messages.GemAnalyzer_0);
+		final GridLayout codeWindowsLayout = new GridLayout();
+		codeWindowsLayout.numColumns = 2;
+		codeWindowsLayout.marginHeight = 10;
+		codeWindowsLayout.marginWidth = 10;
+		codeWindowsLayout.horizontalSpacing = 15;
+		codeWindowsGroup.setLayout(codeWindowsLayout);
+		codeWindowsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+
+		// Create code window labels and their respective layouts, etc.
+		final String newline = System.getProperty("line.separator"); //$NON-NLS-1$
+		this.leftCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP);
+		this.leftCodeWindowLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		final Font leftCodeWindowLabelFont = setFontSize(this.leftCodeWindowLabel.getFont(), 9);
+		this.leftCodeWindowLabel.setFont(leftCodeWindowLabelFont);
+		this.leftCodeWindowLabel.setText(newline);
+		this.rightCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP);
+		this.rightCodeWindowLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		final Font rightCodeWindowLabelFont = setFontSize(this.rightCodeWindowLabel.getFont(), 9);
+		this.rightCodeWindowLabel.setFont(rightCodeWindowLabelFont);
+		this.rightCodeWindowLabel.setText(newline);
+
+		// The short explanations of each of the code windows
+		this.leftCodeWindowExplenationLabel = new CLabel(codeWindowsGroup, SWT.WRAP | SWT.NULL);
+		this.rightCodeWindowExplenationLabel = new CLabel(codeWindowsGroup, SWT.WRAP | SWT.NULL);
+		this.leftCodeWindowExplenationLabel.setImage(sourceCallImage);
+		this.rightCodeWindowExplenationLabel.setImage(matchCallImage);
+		this.leftCodeWindowExplenationLabel.setText(Messages.GemAnalyzer_1);
+		this.rightCodeWindowExplenationLabel.setText(Messages.GemAnalyzer_2);
+
+		// Create the Analyzer list viewers
+		this.leftViewer = new ListViewer(codeWindowsGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		this.rightViewer = new ListViewer(codeWindowsGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		final Font leftViewerFont = setFontSize(this.leftViewer.getControl().getFont(), 8);
+		final Font rightViewerFont = setFontSize(this.rightViewer.getControl().getFont(), 8);
+		this.leftViewer.getControl().setFont(leftViewerFont);
+		this.rightViewer.getControl().setFont(rightViewerFont);
+		this.leftViewer.getList().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		this.rightViewer.getList().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+		/*
+		 * Create two listeners for these viewers. SelectionListener is to
+		 * prevent user from changing the selected line. DoubleListener maps
+		 * selected line to the editor view
+		 */
+		this.singleListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final org.eclipse.swt.widgets.List list = (org.eclipse.swt.widgets.List) e.getSource();
+				final String entry = list.getItem(0).toString();
+
+				// Determine if collective call clicked in the Right Viewer
+				if (!entry.contains(Messages.GemAnalyzer_3) || !entry.contains(Messages.GemAnalyzer_4)) {
+					updateSelectedLine(false);
+				}
+			}
+		};
+
+		// SelectionListener prevents user from changing selected viewer line
+		this.doubleListener = new DoubleClickListener();
+		this.leftViewer.getList().addSelectionListener(this.singleListener);
+		this.rightViewer.getList().addSelectionListener(this.singleListener);
+		this.leftViewer.addDoubleClickListener(this.doubleListener);
+		this.rightViewer.addDoubleClickListener(this.doubleListener);
+	}
+
+	/*
+	 * Helper method called by createPartControl.
+	 */
+	private void createInterleavingsGroup(Composite parent) {
+		// Get images for buttons from image cache
+		final Image firstItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/first-item.gif")); //$NON-NLS-1$
+		final Image lastItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/last-item.gif")); //$NON-NLS-1$
+		final Image prevItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/prev-item.gif")); //$NON-NLS-1$
+		final Image nextItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/next-item.gif")); //$NON-NLS-1$
+		final Image deadlockImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/deadlock.gif")); //$NON-NLS-1$
+
+		// Group and FormLayout data for interleaving buttons and labels
+		this.interleavingsGroup = new Group(parent, SWT.SHADOW_IN);
+		this.interleavingsGroup.setText(Messages.GemAnalyzer_5);
+		this.interleavingsGroup.setToolTipText(Messages.GemAnalyzer_6);
+		final FormData interleavingsFormData = new FormData();
+		interleavingsFormData.bottom = new FormAttachment(100, -5);
+		interleavingsFormData.left = new FormAttachment(44, 0);
+		this.interleavingsGroup.setLayoutData(interleavingsFormData);
+		this.interleavingsGroup.setLayout(new FormLayout());
+
+		// First interleaving button
+		this.firstInterleavingButton = new Button(this.interleavingsGroup, SWT.PUSH);
+		this.firstInterleavingButton.setImage(firstItemImage);
+		this.firstInterleavingButton.setToolTipText(Messages.GemAnalyzer_7);
+		this.firstInterleavingButton.setEnabled(false);
+		final FormData ifirstFormData = new FormData();
+		ifirstFormData.left = new FormAttachment(0, 5);
+		ifirstFormData.bottom = new FormAttachment(100, -5);
+		this.firstInterleavingButton.setLayoutData(ifirstFormData);
+
+		// Previous interleaving button
+		this.previousInterleavingButton = new Button(this.interleavingsGroup, SWT.PUSH);
+		this.previousInterleavingButton.setImage(prevItemImage);
+		this.previousInterleavingButton.setToolTipText(Messages.GemAnalyzer_8);
+		this.previousInterleavingButton.setEnabled(false);
+		final FormData iprevFormData = new FormData();
+		iprevFormData.left = new FormAttachment(this.firstInterleavingButton, 3);
+		iprevFormData.bottom = new FormAttachment(100, -5);
+		this.previousInterleavingButton.setLayoutData(iprevFormData);
+
+		// Next interleaving button
+		this.nextInterleavingButton = new Button(this.interleavingsGroup, SWT.PUSH);
+		this.nextInterleavingButton.setImage(nextItemImage);
+		this.nextInterleavingButton.setToolTipText(Messages.GemAnalyzer_9);
+		this.nextInterleavingButton.setEnabled(false);
+		final FormData inextFormData = new FormData();
+		inextFormData.left = new FormAttachment(this.previousInterleavingButton, 3);
+		inextFormData.bottom = new FormAttachment(100, -5);
+		this.nextInterleavingButton.setLayoutData(inextFormData);
+
+		// Last interleaving button
+		this.lastInterleavingButton = new Button(this.interleavingsGroup, SWT.PUSH);
+		this.lastInterleavingButton.setImage(lastItemImage);
+		this.lastInterleavingButton.setToolTipText(Messages.GemAnalyzer_10);
+		this.lastInterleavingButton.setEnabled(false);
+		final FormData ilastFormData = new FormData();
+		ilastFormData.left = new FormAttachment(this.nextInterleavingButton, 3);
+		ilastFormData.bottom = new FormAttachment(100, -5);
+		this.lastInterleavingButton.setLayoutData(ilastFormData);
+
+		// Deadlock interleaving button
+		this.deadlockInterleavingButton = new Button(this.interleavingsGroup, SWT.PUSH);
+		this.deadlockInterleavingButton.setImage(deadlockImage);
+		this.deadlockInterleavingButton.setToolTipText(Messages.GemAnalyzer_11);
+		this.deadlockInterleavingButton.setEnabled(false);
+		final FormData deadlockButtonFormData = new FormData();
+		deadlockButtonFormData.left = new FormAttachment(this.lastInterleavingButton, 3);
+		deadlockButtonFormData.bottom = new FormAttachment(100, -5);
+		deadlockButtonFormData.right = new FormAttachment(100, -5);
+		this.deadlockInterleavingButton.setLayoutData(deadlockButtonFormData);
 	}
 
 	/**
 	 * Callback that allows us to create the viewer and initialize it.
 	 * 
-	 * @param parent The parent Composite for this View.
+	 * @param parent
+	 *            The parent Composite for this View.
 	 * @return void
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		this.parent = parent;
 
 		// Create layout for the parent Composite
-		GridLayout parentLayout = new GridLayout();
+		final GridLayout parentLayout = new GridLayout();
 		parentLayout.numColumns = 1;
 		parentLayout.marginHeight = 10;
 		parentLayout.marginWidth = 10;
 		parent.setLayout(parentLayout);
 
 		// Create container for transition and interleaving button groups
-		Composite buttonsComposite = new Composite(parent, SWT.NULL);
-		buttonsComposite.setLayoutData(new GridData(SWT.NULL, SWT.FILL, true,
-				false, 1, 1));
-		buttonsComposite.setLayout(new FormLayout());
+		final Composite runtimeComposite = new Composite(parent, SWT.NULL);
+		runtimeComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		runtimeComposite.setLayout(new FormLayout());
+		final Composite buttonGroupsComposite = new Composite(parent, SWT.NULL);
+		buttonGroupsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		buttonGroupsComposite.setLayout(new FormLayout());
 
 		// Create groups and selection listeners
-		createTransitionsGroup(buttonsComposite);
-		createInterleavingsGroup(buttonsComposite);
-		createStepOrderGroup(buttonsComposite);
-		createRuntimeGroup(parent);
+		createRuntimeGroup(runtimeComposite);
+		createTransitionsGroup(buttonGroupsComposite);
+		createInterleavingsGroup(buttonGroupsComposite);
+		createStepOrderGroup(buttonGroupsComposite);
 		createCodeWindowsGroup(parent);
 		createSelectionListeners();
 
@@ -243,1498 +409,78 @@ public class GemAnalyzer extends ViewPart {
 		contributeToActionBars();
 	}
 
-	/**
-	 * Passing the focus request to both code viewer's control.
-	 * 
-	 * @param none
-	 * @return void
-	 */
-	public void setFocus() {
-		IWorkbench wb = PlatformUI.getWorkbench();
-		IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
-		IWorkbenchPage page = window.getActivePage();
-		if (page != null) {
-			page.activate((IWorkbenchPart) this);
-		}
-	}
-
-	/**
-	 * Reads in the contents of the specified file and populates the
-	 * ListViewers.
-	 * 
-	 * @param sourcefile A String containing the absolute path to the source
-	 *            file.
-	 * @return void
-	 */
-	public void parseSourceFile(String leftSourceFilePath,
-			String rightSourceFilePath) {
-		Boolean updateL = this.currLeftFileName == null
-				|| !this.currLeftFileName.equals(leftSourceFilePath);
-		Boolean updateR = this.currRightFileName == null
-				|| rightSourceFilePath.equals("") //$NON-NLS-1$
-				|| !this.currRightFileName.equals(rightSourceFilePath);
-		this.currLeftFileName = leftSourceFilePath;
-		this.currRightFileName = rightSourceFilePath;
-
-		// Clear the left viewer list
-		while (updateL && this.leftViewer.getElementAt(0) != null) {
-			this.leftViewer.remove(this.leftViewer.getElementAt(0));
-		}
-
-		// Clear the right viewer list
-		Boolean isCollective = false;
-		if (this.transitions != null
-				&& this.transitions.getCurrentTransition() != null
-				&& this.transitions.getCurrentTransition().isCollective()) {
-			isCollective = true;
-		}
-		while ((isCollective || updateR)
-				&& this.rightViewer.getElementAt(0) != null) {
-			this.rightViewer.remove(this.rightViewer.getElementAt(0));
-		}
-
-		// Populate the viewers with the source file contents
-		try {
-			File file = new File(leftSourceFilePath);
-			Scanner s = new Scanner(file);
-			int lineNum = 0;
-			while (updateL && s.hasNext()) {
-				lineNum++;
-				String line = s.nextLine();
-				this.leftViewer.add(new ListElement(leftSourceFilePath, line,
-						lineNum, false));
-			}
-		} catch (java.io.FileNotFoundException f) {
-			GemUtilities.showExceptionDialog(Messages.GemAnalyzer_1
-					+ leftSourceFilePath, f);
-			GemUtilities.logError(Messages.GemAnalyzer_2, f);
-			this.leftViewer.add(new ListElement("", Messages.GemAnalyzer_3, -1, //$NON-NLS-1$
-					false));
-		}
-		try {
-			if (!rightSourceFilePath.equals("")) { //$NON-NLS-1$
-				File file = new File(rightSourceFilePath);
-				Scanner s = new Scanner(file);
-				int lineNum = 0;
-				while (s.hasNext()) {
-					lineNum++;
-					String line = s.nextLine();
-					this.rightViewer.add(new ListElement(rightSourceFilePath,
-							line, lineNum, false));
-				}
-			} else {
-				Envelope env = this.transitions.getCurrentTransition();
-				if (env.isCollective()) {
-					displayCollectiveInfo();
-				} else
-					this.rightViewer.add(new ListElement("", "", -1, false)); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		} catch (Exception e) {
-			GemUtilities.showExceptionDialog(Messages.GemAnalyzer_4
-					+ rightSourceFilePath, e);
-			GemUtilities.logError(Messages.GemAnalyzer_5, e);
-			this.rightViewer.add(new ListElement("", Messages.GemAnalyzer_6, //$NON-NLS-1$
-					-1, false));
-		}
-	}
-
-	/**
-	 * Reads in the contents of the specified log file and populates the member
-	 * ArrayList<String>.
-	 * 
-	 * @param logfile A String containing the absolute path and name of the log
-	 *            file.
-	 * @return void
-	 */
-	public void parseLogFile(String logFilePath) {
-		// Create logContents if DNE
-		if (this.logContents == null) {
-			this.logContents = new ArrayList<String>();
-		} else {
-			this.logContents.clear();
-		}
-
-		try {
-			File logfile = new File(logFilePath);
-			Scanner s = new Scanner(logfile);
-			this.numRanks = Integer.parseInt(s.nextLine());
-
-			// loop through all the valid input in the log file
-			while (s.hasNext()) {
-				String line = s.nextLine();
-				if (line.contains("DEADLOCK")) { //$NON-NLS-1$
-					continue;
-				} else {
-					this.logContents.add(line);
-				}
-			}
-
-		} catch (Exception e) {
-			GemUtilities.showExceptionDialog(Messages.GemAnalyzer_7, e);
-			GemUtilities.logError(Messages.GemAnalyzer_7, e);
-		}
-	}
-
-	/**
-	 * Creates a log file from the specified source file by running ISP
-	 * 
-	 * @param sourceFilePath The location of the source file.
-	 * @param compile Whether or not to run ispcc.
-	 * @return void
-	 */
-	public void generateLogFile(String sourceFilePath, boolean compile) {
-		if (compile) {
-			if (GemUtilities.doIspcc(sourceFilePath) != -1) {
-				GemUtilities.doIsp(sourceFilePath);
-			}
-		} else {
-			String exePath = GemPlugin.getDefault().getPreferenceStore()
-					.getString(PreferenceConstants.GEM_PREF_LAST_FILE);
-			GemUtilities.doIsp(exePath);
-		}
-	}
-
-	/**
-	 * This method is used when another location changes the number of processes
-	 * preference. Calling this method will update the drop down so that it has
-	 * the correct number of processes displayed.
-	 * 
-	 * @param none
-	 * @return void
-	 */
-	public void updateDropDown() {
-		Integer nprocs = GemPlugin.getDefault().getPreferenceStore().getInt(
-				PreferenceConstants.GEM_PREF_NUMPROCS);
-		this.setNumProcsComboList.setText(nprocs.toString());
-	}
-
-	/**
-	 * Starts the viewer by: Generating the log file, parsing it, and
-	 * initializing everything.
-	 * 
-	 * @param sourceFilePath The fully qualified path to the source file.
-	 * @param logFilePath The fully qualified path to the log file.
-	 * @param compile Whether or not to run a compile command.
-	 * @return void
-	 */
-	public void init(String sourceFilePath, String logFilePath,
-			boolean compile, boolean runCommand) {
-		globalSourceFilePath = sourceFilePath;
-		globalLogFilePath = logFilePath;
-		globalCompile = compile;
-		globalRunCommand = runCommand;
-
-		commandThread = new Thread() {
-			public void run() {
-				// These need to be done by a Thread
-				if (globalCompile || globalRunCommand) {
-					generateLogFile(globalSourceFilePath, globalCompile);
-				}
-				Display.getDefault().syncExec(analyzerUpdateThread);
-			}
-		};
-
-		analyzerUpdateThread = new Thread() {
-			public void run() {
-				// If just aborted then don't fill the viewer with the half
-				// baked data
-				if (aborted) {
-					Display.getDefault().syncExec(disableTerminateButton);
-					Display.getDefault().syncExec(clearAnalyzer);
-					aborted = false;
-					return;
-				}
-
-				parseLogFile(globalLogFilePath);
-				globalSourceFilePath = GemUtilities
-						.getSourcePathFromLog(globalLogFilePath);
-
-				// if the log file contained no mpi calls
-				if (globalSourceFilePath.equals("")) { //$NON-NLS-1$
-					Display.getDefault().syncExec(disableTerminateButton);
-					return;
-				}
-
-				parseSourceFile(globalSourceFilePath, globalSourceFilePath);
-				initTransitions(globalLogFilePath);
-				Display.getDefault().syncExec(disableTerminateButton);
-			}
-		};
-
-		clearAnalyzer = new Thread() {
-			public void run() {
-				transitionsGroup.setText(Messages.GemAnalyzer_10 + " 0/0"); //$NON-NLS-1$
-				interleavingsGroup.setText(Messages.GemAnalyzer_11 + " 0/0"); //$NON-NLS-1$
-				firstTransitionButton.setEnabled(false);
-				previousTransitionButton.setEnabled(false);
-				nextTransitionButton.setEnabled(false);
-				lastTransitionButton.setEnabled(false);
-				firstInterleavingButton.setEnabled(false);
-				previousInterleavingButton.setEnabled(false);
-				nextInterleavingButton.setEnabled(false);
-				lastInterleavingButton.setEnabled(false);
-				deadlockInterleavingButton.setEnabled(false);
-				internalIssueOrderButton.setEnabled(false);
-				programOrderButton.setEnabled(false);
-				launchIspUIButton.setEnabled(false);
-				browseCallsButton.setEnabled(false);
-				browseLeaksButton.setEnabled(false);
-				examineErrorsButton.setEnabled(false);
-				terminateButton.setEnabled(false);
-				errorMessageLabel.setText(""); //$NON-NLS-1$
-				resourcLeakLabel.setText(""); //$NON-NLS-1$
-				transitions = null;
-				leftViewer.refresh();
-				rightViewer.refresh();
-				leftCodeWindowLabel.setText(""); //$NON-NLS-1$
-				rightCodeWindowLabel.setText(""); //$NON-NLS-1$
-				String[] items = new String[] { "" }; //$NON-NLS-1$
-				lockRanksComboList.setItems(items);
-			}
-		};
-
-		disableTerminateButton = new Thread() {
-			public void run() {
-				terminateButton.setEnabled(false);
-			}
-		};
-
-		// start things up now
-		terminateButton.setEnabled(true);
-		commandThread.start();
-	}
-
-	/**
-	 * Disposes of all shell windows when the instance of Eclipse that created
-	 * them exits.
-	 * 
-	 * @param none
-	 * @return void
-	 */
-	public void dispose() {
-		for (Shell s : this.activeShells) {
-			if (s != null) {
-				s.dispose();
-			}
-		}
-		super.dispose();
-	}
-
-	/*
-	 * Uses the rightViewer to display all other calls associated with this one
-	 */
-	private void displayCollectiveInfo() {
-		Envelope env = this.transitions.getCurrentTransition();
-		ArrayList<Envelope> envs = env.getCommunicator_matches();
-
-		if (envs != null) {
-			for (int i = 0; i < envs.size(); i++) {
-				Envelope currEnv = envs.get(i);
-				String fileName = currEnv.getFilename();
-				int index = fileName.lastIndexOf("/"); //$NON-NLS-1$
-				fileName = fileName.substring(index + 1, fileName.length());
-				this.rightViewer.add(new ListElement(currEnv.getFilename(),
-						fileName + Messages.GemAnalyzer_8
-								+ currEnv.getLinenumber()
-								+ Messages.GemAnalyzer_9 + currEnv.getRank(),
-						currEnv.getLinenumber(), false));
-			}
-		}
-	}
-
-	/*
-	 * Only changes the contents, does not change the highlighting.
-	 */
-	private void updateCodeViewers() {
-		// First time through, current Envelope is null. No update needed
-		if (this.transitions.getCurrentTransition() != null) {
-			String newLeftFileName = this.transitions.getCurrentTransition()
-					.getFilename();
-			String newRightFileName = ""; //$NON-NLS-1$
-			Envelope env = this.transitions.getCurrentTransition()
-					.getMatch_envelope();
-			if (env != null) {
-				newRightFileName = env.getFilename();
-			}
-
-			if (!newLeftFileName.equals(this.currLeftFileName)
-					|| !newRightFileName.equals(this.currRightFileName)
-					|| newRightFileName.equals("")) { //$NON-NLS-1$
-				parseSourceFile(newLeftFileName, newRightFileName);
-			}
-		}
-	}
-
-	/*
-	 * Updates which line of the Log File is currently in focus.
-	 */
-	private void updateSelectedLine(Boolean scroll) {
-		updateCodeViewers();
-
-		// Deselect Everything
-		List leftList = this.leftViewer.getList();
-		List rightList = this.rightViewer.getList();
-		leftList.deselectAll();
-		rightList.deselectAll();
-
-		updateLineCount();
-
-		// Update left view
-		for (int i = 0; i < this.leftLines; i++) {
-			// -1, 0-based
-			leftList.select((this.leftIndex - i) - 1);
-		}
-
-		// Update right view
-		for (int i = 0; i < this.rightLines; i++) {
-			// -1, 0-based
-			rightList.select((this.rightIndex - i) - 1);
-		}
-
-		if (scroll) {
-			updateScrollBars();
-		}
-	}
-
-	/*
-	 * This method is used to highlight ALL lines involved in a call
-	 */
-	private void updateLineCount() {
-		List leftList = this.leftViewer.getList();
-		List rightList = this.rightViewer.getList();
-
-		String curr = ""; //$NON-NLS-1$
-		this.leftLines = 1;
-		if (this.leftIndex <= 0) {
-			this.leftLines = 0;
-			return;
-		}
-		while (leftLines < leftIndex + 1) {// to prevent accidentally going over
-			// Get current string
-			curr = ""; //$NON-NLS-1$
-			for (int i = leftLines; i > 0; i--) {
-				curr += leftList.getItem(leftIndex - i);
-				curr = removeComments(curr);
-			}
-
-			if (this.parenthesesMatched(curr))
-				break;
-			leftLines++;
-		}
-		// Be sure to include the MPI Call
-		curr = curr.substring(0, curr.indexOf("(") - 1); //$NON-NLS-1$
-		if (curr.trim().length() == 0) {
-			this.leftLines++;
-		}
-
-		if (rightIndex == -1) {
-			return;
-		}
-		this.rightLines = 1;
-
-		// to prevent accidentally going over
-		while (rightLines < rightIndex + 1) {
-			// Get current string
-			curr = ""; //$NON-NLS-1$
-			for (int i = rightLines; i > 0; i--) {
-				curr += rightList.getItem(rightIndex - i);
-				curr = removeComments(curr);
-			}
-
-			if (this.parenthesesMatched(curr)) {
-				break;
-			}
-			rightLines++;
-		}
-		curr = curr.substring(0, curr.indexOf("(") - 1); //$NON-NLS-1$
-		if (curr.trim().length() == 0) {
-			this.rightLines++;
-		}
-	}
-
-	/*
-	 * Updates the relative position of the scrollbar for the list viewers.
-	 */
-	private void updateScrollBars() {
-		try {
-			if (this.leftViewer.getList() != null) {
-				this.leftViewer.reveal(this.leftViewer.getElementAt(0));
-			}
-			if (this.leftViewer.getList() != null
-					&& this.leftViewer.getList().getSelection()[0] != null) {
-				this.leftViewer.reveal(this.leftViewer
-						.getElementAt(this.leftIndex - 1));
-			}
-			if (this.rightViewer.getList() != null) {
-				this.rightViewer.reveal(this.rightViewer.getElementAt(0));
-			}
-			if (this.rightViewer.getList() != null
-					&& this.rightViewer.getList().getSelection()[0] != null) {
-				this.rightViewer.reveal(this.rightViewer
-						.getElementAt(this.rightIndex - 1));
-			}
-		} catch (Exception e) {
-		}
-	}
-
-	/*
-	 * Sets the label text in the interleavings buttons group.
-	 */
-	private void setMessageLabelText() {
-		// This is for foreground coloring
-		Display display = this.parent.getShell().getDisplay();
-		Color RED = new Color(display, new RGB(255, 0, 0));
-		Color GREEN = new Color(display, new RGB(0, 200, 0));
-
-		// Interleaving label
-		this.interleavingsGroup.setText(Messages.GemAnalyzer_10
-				+ this.transitions.getCurrentInterleaving() + "/" //$NON-NLS-1$
-				+ this.transitions.getTotalInterleavings());
-
-		// Transition Label
-		this.transitionsGroup.setText(Messages.GemAnalyzer_11 + transitionIndex
-				+ "/" //$NON-NLS-1$
-				+ this.transitionCount);
-
-		// Error message label
-		if (this.transitions.hasDeadlock()) {
-			this.errorMessageLabel.setForeground(RED);
-			ArrayList<Integer> deadlockList = this.transitions
-					.getDeadlockInterleavings();
-			String deadlocks = ""; //$NON-NLS-1$
-			if (deadlockList.size() == 1) {
-				deadlocks = deadlockList.get(0).toString();
-			} else {
-				for (int i = 0; i < deadlockList.size(); i++) {
-					String num = deadlockList.get(i).toString();
-					deadlocks += (i != deadlockList.size() - 1) ? num + ", " //$NON-NLS-1$
-					: num;
-				}
-			}
-			String errorMsg = Messages.GemAnalyzer_12;
-			errorMsg += deadlocks.length() == 1 ? " " : "s "; //$NON-NLS-1$ //$NON-NLS-2$
-			this.errorMessageLabel.setText(errorMsg + deadlocks);
-		} else if (transitions.hasAssertion()) {
-			this.errorMessageLabel.setForeground(RED);
-			this.errorMessageLabel.setText(Messages.GemAnalyzer_13
-					+ this.transitions.getTotalInterleavings());
-		} else if (this.transitions.hasError()) {
-			this.errorMessageLabel.setForeground(RED);
-			this.errorMessageLabel.setText(Messages.GemAnalyzer_120);
-		} else {
-			this.errorMessageLabel.setForeground(GREEN);
-			this.errorMessageLabel.setText(Messages.GemAnalyzer_14);
-		}
-
-		// Resource leak label
-		if (this.transitions.hasResourceLeak()) {
-			this.resourcLeakLabel.setForeground(RED);
-			this.resourcLeakLabel.setText(Messages.GemAnalyzer_15);
-		} else {
-			this.resourcLeakLabel.setForeground(GREEN);
-			this.resourcLeakLabel.setText(Messages.GemAnalyzer_16);
-		}
-	}
-
-	/*
-	 * Launches the call browser window as a separate shell window. This will
-	 * yield a list of MPI calls sorted by interleaving -> rank -> MPI call.
-	 */
-	private void launchCallBrowser() {
-		// Initialize and setup call browser shell
-		IWorkbench wb = PlatformUI.getWorkbench();
-		Display display = wb.getDisplay();
-		Shell shell = new Shell();
-		shell.setText(Messages.GemAnalyzer_17);
-		shell.setImage(GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/magnified-trident.gif"))); //$NON-NLS-1$
-		shell.setLayout(new GridLayout());
-
-		CLabel fileNameLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		fileNameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		CLabel numProcsLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		numProcsLabel.setImage(GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/processes.gif"))); //$NON-NLS-1$
-		numProcsLabel.setText(Messages.GemAnalyzer_18 + this.numRanks);
-		numProcsLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		Tree tree = new Tree(shell, SWT.BORDER);
-		tree.setLinesVisible(true);
-		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
-		tree.setFont(setFontSize(tree.getFont(), 8));
-
-		// Declare everything we'll be working with
-		TreeItem interleavingItem = null;
-		TreeItem rankItem = null;
-		int prevInterleaving = -1;
-		int currInterleaving = -1;
-		int prevRank = -1;
-		int currRank = -1;
-		int lineNum = -1;
-		int end = this.logContents.size();
-
-		// Parse the logfile and populate Call Browser with contents.
-		for (int i = 0; i < end; i++) {
-			String logEntry = this.logContents.get(i);
-			Scanner s = new Scanner(logEntry);
-
-			// Deal with the interleavings
-			currInterleaving = s.nextInt();
-			if (currInterleaving > prevInterleaving) {
-				interleavingItem = new TreeItem(tree, SWT.NULL);
-				interleavingItem.setText(Messages.GemAnalyzer_19
-						+ currInterleaving);
-				prevInterleaving = currInterleaving;
-				currRank = 0;
-				prevRank = -1;
-			}
-
-			// Deal with ranks
-			currRank = s.nextInt();
-			if (currRank > prevRank) {
-				rankItem = new TreeItem(interleavingItem, SWT.NULL);
-				rankItem.setText(Messages.GemAnalyzer_20 + currRank);
-				prevRank = currRank;
-			}
-
-			// Leaks don't have any more ints and we don't want to display them
-			if (!s.hasNextInt()) {
-				continue;
-			}
-
-			// Find out if the call completed
-			boolean completes = true;
-			s.nextInt();
-			s.nextInt();
-			if (s.nextInt() == -1) {
-				completes = false;
-			}
-
-			// Discover which interleaving this entry corresponds to
-			int inter = Integer.parseInt(logEntry.substring(0, logEntry
-					.indexOf(" "))); //$NON-NLS-1$
-
-			// Grab the name of the source file
-			int index = logEntry.lastIndexOf(" "); //$NON-NLS-1$
-			String name = logEntry.substring(0, index);
-			index = name.lastIndexOf("/"); //$NON-NLS-1$
-			name = name.substring(index + 1, name.length());
-
-			// Grab the line number at the end of the log-entry
-			int lastSpaceIndex = logEntry.lastIndexOf(" "); //$NON-NLS-1$
-			lineNum = Integer.parseInt(logEntry.substring(lastSpaceIndex + 1,
-					logEntry.length()));
-
-			// Create leaves for the rank branchesassembleSourceLine
-			TreeItem callItem = new TreeItem(rankItem, SWT.NULL);
-			String call = logContents.get(i);
-			for (int c = 0; c < 5; c++) {
-				call = call.substring(call.indexOf(" ") + 1); //$NON-NLS-1$
-			}
-			call = call.substring(0, call.indexOf(" ")); //$NON-NLS-1$
-			callItem.setText(call
-					+ " \t" + name + Messages.GemAnalyzer_21 + lineNum); //$NON-NLS-1$
-
-			// Mark the current transition +1 b/c currTrans is 0-Based
-			int currentInter = this.transitions.currentInterleaving + 1;
-			if (lineNum == this.leftIndex && inter == currentInter) {
-				callItem.setForeground(new Color(null, 0, 0, 255));
-				// Comment this out if you don't want items expanded
-				revealTreeItem(callItem);
-			}
-			// Mark the lines with errors
-			if (!completes) {
-				callItem.setForeground(new Color(null, 255, 0, 0));
-			}
-		}
-
-		// Open up the Call Browser window with the specified size
-		shell.setSize(550, 550);
-		shell.open();
-		this.activeShells.add(shell);
-
-		// Set up the event loop
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
-
-	/*
-	 * To make an item visible we must expand each of its parents. Sadly the
-	 * root must be expanded first and work its way down to the goal. So we
-	 * recursively find parents and then expand once all of the current item's
-	 * parents has been expanded.
-	 */
-	private void revealTreeItem(TreeItem callItem) {
-		if (callItem.getParentItem() == null) {
-			callItem.setExpanded(true);
-		} else {
-			revealTreeItem(callItem.getParentItem());
-			callItem.setExpanded(true);
-		}
-	}
-
-	/*
-	 * Launches the resource leak browser window as a separate shell window.
-	 * This will yield a listing of all resource leaks found if any.
-	 */
-	private void launchLeakBrowser() {
-		ArrayList<Envelope> leakList = this.transitions.getResourceLeakList();
-
-		// Initialize and setup leak browser shell
-		IWorkbench wb = PlatformUI.getWorkbench();
-		Display display = wb.getDisplay();
-		Shell shell = new Shell();
-		shell.setText(Messages.GemAnalyzer_22);
-		shell.setImage(GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/magnified-trident.gif"))); //$NON-NLS-1$
-		shell.setLayout(new GridLayout());
-
-		CLabel fileNameLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		fileNameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		CLabel hintLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		hintLabel.setImage(GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/expand-tree.gif"))); //$NON-NLS-1$
-		hintLabel.setText(Messages.GemAnalyzer_23);
-		hintLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		Tree tree = new Tree(shell, SWT.BORDER);
-		tree.setLinesVisible(true);
-		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
-		tree.setFont(setFontSize(tree.getFont(), 8));
-
-		// Declare everything we'll be working with
-		TreeItem leakItem = null;
-		TreeItem fileItem = null;
-
-		// Parse the resource leak list and populate tree.
-		int listSize = leakList.size();
-		for (int i = 0; i < listSize; i++) {
-			Envelope env = leakList.get(i);
-			leakItem = new TreeItem(tree, SWT.NULL);
-			leakItem.setText(Messages.GemAnalyzer_24 + i + ": " //$NON-NLS-1$
-					+ env.getLeakResource());
-
-			String sourceFilePath = env.getFilename();
-
-			String base = ResourcesPlugin.getWorkspace().getRoot()
-					.getLocation()
-					+ ""; //$NON-NLS-1$
-			String name = sourceFilePath.substring(base.length());
-
-			fileItem = new TreeItem(leakItem, SWT.NULL);
-			fileItem.setText(name + Messages.GemAnalyzer_25
-					+ env.getLinenumber());
-		}
-
-		// Create a listener to allow "jumps" to the Editor
-		SelectionListener listener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (e.item.toString().contains(Messages.GemAnalyzer_26)) {
-					String lineString = e.item.toString().substring(
-							e.item.toString().lastIndexOf(" ")); //$NON-NLS-1$
-					lineString = lineString.substring(1,
-							lineString.length() - 1);
-					int lineNum = Integer.parseInt(lineString);
-					String fileName = e.item.toString();
-					fileName = fileName.substring(fileName.indexOf("{") + 1); //$NON-NLS-1$
-					fileName = fileName.substring(0, fileName
-							.indexOf(Messages.GemAnalyzer_27) - 1);
-					openEditor(lineNum, fileName);
-				}
-			}
-		};
-		tree.addSelectionListener(listener);
-
-		// Open up the Call Browser window with the specified size
-		shell.setSize(500, 400);
-		shell.open();
-		this.activeShells.add(shell);
-
-		// Set up the event loop
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
-
-	/*
-	 * Launches the resource leak browser window as a separate shell window.
-	 * This will yield a listing of all resource leaks found if any.
-	 */
-	private void launchErrorBrowser() {
-
-		// Initialize and setup leak browser shell
-		IWorkbench wb = PlatformUI.getWorkbench();
-		Display display = wb.getDisplay();
-		Shell shell = new Shell();
-		this.errShell = shell;
-		shell.setText(Messages.GemAnalyzer_28);
-		shell.setImage(GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/magnified-trident.gif"))); //$NON-NLS-1$
-		shell.setLayout(new GridLayout());
-
-		CLabel fileNameLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		fileNameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		CLabel hintLabel = new CLabel(shell, SWT.BORDER_SOLID);
-		hintLabel.setImage(GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/expand-tree.gif"))); //$NON-NLS-1$
-		hintLabel.setText(Messages.GemAnalyzer_29);
-		hintLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		Tree tree = new Tree(shell, SWT.BORDER);
-		tree.setLinesVisible(true);
-		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
-		tree.setFont(setFontSize(tree.getFont(), 8));
-
-		// Declare everything we'll be working with
-		TreeItem fileItem = null;
-
-		// Parse the resource leak list and populate tree.
-		int listSize = this.errorCount;
-		for (int i = 0; i < listSize; i++) {
-			Envelope env = (Envelope) this.errorCalls[i];
-
-			// If this error is not part of this interleaving skip it
-			if (env.getInterleaving() != this.transitions
-					.getCurrentInterleaving()) {
-				continue;
-			}
-
-			String sourceFilePath = env.getFilename();
-			String base = ResourcesPlugin.getWorkspace().getRoot()
-					.getLocation().toPortableString();
-			String name = sourceFilePath.substring(base.length());
-
-			fileItem = new TreeItem(tree, SWT.NULL);
-			fileItem.setText(env.getFunctionName()
-					+ "   \t" + name + Messages.GemAnalyzer_30 //$NON-NLS-1$
-					+ env.getLinenumber());
-		}
-
-		// Create a listener to allow "jumps" to the Editor
-		SelectionListener listener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (e.item.toString().contains(Messages.GemAnalyzer_31)) {
-					String lineString = e.item.toString().substring(
-							e.item.toString().lastIndexOf(" ")); //$NON-NLS-1$
-					lineString = lineString.substring(1,
-							lineString.length() - 1);
-					int lineNum = Integer.parseInt(lineString);
-					String fileName = e.item.toString();
-					fileName = fileName.substring(fileName.indexOf("\t") + 2); //$NON-NLS-1$
-					fileName = fileName.substring(0, fileName
-							.indexOf(Messages.GemAnalyzer_32) - 1);
-					openEditor(lineNum, fileName);
-					errShell.forceFocus();
-				}
-			}
-		};
-		tree.addSelectionListener(listener);
-
-		// Open up the Call Browser window with the specified size
-		shell.setSize(500, 400);
-		shell.open();
-		this.activeShells.add(shell);
-
-		// Set up the event loop
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
-
-	/*
-	 * Sets the enabled property of all buttons to the appropriate state.
-	 */
-	private void setButtonEnabledState() {
-		this.firstTransitionButton.setEnabled(this.transitions
-				.hasValidPreviousTransition(this.lockedRank));
-		this.previousTransitionButton.setEnabled(this.transitions
-				.hasValidPreviousTransition(this.lockedRank));
-		this.nextTransitionButton.setEnabled(this.transitions
-				.hasValidNextTransition(this.lockedRank));
-		this.lastTransitionButton.setEnabled(this.transitions
-				.hasValidNextTransition(this.lockedRank));
-		this.firstInterleavingButton.setEnabled(this.transitions
-				.hasPreviousInterleaving());
-		this.previousInterleavingButton.setEnabled(this.transitions
-				.hasPreviousInterleaving());
-		this.nextInterleavingButton.setEnabled(this.transitions
-				.hasNextInterleaving());
-		this.lastInterleavingButton.setEnabled(this.transitions
-				.hasNextInterleaving());
-		this.deadlockInterleavingButton.setEnabled(this.transitions
-				.getDeadlockInterleavings() != null);
-
-	}
-
-	/*
-	 * Displays the specified envelope and it's matches if they exist.
-	 */
-	private void displayEnvelopes(Envelope env) {
-		// If the env is null, new interleaving, start over
-		if (env == null) {
-			this.leftCodeWindowLabel.setText(""); //$NON-NLS-1$
-			this.rightCodeWindowLabel.setText(""); //$NON-NLS-1$
-			return;
-		}
-
-		// Set the indexes for the highlighted line updater
-		this.leftIndex = env.getLinenumber();
-		boolean hasMatch = true;
-		try {
-			this.rightIndex = env.getMatch_envelope().getLinenumber();
-		} catch (Exception e) {
-			hasMatch = false;
-		}
-
-		// Set font color for code window labels
-		Color textColor = new Color(this.parent.getShell().getDisplay(),
-				new RGB(0, 0, 255));
-		this.leftCodeWindowLabel.setForeground(textColor);
-		this.rightCodeWindowLabel.setForeground(textColor);
-
-		// Build up the Strings for the Label text
-		String leftResult = getCallText(env, true);
-		this.leftCodeWindowLabel.setText(leftResult);
-
-		// If a match exists update the right side
-		if (hasMatch) {
-			Envelope match = env.getMatch_envelope();
-			String rightResult = getCallText(match, false);
-			this.rightCodeWindowLabel.setText(rightResult);
-		} else {
-			this.rightCodeWindowLabel.setText(""); //$NON-NLS-1$
-			this.rightIndex = -1;
-			this.rightViewer.getList().deselectAll();
-		}
-
-		if (env.getIssueIndex() == -1) {
-			textColor = new Color(this.parent.getShell().getDisplay(), new RGB(
-					255, 0, 0));
-			this.rightCodeWindowLabel.setForeground(textColor);
-
-			if (env.getFunctionName().equals("MPI_Abort")) { //$NON-NLS-1$
-				this.rightCodeWindowLabel.setText(""); //$NON-NLS-1$
-			} else if (this.transitions.hasDeadlock()) {
-				this.rightCodeWindowLabel.setText(Messages.GemAnalyzer_36);
-			} else {
-				this.rightCodeWindowLabel.setText(Messages.GemAnalyzer_37);
-			}
-		}
-	}
-
-	/*
-	 * Returns a String representing all information relative to a particular
-	 * successful MPI call.
-	 */
-	private String getCallText(Envelope env, boolean isLeft) {
-		String filename = env.getFilename();
-		filename = filename.substring(filename.lastIndexOf('/') + 1);
-
-		// determine which ranks are involved; by default only call's rank
-		String ranks = Messages.GemAnalyzer_38 + env.getRank() + "\n"; //$NON-NLS-1$
-		if (env.isCollective() && this.lockedRank == -1) {
-			// If it was a group call then discover who else is here, unless of
-			// course we are currently only concerned about a single rank
-			int[] totalSkipped = new int[1];
-			if (this.lockedRank == -1) {
-				ranks = this.transitions.getRanksInvolved(totalSkipped);
-			}
-
-			int MAX = 16;
-			if (totalSkipped[0] > MAX) {
-				// display only first ten
-				String temp = ranks;
-				int total = 0;
-				for (int i = 0; i < MAX; i++) {
-					total += temp.indexOf(",") + 1; //$NON-NLS-1$
-					temp = temp.substring(temp.indexOf(",") + 1); //$NON-NLS-1$
-				}
-				ranks = Messages.GemAnalyzer_39 + ranks.substring(0, total - 1)
-						+ "..." //$NON-NLS-1$
-						+ "\n"; //$NON-NLS-1$
-			} else {
-				ranks = Messages.GemAnalyzer_40 + ranks + "\n"; //$NON-NLS-1$
-			}
-
-			// count number of ":" to determine how many ranks involved
-			int ranksCommunicatedTo = 0;
-			String communicator = env.getCommunicator_ranks_string();
-			while (communicator != null && communicator.contains(":")) { //$NON-NLS-1$
-				communicator = communicator
-						.substring(communicator.indexOf(":") + 1); //$NON-NLS-1$
-				ranksCommunicatedTo++;
-			}
-
-			if (ranksCommunicatedTo != 0
-					&& totalSkipped[0] / ranksCommunicatedTo > 1) {
-				ranks = Messages.GemAnalyzer_41 + totalSkipped[0]
-						/ ranksCommunicatedTo + Messages.GemAnalyzer_42
-						+ ranksCommunicatedTo + Messages.GemAnalyzer_43;
-			}
-		}
-		String result = ""; //$NON-NLS-1$
-		if (isLeft) {
-			result = ranks + Messages.GemAnalyzer_44 + filename
-					+ Messages.GemAnalyzer_45 + this.leftIndex;
-		} else {
-			result = ranks + Messages.GemAnalyzer_46 + filename
-					+ Messages.GemAnalyzer_47 + this.rightIndex;
-		}
-		return result;
-	}
-
-	/*
-	 * Populates the lock ranks combo-box with the correct number of entries for
-	 * the current analyzation.
-	 */
-	private void setLockRankItems() {
-		final String[] ranks = new String[this.numRanks + 1];
-		ranks[0] = Messages.GemAnalyzer_48;
-		for (int i = 1; i <= this.numRanks; i++) {
-			ranks[i] = (Messages.GemAnalyzer_49 + (Integer) (i - 1))
-					+ Messages.GemAnalyzer_50;
-		}
-		this.lockRanksComboList.setItems(ranks);
-		this.lockRanksComboList.setText(Messages.GemAnalyzer_51);
-	}
-
-	/*
-	 * Populates the num-procs combo-box with choices the user can use to set
-	 * the number of processes for the next analyzer run.
-	 */
-	private void setNumProcItems() {
-		final String[] ranks = new String[16];
-		for (int i = 1; i <= 16; i++) {
-			ranks[i - 1] = ((Integer) i).toString();
-		}
-		this.setNumProcsComboList.setItems(ranks);
-		Integer nprocs = GemPlugin.getDefault().getPreferenceStore().getInt(
-				PreferenceConstants.GEM_PREF_NUMPROCS);
-		this.setNumProcsComboList.setText(nprocs.toString());
-	}
-
-	/*
-	 * Resets everything to default values. Used when a new file is analyzed.
-	 */
-	private void reset() {
-		// By making the current files "" we force the code viewers to update
-		this.currLeftFileName = ""; //$NON-NLS-1$
-		this.currRightFileName = ""; //$NON-NLS-1$
-		transitions.currentInterleaving = 0;
-		transitions.currentTransition = 0;
-
-		// Update labels and combo lists
-		setMessageLabelText();
-		setLockRankItems();
-		setNumProcItems();
-
-		// Update global indices
-		this.leftIndex = 0;
-		this.rightIndex = 0;
-		this.lockedRank = -1;
-		this.errorIndex = 1;
-
-		// Runtime group buttons
-		this.deadlockInterleavingButton.setEnabled(transitions
-				.getDeadlockInterleavings() != null);
-		this.browseCallsButton.setEnabled(true);
-		this.browseCallsButton.setText(Messages.GemAnalyzer_52);
-		this.browseCallsButton.setImage(GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/browse.gif"))); //$NON-NLS-1$
-		this.launchIspUIButton.setEnabled(true);
-
-		// Browse resource leaks button
-		this.browseLeaksButton.setEnabled(this.transitions.hasResourceLeak());
-		if (this.browseLeaksButton.isEnabled()) {
-			this.browseLeaksButton.setImage(GemPlugin.getImage(GemPlugin
-					.getImageDescriptor("icons/browse.gif"))); //$NON-NLS-1$
-			this.browseLeaksButton.setText(Messages.GemAnalyzer_53);
-		} else {
-			this.browseLeaksButton.setImage(GemPlugin.getImage(GemPlugin
-					.getImageDescriptor("icons/no-error.gif"))); //$NON-NLS-1$
-			this.browseLeaksButton.setText(Messages.GemAnalyzer_54);
-		}
-
-		// Error button for deadlocks OR assertion violations
-		updateErrorButtonState();
-
-		// Clear the code window info labels
-		this.leftCodeWindowLabel.setText("\n"); //$NON-NLS-1$
-		this.rightCodeWindowLabel.setText("\n"); //$NON-NLS-1$
-
-		// GoToFirstTransition(); Called by UpdateTransitionVars
-		updateTransitionVars(false);
-
-		// This is UGLY section is needed since the scroll bars are unresponsive
-		// until the view is fully created. For this reason we need to back up
-		// to Transition 0 and update the labels.
-		this.transitionIndex = 0;
-		this.transitionsGroup.setText(Messages.GemAnalyzer_55
-				+ this.transitionIndex + "/" //$NON-NLS-1$
-				+ this.transitionCount);
-		this.transitions.currentTransition = -1;
-		this.leftIndex = 0;
-		this.rightIndex = 0;
-		this.oldLeftIndex = 0;
-		setButtonEnabledState();
-		updateSelectedLine(true);
-		setMessageLabelText();
-		// END UGLY SECTION
-	}
-
-	/*
-	 * Given the initial Font, this helper method returns that Font with the new
-	 * specified size.
-	 */
-	private Font setFontSize(Font font, int size) {
-		FontData[] fontData = font.getFontData();
-		for (int i = 0; i < fontData.length; i++) {
-			fontData[i].setHeight(size);
-		}
-		return new Font(this.parent.getDisplay(), fontData);
-	}
-
-	/*
-	 * Opens the editor with the current source file active and jump to the line
-	 * number that is passed in.
-	 */
-	private void openEditor(int lineNum, String sourceFileString) {
-		try {
-			IFile sourceFile = getIFile(sourceFileString);
-			IEditorPart editor = org.eclipse.ui.ide.IDE.openEditor(PlatformUI
-					.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
-					sourceFile, true);
-			IMarker marker = sourceFile.createMarker(IMarker.MARKER);
-			marker.setAttribute(IMarker.LINE_NUMBER, lineNum);
-			org.eclipse.ui.ide.IDE.gotoMarker(editor, marker);
-		} catch (Exception e) {
-			GemUtilities.showExceptionDialog(Messages.GemAnalyzer_56, e);
-			GemUtilities.logError(Messages.GemAnalyzer_56, e);
-		}
-	}
-
-	/*
-	 * Returns an IFile from the specified path and file name. (only works if
-	 * the file is already in the workspace)
-	 */
-	private IFile getIFile(String sourceFilePath) {
-		IPath filePath = new Path(sourceFilePath);
-		IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().getFile(
-				filePath);
-		return sourceFile;
-	}
-
-	/*
-	 * Creates the actions associated with the action bar buttons and context
-	 * menu items.
-	 */
-	private void makeActions() {
-		this.getHelp = new Action() {
-			public void run() {
-				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(
-						"/org.eclipse.ptp.gem.help/html/analyzerView.html"); //$NON-NLS-1$
-			}
-		};
-		this.getHelp.setText(""); //$NON-NLS-1$
-		this.getHelp.setToolTipText(Messages.GemAnalyzer_57);
-		this.getHelp.setImageDescriptor(GemPlugin
-				.getImageDescriptor("icons/help-contents.gif")); //$NON-NLS-1$
-	}
-
-	/*
-	 * Adds MenuListeners to hook selections from the context menu.
-	 */
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				GemAnalyzer.this.fillContextMenu(manager);
-			}
-		});
-		Menu leftMenu = menuMgr.createContextMenu(this.leftViewer.getControl());
-		this.leftViewer.getControl().setMenu(leftMenu);
-		getSite().registerContextMenu(menuMgr, this.leftViewer);
-
-		Menu rightMenu = menuMgr.createContextMenu(this.rightViewer
-				.getControl());
-		this.rightViewer.getControl().setMenu(rightMenu);
-		getSite().registerContextMenu(menuMgr, this.rightViewer);
-	}
-
-	/*
-	 * Calls finer grained methods, populating the view action bar.
-	 */
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
-
-	/*
-	 * Populates the view pull-down menu.
-	 */
-	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(this.getHelp);
-		manager.add(new Separator());
-
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
-
-	/*
-	 * Populates the view context menu.
-	 */
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(this.getHelp);
-		this.getHelp.setText(Messages.GemAnalyzer_58);
-
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
-
-	/*
-	 * Contributes icons and actions to the tool bar.
-	 */
-	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(this.getHelp);
-
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
-
-	/*
-	 * Helper method called by createPartControl.
-	 */
-	private void createTransitionsGroup(Composite parent) {
-		// Get images for buttons from image cache
-		Image firstItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/first-item.gif")); //$NON-NLS-1$
-		Image lastItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/last-item.gif")); //$NON-NLS-1$
-		Image prevItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/prev-item.gif")); //$NON-NLS-1$
-		Image nextItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/next-item.gif")); //$NON-NLS-1$
-
-		// Group and FormLayout data for transition buttons and labels
-		this.transitionsGroup = new Group(parent, SWT.SHADOW_IN);
-		this.transitionsGroup.setText(Messages.GemAnalyzer_59);
-		this.transitionsGroup.setToolTipText(Messages.GemAnalyzer_60);
-		FormData transitionsFormData = new FormData();
-		transitionsFormData.left = new FormAttachment(0, 5);
-		transitionsFormData.bottom = new FormAttachment(100, -5);
-		this.transitionsGroup.setLayoutData(transitionsFormData);
-		this.transitionsGroup.setLayout(new FormLayout());
-
-		// First transition button
-		this.firstTransitionButton = new Button(this.transitionsGroup, SWT.PUSH);
-		this.firstTransitionButton.setImage(firstItemImage);
-		this.firstTransitionButton.setToolTipText(Messages.GemAnalyzer_61);
-		this.firstTransitionButton.setEnabled(false);
-		FormData tfirstFormData = new FormData();
-		tfirstFormData.left = new FormAttachment(0, 5);
-		tfirstFormData.bottom = new FormAttachment(100, -5);
-		this.firstTransitionButton.setLayoutData(tfirstFormData);
-
-		// Previous transition button
-		this.previousTransitionButton = new Button(this.transitionsGroup,
-				SWT.PUSH);
-		this.previousTransitionButton.setImage(prevItemImage);
-		this.previousTransitionButton.setToolTipText(Messages.GemAnalyzer_62);
-		this.previousTransitionButton.setEnabled(false);
-		FormData tprevFormData = new FormData();
-		tprevFormData.left = new FormAttachment(this.firstTransitionButton, 3);
-		tprevFormData.bottom = new FormAttachment(100, -5);
-		this.previousTransitionButton.setLayoutData(tprevFormData);
-
-		// Next transition buttons
-		this.nextTransitionButton = new Button(this.transitionsGroup, SWT.PUSH);
-		this.nextTransitionButton.setImage(nextItemImage);
-		this.nextTransitionButton.setToolTipText(Messages.GemAnalyzer_63);
-		this.nextTransitionButton.setEnabled(false);
-		FormData tnextFormData = new FormData();
-		tnextFormData.left = new FormAttachment(this.previousTransitionButton,
-				3);
-		tnextFormData.bottom = new FormAttachment(100, -5);
-		this.nextTransitionButton.setLayoutData(tnextFormData);
-
-		// Last transition button
-		this.lastTransitionButton = new Button(this.transitionsGroup, SWT.PUSH);
-		this.lastTransitionButton.setImage(lastItemImage);
-		this.lastTransitionButton.setToolTipText(Messages.GemAnalyzer_64);
-		this.lastTransitionButton.setEnabled(false);
-		FormData tlastFormData = new FormData();
-		tlastFormData.left = new FormAttachment(this.nextTransitionButton, 3);
-		tlastFormData.bottom = new FormAttachment(100, -5);
-		this.lastTransitionButton.setLayoutData(tlastFormData);
-
-		// Lock ranks button
-		this.lockRanksComboList = new Combo(this.transitionsGroup,
-				SWT.DROP_DOWN | SWT.READ_ONLY);
-		Font lockRanksComboFont = setFontSize(
-				this.lockRanksComboList.getFont(), 8);
-		this.lockRanksComboList.setFont(lockRanksComboFont);
-		String[] items = new String[] { Messages.GemAnalyzer_65 };
-		this.lockRanksComboList.setItems(items);
-		this.lockRanksComboList.setToolTipText(Messages.GemAnalyzer_66);
-		FormData lockRanksFormData = new FormData();
-		lockRanksFormData.left = new FormAttachment(this.lastTransitionButton,
-				10);
-		lockRanksFormData.right = new FormAttachment(100, -5);
-		lockRanksFormData.bottom = new FormAttachment(100, -5);
-		this.lockRanksComboList.setLayoutData(lockRanksFormData);
-	}
-
-	/*
-	 * Helper method called by createPartControl.
-	 */
-	private void createInterleavingsGroup(Composite parent) {
-		// Get images for buttons from image cache
-		Image firstItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/first-item.gif")); //$NON-NLS-1$
-		Image lastItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/last-item.gif")); //$NON-NLS-1$
-		Image prevItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/prev-item.gif")); //$NON-NLS-1$
-		Image nextItemImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/next-item.gif")); //$NON-NLS-1$
-		Image deadlockImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/deadlock.gif")); //$NON-NLS-1$
-
-		// Group and FormLayout data for interleaving buttons and labels
-		this.interleavingsGroup = new Group(parent, SWT.SHADOW_IN);
-		this.interleavingsGroup.setText(Messages.GemAnalyzer_67);
-		this.interleavingsGroup.setToolTipText(Messages.GemAnalyzer_68);
-		FormData interleavingsFormData = new FormData();
-		interleavingsFormData.bottom = new FormAttachment(100, -5);
-		interleavingsFormData.left = new FormAttachment(this.transitionsGroup,
-				20);
-		this.interleavingsGroup.setLayoutData(interleavingsFormData);
-		this.interleavingsGroup.setLayout(new FormLayout());
-
-		// First interleaving button
-		this.firstInterleavingButton = new Button(this.interleavingsGroup,
-				SWT.PUSH);
-		this.firstInterleavingButton.setImage(firstItemImage);
-		this.firstInterleavingButton.setToolTipText(Messages.GemAnalyzer_69);
-		this.firstInterleavingButton.setEnabled(false);
-		FormData ifirstFormData = new FormData();
-		ifirstFormData.left = new FormAttachment(0, 5);
-		ifirstFormData.bottom = new FormAttachment(100, -5);
-		this.firstInterleavingButton.setLayoutData(ifirstFormData);
-
-		// Previous interleaving button
-		this.previousInterleavingButton = new Button(this.interleavingsGroup,
-				SWT.PUSH);
-		this.previousInterleavingButton.setImage(prevItemImage);
-		this.previousInterleavingButton.setToolTipText(Messages.GemAnalyzer_70);
-		this.previousInterleavingButton.setEnabled(false);
-		FormData iprevFormData = new FormData();
-		iprevFormData.left = new FormAttachment(this.firstInterleavingButton, 3);
-		iprevFormData.bottom = new FormAttachment(100, -5);
-		this.previousInterleavingButton.setLayoutData(iprevFormData);
-
-		// Next interleaving button
-		this.nextInterleavingButton = new Button(this.interleavingsGroup,
-				SWT.PUSH);
-		this.nextInterleavingButton.setImage(nextItemImage);
-		this.nextInterleavingButton.setToolTipText(Messages.GemAnalyzer_71);
-		this.nextInterleavingButton.setEnabled(false);
-		FormData inextFormData = new FormData();
-		inextFormData.left = new FormAttachment(
-				this.previousInterleavingButton, 3);
-		inextFormData.bottom = new FormAttachment(100, -5);
-		this.nextInterleavingButton.setLayoutData(inextFormData);
-
-		// Last interleaving button
-		this.lastInterleavingButton = new Button(this.interleavingsGroup,
-				SWT.PUSH);
-		this.lastInterleavingButton.setImage(lastItemImage);
-		this.lastInterleavingButton.setToolTipText(Messages.GemAnalyzer_72);
-		this.lastInterleavingButton.setEnabled(false);
-		FormData ilastFormData = new FormData();
-		ilastFormData.left = new FormAttachment(this.nextInterleavingButton, 3);
-		ilastFormData.bottom = new FormAttachment(100, -5);
-		this.lastInterleavingButton.setLayoutData(ilastFormData);
-
-		// Deadlock interleaving button
-		this.deadlockInterleavingButton = new Button(this.interleavingsGroup,
-				SWT.PUSH);
-		this.deadlockInterleavingButton.setImage(deadlockImage);
-		this.deadlockInterleavingButton.setToolTipText(Messages.GemAnalyzer_73);
-		this.deadlockInterleavingButton.setEnabled(false);
-		FormData deadlockButtonFormData = new FormData();
-		deadlockButtonFormData.left = new FormAttachment(
-				this.lastInterleavingButton, 3);
-		deadlockButtonFormData.bottom = new FormAttachment(100, -5);
-		deadlockButtonFormData.right = new FormAttachment(100, -5);
-		this.deadlockInterleavingButton.setLayoutData(deadlockButtonFormData);
-	}
-
-	/*
-	 * Helper method called by createPartControl.
-	 */
-	private void createStepOrderGroup(Composite parent) {
-
-		Image endEarlyImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/progress_stop.gif")); //$NON-NLS-1$
-
-		// Group and FormLayout data for step order radio buttons
-		this.stepOrderGroup = new Group(parent, SWT.SHADOW_IN);
-		this.stepOrderGroup.setText(Messages.GemAnalyzer_74);
-		this.stepOrderGroup.setToolTipText(Messages.GemAnalyzer_75);
-		FormData stepOrderFormData = new FormData();
-		stepOrderFormData.left = new FormAttachment(this.interleavingsGroup, 20);
-		stepOrderFormData.bottom = new FormAttachment(100, -5);
-		this.stepOrderGroup.setLayoutData(stepOrderFormData);
-		this.stepOrderGroup.setLayout(new GridLayout(3, false));
-
-		// Step order radio buttons
-		this.internalIssueOrderButton = new Button(this.stepOrderGroup,
-				SWT.RADIO);
-		this.internalIssueOrderButton.setText(Messages.GemAnalyzer_76);
-		this.internalIssueOrderButton.setToolTipText(Messages.GemAnalyzer_77);
-		this.programOrderButton = new Button(this.stepOrderGroup, SWT.RADIO);
-		this.programOrderButton.setText(Messages.GemAnalyzer_78);
-		this.programOrderButton.setToolTipText(Messages.GemAnalyzer_79);
-
-		// Choose which one is to be enabled from the Preference Store setting
-		String stepOrder = GemPlugin.getDefault().getPreferenceStore()
-				.getString(PreferenceConstants.GEM_PREF_STEP_ORDER);
-		if (stepOrder.equals(Messages.GemAnalyzer_80)) {
-			this.internalIssueOrderButton.setSelection(true);
-		} else {
-			this.programOrderButton.setSelection(true);
-		}
-
-		// Font for the radio buttons
-		Font buttonFont = setFontSize(this.programOrderButton.getFont(), 8);
-		this.internalIssueOrderButton.setFont(buttonFont);
-		this.programOrderButton.setFont(buttonFont);
-
-		// Put the kill button to the right of step-order group
-		this.terminateButton = new Button(parent, SWT.PUSH);
-		this.terminateButton.setImage(endEarlyImage);
-		this.terminateButton.setToolTipText(Messages.GemAnalyzer_81);
-		this.terminateButton.setEnabled(false);
-		FormData endEarlyButtonFormData = new FormData();
-		endEarlyButtonFormData.bottom = new FormAttachment(100, -10);
-		endEarlyButtonFormData.left = new FormAttachment(this.stepOrderGroup,
-				15);
-		this.terminateButton.setLayoutData(endEarlyButtonFormData);
-	}
-
 	/*
 	 * Helper method called by createPartControl.
 	 */
 	private void createRuntimeGroup(Composite parent) {
 		// Get images for buttons from image cache
-		Image noErrorImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/no-error.gif")); //$NON-NLS-1$
-		Image uiImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/hbv-trident.gif")); //$NON-NLS-1$
+		final Image noErrorImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/no-error.gif")); //$NON-NLS-1$
+		final Image hbvImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/hbv-trident.gif")); //$NON-NLS-1$
+		final Image trident = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/trident.gif")); //$NON-NLS-1$
 
 		// Runtime information group
-		Group runtimeInfoGroup = new Group(parent, SWT.SHADOW_IN);
-		runtimeInfoGroup.setText(Messages.GemAnalyzer_82);
-		runtimeInfoGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				false, 1, 1));
+		final Group runtimeInfoGroup = new Group(parent, SWT.SHADOW_IN);
+		runtimeInfoGroup.setText(Messages.GemAnalyzer_12);
+		final FormData grid = new FormData();
+		grid.left = new FormAttachment(0, 0);
+		grid.right = new FormAttachment(100, -5);
+		grid.bottom = new FormAttachment(100, -5);
+		runtimeInfoGroup.setLayoutData(grid);
 		runtimeInfoGroup.setLayout(new FormLayout());
 
 		// Error message label
 		this.errorMessageLabel = new Label(runtimeInfoGroup, SWT.NONE);
-		FormData deadlockMessageFormData = new FormData();
+		final FormData deadlockMessageFormData = new FormData();
 		deadlockMessageFormData.left = new FormAttachment(0, 5);
-		deadlockMessageFormData.top = new FormAttachment(0, 0);
-		deadlockMessageFormData.width = 230;
+		deadlockMessageFormData.top = new FormAttachment(0, 5);
+		deadlockMessageFormData.width = 325;
 		this.errorMessageLabel.setLayoutData(deadlockMessageFormData);
-		Font errorMessageLabelFont = setFontSize(this.errorMessageLabel
-				.getFont(), 9);
+		final Font errorMessageLabelFont = setFontSize(this.errorMessageLabel.getFont(), 10);
 		this.errorMessageLabel.setFont(errorMessageLabelFont);
-
-		// Resource leak label
-		this.resourcLeakLabel = new Label(runtimeInfoGroup, SWT.NONE);
-		FormData resourceLeakFormData = new FormData();
-		resourceLeakFormData.left = new FormAttachment(0, 5);
-		resourceLeakFormData.bottom = new FormAttachment(100, -1);
-		resourceLeakFormData.width = 230;
-		this.resourcLeakLabel.setLayoutData(resourceLeakFormData);
-		Font resourceleakLabelFont = setFontSize(this.resourcLeakLabel
-				.getFont(), 9);
-		this.resourcLeakLabel.setFont(resourceleakLabelFont);
-
-		// Examine Error button
-		this.examineErrorsButton = new Button(runtimeInfoGroup, SWT.PUSH);
-		this.examineErrorsButton.setImage(noErrorImage);
-		this.examineErrorsButton.setText(Messages.GemAnalyzer_83);
-		this.examineErrorsButton.setToolTipText(Messages.GemAnalyzer_84);
-		this.examineErrorsButton.setEnabled(false);
-		FormData examineErrorsFormData = new FormData();
-		examineErrorsFormData.right = new FormAttachment(100, -5);
-		examineErrorsFormData.bottom = new FormAttachment(100, -5);
-		this.examineErrorsButton.setLayoutData(examineErrorsFormData);
-
-		// Browse leaks button
-		this.browseLeaksButton = new Button(runtimeInfoGroup, SWT.PUSH);
-		this.browseLeaksButton.setImage(noErrorImage);
-		this.browseLeaksButton.setText(Messages.GemAnalyzer_85);
-		this.browseLeaksButton.setToolTipText(Messages.GemAnalyzer_86);
-		this.browseLeaksButton.setEnabled(false);
-		FormData browseLeaksFormData = new FormData();
-		browseLeaksFormData.right = new FormAttachment(
-				this.examineErrorsButton, -5);
-		browseLeaksFormData.bottom = new FormAttachment(100, -5);
-		this.browseLeaksButton.setLayoutData(browseLeaksFormData);
 
 		// Browse calls button
 		this.browseCallsButton = new Button(runtimeInfoGroup, SWT.PUSH);
 		this.browseCallsButton.setImage(noErrorImage);
-		this.browseCallsButton.setText(Messages.GemAnalyzer_87);
-		this.browseCallsButton.setToolTipText(Messages.GemAnalyzer_88);
+		this.browseCallsButton.setText(Messages.GemAnalyzer_79);
+		this.browseCallsButton.setToolTipText(Messages.GemAnalyzer_14);
 		this.browseCallsButton.setEnabled(false);
-		FormData browseCallsFormData = new FormData();
-		browseCallsFormData.right = new FormAttachment(this.browseLeaksButton,
-				-5);
+		final FormData browseCallsFormData = new FormData();
+		browseCallsFormData.right = new FormAttachment(100, -5);
 		browseCallsFormData.bottom = new FormAttachment(100, -5);
 		this.browseCallsButton.setLayoutData(browseCallsFormData);
 
 		// Launch ispUI button
-		this.launchIspUIButton = new Button(runtimeInfoGroup, SWT.PUSH);
-		this.launchIspUIButton.setImage(uiImage);
-		this.launchIspUIButton.setText(Messages.GemAnalyzer_89);
-		this.launchIspUIButton.setToolTipText(Messages.GemAnalyzer_90);
-		this.launchIspUIButton.setEnabled(false);
-		FormData launchIspUIFormData = new FormData();
-		launchIspUIFormData.right = new FormAttachment(this.browseCallsButton,
-				-5);
+		this.launchHpvButton = new Button(runtimeInfoGroup, SWT.PUSH);
+		this.launchHpvButton.setImage(hbvImage);
+		this.launchHpvButton.setText(Messages.GemAnalyzer_15);
+		this.launchHpvButton.setToolTipText(Messages.GemAnalyzer_16);
+		this.launchHpvButton.setEnabled(false);
+		final FormData launchIspUIFormData = new FormData();
+		launchIspUIFormData.right = new FormAttachment(this.browseCallsButton, -5);
 		launchIspUIFormData.bottom = new FormAttachment(100, -5);
-		this.launchIspUIButton.setLayoutData(launchIspUIFormData);
+		this.launchHpvButton.setLayoutData(launchIspUIFormData);
+
+		// Run GEM button
+		this.runGemButton = new Button(runtimeInfoGroup, SWT.PUSH);
+		this.runGemButton.setImage(trident);
+		this.runGemButton.setToolTipText(Messages.GemAnalyzer_17);
+		final FormData runGemFormData = new FormData();
+		runGemFormData.right = new FormAttachment(this.launchHpvButton, -20);
+		runGemFormData.bottom = new FormAttachment(100, -5);
+		this.runGemButton.setLayoutData(runGemFormData);
+		this.runGemButton.setEnabled(true);
 
 		// Set number of processes button
 		this.setNumProcsComboList = new Combo(runtimeInfoGroup, SWT.DROP_DOWN);
-		Font setRankComboFont = setFontSize(
-				this.setNumProcsComboList.getFont(), 9);
+		final Font setRankComboFont = setFontSize(this.setNumProcsComboList.getFont(), 9);
 		this.setNumProcsComboList.setFont(setRankComboFont);
-		String[] items = new String[] {};
+		final String[] items = new String[] {};
 		this.setNumProcsComboList.setItems(items);
 		this.setNumProcsComboList.setText(" "); //$NON-NLS-1$
-		this.setNumProcsComboList.setToolTipText(Messages.GemAnalyzer_91);
-		FormData setRankFormData = new FormData();
+		this.setNumProcsComboList.setToolTipText(Messages.GemAnalyzer_18);
+		final FormData setRankFormData = new FormData();
 		setRankFormData.width = 50;
-		setRankFormData.right = new FormAttachment(this.launchIspUIButton, -5);
+		setRankFormData.right = new FormAttachment(this.runGemButton, -5);
 		setRankFormData.bottom = new FormAttachment(100, -5);
 		this.setNumProcsComboList.setLayoutData(setRankFormData);
 		this.setNumProcsComboList.setEnabled(true);
@@ -1742,104 +488,10 @@ public class GemAnalyzer extends ViewPart {
 		updateDropDown();
 
 		// Font for the buttons
-		Font buttonFont = setFontSize(this.errorMessageLabel.getFont(), 8);
-		this.launchIspUIButton.setFont(buttonFont);
+		final Font buttonFont = setFontSize(this.errorMessageLabel.getFont(), 8);
+		this.launchHpvButton.setFont(buttonFont);
 		this.browseCallsButton.setFont(buttonFont);
-		this.browseLeaksButton.setFont(buttonFont);
-		this.examineErrorsButton.setFont(buttonFont);
 		this.setNumProcsComboList.setFont(buttonFont);
-	}
-
-	/*
-	 * Helper method called by createPartControl.
-	 */
-	private void createCodeWindowsGroup(Composite parent) {
-		// Get images for buttons from image cache
-		Image sourceCallImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/source-call.gif")); //$NON-NLS-1$
-		Image matchCallImage = GemPlugin.getImage(GemPlugin
-				.getImageDescriptor("icons/match-call.gif")); //$NON-NLS-1$
-
-		// Create the layout for the analyzer windows and call info labels
-		Group codeWindowsGroup = new Group(parent, SWT.NONE | SWT.SHADOW_IN);
-		codeWindowsGroup.setText(Messages.GemAnalyzer_92);
-		GridLayout codeWindowsLayout = new GridLayout();
-		codeWindowsLayout.numColumns = 2;
-		codeWindowsLayout.marginHeight = 10;
-		codeWindowsLayout.marginWidth = 10;
-		codeWindowsLayout.horizontalSpacing = 15;
-		codeWindowsGroup.setLayout(codeWindowsLayout);
-		codeWindowsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true, 2, 1));
-
-		// Create code window labels and their respective layouts, etc.
-		this.leftCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP);
-		this.leftCodeWindowLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-				true, false, 1, 1));
-		Font leftCodeWindowLabelFont = setFontSize(this.leftCodeWindowLabel
-				.getFont(), 9);
-		this.leftCodeWindowLabel.setFont(leftCodeWindowLabelFont);
-		this.leftCodeWindowLabel.setText("\n"); //$NON-NLS-1$
-		this.rightCodeWindowLabel = new Label(codeWindowsGroup, SWT.WRAP);
-		this.rightCodeWindowLabel.setLayoutData(new GridData(SWT.FILL,
-				SWT.FILL, true, false, 1, 1));
-		Font rightCodeWindowLabelFont = setFontSize(this.rightCodeWindowLabel
-				.getFont(), 9);
-		this.rightCodeWindowLabel.setFont(rightCodeWindowLabelFont);
-		this.rightCodeWindowLabel.setText("\n"); //$NON-NLS-1$
-
-		// The short explanations of each of the code windows
-		this.leftCodeWindowExplenationLabel = new CLabel(codeWindowsGroup,
-				SWT.WRAP | SWT.NULL);
-		this.rightCodeWindowExplenationLabel = new CLabel(codeWindowsGroup,
-				SWT.WRAP | SWT.NULL);
-		this.leftCodeWindowExplenationLabel.setImage(sourceCallImage);
-		this.rightCodeWindowExplenationLabel.setImage(matchCallImage);
-		this.leftCodeWindowExplenationLabel.setText(Messages.GemAnalyzer_93);
-		this.rightCodeWindowExplenationLabel.setText(Messages.GemAnalyzer_94);
-
-		// Create the analyzer list viewers
-		this.leftViewer = new ListViewer(codeWindowsGroup, SWT.MULTI
-				| SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		this.rightViewer = new ListViewer(codeWindowsGroup, SWT.MULTI
-				| SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		Font leftViewerFont = setFontSize(this.leftViewer.getControl()
-				.getFont(), 8);
-		Font rightViewerFont = setFontSize(this.rightViewer.getControl()
-				.getFont(), 8);
-		this.leftViewer.getControl().setFont(leftViewerFont);
-		this.rightViewer.getControl().setFont(rightViewerFont);
-		this.leftViewer.getList().setLayoutData(
-				new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		this.rightViewer.getList().setLayoutData(
-				new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-
-		// Create two listeners for these viewers
-		// HACK to prevent user from changing the selected line
-		this.singleListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				org.eclipse.swt.widgets.List list = (org.eclipse.swt.widgets.List) e
-						.getSource();
-				String entry = list.getItem(0).toString();
-
-				// Determine if collective call clicked in the Right Viewer
-				if (!entry.contains(Messages.GemAnalyzer_95)
-						|| !entry.contains(Messages.GemAnalyzer_96)) {
-					updateSelectedLine(false);
-				}
-			}
-		};
-
-		this.doubleListener = new DoubleClickListener();
-		this.rightViewer.addDoubleClickListener(this.doubleListener);
-
-		// HACK to prevent user from changing the selected line
-		this.rightViewer.getList().addSelectionListener(this.singleListener);
-		this.leftViewer.addDoubleClickListener(this.doubleListener);
-
-		// HACK to prevent user from changing the selected line
-		this.leftViewer.getList().addSelectionListener(this.singleListener);
 	}
 
 	/*
@@ -1850,7 +502,7 @@ public class GemAnalyzer extends ViewPart {
 		this.firstTransitionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				goToFirstTransition(true);
+				updateFirstTransition(true);
 			}
 		});
 
@@ -1858,47 +510,46 @@ public class GemAnalyzer extends ViewPart {
 				.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						goToPreviousTransition();
+						updatePreviousTransition();
 					}
 				});
 
 		this.nextTransitionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				goToNextTransition(true);
+				updateNextTransition(true);
 			}
 		});
 
 		this.lastTransitionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				goToLastTransition();
+				updateLastTransition();
 			}
 		});
 
 		this.lockRanksComboList.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (lockRanksComboList.getText() == null) {
+			public void widgetSelected(SelectionEvent event) {
+				if (GemAnalyzer.this.lockRanksComboList.getText() == null) {
 					return;
-				} else {
-					try {
-						String temp = lockRanksComboList.getItems()[lockRanksComboList
-								.getSelectionIndex()];
-						if (!temp.equals(Messages.GemAnalyzer_97)) {
-							int index = temp.indexOf(" "); //$NON-NLS-1$
-							temp = temp.substring(index + 1);
-							index = temp.indexOf(" "); //$NON-NLS-1$
-							temp = temp.substring(0, index);
-							lockedRank = Integer.parseInt(temp);
-						} else {
-							lockedRank = -1;
-						}
-						// Also update things like button disabled/enabled
-						updateTransitionVars(true);
-					} catch (Exception exception) {
-						lockedRank = -1;
+				}
+
+				try {
+					final int selectionIndex = GemAnalyzer.this.lockRanksComboList.getSelectionIndex();
+					final String selectionText = GemAnalyzer.this.lockRanksComboList.getItems()[selectionIndex];
+					final Pattern rankPattern = Pattern.compile("^([a-zA-Z]+?)\\s+([0-9]+?)\\s+([a-zA-Z]+?)$"); //$NON-NLS-1$
+					final Matcher rankPatternMatcher = rankPattern.matcher(selectionText);
+					if (rankPatternMatcher.matches()) {
+						final String rankStr = rankPatternMatcher.group(2);
+						GemAnalyzer.this.lockedRank = Integer.parseInt(rankStr);
+					} else {
+						GemAnalyzer.this.lockedRank = -1;
 					}
+					updateTransitionLabels(true);
+				} catch (final Exception e) {
+					GemUtilities.logExceptionDetail(e);
+					GemAnalyzer.this.lockedRank = -1;
 				}
 			}
 		});
@@ -1908,17 +559,14 @@ public class GemAnalyzer extends ViewPart {
 				.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						if (transitions.hasPreviousInterleaving()) {
-							while (transitions.previousInterleaving()) {
+						if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
+							while (GemAnalyzer.this.transitions.setPreviousInterleaving()) {
 								;
 							}
-							updateTransitionVars(true);
+							updateTransitionLabels(true);
 						} else {
-							GemUtilities.showInformationDialog(
-									Messages.GemAnalyzer_98,
-									Messages.GemAnalyzer_99);
+							GemUtilities.showInformationDialog(Messages.GemAnalyzer_19);
 						}
-						updateErrorButtonState();
 					}
 				});
 
@@ -1926,16 +574,12 @@ public class GemAnalyzer extends ViewPart {
 				.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						if (transitions.hasPreviousInterleaving()) {
-							transitions.previousInterleaving();
-							updateTransitionVars(true);
+						if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
+							GemAnalyzer.this.transitions.setPreviousInterleaving();
+							updateTransitionLabels(true);
 						} else {
-							GemUtilities.showInformationDialog(
-									Messages.GemAnalyzer_100,
-									Messages.GemAnalyzer_101);
+							GemUtilities.showInformationDialog(Messages.GemAnalyzer_20);
 						}
-						errorIndex = 1;
-						updateErrorButtonState();
 					}
 				});
 
@@ -1943,16 +587,12 @@ public class GemAnalyzer extends ViewPart {
 				.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						if (transitions.hasNextInterleaving()) {
-							transitions.nextInterleaving();
-							updateTransitionVars(true);
+						if (GemAnalyzer.this.transitions.hasNextInterleaving()) {
+							GemAnalyzer.this.transitions.setNextInterleaving();
+							updateTransitionLabels(true);
 						} else {
-							GemUtilities.showInformationDialog(
-									Messages.GemAnalyzer_102,
-									Messages.GemAnalyzer_103);
+							GemUtilities.showInformationDialog(Messages.GemAnalyzer_21);
 						}
-						errorIndex = 1;
-						updateErrorButtonState();
 					}
 				});
 
@@ -1960,12 +600,10 @@ public class GemAnalyzer extends ViewPart {
 				.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						while (transitions.hasNextInterleaving()) {
-							transitions.nextInterleaving();
+						while (GemAnalyzer.this.transitions.hasNextInterleaving()) {
+							GemAnalyzer.this.transitions.setNextInterleaving();
 						}
-						updateTransitionVars(true);
-						errorIndex = 1;
-						updateErrorButtonState();
+						updateTransitionLabels(true);
 					}
 				});
 
@@ -1973,10 +611,8 @@ public class GemAnalyzer extends ViewPart {
 				.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						transitions.deadlockInterleaving();
-						updateTransitionVars(true);
-						errorIndex = 1;
-						updateErrorButtonState();
+						GemAnalyzer.this.transitions.deadlockInterleaving();
+						updateTransitionLabels(true);
 					}
 				});
 
@@ -1985,25 +621,19 @@ public class GemAnalyzer extends ViewPart {
 				.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						if (internalIssueOrderButton.getSelection()) {
-							if (transitions != null) {
-								ArrayList<ArrayList<Envelope>> tlists = transitions
-										.getTransitionList();
+						if (GemAnalyzer.this.internalIssueOrderButton.getSelection()) {
+							if (GemAnalyzer.this.transitions != null) {
+								final ArrayList<ArrayList<Envelope>> tlists = GemAnalyzer.this.transitions.getTransitionList();
 								// Sort by internal issue order
-								int size = tlists.size();
+								final int size = tlists.size();
 								for (int i = 0; i < size; i++) {
-									Collections.sort(tlists.get(i),
-											new InternalIssueOrderSorter());
+									Collections.sort(tlists.get(i), new InternalIssueOrderSorter());
 								}
 							}
 
 							// Reset preference store value for this preference
-							GemPlugin
-									.getDefault()
-									.getPreferenceStore()
-									.setValue(
-											PreferenceConstants.GEM_PREF_STEP_ORDER,
-											Messages.GemAnalyzer_104);
+							GemPlugin.getDefault().getPreferenceStore()
+									.setValue(PreferenceConstants.GEM_PREF_STEP_ORDER, "issueOrder"); //$NON-NLS-1$
 							reset();
 						}
 					}
@@ -2012,23 +642,81 @@ public class GemAnalyzer extends ViewPart {
 		this.programOrderButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (programOrderButton.getSelection()) {
+				if (GemAnalyzer.this.programOrderButton.getSelection()) {
 					// Sort by internal issue order
-					if (transitions != null) {
-						ArrayList<ArrayList<Envelope>> tlists = transitions
-								.getTransitionList();
-						int size = tlists.size();
+					if (GemAnalyzer.this.transitions != null) {
+						final ArrayList<ArrayList<Envelope>> tlists = GemAnalyzer.this.transitions.getTransitionList();
+						final int size = tlists.size();
 						for (int i = 0; i < size; i++) {
-							Collections.sort(tlists.get(i),
-									new ProgramOrderSorter());
+							Collections.sort(tlists.get(i), new ProgramOrderSorter());
 						}
 					}
 
 					// Reset preference store value for this preference
-					GemPlugin.getDefault().getPreferenceStore().setValue(
-							PreferenceConstants.GEM_PREF_STEP_ORDER,
-							Messages.GemAnalyzer_105);
+					GemPlugin.getDefault().getPreferenceStore()
+							.setValue(PreferenceConstants.GEM_PREF_STEP_ORDER, "programOrder"); //$NON-NLS-1$
 					reset();
+				}
+			}
+		});
+
+		// To conveniently run GEM from this view
+		this.runGemButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				// Find the active editor
+				final IWorkbench wb = PlatformUI.getWorkbench();
+				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+				final IWorkbenchPage page = window.getActivePage();
+				final IEditorPart editor = page.getActiveEditor();
+				IFile inputFile = null;
+				boolean isSourceFileExtension = false;
+
+				if (editor == null) {
+					GemUtilities.showErrorDialog(Messages.GemBrowser_9);
+					return;
+				}
+
+				final IFileEditorInput editorInput = (IFileEditorInput) editor.getEditorInput();
+				inputFile = editorInput.getFile();
+				final String extension = inputFile.getFileExtension();
+				if (extension != null) {
+					// The most common C & C++ source file extensions
+					isSourceFileExtension = extension.equals("c") //$NON-NLS-1$
+							|| extension.equals("cpp") || extension.equals("c++") //$NON-NLS-1$ //$NON-NLS-2$
+							|| extension.equals("cc") || extension.equals("cp"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				if (isSourceFileExtension) {
+					// Save most recent file reference to preference as a URI
+					GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
+
+					// Open the Console View if the user wants it
+					final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+					try {
+						if (pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON)) {
+							page.showView(GemConsole.ID);
+						}
+					} catch (final PartInitException e) {
+						GemUtilities.logExceptionDetail(e);
+					}
+
+					// Open Analyzer and Browser Views in preference order
+					try {
+						final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
+						if (activeView.equals("analyzer")) { //$NON-NLS-1$
+							page.showView(GemBrowser.ID);
+							page.showView(GemAnalyzer.ID);
+						} else {
+							page.showView(GemAnalyzer.ID);
+							page.showView(GemBrowser.ID);
+						}
+						GemUtilities.initGemViews(inputFile, true, true);
+					} catch (final PartInitException e) {
+						GemUtilities.logExceptionDetail(e);
+					}
+				} else {
+					GemUtilities.showErrorDialog(Messages.GemBrowser_10);
 				}
 			}
 		});
@@ -2036,316 +724,655 @@ public class GemAnalyzer extends ViewPart {
 		// Selection listeners for runtime information group buttons
 		this.setNumProcsComboList.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (setNumProcsComboList.getText() == null) {
+			public void widgetSelected(SelectionEvent event) {
+				if (GemAnalyzer.this.setNumProcsComboList.getText() == null) {
 					return;
-				} else {
-					String nprocsStr = setNumProcsComboList.getItems()[setNumProcsComboList
-							.getSelectionIndex()];
-					int newNumProcs = Integer.parseInt(nprocsStr);
+				}
 
-					// Reset the numProcs value in the preference store
-					GemPlugin.getDefault().getPreferenceStore().setValue(
-							PreferenceConstants.GEM_PREF_NUMPROCS, newNumProcs);
+				final int selectionIndex = GemAnalyzer.this.setNumProcsComboList.getSelectionIndex();
+				final String nprocsStr = GemAnalyzer.this.setNumProcsComboList.getItems()[selectionIndex];
+				final int newNumProcs = Integer.parseInt(nprocsStr);
+
+				// Reset the numProcs value in the preference store
+				GemPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.GEM_PREF_NUMPROCS, newNumProcs);
+
+				// If the browser is open updates its drop down
+				try {
+					final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					final IViewPart browserPart = window.getActivePage().findView(GemBrowser.ID);
+					final GemBrowser browser = (GemBrowser) browserPart;
+					browser.updateDropDown();
+				} catch (final Exception e) {
+					GemUtilities.logExceptionDetail(e);
 				}
 			}
 		});
 
-		this.launchIspUIButton.addSelectionListener(new SelectionAdapter() {
+		this.launchHpvButton.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				String sourceFilePath = GemPlugin.getDefault()
-						.getPreferenceStore().getString(
-								PreferenceConstants.GEM_PREF_LAST_FILE);
-				GemUtilities.doHpv(sourceFilePath);
+			public void widgetSelected(SelectionEvent event) {
+				final URI uri = GemUtilities.getMostRecentURI();
+				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+				IPath sourcefilePath = null;
+
+				if (uri != null) {
+					sourcefilePath = new Path(uri.getPath());
+				}
+
+				final IFile sourceFile = workspaceRoot.getFileForLocation(sourcefilePath);
+				if (sourceFile != null && sourceFile.exists()) {
+					GemUtilities.doHbv(sourceFile);
+				} else {
+					final String message = Messages.GemAnalyzer_13;
+					GemUtilities.showErrorDialog(message);
+				}
 			}
 		});
 
 		this.browseCallsButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (logContents == null || logContents.isEmpty()) {
-					String message = Messages.GemAnalyzer_106;
-					String title = Messages.GemAnalyzer_107;
-					GemUtilities.showErrorDialog(message, title);
+				if (GemAnalyzer.this.transitions == null) {
+					final String message = Messages.GemAnalyzer_24;
+					GemUtilities.showErrorDialog(message);
 					return;
 				}
 				launchCallBrowser();
 			}
 		});
-
-		this.browseLeaksButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (logContents == null || logContents.isEmpty()) {
-					String message = Messages.GemAnalyzer_108;
-					String title = Messages.GemAnalyzer_109;
-					GemUtilities.showErrorDialog(message, title);
-					return;
-				}
-				launchLeakBrowser();
-			}
-		});
-
-		this.examineErrorsButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				// Get the hashmap with the error calls in the interleaving -
-				HashMap<String, Envelope> map = transitions.getErrorCallsList()
-						.get(transitions.getCurrentInterleaving());
-				errorIndex = errorIndex % map.size();
-				Collection<Envelope> collection = map.values();
-				Object[] calls = new Object[collection.size()];
-				calls = collection.toArray();
-				if (errorCalls == null || !errorCalls.equals(calls)) {
-					errorCalls = calls;
-				}
-
-				launchErrorBrowser();
-			}
-		});
-
-		this.terminateButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				GemUtilities.killProcess();
-				aborted = true;
-				Display.getDefault().syncExec(analyzerUpdateThread);
-			}
-		});
-	}
-
-	// Listens for double-clicks and jumps to that line of code
-	private class DoubleClickListener implements IDoubleClickListener {
-
-		public void doubleClick(DoubleClickEvent event) {
-			ISelection selection = event.getSelection();
-			org.eclipse.jface.viewers.StructuredSelection structure = (org.eclipse.jface.viewers.StructuredSelection) selection;
-			ListElement element = (ListElement) structure.getFirstElement();
-
-			// Open the source file in the Editor Window
-			String base = ResourcesPlugin.getWorkspace().getRoot()
-					.getLocation().toPortableString();
-			String sourceFilePath = element.fullFileName.substring(base
-					.length());
-			openEditor(element.line, sourceFilePath);
-		}
-	}
-
-	// ONLY CALL WHEN YOU HAVE STARTED A NEW INTERLEAVING!!!
-	// As it searches it will never display the envelope
-	// displayEnvelope decides whether or not the final destination is displayed
-	private void updateTransitionVars(boolean displayEnvelope) {
-		goToFirstTransition(false);
-
-		// because only incremented if NEXT is also valid
-		this.transitionCount = 1;
-		Envelope env = this.transitions.getCurrentTransition();
-
-		int test = 1;
-		while (test == 1 && env != null) {
-			if (this.transitions.hasValidNextTransition(this.lockedRank)) {
-				this.transitionCount++;
-				test = goToNextTransition(false);
-			} else {
-				break;
-			}
-		}
-		goToFirstTransition(displayEnvelope);
 	}
 
 	/*
-	 * Updates the state of the examine error button based on the interleaving
-	 * and its associated error call(s), if any.
+	 * Helper method called by createPartControl.
 	 */
-	private void updateErrorButtonState() {
-		if (this.transitions.getDeadlockInterleavings() != null) {
-			this.examineErrorsButton.setEnabled(this.transitions
-					.getDeadlockInterleavings().contains(
-							this.transitions.getCurrentInterleaving())
-					&& this.transitions.hasDeadlock());
-		} else if (this.transitions.hasAssertion()) {
-			this.examineErrorsButton.setEnabled(true);
-		} else if (this.transitions.getErrorCallsList().get(
-				this.transitions.getCurrentInterleaving()) != null) {
-			this.examineErrorsButton.setEnabled(true);
+	private void createStepOrderGroup(Composite parent) {
+		// Group and FormLayout data for step order radio buttons
+		this.stepOrderGroup = new Group(parent, SWT.SHADOW_IN);
+		this.stepOrderGroup.setText(Messages.GemAnalyzer_25);
+		this.stepOrderGroup.setToolTipText(Messages.GemAnalyzer_26);
+		final FormData stepOrderFormData = new FormData();
+		// stepOrderFormData.left = new FormAttachment(this.interleavingsGroup,
+		// 20);
+		stepOrderFormData.right = new FormAttachment(100, -5);
+		stepOrderFormData.bottom = new FormAttachment(100, -5);
+		this.stepOrderGroup.setLayoutData(stepOrderFormData);
+		this.stepOrderGroup.setLayout(new GridLayout(3, false));
+
+		// Step order radio buttons
+		this.internalIssueOrderButton = new Button(this.stepOrderGroup, SWT.RADIO);
+		this.internalIssueOrderButton.setText(Messages.GemAnalyzer_27);
+		this.internalIssueOrderButton.setToolTipText(Messages.GemAnalyzer_28);
+		this.programOrderButton = new Button(this.stepOrderGroup, SWT.RADIO);
+		this.programOrderButton.setText(Messages.GemAnalyzer_29);
+		this.programOrderButton.setToolTipText(Messages.GemAnalyzer_30);
+
+		// Choose which one is to be enabled from the Preference Store setting
+		final String stepOrder = GemPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.GEM_PREF_STEP_ORDER);
+		if (stepOrder.equals("issueOrder")) { //$NON-NLS-1$
+			this.internalIssueOrderButton.setSelection(true);
 		} else {
-			this.examineErrorsButton.setEnabled(false);
+			this.programOrderButton.setSelection(true);
 		}
 
-		if (this.examineErrorsButton.isEnabled()) {
-			this.examineErrorsButton.setImage(GemPlugin.getImage(GemPlugin
-					.getImageDescriptor("icons/browse.gif"))); //$NON-NLS-1$
+		// Font for the radio buttons
+		final Font buttonFont = setFontSize(this.programOrderButton.getFont(), 8);
+		this.internalIssueOrderButton.setFont(buttonFont);
+		this.programOrderButton.setFont(buttonFont);
+	}
 
-			// Get the number of error calls for the interleaving
-			this.errorCount = this.transitions.getErrorCallsList().get(
-					this.transitions.getCurrentInterleaving()).size();
+	/*
+	 * Helper method called by createPartControl.
+	 */
+	private void createTransitionsGroup(Composite parent) {
+		// Get images for buttons from image cache
+		final Image firstItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/first-item.gif")); //$NON-NLS-1$
+		final Image lastItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/last-item.gif")); //$NON-NLS-1$
+		final Image prevItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/prev-item.gif")); //$NON-NLS-1$
+		final Image nextItemImage = GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/next-item.gif")); //$NON-NLS-1$
 
-			// Update labels and tooltips
-			this.examineErrorsButton.setText(Messages.GemAnalyzer_110);
-			if (this.transitions.hasDeadlock()) {
-				this.examineErrorsButton
-						.setToolTipText(Messages.GemAnalyzer_111);
-			} else {
-				this.examineErrorsButton
-						.setToolTipText(Messages.GemAnalyzer_112);
+		// Group and FormLayout data for transition buttons and labels
+		this.transitionsGroup = new Group(parent, SWT.SHADOW_IN);
+		this.transitionsGroup.setText(Messages.GemAnalyzer_32);
+		this.transitionsGroup.setToolTipText(Messages.GemAnalyzer_33);
+		final FormData transitionsFormData = new FormData();
+		transitionsFormData.left = new FormAttachment(0, 0);
+		transitionsFormData.bottom = new FormAttachment(100, -5);
+		this.transitionsGroup.setLayoutData(transitionsFormData);
+		this.transitionsGroup.setLayout(new FormLayout());
+
+		// First transition button
+		this.firstTransitionButton = new Button(this.transitionsGroup, SWT.PUSH);
+		this.firstTransitionButton.setImage(firstItemImage);
+		this.firstTransitionButton.setToolTipText(Messages.GemAnalyzer_34);
+		this.firstTransitionButton.setEnabled(false);
+		final FormData tfirstFormData = new FormData();
+		tfirstFormData.left = new FormAttachment(0, 5);
+		tfirstFormData.bottom = new FormAttachment(100, -5);
+		this.firstTransitionButton.setLayoutData(tfirstFormData);
+
+		// Previous transition button
+		this.previousTransitionButton = new Button(this.transitionsGroup, SWT.PUSH);
+		this.previousTransitionButton.setImage(prevItemImage);
+		this.previousTransitionButton.setToolTipText(Messages.GemAnalyzer_35);
+		this.previousTransitionButton.setEnabled(false);
+		final FormData tprevFormData = new FormData();
+		tprevFormData.left = new FormAttachment(this.firstTransitionButton, 3);
+		tprevFormData.bottom = new FormAttachment(100, -5);
+		this.previousTransitionButton.setLayoutData(tprevFormData);
+
+		// Next transition buttons
+		this.nextTransitionButton = new Button(this.transitionsGroup, SWT.PUSH);
+		this.nextTransitionButton.setImage(nextItemImage);
+		this.nextTransitionButton.setToolTipText(Messages.GemAnalyzer_36);
+		this.nextTransitionButton.setEnabled(false);
+		final FormData tnextFormData = new FormData();
+		tnextFormData.left = new FormAttachment(this.previousTransitionButton, 3);
+		tnextFormData.bottom = new FormAttachment(100, -5);
+		this.nextTransitionButton.setLayoutData(tnextFormData);
+
+		// Last transition button
+		this.lastTransitionButton = new Button(this.transitionsGroup, SWT.PUSH);
+		this.lastTransitionButton.setImage(lastItemImage);
+		this.lastTransitionButton.setToolTipText(Messages.GemAnalyzer_37);
+		this.lastTransitionButton.setEnabled(false);
+		final FormData tlastFormData = new FormData();
+		tlastFormData.left = new FormAttachment(this.nextTransitionButton, 3);
+		tlastFormData.bottom = new FormAttachment(100, -5);
+		this.lastTransitionButton.setLayoutData(tlastFormData);
+
+		// Lock ranks button
+		this.lockRanksComboList = new Combo(this.transitionsGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+		final Font lockRanksComboFont = setFontSize(this.lockRanksComboList.getFont(), 8);
+		this.lockRanksComboList.setFont(lockRanksComboFont);
+		final String[] items = new String[] { Messages.GemAnalyzer_38 };
+		this.lockRanksComboList.setItems(items);
+		this.lockRanksComboList.setToolTipText(Messages.GemAnalyzer_39);
+		final FormData lockRanksFormData = new FormData();
+		lockRanksFormData.left = new FormAttachment(this.lastTransitionButton, 10);
+		lockRanksFormData.right = new FormAttachment(100, -5);
+		lockRanksFormData.bottom = new FormAttachment(100, -5);
+		this.lockRanksComboList.setLayoutData(lockRanksFormData);
+	}
+
+	/*
+	 * Uses the right code window to display all calls associated with the
+	 * collective operation displayed in the left code view window.
+	 */
+	private void displayCollectiveInfo() {
+		final Envelope env = this.transitions.getCurrentTransition();
+		final ArrayList<Envelope> matches = env.getCommunicator_matches();
+
+		if (matches != null) {
+			final int listSize = matches.size();
+			for (int i = 0; i < listSize; i++) {
+				final Envelope currEnv = matches.get(i);
+				final String fileInfo = currEnv.getFilePath();
+				final IPath filePath = new Path(fileInfo);
+				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+				final IFile sourceFile = workspaceRoot.getFileForLocation(filePath);
+				this.rightViewer.add(new ListElement(sourceFile, sourceFile.getName() + Messages.GemAnalyzer_40
+						+ currEnv.getLinenumber()
+						+ Messages.GemAnalyzer_41
+						+ currEnv.getRank(), currEnv.getLinenumber(), false));
 			}
-		} else {
-			this.examineErrorsButton.setImage(GemPlugin.getImage(GemPlugin
-					.getImageDescriptor("icons/no-error.gif"))); //$NON-NLS-1$
-			this.examineErrorsButton.setText(Messages.GemAnalyzer_113);
 		}
 	}
 
 	/*
-	 * Goes to the First Transition and updates all relevant data
+	 * Displays the specified envelope and it's matches if they exist.
 	 */
-	private void goToFirstTransition(boolean update) {
-		// Goes to null
-		Envelope env = this.transitions.stepToFirstTransition(this.lockedRank);
-		env = this.transitions.getCurrentTransition();
-
-		if (env != null) {
-			this.oldLeftIndex = env.getLinenumber();
-		}
-
+	private void displayEnvelopes(Envelope env) {
+		// If the envelope is null, it's a new interleaving, start over
 		if (env == null) {
-			GemUtilities.showInformationDialog(Messages.GemAnalyzer_114,
-					Messages.GemAnalyzer_115);
 			return;
 		}
 
-		if (update) {
-			setButtonEnabledState();
-			updateCodeViewers();
-			displayEnvelopes(env);
-			updateSelectedLine(true);
-			this.transitionIndex = 1;
-			setMessageLabelText();
-		}
-	}
-
-	/*
-	 * Goes to the previous transition and updates relevant data
-	 */
-	private void goToPreviousTransition() {
-		Envelope env = this.transitions.previousTransition(lockedRank);
-		this.oldLeftIndex = env.getLinenumber();
-
-		// Go back until you reach the first call itr or beginning
-		if (env.isCollective() && this.lockedRank == -1) {
-			while (true) {
-				env = this.transitions.previousTransition(this.lockedRank);
-				if (env == null) {
-					goToFirstTransition(true);
-					return;
-				}
-				if (env.getLinenumber() != this.oldLeftIndex) {
-					env = this.transitions.nextTransition(this.lockedRank);
-					break;
-				}
-			}
-		}
-
-		this.oldLeftIndex = env.getLinenumber();
-		setButtonEnabledState();
-		updateCodeViewers();
-		displayEnvelopes(env);
-		updateSelectedLine(true);
-		this.transitionIndex--;
-		setMessageLabelText();
-	}
-
-	/*
-	 * Go to the next transition. Returns 1 if successful, -1 if there was no
-	 * where to go.
-	 */
-	private int goToNextTransition(boolean update) {
-		int returnValue = 1;
-		Envelope env = this.transitions.nextTransition(this.lockedRank);
-
-		if (env.isCollective() && this.lockedRank == -1) {
-			env = skipRepeats(1);
-		}
-
-		if (env == null) {
-			returnValue = -1;
-		} else {
-			this.oldLeftIndex = env.getLinenumber();
-		}
-
-		if (update) {
-			setButtonEnabledState();
-			updateCodeViewers();
-			displayEnvelopes(env);
-			updateSelectedLine(true);
-			this.transitionIndex++;
-			setMessageLabelText();
-		}
-		return returnValue;
-	}
-
-	/*
-	 * Goes to the last transition and updates relevant information
-	 */
-	private void goToLastTransition() {
-		Envelope env = this.transitions.stepToLastTransition(this.lockedRank);
-
-		// stepToLastTransition puts us at the last iteration of Finalize
-		// other code always assumes we are on the first iteration of
-		// each call though, so here we go back to the first iteration
-		if (env.getFunctionName().equals("MPI_Finalize")) { //$NON-NLS-1$
-			while (true) {
-				env = this.transitions.previousTransition(this.lockedRank);
-
-				if (env == null) {
-					GemUtilities.showInformationDialog(
-							Messages.GemAnalyzer_116, Messages.GemAnalyzer_117);
-					return;
-				}
-				// If there was only one finalize go back to it
-				if (!env.getFunctionName().equals("MPI_Finalize")) { //$NON-NLS-1$
-					env = this.transitions.nextTransition(this.lockedRank);
-					break;
-				}
-			}
-		}
-
-		if (env == null) {
-			GemUtilities.showInformationDialog(Messages.GemAnalyzer_118,
-					Messages.GemAnalyzer_119);
-			return;
-		}
-		this.oldLeftIndex = env.getLinenumber();
-		setButtonEnabledState();
-		updateCodeViewers();
-		displayEnvelopes(env);
-		updateSelectedLine(true);
-		this.transitionIndex = this.transitionCount;
-		setMessageLabelText();
-	}
-
-	/*
-	 * If you are moving forward pass 1, if backward -1, if you want an ID10T
-	 * error pass something else
-	 */
-	private Envelope skipRepeats(int direction) {
-		Envelope env = this.transitions.getCurrentTransition();
-		while (true) {
-			if (env == null) {
-				return null;
-			}
-			if (env.getLinenumber() == this.oldLeftIndex) {
-				if (direction == 1) {
-					env = this.transitions.nextTransition(this.lockedRank);
-				} else {
-					env = this.transitions.previousTransition(this.lockedRank);
-				}
+		// Set the indexes for the highlighted line updater
+		this.leftIndex = env.getLinenumber();
+		boolean hasMatch = true;
+		try {
+			final Envelope match = env.getMatch_envelope();
+			if (match != null) {
+				this.rightIndex = match.getLinenumber();
 			} else {
-				break;
+				hasMatch = false;
+			}
+		} catch (final Exception e) {
+			GemUtilities.logExceptionDetail(e);
+		}
+
+		// Set font color for code window labels
+		Color textColor = new Color(this.parent.getShell().getDisplay(), new RGB(0, 0, 255));
+		this.leftCodeWindowLabel.setForeground(textColor);
+		this.rightCodeWindowLabel.setForeground(textColor);
+
+		// Build up the Strings for the Label text
+		final String leftResult = getCallText(env, true);
+		this.leftCodeWindowLabel.setText(leftResult);
+
+		// If a match exists update the right side
+		if (hasMatch) {
+			final Envelope match = env.getMatch_envelope();
+			final String rightResult = getCallText(match, false);
+			this.rightCodeWindowLabel.setText(rightResult);
+		} else {
+			this.rightIndex = -1;
+			this.rightViewer.getList().deselectAll();
+			this.rightCodeWindowLabel.setText(""); //$NON-NLS-1$
+		}
+
+		if (env.getIssueIndex() == -1) {
+			textColor = new Color(this.parent.getShell().getDisplay(), new RGB(255, 0, 0));
+			this.rightCodeWindowLabel.setForeground(textColor);
+			if (env.getFunctionName().equals("MPI_Abort")) { //$NON-NLS-1$
+				this.rightCodeWindowLabel.setText(""); //$NON-NLS-1$
+			} else if (this.transitions.hasDeadlock()) {
+				this.rightCodeWindowLabel.setText(Messages.GemAnalyzer_46);
+			} else {
+				this.rightCodeWindowLabel.setText(Messages.GemAnalyzer_47);
 			}
 		}
-		return env;
+	}
+
+	/**
+	 * Disposes of all shell windows when the instance of Eclipse that created
+	 * them exits.
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	@Override
+	public void dispose() {
+		if (this.activeShells != null) {
+			for (final Shell s : this.activeShells) {
+				if (s != null) {
+					s.dispose();
+				}
+			}
+		}
+		super.dispose();
+	}
+
+	/*
+	 * Populates the view context menu.
+	 */
+	private void fillContextMenu(IMenuManager manager) {
+		manager.add(this.terminateButton);
+		this.terminateButton.setText(Messages.GemAnalyzer_48);
+		manager.add(this.getHelp);
+		this.getHelp.setText(Messages.GemAnalyzer_49);
+
+		// Other plug-ins can contribute their actions here
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+
+	/*
+	 * Populates the view pull-down menu.
+	 */
+	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(this.terminateButton);
+		this.terminateButton.setText(Messages.GemAnalyzer_50);
+		manager.add(new Separator());
+		manager.add(this.getHelp);
+		this.getHelp.setText(Messages.GemAnalyzer_51);
+		manager.add(new Separator());
+
+		// Other plug-ins can contribute their actions here
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+
+	/*
+	 * Contributes icons and actions to the tool bar.
+	 */
+	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(this.terminateButton);
+		manager.add(this.getHelp);
+
+		// Other plug-ins can contribute their actions here
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+
+	/*
+	 * Returns a String representing all information relative to a particular
+	 * successful MPI call.
+	 */
+	private String getCallText(Envelope env, boolean isLeft) {
+		final String sourcefileInfo = env.getFilePath();
+		final String newline = System.getProperty("line.separator"); //$NON-NLS-1$
+		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		final IPath sourcefilePath = new Path(sourcefileInfo);
+		final IFile sourcefile = workspaceRoot.getFileForLocation(sourcefilePath);
+		final String fileName = sourcefile.getName();
+		final StringBuffer stringBuffer = new StringBuffer();
+
+		// determine which ranks are involved; by default only call's rank
+		String ranks = Messages.GemAnalyzer_53 + env.getRank() + newline;
+		if (env.isCollective() && this.lockedRank == -1) {
+
+			// If it was a group call then discover who else is here
+			// Also see if we're looking at a single rank or not
+			final int numRanksInvolved[] = new int[1];
+			if (this.lockedRank == -1) {
+				ranks = this.transitions.getRanksInvolved(numRanksInvolved);
+			}
+
+			// This is currently the max #processes GEM drop-down boxes allow
+			final int MAX = 16;
+			if (numRanksInvolved[0] > MAX) {
+				// display only first ten ranks
+				String tempRanks = ranks;
+				int total = 0;
+				for (int i = 0; i < MAX; i++) {
+					// May be multi-digit numbers, hence this code
+					total += tempRanks.indexOf(",") + 1; //$NON-NLS-1$
+					tempRanks = tempRanks.substring(tempRanks.indexOf(",") + 1); //$NON-NLS-1$
+				}
+				stringBuffer.append(Messages.GemAnalyzer_22);
+				stringBuffer.append(ranks.substring(0, total - 1));
+				stringBuffer.append("..."); //$NON-NLS-1$
+				stringBuffer.append(newline);
+			} else {
+				stringBuffer.append(Messages.GemAnalyzer_55);
+				stringBuffer.append(ranks);
+				stringBuffer.append(newline);
+			}
+
+			// count number of ":" to determine how many ranks involved
+			int ranksCommunicatedTo = 0;
+			String communicator = env.getCommunicator_ranks_string();
+			while (communicator != null && communicator.contains(":")) { //$NON-NLS-1$
+				communicator = communicator.substring(communicator.indexOf(":") + 1); //$NON-NLS-1$
+				ranksCommunicatedTo++;
+			}
+
+			if (ranksCommunicatedTo != 0 && numRanksInvolved[0] / ranksCommunicatedTo > 1) {
+				stringBuffer.append(Messages.GemAnalyzer_56);
+				stringBuffer.append(numRanksInvolved[0] / ranksCommunicatedTo);
+				stringBuffer.append(Messages.GemAnalyzer_57);
+				stringBuffer.append(ranksCommunicatedTo);
+				stringBuffer.append(Messages.GemAnalyzer_58);
+			}
+		}
+		if (!env.isCollective()) {
+			stringBuffer.append(ranks);
+		}
+		stringBuffer.append(Messages.GemAnalyzer_60);
+		stringBuffer.append(fileName);
+		stringBuffer.append("\t"); //$NON-NLS-1$
+		stringBuffer.append(Messages.GemAnalyzer_61);
+		stringBuffer.append(isLeft ? this.leftIndex : this.rightIndex);
+
+		return stringBuffer.toString();
+	}
+
+	/*
+	 * Adds MenuListeners to hook selections from the context menu.
+	 */
+	private void hookContextMenu() {
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				GemAnalyzer.this.fillContextMenu(manager);
+			}
+		});
+		final Menu leftMenu = menuMgr.createContextMenu(this.leftViewer.getControl());
+		this.leftViewer.getControl().setMenu(leftMenu);
+		getSite().registerContextMenu(menuMgr, this.leftViewer);
+
+		final Menu rightMenu = menuMgr.createContextMenu(this.rightViewer.getControl());
+		this.rightViewer.getControl().setMenu(rightMenu);
+		getSite().registerContextMenu(menuMgr, this.rightViewer);
+	}
+
+	/**
+	 * Starts this viewer by: Generating the log file, parsing it, and
+	 * initializing everything.
+	 * 
+	 * @param sourceFile
+	 *            The file resource to initialize this viewer with.
+	 * @return void
+	 */
+	public void init(IFile sourceFile) {
+		this.globalSourceFile = sourceFile;
+
+		this.analyzerUpdateThread = new Thread() {
+			@Override
+			public void run() {
+				// If just aborted then don't fill viewers with incomplete data
+				if (GemAnalyzer.this.aborted) {
+					Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButton);
+					Display.getDefault().syncExec(GemAnalyzer.this.clearAnalyzer);
+					GemAnalyzer.this.aborted = false;
+					return;
+				}
+
+				// if the log file contained no MPI calls
+				if (GemAnalyzer.this.globalSourceFile == null) {
+					Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButton);
+					clear();
+					return;
+				}
+
+				reset();
+				parseSourceFile(GemAnalyzer.this.globalSourceFile, GemAnalyzer.this.globalSourceFile);
+				Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButton);
+			}
+		};
+
+		this.clearAnalyzer = new Thread() {
+			@Override
+			public void run() {
+				final String emptyString = ""; //$NON-NLS-1$
+				GemAnalyzer.this.transitionsGroup.setText("Transition:" + " 0/0"); //$NON-NLS-1$ //$NON-NLS-2$
+				GemAnalyzer.this.interleavingsGroup.setText("Interleaving:" + " 0/0"); //$NON-NLS-1$ //$NON-NLS-2$
+				GemAnalyzer.this.firstTransitionButton.setEnabled(false);
+				GemAnalyzer.this.previousTransitionButton.setEnabled(false);
+				GemAnalyzer.this.nextTransitionButton.setEnabled(false);
+				GemAnalyzer.this.lastTransitionButton.setEnabled(false);
+				GemAnalyzer.this.firstInterleavingButton.setEnabled(false);
+				GemAnalyzer.this.previousInterleavingButton.setEnabled(false);
+				GemAnalyzer.this.nextInterleavingButton.setEnabled(false);
+				GemAnalyzer.this.lastInterleavingButton.setEnabled(false);
+				GemAnalyzer.this.deadlockInterleavingButton.setEnabled(false);
+				GemAnalyzer.this.internalIssueOrderButton.setEnabled(false);
+				GemAnalyzer.this.programOrderButton.setEnabled(false);
+				GemAnalyzer.this.launchHpvButton.setEnabled(false);
+				GemAnalyzer.this.browseCallsButton.setEnabled(false);
+				GemAnalyzer.this.terminateButton.setEnabled(false);
+				GemAnalyzer.this.errorMessageLabel.setText(emptyString);
+				GemAnalyzer.this.transitions = null;
+				GemAnalyzer.this.leftViewer.refresh();
+				GemAnalyzer.this.rightViewer.refresh();
+				GemAnalyzer.this.leftCodeWindowLabel.setText(emptyString);
+				GemAnalyzer.this.rightCodeWindowLabel.setText(emptyString);
+				final String[] items = new String[] { emptyString };
+				GemAnalyzer.this.lockRanksComboList.setItems(items);
+				GemUtilities.setTaskStatus(GemUtilities.TaskStatus.IDLE);
+				GemAnalyzer.this.runGemButton.setEnabled(true);
+			}
+		};
+
+		this.disableTerminateButton = new Thread() {
+			@Override
+			public void run() {
+				GemAnalyzer.this.terminateButton.setEnabled(false);
+				GemAnalyzer.this.runGemButton.setEnabled(true);
+				GemAnalyzer.this.internalIssueOrderButton.setEnabled(true);
+				GemAnalyzer.this.programOrderButton.setEnabled(true);
+			}
+		};
+
+		// start things up now
+		this.terminateButton.setEnabled(true);
+		this.runGemButton.setEnabled(false);
+	}
+
+	/*
+	 * Launches the call browser as a separate shell window. This will yield a
+	 * list of MPI calls sorted by interleaving -> rank -> MPI call. Calls are
+	 * also color coded to distinguish the currently selected line in analyzer
+	 * code windows (blue), as well as uncompleted calls due to a deadlock in
+	 * the particular interleaving (red).
+	 */
+	private void launchCallBrowser() {
+		final IWorkbench wb = PlatformUI.getWorkbench();
+		final Display display = wb.getDisplay();
+		final Shell shell = new Shell();
+		shell.setText(Messages.GemAnalyzer_68);
+		shell.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/magnified-trident.gif"))); //$NON-NLS-1$
+		shell.setLayout(new GridLayout());
+		final CLabel fileNameLabel = new CLabel(shell, SWT.BORDER_SOLID);
+		fileNameLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		final CLabel numProcsLabel = new CLabel(shell, SWT.BORDER_SOLID);
+		numProcsLabel.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/processes.gif"))); //$NON-NLS-1$
+		numProcsLabel.setText(Messages.GemAnalyzer_69 + this.numRanks);
+		numProcsLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		final Tree tree = new Tree(shell, SWT.BORDER);
+		tree.setLinesVisible(true);
+		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+		tree.setFont(setFontSize(tree.getFont(), 8));
+
+		// Declare everything we'll be working with
+		TreeItem interleavingItem = null;
+		TreeItem callItem = null;
+		final int currentInter = this.transitions.getCurrentInterleaving();
+
+		// Loop over all interleavings
+		final int numInterleavings = this.transitions.getTotalInterleavings() + 1; // 0-based
+		for (int currentInterleaving = 1; currentInterleaving < numInterleavings; currentInterleaving++) {
+
+			// Create a root node for each interleaving
+			interleavingItem = new TreeItem(tree, SWT.NULL);
+			interleavingItem.setText(Messages.GemAnalyzer_70 + currentInterleaving);
+
+			// Loop over all envelopes (transitions) in the current interleaving
+			final ArrayList<Envelope> envelopes = this.transitions.getInterleavingEnvelopes(currentInterleaving);
+			final int listSize = envelopes.size();
+			Envelope env = null;
+			String functionName = null;
+			String fileName = null;
+			int lineNumber = -1;
+			int envRank = -1;
+
+			try {
+				for (int envIndex = 0; envIndex < listSize; envIndex++) {
+					env = envelopes.get(envIndex);
+
+					// Don't display resource leaks
+					if (env.isLeak()) {
+						continue;
+					}
+
+					// Create the leaf node representing the call
+					callItem = new TreeItem(interleavingItem, SWT.NULL);
+					functionName = env.getFunctionName();
+					fileName = new Path(env.getFilePath()).lastSegment().toString();
+					lineNumber = env.getLinenumber();
+					envRank = env.getRank();
+
+					// make all calls have same name length
+					while (functionName.length() < 12) {
+						functionName += " "; //$NON-NLS-1$
+					}
+
+					final StringBuffer stringBuffer = new StringBuffer();
+					stringBuffer.append("Rank: "); //$NON-NLS-1$
+					stringBuffer.append(envRank);
+					stringBuffer.append("\t"); //$NON-NLS-1$
+					stringBuffer.append(functionName);
+					stringBuffer.append("\t"); //$NON-NLS-1$
+					stringBuffer.append(fileName);
+					stringBuffer.append("Line:"); //$NON-NLS-1$
+					stringBuffer.append("\t"); //$NON-NLS-1$
+					stringBuffer.append(lineNumber);
+					final String callItemText = stringBuffer.toString();
+					callItem.setText(callItemText);
+
+					// Mark the calls with errors red
+					if (env.getIssueIndex() == -1) {
+						callItem.setForeground(new Color(null, 255, 0, 0));
+					}
+
+					// Mark the current call(s) blue
+					String currentFile = null;
+					int currentLine = -1;
+					if (this.transitions.getCurrentTransition() != null) {
+						currentFile = this.transitions.getCurrentTransition().getFilePath();
+						currentLine = this.transitions.getCurrentTransition().getLinenumber();
+					}
+					if (currentFile != null) {
+						if (currentLine == env.getLinenumber() && currentFile.equals(env.getFilePath())
+								&& currentInter == env.getInterleaving()) {
+							callItem.setForeground(new Color(null, 0, 0, 255));
+							// Comment this out if you don't want items expanded
+							revealTreeItem(callItem);
+						}
+					}
+				}
+			} catch (final Exception e) {
+				GemUtilities.logExceptionDetail(e);
+			}
+		}
+
+		// Open up the Call Browser window with the specified size
+		shell.setSize(550, 550);
+		shell.open();
+
+		if (this.activeShells == null) {
+			this.activeShells = new LinkedList<Shell>();
+		}
+		this.activeShells.add(shell);
+
+		// Set up the event loop for disposal
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+	}
+
+	/*
+	 * Creates the actions associated with the action bar buttons and context
+	 * menu items.
+	 */
+	private void makeActions() {
+		this.getHelp = new Action() {
+			@Override
+			public void run() {
+				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.eclipse.ptp.gem.help/html/analyzerView.html"); //$NON-NLS-1$
+			}
+		};
+		this.getHelp.setToolTipText(Messages.GemAnalyzer_73);
+		this.getHelp.setImageDescriptor(GemPlugin.getImageDescriptor("icons/help-contents.gif")); //$NON-NLS-1$
+
+		this.terminateButton = new Action() {
+			@Override
+			public void run() {
+				GemAnalyzer.this.aborted = true;
+				GemUtilities.terminateOperation();
+			}
+		};
+		this.terminateButton.setImageDescriptor(GemPlugin.getImageDescriptor("icons/progress_stop.gif")); //$NON-NLS-1$
+		this.terminateButton.setToolTipText(Messages.GemAnalyzer_74);
+		this.terminateButton.setEnabled(false);
+	}
+
+	/*
+	 * Opens the editor with the current source file active and jump to the line
+	 * number that is passed in.
+	 */
+	private void openEditor(int lineNum, IFile sourceFile) {
+		try {
+			final IEditorPart editor = IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
+					sourceFile, true);
+			final IMarker marker = sourceFile.createMarker(IMarker.MARKER);
+			marker.setAttribute(IMarker.LINE_NUMBER, lineNum);
+			IDE.gotoMarker(editor, marker);
+		} catch (final Exception e) {
+			GemUtilities.logExceptionDetail(e);
+		}
 	}
 
 	/*
@@ -2368,17 +1395,104 @@ public class GemAnalyzer extends ViewPart {
 		return (numRightParens == numLeftParens);
 	}
 
+	/**
+	 * Reads in the contents of the specified file and populates the
+	 * ListViewers.
+	 * 
+	 * @param sourcefile
+	 *            A String containing the absolute path to the source file.
+	 * @return void
+	 */
+	public void parseSourceFile(IFile leftSourceFile, IFile rightSourceFile) {
+
+		final Boolean updateLeftFile = this.currLeftFile == null || !this.currLeftFile.equals(leftSourceFile);
+		final Boolean updateRightFile = this.currRightFile == null || rightSourceFile == null
+				|| !this.currRightFile.equals(rightSourceFile);
+		this.currLeftFile = leftSourceFile;
+		this.currRightFile = rightSourceFile;
+
+		// Clear the left viewer list
+		if (updateLeftFile) {
+			this.leftViewer.getList().removeAll();
+		}
+
+		boolean isCollective = false;
+		if (this.transitions != null && this.transitions.getCurrentTransition() != null) {
+			isCollective = this.transitions.getCurrentTransition().isCollective();
+		}
+
+		// Clear the right viewer list
+		if (isCollective || updateRightFile) {
+			this.rightViewer.getList().removeAll();
+		}
+
+		// Populate the viewers with the source file contents
+		InputStream leftSourceFileStream = null;
+		InputStream rightSourceFileStream = null;
+		String line = ""; //$NON-NLS-1$
+
+		// Populate the left code window
+		try {
+			leftSourceFileStream = leftSourceFile.getContents(true);
+			final Scanner s = new Scanner(leftSourceFileStream);
+			int lineNum = 0;
+			while (updateLeftFile && s.hasNext()) {
+				lineNum++;
+				line = s.nextLine();
+				this.leftViewer.add(new ListElement(leftSourceFile, line, lineNum, false));
+			}
+		} catch (final CoreException e) {
+			GemUtilities.logExceptionDetail(e);
+			this.leftViewer.add(new ListElement(null, Messages.GemAnalyzer_76, -1, false));
+		}
+
+		// Populate the right code window
+		try {
+			if (rightSourceFile != null) {
+				rightSourceFileStream = rightSourceFile.getContents();
+				final Scanner s = new Scanner(rightSourceFileStream);
+				int lineNum = 0;
+				while (s.hasNext()) {
+					lineNum++;
+					line = s.nextLine();
+					this.rightViewer.add(new ListElement(rightSourceFile, line, lineNum, false));
+				}
+			} else {
+				final Envelope env = this.transitions.getCurrentTransition();
+				if (env.isCollective()) {
+					displayCollectiveInfo();
+				} else {
+					this.rightViewer.add(new ListElement(null, "", -1, false)); //$NON-NLS-1$
+				}
+			}
+		} catch (final Exception e) {
+			GemUtilities.logExceptionDetail(e);
+			this.rightViewer.add(new ListElement(null, Messages.GemAnalyzer_78, -1, false));
+		}
+
+		// Close the open InputStreams
+		try {
+			if (leftSourceFileStream != null) {
+				leftSourceFileStream.close();
+			}
+			if (rightSourceFileStream != null) {
+				rightSourceFileStream.close();
+			}
+		} catch (final IOException e) {
+			GemUtilities.logExceptionDetail(e);
+		}
+	}
+
 	/*
 	 * Removes comments from the specified call String.
 	 */
 	private String removeComments(String call) {
 		// remove any c-style comments
 		while (call.contains("/*")) { //$NON-NLS-1$
-			if (!call.contains("*/")) {//$NON-NLS-1$
+			if (!call.contains("*/")) { //$NON-NLS-1$
 				break;
 			}
-			call = call.substring(0, call.indexOf("/*")) //$NON-NLS-1$
-					+ call.substring(call.indexOf("*/") + 2); //$NON-NLS-1$
+			call = call.substring(0, call.indexOf("/*")) + call.substring(call.indexOf("*/") + 2); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// remove any c++-style comments
@@ -2386,5 +1500,561 @@ public class GemAnalyzer extends ViewPart {
 			call = call.substring(0, call.indexOf("//")); //$NON-NLS-1$
 		}
 		return call;
+	}
+
+	/*
+	 * Resets everything to default values. Used when a new file is analyzed.
+	 */
+	private void reset() {
+		// By making the current files null we force the code viewers to update
+		this.currLeftFile = null;
+		this.currRightFile = null;
+		this.transitions.currentInterleaving = 0;
+		this.transitions.currentTransitionIndex = 0;
+
+		// Update labels and combo lists
+		setMessageLabelText();
+		setLockRankItems();
+		setNumProcItems();
+
+		// Update global indices
+		this.leftIndex = 0;
+		this.rightIndex = 0;
+		this.lockedRank = -1;
+
+		// Runtime group buttons
+		this.deadlockInterleavingButton.setEnabled(this.transitions.getDeadlockInterleavings() != null);
+		this.browseCallsButton.setEnabled(true);
+		this.browseCallsButton.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/browse.gif"))); //$NON-NLS-1$
+		this.launchHpvButton.setEnabled(true);
+
+		// Update transition related items w/o displaying
+		updateTransitionLabels(false);
+
+		// TODO Let's clean this up
+		// This section is needed since the scroll bars are unresponsive
+		// until the view is fully created. For this reason we need to back up
+		// to Transition 0 and update the labels.
+		this.transitionLabelIndex = 0;
+		this.transitionsGroup.setText("Transition " + this.transitionLabelIndex + "/" + this.transitionLabelCount); //$NON-NLS-1$ //$NON-NLS-2$ 
+		this.transitions.currentTransitionIndex = -1;
+		this.leftIndex = 0;
+		this.rightIndex = 0;
+		this.previousLeftIndex = 0;
+		setButtonEnabledState();
+		updateSelectedLine(true);
+		setMessageLabelText();
+		GemUtilities.setTaskStatus(GemUtilities.TaskStatus.IDLE);
+	}
+
+	/*
+	 * To make an item visible we must expand each of its parents. Sadly the
+	 * root must be expanded first and work its way down to the goal. So we
+	 * recursively find parents and then expand once all of the current item's
+	 * parents has been expanded.
+	 */
+	private void revealTreeItem(TreeItem callItem) {
+		if (callItem.getParentItem() == null) {
+			callItem.setExpanded(true);
+		} else {
+			revealTreeItem(callItem.getParentItem());
+			callItem.setExpanded(true);
+		}
+	}
+
+	/*
+	 * Sets the enabled property of all buttons to the appropriate state.
+	 */
+	private void setButtonEnabledState() {
+		this.firstTransitionButton.setEnabled(this.transitions.hasValidPreviousTransition(this.lockedRank));
+		this.previousTransitionButton.setEnabled(this.transitions.hasValidPreviousTransition(this.lockedRank));
+		this.nextTransitionButton.setEnabled(this.transitions.hasValidNextTransition(this.lockedRank));
+		this.lastTransitionButton.setEnabled(this.transitions.hasValidNextTransition(this.lockedRank));
+		this.firstInterleavingButton.setEnabled(this.transitions.hasPreviousInterleaving());
+		this.previousInterleavingButton.setEnabled(this.transitions.hasPreviousInterleaving());
+		this.nextInterleavingButton.setEnabled(this.transitions.hasNextInterleaving());
+		this.lastInterleavingButton.setEnabled(this.transitions.hasNextInterleaving());
+		this.deadlockInterleavingButton.setEnabled(this.transitions.getDeadlockInterleavings() != null);
+
+	}
+
+	/**
+	 * Passing the focus request to both code viewer's control.
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	@Override
+	public void setFocus() {
+		final IWorkbench wb = PlatformUI.getWorkbench();
+		final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+		final IWorkbenchPage page = window.getActivePage();
+		if (page != null) {
+			page.activate(this);
+		}
+	}
+
+	/*
+	 * Given the initial Font, this helper method returns that Font with the new
+	 * specified size.
+	 */
+	private Font setFontSize(Font font, int size) {
+		final FontData[] fontData = font.getFontData();
+		for (final FontData element : fontData) {
+			element.setHeight(size);
+		}
+		return new Font(this.parent.getDisplay(), fontData);
+	}
+
+	/*
+	 * Populates the lock ranks combo-box with the correct number of entries for
+	 * the current analyzation.
+	 */
+	private void setLockRankItems() {
+		final String[] ranks = new String[this.numRanks + 1];
+		ranks[0] = Messages.GemAnalyzer_83;
+		for (int i = 1; i <= this.numRanks; i++) {
+			final StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append(Messages.GemAnalyzer_84);
+			stringBuffer.append((Integer) (i - 1));
+			stringBuffer.append(Messages.GemAnalyzer_85);
+			ranks[i] = stringBuffer.toString();
+		}
+		this.lockRanksComboList.setItems(ranks);
+		this.lockRanksComboList.setText(ranks[0]);
+	}
+
+	/*
+	 * Sets the label text in the interleavings buttons group.
+	 */
+	private void setMessageLabelText() {
+		// This is for foreground coloring
+		final Display display = this.parent.getShell().getDisplay();
+		final Color RED = new Color(display, new RGB(255, 0, 0));
+		final Color GREEN = new Color(display, new RGB(0, 200, 0));
+
+		// Interleaving label
+		this.interleavingsGroup.setText("Interleaving: " + this.transitions.getCurrentInterleaving() + "/" //$NON-NLS-1$ //$NON-NLS-2$
+				+ this.transitions.getTotalInterleavings());
+
+		// Transition Label
+		this.transitionsGroup.setText("Transition: " + this.transitionLabelIndex + "/" + this.transitionLabelCount); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Error message label
+		if (this.transitions.hasDeadlock()) {
+			this.errorMessageLabel.setForeground(RED);
+			final ArrayList<Integer> deadlockList = this.transitions.getDeadlockInterleavings();
+			String deadlocks = ""; //$NON-NLS-1$
+			if (deadlockList.size() == 1) {
+				deadlocks = deadlockList.get(0).toString();
+			} else {
+				for (int i = 0; i < deadlockList.size(); i++) {
+					final String num = deadlockList.get(i).toString();
+					deadlocks += (i != deadlockList.size() - 1) ? num + ", " : num; //$NON-NLS-1$
+				}
+			}
+			String errorMsg = Messages.GemAnalyzer_89;
+			errorMsg += deadlocks.length() == 1 ? " " : "s "; //$NON-NLS-1$ //$NON-NLS-2$
+			this.errorMessageLabel.setText(errorMsg + deadlocks);
+		} else if (this.transitions.hasAssertion()) {
+			this.errorMessageLabel.setForeground(RED);
+			this.errorMessageLabel.setText(Messages.GemAnalyzer_91 + this.transitions.getTotalInterleavings());
+		} else if (this.transitions.hasError()) {
+			this.errorMessageLabel.setForeground(RED);
+			this.errorMessageLabel.setText(Messages.GemAnalyzer_92);
+		} else {
+			this.errorMessageLabel.setForeground(GREEN);
+			this.errorMessageLabel.setText(Messages.GemAnalyzer_93);
+		}
+	}
+
+	/*
+	 * Populates the num-procs combo-box with choices the user can use to set
+	 * the number of processes for the next analyzer run.
+	 */
+	private void setNumProcItems() {
+		final String[] ranks = new String[16];
+		for (int i = 1; i <= 16; i++) {
+			ranks[i - 1] = ((Integer) i).toString();
+		}
+		this.setNumProcsComboList.setItems(ranks);
+		final Integer nprocs = GemPlugin.getDefault().getPreferenceStore().getInt(PreferenceConstants.GEM_PREF_NUMPROCS);
+		this.setNumProcsComboList.setText(nprocs.toString());
+	}
+
+	/*
+	 * This method eliminates displaying of redundant collective call
+	 * information in the Analyzer code windows. If you are moving forward
+	 * direction should be 1, if backward -1, otherwise the behavior is
+	 * undefined.
+	 */
+	private Envelope skipRepeats(int direction) {
+		Envelope env = this.transitions.getCurrentTransition();
+		while (true) {
+			if (env == null) {
+				return null;
+			}
+			if (env.getLinenumber() == this.previousLeftIndex) {
+				if (direction == 1) {
+					env = this.transitions.getNextTransition(this.lockedRank);
+				} else {
+					env = this.transitions.getPreviousTransition(this.lockedRank);
+				}
+			} else {
+				break;
+			}
+		}
+		return env;
+	}
+
+	/**
+	 * Updates the Analyzer view.
+	 * 
+	 * @param sourcePath
+	 *            the fully qualified path to the source file to display in the
+	 *            Analyzer view's code windows.
+	 * @param transitions
+	 *            The Transitions object holding holding all transitions per
+	 *            interleaving.
+	 * @return void
+	 */
+	public void update(IFile sourceFile, Transitions transitions) {
+		if (transitions == null) {
+			clear();
+			return;
+		}
+		this.transitions = transitions;
+		this.numRanks = transitions.getNumRanks();
+		this.globalSourceFile = sourceFile;
+		Display.getDefault().syncExec(this.analyzerUpdateThread);
+	}
+
+	/*
+	 * Only changes the code windows content, does not change the highlighting.
+	 * First time through, current Envelope is null, no update needed.
+	 */
+	private void updateCodeViewers() {
+		final String emptyString = ""; //$NON-NLS-1$
+		Envelope env = this.transitions.getCurrentTransition();
+		if (env != null) {
+			final String nextLeftFileInfo = env.getFilePath();
+			String nextRightFileInfo = emptyString;
+
+			env = this.transitions.getCurrentTransition().getMatch_envelope();
+			if (env != null) {
+				nextRightFileInfo = env.getFilePath();
+			}
+
+			final IPath nextLeftFilePath = new Path(nextLeftFileInfo);
+			final String nextLeftFileName = nextLeftFilePath.segment(nextLeftFilePath.segmentCount() - 1);
+			String nextRightFileName = emptyString;
+
+			if (nextRightFileInfo.length() != 0) {
+				final IPath nextRightFilePath = new Path(nextRightFileInfo);
+				nextRightFileName = nextRightFilePath.segment(nextRightFilePath.segmentCount() - 1);
+			}
+
+			final boolean updateWindowContent = this.currLeftFile == null || this.currRightFile == null
+					|| !nextLeftFileName.equals(this.currLeftFile.getName())
+					|| !nextRightFileName.equals(this.currRightFile.getName()) || nextRightFileInfo.equals(emptyString);
+
+			if (updateWindowContent) {
+				final String projectName = this.globalSourceFile.getProject().getName();
+				final IProject currentProject = ResourcesPlugin.getWorkspace()
+						.getRoot().getProject(projectName);
+
+				// Get the next source files for the code viewers
+				final IPath leftProjectRelativePath = new Path(nextLeftFileInfo);
+				final IPath rightProjectRelativePath = new Path(nextRightFileInfo);
+				final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+				final IFile nextLeftSourceFile = workspaceRoot.getFileForLocation(leftProjectRelativePath);
+
+				if (!nextLeftSourceFile.exists()) {
+					GemUtilities.refreshProject(currentProject);
+				}
+
+				IFile nextRightSourceFile = null;
+				final boolean isEmptyPath = rightProjectRelativePath.toString().length() == 0;
+				if (!isEmptyPath) {
+					nextRightSourceFile = workspaceRoot.getFileForLocation(rightProjectRelativePath);
+					if (!nextRightSourceFile.exists()) {
+						GemUtilities.refreshProject(currentProject);
+					}
+				}
+
+				// Now parse the files for new code viewer window content
+				parseSourceFile(nextLeftSourceFile, (isEmptyPath) ? null : nextRightSourceFile);
+			}
+		}
+	}
+
+	/**
+	 * Calling this method will update the drop down so that it has the correct
+	 * number of processes displayed. This method is used when another location
+	 * changes the number of processes preference.
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	public void updateDropDown() {
+		final Integer nprocs = GemPlugin.getDefault().getPreferenceStore().getInt(PreferenceConstants.GEM_PREF_NUMPROCS);
+		this.setNumProcsComboList.setText(nprocs.toString());
+	}
+
+	/*
+	 * Goes to the First Transition and updates all relevant data
+	 */
+	private void updateFirstTransition(boolean update) {
+		// Goes to null
+		Envelope env = this.transitions.getFirstTransition(this.lockedRank);
+		env = this.transitions.getCurrentTransition();
+
+		if (env != null) {
+			this.previousLeftIndex = env.getLinenumber();
+		}
+
+		if (env == null) {
+			GemUtilities.showInformationDialog(Messages.GemAnalyzer_94);
+			return;
+		}
+
+		if (update) {
+			setButtonEnabledState();
+			updateCodeViewers();
+			displayEnvelopes(env);
+			updateSelectedLine(true);
+			this.transitionLabelIndex = 1;
+			setMessageLabelText();
+		}
+	}
+
+	/*
+	 * Goes to the last transition and updates relevant information
+	 */
+	private void updateLastTransition() {
+		Envelope env = this.transitions.getLastTransition(this.lockedRank);
+
+		// stepToLastTransition puts us at the last iteration of Finalize
+		// other code always assumes we are on the first iteration of
+		// each call though, so here we go back to the first iteration
+		if (env.getFunctionName().equals("MPI_Finalize")) { //$NON-NLS-1$
+			while (true) {
+				env = this.transitions.getPreviousTransition(this.lockedRank);
+
+				if (env == null) {
+					GemUtilities.showInformationDialog(Messages.GemAnalyzer_95);
+					return;
+				}
+				// If there was only one finalize go back to it
+				if (!env.getFunctionName().equals("MPI_Finalize")) { //$NON-NLS-1$
+					env = this.transitions.getNextTransition(this.lockedRank);
+					break;
+				}
+			}
+		}
+
+		if (env == null) {
+			GemUtilities.showInformationDialog(Messages.GemAnalyzer_96);
+			return;
+		}
+		this.previousLeftIndex = env.getLinenumber();
+		setButtonEnabledState();
+		updateCodeViewers();
+		displayEnvelopes(env);
+		updateSelectedLine(true);
+		this.transitionLabelIndex = this.transitionLabelCount;
+		setMessageLabelText();
+	}
+
+	/*
+	 * This method is used to highlight ALL lines involved in a call when the
+	 * call is spread over multiple lines in the source code file.
+	 */
+	private void updateLineCount() {
+		final List leftList = this.leftViewer.getList();
+		final List rightList = this.rightViewer.getList();
+		final String emptyString = ""; //$NON-NLS-1$
+
+		String curr = emptyString;
+		this.leftLines = 1;
+		if (this.leftIndex <= 0) {
+			this.leftLines = 0;
+			return;
+		}
+		while (this.leftLines < this.leftIndex + 1) {
+			// Get current string
+			curr = emptyString;
+			for (int i = this.leftLines; i > 0; i--) {
+				curr += leftList.getItem(this.leftIndex - i);
+				curr = removeComments(curr);
+			}
+
+			if (this.parenthesesMatched(curr)) {
+				break;
+			}
+			this.leftLines++;
+		}
+		// Be sure to include the MPI Call
+		curr = curr.substring(0, curr.indexOf("(") - 1); //$NON-NLS-1$
+		if (curr.trim().length() == 0) {
+			this.leftLines++;
+		}
+
+		if (this.rightIndex == -1) {
+			return;
+		}
+		this.rightLines = 1;
+
+		while (this.rightLines < this.rightIndex + 1) {
+			// Get current string
+			curr = emptyString;
+			for (int i = this.rightLines; i > 0; i--) {
+				curr += rightList.getItem(this.rightIndex - i);
+				curr = removeComments(curr);
+			}
+
+			if (this.parenthesesMatched(curr)) {
+				break;
+			}
+			this.rightLines++;
+		}
+		curr = curr.substring(0, curr.indexOf("(") - 1); //$NON-NLS-1$
+		if (curr.trim().length() == 0) {
+			this.rightLines++;
+		}
+	}
+
+	/*
+	 * Go to the next transition. Returns 1 if successful, -1 if there was no
+	 * where to go.
+	 */
+	private int updateNextTransition(boolean update) {
+		int returnValue = 1;
+		Envelope env = this.transitions.getNextTransition(this.lockedRank);
+
+		if (env.isCollective() && this.lockedRank == -1) {
+			env = skipRepeats(1);
+		}
+
+		if (env == null) {
+			returnValue = -1;
+		} else {
+			this.previousLeftIndex = env.getLinenumber();
+		}
+
+		if (update) {
+			setButtonEnabledState();
+			updateCodeViewers();
+			displayEnvelopes(env);
+			updateSelectedLine(true);
+			this.transitionLabelIndex++;
+			setMessageLabelText();
+		}
+		return returnValue;
+	}
+
+	/*
+	 * Goes to the previous transition and updates relevant data
+	 */
+	private void updatePreviousTransition() {
+		Envelope env = this.transitions.getPreviousTransition(this.lockedRank);
+		this.previousLeftIndex = env.getLinenumber();
+
+		// Go back until you reach the first call or beginning
+		if (env.isCollective() && this.lockedRank == -1) {
+			while (true) {
+				env = this.transitions.getPreviousTransition(this.lockedRank);
+				if (env == null) {
+					updateFirstTransition(true);
+					return;
+				}
+				if (env.getLinenumber() != this.previousLeftIndex) {
+					env = this.transitions.getNextTransition(this.lockedRank);
+					break;
+				}
+			}
+		}
+
+		this.previousLeftIndex = env.getLinenumber();
+		setButtonEnabledState();
+		updateCodeViewers();
+		displayEnvelopes(env);
+		updateSelectedLine(true);
+		this.transitionLabelIndex--;
+		setMessageLabelText();
+	}
+
+	/*
+	 * Updates the relative position of the scroll bar for the list viewers in
+	 * the code windows.
+	 */
+	private void updateScrollBars() {
+		final List leftList = this.leftViewer.getList();
+		final List rightList = this.rightViewer.getList();
+
+		try {
+			if (leftList != null && leftList.getSelection().length != 0) {
+				this.leftViewer.reveal(this.leftViewer.getElementAt(0));
+				this.leftViewer.reveal(this.leftViewer.getElementAt(this.leftIndex - 1));
+			}
+			if (rightList != null && rightList.getSelection().length != 0) {
+				this.rightViewer.reveal(this.rightViewer.getElementAt(0));
+				this.rightViewer.reveal(this.rightViewer.getElementAt(this.rightIndex - 1));
+			}
+		} catch (final Exception e) {
+			GemUtilities.logExceptionDetail(e);
+		}
+	}
+
+	/*
+	 * Updates which line of the log file that is currently in focus.
+	 */
+	private void updateSelectedLine(Boolean scroll) {
+		updateCodeViewers();
+
+		// Deselect Everything
+		final List leftList = this.leftViewer.getList();
+		final List rightList = this.rightViewer.getList();
+		leftList.deselectAll();
+		rightList.deselectAll();
+
+		updateLineCount();
+
+		// Update left view (-1, 0-based)
+		for (int i = 0; i < this.leftLines; i++) {
+			leftList.select((this.leftIndex - i) - 1);
+		}
+
+		// Update right view (-1, 0-based)
+		for (int i = 0; i < this.rightLines; i++) {
+			rightList.select((this.rightIndex - i) - 1);
+		}
+
+		if (scroll) {
+			updateScrollBars();
+		}
+	}
+
+	// TODO Let's clean this up
+	// ONLY CALL WHEN YOU HAVE STARTED A NEW INTERLEAVING!!!
+	// As it searches it will never display the envelope
+	// displayEnvelope decides whether or not the final destination is displayed
+	private void updateTransitionLabels(boolean displayEnvelope) {
+		updateFirstTransition(false);
+
+		// because only incremented if next transition is also valid
+		this.transitionLabelCount = 1;
+		final Envelope env = this.transitions.getCurrentTransition();
+
+		int test = 1;
+		while (test == 1 && env != null) {
+			if (this.transitions.hasValidNextTransition(this.lockedRank)) {
+				this.transitionLabelCount++;
+				test = updateNextTransition(false);
+			} else {
+				break;
+			}
+		}
+		updateFirstTransition(displayEnvelope);
 	}
 }

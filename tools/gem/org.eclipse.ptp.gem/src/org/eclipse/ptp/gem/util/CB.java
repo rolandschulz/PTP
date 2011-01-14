@@ -23,22 +23,20 @@ package org.eclipse.ptp.gem.util;
 
 public class CB {
 
-	private int rank;
-	private int index;
-
-	public CB(int _rank, int _index) {
-		this.rank = _rank;
-		this.index = _index;
-	}
+	private final int rank;
+	private final int index;
 
 	/**
-	 * Returns the rank of the operation.
+	 * Constructor
 	 * 
-	 * @param none
-	 * @return int The rank involved with this CB.
+	 * @param rank
+	 *            The rank for this CB.
+	 * @param index
+	 *            The index for this CB.
 	 */
-	public int getRank() {
-		return this.rank;
+	public CB(int rank, int index) {
+		this.rank = rank;
+		this.index = index;
 	}
 
 	/**
@@ -49,6 +47,16 @@ public class CB {
 	 */
 	public int getIndex() {
 		return this.index;
+	}
+
+	/**
+	 * Returns the rank of the operation.
+	 * 
+	 * @param none
+	 * @return int The rank involved with this CB.
+	 */
+	public int getRank() {
+		return this.rank;
 	}
 
 }

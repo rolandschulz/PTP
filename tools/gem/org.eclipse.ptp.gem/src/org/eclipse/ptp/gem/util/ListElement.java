@@ -16,28 +16,88 @@
 
 package org.eclipse.ptp.gem.util;
 
+import org.eclipse.core.resources.IFile;
+
 public class ListElement {
 
-	public String fullFileName;
-	public String entry;
-	public int line;
-	public boolean isCollective;
+	private final IFile file;
+	private final String listEntry;
+	private final int lineNumber;
+	private final boolean isCollective;
 
 	/**
-	 * CTOR
+	 * Constructor
 	 * 
-	 * @param _fullFileName The full name of the file.
-	 * @param _entry The files element entry.
-	 * @param _line The line of code associated with this ListElement.
-	 * @param _isCollective whether this ListElement is a collective operation
-	 *            or not.
+	 * @param file
+	 *            The file resource for this ListElement.
+	 * @param listEntry
+	 *            The full String representing this ListElement's data.
+	 * @param lineNumber
+	 *            The associated line number in this ListElement's file resource
+	 * @param isCollective
+	 *            Whether or not this ListElement is a collective operation.
 	 */
-	public ListElement(String _fullFileName, String _entry, int _line,
-			boolean _isCollective) {
-		this.fullFileName = _fullFileName;
-		this.entry = _entry;
-		this.line = _line;
-		this.isCollective = _isCollective;
+	public ListElement(IFile file, String listEntry, int lineNumber, boolean isCollective) {
+		this.file = file;
+		this.listEntry = listEntry;
+		this.lineNumber = lineNumber;
+		this.isCollective = isCollective;
+	}
+
+	/**
+	 * Checks whether or not this ListElement is equal to the specified element.
+	 * 
+	 * @param otherListELement
+	 *            The ListItem to compare with this ListItem.
+	 * @return boolean True if this ListElement is equal to the other, false
+	 *         otherwise.
+	 */
+	public boolean equals(ListElement otherListELement) {
+		return (this.file.equals(otherListELement.file)
+				&& this.listEntry.equals(otherListELement.listEntry) && this.lineNumber == otherListELement.lineNumber);
+	}
+
+	/**
+	 * Returns the file resource for this ListElement.
+	 * 
+	 * @param none
+	 * @return IFile The file resource.
+	 */
+	public IFile getFile() {
+		return this.file;
+	}
+
+	/**
+	 * Returns the line number in the associated file resource for this
+	 * ListElement.
+	 * 
+	 * @param none
+	 * @return int The line number.
+	 */
+	public int getLineNumber() {
+		return this.lineNumber;
+	}
+
+	/**
+	 * Returns the full String representing this ListElement's data.
+	 * 
+	 * @param none
+	 * @return String The list entry.
+	 */
+	public String getListEntry() {
+		return this.listEntry;
+	}
+
+	/**
+	 * Returns whether or not the call associated with the list entry in this
+	 * ListElement is a collective or not.
+	 * 
+	 * @param none
+	 * @return boolean True if the call associated with the list entry in this
+	 *         ListElement is a collective, false otherwise.
+	 */
+	public boolean isCollective() {
+		return this.isCollective;
 	}
 
 	/**
@@ -48,18 +108,7 @@ public class ListElement {
 	 */
 	@Override
 	public String toString() {
-		return this.entry;
-	}
-
-	/**
-	 * 
-	 * @param other The ListItem to compare with this ListItem.
-	 * @return boolean True if this ListElement is equal to other, false
-	 *         otherwise.
-	 */
-	public boolean equals(ListElement other) {
-		return (this.fullFileName.equals(other.fullFileName)
-				&& this.entry.equals(other.entry) && this.line == other.line);
+		return this.listEntry;
 	}
 
 }
