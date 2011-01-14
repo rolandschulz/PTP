@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    IBM Corporation - initial API and implementation
+ *    Roland Schulz, University of Tennessee
  *******************************************************************************/
 
 package org.eclipse.ptp.rdt.sync.ui;
@@ -31,6 +32,7 @@ public class RDTSyncUIPlugin extends Plugin {
 	private static RDTSyncUIPlugin fInstance = null;
 
 	public static final String PLUGIN_ID = "org.eclipse.ptp.rdt.sync.ui"; //$NON-NLS-1$
+	public static final String SYNCHRONIZE_EXTENSION = "synchronizeParticipants"; //$NON-NLS-1$
 
 	public RDTSyncUIPlugin() {
 		fInstance = this;

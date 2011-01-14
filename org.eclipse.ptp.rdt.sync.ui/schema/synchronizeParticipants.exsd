@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.ptp.rdt.sync.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.ptp.rdt.sync.core" id="languageProperties" name="Language Property Provider"/>
+         <meta.schema plugin="org.eclipse.ptp.rdt.sync.core" id="syncProvider" name="Synchronization Provider"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="propertyProvider"/>
+            <element ref="synchronizeParticipant"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,27 +47,26 @@
       </complexType>
    </element>
 
-   <element name="propertyProvider">
+   <element name="synchronizeParticipant">
       <complexType>
-         <sequence>
-            <element ref="language" minOccurs="1" maxOccurs="unbounded"/>
-         </sequence>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.rdt.sync.core.ILanguagePropertyProvider"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.rdt.sync.core.ISynchronizeProvider"/>
                </appInfo>
             </annotation>
          </attribute>
-      </complexType>
-   </element>
-
-   <element name="language">
-      <complexType>
          <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
                   

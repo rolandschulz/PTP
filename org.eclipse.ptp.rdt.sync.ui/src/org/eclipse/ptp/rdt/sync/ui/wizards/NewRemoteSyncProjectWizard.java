@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM - Initial API and implementation
+ * Roland Schulz, University of Tennessee
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.wizards;
 
@@ -30,14 +31,14 @@ import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
  * @since 2.0
  * 
  */
-public class NewRemoteProjectWizard extends CDTCommonProjectWizard {
+public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	private static final String wz_title = "New Remote Synchronized Project"; //$NON-NLS-1$
 	private static final String wz_desc = "Create remote project of the selected type"; //$NON-NLS-1$
 
 	/**
 	 * 
 	 */
-	public NewRemoteProjectWizard() {
+	public NewRemoteSyncProjectWizard() {
 		super(wz_title, wz_desc);
 	}
 
