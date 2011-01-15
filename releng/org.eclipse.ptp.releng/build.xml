@@ -23,7 +23,7 @@
 		<!-- Update for new CDT version -->
 		<property name="cdtDist" value="/home/data/httpd/download.eclipse.org/tools/cdt/builds/8.0.0/I.I201012131338/cdt-master-8.0.0-I201012131338.zip"/>
 		<!-- Update for new RSE version -->
-		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/R-3.2-201006071030/RSE-SDK-3.2.zip"/>
+		<property name="rseDist" value="/home/data/httpd/download.eclipse.org/dsdp/tm/downloads/drops/S-3.3M4-201012140730/RSE-SDK-3.3M4.zip"/>
 		<!-- Update for new Mylyn version -->
 		<property name="mylynDist" value="/home/data/httpd/download.eclipse.org/tools/mylyn/update/mylyn-3.4.2-e3.4.zip"/>
 		<!-- Properties below here shouldn't need to be changed -->
