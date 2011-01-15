@@ -71,7 +71,8 @@
 	<property name="lpgRuntimeJar" value="net.sourceforge.lpg.lpgjavaruntime_${lpgRuntimeVersion}.jar"/>
 	
 	<!-- RSE VERSIONS MUST BE UPDATED FOR NEW TM VERSION -->
-	<property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/>
+	<!--property name="rseBaseUrl" value="http://download.eclipse.org/dsdp/tm/downloads/drops"/-->
+	<property name="rseBaseUrl" value="/home/data/httpd/download.eclipse.org/tm/downloads/drops"/>
 	<property name="rseVersion" value="S-3.3M4-201012140730"/>
 	<property name="dStoreBaseName" value="rseserver-3.3M4"/>
 	
@@ -334,10 +335,14 @@
 		
 	<target name="fetch.rse">
 		<mkdir dir="${downloads}"/>
-		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-windows.zip" dest="${downloads}/${dStoreBaseName}-windows.zip"/>
-		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-linux.tar" dest="${downloads}/${dStoreBaseName}-linux.tar"/>
-		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-unix.tar" dest="${downloads}/${dStoreBaseName}-unix.tar"/>
-		<get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" dest="${downloads}/${dStoreBaseName}-macosx.tar"/>
+		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-windows.zip" dest="${downloads}/${dStoreBaseName}-windows.zip"/-->
+		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-linux.tar" dest="${downloads}/${dStoreBaseName}-linux.tar"/-->
+		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-unix.tar" dest="${downloads}/${dStoreBaseName}-unix.tar"/-->
+		<!--get src="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" dest="${downloads}/${dStoreBaseName}-macosx.tar"/-->
+		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-windows.zip" tofile="${downloads}/${dStoreBaseName}-windows.zip"/>
+		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-linux.tar" tofile="${downloads}/${dStoreBaseName}-linux.tar"/>
+		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-unix.tar" tofile="${downloads}/${dStoreBaseName}-unix.tar"/>
+		<copy file="${rseBaseUrl}/${rseVersion}/${dStoreBaseName}-macosx.tar" tofile="${downloads}/${dStoreBaseName}-macosx.tar"/>
 	</target>
 	
 	<target name="fetch.icu">
