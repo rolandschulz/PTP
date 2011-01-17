@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D16661)
+   11/26/10 ronglli      Modified the ssh functions
 
 ****************************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -34,6 +35,7 @@
 
 #include "sshfunc.hpp"
 #include "tools.hpp"
+#include "log.hpp"
 
 SshFunc *SshFunc::instance = NULL;
 
@@ -50,10 +52,36 @@ SshFunc * SshFunc::getInstance()
 }
 
 SshFunc::SshFunc()
-    : dlopen_file(NULL), mdlhndl(0), set_auth_module_hndlr(NULL), get_id_token_hndlr(NULL), verify_id_token_hndlr(NULL), get_id_from_token_hndlr(NULL), free_id_token_hndlr(NULL), get_key_from_token_hndlr(NULL), sign_data_hndlr(NULL), verify_data_hndlr(NULL), free_signature_hndlr(NULL) 
+    : sshAuth(false), dlopen_file(NULL), mdlhndl(0), set_auth_module_hndlr(NULL), get_id_token_hndlr(NULL), verify_id_token_hndlr(NULL), get_id_from_token_hndlr(NULL), free_id_token_hndlr(NULL), get_key_from_token_hndlr(NULL), sign_data_hndlr(NULL), verify_data_hndlr(NULL), free_signature_hndlr(NULL) 
 {
+    string out_val = "";
+    char * envp = NULL;
+    int rc;
+
     user_token.iov_base = NULL;
     user_token.iov_len = 0;
+
+    rc = SysUtil::read_config("SCI_ENABLE_SSHAUTH", out_val);
+    if(rc == 0) {
+        if (out_val == "yes") {
+            sshAuth = true;
+        } else if (out_val == "no") {
+            sshAuth = false;
+        } else {
+            log_error("Wrong value of \"SCI_ENABLE_SSHAUTH\": %s\n", out_val.c_str());
+        }
+    } else {
+        log_error("Failed to read config file!\n");
+    }
+
+    envp = ::getenv("SCI_ENABLE_SSHAUTH");
+    if(envp != NULL) {
+        if (strcasecmp(envp, "yes") == 0) {
+            sshAuth = true;
+        } else if (strcasecmp(envp, "no") == 0) {
+            sshAuth = false;
+        }
+    }
 }
 
 SshFunc::~SshFunc()
@@ -70,6 +98,10 @@ int SshFunc::load(char * libPath)
     int rc = -1;
     string path = "";
     string auth_mod = "";
+
+    if (!sshAuth) 
+        return 0;
+
     if (libPath) {
         path = libPath;
     } else {
@@ -155,56 +187,89 @@ int SshFunc::load(char * libPath)
 
 int SshFunc::set_auth_module(char *name, char *fpath, char *opts)
 {
+    if (!sshAuth) 
+        return 0;
+
     return set_auth_module_hndlr(name, fpath, opts, &mdlhndl);
 }
 
 int SshFunc::get_id_token(char *tname, char *thost, psec_idbuf_t idtok)
 {
+    if (!sshAuth) 
+        return 0;
+
     return get_id_token_hndlr(mdlhndl, tname, thost, idtok);
 }
 
 int SshFunc::verify_id_token(char *uname, psec_idbuf_t idtok)
 {
+    if (!sshAuth) 
+        return 0;
+
     return verify_id_token_hndlr(mdlhndl, uname, idtok);
 }
 
 int SshFunc::get_id_from_token(psec_idbuf_t idtok, char *usrid, size_t *usridlen)
 {
+    if (!sshAuth) 
+        return 0;
+
     return get_id_from_token_hndlr(mdlhndl, idtok, usrid, usridlen);
 }
 
 int SshFunc::free_id_token(psec_idbuf_t id)
 {
+    if (!sshAuth) 
+        return 0;
+
     return free_id_token_hndlr(mdlhndl, id);
 }
 
 int SshFunc::get_key_from_token(char *uname, psec_idbuf_t idtok , char *key, size_t *keylen) 
 {
+    if (!sshAuth) 
+        return 0;
+
     return get_key_from_token_hndlr(mdlhndl, uname, idtok, key, keylen);
 }
 
 int SshFunc::sign_data(char *key, size_t keylen, struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
+    if (!sshAuth) 
+        return 0;
+
     return sign_data_hndlr(mdlhndl, key, keylen, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::verify_data(char *key, size_t keylen, struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
+    if (!sshAuth) 
+        return 0;
+
     return verify_data_hndlr(mdlhndl, key, keylen, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::sign_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
+    if (!sshAuth) 
+        return 0;
+
     return sign_data_hndlr(mdlhndl, session_key, key_len, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::verify_data(struct iovec *inbufs, int num_bufs, struct iovec *sigbufs) 
 {
+    if (!sshAuth) 
+        return 0;
+
     return verify_data_hndlr(mdlhndl, session_key, key_len, inbufs, num_bufs, sigbufs);
 }
 
 int SshFunc::free_signature(struct iovec *sigbufs) 
 {
+    if (!sshAuth) 
+        return 0;
+
     return free_signature_hndlr(mdlhndl, sigbufs);
 }
 
@@ -212,6 +277,9 @@ int SshFunc::sign_data(char *key, size_t keylen, char *bufs[], int sizes[], int 
 {
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
+
+    if (!sshAuth) 
+        return 0;
 
     for (i = 0; i < num_bufs; i++) {
         tmp_bufs[i].iov_base = bufs[i];
@@ -228,6 +296,9 @@ int SshFunc::verify_data(char *key, size_t keylen, char *bufs[], int sizes[], in
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
+    if (!sshAuth) 
+        return 0;
+
     for (i = 0; i < num_bufs; i++) {
         tmp_bufs[i].iov_base = bufs[i];
         tmp_bufs[i].iov_len = sizes[i];
@@ -243,6 +314,9 @@ int SshFunc::sign_data(char *bufs[], int sizes[], int num_bufs, struct iovec *si
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
+    if (!sshAuth) 
+        return 0;
+
     for (i = 0; i < num_bufs; i++) {
         tmp_bufs[i].iov_base = bufs[i];
         tmp_bufs[i].iov_len = sizes[i];
@@ -257,6 +331,9 @@ int SshFunc::verify_data(char *bufs[], int sizes[], int num_bufs, struct iovec *
 {
     int i, rc;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
+
+    if (!sshAuth) 
+        return 0;
 
     for (i = 0; i < num_bufs; i++) {
         tmp_bufs[i].iov_base = bufs[i];
@@ -279,6 +356,9 @@ int SshFunc::sign_data(char *key, size_t klen, struct iovec *sigbufs, char *fmt,
     int *d_nums = new int[num_bufs];
     char *skey = key;
     size_t sklen = klen;
+
+    if (!sshAuth) 
+        return 0;
 
     if (key == NULL) {
         skey = session_key;
@@ -325,6 +405,9 @@ int SshFunc::get_sizes(char *fmt)
     int num_bufs = 0;
     char *p = fmt;
 
+    if (!sshAuth) 
+        return 0;
+
     while (*p != '\0') {
         if (*p == '%') {
             num_bufs++;
@@ -346,6 +429,9 @@ int SshFunc::verify_data(char *key, size_t klen, struct iovec *sigbufs, char *fm
     int *d_nums = new int[num_bufs];
     char *skey = key;
     size_t sklen = klen;
+
+    if (!sshAuth) 
+        return 0;
 
     if (key == NULL) {
         skey = session_key;
@@ -394,6 +480,9 @@ int SshFunc::sign_data(struct iovec *sigbufs, int num_bufs, ...)
     size_t para_len;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
+    if (!sshAuth) 
+        return 0;
+
     va_start(argp, num_bufs);
     for (i = 0; i < num_bufs; i++) {
         para = va_arg(argp, char *);
@@ -416,6 +505,9 @@ int SshFunc::verify_data(struct iovec *sigbufs, int num_bufs, ...)
     size_t para_len;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
+    if (!sshAuth) 
+        return 0;
+
     va_start(argp, num_bufs);
     for (i = 0; i < num_bufs; i++) {
         para = va_arg(argp, char *);
@@ -436,6 +528,9 @@ int SshFunc::sign_data(char *key, size_t keylen, struct iovec *sigbufs, int num_
     char *para;
     size_t para_len;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
+
+    if (!sshAuth) 
+        return 0;
 
     va_start(argp, num_bufs);
     for (i = 0; i < num_bufs; i++) {
@@ -459,6 +554,9 @@ int SshFunc::verify_data(char *key, size_t keylen, struct iovec *sigbufs, int nu
     size_t para_len;
     struct iovec *tmp_bufs = new struct iovec[num_bufs];
 
+    if (!sshAuth) 
+        return 0;
+
     va_start(argp, num_bufs);
     for (i = 0; i < num_bufs; i++) {
         para = va_arg(argp, char *);
@@ -475,6 +573,9 @@ int SshFunc::verify_data(char *key, size_t keylen, struct iovec *sigbufs, int nu
 
 int SshFunc::set_user_token(struct iovec *token)
 {
+    if (!sshAuth) 
+        return 0;
+
     free_id_token(&user_token);
     user_token.iov_len = token->iov_len;
     user_token.iov_base = new char [token->iov_len];
@@ -486,6 +587,9 @@ int SshFunc::set_user_token(struct iovec *token)
 
 int SshFunc::set_session_key(struct iovec *sskey)
 {
+    if (!sshAuth) 
+        return 0;
+
     key_len = sskey->iov_len;
     memcpy(session_key, sskey->iov_base, key_len);
 

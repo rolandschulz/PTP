@@ -64,6 +64,7 @@ class SshFunc
         static SshFunc *instance;
         int set_auth_module(char *name, char *fpath, char *opts);
         int get_sizes(char *fmt);
+        bool sshAuth;
         
     public:
         ~SshFunc();

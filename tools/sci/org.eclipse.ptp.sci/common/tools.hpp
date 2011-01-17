@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 nieyy        Initial code (D153875)
+   11/26/10 ronglli      To add config file reading functions
 
 ****************************************************************************/
 
@@ -41,6 +42,7 @@ class SysUtil
 
         static string get_hostname(const char *name);
         static char * get_path_name(const char *program);
+        static int read_config(const char* var, string & out_val);
 };
 
 #define NELEMS(array) (sizeof(array) / sizeof(array[0]))

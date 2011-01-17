@@ -35,8 +35,8 @@
 #include "locker.hpp"
 #include "extlaunch.hpp"
 
-
-const int SCID_PORT = 6688;
+#define SCID_PORT 6188
+#define SCID_NAME "sciv1"
 
 ExtListener::ExtListener()
 {
@@ -48,6 +48,10 @@ ExtListener::~ExtListener()
 
 void ExtListener::run()
 {
+    string out_val = "";
+    int rc;
+    bool sshAuth = false;
+
     int child = -1;
     int port = SCID_PORT;
     struct servent *serv = NULL; 
@@ -56,11 +60,25 @@ void ExtListener::run()
     if (envp != NULL) {
         serv = getservbyname(envp, "tcp");
     } else {
-        serv = getservbyname("scid", "tcp");
+        serv = getservbyname(SCID_NAME, "tcp");
     }
     if (serv != NULL) {
         port = ntohs(serv->s_port);
     }
+    
+    rc = SysUtil::read_config("SCI_ENABLE_SSHAUTH", out_val);
+    if(rc == 0) {
+        if (out_val == "yes") {
+            sshAuth = true;
+        } else if (out_val == "no") {
+            sshAuth = false;
+        } else {
+            log_error("Wrong value of \"SCI_ENABLE_SSHAUTH\": %s\n", out_val.c_str());
+        }
+    } else {
+        log_error("Failed to read config file!\n");
+    }
+
     socket.listen(port);
     log_crit("Extended listener is running");
 
@@ -80,7 +98,7 @@ void ExtListener::run()
 
         Stream *stream = new Stream();
         stream->init(child);
-        ExtLauncher *launcher = new ExtLauncher(stream);
+        ExtLauncher *launcher = new ExtLauncher(stream, sshAuth);
         launcher->start();
     }
 

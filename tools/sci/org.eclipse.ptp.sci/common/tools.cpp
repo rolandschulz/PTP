@@ -20,6 +20,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 nieyy        Initial code (D153875)
+   11/26/10 ronglli      To add config file reading functions
 
 ****************************************************************************/
 
@@ -38,7 +39,9 @@
 #include <sys/time.h> 
 #include <dlfcn.h>
 
+#include <fstream>
 #include "exception.hpp"
+#include "log.hpp"
 
 string SysUtil::itoa(int value)
 {
@@ -111,5 +114,64 @@ char* SysUtil::get_path_name(const char *program)
         strcat(path, save_path + 1);
     }
     return path;
+}
+
+int SysUtil::read_config(const char* var, string & out_val)
+{
+#define FILE_PATH "/etc/sci.conf"
+#define VAR_PATTERN "^([^= ][^= ]*=[^= ][^= ]*)$"
+    int rc = -1;
+    ifstream fs;
+
+    string line;
+    size_t pos = 0;
+    string word;
+    bool found = false;
+    string::iterator it;
+
+    if (var == NULL) {
+        return -1;
+    }
+
+    fs.open(FILE_PATH);
+    if (!fs) {
+        return -1;
+    }
+
+    while(fs) {
+        size_t tmpp = 0;
+        getline(fs,line);
+        for (it = line.begin(); it != line.end(); ){
+            if ((*it == ' ') || *it == '\t')
+                it = line.erase(it);
+            else
+                it++;
+        }
+        if (line.length() == 0){
+            continue;
+        } else if (line[0] == '#') {
+            continue;         //The comments line will start with '#'
+        }
+
+        tmpp = line.find_first_of('#',0);
+        pos = line.find_first_of('=',0);
+        if ((pos == 0) || (pos == string::npos) || (pos >= tmpp)) { //Skip unused lines
+            continue;
+        }
+
+        word = line.substr(0, pos);
+        if (word.compare(var) == 0) {
+            pos += 1;
+            out_val = line.substr(pos, tmpp-pos); //The contents after '#' is regarded as comments
+            found = true;
+            break;
+        } else {
+            continue;
+        }
+    }
+
+    fs.close();
+
+    return (found ? 0 : -1);
 }
 

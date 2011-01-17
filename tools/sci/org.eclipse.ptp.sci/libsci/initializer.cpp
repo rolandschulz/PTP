@@ -65,8 +65,6 @@
 #include "allocator.hpp"
 #include "filterlist.hpp"
 
-#define SCI_DAEMON_PORT 6688
-
 Initializer* Initializer::instance = NULL;
 
 Initializer::Initializer()
@@ -91,6 +89,9 @@ int Initializer::init()
     char dir[MAX_PATH_LEN] = "/opt/sci/log";
     char *envp = NULL; 
     int hndl = -1;
+
+    if (SSHFUNC == NULL)
+        return SCI_ERR_SSHAUTH;
 
     envp = ::getenv("SCI_LOG_DIRECTORY"); 
     if (envp != NULL) {
@@ -213,9 +214,14 @@ int Initializer::initAgent()
     int port = -1;
     int hndl = -1;
     EmbedAgent *agent = NULL;
-    char *envp = ::getenv("SCI_REMOTE_SHELL");
+    char *envp;
+    int rc;
+
+    envp = ::getenv("SCI_REMOTE_SHELL");
     if (envp != NULL) {
-		connectBack();
+		rc = connectBack();
+        if (rc != 0)
+            return rc;
     } else {
         inStream = initStream();
     }
@@ -346,11 +352,13 @@ int Initializer::connectBack()
 
 int Initializer::initBE()
 {
-    int hndl;
+    int hndl, rc;
     char *envp = ::getenv("SCI_USE_EXTLAUNCHER");
     if (((envp != NULL) && (::strcasecmp(envp, "yes") == 0))
 			|| (::getenv("SCI_REMOTE_SHELL") != NULL)) {
-		connectBack();
+		rc = connectBack();
+        if (rc != 0)
+            return rc;
 		if (handle < 0) {
 			gCtrlBlock->setMyRole(CtrlBlock::BACK_AGENT);
 		}
@@ -421,7 +429,7 @@ int Initializer::initExtBE(int hndl)
     struct iovec sign = {0};
     struct iovec token = {0};
     int rc, tmp0, tmp1, tmp2;
-    int port = SCI_DAEMON_PORT;
+    int port = SCID_PORT;
     Launcher::MODE mode = Launcher::REQUEST;
     int jobKey = gCtrlBlock->getJobKey();
     struct servent *serv = NULL;
@@ -431,7 +439,7 @@ int Initializer::initExtBE(int hndl)
     if (envp != NULL) {
         serv = getservbyname(envp, "tcp");
     } else {
-        serv = getservbyname("scid", "tcp");
+        serv = getservbyname(SCID_NAME, "tcp");
     }
     if (serv != NULL) {
         port = ntohs(serv->s_port);

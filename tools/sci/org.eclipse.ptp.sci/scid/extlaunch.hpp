@@ -56,6 +56,7 @@ class ExtLauncher : public Thread
         char            sessionKey[64];
         size_t          ssKeyLen;
         LAUNCH_MODE     mode;
+        bool            sshAuth;
 
     private:
         char *getExename(char *path);
@@ -66,7 +67,7 @@ class ExtLauncher : public Thread
         int putSessionKey(int fd, struct iovec &sign, int jobkey, int id, char *path, char *envStr, bool suer = true);
         int getSessionKey(int fd);
     public:
-        ExtLauncher(Stream *s);
+        ExtLauncher(Stream *s, bool auth = false);
         virtual ~ExtLauncher();
 
         virtual void run();

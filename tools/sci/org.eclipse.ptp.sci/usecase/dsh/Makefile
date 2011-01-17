@@ -4,7 +4,7 @@ CPPFLAGS = -I../../include -L/home/catherine/opt/sci/lib
 
 OTHER_FLAGS = -ldl -lpthread -lsci
 
-all: all_64
+all: all_32
 
 all_32: dsh_fe edsh_fe gdsh_fe ddsh_fe dsh_be
 all_64: dsh_fe64 edsh_fe64 gdsh_fe64 ddsh_fe64 dsh_be64

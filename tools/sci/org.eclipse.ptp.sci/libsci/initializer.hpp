@@ -38,6 +38,9 @@ using namespace std;
 class Stream;
 class Listener;
 
+#define SCID_PORT 6188
+#define SCID_NAME "sciv1" 
+
 class Initializer
 {
     private:

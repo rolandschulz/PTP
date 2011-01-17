@@ -24,6 +24,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D153875)
+   11/27/10 ronglli      Add SCI version
 
 ****************************************************************************/
 
@@ -66,6 +67,9 @@ class CtrlBlock
         typedef map<int, EmbedAgent *> AGENT_MAP;
 
     private:
+        // SCI Version
+        int                  version;
+
         // basic information
         ROLE                 role;
         int                  handle;
@@ -164,6 +168,8 @@ class CtrlBlock
 
         void setFlowctlThreshold(long long th);
         long long getFlowctlThreshold();
+        
+        int getVersion();
 
         void genSelfInfo(MessageQueue *queue, bool isUncle);
         void clean();

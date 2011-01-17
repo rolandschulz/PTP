@@ -271,7 +271,11 @@ int Topology::init()
         agentPath += "/";
         agentPath += agentName;
     } else {
-        agentPath = SysUtil::get_path_name(agentName);
+        char * tmpp = SysUtil::get_path_name(agentName);
+        if (tmpp == NULL) {
+            return SCI_ERR_AGENT_NOTFOUND;
+        }
+        agentPath = tmpp;
     }
 
     return SCI_SUCCESS;
