@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 University of Utah School of Computing
+ * Copyright (c) 2009, 2011 University of Utah School of Computing
  * 50 S Central Campus Dr. 3190 Salt Lake City, UT 84112
  * http://www.cs.utah.edu/formal_verification/
  *
