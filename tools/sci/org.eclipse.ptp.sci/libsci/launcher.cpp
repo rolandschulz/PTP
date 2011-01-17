@@ -60,14 +60,12 @@
 #include "purifierproc.hpp"
 #include "embedagent.hpp"
 
-const int SCI_DAEMON_PORT = 6688;
-
 #ifdef __APPLE__
 extern char **environ;
 #endif
 
 Launcher::Launcher(Topology &topo)
-	: topology(topo), shell(""), scidPort(SCI_DAEMON_PORT), mode(INTERNAL), embedMode(false)
+	: topology(topo), shell(""), scidPort(SCID_PORT), mode(INTERNAL), embedMode(false)
 {
     char *envp = NULL;
     string envStr;
@@ -77,7 +75,7 @@ Launcher::Launcher(Topology &topo)
     if (envp != NULL) {
         serv = getservbyname(envp, "tcp");
     } else {
-        serv = getservbyname("scid", "tcp");
+        serv = getservbyname(SCID_NAME, "tcp");
     }
     if (serv != NULL) {
         scidPort = ntohs(serv->s_port);
@@ -304,8 +302,16 @@ int Launcher::launchClient(int ID, string &path, string host, Launcher::MODE m, 
         listener = gInitializer->initListener();
     }
     if (listener != NULL) {
+        int port = 0;
+        while (1) {
+            port = listener->getBindPort();
+            if (port > 0)
+                break;
+            SysUtil::sleep(1000);
+        }
+
 		localName = listener->getBindName();
-        env.set("SCI_PARENT_PORT", listener->getBindPort());
+        env.set("SCI_PARENT_PORT", port);
     } 
     env.set("SCI_PARENT_HOSTNAME", localName);
     env.set("SCI_ENABLE_LISTENER", ::getenv("SCI_ENABLE_LISTENER"));

@@ -15,6 +15,11 @@
 ***************************************************************************/
 
 /*
+** SCI Version 2.0.0.0
+*/
+#define SCI_VERSION 2000
+
+/*
 ** SCI Return/Error Codes
 */
 #define SCI_SUCCESS                  (0)
@@ -43,6 +48,10 @@
 #define SCI_ERR_POLL_INVALID         (-2023)
 #define SCI_ERR_INVALID_USER         (-2024)
 #define SCI_ERR_INVALID_MODE         (-2025)
+#define SCI_ERR_AGENT_NOTFOUND       (-2026)
+#define SCI_ERR_VERSION              (-2027)
+#define SCI_ERR_SSHAUTH              (-2028)
+#define SCI_ERR_MSG                  (-2029) 
 
 #define SCI_ERR_PARENT_BROKEN        (-5000)
 #define SCI_ERR_CHILD_BROKEN         (-5001)
@@ -134,6 +143,8 @@ typedef struct {
     } _u;
 #define fe_info _u.fe_info
 #define be_info _u.be_info
+    int              sci_version;
+    int              disable_sshauth;
 } sci_info_t;
 
 typedef struct {
@@ -156,7 +167,8 @@ typedef enum {
     SCI_AGENT_LEVEL,
     SCI_LISTENER_PORT,
     SCI_PARENT_SOCKFD,
-    SCI_NUM_CHILDREN_FDS
+    SCI_NUM_CHILDREN_FDS,
+    SCI_CURRENT_VERSION
 #define JOB_KEY              SCI_JOB_KEY
 #define NUM_BACKENDS         SCI_NUM_BACKENDS
 #define BACKEND_ID           SCI_BACKEND_ID
@@ -171,6 +183,7 @@ typedef enum {
 #define LISTENER_PORT        SCI_LISTENER_PORT
 #define PARENT_SOCKFD        SCI_PARENT_SOCKFD
 #define NUM_CHILDREN_FDS     SCI_NUM_CHILDREN_FDS
+#define CURRENT_VERSION      SCI_CURRENT_VERSION
 } sci_query_t;
 
 typedef enum {
@@ -201,6 +214,7 @@ extern "C" {
 int SCI_Initialize(sci_info_t *info);
 int SCI_Terminate();
 int SCI_Query(sci_query_t query, void *ret_val);
+int SCI_Error(int err_code, char *err_msg, int msg_size);
 
 /*
 ** SCI Communication functions.

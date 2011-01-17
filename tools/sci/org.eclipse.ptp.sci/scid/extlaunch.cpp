@@ -53,10 +53,11 @@ vector<ExtLauncher *> launcherList;
 const int MAX_PWD_BUF_SIZE = 1024;
 const int MAX_ENV_VAR_NUM = 1024;
 
-ExtLauncher::ExtLauncher(Stream *s)
+ExtLauncher::ExtLauncher(Stream *s, bool auth)
     : stream(s)
 {
     memset(&usertok, 0, sizeof(usertok));
+    sshAuth = auth;
 }
 
 ExtLauncher::~ExtLauncher()
@@ -279,17 +280,19 @@ int ExtLauncher::putSessionKey(int fd, struct iovec &sign, int jobkey, int id, c
 
     rc = verifyToken(suser);
 #ifdef PSEC_OPEN_SSL
-    if (rc == 0) {
-        rc = verifyData(sign, jobkey, id, path, envStr);
-    }
-    if (fd < 0)
-        return rc;
+    if (sshAuth) {
+        if (rc == 0) {
+            rc = verifyData(sign, jobkey, id, path, envStr);
+        }
+        if (fd < 0)
+            return rc;
 
-    vecs[0].iov_base = &rc;
-    vecs[0].iov_len = sizeof(rc);
-    vecs[1].iov_base = sessionKey;
-    vecs[1].iov_len = ssKeyLen;
-    writev(fd, vecs, 2);
+        vecs[0].iov_base = &rc;
+        vecs[0].iov_len = sizeof(rc);
+        vecs[1].iov_base = sessionKey;
+        vecs[1].iov_len = ssKeyLen;
+        writev(fd, vecs, 2);
+    }
 #endif
 
     return rc;
@@ -303,6 +306,9 @@ int ExtLauncher::doVerify(struct iovec &sign, int jobkey, int id, char *path, ch
     int rc = -1;
     pid_t pid;
     int sockfd[2];
+
+    if (!sshAuth)
+        return 0;
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockfd) == -1) {
         log_error("Failed to create socketpair!");

@@ -52,6 +52,45 @@
 #include "filterproc.hpp"
 #include "routerproc.hpp"
 #include "allocator.hpp"
+#include "sshfunc.hpp"
+
+const char * ErrRetMsg[] = {
+    "Succedded.",
+    "Invalid host file.",
+    "Invalid end type, can only be SCI_FRONT_END or SCI_BACK_END.",
+    "Error occured when doing the initialization.",
+    "The API is called by invalid end type.",
+    "Error occured when searching the group.",
+    "Error occured when searching the filter.",
+    "Invalid filter.",
+    "Error occured when searching the backend.",
+    "Unkown information.",
+    "Uninitialized SCI execution environment.",
+    "Can't free predefined group.",
+    "The group is an empty group.",
+    "Invalid group operator specified.",
+    "Can't unload predefined filter.",
+    "A polling timeout occured after timeout milliseconds elapsed",
+    "Invalid job key specified by SCI_JOB_KEY.",
+    "Can only be used in polling mode.",
+    "Invalid filter id",
+    "The successor id list contains non-existed successor id.",
+    "The back id already existed.",
+    "Out of memory.",
+    "Failed to launch client(s).",
+    "Invalid polling calls.",
+    "Invalid user.",
+    "Invalid mode.",
+    "Error occured when searching the agent.",       
+    "Invalid version number.",              
+    "Error occured when doing the SSH-based authentication.",              
+    "Invalid error message number.",                  
+
+    "The parent is broken.",
+    "The child is broken.",
+    "Error occured when doing the recovery.",
+    "Recover failed.",
+};
 
 SCI_msg_hndlr *gHndlr = NULL;
 void *gParam = NULL;
@@ -59,12 +98,13 @@ void *gParam = NULL;
 
 int SCI_Initialize(sci_info_t *info)
 {
+    int rc;
     if (gCtrlBlock->getMyRole() != CtrlBlock::INVALID) {
         log_warn("Has already been initialized");
         return SCI_SUCCESS;
     }
 
-    int rc = gCtrlBlock->init(info);
+    rc = gCtrlBlock->init(info);
     if (rc != SCI_SUCCESS)
         return rc;
 
@@ -109,6 +149,9 @@ int SCI_Query(sci_query_t query, void *ret_val)
     int *p = (int *) ret_val;
     switch (query) 
     {
+        case CURRENT_VERSION:
+            *p = gCtrlBlock->getVersion();
+            break;
         case JOB_KEY:
             *p = gCtrlBlock->getJobKey();
             break;
@@ -184,6 +227,33 @@ int SCI_Query(sci_query_t query, void *ret_val)
     return SCI_SUCCESS;
 }
 
+int SCI_Error(int err_code, char *err_msg, int msg_size)
+{
+    if ((err_msg == NULL) || (msg_size <= 0)) {
+        return SCI_ERR_NO_MEM;
+    }
+    memset(err_msg, 0, msg_size);
+
+    if (err_code == 0) {
+        strncpy(err_msg, ErrRetMsg[err_code], msg_size);
+        return SCI_SUCCESS;
+    }
+
+    if ((err_code <= -2001) && (err_code >= -2029)){
+        int index = err_code * (-1) % 2000;
+        strncpy(err_msg, ErrRetMsg[index], msg_size);
+        return SCI_SUCCESS;
+    }
+
+    if ((err_code <= -5000) && (err_code >= -5003)){
+        int index = err_code * (-1) % 5000;
+        strncpy(err_msg, ErrRetMsg[index + 30], msg_size);
+        return SCI_SUCCESS;
+    }
+
+    return SCI_ERR_MSG;
+
+}
 
 // Communication
 

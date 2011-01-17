@@ -24,6 +24,7 @@
    Date     Who ID    Description
    -------- --- ---   -----------
    10/06/08 tuhongj      Initial code (D153875)
+   11/27/10 ronglli      Add SCI Version
 
 ****************************************************************************/
 
@@ -53,7 +54,7 @@
 #include "filterproc.hpp"
 #include "observer.hpp"
 
-const long long FLOWCTL_THRESHOLD = 1024 * 1024 * 1024 * 2LL;
+const long long FLOWCTL_THRESHOLD = 1024 * 1024 * 128LL;
 
 CtrlBlock * CtrlBlock::instance = NULL;
 extern SCI_msg_hndlr *gHndlr;
@@ -62,6 +63,7 @@ extern void *gParam;
 CtrlBlock::CtrlBlock()
     : role(INVALID)
 {
+    version = SCI_VERSION;
     endInfo = NULL;
     
     routerProc = NULL;
@@ -165,6 +167,13 @@ int CtrlBlock::init(sci_info_t * info)
 		initClient(AGENT);
         return SCI_SUCCESS;
     } 
+    if ((info->sci_version != 0) && (info->sci_version != version)) {
+        return SCI_ERR_VERSION;
+    }
+
+    if (info->disable_sshauth == 1) { 
+        ::setenv("SCI_ENABLE_SSHAUTH", "no", 1);
+    }
 
     endInfo = (sci_info_t *) ::malloc(sizeof(sci_info_t));
     if (NULL == endInfo) {
@@ -477,6 +486,11 @@ void CtrlBlock::setFlowctlThreshold(long long th)
 long long CtrlBlock::getFlowctlThreshold()
 {
     return thresHold;
+}
+
+int CtrlBlock::getVersion()
+{
+    return version;
 }
 
 RoutingList * CtrlBlock::getRoutingList()

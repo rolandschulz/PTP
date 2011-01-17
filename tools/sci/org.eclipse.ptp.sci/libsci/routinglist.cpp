@@ -336,8 +336,11 @@ int RoutingList::startReaders()
 {
     ReaderProcessor *reader = NULL;
     ROUTING_MAP::iterator pit;
-   
+
     for (pit = routers.begin(); pit != routers.end(); ++pit) {
+        while (pit->second.processor == NULL) {
+            SysUtil::sleep(1000);
+        }
         reader = pit->second.processor->getPeerProcessor();
         while (reader == NULL) {
             SysUtil::sleep(1000);
