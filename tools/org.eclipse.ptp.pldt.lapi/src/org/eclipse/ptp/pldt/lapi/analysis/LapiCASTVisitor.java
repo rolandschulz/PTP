@@ -48,9 +48,9 @@ public class LapiCASTVisitor extends PldtAstVisitor
         this.shouldVisitTranslationUnit = true;
     }
 
-    public LapiCASTVisitor(List mpiIncludes, String fileName,  boolean allowPrefixOnlyMatch, ScanReturn msr)
+    public LapiCASTVisitor(List<String> includes, String fileName,  boolean allowPrefixOnlyMatch, ScanReturn msr)
     {
-        super(mpiIncludes, fileName, allowPrefixOnlyMatch, msr);
+        super(includes, fileName, allowPrefixOnlyMatch, msr);
 		ARTIFACT_CALL = Messages.LapiCASTVisitor_lapi_call;
 		ARTIFACT_CONSTANT=Messages.LapiCASTVisitor_lapi_constant; 
     }
