@@ -52,12 +52,15 @@ public class RunAnalyseLAPIcommandHandler extends RunAnalyseHandlerBase {
 		final ScanReturn msr = new ScanReturn();
 		final String fileName = tu.getElementName();
 		ILanguage lang;
+		boolean allowPrefixOnlyMatch=LapiPlugin.getDefault().getPreferenceStore().getBoolean(LapiIDs.LAPI_RECOGNIZE_APIS_BY_PREFIX_ALONE);
+		System.out.println("RALCH:LAPI allowPrefixOnlyMatch="+allowPrefixOnlyMatch);
 		try {
 			lang = tu.getLanguage();
 
 			IASTTranslationUnit atu = tu.getAST();
 			if (lang.getId().equals(GCCLanguage.ID)) {// cdt40
-				atu.accept(new LapiCASTVisitor(includes, fileName, msr));
+				atu.accept(new LapiCASTVisitor(includes, fileName, allowPrefixOnlyMatch, msr));
+				//atu.accept(new LapiCASTVisitor(includes, fileName, msr));
 			}
 
 		} catch (CoreException e) {

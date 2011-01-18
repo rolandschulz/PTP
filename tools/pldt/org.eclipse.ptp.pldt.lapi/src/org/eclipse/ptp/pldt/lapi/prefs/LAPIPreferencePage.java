@@ -12,6 +12,7 @@ package org.eclipse.ptp.pldt.lapi.prefs;
 
 
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PathEditor;
@@ -33,6 +34,8 @@ public class LAPIPreferencePage extends FieldEditorPreferencePage implements IWo
 {
     private static final String INCLUDES_PREFERENCE_LABEL  = Messages.LAPIPreferencePage_includes_preference_label;
     private static final String INCLUDES_PREFERENCE_BROWSE = Messages.LAPIPreferencePage_includes_preference_browse_dialog_title;
+    private static final String LAPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL = Messages.LAPIPreferencePage_recognizeAPISByPrefixAlone;
+    
     public LAPIPreferencePage()
     {
         super(FLAT);
@@ -72,6 +75,9 @@ public class LAPIPreferencePage extends FieldEditorPreferencePage implements IWo
 
     protected void createFieldEditors()
     {
+        BooleanFieldEditor bPrefix = new BooleanFieldEditor(LapiIDs.LAPI_RECOGNIZE_APIS_BY_PREFIX_ALONE, LAPI_RECOGNIZE_APIS_BY_PREFIX_ALONE_LABEL, getFieldEditorParent());
+        addField(bPrefix);
+        
         PathEditor pathEditor = new PathEditor(LapiIDs.LAPI_INCLUDES, INCLUDES_PREFERENCE_LABEL,
                 INCLUDES_PREFERENCE_BROWSE, getFieldEditorParent());
         addField(pathEditor);
@@ -96,3 +102,4 @@ public class LAPIPreferencePage extends FieldEditorPreferencePage implements IWo
     }
     
 }
+

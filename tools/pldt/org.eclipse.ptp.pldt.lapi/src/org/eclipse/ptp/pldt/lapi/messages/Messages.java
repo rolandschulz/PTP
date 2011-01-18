@@ -22,6 +22,7 @@ public class Messages extends NLS {
 	public static String LapiIDs_lapi_includes_pref_page_title;
 	public static String LAPIPreferencePage_includes_preference_browse_dialog_title;
 	public static String LAPIPreferencePage_includes_preference_label;
+	public static String LAPIPreferencePage_recognizeAPISByPrefixAlone;
 	
 	public static String LapiCHelpBook_LAPI_Addr_get;
 	public static String LapiCHelpBook_LAPI_Addr_set;
