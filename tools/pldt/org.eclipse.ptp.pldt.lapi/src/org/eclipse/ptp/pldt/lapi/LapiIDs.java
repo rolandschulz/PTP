@@ -26,4 +26,13 @@ public interface LapiIDs {
 
 	/** Artifact view id */
 	String LAPI_VIEW_ID = "org.eclipse.ptp.pldt.lapi.views.LapiArtifactView"; //$NON-NLS-1$
+	
+	/**
+	 * If we recognize LAPI APIs by prefix (LAPI_) alone, we don't need the
+	 * include file location and the hassle that it causes for users to get it
+	 * right.
+	 * @since 5.0
+	 * 
+	 */
+	public static final String LAPI_RECOGNIZE_APIS_BY_PREFIX_ALONE = "lapiRecognizeAPIsByPrefixAlone"; //$NON-NLS-1$
 }
