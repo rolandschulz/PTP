@@ -55,6 +55,7 @@
             >
       </specification>  
    </extension>
+   <!-- end marker info -->
    <extension
          point="org.eclipse.ui.views">
       <view
