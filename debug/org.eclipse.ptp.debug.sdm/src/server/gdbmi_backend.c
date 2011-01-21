@@ -462,8 +462,14 @@ GDBMISetLineBreakpoint(int bpid, int isTemp, int isHard, char *file, int line, c
 }
 
 /*
-** Set breakpoint at start of specified function.
-*/
+ * Set breakpoint at start of specified function.
+ *
+ * If the function is "main" and this is a temporary breakpoint, assume that
+ * this is a result of the "Stop in main() on startup" setting. To deal with
+ * Fortran in this situation, we first try to set a breakpoint at "MAIN__"
+ * which is the main Fortran entry point. If this fails, we assume that we
+ * are debugging C/C++ and set the breakpoint on "main".
+ */
 static int
 GDBMISetFuncBreakpoint(int bpid, int isTemp, int isHard, char *file, char *func, char *condition, int ignoreCount, int tid)
 {
@@ -471,6 +477,13 @@ GDBMISetFuncBreakpoint(int bpid, int isTemp, int isHard, char *file, char *func,
 	char *	where;
 
 	CHECK_SESSION();
+
+	if ((file == NULL || *file == '\0') && isTemp && strcmp(func, "main") == 0) {
+		res = SetAndCheckBreakpoint(bpid, isTemp, isHard, "MAIN__", condition, ignoreCount, tid);
+		if (res == DBGRES_OK) {
+			return res;
+		}
+	}
 
 	if (file == NULL || *file == '\0')
 		asprintf(&where, "%s", func);
