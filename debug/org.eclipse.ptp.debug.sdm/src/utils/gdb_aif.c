@@ -104,7 +104,8 @@ GetSimpleType(char *type)
 		return T_USHORT;
 	}
 	if (strncmp(t, "int", 3) == 0 ||
-		strncmp(t, "int4", 4) == 0) {
+		strncmp(t, "int4", 4) == 0 ||
+		strncmp(t, "integer", 7) == 0) {
 		return T_INT;
 	}
 	if (strncmp(t, "unsigned int", 12) == 0) {
