@@ -185,11 +185,11 @@ public interface IPJob extends IPElement {
 	public ProcessAttributes.State getProcessState(int processJobRank);
 
 	/**
-	 * Returns parent queue for this job.
+	 * Get the resource manager controlling this job
 	 * 
-	 * @return IPQueue
+	 * @since 5.0
 	 */
-	public IPQueue getQueue();
+	public IPResourceManager getResourceManager();
 
 	/**
 	 * @param processJobRank

@@ -27,15 +27,19 @@ import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
-
 public class PJobWorkbenchAdapter extends WorkbenchAdapter {
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object
+	 * )
 	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		IPJob job = (IPJob) object;
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(job.getQueue().getResourceManager().getResourceManagerId());
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+				job.getResourceManager().getResourceManagerId());
 		if (presentation != null) {
 			final Image image = presentation.getImage(object);
 			if (image != null) {
@@ -45,13 +49,16 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 		return new ImageImageDescriptor(ParallelImages.jobImages[job.getState().ordinal()][job.isDebug() ? 1 : 0]);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	@Override
 	public String getLabel(Object object) {
 		IPJob job = (IPJob) object;
-		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(job.getQueue().getResourceManager().getResourceManagerId());
+		final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
+				job.getResourceManager().getResourceManagerId());
 		if (presentation != null) {
 			final String label = presentation.getText(object);
 			if (label != null) {

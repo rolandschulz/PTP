@@ -39,7 +39,6 @@ import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -240,7 +239,8 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override
-	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+	public Object getAdapter(@SuppressWarnings("rawtypes")
+	Class adapter) {
 		if (adapter == IToolRuntimeSystemJob.class) {
 			return this;
 		}
@@ -800,19 +800,16 @@ public abstract class AbstractToolRuntimeSystemJob extends Job implements IToolR
 			DebugUtil.trace(DebugUtil.RTS_JOB_TRACING_MORE, "RTS job #{0}: cleanup", getJobID()); //$NON-NLS-1$
 			final IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(getRtSystem().getRmID());
 			if (rm != null) {
-				final IPQueue queue = rm.getQueueById(getQueueID());
-				if (queue != null) {
-					final IPJob ipJob = queue.getJobById(getJobID());
-					if (ipJob != null) {
-						switch (ipJob.getState()) {
-						case COMPLETED:
-							break;
-						case RUNNING:
-						case STARTING:
-						case SUSPENDED:
-							changeJobState(JobAttributes.State.COMPLETED);
-							break;
-						}
+				final IPJob ipJob = rm.getJobById(getJobID());
+				if (ipJob != null) {
+					switch (ipJob.getState()) {
+					case COMPLETED:
+						break;
+					case RUNNING:
+					case STARTING:
+					case SUSPENDED:
+						changeJobState(JobAttributes.State.COMPLETED);
+						break;
 					}
 				}
 			}

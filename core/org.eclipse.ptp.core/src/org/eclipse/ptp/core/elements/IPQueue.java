@@ -39,14 +39,6 @@ public interface IPQueue extends IPElement {
 	public void addElementListener(IQueueListener listener);
 
 	/**
-	 * Find a job object using its ID. Returns null if no job is found.
-	 * 
-	 * @param job_id
-	 * @return IPJob
-	 */
-	public IPJob getJobById(String job_id);
-
-	/**
 	 * Get the jobs in this queue. Returns an empty array if there are no jobs
 	 * 
 	 * @return array of jobs in this queue

@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Richard Maciel
- *
+ * 
  */
 public class TerminateJobFromListAction extends Action {
 
@@ -40,34 +40,34 @@ public class TerminateJobFromListAction extends Action {
 
 		setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_NORMAL);
 		setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_JOB_DISABLE);
-		
+
 		view.getViewer().addPostSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				// Sanity check over viewer data
-				if(event.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection sel = (IStructuredSelection)event.getSelection();
-					
-					if(sel.isEmpty())
+				if (event.getSelection() instanceof IStructuredSelection) {
+					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+
+					if (sel.isEmpty())
 						setEnabled(false);
 					else {
-						Object [] selJobs = sel.toArray();
+						Object[] selJobs = sel.toArray();
 
 						// Only enables if at least one is running
 						boolean running = false;
-						for(int i=0; i < selJobs.length; i++) {
-								IPJob job = (IPJob)selJobs[i];
-								
-								if(job.getState() != JobAttributes.State.COMPLETED)
-									running = true;
+						for (int i = 0; i < selJobs.length; i++) {
+							IPJob job = (IPJob) selJobs[i];
+
+							if (job.getState() != JobAttributes.State.COMPLETED)
+								running = true;
 						}
-						
-						if(running)
+
+						if (running)
 							setEnabled(true);
 						else
 							setEnabled(false);
-						
+
 					}
-						
+
 				}
 			}
 		});
@@ -75,72 +75,74 @@ public class TerminateJobFromListAction extends Action {
 
 	public void updateTerminateJobState() {
 		// Sanity check over viewer data
-		if(view.getViewer().getSelection() instanceof IStructuredSelection) {
-			IStructuredSelection sel = (IStructuredSelection)view.getViewer().getSelection();
-			
-			if(sel.isEmpty())
+		if (view.getViewer().getSelection() instanceof IStructuredSelection) {
+			IStructuredSelection sel = (IStructuredSelection) view.getViewer().getSelection();
+
+			if (sel.isEmpty())
 				setEnabled(false);
 			else {
-				Object [] selJobs = sel.toArray();
+				Object[] selJobs = sel.toArray();
 
 				// Only enables if at least one is running
 				boolean running = false;
-				for(int i=0; i < selJobs.length; i++) {
-						IPJob job = (IPJob)selJobs[i];
-						
-						if(job.getState() != JobAttributes.State.COMPLETED)
-							running = true;
+				for (int i = 0; i < selJobs.length; i++) {
+					IPJob job = (IPJob) selJobs[i];
+
+					if (job.getState() != JobAttributes.State.COMPLETED)
+						running = true;
 				}
-				
-				if(running)
+
+				if (running)
 					setEnabled(true);
 				else
 					setEnabled(false);
 			}
 		}
-		
-	}		
-	
-	/** Get Shell
+
+	}
+
+	/**
+	 * Get Shell
+	 * 
 	 * @return
 	 */
 	public Shell getShell() {
 		return view.getViewSite().getShell();
 	}
 
+	@Override
 	public void run() {
 		TableViewer viewer = view.getViewer();
 
 		// Sanity check over viewer data
-		if(viewer.getSelection() instanceof IStructuredSelection) {
-			IStructuredSelection sel = (IStructuredSelection)viewer.getSelection();
+		if (viewer.getSelection() instanceof IStructuredSelection) {
+			IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
 
 			// Must select at least one item
-			if(sel.size() == 0)
+			if (sel.size() == 0)
 				return;
 
-			Object [] selJobs = sel.toArray();
+			Object[] selJobs = sel.toArray();
 
 			// Iterate over all selected items, killing the respective jobs
-			for(int i=0; i < selJobs.length; i++) {
+			for (int i = 0; i < selJobs.length; i++) {
 				try {
-					IPJob job = (IPJob)selJobs[i];
-					
-					IPResourceManager rm = job.getQueue().getResourceManager();
-					if(job.getState() != JobAttributes.State.COMPLETED) {
+					IPJob job = (IPJob) selJobs[i];
+
+					IPResourceManager rm = job.getResourceManager();
+					if (job.getState() != JobAttributes.State.COMPLETED) {
 						rm.terminateJob(job);
 					}
-					// TODO: Look for job change event to wait for jobs to be finished.
+					// TODO: Look for job change event to wait for jobs to be
+					// finished.
 					viewer.update(selJobs[i], null);
-					
+
 				} catch (CoreException e) {
-					ErrorDialog.openError(getShell(), Messages.TerminateJobFromListAction_2,
-							Messages.TerminateJobFromListAction_3,
+					ErrorDialog.openError(getShell(), Messages.TerminateJobFromListAction_2, Messages.TerminateJobFromListAction_3,
 							e.getStatus());
-					
+
 				}
 			}
-
 
 		}
 	}

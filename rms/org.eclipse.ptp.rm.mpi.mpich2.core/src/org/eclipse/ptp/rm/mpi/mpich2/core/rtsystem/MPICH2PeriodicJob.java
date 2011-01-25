@@ -85,7 +85,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 			 */
 			for (List<MPICH2JobMap.Job> jobs : jobMap.getJobs()) {
 				for (MPICH2JobMap.Job job : jobs) {
-					IPJob pJob = queue.getJobById(job.getJobAlias());
+					IPJob pJob = rm.getJobById(job.getJobAlias());
 					if (pJob == null) {
 						// Not one of our jobs
 						continue;
