@@ -166,7 +166,7 @@ public class GemBrowser extends ViewPart {
 	}
 
 	/**
-	 * Creates a and runs new thread that clears the Analyzer
+	 * Runs a thread that clears the Browser view.
 	 * 
 	 * @param none
 	 * @return void
@@ -474,6 +474,8 @@ public class GemBrowser extends ViewPart {
 	 */
 	private void fillBrowserTabs() {
 		final Boolean FIB = GemPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.GEM_PREF_FIB);
+		final Boolean compareOutput = GemPlugin.getDefault().getPreferenceStore()
+				.getBoolean(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT);
 
 		int tabIndex = 0;
 		fillDeadlockTab(this.tabFolder, tabIndex++);
@@ -483,6 +485,9 @@ public class GemBrowser extends ViewPart {
 			fillIrrelevantBarrierTab(this.tabFolder, tabIndex++);
 		}
 		fillTypeMismatchTab(this.tabFolder, tabIndex++);
+		if (compareOutput) {
+			fillCompareOutputTab(this.tabFolder, tabIndex++);
+		}
 
 		// Open up the first tab
 		this.tabFolder.setSelection(this.tabFolder.getItem(0));
@@ -496,6 +501,34 @@ public class GemBrowser extends ViewPart {
 			this.summaryLabel.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/no-error.gif")));//$NON-NLS-1$
 		} else {
 			this.summaryLabel.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/magnified-trident.gif")));//$NON-NLS-1$
+		}
+	}
+
+	/*
+	 * Calling this will create a tab filled with info on MPI program output
+	 * differences if they exist.
+	 */
+	private void fillCompareOutputTab(CTabFolder tabFolder, int tabIndex) {
+		new CTabItem(tabFolder, SWT.NONE, tabIndex).setText(Messages.GemBrowser_13);
+		final CTabItem outputTab = tabFolder.getItem(tabIndex);
+		outputTab.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/no-error.gif"))); //$NON-NLS-1$
+		outputTab.setToolTipText(Messages.GemBrowser_21);
+		final Tree tree = new Tree(tabFolder, SWT.BORDER);
+		outputTab.setControl(tree);
+		tree.setLinesVisible(true);
+		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+		tree.setFont(setFontSize(tree.getFont(), 8));
+		final TreeItem item = new TreeItem(tree, SWT.NULL);
+		item.setText(GemUtilities.getOutputSameMessage());
+
+		// If the outputs vary
+		if (!GemUtilities.getOutputSameMessage().equals(Messages.GemBrowser_28)) {
+			outputTab.setImage(GemPlugin.getImage(GemPlugin.getImageDescriptor("icons/magnified-trident.gif")));//$NON-NLS-1$
+			final TreeItem details = new TreeItem(item, SWT.NULL);
+			details.setText(GemUtilities.getOutputSameDetails());
+
+			final TreeItem disclaimer = new TreeItem(tree, SWT.NULL);
+			disclaimer.setText(Messages.GemBrowser_34);
 		}
 	}
 
@@ -810,8 +843,8 @@ public class GemBrowser extends ViewPart {
 	}
 
 	/**
-	 * Starts the viewer by: Generating the log file, parsing it, and
-	 * initializing everything.
+	 * Initializing everything and creates threads to be used by the main UI
+	 * thread to do updates.
 	 * 
 	 * @param none
 	 * @return void
@@ -954,20 +987,22 @@ public class GemBrowser extends ViewPart {
 		Display.getDefault().syncExec(GemBrowser.this.disableTerminateButtonThread);
 	}
 
-	/**
-	 * Passing the focus request to both code viewer's control.
-	 * 
-	 * @param none
-	 * @return void
-	 */
 	@Override
 	public void setFocus() {
-		final IWorkbench wb = PlatformUI.getWorkbench();
-		final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
-		final IWorkbenchPage page = window.getActivePage();
-		if (page != null) {
-			page.activate(this);
-		}
+		final Thread setFocusThread = new Thread() {
+			@Override
+			public void run() {
+				final IWorkbench wb = PlatformUI.getWorkbench();
+				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+				final IWorkbenchPage page = window.getActivePage();
+				if (page != null) {
+					page.activate(GemBrowser.this);
+				}
+			}
+		};
+
+		// We need to switch to the thread that is allowed to change the UI
+		Display.getDefault().syncExec(setFocusThread);
 	}
 
 	/*

@@ -58,8 +58,11 @@ public class GemPreferencePage extends FieldEditorPreferencePage implements IWor
 		addField(new IntegerFieldEditor(PreferenceConstants.GEM_PREF_NUMPROCS, Messages.GemPreferencePage_1, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_SHOWCON, Messages.GemPreferencePage_2, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_CLRCON, Messages.GemPreferencePage_3, prefGroup));
-		addField(new RadioGroupFieldEditor(PreferenceConstants.GEM_ACTIVE_VIEW, "Active view:", 2, //$NON-NLS-1$ 
-				new String[][] { { "Analyzer View", "analyzer" }, { "Browser View", "browser" } //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
+		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT, Messages.GemPreferencePage_6, prefGroup));
+		addField(new RadioGroupFieldEditor(PreferenceConstants.GEM_ACTIVE_VIEW, Messages.GemPreferencePage_5, 3,
+				new String[][] { { Messages.GemPreferencePage_7, PreferenceConstants.GEM_ANALYZER },
+						{ Messages.GemPreferencePage_8, PreferenceConstants.GEM_BROWSER },
+						{ Messages.GemPreferencePage_9, PreferenceConstants.GEM_CONSOLE }
 				}, prefGroup, false));
 
 		// Do the grid layout work for each group.

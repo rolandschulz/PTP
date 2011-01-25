@@ -34,9 +34,13 @@ public class PreferenceConstants {
 	public static final String GEM_PREF_PORTNUM = "portPreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_NUMPROCS = "numprocsPreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_REPORTNUM = "reportNumPreference"; //$NON-NLS-1$
+	public static final String GEM_PREF_HOSTNAME = "hostName"; //$NON-NLS-1$
 	public static final String GEM_PREF_CLRCON = "clearConsolePreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_SHOWCON = "showConsolePreference"; //$NON-NLS-1$
 	public static final String GEM_ACTIVE_VIEW = "activeViewPreference"; //$NON-NLS-1$
+	public static final String GEM_CONSOLE = "console"; //$NON-NLS-1$
+	public static final String GEM_BROWSER = "browser"; //$NON-NLS-1$
+	public static final String GEM_ANALYZER = "analyzer"; //$NON-NLS-1$
 
 	// GEM paths, scripts and file names
 	public static final String GEM_PREF_ISPEXE_PATH = "ispPath"; //$NON-NLS-1$
@@ -52,5 +56,6 @@ public class PreferenceConstants {
 
 	// Hidden preference for name of child processes
 	public static final String GEM_PREF_PROCESS_NAME = "processName"; //$NON-NLS-1$
+	public static final String GEM_PREF_COMPARE_OUTPUT = "compareOutput"; //$NON-NLS-1$
 
 }
