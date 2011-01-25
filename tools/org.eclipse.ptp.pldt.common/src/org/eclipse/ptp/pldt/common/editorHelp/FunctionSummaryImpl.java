@@ -21,6 +21,9 @@ import org.eclipse.cdt.ui.IRequiredInclude;
  */
 public class FunctionSummaryImpl implements IFunctionSummary
 {
+	/**
+	 * This name is used for the name of the html help file referenced by the F1 (dynamic help) function key.
+	 */
     private String                    name;
     private String                    namespace;
     private String                    description;
@@ -31,6 +34,14 @@ public class FunctionSummaryImpl implements IFunctionSummary
     {
     	
     }
+    /**
+     * 
+     * @param name - used for  the name of the html help file referenced by the F1 (dynamic help) function key.  Other use too? assumed.
+     * @param namespace
+     * @param description
+     * @param prototype
+     * @param includes
+     */
     public FunctionSummaryImpl(String name, String namespace, String description,
             IFunctionPrototypeSummary prototype, IRequiredInclude[] includes)
     {

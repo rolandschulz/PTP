@@ -110,4 +110,15 @@ public class CHelpBookImpl implements ICHelpBook {
 		resourceDescriptor[0] = hrd; // html file path is in here
 		return resourceDescriptor;
 	}
+	/**
+	 * Convenience function for filling in table info
+	 * @since 5.0
+	 */
+	public void func(String fname, String desc, String retType, String args) {
+		funcName2FuncInfo.put(fname, new FunctionSummaryImpl(fname, "", desc,
+                new FunctionPrototypeSummaryImpl(fname, retType, args), null));
+	}
+
+	
+
 }

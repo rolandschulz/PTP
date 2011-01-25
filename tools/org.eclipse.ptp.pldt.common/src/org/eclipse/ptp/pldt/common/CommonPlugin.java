@@ -11,8 +11,12 @@
 
 package org.eclipse.ptp.pldt.common;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -196,5 +200,20 @@ public class CommonPlugin extends AbstractUIPlugin {
 	 */
 	public static void log(String msg) {
 		log(IStatus.INFO, msg);
+	}
+	/**
+	 * Returns the preference setting for  include paths, as a List of Strings
+	 * 
+	 * @return
+	 * @since 5.0
+	 */
+	public List<String> getIncludeDirs(String includeID) {
+		String stringList=getPreferenceStore().getString(includeID);
+		StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator + "\n\r");//$NON-NLS-1$
+		List<String> dirs = new ArrayList<String>();
+		while (st.hasMoreElements()) {
+			dirs.add(st.nextToken());
+		}
+		return dirs;
 	}
 }
