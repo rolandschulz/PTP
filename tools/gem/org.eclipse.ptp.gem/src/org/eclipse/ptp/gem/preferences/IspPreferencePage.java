@@ -20,6 +20,7 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ptp.gem.GemPlugin;
 import org.eclipse.ptp.gem.messages.Messages;
 import org.eclipse.swt.SWT;
@@ -76,6 +77,7 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements IWor
 		miscGroup.setText(Messages.IspPreferencePage_8);
 		addField(new IntegerFieldEditor(PreferenceConstants.GEM_PREF_PORTNUM, Messages.IspPreferencePage_9, miscGroup));
 		addField(new IntegerFieldEditor(PreferenceConstants.GEM_PREF_REPORTNUM, Messages.IspPreferencePage_10, miscGroup));
+		addField(new StringFieldEditor(PreferenceConstants.GEM_PREF_HOSTNAME, Messages.IspPreferencePage_17, miscGroup));
 
 		// Vertical spacer
 		new Label(fieldEditorParent, SWT.NULL).setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false, 3, 1));

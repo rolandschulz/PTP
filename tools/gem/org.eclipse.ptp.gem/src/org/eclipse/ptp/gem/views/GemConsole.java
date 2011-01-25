@@ -22,27 +22,26 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.gem.GemPlugin;
 import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.MessageConsole;
-import org.eclipse.ui.console.TextConsoleViewer;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -50,19 +49,45 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class GemConsole extends ViewPart {
 
+	// The ID for this view
 	public static final String ID = "org.eclipse.ptp.gem.views.GemConsole"; //$NON-NLS-1$
 
-	private Action clrConsole;
-	private Action writeToLocalFile;
-	private Action getHelp;
+	private Action clearConsoleAction;
+	private Action writeToLocalFileAction;
+	private Action getHelpAction;
+	private Action terminateOperationAction;
 	private MessageConsole msgConsole;
-	private TextConsoleViewer txtConViewer;
+	private StyledText txtConViewer;
+	private Thread disableTerminateButtonThread;
+	private Thread clearConsoleThread;
 
 	/**
 	 * Constructor.
+	 * 
+	 * @param none
 	 */
 	public GemConsole() {
 		super();
+	}
+
+	/**
+	 * Changes status of the terminate process button (Action) to disabled.
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	public void cancel() {
+		Display.getDefault().syncExec(this.disableTerminateButtonThread);
+	}
+
+	/**
+	 * Clears all text from the Gem Console via the main UI thread.
+	 * 
+	 * @param none
+	 * @return void
+	 */
+	public void clear() {
+		Display.getDefault().syncExec(this.clearConsoleThread);
 	}
 
 	/*
@@ -85,42 +110,24 @@ public class GemConsole extends ViewPart {
 	public void createPartControl(Composite parent) {
 
 		// Initializations
-		this.msgConsole = new MessageConsole("GEM Console", null); //$NON-NLS-1$
-		this.txtConViewer = new TextConsoleViewer(parent, this.msgConsole);
-		this.txtConViewer.setInput(getViewSite());
+		this.txtConViewer = new StyledText(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		this.txtConViewer.setFont(new Font(null, "Courier", 10, SWT.NORMAL)); //$NON-NLS-1$
 
-		// Create actions and connect them to buttons and the context menu
+		// Create actions and connect them to buttons
 		makeActions();
-		hookContextMenu();
 		contributeToActionBars();
-	}
-
-	/*
-	 * Populates the view context menu.
-	 */
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(this.clrConsole);
-		this.clrConsole.setText(Messages.GemConsole_0);
-		manager.add(this.writeToLocalFile);
-		this.writeToLocalFile.setText(Messages.GemConsole_1);
-		manager.add(this.getHelp);
-		this.getHelp.setText(Messages.GemConsole_2);
-
-		// Other plug-ins can contribute their actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	/*
 	 * Populates the view pull-down menu.
 	 */
 	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(this.clrConsole);
-		this.clrConsole.setText(Messages.GemConsole_3);
-		manager.add(this.writeToLocalFile);
-		this.writeToLocalFile.setText(Messages.GemConsole_4);
-		manager.add(this.getHelp);
-		this.getHelp.setText(Messages.GemConsole_5);
+		manager.add(this.clearConsoleAction);
+		this.clearConsoleAction.setText(Messages.GemConsole_3);
+		manager.add(this.writeToLocalFileAction);
+		this.writeToLocalFileAction.setText(Messages.GemConsole_4);
+		manager.add(this.getHelpAction);
+		this.getHelpAction.setText(Messages.GemConsole_5);
 		manager.add(new Separator());
 
 		// Other plug-ins can contribute their actions here
@@ -131,28 +138,39 @@ public class GemConsole extends ViewPart {
 	 * Contributes icons and actions to the tool bar.
 	 */
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(this.clrConsole);
-		manager.add(this.writeToLocalFile);
-		manager.add(this.getHelp);
+		manager.add(this.terminateOperationAction);
+		manager.add(this.clearConsoleAction);
+		manager.add(this.writeToLocalFileAction);
+		manager.add(this.getHelpAction);
 
 		// Other plug-ins can contribute their actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
-	/*
-	 * Adds MenuListeners to hook selections from the context menu.
+	/**
+	 * Initializing everything and creates threads to be used by the main UI
+	 * thread to do updates.
+	 * 
+	 * @param none
+	 * @return void
 	 */
-	private void hookContextMenu() {
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				GemConsole.this.fillContextMenu(manager);
+	public void init() {
+
+		this.disableTerminateButtonThread = new Thread() {
+			@Override
+			public void run() {
+				GemConsole.this.terminateOperationAction.setEnabled(false);
 			}
-		});
-		final Menu menu = menuMgr.createContextMenu(((Viewer) this.txtConViewer).getControl());
-		((Viewer) this.txtConViewer).getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, this.txtConViewer);
+		};
+
+		this.clearConsoleThread = new Thread() {
+			@Override
+			public void run() {
+				GemConsole.this.txtConViewer.setText(""); //$NON-NLS-1$
+			}
+		};
+
+		this.terminateOperationAction.setEnabled(true);
 	}
 
 	/*
@@ -160,16 +178,30 @@ public class GemConsole extends ViewPart {
 	 * menu items.
 	 */
 	private void makeActions() {
-		this.clrConsole = new Action() {
+
+		// terminateOperationAction
+		this.terminateOperationAction = new Action() {
 			@Override
 			public void run() {
-				GemConsole.this.msgConsole.clearConsole();
+				GemUtilities.terminateOperation();
 			}
 		};
-		this.clrConsole.setToolTipText(Messages.GemConsole_6);
-		this.clrConsole.setImageDescriptor(GemPlugin.getImageDescriptor("icons/clear-console.gif")); //$NON-NLS-1$
+		this.terminateOperationAction.setImageDescriptor(GemPlugin.getImageDescriptor("icons/progress_stop.gif")); //$NON-NLS-1$
+		this.terminateOperationAction.setToolTipText(Messages.GemAnalyzer_74);
+		this.terminateOperationAction.setEnabled(false);
 
-		this.writeToLocalFile = new Action() {
+		// clearConsoleAction
+		this.clearConsoleAction = new Action() {
+			@Override
+			public void run() {
+				GemConsole.this.txtConViewer.setText(""); //$NON-NLS-1$
+			}
+		};
+		this.clearConsoleAction.setToolTipText(Messages.GemConsole_6);
+		this.clearConsoleAction.setImageDescriptor(GemPlugin.getImageDescriptor("icons/clear-console.gif")); //$NON-NLS-1$
+
+		// write ToLocalFileAction
+		this.writeToLocalFileAction = new Action() {
 			@Override
 			public void run() {
 
@@ -191,30 +223,38 @@ public class GemConsole extends ViewPart {
 				}
 			}
 		};
-		this.writeToLocalFile.setToolTipText(Messages.GemConsole_9);
-		this.writeToLocalFile.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+		this.writeToLocalFileAction.setToolTipText(Messages.GemConsole_9);
+		this.writeToLocalFileAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_ETOOL_SAVE_EDIT));
 
-		this.getHelp = new Action() {
+		// getHelpAction
+		this.getHelpAction = new Action() {
 			@Override
 			public void run() {
 				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.eclipse.ptp.gem.help/html/output.html"); //$NON-NLS-1$
 			}
 		};
-		this.getHelp.setToolTipText(Messages.GemConsole_10);
-		this.getHelp.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+		this.getHelpAction.setToolTipText(Messages.GemConsole_10);
+		this.getHelpAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_LCL_LINKTO_HELP));
 	}
 
-	/**
-	 * Passing the focus request to the viewer's control.
-	 * 
-	 * @param none
-	 * @return void
-	 */
 	@Override
 	public void setFocus() {
-		((Viewer) this.txtConViewer).getControl().setFocus();
+		final Thread setFocusThread = new Thread() {
+			@Override
+			public void run() {
+				final IWorkbench wb = PlatformUI.getWorkbench();
+				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+				final IWorkbenchPage page = window.getActivePage();
+				if (page != null) {
+					page.activate(GemConsole.this);
+				}
+			}
+		};
+
+		// We need to switch to the thread that is allowed to change the UI
+		Display.getDefault().syncExec(setFocusThread);
 	}
 
 	/**
@@ -227,18 +267,42 @@ public class GemConsole extends ViewPart {
 	 * @return void
 	 */
 	public void write(String message) {
-		if (message != null) {
-			final IDocument doc = this.msgConsole.getDocument();
+		// this.txtConViewer.setText(this.txtConViewer.getText()+message);
+		this.txtConViewer.append(message);
+	}
 
-			// Only show most recent results if preference is set
-			if (GemPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.GEM_PREF_CLRCON)) {
-				doc.set(message);
-			} else {
-				// Append the new message after the old
-				final String old = doc.get();
-				doc.set((old.equals("")) ? message : old + "\n\n" + message); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+	/**
+	 * Writes the string to the console as an error message.
+	 * 
+	 * @param consoleStdErrMessage
+	 *            The string to write to this Console that represents stderr.
+	 * @return void
+	 */
+	public void writeStdErr(String consoleStdErrMessage) {
+		final int oldLen = this.txtConViewer.getText().length();
+		write(consoleStdErrMessage);
+
+		if (consoleStdErrMessage.length() > 2) {
+			final StyleRange styleRange = new StyleRange();
+			final Display display = Display.getDefault();
+			styleRange.start = oldLen;
+			styleRange.length = consoleStdErrMessage.length();
+			styleRange.foreground = display.getSystemColor(SWT.COLOR_RED);
+			styleRange.fontStyle = SWT.BOLD;
+			// styleRange1.fontStyle = SWT.BOLD | SWT.ITALIC;
+			this.txtConViewer.setStyleRange(styleRange);
 		}
+	}
+
+	/**
+	 * Writes the string to the console as a standard message.
+	 * 
+	 * @param consoleStdOutMessage
+	 *            The string to write to this Console that represents stdout.
+	 * @void
+	 */
+	public void writeStdOut(String consoleStdOutMessage) {
+		write(consoleStdOutMessage);
 	}
 
 }

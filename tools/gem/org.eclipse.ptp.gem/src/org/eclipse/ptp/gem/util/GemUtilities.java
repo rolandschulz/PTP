@@ -27,6 +27,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -73,10 +74,11 @@ public class GemUtilities {
 	private static Process process;
 	private static GemAnalyzer analyzer;
 	private static GemBrowser browser;
+	private static GemConsole console;
 	protected static TaskStatus taskStatus;
 	private static boolean doCompile;
 	private static boolean doVerify;
-	private static String consoleStdInMessage;
+	private static String consoleStdOutMessage;
 	private static String consoleStdErrMessage;
 	private static String outputSameMessage;
 	private static String outputSameDetails;
@@ -90,8 +92,6 @@ public class GemUtilities {
 			final IWorkbench wb = PlatformUI.getWorkbench();
 			final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
 			final IWorkbenchPage page = window.getActivePage();
-			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
-			final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
 			GemConsole gemConsole = null;
 			IViewPart gemViewPart = null;
 
@@ -99,13 +99,8 @@ public class GemUtilities {
 				page.showView(GemConsole.ID);
 				gemViewPart = page.findView(GemConsole.ID);
 				gemConsole = (GemConsole) gemViewPart;
-				gemConsole.write(consoleStdInMessage + consoleStdErrMessage);
-				if (activeView.equals("analyzer")) { //$NON-NLS-1$
-					analyzer.setFocus();
-				} else {
-					browser.setFocus();
-				}
-
+				gemConsole.writeStdOut(consoleStdOutMessage);
+				gemConsole.writeStdErr(consoleStdErrMessage);
 			} catch (final Exception e) {
 				logExceptionDetail(e);
 			}
@@ -118,7 +113,53 @@ public class GemUtilities {
 	private static void cancelAnalysis() {
 		analyzer.clear();
 		browser.clear();
+		console.cancel();
 		taskStatus = TaskStatus.IDLE;
+	}
+
+	private static void compareOutput(String consoleStdIn) {
+
+		// Create an array that holds the output of each interleaving
+		final ArrayList<String> outputs = new ArrayList<String>();
+		final Scanner scanner = new Scanner(consoleStdIn);
+		int interIndex = -1;
+
+		while (scanner.hasNextLine()) {
+			final String line = scanner.nextLine();
+			if (line.contains("INTERLEAVING :")) {//$NON-NLS-1$
+				outputs.add("");//$NON-NLS-1$
+				interIndex++;
+				continue;
+			}
+			outputs.set(interIndex, outputs.get(interIndex).concat("\n" + line));//$NON-NLS-1$
+		}
+
+		// Compare each output against first interleaving, report discrepancy
+		for (interIndex = 1; interIndex < outputs.size(); interIndex++) {
+			if (!outputs.get(0).equals(outputs.get(interIndex))) {
+				final StringBuffer stringBuffer = new StringBuffer();
+				stringBuffer.append(Messages.GemUtilities_19);
+				stringBuffer.append(outputs.get(0));
+				stringBuffer.append("\n"); //$NON-NLS-1$
+				stringBuffer.append("\n"); //$NON-NLS-1$
+				stringBuffer.append(Messages.GemUtilities_22);
+				stringBuffer.append(outputs.get(interIndex));
+				outputSameDetails = stringBuffer.toString();
+
+				stringBuffer.setLength(0);
+				stringBuffer.append(Messages.GemUtilities_23);
+				stringBuffer.append(" "); //$NON-NLS-1$
+				stringBuffer.append((interIndex - 1));
+				stringBuffer.append(" "); //$NON-NLS-1$
+				stringBuffer.append(Messages.GemUtilities_26);
+				outputSameMessage = stringBuffer.toString();
+
+				return;
+			}
+		}
+
+		outputSameMessage = Messages.GemUtilities_27;
+		return;
 	}
 
 	/**
@@ -208,9 +249,11 @@ public class GemUtilities {
 		final boolean mpiCallsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_MPICALLS);
 		final boolean openmpPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_OPENMP);
 		final boolean blockingSendsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_BLOCK);
+		final boolean compareOutputPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT);
 		final boolean reportPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_REPORT);
 		final boolean unixSocketsPreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_UNIXSOCKETS);
 		final boolean verbosePreference = pstore.getBoolean(PreferenceConstants.GEM_PREF_VERBOSE);
+		final String hostName = pstore.getString(PreferenceConstants.GEM_PREF_HOSTNAME);
 		String ispExePath = pstore.getString(PreferenceConstants.GEM_PREF_ISPEXE_PATH);
 		ispExePath += (ispExePath == "") ? "" : "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -237,14 +280,17 @@ public class GemUtilities {
 		stringBuffer.append(" -p "); //$NON-NLS-1$
 		stringBuffer.append(portnum);
 		stringBuffer.append(" "); //$NON-NLS-1$
-		stringBuffer.append(((blockingSendsPreference) ? "-b " : "")); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append(((mpiCallsPreference) ? "-m " : "")); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append(((unixSocketsPreference) ? "-x " : "")); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append(((verbosePreference) ? "-O " : "")); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append(((openmpPreference) ? "-s " : "")); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append(((reportPreference) ? "-r " : "")); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append(((reportPreference) ? reportnum + " " : "")); //$NON-NLS-1$ //$NON-NLS-2$
-		stringBuffer.append(((fibPreference) ? "-f " : "")); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((blockingSendsPreference) ? "-b " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((compareOutputPreference) ? "-P " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((mpiCallsPreference) ? "-m " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((unixSocketsPreference) ? "-x " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((!hostName.trim().equals("")) ? "-h " : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		stringBuffer.append((!hostName.trim().equals("")) ? hostName + " " : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		stringBuffer.append((verbosePreference) ? "-O " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((openmpPreference) ? "-s " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((reportPreference) ? "-r " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((reportPreference) ? reportnum + " " : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		stringBuffer.append((fibPreference) ? "-f " : ""); //$NON-NLS-1$ //$NON-NLS-2$
 		stringBuffer.append("-l "); //$NON-NLS-1$
 		stringBuffer.append(logfilePath);
 		stringBuffer.append(" "); //$NON-NLS-1$
@@ -367,7 +413,7 @@ public class GemUtilities {
 		runCommand(exePath, false);
 
 		// Parse first line of STDOUT from GEM Console
-		final Scanner scanner = new Scanner(consoleStdInMessage);
+		final Scanner scanner = new Scanner(consoleStdOutMessage);
 		final String version = scanner.nextLine();
 		scanner.close();
 		final Pattern intraCbRegex = Pattern.compile("([0-9]+.[0-9]+.[0-9]+)$"); //$NON-NLS-1$
@@ -435,7 +481,8 @@ public class GemUtilities {
 	/**
 	 * Returns the value of 'outputSameDetails'
 	 * 
-	 * @return String
+	 * @param none
+	 * @return String The details of the output comparison.
 	 */
 	public static String getOutputSameDetails() {
 		return outputSameDetails;
@@ -444,7 +491,8 @@ public class GemUtilities {
 	/**
 	 * Returns the value of 'outputSameMessage'
 	 * 
-	 * @return String
+	 * @param none
+	 * @return String The output to compare against.
 	 */
 	public static String getOutputSameMessage() {
 		return outputSameMessage;
@@ -565,6 +613,11 @@ public class GemUtilities {
 		browser.clear();
 		browser.init();
 
+		// Initialize the console
+		final IViewPart consolePart = window.getActivePage().findView(GemConsole.ID);
+		console = (GemConsole) consolePart;
+		console.init();
+
 		// Create and parse log file, pass transitions to Browser & Analyzer
 		final Thread initGemViewsThread = new Thread() {
 			@Override
@@ -616,7 +669,22 @@ public class GemUtilities {
 					if (browser != null) {
 						browser.update(transitions);
 					}
+					if (console != null) {
+						console.cancel();
+					}
 					taskStatus = TaskStatus.IDLE;
+
+					// Place the focus on the correct view
+					final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+					final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
+					if (activeView.equals(PreferenceConstants.GEM_ANALYZER)) {
+						analyzer.setFocus();
+					} else if (activeView.equals(PreferenceConstants.GEM_BROWSER)) {
+						browser.setFocus();
+					}
+					else {
+						console.setFocus();
+					}
 				}
 			}
 		};
@@ -752,51 +820,73 @@ public class GemUtilities {
 	public static int runCommand(String command, boolean verbose) {
 		try {
 			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+			final boolean showConsole = pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON);
 			process = Runtime.getRuntime().exec(command);
 			final StringBuffer stringBuffer = new StringBuffer();
-			String stdIn = ""; //$NON-NLS-1$
-			String stdInResult = ""; //$NON-NLS-1$
+			String stdOut = ""; //$NON-NLS-1$
+			String stdOutResult = ""; //$NON-NLS-1$
 			String stdErr = ""; //$NON-NLS-1$
 			String stdErrResult = ""; //$NON-NLS-1$
-			final BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			final BufferedReader errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			consoleStdOutMessage = "";//$NON-NLS-1$
+			consoleStdErrMessage = "";//$NON-NLS-1$
+
+			// clear the console if the preference is set
+			final boolean clearConsole = pstore.getBoolean(PreferenceConstants.GEM_PREF_CLRCON);
+			if (clearConsole) {
+				console.clear();
+			}
 
 			// Try breaks when the process is terminated prematurely
 			try {
 				// read the process input stream
-				while (process != null && (stdIn = inReader.readLine()) != null && taskStatus == TaskStatus.ACTIVE) {
-					stringBuffer.append(stdIn);
+				while (process != null && (stdOut = stdOutReader.readLine()) != null && taskStatus == TaskStatus.ACTIVE) {
+					stringBuffer.append(stdOut);
 					stringBuffer.append("\n"); //$NON-NLS-1$
+					consoleStdOutMessage += stdOut + "\n";//$NON-NLS-1$
+					if (!stdOutReader.ready()) {
+						updateConsole(verbose, showConsole);
+						consoleStdOutMessage = "";//$NON-NLS-1$
+					}
 				}
-				stdInResult = stringBuffer.toString();
+				stdOutResult = stringBuffer.toString();
+
+				// cleanup, send last few lines
+				updateConsole(verbose, showConsole);
 
 				// read the process error stream
 				stringBuffer.setLength(0);
-				while (process != null && (stdErr = errReader.readLine()) != null && taskStatus == TaskStatus.ACTIVE) {
+				while (process != null && (stdErr = stdErrReader.readLine()) != null && taskStatus == TaskStatus.ACTIVE) {
 					stringBuffer.append(stdErr);
 					stringBuffer.append("\n"); //$NON-NLS-1$
+					consoleStdErrMessage += stdErr + "\n";//$NON-NLS-1$
+
+					if (!stdErrReader.ready()) {
+						updateConsole(verbose, showConsole);
+						consoleStdErrMessage = "";//$NON-NLS-1$
+					}
 				}
 				stdErrResult = stringBuffer.toString();
+
+				// cleanup, send last few lines
+				updateConsole(verbose, showConsole);
 			} catch (final Exception e) {
 				logExceptionDetail(e);
 				return -1;
 			}
 
-			consoleStdInMessage = stdInResult;
+			consoleStdOutMessage = stdOutResult;
 			consoleStdErrMessage = stdErrResult;
+
+			outputSameMessage = ""; // means that the output was not compared //$NON-NLS-1$
+			outputSameDetails = ""; //$NON-NLS-1$
+			if (verbose && pstore.getBoolean(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT)) {
+				compareOutput(consoleStdOutMessage);
+			}
 
 			if (process == null) {
 				return -1;
-			}
-
-			// This will open the console for updating
-			final boolean showConsole = pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON);
-			if (verbose && showConsole) {
-				try {
-					updateConsole();
-				} catch (final Exception e) {
-					logExceptionDetail(e);
-				}
 			}
 
 			return consoleStdErrMessage.contains("ld returned 1 exit status") ? -1 : 1; //$NON-NLS-1$
@@ -956,7 +1046,8 @@ public class GemUtilities {
 	}
 
 	/**
-	 * Kills the shared Process object associated with this class.
+	 * Clears and shuts down all GEM views then forcibly terminates the shared
+	 * Process object associated with this class and all its children.
 	 * 
 	 * @param none
 	 * @return void
@@ -968,22 +1059,23 @@ public class GemUtilities {
 			taskStatus = TaskStatus.ABORTED;
 			analyzer.clear();
 			browser.clear();
+			console.cancel();
+			console.writeStdErr(Messages.GemConsole_11 + "\n"); //$NON-NLS-1$
 			killProcesses();
 		}
 	}
 
-	/**
-	 * Starts the updateGemConsoleThread which writes STDOUT to the GEM Console
-	 * View.
-	 * 
-	 * @param none
-	 * @return void
+	/*
+	 * Starts the updateGemConsoleThread which writes STDOUT and STDERR to the
+	 * GEM Console.
 	 */
-	public static void updateConsole() {
-		try {
-			Display.getDefault().syncExec(updateGemConsoleThread);
-		} catch (final Exception e) {
-			logExceptionDetail(e);
+	private static void updateConsole(boolean verbose, boolean showConsole) {
+		if (verbose && showConsole) {
+			try {
+				Display.getDefault().syncExec(updateGemConsoleThread);
+			} catch (final Exception e) {
+				logExceptionDetail(e);
+			}
 		}
 	}
 

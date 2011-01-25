@@ -177,13 +177,13 @@ public class GemAnalyzer extends ViewPart {
 	private SelectionListener singleListener;
 	private DoubleClickListener doubleListener;
 
-	// File resources needed for various operations
-	private IFile globalSourceFile;
+	// The active file resource needed for various operations
+	private IFile activeFile;
 
 	// Threads
 	private Thread analyzerUpdateThread;
-	private Thread clearAnalyzer;
-	private Thread disableTerminateButton;
+	private Thread clearAnalyzerThread;
+	private Thread disableTerminateButtonThread;
 
 	// Misc
 	private int leftLines;
@@ -201,13 +201,13 @@ public class GemAnalyzer extends ViewPart {
 	}
 
 	/**
-	 * Creates and runs a new thread that clears the Analyzer view.
+	 * Runs a thread that clears the Analyzer view.
 	 * 
 	 * @param none
 	 * @return void
 	 */
 	public void clear() {
-		Display.getDefault().syncExec(this.clearAnalyzer);
+		Display.getDefault().syncExec(this.clearAnalyzerThread);
 		this.aborted = false;
 	}
 
@@ -1126,41 +1126,41 @@ public class GemAnalyzer extends ViewPart {
 	}
 
 	/**
-	 * Starts this viewer by: Generating the log file, parsing it, and
-	 * initializing everything.
+	 * Initializing everything and creates threads to be used by the main UI
+	 * thread to do updates.
 	 * 
 	 * @param sourceFile
 	 *            The file resource to initialize this viewer with.
 	 * @return void
 	 */
 	public void init(IFile sourceFile) {
-		this.globalSourceFile = sourceFile;
+		this.activeFile = sourceFile;
 
 		this.analyzerUpdateThread = new Thread() {
 			@Override
 			public void run() {
 				// If just aborted then don't fill viewers with incomplete data
 				if (GemAnalyzer.this.aborted) {
-					Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButton);
-					Display.getDefault().syncExec(GemAnalyzer.this.clearAnalyzer);
+					Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButtonThread);
+					Display.getDefault().syncExec(GemAnalyzer.this.clearAnalyzerThread);
 					GemAnalyzer.this.aborted = false;
 					return;
 				}
 
 				// if the log file contained no MPI calls
-				if (GemAnalyzer.this.globalSourceFile == null) {
-					Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButton);
+				if (GemAnalyzer.this.activeFile == null) {
+					Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButtonThread);
 					clear();
 					return;
 				}
 
 				reset();
-				parseSourceFile(GemAnalyzer.this.globalSourceFile, GemAnalyzer.this.globalSourceFile);
-				Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButton);
+				parseSourceFile(GemAnalyzer.this.activeFile, GemAnalyzer.this.activeFile);
+				Display.getDefault().syncExec(GemAnalyzer.this.disableTerminateButtonThread);
 			}
 		};
 
-		this.clearAnalyzer = new Thread() {
+		this.clearAnalyzerThread = new Thread() {
 			@Override
 			public void run() {
 				final String emptyString = ""; //$NON-NLS-1$
@@ -1193,7 +1193,7 @@ public class GemAnalyzer extends ViewPart {
 			}
 		};
 
-		this.disableTerminateButton = new Thread() {
+		this.disableTerminateButtonThread = new Thread() {
 			@Override
 			public void run() {
 				GemAnalyzer.this.terminateButton.setEnabled(false);
@@ -1578,20 +1578,22 @@ public class GemAnalyzer extends ViewPart {
 
 	}
 
-	/**
-	 * Passing the focus request to both code viewer's control.
-	 * 
-	 * @param none
-	 * @return void
-	 */
 	@Override
 	public void setFocus() {
-		final IWorkbench wb = PlatformUI.getWorkbench();
-		final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
-		final IWorkbenchPage page = window.getActivePage();
-		if (page != null) {
-			page.activate(this);
-		}
+		final Thread setFocusThread = new Thread() {
+			@Override
+			public void run() {
+				final IWorkbench wb = PlatformUI.getWorkbench();
+				final IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+				final IWorkbenchPage page = window.getActivePage();
+				if (page != null) {
+					page.activate(GemAnalyzer.this);
+				}
+			}
+		};
+
+		// We need to switch to the thread that is allowed to change the UI
+		Display.getDefault().syncExec(setFocusThread);
 	}
 
 	/*
@@ -1725,7 +1727,7 @@ public class GemAnalyzer extends ViewPart {
 		}
 		this.transitions = transitions;
 		this.numRanks = transitions.getNumRanks();
-		this.globalSourceFile = sourceFile;
+		this.activeFile = sourceFile;
 		Display.getDefault().syncExec(this.analyzerUpdateThread);
 	}
 
@@ -1759,7 +1761,7 @@ public class GemAnalyzer extends ViewPart {
 					|| !nextRightFileName.equals(this.currRightFile.getName()) || nextRightFileInfo.equals(emptyString);
 
 			if (updateWindowContent) {
-				final String projectName = this.globalSourceFile.getProject().getName();
+				final String projectName = this.activeFile.getProject().getName();
 				final IProject currentProject = ResourcesPlugin.getWorkspace()
 						.getRoot().getProject(projectName);
 

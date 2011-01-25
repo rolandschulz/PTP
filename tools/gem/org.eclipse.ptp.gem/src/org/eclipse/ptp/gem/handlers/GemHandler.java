@@ -21,16 +21,14 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.gem.GemPlugin;
 import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -113,30 +111,33 @@ public class GemHandler extends AbstractHandler {
 			// Save most recent file reference to hidden preference as a URI
 			GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
 
-			// Open the Console View if the user wants it
-			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
+			// Activate all inactive views and open up to the console
 			try {
-				if (pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON)) {
-					page.showView(GemConsole.ID);
+				final IViewReference[] activeViews = page.getViewReferences();
+				boolean foundBrowser = false;
+				boolean foundAnalyzer = false;
+				for (final IViewReference ref : activeViews) {
+					if (ref.getId().equals(GemBrowser.ID)) {
+						foundBrowser = true;
+					}
+					if (ref.getId().equals(GemAnalyzer.ID)) {
+						foundAnalyzer = true;
+					}
 				}
-			} catch (final PartInitException e) {
-				GemUtilities.logExceptionDetail(e);
-			}
-
-			// Open Analyzer and Browser Views in order determined by preference
-			try {
-				final String activeView = pstore.getString(PreferenceConstants.GEM_ACTIVE_VIEW);
-				if (activeView.equals("analyzer")) { //$NON-NLS-1$
-					page.showView(GemBrowser.ID);
-					page.showView(GemAnalyzer.ID);
-				} else {
-					page.showView(GemAnalyzer.ID);
+				// open the Browser view if it's not already
+				if (!foundBrowser) {
 					page.showView(GemBrowser.ID);
 				}
+				// open the Analyzer view if it's not already
+				if (!foundAnalyzer) {
+					page.showView(GemAnalyzer.ID);
+				}
+				page.showView(GemConsole.ID);
 				GemUtilities.initGemViews(inputFile, true, true);
 			} catch (final PartInitException e) {
 				GemUtilities.logExceptionDetail(e);
 			}
+
 		} else {
 			GemUtilities.showErrorDialog(Messages.GemHandler_1);
 		}
