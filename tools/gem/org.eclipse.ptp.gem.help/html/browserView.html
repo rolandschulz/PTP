@@ -55,28 +55,37 @@ and given the active focus.
 <center>
 <img src="images/runVerify.png">
 </center>
-<br><br>
+<br>
 
-<h2 id="errorWarningLabel">Browser Overview</h2>
+<h2>Browser Overview</h2>
 <p>
-This highly functional view is to summarize and categorically groups all of the errors and warnings found
-by GEM. Below are listings of the errors and warnings summarized by GEM's Browser View, along with a brief
-description. Each error or warning can be clicked and the developer is taken to the corresponding line in 
-the source code within the Eclipse editor.
+This highly functional view summarizes and categorically groups all of the errors and warnings found
+by GEM on a particular verification run. The summary label (just above the tabs) gives the user a quick
+overview of problems found. Errors and warnings are mapped to the corresponding source code lines in 
+the Eclipse editor.  The Browser View&#39;s tabs help the user to quickly locate and fix MPI errors 
+flagged by GEM in their source code.
 </p>
 
 <p>
-The image below shows what the Browser View should look like along with an explanation of its components.
+Below are listings of the errors and warnings summarized by GEM's Browser View, along with a more
+detailed descriptions. 
+</p>
+
+<p>
+<i>The image below shows what the Browser View should look like along with an explanation of its components.</i>
 </p>
 
 <img src="images/browserIntegration.png" width="900" height="680"/>
 
+<h2>Browser View Tabs</h2>
+
 <p>
 Below the summary is a section containing a tab for category of error or warning that was found in the
-code. By opening a given tab you are given detailed information on each occurrence of that type of
-error or warning in your code. Clicking on any of these occurrences will open the Eclipse editor with that line
-of code highlighted.  If there are no instances of the problem then there is a short message indicating as much.
-Furthermore, a user is shown which types of errors are presented via the icons of the tab.
+code. By selecting a particular tab the user is given detailed information on each occurrence of that type of
+error or warning in their MPI code. Clicking on any of these occurrences takes the user to the offending 
+line in the source code within the Eclipse editor.If there are no instances of the problem then there is 
+a short message indicating as much. Furthermore, a user is shown which types of errors are presented via 
+the icons of the tab (see icons directly below).
 </p>
 <ul>
 	<li>
@@ -89,27 +98,43 @@ Furthermore, a user is shown which types of errors are presented via the icons o
 	</li>
 </ul>
 
-
-<h2>Deadlocks Tab</h2>
+<h3>Deadlocks Tab</h3>
 This tab allows the user to visit all of the calls that did not complete due to a detected deadlock.
 
-<h2>Assertion Violations Tab</h2>
+<h3>Assertion Violations Tab</h3>
 This tab list all local assertion violations found. CLicking any one of these will take the user to the line of 
 source code with the failed assertion.
 
-<h2>Leaks Tab</h2>
+<h3>Leaks Tab</h3>
 Clicking any of these will take the user to the line of source code where the corresponding un-freed MPI 
 resource was allocated (these are usually MPI communicators and MPI DataTypes).
 
-<h2>Irrelevant Barriers Tab</h2>
+<h3>Irrelevant Barriers Tab</h3>
 This tab is reserved for Functionally Irrelevant Barriers. Clicking any these will take the user to the corresponding
 MPI_Barrier call itself, which can then be safely removed without changing the runtime behavior of the program.
 This could potentially serve to speed the application of in the absence of unnecessary synchronization.
 
-<h2>Type Mismatches Tab</h2>
+<h3>Type Mismatches Tab</h3>
 These are warnings about the send type not matching the receive type.
 
-<h3>Browser View Menu &#38; Toolbar Options</h3>
+<br/><br/>
+<hr/>
+
+<h2>Button Explanations</h2>
+<p>
+<img height="20" src="images/setNumProcsCombo.gif" width="47" /> The first drop down combo-box shows the current number of
+processes and lets the user conveniently choose a new value for the next GEM run.
+</p>
+
+<p>
+<img height="16" src="images/trident.gif" width="12" /> This will re-run GEM on the current MPI project. This is semantically
+equivalent to choosing &#34;Formally Verify MPI Program&#34; from the toolbar button drop-down and is provided for convenience.
+</p>
+
+<br/><br/>
+<hr/>
+
+<h2>Menu &#38; Toolbar Options</h2>
 <ul>
 	<li>
 		<img src="images/terminate.gif">
