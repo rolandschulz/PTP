@@ -21,45 +21,16 @@
 
 <hr>
 
-<h2>Setting the Number of Processes</h2>
-<p>
-Before formally verifying an MPI C/C++ program, you need to set the number of processes
-for a particular run.
-</p>
-
-<ul>
-    <li>
-        Open the source code file in the Eclipse editor window and select
-        <img height="16" src="images/triple-trident.gif" width="13" /><b>Set Number of Processes</b>
-        from the trident pull-down icon on the Eclipse toolbar.
-    </li>
-</ul>
-
-<center>
-<img src="images/runNumProcs.png">
-</center>
-<br><br>
-
-<p>
-An input dialog will allow you to enter the desired number of processes, which will persist until you
-change the value again.
-</p>
-
-<br>
-<center>
-<img src="images/numProcsDialog.png">
-</center>
-<br><br>
-
-<p>
-If the Analyzer View is already visible, the number of processes can also be set from the down combo-box in the
-Analyzer View's <a href="#runtimeInfo">Detailed Runtime information group</a> for the next Analyzer run.
-</p>
-
 <h2>Activating the Analyzer View</h2>
 <p>
-When you formally verify an MPI C/C++ program, the Analyzer View will automatically be brought to the 
-foreground. Any of the following will enable the source Analyzer View:
+Before formally verifying an MPI C/C++ program, you need to set the number of processes
+for a particular run. Please refer to the <a href="setNumProcs.html">Setting the Number of Processes Page</a>.
+</p>
+
+<p>
+When you formally verify an MPI C/C++ program, the Browser View and the Analyzer View will both be
+opened and depending on what is specified in preferences, either one may be brought to the foreground
+and given the active focus.
 </p>
 
 <ul>
@@ -106,7 +77,7 @@ of code in the Eclipse editor.
 The image below shows what the Analyzer View should look like along with an explanation of its components.
 </p>
 
-<img src="images/analyzerIntegration.png" width="800" height="607"/>
+<img src="images/analyzerIntegration.png" width="990" height="682"/>
 
 <h2>Transitions</h2>
 <p>
@@ -179,6 +150,11 @@ processes and lets the user conveniently choose a new value for the next Analyze
 </p>
 
 <p>
+<img height="16" src="images/trident.gif" width="12" /> This will re-run GEM on the current MPI project. This is semantically
+equivalent to choosing &#34;Formally Verify MPI Program&#34; from the toolbar button drop-down and is provided for convenience.
+</p>
+
+<p>
 <img height="17" src="images/hpv-trident.gif" width="15" /> This button will launch the Happens Before Viewer, a graphical tool
 for examining all processes at once and their interactions on a more global level. Please reference the
 <a href="happensBeforeViewer.html">Happens Before Viewer page</a> for a detailed overview on its use.
@@ -201,22 +177,6 @@ them and then by the Interleaving they are found in.<br>
 </ul>
 <img src="images/callBrowser.png"><br>
 
-<p>
-<img height="16" src="images/browse.gif" width="16" /> <b>Browse Leaks</b><br>
-If no resource leaks were found then this button is disabled and the text changes to <font COLOR="#00c800">No Leaks Found</font>
-If there are any leaks then clicking on it will prompt a new window that lists all leaks.If you 
-click on a leak in this new window, the source file will be opened in the editor and the line where
-the leak is found will be selected (this is done to help you find and fix the problem).<br><br>
-<img src="images/resourceLeakBrowser.png"><br>
-</p>
-
-<p>
-<img height="16" src="images/goto-error.gif" width="16" /> <b>Browse Errors</b><br>
-This button is also disabled if there were no assertion violations or deadlocks. Clicking on it brings up
-a shell that allows highlighting of individual source code lines involved with the error within the Eclipse editor. 
-Some errors like deadlocks involve multiple lines of code.
-</p>
-
 <h3>Code Windows</h3>
 <p>
 At the top of this section are two labels that explain the MPI Call(s) 
@@ -238,10 +198,17 @@ they match. In the left window the originating call is highlighted and on
 the right the matching call is highlighted.
 </p>
 
-<h3>Analyzer View Options</h3>
-This view's toolbar has a single help button:<br><br>
-<img height="16" src="images/help-contents.gif" width="16">
-Get Analyzer Help - Opens the Eclipse help topic related to the Analyzer View.
+<h3>Analyzer View Menu &#38; Toolbar Options</h3>
+<ul>
+	<li>
+		<img src="images/terminate.gif" height="16"  width="16">
+		Terminate Operation - Forcibly terminates the current GEM operation.
+	</li>
+	<li>
+		<img src="images/help-contents.gif" height="16"  width="16">
+		Get Analyzer Help - Opens the Eclipse help topic related to the Analyzer View page.
+	</li>
+</ul>
 
 <p>
 <b>Note:</b> This same functionality can be obtained through the context and pull-down menus for the view.

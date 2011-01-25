@@ -4,7 +4,8 @@
 <toc label="Graphical Explorer of MPI Programs (GEM)" link_to="../org.eclipse.ptp.help/toc.xml#ptpGEM" topic="html/toc.html">
 	<topic label="Contents"  href="html/toc.html"/>
     <topic label="GEM Overview"  href="html/overview.html"/>
-    <topic label="Prerequisites"  href="html/prereqs.html"/> 
+    <topic label="Prerequisites"  href="html/prereqs.html"/>
+    <topic label="Setting the Number of Processes"  href="html/setNumProcs.html"/> 
     <topic label="Analyzer View" href="html/analyzerView.html" />
     <topic label="Browser View" href="html/browserView.html" />
     <topic label="Console View"  href="html/consoleView.html"/>    
