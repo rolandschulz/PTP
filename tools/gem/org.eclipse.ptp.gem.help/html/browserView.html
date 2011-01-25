@@ -23,26 +23,53 @@
 
 <h2>Activating the Browser View</h2>
 <p>
+Before formally verifying an MPI C/C++ program, you need to set the number of processes
+for a particular run. Please refer to the <a href="setNumProcs.html">Setting the Number of Processes Page</a>.
+</p>
+
+<p>
 When you formally verify an MPI C/C++ program, the Browser View and the Analyzer View will both be
-opened and depending on what is specified in preferences either one may be brought to the foreground
+opened and depending on what is specified in preferences, either one may be brought to the foreground
 and given the active focus.
 </p>
 
-<h2>Browser Overview</h2>
+<ul>
+    <li>
+        Open the source code file in the Eclipse editor window and select
+        <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
+        from the trident pull-down icon on the Eclipse toolbar.
+    </li>
+    <li>
+        From the Project Explorer window, right click on the C source code file and select
+        <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
+        from the GEM context menu.
+    </li>
+    <li>
+        Open the source code file in the Eclipse editor window, right click in the editor window and select
+        <img height="16" src="images/trident.gif" width="13" /><b>Formally Verify MPI Program</b>
+        from the GEM context menu.
+    </li>
+</ul>
+
+<br>
+<center>
+<img src="images/runVerify.png">
+</center>
+<br><br>
+
+<h2 id="errorWarningLabel">Browser Overview</h2>
 <p>
-In the menu of this view there are three buttons
+This highly functional view is to summarize and categorically groups all of the errors and warnings found
+by GEM. Below are listings of the errors and warnings summarized by GEM's Browser View, along with a brief
+description. Each error or warning can be clicked and the developer is taken to the corresponding line in 
+the source code within the Eclipse editor.
 </p>
-	<ul>
-		<li>The <img src="images/terminate.gif"> Terminates the current operation</li>
-		<li>The <img src="images/save-file.gif"> Saves the results to a file</li>
-		<li>The <img src="images/help-contents.gif"> Opens this help page</li>
-	</ul>
 
 <p>
-The purpose of this view is to summarize and categorically group all of the errors and warnings found.
-At the top left is a brief summary of the results indicating the number of errors and warnings found.
-In the top right are users are provided with the ability to set the number of processes and run ISP.
+The image below shows what the Browser View should look like along with an explanation of its components.
 </p>
+
+<img src="images/browserIntegration.png" width="900" height="680"/>
 
 <p>
 Below the summary is a section containing a tab for category of error or warning that was found in the
@@ -51,24 +78,56 @@ error or warning in your code. Clicking on any of these occurrences will open th
 of code highlighted.  If there are no instances of the problem then there is a short message indicating as much.
 Furthermore, a user is shown which types of errors are presented via the icons of the tab.
 </p>
-	<ul>
-		<li>The <img src="images/no-error.gif"> indicates that there are no instances of that type of problem</li>
-		<li>The <img src="images/magnified-trident.gif"> tells the user that this problem is present in their code.</li>
-	</ul>
+<ul>
+	<li>
+		<img src="images/no-error.gif">
+		Indicates that there are no instances of this particular type of problem.
+	</li>
+	<li>
+		<img src="images/magnified-trident.gif">
+		Tells the user that this problem is present in their code.
+	</li>
+</ul>
 
 
-<h2>Errors Tab</h2>
-This tab is reserved for problems that cause the program to crash or deadlock.
+<h2>Deadlocks Tab</h2>
+This tab allows the user to visit all of the calls that did not complete due to a detected deadlock.
 
 <h2>Assertion Violations Tab</h2>
-This tab list all local assertion violations found.
+This tab list all local assertion violations found. CLicking any one of these will take the user to the line of 
+source code with the failed assertion.
 
-<h2>Leak Tab</h2>
-This tab list all MPI resource leaks found.
+<h2>Leaks Tab</h2>
+Clicking any of these will take the user to the line of source code where the corresponding un-freed MPI 
+resource was allocated (these are usually MPI communicators and MPI DataTypes).
 
 <h2>Irrelevant Barriers Tab</h2>
-This tab is reserved for Irrelevant Barriers or barriers that can be safely removed without changing the runtime
-behavior of the program (aside from possibly speeding the program up a little).
+This tab is reserved for Functionally Irrelevant Barriers. Clicking any these will take the user to the corresponding
+MPI_Barrier call itself, which can then be safely removed without changing the runtime behavior of the program.
+This could potentially serve to speed the application of in the absence of unnecessary synchronization.
+
+<h2>Type Mismatches Tab</h2>
+These are warnings about the send type not matching the receive type.
+
+<h3>Browser View Menu &#38; Toolbar Options</h3>
+<ul>
+	<li>
+		<img src="images/terminate.gif">
+		Terminate Operation - Forcibly terminates the current GEM operation
+	</li>
+	<li>
+		<img src="images/save-file.gif">
+		Save to File - Saves a listing of all results to a local text file.
+	</li>
+	<li>
+		<img src="images/help-contents.gif">
+		Get Browser Help - Opens the Eclipse help topic related to the Browser View page.
+	</li>
+</ul>
+
+<p>
+<b>Note:</b> This same functionality can be obtained through the context and pull-down menus for the view.
+</p>
 
 <p>&nbsp;</p>
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
