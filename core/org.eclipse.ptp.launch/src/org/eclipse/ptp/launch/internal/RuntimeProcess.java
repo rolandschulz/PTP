@@ -115,7 +115,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	public void terminate() throws DebugException {
 		if (!isTerminated()) {
 			try {
-				IPResourceManager rm = job.getQueue().getResourceManager();
+				IPResourceManager rm = job.getResourceManager();
 				rm.terminateJob(job);
 			} catch (CoreException e) {
 				throw new DebugException(e.getStatus());

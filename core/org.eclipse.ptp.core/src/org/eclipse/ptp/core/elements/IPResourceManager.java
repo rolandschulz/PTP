@@ -71,6 +71,16 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public String getDescription();
 
 	/**
+	 * Find a job object using its ID Returns null if no node is found.
+	 * 
+	 * @param id
+	 *            ID of the job object
+	 * @return job object corresponding to the ID
+	 * @since 4.0
+	 */
+	public IPJob getJobById(String id);
+
+	/**
 	 * Find a machine object using its ID Returns null if no machine is found.
 	 * 
 	 * @param id
@@ -112,16 +122,6 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	 * @return queue object corresponding to the ID
 	 */
 	public IPQueue getQueueById(String id);
-
-	/**
-	 * Find a queue object using its name attribute. Returns null if no queue is
-	 * found.
-	 * 
-	 * @param name
-	 *            name attribute of the queue object
-	 * @return queue object corresponding to the name
-	 */
-	public IPQueue getQueueByName(String name);
 
 	/**
 	 * Get an array containing all the queues known by this RM. If there are no
@@ -171,13 +171,10 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public void removeElementListener(IResourceManagerListener listener);
 
 	/**
-	 * Remove all terminated jobs from the given queue. A terminated job is
+	 * Remove all terminated jobs from the resource manager. A terminated job is
 	 * determined by its state attribute.
-	 * 
-	 * @param queue
-	 *            queue from which all terminated jobs will be removed
 	 */
-	public void removeTerminatedJobs(IPQueue queue);
+	public void removeTerminatedJobs();
 
 	/**
 	 * Shutdown the resource manager.

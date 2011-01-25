@@ -148,7 +148,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	 */
 	private void terminateJob(final IPJob job) {
 		try {
-			IPResourceManager rm = job.getQueue().getResourceManager();
+			IPResourceManager rm = job.getResourceManager();
 			rm.terminateJob(job);
 		} catch (CoreException e1) {
 			// Ignore, but log

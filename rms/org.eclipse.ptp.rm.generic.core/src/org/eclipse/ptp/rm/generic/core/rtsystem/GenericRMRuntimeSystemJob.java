@@ -22,7 +22,6 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -51,20 +50,17 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		final GenericRMRuntimeSystem rtSystem = (GenericRMRuntimeSystem) getRtSystem();
 		final IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID());
 		if (rm != null) {
-			final IPQueue queue = rm.getQueueById(getQueueID());
-			if (queue != null) {
-				final IPJob ipJob = queue.getJobById(getJobID());
-				if (ipJob != null) {
+			final IPJob ipJob = rm.getJobById(getJobID());
+			if (ipJob != null) {
 
-					/*
-					 * Mark all running and starting processes as finished.
-					 */
+				/*
+				 * Mark all running and starting processes as finished.
+				 */
 
-					AttributeManager attrMrg = new AttributeManager();
-					attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.COMPLETED));
-					final BitSet procJobRanks = ipJob.getProcessJobRanks();
-					rtSystem.changeProcesses(ipJob.getID(), procJobRanks, attrMrg);
-				}
+				AttributeManager attrMrg = new AttributeManager();
+				attrMrg.addAttribute(ProcessAttributes.getStateAttributeDefinition().create(ProcessAttributes.State.COMPLETED));
+				final BitSet procJobRanks = ipJob.getProcessJobRanks();
+				rtSystem.changeProcesses(ipJob.getID(), procJobRanks, attrMrg);
 			}
 		}
 	}
@@ -156,7 +152,7 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		 * Create processes for the job.
 		 */
 		final IPJob job = PTPCorePlugin.getDefault().getUniverse().getResourceManager(getRtSystem().getRmID())
-				.getQueueById(getQueueID()).getJobById(getJobID());
+				.getJobById(getJobID());
 		addProcess(job);
 
 		/*

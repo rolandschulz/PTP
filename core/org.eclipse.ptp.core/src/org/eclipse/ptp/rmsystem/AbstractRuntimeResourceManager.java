@@ -564,27 +564,16 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * .ptp.rtsystem.events.IRuntimeRemoveJobEvent)
 	 */
 	public void handleEvent(IRuntimeRemoveJobEvent e) {
-		Map<IPQueueControl, List<IPJobControl>> map = new HashMap<IPQueueControl, List<IPJobControl>>();
 		Set<IPJobControl> removedJobs = new HashSet<IPJobControl>();
 
 		for (String elementId : e.getElementIds()) {
 			IPJobControl job = getJobControl(elementId);
 			if (job != null) {
 				removedJobs.add(job);
-				IPQueueControl queue = job.getQueueControl();
-				List<IPJobControl> jobs = map.get(queue);
-				if (jobs == null) {
-					jobs = new ArrayList<IPJobControl>();
-					map.put(queue, jobs);
-				}
-				jobs.add(job);
 			}
 		}
 
-		for (Map.Entry<IPQueueControl, List<IPJobControl>> entry : map.entrySet()) {
-			final List<IPJobControl> job = entry.getValue();
-			removeJobs(entry.getKey(), job);
-		}
+		removeJobs(removedJobs);
 	}
 
 	/*
@@ -892,17 +881,15 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	}
 
 	@Override
-	protected List<IPJobControl> doRemoveTerminatedJobs(IPQueueControl queue) {
+	protected List<IPJobControl> doRemoveTerminatedJobs() {
 		List<IPJobControl> terminatedJobs = new ArrayList<IPJobControl>();
 
-		if (queue != null) {
-			for (IPJobControl job : queue.getJobControls()) {
-				if (job.getState() == JobAttributes.State.COMPLETED) {
-					terminatedJobs.add(job);
-				}
+		for (IPJobControl job : getJobControls()) {
+			if (job.getState() == JobAttributes.State.COMPLETED) {
+				terminatedJobs.add(job);
 			}
-			queue.removeJobs(terminatedJobs);
 		}
+		removeJobs(terminatedJobs);
 
 		return terminatedJobs;
 	}

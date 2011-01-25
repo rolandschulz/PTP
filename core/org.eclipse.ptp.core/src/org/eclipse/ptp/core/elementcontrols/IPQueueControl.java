@@ -43,14 +43,6 @@ public interface IPQueueControl extends IPElementControl, IPQueue {
 	public void addJobs(Collection<IPJobControl> jobs);
 
 	/**
-	 * Lookup a job from a job ID
-	 * 
-	 * @param job_id
-	 * @return job associated with the job ID
-	 */
-	public IPJobControl getJobControl(String job_id);
-
-	/**
 	 * Get all the jobs in this queue.
 	 * 
 	 * @return array of jobs

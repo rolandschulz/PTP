@@ -30,8 +30,8 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes.State;
@@ -155,12 +155,9 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		}
 		IPJob job = getJob();
 		if (job != null) {
-			IPQueue queue = job.getQueue();
-			if (queue != null) {
-				IPResourceManager rm = queue.getResourceManager();
-				if (rm != null) {
-					return rm.getName() + ": " + queue.getName() + ":" + job.getName(); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+			IPResourceManager rm = job.getResourceManager();
+			if (rm != null) {
+				return rm.getName() + ": " + job.getName(); //$NON-NLS-1$
 			}
 		}
 		return ""; //$NON-NLS-1$
@@ -273,7 +270,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public Image getImage(IElement element) {
 		IPJob job = getJob();
 		if (job != null) {
-			IPResourceManager rm = job.getQueue().getResourceManager();
+			IPResourceManager rm = job.getResourceManager();
 			final IRuntimeModelPresentation presentation = PTPUIPlugin.getDefault().getRuntimeModelPresentation(
 					rm.getResourceManagerId());
 			if (presentation != null) {
@@ -377,12 +374,12 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * @see org.eclipse.ptp.ui.IJobManager#removeAllStoppedJobs()
 	 */
 	public void removeAllStoppedJobs() {
-		Map<String, IPQueue> queues = new HashMap<String, IPQueue>();
+		Map<String, IPResourceManager> rms = new HashMap<String, IPResourceManager>();
 		for (IPJob job : getJobs()) {
-			IPQueue queue = job.getQueue();
-			if (!queues.containsKey(queue.getID())) {
-				queue.getResourceManager().removeTerminatedJobs(queue);
-				queues.put(queue.getID(), queue);
+			IPResourceManager rm = job.getResourceManager();
+			if (!rms.containsKey(rm.getID())) {
+				rm.removeTerminatedJobs();
+				rms.put(rm.getID(), rm);
 			}
 		}
 	}
@@ -499,7 +496,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	public void terminateJob() throws CoreException {
 		IPJob job = getJob();
 		if (job != null) {
-			job.getQueue().getResourceManager().terminateJob(job);
+			job.getResourceManager().terminateJob(job);
 		}
 	}
 

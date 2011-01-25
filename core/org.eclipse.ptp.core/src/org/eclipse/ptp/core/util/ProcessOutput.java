@@ -33,8 +33,7 @@ public class ProcessOutput {
 		/*
 		 * Derive a unique name for the output file
 		 */
-		String name = job.getQueue().getResourceManager().getName() + "_" + job.getQueue().getName() //$NON-NLS-1$
-				+ "_" + job.getName(); //$NON-NLS-1$
+		String name = job.getResourceManager().getName() + "_" + job.getName(); //$NON-NLS-1$
 
 		outputFile = new OutputTextFile(name, ProcessAttributes.getStdoutAttributeDefinition().getId(), outputDirPath, storeLines);
 

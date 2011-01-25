@@ -16,33 +16,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.core.elementcontrols;
 
-import java.util.Collection;
-
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
 public interface IResourceManagerControl extends IPResourceManager, IPElementControl {
-	/**
-	 * Add attributes to a collection of machines.
-	 * 
-	 * @param machines
-	 *            collection of IPMachineControl
-	 * @param attrs
-	 *            array of attributes to add to each machine
-	 */
-	public void addMachineAttributes(Collection<IPMachineControl> machines, IAttribute<?, ?, ?>[] attrs);
-
-	/**
-	 * Add attributes to a collection of queues.
-	 * 
-	 * @param queues
-	 *            collection of IPQueueControl
-	 * @param attrs
-	 *            array of attributes to add to each queue
-	 */
-	public void addQueueAttributes(Collection<IPQueueControl> queues, IAttribute<?, ?, ?>[] attrs);
-
 	/**
 	 * Safely dispose of this Resource Manager.
 	 */
@@ -54,22 +31,6 @@ public interface IResourceManagerControl extends IPResourceManager, IPElementCon
 	 * @return resource manager configuration
 	 */
 	public IResourceManagerConfiguration getConfiguration();
-
-	/**
-	 * Get the IPMachineControl interfaces for machines that this resource
-	 * manager knows about.
-	 * 
-	 * @return IPMachineControl interfaces
-	 */
-	public Collection<IPMachineControl> getMachineControls();
-
-	/**
-	 * Get the IPQueueControl interfaces for queues that this resource manager
-	 * knows about.
-	 * 
-	 * @return IPQueueControl interfaces
-	 */
-	public Collection<IPQueueControl> getQueueControls();
 
 	/**
 	 * Set the configuration for this resource manager. This will replace the

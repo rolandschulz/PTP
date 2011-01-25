@@ -47,8 +47,8 @@ import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.IPDebugger;
@@ -479,7 +479,7 @@ public class SDMDebugger implements IPDebugger {
 				if (progress.isCanceled()) {
 					throw newCoreException(Messages.SDMDebugger_Operation_canceled_by_user);
 				}
-				IPNode node = pJob.getQueue().getResourceManager().getNodeById(nodeId);
+				IPNode node = pJob.getResourceManager().getNodeById(nodeId);
 				if (node == null) {
 					throw newCoreException(Messages.SDMDebugger_15);
 				}
