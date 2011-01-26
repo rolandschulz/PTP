@@ -106,7 +106,8 @@ public class IspPreferencePage extends FieldEditorPreferencePage implements IWor
 			}
 
 			public void widgetSelected(SelectionEvent e) {
-				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.eclipse.ptp.gem.help/html/preferences.html#ispPrefs"); //$NON-NLS-1$
+				PlatformUI.getWorkbench().getHelpSystem()
+						.displayHelpResource("/org.eclipse.ptp.gem.help/html/preferences.html#ispPrefs"); //$NON-NLS-1$
 			}
 		});
 	}

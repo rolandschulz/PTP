@@ -269,6 +269,7 @@ public class GemConsole extends ViewPart {
 	public void write(String message) {
 		// this.txtConViewer.setText(this.txtConViewer.getText()+message);
 		this.txtConViewer.append(message);
+		this.txtConViewer.setTopIndex(this.txtConViewer.getLineCount() - 1);
 	}
 
 	/**
