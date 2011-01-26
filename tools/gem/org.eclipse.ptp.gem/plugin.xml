@@ -214,11 +214,6 @@
             id="org.eclipse.ptp.gem.commands.gemCommand"
             name="Formally Verify MPI Program">
       </command>
-      <command
-            categoryId="org.eclipse.ptp.gem.commands.category"
-            id="org.eclipse.ptp.gem.commands.consoleCommand"
-            name="Show GEM Console">
-      </command>
    </extension>
    
        
@@ -232,10 +227,6 @@
       <handler
             class="org.eclipse.ptp.gem.handlers.GemHandler"
             commandId="org.eclipse.ptp.gem.commands.gemCommand">
-      </handler>
-      <handler
-            class="org.eclipse.ptp.gem.handlers.GemHandler"
-            commandId="org.eclipse.ptp.gem.commands.consoleCommand">
       </handler>
    </extension>
    
@@ -265,11 +256,6 @@
                   commandId="org.eclipse.ptp.gem.commands.gemCommand"
                   icon="icons/trident.gif"
                   id="org.eclipse.ptp.gem.toolbar.menu.gemCommand">
-            </command>
-            <command
-                  commandId="org.eclipse.ptp.gem.commands.consoleCommand"
-                  icon="icons/magnified-trident.gif"
-                  id="org.eclipse.ptp.gem.toolbar.menu.consoleCommand">
             </command>
       </menuContribution>
     </extension>

@@ -77,16 +77,6 @@ public class GemHandler extends AbstractHandler {
 			return null;
 		}
 
-		// Likewise, if we are just opening the console, do so and break early
-		if (cmdString.equals("org.eclipse.ptp.gem.commands.consoleCommand")) { //$NON-NLS-1$
-			try {
-				page.showView(GemConsole.ID);
-			} catch (final PartInitException e) {
-				GemUtilities.logExceptionDetail(e);
-			}
-			return null;
-		}
-
 		// Otherwise do analysis, filter extension and do the work
 		final IEditorPart editor = page.getActiveEditor();
 		IFile inputFile = null;

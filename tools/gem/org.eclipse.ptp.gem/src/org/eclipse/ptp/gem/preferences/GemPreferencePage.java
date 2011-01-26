@@ -56,7 +56,6 @@ public class GemPreferencePage extends FieldEditorPreferencePage implements IWor
 		final Group prefGroup = new Group(fieldEditorParent, SWT.NULL);
 		prefGroup.setText(Messages.GemPreferencePage_0);
 		addField(new IntegerFieldEditor(PreferenceConstants.GEM_PREF_NUMPROCS, Messages.GemPreferencePage_1, prefGroup));
-		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_SHOWCON, Messages.GemPreferencePage_2, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_CLRCON, Messages.GemPreferencePage_3, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_COMPARE_OUTPUT, Messages.GemPreferencePage_6, prefGroup));
 		addField(new RadioGroupFieldEditor(PreferenceConstants.GEM_ACTIVE_VIEW, Messages.GemPreferencePage_5, 3,

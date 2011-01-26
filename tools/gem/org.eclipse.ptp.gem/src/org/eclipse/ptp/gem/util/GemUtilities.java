@@ -820,7 +820,6 @@ public class GemUtilities {
 	public static int runCommand(String command, boolean verbose) {
 		try {
 			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
-			final boolean showConsole = pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON);
 			process = Runtime.getRuntime().exec(command);
 			final StringBuffer stringBuffer = new StringBuffer();
 			String stdOut = ""; //$NON-NLS-1$
@@ -846,14 +845,14 @@ public class GemUtilities {
 					stringBuffer.append("\n"); //$NON-NLS-1$
 					consoleStdOutMessage += stdOut + "\n";//$NON-NLS-1$
 					if (!stdOutReader.ready()) {
-						updateConsole(verbose, showConsole);
+						updateConsole(verbose, true);
 						consoleStdOutMessage = "";//$NON-NLS-1$
 					}
 				}
 				stdOutResult = stringBuffer.toString();
 
 				// cleanup, send last few lines
-				updateConsole(verbose, showConsole);
+				updateConsole(verbose, true);
 
 				// read the process error stream
 				stringBuffer.setLength(0);
@@ -863,14 +862,14 @@ public class GemUtilities {
 					consoleStdErrMessage += stdErr + "\n";//$NON-NLS-1$
 
 					if (!stdErrReader.ready()) {
-						updateConsole(verbose, showConsole);
+						updateConsole(verbose, true);
 						consoleStdErrMessage = "";//$NON-NLS-1$
 					}
 				}
 				stdErrResult = stringBuffer.toString();
 
 				// cleanup, send last few lines
-				updateConsole(verbose, showConsole);
+				updateConsole(verbose, true);
 			} catch (final Exception e) {
 				logExceptionDetail(e);
 				return -1;
