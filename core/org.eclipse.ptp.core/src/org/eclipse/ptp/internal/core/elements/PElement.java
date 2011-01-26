@@ -35,11 +35,9 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	protected final AttributeManager attributeValues = new AttributeManager();
 	protected final String elementId;
 	protected final IPElementControl elementParent;
-	protected final int elementType;
 
-	protected PElement(String id, IPElementControl parent, int type, IAttribute<?, ?, ?>[] attrs) {
+	protected PElement(String id, IPElementControl parent, IAttribute<?, ?, ?>[] attrs) {
 		elementId = id;
-		elementType = type;
 		elementParent = parent;
 		ArrayList<IAttribute<?, ?, ?>> attrList = new ArrayList<IAttribute<?, ?, ?>>(Arrays.asList(attrs));
 		attrList.add(ElementAttributes.getIdAttributeDefinition().create(id));
@@ -135,16 +133,6 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 */
 	protected PElementInfo getElementInfo() {
 		return elementInfo;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elementcontrols.IPElementControl#getElementType()
-	 */
-	public int getElementType() {
-		return elementType;
 	}
 
 	/*

@@ -136,7 +136,7 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	private final Map<String, IPQueueControl> queuesById = Collections.synchronizedMap(new HashMap<String, IPQueueControl>());
 
 	public AbstractResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
-		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
+		super(id, universe, getDefaultAttributes(config));
 		this.config = config;
 
 		machineNodeListener = new IMachineChildListener() {
@@ -394,16 +394,6 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 */
 	public String getUniqueName() {
 		return getConfiguration().getUniqueName();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
-	 */
-	@Override
-	public boolean hasChildren() {
-		return getMachines().length > 0 || getQueues().length > 0;
 	}
 
 	/*

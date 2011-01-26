@@ -35,8 +35,8 @@ public abstract class Parent extends PElement {
 		Arrays.sort(elements);
 	}
 
-	public Parent(String id, IPElementControl parent, int type, IAttribute<?, ?, ?>[] attrs) {
-		super(id, parent, type, attrs);
+	public Parent(String id, IPElementControl parent, IAttribute<?, ?, ?>[] attrs) {
+		super(id, parent, attrs);
 	}
 
 	/**
@@ -67,15 +67,6 @@ public abstract class Parent extends PElement {
 	 */
 	protected IPElementControl[] getChildren() {
 		return getElementInfo().getChildren();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
-	 */
-	public boolean hasChildren() {
-		return getElementInfo().hasChildren();
 	}
 
 	/**
