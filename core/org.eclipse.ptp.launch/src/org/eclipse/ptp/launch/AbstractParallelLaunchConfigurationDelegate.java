@@ -76,7 +76,6 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
-import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
@@ -276,13 +275,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		}
 	}
 
-	private final class QueueChildListener implements IQueueChildListener {
+	private final class RMChildListener implements IResourceManagerChildListener {
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IChangedJobEvent)
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
 		 */
 		public void handleEvent(IChangedJobEvent e) {
 			// Handled by IJobListener
@@ -292,8 +291,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.INewJobEvent)
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
 		 */
 		public void handleEvent(INewJobEvent e) {
 			/*
@@ -326,18 +325,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
 		 */
 		public void handleEvent(IRemoveJobEvent e) {
 			for (IPJob job : e.getJobs()) {
 				job.removeElementListener(jobListener);
 			}
-		}
-	}
-
-	private final class RMChildListener implements IResourceManagerChildListener {
-		/*
+		} /*
 		 * (non-Javadoc)
 		 * 
 		 * @see
@@ -345,6 +340,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.
 		 * IResourceManagerChangedMachineEvent)
 		 */
+
 		public void handleEvent(IChangedMachineEvent e) {
 			// Don't need to do anything
 		}
@@ -380,9 +376,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
-			for (IPQueue queue : e.getQueues()) {
-				queue.addChildListener(queueChildListener);
-			}
 		}
 
 		/*
@@ -405,9 +398,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		 * IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
-			for (IPQueue queue : e.getQueues()) {
-				queue.removeChildListener(queueChildListener);
-			}
 		}
 	}
 
@@ -600,7 +590,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	private final IModelManagerChildListener modelManagerChildListener = new MMChildListener();
 	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
 	private final IResourceManagerListener resourceManagerListener = new RMListener();
-	private final IQueueChildListener queueChildListener = new QueueChildListener();
 	private final IJobListener jobListener = new JobListener();
 	/*
 	 * HashMap used to keep track of job submissions
@@ -618,9 +607,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
 		synchronized (mm) {
 			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				for (IPQueue queue : rm.getQueues()) {
-					queue.addChildListener(queueChildListener);
-				}
 				rm.addChildListener(resourceManagerChildListener);
 				rm.addElementListener(resourceManagerListener);
 			}

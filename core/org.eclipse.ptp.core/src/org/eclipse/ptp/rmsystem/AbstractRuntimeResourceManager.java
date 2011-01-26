@@ -206,33 +206,23 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public void handleEvent(IRuntimeJobChangeEvent e) {
 		ElementAttributeManager eMgr = e.getElementAttributeManager();
-		Map<IPQueueControl, List<IPJobControl>> map = new HashMap<IPQueueControl, List<IPJobControl>>();
+		List<IPJobControl> changedJobs = new ArrayList<IPJobControl>();
 
 		for (Map.Entry<RangeSet, AttributeManager> mgrEntry : eMgr.getEntrySet()) {
 			AttributeManager attrs = mgrEntry.getValue();
 			RangeSet jobIds = mgrEntry.getKey();
-			List<IPJobControl> changedJobs;
 
 			for (String elementId : jobIds) {
 				IPJobControl job = getJobControl(elementId);
 				if (job != null) {
-					IPQueueControl queue = job.getQueueControl();
-					changedJobs = map.get(queue);
-					if (changedJobs == null) {
-						changedJobs = new ArrayList<IPJobControl>();
-						map.put(queue, changedJobs);
-					}
 					changedJobs.add(job);
 				} else {
 					PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_7 + elementId);
 				}
 			}
 
-			for (Map.Entry<IPQueueControl, List<IPJobControl>> entry : map.entrySet()) {
-				doUpdateJobs(entry.getKey(), entry.getValue(), attrs);
-			}
-
-			map.clear();
+			doUpdateJobs(changedJobs, attrs);
+			changedJobs.clear();
 		}
 	}
 
@@ -302,42 +292,38 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	public void handleEvent(IRuntimeNewJobEvent e) {
 		IPQueueControl queue = getQueueControl(e.getParentId());
 
-		if (queue != null) {
-			ElementAttributeManager mgr = e.getElementAttributeManager();
-			Collection<IPJobControl> newJobs = new ArrayList<IPJobControl>();
+		ElementAttributeManager mgr = e.getElementAttributeManager();
+		Collection<IPJobControl> newJobs = new ArrayList<IPJobControl>();
 
-			for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
-				AttributeManager jobAttrs = entry.getValue();
+		for (Map.Entry<RangeSet, AttributeManager> entry : mgr.getEntrySet()) {
+			AttributeManager jobAttrs = entry.getValue();
 
-				RangeSet jobIds = entry.getKey();
+			RangeSet jobIds = entry.getKey();
 
-				for (String elementId : jobIds) {
-					IPJobControl job = getJobControl(elementId);
-					if (job == null) {
-						job = doCreateJob(queue, elementId, jobAttrs);
-						newJobs.add(job);
+			for (String elementId : jobIds) {
+				IPJobControl job = getJobControl(elementId);
+				if (job == null) {
+					job = doCreateJob(elementId, jobAttrs);
+					newJobs.add(job);
 
-						StringAttribute jobSubAttr = jobAttrs.getAttribute(JobAttributes.getSubIdAttributeDefinition());
-						if (jobSubAttr != null) {
-							/*
-							 * Notify any submitJob() calls that the job has
-							 * been created
-							 */
-							JobSubmission sub = jobSubmissions.remove(jobSubAttr.getValue());
-							if (sub != null) {
-								sub.setJob(job);
-								job.setLaunchConfiguration(sub.getLaunchConfiguration());
-								sub.setStatus(JobSubStatus.SUBMITTED);
-							}
+					StringAttribute jobSubAttr = jobAttrs.getAttribute(JobAttributes.getSubIdAttributeDefinition());
+					if (jobSubAttr != null) {
+						/*
+						 * Notify any submitJob() calls that the job has been
+						 * created
+						 */
+						JobSubmission sub = jobSubmissions.remove(jobSubAttr.getValue());
+						if (sub != null) {
+							sub.setJob(job);
+							job.setLaunchConfiguration(sub.getLaunchConfiguration());
+							sub.setStatus(JobSubStatus.SUBMITTED);
 						}
 					}
 				}
-
 			}
-			addJobs(queue, newJobs);
-		} else {
-			PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_0 + e.getParentId());
+
 		}
+		addJobs(queue, newJobs);
 	}
 
 	/*
@@ -810,8 +796,9 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * @param queue
 	 * @param jobId
 	 * @return
+	 * @since 5.0
 	 */
-	abstract protected IPJobControl doCreateJob(IPQueueControl queue, String jobId, AttributeManager attrs);
+	protected abstract IPJobControl doCreateJob(String jobId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the machine.
@@ -819,7 +806,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * @param machineId
 	 * @return
 	 */
-	abstract protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs);
+	protected abstract IPMachineControl doCreateMachine(String machineId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the node.
@@ -828,7 +815,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * @param nodeId
 	 * @return
 	 */
-	abstract protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs);
+	protected abstract IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually create the queue.
@@ -836,7 +823,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * @param queueId
 	 * @return
 	 */
-	abstract protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs);
+	protected abstract IPQueueControl doCreateQueue(String queueId, AttributeManager attrs);
 
 	/**
 	 * create a new runtime system
@@ -1012,11 +999,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	/**
 	 * Template pattern method to actually update the jobs.
 	 * 
-	 * @param job
+	 * @param jobs
 	 * @param attrs
 	 * @return changes were made
+	 * @since 5.0
 	 */
-	abstract protected boolean doUpdateJobs(IPQueueControl queue, Collection<IPJobControl> jobs, AttributeManager attrs);
+	protected abstract boolean doUpdateJobs(Collection<IPJobControl> jobs, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to actually update the machines.
@@ -1025,7 +1013,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * @param attrs
 	 * @return changes were made
 	 */
-	abstract protected boolean doUpdateMachines(Collection<IPMachineControl> machines, AttributeManager attrs);
+	protected abstract boolean doUpdateMachines(Collection<IPMachineControl> machines, AttributeManager attrs);
 
 	/**
 	 * Template pattern method to update a collection of nodes.

@@ -40,7 +40,7 @@ import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.attributes.StringAttributeDefinition;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
-import org.eclipse.ptp.core.elementcontrols.IPQueueControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.AttributeIndexSet;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
@@ -68,8 +68,8 @@ public class PJob extends Parent implements IPJobControl {
 	private final IPResourceManager fResourceManager;
 	private final Map<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> processAttributesMap = new HashMap<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>>();
 
-	public PJob(String id, IPResourceManager rm, IPQueueControl queue, IAttribute<?, ?, ?>[] attrs) {
-		super(id, queue, P_JOB, attrs);
+	public PJob(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
+		super(id, rm, P_JOB, attrs);
 
 		fResourceManager = rm;
 
@@ -498,15 +498,6 @@ public class PJob extends Parent implements IPJobControl {
 	public ProcessAttributes.State getProcessState(int processJobRank) {
 		final EnumeratedAttributeDefinition<ProcessAttributes.State> def = ProcessAttributes.getStateAttributeDefinition();
 		return getProcessAttributeValue(processJobRank, def);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPJobControl#getQueueControl()
-	 */
-	public IPQueueControl getQueueControl() {
-		return (IPQueueControl) getParent();
 	}
 
 	/*

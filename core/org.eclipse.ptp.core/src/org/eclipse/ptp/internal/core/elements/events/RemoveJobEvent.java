@@ -22,7 +22,7 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 
 /**
@@ -31,19 +31,18 @@ import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
  */
 public class RemoveJobEvent implements IRemoveJobEvent {
 
-	private final IPQueue queue;
+	private final IPResourceManager rm;
 	private final Collection<IPJob> jobs;
 
-	public RemoveJobEvent(IPQueue queue, Collection<IPJob> jobs) {
-		this.queue = queue;
+	public RemoveJobEvent(IPResourceManager rm, Collection<IPJob> jobs) {
+		this.rm = rm;
 		this.jobs = jobs;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent#getProcess()
+	 * @see org.eclipse.ptp.core.elements.events.IRemoveJobEvent#getJobs()
 	 */
 	public Collection<IPJob> getJobs() {
 		return jobs;
@@ -52,11 +51,10 @@ public class RemoveJobEvent implements IRemoveJobEvent {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.events.IQueueRemoveJobEvent#getSource()
+	 * @see org.eclipse.ptp.core.elements.events.IRemoveJobEvent#getSource()
 	 */
-	public IPQueue getSource() {
-		return queue;
+	public IPResourceManager getSource() {
+		return rm;
 	}
 
 }

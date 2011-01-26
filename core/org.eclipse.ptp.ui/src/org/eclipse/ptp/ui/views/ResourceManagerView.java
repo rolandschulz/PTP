@@ -78,7 +78,6 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
 import org.eclipse.ptp.core.elements.listeners.IMachineListener;
-import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
@@ -207,29 +206,7 @@ public class ResourceManagerView extends ViewPart {
 		}
 	}
 
-	private final class QueueListener implements IQueueListener, IQueueChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IChangedJobEvent)
-		 */
-		public void handleEvent(IChangedJobEvent e) {
-			updateViewer(e.getSource());
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.INewJobEvent)
-		 */
-		public void handleEvent(INewJobEvent e) {
-			refreshViewer(e.getSource());
-		}
-
+	private final class QueueListener implements IQueueListener {
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -240,18 +217,6 @@ public class ResourceManagerView extends ViewPart {
 		public void handleEvent(IQueueChangeEvent e) {
 			updateViewer(e.getSource());
 		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
-		 */
-		public void handleEvent(IRemoveJobEvent e) {
-			refreshViewer(e.getSource());
-		}
-
 	}
 
 	private class ResourceManagerLabelProvider extends WorkbenchLabelProvider {
@@ -339,6 +304,39 @@ public class ResourceManagerView extends ViewPart {
 				removeListeners(queue);
 			}
 			queues.clear();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
+		 */
+		public void handleEvent(IChangedJobEvent e) {
+			updateViewer(e.getSource());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
+		 */
+		public void handleEvent(INewJobEvent e) {
+			refreshViewer(e.getSource());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
+		 */
+		public void handleEvent(IRemoveJobEvent e) {
+			refreshViewer(e.getSource());
 		}
 
 		/*
@@ -460,7 +458,6 @@ public class ResourceManagerView extends ViewPart {
 		 */
 		private void addListeners(final IPQueue queue) {
 			queue.addElementListener(queueListener);
-			queue.addChildListener(queueListener);
 		}
 
 		/**
@@ -476,7 +473,6 @@ public class ResourceManagerView extends ViewPart {
 		 */
 		private void removeListeners(IPQueue queue) {
 			queue.removeElementListener(queueListener);
-			queue.removeChildListener(queueListener);
 		}
 	}
 

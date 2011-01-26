@@ -22,7 +22,7 @@ package org.eclipse.ptp.internal.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 
 /**
@@ -31,11 +31,11 @@ import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
  */
 public class ChangedJobEvent implements IChangedJobEvent {
 
-	private final IPQueue queue;
+	private final IPResourceManager rm;
 	private final Collection<IPJob> jobs;
 
-	public ChangedJobEvent(IPQueue queue, Collection<IPJob> jobs) {
-		this.queue = queue;
+	public ChangedJobEvent(IPResourceManager rm, Collection<IPJob> jobs) {
+		this.rm = rm;
 		this.jobs = jobs;
 	}
 
@@ -53,8 +53,8 @@ public class ChangedJobEvent implements IChangedJobEvent {
 	 * 
 	 * @see org.eclipse.ptp.core.elements.events.IChangedJobEvent#getSource()
 	 */
-	public IPQueue getSource() {
-		return queue;
+	public IPResourceManager getSource() {
+		return rm;
 	}
 
 }

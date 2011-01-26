@@ -81,6 +81,14 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public IPJob getJobById(String id);
 
 	/**
+	 * Get an array containing all the jobs known by this RM. If there are no
+	 * jobs, an empty array is returned.
+	 * 
+	 * @return array of jobs known by this RM
+	 */
+	public IPJob[] getJobs();
+
+	/**
 	 * Find a machine object using its ID Returns null if no machine is found.
 	 * 
 	 * @param id

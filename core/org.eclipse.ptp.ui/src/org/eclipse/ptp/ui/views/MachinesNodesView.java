@@ -33,7 +33,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.IPNode;
-import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
@@ -50,7 +49,6 @@ import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveNodeEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
-import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
@@ -85,91 +83,69 @@ import org.eclipse.ui.progress.WorkbenchJob;
  */
 public class MachinesNodesView extends ViewPart {
 
-	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
-
-	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
-
-	private final IMachineChildListener machineListener = new MachineChildListener();
-
-	private final IQueueChildListener queueChildListener = new QueueChildListener();
-
-	private final ArrayList<MachineGraphicalRepresentation> machinesGraphicalRepresentations = new ArrayList<MachineGraphicalRepresentation>();
-
-	private final Hashtable<String, NodeGraphicalRepresentation> nodesHashMap = new Hashtable<String, NodeGraphicalRepresentation>();
-
-	protected RefreshWorkbenchJob refreshWorkbench = new RefreshWorkbenchJob();
-
-	private MachineNodesCanvas canvas = null;
-	private Listener listener = null;
-	private Font defaultFont = null;
-	private Object elementSelected = null;
-
-	public MachinesNodesView() {
-		super();
-	}
-
-	@Override
-	public void createPartControl(final Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new FillLayout());
-		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		canvas = new MachineNodesCanvas(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		FontData[] fd = composite.getDisplay().getSystemFont().getFontData();
-		for (int i = 0; i < fd.length; i++) {
-			fd[i].setHeight(8);
+	private final class MachineChildListener implements IMachineChildListener {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IChangedNodeEvent)
+		 */
+		public void handleEvent(final IChangedNodeEvent e) {
 		}
-		defaultFont = new Font(composite.getDisplay(), fd);
 
 		/*
-		 * Wait until the view has been created before registering for events
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.INewNodeEvent)
 		 */
-		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
-
-		synchronized (mm) {
-			/*
-			 * Add us to any existing RM's. I guess it's possible we could miss
-			 * a RM if a new event arrives while we're doing this, but is it a
-			 * problem?
-			 */
-			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				rm.addChildListener(resourceManagerListener);
-				/*
-				 * We need to get the current state of the nodes on this
-				 * resource manager, browsing through the machines and adding
-				 * them to our view
-				 */
-				for (int i = 0; i < rm.getMachines().length; i++) {
-					IPMachine machine = rm.getMachines()[i];
-					machine.addChildListener(machineListener);
-					MachineGraphicalRepresentation machinegr = new MachineGraphicalRepresentation(machine.getName(),
-							machine.getID());
-					for (IPNode node : machine.getNodes()) {
+		public void handleEvent(final INewNodeEvent e) {
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					for (IPNode node : e.getNodes()) {
 						// create graphical representation of the node
 						NodeGraphicalRepresentation nodegr = new NodeGraphicalRepresentation(node.getName(), node.getID());
-						machinegr.addNode(nodegr);
-						machinesGraphicalRepresentations.add(machinegr);
+						// associate it with the correspondent IPMachine
+						for (MachineGraphicalRepresentation machine : machinesGraphicalRepresentations) {
+							if (machine.getMachineID().equals(node.getMachine().getID())) {
+								machine.addNode(nodegr);
+								nodesHashMap.put(node.getID(), nodegr);
+								break;
+							}
+						}
 					}
 				}
-			}
-			mm.addListener(modelManagerListener);
+			});
+			refreshView();
 		}
 
-		refreshView();
-	}
-
-	private void refreshView() {
-		refreshWorkbench.schedule(true, true);
-	}
-
-	/*
-	 * Method required so the class can extends ViewPart
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
-
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IMachineChildListener#handleEvent
+		 * (org.eclipse.ptp.core.elements.events.IRemoveNodeEvent)
+		 */
+		public void handleEvent(final IRemoveNodeEvent e) {
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					for (IPNode node : e.getNodes()) {
+						// delete the node graphical view on the corresponding
+						// IPMachine
+						for (MachineGraphicalRepresentation machine : machinesGraphicalRepresentations) {
+							if (machine.getMachineID().equals(node.getMachine().getID())) {
+								machine.removeNode(node.getID());
+								nodesHashMap.remove(node.getID());
+								break;
+							}
+						}
+					}
+				}
+			});
+			refreshView();
+		}
 	}
 
 	private class MachineGraphicalRepresentation {
@@ -182,6 +158,22 @@ public class MachinesNodesView extends ViewPart {
 		private Color color = null;
 		private boolean halted;
 		private boolean selected = false;
+
+		@SuppressWarnings("unused")
+		public MachineGraphicalRepresentation(String machineName, Color color, int Ox, int Oy) {
+			this.machineName = machineName;
+			this.color = color;
+			nodes = new ArrayList<NodeGraphicalRepresentation>();
+			rectangle = new Rectangle(Ox, Oy, WIDTH, HEIGHT);
+		}
+
+		@SuppressWarnings("unused")
+		public MachineGraphicalRepresentation(String machineName, Color color, int Ox, int Oy, int width, int height) {
+			this.machineName = machineName;
+			this.color = color;
+			nodes = new ArrayList<NodeGraphicalRepresentation>();
+			rectangle = new Rectangle(Ox, Oy, width, height);
+		}
 
 		public MachineGraphicalRepresentation(String machineName, String machineID) {
 			this.machineName = machineName;
@@ -201,32 +193,12 @@ public class MachinesNodesView extends ViewPart {
 			halted = false;
 		}
 
-		@SuppressWarnings("unused")
-		public MachineGraphicalRepresentation(String machineName, Color color, int Ox, int Oy, int width, int height) {
-			this.machineName = machineName;
-			this.color = color;
-			nodes = new ArrayList<NodeGraphicalRepresentation>();
-			rectangle = new Rectangle(Ox, Oy, width, height);
-		}
-
-		@SuppressWarnings("unused")
-		public MachineGraphicalRepresentation(String machineName, Color color, int Ox, int Oy) {
-			this.machineName = machineName;
-			this.color = color;
-			nodes = new ArrayList<NodeGraphicalRepresentation>();
-			rectangle = new Rectangle(Ox, Oy, WIDTH, HEIGHT);
+		public boolean addNode(NodeGraphicalRepresentation node) {
+			return nodes.add(node);
 		}
 
 		public boolean containsPoint(int x, int y) {
 			return rectangle.contains(x, y);
-		}
-
-		public String getMachineName() {
-			return machineName;
-		}
-
-		public Rectangle getGraphicalRepresentation() {
-			return rectangle;
 		}
 
 		@SuppressWarnings("unused")
@@ -234,13 +206,28 @@ public class MachinesNodesView extends ViewPart {
 			return color;
 		}
 
-		@SuppressWarnings("unused")
-		public void setColor(Color color) {
-			this.color = color;
+		public Rectangle getGraphicalRepresentation() {
+			return rectangle;
 		}
 
-		public boolean addNode(NodeGraphicalRepresentation node) {
-			return nodes.add(node);
+		public String getMachineID() {
+			return machineID;
+		}
+
+		public String getMachineName() {
+			return machineName;
+		}
+
+		public ArrayList<NodeGraphicalRepresentation> getNodes() {
+			return nodes;
+		}
+
+		public boolean isHalted() {
+			return halted;
+		}
+
+		public boolean isSelected() {
+			return selected;
 		}
 
 		@SuppressWarnings("unused")
@@ -257,102 +244,22 @@ public class MachinesNodesView extends ViewPart {
 			}
 		}
 
+		@SuppressWarnings("unused")
+		public void setColor(Color color) {
+			this.color = color;
+		}
+
 		public void setHalted(boolean halted) {
 			this.halted = halted;
-		}
-
-		public boolean isHalted() {
-			return halted;
-		}
-
-		public void setSelected(boolean selected) {
-			this.selected = selected;
-		}
-
-		public boolean isSelected() {
-			return selected;
-		}
-
-		public ArrayList<NodeGraphicalRepresentation> getNodes() {
-			return nodes;
 		}
 
 		public void setMachineID(String nodeID) {
 			this.machineID = nodeID;
 		}
 
-		public String getMachineID() {
-			return machineID;
-		}
-	}
-
-	private class NodeGraphicalRepresentation {
-		private Rectangle rectangle = null;
-		private String nodeName = ""; //$NON-NLS-1$
-		private String nodeID = ""; //$NON-NLS-1$
-		private static final int WIDTH = 20;
-		private static final int HEIGHT = 20;
-		private boolean selected = false;
-		private ArrayList<String> jobsIDs = null;
-
-		public NodeGraphicalRepresentation(String nodeName, String nodeID) {
-			this.nodeName = nodeName;
-			this.nodeID = nodeID;
-			rectangle = new Rectangle(0, 0, WIDTH, HEIGHT);
-			jobsIDs = new ArrayList<String>();
-		}
-
-		public String getNodeName() {
-			return nodeName;
-		}
-
-		public Rectangle getGraphicalRepresentation() {
-			return rectangle;
-		}
-
-		@SuppressWarnings("unused")
-		public void setGraphicalRepresentation(Rectangle ret) {
-			rectangle = ret;
-		}
-
-		@SuppressWarnings("unused")
-		public void setNodeID(String nodeID) {
-			this.nodeID = nodeID;
-		}
-
-		public String getNodeID() {
-			return nodeID;
-		}
-
-		public int getNumberOfJobs() {
-			return jobsIDs.size();
-		}
-
-		public void addJob(String jobID) {
-			if (!jobsIDs.contains(jobID))
-				jobsIDs.add(jobID);
-		}
-
-		public void removeJob(String jobID) {
-			jobsIDs.remove(jobID);
-		}
-
-		public ArrayList<String> getJobsIDs() {
-			return jobsIDs;
-		}
-
 		public void setSelected(boolean selected) {
 			this.selected = selected;
 		}
-
-		public boolean isSelected() {
-			return selected;
-		}
-
-		public boolean containsPoint(int x, int y) {
-			return rectangle.contains(x, y);
-		}
-
 	}
 
 	private class MachineNodesCanvas extends Canvas {
@@ -372,84 +279,6 @@ public class MachinesNodesView extends ViewPart {
 			if (getDisplay().getPrimaryMonitor() != null)
 				WIDTH = getDisplay().getPrimaryMonitor().getBounds().width;
 			installListeners();
-		}
-
-		protected void installListeners() {
-
-			listener = new Listener() {
-				public void handleEvent(Event event) {
-					switch (event.type) {
-					case SWT.Dispose:
-						// handleDispose(event);
-						break;
-					case SWT.KeyDown:
-						// handleKeyDown(event);
-						break;
-					case SWT.KeyUp:
-						// handleKeyUp(event);
-						break;
-					case SWT.MouseDown:
-						handleMouseDown(event);
-						break;
-					case SWT.MouseUp:
-						// handleMouseUp(event);
-						break;
-					case SWT.MouseDoubleClick:
-						// handleMouseDoubleClick(event);
-						break;
-					case SWT.MouseMove:
-						// handleMouseMove(event);
-						break;
-					case SWT.MouseHover:
-						// handleMouseHover(event);
-						break;
-					case SWT.Paint:
-						handlePaint(event);
-						break;
-					case SWT.Resize:
-						handleResize(event);
-						break;
-					case SWT.FocusOut:
-						// handleFocusOut(event);
-						break;
-					}
-				}
-			};
-			addListener(SWT.Dispose, listener);
-			addListener(SWT.KeyDown, listener);
-			addListener(SWT.KeyUp, listener);
-			addListener(SWT.MouseDown, listener);
-			addListener(SWT.MouseUp, listener);
-			addListener(SWT.MouseDoubleClick, listener);
-			addListener(SWT.MouseMove, listener);
-			addListener(SWT.MouseHover, listener);
-			addListener(SWT.Paint, listener);
-			addListener(SWT.Resize, listener);
-			addListener(SWT.FocusOut, listener);
-
-			verticalBar = this.getVerticalBar();
-			horizontalBar = this.getHorizontalBar();
-
-			if (horizontalBar != null) {
-				horizontalBar.addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event e) {
-						int hSelection = horizontalBar.getSelection();
-						origin.x = -hSelection;
-						redraw();
-					}
-				});
-			}
-
-			if (verticalBar != null) {
-				verticalBar.addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event e) {
-						int vSelection = verticalBar.getSelection();
-						origin.y = -vSelection;
-						redraw();
-					}
-				});
-			}
-
 		}
 
 		protected void handleMouseDown(Event e) {
@@ -487,30 +316,6 @@ public class MachinesNodesView extends ViewPart {
 				elementSelected = selection;
 				refreshView();
 			}
-		}
-
-		protected void handleResize(Event event) {
-			Rectangle rect = getBounds();
-			Rectangle client = getClientArea();
-			horizontalBar.setMaximum(WIDTH);
-			verticalBar.setMaximum(HEIGHT);
-			horizontalBar.setThumb(Math.min(rect.width, client.width));
-			verticalBar.setThumb(Math.min(rect.height, client.height));
-			int hPage = WIDTH - client.width;
-			int vPage = HEIGHT - client.height;
-			int hSelection = horizontalBar.getSelection();
-			int vSelection = verticalBar.getSelection();
-			if (hSelection >= hPage) {
-				if (hPage <= 0)
-					hSelection = 0;
-				origin.x = -hSelection;
-			}
-			if (vSelection >= vPage) {
-				if (vPage <= 0)
-					vSelection = 0;
-				origin.y = -vSelection;
-			}
-			redraw();
 		}
 
 		protected void handlePaint(Event event) {
@@ -711,138 +516,119 @@ public class MachinesNodesView extends ViewPart {
 			newGC.dispose();
 			imageBuffer.dispose();
 		}
-	}
 
-	private boolean machineRepresentationExists(String machineID) {
-		for (MachineGraphicalRepresentation machinegr : machinesGraphicalRepresentations)
-			if (machinegr.getMachineID().equals(machineID))
-				return true;
-		return false;
-	}
-
-	/*
-	 * Listener to take care of job events.
-	 */
-	private final class QueueChildListener implements IQueueChildListener {
-		public void handleEvent(IChangedJobEvent e) {
-			boolean needRefresh = false;
-			for (IPJob job : e.getJobs()) {
-				if ((job.getState() == JobAttributes.State.STARTING) || job.getState() == JobAttributes.State.RUNNING) {
-					/*
-					 * Add job to the graphical representation of its node
-					 */
-					final BitSet procJobRanks = job.getProcessJobRanks();
-					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-						final String nodeId = job.getProcessNodeId(procJobRank);
-						if (nodeId != null) {
-							nodesHashMap.get(nodeId).addJob(job.getID());
-							needRefresh = true;
-						}
-					}
-				} else {
-					/*
-					 * remove job from the graphical representation of its node
-					 */
-					final BitSet procJobRanks = job.getProcessJobRanks();
-					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-						final String nodeId = job.getProcessNodeId(procJobRank);
-						if (nodeId != null) {
-							nodesHashMap.get(nodeId).removeJob(job.getID());
-							needRefresh = true;
-						}
-					}
-				}
-				if (needRefresh) {
-					refreshView();
-				}
+		protected void handleResize(Event event) {
+			Rectangle rect = getBounds();
+			Rectangle client = getClientArea();
+			horizontalBar.setMaximum(WIDTH);
+			verticalBar.setMaximum(HEIGHT);
+			horizontalBar.setThumb(Math.min(rect.width, client.width));
+			verticalBar.setThumb(Math.min(rect.height, client.height));
+			int hPage = WIDTH - client.width;
+			int vPage = HEIGHT - client.height;
+			int hSelection = horizontalBar.getSelection();
+			int vSelection = verticalBar.getSelection();
+			if (hSelection >= hPage) {
+				if (hPage <= 0)
+					hSelection = 0;
+				origin.x = -hSelection;
 			}
+			if (vSelection >= vPage) {
+				if (vPage <= 0)
+					vSelection = 0;
+				origin.y = -vSelection;
+			}
+			redraw();
 		}
 
-		public void handleEvent(final INewJobEvent e) {
-			boolean needRefresh = false;
-			for (IPJob job : e.getJobs()) {
-				/*
-				 * Add job to the graphical representation of its node
-				 */
-				final BitSet procJobRanks = job.getProcessJobRanks();
-				for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-					final String nodeId = job.getProcessNodeId(procJobRank);
-					if (nodeId != null) {
-						nodesHashMap.get(nodeId).addJob(job.getID());
-						needRefresh = true;
-					}
-				}
-			}
-			if (needRefresh)
-				refreshView();
-		}
+		protected void installListeners() {
 
-		public void handleEvent(IRemoveJobEvent e) {
-			boolean needRefresh = false;
-			for (IPJob job : e.getJobs()) {
-				/*
-				 * remove job from the graphical representation of its node
-				 */
-				final BitSet procJobRanks = job.getProcessJobRanks();
-				for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
-					final String nodeId = job.getProcessNodeId(procJobRank);
-					if (nodeId != null) {
-						nodesHashMap.get(nodeId).removeJob(job.getID());
+			listener = new Listener() {
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Dispose:
+						// handleDispose(event);
+						break;
+					case SWT.KeyDown:
+						// handleKeyDown(event);
+						break;
+					case SWT.KeyUp:
+						// handleKeyUp(event);
+						break;
+					case SWT.MouseDown:
+						handleMouseDown(event);
+						break;
+					case SWT.MouseUp:
+						// handleMouseUp(event);
+						break;
+					case SWT.MouseDoubleClick:
+						// handleMouseDoubleClick(event);
+						break;
+					case SWT.MouseMove:
+						// handleMouseMove(event);
+						break;
+					case SWT.MouseHover:
+						// handleMouseHover(event);
+						break;
+					case SWT.Paint:
+						handlePaint(event);
+						break;
+					case SWT.Resize:
+						handleResize(event);
+						break;
+					case SWT.FocusOut:
+						// handleFocusOut(event);
 						break;
 					}
 				}
+			};
+			addListener(SWT.Dispose, listener);
+			addListener(SWT.KeyDown, listener);
+			addListener(SWT.KeyUp, listener);
+			addListener(SWT.MouseDown, listener);
+			addListener(SWT.MouseUp, listener);
+			addListener(SWT.MouseDoubleClick, listener);
+			addListener(SWT.MouseMove, listener);
+			addListener(SWT.MouseHover, listener);
+			addListener(SWT.Paint, listener);
+			addListener(SWT.Resize, listener);
+			addListener(SWT.FocusOut, listener);
+
+			verticalBar = this.getVerticalBar();
+			horizontalBar = this.getHorizontalBar();
+
+			if (horizontalBar != null) {
+				horizontalBar.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						int hSelection = horizontalBar.getSelection();
+						origin.x = -hSelection;
+						redraw();
+					}
+				});
 			}
-			if (needRefresh)
-				refreshView();
-		}
-	}
 
-	private final class MachineChildListener implements IMachineChildListener {
-		public void handleEvent(final IChangedNodeEvent e) {
-		}
-
-		public void handleEvent(final INewNodeEvent e) {
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					for (IPNode node : e.getNodes()) {
-						// create graphical representation of the node
-						NodeGraphicalRepresentation nodegr = new NodeGraphicalRepresentation(node.getName(), node.getID());
-						// associate it with the correspondent IPMachine
-						for (MachineGraphicalRepresentation machine : machinesGraphicalRepresentations) {
-							if (machine.getMachineID().equals(node.getMachine().getID())) {
-								machine.addNode(nodegr);
-								nodesHashMap.put(node.getID(), nodegr);
-								break;
-							}
-						}
+			if (verticalBar != null) {
+				verticalBar.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						int vSelection = verticalBar.getSelection();
+						origin.y = -vSelection;
+						redraw();
 					}
-				}
-			});
-			refreshView();
-		}
+				});
+			}
 
-		public void handleEvent(final IRemoveNodeEvent e) {
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					for (IPNode node : e.getNodes()) {
-						// delete the node graphical view on the corresponding
-						// IPMachine
-						for (MachineGraphicalRepresentation machine : machinesGraphicalRepresentations) {
-							if (machine.getMachineID().equals(node.getMachine().getID())) {
-								machine.removeNode(node.getID());
-								nodesHashMap.remove(node.getID());
-								break;
-							}
-						}
-					}
-				}
-			});
-			refreshView();
 		}
 	}
 
 	private final class MMChildListener implements IModelManagerChildListener {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
+		 */
 		public void handleEvent(IChangedResourceManagerEvent e) {
 			boolean needRefresh = false;
 			for (IPResourceManager rm : e.getResourceManagers()) {
@@ -884,6 +670,13 @@ public class MachinesNodesView extends ViewPart {
 
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
+		 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
+		 */
 		public void handleEvent(INewResourceManagerEvent e) {
 			/*
 			 * Add resource manager child listener so we get notified when new
@@ -893,6 +686,13 @@ public class MachinesNodesView extends ViewPart {
 			rm.addChildListener(resourceManagerListener);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
+		 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
+		 */
 		public void handleEvent(IRemoveResourceManagerEvent e) {
 			/*
 			 * Removed resource manager child listener when resource manager is
@@ -903,76 +703,76 @@ public class MachinesNodesView extends ViewPart {
 		}
 	}
 
-	private final class RMChildListener implements IResourceManagerChildListener {
+	private class NodeGraphicalRepresentation {
+		private Rectangle rectangle = null;
+		private String nodeName = ""; //$NON-NLS-1$
+		private String nodeID = ""; //$NON-NLS-1$
+		private static final int WIDTH = 20;
+		private static final int HEIGHT = 20;
+		private boolean selected = false;
+		private ArrayList<String> jobsIDs = null;
 
-		public void handleEvent(IChangedMachineEvent e) {
+		public NodeGraphicalRepresentation(String nodeName, String nodeID) {
+			this.nodeName = nodeName;
+			this.nodeID = nodeID;
+			rectangle = new Rectangle(0, 0, WIDTH, HEIGHT);
+			jobsIDs = new ArrayList<String>();
 		}
 
-		public void handleEvent(IChangedQueueEvent e) {
+		public void addJob(String jobID) {
+			if (!jobsIDs.contains(jobID))
+				jobsIDs.add(jobID);
 		}
 
-		public void handleEvent(final INewMachineEvent e) {
-			boolean needRefresh = false;
-			for (IPMachine machine : e.getMachines()) {
-				/*
-				 * check if the machine wasn't added already on the start of the
-				 * view
-				 */
-				if (!machineRepresentationExists(machine.getID())) {
-					/*
-					 * Add us as a child listener so we get notified of node
-					 * events
-					 */
-					machine.addChildListener(machineListener);
-					MachineGraphicalRepresentation machinegr = new MachineGraphicalRepresentation(machine.getName(),
-							machine.getID());
-					machinesGraphicalRepresentations.add(machinegr);
-					needRefresh = true;
-				}
-			}
-			// refresh if needed
-			if (needRefresh)
-				refreshView();
+		public boolean containsPoint(int x, int y) {
+			return rectangle.contains(x, y);
 		}
 
-		public void handleEvent(INewQueueEvent e) {
-			for (IPQueue queue : e.getQueues()) {
-				queue.addChildListener(queueChildListener);
-			}
+		public Rectangle getGraphicalRepresentation() {
+			return rectangle;
 		}
 
-		public void handleEvent(final IRemoveMachineEvent e) {
-			/*
-			 * Update views when a machine is removed.
-			 */
-			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
-				public void run() {
-					for (IPMachine machine : e.getMachines()) {
-						for (int i = 0; i < machinesGraphicalRepresentations.size(); i++) {
-							if (machinesGraphicalRepresentations.get(i).getMachineID().equals(machine.getID())) {
-								machinesGraphicalRepresentations.remove(i);
-								break;
-							}
-						}
-						/*
-						 * Remove child listener
-						 */
-						machine.removeChildListener(machineListener);
-					}
-
-				}
-			});
-			refreshView();
+		public ArrayList<String> getJobsIDs() {
+			return jobsIDs;
 		}
 
-		public void handleEvent(IRemoveQueueEvent e) {
-			for (IPQueue queue : e.getQueues()) {
-				queue.removeChildListener(queueChildListener);
-			}
+		public String getNodeID() {
+			return nodeID;
 		}
+
+		public String getNodeName() {
+			return nodeName;
+		}
+
+		public int getNumberOfJobs() {
+			return jobsIDs.size();
+		}
+
+		public boolean isSelected() {
+			return selected;
+		}
+
+		public void removeJob(String jobID) {
+			jobsIDs.remove(jobID);
+		}
+
+		@SuppressWarnings("unused")
+		public void setGraphicalRepresentation(Rectangle ret) {
+			rectangle = ret;
+		}
+
+		@SuppressWarnings("unused")
+		public void setNodeID(String nodeID) {
+			this.nodeID = nodeID;
+		}
+
+		public void setSelected(boolean selected) {
+			this.selected = selected;
+		}
+
 	}
 
-	class RefreshWorkbenchJob extends WorkbenchJob {
+	private class RefreshWorkbenchJob extends WorkbenchJob {
 		private final ReentrantLock waitLock = new ReentrantLock();
 		private final List<Boolean> refreshList = new ArrayList<Boolean>();
 
@@ -1004,31 +804,6 @@ public class MachinesNodesView extends ViewPart {
 			return Status.OK_STATUS;
 		}
 
-		@Override
-		public boolean shouldSchedule() {
-			int size = size();
-
-			return (size == 1);
-		}
-
-		private int size() {
-			waitLock.lock();
-			try {
-				return refreshList.size();
-			} finally {
-				waitLock.unlock();
-			}
-		}
-
-		private boolean isRefreshAll() {
-			waitLock.lock();
-			try {
-				return refreshList.get(refreshList.size() - 1).booleanValue();
-			} finally {
-				waitLock.unlock();
-			}
-		}
-
 		public void schedule(boolean refresh_all, boolean force) {
 			waitLock.lock();
 			try {
@@ -1040,5 +815,318 @@ public class MachinesNodesView extends ViewPart {
 			}
 			schedule();
 		}
+
+		@Override
+		public boolean shouldSchedule() {
+			int size = size();
+
+			return (size == 1);
+		}
+
+		private boolean isRefreshAll() {
+			waitLock.lock();
+			try {
+				return refreshList.get(refreshList.size() - 1).booleanValue();
+			} finally {
+				waitLock.unlock();
+			}
+		}
+
+		private int size() {
+			waitLock.lock();
+			try {
+				return refreshList.size();
+			} finally {
+				waitLock.unlock();
+			}
+		}
+	}
+
+	private final class RMChildListener implements IResourceManagerChildListener {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
+		 */
+		public void handleEvent(IChangedJobEvent e) {
+			boolean needRefresh = false;
+			for (IPJob job : e.getJobs()) {
+				if ((job.getState() == JobAttributes.State.STARTING) || job.getState() == JobAttributes.State.RUNNING) {
+					/*
+					 * Add job to the graphical representation of its node
+					 */
+					final BitSet procJobRanks = job.getProcessJobRanks();
+					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+						final String nodeId = job.getProcessNodeId(procJobRank);
+						if (nodeId != null) {
+							nodesHashMap.get(nodeId).addJob(job.getID());
+							needRefresh = true;
+						}
+					}
+				} else {
+					/*
+					 * remove job from the graphical representation of its node
+					 */
+					final BitSet procJobRanks = job.getProcessJobRanks();
+					for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+						final String nodeId = job.getProcessNodeId(procJobRank);
+						if (nodeId != null) {
+							nodesHashMap.get(nodeId).removeJob(job.getID());
+							needRefresh = true;
+						}
+					}
+				}
+				if (needRefresh) {
+					refreshView();
+				}
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #
+		 * handleEvent(org.eclipse.ptp.core.elements.events.IChangedMachineEvent
+		 * )
+		 */
+		public void handleEvent(IChangedMachineEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedQueueEvent)
+		 */
+		public void handleEvent(IChangedQueueEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
+		 */
+		public void handleEvent(final INewJobEvent e) {
+			boolean needRefresh = false;
+			for (IPJob job : e.getJobs()) {
+				/*
+				 * Add job to the graphical representation of its node
+				 */
+				final BitSet procJobRanks = job.getProcessJobRanks();
+				for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+					final String nodeId = job.getProcessNodeId(procJobRank);
+					if (nodeId != null) {
+						nodesHashMap.get(nodeId).addJob(job.getID());
+						needRefresh = true;
+					}
+				}
+			}
+			if (needRefresh)
+				refreshView();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewMachineEvent)
+		 */
+		public void handleEvent(final INewMachineEvent e) {
+			boolean needRefresh = false;
+			for (IPMachine machine : e.getMachines()) {
+				/*
+				 * check if the machine wasn't added already on the start of the
+				 * view
+				 */
+				if (!machineRepresentationExists(machine.getID())) {
+					/*
+					 * Add us as a child listener so we get notified of node
+					 * events
+					 */
+					machine.addChildListener(machineListener);
+					MachineGraphicalRepresentation machinegr = new MachineGraphicalRepresentation(machine.getName(),
+							machine.getID());
+					machinesGraphicalRepresentations.add(machinegr);
+					needRefresh = true;
+				}
+			}
+			// refresh if needed
+			if (needRefresh)
+				refreshView();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
+		 */
+		public void handleEvent(INewQueueEvent e) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
+		 */
+		public void handleEvent(IRemoveJobEvent e) {
+			boolean needRefresh = false;
+			for (IPJob job : e.getJobs()) {
+				/*
+				 * remove job from the graphical representation of its node
+				 */
+				final BitSet procJobRanks = job.getProcessJobRanks();
+				for (Integer procJobRank : new BitSetIterable(procJobRanks)) {
+					final String nodeId = job.getProcessNodeId(procJobRank);
+					if (nodeId != null) {
+						nodesHashMap.get(nodeId).removeJob(job.getID());
+						break;
+					}
+				}
+			}
+			if (needRefresh)
+				refreshView();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #
+		 * handleEvent(org.eclipse.ptp.core.elements.events.IRemoveMachineEvent)
+		 */
+		public void handleEvent(final IRemoveMachineEvent e) {
+			/*
+			 * Update views when a machine is removed.
+			 */
+			UIUtils.safeRunAsyncInUIThread(new SafeRunnable() {
+				public void run() {
+					for (IPMachine machine : e.getMachines()) {
+						for (int i = 0; i < machinesGraphicalRepresentations.size(); i++) {
+							if (machinesGraphicalRepresentations.get(i).getMachineID().equals(machine.getID())) {
+								machinesGraphicalRepresentations.remove(i);
+								break;
+							}
+						}
+						/*
+						 * Remove child listener
+						 */
+						machine.removeChildListener(machineListener);
+					}
+
+				}
+			});
+			refreshView();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveQueueEvent)
+		 */
+		public void handleEvent(IRemoveQueueEvent e) {
+		}
+	}
+
+	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
+	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
+	private final IMachineChildListener machineListener = new MachineChildListener();
+	private final ArrayList<MachineGraphicalRepresentation> machinesGraphicalRepresentations = new ArrayList<MachineGraphicalRepresentation>();
+	private final Hashtable<String, NodeGraphicalRepresentation> nodesHashMap = new Hashtable<String, NodeGraphicalRepresentation>();
+
+	protected RefreshWorkbenchJob refreshWorkbench = new RefreshWorkbenchJob();
+	private MachineNodesCanvas canvas = null;
+	private Listener listener = null;
+	private Font defaultFont = null;
+	private Object elementSelected = null;
+
+	public MachinesNodesView() {
+		super();
+	}
+
+	@Override
+	public void createPartControl(final Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new FillLayout());
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		composite.setBackground(composite.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		canvas = new MachineNodesCanvas(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		FontData[] fd = composite.getDisplay().getSystemFont().getFontData();
+		for (int i = 0; i < fd.length; i++) {
+			fd[i].setHeight(8);
+		}
+		defaultFont = new Font(composite.getDisplay(), fd);
+
+		/*
+		 * Wait until the view has been created before registering for events
+		 */
+		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
+
+		synchronized (mm) {
+			/*
+			 * Add us to any existing RM's. I guess it's possible we could miss
+			 * a RM if a new event arrives while we're doing this, but is it a
+			 * problem?
+			 */
+			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
+				rm.addChildListener(resourceManagerListener);
+				/*
+				 * We need to get the current state of the nodes on this
+				 * resource manager, browsing through the machines and adding
+				 * them to our view
+				 */
+				for (int i = 0; i < rm.getMachines().length; i++) {
+					IPMachine machine = rm.getMachines()[i];
+					machine.addChildListener(machineListener);
+					MachineGraphicalRepresentation machinegr = new MachineGraphicalRepresentation(machine.getName(),
+							machine.getID());
+					for (IPNode node : machine.getNodes()) {
+						// create graphical representation of the node
+						NodeGraphicalRepresentation nodegr = new NodeGraphicalRepresentation(node.getName(), node.getID());
+						machinegr.addNode(nodegr);
+						machinesGraphicalRepresentations.add(machinegr);
+					}
+				}
+			}
+			mm.addListener(modelManagerListener);
+		}
+
+		refreshView();
+	}
+
+	/*
+	 * Method required so the class can extends ViewPart
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
+	@Override
+	public void setFocus() {
+
+	}
+
+	private boolean machineRepresentationExists(String machineID) {
+		for (MachineGraphicalRepresentation machinegr : machinesGraphicalRepresentations)
+			if (machinegr.getMachineID().equals(machineID))
+				return true;
+		return false;
+	}
+
+	private void refreshView() {
+		refreshWorkbench.schedule(true, true);
 	}
 }

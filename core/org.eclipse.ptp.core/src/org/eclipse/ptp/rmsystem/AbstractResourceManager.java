@@ -85,7 +85,6 @@ import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IMachineChildListener;
-import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
 import org.eclipse.ptp.core.messages.Messages;
@@ -94,10 +93,13 @@ import org.eclipse.ptp.internal.core.elements.PMachine;
 import org.eclipse.ptp.internal.core.elements.PNode;
 import org.eclipse.ptp.internal.core.elements.PQueue;
 import org.eclipse.ptp.internal.core.elements.Parent;
+import org.eclipse.ptp.internal.core.elements.events.ChangedJobEvent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.ChangedQueueEvent;
+import org.eclipse.ptp.internal.core.elements.events.NewJobEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.NewQueueEvent;
+import org.eclipse.ptp.internal.core.elements.events.RemoveJobEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveMachineEvent;
 import org.eclipse.ptp.internal.core.elements.events.RemoveQueueEvent;
 import org.eclipse.ptp.internal.core.elements.events.ResourceManagerChangeEvent;
@@ -131,30 +133,12 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 
 	private final Map<String, IPMachineControl> machinesById = Collections.synchronizedMap(new HashMap<String, IPMachineControl>());
 	private final Map<String, IPNodeControl> nodesById = Collections.synchronizedMap(new HashMap<String, IPNodeControl>());
-	private final IQueueChildListener queueJobListener;
 	private final Map<String, IPQueueControl> queuesById = Collections.synchronizedMap(new HashMap<String, IPQueueControl>());
 
 	public AbstractResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id, universe, P_RESOURCE_MANAGER, getDefaultAttributes(config));
 		this.config = config;
 
-		queueJobListener = new IQueueChildListener() {
-			public void handleEvent(IChangedJobEvent e) {
-				// OK to ignore
-			}
-
-			public void handleEvent(INewJobEvent e) {
-				// OK to ignore
-			}
-
-			public void handleEvent(IRemoveJobEvent e) {
-				synchronized (jobsById) {
-					for (IPJob job : e.getJobs()) {
-						jobsById.remove(job.getID());
-					}
-				}
-			}
-		};
 		machineNodeListener = new IMachineChildListener() {
 			public void handleEvent(IChangedNodeEvent e) {
 				// OK to ignore
@@ -289,6 +273,34 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * org.eclipse.ptp.core.elements.IPResourceManager#getJobById(java.lang.
+	 * String)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IPJob getJobById(String id) {
+		synchronized (jobsById) {
+			return jobsById.get(id);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.elements.IPResourceManager#getJobs()
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public IPJob[] getJobs() {
+		return getJobControls().toArray(new IPJobControl[0]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * org.eclipse.ptp.core.elements.IPResourceManager#getMachineById(java.lang
 	 * .String)
 	 */
@@ -330,22 +342,6 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	public IPNode getNodeById(String id) {
 		synchronized (nodesById) {
 			return nodesById.get(id);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#getJobById(java.lang.
-	 * String)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public IPJob getJobById(String id) {
-		synchronized (jobsById) {
-			return jobsById.get(id);
 		}
 	}
 
@@ -569,6 +565,17 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 		doTerminateJob(job);
 	}
 
+	private void addJobAttributes(Collection<IPJobControl> jobControls, IAttribute<?, ?, ?>[] attrs) {
+		List<IPJob> jobs = new ArrayList<IPJob>(jobControls.size());
+
+		for (IPJobControl job : jobControls) {
+			job.addAttributes(attrs);
+			jobs.add(job);
+		}
+
+		fireChangedJobs(jobs);
+	}
+
 	private void addMachineAttributes(Collection<IPMachineControl> machineControls, IAttribute<?, ?, ?>[] attrs) {
 		List<IPMachine> machines = new ArrayList<IPMachine>(machineControls.size());
 
@@ -605,39 +612,6 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 		}
 	}
 
-	protected Collection<IPMachineControl> getMachineControls() {
-		synchronized (machinesById) {
-			List<IPMachineControl> machines = new ArrayList<IPMachineControl>(machinesById.values().size());
-			for (IPMachineControl machine : machinesById.values()) {
-				machines.add(machine);
-			}
-			return machines;
-		}
-	}
-
-	protected Collection<IPQueueControl> getQueueControls() {
-		synchronized (queuesById) {
-			List<IPQueueControl> queues = new ArrayList<IPQueueControl>(queuesById.values().size());
-			for (IPQueueControl queue : queuesById.values()) {
-				queues.add(queue);
-			}
-			return queues;
-		}
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	protected Collection<IPJobControl> getJobControls() {
-		synchronized (jobsById) {
-			List<IPJobControl> jobs = new ArrayList<IPJobControl>(jobsById.values().size());
-			for (IPJobControl job : jobsById.values()) {
-				jobs.add(job);
-			}
-			return jobs;
-		}
-	}
-
 	/**
 	 * Helper method to get the state attribute for this RM
 	 * 
@@ -669,18 +643,48 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 
 	/**
 	 * Add a collection of jobs to the model. This will result in a INewJobEvent
-	 * being propagated to listeners on the queue.
+	 * being propagated to listeners on the RM. Supports either the old
+	 * hierarchy where a parent queue is supplied, or each job can contain a
+	 * queue attribute specifying the job queue.
 	 * 
 	 * @param queue
+	 *            jobs will be added to the queue if specified
 	 * @param jobs
+	 *            collection of jobs to add
 	 */
-	protected void addJobs(IPQueueControl queue, Collection<IPJobControl> jobs) {
+	protected void addJobs(IPQueueControl queue, Collection<IPJobControl> jobControls) {
+		Map<IPQueueControl, List<IPJobControl>> map = new HashMap<IPQueueControl, List<IPJobControl>>();
+		List<IPJob> jobs = new ArrayList<IPJob>(jobControls.size());
 
-		for (IPJobControl job : jobs) {
+		for (IPJobControl job : jobControls) {
+			StringAttribute queueIdAttr = job.getAttribute(JobAttributes.getQueueIdAttributeDefinition());
+			if (queueIdAttr != null) {
+				IPQueueControl jQueue = getQueueControl(queueIdAttr.getValue());
+				List<IPJobControl> qJobs = map.get(jQueue);
+				if (qJobs == null) {
+					qJobs = new ArrayList<IPJobControl>();
+					map.put(queue, qJobs);
+				}
+			}
 			jobsById.put(job.getID(), job);
+			jobs.add(job);
 		}
 
-		queue.addJobs(jobs);
+		/*
+		 * Add jobs to any queues that were specified as attributes on the job
+		 */
+		for (Map.Entry<IPQueueControl, List<IPJobControl>> entry : map.entrySet()) {
+			entry.getKey().addJobs(entry.getValue());
+		}
+
+		/*
+		 * Add jobs to the parent queue if supplied
+		 */
+		if (queue != null) {
+			queue.addJobs(jobControls);
+		}
+
+		fireNewJobs(jobs);
 	}
 
 	/**
@@ -772,7 +776,6 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 		synchronized (queuesById) {
 			for (IPQueueControl queue : queueControls) {
 				queuesById.put(queue.getID(), queue);
-				queue.addChildListener(queueJobListener);
 				queues.add(queue);
 			}
 		}
@@ -877,6 +880,21 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	protected abstract void doTerminateJob(IPJob job) throws CoreException;
 
 	/**
+	 * Send IChangedJobEvent to registered listeners
+	 * 
+	 * @param jobs
+	 *            jobs that have changed
+	 * @since 5.0
+	 */
+	protected void fireChangedJobs(Collection<IPJob> jobs) {
+		IChangedJobEvent e = new ChangedJobEvent(this, jobs);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener) listener).handleEvent(e);
+		}
+	}
+
+	/**
 	 * Propagate IChangedMachineEvent to listener
 	 * 
 	 * @param machine
@@ -918,6 +936,21 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	}
 
 	/**
+	 * Send INewJobEvent to registered listeners
+	 * 
+	 * @param jobs
+	 *            new jobs
+	 * @since 5.0
+	 */
+	protected void fireNewJobs(Collection<IPJob> jobs) {
+		INewJobEvent e = new NewJobEvent(this, jobs);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener) listener).handleEvent(e);
+		}
+	}
+
+	/**
 	 * Propagate a IResourceManagerNewMachinesEvent to listeners.
 	 * 
 	 * @param machines
@@ -936,6 +969,21 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 */
 	protected void fireNewQueues(Collection<IPQueue> queues) {
 		INewQueueEvent e = new NewQueueEvent(this, queues);
+
+		for (Object listener : childListeners.getListeners()) {
+			((IResourceManagerChildListener) listener).handleEvent(e);
+		}
+	}
+
+	/**
+	 * Send IRemoveJobEvent to registered listeners
+	 * 
+	 * @param job
+	 *            removed jobs
+	 * @since 5.0
+	 */
+	protected void fireRemoveJobs(Collection<IPJob> jobs) {
+		IRemoveJobEvent e = new RemoveJobEvent(this, jobs);
 
 		for (Object listener : childListeners.getListeners()) {
 			((IResourceManagerChildListener) listener).handleEvent(e);
@@ -989,12 +1037,35 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	}
 
 	/**
+	 * @since 5.0
+	 */
+	protected Collection<IPJobControl> getJobControls() {
+		synchronized (jobsById) {
+			List<IPJobControl> jobs = new ArrayList<IPJobControl>(jobsById.values().size());
+			for (IPJobControl job : jobsById.values()) {
+				jobs.add(job);
+			}
+			return jobs;
+		}
+	}
+
+	/**
 	 * @param machineId
 	 * @return
 	 */
 	protected IPMachineControl getMachineControl(String machineId) {
 		synchronized (machinesById) {
 			return machinesById.get(machineId);
+		}
+	}
+
+	protected Collection<IPMachineControl> getMachineControls() {
+		synchronized (machinesById) {
+			List<IPMachineControl> machines = new ArrayList<IPMachineControl>(machinesById.values().size());
+			for (IPMachineControl machine : machinesById.values()) {
+				machines.add(machine);
+			}
+			return machines;
 		}
 	}
 
@@ -1018,6 +1089,16 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 		}
 	}
 
+	protected Collection<IPQueueControl> getQueueControls() {
+		synchronized (queuesById) {
+			List<IPQueueControl> queues = new ArrayList<IPQueueControl>(queuesById.values().size());
+			for (IPQueueControl queue : queuesById.values()) {
+				queues.add(queue);
+			}
+			return queues;
+		}
+	}
+
 	/**
 	 * @param string
 	 * @return
@@ -1030,16 +1111,15 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	/**
 	 * Helper method to create a new job.
 	 * 
-	 * @param queue
-	 *            queue that this job belongs to
 	 * @param jobId
 	 *            job ID for the job
 	 * @param attrs
 	 *            initial attributes for the job
 	 * @return newly created job model element
+	 * @since 5.0
 	 */
-	protected IPJobControl newJob(IPQueueControl queue, String jobId, AttributeManager attrs) {
-		return new PJob(jobId, this, queue, attrs.getAttributes());
+	protected IPJobControl newJob(String jobId, AttributeManager attrs) {
+		return new PJob(jobId, this, attrs.getAttributes());
 	}
 
 	/**
@@ -1088,24 +1168,24 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 * @since 5.0
 	 */
 	protected void removeJobs(Collection<IPJobControl> jobControls) {
-		Map<IPQueueControl, List<IPJobControl>> map = new HashMap<IPQueueControl, List<IPJobControl>>();
+		List<IPJob> jobs = new ArrayList<IPJob>(jobControls.size());
+
 		synchronized (jobsById) {
 			for (IPJobControl job : jobControls) {
 				job.removeProcessesByJobRanks(job.getProcessJobRanks());
-				IPQueueControl queue = job.getQueueControl();
-				if (queue != null) {
-					List<IPJobControl> jobs = map.get(queue);
-					if (jobs == null) {
-						jobs = new ArrayList<IPJobControl>();
-						map.put(queue, jobs);
-					}
-				}
 				jobsById.remove(job.getID());
+				jobs.add(job);
 			}
 		}
-		for (Map.Entry<IPQueueControl, List<IPJobControl>> entry : map.entrySet()) {
-			entry.getKey().removeJobs(entry.getValue());
+
+		/*
+		 * Remove jobs from any queues
+		 */
+		for (IPQueueControl queue : getQueueControls()) {
+			queue.removeJobs(jobControls);
 		}
+
+		fireRemoveJobs(jobs);
 	}
 
 	/**
@@ -1149,7 +1229,6 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 		synchronized (queuesById) {
 			for (IPQueueControl queue : queueControls) {
 				queue.removeJobs(queue.getJobControls());
-				queue.removeChildListener(queueJobListener);
 				queuesById.remove(queue.getID());
 				queues.add(queue);
 			}
@@ -1174,16 +1253,15 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	/**
 	 * Update attributes on a collection of jobs.
 	 * 
-	 * @param queue
-	 *            parent of jobs
 	 * @param jobs
 	 *            jobs to update
 	 * @param attrs
 	 *            attributes to update
 	 * @return true if updated
+	 * @since 5.0
 	 */
-	protected boolean updateJobs(IPQueueControl queue, Collection<IPJobControl> jobs, AttributeManager attrs) {
-		queue.addJobAttributes(jobs, attrs.getAttributes());
+	protected boolean updateJobs(Collection<IPJobControl> jobs, AttributeManager attrs) {
+		addJobAttributes(jobs, attrs.getAttributes());
 		return true;
 	}
 

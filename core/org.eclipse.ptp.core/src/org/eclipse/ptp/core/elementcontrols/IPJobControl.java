@@ -45,13 +45,6 @@ public interface IPJobControl extends IPElementControl, IPJob {
 	public void addProcessesByJobRanks(BitSet jobRanks, AttributeManager attrs);
 
 	/**
-	 * Get the parent of this job
-	 * 
-	 * @return parent queue
-	 */
-	public IPQueueControl getQueueControl();
-
-	/**
 	 * Remove processes from the job
 	 * 
 	 * @param jobRanks

@@ -20,20 +20,9 @@ package org.eclipse.ptp.core.elementcontrols;
 
 import java.util.Collection;
 
-import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPQueue;
 
 public interface IPQueueControl extends IPElementControl, IPQueue {
-	/**
-	 * Add attributes to a collection of jobs.
-	 * 
-	 * @param jobs
-	 *            collection of IJobControls
-	 * @param attrs
-	 *            array of attributes to add to each job
-	 */
-	public void addJobAttributes(Collection<IPJobControl> jobs, IAttribute<?, ?, ?>[] attrs);
-
 	/**
 	 * Add the collection of jobs to the queue.
 	 * 

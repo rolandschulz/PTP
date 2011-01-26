@@ -19,7 +19,7 @@ package org.eclipse.ptp.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 
 /**
  * This event is generated when one or more new jobs are created. It is a bulk
@@ -40,6 +40,7 @@ public interface INewJobEvent {
 	 * Get the source of this event.
 	 * 
 	 * @return the source of the event
+	 * @since 5.0
 	 */
-	public IPQueue getSource();
+	public IPResourceManager getSource();
 }
