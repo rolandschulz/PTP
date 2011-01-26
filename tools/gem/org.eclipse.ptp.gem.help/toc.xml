@@ -9,6 +9,7 @@
     <topic label="Analyzer View" href="html/analyzerView.html" />
     <topic label="Browser View" href="html/browserView.html" />
     <topic label="Console View"  href="html/consoleView.html"/>    
+    <topic label="Understanding Console Output"  href="html/output.html"/>  
     <topic label="Happens Before (HB) Viewer" href="html/happensBeforeViewer.html" />
     <topic label="Makefile Support" href="html/makefileSupport.html" />
     <topic label="Preferences"  href="html/preferences.html"/>

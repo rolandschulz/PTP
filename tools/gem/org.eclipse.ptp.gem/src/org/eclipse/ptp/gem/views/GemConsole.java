@@ -231,7 +231,7 @@ public class GemConsole extends ViewPart {
 		this.getHelpAction = new Action() {
 			@Override
 			public void run() {
-				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.eclipse.ptp.gem.help/html/output.html"); //$NON-NLS-1$
+				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.eclipse.ptp.gem.help/html/consoleView.html"); //$NON-NLS-1$
 			}
 		};
 		this.getHelpAction.setToolTipText(Messages.GemConsole_10);

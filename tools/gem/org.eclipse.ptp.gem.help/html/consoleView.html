@@ -22,43 +22,19 @@
 <hr>
 
 <h2>Activating the Console View</h2>
-<p>
-When one of the following steps is executed, the Console View will automatically be brought to the foreground and given active focus.
-Any of the following will accomplish this:
-</p>
-
-<ul>
-    <li>
-        Open the source code file in the Eclipse editor window, right click in the editor window and select
-        <img height="16" src="images/magnified-trident.gif" width="13" /><b>View GEM Console Output</b>
-        from the trident pull-down icon on the Eclipse toolbar.
-    </li>
-    <li>
-        From the Project Explorer window, right click on the C source code file and select
-        <img height="16" src="images/magnified-trident.gif" width="13" /><b>View GEM Console Output</b>
-        from the GEM context menu.
-    </li>
-    <li>
-        Open the source code file in the Eclipse editor window and right click
-        <img height="16" src="images/magnified-trident.gif" width="13" /><b>View GEM Console Output</b>
-        from the GEM context menu.
-    </li>
-</ul>
-
-<br>
-<center>
-<img src="images/runConsole.png">
-</center>
-<br>
 
 <p>
-<b>NOTE:</b> The Console View will also be opened up anytime GEM is run and the Analyzer View is opened.
+The Console View is opened automatically when GEM is run. This allows the user to see progress as GEM runs and
+also gives the user a chance to cancel long running operations. Once a GEM verification run is complete, the
+view with the active focus will visible &#40;see the GEM <a href=preferences.html#gemPrefs>Preference Page</a>
+for details&#41;.
 </p>
 
 <h2>Console Overview</h2>
-The GEM Console view is simply a dedicated console for viewing the output from ISP itself. This
-information will be useful to the advanced user. All this information and more can be graphically
-examined from the Analyzer view.
+The GEM Console view is dedicated console for viewing STDOUT &#38; STDERR from ISP itself. No other terminal data will 
+be present here. The STDOUT generated in the Console View will be useful to the advanced user, but in general, the
+Browser &#38; and Analyzer views exist to graphically examine this output as well as the generated trace file. 
+STDERR will be printed to the GEM Console in bold red.
 
 <h3>Understanding Output</h3>
 Please reference the <a href="output.html">Understanding GEM Output help page</a>.
@@ -70,8 +46,8 @@ The image below shows what the Console View should look like.
 <img src="images/consoleIntegration.png" width="800" height="607"/>
 
 <p>
-<b>Note:</b>&nbsp; On the GEM preference page, you can specify whether you want new output to 
-replace the older or if it should be prepended to the existing terminal output.
+<b>Note:</b>&nbsp; On the <a href=preferences.html#gemPrefs>GEM Preference Page</a>, you can specify whether you want new output to 
+replace the older or if it should be appended to the existing terminal output.
 </p>
 
 <h3>GEM Console View Options</h3>
