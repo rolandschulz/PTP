@@ -47,7 +47,6 @@ import org.eclipse.ptp.core.elements.events.INewQueueEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
-import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
@@ -111,13 +110,13 @@ public class JobsListView extends ViewPart {
 		}
 	}
 
-	private final class QueueChildListener implements IQueueChildListener {
+	private final class RMChildListener implements IResourceManagerChildListener {
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IChangedJobEvent)
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
 		 */
 		public void handleEvent(IChangedJobEvent e) {
 			update(e.getJobs().toArray(new IPJob[0]));
@@ -132,37 +131,6 @@ public class JobsListView extends ViewPart {
 
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.INewJobEvent)
-		 */
-		public void handleEvent(final INewJobEvent e) {
-			if (fColumnsNeedUpdating) {
-				PTPUIPlugin.getDisplay().syncExec(new Runnable() {
-					public void run() {
-						addColumns(viewer, e.getJobs().iterator().next());
-					}
-				});
-			}
-			refresh();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IQueueChildListener#handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
-		 */
-		public void handleEvent(IRemoveJobEvent e) {
-			refresh();
-		}
-	}
-
-	private final class RMChildListener implements IResourceManagerChildListener {
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -191,6 +159,24 @@ public class JobsListView extends ViewPart {
 		 * (non-Javadoc)
 		 * 
 		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
+		 */
+		public void handleEvent(final INewJobEvent e) {
+			if (fColumnsNeedUpdating) {
+				PTPUIPlugin.getDisplay().syncExec(new Runnable() {
+					public void run() {
+						addColumns(viewer, e.getJobs().iterator().next());
+					}
+				});
+			}
+			refresh();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
 		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.
 		 * IResourceManagerNewMachineEvent)
@@ -206,9 +192,18 @@ public class JobsListView extends ViewPart {
 		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
 		 */
 		public void handleEvent(INewQueueEvent e) {
-			for (IPQueue queue : e.getQueues()) {
-				queue.addChildListener(queueChildListener);
-			}
+			// Don't need to do anything
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
+		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
+		 */
+		public void handleEvent(IRemoveJobEvent e) {
+			refresh();
 		}
 
 		/*
@@ -231,9 +226,7 @@ public class JobsListView extends ViewPart {
 		 * IResourceManagerRemoveQueueEvent)
 		 */
 		public void handleEvent(IRemoveQueueEvent e) {
-			for (IPQueue queue : e.getQueues()) {
-				queue.removeChildListener(queueChildListener);
-			}
+			// Don't need to do anything
 		}
 	}
 
@@ -248,7 +241,6 @@ public class JobsListView extends ViewPart {
 	 */
 	private final IModelManagerChildListener modelManagerListener = new MMChildListener();
 	private final IResourceManagerChildListener resourceManagerListener = new RMChildListener();
-	private final IQueueChildListener queueChildListener = new QueueChildListener();
 
 	private final Set<IAttributeDefinition<?, ?, ?>> colDefs = Collections
 			.synchronizedSet(new HashSet<IAttributeDefinition<?, ?, ?>>());
@@ -333,9 +325,6 @@ public class JobsListView extends ViewPart {
 		 */
 		for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
 			rm.addChildListener(resourceManagerListener);
-			for (IPQueue queue : rm.getQueues()) {
-				queue.addChildListener(queueChildListener);
-			}
 		}
 		mm.addListener(modelManagerListener);
 
@@ -515,6 +504,20 @@ public class JobsListView extends ViewPart {
 	}
 
 	/**
+	 * Get the first job from the queue
+	 * 
+	 * @param queue
+	 * @return first job in the queue or null if there are no jobs
+	 */
+	private IPJob getFirstJob(IPQueue queue) {
+		IPJob[] jobs = queue.getJobs();
+		if (jobs.length > 0) {
+			return jobs[0];
+		}
+		return null;
+	}
+
+	/**
 	 * Finds the first few jobs to use to create the table columns If an RM
 	 * queue is selected, just return the first job If an RM is selected, return
 	 * the first job from one of the queues If no RM is selected, return the
@@ -550,20 +553,6 @@ public class JobsListView extends ViewPart {
 			}
 		}
 		return jobsList.toArray(new IPJob[0]);
-	}
-
-	/**
-	 * Get the first job from the queue
-	 * 
-	 * @param queue
-	 * @return first job in the queue or null if there are no jobs
-	 */
-	private IPJob getFirstJob(IPQueue queue) {
-		IPJob[] jobs = queue.getJobs();
-		if (jobs.length > 0) {
-			return jobs[0];
-		}
-		return null;
 	}
 
 	/**

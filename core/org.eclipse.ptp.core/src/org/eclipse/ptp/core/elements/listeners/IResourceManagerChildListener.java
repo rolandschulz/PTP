@@ -21,10 +21,13 @@
  */
 package org.eclipse.ptp.core.elements.listeners;
 
+import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
 import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
 import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
+import org.eclipse.ptp.core.elements.events.INewJobEvent;
 import org.eclipse.ptp.core.elements.events.INewMachineEvent;
 import org.eclipse.ptp.core.elements.events.INewQueueEvent;
+import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
 import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
 
@@ -33,6 +36,12 @@ import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
  * 
  */
 public interface IResourceManagerChildListener {
+
+	/**
+	 * @param e
+	 * @since 5.0
+	 */
+	public void handleEvent(IChangedJobEvent e);
 
 	/**
 	 * @param e
@@ -46,6 +55,12 @@ public interface IResourceManagerChildListener {
 
 	/**
 	 * @param e
+	 * @since 5.0
+	 */
+	public void handleEvent(INewJobEvent e);
+
+	/**
+	 * @param e
 	 */
 	public void handleEvent(INewMachineEvent e);
 
@@ -53,6 +68,12 @@ public interface IResourceManagerChildListener {
 	 * @param e
 	 */
 	public void handleEvent(INewQueueEvent e);
+
+	/**
+	 * @param e
+	 * @since 5.0
+	 */
+	public void handleEvent(IRemoveJobEvent e);
 
 	/**
 	 * @param e

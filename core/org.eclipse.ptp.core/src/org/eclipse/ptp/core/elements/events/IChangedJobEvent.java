@@ -19,13 +19,13 @@ package org.eclipse.ptp.core.elements.events;
 import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPQueue;
+import org.eclipse.ptp.core.elements.IPResourceManager;
 
 /**
  * This event is generated when the attributes on one or more jobs have changed.
  * It is a bulk event that is sent to child listeners on the source queue.
  * 
- * @see org.eclipse.ptp.core.elements.listeners.IQueueChildListener
+ * @see org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
  */
 public interface IChangedJobEvent {
 
@@ -40,7 +40,8 @@ public interface IChangedJobEvent {
 	 * Get the source event
 	 * 
 	 * @return the source of the event
+	 * @since 5.0
 	 */
-	public IPQueue getSource();
+	public IPResourceManager getSource();
 
 }

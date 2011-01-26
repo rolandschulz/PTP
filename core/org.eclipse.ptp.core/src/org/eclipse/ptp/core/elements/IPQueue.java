@@ -19,18 +19,9 @@
 package org.eclipse.ptp.core.elements;
 
 import org.eclipse.ptp.core.elements.attributes.QueueAttributes;
-import org.eclipse.ptp.core.elements.listeners.IQueueChildListener;
 import org.eclipse.ptp.core.elements.listeners.IQueueListener;
 
 public interface IPQueue extends IPElement {
-
-	/**
-	 * Add a listener for events related to children of this queue.
-	 * 
-	 * @param listener
-	 */
-	public void addChildListener(IQueueChildListener listener);
-
 	/**
 	 * Add a listener for events related to this queue.
 	 * 
@@ -59,13 +50,6 @@ public interface IPQueue extends IPElement {
 	 * @return process state
 	 */
 	public QueueAttributes.State getState();
-
-	/**
-	 * Remove a listener for events related to children of this queue.
-	 * 
-	 * @param listener
-	 */
-	public void removeChildListener(IQueueChildListener listener);
 
 	/**
 	 * Remove a listener for events related to this queue.

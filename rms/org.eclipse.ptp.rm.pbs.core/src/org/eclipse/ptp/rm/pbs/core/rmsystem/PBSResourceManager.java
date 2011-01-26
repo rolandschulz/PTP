@@ -29,8 +29,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 
 	private final Integer PBSRMID;
 
-	public PBSResourceManager(Integer id, IPUniverseControl universe,
-			IResourceManagerConfiguration config) {
+	public PBSResourceManager(Integer id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id.toString(), universe, config);
 		PBSRMID = id;
 	}
@@ -83,14 +82,12 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateJob(org
-	 * .eclipse.ptp.core.elementcontrols.IPQueueControl, java.lang.String,
-	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doCreateJob(java
+	 * .lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected IPJobControl doCreateJob(IPQueueControl queue, String jobId,
-			AttributeManager attrs) {
-		return newJob(queue, jobId, attrs);
+	protected IPJobControl doCreateJob(String jobId, AttributeManager attrs) {
+		return newJob(jobId, attrs);
 	}
 
 	/*
@@ -101,8 +98,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * (java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected IPMachineControl doCreateMachine(String machineId,
-			AttributeManager attrs) {
+	protected IPMachineControl doCreateMachine(String machineId, AttributeManager attrs) {
 		return newMachine(machineId, attrs);
 	}
 
@@ -115,8 +111,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected IPNodeControl doCreateNode(IPMachineControl machine,
-			String nodeId, AttributeManager attrs) {
+	protected IPNodeControl doCreateNode(IPMachineControl machine, String nodeId, AttributeManager attrs) {
 		return newNode(machine, nodeId, attrs);
 	}
 
@@ -128,8 +123,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * (java.lang.String, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected IPQueueControl doCreateQueue(String queueId,
-			AttributeManager attrs) {
+	protected IPQueueControl doCreateQueue(String queueId, AttributeManager attrs) {
 		return newQueue(queueId, attrs);
 	}
 
@@ -144,10 +138,8 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	protected IRuntimeSystem doCreateRuntimeSystem() {
 		IPBSResourceManagerConfiguration config = (IPBSResourceManagerConfiguration) getConfiguration();
 		/* load up the control and monitoring systems for PBS */
-		PBSProxyRuntimeClient runtimeProxy = new PBSProxyRuntimeClient(config,
-				PBSRMID);
-		return new PBSRuntimeSystem(runtimeProxy,
-				getAttributeDefinitionManager());
+		PBSProxyRuntimeClient runtimeProxy = new PBSProxyRuntimeClient(config, PBSRMID);
+		return new PBSRuntimeSystem(runtimeProxy, getAttributeDefinitionManager());
 	}
 
 	/*
@@ -155,13 +147,11 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rmsystem.AbstractRuntimeResourceManager#doUpdateJobs(
-	 * org.eclipse.ptp.core.elements.IPQueue, java.util.Collection,
-	 * org.eclipse.ptp.core.attributes.AttributeManager)
+	 * java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected boolean doUpdateJobs(IPQueueControl queue,
-			Collection<IPJobControl> jobs, AttributeManager attrs) {
-		return updateJobs(queue, jobs, attrs);
+	protected boolean doUpdateJobs(Collection<IPJobControl> jobs, AttributeManager attrs) {
+		return updateJobs(jobs, attrs);
 	}
 
 	/*
@@ -172,8 +162,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * (java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected boolean doUpdateMachines(Collection<IPMachineControl> machines,
-			AttributeManager attrs) {
+	protected boolean doUpdateMachines(Collection<IPMachineControl> machines, AttributeManager attrs) {
 		return updateMachines(machines, attrs);
 	}
 
@@ -186,8 +175,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected boolean doUpdateNodes(IPMachineControl machine,
-			Collection<IPNodeControl> nodes, AttributeManager attrs) {
+	protected boolean doUpdateNodes(IPMachineControl machine, Collection<IPNodeControl> nodes, AttributeManager attrs) {
 		return updateNodes(machine, nodes, attrs);
 	}
 
@@ -200,8 +188,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected boolean doUpdateProcesses(IPJobControl job,
-			BitSet processJobRanks, AttributeManager attrs) {
+	protected boolean doUpdateProcesses(IPJobControl job, BitSet processJobRanks, AttributeManager attrs) {
 		return updateProcessesByJobRanks(job, processJobRanks, attrs);
 	}
 
@@ -213,8 +200,7 @@ public class PBSResourceManager extends AbstractRuntimeResourceManager {
 	 * (java.util.Collection, org.eclipse.ptp.core.attributes.AttributeManager)
 	 */
 	@Override
-	protected boolean doUpdateQueues(Collection<IPQueueControl> queues,
-			AttributeManager attrs) {
+	protected boolean doUpdateQueues(Collection<IPQueueControl> queues, AttributeManager attrs) {
 		return updateQueues(queues, attrs);
 	}
 
