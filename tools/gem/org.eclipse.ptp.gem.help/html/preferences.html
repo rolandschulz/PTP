@@ -23,41 +23,122 @@
 
 <p>
 <em>To edit preferences, from the Eclipse menus, go to <b>Window -&#62; Preferences -&#62; Parallel Tools -&#62; GEM</b></em>
-
 </p>
 
+<p>
+GEM has two preference pages:
+</p>
+<ol>
+	<li>
+		<b>GEM Preferences:</b> For settings related to how the views and various components within 
+		GEM behave and function.
+	</li>
+	<li>
+		<b>ISP Preferences:</b> For settings on the underlying formal verification tool GEM uses, 
+		In-situ Parital Order (ISP). Most settings and values here are equivalent to the available
+		ISP command line options GEM currently needs support for.
+	</li>
+</ol>
+
+<h4>Below are detailed descriptions of each of GEM's Preference Pages.</h4>
+
+<hr/>
+
+<h2>GEM Preference Page</h2>
+<br/>
 <a name="gemPrefs"></a>
 <img src="images/gemPrefs.png">
 
 <h4>Note:</h4>
 <ol>
     <li>
-        If GEM is configured and installed with default values, there is no need to fill in the last three items on the GEM preferences
-        page. When blank, the plug-in will assume they are in the default location. These three items simply need to be in your path.
-    </li>
-    <li>
-        Please note the smaller help button on this preference page (below ispUI Script label).
+        Please note the smaller help button on this preference page (below the &#34;Active View:&#34; label).
         Clicking this button while viewing the GEM preference page will bring you to this help page.
     </li>
 </ol>
 
-<h2>GEM Preferences Reference Table</h2>
+<h3>GEM Preferences Reference Table</h3>
 <table border="1"  cellpadding="5">
 <tr><th>Preference</th><th>Meaning or Condition When Selected</th></tr>
+<tr>
+	<td>Number of Processes:</td>
+	<td>
+		This field takes an integer value that represents the number of processes to use for the next GEM 
+	    verification. It is what is stored after going through the motions on the
+	    <a href="setNumProcs.html">Setting the Number of Processes</a> page.
+	</td>
+</tr>
+<tr>
+	<td>Show GEM Console</td>
+	<td>
+		When enabled (checked), the GEM Console will be open after each GEM verification run. It is suggested that a
+		user <b>enable</b> this feature, as the GEM Console reports important error information if it exists for 
+		a particular verification.
+	</td>
+</tr>
+<tr>
+	<td>Clear GEM Console on Each Run</td>
+	<td>
+		When enabled (checked), the GEM Console will be cleared prior to each verification run. If this preference
+		is not enabled, output is appended to the existing GEM Console content (at the bottom).
+	</td>
+</tr>
+<tr>
+	<td>Verify ISP Output Consistency</td>
+	<td>
+		This is really a tool meant for internal development. It is suggested that you keep this preference
+		<b>disabled</b>.
+	</td>
+</tr>
+<tr>
+	<td>Active View:</td>
+	<td>
+		The selected view will be the one that gets the active focus after each GEM verification run, e.g. if you
+		would like to see the Analyzer View after each verification, then simply select &#34;Analyzer&#34;.
+	</td>
+</tr>
+</table>
+
+<br/>
+<hr/>
+
+<h2>ISP Preference Page</h2>
+<br/>
+<a name="ispPrefs"></a>
+<img src="images/ispPrefs.png">
+
+<h4>Note:</h4>
+<ol>
+    <li>
+        If ISP is configured and installed with default values, there is no need to fill in the  four items in the &#34;ISP Paths&#34;
+        group of the ISP preferences page. When blank, the plug-in will assume they are in the default location (/usr/local/bin).
+        These items simply need to be in your path (we show <b>/usr/local/bin</b> purely for the sake of illustration here).
+    </li>
+    <li>
+        Please note the smaller help button on this preference page (below &#34;ISP Paths&#34; group).
+        Clicking this button while viewing the ISP preference page will bring you to this help page.
+    </li>
+</ol>
+
+<h3>ISP Preferences Reference Table</h3>
+<table border="1"  cellpadding="8">
+<tr><th colspan="2">Command Line Options</th></tr>
 <tr><td>Enable FIB</td> <td>Enables detection of irrelevant barriers</td></tr>
 <tr><td>Log Total MPI Calls</td> <td>Outputs the number of MPI calls trapped for each rank (Console View)</td></tr>
 <tr><td>Enable OpenMP</td> <td>Enables OpenMP based parallelization on multi-core machines</td></tr>
 <tr><td>Use Blocking Sends</td> <td>Sends will be treated as blocking, without buffering</td></tr>
 <tr><td>Report Progress</td> <td>Outputs progress every (n) MPI calls (default is 4). Note: If this is checked, please set the Report progress field below</td></tr>
+<tr><td>Use Unix Sockets</td> <td>Enable this when running GEM on a single, local machine. It speeds up ISP/GEM significantly</td></tr>
 <tr><td>Verbose Mode</td> <td>Output the transition list for all interleavings, otherwise only output last interleaving if deadlock.</td></tr>
+<tr><th colspan="2">Miscellaneous Options</th></tr>
 <tr><td>Port</td> <td>Assigns the port to communicate with MPI programs(default is 9999). GEM will search for a port that is free if specified port is unavailable</td></tr>
-<tr><td>Number of Processes</td> <td>The number of processes to start when analyzing the MPI program (default is 2)</td></tr>
 <tr><td>Report Progress Every (n) MPI Calls</td> <td>Outputs progress every (n) MPI calls (default is 4).  Note: This is ignored if Report Progress is not checked</td></tr>
-<tr><td>Clear GEM Console on Each Run</td> <td>Clears GEM Console output before each run.  If it is not checked then the more recent results are appended to the top</td></tr>
-<tr><td>isp executable </td> <td>The location of the <b>isp executable (this is ISP itself)</b></td></tr>
-<tr><td>ispcc script</td> <td>The location of the <b>ispcc script (for C compile)</b></td></tr>
-<tr><td>ispCC script</td> <td>The location of the <b>ispCC script (for C++ compile)</b></td></tr>
-<tr><td>ispui script</td> <td>The location of the <b>ispUI script (for Happens Before Viewer)</b></td></tr>
+<tr><td>Host Where ISP Resides</td> <td>If ISP is installed on a remote machine, enter the fully qualified hostname here. If ISP is installed on your local machine (e.g. laptop), leave this blank</td></tr>
+<tr><th colspan="2">ISP Paths</th></tr>
+<tr><td>isp executable </td> <td>The location of the <b>isp executable</b> (this is ISP itself)</td></tr>
+<tr><td>ispcc script</td> <td>The location of the <b>ispcc script</b> (for C compilation)</td></tr>
+<tr><td>ispCC script</td> <td>The location of the <b>ispCC script</b> (for C++ compilation)</td></tr>
+<tr><td>HB Viewer script</td> <td>The location of the <b>HB Viewer</b> script (a.k.a. ispUI)</td></tr>
 </table>
 
 <p>&nbsp;</p>
