@@ -39,13 +39,13 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	}
 
 	private int nextResourceManagerId = 1;
-	private final List<IResourceManagerControl> resourceManagers =
-			Collections.synchronizedList(new LinkedList<IResourceManagerControl>());
+	private final List<IResourceManagerControl> resourceManagers = Collections
+			.synchronizedList(new LinkedList<IResourceManagerControl>());
 	protected String NAME_TAG = "universe "; //$NON-NLS-1$
 
 	public PUniverse() {
 		/* '1' because this is the only universe */
-		super("1", null, P_UNIVERSE, getDefaultAttributes("TheUniverse")); //$NON-NLS-1$ //$NON-NLS-2$
+		super("1", null, getDefaultAttributes("TheUniverse")); //$NON-NLS-1$ //$NON-NLS-2$
 		// setOutputStore();
 	}
 
@@ -128,16 +128,6 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	 */
 	public IPResourceManager[] getResourceManagers() {
 		return getResourceManagerControls();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#hasChildren()
-	 */
-	@Override
-	public boolean hasChildren() {
-		return !resourceManagers.isEmpty();
 	}
 
 	/*

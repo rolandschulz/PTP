@@ -54,7 +54,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	private String arch = Messages.PMachine_0;
 
 	public PMachine(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
-		super(id, rm, P_MACHINE, attrs);
+		super(id, rm, attrs);
 		/*
 		 * Create required attributes.
 		 */
@@ -105,8 +105,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * (java.util.Collection,
 	 * org.eclipse.ptp.core.attributes.IAttribute<?,?,?>[])
 	 */
-	public void addNodeAttributes(Collection<IPNodeControl> nodeControls,
-			IAttribute<?, ?, ?>[] attrs) {
+	public void addNodeAttributes(Collection<IPNodeControl> nodeControls, IAttribute<?, ?, ?>[] attrs) {
 		List<IPNode> nodes = new ArrayList<IPNode>(nodeControls.size());
 		for (IPNodeControl node : nodeControls) {
 			node.addAttributes(attrs);
@@ -155,8 +154,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @param attrs
 	 */
 	private void fireChangedMachine(AttributeManager attrs) {
-		IMachineChangeEvent e =
-				new MachineChangeEvent(this, attrs);
+		IMachineChangeEvent e = new MachineChangeEvent(this, attrs);
 
 		for (Object listener : elementListeners.getListeners()) {
 			((IMachineListener) listener).handleEvent(e);
@@ -169,8 +167,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @param nodes
 	 */
 	private void fireChangedNodes(Collection<IPNode> nodes) {
-		IChangedNodeEvent e =
-				new ChangedNodeEvent(this, nodes);
+		IChangedNodeEvent e = new ChangedNodeEvent(this, nodes);
 
 		for (Object listener : childListeners.getListeners()) {
 			((IMachineChildListener) listener).handleEvent(e);
@@ -183,8 +180,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @param nodes
 	 */
 	private void fireNewNodes(Collection<IPNode> nodes) {
-		INewNodeEvent e =
-				new NewNodeEvent(this, nodes);
+		INewNodeEvent e = new NewNodeEvent(this, nodes);
 
 		for (Object listener : childListeners.getListeners()) {
 			((IMachineChildListener) listener).handleEvent(e);
@@ -195,8 +191,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * @param node
 	 */
 	private void fireRemoveNodes(Collection<IPNode> nodes) {
-		IRemoveNodeEvent e =
-				new RemoveNodeEvent(this, nodes);
+		IRemoveNodeEvent e = new RemoveNodeEvent(this, nodes);
 
 		for (Object listener : childListeners.getListeners()) {
 			((IMachineChildListener) listener).handleEvent(e);
@@ -234,8 +229,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 */
 	public Collection<IPNodeControl> getNodeControls() {
 		IPElementControl[] children = getChildren();
-		List<IPNodeControl> nodes =
-				new ArrayList<IPNodeControl>(children.length);
+		List<IPNodeControl> nodes = new ArrayList<IPNodeControl>(children.length);
 		for (IPElementControl element : children) {
 			nodes.add((IPNodeControl) element);
 		}

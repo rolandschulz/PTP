@@ -59,7 +59,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	private final Map<IPJobControl, BitSet> jobProcessRanksMap = new HashMap<IPJobControl, BitSet>();
 
 	public PNode(String id, IPMachineControl mac, IAttribute<?, ?, ?>[] attrs) {
-		super(id, mac, P_NODE, attrs);
+		super(id, mac, attrs);
 		/*
 		 * Create required attributes.
 		 */

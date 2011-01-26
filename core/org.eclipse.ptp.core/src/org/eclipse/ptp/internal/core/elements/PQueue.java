@@ -44,7 +44,7 @@ public class PQueue extends Parent implements IPQueueControl {
 	private final Map<String, IPJobControl> fJobs = new HashMap<String, IPJobControl>();
 
 	public PQueue(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
-		super(id, rm, P_QUEUE, attrs);
+		super(id, rm, attrs);
 		/*
 		 * Create required attributes.
 		 */

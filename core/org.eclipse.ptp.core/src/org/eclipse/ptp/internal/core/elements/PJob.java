@@ -69,7 +69,7 @@ public class PJob extends Parent implements IPJobControl {
 	private final Map<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>> processAttributesMap = new HashMap<IAttributeDefinition<?, ?, ?>, AttributeIndexSet<?>>();
 
 	public PJob(String id, IResourceManagerControl rm, IAttribute<?, ?, ?>[] attrs) {
-		super(id, rm, P_JOB, attrs);
+		super(id, rm, attrs);
 
 		fResourceManager = rm;
 

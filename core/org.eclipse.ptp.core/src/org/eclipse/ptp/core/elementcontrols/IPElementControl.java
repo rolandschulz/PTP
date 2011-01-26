@@ -30,62 +30,6 @@ import org.eclipse.ptp.core.elements.IPElement;
  * @author Nathan DeBardeleben
  */
 public interface IPElementControl extends IPElement {
-	// public String NAME_TAG = "";
-
-	/**
-	 * Element tag for an error / undefined type
-	 */
-	public static final int P_TYPE_ERROR = -1;
-
-	/**
-	 * Element tag for Universe Elements
-	 */
-	public static final int P_UNIVERSE = 10;
-
-	/**
-	 * Element tag for Machine Elements
-	 */
-	public static final int P_MACHINE = 11;
-
-	/**
-	 * Element tag for Node Elements
-	 */
-	public static final int P_NODE = 12;
-
-	/**
-	 * Element tag for Job Elements
-	 */
-	public static final int P_JOB = 13;
-
-	/**
-	 * Element tag for Process Elements
-	 */
-	public static final int P_PROCESS = 14;
-
-	/**
-	 * Element tag for Resource Manager Elements
-	 */
-	public static final int P_RESOURCE_MANAGER = 15;
-
-	/**
-	 * Element tag for Queue Elements
-	 */
-	public static final int P_QUEUE = 16;
-
-	/**
-	 * Returns the element type (such as P_UNIVERSE, P_MACHINE, etc.) for this
-	 * Element. This type is usually set through the constructor of the
-	 * implementing class of this interface.
-	 * 
-	 * @return The element type of this Element which can be compared with the
-	 *         public statics of this interface.
-	 * @see P_UNIVERSE
-	 * @see P_MACHINE
-	 * @see P_NODE
-	 * @see P_JOB
-	 * @see P_PROCESS
-	 */
-	public int getElementType();
 
 	/**
 	 * If this Element has a parent then this method returns it, else it returns
@@ -94,16 +38,4 @@ public interface IPElementControl extends IPElement {
 	 * @return The parent Element of this Element, null if there is none
 	 */
 	public IPElementControl getParent();
-
-	/*
-	 * public IPUniverse getPUniverse(); public IPMachine getPMachine(); public
-	 * IPJob getPRoot();
-	 */
-
-	/**
-	 * Returns true if this Element has children Elements, else returns false.
-	 * 
-	 * @return True if this Element has children Elements, else false
-	 */
-	public boolean hasChildren();
 }
