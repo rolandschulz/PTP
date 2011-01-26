@@ -22,7 +22,7 @@
 <hr>
 
 <p>
-GEM supports CDT C/C++ Makefile projects with a minimum effort required on the part of the programmer.
+GEM supports CDT C and C++ Makefile projects with a minimum effort required on the part of the programmer.
 Just some minor modifications to your project's Makefiles and you'll be able to use GEM with your Makefile 
 Projects as well as your Managed Build Projects.
 </p>
@@ -37,27 +37,29 @@ and not a <b>Managed-Build Project</b>!
 
 <ul>
     <li>
-        <b>Change the compiler to ispcc forC or ispCC for C++. This is a wrapper for mpicc that allow ISP's Profiler to intercept MPI calls at runtime</b>
+        <b>
+        	Change the compiler to &#34;ispcc&#34; for C or &#34;ispCC&#34; for C++. These are wrappers for 
+        	&#34;mpicc&#34; and &#34;mpicxx&#34; that allow ISP's Profiler to intercept MPI calls at runtime.</b>
         <pre>
         # Which compiler to use
         # CC = mpicc  &#60;-- comment this out
         
         # For MPI C applications
-        CC = ispcc
+        CC = ispcc    &#60;-- add this for C compilation (ispcc is a wrapper for mpicc)
         
         # For MPI C++ applications
-        CC = ispCC
+        CXX = ispCC   &#60;-- add this for C++ compilation (ispCC is a wrapper for mpicxx)
         </pre>
     </li>
     <li>
         <b>
             GEM requires the fully qualified path to all source code in order to do the code analyzing. ISP itself uses
             the __FILE__ and __LINE__ macros in generating a runtime log. Your Makefiles will have to pass the source files to
-            ispcc/ispCC (gcc) at compile time in order to get that back in the same form. This is accomplished by the following being
+            ispcc/ispCC (gcc/g++) at compile time in order to get that back in the same form. This is accomplished by the following being
             added to your Makefiles
         </b>
         <pre>
-        SOURCEPATH = $(shell pwd)   # defining this will make the present working directory available for use
+        SOURCEPATH = $(shell pwd)   # defining this will give the compiler the fully qualified path to each file encountered
         $(CC) $(CFLAGS) -c $(SOURCEPATH)/$*.c   # add this to your build rules
         </pre>
     </li>
@@ -94,20 +96,27 @@ and not a <b>Managed-Build Project</b>!
         <p>&nbsp;</p>
     </li>
         <li>
-        Set the number of processes for the next run of GEM.<br>
-        Find these instructions in the section in the corresponding section 
-        of the <a href="analyzerView.html">Analyzer View Help page</a>
-        <p>&nbsp;</p>
+        <a href=setNumProcs.html>Set the number of processes</a> for the next run of GEM.
     </li>  
     <li>
-        Right click on an executable with ".gem" extension in the Project Explorer
+        Right click on the previously located executable with <b>&#34;.gem&#34;</b> extension in the Project Explorer
         <p>&nbsp;</p>
         <img src="images/executablePopUp.png">
         <p>&nbsp;</p>
     </li>
     <li>
-        This should bring up the Analyzer View if it isn't already, as it does with any CDT Managed Build Project.<br>
-        Please see the <a href="analyzerView.html">Analyzer View Help page</a> from info.
+        This should bring up the GEM views &#40;if they aren&#39;t already open&#41; with post verification results.<br/>
+        <ul>
+        	<li>
+        		<a href="analyzerView.html">Analyzer View Help page</a>
+        	</li>
+        	<li>
+        		<a href="browserView.html">Browser View Help page</a>
+        	</li>
+        	<li>
+        		<a href="consoleView.html">Console View Help page</a>
+        	</li>
+        </ul>
     </li>  
 </ul>
 <p>&nbsp;</p>
