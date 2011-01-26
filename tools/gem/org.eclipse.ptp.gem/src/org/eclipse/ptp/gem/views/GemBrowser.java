@@ -334,16 +334,7 @@ public class GemBrowser extends ViewPart {
 				if (isSourceFileExtension) {
 					// Save most recent file reference to preference as a URI
 					GemUtilities.saveMostRecentURI(inputFile.getLocationURI());
-
-					// Open the Console View if the user wants it
 					final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
-					try {
-						if (pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON)) {
-							page.showView(GemConsole.ID);
-						}
-					} catch (final PartInitException e) {
-						GemUtilities.logExceptionDetail(e);
-					}
 
 					// Open Analyzer and Browser Views in preference order
 					try {

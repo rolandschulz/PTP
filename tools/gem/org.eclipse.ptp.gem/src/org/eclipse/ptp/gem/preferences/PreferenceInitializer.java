@@ -51,7 +51,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		pstore.setDefault(PreferenceConstants.GEM_PREF_REPORTNUM, 4);
 		pstore.setDefault(PreferenceConstants.GEM_PREF_HOSTNAME, ""); //$NON-NLS-1$
 		pstore.setDefault(PreferenceConstants.GEM_PREF_CLRCON, false);
-		pstore.setDefault(PreferenceConstants.GEM_PREF_SHOWCON, false);
 		pstore.setDefault(PreferenceConstants.GEM_ACTIVE_VIEW, "browser"); //$NON-NLS-1$
 
 		// ISP paths, scripts and file names

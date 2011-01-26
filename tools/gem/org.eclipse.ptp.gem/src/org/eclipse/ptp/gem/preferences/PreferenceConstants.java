@@ -36,7 +36,6 @@ public class PreferenceConstants {
 	public static final String GEM_PREF_REPORTNUM = "reportNumPreference"; //$NON-NLS-1$
 	public static final String GEM_PREF_HOSTNAME = "hostName"; //$NON-NLS-1$
 	public static final String GEM_PREF_CLRCON = "clearConsolePreference"; //$NON-NLS-1$
-	public static final String GEM_PREF_SHOWCON = "showConsolePreference"; //$NON-NLS-1$
 	public static final String GEM_ACTIVE_VIEW = "activeViewPreference"; //$NON-NLS-1$
 	public static final String GEM_CONSOLE = "console"; //$NON-NLS-1$
 	public static final String GEM_BROWSER = "browser"; //$NON-NLS-1$

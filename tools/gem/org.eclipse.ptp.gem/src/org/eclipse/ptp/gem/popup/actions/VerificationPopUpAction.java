@@ -27,7 +27,6 @@ import org.eclipse.ptp.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
-import org.eclipse.ptp.gem.views.GemConsole;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
@@ -73,15 +72,6 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 			final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			final IWorkbenchPage page = window.getActivePage();
 			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
-
-			// Open the Console View
-			if (pstore.getBoolean(PreferenceConstants.GEM_PREF_SHOWCON)) {
-				try {
-					page.showView(GemConsole.ID);
-				} catch (final PartInitException e) {
-					GemUtilities.logExceptionDetail(e);
-				}
-			}
 
 			// Open GEM views
 			try {
