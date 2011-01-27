@@ -23,7 +23,7 @@ import java.util.Collection;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elements.IPMachine;
 
-public interface IPMachineControl extends IPElementControl, IPMachine {
+public interface IPMachineControl extends IPMachine {
 
 	/**
 	 * Add attributes to a collection of nodes.

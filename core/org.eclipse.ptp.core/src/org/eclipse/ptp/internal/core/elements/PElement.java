@@ -26,17 +26,17 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IAttributeDefinition;
 import org.eclipse.ptp.core.attributes.StringAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPElementControl;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.attributes.ElementAttributes;
 
-public abstract class PElement extends PlatformObject implements IPElementControl, Comparable<IPElementControl> {
+public abstract class PElement extends PlatformObject implements IPElement, Comparable<IPElement> {
 
 	private final PElementInfo elementInfo = new PElementInfo(this);
 	protected final AttributeManager attributeValues = new AttributeManager();
 	protected final String elementId;
-	protected final IPElementControl elementParent;
+	protected final IPElement elementParent;
 
-	protected PElement(String id, IPElementControl parent, IAttribute<?, ?, ?>[] attrs) {
+	protected PElement(String id, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		elementId = id;
 		elementParent = parent;
 		ArrayList<IAttribute<?, ?, ?>> attrList = new ArrayList<IAttribute<?, ?, ?>>(Arrays.asList(attrs));
@@ -72,7 +72,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(IPElementControl obj) {
+	public int compareTo(IPElement obj) {
 		return getName().compareTo(obj.getName());
 	}
 
@@ -160,9 +160,9 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#getParent()
+	 * @see org.eclipse.ptp.core.elementcontrols.IPElement#getParent()
 	 */
-	public IPElementControl getParent() {
+	public IPElement getParent() {
 		return elementParent;
 	}
 
@@ -180,7 +180,7 @@ public abstract class PElement extends PlatformObject implements IPElementContro
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.elementcontrols.IPElementControl#size()
+	 * @see org.eclipse.ptp.core.elementcontrols.IPElement#size()
 	 */
 	public int size() {
 		return getElementInfo().size();

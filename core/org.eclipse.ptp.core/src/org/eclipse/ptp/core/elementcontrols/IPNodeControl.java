@@ -22,7 +22,7 @@ import java.util.BitSet;
 
 import org.eclipse.ptp.core.elements.IPNode;
 
-public interface IPNodeControl extends IPElementControl, IPNode {
+public interface IPNodeControl extends IPNode {
 	/**
 	 * @param job
 	 * @param processRanks

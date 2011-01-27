@@ -24,7 +24,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.elements.IPJob;
 
-public interface IPJobControl extends IPElementControl, IPJob {
+public interface IPJobControl extends IPJob {
 
 	/**
 	 * Add attributes to a collection of processes.

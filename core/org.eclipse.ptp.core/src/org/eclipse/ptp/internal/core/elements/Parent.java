@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.core.elements;
 import java.util.Arrays;
 
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elements.IPElement;
 
 /**
@@ -31,11 +30,11 @@ public abstract class Parent extends PElement {
 	/**
 	 * @param elements
 	 */
-	public static void sort(IPElementControl elements[]) {
+	public static void sort(IPElement elements[]) {
 		Arrays.sort(elements);
 	}
 
-	public Parent(String id, IPElementControl parent, IAttribute<?, ?, ?>[] attrs) {
+	public Parent(String id, IPElement parent, IAttribute<?, ?, ?>[] attrs) {
 		super(id, parent, attrs);
 	}
 
@@ -45,7 +44,7 @@ public abstract class Parent extends PElement {
 	 * @param member
 	 *            child to add
 	 */
-	protected void addChild(IPElementControl member) {
+	protected void addChild(IPElement member) {
 		getElementInfo().addChild(member);
 	}
 
@@ -56,7 +55,7 @@ public abstract class Parent extends PElement {
 	 *            key used to identify the child
 	 * @return IPElementControl of the child, or null
 	 */
-	protected IPElementControl findChild(String key) {
+	protected IPElement findChild(String key) {
 		return getElementInfo().findChild(key);
 	}
 
@@ -65,7 +64,7 @@ public abstract class Parent extends PElement {
 	 * 
 	 * @return array of IPElementControls containing children
 	 */
-	protected IPElementControl[] getChildren() {
+	protected IPElement[] getChildren() {
 		return getElementInfo().getChildren();
 	}
 

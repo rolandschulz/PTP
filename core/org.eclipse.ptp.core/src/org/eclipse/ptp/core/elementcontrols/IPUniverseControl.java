@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.elements.IPUniverse;
  * @author rsqrd
  * 
  */
-public interface IPUniverseControl extends IPUniverse, IPElementControl {
+public interface IPUniverseControl extends IPUniverse {
 
 	public void addResourceManager(IResourceManagerControl addedManager);
 
