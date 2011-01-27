@@ -527,21 +527,7 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	 */
 	public IPJob submitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
-		return doSubmitJob(null, configuration, attrMgr, monitor);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.elements.IPResourceManager#submitJob(java.lang.String
-	 * , org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.ptp.core.attributes.AttributeManager,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public void submitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
-			throws CoreException {
-		doSubmitJob(subId, configuration, attrMgr, monitor);
+		return doSubmitJob(configuration, attrMgr, monitor);
 	}
 
 	/*
@@ -848,17 +834,16 @@ public abstract class AbstractResourceManager extends Parent implements IPResour
 	protected abstract void doStartup(IProgressMonitor monitor) throws CoreException;
 
 	/**
-	 * Submit a job with the supplied submission ID.Returns a job that
-	 * represents the submitted job, or null if the progress monitor was
-	 * canceled.
+	 * Submit a job to the resource manager. Returns a job that represents the
+	 * submitted job, or null if the progress monitor was canceled.
 	 * 
-	 * @param subId
 	 * @param attrMgr
 	 * @param monitor
 	 * @throws CoreException
+	 * @since 5.0
 	 */
-	protected abstract IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr,
-			IProgressMonitor monitor) throws CoreException;
+	protected abstract IPJob doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+			throws CoreException;
 
 	/**
 	 * Terminate a job.

@@ -144,6 +144,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 
 	private final Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
 	private IRuntimeSystem runtimeSystem;
+	private volatile int jobSubIdCounter = 0;
 
 	public AbstractRuntimeResourceManager(String id, IPUniverseControl universe, IResourceManagerConfiguration config) {
 		super(id, universe, config);
@@ -188,10 +189,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		 * Fatal error in the runtime system. Cancel any pending job submissions
 		 * and inform upper levels of the problem.
 		 */
-		for (JobSubmission sub : jobSubmissions.values()) {
-			sub.setError(Messages.AbstractRuntimeResourceManager_6);
+		synchronized (jobSubmissions) {
+			for (JobSubmission sub : jobSubmissions.values()) {
+				sub.setError(Messages.AbstractRuntimeResourceManager_6);
+			}
+			jobSubmissions.clear();
 		}
-		jobSubmissions.clear();
 
 		setState(ResourceManagerAttributes.State.ERROR);
 		fireError(Messages.AbstractRuntimeResourceManager_6);
@@ -312,7 +315,11 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 						 * Notify any submitJob() calls that the job has been
 						 * created
 						 */
-						JobSubmission sub = jobSubmissions.remove(jobSubAttr.getValue());
+
+						JobSubmission sub;
+						synchronized (jobSubmissions) {
+							sub = jobSubmissions.remove(jobSubAttr.getValue());
+						}
 						if (sub != null) {
 							sub.setJob(job);
 							job.setLaunchConfiguration(sub.getLaunchConfiguration());
@@ -730,7 +737,10 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 */
 	public void handleEvent(IRuntimeSubmitJobErrorEvent e) {
 		if (e.getJobSubID() != null) {
-			JobSubmission sub = jobSubmissions.remove(e.getJobSubID());
+			JobSubmission sub;
+			synchronized (jobSubmissions) {
+				sub = jobSubmissions.remove(e.getJobSubID());
+			}
 			if (sub != null) {
 				sub.setError(e.getErrorMessage());
 			}
@@ -784,10 +794,12 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		/*
 		 * Cancel any pending job submissions.
 		 */
-		for (JobSubmission sub : jobSubmissions.values()) {
-			sub.setStatus(JobSubStatus.CANCELLED);
+		synchronized (jobSubmissions) {
+			for (JobSubmission sub : jobSubmissions.values()) {
+				sub.setStatus(JobSubStatus.CANCELLED);
+			}
+			jobSubmissions.clear();
 		}
-		jobSubmissions.clear();
 	}
 
 	/**
@@ -930,13 +942,13 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(java.lang
-	 * .String, org.eclipse.debug.core.ILaunchConfiguration,
+	 * org.eclipse.ptp.rmsystem.AbstractResourceManager#doSubmitJob(org.eclipse
+	 * .debug.core.ILaunchConfiguration,
 	 * org.eclipse.ptp.core.attributes.AttributeManager,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected IPJob doSubmitJob(String subId, ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
+	protected IPJob doSubmitJob(ILaunchConfiguration configuration, AttributeManager attrMgr, IProgressMonitor monitor)
 			throws CoreException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
@@ -945,18 +957,13 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 		IPJob job = null;
 
 		try {
-			JobSubmission sub = new JobSubmission(subId);
+			JobSubmission sub = new JobSubmission(jobSubIdCounter++);
 			sub.setLaunchConfiguration(configuration);
-			jobSubmissions.put(subId, sub);
-
-			runtimeSystem.submitJob(subId, attrMgr);
-
-			/*
-			 * If subId is null then don't wait for the submission to complete.
-			 */
-			if (subId != null) {
-				return job;
+			synchronized (jobSubmissions) {
+				jobSubmissions.put(sub.getId(), sub);
 			}
+
+			runtimeSystem.submitJob(sub.getId(), attrMgr);
 
 			JobSubStatus state = sub.waitFor(monitor);
 
@@ -964,10 +971,14 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			case CANCELLED:
 				/*
 				 * Once a job has been sent to the RM, it can't be canceled, so
-				 * this will just cause the submitJob command to return a null.
-				 * The job will still eventually get created.
+				 * this will just cause the submitJob command to throw an
+				 * exception. The job will still eventually get created.
 				 */
-				break;
+				synchronized (jobSubmissions) {
+					jobSubmissions.remove(sub.getId());
+				}
+				throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(), IStatus.CANCEL,
+						Messages.AbstractRuntimeResourceManager_cancelled, null));
 
 			case SUBMITTED:
 				job = sub.getJob();
@@ -1088,7 +1099,7 @@ public abstract class AbstractRuntimeResourceManager extends AbstractResourceMan
 			if (rank != null) {
 				bitSet.set(rank);
 			} else {
-				PTPCorePlugin.log(Messages.AbstractRuntimeResourceManager_12 + sRank + Messages.AbstractRuntimeResourceManager_13);
+				PTPCorePlugin.log(NLS.bind(Messages.AbstractRuntimeResourceManager_12, sRank));
 			}
 		}
 		return bitSet;
