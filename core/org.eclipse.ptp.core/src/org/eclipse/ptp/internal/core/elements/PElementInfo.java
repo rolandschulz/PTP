@@ -22,18 +22,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elements.IPElement;
 
 /**
  *
  */
 public class PElementInfo {
-	private final Map<String, IPElementControl> fChildren =
-			Collections.synchronizedMap(new HashMap<String, IPElementControl>());
-	protected final IPElementControl element;
+	private final Map<String, IPElement> fChildren = Collections.synchronizedMap(new HashMap<String, IPElement>());
+	protected final IPElement element;
 
-	public PElementInfo(IPElementControl element) {
+	public PElementInfo(IPElement element) {
 		this.element = element;
 	}
 
@@ -42,7 +40,7 @@ public class PElementInfo {
 	 * 
 	 * @param member
 	 */
-	public void addChild(IPElementControl member) {
+	public void addChild(IPElement member) {
 		fChildren.put(member.getID(), member);
 	}
 
@@ -66,7 +64,7 @@ public class PElementInfo {
 	 * @param key
 	 * @return child
 	 */
-	public IPElementControl findChild(String key) {
+	public IPElement findChild(String key) {
 		synchronized (fChildren) {
 			if (fChildren.containsKey(key)) {
 				return fChildren.get(key);
@@ -80,8 +78,8 @@ public class PElementInfo {
 	 * 
 	 * @return children
 	 */
-	public IPElementControl[] getChildren() {
-		return fChildren.values().toArray(new IPElementControl[size()]);
+	public IPElement[] getChildren() {
+		return fChildren.values().toArray(new IPElement[size()]);
 	}
 
 	/**
@@ -89,7 +87,7 @@ public class PElementInfo {
 	 * 
 	 * @return element
 	 */
-	public IPElementControl getElement() {
+	public IPElement getElement() {
 		return element;
 	}
 
@@ -108,7 +106,7 @@ public class PElementInfo {
 	 * @param child
 	 * @return true if child is one of ours
 	 */
-	public boolean includesChild(IPElementControl child) {
+	public boolean includesChild(IPElement child) {
 		if (fChildren.containsKey(child.getID())) {
 			return true;
 		}
@@ -136,8 +134,8 @@ public class PElementInfo {
 	 * 
 	 * @param children
 	 */
-	public void setChildren(IPElementControl[] children) {
-		for (IPElementControl element : children) {
+	public void setChildren(IPElement[] children) {
+		for (IPElement element : children) {
 			fChildren.put(element.getID(), element);
 		}
 	}

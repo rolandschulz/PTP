@@ -140,9 +140,9 @@ public interface IPResourceManager extends IPElement, IAdaptable, IResourceManag
 	public IPQueue[] getQueues();
 
 	/**
-	 * Returns the id of the resource manager
+	 * Returns the extension point id of the resource manager
 	 * 
-	 * @return the id of the resource manager
+	 * @return the extension point id of the resource manager
 	 */
 	public String getResourceManagerId();
 

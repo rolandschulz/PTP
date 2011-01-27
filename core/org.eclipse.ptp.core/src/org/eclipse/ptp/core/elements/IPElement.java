@@ -44,8 +44,7 @@ public interface IPElement extends IAdaptable {
 	 * @param attrDef
 	 * @return The attribute for this attribute definition
 	 */
-	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>>
-			A getAttribute(D attrDef);
+	public <T, A extends IAttribute<T, A, D>, D extends IAttributeDefinition<T, A, D>> A getAttribute(D attrDef);
 
 	/**
 	 * Returns the attribute corresponding to the attribute definition ID.
@@ -91,6 +90,15 @@ public interface IPElement extends IAdaptable {
 	 * @return This Element's name
 	 */
 	public String getName();
+
+	/**
+	 * If this Element has a parent then this method returns it, else it returns
+	 * null.
+	 * 
+	 * @return The parent Element of this Element, null if there is none
+	 * @since 5.0
+	 */
+	public IPElement getParent();
 
 	/**
 	 * Removes the attribute value.

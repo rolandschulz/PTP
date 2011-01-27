@@ -22,7 +22,7 @@ import java.util.Collection;
 
 import org.eclipse.ptp.core.elements.IPQueue;
 
-public interface IPQueueControl extends IPElementControl, IPQueue {
+public interface IPQueueControl extends IPQueue {
 	/**
 	 * Add the collection of jobs to the queue.
 	 * 

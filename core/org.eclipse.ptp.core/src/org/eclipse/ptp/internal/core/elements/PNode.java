@@ -30,10 +30,10 @@ import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPMachine;
 import org.eclipse.ptp.core.elements.attributes.NodeAttributes;
@@ -228,7 +228,7 @@ public class PNode extends Parent implements IPNodeControl, IJobChildListener {
 	 * org.eclipse.ptp.core.elementcontrols.IPNodeControl#getMachineControl()
 	 */
 	public IPMachineControl getMachineControl() {
-		IPElementControl current = this;
+		IPElement current = this;
 		do {
 			if (current instanceof IPMachineControl) {
 				return (IPMachineControl) current;

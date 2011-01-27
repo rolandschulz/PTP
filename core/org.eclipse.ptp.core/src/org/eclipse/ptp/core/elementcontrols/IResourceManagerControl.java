@@ -19,7 +19,7 @@ package org.eclipse.ptp.core.elementcontrols;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 
-public interface IResourceManagerControl extends IPResourceManager, IPElementControl {
+public interface IResourceManagerControl extends IPResourceManager {
 	/**
 	 * Safely dispose of this Resource Manager.
 	 */

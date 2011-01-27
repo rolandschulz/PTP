@@ -28,10 +28,10 @@ import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IllegalValueException;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
-import org.eclipse.ptp.core.elementcontrols.IPElementControl;
 import org.eclipse.ptp.core.elementcontrols.IPMachineControl;
 import org.eclipse.ptp.core.elementcontrols.IPNodeControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elements.IPElement;
 import org.eclipse.ptp.core.elements.IPNode;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.MachineAttributes;
@@ -214,7 +214,7 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * org.eclipse.ptp.core.elements.IPMachine#getNodeById(java.lang.String)
 	 */
 	public IPNode getNodeById(String id) {
-		IPElementControl element = findChild(id);
+		IPElement element = findChild(id);
 		if (element != null) {
 			return (IPNodeControl) element;
 		}
@@ -228,9 +228,9 @@ public class PMachine extends Parent implements IPMachineControl {
 	 * org.eclipse.ptp.core.elementcontrols.IPMachineControl#getNodeControls()
 	 */
 	public Collection<IPNodeControl> getNodeControls() {
-		IPElementControl[] children = getChildren();
+		IPElement[] children = getChildren();
 		List<IPNodeControl> nodes = new ArrayList<IPNodeControl>(children.length);
-		for (IPElementControl element : children) {
+		for (IPElement element : children) {
 			nodes.add((IPNodeControl) element);
 		}
 		return nodes;
