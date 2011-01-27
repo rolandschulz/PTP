@@ -126,7 +126,7 @@ public class PUniverse extends Parent implements IPUniverseControl {
 	 * 
 	 * @see org.eclipse.ptp.core.elements.IPUniverse#getResourceManagers()
 	 */
-	public IPResourceManager[] getResourceManagers() {
+	public IResourceManagerControl[] getResourceManagers() {
 		return getResourceManagerControls();
 	}
 

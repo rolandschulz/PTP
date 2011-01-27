@@ -100,7 +100,7 @@ public class ModelManager implements IModelManager {
 			case IServiceModelEvent.SERVICE_CONFIGURATION_REMOVED: {
 				IServiceProvider provider = ((IServiceConfiguration) event.getSource()).getServiceProvider(fLaunchService);
 				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
+					IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
 							.getUniqueName());
 					if (rm != null) {
 						doRemoveResourceManager(rm);
@@ -116,7 +116,7 @@ public class ModelManager implements IModelManager {
 					if (oldProvider instanceof IResourceManagerConfiguration) {
 						IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
 						if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
-							IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) oldProvider)
+							IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) oldProvider)
 									.getUniqueName());
 							if (rm != null) {
 								rm.setConfiguration((IResourceManagerConfiguration) newProvider);
@@ -126,7 +126,7 @@ public class ModelManager implements IModelManager {
 				} else {
 					IServiceProvider newProvider = config.getServiceProvider(fLaunchService);
 					if (newProvider != null && newProvider instanceof IResourceManagerConfiguration) {
-						IResourceManagerControl rm = (IResourceManagerControl) getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
+						IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) newProvider)
 								.getUniqueName());
 						if (rm == null) {
 							rm = (IResourceManagerControl) ((IResourceManagerConfiguration) newProvider)
@@ -143,7 +143,7 @@ public class ModelManager implements IModelManager {
 			case IServiceModelEvent.SERVICE_PROVIDER_CHANGED: {
 				IServiceProvider provider = (IServiceProvider) event.getSource();
 				if (provider != null && provider instanceof IResourceManagerConfiguration) {
-					IPResourceManager rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
+					IResourceManagerControl rm = getResourceManagerFromUniqueName(((IResourceManagerConfiguration) provider)
 							.getUniqueName());
 					if (rm != null) {
 						updateResourceManager(rm);
@@ -212,13 +212,13 @@ public class ModelManager implements IModelManager {
 	 * org.eclipse.ptp.core.IModelManager#getResourceManagerFromUniqueName(java
 	 * .lang.String)
 	 */
-	public IPResourceManager getResourceManagerFromUniqueName(String rmUniqueName) {
-		IPResourceManager[] rms;
+	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName) {
+		IResourceManagerControl[] rms;
 		synchronized (universe) {
 			rms = universe.getResourceManagers();
 		}
 
-		for (IPResourceManager rm : rms) {
+		for (IResourceManagerControl rm : rms) {
 			if (rm.getUniqueName().equals(rmUniqueName)) {
 				return rm;
 			}
@@ -325,9 +325,9 @@ public class ModelManager implements IModelManager {
 	 */
 	public void removeResourceManagers(IResourceManagerConfiguration[] rms) {
 		for (IResourceManagerConfiguration rmConf : rms) {
-			IPResourceManager rm = getResourceManagerFromUniqueName(rmConf.getUniqueName());
+			IResourceManagerControl rm = getResourceManagerFromUniqueName(rmConf.getUniqueName());
 			if (rm != null) {
-				removeResourceManager((IResourceManagerControl) rm);
+				removeResourceManager(rm);
 			}
 		}
 	}

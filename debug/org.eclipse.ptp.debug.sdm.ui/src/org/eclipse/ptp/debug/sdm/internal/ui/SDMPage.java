@@ -179,8 +179,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 					EMPTY_STRING);
-			resourceManager = (IResourceManagerControl) PTPCorePlugin.getDefault().getModelManager()
-					.getResourceManagerFromUniqueName(rmId);
+			resourceManager = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 			fSDMBackendCombo.setText(configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
 					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
 							SDMPreferenceConstants.SDM_DEBUGGER_BACKEND_TYPE)));
@@ -316,8 +315,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		try {
 			String rmId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 					EMPTY_STRING);
-			IResourceManagerControl rm = (IResourceManagerControl) PTPCorePlugin.getDefault().getModelManager()
-					.getResourceManagerFromUniqueName(rmId);
+			IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 			if (rm != null) {
 				IResourceManagerConfiguration rmConfig = rm.getConfiguration();
 				if (rmConfig instanceof IRemoteResourceManagerConfiguration) {
@@ -395,8 +393,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 			return EMPTY_STRING;
 		}
 
-		IResourceManagerControl rm = (IResourceManagerControl) PTPCorePlugin.getDefault().getModelManager()
-				.getResourceManagerFromUniqueName(rmId);
+		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmId);
 		if (rm != null) {
 			/*
 			 * If the resource manager has been changed and this is a remote
