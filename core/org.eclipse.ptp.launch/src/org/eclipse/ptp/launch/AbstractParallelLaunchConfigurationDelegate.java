@@ -26,6 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -40,21 +43,18 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.ptp.core.AbstractJobSubmission;
-import org.eclipse.ptp.core.AbstractJobSubmission.JobSubStatus;
-import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.EnumeratedAttribute;
 import org.eclipse.ptp.core.attributes.IAttribute;
-import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
@@ -62,26 +62,8 @@ import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
-import org.eclipse.ptp.core.elements.events.IChangedJobEvent;
-import org.eclipse.ptp.core.elements.events.IChangedMachineEvent;
-import org.eclipse.ptp.core.elements.events.IChangedQueueEvent;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
-import org.eclipse.ptp.core.elements.events.INewJobEvent;
-import org.eclipse.ptp.core.elements.events.INewMachineEvent;
-import org.eclipse.ptp.core.elements.events.INewQueueEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveJobEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveMachineEvent;
-import org.eclipse.ptp.core.elements.events.IRemoveQueueEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
-import org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent;
 import org.eclipse.ptp.core.elements.listeners.IJobListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener;
-import org.eclipse.ptp.core.elements.listeners.IResourceManagerListener;
-import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
-import org.eclipse.ptp.core.events.INewResourceManagerEvent;
-import org.eclipse.ptp.core.events.IRemoveResourceManagerEvent;
-import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -109,65 +91,115 @@ import org.eclipse.ptp.utils.core.ArgumentParser;
  */
 public abstract class AbstractParallelLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements
 		ILaunchProcessCallback {
+
 	/**
-	 * The JobSubmission class encapsulates all the information used in a job
-	 * submission. Once the job is created *and starts running*, this
-	 * information is used to complete the launch.
+	 * Wait for job to begin running, then call completion method
 	 * 
-	 * TODO: Add persistence to job submissions so that Eclipse sessions can be
-	 * restarted without losing the submission information. The persistence will
-	 * also need to deal with starting the debugger for persisted debug jobs.
+	 * <pre>
+	 * Job state transition is STARTING--->RUNNING---->COMPLETED
+	 *                                  ^            |
+	 *                                  |-SUSPENDED<-|
+	 * </pre>
+	 * 
+	 * We must call completion method when job state is RUNNING, however it is
+	 * possible that the job may get to COMPLETED or SUSPENDED before we are
+	 * started. If either of these states is reached, assume that RUNNING has
+	 * also been reached.
 	 */
-	private class JobSubmission extends AbstractJobSubmission {
-		private final ILaunchConfiguration configuration;
-		private final String mode;
-		private final IPLaunch launch;
-		private final AttributeManager attrMgr;
-		private final IPDebugger debugger;
+	private class JobSubmission extends Job {
+		private final ILaunchConfiguration fConfiguration;
+		private final String fMode;
+		private final IPLaunch fLaunch;
+		private final AttributeManager fAttrMgr;
+		private final IPDebugger fDebugger;
+		private final IPJob fJob;
+		private final ReentrantLock fSubLock = new ReentrantLock();
+		private final Condition fSubCondition = fSubLock.newCondition();
 
-		public JobSubmission(int count, ILaunchConfiguration configuration, String mode, IPLaunch launch, AttributeManager attrMgr,
-				IPDebugger debugger) {
-			super(count);
-			this.configuration = configuration;
-			this.mode = mode;
-			this.launch = launch;
-			this.attrMgr = attrMgr;
-			this.debugger = debugger;
+		public JobSubmission(String name, ILaunchConfiguration conf, String mode, IPLaunch launch, AttributeManager attrMgr,
+				IPDebugger debugger, IPJob job) {
+			super(name);
+			fConfiguration = conf;
+			fMode = mode;
+			fLaunch = launch;
+			fAttrMgr = attrMgr;
+			fDebugger = debugger;
+			fJob = job;
 		}
 
-		/**
-		 * @return the attrMgr
-		 */
-		public AttributeManager getAttrMgr() {
-			return attrMgr;
+		public void statusChanged() {
+			fSubLock.lock();
+			try {
+				fSubCondition.signalAll();
+			} finally {
+				fSubLock.unlock();
+			}
 		}
 
-		/**
-		 * @return the configuration
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
+		 * IProgressMonitor)
 		 */
-		public ILaunchConfiguration getConfiguration() {
-			return configuration;
-		}
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			fSubLock.lock();
+			try {
+				while (fJob.getState() == JobAttributes.State.STARTING) {
+					try {
+						fSubCondition.await(100, TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						// Expect to be interrupted if monitor is canceled
+					}
+				}
+			} finally {
+				fSubLock.unlock();
+			}
 
-		/**
-		 * @return the debugger
-		 */
-		public IPDebugger getDebugger() {
-			return debugger;
-		}
+			doCompleteJobLaunch(fConfiguration, fMode, fLaunch, fAttrMgr, fDebugger, fJob);
 
-		/**
-		 * @return the launch
-		 */
-		public IPLaunch getLaunch() {
-			return launch;
-		}
+			fSubLock.lock();
+			try {
+				while (fJob.getState() != JobAttributes.State.COMPLETED) {
+					try {
+						fSubCondition.await(100, TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						// Expect to be interrupted if monitor is canceled
+					}
+				}
+			} finally {
+				fSubLock.unlock();
+			}
 
-		/**
-		 * @return the mode
-		 */
-		public String getMode() {
-			return mode;
+			/*
+			 * When the job terminates, do any post launch data synchronization.
+			 */
+			// If needed, copy data back.
+			try {
+				// Get the list of paths to be copied back.
+				doPostLaunchSynchronization(fConfiguration);
+			} catch (CoreException e) {
+				PTPLaunchPlugin.log(e);
+			}
+
+			/*
+			 * Clean up any launch activities.
+			 */
+			doCleanupLaunch(fConfiguration, fMode, fLaunch);
+
+			/*
+			 * Remove listener for job status changes
+			 */
+			fJob.removeElementListener(jobListener);
+
+			/*
+			 * Remove job submission
+			 */
+			synchronized (jobSubmissions) {
+				jobSubmissions.remove(fJob);
+			}
+			return Status.OK_STATUS;
 		}
 	}
 
@@ -182,262 +214,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		public void handleEvent(IJobChangeEvent e) {
 			IPJob job = e.getSource();
 			AttributeManager attrMgr = e.getAttributes();
-			StringAttribute subIdAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
-			if (subIdAttr != null) {
-				EnumeratedAttribute<JobAttributes.State> stateAttr = attrMgr.getAttribute(JobAttributes
-						.getStateAttributeDefinition());
-				if (stateAttr != null) {
-					JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
-					if (jobSub != null) {
-						switch (stateAttr.getValue()) {
-						case RUNNING:
-							/*
-							 * When the job starts running call back to notify
-							 * that job submission is completed.
-							 */
-							doCompleteJobLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch(),
-									jobSub.getAttrMgr(), jobSub.getDebugger(), job);
-							break;
-
-						case COMPLETED:
-							/*
-							 * When the job terminates, do any post launch data
-							 * synchronization.
-							 */
-							ILaunchConfiguration lconf = jobSub.getConfiguration();
-							// If needed, copy data back.
-							try {
-								// Get the list of paths to be copied back.
-								doPostLaunchSynchronization(lconf);
-							} catch (CoreException e1) {
-								PTPLaunchPlugin.log(e1);
-							}
-
-							/*
-							 * Clean up any launch activities.
-							 */
-							doCleanupLaunch(jobSub.getConfiguration(), jobSub.getMode(), jobSub.getLaunch());
-
-							jobSubmissions.remove(jobSub);
-							break;
-						}
-					}
-					PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
+			EnumeratedAttribute<JobAttributes.State> stateAttr = attrMgr.getAttribute(JobAttributes.getStateAttributeDefinition());
+			if (stateAttr != null) {
+				JobSubmission jobSub;
+				synchronized (jobSubmissions) {
+					jobSub = jobSubmissions.get(job);
+				}
+				if (jobSub != null) {
+					jobSub.statusChanged();
 				}
 			}
-		}
-	}
-
-	private final class MMChildListener implements IModelManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IChangedResourceManagerEvent)
-		 */
-		public void handleEvent(IChangedResourceManagerEvent e) {
-			// Don't need to do anything
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.INewResourceManagerEvent)
-		 */
-		public void handleEvent(INewResourceManagerEvent e) {
-			/*
-			 * Add resource manager child listener so we get notified when new
-			 * machines are added to the model.
-			 */
-			final IPResourceManager rm = e.getResourceManager();
-			rm.addChildListener(resourceManagerChildListener);
-			rm.addElementListener(resourceManagerListener);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.listeners.IModelManagerChildListener#handleEvent
-		 * (org.eclipse.ptp.core.events.IRemoveResourceManagerEvent)
-		 */
-		public void handleEvent(IRemoveResourceManagerEvent e) {
-			/*
-			 * Removed resource manager child listener when resource manager is
-			 * removed.
-			 */
-			final IPResourceManager rm = e.getResourceManager();
-			rm.removeChildListener(resourceManagerChildListener);
-			rm.removeElementListener(resourceManagerListener);
-		}
-	}
-
-	private final class RMChildListener implements IResourceManagerChildListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.IChangedJobEvent)
-		 */
-		public void handleEvent(IChangedJobEvent e) {
-			// Handled by IJobListener
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewJobEvent)
-		 */
-		public void handleEvent(INewJobEvent e) {
-			/*
-			 * Notify listeners that the job state has changed (in this case the
-			 * job should be in pending state)
-			 */
-			for (IPJob job : e.getJobs()) {
-				StringAttribute subIdAttr = job.getAttribute(JobAttributes.getSubIdAttributeDefinition());
-				if (subIdAttr != null) {
-					EnumeratedAttribute<JobAttributes.State> stateAttr = job.getAttribute(JobAttributes
-							.getStateAttributeDefinition());
-					if (stateAttr != null) {
-						PTPLaunchPlugin.getDefault().notifyJobStateChange(job, stateAttr.getValue());
-					}
-					JobSubmission jobSub = jobSubmissions.get(subIdAttr.getValue());
-					if (jobSub != null) {
-						/*
-						 * The job must now be SUBMITTED as the job has been
-						 * created. Set the status so that anyone waiting on the
-						 * job submission will be notified.
-						 */
-						jobSub.setStatus(JobSubStatus.SUBMITTED);
-					}
-				}
-				job.addElementListener(jobListener);
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.IRemoveJobEvent)
-		 */
-		public void handleEvent(IRemoveJobEvent e) {
-			for (IPJob job : e.getJobs()) {
-				job.removeElementListener(jobListener);
-			}
-		} /*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerChangedMachineEvent)
-		 */
-
-		public void handleEvent(IChangedMachineEvent e) {
-			// Don't need to do anything
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerChangedQueueEvent)
-		 */
-		public void handleEvent(IChangedQueueEvent e) {
-			// Can safely ignore
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerNewMachineEvent)
-		 */
-		public void handleEvent(INewMachineEvent e) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.INewQueueEvent)
-		 */
-		public void handleEvent(INewQueueEvent e) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerMachineListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerRemoveMachineEvent)
-		 */
-		public void handleEvent(IRemoveMachineEvent e) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerChildListener
-		 * #handleEvent(org.eclipse.ptp.core.elements.events.
-		 * IResourceManagerRemoveQueueEvent)
-		 */
-		public void handleEvent(IRemoveQueueEvent e) {
-		}
-	}
-
-	private final class RMListener implements IResourceManagerListener {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
-		 * handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IResourceManagerChangeEvent)
-		 */
-		public void handleEvent(IResourceManagerChangeEvent e) {
-			// Ignore
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
-		 * handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent)
-		 */
-		public void handleEvent(IResourceManagerErrorEvent e) {
-			// TODO Auto-generated method stub
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ptp.core.elements.listeners.IResourceManagerListener#
-		 * handleEvent
-		 * (org.eclipse.ptp.core.elements.events.IResourceManagerSubmitJobErrorEvent
-		 * )
-		 */
-		public void handleEvent(IResourceManagerSubmitJobErrorEvent e) {
-			JobSubmission jobSub = jobSubmissions.remove(e.getJobSubmissionId());
-			jobSub.setError(e.getMessage());
 		}
 	}
 
@@ -581,20 +367,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 
 	/*
-	 * Total number of jobs submitted
-	 */
-	private int jobCount = 0;
-	/*
 	 * Model listeners
 	 */
-	private final IModelManagerChildListener modelManagerChildListener = new MMChildListener();
-	private final IResourceManagerChildListener resourceManagerChildListener = new RMChildListener();
-	private final IResourceManagerListener resourceManagerListener = new RMListener();
 	private final IJobListener jobListener = new JobListener();
 	/*
 	 * HashMap used to keep track of job submissions
 	 */
-	protected Map<String, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<String, JobSubmission>());
+	protected Map<IPJob, JobSubmission> jobSubmissions = Collections.synchronizedMap(new HashMap<IPJob, JobSubmission>());
 	/*
 	 * Data synchronization rules
 	 */
@@ -604,14 +383,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * Constructor
 	 */
 	public AbstractParallelLaunchConfigurationDelegate() {
-		IModelManager mm = PTPCorePlugin.getDefault().getModelManager();
-		synchronized (mm) {
-			for (IPResourceManager rm : mm.getUniverse().getResourceManagers()) {
-				rm.addChildListener(resourceManagerChildListener);
-				rm.addElementListener(resourceManagerListener);
-			}
-			mm.addListener(modelManagerChildListener);
-		}
 	}
 
 	/*
@@ -1188,23 +959,13 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						Messages.AbstractParallelLaunchConfigurationDelegate_No_ResourceManager));
 			}
 
-			JobSubmission jobSub = new JobSubmission(jobCount++, configuration, mode, launch, attrMgr, debugger);
-			jobSubmissions.put(jobSub.getId(), jobSub);
-
-			JobSubStatus status;
-
-			try {
-				rm.submitJob(jobSub.getId(), configuration, attrMgr, progress.newChild(5));
-				status = jobSub.waitFor(progress.newChild(5));
-			} catch (CoreException e) {
-				jobSub.setError(e.getMessage());
-				jobSub.setStatus(JobSubStatus.ERROR);
-				status = JobSubStatus.ERROR;
+			IPJob job = rm.submitJob(configuration, attrMgr, progress.newChild(5));
+			JobSubmission jobSub = new JobSubmission(job.getName(), configuration, mode, launch, attrMgr, debugger, job);
+			synchronized (jobSubmissions) {
+				jobSubmissions.put(job, jobSub);
 			}
-
-			if (status == JobSubStatus.ERROR) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), jobSub.getError()));
-			}
+			job.addElementListener(jobListener);
+			jobSub.schedule();
 		} finally {
 			if (monitor != null) {
 				monitor.done();
