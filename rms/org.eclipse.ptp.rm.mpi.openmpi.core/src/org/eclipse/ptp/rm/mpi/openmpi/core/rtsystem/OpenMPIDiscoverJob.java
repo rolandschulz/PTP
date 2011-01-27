@@ -89,7 +89,7 @@ public class OpenMPIDiscoverJob extends AbstractRemoteCommandJob {
 		 * MPI resource manager have only one machine and one queue. There they
 		 * are implicitly "discovered".
 		 */
-		IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rts.getRmID());
+		IPResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManager(rts.getRmID());
 		String machineID = rts.createMachine(connection.getName());
 		rts.setMachineID(machineID);
 		String queueID = rts.createQueue(Messages.OpenMPIDiscoverJob_defaultQueueName);

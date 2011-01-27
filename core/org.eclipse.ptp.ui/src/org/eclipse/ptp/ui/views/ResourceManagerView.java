@@ -186,7 +186,7 @@ public class ResourceManagerView extends ViewPart {
 			resourceManagers.add(resourceManager);
 			resourceManager.addElementListener(rmListener);
 			resourceManager.addChildListener(rmChildListener);
-			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
+			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
 		}
 
 		/*
@@ -202,7 +202,7 @@ public class ResourceManagerView extends ViewPart {
 			resourceManager.removeElementListener(rmListener);
 			resourceManager.removeChildListener(rmChildListener);
 			rmChildListener.removeListeners(resourceManager);
-			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
+			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
 		}
 	}
 
@@ -550,7 +550,7 @@ public class ResourceManagerView extends ViewPart {
 		public void added(IRMModelChangeEvent event) {
 			final IResourceManager rm = event.getResourceManager();
 			rm.addListener(rmChangeListener);
-			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
+			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
 		}
 
 		public void changed(IRMModelChangeEvent event) {
@@ -560,7 +560,7 @@ public class ResourceManagerView extends ViewPart {
 		public void removed(IRMModelChangeEvent event) {
 			final IResourceManager rm = event.getResourceManager();
 			rm.removeListener(rmChangeListener);
-			refreshViewer(PTPCorePlugin.getDefault().getUniverse());
+			refreshViewer(PTPCorePlugin.getDefault().getModelManager().getUniverse());
 		}
 
 	}
@@ -663,7 +663,7 @@ public class ResourceManagerView extends ViewPart {
 				}
 			}
 		});
-		viewer.setInput(PTPCorePlugin.getDefault().getUniverse());
+		viewer.setInput(PTPCorePlugin.getDefault().getModelManager().getUniverse());
 
 		// -----------------------------
 		// Enable right-click popup menu

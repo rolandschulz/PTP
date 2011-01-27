@@ -20,8 +20,6 @@ package org.eclipse.ptp.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.listeners.IModelManagerChildListener;
 import org.eclipse.ptp.rmsystem.IResourceManagerConfiguration;
 import org.eclipse.ptp.services.core.ServiceModelManager;
@@ -56,15 +54,6 @@ public interface IModelManager extends IModelPresentation {
 	 * @since 5.0
 	 */
 	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName);
-
-	/**
-	 * Find resource managers that have been started
-	 * 
-	 * @param universe
-	 * @return array of resource managers
-	 * @since 5.0
-	 */
-	public IPResourceManager[] getStartedResourceManagers(IPUniverse universe);
 
 	/**
 	 * Loads saved resource managers. Loading of resource manager configuration
@@ -126,14 +115,4 @@ public interface IModelManager extends IModelPresentation {
 	 * @throws CoreException
 	 */
 	public void stopResourceManagers() throws CoreException;
-
-	/**
-	 * Notify the model that the resource manager attributes or configuration
-	 * has been changed.
-	 * 
-	 * @param rm
-	 *            resource manager
-	 * @since 5.0
-	 */
-	public void updateResourceManager(IPResourceManager rm);
 }

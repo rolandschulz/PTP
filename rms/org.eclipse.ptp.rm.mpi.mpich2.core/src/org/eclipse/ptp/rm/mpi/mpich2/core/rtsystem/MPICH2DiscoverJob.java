@@ -31,32 +31,32 @@ import org.eclipse.ptp.rm.mpi.mpich2.core.messages.Messages;
 /**
  * 
  * @author Greg Watson
- *
+ * 
  */
 public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 	MPICH2RuntimeSystem rts;
 
 	public MPICH2DiscoverJob(MPICH2RuntimeSystem rts, IProgressMonitor monitor) {
-		super(rts,
-				NLS.bind(Messages.MPICH2DiscoverJob_name, rts.getRmConfiguration().getName()),
-				rts.retrieveEffectiveToolRmConfiguration().getDiscoverCmd(),
-				Messages.MPICH2DiscoverJob_interruptedErrorMessage,
-				Messages.MPICH2DiscoverJob_processErrorMessage,
-				Messages.MPICH2DiscoverJob_parsingErrorMessage,
-				monitor);
+		super(rts, NLS.bind(Messages.MPICH2DiscoverJob_name, rts.getRmConfiguration().getName()), rts
+				.retrieveEffectiveToolRmConfiguration().getDiscoverCmd(), Messages.MPICH2DiscoverJob_interruptedErrorMessage,
+				Messages.MPICH2DiscoverJob_processErrorMessage, Messages.MPICH2DiscoverJob_parsingErrorMessage, monitor);
 		this.rts = rts;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob#parse(java.io.BufferedReader)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rm.core.rtsystem.AbstractRemoteCommandJob#parse(java.
+	 * io.BufferedReader)
 	 */
 	@Override
 	protected IStatus parse(BufferedReader output) {
 		/*
-		 * MPI resource manager have only one machine and one queue.
-		 * There they are implicitly "discovered".
+		 * MPI resource manager have only one machine and one queue. There they
+		 * are implicitly "discovered".
 		 */
-		IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rts.getRmID());
+		IPResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManager(rts.getRmID());
 		String machineID = rts.createMachine(rm.getName());
 		rts.setMachineID(machineID);
 		String queueID = rts.createQueue(Messages.MPICH2DiscoverJob_defaultQueueName);
@@ -66,18 +66,20 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 		assert machine != null;
 
 		/*
-		 * Any exception from now on is caught in order to add the error message as an attribute to the machine.
-		 * Then, the exception is re-thrown.
+		 * Any exception from now on is caught in order to add the error message
+		 * as an attribute to the machine. Then, the exception is re-thrown.
 		 */
 		try {
 			/*
-			 * Parse output of trace command that describes the system configuration.
+			 * Parse output of trace command that describes the system
+			 * configuration.
 			 */
 			MPICH2TraceParser parser = new MPICH2TraceParser();
 			MPICH2HostMap hostMap = parser.parse(output);
 			if (hostMap == null) {
 				machine.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-				machine.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(Messages.MPICH2DiscoverJob_Exception_HostFileParseError));
+				machine.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(
+						Messages.MPICH2DiscoverJob_Exception_HostFileParseError));
 				return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), parser.getErrorMessage());
 			}
 
@@ -95,9 +97,11 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 				AttributeManager attrManager = new AttributeManager();
 				if (host.getNumProcessors() != 0) {
 					try {
-						attrManager.addAttribute(MPICH2NodeAttributes.getNumberOfNodesAttributeDefinition().create(Integer.valueOf(host.getNumProcessors())));
+						attrManager.addAttribute(MPICH2NodeAttributes.getNumberOfNodesAttributeDefinition().create(
+								Integer.valueOf(host.getNumProcessors())));
 					} catch (IllegalValueException e) {
-						// This situation is not possible since host.getNumProcessors() is always valid.
+						// This situation is not possible since
+						// host.getNumProcessors() is always valid.
 						assert false;
 					}
 				}
@@ -106,15 +110,18 @@ public class MPICH2DiscoverJob extends AbstractRemoteCommandJob {
 			}
 		} catch (Exception e) {
 			/*
-			 * Show message of all other exceptions and change machine status to error.
+			 * Show message of all other exceptions and change machine status to
+			 * error.
 			 */
 			AttributeManager attrManager = new AttributeManager();
 			attrManager.addAttribute(MachineAttributes.getStateAttributeDefinition().create(MachineAttributes.State.ERROR));
-			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
+			attrManager.addAttribute(MPICH2MachineAttributes.getStatusMessageAttributeDefinition().create(
+					NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage())));
 			rts.changeMachine(machineID, attrManager);
-			return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), NLS.bind(Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e);
+			return new Status(IStatus.ERROR, MPICH2Plugin.getDefault().getBundle().getSymbolicName(), NLS.bind(
+					Messages.MPICH2DiscoverJob_Exception_DiscoverCommandInternalError, e.getMessage()), e);
 		}
-		
+
 		return Status.OK_STATUS;
 	}
 }

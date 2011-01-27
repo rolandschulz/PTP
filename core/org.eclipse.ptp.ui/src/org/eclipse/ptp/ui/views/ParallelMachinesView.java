@@ -1225,7 +1225,7 @@ public class ParallelMachinesView extends AbstractParallelSetView implements ISe
 	 */
 	@Override
 	protected void initialElement() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 
 		/*
 		 * Add us as a child listener to any existing machines

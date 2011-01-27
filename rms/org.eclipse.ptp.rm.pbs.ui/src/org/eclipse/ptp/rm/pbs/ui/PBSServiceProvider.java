@@ -73,7 +73,7 @@ public class PBSServiceProvider extends AbstractRemoteResourceManagerServiceProv
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResourceManagerControl.class) {
-			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getUniverse();
+			IPUniverseControl universe = (IPUniverseControl) PTPCorePlugin.getDefault().getModelManager().getUniverse();
 			return new PBSResourceManager(Integer.valueOf(universe.getNextResourceManagerId()), universe, this);
 		}
 		return null;

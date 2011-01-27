@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.messages.Messages;
 import org.eclipse.ptp.core.rm.RMModelManager;
 import org.eclipse.ptp.core.util.DebugUtil;
@@ -156,15 +155,6 @@ public class PTPCorePlugin extends Plugin {
 	 */
 	public ResourceBundle getResourceBundle() {
 		return resourceBundle;
-	}
-
-	/**
-	 * Convenience function to return the universe
-	 * 
-	 * @return the universe
-	 */
-	public IPUniverse getUniverse() {
-		return getModelPresentation().getUniverse();
 	}
 
 	/**

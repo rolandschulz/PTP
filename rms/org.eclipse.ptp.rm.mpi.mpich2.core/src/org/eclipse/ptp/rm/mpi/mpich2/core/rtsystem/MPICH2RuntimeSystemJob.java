@@ -30,6 +30,7 @@ import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.attributes.IntegerAttribute;
 import org.eclipse.ptp.core.attributes.StringAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
@@ -67,7 +68,9 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void initializeProcesses() {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getJobById(getJobID());
+		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
+				.getResourceManagerFromUniqueName(getRtSystem().getRmConfiguration().getUniqueName());
+		final IPJob ipJob = rm.getJobById(getJobID());
 		IntegerAttribute numProcsAttr = ipJob.getAttribute(JobAttributes.getNumberOfProcessesAttributeDefinition());
 		getRtSystem().createProcesses(getJobID(), numProcsAttr.getValue().intValue());
 
@@ -82,7 +85,9 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void terminateProcesses() {
 		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getJobById(getJobID());
+		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
+				.getResourceManagerFromUniqueName(getRtSystem().getRmConfiguration().getUniqueName());
+		final IPJob ipJob = rm.getJobById(getJobID());
 
 		/*
 		 * Mark all running and starting processes as finished.
@@ -132,8 +137,9 @@ public class MPICH2RuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 
 	@Override
 	protected void doExecutionStarted(IProgressMonitor monitor) throws CoreException {
-		final MPICH2RuntimeSystem rtSystem = (MPICH2RuntimeSystem) getRtSystem();
-		final IPJob ipJob = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID()).getJobById(getJobID());
+		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
+				.getResourceManagerFromUniqueName(getRtSystem().getRmConfiguration().getUniqueName());
+		final IPJob ipJob = rm.getJobById(getJobID());
 
 		initializeProcesses();
 
