@@ -30,7 +30,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.elements.IPResourceManager;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -147,7 +147,7 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected IPResourceManager getResourceManager(ILaunchConfiguration configuration) {
+	protected IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) {
 		final String rmUniqueName;
 		try {
 			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,

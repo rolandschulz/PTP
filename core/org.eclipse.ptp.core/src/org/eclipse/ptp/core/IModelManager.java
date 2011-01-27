@@ -55,7 +55,7 @@ public interface IModelManager extends IModelPresentation {
 	 * @return resource manager
 	 * @since 5.0
 	 */
-	public IPResourceManager getResourceManagerFromUniqueName(String rmUniqueName);
+	public IResourceManagerControl getResourceManagerFromUniqueName(String rmUniqueName);
 
 	/**
 	 * Find resource managers that have been started

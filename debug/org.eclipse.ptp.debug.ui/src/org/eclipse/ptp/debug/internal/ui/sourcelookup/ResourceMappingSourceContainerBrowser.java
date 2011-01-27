@@ -107,8 +107,7 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 		} catch (CoreException e) {
 		}
 		if (rmName != null) {
-			IResourceManagerControl rm = (IResourceManagerControl) PTPCorePlugin.getDefault().getModelManager()
-					.getResourceManagerFromUniqueName(rmName);
+			IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmName);
 			if (rm != null) {
 				String remId = rm.getConfiguration().getRemoteServicesId();
 				String connName = rm.getConfiguration().getConnectionName();

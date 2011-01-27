@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.core.elements;
 
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+
 /**
  * A Universe represents a user's view of the world. It is comprised of a set of
  * Resource Managers.
@@ -38,6 +40,6 @@ public interface IPUniverse extends IPElement {
 	 * @return IPResourceManager[]
 	 * @since 5.0
 	 */
-	public IPResourceManager[] getResourceManagers();
+	public IResourceManagerControl[] getResourceManagers();
 
 }
