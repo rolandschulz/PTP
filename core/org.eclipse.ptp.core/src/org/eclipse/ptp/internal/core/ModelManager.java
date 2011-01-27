@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,7 +39,6 @@ import org.eclipse.ptp.core.elementcontrols.IPUniverseControl;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IResourceManagerErrorEvent;
 import org.eclipse.ptp.core.events.IChangedResourceManagerEvent;
 import org.eclipse.ptp.core.events.INewResourceManagerEvent;
@@ -229,24 +227,6 @@ public class ModelManager implements IModelManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#getStartedResourceManagers(org.eclipse
-	 * .ptp.core.elements.IPUniverse)
-	 */
-	public IPResourceManager[] getStartedResourceManagers(IPUniverse universe) {
-		IPResourceManager[] rms = universe.getResourceManagers();
-		ArrayList<IPResourceManager> startedRMs = new ArrayList<IPResourceManager>(rms.length);
-		for (IPResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
-				startedRMs.add(rm);
-			}
-		}
-		return startedRMs.toArray(new IPResourceManager[startedRMs.size()]);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.core.IModelPresentation#getUniverse()
 	 */
 	public IPUniverse getUniverse() {
@@ -377,17 +357,6 @@ public class ModelManager implements IModelManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.core.IModelManager#updateResourceManager(org.eclipse.
-	 * ptp.core.elements.IPResourceManager)
-	 */
-	public void updateResourceManager(IPResourceManager rm) {
-		fireChangedResourceManager(Arrays.asList(rm));
-	}
-
 	private void doRemoveResourceManager(IResourceManagerControl rm) {
 		synchronized (universe) {
 			universe.removeResourceManager(rm);
@@ -473,6 +442,10 @@ public class ModelManager implements IModelManager {
 			Job job = new RMStartupJob(rm);
 			job.schedule();
 		}
+	}
+
+	private void updateResourceManager(IPResourceManager rm) {
+		fireChangedResourceManager(Arrays.asList(rm));
 	}
 
 }

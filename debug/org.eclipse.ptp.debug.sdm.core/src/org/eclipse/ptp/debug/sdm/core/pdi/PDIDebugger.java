@@ -31,8 +31,6 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
-import org.eclipse.ptp.core.elements.IPUniverse;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.TaskSet;
@@ -1013,8 +1011,6 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 	 * @throws CoreException
 	 */
 	private IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws PDIException {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IPResourceManager[] rms = universe.getResourceManagers();
 		String rmUniqueName;
 		try {
 			rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
@@ -1022,10 +1018,9 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 		} catch (CoreException e) {
 			throw new PDIException(null, e.getMessage());
 		}
-		for (IPResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED && rm.getUniqueName().equals(rmUniqueName)) {
-				return (IResourceManagerControl) rm;
-			}
+		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+			return rm;
 		}
 		return null;
 	}

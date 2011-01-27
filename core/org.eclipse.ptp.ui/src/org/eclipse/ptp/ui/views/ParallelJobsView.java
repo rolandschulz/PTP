@@ -991,7 +991,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	@Override
 	protected void initialElement() {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
 		manager.initial(universe);
 		changeJobRefresh(null, true);
 	}

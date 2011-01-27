@@ -21,8 +21,8 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.attributes.AttributeManager;
 import org.eclipse.ptp.core.attributes.IAttribute;
 import org.eclipse.ptp.core.elementcontrols.IPJobControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
-import org.eclipse.ptp.core.elements.IPResourceManager;
 import org.eclipse.ptp.core.elements.attributes.ProcessAttributes;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.core.MPIJobAttributes;
@@ -48,7 +48,8 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 	 */
 	private void terminateProcesses() {
 		final GenericRMRuntimeSystem rtSystem = (GenericRMRuntimeSystem) getRtSystem();
-		final IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rtSystem.getRmID());
+		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
+				.getResourceManagerFromUniqueName(rtSystem.getRmConfiguration().getUniqueName());
 		if (rm != null) {
 			final IPJob ipJob = rm.getJobById(getJobID());
 			if (ipJob != null) {
@@ -151,8 +152,9 @@ public class GenericRMRuntimeSystemJob extends AbstractToolRuntimeSystemJob {
 		/*
 		 * Create processes for the job.
 		 */
-		final IPJob job = PTPCorePlugin.getDefault().getUniverse().getResourceManager(getRtSystem().getRmID())
-				.getJobById(getJobID());
+		final IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager()
+				.getResourceManagerFromUniqueName(getRtSystem().getRmConfiguration().getUniqueName());
+		final IPJob job = rm.getJobById(getJobID());
 		addProcess(job);
 
 		/*

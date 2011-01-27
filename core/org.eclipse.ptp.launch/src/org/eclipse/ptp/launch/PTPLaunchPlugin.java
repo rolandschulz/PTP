@@ -45,7 +45,6 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.launch.messages.Messages;
@@ -270,14 +269,11 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 * @since 5.0
 	 */
 	public IPResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IPResourceManager[] rms = universe.getResourceManagers();
 		String rmUniqueName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
 				(String) null);
-		for (IPResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED && rm.getUniqueName().equals(rmUniqueName)) {
-				return rm;
-			}
+		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+			return rm;
 		}
 		return null;
 	}

@@ -54,7 +54,7 @@ public class MPICH2PeriodicJob extends AbstractRemoteCommandJob {
 		 * MPI resource manager have only one machine and one queue. There they
 		 * are implicitly "discovered".
 		 */
-		IPResourceManager rm = PTPCorePlugin.getDefault().getUniverse().getResourceManager(rts.getRmID());
+		IPResourceManager rm = PTPCorePlugin.getDefault().getModelManager().getUniverse().getResourceManager(rts.getRmID());
 		IPMachine machine = rm.getMachineById(rts.getMachineID());
 		IPQueue queue = rm.getQueueById(rts.getQueueID());
 

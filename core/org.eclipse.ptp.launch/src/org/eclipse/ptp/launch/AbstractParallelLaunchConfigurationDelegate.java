@@ -59,7 +59,6 @@ import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.core.elements.IPQueue;
 import org.eclipse.ptp.core.elements.IPResourceManager;
-import org.eclipse.ptp.core.elements.IPUniverse;
 import org.eclipse.ptp.core.elements.attributes.JobAttributes;
 import org.eclipse.ptp.core.elements.attributes.ResourceManagerAttributes;
 import org.eclipse.ptp.core.elements.events.IJobChangeEvent;
@@ -452,7 +451,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	public IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		IResourceManagerControl rm = (IResourceManagerControl) getResourceManager(configuration);
+		IResourceManagerControl rm = getResourceManager(configuration);
 		if (rm != null) {
 			IResourceManagerConfiguration conf = rm.getConfiguration();
 			IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
@@ -851,14 +850,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @throws CoreException
 	 * @since 5.0
 	 */
-	protected IPResourceManager getResourceManager(ILaunchConfiguration configuration) throws CoreException {
-		IPUniverse universe = PTPCorePlugin.getDefault().getUniverse();
-		IPResourceManager[] rms = universe.getResourceManagers();
+	protected IResourceManagerControl getResourceManager(ILaunchConfiguration configuration) throws CoreException {
 		String rmUniqueName = getResourceManagerUniqueName(configuration);
-		for (IPResourceManager rm : rms) {
-			if (rm.getState() == ResourceManagerAttributes.State.STARTED && rm.getUniqueName().equals(rmUniqueName)) {
-				return rm;
-			}
+		IResourceManagerControl rm = PTPCorePlugin.getDefault().getModelManager().getResourceManagerFromUniqueName(rmUniqueName);
+		if (rm.getState() == ResourceManagerAttributes.State.STARTED) {
+			return rm;
 		}
 		return null;
 	}
