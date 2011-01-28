@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2009,2010 IBM Corporation.
+ * Copyright (c) 2009,2011 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,12 +50,13 @@ public class MarkerManager {
 
 	static String path;
 	static String filename;
-	
-	/** Hash table of filenames and resources.  Since usually a single file is
+
+	/**
+	 * Hash table of filenames and resources. Since usually a single file is
 	 * used often, we don't recreate the IResource.<br>
 	 * This is the list of unique files found in the IFeedbackItems
 	 */
-	Map<String,IResource> fileMap = new HashMap<String,IResource>();
+	Map<String, IResource> fileMap = new HashMap<String, IResource>();
 
 	/**
 	 * FIXME this will be valid on local file system only
@@ -63,16 +64,15 @@ public class MarkerManager {
 	private static final String SLASH = System.getProperty("file.separator"); //$NON-NLS-1$
 
 	/**
-	 * Remove the markers 
-	 * and remove the then-empty parent nodes too
+	 * Remove the markers and remove the then-empty parent nodes too
 	 * 
 	 */
 	public void removeMarkers(IResource res, String markerID) {
 		try {
 			res.deleteMarkers(markerID, true, IResource.DEPTH_INFINITE);
 		} catch (CoreException e) {
-			System.out.println("Error deleting markers on " + res.getName()+" - probably can ignore this."); //$NON-NLS-1$
-			//e.printStackTrace();
+			System.out.println("Error deleting markers on " + res.getName() + " - probably can ignore this."); //$NON-NLS-1$
+			// e.printStackTrace();
 		}
 	}
 
@@ -196,10 +196,15 @@ public class MarkerManager {
 		ResourcesPlugin.getWorkspace();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(filename));// local file system only (null for remote)
+		IFile file = root.getFileForLocation(new Path(filename));// local file
+																	// system
+																	// only
+																	// (null for
+																	// remote)
 		file = root.getFile(new Path(filename));
 		return file;
 	}
+
 	/**
 	 * @since 5.0
 	 */
@@ -208,48 +213,53 @@ public class MarkerManager {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		IFile[] files = root.findFilesForLocationURI(location);
-		IFile file = files[0];//hack
+		IFile file = files[0];// hack
 		return file;
 	}
+
 	/**
-	 * from SampleFeedbackParser.getResource
-	 * <br>
+	 * from SampleFeedbackParser.getResource <br>
 	 * Works for remote projects/files too
+	 * 
 	 * @param projName
 	 * @param filename
 	 * @return
 	 * @since 5.0
 	 */
-	 public static IResource getResourceInProject(String projName, String filename) {
-	       ResourcesPlugin.getWorkspace();
-	       IWorkspace workspace = ResourcesPlugin.getWorkspace();
-	       IWorkspaceRoot root = workspace.getRoot();
-	       IProject proj=root.getProject(projName);
-	       IResource res = proj.findMember(filename);
-	       //boolean exists=res.exists();
-	       
-	       //IFile file=root.getFile(new Path(filename)); // works when filename contains project name
-	       return res;
-	   }
+	public static IResource getResourceInProject(String projName, String filename) {
+		ResourcesPlugin.getWorkspace();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IProject proj = root.getProject(projName);
+		IResource res = proj.findMember(filename);
+		// boolean exists=res.exists();
+
+		// IFile file=root.getFile(new Path(filename)); // works when filename
+		// contains project name
+		return res;
+	}
 
 	private static int counter = 0;
 
 	/**
 	 * Create marker attributes common to all marker items.
 	 * 
-	 * @param item the IFeedback item that this marker represents.  
+	 * @param item
+	 *            the IFeedback item that this marker represents.
 	 * @param itemID
 	 * @param name
 	 * @param parentID
 	 * @param filename
-	 * @param pathname possibly not used?
+	 * @param pathname
+	 *            possibly not used?
 	 * @param lineNo
 	 * @param desc
 	 * @return
 	 * @since 5.0
 	 */
-	public Map<String, Object> createCommonMarkers(IFeedbackItem item, String itemID, String name, String parentID, String filename, String pathname,
-			int lineNo,  String desc) {
+	public Map<String, Object> createCommonMarkers(IFeedbackItem item, String itemID, String name, String parentID,
+			String filename, String pathname,
+			int lineNo, String desc) {
 		Map<String, Object> attrs = new HashMap<String, Object>();
 
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_ID, itemID);
@@ -257,16 +267,17 @@ public class MarkerManager {
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_NAME, name);
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_FILENAME, filename);
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_PARENT, parentID);
- 
+
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_PATHNAME, pathname);
 		attrs.put(IMarker.LINE_NUMBER, new Integer(lineNo));
-		
+
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_ITEM, item);
 
 		// later, set the marker to more precise location - but omit for now, or
 		// else lineNumber won't be used
 		// attrs.put(IMarker.CHAR_START, new Integer(ila.getColumn()));
-		// attrs.put(IMarker.CHAR_END, new Integer(ila.getColumn()+5));// hack, what is end?
+		// attrs.put(IMarker.CHAR_END, new Integer(ila.getColumn()+5));// hack,
+		// what is end?
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_DESC, desc);
 		attrs.put(FeedbackIDs.FEEDBACK_ATTR_LOOP_ID, ""); // filled in by (only) transform attempts //$NON-NLS-1$
 		return attrs;
@@ -276,7 +287,8 @@ public class MarkerManager {
 		try {
 			MarkerUtilities.createMarker(resource, attrs, markerID);
 			if (traceOn)
-				System.out.println("  MarkerManager: Created marker for " + resource.getName() + " " + attrs.get(FeedbackIDs.FEEDBACK_ATTR_NAME) + " lineNo:" + attrs.get(IMarker.LINE_NUMBER) + " parentID=" + attrs.get(FeedbackIDs.FEEDBACK_ATTR_PARENT)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				System.out
+						.println("  MarkerManager: Created marker for " + resource.getName() + " " + attrs.get(FeedbackIDs.FEEDBACK_ATTR_NAME) + " lineNo:" + attrs.get(IMarker.LINE_NUMBER) + " parentID=" + attrs.get(FeedbackIDs.FEEDBACK_ATTR_PARENT)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		} catch (CoreException e) {
 			System.out.println("Error creating Xform marker: " + e.getMessage()); //$NON-NLS-1$
 			e.printStackTrace();
@@ -284,80 +296,88 @@ public class MarkerManager {
 	}
 
 	/**
-	 * Create the markers for the IFeedbackItems.
-	 * Note: some Items may be parent groups and not have file, etc. info
+	 * Create the markers for the IFeedbackItems. Note: some Items may be parent
+	 * groups and not have file, etc. info
 	 * 
 	 * 
 	 * @param itemlist
 	 */
 	public void createMarkers(final List<IFeedbackItem> itemlist, final String markerID) {
-		long firstStart=System.currentTimeMillis();
-		if(traceOn)System.out.println("MarkerMgr.createMarkers()...");
-		if(itemlist.size()==0) {
+		long firstStart = System.currentTimeMillis();
+		if (traceOn)
+			System.out.println("MarkerMgr.createMarkers()...");
+		if (itemlist.size() == 0) {
 			showNoItemsFound();
 			return;
 		}
 		// create the list of unique files found in the IFeedbackItems
-		fileMap = new HashMap<String,IResource>();
+		fileMap = new HashMap<String, IResource>();
 		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
-			IFeedbackItem item = (IFeedbackItem) iterator.next();
+			IFeedbackItem item = iterator.next();
 
 			String filename = item.getFile();
 
 			// Populate fileMap
-			if( (filename!=null) && (!fileMap.containsKey(filename))  ) {
-				//IResource res = getResource(f1);
-				IFile ifile=item.getIFile();// works for a remote file :)
-				if(traceOn)System.out.println("MM: found: "+ifile.getLocationURI());
-				fileMap.put(filename,ifile);
-				if(traceOn)System.out.println("Source file: "+filename);// print each unique one we find
+			if ((filename != null) && (!fileMap.containsKey(filename))) {
+				// IResource res = getResource(f1);
+				IFile ifile = item.getIFile();// works for a remote file :)
+				if (traceOn)
+					System.out.println("MM: found: " + ifile.getLocationURI());
+				fileMap.put(filename, ifile);
+				if (traceOn)
+					System.out.println("Source file: " + filename);// print each
+																	// unique
+																	// one we
+																	// find
 			}
-		} 
-		if(traceOn)System.out.println("MarkerMgr.createMarkers()...after file gathering, found # files: "+fileMap.size());
-		
-		 
+		}
+		if (traceOn)
+			System.out.println("MarkerMgr.createMarkers()...after file gathering, found # files: " + fileMap.size());
+
 		// remove "our" markers on all source files referenced in this file
 		IResource res = null;
 		for (Iterator<String> iterator = fileMap.keySet().iterator(); iterator.hasNext();) {
-			String filename = (String) iterator.next();
-			//res=getResource(filename);
-			res=fileMap.get(filename);
+			String filename = iterator.next();
+			// res=getResource(filename);
+			res = fileMap.get(filename);
 			try {
 				removeMarkers(res, markerID);
 			} catch (Exception e) {
 				System.out.println("Error deleting markers on file: " + res); //$NON-NLS-1$
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 
 		// BATCH all the resource changes from the marker creation in a runnable
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
- 		IWorkspaceRunnable operation = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException{
+		IWorkspaceRunnable operation = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
 				loopItemsCreateMarkers(itemlist, markerID);
 			}
 		};
-		// if this takes a non-trivial amt of time we can put up a real progress monitor
-		IProgressMonitor monitor=null;
+		// if this takes a non-trivial amt of time we can put up a real progress
+		// monitor
+		IProgressMonitor monitor = null;
 		try {
 			workspace.run(operation, monitor);
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
-		if(traceOn)System.out.println("Total elapsed time in createMarkers: "+(System.currentTimeMillis()-firstStart));
+		}
+		if (traceOn)
+			System.out.println("Total elapsed time in createMarkers: " + (System.currentTimeMillis() - firstStart));
 	}// end createMarkers
 
 	/**
-	 * Loop thru the IFeedbackItems and create the markers.
-	 * This can be batched within a runnable to avoid sending resource change events
-	 * until all the markers are created.
+	 * Loop thru the IFeedbackItems and create the markers. This can be batched
+	 * within a runnable to avoid sending resource change events until all the
+	 * markers are created.
 	 * 
 	 * @param itemlist
 	 * @param markerID
 	 */
 	private void loopItemsCreateMarkers(List<IFeedbackItem> itemlist, String markerID) {
-		final boolean dbgTags=false;
+		final boolean dbgTags = false;
 		String parentID;
 		Map<String, Object> attrs;
 		for (Iterator<IFeedbackItem> iterator = itemlist.iterator(); iterator.hasNext();) {
@@ -369,9 +389,10 @@ public class MarkerManager {
 			String itemID = item.getID();
 			parentID = item.getParentID();
 			String pathname = ""; // we assume it's fully qualified filename now //$NON-NLS-1$
-			IResource resource=fileMap.get(filename);
-			if (filename!=null && filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
-				// note: we could do this ONCE instead. probably re-creating it here.
+			IResource resource = fileMap.get(filename);
+			if (filename != null && filename.contains(Path.SEPARATOR + "")) { //$NON-NLS-1$
+				// note: we could do this ONCE instead. probably re-creating it
+				// here.
 				IPath path = new Path(filename);
 				pathname = path.removeLastSegments(1).toString();
 				filename = path.segment(path.segmentCount() - 1);
@@ -387,7 +408,7 @@ public class MarkerManager {
 			if (item.hasChildren()) {
 				List<IFeedbackItem> kids = item.getChildren();
 				for (Iterator<IFeedbackItem> iterator2 = kids.iterator(); iterator2.hasNext();) {
-					IFeedbackItem kid = (IFeedbackItem) iterator2.next();
+					IFeedbackItem kid = iterator2.next();
 					String parentid = item.getID();
 					String namePrefix = "";//"Bottleneck: ";   //$NON-NLS-1$
 					String kname = kid.getName();
@@ -401,7 +422,8 @@ public class MarkerManager {
 					attrs = createCommonMarkers(kid, uidStr, kname, parentid, filename, pathname, lineNo, kid.getDescription());
 					createMarker(resource, attrs, markerID);
 					boolean gkids = kid.hasChildren();
-					// fixme make this recursive so level of hierarchy doesn't  matter
+					// fixme make this recursive so level of hierarchy doesn't
+					// matter
 					if (gkids) {
 						if (dbgTags)
 							System.out.println("grandkids"); //$NON-NLS-1$
@@ -410,18 +432,18 @@ public class MarkerManager {
 							IFeedbackItem gki = (IFeedbackItem) gkid;
 							String gkNamePrefix = Messages.MarkerManager_solution; // HACK
 							attrs = createCommonMarkers(gki, gki.getID(), gkNamePrefix + gki.getName(), uidStr, filename,
-									pathname, lineNo,  gki.getDescription());
+									pathname, lineNo, gki.getDescription());
 							createMarker(resource, attrs, markerID);
 						}
 					}
-				}			
+				}
 			}
 		}
-	}//end loopItemsCreateMarkers
+	}// end loopItemsCreateMarkers
 
 	/**
-	 * Put up a dialog informing the user that no items were found to be shown 
-	 * in the feedback view.  Preference value can prevent this from being shown.
+	 * Put up a dialog informing the user that no items were found to be shown
+	 * in the feedback view. Preference value can prevent this from being shown.
 	 */
 	private void showNoItemsFound() {
 		IPreferenceStore pf = Activator.getDefault().getPreferenceStore();
@@ -436,14 +458,10 @@ public class MarkerManager {
 		}
 	}
 	/*
-	long start;
-	void time(String label){
-		long time=System.currentTimeMillis();
-		System.out.println(label+"  elapsed: "+(time-start));
-		start=System.currentTimeMillis();
-	}
-	void timeStart(){
-		start=System.currentTimeMillis();
-	}
-	*/
+	 * long start; void time(String label){ long
+	 * time=System.currentTimeMillis();
+	 * System.out.println(label+"  elapsed: "+(time-start));
+	 * start=System.currentTimeMillis(); } void timeStart(){
+	 * start=System.currentTimeMillis(); }
+	 */
 }
