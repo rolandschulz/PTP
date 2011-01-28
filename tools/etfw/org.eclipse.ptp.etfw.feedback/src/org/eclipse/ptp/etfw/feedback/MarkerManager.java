@@ -71,8 +71,8 @@ public class MarkerManager {
 		try {
 			res.deleteMarkers(markerID, true, IResource.DEPTH_INFINITE);
 		} catch (CoreException e) {
-			System.out.println("Error deleting markers on " + res.getName()); //$NON-NLS-1$
-			e.printStackTrace();
+			System.out.println("Error deleting markers on " + res.getName()+" - probably can ignore this."); //$NON-NLS-1$
+			//e.printStackTrace();
 		}
 	}
 
@@ -226,7 +226,7 @@ public class MarkerManager {
 	       IWorkspaceRoot root = workspace.getRoot();
 	       IProject proj=root.getProject(projName);
 	       IResource res = proj.findMember(filename);
-	       boolean exists=res.exists();
+	       //boolean exists=res.exists();
 	       
 	       //IFile file=root.getFile(new Path(filename)); // works when filename contains project name
 	       return res;
@@ -304,6 +304,7 @@ public class MarkerManager {
 
 			String filename = item.getFile();
 
+			// Populate fileMap
 			if( (filename!=null) && (!fileMap.containsKey(filename))  ) {
 				//IResource res = getResource(f1);
 				IFile ifile=item.getIFile();// works for a remote file :)
