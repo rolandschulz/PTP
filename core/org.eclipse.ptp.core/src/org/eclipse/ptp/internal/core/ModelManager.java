@@ -75,7 +75,7 @@ public class ModelManager implements IModelManager {
 			try {
 				try {
 					monitor.beginTask(Messages.ModelManager_1, 100);
-					resourceManager.startUp(new SubProgressMonitor(monitor, 100));
+					resourceManager.start(new SubProgressMonitor(monitor, 100));
 				} catch (CoreException e) {
 					return e.getStatus();
 				}
@@ -351,7 +351,7 @@ public class ModelManager implements IModelManager {
 			resourceManagers = universe.getResourceManagers();
 		}
 		for (int i = 0; i < resourceManagers.length; ++i) {
-			resourceManagers[i].shutdown();
+			resourceManagers[i].stop();
 		}
 	}
 

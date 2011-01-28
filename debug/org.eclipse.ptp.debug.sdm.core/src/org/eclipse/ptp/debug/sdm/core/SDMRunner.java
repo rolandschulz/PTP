@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl;
+import org.eclipse.ptp.core.elementcontrols.IResourceManagerControl.JobControlOperation;
 import org.eclipse.ptp.core.elements.IPJob;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.sdm.core.messages.Messages;
@@ -195,7 +196,7 @@ public class SDMRunner extends Job {
 			}
 			try {
 				DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_21, ipJob.getID());
-				rmControl.terminateJob(ipJob);
+				rmControl.control(ipJob, JobControlOperation.TERMINATE, null);
 			} catch (CoreException e1) {
 				PTPDebugCorePlugin.log(e1);
 			}

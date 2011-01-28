@@ -57,6 +57,8 @@ public class Messages extends NLS {
 	public static String AbstractRuntimeResourceManager_8;
 	public static String AbstractRuntimeResourceManager_9;
 	public static String AbstractRuntimeResourceManager_cancelled;
+
+	public static String AbstractRuntimeResourceManager_operationNotSupported;
 	public static String BigIntegerAttribute_0;
 	public static String BigIntegerAttribute_1;
 	public static String BigIntegerAttribute_2;
