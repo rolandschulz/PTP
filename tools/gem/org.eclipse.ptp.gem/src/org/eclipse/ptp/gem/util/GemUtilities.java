@@ -564,12 +564,24 @@ public class GemUtilities {
 	}
 
 	/*
-	 * Returns whether or not the version of ISP that is installed is the same
-	 * as the version currently required by GEM. When version changes, update
-	 * the corresponding entry in messages package!
+	 * Returns whether or not the correct version of ISP is installed on the
+	 * host machine (to support GEM operations). When version changes, be sure
+	 * to update the corresponding entry in messages package!
 	 */
 	private static boolean hasCorrectIspVersion() {
-		return getIspVersion().equals("0.2.0"); //$NON-NLS-1$
+		final String ispVersion = getIspVersion();
+		final StringTokenizer st = new StringTokenizer(ispVersion, ".", false); //$NON-NLS-1$
+		st.nextToken();
+		final int majorVersionNum = Integer.parseInt(st.nextToken());
+		final int minorVersionNum = Integer.parseInt(st.nextToken());
+
+		// if we have version 2, we need at least 2.5
+		if (majorVersionNum == 2) {
+			return minorVersionNum >= 5;
+		}
+
+		// otherwise we have a compatible version
+		return true;
 	}
 
 	/**

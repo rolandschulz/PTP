@@ -657,7 +657,7 @@ public class Transitions {
 				}
 
 				// If this line indicates TYPE MISMATCH, process all of them
-				if (line.equalsIgnoreCase("[TYPE MISMATCHES]")) { //$NON-NLS-1$
+				if (line.equalsIgnoreCase("[TYPEMISMATCH]")) { //$NON-NLS-1$
 					this.typeMismatches = new HashMap<Integer, String>();
 					line = scanner.nextLine();
 
