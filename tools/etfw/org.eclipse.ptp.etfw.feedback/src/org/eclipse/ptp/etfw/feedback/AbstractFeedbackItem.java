@@ -27,11 +27,27 @@ public abstract class AbstractFeedbackItem implements IFeedbackItem {
 	 * @see org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem#getIFile()
 	 */
 	public IFile getIFile() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IFile file = null;
 		String filename = getFile(); // assumes this contains project name
 		Path path = new Path(filename);
-		IFile file = root.getFile(path); // works when filename contains project name
+
+		// if filename is fully qualified
+		if (path.isAbsolute()) {
+			file = root.getFileForLocation(path);
+			// if filename starts with '/' but isn't fully absolute
+			// e.g. "/proj/filename.ext"... try one more
+			if (file == null) {
+				file = root.getFile(path);
+			}
+		} else {
+			// works when filename contains project name e.g. "proj/fn.ext"
+			file = root.getFile(path);
+		}
+
+		if ((file == null) || (!file.exists())) {
+			System.out.println("Warning: AbstractFeedbackItem, file " + filename + " does not exist as " + file);
+		}
 		return file;
 	}
 
